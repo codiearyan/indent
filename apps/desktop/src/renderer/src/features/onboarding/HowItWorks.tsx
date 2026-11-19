@@ -3,6 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useReducedMotion } from '@/lib/useReducedMotion'
 import { cn } from '@/lib/utils'
 import { StepLayout } from './StepLayout'
+import { CodeScene } from './scenes/CodeScene'
+import { RepoScene } from './scenes/RepoScene'
 
 type Point = 'repo' | 'code' | 'check' | 'more'
 
@@ -12,13 +14,13 @@ const POINTS: { id: Point; title: string; text: string; scene: () => React.JSX.E
       id: 'repo',
       title: 'A repo is a story',
       text: 'A small company with a problem. Its issues are the work, one at a time.',
-      scene: () => null
+      scene: RepoScene
     },
     {
       id: 'code',
       title: 'Write code and run it',
       text: 'A real editor and a real terminal, right beside the lesson.',
-      scene: () => null
+      scene: CodeScene
     },
     {
       id: 'check',
