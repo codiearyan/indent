@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import { MessageCircle, SendHorizontal, Sparkles, Square, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Markdown } from '@/features/workspace/Markdown'
 import { useSettings } from '@/stores/settings'
 import { activeProvider, useAi } from './aiStore'
 import { MESSAGE_BUDGET, useChat } from './chatStore'
@@ -75,8 +74,8 @@ export function ChatPanel(): React.JSX.Element {
                   {message.content}
                 </div>
               ) : (
-                <div key={i} className="prose-lab prose-compact text-sm">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+                <div key={i} className="text-sm">
+                  <Markdown compact>{message.content}</Markdown>
                   {busy && i === messages.length - 1 && (
                     <span
                       aria-label="Writing"

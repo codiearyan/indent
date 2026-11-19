@@ -53,8 +53,10 @@ export function register(): void {
   handle('progress', {
     get: getState,
     touch: (labId, chapterId) => update((s) => rules.touch(s, labId, chapterId, new Date())),
-    setMode: (labId, chapterId, mode) =>
-      update((s) => rules.setMode(s, labId, chapterId, mode, new Date())),
+    setMode: (labId, chapterId, mode) => {
+      if (mode !== 'hard' && mode !== 'easy') throw new Error(`Unknown mode: ${mode}`)
+      return update((s) => rules.setMode(s, labId, chapterId, mode, new Date()))
+    },
     openSolution: async (labId, chapterId, taskId) => {
       const chapter = await loadChapter(labId, chapterId)
       const task = chapter.tasks.find((t) => t.id === taskId)

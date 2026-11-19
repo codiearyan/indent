@@ -23,11 +23,16 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: true
     }
   })
 
   mainWindow.on('ready-to-show', () => mainWindow.show())
+
+  // The page has the full IPC API, so the window must never load anything but the app itself.
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (url !== mainWindow.webContents.getURL()) event.preventDefault()
+  })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     if (/^https?:/.test(details.url)) shell.openExternal(details.url)
