@@ -1,0 +1,71 @@
+{
+  "id": "same-reminder",
+  "title": "Every text went to the same customer",
+  "files": [
+    "src/reminders.js",
+    "src/reproduce.js",
+    "src/reminders.test.js",
+    "src/bookings.js",
+    "src/demo.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the demo schedules Saturday's reminders with real timers and prints each text.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Catch the texts all going to one person",
+      "file": "src/reproduce.js",
+      "description": "Before you change anything, capture the bug without waiting on real timers. In `src/reproduce.js`, implement `reproduceSameReminder()`.\n\nCall the original `scheduleReminders(saturday, send, setTimer)` with:\n\n- a `send(to, text)` that pushes `{ to, text }` into an array\n- a fake `setTimer(callback, ms)` that only saves `callback`\n\nAfter `scheduleReminders` returns, call every saved callback, then return the array of `{ to, text }`. The check runs your function against the original `reminders.js`.",
+      "nextSteps": [
+        "Run `node src/demo.js` and read who each text goes to.",
+        "Write a `send` and a fake `setTimer` that push into two arrays.",
+        "Pass both to `scheduleReminders`, then call every saved callback.",
+        "Return the texts and run the demo again."
+      ],
+      "hints": [
+        "A fake timer is just a function with the same arguments as `setTimeout` that stores the callback instead of scheduling it.",
+        "Running the saved callbacks after the loop is exactly what real timers do: they fire when the loop is long gone.",
+        "You should get three entries, and all three go to Priya at +44 7700 900303."
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "One customer, one text",
+      "file": "src/reminders.js",
+      "description": "Fix `scheduleReminders(bookings, send, setTimer = setTimeout)` in `src/reminders.js`.\n\n- For each booking, call `setTimer(callback, booking.remindInMs)` once.\n- When that callback runs, it calls `send(booking.phone, text)` with that booking's text: `Hi ${name}, your ${boat} is ready at ${time}.`\n- Nothing is sent before its timer fires.\n- The caller may empty or reuse its `bookings` array right after scheduling, and the texts must still be right.\n- Return the number of reminders scheduled.\n\nThe check drives your function with a fake timer and with real timers.",
+      "nextSteps": [
+        "Find which variable every callback reads when it finally runs.",
+        "Give each pass of the loop its own binding for the booking.",
+        "Keep the callback a function that sends later, not a call that sends now.",
+        "Run `node src/demo.js` and check each text."
+      ],
+      "hints": [
+        "`var` belongs to the whole function, not to one pass of the loop. There is only one `booking` variable, and all three callbacks share it.",
+        "`let` and `const` inside a loop body make a fresh binding on every pass, so each callback can close over its own one.",
+        "Changing the loop counter to `let` is not enough while `booking` is still a `var`. Declare the booking itself with `const`, or loop with `for...of`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/reminders.test.js",
+      "description": "Write vitest tests in `src/reminders.test.js` with your own fake `setTimer` that saves each callback and delay. They should check that:\n\n- nothing is sent while the reminders are being scheduled\n- once you run the saved callbacks, each customer got a text about their own booking\n\nThe check runs your test file three times: beside the original `reminders.js` (it must fail), beside a correct fix (it must pass) and beside a fix that builds each text correctly but sends it right away instead of when the timer fires (it must fail).",
+      "nextSteps": [
+        "Write a helper that calls `scheduleReminders` with a fake `send` and `setTimer`.",
+        "Assert what was sent before you run any saved callback.",
+        "Run the callbacks and assert every `{ to, text }` exactly.",
+        "Run `npx vitest run src/reminders.test.js`."
+      ],
+      "hints": [
+        "Real timers make tests slow and flaky. A fake one gives you control over when the callbacks run.",
+        "The wrong fix passes `send(...)` to `setTimer`, so `send` runs immediately and `setTimer` gets `undefined`.",
+        "Check `sent` is empty right after scheduling, and only then run the callbacks and check the three texts."
+      ],
+      "points": 10
+    }
+  ]
+}

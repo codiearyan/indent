@@ -1,0 +1,13 @@
+{
+  "id": "js-bug-hunts",
+  "title": "JavaScript bug hunts",
+  "description": "You are the only developer at Cinderbay Paddle Co., a kayak and paddleboard rental on the harbour, and the bug reports have started to pile up. Work through five tickets, each a classic JavaScript interview bug: reproduce it, fix the cause, and write the test that would have caught it.",
+  "category": "Interview bug cases",
+  "language": "javascript",
+  "tags": ["JavaScript", "Interview"],
+  "kind": "lab",
+  "parts": [
+    { "title": "Values that lie quietly", "chapters": ["cent-off-totals", "reordered-departures"] },
+    { "title": "Timing and context", "chapters": ["same-reminder", "lost-this", "unawaited-saves"] }
+  ]
+}

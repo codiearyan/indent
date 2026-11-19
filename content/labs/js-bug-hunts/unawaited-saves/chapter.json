@@ -1,0 +1,71 @@
+{
+  "id": "unawaited-saves",
+  "title": "The sync that did not wait",
+  "files": [
+    "src/sync.js",
+    "src/reproduce.js",
+    "src/sync.test.js",
+    "src/store.js",
+    "src/demo.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the demo runs the evening sync against a healthy store and a failing one.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Catch the sync returning early",
+      "file": "src/reproduce.js",
+      "description": "Before you change anything, measure the bug. In `src/reproduce.js`, implement `async reproduceEarlyReturn()`.\n\nMake a store with `createFakeStore()` and `await` the original `syncBookings(evening, store)`. Return an object with:\n\n- `returned`: what `syncBookings` resolved with\n- `savedWhenReturned`: `store.saved().length` right after that `await`\n- `savedLater`: `store.saved().length` after you wait another 100 ms\n\nThe check runs your function against the original `sync.js`.",
+      "nextSteps": [
+        "Run `node src/demo.js` and compare the count with what the store holds.",
+        "Await `syncBookings` and read `store.saved()` straight away.",
+        "Wait 100 ms with a promise around `setTimeout`, then read it again.",
+        "Return all three numbers and run the demo again."
+      ],
+      "hints": [
+        "`await` waits for the promise `syncBookings` returns, and nothing else. What does that promise wait for?",
+        "`await new Promise((resolve) => setTimeout(resolve, 100))` pauses an async function for 100 ms.",
+        "With the original code you should see 3 returned, 0 saved when it returned and 3 saved later."
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Wait for every save",
+      "file": "src/sync.js",
+      "description": "Fix `syncBookings(bookings, store)` in `src/sync.js`.\n\n- It calls `store.save(booking)` for every booking.\n- It resolves with the number of bookings, only after every save has finished.\n- If a save fails, it rejects with that error, so `await syncBookings(...)` inside a `try...catch` catches it. No error may escape as an unhandled rejection.\n- An empty list resolves with `0`.\n\nSaving one after another or all at once are both fine. The check runs your function against fake stores, some with a failing save.",
+      "nextSteps": [
+        "Find what `forEach` does with the promises your callback returns.",
+        "Choose: a `for...of` loop with `await`, or `Promise.all` over the saves.",
+        "Make sure the function only returns after that waiting is done.",
+        "Run `node src/demo.js` and check both lines."
+      ],
+      "hints": [
+        "An async callback returns a promise. `forEach` calls it and throws that promise away, so nobody waits for it and nobody catches its error.",
+        "Putting `await` in front of `forEach` does nothing: `forEach` returns `undefined`, and awaiting `undefined` finishes at once.",
+        "Either await each save inside a `for...of` loop, or turn the bookings into an array of save promises with `map` and await `Promise.all` of it."
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/sync.test.js",
+      "description": "Write vitest tests in `src/sync.test.js` with stores from `createFakeStore`. They should check that:\n\n- as soon as `syncBookings` resolves, every booking is in `store.saved()`\n- when a save fails (use `failOn`), `syncBookings` rejects with an error that names the booking\n\nKeep them fast with a small `delayMs`. The check runs your test file three times: beside the original `sync.js` (it must fail), beside a correct fix (it must pass) and beside a fix that puts `await` in front of `forEach` (it must fail).",
+      "nextSteps": [
+        "Write a test that awaits `syncBookings` and then reads `store.saved()`.",
+        "Write a test with `failOn` that expects the promise to reject.",
+        "Run `npx vitest run src/sync.test.js` against your fixed code.",
+        "Ask yourself why the await forEach fix fails your first test."
+      ],
+      "hints": [
+        "Read the store immediately after the `await`. Waiting longer in a test would hide the bug.",
+        "`await expect(promise).rejects.toThrow('Could not save b102')` checks a rejection.",
+        "Sort `store.saved()` before comparing if your fix may save in parallel, so the test does not depend on finishing order."
+      ],
+      "points": 10
+    }
+  ]
+}

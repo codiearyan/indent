@@ -1,0 +1,71 @@
+{
+  "id": "cent-off-totals",
+  "title": "Receipts that are a cent off",
+  "files": [
+    "src/receipt.js",
+    "src/reproduce.js",
+    "src/receipt.test.js",
+    "src/orders.js",
+    "src/demo.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the demo prints receipts for three real orders.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Catch a receipt that does not add up",
+      "file": "src/reproduce.js",
+      "description": "Before you change anything, prove the bug. In `src/reproduce.js`, implement `reproduceCentDrift()`.\n\nPick an order and run it through the original `receipt()`. Return an object with:\n\n- `lines` and `discountPercent`: the order you used\n- `shown`: exactly what `receipt(lines, discountPercent)` returned\n- `correct`: the receipt you worked out by hand for the same order, in the same `{ subtotal, discount, total }` shape with two decimal strings\n\nThe check runs your function against the original `receipt.js`. It passes when `shown` is real, `correct` is right, and the two differ.",
+      "nextSteps": [
+        "Run `node src/demo.js` and do the subtraction on the first receipt yourself.",
+        "Use `ticketOrder` from `orders.js` and call `receipt()` with it.",
+        "Work out the right receipt in whole cents on paper and write it as `correct`.",
+        "Run the demo again and compare `shown` with `correct`."
+      ],
+      "hints": [
+        "Check the ticket receipt: does subtotal minus discount equal the total it prints?",
+        "Ten percent of 42.65 is 4.265, exactly half a cent. The team rule says half a cent rounds up.",
+        "The right ticket receipt has a discount of 4.27, and the total is subtotal minus that rounded discount."
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Make every receipt add up",
+      "file": "src/receipt.js",
+      "description": "Fix `receipt(lines, discountPercent)` in `src/receipt.js` so every receipt is right to the cent.\n\n- `subtotal` is the sum of `price * qty` for every line. Prices have at most two decimals.\n- `discount` is `discountPercent` of the subtotal, rounded to the nearest cent. Half a cent rounds up.\n- `total` is exactly `subtotal - discount`.\n- All three are strings with two decimals, like `'38.38'`. An empty order gives `'0.00'` everywhere.\n\nThe check compares your receipts with the right ones for a few hundred orders, including half cent discounts and a 100% discount.",
+      "nextSteps": [
+        "Turn each price into a whole number of cents before you multiply or add.",
+        "Work out the discount in cents and round it once.",
+        "Build the total from the rounded discount, then format all three.",
+        "Run `node src/demo.js` and check each receipt adds up."
+      ],
+      "hints": [
+        "The cause is not toFixed itself. It is that 18.15 and 4.265 cannot be stored exactly as binary fractions, so every step works on a value that is slightly off.",
+        "A price like 18.15 becomes a safe whole number with `Math.round(price * 100)`. Sums and products of whole numbers are exact.",
+        "Keep everything in cents until the very end, and only divide by 100 when you format. The total should be subtotal cents minus discount cents."
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/receipt.test.js",
+      "description": "Write vitest tests in `src/receipt.test.js` that guard this bug for good. Assert exact receipts with `toEqual`, for orders where the cents are tricky, such as the ticket order.\n\nThe check runs your test file three times: beside the original `receipt.js` (it must fail), beside a correct fix (it must pass) and beside a fix that keeps adding floats but rounds each value with `Math.round(value * 100) / 100` at the end (it must fail).",
+      "nextSteps": [
+        "Import `receipt` and the orders from `orders.js`.",
+        "Assert the full ticket receipt with `toEqual`.",
+        "Add an order where only the total is wrong, then run `npx vitest run src/receipt.test.js`.",
+        "Ask yourself which line of the receipt the rounding fix still gets wrong."
+      ],
+      "hints": [
+        "Compare whole objects, not just the total. A receipt can have the right total and the wrong discount.",
+        "`Math.round(4.265 * 100)` is not 427. Try it in `node -e` and see why rounding at the end does not save you.",
+        "The ticket order catches the rounding fix on the discount line. The group order catches the original on the total line."
+      ],
+      "points": 10
+    }
+  ]
+}

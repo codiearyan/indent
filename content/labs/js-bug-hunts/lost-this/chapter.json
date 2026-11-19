@@ -1,0 +1,71 @@
+{
+  "id": "lost-this",
+  "title": "The method that forgot its fleet",
+  "files": [
+    "src/fleet.js",
+    "src/reproduce.js",
+    "src/fleet.test.js",
+    "src/dock.js",
+    "src/demo.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the demo opens the dock: one scan out, the free boat list, one scan in.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Catch the methods losing their fleet",
+      "file": "src/reproduce.js",
+      "description": "Before you change anything, capture both crashes. In `src/reproduce.js`, implement `reproduceLostThis()`.\n\nWith the original `Fleet`, make a fleet of `['K1', 'K2', 'P1']`, then:\n\n- call `fleet.freeBoats()` and keep the `message` of the error it throws\n- make a scanner with `createScanner()`, wire it with `connectScanner(scanner, fleet)`, call `scanner.scan('out', 'K1')` and keep that error's `message`\n\nReturn `{ freeBoatsError, scannerError }`, both strings. The check runs your function against the original `fleet.js`.",
+      "nextSteps": [
+        "Run `node src/demo.js` and read the three errors.",
+        "Wrap each call in its own `try...catch`.",
+        "Keep `err.message` from each and return both.",
+        "Read the messages and ask which object was undefined."
+      ],
+      "hints": [
+        "Both calls throw a TypeError. Return the messages, not the error objects, so they survive being printed as JSON.",
+        "A small helper that runs a function and returns the message of whatever it throws keeps this short.",
+        "Both messages say that something is undefined while reading `out`. That something is `this`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Methods that remember their fleet",
+      "file": "src/fleet.js",
+      "description": "Fix `Fleet` in `src/fleet.js` so its methods work wherever they are called from.\n\n- `checkOut(id)`, `checkIn(id)` and `isFree(id)` keep working when taken off the fleet and called as plain functions, such as `boatIds.filter(fleet.isFree)`, `const { checkIn } = fleet` or a scanner handler.\n- Each method stays tied to the fleet it came from. Two fleets never share boats.\n- `freeBoats()` returns the ids of boats that are not out, in fleet order.\n- `checkOut` of a boat that is already out still throws an error that says `already out`.\n\nLeave `dock.js` unchanged: the check uses the original one.",
+      "nextSteps": [
+        "Find every place a Fleet method is handed to other code.",
+        "Pick one way to tie the methods to their fleet for good.",
+        "Make sure it is done per fleet, not once for the class.",
+        "Run `node src/demo.js` and check all three steps."
+      ],
+      "hints": [
+        "`this` is decided by how a function is called, not where it was written. `fleet.isFree(id)` sets it, `isFree(id)` does not.",
+        "Fixing the call inside `freeBoats` only fixes that one caller. The scanner in `dock.js` calls the methods as plain functions too.",
+        "Arrow functions take `this` from where they are created. A class field like `isFree = (id) => ...` creates one per fleet, tied to it. Binding each method in the constructor also works."
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/fleet.test.js",
+      "description": "Write vitest tests in `src/fleet.test.js` that use `Fleet` the way Cinderbay does:\n\n- `freeBoats()` after a boat is checked out\n- `checkOut` and `checkIn` through a scanner from `dock.js`, wired with `connectScanner`\n\nThe check runs your test file three times: beside the original `fleet.js` (it must fail), beside a correct fix (it must pass) and beside a fix that only repairs the call inside `freeBoats` (it must fail).",
+      "nextSteps": [
+        "Write a test that checks a boat out and asserts `freeBoats()`.",
+        "Write a test that wires a scanner and scans a boat out and in.",
+        "Assert the free boats after each scan.",
+        "Run `npx vitest run src/fleet.test.js`."
+      ],
+      "hints": [
+        "A test that only calls methods as `fleet.method()` will never see this bug. Use the methods the way other code does.",
+        "Import `createScanner` and `connectScanner` from `dock.js`. The real wiring is the best test of it.",
+        "The freeBoats only fix passes your first test. Only the scanner test fails beside it, because `checkOut` still loses `this`."
+      ],
+      "points": 10
+    }
+  ]
+}
