@@ -1,0 +1,63 @@
+{
+  "id": "structured-output",
+  "title": "Structured output",
+  "files": ["src/orders.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "parse",
+      "title": "Find and parse the JSON in a reply",
+      "file": "src/orders.ts",
+      "description": "Implement `parseJsonReply(text: string): unknown`.\n\n- If the reply contains a code fence (three backticks, optionally followed by `json`), parse what is inside the first fence.\n- Otherwise parse the text from the first `{` to the last `}`.\n- If there is nothing to parse, or `JSON.parse` fails, throw an `Error` whose message contains `not valid JSON`.\n\nThe check passes a bare object, an object in a fence with prose around it, an object in the middle of a sentence, broken JSON with a trailing comma, and a reply with no JSON at all.",
+      "nextSteps": [
+        "Run `node src/demo.ts` and read the first raw reply for each email.",
+        "Handle the fenced case first, then the first `{` to last `}` case.",
+        "Wrap `JSON.parse` so every failure becomes your own error message."
+      ],
+      "hints": [
+        "Models like to be helpful, so the JSON is often wrapped in a sentence or a fence. Your job is to cut it out before parsing.",
+        "A regular expression with a lazy group between two fences finds the inside of the first one. `indexOf` and `lastIndexOf` find the braces.",
+        "If you cannot find any JSON, parse an empty string anyway: it fails, and your catch turns it into the right message."
+      ],
+      "points": 10
+    },
+    {
+      "id": "validate",
+      "title": "Validate the order by hand",
+      "file": "src/orders.ts",
+      "description": "Implement `validateOrder(value: unknown): string[]`. Return one problem per wrong field, and an empty array for a valid order. Each problem is a short sentence that contains the field name exactly as written here:\n\n- `plant`: a non-empty string\n- `quantity`: a number that is a whole number of at least 1\n- `potSize`: one of `\"small\"`, `\"medium\"`, `\"large\"`\n- `giftWrap`: a boolean\n\nA missing field is a wrong field. Extra fields are allowed. If `value` is not a plain object (`null`, an array, a string), return at least one problem instead of throwing.\n\nThe check passes a valid order, an order with an extra field, one value per kind of mistake, an order with two mistakes, and values that are not objects.",
+      "nextSteps": [
+        "Return early with a problem when value is not a plain object.",
+        "Treat value as a record of unknown fields and check each field in turn.",
+        "Write each problem so a model reading it would know what to fix."
+      ],
+      "hints": [
+        "`typeof null` is 'object', and so is an array. Rule both out explicitly.",
+        "`Number.isInteger` is false for strings, fractions and NaN, which covers most quantity mistakes at once.",
+        "These sentences are about to be sent back to the model in a repair message, so name the field and the rule, like \"quantity must be a whole number\"."
+      ],
+      "points": 10
+    },
+    {
+      "id": "extract",
+      "title": "Extract an order with one repair",
+      "file": "src/orders.ts",
+      "description": "Implement `extractOrder(email: string, client?: OpenAI): Promise<Order>`.\n\n1. Send `[system: ORDER_PROMPT, user: email]` to `MODEL` through `client`.\n2. Parse the reply with `parseJsonReply` and check it with `validateOrder`. A parse error counts as a problem: use its message.\n3. If there are no problems, return the order.\n4. Otherwise make exactly one repair request: the same messages, plus the bad reply as an `assistant` message, plus a `user` message that lists every problem.\n5. Parse and validate again. Return the order, or throw an `Error` whose message contains `invalid order`.\n\nThe lab model gets some emails wrong on the first try and fixes a mistake only when the repair message names it. The check counts your requests: 1 for a clean email, 2 for a repaired one, and 2 before giving up.",
+      "nextSteps": [
+        "Write a small helper that turns a reply into either an order or a list of problems.",
+        "Make the first request and return straight away when it is valid.",
+        "Build the repair messages from the problems and send them once.",
+        "Run `node src/demo.ts` and compare the first raw replies with the final orders."
+      ],
+      "hints": [
+        "The model cannot see your validator. The only way it learns what was wrong is the text of your repair message.",
+        "Keep the messages in an array you can push to, so the repair request carries the whole conversation.",
+        "Two attempts, not a loop: first try, one repair, then either return or throw with \"invalid order\" in the message."
+      ],
+      "points": 10
+    }
+  ]
+}

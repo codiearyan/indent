@@ -1,0 +1,65 @@
+{
+  "id": "token-budget",
+  "title": "A conversation with a token budget",
+  "files": ["src/conversation.ts", "src/tokens.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "history",
+      "title": "Keep the conversation's history",
+      "file": "src/conversation.ts",
+      "description": "Implement `Conversation.send(text: string): Promise<string>` so Moss remembers the conversation.\n\n- Add `{ role: 'user', content: text }` to `this.history`.\n- Send the whole history to `MODEL` through `this.client`.\n- Add the reply as `{ role: 'assistant', content: reply }` and return the reply text.\n\nThe check holds a three-question conversation with the lab model. The model tells you how many of your messages it can see, so on the third question it should see three. History should then hold 7 messages: the system message and three question and reply pairs.",
+      "nextSteps": [
+        "Push the user message onto this.history.",
+        "Send this.history with `this.client.chat.completions.create`.",
+        "Push the reply, then return it.",
+        "Run `node src/demo.ts` and watch what happens after a few turns."
+      ],
+      "hints": [
+        "A model has no memory between requests. Everything it knows about the conversation is in the messages you send.",
+        "The constructor already put the system message in this.history. You only add to it.",
+        "The reply is at `res.choices[0].message.content`, which can be null, so fall back to ''."
+      ],
+      "points": 10
+    },
+    {
+      "id": "fit",
+      "title": "Fit the messages into a budget",
+      "file": "src/conversation.ts",
+      "description": "Implement `fitToBudget(messages: ChatMessage[], budget: number): ChatMessage[]`. `messages[0]` is always the system message. Count tokens with `countMessageTokens` from `src/tokens.ts`.\n\n- If the messages fit the budget, return all of them.\n- Otherwise drop the oldest message after the system message, one at a time, until the total fits.\n- If the first message after the system message is then an `assistant` reply, drop it too.\n- Always keep the system message and the last message. If those two alone are over budget, throw an `Error` whose message contains `budget`.\n- Return a new array. Do not change the array you were given.\n\nThe check uses a history of 8 messages and several budgets, from one that fits everything to one that cannot be met.",
+      "nextSteps": [
+        "Split the system message from the rest.",
+        "Throw first if the system message and the last message are already too big.",
+        "Drop from the front of the rest until the total fits.",
+        "Drop a leading assistant message, then return the system message and what is left."
+      ],
+      "hints": [
+        "Copy before you trim: destructuring with `const [system, ...rest] = messages` already gives you a new array for the rest.",
+        "Checking the impossible case first means your trimming loop can never remove the last message.",
+        "`rest.shift()` drops the oldest message. A while loop around `countMessageTokens([system, ...rest]) > budget` does the trimming."
+      ],
+      "points": 10
+    },
+    {
+      "id": "budget",
+      "title": "Stay under the budget on every turn",
+      "file": "src/conversation.ts",
+      "description": "Change `Conversation.send` so a long conversation never goes over `this.budget`.\n\n- Build the messages for this turn: the history plus the new user message.\n- Trim them with `fitToBudget(messages, this.budget)` and send the trimmed messages.\n- Make the trimmed messages plus the reply the new `this.history`.\n\nThe lab model refuses any request over 400 tokens, and the default budget is 300. The check holds a 30-question conversation and a 12-question one created with a budget of 150. It measures every request, checks that each one starts with the system prompt, and checks that each request is the previous history plus the new question, trimmed with `fitToBudget`.",
+      "nextSteps": [
+        "Run `node src/demo.ts` and find the turn where it fails.",
+        "Trim the messages before the request instead of sending the whole history.",
+        "Store the trimmed messages and the reply as the history.",
+        "Run the demo again and watch the token count stay level."
+      ],
+      "hints": [
+        "Read the error from the failed turn: the model says how many tokens it got and how many it allows.",
+        "Trim the messages you are about to send, not the history after the reply, so the request itself is always within budget.",
+        "`const messages = fitToBudget([...this.history, userMessage], this.budget)` and later `this.history = [...messages, replyMessage]`."
+      ],
+      "points": 10
+    }
+  ]
+}

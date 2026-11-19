@@ -1,0 +1,64 @@
+{
+  "id": "first-call",
+  "title": "Your first model call",
+  "files": ["src/ask.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "messages",
+      "title": "Build the messages for one question",
+      "file": "src/ask.ts",
+      "description": "In `src/ask.ts`, implement `buildMessages(question: string): Message[]`.\n\nReturn exactly two messages, in this order:\n\n1. `{ role: 'system', content: SYSTEM_PROMPT }`\n2. `{ role: 'user', content: question }` with the question unchanged\n\nThe check calls `buildMessages` with a customer question and compares the array it returns.",
+      "nextSteps": [
+        "Read the lesson section on messages and roles.",
+        "Return an array literal with the two message objects.",
+        "Run `node src/demo.ts` and look at what buildMessages prints."
+      ],
+      "hints": [
+        "A message is a plain object with a `role` and a `content`.",
+        "The order matters: instructions for the model first, then what the customer asked.",
+        "Use the `SYSTEM_PROMPT` constant for the first message and the `question` argument for the second."
+      ],
+      "points": 10
+    },
+    {
+      "id": "ask",
+      "title": "Send the question and read the reply",
+      "file": "src/ask.ts",
+      "description": "Implement `ask(question: string, client?: OpenAI): Promise<string>`.\n\n- Send one chat completion request through `client` with `model: MODEL` and `messages: buildMessages(question)`.\n- Return the text of the first choice's message. If the content is `null`, return an empty string.\n\nThe check asks two questions through the lab model and compares the text. It also calls `ask` with a fake client to make sure your request goes through the client you are given and names `MODEL`. The lab model starts its answer with \"Moss here.\" only when it sees the system message.",
+      "nextSteps": [
+        "Call `client.chat.completions.create` with the model and the messages.",
+        "Await the response and print it once to see its shape.",
+        "Return the content of the first choice's message.",
+        "Run `node src/demo.ts` and read the answer."
+      ],
+      "hints": [
+        "Keep using the `client` parameter. Do not create a second client inside the function.",
+        "The response has a `choices` array. Each choice has a `message`.",
+        "The text is at `res.choices[0].message.content`, which TypeScript says can be null, so fall back to ''."
+      ],
+      "points": 10
+    },
+    {
+      "id": "details",
+      "title": "Read the finish reason and usage",
+      "file": "src/ask.ts",
+      "description": "Implement `askWithDetails(question: string, maxTokens: number, client?: OpenAI): Promise<ReplyDetails>`.\n\nSend the same request as `ask`, with `max_tokens` set to `maxTokens`. Return:\n\n- `text`: the reply content (or `''`)\n- `finishReason`: the `finish_reason` of the first choice\n- `promptTokens`, `completionTokens`, `totalTokens`: copied from the response's `usage`\n\nThe check calls it once with 200 tokens, where the reply fits and ends with `stop`, and once with 6 tokens, where the model is cut off and ends with `length`.",
+      "nextSteps": [
+        "Copy the request from `ask` and add `max_tokens`.",
+        "Keep the first choice in a variable so you can read two fields from it.",
+        "Read the three counts from `res.usage`.",
+        "Run `node src/demo.ts` and compare the 200 token and 8 token results."
+      ],
+      "hints": [
+        "Everything you need is in one response object: the choice and the usage sit side by side.",
+        "`usage` uses snake_case names like `prompt_tokens`, while `ReplyDetails` uses camelCase.",
+        "TypeScript marks `usage` as optional, so read it with `res.usage?.` and a fallback of 0."
+      ],
+      "points": 10
+    }
+  ]
+}
