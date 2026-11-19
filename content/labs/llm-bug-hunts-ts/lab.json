@@ -1,0 +1,13 @@
+{
+  "id": "llm-bug-hunts-ts",
+  "title": "LLM bug hunts",
+  "description": "You just joined Kestrel Parcels, a same-day courier whose support assistant runs on a language model. Work through three tickets, each a classic AI engineering interview bug: reproduce it, fix the cause, and write the test that would have caught it.",
+  "category": "AI engineering",
+  "language": "typescript",
+  "tags": ["TypeScript", "Interview"],
+  "kind": "lab",
+  "parts": [
+    { "title": "Reading what the model sends back", "chapters": ["cut-off-replies", "untrusted-json"] },
+    { "title": "Conversations that last", "chapters": ["runaway-history"] }
+  ]
+}

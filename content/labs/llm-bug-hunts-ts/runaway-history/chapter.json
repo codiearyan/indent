@@ -1,0 +1,70 @@
+{
+  "id": "runaway-history",
+  "title": "The conversation that ate itself",
+  "files": [
+    "src/chat.ts",
+    "src/reproduce.ts",
+    "src/chat.test.ts",
+    "src/questions.ts",
+    "src/demo.ts"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Make a long conversation fall over",
+      "file": "src/reproduce.ts",
+      "description": "In `src/reproduce.ts`, implement `reproduceOverflow()`.\n\nStart one `ChatSession` and send it the questions from `src/questions.ts`, one at a time, until `send` throws. Return:\n\n- `turns`: which send failed, counting from 1\n- `error`: the message of the error it threw\n\nThe check runs your function against the original `chat.ts`.",
+      "nextSteps": [
+        "Run `node src/demo.ts` and watch the number of messages kept grow.",
+        "Loop over `questions` and await `send` for each one.",
+        "Catch the first error and return its turn number and message."
+      ],
+      "hints": [
+        "The demo already shows the failure. Your job is to capture it as data.",
+        "Use `questions.entries()` or a counter so you know which send you are on when it throws.",
+        "Put the `try`/`catch` inside the loop and `return { turns: i + 1, error: (err as Error).message }` from the catch."
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Keep the conversation inside the window",
+      "file": "src/chat.ts",
+      "description": "Fix `ChatSession` in `src/chat.ts` so a conversation can go on as long as the customer likes.\n\nTeam policy:\n\n- The system prompt always stays as `history[0]`.\n- After it, keep at most `MAX_RECENT_MESSAGES` messages: the most recent ones.\n- The request sent to the model follows the same rule.\n- Short conversations are not trimmed at all.\n\nKeep the class name, the `history` property and the `send` signature.",
+      "nextSteps": [
+        "Count how many messages `send` passes to the model on each turn.",
+        "Decide where in `send` the history should be trimmed.",
+        "Keep the system prompt separate from the messages you trim.",
+        "Run `node src/demo.ts` and check the count stays flat."
+      ],
+      "hints": [
+        "The model refuses once the whole history no longer fits its context window. Nothing ever removes old messages.",
+        "Split the history into the first message and the rest. Only the rest gets cut down.",
+        "`rest.slice(-MAX_RECENT_MESSAGES)` keeps the newest messages. Rebuild the history from the system prompt plus that, before the request and after the reply."
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/chat.test.ts",
+      "description": "Write vitest tests in `src/chat.test.ts` that check:\n\n- a session can answer all 30 questions in `questions.ts` without an error\n- after a long conversation Kes still follows the system prompt: replies start with `Kes here.` and `history[0]` is still the system prompt\n\nThe check runs your test file beside the original `chat.ts` (it must fail), beside a correct fix (it must pass) and beside a fix that simply drops the oldest messages (it must fail).",
+      "nextSteps": [
+        "Import `ChatSession`, `SYSTEM_PROMPT` and `questions`.",
+        "Write a test that sends every question.",
+        "Write a test that inspects the last reply and `history[0]` afterwards.",
+        "Run `npx vitest run src/chat.test.ts` against your fixed code."
+      ],
+      "hints": [
+        "Use a fresh `ChatSession` in each test so they do not depend on each other.",
+        "The lab model only introduces itself as Kes when the first message it receives is the system prompt.",
+        "Dropping the oldest messages also drops the system prompt. Assert on the last reply's opening words and on `history[0]`."
+      ],
+      "points": 10
+    }
+  ]
+}

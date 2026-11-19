@@ -1,0 +1,24 @@
+[
+  {
+    "id": "ai-engineering-interviews",
+    "title": "AI engineering interviews",
+    "tagline": "From solid JavaScript to debugging LLM features",
+    "description": "Build the JavaScript base, then practice the bugs interviewers ask about when a product runs on a language model, and finish with two classic coding challenges.",
+    "stages": [
+      { "title": "Foundations", "labs": ["js-foundations"] },
+      { "title": "Debugging LLM code", "labs": ["llm-bug-hunts-ts"] },
+      { "title": "Coding rounds", "labs": ["challenge-rate-limiter", "challenge-lru-cache"] }
+    ]
+  },
+  {
+    "id": "backend-interview-drills",
+    "title": "Backend interview drills",
+    "tagline": "The data structures and limits every backend needs",
+    "description": "Warm up on the language, then build the caches and rate limiters that come up in backend interviews again and again.",
+    "stages": [
+      { "title": "Warm up", "labs": ["js-foundations"] },
+      { "title": "Data structures", "labs": ["challenge-lru-cache"] },
+      { "title": "Protecting a service", "labs": ["challenge-rate-limiter"] }
+    ]
+  }
+]

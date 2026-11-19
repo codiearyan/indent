@@ -1,0 +1,71 @@
+{
+  "id": "cut-off-replies",
+  "title": "Summaries that stop mid-sentence",
+  "files": [
+    "src/summarize.ts",
+    "src/reproduce.ts",
+    "src/summarize.test.ts",
+    "src/complaints.ts",
+    "src/demo.ts"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Catch the model cutting a summary short",
+      "file": "src/reproduce.ts",
+      "description": "Before you change anything, prove what is happening. In `src/reproduce.ts`, implement `reproduceCutoff()`.\n\nIt should call the lab model directly with the same settings `summarizeComplaint` uses: `MODEL`, `MAX_TOKENS` and `buildMessages(longComplaint)`. Return an object with:\n\n- `text`: the message content of the reply, unchanged\n- `finishReason`: the `finish_reason` of that same reply\n\nThe check runs your function against the original `summarize.ts`.",
+      "nextSteps": [
+        "Run `node src/demo.ts` and read the summary it prints.",
+        "Create a client with `new OpenAI()` and call `chat.completions.create` with the same options.",
+        "Return the content and the finish reason of the first choice.",
+        "Run the demo again and compare the two outputs."
+      ],
+      "hints": [
+        "Every choice in a chat completion has more than a message. Print the whole first choice and look at its other fields.",
+        "You can import MODEL, MAX_TOKENS and buildMessages from summarize.ts, so your call matches the buggy one exactly.",
+        "The value you want is `res.choices[0].finish_reason`. For this complaint it should not say the model stopped on its own."
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Never hand back a cut-off summary",
+      "file": "src/summarize.ts",
+      "description": "Fix `summarizeComplaint` in `src/summarize.ts` so the support team never sees half a summary.\n\nTeam policy for this endpoint:\n\n- Check `finish_reason` on every reply.\n- If the reply was cut off, ask again with double the `max_tokens` budget. Start at `MAX_TOKENS`.\n- Make at most 3 requests in total.\n- If the third reply is still cut off, throw an `Error` whose message contains `truncated`.\n- Replies that finished normally are returned as they are.\n\nKeep the function signature, including the optional `client` parameter.",
+      "nextSteps": [
+        "Read the reply's `finish_reason` before returning the content.",
+        "Wrap the request in a loop that runs at most 3 times.",
+        "Double the budget after each cut-off reply.",
+        "Throw after the last attempt, then run `node src/demo.ts`."
+      ],
+      "hints": [
+        "The bug is not the size of MAX_TOKENS. It is that the code never asks whether the reply is complete.",
+        "Keep the budget in a variable outside the loop so each attempt can use a larger one.",
+        "Inside the loop, return early when `finish_reason` is not 'length'. After the loop ends, the only thing left to do is throw."
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/summarize.test.ts",
+      "description": "Write vitest tests in `src/summarize.test.ts` that guard this bug for good. They should check that:\n\n- a long complaint comes back as a complete summary, not one cut mid-sentence\n- a complaint whose summary never fits makes `summarizeComplaint` reject with an error mentioning `truncated`\n\nThe check runs your test file three times: beside the original `summarize.ts` (it must fail), beside a correct fix (it must pass) and beside a fix that only raises `max_tokens` (it must fail). The fixtures in `src/complaints.ts` are there to help.",
+      "nextSteps": [
+        "Import `summarizeComplaint` and the fixtures from `complaints.ts`.",
+        "Write one test for the long complaint and one for the endless complaint.",
+        "Run `npx vitest run src/summarize.test.ts` against your fixed code.",
+        "Ask yourself what a version that only raises the limit would still get wrong."
+      ],
+      "hints": [
+        "Look at a full summary from the lab model. What does its last character tell you?",
+        "For the error case, `await expect(promise).rejects.toThrow(...)` lets you assert on the message.",
+        "A larger limit fixes the long complaint but not the endless one. Your second test is the one that catches that fix."
+      ],
+      "points": 10
+    }
+  ]
+}
