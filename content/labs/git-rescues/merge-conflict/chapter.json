@@ -1,0 +1,63 @@
+{
+  "id": "merge-conflict",
+  "title": "Two changes to the same lines",
+  "files": ["setup.mjs", "NOTES.md"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the setup to build the repository, then work inside repo/ with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "timetable",
+      "title": "Keep both new sailings",
+      "file": "setup.mjs",
+      "description": "Run `node setup.mjs`, then work inside `repo/`.\n\nMerge `weekend-sailings` into `main`. Both branches added a sailing at the same spot in `timetable.txt`.\n\nThe check reads `timetable.txt` in the last commit on `main` and expects:\n\n- no conflict marker lines\n- both the 08:00 Seal Bay and the 08:30 Puffin Rock sailings\n- every sailing listed in time order\n- every other line as it was",
+      "nextSteps": [
+        "Run `node setup.mjs`, `cd repo`, then start the merge without an editor.",
+        "Open `repo/timetable.txt` and find the block between the conflict markers.",
+        "Keep both sailings in time order and delete the marker lines.",
+        "Stage the file once it looks right."
+      ],
+      "hints": [
+        "A conflict is a question, not a failure. Here both people were right.",
+        "The lines between `<<<<<<<` and `=======` are main's version; the lines between `=======` and `>>>>>>>` are Pavel's.",
+        "The file should end up with the 08:00 line followed by the 08:30 line, and no `<<<<<<<`, `=======` or `>>>>>>>` lines anywhere."
+      ],
+      "points": 10
+    },
+    {
+      "id": "fares",
+      "title": "Keep both changes to the adult fare",
+      "file": "setup.mjs",
+      "description": "In the same merge, `fares.txt` conflicts on the adult line: Ines raised the price to 7.00 on `main`, and Pavel labelled the line with the age range `(16+)` on `weekend-sailings`.\n\nThe check reads `fares.txt` in the last commit on `main` and expects:\n\n- no conflict marker lines\n- one adult line that has both Pavel's label and Ines's new price, written the way Pavel formats it\n- the child and bike lines unchanged",
+      "nextSteps": [
+        "Run `git diff` while the merge is in progress to see both versions of the adult line.",
+        "Write one adult line that keeps what each side wanted.",
+        "Remove the markers and stage the file."
+      ],
+      "hints": [
+        "Neither side is wrong. One changed the label, the other changed the number.",
+        "Take Pavel's line as the shape, then put Ines's price in it.",
+        "The result is a single line starting with `adult (16+)`, followed by the price from main."
+      ],
+      "points": 10
+    },
+    {
+      "id": "finish",
+      "title": "Finish the merge cleanly",
+      "file": "setup.mjs",
+      "description": "Complete the merge with a merge commit.\n\nThe check expects:\n\n- the last commit on `main` is a merge with two parents, and `main`'s history contains every original commit from both branches (merge, do not rebase)\n- `weekend.txt` from `weekend-sailings` is on `main`, unchanged\n- no merge is left in progress and `git status` shows nothing to commit and no untracked files\n- you are on `main`",
+      "nextSteps": [
+        "Run `git status` and confirm no paths are listed as unmerged.",
+        "Create the merge commit without opening an editor.",
+        "Run `git log --oneline --graph -n 8` and `git status`."
+      ],
+      "hints": [
+        "Staging resolved files does not end the merge. One more command does.",
+        "`git commit` accepts a flag that keeps the suggested merge message and skips the editor.",
+        "After `git commit --no-edit`, `git log --graph` should show two lines joining at the top, and `git status` should be clean."
+      ],
+      "points": 10
+    }
+  ]
+}
