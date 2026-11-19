@@ -25,8 +25,18 @@ export function bindSuggestShortcut(
   monaco: typeof Monaco,
   editor: Monaco.editor.IStandaloneCodeEditor
 ): void {
-  editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Backslash, () =>
-    editor.trigger('keyboard', 'editor.action.inlineSuggest.trigger', {})
+  // Claimed only in manual mode: on some keyboard layouts this combination types a character.
+  const manual = editor.createContextKey<boolean>('suggestOnRequest', false)
+  const sync = (): void => {
+    const { config } = useAi.getState()
+    manual.set(!!config?.enabled && config.suggestions === 'manual')
+  }
+  sync()
+  editor.onDidDispose(useAi.subscribe(sync))
+  editor.addCommand(
+    monaco.KeyMod.Alt | monaco.KeyCode.Backslash,
+    () => editor.trigger('keyboard', 'editor.action.inlineSuggest.trigger', {}),
+    'suggestOnRequest'
   )
 }
 
