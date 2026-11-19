@@ -1,0 +1,88 @@
+import { useEffect } from 'react'
+import { Pause, Play, RotateCcw, SkipBack, SkipForward } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Slider } from '@/components/ui/slider'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { IconButton } from '@/features/workspace/IconButton'
+import type { Player as PlayerControls } from './usePlayer'
+
+function inTextField(target: EventTarget | null): boolean {
+  return (
+    target instanceof HTMLElement &&
+    (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
+  )
+}
+
+export function Player({ player }: { player: PlayerControls }): React.JSX.Element {
+  const { index, count, playing, speed } = player
+  const last = count - 1
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent): void => {
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return
+      if (inTextField(event.target)) return
+      const target = event.target instanceof HTMLElement ? event.target : null
+      // A focused button or slider already handles these keys itself.
+      if (event.key === ' ' && target?.closest('button')) return
+      if (event.key !== ' ' && target?.closest('[role="slider"]')) return
+      const actions: Record<string, () => void> = {
+        ' ': player.toggle,
+        ArrowLeft: player.prev,
+        ArrowRight: player.next,
+        Home: () => player.seek(0),
+        End: () => player.seek(last)
+      }
+      const action = actions[event.key]
+      if (!action) return
+      event.preventDefault()
+      action()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [player, last])
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div className="flex items-center gap-1">
+        <IconButton label="Restart" onClick={() => player.seek(0)}>
+          <RotateCcw />
+        </IconButton>
+        <IconButton label="Step back" onClick={player.prev} disabled={index === 0}>
+          <SkipBack />
+        </IconButton>
+        <IconButton label={playing ? 'Pause' : 'Play'} variant="default" onClick={player.toggle}>
+          {playing ? <Pause /> : <Play />}
+        </IconButton>
+        <IconButton label="Step forward" onClick={player.next} disabled={index === last}>
+          <SkipForward />
+        </IconButton>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={player.cycleSpeed}
+              aria-label={`Speed ${speed}x`}
+              className="w-12 font-mono text-xs tabular-nums"
+            >
+              {speed}x
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Speed</TooltipContent>
+        </Tooltip>
+      </div>
+      <Slider
+        value={[index]}
+        min={0}
+        max={last}
+        step={1}
+        onValueChange={([value]) => player.seek(value)}
+        aria-label="Step"
+        className="min-w-32 flex-1"
+      />
+      <span className="text-xs whitespace-nowrap text-muted-foreground tabular-nums">
+        Step {index + 1} of {count}
+      </span>
+    </div>
+  )
+}
