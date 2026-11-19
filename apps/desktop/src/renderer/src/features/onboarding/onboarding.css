@@ -250,3 +250,23 @@ html:active-view-transition-type(onboarding-finish) {
 [data-done='true'] .ob-tick {
   stroke-dashoffset: 0;
 }
+
+/* Patterns scene: pointers move on the on-screen curve, cells change tone, days fill in. */
+.ob-move {
+  transition: transform var(--motion-enter) var(--ease-in-out);
+}
+.ob-tone {
+  transition:
+    border-color var(--motion-state) var(--ease-out),
+    background-color var(--motion-state) var(--ease-out);
+}
+.ob-day {
+  animation: ob-day var(--motion-enter) var(--ease-out) both;
+}
+
+@keyframes ob-day {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
