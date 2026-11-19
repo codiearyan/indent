@@ -48,7 +48,7 @@ Other commands:
 pnpm typecheck      # both TypeScript projects
 pnpm lint
 pnpm test           # unit tests
-pnpm --filter @labbench/desktop build:mac   # package the app (also build:win, build:linux)
+pnpm --filter @indent/desktop build:mac   # package the app (also build:win, build:linux)
 ```
 
 The repository is a pnpm workspaces monorepo: the desktop app is in `apps/desktop`, and the content

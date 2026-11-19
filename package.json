@@ -1,11 +1,11 @@
 {
-  "name": "labbench",
+  "name": "indent",
   "private": true,
   "description": "A local-first desktop app for hands-on coding labs",
   "author": "Aryan Bhati",
   "scripts": {
-    "dev": "pnpm --filter @labbench/desktop dev",
-    "build": "pnpm --filter @labbench/desktop build",
+    "dev": "pnpm --filter @indent/desktop dev",
+    "build": "pnpm --filter @indent/desktop build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "lint": "eslint --cache .",

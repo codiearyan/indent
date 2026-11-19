@@ -41,7 +41,7 @@ root so other apps (a future site) can read it. Each app is a workspace under `a
 
 ```
 content/                 lab packs and the grader kit (plain files, shipped as an extra resource)
-apps/desktop/            the Electron app (@labbench/desktop); src/ paths below are relative to it
+apps/desktop/            the Electron app (@indent/desktop); src/ paths below are relative to it
 ```
 
 Inside `apps/desktop/`:
@@ -122,7 +122,7 @@ the chrome is neutral, and the one hue is the yellow of a highlighted line of co
   `var(--titlebar-inset)` free on the left and the sidebar starts at `var(--sidebar-top)`.
 - Copy is plain and short. No em dashes. Sentence case.
 - Guided tour: elements the tour points at carry `data-tour={TOUR.x}` from `features/tour/anchors.ts`.
-- To look at a change: `npm run dev` starts the app; `node scripts/cdp.mjs navshot "#/labs|/tmp/x.png"`
+- To look at a change: `pnpm dev` starts the app; `node scripts/cdp.mjs navshot "#/labs|/tmp/x.png"`
   navigates the running window and saves a screenshot (start Electron with
   `--remote-debugging-port=9222`, or set `CDP_PORT`).
 
