@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { readSettings } from './settings'
+import { readSettings, withKey } from './settings'
 
 describe('readSettings', () => {
   it('turns AI on for a file saved before it could be turned off', () => {
@@ -29,5 +29,19 @@ describe('suggestionMode', () => {
     expect(readSettings({ suggestions: 'manual' }).suggestions).toBe('manual')
     expect(readSettings({ suggestions: 'auto' }).suggestions).toBe('auto')
     expect(readSettings({ suggestions: 'always' }).suggestions).toBe('off')
+  })
+})
+
+describe('withKey', () => {
+  it('stores a key without the spaces a paste brings along', () => {
+    expect(withKey({}, 'openai', '  sk-test\n')).toEqual({ openai: 'sk-test' })
+  })
+
+  it('removes a key for null, blank or a value that is not text', () => {
+    const stored = { openai: 'sk-a', anthropic: 'sk-b' }
+    expect(withKey(stored, 'openai', null)).toEqual({ anthropic: 'sk-b' })
+    expect(withKey(stored, 'openai', '   ')).toEqual({ anthropic: 'sk-b' })
+    expect(withKey(stored, 'openai', 42)).toEqual({ anthropic: 'sk-b' })
+    expect(stored).toEqual({ openai: 'sk-a', anthropic: 'sk-b' })
   })
 })

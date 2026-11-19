@@ -21,3 +21,16 @@ export function suggestionMode(value: unknown): SuggestionMode {
   if (value === true) return 'auto'
   return MODES.includes(value as SuggestionMode) ? (value as SuggestionMode) : 'off'
 }
+
+/** The stored keys after saving `key` for `provider`; a blank or missing key removes it. */
+export function withKey<K extends string>(
+  stored: Partial<Record<K, string>>,
+  provider: K,
+  key: unknown
+): Partial<Record<K, string>> {
+  const next = { ...stored }
+  const trimmed = typeof key === 'string' ? key.trim() : ''
+  if (trimmed) next[provider] = trimmed
+  else delete next[provider]
+  return next
+}
