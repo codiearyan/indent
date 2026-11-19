@@ -7,14 +7,28 @@ import { chapterContentDir, workspaceDir } from '../paths'
 import { loadChapter } from './content'
 import { copyStarter, emptyDir, readWorkspace, resolveInside } from './workspaceFiles'
 
-async function open(labId: string, chapterId: string, reset = false): Promise<WorkspaceSnapshot> {
-  const chapter = await loadChapter(labId, chapterId)
+const queues = new Map<string, Promise<unknown>>()
+
+// Two opens of the same new workspace would both copy the starter files and collide.
+function oneAtATime<T>(key: string, job: () => Promise<T>): Promise<T> {
+  const result = (queues.get(key) ?? Promise.resolve()).then(job, job)
+  queues.set(
+    key,
+    result.catch(() => {})
+  )
+  return result
+}
+
+function open(labId: string, chapterId: string, reset = false): Promise<WorkspaceSnapshot> {
   const dir = workspaceDir(labId, chapterId)
-  if (reset) await emptyDir(dir)
-  if (reset || !existsSync(dir)) {
-    await copyStarter(join(chapterContentDir(labId, chapterId), 'starter'), dir)
-  }
-  return { dir, files: await readWorkspace(dir, chapter.files) }
+  return oneAtATime(dir, async () => {
+    const chapter = await loadChapter(labId, chapterId)
+    if (reset) await emptyDir(dir)
+    if (reset || !existsSync(dir)) {
+      await copyStarter(join(chapterContentDir(labId, chapterId), 'starter'), dir)
+    }
+    return { dir, files: await readWorkspace(dir, chapter.files) }
+  })
 }
 
 async function write(
