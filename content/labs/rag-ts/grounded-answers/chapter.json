@@ -1,0 +1,64 @@
+{
+  "id": "grounded-answers",
+  "title": "Answers with sources",
+  "files": ["src/answer.ts", "src/demo.ts", "src/store.ts", "src/embed.ts", "src/chunk.ts", "src/handbook.ts"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo asks the handbook questions through the offline chat model.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "prompt",
+      "title": "Build a prompt with numbered sources",
+      "file": "src/answer.ts",
+      "description": "Implement `buildPrompt(question, hits)` in `src/answer.ts`. It returns chat messages:\n\n- A `system` message telling the model to answer only from the numbered sources, to cite every source it uses as `[n]`, and to say it does not know when the sources do not contain the answer. It must contain the words `only` and `cite`.\n- A `user` message holding one line per hit, `[1] <chunk text>`, `[2] <chunk text>`, ... in the order of `hits`, and ending with the line `Question: <question>`.\n- With no hits, it still returns the messages, with no numbered lines.\n\nThe check reads your messages, and also sends them to the lab chat model to make sure it can answer from them.",
+      "nextSteps": [
+        "Run `node src/demo.ts` and read the error for buildPrompt.",
+        "Write the system message with the three rules.",
+        "Turn the hits into numbered lines and add the question line.",
+        "Run the demo and read the prompt it prints."
+      ],
+      "hints": [
+        "Numbers start at 1 for people and for models, so the first hit is [1], not [0].",
+        "The second argument of a map callback is the position. Join the lines with '\\n'.",
+        "The user message can be the joined source lines, a blank line, then `Question: ${question}` as its last line."
+      ],
+      "points": 10
+    },
+    {
+      "id": "answer",
+      "title": "Answer and return the cited sources",
+      "file": "src/answer.ts",
+      "description": "Implement `answer(question, index, client)` in `src/answer.ts`. It returns `Promise<Answer>`, `{ answer, sources }`:\n\n- Search with `search(index, question, TOP_K, MIN_SCORE, client)`.\n- Send `buildPrompt(question, hits)` to `CHAT_MODEL` with `client.chat.completions.create`.\n- `answer` is the reply text, unchanged.\n- `sources` lists the chunks the reply cites: `[n]` means `hits[n - 1].chunk`. Each cited chunk appears once, in the order it is first cited. Numbers that match no hit are ignored, and a reply without citations has `sources: []`.\n\nThe check uses the lab model and a fake model with a messy reply, and looks at the prompt you send.",
+      "nextSteps": [
+        "Search, build the prompt and send it to the chat model.",
+        "Return the reply text with an empty sources list first, and run the demo.",
+        "Find every [n] in the reply and map it to a chunk.",
+        "Remove repeats and numbers that match no hit."
+      ],
+      "hints": [
+        "The reply text is at `res.choices[0].message.content`, which can be null.",
+        "A regular expression with the g flag and matchAll finds every [n] in order.",
+        "A Set keeps the first position of each number. Filter out numbers below 1 or above hits.length before turning them into chunks."
+      ],
+      "points": 10
+    },
+    {
+      "id": "not-found",
+      "title": "Say so when the handbook has nothing",
+      "file": "src/answer.ts",
+      "description": "When the search finds no hit at or above `MIN_SCORE`, there is nothing to ground an answer in. Change `answer` so that in that case it:\n\n- returns `{ answer: NOT_FOUND, sources: [] }`\n- does not call the chat model at all\n\nQuestions the handbook covers still get one chat request. The check asks about surfboards and credit cards (nothing above the cut-off), counts the chat requests, and type-checks `src/answer.ts`.",
+      "nextSteps": [
+        "Run the demo and read what happens to the surfboard question now.",
+        "Return early, right after the search, when there are no hits.",
+        "Run the demo again and compare the cafe and surfboard answers."
+      ],
+      "hints": [
+        "Look at what the lab model says when the prompt has no sources at all. That is a wasted request.",
+        "The earlier you return, the less work you do: the check counts chat requests.",
+        "If hits.length is 0, return the NOT_FOUND result before building any prompt."
+      ],
+      "points": 10
+    }
+  ]
+}
