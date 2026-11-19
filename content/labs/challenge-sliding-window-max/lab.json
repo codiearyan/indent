@@ -1,0 +1,11 @@
+{
+  "id": "challenge-sliding-window-max",
+  "title": "Sliding window maximum",
+  "description": "Find the largest value in every window of a long series, first the obvious way and then in linear time with a monotonic deque. Then reuse the same structure to find the longest stretch whose highest and lowest values stay within a limit.",
+  "category": "Challenges",
+  "language": "typescript",
+  "tags": ["TypeScript", "DSA"],
+  "kind": "challenge",
+  "difficulty": "hard",
+  "parts": [{ "title": "Challenge", "chapters": ["challenge"] }]
+}

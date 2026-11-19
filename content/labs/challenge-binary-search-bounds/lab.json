@@ -1,0 +1,11 @@
+{
+  "id": "challenge-binary-search-bounds",
+  "title": "Binary search bounds",
+  "description": "Write the binary searches that get the edges right: the first and last position of a value in a sorted array full of duplicates, counts and insert positions built on them, then a search in a sorted array that was rotated. Every answer must take a logarithmic number of comparisons, and the check counts them.",
+  "category": "Challenges",
+  "language": "typescript",
+  "tags": ["TypeScript", "DSA"],
+  "kind": "challenge",
+  "difficulty": "easy",
+  "parts": [{ "title": "Challenge", "chapters": ["challenge"] }]
+}

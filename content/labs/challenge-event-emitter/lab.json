@@ -1,0 +1,11 @@
+{
+  "id": "challenge-event-emitter",
+  "title": "Event emitter",
+  "description": "Build the small object that lets one part of a program announce something and any number of others react to it. Start with on, off and emit, add listeners that run once, then make it safe when listeners change the list or throw in the middle of an emit.",
+  "category": "Challenges",
+  "language": "typescript",
+  "tags": ["TypeScript"],
+  "kind": "challenge",
+  "difficulty": "easy",
+  "parts": [{ "title": "Challenge", "chapters": ["challenge"] }]
+}

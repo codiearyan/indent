@@ -1,0 +1,65 @@
+{
+  "id": "challenge",
+  "title": "Sliding window maximum",
+  "files": ["src/windowMax.ts", "src/longestWithin.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo runs both functions on a short series and times windowMax on a longer one.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "small",
+      "title": "Window maximum, any way you like",
+      "file": "src/windowMax.ts",
+      "description": "Implement `windowMax(nums, k)` in `src/windowMax.ts`. It returns the maximum of every window of `k` consecutive numbers, from left to right: `nums.length - k + 1` values.\n\n- `k` is a whole number of at least 1. When `k` is larger than `nums.length`, return `[]`.\n- Do not change `nums`.\n\nThis task only uses small inputs, so a direct approach that looks at every window is fine. The check covers `k` of 1, `k` equal to the length, `k` larger than the length, an empty array, negative numbers and repeated values.",
+      "nextSteps": [
+        "Work out how many windows there are and where each one starts.",
+        "Compute the maximum of each window and collect them.",
+        "Try negative numbers and `k` larger than the array in the demo.",
+        "Run `node src/demo.ts` and read the first line."
+      ],
+      "hints": [
+        "The windows start at indexes 0 to `nums.length - k`. If that is negative, there are none.",
+        "A starting maximum of 0 breaks windows of negative numbers. Start from the first number of the window or from `-Infinity`.",
+        "Two nested loops are enough here: the outer one over window starts, the inner one over the `k` numbers of the window."
+      ],
+      "points": 10
+    },
+    {
+      "id": "linear",
+      "title": "Window maximum in linear time",
+      "file": "src/windowMax.ts",
+      "description": "Make `windowMax` run in O(n), whatever `k` is.\n\nThe check runs it on a million random, falling and rising numbers with windows of 1,000 to 50,000, compares the results with a correct answer and expects each run to finish in under 1 second. Looking at every number of a window again is too slow, even if you only do it when the maximum leaves the window: falling numbers make that happen on every step.\n\nA couple of small cases with repeated values check that numbers leave the window by position, not by value.",
+      "nextSteps": [
+        "Read the monotonic deque section of the lesson.",
+        "Keep indexes, not values, in your deque.",
+        "On each step: drop smaller candidates from the back, add the new index, drop the front if it left the window.",
+        "Run the demo and compare the time on the last line with task 1."
+      ],
+      "hints": [
+        "A number that has a larger number after it inside the window can never be a window maximum again. You can forget it.",
+        "If you only keep numbers that are not followed by a larger one, they are in decreasing order, and the first one is the maximum.",
+        "`Array.prototype.shift` is O(n). Use a head index into an array instead, so removing from the front is O(1)."
+      ],
+      "points": 15
+    },
+    {
+      "id": "limit",
+      "title": "Longest stretch within a limit",
+      "file": "src/longestWithin.ts",
+      "description": "Implement `longestWithin(nums, limit)` in `src/longestWithin.ts`. It returns the length of the longest run of consecutive numbers whose maximum minus minimum is at most `limit`.\n\n- `limit` is at least 0. An empty array gives 0. A single number is a run of length 1.\n- Do not change `nums`.\n\nThe check covers limit 0, a run covering the whole array, negative numbers and a run that must shrink from its start. It also runs a million slowly wandering numbers, where the best run is thousands long, and expects it to finish in under 1 second.",
+      "nextSteps": [
+        "Use a window with a start and an end that both only move right.",
+        "Keep one deque for the maximum and one for the minimum of the window.",
+        "When the window gets too wide, move its start right and drop deque fronts that fell out.",
+        "Record the best length after each step and run the demo."
+      ],
+      "hints": [
+        "This is a window whose size changes. The end moves one step per number; the start moves only when the window breaks the limit.",
+        "The maximum deque is the one from task 2. The minimum deque is the same with the comparison flipped.",
+        "After adding index `i` to both deques, while `max - min > limit`, move `start` forward and drop a deque front whose index is now below `start`. Then the window `start..i` qualifies."
+      ],
+      "points": 20
+    }
+  ]
+}
