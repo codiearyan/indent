@@ -112,6 +112,13 @@ the chrome is neutral, and the one hue is a calm orange.
 - **Empty states keep the frame**: the card and its header stay, with one plain sentence inside.
 - **Never:** gradients, glows, glass or backdrop blur, emoji, a greeting as the title, a hue on the
   chrome, more than one filled button in a view.
+- **Motion from tokens.** `packages/design/tokens.css` holds the curves and durations: `--ease-out`
+  to enter and exit (also the `ease-out` utility), `--ease-in-out` to move on screen, and
+  `--motion-press` (150ms), `--motion-state` (220ms), `--motion-enter` (280ms), `--motion-exit`
+  (160ms, exits are faster), `--motion-stage` (100ms between staged parts), `--motion-stagger` (40ms
+  between list rows). Name the properties (`opacity`, `transform`, `filter`), never `transition: all`;
+  hover colour is instant; presses scale to 0.98; nothing starts from scale 0; under
+  `prefers-reduced-motion` movement becomes a plain fade.
 - Icons: `lucide-react`, `size-4`, `strokeWidth={1.5}` in navigation. Icon-only buttons get a Tooltip
   and an `aria-label`.
 - Build from `components/ui/*` (Button, Badge, Dialog, DropdownMenu, Popover, Tooltip, Tabs, Slider,

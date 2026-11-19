@@ -51,6 +51,22 @@
   --gold-400: #e5c14b;
 }
 
+/*
+ * Motion. Enter and exit on --ease-out, move on screen on --ease-in-out. Presses take
+ * --motion-press, small state changes --motion-state, entrances --motion-enter, and exits
+ * the shorter --motion-exit. Nothing the person starts runs past 300ms.
+ */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --motion-press: 150ms;
+  --motion-state: 220ms;
+  --motion-enter: 280ms;
+  --motion-exit: 160ms;
+  --motion-stage: 100ms;
+  --motion-stagger: 40ms;
+}
+
 /* 2. Semantic: light */
 :root {
   --radius: 8px;
