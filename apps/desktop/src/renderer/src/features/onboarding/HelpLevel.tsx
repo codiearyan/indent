@@ -88,7 +88,7 @@ const TYPED_MS = 300 + LINE.length * MS_PER_CHAR
 function Demo({ level }: { level: Level }): React.JSX.Element {
   if (level === 'tutor') {
     return (
-      <div className="flex h-[88px] flex-col justify-center gap-2 rounded-md border border-rule px-3 text-xs">
+      <div className="ob-scene flex h-[88px] flex-col justify-center gap-2 rounded-md border border-rule px-3 text-xs">
         <p
           className="ob-appear self-end rounded-md bg-muted px-2 py-1"
           style={{ animationDelay: '300ms' }}
@@ -111,7 +111,7 @@ function Demo({ level }: { level: Level }): React.JSX.Element {
   const keyAt = level === 'manual' ? TYPED_MS + 400 : ghostAt + 900
 
   return (
-    <div className="flex h-[88px] flex-col justify-between rounded-md border border-rule px-3 py-2.5 overflow-hidden font-mono text-[11px] leading-5">
+    <div className="ob-scene flex h-[88px] flex-col justify-between rounded-md border border-rule px-3 py-2.5 overflow-hidden font-mono text-[11px] leading-5">
       <p className="whitespace-nowrap">
         <Typed text={LINE} at={300} />
         <span
