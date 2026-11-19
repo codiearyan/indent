@@ -137,6 +137,7 @@ export const useChat = create<ChatStore>()((set, get) => {
     },
 
     ask: (question) => {
+      if (!useAi.getState().config?.enabled) return
       useSettings.getState().setPanel('chat', true)
       void get().send(question)
     }
