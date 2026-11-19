@@ -1,0 +1,11 @@
+{
+  "id": "challenge-trie-autocomplete",
+  "title": "Trie autocomplete",
+  "description": "Build the tree of letters behind every search box suggestion list. Store words and look up prefixes, rank the most frequent completions for a prefix, then delete words and prune the branches nobody uses any more.",
+  "category": "Challenges",
+  "language": "typescript",
+  "tags": ["TypeScript", "DSA"],
+  "kind": "challenge",
+  "difficulty": "medium",
+  "parts": [{ "title": "Challenge", "chapters": ["challenge"] }]
+}
