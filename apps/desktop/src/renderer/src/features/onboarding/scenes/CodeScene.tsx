@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { MS_PER_CHAR, Typed } from './Typed'
 
 const CODE = [
   'function weekTotal(orders) {',
@@ -8,35 +8,7 @@ const CODE = [
   'console.log(weekTotal(orders).toFixed(2))'
 ]
 const COMMAND = 'node report.js'
-const MS_PER_CHAR = 22
 const START_MS = 300
-
-/** Typing is a reveal in whole characters; `at` is when this piece starts, in ms. */
-function Typed({
-  text,
-  at,
-  className
-}: {
-  text: string
-  at: number
-  className?: string
-}): React.JSX.Element {
-  return (
-    <span
-      className={cn('ob-type', className)}
-      style={
-        {
-          '--chars': text.length,
-          '--steps': text.length + 1,
-          animationDuration: `${text.length * MS_PER_CHAR}ms`,
-          animationDelay: `${at}ms`
-        } as React.CSSProperties
-      }
-    >
-      {text}
-    </span>
-  )
-}
 
 export function CodeScene(): React.JSX.Element {
   const starts: number[] = []

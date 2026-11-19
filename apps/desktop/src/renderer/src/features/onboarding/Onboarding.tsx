@@ -7,6 +7,7 @@ import { useSettings } from '@/stores/settings'
 import { StepLayout } from './StepLayout'
 import { StepStrip } from './StepStrip'
 import { AiChoice } from './AiChoice'
+import { HelpLevel } from './HelpLevel'
 import { HowItWorks } from './HowItWorks'
 import { Provider } from './Provider'
 import { Welcome } from './Welcome'
@@ -33,6 +34,7 @@ function StepView({ step, ...props }: StepProps & { step: StepId }): React.JSX.E
   if (step === 'how') return <HowItWorks staged={props.staged} />
   if (step === 'ai') return <AiChoice staged={props.staged} />
   if (step === 'provider') return <Provider staged={props.staged} />
+  if (step === 'help') return <HelpLevel staged={props.staged} />
   return <StepLayout title={PLACEHOLDER_TITLES[step]} staged={props.staged} />
 }
 
