@@ -17,6 +17,8 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { TOUR } from '@/features/tour/anchors'
 import { IconButton } from '@/features/workspace/IconButton'
 import { cn, errorMessage } from '@/lib/utils'
+import { viewTransition } from '@/lib/viewTransition'
+import { useSettings } from '@/stores/settings'
 import { activeProvider, useAi } from './aiStore'
 import { SUGGEST_SHORTCUT } from './inlineSuggestions'
 import { TestConnection } from './TestConnection'
@@ -58,6 +60,17 @@ export function AiMenu(): React.JSX.Element {
       >
         <AiSwitch />
         {config?.enabled !== false && <AiSettings />}
+        <Separator />
+        <button
+          type="button"
+          className="self-start rounded-sm text-xs text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+          onClick={() => {
+            setMenuOpen(false)
+            viewTransition('onboarding-finish', () => useSettings.getState().setOnboarded(false))
+          }}
+        >
+          Run setup again
+        </button>
       </PopoverContent>
     </Popover>
   )
