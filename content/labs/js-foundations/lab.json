@@ -5,7 +5,6 @@
   "category": "JavaScript and TypeScript",
   "language": "javascript",
   "tags": ["JavaScript"],
-  "kind": "lab",
   "parts": [
     { "title": "A week at Larkspur Tea", "chapters": ["order-reports", "loyalty-cards"] }
   ]

@@ -43,7 +43,7 @@ const defaultPanels: Record<PanelKey, boolean> = {
 export const useSettings = create<SettingsState>()(
   persist(
     (set) => ({
-      theme: 'dark',
+      theme: 'light',
       textScale: defaultScale,
       panels: defaultPanels,
       lessonSide: 'left',

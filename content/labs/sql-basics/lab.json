@@ -5,7 +5,6 @@
   "category": "Databases",
   "language": "sql",
   "tags": ["SQL"],
-  "kind": "lab",
   "parts": [
     { "title": "Asking the database questions", "chapters": ["reading-rows", "summaries", "joins", "subqueries"] },
     { "title": "Changing what is stored", "chapters": ["changing-data"] }

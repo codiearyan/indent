@@ -28,9 +28,7 @@ export function LabsPage(): React.JSX.Element {
 
   const rows = useMemo(
     () =>
-      (labs ?? [])
-        .filter((lab) => lab.kind === 'lab')
-        .map((lab) => ({ lab, progress: labProgress(lab, progress?.chapters ?? {}) })),
+      (labs ?? []).map((lab) => ({ lab, progress: labProgress(lab, progress?.chapters ?? {}) })),
     [labs, progress]
   )
 

@@ -40,7 +40,6 @@ beforeAll(async () => {
     category: 'AI engineering',
     language: 'typescript',
     tags: [],
-    kind: 'lab',
     parts: [
       { title: 'One', chapters: ['c1', 'c2'] },
       { title: 'Two', chapters: ['c3'] }

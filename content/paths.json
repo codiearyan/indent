@@ -5,11 +5,38 @@
     "tagline": "Call models, ground them in your data, give them tools, and measure the result",
     "description": "Start with the language and async code, then build the pieces of a real LLM feature one at a time: model calls, retrieval, agents and evals, and finish with the bugs that show up in production.",
     "stages": [
-      { "title": "The language", "labs": ["typescript-essentials", "async-js"] },
-      { "title": "Calling models", "labs": ["llm-apps-ts"] },
-      { "title": "Your own data", "labs": ["rag-ts"] },
-      { "title": "Tools and agents", "labs": ["agents-ts"] },
-      { "title": "Knowing it works", "labs": ["evals-ts", "llm-bug-hunts-ts"] }
+      {
+        "title": "The language",
+        "labs": [
+          "typescript-essentials",
+          "async-js"
+        ]
+      },
+      {
+        "title": "Calling models",
+        "labs": [
+          "llm-apps-ts"
+        ]
+      },
+      {
+        "title": "Your own data",
+        "labs": [
+          "rag-ts"
+        ]
+      },
+      {
+        "title": "Tools and agents",
+        "labs": [
+          "agents-ts"
+        ]
+      },
+      {
+        "title": "Knowing it works",
+        "labs": [
+          "evals-ts",
+          "llm-bug-hunts-ts"
+        ]
+      }
     ]
   },
   {
@@ -18,34 +45,60 @@
     "tagline": "From the language to an API with a database behind it",
     "description": "Get solid in JavaScript and TypeScript, handle slow and failing services, build a JSON API with nothing but Node, learn the SQL behind it, and keep your history clean when things go wrong.",
     "stages": [
-      { "title": "JavaScript", "labs": ["js-foundations", "async-js"] },
-      { "title": "TypeScript", "labs": ["typescript-essentials"] },
-      { "title": "An API", "labs": ["node-api"] },
-      { "title": "Data", "labs": ["sql-basics"] },
-      { "title": "Working with git", "labs": ["git-rescues"] }
+      {
+        "title": "JavaScript",
+        "labs": [
+          "js-foundations",
+          "async-js"
+        ]
+      },
+      {
+        "title": "TypeScript",
+        "labs": [
+          "typescript-essentials"
+        ]
+      },
+      {
+        "title": "An API",
+        "labs": [
+          "node-api"
+        ]
+      },
+      {
+        "title": "Data",
+        "labs": [
+          "sql-basics"
+        ]
+      },
+      {
+        "title": "Working with git",
+        "labs": [
+          "git-rescues"
+        ]
+      }
     ]
   },
   {
     "id": "interview-prep",
     "title": "Interview prep",
-    "tagline": "Bugs to explain out loud and problems to solve on a clock",
-    "description": "Practice the debugging stories interviewers ask for, in JavaScript and in LLM code, then work through coding rounds from warm-ups to the hard ones.",
+    "tagline": "The language questions and the bug stories interviewers ask for",
+    "description": "Get the language answers solid, then practice the debugging stories interviewers ask you to tell, in JavaScript and in LLM code.",
     "stages": [
-      { "title": "Bug stories", "labs": ["js-bug-hunts", "llm-bug-hunts-ts"] },
       {
-        "title": "Warm-up rounds",
-        "labs": ["challenge-event-emitter", "challenge-binary-search-bounds"]
-      },
-      {
-        "title": "Core rounds",
+        "title": "Language questions",
         "labs": [
-          "challenge-deep-equal",
-          "challenge-debounce",
-          "challenge-trie-autocomplete",
-          "challenge-rate-limiter"
+          "js-foundations",
+          "typescript-essentials",
+          "async-js"
         ]
       },
-      { "title": "Hard rounds", "labs": ["challenge-lru-cache", "challenge-sliding-window-max"] }
+      {
+        "title": "Bug stories",
+        "labs": [
+          "js-bug-hunts",
+          "llm-bug-hunts-ts"
+        ]
+      }
     ]
   }
 ]

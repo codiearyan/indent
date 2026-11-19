@@ -89,7 +89,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
     if (!session || !chapter || !container) return
     const { theme, textScale } = useSettings.getState()
     const term = new Terminal({
-      fontFamily: "'Geist Mono Variable', ui-monospace, monospace",
+      fontFamily: "'IBM Plex Mono', ui-monospace, monospace",
       fontSize: 13 * textScale.terminal,
       theme: xtermTheme(theme),
       cursorBlink: true

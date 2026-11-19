@@ -1,86 +1,115 @@
 import { useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
+import { CalendarDays, FlaskConical, House, Moon, Route, Sun, Workflow } from 'lucide-react'
 import { toast } from 'sonner'
-import { LevelBadge } from '@/components/app/LevelBadge'
-import { ThemeToggle } from '@/components/app/ThemeToggle'
+import { levelFor } from '@shared/rules'
+import { APP_NAME, BrandMark } from '@/components/app/Brand'
 import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
+import { useSettings } from '@/stores/settings'
 
 const NAV = [
-  { to: '/', label: 'Dashboard' },
-  { to: '/labs', label: 'My labs' },
-  { to: '/paths', label: 'Paths' },
-  { to: '/challenges', label: 'Challenges' },
-  { to: '/dsa', label: 'DSA' },
-  { to: '/year', label: 'Year board' }
+  { to: '/', label: 'Home', icon: House },
+  { to: '/labs', label: 'Labs', icon: FlaskConical },
+  { to: '/paths', label: 'Paths', icon: Route },
+  { to: '/dsa', label: 'DSA patterns', icon: Workflow },
+  { to: '/year', label: 'Year board', icon: CalendarDays }
 ]
 
-function Mark(): React.JSX.Element {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="size-5"
-      aria-hidden
-    >
-      <path d="M9 3h6" />
-      <path d="M10 3v6.5l-5.4 8.9A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.4-2.6L14 9.5V3" />
-      <path d="M7.5 15h9" />
-    </svg>
-  )
-}
+const row =
+  'flex h-8 items-center gap-2.5 rounded-md px-2.5 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50'
 
+/** The frame: navigation on the tinted ground, the page on a sheet beside it. */
 export function AppShell(): React.JSX.Element {
+  const loadCatalog = useCatalog((s) => s.load)
+  const loadProgress = useProgress((s) => s.load)
+
   useEffect(() => {
-    useCatalog
-      .getState()
-      .load()
-      .catch(() => toast.error('Could not load the labs.'))
-    useProgress
-      .getState()
-      .load()
-      .catch(() => toast.error('Could not load your progress.'))
-  }, [])
+    Promise.all([loadCatalog(), loadProgress()]).catch((error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Could not load your labs.')
+    })
+  }, [loadCatalog, loadProgress])
 
   return (
-    <div className="flex h-full flex-col bg-background">
-      <header className="app-drag flex h-16 shrink-0 items-center gap-8 border-b border-border pr-4 pl-[calc(var(--titlebar-inset)+16px)]">
-        <NavLink to="/" className="flex items-center gap-2 text-base font-medium tracking-tight">
-          <Mark />
-          Labbench
+    <div className="flex h-full bg-background">
+      <aside className="app-drag flex w-[228px] shrink-0 flex-col px-3 pt-[var(--sidebar-top)] pb-3">
+        <NavLink to="/" className="mb-5 flex items-center gap-2.5 px-2.5 text-[15px] font-semibold">
+          <BrandMark />
+          {APP_NAME}
         </NavLink>
-        <nav className="flex min-w-0 items-center gap-1">
-          {NAV.map(({ to, label }) => (
+        <nav className="flex flex-col gap-0.5">
+          {NAV.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               end={to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'rounded-md px-3 py-1.5 text-sm whitespace-nowrap transition-colors outline-none hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50',
-                  isActive ? 'font-medium text-foreground' : 'text-muted-foreground'
+                  row,
+                  isActive
+                    ? 'bg-accent text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
                 )
               }
             >
+              <Icon className="size-4" strokeWidth={1.5} />
               {label}
             </NavLink>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-1">
-          <LevelBadge />
-          <ThemeToggle />
+        <div className="mt-auto space-y-3">
+          <LevelMeter />
+          <ThemeRow />
         </div>
-      </header>
-      <main className="min-h-0 flex-1 overflow-auto">
-        <div className="mx-auto w-full max-w-[1200px] px-8 py-8">
+      </aside>
+      <main className="my-2 mr-2 min-w-0 flex-1 overflow-auto rounded-2xl border border-border bg-card">
+        <div className="mx-auto w-full max-w-[1180px] px-10 py-9">
           <Outlet />
         </div>
       </main>
     </div>
+  )
+}
+
+function LevelMeter(): React.JSX.Element {
+  const totalPoints = useProgress((s) => s.progress?.totalPoints ?? 0)
+  const { level, into, span } = levelFor(totalPoints)
+  return (
+    <div className="px-2.5">
+      <div className="flex items-baseline justify-between text-[13px]">
+        <span className="font-medium">Level {level}</span>
+        <span className="text-muted-foreground tabular-nums">{totalPoints} points</span>
+      </div>
+      <div
+        role="img"
+        aria-label={`${span - into} points to level ${level + 1}`}
+        className="mt-2 h-1 overflow-hidden rounded-full bg-accent"
+      >
+        <div
+          className="h-full rounded-full bg-brand"
+          style={{ width: `${(into / span) * 100}%` }}
+        />
+      </div>
+      <p className="mt-1.5 text-xs text-muted-foreground tabular-nums">
+        {span - into} to level {level + 1}
+      </p>
+    </div>
+  )
+}
+
+function ThemeRow(): React.JSX.Element {
+  const theme = useSettings((s) => s.theme)
+  const toggleTheme = useSettings((s) => s.toggleTheme)
+  const Icon = theme === 'dark' ? Sun : Moon
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      className={cn(row, 'w-full text-muted-foreground hover:text-foreground')}
+    >
+      <Icon className="size-4" strokeWidth={1.5} />
+      {theme === 'dark' ? 'Light theme' : 'Dark theme'}
+    </button>
   )
 }

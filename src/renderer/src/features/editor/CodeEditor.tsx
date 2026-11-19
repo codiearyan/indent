@@ -27,7 +27,7 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
     const editor = monaco.editor.create(hostRef.current!, {
       model: null,
       theme: themeName(theme),
-      fontFamily: 'Geist Mono Variable',
+      fontFamily: 'IBM Plex Mono',
       fontSize: fontSizeFor(textScale.editor),
       lineHeight: 1.6,
       folding: true,

@@ -12,6 +12,7 @@ export default defineConfig(
       '**/dist',
       '**/out',
       'content/**',
+      'scripts/**',
       'src/renderer/src/components/ui/**'
     ]
   },

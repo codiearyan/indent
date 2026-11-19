@@ -5,7 +5,6 @@
   "category": "AI engineering",
   "language": "typescript",
   "tags": ["TypeScript", "AI"],
-  "kind": "lab",
   "parts": [
     { "title": "Talking to a model", "chapters": ["first-call", "system-prompts", "structured-output"] },
     { "title": "Building for real users", "chapters": ["streaming", "token-budget"] }

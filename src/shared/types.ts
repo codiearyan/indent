@@ -2,8 +2,6 @@
 
 // ---------- Content ----------
 
-export type LabKind = 'lab' | 'challenge'
-
 /** content/labs/<labId>/lab.json */
 export interface LabMeta {
   id: string
@@ -15,9 +13,6 @@ export interface LabMeta {
   language: string
   /** Short labels on the card, e.g. ["TypeScript", "Interview"]. */
   tags: string[]
-  kind: LabKind
-  /** Challenges only. */
-  difficulty?: 'easy' | 'medium' | 'hard'
   parts: { title: string; chapters: string[] }[]
 }
 

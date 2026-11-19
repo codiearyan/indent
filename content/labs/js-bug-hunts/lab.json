@@ -5,7 +5,6 @@
   "category": "Interview bug cases",
   "language": "javascript",
   "tags": ["JavaScript", "Interview"],
-  "kind": "lab",
   "parts": [
     { "title": "Values that lie quietly", "chapters": ["cent-off-totals", "reordered-departures"] },
     { "title": "Timing and context", "chapters": ["same-reminder", "lost-this", "unawaited-saves"] }

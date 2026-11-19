@@ -41,10 +41,7 @@ export function LabDetailPage(): React.JSX.Element {
   }
 
   const summary = labProgress(lab, progress.chapters)
-  const back =
-    lab.kind === 'challenge'
-      ? { to: '/challenges', label: 'Challenges' }
-      : { to: '/labs', label: 'My labs' }
+  const back = { to: '/labs', label: 'Labs' }
 
   return (
     <div className="space-y-8">

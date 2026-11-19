@@ -10,7 +10,6 @@ const lab: LabSummary = {
   category: 'AI engineering',
   language: 'typescript',
   tags: [],
-  kind: 'lab',
   parts: [{ title: 'One', chapters: ['a', 'b'] }],
   chapters: [
     { id: 'a', number: 1, title: 'A', part: 'One', taskCount: 2, points: 20 },
