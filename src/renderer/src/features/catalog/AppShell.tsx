@@ -12,6 +12,7 @@ const NAV = [
   { to: '/labs', label: 'My labs' },
   { to: '/paths', label: 'Paths' },
   { to: '/challenges', label: 'Challenges' },
+  { to: '/dsa', label: 'DSA' },
   { to: '/year', label: 'Year board' }
 ]
 

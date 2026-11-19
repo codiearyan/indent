@@ -19,6 +19,10 @@ No account and no server. Lessons, your files and your progress live on your com
 - **Lab model**: labs about language models talk to a small offline model that answers the same
   way every time, so nothing costs money and tests are repeatable.
 - **Listen to the chapter**, a guided tour, text size per panel, layout options, light and dark.
+- **DSA patterns**: 18 algorithm patterns as step-through animations (two pointers, sliding window,
+  binary search, linked lists, heaps, BFS and DFS, topological sort, union-find, backtracking,
+  dynamic programming and more). Each step highlights the line of code that runs and says what
+  happened and why. Play, pause, scrub, change speed, and try your own input.
 - **Catalog**: dashboard, labs with search and filters, learning paths, challenges and a year board
   of your activity, points, levels and streaks.
 

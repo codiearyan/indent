@@ -18,6 +18,9 @@ interface SettingsState {
   lessonSide: 'left' | 'right'
   leftTab: 'insights' | 'tasks'
   tourSeen: boolean
+  /** Ids of DSA patterns whose animation was played to the end. */
+  dsaWatched: string[]
+  markDsaWatched(id: string): void
   toggleTheme(): void
   setTextScale(zone: TextZone, value: number): void
   setAllTextScale(value: number): void
@@ -46,6 +49,9 @@ export const useSettings = create<SettingsState>()(
       lessonSide: 'left',
       leftTab: 'insights',
       tourSeen: false,
+      dsaWatched: [],
+      markDsaWatched: (id) =>
+        set((s) => (s.dsaWatched.includes(id) ? s : { dsaWatched: [...s.dsaWatched, id] })),
       toggleTheme: () => set((s) => ({ theme: s.theme === 'dark' ? 'light' : 'dark' })),
       setTextScale: (zone, value) => set((s) => ({ textScale: { ...s.textScale, [zone]: value } })),
       setAllTextScale: (value) =>
