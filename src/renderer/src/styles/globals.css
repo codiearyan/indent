@@ -9,42 +9,43 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system: a tinted frame holds the navigation, the work sits on a sheet.
+ * Design system: a dark frame holds the navigation, the work sits on a sheet one step lighter.
  *   1. Primitives  raw values, never used directly in components
  *   2. Semantic    purpose aliases, the only tokens components may use
  *   3. Tailwind    @theme mapping, exposes semantic tokens as utilities
- * The chrome is grey. The one hue is green and it only ever means passed or progress.
+ * The chrome is neutral. The one hue is the yellow of a highlighted line: it marks progress and
+ * the one main action. Green and red are status marks only.
  * Raw hex or oklch in a component is a bug.
  */
 
 /* 1. Primitives */
 :root {
-  /* A grey with a trace of the green in it, so the frame belongs to the product. */
-  --stone-0: #ffffff;
-  --stone-50: #f5f7f6;
-  --stone-100: #f1f4f2;
-  --stone-150: #e8ece9;
-  --stone-200: #e4e8e5;
-  --stone-250: #eef1ef;
-  --stone-300: #c9cfcb;
-  --stone-500: #5a5f5c;
-  --stone-900: #121513;
+  --paper-0: #ffffff;
+  --paper-50: #f4f4f5;
+  --paper-100: #ededef;
+  --paper-150: #e6e6e9;
+  --paper-200: #dfdfe3;
+  --paper-300: #c4c4cb;
+  --paper-500: #5c5c66;
+  --paper-900: #111113;
 
-  --coal-0: #f1f3f1;
-  --coal-400: #a7ada9;
-  --coal-600: #3d423f;
-  --coal-700: #262a28;
-  --coal-750: #202422;
-  --coal-800: #1a1d1b;
-  --coal-850: #131514;
-  --coal-900: #0b0c0b;
+  --ink-0: #f5f5f5;
+  --ink-400: #a1a1a6;
+  --ink-600: #3b3b3f;
+  --ink-700: #262628;
+  --ink-750: #202022;
+  --ink-800: #19191b;
+  --ink-850: #111112;
+  --ink-900: #0a0a0b;
 
+  --volt-400: #facc15;
+  --volt-500: #eab308;
   --green-600: #1b7a4c;
-  --green-400: #46c283;
+  --green-400: #4ac07f;
   --red-600: #c4242a;
-  --red-400: #e5566f;
+  --red-400: #f0556a;
   --amber-700: #92400e;
-  --amber-400: #e3ad48;
+  --amber-400: #f0a04b;
 }
 
 /* 2. Semantic: light */
@@ -52,34 +53,35 @@
   --radius: 8px;
 
   /* background is the frame; card is the sheet and everything that sits on it */
-  --background: var(--stone-50);
-  --foreground: var(--stone-900);
-  --card: var(--stone-0);
-  --card-foreground: var(--stone-900);
-  --popover: var(--stone-0);
-  --popover-foreground: var(--stone-900);
-  --primary: var(--stone-900);
-  --primary-foreground: var(--stone-0);
-  --secondary: var(--stone-100);
-  --secondary-foreground: var(--stone-900);
-  --muted: var(--stone-100);
-  --muted-foreground: var(--stone-500);
-  --accent: var(--stone-150);
-  --accent-foreground: var(--stone-900);
-  --border: var(--stone-200);
-  --rule: var(--stone-250);
-  --input: var(--stone-300);
-  --ring: var(--green-600);
+  --background: var(--paper-50);
+  --foreground: var(--paper-900);
+  --card: var(--paper-0);
+  --card-foreground: var(--paper-900);
+  --popover: var(--paper-0);
+  --popover-foreground: var(--paper-900);
+  --secondary: var(--paper-100);
+  --secondary-foreground: var(--paper-900);
+  --muted: var(--paper-50);
+  --muted-foreground: var(--paper-500);
+  --accent: var(--paper-150);
+  --accent-foreground: var(--paper-900);
+  --border: var(--paper-200);
+  --rule: var(--paper-100);
+  --input: var(--paper-300);
+  --ring: var(--paper-900);
 
-  /* brand and success are one colour on purpose: the product's hue is a passed check */
-  --brand: var(--green-600);
-  --brand-foreground: var(--stone-0);
+  /* The brand hue is also the one main action: a yellow button with ink text. */
+  --brand: var(--volt-500);
+  --brand-foreground: var(--paper-900);
+  --primary: var(--volt-400);
+  --primary-foreground: var(--paper-900);
+
   --success: var(--green-600);
   --warning: var(--amber-700);
   --destructive: var(--red-600);
 
-  --panel: var(--stone-0);
-  --editor: var(--stone-0);
+  --panel: var(--paper-0);
+  --editor: var(--paper-0);
 
   --scale-lesson: 1;
   --scale-tasks: 1;
@@ -93,35 +95,36 @@ html.platform-darwin {
   --sidebar-top: 52px;
 }
 
-/* 2. Semantic: dark. True neutral darks; depth is lightness alone. */
+/* 2. Semantic: dark, the default. True neutral blacks; depth is lightness alone. */
 .dark {
-  --background: var(--coal-900);
-  --foreground: var(--coal-0);
-  --card: var(--coal-850);
-  --card-foreground: var(--coal-0);
-  --popover: var(--coal-800);
-  --popover-foreground: var(--coal-0);
-  --primary: var(--coal-0);
-  --primary-foreground: var(--coal-850);
-  --secondary: var(--coal-800);
-  --secondary-foreground: var(--coal-0);
-  --muted: var(--coal-800);
-  --muted-foreground: var(--coal-400);
-  --accent: var(--coal-750);
-  --accent-foreground: var(--coal-0);
-  --border: var(--coal-700);
-  --rule: var(--coal-800);
-  --input: var(--coal-600);
-  --ring: var(--green-400);
+  --background: var(--ink-900);
+  --foreground: var(--ink-0);
+  --card: var(--ink-850);
+  --card-foreground: var(--ink-0);
+  --popover: var(--ink-800);
+  --popover-foreground: var(--ink-0);
+  --secondary: var(--ink-800);
+  --secondary-foreground: var(--ink-0);
+  --muted: var(--ink-800);
+  --muted-foreground: var(--ink-400);
+  --accent: var(--ink-750);
+  --accent-foreground: var(--ink-0);
+  --border: var(--ink-700);
+  --rule: var(--ink-800);
+  --input: var(--ink-600);
+  --ring: var(--volt-400);
 
-  --brand: var(--green-400);
-  --brand-foreground: var(--coal-900);
+  --brand: var(--volt-400);
+  --brand-foreground: var(--ink-900);
+  --primary: var(--volt-400);
+  --primary-foreground: var(--ink-900);
+
   --success: var(--green-400);
   --warning: var(--amber-400);
   --destructive: var(--red-400);
 
-  --panel: var(--coal-850);
-  --editor: var(--coal-850);
+  --panel: var(--ink-850);
+  --editor: var(--ink-850);
 }
 
 /* 3. Tailwind mapping */

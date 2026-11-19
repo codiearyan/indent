@@ -37,19 +37,21 @@ signature has to change, change it there and in every caller in the same change.
 
 ## Design system
 
-The look in one line: a tinted frame holds the navigation, the work sits on a sheet, the chrome is
-grey, and the one hue is a green that only ever means passed.
+The look in one line: a dark frame holds the navigation, the work sits on a sheet one step lighter,
+the chrome is neutral, and the one hue is the yellow of a highlighted line of code.
 
 - **Three levels, no more.** The frame is `bg-background`. The sheet is `bg-card rounded-2xl border`
   inset 8px from the window edges. Cards on the sheet are `rounded-lg border border-border` with no
   fill of their own and no shadow. Shadows are only for what floats (menus, popovers, dialogs).
-- **Colour is meaning.** `brand` and `success` are the same green and are used only for something
-  passed or for progress: a passed check, a filled task cell, a progress fill, the activity heatmap.
-  `destructive` is a failed check. `warning` is hints and hard mode. Nothing else has a hue: links,
-  active navigation, selected tabs, focus decoration, AI and the main button are all neutral.
-  - Selected or active: a neutral pill (`bg-accent text-foreground`) or ink text. Never green.
+- **Colour is meaning.** `brand` is the yellow. It marks progress (a filled task cell in the build
+  strip, the level meter, the activity heatmap) and it is the one main action of a view
+  (`bg-primary text-primary-foreground`: a yellow button with ink text). `success` is the small green
+  mark of a passed check and `destructive` the red mark of a failed one; they are status marks, never
+  fills for large areas. `warning` is only the "being compared" tone in the DSA animations.
+  Nothing else has a hue: links, active navigation, selected tabs, hints and AI are neutral.
+  - Selected or active: a neutral pill (`bg-accent text-foreground`) or ink text. Never the brand.
   - Links: `text-muted-foreground hover:text-foreground`, or ink with an underline in prose.
-  - The one main action in a view is near-black: `bg-primary text-primary-foreground`.
+  - Never set text in the brand colour on a light surface; use it as a fill with ink text on top.
   - Soft status fills use opacity (`bg-success/10 text-success`, `bg-destructive/10`).
 - **Tokens only.** Use the Tailwind utilities of the semantic tokens in `styles/globals.css`
   (`bg-background`, `bg-card`, `bg-muted`, `bg-accent`, `text-foreground`, `text-muted-foreground`,
@@ -84,7 +86,7 @@ grey, and the one hue is a green that only ever means passed.
   (`.prose-lab.prose-compact` for dense places).
 - Text size zones: the lesson content gets `.zone-lesson`, the tasks list `.zone-tasks`; the editor
   and terminal multiply their font size by `useSettings().textScale.editor|terminal`.
-- Both themes must work; light is the default. Check every view in both.
+- Both themes must work; dark is the default. Check every view in both.
 - The window is frameless on macOS: the frame is `.app-drag`; a top bar leaves
   `var(--titlebar-inset)` free on the left and the sidebar starts at `var(--sidebar-top)`.
 - Copy is plain and short. No em dashes. Sentence case.
@@ -145,8 +147,7 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
 
 ## Rules of the product
 
-- Hard mode pays full task points, easy mode half. Easy mode shows the solution after a check. Once a
-  solution is opened in a chapter, that chapter stays in easy mode.
+- Every task pays its points once, the first time it passes.
 - Each task has three hints. The first unlocks after 3 checks that are not all green, then one per check.
 - All of it is in `src/shared/rules.ts`; do not re-implement the numbers elsewhere.
 
