@@ -1,0 +1,69 @@
+{
+  "id": "joins",
+  "title": "Joins",
+  "files": [
+    "queries/1-october-deliveries.sql",
+    "queries/2-driver-load.sql",
+    "queries/3-never-ordered.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs a query file against a fresh copy of the bakehouse database.",
+    "suggestedCommand": "node run.mjs queries/1-october-deliveries.sql"
+  },
+  "tasks": [
+    {
+      "id": "october-deliveries",
+      "title": "Build the October delivery log",
+      "file": "queries/1-october-deliveries.sql",
+      "description": "A cafe says an October delivery never arrived. Odile needs the log with names, not ids.\n\nIn `queries/1-october-deliveries.sql`, return one row per **delivered** order whose `ordered_on` falls in October 2026 (`2026-10-01` to `2026-10-31`), with these columns:\n\n- `order_id`: the order's id\n- `cafe`: the cafe's name\n- `driver`: the driver's name\n- `ordered_on`\n\nSort by `ordered_on`, then by `order_id`. This needs three tables: `orders`, `cafes` and `drivers`.\n\nThe check compares rows and their order on the shipped data and on a hidden dataset.",
+      "nextSteps": [
+        "Join orders to cafes and select the order id with the cafe name.",
+        "Add a second join to drivers.",
+        "Filter by status and date range, then sort.",
+        "Rename the columns to the names the task asks for."
+      ],
+      "hints": [
+        "Each order row holds a cafe_id and a driver_id. Those are what you join on.",
+        "Both cafes and drivers have a column called name. Give each table a short alias and write c.name, d.name with AS to tell them apart.",
+        "Write JOIN cafes AS c ON c.id = o.cafe_id and JOIN drivers AS d ON d.id = o.driver_id, then WHERE on status and BETWEEN on the two dates."
+      ],
+      "points": 10
+    },
+    {
+      "id": "driver-load",
+      "title": "Count orders for every driver",
+      "file": "queries/2-driver-load.sql",
+      "description": "Odile is planning rotas and wants to see how many orders each driver has been given, including any driver with none yet.\n\nIn `queries/2-driver-load.sql`, return one row for **every** driver with:\n\n- `driver`: the driver's name\n- `orders`: how many orders have that driver's id as `driver_id` (any status), `0` when there are none\n\nSort by `orders` from most to fewest, then by `driver` from A to Z.\n\nThe check compares rows and their order on the shipped data and on a hidden dataset.",
+      "nextSteps": [
+        "Join drivers to orders and count per driver. Compare the driver count with `SELECT * FROM drivers;`.",
+        "Change the join so drivers without orders stay in the result.",
+        "Make sure a driver with no orders shows 0, not 1."
+      ],
+      "hints": [
+        "An inner join drops a driver who has no matching order, so that driver never reaches the count.",
+        "LEFT JOIN keeps every row from the left table and fills the right side with NULL when nothing matches.",
+        "COUNT(*) counts that NULL-filled row as 1. Count a column from the orders side, such as o.id, which is NULL when there is no match."
+      ],
+      "points": 10
+    },
+    {
+      "id": "never-ordered",
+      "title": "Find products nobody orders",
+      "file": "queries/3-never-ordered.sql",
+      "description": "Tobias suspects a few products are baked for nobody. Find them.\n\nIn `queries/3-never-ordered.sql`, return `name` and `category` for every product that does not appear in any row of `order_items`. Row order does not matter.\n\nThe check compares your rows with the expected rows on the shipped data and on a hidden dataset.",
+      "nextSteps": [
+        "LEFT JOIN products to order_items and look at the rows with NULL on the right.",
+        "Keep only those rows.",
+        "Select the two columns the task asks for."
+      ],
+      "hints": [
+        "A product with orders matches one or more order_items rows. A product without orders matches none.",
+        "After a LEFT JOIN, the right side of an unmatched row is NULL in every column.",
+        "Filter with WHERE on a column from order_items that is never NULL in real rows, such as its product_id, being IS NULL."
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "id": "summaries",
+  "title": "Summaries",
+  "files": [
+    "queries/1-status-counts.sql",
+    "queries/2-category-prices.sql",
+    "queries/3-regular-cafes.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs a query file against a fresh copy of the bakehouse database.",
+    "suggestedCommand": "node run.mjs queries/1-status-counts.sql"
+  },
+  "tasks": [
+    {
+      "id": "status-counts",
+      "title": "Count orders by status",
+      "file": "queries/1-status-counts.sql",
+      "description": "Odile starts each Monday by asking how many orders are pending, delivered and cancelled.\n\nIn `queries/1-status-counts.sql`, return one row per order status with two columns:\n\n- `status`\n- `orders`: how many orders have that status\n\nRow order does not matter. The check compares your rows with the expected rows on the shipped data and on a hidden dataset.",
+      "nextSteps": [
+        "Run `SELECT COUNT(*) FROM orders;` to see the total.",
+        "Group the orders so you get one row per status.",
+        "Name the count column and run the file."
+      ],
+      "hints": [
+        "COUNT(*) counts rows. On its own it counts the whole table.",
+        "GROUP BY splits the rows into groups that share a value, and COUNT then counts each group.",
+        "Select the column you group by next to COUNT(*), and give the count the name the task asks for with AS."
+      ],
+      "points": 10
+    },
+    {
+      "id": "category-prices",
+      "title": "Summarize prices by category",
+      "file": "queries/2-category-prices.sql",
+      "description": "Tobias is reviewing prices and wants one line per product category.\n\nIn `queries/2-category-prices.sql`, return one row per `category`, sorted by category from A to Z, with these columns in any order:\n\n- `category`\n- `products`: how many products are in it\n- `cheapest`: the lowest price\n- `dearest`: the highest price\n- `avg_price`: the average price, rounded to 2 decimal places with `ROUND(value, 2)`\n\nThe check compares rows and their order on the shipped data and on a hidden dataset.",
+      "nextSteps": [
+        "Group the products by category and count them.",
+        "Add the lowest and highest price.",
+        "Add the rounded average and the sort."
+      ],
+      "hints": [
+        "MIN, MAX and AVG work like COUNT: one value per group.",
+        "You can wrap an aggregate in another function, for example ROUND(AVG(price), 2).",
+        "Every column in the SELECT list is either the grouped column or an aggregate. Then add ORDER BY category at the end."
+      ],
+      "points": 10
+    },
+    {
+      "id": "regular-cafes",
+      "title": "Find the regular cafes",
+      "file": "queries/3-regular-cafes.sql",
+      "description": "Odile wants to thank the cafes that keep coming back. A regular is a cafe with at least 3 **delivered** orders. Cancelled and pending orders do not count.\n\nIn `queries/3-regular-cafes.sql`, return:\n\n- `cafe_id`\n- `delivered`: how many delivered orders that cafe has\n\nOnly cafes with 3 or more delivered orders. Sort by `delivered` from most to fewest, then by `cafe_id` from smallest to largest.\n\nThe check compares rows and their order on the shipped data and on a hidden dataset.",
+      "nextSteps": [
+        "Count orders per cafe and look at the numbers.",
+        "Decide which rows to remove before grouping and which groups to remove after.",
+        "Add the sort and compare a few counts by hand."
+      ],
+      "hints": [
+        "Two different filters are needed: one about single orders and one about whole groups.",
+        "WHERE removes rows before they are grouped. HAVING removes groups after they are counted.",
+        "Filter the status in WHERE, group by cafe_id, keep groups with HAVING COUNT(*) >= 3, then ORDER BY two columns."
+      ],
+      "points": 10
+    }
+  ]
+}

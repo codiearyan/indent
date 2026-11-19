@@ -1,0 +1,70 @@
+{
+  "id": "reading-rows",
+  "title": "Reading rows",
+  "files": [
+    "queries/1-port-ellery-cafes.sql",
+    "queries/2-shelf-picks.sql",
+    "queries/3-missing-emails.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs a query file against a fresh copy of the bakehouse database.",
+    "suggestedCommand": "node run.mjs queries/1-port-ellery-cafes.sql"
+  },
+  "tasks": [
+    {
+      "id": "port-ellery-cafes",
+      "title": "List the cafes in Port Ellery",
+      "file": "queries/1-port-ellery-cafes.sql",
+      "description": "Odile is planning the Port Ellery round and needs every cafe in that town with its email address.\n\nIn `queries/1-port-ellery-cafes.sql`, write one `SELECT` that returns exactly two columns:\n\n- `name`: the cafe's name\n- `email`: the cafe's `contact_email`, renamed\n\nInclude only cafes whose `town` is `Port Ellery`, sorted by name from A to Z. Keep cafes without an email: they show `NULL`.\n\nThe check runs your file on the shipped data and on a hidden dataset with different cafes, and compares the rows, the column names and the order.",
+      "nextSteps": [
+        "Run `node run.mjs queries/1-port-ellery-cafes.sql` and read the message it prints.",
+        "Write `SELECT * FROM cafes;` first to see every column and value.",
+        "Choose the two columns, rename the email column and filter by town.",
+        "Add the sort and run the file again."
+      ],
+      "hints": [
+        "Text values in SQL go in single quotes, and the comparison is exact, including capital letters.",
+        "`AS` gives a column a new name in the result without changing the table.",
+        "The query has four parts in this order: SELECT, FROM, WHERE, ORDER BY. ORDER BY sorts from A to Z unless you say otherwise."
+      ],
+      "points": 10
+    },
+    {
+      "id": "shelf-picks",
+      "title": "Pick products for the counter display",
+      "file": "queries/2-shelf-picks.sql",
+      "description": "Tobias wants a list for the new counter display: cheap sweet things, plus every rye product, because rye is what the bakehouse is known for.\n\nIn `queries/2-shelf-picks.sql`, return the columns `name`, `category` and `price` for every product that is either:\n\n- in the category `pastry` or `cake` and priced under 3.00, or\n- has `rye` anywhere in its name, in any category and at any price\n\nUse `IN` for the categories and `LIKE` for the name. Row order does not matter. The check compares your rows with the expected rows on the shipped data and on a hidden dataset.",
+      "nextSteps": [
+        "Write the first condition on its own and run it.",
+        "Write the rye condition on its own and run it.",
+        "Join the two with OR, using parentheses so each half means what you intend.",
+        "Check that a 4.65 rye loaf and a 2.60 bun both appear."
+      ],
+      "hints": [
+        "`category IN ('a', 'b')` is a short way to write two equality checks joined by OR.",
+        "In LIKE, `%` matches any run of characters, so put it on both sides of the word. In SQLite, LIKE ignores the case of plain letters.",
+        "AND binds tighter than OR. Wrap the category and price conditions in parentheses together, then OR the name condition."
+      ],
+      "points": 10
+    },
+    {
+      "id": "missing-emails",
+      "title": "Find the newest cafes with no email",
+      "file": "queries/3-missing-emails.sql",
+      "description": "Invoices go out by email, and some cafes never gave one. Odile will phone the most recent ones first.\n\nIn `queries/3-missing-emails.sql`, return `name`, `town` and `joined_on` for cafes whose `contact_email` is missing (`NULL`). Sort them by `joined_on` with the newest first, and return only the first 5.\n\nThe check compares rows and their order on the shipped data and on a hidden dataset.",
+      "nextSteps": [
+        "List every cafe with its email and spot the ones that show NULL.",
+        "Filter to only those cafes.",
+        "Sort newest first, then keep the first 5 rows."
+      ],
+      "hints": [
+        "NULL means no value at all, so it is never equal to anything, not even to NULL.",
+        "SQL has a special test for missing values: `IS NULL`. `= NULL` returns no rows.",
+        "Dates stored as YYYY-MM-DD text sort correctly as text. Add DESC after the column in ORDER BY, then LIMIT 5 at the very end."
+      ],
+      "points": 10
+    }
+  ]
+}
