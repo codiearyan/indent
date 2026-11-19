@@ -1,9 +1,11 @@
 import { app } from 'electron'
 import { join } from 'path'
 
-/** Lab packs: the repo's content/ folder in dev, an extra resource when packaged. */
+/** Lab packs: the repo root's content/ folder in dev, an extra resource when packaged. */
 export function contentDir(): string {
-  return app.isPackaged ? join(process.resourcesPath, 'content') : join(app.getAppPath(), 'content')
+  return app.isPackaged
+    ? join(process.resourcesPath, 'content')
+    : join(app.getAppPath(), '..', '..', 'content')
 }
 
 /** Parent of every learner workspace. Lab dependencies are installed here so each workspace resolves them. */
