@@ -26,6 +26,9 @@ the picture: a repo has issues, an issue has tasks, tasks have checks ("Start re
 
 ## Commands
 
+Run from the repo root.
+
+- `npm install` installs every workspace
 - `npm run dev` start the app with hot reload
 - `npm run typecheck` both tsconfigs (node and web)
 - `npm test` vitest unit tests
@@ -33,8 +36,17 @@ the picture: a repo has issues, an issue has tasks, tasks have checks ("Start re
 
 ## Layout
 
+An npm workspaces monorepo. Install, lint and format from the root. Lab content is shared at the
+root so other apps (a future site) can read it. Each app is a workspace under `apps/`:
+
 ```
 content/                 lab packs and the grader kit (plain files, shipped as an extra resource)
+apps/desktop/            the Electron app (@labbench/desktop); src/ paths below are relative to it
+```
+
+Inside `apps/desktop/`:
+
+```
 src/shared/              the contract: types.ts (domain + window.api), rules.ts (points, hints, levels)
 src/main/                Electron main process
   ipc.ts                 handle() / listen() / emit() helpers; channels are `${namespace}:${method}`

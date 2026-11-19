@@ -48,8 +48,11 @@ Other commands:
 npm run typecheck   # both TypeScript projects
 npm run lint
 npm test            # unit tests
-npm run build:mac   # package the app (also build:win, build:linux)
+npm run build:mac -w @labbench/desktop   # package the app (also build:win, build:linux)
 ```
+
+The repository is an npm workspaces monorepo: the desktop app is in `apps/desktop`, and the content
+stays in `content/` at the root so other apps can share it.
 
 ## Add a repo
 
