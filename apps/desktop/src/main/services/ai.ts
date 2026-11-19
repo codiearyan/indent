@@ -63,6 +63,7 @@ const API_PROVIDERS: { id: ApiProviderId; label: string; models: string[]; fast:
 const CLI_FAST_MODEL: Partial<Record<CliProviderId, string>> = { 'claude-code': 'haiku' }
 
 const CHAT_TIMEOUT_MS = 120_000
+const AI_OFF = 'AI is off. Turn it on from the AI menu.'
 const COMPLETE_TIMEOUT_MS = { cli: 20_000, api: 8_000 }
 
 const settingsFile = (): string => dataFile('ai.json')
@@ -241,6 +242,7 @@ async function runChat(
 }
 
 async function complete(request: AiCompleteRequest): Promise<string> {
+  if (!(await loadSettings()).enabled) throw new Error(AI_OFF)
   completion?.abort()
   const cancel = new AbortController()
   completion = cancel
@@ -316,6 +318,7 @@ export function register(): void {
     },
 
     chat: async (request) => {
+      if (!(await loadSettings()).enabled) throw new Error(AI_OFF)
       const requestId = randomUUID()
       const cancel = new AbortController()
       chats.set(requestId, cancel)
