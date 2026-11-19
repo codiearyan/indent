@@ -1,0 +1,65 @@
+{
+  "id": "promises",
+  "title": "Promises from callbacks",
+  "files": ["src/loadTides.js", "src/nextHighTide.js", "src/sailingReport.js", "src/services.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo calls your functions against the slow fake Tidewell services.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "wrap",
+      "title": "Wrap the tide reader in a promise",
+      "file": "src/loadTides.js",
+      "description": "Implement `loadTides(port, read)` in `src/loadTides.js`. It calls `read(port, callback)` once and returns a promise right away.\n\n- `read` calls back with `(error)` when it fails: reject with that same error\n- `read` calls back with `(null, table)` when it works: resolve with `table`\n- it must also work when `read` calls back before it returns\n\n**Timing:** `read` is a parameter that defaults to `readTideTable` from `src/services.js`. The check passes its own fake `read` that answers at once or on the next turn of the event loop, so nothing waits in real time.",
+      "nextSteps": [
+        "Run `node src/demo.js` and read the first two lines.",
+        "Return a new promise from `loadTides`.",
+        "Inside it, call `read` with the port and a callback that settles the promise.",
+        "Run the demo again: quay should print a table and heron an error."
+      ],
+      "hints": [
+        "A promise you create yourself hands you two functions, one to fulfil it and one to reject it. The callback is where you call one of them.",
+        "`new Promise((resolve, reject) => { ... })` runs its body straight away, so calling `read` inside it is fine.",
+        "In the callback, look at the first argument: if it is set, pass it to `reject`, otherwise pass the second argument to `resolve`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "chain",
+      "title": "Chain the next high tide",
+      "file": "src/nextHighTide.js",
+      "description": "Implement `nextHighTide(port, after, load)` in `src/nextHighTide.js` with `.then()`. It returns a promise of one line for the departure board.\n\n- `load(port)` returns a promise of `[{ time: 'HH:MM', height }]` in time order\n- a high tide has a `height` of 3 or more\n- find the first high tide whose `time` is at or after `after`\n- resolve with `'17:15 (3.4 m)'`: the time, then the height with one decimal (`3` shows as `3.0`)\n- if there is none, resolve with `'No high tide after 18:00'`, using the `after` you were given\n- if `load` rejects, reject with the same error\n\n**Timing:** `load` is a parameter that defaults to `loadTides`. The check passes a fake `load` that answers on the next turn of the event loop.",
+      "nextSteps": [
+        "Call `load(port)` and return the promise you build from it.",
+        "Add a `then` that finds the tide you want.",
+        "Add another `then` that turns it into the sentence.",
+        "Try the demo: gull has no high tide over 3 m."
+      ],
+      "hints": [
+        "Every `then` returns a new promise that resolves with whatever its callback returned. You can split the work into small steps.",
+        "Times written as 'HH:MM' compare correctly as strings, so `'17:15' >= '12:00'` is true. `toFixed(1)` gives one decimal.",
+        "`find` returns `undefined` when nothing matches. Check for that in the last step and build the 'No high tide after' sentence there. Do not add a `catch`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "flatten",
+      "title": "One report from two services",
+      "file": "src/sailingReport.js",
+      "description": "Implement `sailingReport(route, services)` in `src/sailingReport.js` with `.then()`. It returns a promise of `{ route, time, sea }`.\n\n- `services.getSailing(route)` resolves with `{ route, time }`\n- `services.getSeaState(time)` resolves with the sea state for that time\n- ask for the sea state only once the sailing's time is known\n- if either service rejects, reject with that same error, and if `getSailing` fails do not call `getSeaState`\n\n**Timing:** `services` is a parameter that defaults to the fake services. The check passes its own pair that answer on the next turn of the event loop and records the order they were called in.",
+      "nextSteps": [
+        "Call `getSailing` and add a `then`.",
+        "Inside it, call `getSeaState` with the sailing's time.",
+        "Make sure the outer promise waits for the sea state.",
+        "Run the demo and check both report lines."
+      ],
+      "hints": [
+        "The sea state needs the time, so the two calls cannot happen side by side.",
+        "When a `then` callback returns a promise, the promise from `then` waits for it and takes on its result. Forgetting the `return` loses both the value and any error.",
+        "Return `getSeaState(sailing.time).then(...)` from the first callback, and build the final object in the inner `then`, where both `sailing` and `sea` are in scope."
+      ],
+      "points": 10
+    }
+  ]
+}

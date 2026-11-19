@@ -1,0 +1,65 @@
+{
+  "id": "many-at-once",
+  "title": "Many things at once",
+  "files": ["src/loadRoutes.js", "src/portStatus.js", "src/withTimeout.js", "src/services.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo loads routes, pings ports and waits for a slow forecast, printing how long each took.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "all",
+      "title": "Load every route at once",
+      "file": "src/loadRoutes.js",
+      "description": "Implement `loadRoutes(ids, getRoute)` in `src/loadRoutes.js`. It returns a promise of the routes for every id, in the same order as `ids`.\n\n- start every `getRoute(id)` call before waiting for any of them\n- keep the order of `ids`, whatever order the answers arrive in\n- if any call rejects, reject with that error\n- `loadRoutes([])` resolves with `[]`\n\n**Timing:** `getRoute` is a parameter that defaults to the fake service. The check passes a fake whose answers it settles one by one, in an order it chooses, and records which calls had started before any answer arrived.",
+      "nextSteps": [
+        "Run `node src/demo.js` and read the first two lines.",
+        "Turn the list of ids into a list of promises.",
+        "Wait for all of them in one step.",
+        "Run the demo again: three routes should take about as long as the slowest one."
+      ],
+      "hints": [
+        "Calling `getRoute` starts a request. You want every request started before any waiting happens.",
+        "`ids.map(...)` calls a function for every id straight away and gives you an array of whatever it returned.",
+        "`Promise.all` takes an array of promises and gives you one promise of their values, in the array's order. It rejects as soon as any of them rejects."
+      ],
+      "points": 10
+    },
+    {
+      "id": "settled",
+      "title": "Which ports are answering",
+      "file": "src/portStatus.js",
+      "description": "Implement `portStatus(ports, ping)` in `src/portStatus.js`. It pings every port at the same time and resolves with `{ up, down }`.\n\n- `up` is the list of ports whose `ping(port)` resolved\n- `down` is a list of `{ port, reason }` for every port whose ping rejected, where `reason` is the error's `message`\n- both lists keep the order of `ports`\n- `portStatus` never rejects because a ping failed, even when every port is down\n\n**Timing:** `ping` is a parameter that defaults to the fake service. The check passes a fake whose answers it settles in reverse order, and records which pings started before any answer arrived.",
+      "nextSteps": [
+        "Start a ping for every port.",
+        "Wait for every ping to settle, successful or not.",
+        "Walk the results and sort each port into one of the two lists.",
+        "Run the demo: reef should be down."
+      ],
+      "hints": [
+        "`Promise.all` gives up at the first failure, so it cannot tell you about the ports that answered.",
+        "`Promise.allSettled` never rejects. It resolves with one object per promise that has a `status`, plus `value` or `reason`.",
+        "The results come back in the same order as the promises, so result `i` belongs to `ports[i]`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "timeout",
+      "title": "Give up after a while",
+      "file": "src/withTimeout.js",
+      "description": "Implement `withTimeout(promise, ms, timers)` in `src/withTimeout.js`. It returns a promise that settles the same way as `promise`, unless `promise` takes longer than `ms`.\n\n- start exactly one timer with `timers.setTimeout(callback, ms)`\n- if the timer fires first, reject with an `Error` whose `name` is `'TimeoutError'` and whose message contains `ms`, such as `'Timed out after 500 ms'`\n- if `promise` settles first, settle the same way and call `timers.clearTimeout` with the timer's id\n- if `promise` rejects after the timeout, that rejection must not be left unhandled\n\n**Timing:** `timers` is `{ setTimeout, clearTimeout }` and defaults to the real ones. The check passes a fake clock: it records the delay you ask for and whether you clear the timer, and fires it by hand, so no real time passes.",
+      "nextSteps": [
+        "Build a promise that rejects when the timer fires.",
+        "Let it race against the promise you were given.",
+        "Clear the timer once the race is over.",
+        "Run the demo: one forecast arrives, the other times out after 500 ms."
+      ],
+      "hints": [
+        "You need two promises competing: the real work, and one that only ever rejects, after `ms`.",
+        "`Promise.race` settles the same way as whichever promise settles first, and keeps listening to the others, so a late failure is not unhandled.",
+        "Keep the id that `setTimeout` returns in a variable. `.finally(...)` on the raced promise is a tidy place to clear it, whichever way the race ended."
+      ],
+      "points": 10
+    }
+  ]
+}

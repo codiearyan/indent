@@ -1,0 +1,65 @@
+{
+  "id": "retries-and-cancellation",
+  "title": "Retries and cancellation",
+  "files": ["src/retry.js", "src/sleep.js", "src/services.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo fetches passenger lists from a busy fake harbour server, retries, and cancels one request part way through.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "backoff",
+      "title": "Retry with backoff",
+      "file": "src/retry.js",
+      "description": "Implement `retry(task, options)` in `src/retry.js`. It calls `task({ attempt, signal })` until it resolves, and resolves with its value. `options` is `{ attempts = 4, baseMs = 100, signal, sleep }`.\n\n- `attempt` counts from 1\n- if the error's `retryable` property is not `true`, reject with it at once\n- if it is retryable and attempts are left, `await sleep(baseMs * 2 ** (attempt - 1), { signal })` and try again, so the waits are 100, 200, 400 ms by default\n- after the last attempt fails, reject with that last error, without a final wait\n\nFor this task `signal` can stay unused; the third task adds it.\n\n**Timing:** `sleep` is an option that defaults to `sleep` from `src/sleep.js`. The check passes a fake sleep that records every delay you ask for and returns at once, so no real time passes.",
+      "nextSteps": [
+        "Run `node src/demo.js` and read the first block.",
+        "Write a loop that calls the task and returns its value when it works.",
+        "Decide in the catch whether to give up or wait and go round again.",
+        "Run the demo: S1 should succeed on call 3 and X9 fail on call 1."
+      ],
+      "hints": [
+        "There are three ways out of each attempt: success, a failure worth retrying, and a failure that is not.",
+        "A `for` loop over `attempt` with a `try` and `catch` inside reads well. The `return` inside the `try` ends the whole function.",
+        "In the catch, rethrow when the error is not retryable or when `attempt` has reached `attempts`. Sleep after the catch, before the next turn."
+      ],
+      "points": 10
+    },
+    {
+      "id": "sleep",
+      "title": "A sleep you can cancel",
+      "file": "src/sleep.js",
+      "description": "`sleep(ms, options)` in `src/sleep.js` works, but nothing can stop it. Make it cancellable. `options` is `{ signal, setTimeout, clearTimeout }`.\n\n- start one timer with `setTimeout(callback, ms)` and resolve when it fires\n- if `signal` is already aborted, reject with `signal.reason` and start no timer\n- if `signal` aborts while waiting, clear the timer and reject with `signal.reason`\n- once the timer has fired, remove the abort listener you added\n- without a `signal` it simply waits\n\n**Timing:** `setTimeout` and `clearTimeout` are options that default to the real ones. The check passes a fake clock that records the delay, fires the timer by hand and notes whether you cleared it. It also counts the abort listeners left on the signal.",
+      "nextSteps": [
+        "Handle a signal that is already aborted.",
+        "Start the timer and keep its id.",
+        "Listen for the abort event and clean up in both directions.",
+        "Run the checks and read which case fails, if any."
+      ],
+      "hints": [
+        "An `AbortSignal` has an `aborted` flag, a `reason`, and fires an `abort` event. You need all three.",
+        "Two things can happen first: the timer fires or the signal aborts. Whichever comes first should undo the other.",
+        "Name the abort handler so you can pass the same function to `removeEventListener` inside the timer callback, and call `clearTimeout(timer)` inside the handler."
+      ],
+      "points": 10
+    },
+    {
+      "id": "cancel",
+      "title": "Stop when asked",
+      "file": "src/retry.js",
+      "description": "Teach `retry` in `src/retry.js` to stop when `options.signal` (an `AbortSignal`, possibly missing) aborts, so no retry or timer runs after that.\n\n- pass the signal on: `task({ attempt, signal })` and `sleep(ms, { signal })`\n- if the signal is already aborted, reject with `signal.reason` without calling `task`\n- once the signal has aborted, start no new attempt and no new sleep, and reject with `signal.reason`\n- this holds even if the attempt in progress then fails with a retryable error, or a sleep finishes anyway\n- everything from the first task still works without a signal\n\n**Timing:** `sleep` is an option. The check passes a fake sleep that it finishes by hand, and that rejects on abort like the real one, except in one case where it ignores the signal on purpose.",
+      "nextSteps": [
+        "Pass the signal to the task and to sleep.",
+        "Find every point where your loop is about to start something new.",
+        "Check the signal at each of them.",
+        "Run the demo: S2 should stop at about 120 ms with no calls after it."
+      ],
+      "hints": [
+        "Aborting cannot reach inside a promise that is already running. Your code has to look at the signal whenever it gets control back.",
+        "`signal?.throwIfAborted()` throws `signal.reason` when the signal is aborted and does nothing otherwise, including when there is no signal.",
+        "Check at the top of each turn of the loop (covers the start and after waking) and first thing in the catch (covers a failure that arrives after an abort)."
+      ],
+      "points": 10
+    }
+  ]
+}
