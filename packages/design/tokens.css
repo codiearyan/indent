@@ -1,0 +1,172 @@
+/*
+ * @indent/design: the tokens every Indent surface shares (the desktop app and the site).
+ * Import after Tailwind:  @import 'tailwindcss'; @import '@indent/design/tokens.css';
+ * Dark is the designed default; put class="dark" on <html>. Without it the light values apply.
+ */
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system: a dark frame holds the navigation, the work sits on a sheet one step lighter.
+ *   1. Primitives  raw values, never used directly in components
+ *   2. Semantic    purpose aliases, the only tokens components may use
+ *   3. Tailwind    @theme mapping, exposes semantic tokens as utilities
+ * The chrome is neutral. The one hue is one vivid orange: it marks progress and
+ * the one main action. Green and red are status marks only.
+ * Raw hex or oklch in a component is a bug.
+ */
+
+/* 1. Primitives */
+:root {
+  --paper-0: #ffffff;
+  --paper-50: #f4f4f5;
+  --paper-100: #ededef;
+  --paper-150: #e6e6e9;
+  --paper-200: #dfdfe3;
+  --paper-300: #c4c4cb;
+  --paper-500: #5c5c66;
+  --paper-900: #111113;
+
+  --ink-0: #f5f5f5;
+  --ink-400: #a1a1a6;
+  --ink-600: #3b3b3f;
+  --ink-700: #262628;
+  --ink-750: #202022;
+  --ink-800: #19191b;
+  --ink-850: #111112;
+  --ink-900: #0a0a0b;
+
+  --ember-500: #ff5a1f;
+  --ember-600: #e8500f;
+  --green-600: #1b7a4c;
+  --green-400: #4ac07f;
+  --red-600: #c4242a;
+  --red-400: #f0556a;
+  --gold-700: #8a6400;
+  --gold-400: #e5c14b;
+}
+
+/* 2. Semantic: light */
+:root {
+  --radius: 8px;
+
+  /* background is the frame; card is the sheet and everything that sits on it */
+  --background: var(--paper-50);
+  --foreground: var(--paper-900);
+  --card: var(--paper-0);
+  --card-foreground: var(--paper-900);
+  --popover: var(--paper-0);
+  --popover-foreground: var(--paper-900);
+  --secondary: var(--paper-100);
+  --secondary-foreground: var(--paper-900);
+  --muted: var(--paper-50);
+  --muted-foreground: var(--paper-500);
+  --accent: var(--paper-150);
+  --accent-foreground: var(--paper-900);
+  --border: var(--paper-200);
+  --rule: var(--paper-100);
+  --input: var(--paper-300);
+  --ring: var(--paper-900);
+
+  /* The brand hue is also the one main action: an orange button with ink text. */
+  --brand: var(--ember-600);
+  --brand-foreground: var(--paper-900);
+  --primary: var(--ember-500);
+  --primary-foreground: var(--paper-900);
+
+  --success: var(--green-600);
+  --warning: var(--gold-700);
+  --destructive: var(--red-600);
+
+  --panel: var(--paper-0);
+  --editor: var(--paper-0);
+}
+
+/* 2. Semantic: dark, the default. True neutral blacks; depth is lightness alone. */
+.dark {
+  --background: var(--ink-900);
+  --foreground: var(--ink-0);
+  --card: var(--ink-850);
+  --card-foreground: var(--ink-0);
+  --popover: var(--ink-800);
+  --popover-foreground: var(--ink-0);
+  --secondary: var(--ink-800);
+  --secondary-foreground: var(--ink-0);
+  --muted: var(--ink-800);
+  --muted-foreground: var(--ink-400);
+  --accent: var(--ink-750);
+  --accent-foreground: var(--ink-0);
+  --border: var(--ink-700);
+  --rule: var(--ink-800);
+  --input: var(--ink-600);
+  --ring: var(--ember-500);
+
+  --brand: var(--ember-500);
+  --brand-foreground: var(--ink-900);
+  --primary: var(--ember-500);
+  --primary-foreground: var(--ink-900);
+
+  --success: var(--green-400);
+  --warning: var(--gold-400);
+  --destructive: var(--red-400);
+
+  --panel: var(--ink-850);
+  --editor: var(--ink-850);
+}
+
+/* 3. Tailwind mapping */
+@theme inline {
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-rule: var(--rule);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-panel: var(--panel);
+  --color-editor: var(--editor);
+
+  /* Tight radii: 4 chips, 6 controls, 8 cards. Only the sheet is soft (rounded-2xl, 16px). */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  ::selection {
+    background: color-mix(in oklch, var(--brand) 30%, transparent);
+  }
+}

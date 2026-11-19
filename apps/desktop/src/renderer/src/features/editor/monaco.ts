@@ -4,7 +4,7 @@ import TsWorker from 'monaco-editor/language/typescript/ts.worker?worker'
 import JsonWorker from 'monaco-editor/language/json/json.worker?worker'
 import CssWorker from 'monaco-editor/language/css/css.worker?worker'
 import HtmlWorker from 'monaco-editor/language/html/html.worker?worker'
-import { codePalette, type CodePalette } from '@/lib/code-palette'
+import { codePalette, type CodePalette } from '@indent/design/code-palette'
 import { registerInlineSuggestions } from '@/features/ai/inlineSuggestions'
 
 self.MonacoEnvironment = {

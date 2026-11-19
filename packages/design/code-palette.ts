@@ -1,5 +1,5 @@
 // Hex mirror of the design tokens for libraries that cannot read CSS variables
-// (Monaco themes, xterm themes). Keep in step with styles/globals.css.
+// (Monaco themes, xterm themes). Keep in step with tokens.css.
 export interface CodePalette {
   background: string
   foreground: string
@@ -33,9 +33,9 @@ export const codePalette: Record<'dark' | 'light', CodePalette> = {
     foreground: '#e8ebe9',
     muted: '#a1a1a6',
     border: '#262628',
-    selection: '#3a3a1f',
+    selection: '#3d2418',
     lineHighlight: '#19191b',
-    cursor: '#facc15',
+    cursor: '#ff5a1f',
     comment: '#7c7c85',
     keyword: '#79b8ff',
     string: '#e6b673',
@@ -47,7 +47,7 @@ export const codePalette: Record<'dark' | 'light', CodePalette> = {
       black: '#262628',
       red: '#f0556a',
       green: '#4ac07f',
-      yellow: '#facc15',
+      yellow: '#e5c14b',
       blue: '#79b8ff',
       magenta: '#c79bf2',
       cyan: '#5fd0c0',
@@ -59,7 +59,7 @@ export const codePalette: Record<'dark' | 'light', CodePalette> = {
     foreground: '#111113',
     muted: '#5c5c66',
     border: '#dfdfe3',
-    selection: '#fdefb0',
+    selection: '#ffe1d3',
     lineHighlight: '#f4f4f5',
     cursor: '#111113',
     comment: '#6b6b75',
