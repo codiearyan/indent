@@ -30,6 +30,8 @@ export function withKey<K extends string>(
 ): Partial<Record<K, string>> {
   const next = { ...stored }
   const trimmed = typeof key === 'string' ? key.trim() : ''
+  // A key travels in a request header, where anything else fails with the key in the error.
+  if (trimmed && !/^[\x21-\x7e]+$/.test(trimmed)) throw new Error('That is not an API key.')
   if (trimmed) next[provider] = trimmed
   else delete next[provider]
   return next

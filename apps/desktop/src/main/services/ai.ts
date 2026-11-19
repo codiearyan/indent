@@ -144,8 +144,9 @@ async function providerList(fresh: boolean): Promise<AiProviderInfo[]> {
 }
 
 async function buildConfig(fresh = false): Promise<AiConfig> {
-  const providers = await providerList(fresh)
   const saved = await loadSettings()
+  // With AI off nothing is looked for, so no CLI is started on the learner's behalf.
+  const providers = saved.enabled ? await providerList(fresh) : []
   const chosen = providers.find((p) => p.id === saved.provider && p.available)
   const active = chosen ?? providers.find((p) => p.available) ?? null
   let model = chosen ? saved.model : null
@@ -203,6 +204,13 @@ async function loadChapter(labId: string, chapterId: string): Promise<[ChapterDe
 
 const chats = new Map<string, AbortController>()
 let completion: AbortController | undefined
+let testing: AbortController | undefined
+
+function stopEverything(): void {
+  for (const chat of chats.values()) chat.abort()
+  completion?.abort()
+  testing?.abort()
+}
 
 function send(event: AiChatEvent): void {
   emit(EVENTS.aiChat, event)
@@ -290,13 +298,15 @@ async function testConnection(): Promise<string> {
   if (!provider) throw new Error('No AI provider is set up yet.')
   const limit = TEST_TIMEOUT_MS[provider.kind]
   const timeout = AbortSignal.timeout(limit)
+  testing?.abort()
+  const cancel = (testing = new AbortController())
   let text = ''
   try {
     await streamReply(config, {
       system: 'You check that a connection works. Answer in one short sentence.',
       messages: [{ role: 'user', content: 'Greet a learner in five words or fewer.' }],
       quick: false,
-      signal: timeout,
+      signal: AbortSignal.any([timeout, cancel.signal]),
       onDelta: (delta) => {
         text += delta
       }
@@ -305,6 +315,8 @@ async function testConnection(): Promise<string> {
     if (timeout.aborted)
       throw new Error(`No reply within ${limit / 1000} seconds.`, { cause: error })
     throw error
+  } finally {
+    if (testing === cancel) testing = undefined
   }
   const reply = text.trim().replace(/\s+/g, ' ').slice(0, 200)
   if (!reply) throw new Error(`${provider.label} answered with nothing.`)
@@ -330,7 +342,15 @@ export function register(): void {
       if (patch.nudge !== undefined) next.nudge = !!patch.nudge
       settings = next
       await saveSettings()
-      return buildConfig()
+      if (!next.enabled) stopEverything()
+      const config = await buildConfig()
+      // The provider shown as picked becomes the saved one, so a later install cannot move it.
+      if (!next.provider && config.provider) {
+        settings = { ...next, provider: config.provider }
+        await saveSettings()
+        return buildConfig()
+      }
+      return config
     },
 
     setKey: async (provider, key) => {

@@ -44,4 +44,9 @@ describe('withKey', () => {
     expect(withKey(stored, 'openai', 42)).toEqual({ anthropic: 'sk-b' })
     expect(stored).toEqual({ openai: 'sk-a', anthropic: 'sk-b' })
   })
+
+  it('refuses a key that could not travel in a header', () => {
+    expect(() => withKey({}, 'openai', 'sk-\u2022\u2022abcd')).toThrow('not an API key')
+    expect(() => withKey({}, 'openai', 'sk-a\nb')).toThrow('not an API key')
+  })
 })
