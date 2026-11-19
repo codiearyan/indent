@@ -140,3 +140,21 @@ html:active-view-transition-type(onboarding-finish) {
     opacity: 0;
   }
 }
+
+/* The mark settles in once, the first time the setup opens. */
+.ob-mark {
+  animation: ob-mark 480ms var(--ease-out) both;
+}
+
+@keyframes ob-mark {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-mark {
+    animation-name: ob-fade-in;
+  }
+}
