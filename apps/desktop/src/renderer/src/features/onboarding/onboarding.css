@@ -25,10 +25,13 @@ html:active-view-transition-type(onboarding-step) {
 
 /* Finishing hands the window to the app with one cross-fade. */
 html:active-view-transition-type(onboarding-finish) {
-  &::view-transition-old(root) {
+  &::view-transition-group(*) {
+    animation: none;
+  }
+  &::view-transition-old(*) {
     animation: ob-out var(--motion-exit) var(--ease-out) both;
   }
-  &::view-transition-new(root) {
+  &::view-transition-new(*) {
     animation: ob-in var(--motion-enter) var(--ease-out) both;
   }
 }
@@ -102,10 +105,10 @@ html:active-view-transition-type(onboarding-finish) {
     }
   }
   html:active-view-transition-type(onboarding-finish) {
-    &::view-transition-old(root) {
+    &::view-transition-old(*) {
       animation-name: ob-fade-out;
     }
-    &::view-transition-new(root) {
+    &::view-transition-new(*) {
       animation-name: ob-fade-in;
     }
   }
