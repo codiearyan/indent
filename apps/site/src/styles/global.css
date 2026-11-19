@@ -69,10 +69,6 @@
   mask-composite: intersect;
 }
 
-.wordmark-mask {
-  mask-image: linear-gradient(to bottom, black 10%, transparent 95%);
-}
-
 .cell {
   transition: background-color 240ms ease;
 }

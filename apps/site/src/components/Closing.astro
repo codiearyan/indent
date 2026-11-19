@@ -80,11 +80,71 @@ const requirements = [
       </nav>
     </div>
   </div>
-  <div class="wordmark-mask h-[19vw] overflow-hidden select-none" aria-hidden="true">
-    <p
-      class="text-center text-[27vw] leading-[0.9] font-semibold tracking-[-0.06em] text-foreground/[0.07]"
-    >
-      Indent
-    </p>
+  <div
+    class="relative overflow-hidden text-foreground select-none after:absolute after:bottom-0 after:h-px after:w-full after:bg-current/15"
+    data-fluid-word
+    aria-hidden="true"
+  >
+    <svg class="w-full translate-y-[37.5%]" viewBox="0 0 1200 300" fill="none">
+      <text
+        x="50%"
+        y="50%"
+        text-anchor="middle"
+        dominant-baseline="central"
+        stroke="currentColor"
+        stroke-opacity="0.1"
+        stroke-width="2"
+        fill="url(#fluid-word-fill)"
+        font-size="300"
+        font-weight="600"
+        letter-spacing="-0.04em"
+      >
+        Indent
+      </text>
+      <defs>
+        <linearGradient
+          id="fluid-word-fill"
+          x1="600"
+          y1="0"
+          x2="600"
+          y2="300"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0.625" stop-color="currentColor" stop-opacity="0"></stop>
+          <stop offset="1" stop-color="currentColor"></stop>
+        </linearGradient>
+      </defs>
+    </svg>
   </div>
 </footer>
+
+<script>
+  // The fill's starting point follows the pointer on a spring, so the gradient leans toward it.
+  const word = document.querySelector<HTMLElement>('[data-fluid-word]')
+  const fill = word?.querySelector('linearGradient')
+  if (word && fill && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const rest = 600
+    let target = rest
+    let x = rest
+    let speed = 0
+    let frame = 0
+    const step = (): void => {
+      speed = (speed + (target - x) * 0.08) * 0.75
+      x += speed
+      fill.setAttribute('x1', String(x))
+      const moving = Math.abs(target - x) > 0.5 || Math.abs(speed) > 0.5
+      frame = moving ? requestAnimationFrame(step) : 0
+    }
+    const aim = (to: number): void => {
+      target = to
+      if (!frame) frame = requestAnimationFrame(step)
+    }
+    const follow = (event: PointerEvent): void => {
+      const box = word.getBoundingClientRect()
+      aim(((event.clientX - box.left) / box.width) * 1200)
+    }
+    word.addEventListener('pointermove', follow)
+    word.addEventListener('pointerdown', follow)
+    word.addEventListener('pointerleave', () => aim(rest))
+  }
+</script>
