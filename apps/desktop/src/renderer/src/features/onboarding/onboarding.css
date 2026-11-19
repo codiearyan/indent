@@ -188,16 +188,20 @@ html:active-view-transition-type(onboarding-finish) {
   overflow: hidden;
   white-space: pre;
   vertical-align: top;
-  /* One spare step: Chromium holds a steps() animation one step short at its end. */
-  width: calc((var(--chars) + 1) * 1ch);
+  width: calc(var(--chars) * 1ch);
   animation-name: ob-type;
   animation-timing-function: steps(var(--steps), end);
-  animation-fill-mode: both;
+  /* Backwards only: Chromium holds a steps() animation one step short at its end, so the
+     finished line falls back to its own width. One spare step reaches the last character. */
+  animation-fill-mode: backwards;
 }
 
 @keyframes ob-type {
   from {
     width: 0;
+  }
+  to {
+    width: calc((var(--chars) + 1) * 1ch);
   }
 }
 
@@ -269,4 +273,29 @@ html:active-view-transition-type(onboarding-finish) {
     opacity: 0;
     transform: scale(0.95);
   }
+}
+
+/* Help level demos: a key is pressed, grey text appears, Tab turns it into code. */
+.ob-ghost {
+  color: var(--muted-foreground);
+  opacity: 0.8;
+  animation: ob-fade-in var(--motion-enter) var(--ease-out) both;
+}
+.ob-ghost.ob-accept {
+  animation:
+    ob-fade-in var(--motion-enter) var(--ease-out) both,
+    ob-accept var(--motion-state) var(--ease-out) forwards;
+}
+
+@keyframes ob-accept {
+  to {
+    color: var(--foreground);
+    opacity: 1;
+  }
+}
+
+.ob-key {
+  animation:
+    ob-appear var(--motion-enter) var(--ease-out) both,
+    ob-press 240ms var(--ease-out) both;
 }
