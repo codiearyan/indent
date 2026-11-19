@@ -3,13 +3,21 @@ import { Pause, Play, SkipBack, SkipForward } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TOUR } from '@/features/tour/anchors'
 import { IconButton } from './IconButton'
-import { lessonParts } from './lessonSpeech'
+import { lessonParts } from '@shared/narration'
 import { useSpeech } from './useSpeech'
 
 /** Mount with `key={chapter.id}` so speech stops when the chapter changes. */
-export function AudioCard({ lesson }: { lesson: string }): React.JSX.Element | null {
+export function AudioCard({
+  lesson,
+  labId,
+  chapterId
+}: {
+  lesson: string
+  labId: string
+  chapterId: string
+}): React.JSX.Element | null {
   const parts = useMemo(() => lessonParts(lesson), [lesson])
-  const { status, index, rate, toggle, go, cycleRate } = useSpeech(parts)
+  const { status, index, rate, toggle, go, cycleRate } = useSpeech(parts, labId, chapterId)
 
   if (parts.length === 0 || !('speechSynthesis' in window)) return null
 

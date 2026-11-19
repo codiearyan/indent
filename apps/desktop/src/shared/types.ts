@@ -209,6 +209,8 @@ export interface Api {
     listLabs(): Promise<LabSummary[]>
     getChapter(labId: string, chapterId: string): Promise<Chapter>
     listPaths(): Promise<PathDef[]>
+    /** The recording of one lesson part, named by `narrationKey` of its text; null when there is none. */
+    narration(labId: string, chapterId: string, key: string): Promise<Uint8Array | null>
   }
   workspace: {
     /** Creates the folder from the starter files on first open; otherwise reads it from disk. */
@@ -259,7 +261,7 @@ export interface Api {
 
 /** Methods the preload bridges with ipcRenderer.invoke, per namespace. */
 export const INVOKE_METHODS = {
-  content: ['listLabs', 'getChapter', 'listPaths'],
+  content: ['listLabs', 'getChapter', 'listPaths', 'narration'],
   workspace: ['open', 'writeFile', 'reset'],
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
