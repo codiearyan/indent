@@ -85,10 +85,10 @@ async function loadSettings(): Promise<Settings> {
     settings = {
       provider: saved.provider ?? null,
       model: saved.model ?? null,
-      suggestions: saved.suggestions ?? true
+      suggestions: saved.suggestions ?? false
     }
   } catch {
-    settings = { provider: null, model: null, suggestions: true }
+    settings = { provider: null, model: null, suggestions: false }
   }
   return settings
 }
