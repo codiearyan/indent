@@ -33,3 +33,6 @@ linux:
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
+extraResources:
+  - from: content
+    to: content
