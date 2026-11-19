@@ -23,3 +23,13 @@ function toSpeech(markdown: string): string {
     .replace(/\n{2,}/g, '\n')
     .trim()
 }
+
+/**
+ * Names the recording of one part by its text, so a recording is only ever played for the exact
+ * words it was made from. A lesson that changes simply stops matching until it is narrated again.
+ */
+export function narrationKey(text: string): string {
+  let hash = 2166136261
+  for (let i = 0; i < text.length; i++) hash = Math.imul(hash ^ text.charCodeAt(i), 16777619)
+  return (hash >>> 0).toString(16).padStart(8, '0')
+}

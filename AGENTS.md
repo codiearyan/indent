@@ -146,7 +146,14 @@ content/
     starter/**                       copied into the workspace on first open and on reset
     solution/**                      solved files, same relative paths
     grader/checks.mjs                hidden tests, never copied into the workspace
+    audio/<key>.ogg                  recorded narration, one file per lesson part (see below)
 ```
+
+Read aloud plays a recording when one exists for the exact text of a lesson part, and falls back
+to the system voice when it does not. `node scripts/narrate.mjs [labId ...]` records the parts that
+have no recording yet with a neural voice (it needs `uvx` and `ffmpeg`, and sends the lesson text to
+the voice service) and removes recordings whose text is gone. Run it after writing or editing a
+lesson. `apps/desktop/src/shared/narration.ts` holds the splitting and the key both sides use.
 
 Grader CLI, run by the main process with system Node and `labEnv()`:
 

@@ -52,7 +52,12 @@ export function LeftPanel(): React.JSX.Element {
           <TabsContent value="insights" forceMount className={content}>
             <ScrollArea className={scroll}>
               <div className="zone-lesson space-y-6 px-6 pt-5 pb-10">
-                <AudioCard key={`${chapter.labId}/${chapter.id}`} lesson={chapter.lesson} />
+                <AudioCard
+                  key={`${chapter.labId}/${chapter.id}`}
+                  lesson={chapter.lesson}
+                  labId={chapter.labId}
+                  chapterId={chapter.id}
+                />
                 <Markdown>{chapter.lesson}</Markdown>
               </div>
             </ScrollArea>

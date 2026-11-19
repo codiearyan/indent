@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { lessonParts } from './lessonSpeech'
+import { lessonParts, narrationKey } from './narration'
 
 describe('lessonParts', () => {
   it('splits at ## headings, strips markdown and skips code blocks', () => {
@@ -29,5 +29,13 @@ describe('lessonParts', () => {
       'The ticket.\none\ntwo',
       'Empty after code.'
     ])
+  })
+})
+
+describe('narrationKey', () => {
+  it('is stable for the same words and changes when they change', () => {
+    expect(narrationKey('Read the reply.')).toBe(narrationKey('Read the reply.'))
+    expect(narrationKey('Read the reply.')).not.toBe(narrationKey('Read the reply!'))
+    expect(narrationKey('')).toMatch(/^[0-9a-f]{8}$/)
   })
 })

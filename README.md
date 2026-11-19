@@ -18,7 +18,8 @@ No account and no server. Lessons, your files and your progress live on your com
   rather than answers, and optional grey inline suggestions accepted with Tab.
 - **Local model**: repos about language models talk to a small offline model that answers the same
   way every time, so nothing costs money and tests are repeatable.
-- **Read aloud**, a guided tour, text size per panel, layout options, dark and light themes.
+- **Read aloud** in a recorded, natural voice, a guided tour, text size per panel, layout options,
+  dark and light themes.
 - **Patterns**: 18 algorithm patterns as step-through animations (two pointers, sliding window,
   binary search, linked lists, heaps, BFS and DFS, topological sort, union-find, backtracking,
   dynamic programming and more). Each step highlights the line of code that runs and says what
