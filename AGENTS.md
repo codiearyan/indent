@@ -26,15 +26,27 @@ the picture: a repo has issues, an issue has tasks, tasks have checks ("Start re
 
 ## Commands
 
-- `npm run dev` start the app with hot reload
-- `npm run typecheck` both tsconfigs (node and web)
-- `npm test` vitest unit tests
-- `npx prettier --write <files>` and `npx eslint <files>` before finishing a change
+Run from the repo root.
+
+- `pnpm install` installs every workspace
+- `pnpm dev` start the app with hot reload
+- `pnpm typecheck` both tsconfigs (node and web)
+- `pnpm test` vitest unit tests
+- `pnpm prettier --write <files>` and `pnpm eslint <files>` before finishing a change
 
 ## Layout
 
+A pnpm workspaces monorepo. Install, lint and format from the root. Lab content is shared at the
+root so other apps (a future site) can read it. Each app is a workspace under `apps/`:
+
 ```
 content/                 lab packs and the grader kit (plain files, shipped as an extra resource)
+apps/desktop/            the Electron app (@indent/desktop); src/ paths below are relative to it
+```
+
+Inside `apps/desktop/`:
+
+```
 src/shared/              the contract: types.ts (domain + window.api), rules.ts (points, hints, levels)
 src/main/                Electron main process
   ipc.ts                 handle() / listen() / emit() helpers; channels are `${namespace}:${method}`
@@ -110,7 +122,7 @@ the chrome is neutral, and the one hue is the yellow of a highlighted line of co
   `var(--titlebar-inset)` free on the left and the sidebar starts at `var(--sidebar-top)`.
 - Copy is plain and short. No em dashes. Sentence case.
 - Guided tour: elements the tour points at carry `data-tour={TOUR.x}` from `features/tour/anchors.ts`.
-- To look at a change: `npm run dev` starts the app; `node scripts/cdp.mjs navshot "#/labs|/tmp/x.png"`
+- To look at a change: `pnpm dev` starts the app; `node scripts/cdp.mjs navshot "#/labs|/tmp/x.png"`
   navigates the running window and saves a screenshot (start Electron with
   `--remote-debugging-port=9222`, or set `CDP_PORT`).
 
@@ -181,7 +193,7 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
 - The repository is private on GitHub. `main` is always releasable and is never committed to directly.
 - Every feature and every fix gets its own branch (`feat/<name>`, `fix/<name>`, `chore/<name>`,
   `docs/<name>`) and its own pull request against `main`. One concern per pull request.
-- Before opening a pull request: `npm run typecheck`, `npm run lint` and `npm test` pass.
+- Before opening a pull request: `pnpm typecheck`, `pnpm lint` and `pnpm test` pass.
 - Pull requests are squash-merged. The squash title is the pull request title plus its number.
 - CI minutes are limited. CI runs on pull requests only and skips docs and lab content. Verify
   locally, push once per pull request, and batch small related fixes into one pull request instead
