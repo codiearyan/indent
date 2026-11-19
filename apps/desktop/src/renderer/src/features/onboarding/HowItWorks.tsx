@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { StepLayout } from './StepLayout'
 import { CheckScene } from './scenes/CheckScene'
 import { CodeScene } from './scenes/CodeScene'
+import { PatternsScene } from './scenes/PatternsScene'
 import { RepoScene } from './scenes/RepoScene'
 
 type Point = 'repo' | 'code' | 'check' | 'more'
@@ -33,7 +34,7 @@ const POINTS: { id: Point; title: string; text: string; scene: () => React.JSX.E
       id: 'more',
       title: 'Patterns, roadmaps and activity',
       text: 'Watch algorithms move, follow a roadmap, and see your days of practice.',
-      scene: () => null
+      scene: PatternsScene
     }
   ]
 
