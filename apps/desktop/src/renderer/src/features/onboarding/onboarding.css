@@ -87,7 +87,6 @@ html:active-view-transition-type(onboarding-finish) {
 /* Choice cards: the selected state is a transition, so reversing it mid-way retargets. */
 .ob-choice {
   transition:
-    border-color var(--motion-state) var(--ease-out),
     background-color var(--motion-state) var(--ease-out),
     transform var(--motion-press) var(--ease-out);
 }
@@ -146,7 +145,7 @@ html:active-view-transition-type(onboarding-finish) {
 
 /* The mark settles in once, the first time the setup opens. */
 .ob-mark {
-  animation: ob-mark 480ms var(--ease-out) both;
+  animation: ob-mark calc(2 * var(--motion-state)) var(--ease-out) both;
 }
 
 @keyframes ob-mark {
@@ -221,7 +220,7 @@ html:active-view-transition-type(onboarding-finish) {
 
 /* Check scene: a light press on Check, then each status mark fills while its tick draws. */
 .ob-press {
-  animation: ob-press 240ms var(--ease-out) both;
+  animation: ob-press var(--motion-state) var(--ease-out) both;
 }
 
 @keyframes ob-press {
@@ -300,5 +299,5 @@ html:active-view-transition-type(onboarding-finish) {
 .ob-key {
   animation:
     ob-appear var(--motion-enter) var(--ease-out) both,
-    ob-press 240ms var(--ease-out) both;
+    ob-press var(--motion-state) var(--ease-out) both;
 }

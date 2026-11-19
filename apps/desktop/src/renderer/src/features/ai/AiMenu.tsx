@@ -61,16 +61,17 @@ export function AiMenu(): React.JSX.Element {
         <AiSwitch />
         {config?.enabled !== false && <AiSettings />}
         <Separator />
-        <button
-          type="button"
-          className="self-start rounded-sm text-xs text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+        <Button
+          variant="link"
+          size="sm"
+          className="h-auto self-start p-0 text-xs font-normal text-muted-foreground no-underline hover:text-foreground hover:no-underline"
           onClick={() => {
             setMenuOpen(false)
             viewTransition('onboarding-finish', () => useSettings.getState().setOnboarded(false))
           }}
         >
           Run setup again
-        </button>
+        </Button>
       </PopoverContent>
     </Popover>
   )
