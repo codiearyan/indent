@@ -1,24 +1,51 @@
 [
   {
-    "id": "ai-engineering-interviews",
-    "title": "AI engineering interviews",
-    "tagline": "From solid JavaScript to debugging LLM features",
-    "description": "Build the JavaScript base, then practice the bugs interviewers ask about when a product runs on a language model, and finish with two classic coding challenges.",
+    "id": "ai-engineer-typescript",
+    "title": "AI engineer with TypeScript",
+    "tagline": "Call models, ground them in your data, give them tools, and measure the result",
+    "description": "Start with the language and async code, then build the pieces of a real LLM feature one at a time: model calls, retrieval, agents and evals, and finish with the bugs that show up in production.",
     "stages": [
-      { "title": "Foundations", "labs": ["js-foundations"] },
-      { "title": "Debugging LLM code", "labs": ["llm-bug-hunts-ts"] },
-      { "title": "Coding rounds", "labs": ["challenge-rate-limiter", "challenge-lru-cache"] }
+      { "title": "The language", "labs": ["typescript-essentials", "async-js"] },
+      { "title": "Calling models", "labs": ["llm-apps-ts"] },
+      { "title": "Your own data", "labs": ["rag-ts"] },
+      { "title": "Tools and agents", "labs": ["agents-ts"] },
+      { "title": "Knowing it works", "labs": ["evals-ts", "llm-bug-hunts-ts"] }
     ]
   },
   {
-    "id": "backend-interview-drills",
-    "title": "Backend interview drills",
-    "tagline": "The data structures and limits every backend needs",
-    "description": "Warm up on the language, then build the caches and rate limiters that come up in backend interviews again and again.",
+    "id": "backend-node",
+    "title": "Backend developer with Node.js",
+    "tagline": "From the language to an API with a database behind it",
+    "description": "Get solid in JavaScript and TypeScript, handle slow and failing services, build a JSON API with nothing but Node, learn the SQL behind it, and keep your history clean when things go wrong.",
     "stages": [
-      { "title": "Warm up", "labs": ["js-foundations"] },
-      { "title": "Data structures", "labs": ["challenge-lru-cache"] },
-      { "title": "Protecting a service", "labs": ["challenge-rate-limiter"] }
+      { "title": "JavaScript", "labs": ["js-foundations", "async-js"] },
+      { "title": "TypeScript", "labs": ["typescript-essentials"] },
+      { "title": "An API", "labs": ["node-api"] },
+      { "title": "Data", "labs": ["sql-basics"] },
+      { "title": "Working with git", "labs": ["git-rescues"] }
+    ]
+  },
+  {
+    "id": "interview-prep",
+    "title": "Interview prep",
+    "tagline": "Bugs to explain out loud and problems to solve on a clock",
+    "description": "Practice the debugging stories interviewers ask for, in JavaScript and in LLM code, then work through coding rounds from warm-ups to the hard ones.",
+    "stages": [
+      { "title": "Bug stories", "labs": ["js-bug-hunts", "llm-bug-hunts-ts"] },
+      {
+        "title": "Warm-up rounds",
+        "labs": ["challenge-event-emitter", "challenge-binary-search-bounds"]
+      },
+      {
+        "title": "Core rounds",
+        "labs": [
+          "challenge-deep-equal",
+          "challenge-debounce",
+          "challenge-trie-autocomplete",
+          "challenge-rate-limiter"
+        ]
+      },
+      { "title": "Hard rounds", "labs": ["challenge-lru-cache", "challenge-sliding-window-max"] }
     ]
   }
 ]
