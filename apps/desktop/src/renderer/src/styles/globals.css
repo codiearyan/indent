@@ -137,3 +137,40 @@ html.window-fullscreen {
     @apply my-2;
   }
 }
+
+/* Motion shared by app components; curves and durations come from the design tokens. */
+@layer components {
+  /* Appears once: a fade with a short rise. `--i` staggers rows. */
+  .motion-enter {
+    animation: motion-rise var(--motion-enter) var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * var(--motion-stagger));
+  }
+  .press {
+    transition: transform var(--motion-press) var(--ease-out);
+  }
+  .press:active:not(:disabled, [aria-disabled='true']) {
+    transform: scale(0.98);
+  }
+}
+
+@keyframes motion-rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes motion-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-enter {
+    animation-name: motion-fade;
+  }
+  .press:active:not(:disabled, [aria-disabled='true']) {
+    transform: none;
+  }
+}
