@@ -261,6 +261,8 @@ export interface Api {
     onChatEvent(listener: (event: AiChatEvent) => void): Unsubscribe
     /** One inline suggestion for the cursor position; empty string when there is none. */
     complete(request: AiCompleteRequest): Promise<string>
+    /** Sends one tiny fixed prompt through the chosen provider and model; resolves with the reply. */
+    test(): Promise<string>
   }
 }
 
@@ -271,7 +273,7 @@ export const INVOKE_METHODS = {
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],
-  ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete']
+  ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test']
 } as const
 
 /** Fire-and-forget renderer to main messages. */
