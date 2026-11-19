@@ -1,0 +1,71 @@
+{
+  "id": "reordered-departures",
+  "title": "The timetable that reordered itself",
+  "files": [
+    "src/departures.js",
+    "src/reproduce.js",
+    "src/departures.test.js",
+    "src/timetable.js",
+    "src/demo.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the demo plays the dock board: next tours, then the whole day.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Catch the timetable changing",
+      "file": "src/reproduce.js",
+      "description": "Before you change anything, prove both halves of the bug. In `src/reproduce.js`, implement `reproduceReorder()`.\n\nCopy `harbourTour` into a new array, then call the original `nextDepartures(copy, 600)`. Return an object with:\n\n- `before`: the contents of your copy before the call (a second copy, so it cannot change)\n- `result`: what `nextDepartures` returned\n- `after`: your copy, read after the call\n\nThe check runs your function against the original `departures.js`.",
+      "nextSteps": [
+        "Run `node src/demo.js` and compare the full day with `timetable.js`.",
+        "Copy `harbourTour` with the spread syntax and save a second copy as `before`.",
+        "Call `nextDepartures` with the first copy and return all three.",
+        "Run the demo again and read `after`."
+      ],
+      "hints": [
+        "Two things are wrong in the demo: the order of the next tours, and the full day printed after the call.",
+        "`[...harbourTour]` makes a new array. If `before` and `after` are the same array, they will always look the same.",
+        "Return the same array you passed to `nextDepartures` as `after`. It should now start with 1020."
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Sort by time, and leave the timetable alone",
+      "file": "src/departures.js",
+      "description": "Fix `nextDepartures(times, now, count = 3)` in `src/departures.js`.\n\n- It returns at most `count` departures that are at or after `now`, earliest first, as numbers.\n- `times` can be in any order and can hold small values like `75` (01:15).\n- It must not change the array it is given, so it also works on a frozen array.\n\nKeep `formatTime` as it is. The check calls `nextDepartures` with several timetables, then looks at both the result and the array it passed in.",
+      "nextSteps": [
+        "Decide how two numbers should be compared and pass that to `sort`.",
+        "Make sure the array you sort is not the one the caller gave you.",
+        "Keep the filter for `now` and the `slice` for `count`.",
+        "Run `node src/demo.js` and check the full day stays in order."
+      ],
+      "hints": [
+        "Without a compare function, `sort` turns each value into a string and compares the strings, so '1020' comes before '540'.",
+        "`sort` changes the array it is called on and returns that same array. `filter`, `slice` and spread all return a new one.",
+        "Sort a new array with a compare function that returns a negative number when `a` should come first, such as the difference of the two."
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/departures.test.js",
+      "description": "Write vitest tests in `src/departures.test.js` that guard both halves of this bug:\n\n- the next departures come back in time order, for times that sort differently as text\n- the array passed to `nextDepartures` is exactly the same afterwards\n\nThe check runs your test file three times: beside the original `departures.js` (it must fail), beside a correct fix (it must pass) and beside a fix that adds a numeric compare function but still sorts the caller's array in place (it must fail).",
+      "nextSteps": [
+        "Import `nextDepartures` and write a test for the order of the result.",
+        "Write a second test that passes in an unsorted array and checks it afterwards.",
+        "Run `npx vitest run src/departures.test.js` against your fixed code.",
+        "Ask yourself what the in place fix still gets wrong."
+      ],
+      "hints": [
+        "Use an array you own in the test, not the shared `harbourTour`, so one test cannot change another.",
+        "Keep a reference to the array you pass in, call the function, then `expect` that same array to equal the order you wrote.",
+        "The in place fix returns the right answer. Only the test that checks the input array afterwards can catch it, so the input must start out of order."
+      ],
+      "points": 10
+    }
+  ]
+}
