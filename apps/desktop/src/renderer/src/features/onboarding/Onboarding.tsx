@@ -4,38 +4,23 @@ import { Button } from '@/components/ui/button'
 import { useAi } from '@/features/ai/aiStore'
 import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
-import { StepLayout } from './StepLayout'
 import { StepStrip } from './StepStrip'
 import { AiChoice } from './AiChoice'
 import { HelpLevel } from './HelpLevel'
+import { Ready } from './Ready'
 import { HowItWorks } from './HowItWorks'
 import { Provider } from './Provider'
 import { Welcome } from './Welcome'
 import { nextStep, prevStep, type Choices, type StepId } from './steps'
 import './onboarding.css'
 
-export interface StepProps {
-  /** First visit: play the staged entrance. Going back shows the step as it was. */
-  staged: boolean
-  choices: Choices
-}
-
-const PLACEHOLDER_TITLES: Record<StepId, string> = {
-  welcome: APP_NAME,
-  how: 'How it works',
-  ai: 'AI, on or off',
-  provider: 'Connect a provider',
-  help: 'How much help',
-  ready: 'Ready'
-}
-
-function StepView({ step, ...props }: StepProps & { step: StepId }): React.JSX.Element {
-  if (step === 'welcome') return <Welcome staged={props.staged} />
-  if (step === 'how') return <HowItWorks staged={props.staged} />
-  if (step === 'ai') return <AiChoice staged={props.staged} />
-  if (step === 'provider') return <Provider staged={props.staged} />
-  if (step === 'help') return <HelpLevel staged={props.staged} />
-  return <StepLayout title={PLACEHOLDER_TITLES[step]} staged={props.staged} />
+const STEPS: Record<StepId, (props: { staged: boolean }) => React.JSX.Element> = {
+  welcome: Welcome,
+  how: HowItWorks,
+  ai: AiChoice,
+  provider: Provider,
+  help: HelpLevel,
+  ready: Ready
 }
 
 /** Elements where Enter already means something; everywhere else in the setup it continues. */
@@ -46,13 +31,14 @@ export function Onboarding(): React.JSX.Element {
   const aiEnabled = useAi((s) => s.config?.enabled ?? true)
   const [step, setStep] = useState<StepId>('welcome')
   const [visited, setVisited] = useState<ReadonlySet<StepId>>(() => new Set())
-  const [complete] = useState(false)
+  const [complete, setComplete] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const stepRef = useRef<HTMLDivElement>(null)
 
   const choices: Choices = { ai: aiEnabled }
   const next = nextStep(step, choices)
   const back = prevStep(step, choices)
+  const View = STEPS[step]
 
   const finish = useCallback((): void => {
     window.location.hash = '#/'
@@ -83,6 +69,16 @@ export function Onboarding(): React.JSX.Element {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
+
+  // The one quiet celebration: once the last step has settled, its cell fills too.
+  useEffect(() => {
+    if (step !== 'ready') return
+    const timer = setTimeout(() => setComplete(true), 420)
+    return () => {
+      clearTimeout(timer)
+      setComplete(false)
+    }
+  }, [step])
 
   useEffect(() => {
     stepRef.current?.querySelector<HTMLElement>('[data-step-heading]')?.focus({
@@ -117,7 +113,7 @@ export function Onboarding(): React.JSX.Element {
           style={{ viewTransitionName: 'onboarding-step' }}
         >
           <div key={step} className="my-auto w-full">
-            <StepView step={step} staged={!visited.has(step)} choices={choices} />
+            <View staged={!visited.has(step)} />
           </div>
         </div>
 
