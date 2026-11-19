@@ -1,0 +1,65 @@
+{
+  "id": "challenge",
+  "title": "Rate limiter",
+  "files": ["src/fixedWindow.ts", "src/slidingWindow.ts", "src/tokenBucket.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo replays the same six requests against each limiter with a fake clock.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "fixed",
+      "title": "Fixed window",
+      "file": "src/fixedWindow.ts",
+      "description": "Implement `createFixedWindowLimiter({ limit, windowMs, now })` in `src/fixedWindow.ts`. It returns `{ allow(key) }`.\n\n- Time is split into windows aligned to 0: `[0, windowMs)`, `[windowMs, 2 * windowMs)` and so on.\n- `allow(key)` returns `true` and counts the request when that key has made fewer than `limit` allowed requests in the current window. Otherwise it returns `false`.\n- Keys are counted separately.\n- `now` defaults to `Date.now`.",
+      "nextSteps": [
+        "Destructure the options and give `now` a default.",
+        "Keep a `Map` from key to the window it is in and its count.",
+        "On each call work out the current window from `now()` and compare.",
+        "Run `node src/demo.ts` and read the first line."
+      ],
+      "hints": [
+        "You never need a timer. Every decision can be made from the current time and what you stored for the key.",
+        "Which window does a time belong to? Dividing by `windowMs` and rounding down gives you a number that is the same for every time in that window.",
+        "Store `{ window, count }` per key. If the stored window is not the current one, start a new count before you compare with `limit`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "sliding",
+      "title": "Sliding window",
+      "file": "src/slidingWindow.ts",
+      "description": "Implement `createSlidingWindowLimiter({ limit, windowMs, now })` in `src/slidingWindow.ts`.\n\n- `allow(key)` at time `T` returns `true` when that key has fewer than `limit` allowed requests at times `t` with `T - windowMs < t <= T`. The request is then recorded.\n- Refused requests are not recorded and never count.\n- Keys are counted separately.",
+      "nextSteps": [
+        "Keep a list of allowed request times per key.",
+        "On each call drop the times that have left the window.",
+        "Compare what is left with `limit`, and record the time only when you allow.",
+        "Run the demo and compare its line with the fixed window."
+      ],
+      "hints": [
+        "The fixed window lets a caller make `2 * limit` requests in a short burst across a window edge. Remembering times instead of a count fixes that.",
+        "A request at time `t` is still inside the window while `t > now - windowMs`. Mind whether the edge itself is in or out.",
+        "Filter the key's times to the recent ones, save the filtered list back, then push the current time only on the path that returns true."
+      ],
+      "points": 15
+    },
+    {
+      "id": "bucket",
+      "title": "Token bucket",
+      "file": "src/tokenBucket.ts",
+      "description": "Implement `createTokenBucket({ capacity, refillPerSecond, now })` in `src/tokenBucket.ts`. It returns `{ take(key, cost), tokens(key) }`.\n\n- Each key has its own bucket that starts full with `capacity` tokens.\n- Tokens refill continuously at `refillPerSecond` (250 ms at 2 per second adds 0.5). A bucket never holds more than `capacity`.\n- `take(key, cost = 1)` returns `true` and removes `cost` tokens when the bucket holds at least `cost`. Otherwise it returns `false` and removes nothing.\n- `tokens(key)` returns the current tokens, fractions included.",
+      "nextSteps": [
+        "Store `{ tokens, at }` per key, where `at` is when you last updated it.",
+        "Write one small function that brings a bucket up to date with `now()`.",
+        "Use it from both `take` and `tokens`.",
+        "Run the demo and check the third line."
+      ],
+      "hints": [
+        "Like the windows, a bucket never needs a timer. You can work out how full it is from how much time has passed.",
+        "Elapsed milliseconds divided by 1000, times `refillPerSecond`, is what to add. Cap the result at `capacity`.",
+        "After adding the refill, set `at` to the current time. Otherwise the next call counts the same time again."
+      ],
+      "points": 20
+    }
+  ]
+}

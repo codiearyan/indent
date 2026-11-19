@@ -1,0 +1,65 @@
+{
+  "id": "challenge",
+  "title": "LRU cache",
+  "files": ["src/lru.ts", "src/ttlCache.ts", "src/weightedCache.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo runs a few operations on each of your caches.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "lru",
+      "title": "LRU cache in O(1)",
+      "file": "src/lru.ts",
+      "description": "Implement the `LRUCache<K, V>` class in `src/lru.ts`. `new LRUCache(capacity)` holds at most `capacity` entries.\n\n- `get(key)` returns the value or `undefined`. A hit makes the key the most recently used.\n- `set(key, value)` adds or replaces and makes the key the most recently used. If that leaves more than `capacity` entries, remove the least recently used.\n- `has(key)` does not change the order. `delete(key)` returns whether the key was there.\n- `size` is a getter. `keys()` lists keys from least to most recently used.\n\nEvery operation except `keys()` must be O(1) on average. The check runs 600,000 operations on a cache of 100,000.",
+      "nextSteps": [
+        "Pick a structure that remembers order and finds keys in O(1).",
+        "Write `get` and `set` so both move the key to the recent end.",
+        "Evict from the old end when `set` goes over capacity.",
+        "Run `node src/demo.ts` and read the first line."
+      ],
+      "hints": [
+        "Arrays find keys in O(n). You need lookup by key and an order you can update cheaply. JavaScript has a built-in that gives you both.",
+        "A `Map` iterates in insertion order. Deleting a key and setting it again moves it to the end.",
+        "The least recently used key is the first one a `Map` iterates: `map.keys().next().value`. Remember that a stored value can be 0, so decide hits with `has`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "ttl",
+      "title": "Entries that expire",
+      "file": "src/ttlCache.ts",
+      "description": "Implement `TTLCache<K, V>` in `src/ttlCache.ts`: `new TTLCache({ capacity, ttlMs, now })`.\n\n- `set(key, value)` keeps the entry until `now() + ttlMs`. Setting a key again restarts its time.\n- An entry is expired once `now()` is at or past that time. Expired entries act as if they are not there for `get`, `has`, `size` and `keys()`.\n- `get` on a live entry makes it the most recently used but does not extend its time.\n- When `set` adds a new key to a full cache, remove expired entries first. Only if it is still full, evict the least recently used live entry.\n- `now` defaults to `Date.now`.",
+      "nextSteps": [
+        "Store `{ value, expiresAt }` for each key.",
+        "Write a helper that returns a live entry or removes an expired one.",
+        "Use it in `get` and `has`, and sweep expired entries for `size`, `keys()` and a full `set`.",
+        "Run the demo and check the second line."
+      ],
+      "hints": [
+        "You can reuse the ordering trick from task 1. The new part is a second piece of data per entry.",
+        "Never read the time any way other than `this.now()`. The check moves a fake clock between calls.",
+        "In `set`, delete the key first, then if the cache is full remove every expired entry, then if it is still full remove the oldest one, then insert."
+      ],
+      "points": 15
+    },
+    {
+      "id": "weighted",
+      "title": "Entries with a weight",
+      "file": "src/weightedCache.ts",
+      "description": "Implement `WeightedCache<K, V>` in `src/weightedCache.ts`: `new WeightedCache({ maxWeight, onEvict })` limits the total weight instead of the count.\n\n- `set(key, value, weight)` returns `false` and changes nothing when `weight > maxWeight`. Otherwise it adds or replaces the entry, makes it the most recently used, removes least recently used entries until the total is at most `maxWeight`, and returns `true`.\n- `onEvict(key, value)` is called for each entry removed to make room, in order. Replacing a key or `delete` does not call it.\n- `get`, `has` and `delete` work as in task 1. `size`, `weight` (the total) and `keys()` report the contents.",
+      "nextSteps": [
+        "Store `{ value, weight }` per key and keep a running total.",
+        "Handle the too-heavy case first, before touching anything.",
+        "Replace, insert, then evict from the old end in a loop while the total is too high.",
+        "Run the demo and check the third line."
+      ],
+      "hints": [
+        "A running total is cheaper and simpler than adding up every weight each time.",
+        "When a key is replaced, its old weight has to come off the total before the new one goes on. `delete` already does that.",
+        "Because the new entry fits on its own and is the most recent, a loop that removes the oldest entry while `total > maxWeight` will never remove it."
+      ],
+      "points": 20
+    }
+  ]
+}
