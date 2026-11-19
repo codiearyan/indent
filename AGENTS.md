@@ -29,7 +29,7 @@ src/renderer/src/
   components/app/        small shared app components (ThemeToggle, LevelBadge, LanguageIcon)
   lib/                   api.ts (typed window.api), utils.ts (cn), code-palette.ts (hex mirror of tokens)
   stores/                zustand: settings (persisted), progress, catalog, workspace
-  features/<name>/       catalog, workspace, editor, terminal, ai, tour
+  features/<name>/       catalog, workspace, editor, terminal, ai, tour, dsa
 ```
 
 `src/shared/types.ts` is the contract between content, main and renderer. Read it first. If a
@@ -99,6 +99,16 @@ Messages say what to look at in plain words and never give the answer.
 Lab model: `node content/kit/lab-model.mjs` prints `{"port":N}` as its first stdout line, then serves
 `POST /v1/chat/completions` on 127.0.0.1. Learner code reaches it with `new OpenAI()` because the
 environment sets `OPENAI_BASE_URL`, `OPENAI_API_KEY` and `LAB_MODEL_URL`.
+
+## DSA patterns
+
+`features/dsa/` holds the animated algorithm patterns. A pattern is data and logic with no React:
+`patterns/<id>.ts` exports a `Pattern` whose `build(values)` turns input into `Step[]`, each step a
+full snapshot of frames (array, bucket, map, intervals, grid, list, tree, graph), the code lines
+being executed and a plain-words note. `types.ts` is the contract, `tones.ts` the only place a
+highlight becomes a color, `views/` draws one frame kind each and animates between snapshots with
+CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and its test (call
+`expectValidPattern`, compare the answer with a brute force), then list it in `registry.ts`.
 
 ## Rules of the product
 
