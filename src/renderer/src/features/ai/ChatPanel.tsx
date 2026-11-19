@@ -1,3 +1,167 @@
+import { useEffect, useRef, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { MessageCircle, SendHorizontal, Sparkles, Square, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useSettings } from '@/stores/settings'
+import { activeProvider, useAi } from './aiStore'
+import { MESSAGE_BUDGET, useChat } from './chatStore'
+
 export function ChatPanel(): React.JSX.Element {
-  return <div className="p-6 text-sm text-muted-foreground">ChatPanel</div>
+  const setPanel = useSettings((s) => s.setPanel)
+  const config = useAi((s) => s.config)
+  const provider = activeProvider(config)
+  const { messages, busy, error, remaining, send, stop } = useChat()
+  const [draft, setDraft] = useState('')
+  const listRef = useRef<HTMLDivElement>(null)
+  const stickToBottom = useRef(true)
+
+  const budgeted = provider?.kind === 'api'
+  const outOfMessages = budgeted && remaining <= 0
+  const canSend = !!provider && !busy && !outOfMessages && !!draft.trim()
+
+  useEffect(() => {
+    const list = listRef.current
+    if (list && stickToBottom.current) list.scrollTop = list.scrollHeight
+  }, [messages, error])
+
+  const submit = (): void => {
+    if (!canSend) return
+    stickToBottom.current = true
+    void send(draft)
+    setDraft('')
+  }
+
+  return (
+    <aside className="flex h-full min-w-0 flex-col bg-background">
+      <header className="flex h-12 shrink-0 items-center gap-2 border-b pr-2 pl-4">
+        <MessageCircle className="size-4 text-muted-foreground" />
+        <h2 className="flex-1 text-sm font-medium">AI chat</h2>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Close chat"
+              onClick={() => setPanel('chat', false)}
+            >
+              <X />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Close chat</TooltipContent>
+        </Tooltip>
+      </header>
+
+      <div
+        ref={listRef}
+        className="min-h-0 flex-1 overflow-y-auto px-4 py-4"
+        onScroll={(e) => {
+          const el = e.currentTarget
+          stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48
+        }}
+      >
+        {messages.length === 0 ? (
+          <EmptyState hasProvider={!!provider} loading={!config} />
+        ) : (
+          <div className="flex flex-col gap-4">
+            {messages.map((message, i) =>
+              message.role === 'user' ? (
+                <div
+                  key={i}
+                  className="ml-8 self-end rounded-lg bg-muted px-3 py-2 text-sm whitespace-pre-wrap"
+                >
+                  {message.content}
+                </div>
+              ) : (
+                <div key={i} className="prose-lab prose-compact text-sm">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+                  {busy && i === messages.length - 1 && (
+                    <span
+                      aria-label="Writing"
+                      className="inline-block h-4 w-1.5 animate-pulse rounded-sm bg-brand align-text-bottom"
+                    />
+                  )}
+                </div>
+              )
+            )}
+          </div>
+        )}
+        {error && <p className="mt-4 text-[13px] text-destructive">{error}</p>}
+      </div>
+
+      <div className="shrink-0 border-t p-3">
+        <div className="flex items-end gap-2">
+          <Textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                e.preventDefault()
+                submit()
+              }
+            }}
+            placeholder="Ask about this chapter"
+            aria-label="Ask about this chapter"
+            disabled={!provider || outOfMessages}
+            className="max-h-40 min-h-16 resize-none"
+          />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {busy ? (
+                <Button size="icon" variant="secondary" aria-label="Stop" onClick={stop}>
+                  <Square />
+                </Button>
+              ) : (
+                <Button size="icon" aria-label="Send" disabled={!canSend} onClick={submit}>
+                  <SendHorizontal />
+                </Button>
+              )}
+            </TooltipTrigger>
+            <TooltipContent>{busy ? 'Stop' : 'Send'}</TooltipContent>
+          </Tooltip>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {provider ? `Using ${provider.label}` : 'No AI provider yet'}
+          {budgeted && ` · ${remaining} of ${MESSAGE_BUDGET} messages left this session`}
+        </p>
+      </div>
+    </aside>
+  )
+}
+
+function EmptyState({
+  hasProvider,
+  loading
+}: {
+  hasProvider: boolean
+  loading: boolean
+}): React.JSX.Element | null {
+  const openMenu = useAi((s) => s.openMenu)
+  if (loading) return null
+  if (!hasProvider) {
+    return (
+      <div className="flex flex-col items-start gap-3 text-sm text-muted-foreground">
+        <p>
+          The tutor needs an AI provider. If Claude Code, Codex, OpenCode or Gemini CLI is installed
+          and signed in on this computer, it is picked up on its own. You can also add your own API
+          key.
+        </p>
+        <Button variant="outline" size="sm" onClick={openMenu}>
+          <Sparkles />
+          Set up AI
+        </Button>
+      </div>
+    )
+  }
+  return (
+    <div className="flex flex-col gap-3 text-sm text-muted-foreground">
+      <p>
+        Ask about this chapter: why a task fails, what a line does, or where to start. The tutor
+        guides you to the answer rather than writing it for you.
+      </p>
+      <p>It sees the lesson, the tasks, the file you have open and your latest check.</p>
+    </div>
+  )
 }
