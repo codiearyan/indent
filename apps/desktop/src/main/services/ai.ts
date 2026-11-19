@@ -155,6 +155,7 @@ async function buildConfig(fresh = false): Promise<AiConfig> {
     provider: active?.id ?? null,
     model,
     suggestions: saved.suggestions,
+    nudge: saved.nudge,
     providers
   }
 }
@@ -325,6 +326,7 @@ export function register(): void {
       if (patch.model !== undefined) next.model = patch.model || null
       if (patch.suggestions !== undefined) next.suggestions = suggestionMode(patch.suggestions)
       if (patch.enabled !== undefined) next.enabled = !!patch.enabled
+      if (patch.nudge !== undefined) next.nudge = !!patch.nudge
       settings = next
       await saveSettings()
       return buildConfig()

@@ -11,6 +11,11 @@ describe('readSettings', () => {
   it('keeps AI off once it was turned off', () => {
     expect(readSettings({ enabled: false }).enabled).toBe(false)
   })
+
+  it('offers the tutor after a failed check unless that was turned off', () => {
+    expect(readSettings({}).nudge).toBe(true)
+    expect(readSettings({ nudge: false }).nudge).toBe(false)
+  })
 })
 
 describe('suggestionMode', () => {

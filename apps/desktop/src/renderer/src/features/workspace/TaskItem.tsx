@@ -3,8 +3,10 @@ import { Check, Circle, Compass, ListChecks, Loader2, Sparkles, X } from 'lucide
 import type { ChapterProgress, TaskDef } from '@shared/types'
 import { hintsUnlocked } from '@shared/rules'
 import { Button } from '@/components/ui/button'
+import { useAi } from '@/features/ai/aiStore'
 import { useChat } from '@/features/ai/chatStore'
 import { TOUR } from '@/features/tour/anchors'
+import { cn } from '@/lib/utils'
 import { useWorkspace } from '@/stores/workspace'
 import { CheckDetails } from './CheckDetails'
 import { Markdown } from './Markdown'
@@ -26,6 +28,7 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
   const result = taskProgress?.lastResult
   const failed = result?.passed === false
   const isChecking = checking?.includes(task.id) ?? false
+  const nudge = useAi((s) => s.config?.nudge ?? false)
 
   const askWhy = (): void => {
     const failing = result?.details.filter((d) => !d.passed).map((d) => d.name) ?? []
@@ -72,6 +75,7 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
             <Compass />
             Next step
           </Button>
+          {failed && nudge && !isChecking && <AskWhy onClick={askWhy} />}
         </div>
         {stepsOpen && (
           <div className="space-y-2 rounded-lg border border-border p-3 text-sm">
@@ -80,17 +84,32 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
                 <li key={i}>{step}</li>
               ))}
             </ol>
-            {failed && (
-              <Button variant="ghost" size="sm" className="-ml-2 font-normal" onClick={askWhy}>
-                <Sparkles />
-                Ask the tutor why this failed
-              </Button>
-            )}
+            {failed && !nudge && <AskWhy onClick={askWhy} className="-ml-2" />}
           </div>
         )}
         <TaskHints hints={task.hints} unlocked={hintsUnlocked(progress?.nonGreenChecks ?? 0)} />
       </div>
     </li>
+  )
+}
+
+function AskWhy({
+  onClick,
+  className
+}: {
+  onClick(): void
+  className?: string
+}): React.JSX.Element {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className={cn('font-normal text-muted-foreground hover:text-foreground', className)}
+      onClick={onClick}
+    >
+      <Sparkles />
+      Ask the tutor why this failed
+    </Button>
   )
 }
 
