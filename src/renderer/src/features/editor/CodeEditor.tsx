@@ -4,7 +4,7 @@ import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
 import { languageFor, monaco, pathOf, uriFor } from './monaco'
 
-const themeName = (theme: 'dark' | 'light'): string => `labbench-${theme}`
+const themeName = (theme: 'dark' | 'light'): string => `indent-${theme}`
 const fontSizeFor = (scale: number): number => Math.round(13 * scale)
 
 interface Props {

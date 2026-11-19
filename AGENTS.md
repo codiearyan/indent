@@ -1,4 +1,4 @@
-# Labbench
+# Indent
 
 A local-first Electron desktop app for hands-on coding labs. Each lab is a story: a small company has a
 problem and the learner is its developer. A chapter is a short lesson plus tasks; the learner writes

@@ -31,7 +31,7 @@ const chapter = (id: string, tasks: object[]): object => ({
 })
 
 beforeAll(async () => {
-  root = await mkdtemp(join(tmpdir(), 'labbench-packs-'))
+  root = await mkdtemp(join(tmpdir(), 'indent-packs-'))
   await put('paths.json', [{ id: 'p', title: 'P', tagline: '', description: '', stages: [] }])
   await put('labs/alpha/lab.json', {
     id: 'alpha',

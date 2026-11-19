@@ -1,5 +1,5 @@
 {
-  "name": "labbench",
+  "name": "indent",
   "version": "0.1.0",
   "description": "A local-first desktop app for hands-on coding labs",
   "main": "./out/main/index.js",

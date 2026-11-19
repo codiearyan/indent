@@ -20,7 +20,7 @@ function pause(ms: number, token: Monaco.CancellationToken): Promise<boolean> {
 /** Registers the grey, Tab-to-accept suggestions. The editor calls this once after Monaco loads. */
 export function registerInlineSuggestions(monaco: typeof Monaco): Monaco.IDisposable {
   return monaco.languages.registerInlineCompletionsProvider('*', {
-    displayName: 'Labbench AI',
+    displayName: 'Indent AI',
 
     provideInlineCompletions: async (model, position, _context, token) => {
       const none = { items: [] }

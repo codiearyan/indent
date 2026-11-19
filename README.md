@@ -1,4 +1,4 @@
-# Labbench
+# Indent
 
 A local-first desktop app for hands-on coding labs. Each lab is a story: a small company has a
 problem and you are its developer. Read a short lesson, write the code, press Check.
@@ -60,6 +60,6 @@ complete example. Restart the app to pick up a new lab.
 
 ## Where things are stored
 
-Everything is under the app's data folder (`~/Library/Application Support/labbench` on macOS):
+Everything is under the app's data folder (`~/Library/Application Support/indent` on macOS):
 `workspaces/` holds your files per chapter, `progress.json` your points and history. API keys are
 encrypted with the operating system's keychain.

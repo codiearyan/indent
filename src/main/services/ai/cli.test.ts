@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { runCli, type CliRun } from './cli'
 
 async function fakeCli(script: string): Promise<string> {
-  const dir = await mkdtemp(join(tmpdir(), 'labbench-fake-cli-'))
+  const dir = await mkdtemp(join(tmpdir(), 'indent-fake-cli-'))
   const path = join(dir, 'fake')
   await writeFile(path, `#!/bin/sh\n${script}\n`)
   await chmod(path, 0o755)

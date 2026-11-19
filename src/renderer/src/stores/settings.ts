@@ -63,7 +63,7 @@ export const useSettings = create<SettingsState>()(
       setTourSeen: (tourSeen) => set({ tourSeen }),
       resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' })
     }),
-    { name: 'labbench-settings', version: 1 }
+    { name: 'indent-settings', version: 1 }
   )
 )
 

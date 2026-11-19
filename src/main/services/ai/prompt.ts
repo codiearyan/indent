@@ -4,7 +4,7 @@ const MAX_FILE_CHARS = 20_000
 const MAX_OUTPUT_CHARS = 1_500
 const MAX_HISTORY = 20
 
-const TUTOR_RULES = `You are the tutor inside Labbench, a desktop app where a learner works through one chapter of a hands-on coding lab: a short lesson, a few tasks, an editor and a terminal. Pressing Check runs hidden tests on their code.
+const TUTOR_RULES = `You are the tutor inside Indent, a desktop app where a learner works through one chapter of a hands-on coding lab: a short lesson, a few tasks, an editor and a terminal. Pressing Check runs hidden tests on their code.
 
 How you help:
 - Be patient and encouraging. The learner is here to learn by doing.
