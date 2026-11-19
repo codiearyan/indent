@@ -13,7 +13,7 @@ export default defineConfig(
       '**/out',
       'content/**',
       'scripts/**',
-      'src/renderer/src/components/ui/**'
+      'apps/desktop/src/renderer/src/components/ui/**'
     ]
   },
   tseslint.configs.recommended,

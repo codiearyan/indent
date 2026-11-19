@@ -1,0 +1,26 @@
+{
+  "name": "labbench",
+  "private": true,
+  "description": "A local-first desktop app for hands-on coding labs",
+  "author": "Aryan Bhati",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @labbench/desktop",
+    "build": "npm run build -w @labbench/desktop",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "lint": "eslint --cache .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@electron-toolkit/eslint-config-prettier": "^3.0.1",
+    "@electron-toolkit/eslint-config-ts": "^4.0.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "prettier": "^3.9.10"
+  }
+}
