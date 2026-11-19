@@ -3,14 +3,11 @@
   "private": true,
   "description": "A local-first desktop app for hands-on coding labs",
   "author": "Aryan Bhati",
-  "workspaces": [
-    "apps/*"
-  ],
   "scripts": {
-    "dev": "npm run dev -w @labbench/desktop",
-    "build": "npm run build -w @labbench/desktop",
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm test --workspaces --if-present",
+    "dev": "pnpm --filter @labbench/desktop dev",
+    "build": "pnpm --filter @labbench/desktop build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
     "lint": "eslint --cache .",
     "format": "prettier --write ."
   },
@@ -22,5 +19,6 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
     "prettier": "^3.9.10"
-  }
+  },
+  "packageManager": "pnpm@11.5.2"
 }

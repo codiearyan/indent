@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+
+allowBuilds:
+  electron: true
+  esbuild: true
+  node-pty: true
+  electron-winstaller: false
+
+# Already in the lockfile before the switch to pnpm; drop once they are a day old.
+minimumReleaseAgeExclude:
+  - electron@44.11.5
+  - lucide-react@1.76.0
