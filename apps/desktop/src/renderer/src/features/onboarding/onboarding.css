@@ -6,8 +6,14 @@ html:active-view-transition-type(onboarding-step) {
   &::view-transition-new(root) {
     animation: none;
   }
-  &::view-transition-group(onboarding-step) {
+  &::view-transition-group(onboarding-step),
+  &::view-transition-group(onboarding-strip),
+  &::view-transition-new(onboarding-strip) {
     animation: none;
+  }
+  /* The strip is its own layer so its live fill shows through, never a cross-fade of two strips. */
+  &::view-transition-old(onboarding-strip) {
+    display: none;
   }
   &::view-transition-old(onboarding-step) {
     animation: ob-out var(--motion-exit) var(--ease-out) both;

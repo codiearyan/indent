@@ -2,6 +2,7 @@ import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { APP_NAME, BrandMark } from '@/components/app/Brand'
 import { Button } from '@/components/ui/button'
 import { useAi } from '@/features/ai/aiStore'
+import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
 import { StepLayout } from './StepLayout'
 import { StepStrip } from './StepStrip'
@@ -45,13 +46,15 @@ export function Onboarding(): React.JSX.Element {
 
   const finish = useCallback((): void => {
     window.location.hash = '#/'
-    useSettings.getState().setOnboarded(true)
+    viewTransition('onboarding-finish', () => useSettings.getState().setOnboarded(true))
   }, [])
 
   const go = (to: StepId | null): void => {
     if (!to) return finish()
-    setVisited((seen) => new Set(seen).add(step))
-    setStep(to)
+    viewTransition('onboarding-step', () => {
+      setVisited((seen) => new Set(seen).add(step))
+      setStep(to)
+    })
   }
 
   const advance = useEffectEvent(() => go(next))
