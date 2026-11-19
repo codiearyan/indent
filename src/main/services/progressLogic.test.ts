@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import type { CheckResult, TaskDef } from '../../shared/types'
+import type { CheckResult, ProgressState, TaskDef } from '../../shared/types'
 import { localDate } from '../../shared/rules'
-import { emptyProgress, openSolution, recordCheck, setMode, touch } from './progressLogic'
+import { emptyProgress, recordCheck, touch } from './progressLogic'
 
 const now = new Date('2026-11-19T10:00:00')
 const later = new Date('2026-11-19T11:00:00')
@@ -28,12 +28,10 @@ const result = (taskId: string, passed: boolean, error?: string): CheckResult =>
 })
 
 describe('progress rules', () => {
-  it('touch creates a hard-mode entry and updates lastOpened', () => {
+  it('touch creates an entry and updates lastOpened', () => {
     const state = emptyProgress()
     touch(state, 'lab', 'c1', now)
     expect(state.chapters['lab/c1']).toMatchObject({
-      mode: 'hard',
-      easyLocked: false,
       nonGreenChecks: 0,
       startedAt: now.toISOString(),
       lastOpenedAt: now.toISOString()
@@ -44,7 +42,7 @@ describe('progress rules', () => {
     expect(state.lastOpened).toEqual({ labId: 'lab', chapterId: 'c1' })
   })
 
-  it('awards hard points once, counts non-green runs and completes the chapter', () => {
+  it('awards full points once, counts non-green runs and completes the chapter', () => {
     const state = emptyProgress()
     recordCheck(state, 'lab', 'c1', tasks, [result('t1', true), result('t2', false)], now)
     expect(state.totalPoints).toBe(10)
@@ -56,7 +54,7 @@ describe('progress rules', () => {
     expect(state.totalPoints).toBe(31)
     expect(chapter.nonGreenChecks).toBe(1)
     expect(chapter.tasks.t1.passedAt).toBe(now.toISOString())
-    expect(chapter.tasks.t2).toMatchObject({ passed: true, pointsEarned: 21, passedMode: 'hard' })
+    expect(chapter.tasks.t2).toMatchObject({ passed: true, pointsEarned: 21 })
     expect(chapter.tasks.t2.lastResult?.passed).toBe(true)
     expect(chapter.completedAt).toBe(later.toISOString())
     expect(state.activity[today]).toEqual({ points: 31, checks: 2, tasksPassed: 2 })
@@ -78,35 +76,26 @@ describe('progress rules', () => {
     expect(state.activity[today].checks).toBe(1)
   })
 
-  it('pays half in easy mode, and always half after the solution was opened', () => {
-    const state = emptyProgress()
-    setMode(state, 'lab', 'c1', 'easy', now)
-    recordCheck(state, 'lab', 'c1', tasks, [result('t2', true)], now)
-    expect(state.chapters['lab/c1'].tasks.t2).toMatchObject({
-      pointsEarned: 10,
-      passedMode: 'easy'
-    })
-
-    expect(() => openSolution(state, 'lab', 'c1', tasks[0], now)).toThrow('Run a check')
-    recordCheck(state, 'lab', 'c1', tasks, [result('t1', false)], now)
-    expect(openSolution(state, 'lab', 'c1', tasks[0], now)).toBe('solution/src/t1.ts')
-    expect(state.chapters['lab/c1'].easyLocked).toBe(true)
-    expect(state.chapters['lab/c1'].tasks.t1.solutionOpened).toBe(true)
-    expect(() => setMode(state, 'lab', 'c1', 'hard', now)).toThrow('stays in easy mode')
-
-    state.chapters['lab/c1'].mode = 'hard'
-    recordCheck(state, 'lab', 'c1', tasks, [result('t1', true)], now)
-    expect(state.chapters['lab/c1'].tasks.t1).toMatchObject({ pointsEarned: 5, passedMode: 'easy' })
-    expect(state.totalPoints).toBe(15)
-  })
-
-  it('refuses solutions in hard mode', () => {
-    const state = emptyProgress()
-    recordCheck(state, 'lab', 'c1', tasks, [result('t1', false)], now)
-    expect(() => openSolution(state, 'lab', 'c1', tasks[0], now)).toThrow('easy mode')
-    setMode(state, 'lab', 'c1', 'easy', now)
-    setMode(state, 'lab', 'c1', 'hard', now)
-    expect(state.chapters['lab/c1'].mode).toBe('hard')
+  it('keeps working on progress saved with the old mode fields', () => {
+    const saved = {
+      chapters: {
+        'lab/c1': {
+          mode: 'easy',
+          nonGreenChecks: 2,
+          tasks: { t1: { passed: false, pointsEarned: 0, solutionOpened: true } },
+          startedAt: now.toISOString(),
+          lastOpenedAt: now.toISOString()
+        }
+      },
+      activity: {},
+      totalPoints: 4
+    }
+    const state = JSON.parse(JSON.stringify(saved)) as ProgressState
+    touch(state, 'lab', 'c1', later)
+    recordCheck(state, 'lab', 'c1', tasks, [result('t1', true), result('t2', true)], later)
+    expect(state.chapters['lab/c1'].tasks.t1).toMatchObject({ passed: true, pointsEarned: 10 })
+    expect(state.totalPoints).toBe(35)
+    expect(state.chapters['lab/c1'].completedAt).toBe(later.toISOString())
   })
 
   it('ignores results for tasks the chapter does not have', () => {

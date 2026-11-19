@@ -1,9 +1,7 @@
 import { readFile, rename, writeFile } from 'fs/promises'
-import { join } from 'path'
 import type { CheckResult, ProgressState, TaskDef } from '@shared/types'
 import { handle } from '../ipc'
-import { chapterContentDir, dataFile } from '../paths'
-import { loadChapter } from './content'
+import { dataFile } from '../paths'
 import * as rules from './progressLogic'
 
 let state: Promise<ProgressState> | undefined
@@ -52,24 +50,6 @@ export function recordCheck(
 export function register(): void {
   handle('progress', {
     get: getState,
-    touch: (labId, chapterId) => update((s) => rules.touch(s, labId, chapterId, new Date())),
-    setMode: (labId, chapterId, mode) => {
-      if (mode !== 'hard' && mode !== 'easy') throw new Error(`Unknown mode: ${mode}`)
-      return update((s) => rules.setMode(s, labId, chapterId, mode, new Date()))
-    },
-    openSolution: async (labId, chapterId, taskId) => {
-      const chapter = await loadChapter(labId, chapterId)
-      const task = chapter.tasks.find((t) => t.id === taskId)
-      if (!task) throw new Error(`Unknown task: ${taskId}`)
-      let solutionPath = ''
-      const progress = await update((s) => {
-        solutionPath = rules.openSolution(s, labId, chapterId, task, new Date())
-      })
-      const content = await readFile(
-        join(chapterContentDir(labId, chapterId), solutionPath),
-        'utf8'
-      )
-      return { solution: { path: task.file, content }, progress }
-    }
+    touch: (labId, chapterId) => update((s) => rules.touch(s, labId, chapterId, new Date()))
   })
 }

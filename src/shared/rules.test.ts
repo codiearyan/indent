@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { currentStreak, hintsUnlocked, levelFor, pointsFor } from './rules'
+import { currentStreak, hintsUnlocked, levelFor } from './rules'
 
 describe('rules', () => {
-  it('pays half points in easy mode', () => {
-    expect(pointsFor(10, 'hard')).toBe(10)
-    expect(pointsFor(10, 'easy')).toBe(5)
-  })
-
   it('unlocks the first hint after 3 non-green checks, then one per check, capped at 3', () => {
     expect([0, 2, 3, 4, 5, 9].map(hintsUnlocked)).toEqual([0, 0, 1, 2, 3, 3])
   })

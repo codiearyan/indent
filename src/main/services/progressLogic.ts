@@ -1,12 +1,11 @@
 import type {
   ChapterProgress,
   CheckResult,
-  Mode,
   ProgressState,
   TaskDef,
   TaskProgress
 } from '../../shared/types'
-import { chapterKey, isChapterComplete, localDate, pointsFor } from '../../shared/rules'
+import { chapterKey, isChapterComplete, localDate } from '../../shared/rules'
 
 // Every rule mutates the given state in place; the service saves and returns it.
 
@@ -20,8 +19,6 @@ function chapterEntry(
 ): ChapterProgress {
   const at = now.toISOString()
   return (state.chapters[chapterKey(labId, chapterId)] ??= {
-    mode: 'hard',
-    easyLocked: false,
     nonGreenChecks: 0,
     tasks: {},
     startedAt: at,
@@ -30,43 +27,12 @@ function chapterEntry(
 }
 
 function taskEntry(chapter: ChapterProgress, taskId: string): TaskProgress {
-  return (chapter.tasks[taskId] ??= { passed: false, pointsEarned: 0, solutionOpened: false })
+  return (chapter.tasks[taskId] ??= { passed: false, pointsEarned: 0 })
 }
 
 export function touch(state: ProgressState, labId: string, chapterId: string, now: Date): void {
   chapterEntry(state, labId, chapterId, now).lastOpenedAt = now.toISOString()
   state.lastOpened = { labId, chapterId }
-}
-
-export function setMode(
-  state: ProgressState,
-  labId: string,
-  chapterId: string,
-  mode: Mode,
-  now: Date
-): void {
-  const chapter = chapterEntry(state, labId, chapterId, now)
-  if (mode === 'hard' && chapter.easyLocked) {
-    throw new Error('A solution was opened in this chapter, so it stays in easy mode.')
-  }
-  chapter.mode = mode
-}
-
-/** Returns the solution path relative to the chapter folder. */
-export function openSolution(
-  state: ProgressState,
-  labId: string,
-  chapterId: string,
-  task: TaskDef,
-  now: Date
-): string {
-  const chapter = chapterEntry(state, labId, chapterId, now)
-  if (chapter.mode !== 'easy') throw new Error('Solutions are only available in easy mode.')
-  const progress = taskEntry(chapter, task.id)
-  if (!progress.lastResult) throw new Error('Run a check on this task before opening its solution.')
-  progress.solutionOpened = true
-  chapter.easyLocked = true
-  return `solution/${task.file}`
 }
 
 export function recordCheck(
@@ -89,14 +55,8 @@ export function recordCheck(
     const progress = taskEntry(chapter, task.id)
     progress.lastResult = result
     if (!result.passed || progress.passed) continue
-    const mode = progress.solutionOpened ? 'easy' : chapter.mode
-    const points = pointsFor(task.points, mode)
-    Object.assign(progress, {
-      passed: true,
-      pointsEarned: points,
-      passedAt: now.toISOString(),
-      passedMode: mode
-    })
+    const points = task.points
+    Object.assign(progress, { passed: true, pointsEarned: points, passedAt: now.toISOString() })
     state.totalPoints += points
     day.points += points
     day.tasksPassed++

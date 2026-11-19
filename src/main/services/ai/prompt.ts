@@ -12,7 +12,7 @@ How you help:
 - When asked what a line or piece of code does, explain it.
 - Point to the part of the lesson that covers the idea, by its heading.
 - Ask one guiding question when it helps the learner find the next step themselves.
-- Small examples are welcome, but they must show the idea on different names and data, never the task's own solution.
+- Small examples are welcome, but they must show the idea on different names and data, never the task's own answer.
 
 What you never do:
 - Never write the finished answer to a task, the full file, or a drop-in fix for their code. If asked, explain the idea and give the next small step instead.
@@ -123,7 +123,7 @@ export function withInstructions(system: string, prompt: string): string {
   return `<instructions>\n${system}\n</instructions>\n\n${prompt}`
 }
 
-export const COMPLETION_RULES = `You are an inline code completion engine in a learning app. Reply with only the code to insert at <cursor/>: no explanation, no markdown fences, no text that repeats what is already before or after the cursor. Insert at most a few lines, usually finishing the current line or statement. Never write a whole function body or a whole task solution in one go; the learner is practicing. If nothing useful fits, reply with nothing.`
+export const COMPLETION_RULES = `You are an inline code completion engine in a learning app. Reply with only the code to insert at <cursor/>: no explanation, no markdown fences, no text that repeats what is already before or after the cursor. Insert at most a few lines, usually finishing the current line or statement. Never write a whole function body or a whole task answer in one go; the learner is practicing. If nothing useful fits, reply with nothing.`
 
 export function completionPrompt(path: string, prefix: string, suffix: string): string {
   return `File: ${path}\n\n${prefix}<cursor/>${suffix}`

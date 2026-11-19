@@ -19,10 +19,8 @@ const lab: LabSummary = {
 
 function chapter(completed: boolean, pointsEarned = 0): ChapterProgress {
   return {
-    mode: 'hard',
-    easyLocked: false,
     nonGreenChecks: 0,
-    tasks: { t1: { passed: completed, pointsEarned, solutionOpened: false } },
+    tasks: { t1: { passed: completed, pointsEarned } },
     startedAt: '2026-01-01T00:00:00Z',
     lastOpenedAt: '2026-01-02T00:00:00Z',
     completedAt: completed ? '2026-01-02T00:00:00Z' : undefined

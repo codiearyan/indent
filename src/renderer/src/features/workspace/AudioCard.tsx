@@ -30,7 +30,7 @@ export function AudioCard({ lesson }: { lesson: string }): React.JSX.Element | n
         {playing ? <Pause /> : <Play />}
       </Button>
       <div className="flex min-w-0 flex-1 items-baseline gap-2">
-        <span className="truncate text-sm">Listen to this chapter</span>
+        <span className="truncate text-sm">Read aloud</span>
         <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
           {status === 'idle'
             ? `${parts.length} ${parts.length === 1 ? 'part' : 'parts'}`

@@ -35,10 +35,10 @@ export function LeftPanel(): React.JSX.Element {
       <div className="h-11 shrink-0 border-b border-border px-4">
         <TabsList variant="line" className="h-full! gap-5 p-0">
           <TabsTrigger value="insights" data-tour={TOUR.insightsTab} className={trigger}>
-            Chapter insights
+            Lesson
           </TabsTrigger>
           <TabsTrigger value="tasks" data-tour={TOUR.tasksTab} className={trigger}>
-            Your tasks
+            Tasks
             {chapter && <TaskCount chapter={chapter} />}
           </TabsTrigger>
         </TabsList>

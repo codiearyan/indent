@@ -36,20 +36,20 @@ export function ChatPanel(): React.JSX.Element {
   return (
     <aside className="flex h-full min-w-0 flex-col bg-card">
       <header className="flex h-11 shrink-0 items-center gap-2 border-b border-border pr-2 pl-4">
-        <h2 className="flex-1 text-sm font-medium">AI chat</h2>
+        <h2 className="flex-1 text-sm font-medium">Tutor</h2>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon-sm"
-              aria-label="Close chat"
+              aria-label="Close tutor"
               className="text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]"
               onClick={() => setPanel('chat', false)}
             >
               <X />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Close chat</TooltipContent>
+          <TooltipContent>Close tutor</TooltipContent>
         </Tooltip>
       </header>
 

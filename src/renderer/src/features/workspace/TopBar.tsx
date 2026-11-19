@@ -1,24 +1,20 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, ChevronLeft, ChevronRight, CircleHelp, MessageCircle } from 'lucide-react'
-import { LevelBadge } from '@/components/app/LevelBadge'
-import { ThemeToggle } from '@/components/app/ThemeToggle'
+import { ArrowLeft, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { AiMenu } from '@/features/ai/AiMenu'
+import { cn } from '@/lib/utils'
 import { TOUR } from '@/features/tour/anchors'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { IconButton } from './IconButton'
-import { LayoutPopover } from './LayoutPopover'
-import { ModeMenu } from './ModeMenu'
-import { ResetButton } from './ResetButton'
-import { TextSizePopover } from './TextSizePopover'
+import { ViewPopover } from './ViewPopover'
 
 const crumb = 'shrink-0 text-muted-foreground transition-colors hover:text-foreground'
 
 export function TopBar(): React.JSX.Element {
-  const { labId = '', chapterId = '' } = useParams()
+  const { labId = '' } = useParams()
   const navigate = useNavigate()
   const chapter = useWorkspace((s) => s.chapter)
-  const setTourOpen = useWorkspace((s) => s.setTourOpen)
   const chatOpen = useSettings((s) => s.panels.chat)
   const togglePanel = useSettings((s) => s.togglePanel)
 
@@ -71,24 +67,22 @@ export function TopBar(): React.JSX.Element {
         )}
       </nav>
       <div className="flex shrink-0 items-center gap-0.5">
-        <ModeMenu labId={labId} chapterId={chapterId} />
-        <LevelBadge data-tour={TOUR.level} />
-        <IconButton label="Take the tour" onClick={() => setTourOpen(true)}>
-          <CircleHelp />
-        </IconButton>
-        <AiMenu />
-        <ResetButton />
-        <IconButton
-          label={chatOpen ? 'Close chat' : 'Open chat'}
-          pressed={chatOpen}
+        <Button
+          variant="ghost"
+          size="sm"
+          aria-pressed={chatOpen}
           onClick={() => togglePanel('chat')}
           data-tour={TOUR.chat}
+          className={cn(
+            'font-normal text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]',
+            chatOpen && 'bg-accent text-foreground'
+          )}
         >
           <MessageCircle />
-        </IconButton>
-        <TextSizePopover />
-        <LayoutPopover />
-        <ThemeToggle />
+          Tutor
+        </Button>
+        <AiMenu />
+        <ViewPopover />
       </div>
     </header>
   )

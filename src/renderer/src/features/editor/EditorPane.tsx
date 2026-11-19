@@ -107,16 +107,12 @@ export function EditorPane(): React.JSX.Element {
           onClick={checkAll}
         >
           {checking && <Loader2Icon className="animate-spin" />}
-          {checking ? 'Checking...' : 'Check all tasks'}
+          {checking ? 'Running...' : 'Run checks'}
         </Button>
       </div>
 
       <div className="shrink-0 border-b border-border px-4 pb-2.5 text-[13px] text-muted-foreground">
-        {showSummary ? (
-          <CheckSummary />
-        ) : (
-          'Your work saves as you type. Press Check all tasks when ready, or check one task at a time.'
-        )}
+        {showSummary ? <CheckSummary /> : 'Saved as you type. Run checks when you are ready.'}
       </div>
 
       <div className="flex min-h-0 flex-1">

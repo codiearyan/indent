@@ -11,14 +11,13 @@ No account and no server. Lessons, your files and your progress live on your com
   below, an AI tutor on the right.
 - **Check**: hidden tests run against your code in about a second. Each task turns green, or shows
   what your code produced and says in plain words what to look at.
-- **Hints and modes**: three hints per task that unlock as you try. Hard mode pays full points;
-  easy mode shows the solution after a check for half points.
+- **Hints**: three hints per task, from a light nudge to almost there, that open as you try.
 - **AI without a sign-in**: uses a coding CLI you are already logged in to (Claude Code, Codex,
   OpenCode, Gemini CLI) or your own Anthropic, OpenAI or Gemini key. Tutor chat that explains
   rather than answers, and optional grey inline suggestions accepted with Tab.
 - **Lab model**: labs about language models talk to a small offline model that answers the same
   way every time, so nothing costs money and tests are repeatable.
-- **Listen to the chapter**, a guided tour, text size per panel, layout options, light and dark.
+- **Read aloud**, a guided tour, text size per panel, layout options, dark and light themes.
 - **DSA patterns**: 18 algorithm patterns as step-through animations (two pointers, sliding window,
   binary search, linked lists, heaps, BFS and DFS, topological sort, union-find, backtracking,
   dynamic programming and more). Each step highlights the line of code that runs and says what

@@ -1,4 +1,3 @@
-import { RotateCcw } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -8,16 +7,15 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { useWorkspace } from '@/stores/workspace'
-import { TOUR } from '@/features/tour/anchors'
-import { IconButton } from './IconButton'
 
-export function ResetButton(): React.JSX.Element {
+export function ResetDialog(props: {
+  open: boolean
+  onOpenChange(open: boolean): void
+}): React.JSX.Element {
   const reset = useWorkspace((s) => s.reset)
-  const ready = useWorkspace((s) => s.status === 'ready')
 
   const confirm = async (): Promise<void> => {
     try {
@@ -31,18 +29,13 @@ export function ResetButton(): React.JSX.Element {
   }
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <IconButton label="Reset this chapter's files" disabled={!ready} data-tour={TOUR.reset}>
-          <RotateCcw />
-        </IconButton>
-      </AlertDialogTrigger>
+    <AlertDialog {...props}>
       <AlertDialogContent className="bg-popover">
         <AlertDialogHeader>
           <AlertDialogTitle>Reset this chapter&apos;s files?</AlertDialogTitle>
           <AlertDialogDescription>
-            Your edits in this chapter are replaced with the starter files. Passed tasks, points and
-            your mode stay as they are.
+            Your edits in this chapter are replaced with the starter files. Passed tasks and points
+            stay as they are.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

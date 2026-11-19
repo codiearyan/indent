@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import { Check, Circle, Compass, ListChecks, Loader2, Sparkles, X } from 'lucide-react'
 import type { ChapterProgress, TaskDef } from '@shared/types'
-import { hintsUnlocked, pointsFor } from '@shared/rules'
+import { hintsUnlocked } from '@shared/rules'
 import { Button } from '@/components/ui/button'
 import { useChat } from '@/features/ai/chatStore'
 import { TOUR } from '@/features/tour/anchors'
 import { useWorkspace } from '@/stores/workspace'
 import { CheckDetails } from './CheckDetails'
 import { Markdown } from './Markdown'
-import { SolutionButton } from './SolutionButton'
 import { TaskHints } from './TaskHints'
 
 interface Props {
@@ -27,7 +26,6 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
   const result = taskProgress?.lastResult
   const failed = result?.passed === false
   const isChecking = checking?.includes(task.id) ?? false
-  const mode = progress?.mode ?? 'hard'
 
   const askWhy = (): void => {
     const failing = result?.details.filter((d) => !d.passed).map((d) => d.name) ?? []
@@ -46,7 +44,7 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
           <span className="shrink-0 text-[13px] text-muted-foreground tabular-nums">
             {taskProgress?.passed
               ? `${taskProgress.pointsEarned} pts earned`
-              : `${pointsFor(task.points, mode)} pts`}
+              : `${task.points} pts`}
           </span>
         </div>
         <Markdown compact>{task.description}</Markdown>
@@ -61,7 +59,7 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
             data-tour={first ? TOUR.taskCheck : undefined}
           >
             {isChecking ? <Loader2 className="animate-spin" /> : <ListChecks />}
-            Check this task
+            Check
           </Button>
           <Button
             variant="ghost"
@@ -72,11 +70,8 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
             data-tour={first ? TOUR.taskNext : undefined}
           >
             <Compass />
-            What do I do next?
+            Next step
           </Button>
-          {mode === 'easy' && result && (
-            <SolutionButton taskId={task.id} easyLocked={!!progress?.easyLocked} />
-          )}
         </div>
         {stepsOpen && (
           <div className="space-y-2 rounded-lg border border-border p-3 text-sm">

@@ -267,10 +267,10 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
               onClick={() => connect()}
               disabled={!chapter}
             >
-              Connect to terminal
+              Open terminal
             </Button>
             <p className="max-w-sm text-[13px] text-muted-foreground">
-              You do not need the terminal to check your work. Connect to run and explore.
+              Checks do not need the terminal. Open it to run and explore.
             </p>
             {suggestion}
           </div>
