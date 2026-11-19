@@ -1,0 +1,65 @@
+{
+  "id": "unhappy-path",
+  "title": "Typing the unhappy path",
+  "files": ["src/import.ts", "src/errors.ts", "src/quotes.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. The demo imports a messy export, reads thrown values and asks a fake supplier for quotes, and `npm run types` type-checks your files.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "import",
+      "title": "Importing bookings you cannot trust",
+      "file": "src/import.ts",
+      "description": "In `src/import.ts`:\n\n- Export an interface `BookingRecord` with `id: string`, `customer: string` and `priceCents: number`.\n- `isBookingRecord(value: unknown)` is a type guard returning `value is BookingRecord`. It is true only for a non-null object whose `id` and `customer` are strings and whose `priceCents` is a number.\n- `readBookings(json: string): BookingRecord[]` parses the JSON. When the result is not an array it throws an `Error` whose message contains `array`. Otherwise it returns only the valid rows, in order. Invalid JSON may throw the parser's own error.\n\n`JSON.parse` returns `any`; put its result straight into a variable typed `unknown` and narrow from there, with no casts. The check calls both functions with hidden rows, including `null`, prices written as text and missing members. It also type-checks your file with hidden code: reading `id` after the guard must compile, and misuse (reading a price as text, passing an array to `readBookings`) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Write the `BookingRecord` interface.",
+        "Write `isBookingRecord`, rejecting non-objects and `null` first.",
+        "Check each member with `in` and `typeof`.",
+        "Write `readBookings` with `unknown`, then run `npm run types` and `node src/demo.ts`."
+      ],
+      "hints": [
+        "`unknown` accepts every value, like `any`, but lets you do nothing with it until you have narrowed it. That is exactly what untrusted input needs.",
+        "After `typeof value === 'object' && value !== null`, TypeScript lets you write `'id' in value`, and after that `value.id` is readable with the type `unknown`.",
+        "`Array.isArray` narrows the parsed data to an array, and `filter` with your type guard as the callback returns `BookingRecord[]`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "errors",
+      "title": "Errors you did not throw",
+      "file": "src/errors.ts",
+      "description": "In `src/errors.ts`, `PartNotFoundError` is ready. Write two functions that take whatever a `catch` block caught.\n\n- `errorMessage(error: unknown): string` returns the message of an `Error` (subclasses included), the string itself for a thrown string, the message of a non-null object whose `message` is a string, and `'Something went wrong'` for anything else.\n- `describeOrderFailure(error: unknown): string` returns `'Part not found: <part>'` for a `PartNotFoundError` and `'Order failed: <errorMessage(error)>'` for anything else.\n\nThe check really throws hidden values (Errors, strings, objects, numbers, `null`, `undefined`) and passes what it caught to your functions. It also type-checks your file with hidden code: passing a caught error, a number or `undefined` must compile, and using the result as anything but a string must be a type error. The parameter must be `unknown`; code that uses `any` is rejected.",
+      "nextSteps": [
+        "Annotate both functions with `unknown` parameters and string results.",
+        "Handle `Error` and strings in `errorMessage`.",
+        "Handle objects with a string `message`, then the fallback.",
+        "Write `describeOrderFailure` with `instanceof`, then run `npm run types`."
+      ],
+      "hints": [
+        "In strict mode the variable in `catch (error)` already has the type `unknown`, because JavaScript can throw anything.",
+        "`instanceof Error` narrows to `Error` and covers `TypeError` and your own subclasses. `typeof` handles the string case.",
+        "For the object case you need three steps: an object, not `null`, has `message`. Then check that `message` is a string before returning it."
+      ],
+      "points": 10
+    },
+    {
+      "id": "quotes",
+      "title": "Quotes that can fail",
+      "file": "src/quotes.ts",
+      "description": "In `src/quotes.ts`:\n\n- Export `type Result<T, E = string>`: either `{ ok: true, value: T }` or `{ ok: false, error: E }`.\n- `getQuote(partId: string, fetchPrice: (partId: string) => Promise<number>): Promise<Result<number>>` is async and calls `fetchPrice(partId)`. It resolves to `{ ok: true, value }` for a finite price of 0 or more, `{ ok: false, error: 'Invalid price' }` for a negative or non-finite price, `{ ok: false, error: <message> }` when `fetchPrice` throws or rejects with an `Error`, and `{ ok: false, error: 'Supplier error' }` when it throws or rejects with anything else. `getQuote` itself never rejects, even when `fetchPrice` throws before returning a promise.\n- `unwrapOr(result, fallback)` returns the value of a successful result, or `fallback`. It is generic, and the fallback has the same type as the value.\n\nThe check calls `getQuote` with hidden suppliers and `unwrapOr` with hidden results. It also type-checks your file with hidden code: narrowing on `ok` and awaiting the quote must compile, and misuse (reading `value` without checking `ok`, using the quote without `await`, a fallback of the wrong type) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Write the `Result` type as a union told apart by `ok`.",
+        "Annotate `getQuote`, including its `Promise<Result<number>>` return type.",
+        "Wrap the call to `fetchPrice` in `try` and `catch`, and check the price.",
+        "Write `unwrapOr`, then run `npm run types` and `node src/demo.ts`."
+      ],
+      "hints": [
+        "`ok: true` and `ok: false` are literal types, so `Result` is a discriminated union just like `JobStatus` was.",
+        "In an async function, `return { ok: true, value: price }` is enough. The `Promise` around it comes from the `async` keyword.",
+        "Put `await fetchPrice(partId)` inside the `try`. A sync throw and a rejected promise then both land in the same `catch`, where the caught value is `unknown`."
+      ],
+      "points": 10
+    }
+  ]
+}

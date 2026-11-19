@@ -1,0 +1,13 @@
+{
+  "id": "typescript-essentials",
+  "title": "TypeScript, the parts you use daily",
+  "description": "Spokewell is a small bike repair shop whose booking app was written in plain JavaScript, and you are the developer moving it to TypeScript. Over five chapters you type real functions, model the shop's data, write generics and derived types, and handle failure without reaching for any.",
+  "category": "JavaScript and TypeScript",
+  "language": "typescript",
+  "tags": ["TypeScript"],
+  "kind": "lab",
+  "parts": [
+    { "title": "Typing what is already there", "chapters": ["narrowing", "modelling-data"] },
+    { "title": "Types that do more of the work", "chapters": ["generics", "types-from-types", "unhappy-path"] }
+  ]
+}
