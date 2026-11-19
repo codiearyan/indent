@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { AiConfig, AiProviderId, AiProviderInfo } from '@shared/types'
+import type { AiConfig, AiProviderId, AiProviderInfo, AiSettingsPatch } from '@shared/types'
 import { api } from '@/lib/api'
 
 interface AiStore {
@@ -7,7 +7,7 @@ interface AiStore {
   /** The AI menu popover; other components open it with `openMenu()`. */
   menuOpen: boolean
   load(): Promise<void>
-  update(patch: Partial<Pick<AiConfig, 'provider' | 'model' | 'suggestions'>>): Promise<void>
+  update(patch: AiSettingsPatch): Promise<void>
   setKey(provider: AiProviderId, key: string | null): Promise<void>
   setMenuOpen(open: boolean): void
   openMenu(): void

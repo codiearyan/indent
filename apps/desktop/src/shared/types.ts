@@ -165,12 +165,17 @@ export interface AiProviderInfo {
 }
 
 export interface AiConfig {
+  /** Off means no AI anywhere: no tutor, no suggestions, and main refuses AI calls. */
+  enabled: boolean
   provider: AiProviderId | null
   model: string | null
   /** Grey inline suggestions in the editor. */
   suggestions: boolean
   providers: AiProviderInfo[]
 }
+
+/** The parts of AiConfig the renderer may change. */
+export type AiSettingsPatch = Partial<Pick<AiConfig, 'enabled' | 'provider' | 'model' | 'suggestions'>>
 
 export interface AiMessage {
   role: 'user' | 'assistant'
@@ -245,9 +250,7 @@ export interface Api {
   }
   ai: {
     getConfig(): Promise<AiConfig>
-    setConfig(
-      patch: Partial<Pick<AiConfig, 'provider' | 'model' | 'suggestions'>>
-    ): Promise<AiConfig>
+    setConfig(patch: AiSettingsPatch): Promise<AiConfig>
     /** Stores or (with null) removes an API key. */
     setKey(provider: AiProviderId, key: string | null): Promise<AiConfig>
     /** Starts a streamed reply; events arrive on onChatEvent with the returned request id. */

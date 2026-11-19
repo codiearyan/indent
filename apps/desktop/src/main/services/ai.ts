@@ -27,6 +27,7 @@ import {
   trimHistory,
   tutorSystemPrompt
 } from './ai/prompt'
+import { readSettings, type AiSettings } from './ai/settings'
 
 type ApiProviderId = Exclude<AiProviderId, CliProviderId>
 
@@ -64,31 +65,20 @@ const CLI_FAST_MODEL: Partial<Record<CliProviderId, string>> = { 'claude-code': 
 const CHAT_TIMEOUT_MS = 120_000
 const COMPLETE_TIMEOUT_MS = { cli: 20_000, api: 8_000 }
 
-interface Settings {
-  provider: AiProviderId | null
-  model: string | null
-  suggestions: boolean
-}
-
 const settingsFile = (): string => dataFile('ai.json')
 const keysFile = (): string => dataFile('ai-keys.bin')
 
-let settings: Settings | undefined
+let settings: AiSettings | undefined
 let keys: Partial<Record<ApiProviderId, string>> | undefined
 let detected: Promise<AiProviderInfo[]> | undefined
 const cliPaths = new Map<AiProviderId, string>()
 
-async function loadSettings(): Promise<Settings> {
+async function loadSettings(): Promise<AiSettings> {
   if (settings) return settings
   try {
-    const saved = JSON.parse(await readFile(settingsFile(), 'utf8')) as Partial<Settings>
-    settings = {
-      provider: saved.provider ?? null,
-      model: saved.model ?? null,
-      suggestions: saved.suggestions ?? false
-    }
+    settings = readSettings(JSON.parse(await readFile(settingsFile(), 'utf8')))
   } catch {
-    settings = { provider: null, model: null, suggestions: false }
+    settings = readSettings({})
   }
   return settings
 }
@@ -157,7 +147,13 @@ async function buildConfig(fresh = false): Promise<AiConfig> {
   const active = chosen ?? providers.find((p) => p.available) ?? null
   let model = chosen ? saved.model : null
   if (!model && active?.kind === 'api') model = active.models[0]
-  return { provider: active?.id ?? null, model, suggestions: saved.suggestions, providers }
+  return {
+    enabled: saved.enabled,
+    provider: active?.id ?? null,
+    model,
+    suggestions: saved.suggestions,
+    providers
+  }
 }
 
 interface Reply {
@@ -297,6 +293,7 @@ export function register(): void {
       if (patch.model?.startsWith('-')) throw new Error('That is not a model name.')
       if (patch.model !== undefined) next.model = patch.model || null
       if (patch.suggestions !== undefined) next.suggestions = !!patch.suggestions
+      if (patch.enabled !== undefined) next.enabled = !!patch.enabled
       settings = next
       await saveSettings()
       return buildConfig()
