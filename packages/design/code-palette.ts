@@ -35,7 +35,7 @@ export const codePalette: Record<'dark' | 'light', CodePalette> = {
     border: '#262628',
     selection: '#3d2418',
     lineHighlight: '#19191b',
-    cursor: '#ff5a1f',
+    cursor: '#ea6030',
     comment: '#7c7c85',
     keyword: '#79b8ff',
     string: '#e6b673',
