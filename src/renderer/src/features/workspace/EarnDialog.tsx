@@ -26,12 +26,12 @@ export function EarnDialog(props: {
 
   return (
     <Dialog {...props}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="bg-popover sm:max-w-md">
         <DialogHeader>
           <DialogTitle>What do I earn?</DialogTitle>
           <DialogDescription>Points come from tasks. They add up to your level.</DialogDescription>
         </DialogHeader>
-        <dl className="space-y-4 text-sm">
+        <dl className="divide-y divide-rule border-y border-rule text-sm">
           <Rule term="Points">
             Every task shows its points. A task worth {EXAMPLE_POINTS} pays{' '}
             {pointsFor(EXAMPLE_POINTS, 'hard')} the first time it passes in hard mode and{' '}
@@ -57,7 +57,7 @@ export function EarnDialog(props: {
 
 function Rule({ term, children }: { term: string; children: React.ReactNode }): React.JSX.Element {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 py-3">
       <dt className="font-medium">{term}</dt>
       <dd className="text-muted-foreground">{children}</dd>
     </div>

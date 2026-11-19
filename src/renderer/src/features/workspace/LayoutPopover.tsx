@@ -27,7 +27,7 @@ export function LayoutPopover(): React.JSX.Element {
           <SlidersHorizontal />
         </IconButton>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-64 space-y-4">
+      <PopoverContent align="end" className="w-64 space-y-4 rounded-lg">
         <div className="space-y-2">
           <span className="text-sm font-medium">Lesson side</span>
           <ToggleGroup
@@ -38,11 +38,17 @@ export function LayoutPopover(): React.JSX.Element {
             value={lessonSide}
             onValueChange={(side) => side && setLessonSide(side as 'left' | 'right')}
           >
-            <ToggleGroupItem value="left" className="flex-1">
+            <ToggleGroupItem
+              value="left"
+              className="h-7 flex-1 rounded-sm font-normal text-muted-foreground data-[state=on]:font-medium data-[state=on]:text-foreground"
+            >
               <PanelLeft />
               Left
             </ToggleGroupItem>
-            <ToggleGroupItem value="right" className="flex-1">
+            <ToggleGroupItem
+              value="right"
+              className="h-7 flex-1 rounded-sm font-normal text-muted-foreground data-[state=on]:font-medium data-[state=on]:text-foreground"
+            >
               <PanelRight />
               Right
             </ToggleGroupItem>

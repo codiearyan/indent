@@ -3,7 +3,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { cn } from '@/lib/utils'
 import { intensity, parseDate, type Week } from './activity'
 
-const STEPS = ['bg-muted', 'bg-brand/25', 'bg-brand/50', 'bg-brand/75', 'bg-brand']
+const STEPS = ['bg-accent', 'bg-brand/25', 'bg-brand/50', 'bg-brand/75', 'bg-brand']
 const DAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', '']
 
 const monthName = (date: string): string =>
@@ -21,21 +21,26 @@ function describe(date: string, activity: ProgressState['activity']): string {
   return `${when}: ${passed} ${passed === 1 ? 'task' : 'tasks'} passed, ${points} points`
 }
 
-/** Weeks as columns, Sunday to Saturday as rows. */
+/** Weeks as columns, Sunday to Saturday as rows. `fill` stretches the cells to the width. */
 export function Heatmap({
   weeks,
-  activity
+  activity,
+  fill = false
 }: {
   weeks: Week[]
   activity: ProgressState['activity']
+  fill?: boolean
 }): React.JSX.Element {
   return (
-    <div className="overflow-x-auto pb-1">
+    <div className={cn(!fill && 'overflow-x-auto pb-1')}>
       <div
-        className="grid w-max grid-flow-col gap-[3px] text-[10px] text-muted-foreground"
+        className={cn(
+          'grid grid-flow-col gap-[3px] text-[10px] text-muted-foreground',
+          fill ? 'w-full' : 'w-max'
+        )}
         style={{
-          gridTemplateColumns: `auto repeat(${weeks.length}, 12px)`,
-          gridTemplateRows: 'auto repeat(7, 12px)'
+          gridTemplateColumns: `auto repeat(${weeks.length}, ${fill ? 'minmax(0, 1fr)' : '12px'})`,
+          gridTemplateRows: fill ? 'auto repeat(7, auto)' : 'auto repeat(7, 12px)'
         }}
       >
         <span />
@@ -57,7 +62,11 @@ export function Heatmap({
                     <div
                       role="img"
                       aria-label={describe(date, activity)}
-                      className={cn('rounded-[3px]', STEPS[intensity(activity[date])])}
+                      className={cn(
+                        'rounded-[3px]',
+                        fill && 'aspect-square',
+                        STEPS[intensity(activity[date])]
+                      )}
                     />
                   </TooltipTrigger>
                   <TooltipContent>{describe(date, activity)}</TooltipContent>

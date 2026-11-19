@@ -39,13 +39,19 @@ export function ModeMenu({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" disabled={!progress} data-tour={TOUR.mode}>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={!progress}
+            data-tour={TOUR.mode}
+            className="font-normal text-muted-foreground hover:text-foreground data-[state=open]:bg-accent [&_svg]:stroke-[1.5]"
+          >
             {mode === 'hard' ? <Flame className="text-warning" /> : <Leaf />}
             {mode === 'hard' ? 'Hard' : 'Easy'}
             <ChevronDown className="text-muted-foreground" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-72">
+        <DropdownMenuContent align="end" className="w-72 rounded-lg">
           <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
             Easy mode lets you open solutions after a check, for half the points. You can switch
             back until you open one.
@@ -60,12 +66,12 @@ export function ModeMenu({
                 </div>
               )}
             </div>
-            {mode === 'hard' && <Check />}
+            {mode === 'hard' && <Check className="text-foreground" />}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => choose('easy')}>
             <Leaf />
             <span className="flex-1">Easy mode: solutions, half points</span>
-            {mode === 'easy' && <Check />}
+            {mode === 'easy' && <Check className="text-foreground" />}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => setEarnOpen(true)}>What do I earn?</DropdownMenuItem>

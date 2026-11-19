@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Headphones, Pause, Play, SkipBack, SkipForward } from 'lucide-react'
+import { Pause, Play, SkipBack, SkipForward } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TOUR } from '@/features/tour/anchors'
 import { IconButton } from './IconButton'
@@ -16,28 +16,28 @@ export function AudioCard({ lesson }: { lesson: string }): React.JSX.Element | n
   const playing = status === 'playing'
 
   return (
-    <div data-tour={TOUR.audio} className="flex items-center gap-3 rounded-lg border bg-card p-3">
+    <div
+      data-tour={TOUR.audio}
+      className="flex h-12 items-center gap-3 rounded-lg border border-border pr-1.5 pl-2"
+    >
       <Button
         variant="outline"
-        size="icon"
-        className="shrink-0 rounded-full"
+        size="icon-sm"
+        className="shrink-0 rounded-full border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent [&_svg]:stroke-[1.5]"
         aria-label={playing ? 'Pause' : 'Play'}
         onClick={toggle}
       >
         {playing ? <Pause /> : <Play />}
       </Button>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5 text-sm font-medium">
-          <Headphones className="size-4 shrink-0 text-muted-foreground" />
-          <span className="truncate">Listen to this chapter</span>
-        </div>
-        <p className="text-xs text-muted-foreground">
+      <div className="flex min-w-0 flex-1 items-baseline gap-2">
+        <span className="truncate text-sm">Listen to this chapter</span>
+        <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
           {status === 'idle'
-            ? `${parts.length} ${parts.length === 1 ? 'part' : 'parts'}, read aloud. Keep reading or coding while it plays.`
+            ? `${parts.length} ${parts.length === 1 ? 'part' : 'parts'}`
             : `Part ${index + 1} of ${parts.length}${status === 'paused' ? ', paused' : ''}`}
-        </p>
+        </span>
       </div>
-      <div className="flex shrink-0 items-center gap-0.5">
+      <div className="flex shrink-0 items-center">
         <IconButton label="Previous part" disabled={index === 0} onClick={() => go(index - 1)}>
           <SkipBack />
         </IconButton>
@@ -51,7 +51,7 @@ export function AudioCard({ lesson }: { lesson: string }): React.JSX.Element | n
         <Button
           variant="ghost"
           size="sm"
-          className="w-12 tabular-nums"
+          className="w-11 px-0 font-normal text-muted-foreground tabular-nums hover:text-foreground"
           aria-label={`Speed ${rate}x`}
           onClick={cycleRate}
         >

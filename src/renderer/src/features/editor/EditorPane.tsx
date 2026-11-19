@@ -9,6 +9,7 @@ import {
   PanelLeftIcon,
   WandSparklesIcon
 } from 'lucide-react'
+import { isChapterComplete } from '@shared/rules'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -45,6 +46,10 @@ export function EditorPane(): React.JSX.Element {
     if (prevChecking && !checking) setShowSummary(true)
   }
   const chapterId = useWorkspace((s) => s.chapter?.id)
+  const chapter = useWorkspace((s) => s.chapter)
+  const chapterProgress = useChapterProgress(chapter?.labId ?? '', chapter?.id ?? '')
+  // Once every task has passed, the next-chapter button is the screen's one filled action.
+  const finished = isChapterComplete(chapterProgress, chapter?.tasks.map((t) => t.id) ?? [])
   const [prevChapterId, setPrevChapterId] = useState(chapterId)
   if (chapterId !== prevChapterId) {
     setPrevChapterId(chapterId)
@@ -54,7 +59,7 @@ export function EditorPane(): React.JSX.Element {
 
   return (
     <div className="flex h-full flex-col bg-editor">
-      <div className="flex h-12 shrink-0 items-center gap-1 px-2">
+      <div className="flex h-11 shrink-0 items-center gap-1 px-2">
         <IconButton
           label={panels.files ? 'Hide files' : 'Show files'}
           onClick={() => togglePanel('files')}
@@ -76,8 +81,8 @@ export function EditorPane(): React.JSX.Element {
               size="sm"
               onClick={() => setActive(file.path)}
               className={cn(
-                'font-mono font-normal text-muted-foreground',
-                file.path === activePath && 'bg-muted text-foreground'
+                'h-7 px-2.5 font-mono text-[13px] font-normal text-muted-foreground hover:bg-accent/60 hover:text-foreground',
+                file.path === activePath && 'bg-accent text-foreground hover:bg-accent'
               )}
             >
               {file.path}
@@ -95,6 +100,7 @@ export function EditorPane(): React.JSX.Element {
         </IconButton>
         <Button
           size="sm"
+          variant={finished ? 'outline' : 'default'}
           className="ml-1"
           data-tour={TOUR.checkAll}
           disabled={checking !== null || status !== 'ready'}
@@ -105,7 +111,7 @@ export function EditorPane(): React.JSX.Element {
         </Button>
       </div>
 
-      <div className="shrink-0 border-b px-4 pb-2.5 text-[13px] text-muted-foreground">
+      <div className="shrink-0 border-b border-border px-4 pb-2.5 text-[13px] text-muted-foreground">
         {showSummary ? (
           <CheckSummary />
         ) : (
@@ -115,7 +121,7 @@ export function EditorPane(): React.JSX.Element {
 
       <div className="flex min-h-0 flex-1">
         {panels.files && status === 'ready' && (
-          <div className="w-[200px] shrink-0 overflow-y-auto border-r p-2">
+          <div className="w-[200px] shrink-0 space-y-0.5 overflow-y-auto border-r border-border p-2">
             {files.map((file) => (
               <Button
                 key={file.path}
@@ -123,8 +129,8 @@ export function EditorPane(): React.JSX.Element {
                 size="sm"
                 onClick={() => setActive(file.path)}
                 className={cn(
-                  'w-full justify-start font-mono font-normal text-muted-foreground',
-                  file.path === activePath && 'bg-muted text-foreground'
+                  'h-7 w-full justify-start px-2 font-mono text-[13px] font-normal text-muted-foreground hover:bg-accent/60 hover:text-foreground [&_svg]:stroke-[1.5]',
+                  file.path === activePath && 'bg-accent text-foreground hover:bg-accent'
                 )}
               >
                 <FileIcon />
@@ -176,7 +182,13 @@ function IconButton({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label={label} onClick={onClick}>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={label}
+          onClick={onClick}
+          className="text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]"
+        >
           {children}
         </Button>
       </TooltipTrigger>

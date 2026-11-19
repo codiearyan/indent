@@ -209,7 +209,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
     <button
       type="button"
       onClick={() => typeCommand(suggested)}
-      className="max-w-64 truncate rounded-md border bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
+      className="max-w-64 truncate rounded-sm border border-border px-2 py-0.5 font-mono text-xs text-muted-foreground transition-colors hover:border-input hover:text-foreground"
     >
       Try: {suggested}
     </button>
@@ -219,26 +219,30 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
     <div
       ref={rootRef}
       style={overlay}
-      className={cn('flex h-full flex-col bg-editor', maximized && 'border-t')}
+      className={cn('flex h-full flex-col bg-editor', maximized && 'border-t border-border')}
     >
       <div
         data-tour={TOUR.terminal}
-        className="flex h-[41px] shrink-0 items-center gap-2 border-b px-2 text-sm"
+        className="flex h-[41px] shrink-0 items-center gap-2 border-b border-border px-2 text-sm"
       >
         <IconButton label={open ? 'Collapse terminal' : 'Expand terminal'} onClick={toggleOpen}>
           {open ? <ChevronDown /> : <ChevronUp />}
         </IconButton>
-        <SquareTerminal className="size-4 shrink-0 text-muted-foreground" />
         <span className="shrink-0 font-medium">Terminal</span>
         {chapter && (
-          <span className="min-w-0 truncate text-xs text-muted-foreground">
+          <span className="min-w-0 truncate text-[13px] text-muted-foreground">
             {chapter.terminal.description}
           </span>
         )}
         <div className="ml-auto flex shrink-0 items-center gap-1">
           {status === 'connected' && suggestion}
           {status === 'connected' && (
-            <Button variant="ghost" size="xs" onClick={() => setSession((n) => n + 1)}>
+            <Button
+              variant="ghost"
+              size="xs"
+              className="font-normal text-muted-foreground hover:text-foreground"
+              onClick={() => setSession((n) => n + 1)}
+            >
               <RotateCw />
               Restart
             </Button>
@@ -255,11 +259,17 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
       <div className="min-h-0 flex-1">
         {status === 'idle' ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 overflow-auto p-6 text-center">
-            <SquareTerminal className="size-6 text-muted-foreground" />
-            <Button onClick={() => connect()} disabled={!chapter}>
+            <SquareTerminal className="size-5 text-muted-foreground" strokeWidth={1.5} />
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
+              onClick={() => connect()}
+              disabled={!chapter}
+            >
               Connect to terminal
             </Button>
-            <p className="max-w-sm text-xs text-muted-foreground">
+            <p className="max-w-sm text-[13px] text-muted-foreground">
               You do not need the terminal to check your work. Connect to run and explore.
             </p>
             {suggestion}
@@ -268,7 +278,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
           <div className="flex h-full flex-col">
             <div ref={containerRef} className="min-h-0 flex-1 overflow-hidden py-1 pl-3" />
             {status === 'exited' && (
-              <div className="flex shrink-0 items-center gap-3 border-t px-3 py-2 text-xs text-muted-foreground">
+              <div className="flex shrink-0 items-center gap-3 border-t border-border px-3 py-2 text-xs text-muted-foreground">
                 <span>Shell exited with code {exitCode}.</span>
                 <Button variant="outline" size="xs" onClick={() => connect()}>
                   Reconnect
@@ -294,7 +304,13 @@ function IconButton({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon-xs" aria-label={label} onClick={onClick}>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={label}
+          onClick={onClick}
+          className="text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]"
+        >
           {children}
         </Button>
       </TooltipTrigger>

@@ -40,7 +40,7 @@ export function TextSizePopover(): React.JSX.Element {
           <ALargeSmall />
         </IconButton>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 space-y-4">
+      <PopoverContent align="end" className="w-80 space-y-4 rounded-lg">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium">Text size</span>
           <Button variant="ghost" size="xs" onClick={() => setAllTextScale(TEXT_SCALE_PRESETS.M)}>
@@ -49,14 +49,19 @@ export function TextSizePopover(): React.JSX.Element {
         </div>
         <ToggleGroup
           type="single"
-          variant="outline"
           size="sm"
-          className="w-full"
+          spacing={1}
+          className="w-full rounded-md border border-input p-0.5"
           value={preset}
           onValueChange={(key) => key && setAllTextScale(TEXT_SCALE_PRESETS[key as Preset])}
         >
           {(Object.keys(TEXT_SCALE_PRESETS) as Preset[]).map((key) => (
-            <ToggleGroupItem key={key} value={key} className="flex-1" aria-label={`Size ${key}`}>
+            <ToggleGroupItem
+              key={key}
+              value={key}
+              className="h-7 flex-1 rounded-sm font-normal text-muted-foreground data-[state=on]:font-medium data-[state=on]:text-foreground"
+              aria-label={`Size ${key}`}
+            >
               {key}
             </ToggleGroupItem>
           ))}
@@ -79,7 +84,9 @@ export function TextSizePopover(): React.JSX.Element {
             </div>
           ))}
         </div>
-        <p className="border-t pt-3 text-xs text-muted-foreground">Saved on this device</p>
+        <p className="border-t border-rule pt-3 text-xs text-muted-foreground">
+          Saved on this device
+        </p>
       </PopoverContent>
     </Popover>
   )

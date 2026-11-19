@@ -90,7 +90,7 @@ export function TourOverlay({ onClose }: { onClose(): void }): React.JSX.Element
       {rect && (
         <>
           <div
-            className="pointer-events-none absolute rounded-lg ring-2 ring-brand transition-all duration-200"
+            className="pointer-events-none absolute rounded-lg ring-2 ring-foreground transition-all duration-200"
             style={{
               top: rect.top - PAD,
               left: rect.left - PAD,
@@ -106,7 +106,7 @@ export function TourOverlay({ onClose }: { onClose(): void }): React.JSX.Element
             className="absolute w-80 space-y-2 rounded-lg border bg-popover p-4 text-popover-foreground shadow-md"
             style={cardPosition(rect)}
           >
-            <h2 id="tour-title" className="text-sm font-medium">
+            <h2 id="tour-title" className="text-sm font-semibold">
               {step.title}
             </h2>
             <p id="tour-text" className="text-sm text-muted-foreground">
@@ -117,7 +117,12 @@ export function TourOverlay({ onClose }: { onClose(): void }): React.JSX.Element
                 {index + 1} of {TOUR_STEPS.length}
               </span>
               {!last && (
-                <Button variant="ghost" size="sm" onClick={onClose}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="font-normal text-muted-foreground hover:text-foreground"
+                  onClick={onClose}
+                >
                   Skip
                 </Button>
               )}

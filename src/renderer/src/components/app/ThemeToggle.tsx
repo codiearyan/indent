@@ -11,7 +11,13 @@ export function ThemeToggle(): React.JSX.Element {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label={label} onClick={toggleTheme}>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={label}
+          onClick={toggleTheme}
+          className="text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]"
+        >
           {theme === 'dark' ? <Sun /> : <Moon />}
         </Button>
       </TooltipTrigger>

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Lightbulb, PartyPopper } from 'lucide-react'
+import { ArrowRight, CircleCheck } from 'lucide-react'
 import type { Chapter } from '@shared/types'
 import {
   CHECKS_BEFORE_FIRST_HINT,
@@ -29,13 +29,13 @@ export function TaskList({ chapter }: { chapter: Chapter }): React.JSX.Element {
     : `/labs/${chapter.labId}`
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="px-6 pt-2 pb-10">
       {complete && (
-        <div className="flex items-center gap-3 rounded-lg border border-success/30 bg-success/10 p-4">
-          <PartyPopper className="size-5 shrink-0 text-success" />
+        <div className="mt-4 flex items-center gap-3 rounded-lg bg-success/10 py-3 pr-3 pl-4">
+          <CircleCheck className="size-5 shrink-0 text-success" strokeWidth={1.5} />
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium">Every task passed</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[13px] text-muted-foreground tabular-nums">
               You earned {earned} points in this chapter.
             </p>
           </div>
@@ -45,7 +45,7 @@ export function TaskList({ chapter }: { chapter: Chapter }): React.JSX.Element {
           </Button>
         </div>
       )}
-      <ol className="space-y-6 rounded-xl border bg-card p-4">
+      <ol className="divide-y divide-rule">
         {chapter.tasks.map((task, i) => (
           <TaskItem
             key={`${chapter.id}/${task.id}`}
@@ -56,8 +56,7 @@ export function TaskList({ chapter }: { chapter: Chapter }): React.JSX.Element {
           />
         ))}
       </ol>
-      <p className="flex items-center gap-2 px-1 text-xs text-muted-foreground">
-        <Lightbulb className="size-4 shrink-0" />
+      <p className="border-t border-rule pt-4 text-xs text-muted-foreground">
         {unlocked === 0
           ? `A hint unlocks after ${CHECKS_BEFORE_FIRST_HINT} checks that are not all green.`
           : `${unlocked} of ${MAX_HINTS} hints unlocked for each task.` +

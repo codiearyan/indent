@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Circle, CircleCheck, CircleX, Compass, ListChecks, Loader2, Sparkles } from 'lucide-react'
+import { Check, Circle, Compass, ListChecks, Loader2, Sparkles, X } from 'lucide-react'
 import type { ChapterProgress, TaskDef } from '@shared/types'
 import { hintsUnlocked, pointsFor } from '@shared/rules'
 import { Button } from '@/components/ui/button'
@@ -36,14 +36,14 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
   }
 
   return (
-    <li className="flex gap-3">
+    <li className="flex gap-3 py-5">
       <StatusIcon checking={isChecking} failed={failed} passed={!!taskProgress?.passed} />
       <div className="min-w-0 flex-1 space-y-3">
         <div className="flex items-baseline gap-2">
-          <h3 className="min-w-0 flex-1 font-medium">
-            <span className="text-muted-foreground tabular-nums">{number}.</span> {task.title}
+          <h3 className="min-w-0 flex-1 text-sm font-semibold">
+            <span className="tabular-nums">{number}.</span> {task.title}
           </h3>
-          <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+          <span className="shrink-0 text-[13px] text-muted-foreground tabular-nums">
             {taskProgress?.passed
               ? `${taskProgress.pointsEarned} pts earned`
               : `${pointsFor(task.points, mode)} pts`}
@@ -53,19 +53,9 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
         {result && <CheckDetails result={result} />}
         <div className="flex flex-wrap items-center gap-2">
           <Button
-            variant="ghost"
-            size="sm"
-            className="text-brand hover:text-brand"
-            aria-expanded={stepsOpen}
-            onClick={() => setStepsOpen(!stepsOpen)}
-            data-tour={first ? TOUR.taskNext : undefined}
-          >
-            <Compass />
-            What do I do next?
-          </Button>
-          <Button
             variant="outline"
             size="sm"
+            className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
             disabled={checking !== null}
             onClick={() => void check([task.id])}
             data-tour={first ? TOUR.taskCheck : undefined}
@@ -73,19 +63,30 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
             {isChecking ? <Loader2 className="animate-spin" /> : <ListChecks />}
             Check this task
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="font-normal text-muted-foreground hover:text-foreground"
+            aria-expanded={stepsOpen}
+            onClick={() => setStepsOpen(!stepsOpen)}
+            data-tour={first ? TOUR.taskNext : undefined}
+          >
+            <Compass />
+            What do I do next?
+          </Button>
           {mode === 'easy' && result && (
             <SolutionButton taskId={task.id} easyLocked={!!progress?.easyLocked} />
           )}
         </div>
         {stepsOpen && (
-          <div className="space-y-2 rounded-md border bg-muted/40 p-3 text-sm">
+          <div className="space-y-2 rounded-lg border border-border p-3 text-sm">
             <ol className="list-decimal space-y-1 pl-5">
               {task.nextSteps.map((step, i) => (
                 <li key={i}>{step}</li>
               ))}
             </ol>
             {failed && (
-              <Button variant="ghost" size="sm" className="text-brand" onClick={askWhy}>
+              <Button variant="ghost" size="sm" className="-ml-2 font-normal" onClick={askWhy}>
                 <Sparkles />
                 Ask the tutor why this failed
               </Button>
@@ -103,18 +104,34 @@ function StatusIcon(props: {
   failed: boolean
   passed: boolean
 }): React.JSX.Element {
-  const className = 'mt-0.5 size-5 shrink-0'
+  const mark = 'mt-px flex size-5 shrink-0 items-center justify-center rounded-full'
   if (props.checking) {
     return (
       <Loader2
-        className={`${className} animate-spin text-muted-foreground`}
+        className="mt-px size-5 shrink-0 animate-spin text-muted-foreground"
         aria-label="Checking"
       />
     )
   }
-  if (props.failed)
-    return <CircleX className={`${className} text-destructive`} aria-label="Failed" />
-  if (props.passed)
-    return <CircleCheck className={`${className} text-success`} aria-label="Passed" />
-  return <Circle className={`${className} text-muted-foreground`} aria-label="Not passed yet" />
+  if (props.failed) {
+    return (
+      <span className={`${mark} bg-destructive/10 text-destructive`} aria-label="Failed">
+        <X className="size-3.5" strokeWidth={2} />
+      </span>
+    )
+  }
+  if (props.passed) {
+    return (
+      <span className={`${mark} bg-success text-card`} aria-label="Passed">
+        <Check className="size-3.5" strokeWidth={2.5} />
+      </span>
+    )
+  }
+  return (
+    <Circle
+      className="mt-px size-5 shrink-0 text-input"
+      strokeWidth={1.5}
+      aria-label="Not passed yet"
+    />
+  )
 }

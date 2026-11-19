@@ -47,6 +47,7 @@ describe('labProgress', () => {
     const p = labProgress(lab, { 'lab/a': chapter(true, 10), 'lab/b': chapter(false) })
     expect(p).toMatchObject({ status: 'in-progress', chaptersDone: 1, nextChapterId: 'b' })
     expect(p.pointsEarned).toBe(10)
+    expect(p.tasksPassed).toBe(1)
   })
 
   it('is completed when every chapter is, and goes back to the first chapter', () => {

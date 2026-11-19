@@ -247,7 +247,7 @@ html.platform-darwin {
     @apply font-semibold text-foreground;
   }
   .prose-lab a {
-    @apply text-brand underline underline-offset-4;
+    @apply text-foreground underline decoration-muted-foreground/60 underline-offset-4;
   }
   .prose-lab code {
     @apply rounded-sm bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground;

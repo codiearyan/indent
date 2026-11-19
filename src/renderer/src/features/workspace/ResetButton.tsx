@@ -37,7 +37,7 @@ export function ResetButton(): React.JSX.Element {
           <RotateCcw />
         </IconButton>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="bg-popover">
         <AlertDialogHeader>
           <AlertDialogTitle>Reset this chapter&apos;s files?</AlertDialogTitle>
           <AlertDialogDescription>

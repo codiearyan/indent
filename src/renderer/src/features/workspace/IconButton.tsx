@@ -14,7 +14,11 @@ export function IconButton({ label, pressed, className, ...props }: Props): Reac
           size="icon-sm"
           aria-label={label}
           aria-pressed={pressed}
-          className={cn(pressed && 'bg-accent text-accent-foreground', className)}
+          className={cn(
+            'text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]',
+            pressed && 'bg-accent text-foreground',
+            className
+          )}
           {...props}
         />
       </TooltipTrigger>

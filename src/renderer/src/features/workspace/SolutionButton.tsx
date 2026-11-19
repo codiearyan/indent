@@ -56,13 +56,14 @@ export function SolutionButton({
       <Button
         variant="ghost"
         size="sm"
+        className="font-normal text-muted-foreground hover:text-foreground"
         onClick={() => (easyLocked ? void open() : setConfirming(true))}
       >
         <Eye />
         Show solution
       </Button>
       <AlertDialog open={confirming} onOpenChange={setConfirming}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-popover">
           <AlertDialogHeader>
             <AlertDialogTitle>Open the solution?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -77,7 +78,7 @@ export function SolutionButton({
         </AlertDialogContent>
       </AlertDialog>
       <Dialog open={solution !== null} onOpenChange={(isOpen) => !isOpen && setSolution(null)}>
-        <DialogContent className="flex max-h-[85vh] flex-col sm:max-w-3xl">
+        <DialogContent className="flex max-h-[85vh] flex-col bg-popover sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Solution</DialogTitle>
             <DialogDescription className="font-mono">{solution?.path}</DialogDescription>
