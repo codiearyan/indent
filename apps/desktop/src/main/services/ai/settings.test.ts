@@ -12,3 +12,17 @@ describe('readSettings', () => {
     expect(readSettings({ enabled: false }).enabled).toBe(false)
   })
 })
+
+describe('suggestionMode', () => {
+  it('moves a saved boolean to a mode', () => {
+    expect(readSettings({ suggestions: true }).suggestions).toBe('auto')
+    expect(readSettings({ suggestions: false }).suggestions).toBe('off')
+    expect(readSettings({}).suggestions).toBe('off')
+  })
+
+  it('keeps a saved mode and drops anything else', () => {
+    expect(readSettings({ suggestions: 'manual' }).suggestions).toBe('manual')
+    expect(readSettings({ suggestions: 'auto' }).suggestions).toBe('auto')
+    expect(readSettings({ suggestions: 'always' }).suggestions).toBe('off')
+  })
+})
