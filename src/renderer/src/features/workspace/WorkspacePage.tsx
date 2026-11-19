@@ -39,7 +39,11 @@ export function WorkspacePage(): React.JSX.Element {
   useEffect(() => {
     const panel = terminalRef.current
     if (!panel) return
-    if (panels.terminal && panel.isCollapsed()) panel.expand()
+    if (panels.terminal && panel.isCollapsed()) {
+      panel.expand()
+      // A first expand has no earlier size to return to and lands on the minimum.
+      if (panel.getSize().asPercentage < 25) panel.resize('40%')
+    }
     if (!panels.terminal && !panel.isCollapsed()) panel.collapse()
   }, [panels.terminal, terminalRef])
 
@@ -68,9 +72,11 @@ export function WorkspacePage(): React.JSX.Element {
               collapsedSize={TERMINAL_HEADER_PX}
               minSize={160}
               defaultSize={panels.terminal ? '40%' : TERMINAL_HEADER_PX}
-              onResize={() => {
-                const collapsed = terminalRef.current?.isCollapsed()
-                if (collapsed === panels.terminal) setPanel('terminal', !collapsed)
+              onResize={(size) => {
+                const collapsed = size.inPixels <= TERMINAL_HEADER_PX + 1
+                if (collapsed === useSettings.getState().panels.terminal) {
+                  setPanel('terminal', !collapsed)
+                }
               }}
             >
               <TerminalPane />
