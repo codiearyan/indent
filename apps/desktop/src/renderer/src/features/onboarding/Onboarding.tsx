@@ -6,6 +6,7 @@ import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
 import { StepLayout } from './StepLayout'
 import { StepStrip } from './StepStrip'
+import { HowItWorks } from './HowItWorks'
 import { Welcome } from './Welcome'
 import { nextStep, prevStep, type Choices, type StepId } from './steps'
 import './onboarding.css'
@@ -27,6 +28,7 @@ const PLACEHOLDER_TITLES: Record<StepId, string> = {
 
 function StepView({ step, ...props }: StepProps & { step: StepId }): React.JSX.Element {
   if (step === 'welcome') return <Welcome staged={props.staged} />
+  if (step === 'how') return <HowItWorks staged={props.staged} />
   return <StepLayout title={PLACEHOLDER_TITLES[step]} staged={props.staged} />
 }
 

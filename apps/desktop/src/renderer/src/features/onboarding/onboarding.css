@@ -158,3 +158,26 @@ html:active-view-transition-type(onboarding-finish) {
     animation-name: ob-fade-in;
   }
 }
+
+/* How it works: the line under the playing point shows when the next one comes. */
+.ob-dwell {
+  animation: ob-dwell linear both;
+}
+
+@keyframes ob-dwell {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Scenes play once when selected. With reduced motion they show their final frame at once. */
+@media (prefers-reduced-motion: reduce) {
+  .ob-scene *,
+  .ob-scene *::before,
+  .ob-scene *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
