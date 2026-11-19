@@ -1,0 +1,74 @@
+{
+  "id": "guardrails",
+  "title": "Ask before you refund",
+  "files": [
+    "src/guard.ts",
+    "src/agent.ts",
+    "src/agent.test.ts",
+    "src/trace.ts",
+    "src/registry.ts",
+    "src/tools.ts",
+    "src/data.ts",
+    "src/demo.ts"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model. The demo asks you to approve the refund.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "confirm",
+      "title": "Hold risky tools until someone approves",
+      "file": "src/guard.ts",
+      "description": "Implement `guardedCall(registry, name, raw, confirm)` in `src/guard.ts`. It returns `{ content, refused }` and never throws.\n\n- A tool without `needsConfirmation`, or an unknown tool: return `executeToolCall`'s content, `refused: false`, and never call `confirm`.\n- A tool with `needsConfirmation` and invalid arguments: report the argument error the usual way, without asking.\n- A tool with `needsConfirmation` and valid arguments: call `confirm({ name, args })` with the parsed arguments and wait for its answer. It may return a boolean or a promise of one.\n  - Approved: run it with `executeToolCall`, `refused: false`.\n  - Refused: do not run it. Return `refused: true` and content that is a JSON object with `refused: true` and a `reason` string.\n\nThe check counts how often each tool ran and what `confirm` was asked.",
+      "nextSteps": [
+        "Read `needsConfirmation` in `src/registry.ts` and `Confirm` in `src/trace.ts`.",
+        "Handle the tools that need no approval first.",
+        "Parse the arguments, ask, and only then decide whether to run.",
+        "Build the refusal content the model will read."
+      ],
+      "hints": [
+        "The safe order is: check, ask, act. A guard that acts first and asks afterwards guards nothing.",
+        "`parseArguments` from `registry.ts` gives you the parsed args for `confirm`, and tells you when not to ask at all.",
+        "`confirm` can return a promise, and every promise is truthy. Put `await` in front of the call before you test the answer."
+      ],
+      "points": 10
+    },
+    {
+      "id": "trace",
+      "title": "Record every step in a trace",
+      "file": "src/agent.ts",
+      "description": "Implement `runAgent(question, options?)` in `src/agent.ts`. It is the agent loop from earlier chapters, with three changes:\n\n- every tool call goes through `guardedCall` with `options.confirm`, which defaults to refusing everything\n- calls run one at a time, in call order\n- it returns `{ answer, trace }` instead of a step count\n\nThe trace is a list of `TraceEntry` (see `src/trace.ts`), in the order things happened:\n\n1. for each model reply: `{ type: 'model', step, content, toolCalls }`, with `step` counting from 1, the reply's `content` (often `null` with tool calls) and the ids of its tool calls (`[]` on the final reply)\n2. then for each of its calls: `{ type: 'tool_call', id, name, arguments }` with the raw arguments string, followed by `{ type: 'tool_result', id, content }`, or `{ type: 'refused', id, name }` when the call was refused\n\nKeep `maxSteps` (default 8) and `StepLimitError`. The check compares your trace with a correct one for a lookup, an approved refund, a refused refund and a refund with no `confirm` given.",
+      "nextSteps": [
+        "Start from the loop you know: messages, request, tool calls, tool messages.",
+        "Push a model entry right after each reply.",
+        "Run each call through `guardedCall` and push its entries.",
+        "Run `node src/demo.ts`, answer no, and read the trace."
+      ],
+      "hints": [
+        "The refused call still needs a tool message. The model has to hear the answer, even when it is no.",
+        "Give `confirm` a default in the options destructuring, a function that returns `false`.",
+        "`guardedCall` tells you `refused`. Use it to choose between a `refused` entry and a `tool_result` entry, and send `content` to the model either way."
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Prove the refund guardrail with a test",
+      "file": "src/agent.test.ts",
+      "description": "Write vitest tests in `src/agent.test.ts` that run `runAgent('Refund order PL-2043 in full, the eggs arrived broken.')` with a `confirm` callback that refuses, and check that:\n\n- the refund never ran: `refunds` from `src/data.ts` is still empty\n- the trace records the refusal: a `refused` entry for `refund_order`, and no `tool_result` entry for that call\n\nThe check runs your test file three times: beside a correct guard and agent (it must pass), beside a guard that runs the tool before asking (it must fail) and beside an agent that records refusals as ordinary results (it must fail).",
+      "nextSteps": [
+        "Import `runAgent` and `refunds`.",
+        "Run the refund question with a `confirm` that returns `false`.",
+        "Assert on `refunds`, then on the trace.",
+        "Run `npx vitest run src/agent.test.ts`."
+      ],
+      "hints": [
+        "A trace can look perfect while the tool still ran. That is why the test checks the money as well as the log.",
+        "`trace.filter((entry) => entry.type === 'refused')` gives you the refusals to compare with `toEqual`. `expect.any(String)` matches an id you do not want to spell out.",
+        "Take the id from the refused entry and assert that no `tool_result` entry has that id."
+      ],
+      "points": 10
+    }
+  ]
+}

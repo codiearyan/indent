@@ -1,0 +1,64 @@
+{
+  "id": "bad-arguments",
+  "title": "Tools that fail politely",
+  "files": ["src/registry.ts", "src/agent.ts", "src/tools.ts", "src/data.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "parse-args",
+      "title": "Check the arguments before you run",
+      "file": "src/registry.ts",
+      "description": "Implement `parseArguments(tool, raw)` in `src/registry.ts`. `raw` is the arguments string from a tool call. Return `{ ok: true, args }` when it is valid, otherwise `{ ok: false, error }` with a short message. It must never throw.\n\nRaw arguments are invalid when:\n\n- they are not valid JSON\n- they are JSON but not an object (an array, `null`, a string, a number)\n- a name in `tool.parameters.required` is missing (the error names it)\n- a key is not in `tool.parameters.properties` (the error names it)\n- a value does not match its property's `type`: `string`, `number`, `integer` (a whole number) or `boolean` (the error names the argument)\n\nOptional properties may be left out. The check calls your function with a tool that has required and optional properties of every type.",
+      "nextSteps": [
+        "Read the `ToolDef` and `ParameterSchema` types at the top of the file.",
+        "Parse the string inside a `try` and reject anything that is not a plain object.",
+        "Check the required names, then loop over the keys you were given.",
+        "Run `node src/demo.ts` once `executeToolCall` is done too."
+      ],
+      "hints": [
+        "Every rejection is a value you return, not an error you throw. The model will read these messages.",
+        "`typeof null` is `'object'` and so is `typeof []`. You need two more checks to rule them out.",
+        "For the type rule, `Number.isInteger(value)` covers `integer`; for the others compare `typeof value` with the type name, and make sure `number` is a finite number."
+      ],
+      "points": 10
+    },
+    {
+      "id": "execute",
+      "title": "Turn every failure into a result",
+      "file": "src/registry.ts",
+      "description": "Implement `executeToolCall(registry, name, raw)` in `src/registry.ts`. It returns the content for one tool message, always a JSON string, and never throws or rejects.\n\n- Known tool, valid arguments: run it, await the result, return `JSON.stringify(result)`.\n- Unknown tool: return `{ \"error\": \"...\" }` naming the tool and listing the tools that do exist.\n- Invalid arguments: return `{ \"error\": \"...\" }` with the message from `parseArguments`, without running the tool.\n- The tool throws or rejects: return `{ \"error\": \"...\" }` containing the thrown error's message.\n\nThe check uses its own registry with sync, async and failing tools.",
+      "nextSteps": [
+        "Look the tool up by name and handle the missing case first.",
+        "Validate with `parseArguments` before you call `run`.",
+        "Wrap the call to `run` so both a throw and a rejection are caught."
+      ],
+      "hints": [
+        "Think of the model as a colleague reading your error message: it can only fix what the message tells it.",
+        "`Object.keys(registry)` gives you the names to list. `Object.hasOwn` is a safer lookup than reading the property directly.",
+        "`try { return JSON.stringify(await tool.run(args)) } catch (err) { ... }` catches both kinds of failure, because the `await` sits inside the `try`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "recover",
+      "title": "Let the model recover",
+      "file": "src/agent.ts",
+      "description": "Two changes in `src/agent.ts`.\n\n1. Implement `toolSpecs(registry)`: one `{ type: 'function', function: { name, description, parameters } }` per registry entry, in registry order. The name is the registry key.\n2. Fix `runAgent`. It runs every tool call straight from the registry, so the first made-up tool name crashes the run. Answer each call with `executeToolCall` instead.\n\nThe check asks Pip to reserve honey for an order. On the way it calls a tool that does not exist and sends a quantity as text. Your agent should pass those errors back and let the model correct itself. It also asks for more honey than there is, which must end in an answer, not a crash.",
+      "nextSteps": [
+        "Run `node src/demo.ts` and read how the reservations fail.",
+        "Write `toolSpecs` with `Object.entries`.",
+        "Replace the direct call in the loop with `executeToolCall`.",
+        "Run the demo again and compare the answers."
+      ],
+      "hints": [
+        "The registry already holds everything the API needs. `toolSpecs` only reshapes it.",
+        "In `runAgent`, the line that reads `registry[call.function.name].run(...)` is where the crash happens.",
+        "`executeToolCall` already returns a JSON string, so its result goes straight into the tool message's `content`."
+      ],
+      "points": 10
+    }
+  ]
+}

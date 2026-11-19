@@ -1,0 +1,63 @@
+{
+  "id": "one-tool-call",
+  "title": "One tool call, by hand",
+  "files": ["src/assistant.ts", "src/tools.ts", "src/data.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/demo.ts \"Where is order PL-2041?\""
+  },
+  "tasks": [
+    {
+      "id": "describe-tool",
+      "title": "Describe get_order to the model",
+      "file": "src/assistant.ts",
+      "description": "The model cannot see your code. It only sees a description of each tool. In `src/assistant.ts`, implement `describeOrderTool()` so it returns an `OpenAI.Chat.ChatCompletionFunctionTool` with:\n\n- `type: 'function'`\n- `function.name`: `get_order`\n- `function.description`: one sentence saying what the tool does\n- `function.parameters`: a JSON schema of type `object` with one property, `orderId`, of type `string`, listed in `required`\n\nThe check calls `describeOrderTool()` and inspects the object it returns.",
+      "nextSteps": [
+        "Open `src/tools.ts` and read what `getOrder` takes and returns.",
+        "Return an object with `type` and a `function` field holding name, description and parameters.",
+        "Run `node src/demo.ts` and read the tool it prints."
+      ],
+      "hints": [
+        "The model only knows what you write here. Name and describe the tool the way you would explain it to a new teammate.",
+        "`parameters` is plain JSON schema: `type`, `properties` and `required`, all at the same level.",
+        "Inside `properties`, `orderId` is itself a small schema: `{ type: 'string', description: '...' }`. Then put `'orderId'` in the `required` array."
+      ],
+      "points": 10
+    },
+    {
+      "id": "read-call",
+      "title": "Read the tool call the model sends",
+      "file": "src/assistant.ts",
+      "description": "Implement `requestToolCall(question, client?)` in `src/assistant.ts`.\n\nSend one chat completion to `MODEL` with a system message (`SYSTEM`), the user's question, and `tools: [describeOrderTool()]`. The model replies with a tool call instead of text. Return the first one as:\n\n- `id`: the id of the tool call\n- `name`: the function name it wants to run\n- `args`: its arguments, parsed from the JSON string into an object\n\nKeep the optional `client` parameter. The check also runs your function with a fake model that uses different ids and arguments, so read them from the reply.",
+      "nextSteps": [
+        "Create the request with `client.chat.completions.create` and the `tools` option.",
+        "Print `res.choices[0].message` once to see where the tool call lives.",
+        "Return the id, the function name and the parsed arguments of the first call."
+      ],
+      "hints": [
+        "When the model wants a tool, the message content is empty and a different field of the message is filled in.",
+        "Each entry in `tool_calls` has an `id`, a `type` and a `function` with `name` and `arguments`. Check `type === 'function'` so TypeScript knows `function` is there.",
+        "`arguments` is a string. `JSON.parse(call.function.arguments)` turns it into the object you return as `args`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "round-trip",
+      "title": "Send the result back and get the answer",
+      "file": "src/assistant.ts",
+      "description": "Implement `askAboutOrder(question, client?)` in `src/assistant.ts`: the whole round trip.\n\n1. Send the question with the tool, like `requestToolCall`.\n2. Run `getOrder` from `src/tools.ts` with the `orderId` the model asked for.\n3. Send a second request with the full conversation: system, user, the assistant message that holds the tool call, and a `tool` message whose `tool_call_id` is that call's id and whose `content` is the result as a JSON string.\n4. Return the content of the second reply.\n\nIf the first reply has no tool call, return its content. The check asks about several orders, including one that does not exist, and runs a fake model with its own ids. It expects exactly two requests.",
+      "nextSteps": [
+        "Keep the messages in one array so you can append to it.",
+        "After the first reply, push the assistant message itself onto the array.",
+        "Run the tool, then push a `tool` message that answers the call.",
+        "Send the array again and return the new reply's content."
+      ],
+      "hints": [
+        "The API is strict about order: a `tool` message must come right after the assistant message that asked for it.",
+        "You can push `res.choices[0].message` as it is. It already carries `role: 'assistant'` and the `tool_calls`.",
+        "The tool message looks like `{ role: 'tool', tool_call_id: <the call's id>, content: JSON.stringify(result) }`. Send the same `tools` again in the second request."
+      ],
+      "points": 10
+    }
+  ]
+}
