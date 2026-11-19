@@ -68,7 +68,11 @@ function defineTheme(name: string, base: 'vs' | 'vs-dark', p: CodePalette): void
       'editorLineNumber.activeForeground': p.foreground,
       'editorIndentGuide.background1': p.border,
       'editorWidget.border': p.border,
-      'editorGutter.background': p.background
+      'editorGutter.background': p.background,
+      'scrollbar.shadow': '#00000000',
+      'scrollbarSlider.background': p.muted + '33',
+      'scrollbarSlider.hoverBackground': p.muted + '59',
+      'scrollbarSlider.activeBackground': p.muted + '80'
     }
   })
 }

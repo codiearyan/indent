@@ -32,6 +32,7 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
       lineHeight: 1.6,
       folding: true,
       minimap: { enabled: false },
+      scrollbar: { verticalScrollbarSize: 10, horizontalScrollbarSize: 10 },
       overviewRulerBorder: false,
       smoothScrolling: true,
       automaticLayout: true,
