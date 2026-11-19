@@ -1,6 +1,6 @@
 import type { AiConfig, SuggestionMode } from '@shared/types'
 
-export type AiSettings = Pick<AiConfig, 'enabled' | 'provider' | 'model' | 'suggestions'>
+export type AiSettings = Pick<AiConfig, 'enabled' | 'provider' | 'model' | 'suggestions' | 'nudge'>
 
 /** Reads ai.json as saved by any earlier version; missing fields get their defaults. */
 export function readSettings(saved: unknown): AiSettings {
@@ -9,7 +9,8 @@ export function readSettings(saved: unknown): AiSettings {
     enabled: s.enabled !== false,
     provider: (s.provider as AiSettings['provider']) ?? null,
     model: typeof s.model === 'string' ? s.model : null,
-    suggestions: suggestionMode(s.suggestions)
+    suggestions: suggestionMode(s.suggestions),
+    nudge: s.nudge !== false
   }
 }
 

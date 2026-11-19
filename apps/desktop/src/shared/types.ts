@@ -173,11 +173,15 @@ export interface AiConfig {
   model: string | null
   /** Grey inline suggestions in the editor: never, when asked with a shortcut, or after a pause. */
   suggestions: SuggestionMode
+  /** Offer the tutor right under a task whose check just failed. */
+  nudge: boolean
   providers: AiProviderInfo[]
 }
 
 /** The parts of AiConfig the renderer may change. */
-export type AiSettingsPatch = Partial<Pick<AiConfig, 'enabled' | 'provider' | 'model' | 'suggestions'>>
+export type AiSettingsPatch = Partial<
+  Pick<AiConfig, 'enabled' | 'provider' | 'model' | 'suggestions' | 'nudge'>
+>
 
 export interface AiMessage {
   role: 'user' | 'assistant'
