@@ -17,7 +17,12 @@ export interface HttpRun {
 const FALLBACK_MODELS = new Set(['claude-fable-5-2', 'claude-opus-5-5', 'claude-sonnet-5-5'])
 
 export async function anthropicStream(run: HttpRun): Promise<void> {
-  const client = new Anthropic({ apiKey: run.key, maxRetries: 1 })
+  const client = new Anthropic({
+    apiKey: run.key,
+    // Pinned so a stray ANTHROPIC_BASE_URL cannot send the key elsewhere.
+    baseURL: 'https://api.anthropic.com',
+    maxRetries: 1
+  })
   try {
     const stream = client.beta.messages.stream(
       {

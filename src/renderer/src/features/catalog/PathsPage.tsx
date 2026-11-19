@@ -111,7 +111,8 @@ function PathCard({
                       >
                         <span className="min-w-0 flex-1 truncate">{lab.title}</span>
                         <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
-                          {progress.chaptersDone} / {progress.chapterCount} chapters
+                          {progress.chaptersDone} / {progress.chapterCount}{' '}
+                          {progress.chapterCount === 1 ? 'chapter' : 'chapters'}
                         </span>
                         {progress.status === 'completed' ? (
                           <CircleCheck

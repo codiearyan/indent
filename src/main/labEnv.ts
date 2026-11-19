@@ -20,14 +20,23 @@ export function setLabModelUrl(url: string): void {
   labModelUrl = url
 }
 
-/** Environment for every process that runs learner code: the terminal and the checks. */
-export async function labEnv(): Promise<Record<string, string>> {
+/** The learner's own environment with the PATH of their login shell. */
+export async function shellEnv(): Promise<Record<string, string>> {
   shellPath ??= resolveShellPath()
   const env: Record<string, string> = {}
   for (const [key, value] of Object.entries(process.env)) {
     if (value !== undefined && !key.startsWith('ELECTRON_')) env[key] = value
   }
   env.PATH = await shellPath
+  return env
+}
+
+/**
+ * Environment for every process that runs learner code: the terminal and the checks.
+ * It points the OpenAI client at the lab model, so never use it for a real AI provider.
+ */
+export async function labEnv(): Promise<Record<string, string>> {
+  const env = await shellEnv()
   if (labModelUrl) {
     env.LAB_MODEL_URL = labModelUrl
     env.OPENAI_BASE_URL = labModelUrl

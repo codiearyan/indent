@@ -13,7 +13,7 @@ import type {
 } from '@shared/types'
 import { EVENTS } from '@shared/types'
 import { emit, handle, listen } from '../ipc'
-import { labEnv } from '../labEnv'
+import { shellEnv } from '../labEnv'
 import { chapterContentDir, dataFile } from '../paths'
 import { CLI_BINS, cliModels, cliVersion, runCli, which } from './ai/cli'
 import { GEMINI_URL, OPENAI_URL, anthropicStream, openAiCompatibleStream } from './ai/http'
@@ -110,7 +110,7 @@ async function loadKeys(): Promise<Partial<Record<ApiProviderId, string>>> {
 
 function detectClis(): Promise<AiProviderInfo[]> {
   detected = (async () => {
-    const env = await labEnv()
+    const env = await shellEnv()
     return Promise.all(
       CLI_PROVIDERS.map(async ({ id, label }): Promise<AiProviderInfo> => {
         const path = await which(CLI_BINS[id], env.PATH ?? '')
@@ -186,7 +186,7 @@ async function streamReply(config: AiConfig, reply: Reply): Promise<void> {
     model: (reply.quick && CLI_FAST_MODEL[id]) || config.model,
     system: reply.system,
     prompt: transcript(reply.messages),
-    env: await labEnv(),
+    env: await shellEnv(),
     signal: reply.signal,
     onDelta: reply.onDelta
   })
@@ -293,6 +293,8 @@ export function register(): void {
         next.provider = patch.provider
         next.model = null
       }
+      // The model is passed to a CLI as an argument; it must not read as a flag.
+      if (patch.model?.startsWith('-')) throw new Error('That is not a model name.')
       if (patch.model !== undefined) next.model = patch.model || null
       if (patch.suggestions !== undefined) next.suggestions = !!patch.suggestions
       settings = next

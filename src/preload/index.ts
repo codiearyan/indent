@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { electronAPI } from '@electron-toolkit/preload'
 import { EVENTS, INVOKE_METHODS, SEND_METHODS } from '@shared/types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,5 +28,5 @@ api.terminal.onData = subscribe(EVENTS.terminalData)
 api.terminal.onExit = subscribe(EVENTS.terminalExit)
 api.ai.onChatEvent = subscribe(EVENTS.aiChat)
 
-contextBridge.exposeInMainWorld('electron', electronAPI)
+contextBridge.exposeInMainWorld('platform', process.platform)
 contextBridge.exposeInMainWorld('api', api)

@@ -5,7 +5,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 
-document.documentElement.classList.add(`platform-${window.electron.process.platform}`)
+document.documentElement.classList.add(`platform-${window.platform}`)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
