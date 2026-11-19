@@ -1,0 +1,65 @@
+{
+  "id": "boat-crud",
+  "title": "The fleet as a resource",
+  "files": ["src/store.js", "src/app.js", "src/boats.js", "try.js", "src/errors.js", "src/body.js", "src/respond.js", "src/quote.js", "src/fleet.js", "server.js"],
+  "terminal": {
+    "description": "A shell in your workspace where try.js reads, creates, updates and deletes a boat through your API.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "store",
+      "title": "Keep the fleet in memory",
+      "file": "src/store.js",
+      "description": "Implement `createBoatStore(seed)` in `src/store.js`. It keeps boats in a `Map` keyed by `code`, starting from a copy of `seed`, and returns an object with five methods:\n\n- `list()` returns every boat, in the order they were added\n- `get(code)` returns the boat, or `undefined`\n- `create(boat)` adds it and returns it; a code that already exists throws `new HttpError(409, 'conflict', message)`\n- `update(code, changes)` merges `changes` into the boat and returns the whole boat, or returns `undefined` when there is none; the code never changes, even if `changes` has one\n- `remove(code)` deletes the boat and returns `true`, or returns `false` when there is none\n\nBoats go in and come out as **copies**: changing an object you passed in or got back must never change what the store holds. The check runs each method on a fresh store, including two stores made from the same seed array.",
+      "nextSteps": [
+        "Build the Map from the seed, one entry per boat.",
+        "Write `list` and `get` first, then `create` with its duplicate check.",
+        "Write `update` and `remove`, using what `Map` already returns.",
+        "Make every way in and out a copy, then press Check."
+      ],
+      "hints": [
+        "A Map remembers the order keys were added, and `has`, `get`, `set` and `delete` cover almost everything here.",
+        "Objects are shared by reference. If the store keeps the same object it hands out, a caller can change the store without asking. A spread like `{ ...boat }` makes a shallow copy.",
+        "For update, spread the old boat, then the changes, then put the original `code` back last. `map.delete(code)` already returns true or false."
+      ],
+      "points": 10
+    },
+    {
+      "id": "create-read",
+      "title": "Create and read boats",
+      "file": "src/app.js",
+      "description": "Fill in `getBoat` and `createBoat` in `src/app.js`. Each handler gets `(req, res, { store, params })`, where `params.code` comes from the `:code` in the path.\n\n- `GET /boats/:code` answers `200` with the boat, or `404` with code `not_found`\n- `POST /boats` reads the body with `readJson`, checks it with `validateBoat`, stores it and answers `201` with the stored boat and a `location` header such as `/boats/TW-09`\n- a code that already exists answers `409` with code `conflict`\n\nThrow an `HttpError` for every error answer; `createApp` turns it into JSON. The check starts your app with its own seed of three boats.",
+      "nextSteps": [
+        "Write `getBoat` using `store.get` and the `boatNotFound` helper.",
+        "Write `createBoat`: read, validate, store.",
+        "Set the `location` header before you send the 201.",
+        "Run `node try.js` and read the first three answers."
+      ],
+      "hints": [
+        "Each handler is a few lines. The store and validateBoat already do the hard parts.",
+        "The 409 comes from the store. If you let its HttpError bubble up, createApp sends it for you.",
+        "In createBoat: `const boat = store.create(validateBoat(await readJson(req)))`, then `res.setHeader('location', ...)` and `sendJson(res, 201, boat)`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "update-delete",
+      "title": "Change and retire boats",
+      "file": "src/app.js",
+      "description": "Fill in `updateBoat` and `deleteBoat` in `src/app.js`.\n\n- `PATCH /boats/:code` checks the body with `validateBoat(input, { partial: true })`, merges it with `store.update` and answers `200` with the whole updated boat\n- `DELETE /boats/:code` removes the boat and answers `204` with **no body**\n- both answer `404` with code `not_found` when there is no such boat\n\nPartial mode lets every field be optional and refuses a new `code`. The check patches, deletes and then reads the fleet back.",
+      "nextSteps": [
+        "Write `updateBoat` the same way as `createBoat`, but with partial validation.",
+        "Turn an `undefined` from the store into a 404.",
+        "Write `deleteBoat` so it sends a status with no body.",
+        "Run `node try.js` and read the last three answers."
+      ],
+      "hints": [
+        "PATCH sends only what changes. PUT would replace the whole thing, which is not what the booking page wants.",
+        "204 means there is no body at all, so `sendJson` is the wrong tool here.",
+        "For delete, `if (!store.remove(params.code)) throw boatNotFound(params.code)`, then `res.writeHead(204)` and `res.end()`."
+      ],
+      "points": 10
+    }
+  ]
+}

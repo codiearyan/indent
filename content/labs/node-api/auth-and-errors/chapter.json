@@ -1,0 +1,65 @@
+{
+  "id": "auth-and-errors",
+  "title": "Locks and safety nets",
+  "files": ["src/auth.js", "src/errors.js", "src/requestId.js", "src/app.js", "try.js", "src/tokens.js", "src/listQuery.js", "src/boats.js", "src/store.js", "src/body.js", "src/respond.js", "src/quote.js", "src/fleet.js", "server.js"],
+  "terminal": {
+    "description": "A shell in your workspace where try.js sends requests with and without tokens, and one to an app whose store is broken on purpose.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "auth",
+      "title": "Lock the write routes",
+      "file": "src/auth.js",
+      "description": "Implement `requireStaff(req, res, tokens)` in `src/auth.js`, then call it at the very start of `createBoat`, `updateBoat` and `deleteBoat` in `src/app.js`. `tokens` is a `Map` from token to role, passed to every handler.\n\n- no `authorization` header, a header that is not `Bearer <token>`, or a token not in the map: set the header `www-authenticate: Bearer` on `res` and throw `new HttpError(401, 'unauthorized', message)`\n- a known token whose role is not `'staff'`: throw `new HttpError(403, 'forbidden', message)`\n- otherwise return the role\n\nThe word `Bearer` may arrive in any case. `GET` routes stay open. The check starts your app with its own tokens and tries every write route with no token, a wrong token, a viewer token and a staff token.",
+      "nextSteps": [
+        "Read `req.headers.authorization` and pull the token out of it.",
+        "Look the token up in the map and decide between 401, 403 and success.",
+        "Call `requireStaff` first thing in the three write handlers.",
+        "Run `node try.js` and read the answers to the three POST requests."
+      ],
+      "hints": [
+        "401 means we do not know who you are. 403 means we know, and the answer is still no.",
+        "A regular expression with the `i` flag can match the scheme in any case and capture the token after it.",
+        "Check the token before `readJson`, otherwise a client with no token learns about JSON errors first. `/^Bearer +(\\S+)$/i` captures the token in group 1."
+      ],
+      "points": 10
+    },
+    {
+      "id": "error-handler",
+      "title": "One place for errors",
+      "file": "src/errors.js",
+      "description": "Implement `handleError(err, req, res, log)` in `src/errors.js`, then make the `catch` in `createApp` call it with the `log` from the options.\n\n- an `HttpError` answers its `status` with `{ error: { code, message, details }, requestId }`\n- any other error is a bug: call `log(...)` with the error, and answer `500` with `{ error: { code: 'internal_error', message }, requestId }`, where the message is a fixed sentence that says nothing about the error\n- `requestId` is `res.getHeader('x-request-id')`\n- if `res.headersSent` is already true, call `res.destroy()` instead of answering\n\nRight now a crash sends its own message to the client. The check throws an error that contains a password and a server address, and looks for them in the response.",
+      "nextSteps": [
+        "Run `node try.js` and read the last answer. That message should never reach a client.",
+        "Write the HttpError branch, then the branch for everything else.",
+        "Log the real error in the second branch.",
+        "Replace the body of the catch in `createApp` with one call."
+      ],
+      "hints": [
+        "An error message is written for developers. It can hold file paths, hostnames, queries and secrets.",
+        "The client needs to know that it failed and how to report it. The team needs the details. Each gets its own channel.",
+        "Use `err instanceof HttpError` to choose the branch, `log('request', requestId, 'failed:', err)` for the details, and a constant message in the 500 body."
+      ],
+      "points": 10
+    },
+    {
+      "id": "request-ids",
+      "title": "A request id on every response",
+      "file": "src/requestId.js",
+      "description": "Implement `requestIdFor(req)` in `src/requestId.js`, then set `res.setHeader('x-request-id', requestIdFor(req))` as the first thing `createApp`'s request handler does.\n\n- if the request has an `x-request-id` header of 1 to 64 characters, all letters, digits, `.`, `_` or `-`, return it\n- otherwise return a new id from `randomUUID()`\n\nEvery response then carries the id, including 404s and errors, and `handleError` puts the same value in error bodies as `requestId`. The check compares headers across several requests and against the body of two error answers.",
+      "nextSteps": [
+        "Read the incoming header and test it against the allowed pattern.",
+        "Return it, or a new UUID.",
+        "Set the header in `createApp` before `handleRequest` runs.",
+        "Run `node try.js` and match the ids in headers and bodies."
+      ],
+      "hints": [
+        "An id that comes from the client is input like any other. It will end up in your logs, so only accept a safe shape.",
+        "Setting the header before routing means every answer has it, even ones you did not think about.",
+        "`/^[\\w.-]{1,64}$/` matches the allowed shape. `req.headers['x-request-id']` is a string or undefined."
+      ],
+      "points": 10
+    }
+  ]
+}

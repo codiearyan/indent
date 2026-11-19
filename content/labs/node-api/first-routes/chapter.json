@@ -1,0 +1,65 @@
+{
+  "id": "first-routes",
+  "title": "A server that answers",
+  "files": ["src/respond.js", "src/app.js", "src/fleet.js", "try.js", "server.js"],
+  "terminal": {
+    "description": "A shell in your workspace where try.js starts your API on a free port and sends it a few requests.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "json",
+      "title": "Send JSON responses",
+      "file": "src/respond.js",
+      "description": "Implement `sendJson(res, status, body)` in `src/respond.js`. Every route in this API will answer through it.\n\nIt writes one complete response:\n\n- the status code is `status`\n- the `content-type` header is `application/json; charset=utf-8`\n- the `content-length` header is the size of the JSON text in **bytes**\n- the body is `body` turned into JSON text, and the response is ended\n\nThe check starts a small server that calls your `sendJson` with different statuses and bodies, including one with letters like `ø` and `é`, and reads what a real client receives.",
+      "nextSteps": [
+        "Turn `body` into JSON text first and keep it in a variable.",
+        "Write the status and both headers.",
+        "End the response with the text.",
+        "Press Check. The routes come next, so `node try.js` still shows errors for now."
+      ],
+      "hints": [
+        "A response is three things: a status line, headers and a body. `res.writeHead` sets the first two at once.",
+        "`'ø'.length` is 1, but it takes 2 bytes on the wire. Node has a helper on `Buffer` that measures a string in bytes.",
+        "Call `res.writeHead(status, { ... })` with the two headers, using `Buffer.byteLength(text)` for the length, then `res.end(text)`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "routes",
+      "title": "Answer the first routes",
+      "file": "src/app.js",
+      "description": "Implement `handleRequest(req, res)` in `src/app.js` so it answers two routes:\n\n- `GET /health` answers `200` with `{ \"status\": \"ok\" }`\n- `GET /boats` answers `200` with the `fleet` array from `src/fleet.js`, unchanged\n\nUse `sendJson` for both. `req.url` includes the query string, so `GET /boats?available=true` must reach the same route as `GET /boats`.\n\nThe check starts your app with `createApp()` on a free port and sends real requests to it.",
+      "nextSteps": [
+        "Read the path out of `req.url` without the query string.",
+        "Keep your routes in one object keyed by path, then by method.",
+        "Look up the handler for this request and call it.",
+        "Run `node try.js` and look at the first two answers."
+      ],
+      "hints": [
+        "`req.method` and `req.url` are all you need to pick a route. Print them once to see what they hold.",
+        "`new URL(req.url, 'http://localhost')` gives you a `pathname` without the query string.",
+        "A table like `{ '/health': { GET: (req, res) => ... } }` makes the lookup two steps: the path, then the method."
+      ],
+      "points": 10
+    },
+    {
+      "id": "not-found",
+      "title": "Say no clearly",
+      "file": "src/app.js",
+      "description": "Make `handleRequest` answer requests it cannot serve, as JSON:\n\n- a path with no route answers `404` with `{ \"error\": { \"code\": \"not_found\", \"message\": \"...\" } }`\n- a path that exists but not for this method (for example `POST /health`) answers `405` with `{ \"error\": { \"code\": \"method_not_allowed\", \"message\": \"...\" } }` and an `allow` header listing the methods that path accepts, such as `GET`\n\nThe message is a short sentence for a developer; the check only needs it to be a non-empty string.",
+      "nextSteps": [
+        "Handle the case where no route matches the path.",
+        "Then handle the case where the path matches but the method does not.",
+        "Build the `allow` header from the methods the route has.",
+        "Run `node try.js` and compare the last two answers."
+      ],
+      "hints": [
+        "There are two different ways a lookup can miss here. Each one gets its own status.",
+        "404 means the thing is not there. 405 means it is there but cannot be used that way.",
+        "`Object.keys(route).join(', ')` lists the methods a route has. Set it with `res.setHeader('allow', ...)` before you call sendJson."
+      ],
+      "points": 10
+    }
+  ]
+}

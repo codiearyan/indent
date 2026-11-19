@@ -1,0 +1,65 @@
+{
+  "id": "json-bodies",
+  "title": "Reading what clients send",
+  "files": ["src/body.js", "src/quote.js", "src/app.js", "src/errors.js", "try.js", "src/respond.js", "src/fleet.js", "server.js"],
+  "terminal": {
+    "description": "A shell in your workspace where try.js posts a good quote, broken JSON, bad fields and an oversized body to your API.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "read-body",
+      "title": "Collect the body",
+      "file": "src/body.js",
+      "description": "Implement `readBody(req, limit = 10000)` in `src/body.js`.\n\nIt resolves to the whole request body as a UTF-8 string:\n\n- an empty body resolves to `''`\n- a body of exactly `limit` bytes is fine\n- a body larger than `limit` **bytes** rejects with `new HttpError(413, 'payload_too_large', message)`\n\nThe check starts a small server around your `readBody` and posts real bodies to it, including one where the number of characters and the number of bytes differ.",
+      "nextSteps": [
+        "Loop over the request with `for await` and look at what each chunk is.",
+        "Keep a running total of bytes and stop as soon as it goes over the limit.",
+        "Join the chunks and turn them into a string at the end.",
+        "Press Check, then run `node try.js` once `readJson` is done too."
+      ],
+      "hints": [
+        "A request is a stream. It arrives in pieces, and you only have the body once the stream ends.",
+        "Each chunk is a Buffer, and a Buffer's `length` is already in bytes. Count those, not characters.",
+        "Push each chunk into an array and add its length to a total. Throw the HttpError when the total passes `limit`, and return `Buffer.concat(chunks).toString('utf8')` at the end."
+      ],
+      "points": 10
+    },
+    {
+      "id": "read-json",
+      "title": "Parse it as JSON",
+      "file": "src/body.js",
+      "description": "Implement `readJson(req, limit = 10000)` in `src/body.js`.\n\n- read the body with `readBody(req, limit)`, so large bodies still get 413\n- resolve to the parsed value\n- an empty body, or text that is not valid JSON, rejects with `new HttpError(400, 'invalid_json', message)`\n\nA `SyntaxError` escaping from here would become a 500, which tells the client the server broke when it was the request that was wrong. The check calls `readJson` directly and also posts broken JSON to `POST /quotes`.",
+      "nextSteps": [
+        "Await `readBody` with the same limit.",
+        "Handle the empty body first.",
+        "Parse the text and turn a parse failure into the right HttpError.",
+        "Run `node try.js` and look at the second request."
+      ],
+      "hints": [
+        "Ask yourself who made the mistake when parsing fails. The status code should say so.",
+        "`JSON.parse('')` throws too, but its message is confusing. A clear message for an empty body helps the client.",
+        "Wrap only `JSON.parse(text)` in try and catch, and throw `new HttpError(400, 'invalid_json', ...)` from the catch."
+      ],
+      "points": 10
+    },
+    {
+      "id": "validate",
+      "title": "Check the fields",
+      "file": "src/quote.js",
+      "description": "Implement `validateQuote(input)` in `src/quote.js`. It runs on the parsed body of `POST /quotes` and returns `{ type, hours }`, with no other fields.\n\nRules:\n\n- `input` must be a plain object, not `null` and not an array\n- `type` must be one of the keys of `RATES` (`single`, `double`, `paddleboard`)\n- `hours` must be a whole number from 1 to 8, sent as a number\n\nWhen anything is wrong, throw `new HttpError(400, 'validation_failed', message, details)`. `details` is an array with one `{ field, message }` entry per problem, and it lists **every** problem at once, so `{}` gives entries for both `type` and `hours`.\n\nThe check calls `validateQuote` with many inputs, including a type name that every object has.",
+      "nextSteps": [
+        "Reject anything that is not a plain object first.",
+        "Collect problems in an array instead of throwing on the first one.",
+        "Throw once at the end if the array is not empty, otherwise return the two fields.",
+        "Run `node try.js` and read the details of the third request."
+      ],
+      "hints": [
+        "JSON gives you whatever the client sent. Check the type of each value, not just whether it is there.",
+        "`typeof null` is `'object'` and so is `typeof []`. You need more than one test for a plain object.",
+        "`'toString' in RATES` is true and `RATES.toString` exists. `Object.hasOwn(RATES, type)` only sees the keys you wrote. For hours, `Number.isInteger` rejects strings and fractions in one go."
+      ],
+      "points": 10
+    }
+  ]
+}

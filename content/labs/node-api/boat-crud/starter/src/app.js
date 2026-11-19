@@ -1,0 +1,99 @@
+// Tasks: Create and read boats, Change and retire boats
+//
+// - GET /boats/:code answers 200 with the boat, or 404 not_found
+// - POST /boats validates the body with validateBoat, stores it and answers 201 with the boat
+//   and a `location` header like /boats/TW-09; a duplicate code answers 409 conflict
+// - PATCH /boats/:code validates the body with validateBoat(input, { partial: true }), merges it
+//   and answers 200 with the whole updated boat, or 404 not_found
+// - DELETE /boats/:code answers 204 with no body, or 404 not_found
+// Throw an HttpError for every error answer; createApp turns it into JSON.
+import { createServer } from 'node:http'
+import { readJson } from './body.js'
+import { validateBoat } from './boats.js'
+import { HttpError } from './errors.js'
+import { fleet } from './fleet.js'
+import { priceQuote, validateQuote } from './quote.js'
+import { sendJson } from './respond.js'
+import { createBoatStore } from './store.js'
+
+function listBoats(req, res, { store }) {
+  sendJson(res, 200, store.list())
+}
+
+function boatNotFound(code) {
+  return new HttpError(404, 'not_found', `No boat with code ${code}`)
+}
+
+function getBoat(req, res, { store, params }) {
+  throw new Error('Not implemented')
+}
+
+async function createBoat(req, res, { store }) {
+  throw new Error('Not implemented')
+}
+
+async function updateBoat(req, res, { store, params }) {
+  throw new Error('Not implemented')
+}
+
+function deleteBoat(req, res, { store, params }) {
+  throw new Error('Not implemented')
+}
+
+async function createQuote(req, res) {
+  const input = await readJson(req)
+  sendJson(res, 200, priceQuote(validateQuote(input)))
+}
+
+const routes = [
+  { path: '/health', methods: { GET: (req, res) => sendJson(res, 200, { status: 'ok' }) } },
+  { path: '/quotes', methods: { POST: createQuote } },
+  { path: '/boats', methods: { GET: listBoats, POST: createBoat } },
+  { path: '/boats/:code', methods: { GET: getBoat, PATCH: updateBoat, DELETE: deleteBoat } }
+]
+
+// Returns the :params of `pattern` when `pathname` matches it, otherwise null.
+function matchPath(pattern, pathname) {
+  const want = pattern.split('/')
+  const got = pathname.split('/')
+  if (want.length !== got.length) return null
+  const params = {}
+  for (let i = 0; i < want.length; i++) {
+    if (want[i].startsWith(':')) params[want[i].slice(1)] = got[i]
+    else if (want[i] !== got[i]) return null
+  }
+  return params
+}
+
+export async function handleRequest(req, res, store) {
+  const { pathname } = new URL(req.url, 'http://localhost')
+  for (const route of routes) {
+    const params = matchPath(route.path, pathname)
+    if (!params) continue
+    const handler = route.methods[req.method]
+    if (!handler) {
+      const allowed = Object.keys(route.methods).join(', ')
+      res.setHeader('allow', allowed)
+      return sendJson(res, 405, {
+        error: { code: 'method_not_allowed', message: `${pathname} accepts ${allowed}` }
+      })
+    }
+    return handler(req, res, { store, params })
+  }
+  sendJson(res, 404, { error: { code: 'not_found', message: `Nothing lives at ${pathname}` } })
+}
+
+export function createApp({ boats = fleet } = {}) {
+  const store = createBoatStore(boats)
+  return createServer(async (req, res) => {
+    try {
+      await handleRequest(req, res, store)
+    } catch (err) {
+      if (err instanceof HttpError) {
+        const { code, message, details } = err
+        return sendJson(res, err.status, { error: { code, message, details } })
+      }
+      sendJson(res, 500, { error: { code: 'internal_error', message: err.message } })
+    }
+  })
+}
