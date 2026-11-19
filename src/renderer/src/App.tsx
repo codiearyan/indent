@@ -1,35 +1,32 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import { HashRouter, Route, Routes } from 'react-router-dom'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { Toaster } from '@/components/ui/sonner'
+import { AppShell } from '@/features/catalog/AppShell'
+import { DashboardPage } from '@/features/catalog/DashboardPage'
+import { LabsPage } from '@/features/catalog/LabsPage'
+import { LabDetailPage } from '@/features/catalog/LabDetailPage'
+import { PathsPage } from '@/features/catalog/PathsPage'
+import { ChallengesPage } from '@/features/catalog/ChallengesPage'
+import { YearBoardPage } from '@/features/catalog/YearBoardPage'
+import { WorkspacePage } from '@/features/workspace/WorkspacePage'
 
-function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-
+export default function App(): React.JSX.Element {
   return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-        &nbsp;and <span className="ts">TypeScript</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-        </div>
-      </div>
-      <Versions></Versions>
-    </>
+    <TooltipProvider delayDuration={300}>
+      <HashRouter>
+        <Routes>
+          <Route element={<AppShell />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="labs" element={<LabsPage />} />
+            <Route path="labs/:labId" element={<LabDetailPage />} />
+            <Route path="paths" element={<PathsPage />} />
+            <Route path="challenges" element={<ChallengesPage />} />
+            <Route path="year" element={<YearBoardPage />} />
+          </Route>
+          <Route path="learn/:labId/:chapterId" element={<WorkspacePage />} />
+        </Routes>
+      </HashRouter>
+      <Toaster />
+    </TooltipProvider>
   )
 }
-
-export default App
