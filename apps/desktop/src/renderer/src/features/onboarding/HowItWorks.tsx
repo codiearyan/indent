@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useReducedMotion } from '@/lib/useReducedMotion'
 import { cn } from '@/lib/utils'
 import { StepLayout } from './StepLayout'
+import { CheckScene } from './scenes/CheckScene'
 import { CodeScene } from './scenes/CodeScene'
 import { RepoScene } from './scenes/RepoScene'
 
@@ -26,7 +27,7 @@ const POINTS: { id: Point; title: string; text: string; scene: () => React.JSX.E
       id: 'check',
       title: 'Press Check',
       text: 'Hidden tests turn each task green, or say in plain words what to look at.',
-      scene: () => null
+      scene: CheckScene
     },
     {
       id: 'more',

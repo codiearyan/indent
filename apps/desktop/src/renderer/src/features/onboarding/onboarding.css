@@ -211,3 +211,42 @@ html:active-view-transition-type(onboarding-finish) {
     transform: translateY(3px);
   }
 }
+
+/* Check scene: a light press on Check, then each status mark fills while its tick draws. */
+.ob-press {
+  animation: ob-press 240ms var(--ease-out) both;
+}
+
+@keyframes ob-press {
+  50% {
+    transform: scale(0.96);
+    background: var(--accent);
+  }
+}
+
+.ob-status {
+  transition:
+    background-color var(--motion-state) var(--ease-out),
+    border-color var(--motion-state) var(--ease-out);
+}
+.ob-status[data-done='true'] {
+  animation: ob-pop var(--motion-enter) var(--ease-out);
+}
+
+@keyframes ob-pop {
+  0% {
+    transform: scale(0.95);
+  }
+  60% {
+    transform: scale(1.05);
+  }
+}
+
+.ob-tick {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset var(--motion-enter) var(--ease-out) 80ms;
+}
+[data-done='true'] .ob-tick {
+  stroke-dashoffset: 0;
+}
