@@ -18,6 +18,8 @@ interface SettingsState {
   lessonSide: 'left' | 'right'
   leftTab: 'insights' | 'tasks'
   tourSeen: boolean
+  /** The first-run setup was finished or skipped. */
+  onboarded: boolean
   /** Ids of DSA patterns whose animation was played to the end. */
   dsaWatched: string[]
   markDsaWatched(id: string): void
@@ -29,6 +31,7 @@ interface SettingsState {
   setLessonSide(side: 'left' | 'right'): void
   setLeftTab(tab: 'insights' | 'tasks'): void
   setTourSeen(seen: boolean): void
+  setOnboarded(onboarded: boolean): void
   resetLayout(): void
 }
 
@@ -49,6 +52,7 @@ export const useSettings = create<SettingsState>()(
       lessonSide: 'left',
       leftTab: 'insights',
       tourSeen: false,
+      onboarded: false,
       dsaWatched: [],
       markDsaWatched: (id) =>
         set((s) => (s.dsaWatched.includes(id) ? s : { dsaWatched: [...s.dsaWatched, id] })),
@@ -61,9 +65,16 @@ export const useSettings = create<SettingsState>()(
       setLessonSide: (lessonSide) => set({ lessonSide }),
       setLeftTab: (leftTab) => set({ leftTab }),
       setTourSeen: (tourSeen) => set({ tourSeen }),
+      setOnboarded: (onboarded) => set({ onboarded }),
       resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' })
     }),
-    { name: 'indent-settings', version: 1 }
+    {
+      name: 'indent-settings',
+      version: 2,
+      // Settings saved before the first-run setup existed belong to someone already set up.
+      migrate: (saved, version) =>
+        (version < 2 ? { ...(saved as object), onboarded: true } : saved) as SettingsState
+    }
   )
 )
 
