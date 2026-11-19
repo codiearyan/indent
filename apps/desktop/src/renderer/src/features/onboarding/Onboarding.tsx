@@ -117,7 +117,7 @@ export function Onboarding(): React.JSX.Element {
           className="flex min-h-0 flex-1 flex-col overflow-y-auto px-12 py-10"
           style={{ viewTransitionName: 'onboarding-step' }}
         >
-          <div key={step} className="my-auto w-full">
+          <div key={step} className="ob-view my-auto w-full">
             <View staged={!visited.has(step)} />
           </div>
         </div>
