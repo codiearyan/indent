@@ -1,0 +1,136 @@
+/* The first-run setup. Curves and durations come from the motion tokens in @indent/design. */
+
+/* Step changes: the frame holds still, only the step cross-fades. The exit is shorter. */
+html:active-view-transition-type(onboarding-step) {
+  &::view-transition-old(root),
+  &::view-transition-new(root) {
+    animation: none;
+  }
+  &::view-transition-group(onboarding-step) {
+    animation: none;
+  }
+  &::view-transition-old(onboarding-step) {
+    animation: ob-out var(--motion-exit) var(--ease-out) both;
+  }
+  &::view-transition-new(onboarding-step) {
+    animation: ob-in var(--motion-enter) var(--ease-out) both;
+  }
+}
+
+/* Finishing hands the window to the app with one cross-fade. */
+html:active-view-transition-type(onboarding-finish) {
+  &::view-transition-old(root) {
+    animation: ob-out var(--motion-exit) var(--ease-out) both;
+  }
+  &::view-transition-new(root) {
+    animation: ob-in var(--motion-enter) var(--ease-out) both;
+  }
+}
+
+@keyframes ob-out {
+  to {
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+@keyframes ob-in {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+/* A step's first entrance: heading, text, then content, one stage apart. */
+.ob-stage {
+  animation: ob-stage var(--motion-enter) var(--ease-out) both;
+  animation-delay: calc(var(--stage, 0) * var(--motion-stage) + 40ms);
+}
+
+@keyframes ob-stage {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* The progress strip: each cell fills from its left edge, skipped steps fold away. */
+.ob-cell {
+  transition:
+    flex-grow var(--motion-state) var(--ease-in-out),
+    margin var(--motion-state) var(--ease-in-out),
+    opacity var(--motion-state) var(--ease-out);
+}
+.ob-cell[data-state='skipped'] {
+  flex-grow: 0;
+  margin-left: -4px;
+  opacity: 0;
+}
+.ob-fill {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--motion-enter) var(--ease-in-out);
+}
+.ob-cell[data-state='done'] .ob-fill {
+  transform: scaleX(1);
+}
+
+/* Choice cards: the selected state is a transition, so reversing it mid-way retargets. */
+.ob-choice {
+  transition:
+    border-color var(--motion-state) var(--ease-out),
+    box-shadow var(--motion-state) var(--ease-out),
+    transform var(--motion-press) var(--ease-out);
+}
+.ob-choice:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:active-view-transition-type(onboarding-step) {
+    &::view-transition-old(onboarding-step) {
+      animation-name: ob-fade-out;
+    }
+    &::view-transition-new(onboarding-step) {
+      animation-name: ob-fade-in;
+    }
+  }
+  html:active-view-transition-type(onboarding-finish) {
+    &::view-transition-old(root) {
+      animation-name: ob-fade-out;
+    }
+    &::view-transition-new(root) {
+      animation-name: ob-fade-in;
+    }
+  }
+  .ob-stage {
+    animation-name: ob-fade-in;
+  }
+  .ob-fill {
+    transition: opacity var(--motion-state) linear;
+    transform: none;
+    opacity: 0;
+  }
+  .ob-cell[data-state='done'] .ob-fill {
+    transform: none;
+    opacity: 1;
+  }
+  .ob-cell {
+    transition: opacity var(--motion-state) linear;
+  }
+  .ob-choice:active {
+    transform: none;
+  }
+}
+
+@keyframes ob-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ob-fade-in {
+  from {
+    opacity: 0;
+  }
+}
