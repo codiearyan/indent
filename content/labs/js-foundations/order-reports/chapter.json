@@ -1,0 +1,65 @@
+{
+  "id": "order-reports",
+  "title": "Turning orders into answers",
+  "files": ["src/orderTotal.js", "src/topTeas.js", "src/revenueByDay.js", "src/orders.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where you can run the demo against last week's orders.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "total",
+      "title": "Total one order",
+      "file": "src/orderTotal.js",
+      "description": "Implement `orderTotal(order)` in `src/orderTotal.js`.\n\nReturn the order's total in cents:\n\n- add up `qty * priceCents` for every entry in `order.items`\n- subtract `order.discountCents` when the order has one\n- the total never goes below `0`\n\nAn order with no items totals `0`.",
+      "nextSteps": [
+        "Open `src/orders.js` and look at the shape of one order.",
+        "Add up the items with `reduce`, starting from 0.",
+        "Take the discount off and make sure the result cannot go negative.",
+        "Run `node src/demo.js` and check the first two lines."
+      ],
+      "hints": [
+        "This is one value made from a whole array. Which array method is built for that?",
+        "Not every order has `discountCents`. Reading a missing field gives `undefined`, and `undefined` in arithmetic gives `NaN`.",
+        "Compute the subtotal with reduce, subtract the discount (or 0 when there is none), then keep the larger of that and 0."
+      ],
+      "points": 10
+    },
+    {
+      "id": "top",
+      "title": "Find the best sellers",
+      "file": "src/topTeas.js",
+      "description": "Implement `topTeas(orders, n)` in `src/topTeas.js`.\n\nCount the units sold per sku, skipping orders whose `status` is `'cancelled'`. Return an array of `{ sku, units }` for the `n` skus with the most units:\n\n- most units first\n- on a tie, the sku that comes first alphabetically goes first\n- if fewer than `n` skus were sold, return all of them",
+      "nextSteps": [
+        "Filter out the cancelled orders.",
+        "Count units per sku in an object or a `Map`.",
+        "Turn the counts into `{ sku, units }` objects and sort them.",
+        "Keep the first `n` with `slice` and run the demo."
+      ],
+      "hints": [
+        "There are three steps here: filter, count, rank. Write them one after another instead of all at once.",
+        "A `Map` from sku to units makes counting easy: read the old count (or 0), add qty, write it back.",
+        "Your sort compare function needs two rules. When `b.units - a.units` is 0, fall back to comparing the two skus as strings."
+      ],
+      "points": 10
+    },
+    {
+      "id": "revenue",
+      "title": "Revenue per day",
+      "file": "src/revenueByDay.js",
+      "description": "Implement `revenueByDay(orders)` in `src/revenueByDay.js`.\n\nReturn an object that maps each day to that day's revenue in cents, for example `{ '2026-11-02': 3200 }`.\n\n- only orders with `status` `'paid'` count\n- the day is the date part of `placedAt` (its first 10 characters)\n- an order's revenue is its total with the discount taken off, so `orderTotal` helps\n- days without paid orders do not appear",
+      "nextSteps": [
+        "Start from an empty object.",
+        "Loop over the orders and skip the ones that are not paid.",
+        "Cut the day out of `placedAt` and add the order's total to that key.",
+        "Run the demo and compare with the orders in `src/orders.js`."
+      ],
+      "hints": [
+        "This is grouping: many orders go into one bucket per day. An object whose keys are dates is the bucket.",
+        "`'2026-11-02T08:15:00Z'.slice(0, 10)` gives you the date part.",
+        "The first time you see a day its key is missing, so add to `days[day] ?? 0` instead of `days[day]`."
+      ],
+      "points": 10
+    }
+  ]
+}

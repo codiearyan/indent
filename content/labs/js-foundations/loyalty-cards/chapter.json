@@ -1,0 +1,65 @@
+{
+  "id": "loyalty-cards",
+  "title": "Functions that remember",
+  "files": ["src/stampCard.js", "src/memoize.js", "src/once.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo tries your stamp card, memoize and once helpers.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "stamp",
+      "title": "A stamp card that remembers",
+      "file": "src/stampCard.js",
+      "description": "Implement `createStampCard(goal)` in `src/stampCard.js`. It returns a card object with two methods:\n\n- `stamp()` adds one stamp. When the card reaches `goal` stamps it returns `true` (a free cup) and the card starts again from `0`. Otherwise it returns `false`.\n- `stamps()` returns how many stamps the card holds right now.\n\nEvery card keeps its own count.",
+      "nextSteps": [
+        "Declare a `count` variable inside `createStampCard`.",
+        "Return an object with `stamp` and `stamps` methods that use it.",
+        "Handle the goal: return `true` and start again from 0.",
+        "Run `node src/demo.js` and read the first line."
+      ],
+      "hints": [
+        "The count has to survive between calls to `stamp()` but must not be shared between cards. Where can a variable live so that is true?",
+        "A `let` inside `createStampCard` is created fresh on every call, and the methods you return can still read and change it.",
+        "In `stamp()`, add one first, then compare with `goal`. Only when they match do you reset and return true."
+      ],
+      "points": 10
+    },
+    {
+      "id": "memo",
+      "title": "Remember slow answers",
+      "file": "src/memoize.js",
+      "description": "Implement `memoize(fn)` in `src/memoize.js`. It returns a new function of one argument that gives the same result as `fn`, but calls `fn` at most once per distinct argument and reuses the saved result after that.\n\n- arguments are distinct the way a `Map` sees them, so `1` and `'1'` are different\n- results like `0`, `''` and `undefined` are saved too\n- every memoized function has its own memory",
+      "nextSteps": [
+        "Create a `Map` inside `memoize`.",
+        "Return a function that looks up its argument first.",
+        "Call `fn` only when the argument has not been seen, and save the result.",
+        "Run the demo and check that `brews` is 2."
+      ],
+      "hints": [
+        "This is the same trick as the stamp card: a variable inside the outer function that the returned function keeps using.",
+        "A plain object turns every key into a string. A `Map` keeps `1` and `'1'` apart.",
+        "Decide with `cache.has(arg)`, not with whether `cache.get(arg)` is truthy. A saved 0 is still saved."
+      ],
+      "points": 10
+    },
+    {
+      "id": "once",
+      "title": "Only once",
+      "file": "src/once.js",
+      "description": "Implement `once(fn)` in `src/once.js`. It returns a new function. The first time that function is called, it calls `fn` with the same arguments and returns `fn`'s result. Every later call returns that first result again without calling `fn`, whatever arguments it gets.\n\nThis must hold even when `fn` returned `undefined`.",
+      "nextSteps": [
+        "Keep two variables inside `once`: whether `fn` ran, and what it returned.",
+        "Return a function that takes any number of arguments with `...args`.",
+        "On the first call run `fn(...args)` and remember both things.",
+        "Run the demo and check that only one welcome email was sent."
+      ],
+      "hints": [
+        "Two pieces of memory are needed here, not one. What would go wrong if you only kept the result?",
+        "Rest parameters (`...args`) collect every argument, and spread (`fn(...args)`) passes them on unchanged.",
+        "Use a boolean flag to decide whether to call `fn`. Checking `result === undefined` breaks when `fn` returns undefined."
+      ],
+      "points": 10
+    }
+  ]
+}
