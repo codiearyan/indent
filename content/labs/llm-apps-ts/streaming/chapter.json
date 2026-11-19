@@ -1,0 +1,63 @@
+{
+  "id": "streaming",
+  "title": "Streaming",
+  "files": ["src/stream.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "assemble",
+      "title": "Assemble a reply from chunks",
+      "file": "src/stream.ts",
+      "description": "Implement `collectStream(chunks: AsyncIterable<Chunk>, onPartial?): Promise<StreamResult>`. Ignore `onPartial` for now.\n\n- Read every chunk with `for await`.\n- Add `choices[0].delta.content` to the text whenever it is a non-empty string.\n- Remember `choices[0].finish_reason` when a chunk carries one.\n- Skip chunks whose `choices` array is empty (the usage chunk at the end of some streams).\n- Return `{ text, finishReason }`. If the chunks run out and no finish reason ever arrived, throw an `Error` whose message contains `ended early`.\n\nThe check feeds `collectStream` hand-made chunk lists: a normal stream with a role chunk, an empty delta and a usage chunk; a stream cut by the token limit; and a stream that stops without a finish reason.",
+      "nextSteps": [
+        "Read the lesson section on what a chunk looks like.",
+        "Loop over the chunks and build the text in a variable.",
+        "Keep the finish reason when you see one.",
+        "After the loop, throw if you never saw a finish reason."
+      ],
+      "hints": [
+        "A stream is not one response. It is many small objects, each with a tiny `delta` instead of a whole `message`.",
+        "The first chunk often has an empty content, and the last one may have no choices at all. Guard both before reading.",
+        "`const choice = chunk.choices[0]; if (!choice) continue` handles the empty case, and `choice.delta?.content` the rest."
+      ],
+      "points": 10
+    },
+    {
+      "id": "partial",
+      "title": "Report partial text through a callback",
+      "file": "src/stream.ts",
+      "description": "Extend `collectStream` so it calls `onPartial(textSoFar)` once after every chunk that adds text.\n\n- `textSoFar` is all the text received up to and including that chunk, not just the new piece.\n- Chunks that add no text (the role chunk, empty deltas, the finish chunk, the usage chunk) do not trigger a call.\n- The return value stays the same.\n\nThe check records every call to `onPartial` for two hand-made streams and compares the list.",
+      "nextSteps": [
+        "Find the line where you add a piece to the text.",
+        "Call onPartial right after it, with the text so far.",
+        "Run `node src/demo.ts` once task 3 is done and watch the answer appear."
+      ],
+      "hints": [
+        "The chat window redraws the whole bubble each time, which is why it wants the full text rather than the latest piece.",
+        "The call belongs inside the same `if` that adds a non-empty piece.",
+        "One line is enough: `onPartial(text)` after `text += piece`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "stream-answer",
+      "title": "Stream an answer from the model",
+      "file": "src/stream.ts",
+      "description": "Implement `streamAnswer(question: string, onPartial, maxTokens = 200, client?: OpenAI): Promise<StreamResult>`.\n\n- Call `client.chat.completions.create` with `model: MODEL`, `stream: true`, `max_tokens: maxTokens` and `messages: buildMessages(question)`.\n- Pass the stream it returns to `collectStream` together with `onPartial`, and return the result.\n\nThe check streams an answer from the lab model and records every partial text, streams one with a small token limit that must end with `length`, and calls `streamAnswer` with a fake client to read the request you send.",
+      "nextSteps": [
+        "Make the request with `stream: true` and the other options.",
+        "Hand the result straight to collectStream.",
+        "Run `node src/demo.ts` and watch both answers arrive word by word."
+      ],
+      "hints": [
+        "With `stream: true`, the client does not give you a response with choices. It gives you something to iterate.",
+        "You already wrote the hard part. This function only builds the request.",
+        "Await the `create` call, then `return collectStream(stream, onPartial)`."
+      ],
+      "points": 10
+    }
+  ]
+}

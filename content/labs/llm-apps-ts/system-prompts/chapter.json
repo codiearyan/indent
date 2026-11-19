@@ -1,0 +1,65 @@
+{
+  "id": "system-prompts",
+  "title": "Steering with a system prompt and examples",
+  "files": ["src/inbox.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "label-only",
+      "title": "Ask for a bare label",
+      "file": "src/inbox.ts",
+      "description": "Ravi wants every inbox message tagged with one of five labels: `watering`, `light`, `pests`, `order`, `other`.\n\n1. Write `LABEL_PROMPT`: a system prompt that says who the model is, names all five labels, and tells it to reply with **only** the label.\n2. Implement `labelMessage(text: string, client?: OpenAI): Promise<Label>`. Send `[system: LABEL_PROMPT, user: text]` to `MODEL` through `client`. Trim and lowercase the reply. If the result is one of `LABELS`, return it. Otherwise throw an `Error`.\n\nThe check labels five sample messages through the lab model, reads the system message you send, and feeds `labelMessage` a fake reply that is a full sentence (it must throw) and one with stray spaces and a capital letter (it must return the label).",
+      "nextSteps": [
+        "Send the request with LABEL_PROMPT as the system message and print the raw reply.",
+        "Run `node src/demo.ts` while the prompt is still empty and read what the model says.",
+        "Write LABEL_PROMPT so the model knows the labels and the reply format, then clean up the reply.",
+        "Throw when the cleaned reply is not one of LABELS."
+      ],
+      "hints": [
+        "Without instructions the lab model answers like a chatty colleague. Your prompt is what changes that.",
+        "The lab model only switches to bare labels when the system message lists every label and uses the word \"only\".",
+        "`LABELS.includes(...)` needs a small cast in TypeScript, because LABELS is a readonly tuple of exact strings."
+      ],
+      "points": 10
+    },
+    {
+      "id": "examples",
+      "title": "Show the format with worked examples",
+      "file": "src/inbox.ts",
+      "description": "A label is not enough for the inbox view: Ravi also wants the plant and how urgent the message is. The reply must be one line in exactly this format:\n\n```\nlabel: pests | plant: orchid | urgency: normal\n```\n\nKeys are lowercase, separated by ` | `. `label` is one of the five labels, `plant` is the plant in lowercase (or `unknown`), `urgency` is `high` or `normal`.\n\nWrite `TRIAGE_PROMPT` and implement `buildTriageMessages(text: string): Message[]`:\n\n- first, a system message with `TRIAGE_PROMPT`\n- then at least two worked examples, each a `user` message followed by an `assistant` reply in the exact format above\n- last, a `user` message with `text`, unchanged\n\nThe check inspects the array and sends it to the lab model with five sample messages to see that every reply comes back as a triage line.",
+      "nextSteps": [
+        "Write two short customer messages of your own.",
+        "Write the triage line you would want back for each one.",
+        "Build the array: system, your examples as user and assistant pairs, then the text.",
+        "Run `node src/demo.ts` and compare the replies with your examples."
+      ],
+      "hints": [
+        "Describing a format in words is a start. Showing it is what makes a model copy it exactly.",
+        "Examples go in the conversation as if the model had already answered them: user, then assistant.",
+        "Keep the examples in a constant array of pairs and use flatMap to turn each pair into two messages."
+      ],
+      "points": 10
+    },
+    {
+      "id": "triage",
+      "title": "Parse the triage line",
+      "file": "src/inbox.ts",
+      "description": "Implement `triage(text: string, client?: OpenAI): Promise<Triage>`.\n\n- Send `buildTriageMessages(text)` to `MODEL` through `client`.\n- Trim the reply and parse it as a triage line. Return `{ label, plant, urgency }` and nothing else.\n- If the reply is not exactly a triage line (wrong case, commas, a sentence, an unknown label or urgency), throw an `Error`.\n\nThe check triages five sample messages through the lab model, and feeds `triage` fake replies: a valid line with a two-word plant, a sentence and a near miss with capital letters.",
+      "nextSteps": [
+        "Write a regular expression for the whole line, anchored at both ends.",
+        "Capture the label, the plant and the urgency.",
+        "Throw when it does not match, then build the result object.",
+        "Run `node src/demo.ts`."
+      ],
+      "hints": [
+        "Your code is the one that relies on the format, so it should be strict about it rather than forgiving.",
+        "Anchor the pattern with `^` and `$`, and remember that `|` must be escaped to match a literal bar.",
+        "The plant capture needs to allow letters and spaces, while label and urgency can list their allowed words."
+      ],
+      "points": 10
+    }
+  ]
+}

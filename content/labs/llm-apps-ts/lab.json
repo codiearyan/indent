@@ -1,0 +1,13 @@
+{
+  "id": "llm-apps-ts",
+  "title": "LLM apps from scratch",
+  "description": "Fernhollow is a small plant shop that wants an assistant called Moss to help with care questions, a busy inbox and order emails. You are its first developer, and you build Moss one piece at a time: plain model calls, steered replies, structured output, streaming and conversations that stay within a token budget.",
+  "category": "AI engineering",
+  "language": "typescript",
+  "tags": ["TypeScript", "AI"],
+  "kind": "lab",
+  "parts": [
+    { "title": "Talking to a model", "chapters": ["first-call", "system-prompts", "structured-output"] },
+    { "title": "Building for real users", "chapters": ["streaming", "token-budget"] }
+  ]
+}
