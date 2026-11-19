@@ -1,0 +1,73 @@
+{
+  "id": "compare",
+  "title": "Baseline against candidate",
+  "files": [
+    "src/compare.ts",
+    "src/decide.ts",
+    "src/decide.test.ts",
+    "src/evaluate.ts",
+    "src/cases.ts",
+    "src/triage.ts",
+    "src/run.ts"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/run.ts evals-triage-v1 evals-triage-v2"
+  },
+  "tasks": [
+    {
+      "id": "compare",
+      "title": "Compare two runs case by case",
+      "file": "src/compare.ts",
+      "description": "In `src/compare.ts`, implement `compareRuns(baseline: RunResult, candidate: RunResult): Comparison`.\n\nReturn `{ baseline, candidate, baselineRate, candidateRate, fixed, broken, unchanged }`:\n\n- `baseline` and `candidate`: the two model names\n- the rates: passing cases divided by all cases for each run, or `0` for a run with no cases\n- `fixed`: ids that failed on the baseline and pass on the candidate\n- `broken`: ids that passed on the baseline and fail on the candidate\n- `unchanged`: every other id\n\nAll three lists follow the baseline's case order. Match cases by id: the candidate run may list them in a different order. Both runs must cover the same ids; if an id is in one run but not the other, throw an `Error` that contains that id.",
+      "nextSteps": [
+        "Index the candidate's outcomes by id.",
+        "Walk the baseline cases in order and sort each id into one of the three lists.",
+        "Check for ids that only one run has, in both directions.",
+        "Compute the two rates."
+      ],
+      "hints": [
+        "Two runs over the same set can still list cases in a different order, for example when requests finish at different times.",
+        "A `Map` from id to `passed` gives you the candidate outcome for any baseline id in one lookup. A missing entry means the runs do not match.",
+        "Checking baseline ids against the candidate map finds one direction. Also look for candidate ids that are not in the baseline before you start sorting."
+      ],
+      "points": 10
+    },
+    {
+      "id": "decide",
+      "title": "Write the ship rule",
+      "file": "src/decide.ts",
+      "description": "In `src/decide.ts`, implement:\n\n- `decide(comparison: Comparison): Decision`, returning `{ ship, reasons }`. The team's rule: no case that passed on the baseline may break. Any broken id means `ship: false`, with one reason per broken id that contains the id. A comparison with no cases at all means `ship: false`, with a reason that contains `no cases`. Otherwise `ship: true` and `reasons: []`.\n- `compareModels(cases, baselineModel, candidateModel)`: run both models with `runCases`, compare the runs with `compareRuns`, and return `{ comparison, decision }`.\n\nA higher pass rate does not override the rule. The check runs `decide` on hand-made comparisons and `compareModels` on hidden cases with the real triage models.",
+      "nextSteps": [
+        "Handle the empty comparison first.",
+        "Turn each broken id into a reason.",
+        "Write `compareModels` with the functions you already have.",
+        "Run `node src/run.ts evals-triage-v1 evals-triage-v2`."
+      ],
+      "hints": [
+        "The decision depends on the lists, not on the two rates.",
+        "`broken.map(id => ...)` gives you the reasons; `ship` is whether that list is empty.",
+        "Both model runs are independent, so `Promise.all` can run them side by side."
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Test the ship rule",
+      "file": "src/decide.test.ts",
+      "description": "Write vitest tests in `src/decide.test.ts` that pin the ship rule down. They should check that:\n\n- a candidate that breaks a case that passed before is not shipped, even when its pass rate is higher\n- each broken id appears in the reasons\n- a candidate with no broken cases is shipped\n- a comparison with no cases is not shipped\n\nThe check runs your test file three times: beside an unfinished `decide.ts` (it must fail), beside a correct one (it must pass) and beside one that ships whenever the pass rate does not drop (it must fail). Build your comparisons by hand or with `compareRuns`; do not call the model.",
+      "nextSteps": [
+        "Write a small helper that builds a `RunResult` from ids and pass flags.",
+        "Write one test per rule in the task.",
+        "Run `npx vitest run src/decide.test.ts`.",
+        "Ask which of your tests a rate-only rule would still pass."
+      ],
+      "hints": [
+        "Tests that only use cases where the rate and the rule agree cannot tell the two rules apart.",
+        "Make a candidate that fixes two cases and breaks one. Its rate goes up, and the rule must still say no.",
+        "`expect(decision.ship).toBe(false)` plus `expect(decision.reasons.join(' ')).toContain(id)` covers the first two rules for that case."
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "id": "exact-match",
+  "title": "A test set and a pass rate",
+  "files": ["src/cases.ts", "src/evaluate.ts", "src/triage.ts", "src/run.ts", "data/tickets.jsonl"],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/run.ts evals-triage-v1"
+  },
+  "tasks": [
+    {
+      "id": "load",
+      "title": "Load the test set",
+      "file": "src/cases.ts",
+      "description": "In `src/cases.ts`, implement `loadCases(path: string): Case[]`.\n\n`data/tickets.jsonl` holds one case per line: a JSON object with string fields `id`, `input` and `expected`. Read the file and return the cases in file order.\n\n- Skip lines that are empty or contain only whitespace.\n- Throw an `Error` whose message names the line, like `line 4`, when a line is not valid JSON or lacks a string `id`, `input` or `expected`. Count every line from 1, blank ones included, so the number matches what an editor shows.\n- Throw an `Error` whose message contains the id when two cases share an id.\n\nThe check loads the shipped file and several hidden files, some of them broken on purpose.",
+      "nextSteps": [
+        "Read the file as text and split it into lines.",
+        "Skip blank lines, parse the rest and keep the line number for each.",
+        "Validate each parsed value before you trust it.",
+        "Track the ids you have seen, then run `node src/run.ts` once the other tasks are done."
+      ],
+      "hints": [
+        "`readFileSync(path, 'utf8')` gives you the whole file. Split on newlines and keep the index so you can report line numbers.",
+        "`JSON.parse` throws on bad input. Catch that and throw your own error that says which line it was.",
+        "The line number is the array index plus one, counted before you skip blank lines. A `Set` of ids tells you when one repeats."
+      ],
+      "points": 10
+    },
+    {
+      "id": "normalize",
+      "title": "Compare labels fairly",
+      "file": "src/evaluate.ts",
+      "description": "The triage model does not always format its label the same way. In `src/evaluate.ts`, implement:\n\n- `normalizeLabel(text: string): string`: trim, lowercase, drop a leading `category:` label, drop quotes or backticks around the label, drop trailing `.` or `!`, and turn every run of spaces or underscores inside the label into a single `-`. So `'  Category: \"Plant care\"  '` becomes `'plant-care'`.\n- `isExactMatch(output: string, expected: string): boolean`: normalize both sides, then compare them exactly. A reply that only contains the expected word, like `'not a refund'`, is not a match.\n\nThe check runs both functions on a hidden list of replies.",
+      "nextSteps": [
+        "Run `node src/run.ts` once task 3 works and read the raw labels the model sends.",
+        "Write `normalizeLabel` one rule at a time, in the order the task lists them.",
+        "Build `isExactMatch` on top of `normalizeLabel`."
+      ],
+      "hints": [
+        "Normalization fixes formatting, not meaning. Every rule should remove noise without changing which word the model chose.",
+        "A chain of `.replace()` calls with small regular expressions keeps each rule on its own line. Anchor them with `^` and `$` so you only touch the edges.",
+        "Trim again after removing the prefix and the punctuation, then replace `/[\\s_]+/g` last."
+      ],
+      "points": 10
+    },
+    {
+      "id": "report",
+      "title": "Score a model on the test set",
+      "file": "src/evaluate.ts",
+      "description": "In `src/evaluate.ts`, implement `runEval(cases: Case[], model: string): Promise<EvalReport>`.\n\nSend each case's `input` through `triage(input, model)` and return:\n\n- `model`: the model name you were given\n- `total`: the number of cases\n- `passed`: how many replies match `expected` with `isExactMatch`\n- `passRate`: `passed / total`, or `0` when there are no cases\n- `failures`: one `{ id, expected, got }` per missed case, in case order, where `got` is the normalized reply and `expected` is the case's value\n\nThe check runs your function on hidden cases with two different models and with an empty list.",
+      "nextSteps": [
+        "Loop over the cases and await `triage` for each one.",
+        "Normalize the reply and decide whether the case passed.",
+        "Collect the failures and compute the totals.",
+        "Run `node src/run.ts evals-triage-v1`, then try `evals-triage-v2`."
+      ],
+      "hints": [
+        "Use the model name you are given. The check calls runEval with two different models and expects different results.",
+        "Keep a `failures` array and push to it inside the loop. `passed` is then the total minus the number of failures.",
+        "Guard the division: when `total` is 0, `passRate` should be 0, not `NaN`."
+      ],
+      "points": 10
+    }
+  ]
+}

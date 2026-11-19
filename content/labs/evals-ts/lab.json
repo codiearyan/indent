@@ -1,0 +1,13 @@
+{
+  "id": "evals-ts",
+  "title": "Evals: measure before you ship",
+  "description": "Pebblebrook Plants routes every support email through a language model, and nobody can say whether the next change will make it better or worse. Build the eval tooling that answers that: test sets, graders, a model judge, version comparisons and flakiness reports.",
+  "category": "AI engineering",
+  "language": "typescript",
+  "tags": ["TypeScript", "AI"],
+  "kind": "lab",
+  "parts": [
+    { "title": "Scoring one version", "chapters": ["exact-match", "graders", "judge"] },
+    { "title": "Deciding between versions", "chapters": ["compare", "flaky"] }
+  ]
+}
