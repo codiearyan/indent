@@ -6,6 +6,7 @@ import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
 import { StepLayout } from './StepLayout'
 import { StepStrip } from './StepStrip'
+import { AiChoice } from './AiChoice'
 import { HowItWorks } from './HowItWorks'
 import { Welcome } from './Welcome'
 import { nextStep, prevStep, type Choices, type StepId } from './steps'
@@ -29,6 +30,7 @@ const PLACEHOLDER_TITLES: Record<StepId, string> = {
 function StepView({ step, ...props }: StepProps & { step: StepId }): React.JSX.Element {
   if (step === 'welcome') return <Welcome staged={props.staged} />
   if (step === 'how') return <HowItWorks staged={props.staged} />
+  if (step === 'ai') return <AiChoice staged={props.staged} />
   return <StepLayout title={PLACEHOLDER_TITLES[step]} staged={props.staged} />
 }
 
@@ -65,8 +67,10 @@ export function Onboarding(): React.JSX.Element {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent): void => {
-      if (event.key !== 'Enter' || event.defaultPrevented || event.isComposing) return
       const target = event.target as HTMLElement
+      if (event.key !== 'Enter' || event.isComposing) return
+      // Radio items cancel Enter themselves (it must not pick an option), so they are let through.
+      if (event.defaultPrevented && target.getAttribute('role') !== 'radio') return
       if (target !== document.body && !rootRef.current?.contains(target)) return
       if (target.closest(OWNS_ENTER)) return
       event.preventDefault()
