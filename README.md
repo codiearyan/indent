@@ -23,6 +23,10 @@ No account and no server. Lessons, your files and your progress live on your com
   binary search, linked lists, heaps, BFS and DFS, topological sort, union-find, backtracking,
   dynamic programming and more). Each step highlights the line of code that runs and says what
   happened and why. Play, pause, scrub, change speed, and try your own input.
+- **Labs**: 12 story labs and 8 challenges (63 chapters, 186 tasks): LLM apps, retrieval, agents and
+  evals against the offline lab model; TypeScript, async JavaScript and a JSON API with plain Node;
+  SQL on built-in SQLite; Git rescues done in the real terminal; and bug hunts in JavaScript and
+  LLM code. Three learning paths put them in order.
 - **Catalog**: dashboard, labs with search and filters, learning paths, challenges and a year board
   of your activity, points, levels and streaks.
 
