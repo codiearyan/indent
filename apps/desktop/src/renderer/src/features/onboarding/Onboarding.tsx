@@ -24,7 +24,8 @@ const STEPS: Record<StepId, (props: { staged: boolean }) => React.JSX.Element> =
 }
 
 /** Elements where Enter already means something; everywhere else in the setup it continues. */
-const OWNS_ENTER = 'a, input, textarea, select, [role="combobox"], button:not([role="radio"])'
+const OWNS_ENTER =
+  'a, input, textarea, select, [role="combobox"], button:not([role="radio"], [role="tab"])'
 
 /** The first-run setup. Shown instead of the app until it is finished or skipped. */
 export function Onboarding(): React.JSX.Element {
