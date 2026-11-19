@@ -1,0 +1,65 @@
+{
+  "id": "limiting-concurrency",
+  "title": "At most N at a time",
+  "files": ["src/batches.js", "src/mapLimit.js", "src/mapLimitSettled.js", "src/services.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo sends reminder emails through a fake mail service that refuses more than three connections at once.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "batches",
+      "title": "Send in batches",
+      "file": "src/batches.js",
+      "description": "Implement `runInBatches(items, size, fn)` in `src/batches.js`. It calls `fn(item, index)` for every item, `size` items at a time: start a whole batch, wait until every call in it has finished, then start the next batch.\n\n- `index` is the item's position in the whole list\n- resolve with every result, in the same order as `items`\n- the last batch may be smaller\n- if a call rejects, reject with that error and start no further batches\n- an empty list resolves with `[]` without calling `fn`\n\n**Timing:** there is no clock here. `fn` is the slow work, and the check passes a fake job whose calls it settles by hand, one at a time, recording which items had started after each step.",
+      "nextSteps": [
+        "Run `node src/demo.js` and read the first line.",
+        "Loop over the list in steps of `size`.",
+        "Run each slice at once and wait for all of it before moving on.",
+        "Run the demo again and compare its time with the next line's later on."
+      ],
+      "hints": [
+        "This is a loop where each turn handles one slice of the list, and the turns happen one after the other.",
+        "`items.slice(start, start + size)` gives you one batch. You already know a way to wait for several promises at once.",
+        "Inside an async function, `await Promise.all(batch.map(...))` per turn of a `for` loop does it. Remember to add `start` to the index within the batch."
+      ],
+      "points": 10
+    },
+    {
+      "id": "pool",
+      "title": "Keep the line moving",
+      "file": "src/mapLimit.js",
+      "description": "Implement `mapLimit(items, limit, fn)` in `src/mapLimit.js`. It calls `fn(item, index)` for every item with at most `limit` calls in flight, and starts the next item as soon as **any** call finishes, without waiting for the rest of a batch.\n\n- start items in list order\n- resolve with every result, in the same order as `items`\n- with fewer items than `limit`, start them all at once\n- an empty list resolves with `[]` without calling `fn`\n- if a call rejects, reject with that error, start no new items after it, and leave no rejection unhandled\n\n**Timing:** there is no clock here. The check passes a fake job whose calls it settles by hand in an order it chooses, and records which items had started after each step and the most calls in flight at once.",
+      "nextSteps": [
+        "Decide how you will remember which item comes next.",
+        "Write a small async loop that takes the next item, runs it and repeats.",
+        "Run `limit` of those loops side by side and wait for them all.",
+        "Run the demo: the limited line should be faster than batches."
+      ],
+      "hints": [
+        "Think of `limit` workers sharing one queue. Each worker takes the next item, waits for it, then takes another, until the queue is empty.",
+        "A shared `next` counter that each worker reads and increments gives you the index. Store each result at `results[index]` so the order is kept.",
+        "Start `Math.min(limit, items.length)` workers and wait for them with `Promise.all`. On a failure, set a flag that makes every worker stop taking new items, and rethrow."
+      ],
+      "points": 10
+    },
+    {
+      "id": "settled",
+      "title": "Finish the list even when some fail",
+      "file": "src/mapLimitSettled.js",
+      "description": "Implement `mapLimitSettled(items, limit, fn)` in `src/mapLimitSettled.js`. It has the same limit and order as `mapLimit`, but a failed item does not stop the others and the result never rejects. It resolves with one entry per item, in order:\n\n- `{ ok: true, value }` when `fn(item, index)` resolved\n- `{ ok: false, error }` when it rejected, where `error` is the rejection itself, not its message\n\n**Timing:** there is no clock here. The check passes a fake job whose calls it settles by hand and records which items had started after each failure and the most calls in flight at once.",
+      "nextSteps": [
+        "Decide what a failed reminder should turn into.",
+        "Wrap `fn` so that it never rejects.",
+        "Hand the wrapped function to `mapLimit`.",
+        "Run the demo and find B9 in the last line."
+      ],
+      "hints": [
+        "`mapLimit` already keeps the limit and the order. It only stops when a job rejects.",
+        "If every job resolves, `mapLimit` never stops early. What if a job's failure were turned into a value?",
+        "Pass `mapLimit` an async function that awaits `fn(item, index)` inside try and catch, and returns `{ ok: true, value }` or `{ ok: false, error }`."
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "async-js",
+  "title": "Async JavaScript without surprises",
+  "description": "Tidewell Ferries runs three small boats between the quay and two islands, and every screen in its ticket office waits on a slow, unreliable service. As its developer you wrap, combine, limit, retry and cancel that waiting until nothing hangs, nothing is lost and nothing runs after it should have stopped.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": ["JavaScript"],
+  "kind": "lab",
+  "parts": [
+    { "title": "Waiting well", "chapters": ["promises", "async-await", "many-at-once"] },
+    { "title": "When services push back", "chapters": ["limiting-concurrency", "retries-and-cancellation"] }
+  ]
+}

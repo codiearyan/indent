@@ -1,0 +1,65 @@
+{
+  "id": "async-await",
+  "title": "async and await",
+  "files": ["src/sailingReport.js", "src/dashboard.js", "src/booking.js", "src/services.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo runs your functions against the fake services and prints how long each one took.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "rewrite",
+      "title": "Rewrite the report with await",
+      "file": "src/sailingReport.js",
+      "description": "`sailingReport(route, services)` in `src/sailingReport.js` already works with `.then()`. Rewrite it as an `async` function that uses `await` and has no `.then(` left in it.\n\nIt must behave exactly as before:\n\n- resolve with `{ route, time, sea }`\n- call `getSailing(route)`, then `getSeaState(time)` with the sailing's time\n- reject with the same error when either service fails, and skip `getSeaState` when `getSailing` fails\n\n**Timing:** `services` is a parameter that defaults to the fake services. The check passes its own pair that answer on the next turn of the event loop.",
+      "nextSteps": [
+        "Run `node src/demo.js` and note the two report lines.",
+        "Add `async` in front of the function.",
+        "Replace each `.then()` with a `const` and an `await`.",
+        "Run the demo again: the lines should not change."
+      ],
+      "hints": [
+        "`await` pauses the async function until the promise settles and gives you its value. A rejection becomes a thrown error.",
+        "You do not need a try and catch here. An error thrown inside an async function rejects the promise it returns.",
+        "Two awaits, one after the other, then return an object that spreads the sailing and adds `sea`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "parallel",
+      "title": "A dashboard that waits only when it must",
+      "file": "src/dashboard.js",
+      "description": "`loadDashboard(route, services)` in `src/dashboard.js` works, but it awaits three slow calls one after the other. Make it faster without changing what it returns: `{ sailings, weather, crew }`.\n\n- start `getSailings(route)` and `getWeather(route)` before waiting for either\n- call `getCrew(id)` with the first sailing's id as soon as the sailings arrive, without waiting for the weather\n- with no sailings, `crew` is `[]` and `getCrew` is not called\n- if `getWeather` rejects while the sailings are still loading, the dashboard rejects with that error and the rejection is never left unhandled\n\n**Timing:** `services` is a parameter that defaults to the fake services. The check passes fakes it settles one at a time, and records which calls had started after each one.",
+      "nextSteps": [
+        "Run the demo and note how long the dashboard takes.",
+        "Find which calls depend on which.",
+        "Start the independent work first and wait for it together.",
+        "Run the demo again: it should take about 700 ms instead of 1100."
+      ],
+      "hints": [
+        "Calling an async function starts it. Awaiting it is a separate step you can do later.",
+        "Holding a started promise in a variable and awaiting it later is fast, but if it rejects before you reach the await, nobody is listening yet. `Promise.all` listens to every promise from the moment you give it to it.",
+        "Put 'sailings, then crew' in a small async function of its own, then wait for it and the weather with one `Promise.all`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "finally",
+      "title": "Save a booking and always unlock the seat",
+      "file": "src/booking.js",
+      "description": "Implement `saveBooking(booking, services)` in `src/booking.js`. A booking is `{ id, name, email, seat }`. It resolves with `{ saved: true, emailed }`.\n\n- await `services.storeBooking(booking)`. If it rejects, reject with that same error and do not call `emailTicket`\n- then await `services.emailTicket(booking)`. If it rejects, the booking still counts: resolve with `emailed: false`. Otherwise `emailed: true`\n- call `services.unlockSeat(booking.seat)` exactly once in every case, after the other calls have settled\n- no rejection may be left unhandled\n\n**Timing:** `services` is a parameter that defaults to the fake services. The check passes fakes that answer on the next turn of the event loop and records the order of every call.",
+      "nextSteps": [
+        "Write the happy path: store, email, return.",
+        "Wrap the email in its own try and catch.",
+        "Unlock the seat in a block that always runs.",
+        "Run the demo and read all three booking lines."
+      ],
+      "hints": [
+        "Two different failures need two different answers: one is passed on to the caller, the other is turned into `emailed: false`.",
+        "`finally` runs after `try` finishes, whether it returned or threw, and it does not swallow the error.",
+        "A `try` only covers promises you `await` inside it. Calling `emailTicket` without `await` lets it fail later, outside your catch, and unlocks the seat too early."
+      ],
+      "points": 10
+    }
+  ]
+}
