@@ -55,9 +55,9 @@ export function AiMenu(): React.JSX.Element {
           </div>
           <Switch
             id="ai-suggestions"
-            checked={config?.suggestions ?? false}
+            checked={config ? config.suggestions !== 'off' : false}
             disabled={!config}
-            onCheckedChange={(suggestions) => void update({ suggestions })}
+            onCheckedChange={(on) => void update({ suggestions: on ? 'auto' : 'off' })}
           />
         </div>
 

@@ -1,4 +1,4 @@
-import type { AiConfig } from '@shared/types'
+import type { AiConfig, SuggestionMode } from '@shared/types'
 
 export type AiSettings = Pick<AiConfig, 'enabled' | 'provider' | 'model' | 'suggestions'>
 
@@ -9,6 +9,14 @@ export function readSettings(saved: unknown): AiSettings {
     enabled: s.enabled !== false,
     provider: (s.provider as AiSettings['provider']) ?? null,
     model: typeof s.model === 'string' ? s.model : null,
-    suggestions: s.suggestions === true
+    suggestions: suggestionMode(s.suggestions)
   }
+}
+
+const MODES: SuggestionMode[] = ['off', 'manual', 'auto']
+
+/** Suggestions were a boolean before they had modes: true meant what `auto` does now. */
+export function suggestionMode(value: unknown): SuggestionMode {
+  if (value === true) return 'auto'
+  return MODES.includes(value as SuggestionMode) ? (value as SuggestionMode) : 'off'
 }

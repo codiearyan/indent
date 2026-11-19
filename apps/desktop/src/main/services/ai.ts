@@ -27,7 +27,7 @@ import {
   trimHistory,
   tutorSystemPrompt
 } from './ai/prompt'
-import { readSettings, type AiSettings } from './ai/settings'
+import { readSettings, suggestionMode, type AiSettings } from './ai/settings'
 
 type ApiProviderId = Exclude<AiProviderId, CliProviderId>
 
@@ -249,7 +249,7 @@ async function complete(request: AiCompleteRequest): Promise<string> {
   try {
     const config = await buildConfig()
     const provider = config.providers.find((p) => p.id === config.provider)
-    if (!config.suggestions || !provider) return ''
+    if (config.suggestions === 'off' || !provider) return ''
     let text = ''
     await streamReply(config, {
       system: COMPLETION_RULES,
@@ -294,7 +294,7 @@ export function register(): void {
       // The model is passed to a CLI as an argument; it must not read as a flag.
       if (patch.model?.startsWith('-')) throw new Error('That is not a model name.')
       if (patch.model !== undefined) next.model = patch.model || null
-      if (patch.suggestions !== undefined) next.suggestions = !!patch.suggestions
+      if (patch.suggestions !== undefined) next.suggestions = suggestionMode(patch.suggestions)
       if (patch.enabled !== undefined) next.enabled = !!patch.enabled
       settings = next
       await saveSettings()

@@ -26,7 +26,7 @@ export function registerInlineSuggestions(monaco: typeof Monaco): Monaco.IDispos
       const none = { items: [] }
       const { config } = useAi.getState()
       const chapter = useWorkspace.getState().chapter
-      if (!config?.suggestions || !config.provider || !chapter) return none
+      if (config?.suggestions !== 'auto' || !config.provider || !chapter) return none
       // Monaco cancels the token on the next keystroke, so only a real pause gets through.
       if (!(await pause(PAUSE_MS, token))) return none
 

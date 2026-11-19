@@ -164,13 +164,15 @@ export interface AiProviderInfo {
   models: string[]
 }
 
+export type SuggestionMode = 'off' | 'manual' | 'auto'
+
 export interface AiConfig {
   /** Off means no AI anywhere: no tutor, no suggestions, and main refuses AI calls. */
   enabled: boolean
   provider: AiProviderId | null
   model: string | null
-  /** Grey inline suggestions in the editor. */
-  suggestions: boolean
+  /** Grey inline suggestions in the editor: never, when asked with a shortcut, or after a pause. */
+  suggestions: SuggestionMode
   providers: AiProviderInfo[]
 }
 
