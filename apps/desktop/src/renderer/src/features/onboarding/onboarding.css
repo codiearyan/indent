@@ -301,3 +301,15 @@ html:active-view-transition-type(onboarding-finish) {
     ob-appear var(--motion-enter) var(--ease-out) both,
     ob-press var(--motion-state) var(--ease-out) both;
 }
+
+/* A step is drawn for the smallest window; larger windows scale it up instead of leaving it adrift. */
+@media (min-width: 1280px) and (min-height: 780px) {
+  .ob-view {
+    zoom: 1.15;
+  }
+}
+@media (min-width: 1536px) and (min-height: 900px) {
+  .ob-view {
+    zoom: 1.3;
+  }
+}
