@@ -1,0 +1,139 @@
+import { useEffect, useState } from 'react'
+import type { AiProviderInfo } from '@shared/types'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useAi } from '@/features/ai/aiStore'
+import { cn } from '@/lib/utils'
+import { StepLayout } from './StepLayout'
+
+export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
+  const config = useAi((s) => s.config)
+  const load = useAi((s) => s.load)
+  const update = useAi((s) => s.update)
+  const [loading, setLoading] = useState(true)
+
+  // Looks for installed CLIs again, so one installed a minute ago shows up.
+  useEffect(() => {
+    void load().finally(() => setLoading(false))
+  }, [load])
+
+  const clis = config?.providers.filter((p) => p.kind === 'cli') ?? []
+  const apis = config?.providers.filter((p) => p.kind === 'api') ?? []
+  const nothing = !config?.providers.some((p) => p.available)
+
+  return (
+    <StepLayout
+      wide
+      staged={staged}
+      title="Connect a provider"
+      lead="The tutor runs on an AI you already have. Pick one here, or set it up later from the AI menu."
+    >
+      <RadioGroup
+        aria-label="AI provider"
+        value={config?.provider ?? ''}
+        onValueChange={(provider) => void update({ provider: provider as AiProviderInfo['id'] })}
+        className="grid-cols-2 items-start gap-6"
+      >
+        <ProviderCard
+          title="On this computer"
+          hint="Coding CLIs you are signed in to."
+          loading={loading}
+          rows={4}
+          empty={
+            !loading && nothing
+              ? 'No coding CLI was found. Install one and sign in, or use an API key.'
+              : undefined
+          }
+        >
+          {clis.map((p, i) => (
+            <ProviderRow key={p.id} provider={p} index={i} />
+          ))}
+        </ProviderCard>
+        <ProviderCard
+          title="Your own key"
+          hint="Paid by you, stored encrypted."
+          loading={loading}
+          rows={3}
+        >
+          {apis.map((p, i) => (
+            <ProviderRow key={p.id} provider={p} index={i + clis.length} />
+          ))}
+        </ProviderCard>
+      </RadioGroup>
+    </StepLayout>
+  )
+}
+
+function ProviderCard({
+  title,
+  hint,
+  loading,
+  rows,
+  empty,
+  children
+}: {
+  title: string
+  hint: string
+  loading: boolean
+  rows: number
+  empty?: string
+  children: React.ReactNode
+}): React.JSX.Element {
+  return (
+    <section className="rounded-lg border border-border">
+      <header className="flex h-11 items-baseline gap-2 border-b border-rule px-4 pt-3">
+        <h2 className="text-sm font-semibold">{title}</h2>
+        <span className="text-xs text-muted-foreground">{hint}</span>
+      </header>
+      {empty && (
+        <p className="border-b border-rule px-4 py-3 text-[13px] text-muted-foreground">{empty}</p>
+      )}
+      <ul aria-busy={loading}>
+        {loading
+          ? Array.from({ length: rows }, (_, i) => (
+              <li
+                key={i}
+                className="flex h-12 items-center gap-3 border-b border-rule px-4 last:border-b-0"
+              >
+                <Skeleton className="size-4 rounded-full" />
+                <Skeleton className="h-3.5 w-24" />
+                <Skeleton className="ml-auto h-3 w-20" />
+              </li>
+            ))
+          : children}
+      </ul>
+    </section>
+  )
+}
+
+function ProviderRow({
+  provider,
+  index
+}: {
+  provider: AiProviderInfo
+  index: number
+}): React.JSX.Element {
+  const id = `provider-${provider.id}`
+  return (
+    <li
+      className="motion-enter flex min-h-12 items-center gap-3 border-b border-rule px-4 last:border-b-0"
+      style={{ '--i': index } as React.CSSProperties}
+    >
+      <RadioGroupItem id={id} value={provider.id} disabled={!provider.available} />
+      <label
+        htmlFor={id}
+        className={cn('text-sm', provider.available ? 'cursor-pointer' : 'text-muted-foreground')}
+      >
+        {provider.label}
+      </label>
+      <span
+        className={cn(
+          'ml-auto min-w-0 truncate text-right text-xs text-muted-foreground',
+          provider.available && 'font-mono'
+        )}
+      >
+        {provider.detail ?? 'No key yet'}
+      </span>
+    </li>
+  )
+}

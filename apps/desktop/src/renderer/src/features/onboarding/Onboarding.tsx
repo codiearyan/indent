@@ -8,6 +8,7 @@ import { StepLayout } from './StepLayout'
 import { StepStrip } from './StepStrip'
 import { AiChoice } from './AiChoice'
 import { HowItWorks } from './HowItWorks'
+import { Provider } from './Provider'
 import { Welcome } from './Welcome'
 import { nextStep, prevStep, type Choices, type StepId } from './steps'
 import './onboarding.css'
@@ -31,6 +32,7 @@ function StepView({ step, ...props }: StepProps & { step: StepId }): React.JSX.E
   if (step === 'welcome') return <Welcome staged={props.staged} />
   if (step === 'how') return <HowItWorks staged={props.staged} />
   if (step === 'ai') return <AiChoice staged={props.staged} />
+  if (step === 'provider') return <Provider staged={props.staged} />
   return <StepLayout title={PLACEHOLDER_TITLES[step]} staged={props.staged} />
 }
 
