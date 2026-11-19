@@ -1,0 +1,70 @@
+{
+  "id": "untrusted-json",
+  "title": "The JSON that was almost JSON",
+  "files": [
+    "src/parse.ts",
+    "src/reproduce.ts",
+    "src/parse.test.ts",
+    "src/messages.ts",
+    "src/demo.ts"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Crash the parser on purpose",
+      "file": "src/reproduce.ts",
+      "description": "In `src/reproduce.ts`, implement `reproduceCrash()`.\n\nPick a customer message from `src/messages.ts` that makes the original `parseRequest` throw. Call `parseRequest` with it, catch the error, and return:\n\n- `message`: the customer message you sent\n- `error`: the message of the error that was thrown\n\nThe check runs your function against the original `parse.ts` and then confirms your message really crashes it.",
+      "nextSteps": [
+        "Run `node src/demo.ts` and see which messages end in an error.",
+        "Call `parseRequest` with one of them inside a `try` block.",
+        "Return the customer message and the caught error's message."
+      ],
+      "hints": [
+        "The demo prints a line for every message in messages.ts. Some of them do not come back as results.",
+        "A caught value is typed `unknown`. Treat it as an `Error` to read its `message`.",
+        "The fenced and chatty messages both make JSON.parse throw. Either one works; return its text and `err.message`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Stop trusting the model's JSON",
+      "file": "src/parse.ts",
+      "description": "Fix `parseRequest` in `src/parse.ts` so a strange reply can never crash the endpoint or slip a bad request through.\n\nIt must:\n\n- find the JSON object even when the model wraps it in a code fence or puts a sentence before it\n- never throw because of the reply text; resolve to `{ ok: false, reason }` instead\n- only return `{ ok: true, request }` when `action` is one of `reschedule`, `redirect`, `cancel` and `trackingId` looks like `KP-` followed by 5 digits\n\nKeep the exported types and the function signature.",
+      "nextSteps": [
+        "Print the raw reply text for each message and look at what surrounds the JSON.",
+        "Pull out the part of the text that is the JSON object.",
+        "Parse it so a failure becomes `{ ok: false }`, not an exception.",
+        "Check `action` and `trackingId` before returning `ok: true`, then run the demo."
+      ],
+      "hints": [
+        "There are two separate problems: getting the JSON out of the text, and deciding whether what you got is a request you can act on.",
+        "The JSON object starts at the first `{` and ends at the last `}`. JSON.parse can still fail, so give it a try/catch.",
+        "`as DeliveryRequest` only silences the compiler. Write a small function that checks the type of each field and returns a boolean."
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/parse.test.ts",
+      "description": "Write vitest tests in `src/parse.test.ts` that check:\n\n- a reply wrapped in a code fence, or with chatty text around the JSON, still parses\n- a message with no delivery request resolves to `{ ok: false }` instead of throwing\n- a reply with the wrong shape (no tracking id, or an action Kes does not support) resolves to `{ ok: false }`\n\nThe check runs your test file beside the original `parse.ts` (it must fail), beside a correct fix (it must pass) and beside a fix that parses safely but never checks the shape (it must fail).",
+      "nextSteps": [
+        "Import `parseRequest` and `messages`.",
+        "Write one test per kind of reply: fenced, chatty, no JSON, wrong shape.",
+        "Run `npx vitest run src/parse.test.ts` against your fixed code.",
+        "Ask which of your tests a fix without shape checks would still pass."
+      ],
+      "hints": [
+        "Each entry in messages.ts makes the lab model answer in a different way. Use them as your cases.",
+        "Assert on `result.ok` first; that is the part of the contract callers rely on.",
+        "A version that only adds try/catch passes the fenced and no-JSON cases. The missingId and unknownAction messages are what catch it."
+      ],
+      "points": 10
+    }
+  ]
+}
