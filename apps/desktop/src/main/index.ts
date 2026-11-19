@@ -30,6 +30,15 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => mainWindow.show())
 
+  // Full screen hides the traffic lights, so the page gives the room it kept for them back.
+  const syncFullScreen = (): void => {
+    const toggle = `document.documentElement.classList.toggle('window-fullscreen', ${mainWindow.isFullScreen()})`
+    mainWindow.webContents.executeJavaScript(toggle).catch(() => {})
+  }
+  mainWindow.on('enter-full-screen', syncFullScreen)
+  mainWindow.on('leave-full-screen', syncFullScreen)
+  mainWindow.webContents.on('did-finish-load', syncFullScreen)
+
   // The page has the full IPC API, so the window must never load anything but the app itself.
   mainWindow.webContents.on('will-navigate', (event, url) => {
     if (url !== mainWindow.webContents.getURL()) event.preventDefault()
@@ -71,7 +80,7 @@ app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.indent.app')
 
   app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
+    optimizer.watchWindowShortcuts(window, { zoom: true })
   })
 
   for (const service of [content, workspace, checks, progress, terminal, ai]) service.register()
