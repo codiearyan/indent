@@ -1,4 +1,4 @@
-// Shared by every chapter's grader/checks.mjs.
+// Shared by every issue's grader/checks.mjs.
 import { isDeepStrictEqual } from 'node:util'
 import { fileURLToPath } from 'node:url'
 

@@ -6,13 +6,13 @@ Before each sailing the crew downloads a passenger list from the harbour authori
 
 > **Odile:** When it says busy, try again, but do not hammer it. And when I cancel a sailing for weather, I want the download to stop. Last week the tablet kept retrying for a sailing I had already cancelled.
 
-By the end of this chapter you can retry a failing call with exponential backoff, retry only the errors that are worth it, and cancel the whole thing with `AbortController` so that nothing runs after you said stop.
+By the end of this issue you can retry a failing call with exponential backoff, retry only the errors that are worth it, and cancel the whole thing with `AbortController` so that nothing runs after you said stop.
 
 ## Which errors deserve another try
 
 Some failures go away on their own: a busy server, a dropped connection, a timeout. Others never will: a sailing that does not exist, a bad password. Retrying those only wastes time and hides the real problem.
 
-The code that throws usually knows best, so let it mark the error. In this lab a temporary failure has `retryable: true`:
+The code that throws usually knows best, so let it mark the error. In this repo a temporary failure has `retryable: true`:
 
 ```js
 const err = new Error('Server busy')

@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-With the receipts fixed, Cinderbay's next problem is on the screen above the dock. By the end of this chapter you will be able to:
+With the receipts fixed, Cinderbay's next problem is on the screen above the dock. By the end of this issue you will be able to:
 
 - explain how `sort()` compares values when you give it no compare function
 - explain why `sort()` changes the array you call it on, and why that hurts the caller

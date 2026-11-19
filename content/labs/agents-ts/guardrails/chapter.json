@@ -12,7 +12,7 @@
     "src/demo.ts"
   ],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model. The demo asks you to approve the refund.",
+    "description": "A shell in your workspace, already pointed at the offline local model. The demo asks you to approve the refund.",
     "suggestedCommand": "node src/demo.ts"
   },
   "tasks": [
@@ -38,7 +38,7 @@
       "id": "trace",
       "title": "Record every step in a trace",
       "file": "src/agent.ts",
-      "description": "Implement `runAgent(question, options?)` in `src/agent.ts`. It is the agent loop from earlier chapters, with three changes:\n\n- every tool call goes through `guardedCall` with `options.confirm`, which defaults to refusing everything\n- calls run one at a time, in call order\n- it returns `{ answer, trace }` instead of a step count\n\nThe trace is a list of `TraceEntry` (see `src/trace.ts`), in the order things happened:\n\n1. for each model reply: `{ type: 'model', step, content, toolCalls }`, with `step` counting from 1, the reply's `content` (often `null` with tool calls) and the ids of its tool calls (`[]` on the final reply)\n2. then for each of its calls: `{ type: 'tool_call', id, name, arguments }` with the raw arguments string, followed by `{ type: 'tool_result', id, content }`, or `{ type: 'refused', id, name }` when the call was refused\n\nKeep `maxSteps` (default 8) and `StepLimitError`. The check compares your trace with a correct one for a lookup, an approved refund, a refused refund and a refund with no `confirm` given.",
+      "description": "Implement `runAgent(question, options?)` in `src/agent.ts`. It is the agent loop from earlier issues, with three changes:\n\n- every tool call goes through `guardedCall` with `options.confirm`, which defaults to refusing everything\n- calls run one at a time, in call order\n- it returns `{ answer, trace }` instead of a step count\n\nThe trace is a list of `TraceEntry` (see `src/trace.ts`), in the order things happened:\n\n1. for each model reply: `{ type: 'model', step, content, toolCalls }`, with `step` counting from 1, the reply's `content` (often `null` with tool calls) and the ids of its tool calls (`[]` on the final reply)\n2. then for each of its calls: `{ type: 'tool_call', id, name, arguments }` with the raw arguments string, followed by `{ type: 'tool_result', id, content }`, or `{ type: 'refused', id, name }` when the call was refused\n\nKeep `maxSteps` (default 8) and `StepLimitError`. The check compares your trace with a correct one for a lookup, an approved refund, a refused refund and a refund with no `confirm` given.",
       "nextSteps": [
         "Start from the loop you know: messages, request, tool calls, tool messages.",
         "Push a model entry right after each reply.",

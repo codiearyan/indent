@@ -1,4 +1,4 @@
-// The tool registry from the last chapter: validated arguments, and errors returned as results.
+// The tool registry from the last issue: validated arguments, and errors returned as results.
 export type PropertySchema = {
   type: 'string' | 'number' | 'integer' | 'boolean'
   description?: string

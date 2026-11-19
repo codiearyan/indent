@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Merging is usually quiet. Git combines two branches on its own unless both changed the same lines. By the end of this chapter you will be able to:
+Merging is usually quiet. Git combines two branches on its own unless both changed the same lines. By the end of this issue you will be able to:
 
 - explain when a merge stops with a conflict and what git wants from you
 - read conflict markers and turn them into the file you actually want

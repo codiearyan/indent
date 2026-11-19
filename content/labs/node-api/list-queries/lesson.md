@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Bram has added three boats this week, and the booking page now loads the whole fleet on every visit just to show the doubles. By the end of this chapter you will be able to:
+Bram has added three boats this week, and the booking page now loads the whole fleet on every visit just to show the doubles. By the end of this issue you will be able to:
 
 - read filters, a sort order and a page from the query string
 - turn query text into typed values, and refuse values you cannot trust
@@ -19,7 +19,7 @@ He is right that it feels wrong. Filtering in the browser means sending every bo
 
 `GET /boats?type=double&available=true&sort=-hourlyCents&limit=10&offset=0` carries five parameters. `URLSearchParams` parses them for you, but every value it gives back is a string, and a missing parameter is `null`.
 
-That makes parsing a trust boundary, like the JSON body in chapter 2. JavaScript's number helpers are forgiving in ways that hurt here:
+That makes parsing a trust boundary, like the JSON body in the second issue. JavaScript's number helpers are forgiving in ways that hurt here:
 
 ```js
 Number('')         // 0

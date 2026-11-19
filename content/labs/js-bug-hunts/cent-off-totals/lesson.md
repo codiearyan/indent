@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Cinderbay Paddle Co. rents kayaks and paddleboards from a little dock on the harbour. You are its only developer, and the till runs on JavaScript you inherited. By the end of this chapter you will be able to:
+Cinderbay Paddle Co. rents kayaks and paddleboards from a little dock on the harbour. You are its only developer, and the till runs on JavaScript you inherited. By the end of this issue you will be able to:
 
 - explain why `0.1 + 0.2` is not `0.3` in JavaScript, in one breath
 - reproduce a receipt whose lines do not add up

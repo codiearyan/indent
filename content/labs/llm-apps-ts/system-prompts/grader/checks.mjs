@@ -110,7 +110,7 @@ export const checks = {
       {
         name: 'The model replies with triage lines',
         passed: replies.every(({ reply }) => TRIAGE_LINE.test(reply)),
-        message: 'With your messages, the lab model does not answer every sample in the triage line format.',
+        message: 'With your messages, the local model does not answer every sample in the triage line format.',
         output: JSON.stringify(replies, null, 2)
       }
     ])

@@ -1,4 +1,4 @@
-// Chapter 5: tidy history before sharing.
+// Issue 5: tidy history before sharing.
 //
 // Run `node setup.mjs` to build the scenario in ./repo. Running it again starts over.
 //

@@ -5,7 +5,7 @@ import { chunkDocs } from '../src/chunk.ts'
 import { handbook } from '../src/handbook.ts'
 import { indexChunks } from '../src/store.ts'
 
-// reply null: the lab model answers. A string: a fake model answers with exactly that text.
+// reply null: the local model answers. A string: a fake model answers with exactly that text.
 function recordingClient(reply) {
   const real = new OpenAI()
   const chats = []

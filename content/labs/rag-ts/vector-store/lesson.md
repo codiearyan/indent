@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-You can chunk the handbook and you can compare texts. Now you will put the two together into the piece every retrieval system has at its centre: a vector store. By the end of this chapter you will be able to:
+You can chunk the handbook and you can compare texts. Now you will put the two together into the piece every retrieval system has at its centre: a vector store. By the end of this issue you will be able to:
 
 - explain what a vector store keeps and why it embeds documents only once
 - build an index of chunks and their vectors
@@ -48,9 +48,9 @@ const hits = [
 hits.every((hit) => hit.score < 0.2) // true: nothing here is really about the question
 ```
 
-A minimum score, or cut-off, fixes this: hits below it are dropped, even if that leaves none. An empty result is useful information. It lets the next chapter say "the handbook does not cover that" instead of making up an answer from irrelevant text.
+A minimum score, or cut-off, fixes this: hits below it are dropped, even if that leaves none. An empty result is useful information. It lets the next issue say "the handbook does not cover that" instead of making up an answer from irrelevant text.
 
-There is no universal right value. It depends on the embedding model and on how your questions are worded. For this handbook and the lab model, real questions score their best chunk above 0.2 and unrelated ones stay below it, which you can see in the demo. The last chapter shows how to choose such numbers with measurements instead of guesses.
+There is no universal right value. It depends on the embedding model and on how your questions are worded. For this handbook and the local model, real questions score their best chunk above 0.2 and unrelated ones stay below it, which you can see in the demo. The last issue shows how to choose such numbers with measurements instead of guesses.
 
 ## Try it
 

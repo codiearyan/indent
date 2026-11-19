@@ -6,7 +6,7 @@ The departure board works again. Bram has two new complaints.
 
 > **Bram:** The morning dashboard takes over a second to load, and I am staring at it while a queue builds. And yesterday a customer's ticket email bounced, the booking screen froze, and seat 4B stayed locked until Odile restarted everything.
 
-By the end of this chapter you can rewrite a promise chain as an async function, tell needless waiting from necessary waiting, and use try, catch and finally so that no failure is lost and cleanup always happens.
+By the end of this issue you can rewrite a promise chain as an async function, tell needless waiting from necessary waiting, and use try, catch and finally so that no failure is lost and cleanup always happens.
 
 ## async functions are promise functions
 

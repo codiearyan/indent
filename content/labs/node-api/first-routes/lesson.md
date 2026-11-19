@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Larchmere Kayaks rents single kayaks, doubles and paddleboards from a wooden shed on Lake Marrow. Bookings live on a whiteboard, and you are the developer hired to put them behind a small JSON API. By the end of this chapter you will be able to:
+Larchmere Kayaks rents single kayaks, doubles and paddleboards from a wooden shed on Lake Marrow. Bookings live on a whiteboard, and you are the developer hired to put them behind a small JSON API. By the end of this issue you will be able to:
 
 - start an HTTP server with nothing but `node:http`
 - send JSON with the right status, content type and length
@@ -21,7 +21,7 @@ That is two routes: `GET /health` and `GET /boats`. Everything else should get a
 
 `createServer` from `node:http` takes one function and calls it for every request with two objects. `req` describes what the client asked for: `req.method` is a string like `'GET'`, and `req.url` is everything after the host, query string included. `res` is the answer you build: a status, some headers and a body.
 
-The app in this lab is created by `createApp()`, which returns a server that is not listening yet. That split matters. `server.js` listens on a fixed port for you to try with `curl`, while `try.js` and the checks start the same app on port `0`, which asks the system for any free port, so nothing ever clashes.
+The app in this repo is created by `createApp()`, which returns a server that is not listening yet. That split matters. `server.js` listens on a fixed port for you to try with `curl`, while `try.js` and the checks start the same app on port `0`, which asks the system for any free port, so nothing ever clashes.
 
 ## A response is three parts
 

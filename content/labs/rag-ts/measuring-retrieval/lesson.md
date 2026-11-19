@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-The answer box works. The question now is how well, and whether a change makes it better or worse. By the end of this chapter you will be able to:
+The answer box works. The question now is how well, and whether a change makes it better or worse. By the end of this issue you will be able to:
 
 - build a small labelled set of questions for your own documents
 - compute hit rate and recall at k

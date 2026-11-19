@@ -3,7 +3,7 @@
   "title": "Your first model call",
   "files": ["src/ask.ts", "src/demo.ts"],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/demo.ts"
   },
   "tasks": [
@@ -28,7 +28,7 @@
       "id": "ask",
       "title": "Send the question and read the reply",
       "file": "src/ask.ts",
-      "description": "Implement `ask(question: string, client?: OpenAI): Promise<string>`.\n\n- Send one chat completion request through `client` with `model: MODEL` and `messages: buildMessages(question)`.\n- Return the text of the first choice's message. If the content is `null`, return an empty string.\n\nThe check asks two questions through the lab model and compares the text. It also calls `ask` with a fake client to make sure your request goes through the client you are given and names `MODEL`. The lab model starts its answer with \"Moss here.\" only when it sees the system message.",
+      "description": "Implement `ask(question: string, client?: OpenAI): Promise<string>`.\n\n- Send one chat completion request through `client` with `model: MODEL` and `messages: buildMessages(question)`.\n- Return the text of the first choice's message. If the content is `null`, return an empty string.\n\nThe check asks two questions through the local model and compares the text. It also calls `ask` with a fake client to make sure your request goes through the client you are given and names `MODEL`. The local model starts its answer with \"Moss here.\" only when it sees the system message.",
       "nextSteps": [
         "Call `client.chat.completions.create` with the model and the messages.",
         "Await the response and print it once to see its shape.",

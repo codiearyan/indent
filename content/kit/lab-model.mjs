@@ -1,4 +1,4 @@
-// The lab model: a deterministic, offline, OpenAI-compatible server.
+// The local model: a deterministic, offline, OpenAI-compatible server.
 // Each content/labs/<labId>/model.mjs may export:
 //   models:     { [name]: (request) => string | { content?: string, tool_calls?: [{ name, arguments }] } }
 //               A reply with tool_calls ends with finish_reason "tool_calls".
@@ -24,7 +24,7 @@ async function loadModels() {
       Object.assign(embeddings, lab.embeddings)
     } catch (err) {
       // One broken lab must not take the model away from every other lab.
-      process.stderr.write(`lab model: skipped ${entry.name}/model.mjs: ${err.message}\n`)
+      process.stderr.write(`local model: skipped ${entry.name}/model.mjs: ${err.message}\n`)
     }
   }
   return { models, embeddings }
@@ -119,7 +119,7 @@ async function chatCompletions(req, res) {
     return sendError(
       res,
       404,
-      `The model \`${request.model}\` does not exist on the lab model.`,
+      `The model \`${request.model}\` does not exist on the local model.`,
       'model_not_found'
     )
   }
@@ -169,7 +169,7 @@ async function createEmbeddings(req, res) {
     return sendError(
       res,
       404,
-      `The embedding model \`${request.model}\` does not exist on the lab model.`,
+      `The embedding model \`${request.model}\` does not exist on the local model.`,
       'model_not_found'
     )
   }
@@ -206,13 +206,13 @@ const server = createServer((req, res) => {
   }
   if (req.method === 'POST' && path === '/v1/chat/completions') {
     return chatCompletions(req, res).catch((err) => {
-      if (!res.headersSent) sendError(res, 500, `Lab model error: ${err.message}`, null, 'server_error')
+      if (!res.headersSent) sendError(res, 500, `Local model error: ${err.message}`, null, 'server_error')
       else res.end()
     })
   }
   if (req.method === 'POST' && path === '/v1/embeddings') {
     return createEmbeddings(req, res).catch((err) => {
-      if (!res.headersSent) sendError(res, 500, `Lab model error: ${err.message}`, null, 'server_error')
+      if (!res.headersSent) sendError(res, 500, `Local model error: ${err.message}`, null, 'server_error')
       else res.end()
     })
   }

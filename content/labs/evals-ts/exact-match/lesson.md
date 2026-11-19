@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Pebblebrook Plants sells houseplants online, and every support email goes through a small language model feature called triage. It reads the ticket and picks one queue: `shipping`, `refund`, `plant-care`, `account` or `other`. You are the developer who has to say whether a change to that feature is safe. By the end of this chapter you will be able to:
+Pebblebrook Plants sells houseplants online, and every support email goes through a small language model feature called triage. It reads the ticket and picks one queue: `shipping`, `refund`, `plant-care`, `account` or `other`. You are the developer who has to say whether a change to that feature is safe. By the end of this issue you will be able to:
 
 - keep a test set in a file and load it with clear errors when it is broken
 - compare a model's label to the expected one without being fooled by formatting
@@ -53,4 +53,4 @@ Two details matter. Use the model name you are given, because next you will run 
 
 ## Try it
 
-Run `node src/run.ts evals-triage-v1` once your three functions work. Then run it again with `evals-triage-v2`, the version Dev wants to ship. Look at the two lists of failures, not just the two numbers. You will come back to that difference in a later chapter.
+Run `node src/run.ts evals-triage-v1` once your three functions work. Then run it again with `evals-triage-v2`, the version Dev wants to ship. Look at the two lists of failures, not just the two numbers. You will come back to that difference in a later issue.

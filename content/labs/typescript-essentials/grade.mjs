@@ -1,9 +1,9 @@
-// Shared by every chapter's grader/checks.mjs: behavior cases plus the type checks.
+// Shared by every issue's grader/checks.mjs: behavior cases plus the type checks.
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { isDeepStrictEqual } from 'node:util'
 
-/** A sandbox holding the chapter's driver and the task's hidden type tests under .grader/. */
+/** A sandbox holding the issue's driver and the task's hidden type tests under .grader/. */
 export function prepare(t, task) {
   return t.sandbox({
     '.grader/drive.mjs': t.chapterPath('grader/drive.mjs'),

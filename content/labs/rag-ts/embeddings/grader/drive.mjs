@@ -1,4 +1,4 @@
-// Copied into the sandbox as .grader/drive.mjs. Wraps the lab model client to watch requests.
+// Copied into the sandbox as .grader/drive.mjs. Wraps the local model client to watch requests.
 import OpenAI from 'openai'
 import { embed, rank } from '../src/embed.ts'
 

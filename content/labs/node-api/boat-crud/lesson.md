@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Quotes work, and Luka's booking page shows real prices. The fleet itself is still a list typed into `fleet.js`. By the end of this chapter you will be able to:
+Quotes work, and Luka's booking page shows real prices. The fleet itself is still a list typed into `fleet.js`. By the end of this issue you will be able to:
 
 - keep data in memory behind a small store with a clear interface
 - map create, read, update and delete onto HTTP methods and paths

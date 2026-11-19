@@ -50,7 +50,7 @@ export async function getChapter(root: string, labId: string, chapterId: string)
   const lab = await readLab(root, labId)
   const order = lab.parts.flatMap((part) => part.chapters)
   const index = order.indexOf(chapterId)
-  if (index === -1) throw new Error(`Chapter ${chapterId} is not part of lab ${labId}`)
+  if (index === -1) throw new Error(`Issue ${chapterId} is not part of repo ${labId}`)
   const def = await readChapterDef(root, labId, chapterId)
   const lesson = await readFile(join(root, 'labs', labId, chapterId, 'lesson.md'), 'utf8')
   return {

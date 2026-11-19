@@ -1,4 +1,4 @@
-// The lab model's tokenizer: a token is a run of word characters or one punctuation character.
+// The local model's tokenizer: a token is a run of word characters or one punctuation character.
 const TOKEN = /\w+|[^\w\s]/g
 
 export function countTokens(text) {

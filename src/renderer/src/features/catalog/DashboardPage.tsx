@@ -102,10 +102,10 @@ export function DashboardPage(): React.JSX.Element {
         <Panel
           className="col-span-8"
           title="In progress"
-          action={{ to: '/labs', label: 'All labs' }}
+          action={{ to: '/labs', label: 'All repos' }}
         >
           {inProgress.length === 0 ? (
-            <Empty>Labs you start show up here.</Empty>
+            <Empty>Repos you start show up here.</Empty>
           ) : (
             <ul>
               {inProgress.slice(0, 3).map(({ lab, progress: p }) => (
@@ -113,7 +113,7 @@ export function DashboardPage(): React.JSX.Element {
                   key={lab.id}
                   lab={lab}
                   to={`/learn/${lab.id}/${p.nextChapterId}`}
-                  meta={`Chapter ${p.chaptersDone + 1} of ${p.chapterCount}`}
+                  meta={`Issue ${p.chaptersDone + 1} of ${p.chapterCount}`}
                   chapters={progress.chapters}
                 />
               ))}
@@ -123,7 +123,7 @@ export function DashboardPage(): React.JSX.Element {
         <Panel
           className="col-span-4"
           title="Last 4 months"
-          action={{ to: '/year', label: 'Year board' }}
+          action={{ to: '/year', label: 'Activity' }}
         >
           <div className="px-5 py-4">
             <Heatmap weeks={weeks} activity={progress.activity} />
@@ -134,9 +134,13 @@ export function DashboardPage(): React.JSX.Element {
           </div>
         </Panel>
 
-        <Panel className="col-span-8" title="Start next" action={{ to: '/paths', label: 'Paths' }}>
+        <Panel
+          className="col-span-8"
+          title="Start next"
+          action={{ to: '/paths', label: 'Roadmaps' }}
+        >
           {notStarted.length === 0 ? (
-            <Empty>You have started every lab.</Empty>
+            <Empty>You have started every repo.</Empty>
           ) : (
             <ul>
               {notStarted.slice(0, 3).map(({ lab, progress: p }) => (
@@ -144,7 +148,7 @@ export function DashboardPage(): React.JSX.Element {
                   key={lab.id}
                   lab={lab}
                   to={`/labs/${lab.id}`}
-                  meta={`${p.chapterCount} chapters, ${p.taskCount} tasks`}
+                  meta={`${p.chapterCount} issues, ${p.taskCount} tasks`}
                 />
               ))}
             </ul>
@@ -179,9 +183,9 @@ function UpNext({
   if (!lab || !chapter) {
     return (
       <section className="col-span-8 rounded-lg border border-border p-6">
-        <h2 className="text-base font-semibold">Every lab is finished</h2>
+        <h2 className="text-base font-semibold">Every repo is finished</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Nothing is waiting. The DSA patterns are still there to step through.
+          Nothing is waiting. The algorithm patterns are still there to step through.
         </p>
       </section>
     )
@@ -194,12 +198,12 @@ function UpNext({
         <div className="min-w-0 flex-1">
           <h2 className="truncate text-lg leading-6 font-semibold">{lab.title}</h2>
           <p className="mt-1 truncate text-sm text-muted-foreground">
-            Chapter {chapter.number}: {chapter.title}
+            Issue {chapter.number}: {chapter.title}
           </p>
         </div>
         <Button asChild>
           <Link to={`/learn/${lab.id}/${chapter.id}`}>
-            {started ? 'Continue' : 'Start lab'}
+            {started ? 'Continue' : 'Start repo'}
             <ArrowRight />
           </Link>
         </Button>
@@ -217,7 +221,7 @@ function UpNext({
         <p className="mt-2 text-xs text-muted-foreground tabular-nums">
           {row.progress.pointsEarned > 0 || started
             ? `${passedTasks(lab, chapters)} of ${row.progress.taskCount} tasks passed`
-            : `${row.progress.chapterCount} chapters, ${row.progress.taskCount} tasks. Each cell is one task.`}
+            : `${row.progress.chapterCount} issues, ${row.progress.taskCount} tasks. Each cell is one task.`}
         </p>
       </div>
     </section>
@@ -277,7 +281,7 @@ function Stats({
     { label: 'Level', value: level, note: `${span - into} points to level ${level + 1}` },
     { label: 'Points', value: totalPoints.toLocaleString('en-US') },
     { label: 'Streak', value: streak, unit: streak === 1 ? 'day' : 'days' },
-    { label: 'Chapters finished', value: chaptersDone, unit: `/ ${chapterCount}` }
+    { label: 'Issues finished', value: chaptersDone, unit: `/ ${chapterCount}` }
   ]
   return (
     <section
@@ -384,7 +388,7 @@ function Finished({
     .sort((a, b) => b.at.localeCompare(a.at))
     .slice(0, 3)
 
-  if (finished.length === 0) return <Empty>Chapters you finish show up here.</Empty>
+  if (finished.length === 0) return <Empty>Issues you finish show up here.</Empty>
   return (
     <ul>
       {finished.map(({ lab, chapter, at }) => (

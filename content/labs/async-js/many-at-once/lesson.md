@@ -6,7 +6,7 @@ Odile wants one page she can glance at from the wheelhouse before the first sail
 
 > **Odile:** Every route with its crossing time, which harbour radios are answering, and the forecast. But the forecast service sometimes just hangs. If it is not back in half a second, I would rather see nothing than wait.
 
-By the end of this chapter you can run many requests at the same time with `Promise.all`, keep going past failures with `Promise.allSettled`, and stop waiting with `Promise.race` and a timer.
+By the end of this issue you can run many requests at the same time with `Promise.all`, keep going past failures with `Promise.allSettled`, and stop waiting with `Promise.race` and a timer.
 
 ## Start first, wait once
 

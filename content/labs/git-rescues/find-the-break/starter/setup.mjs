@@ -1,4 +1,4 @@
-// Chapter 4: find the commit that broke it.
+// Issue 4: find the commit that broke it.
 //
 // Run `node setup.mjs` to build the scenario in ./repo. Running it again starts over.
 //

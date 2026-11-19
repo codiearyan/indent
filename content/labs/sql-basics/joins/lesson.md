@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Odile's questions now cross tables. An order row says `cafe_id = 9` and `driver_id = 3`, which means nothing to a cafe owner on the phone. The names live in other tables. By the end of this chapter you will be able to:
+Odile's questions now cross tables. An order row says `cafe_id = 9` and `driver_id = 3`, which means nothing to a cafe owner on the phone. The names live in other tables. By the end of this issue you will be able to:
 
 - combine two or more tables with INNER JOIN
 - keep rows that have no match with LEFT JOIN

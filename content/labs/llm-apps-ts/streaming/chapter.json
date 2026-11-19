@@ -3,7 +3,7 @@
   "title": "Streaming",
   "files": ["src/stream.ts", "src/demo.ts"],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/demo.ts"
   },
   "tasks": [
@@ -46,7 +46,7 @@
       "id": "stream-answer",
       "title": "Stream an answer from the model",
       "file": "src/stream.ts",
-      "description": "Implement `streamAnswer(question: string, onPartial, maxTokens = 200, client?: OpenAI): Promise<StreamResult>`.\n\n- Call `client.chat.completions.create` with `model: MODEL`, `stream: true`, `max_tokens: maxTokens` and `messages: buildMessages(question)`.\n- Pass the stream it returns to `collectStream` together with `onPartial`, and return the result.\n\nThe check streams an answer from the lab model and records every partial text, streams one with a small token limit that must end with `length`, and calls `streamAnswer` with a fake client to read the request you send.",
+      "description": "Implement `streamAnswer(question: string, onPartial, maxTokens = 200, client?: OpenAI): Promise<StreamResult>`.\n\n- Call `client.chat.completions.create` with `model: MODEL`, `stream: true`, `max_tokens: maxTokens` and `messages: buildMessages(question)`.\n- Pass the stream it returns to `collectStream` together with `onPartial`, and return the result.\n\nThe check streams an answer from the local model and records every partial text, streams one with a small token limit that must end with `length`, and calls `streamAnswer` with a fake client to read the request you send.",
       "nextSteps": [
         "Make the request with `stream: true` and the other options.",
         "Hand the result straight to collectStream.",

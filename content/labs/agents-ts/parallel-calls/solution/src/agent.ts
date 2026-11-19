@@ -1,6 +1,6 @@
 // Task 3: use parallel tool calls in the agent.
 //
-// runAgent is the loop from the last chapter. It runs the calls of each reply one after another,
+// runAgent is the loop from the last issue. It runs the calls of each reply one after another,
 // so three slow stock checks take three times as long as one. Answer each reply with
 // runToolCalls from parallel.ts instead, keeping one assistant message followed by its tool messages.
 // `node src/demo.ts` times a stock check.

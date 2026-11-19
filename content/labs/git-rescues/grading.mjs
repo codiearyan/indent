@@ -1,4 +1,4 @@
-// Read-only helpers the chapter graders share. They inspect <workspace>/repo with plain git.
+// Read-only helpers the issue graders share. They inspect <workspace>/repo with plain git.
 import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { devNull } from 'node:os'
@@ -38,7 +38,7 @@ export function openRepo(t) {
 
 export const noRepo = (names) => names.map((name) => ({ name, passed: false, message: NO_REPO }))
 
-/** Builds the untouched scenario from the chapter's own setup.mjs and maps commit subjects to hashes. */
+/** Builds the untouched scenario from the issue's own setup.mjs and maps commit subjects to hashes. */
 export async function reference(t) {
   const dir = await t.sandbox({ 'setup.mjs': t.chapterPath('starter/setup.mjs') })
   const run = await t.node(dir, ['setup.mjs'], { timeoutMs: 30000 })

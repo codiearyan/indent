@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-The booking types are in, and Dele has started deleting small helper functions that did the same thing for different kinds of data. By the end of this chapter you will be able to:
+The booking types are in, and Dele has started deleting small helper functions that did the same thing for different kinds of data. By the end of this issue you will be able to:
 
 - write a generic function whose result keeps the type of its input
 - limit a type parameter with `extends`, so the function can rely on some members

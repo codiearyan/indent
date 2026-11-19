@@ -1,4 +1,4 @@
-// Ready to use. Counts tokens the way the lab model does: a run of letters and digits is one token,
+// Ready to use. Counts tokens the way the local model does: a run of letters and digits is one token,
 // and so is each punctuation mark. Real tokenizers differ, but the idea is the same.
 
 export interface ChatMessage {

@@ -38,7 +38,7 @@ const pendingSaves = new Map<string, ReturnType<typeof setTimeout>>()
 export const useWorkspace = create<WorkspaceStore>()((set, get) => {
   const ids = (): [string, string] => {
     const chapter = get().chapter
-    if (!chapter) throw new Error('No chapter is open')
+    if (!chapter) throw new Error('No issue is open')
     return [chapter.labId, chapter.id]
   }
 

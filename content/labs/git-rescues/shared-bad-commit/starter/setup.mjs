@@ -1,4 +1,4 @@
-// Chapter 1: undo a commit everyone already has.
+// Issue 1: undo a commit everyone already has.
 //
 // Run `node setup.mjs` to build the scenario in ./repo (and its shared remote in ./.shared.git).
 // Running it again throws away your changes and starts the scenario over.

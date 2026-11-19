@@ -1,9 +1,28 @@
 # Indent
 
-A local-first Electron desktop app for hands-on coding labs. Each lab is a story: a small company has a
-problem and the learner is its developer. A chapter is a short lesson plus tasks; the learner writes
-code in the editor, runs it in a real terminal, and presses Check, which runs hidden tests and turns
-each task green or says in plain words what to look at. No accounts, no server: everything is on disk.
+A local-first Electron desktop app where developers learn by doing. Each repo is a story: a small
+company has a problem and the learner is its developer. A repo has issues; an issue is a short lesson
+plus tasks; the learner writes code in the editor, runs it in a real terminal, and presses Check,
+which runs hidden tests and turns each task green or says in plain words what to look at. No
+accounts, no server: everything is on disk.
+
+## Vocabulary
+
+Everything a person sees or hears (UI copy, errors, the tutor's prompt, README) uses the app's words.
+The code keeps its older names on purpose; do not rename them to match.
+
+| The app says      | The code says                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------- |
+| repo, repos       | lab: `labId`, `LabSummary`, `LabMeta`, `content/labs/`, `lab.json`, the `/labs` route |
+| issue, issues     | chapter: `chapterId`, `Chapter`, `ChapterDef`, `chapter.json`                         |
+| roadmap, roadmaps | path: `PathDef`, `paths.json`, the `/paths` route                                     |
+| local model       | lab model: `lab-model.mjs`, `labModel.ts`, `LAB_MODEL_URL`                            |
+| runtime           | `content/runtime/`, `RuntimeStatus`                                                   |
+| Activity          | year board: `YearBoardPage`, the `/year` route                                        |
+| Patterns          | DSA: `features/dsa/`, the `/dsa` route                                                |
+
+Tasks, checks, hints, points, levels, streak, Home, Tutor and Lesson keep their names. Copy should fit
+the picture: a repo has issues, an issue has tasks, tasks have checks ("Start repo", "Issue 2 of 5").
 
 ## Commands
 

@@ -128,7 +128,7 @@ export const checks = {
         passed: roomy.ok && same(roomy.value?.result, { text: full, finishReason: 'stop' }),
         message: roomy.value?.error
           ? 'streamAnswer threw. Read the error: a stream must be read with for await, not like a normal response.'
-          : 'streamAnswer should return the whole answer from the lab model and its finish reason.',
+          : 'streamAnswer should return the whole answer from the local model and its finish reason.',
         output: show(roomy)
       },
       {

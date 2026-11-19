@@ -1,4 +1,4 @@
-// Helpers shared by every chapter's grader/checks.mjs. Runs in the grader process, never in the workspace.
+// Helpers shared by every issue's grader/checks.mjs. Runs in the grader process, never in the workspace.
 import { fileURLToPath } from 'node:url'
 
 const harness = fileURLToPath(new URL('./harness.mjs', import.meta.url))

@@ -16,15 +16,15 @@ export function PathsPage(): React.JSX.Element {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-[22px] leading-7 font-semibold">Paths</h1>
+        <h1 className="text-[22px] leading-7 font-semibold">Roadmaps</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Labs in an order that builds on itself, one stage at a time.
+          Repos in an order that builds on itself, one stage at a time.
         </p>
       </header>
       {!labs || !paths || !progress ? (
         Array.from({ length: 2 }, (_, i) => <Skeleton key={i} className="h-80 w-full rounded-lg" />)
       ) : paths.length === 0 ? (
-        <EmptyState title="No paths are installed yet." />
+        <EmptyState title="No roadmaps are installed yet." />
       ) : (
         paths.map((path) => (
           <PathCard key={path.id} path={path} labs={labs} chapters={progress.chapters} />
@@ -77,7 +77,7 @@ function PathCard({
                       >
                         <span className="min-w-0 flex-1 truncate">{lab.title}</span>
                         <span className="w-24 shrink-0 text-right text-[13px] text-muted-foreground tabular-nums">
-                          {lab.chapters.length} {lab.chapters.length === 1 ? 'chapter' : 'chapters'}
+                          {lab.chapters.length} {lab.chapters.length === 1 ? 'issue' : 'issues'}
                         </span>
                         <BuildStrip lab={lab} chapters={chapters} className="w-[180px] shrink-0" />
                         <ChevronRight

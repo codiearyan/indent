@@ -20,7 +20,7 @@ export function DsaPage(): React.JSX.Element {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-[22px] leading-7 font-semibold">DSA patterns</h1>
+        <h1 className="text-[22px] leading-7 font-semibold">Patterns</h1>
         <p className="mt-1 text-sm text-muted-foreground tabular-nums">
           {patterns.length} patterns, {watchedCount} watched
         </p>

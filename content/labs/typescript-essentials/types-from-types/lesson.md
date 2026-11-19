@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-The booking model in `src/booking.ts` is settled. Around it, the old code has a dozen hand-written copies of the same shape: a booking without an id for the create form, a booking with only some members for the edit form, a count per level for the dashboard. By the end of this chapter you will be able to:
+The booking model in `src/booking.ts` is settled. Around it, the old code has a dozen hand-written copies of the same shape: a booking without an id for the create form, a booking with only some members for the edit form, a count per level for the dashboard. By the end of this issue you will be able to:
 
 - name the keys of a type with `keyof` and the type of one member with an indexed access type
 - derive new types with `Pick`, `Omit`, `Partial` and `Record`

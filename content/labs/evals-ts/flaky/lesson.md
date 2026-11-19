@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-So far every eval at Pebblebrook Plants gave the same answer each time you ran it. Real models do not always do that. With sampling turned on, the same ticket can land in a different queue on Tuesday than on Monday. By the end of this chapter you will be able to:
+So far every eval at Pebblebrook Plants gave the same answer each time you ran it. Real models do not always do that. With sampling turned on, the same ticket can land in a different queue on Tuesday than on Monday. By the end of this issue you will be able to:
 
 - run each case several times with a seed per run, so every result can be reproduced
 - give each case a pass rate and a clear status: stable pass, stable fail or flaky
@@ -18,7 +18,7 @@ One run of a sampling model is one draw. It tells you what can happen, not what 
 
 ## Seeds make randomness repeatable
 
-The lab model `evals-triage-v3` takes a `seed` in the request. For a given seed and input it always gives the same answer, but different seeds can give different answers on tickets that sit between two queues. A pot that arrived cracked with soil everywhere is both a refund and, if you squint, plant care.
+The local model `evals-triage-v3` takes a `seed` in the request. For a given seed and input it always gives the same answer, but different seeds can give different answers on tickets that sit between two queues. A pot that arrived cracked with soil everywhere is both a refund and, if you squint, plant care.
 
 Seeds turn "it sometimes fails" into "it fails on seed 4", which anyone on the team can rerun and look at. That is why every run in your report keeps its seed.
 
@@ -27,7 +27,7 @@ Seeds turn "it sometimes fails" into "it fails on seed 4", which anyone on the t
 Run a case five times and you get one of three pictures:
 
 - **stable pass**: all five passed. You can trust this case.
-- **stable fail**: none passed. A real, repeatable bug, just like in earlier chapters.
+- **stable fail**: none passed. A real, repeatable bug, just like in earlier issues.
 - **flaky**: some passed, some failed. The model is unsure, and customers will see both answers.
 
 Flaky does not mean "mostly fine". A case that fails one run in five sends one customer in five to the wrong queue. Do not round it up with a threshold.
@@ -48,7 +48,7 @@ The mean answers "how often is a random answer right". The stable pass rate answ
 
 ## How many runs?
 
-More runs catch rarer flakiness and cost more requests. One run cannot show flakiness at all, so the report refuses fewer than two. Five is a sensible default for a small set; raise it for the cases that matter most. Use the same seeds, 1 to `runs`, for every case and every model, so two reports can be compared case by case like in the last chapter.
+More runs catch rarer flakiness and cost more requests. One run cannot show flakiness at all, so the report refuses fewer than two. Five is a sensible default for a small set; raise it for the cases that matter most. Use the same seeds, 1 to `runs`, for every case and every model, so two reports can be compared case by case like in the last issue.
 
 ## Try it
 

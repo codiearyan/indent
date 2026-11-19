@@ -21,7 +21,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     anchor: TOUR.tasksTab,
     title: 'Tasks',
-    text: 'This is what you build in this chapter. A task turns green once your code passes its hidden checks.',
+    text: 'This is what you build in this issue. A task turns green once your code passes its hidden checks.',
     prepare: showLeft('tasks')
   },
   {
@@ -51,7 +51,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     anchor: TOUR.editorTabs,
     title: 'Your files',
-    text: 'The files this chapter is about. Switch between them here.'
+    text: 'The files this issue is about. Switch between them here.'
   },
   {
     anchor: TOUR.editor,
@@ -66,7 +66,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     anchor: TOUR.terminal,
     title: 'A real terminal',
-    text: 'A shell in your chapter folder. Run your code and explore. Checks do not need it.',
+    text: "A shell in this issue's folder. Run your code and explore. Checks do not need it.",
     prepare: showTerminal
   },
   {

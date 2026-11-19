@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Some bugs arrive quietly, inside a commit that looked harmless. Reading every diff by hand is slow. By the end of this chapter you will be able to:
+Some bugs arrive quietly, inside a commit that looked harmless. Reading every diff by hand is slow. By the end of this issue you will be able to:
 
 - use `git bisect` to find the first commit where a test fails
 - let `git bisect run` drive the search with a script

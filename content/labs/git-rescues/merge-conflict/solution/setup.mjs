@@ -1,4 +1,4 @@
-// Chapter 3: resolve a merge conflict.
+// Issue 3: resolve a merge conflict.
 //
 // Run `node setup.mjs` to build the scenario in ./repo. Running it again starts over.
 //

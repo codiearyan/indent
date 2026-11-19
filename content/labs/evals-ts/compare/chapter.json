@@ -11,7 +11,7 @@
     "src/run.ts"
   ],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/run.ts evals-triage-v1 evals-triage-v2"
   },
   "tasks": [

@@ -3,7 +3,7 @@
   "title": "Answers that change between runs",
   "files": ["src/stability.ts", "src/cases.ts", "src/triage.ts", "src/run.ts"],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/run.ts 5"
   },
   "tasks": [

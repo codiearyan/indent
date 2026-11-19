@@ -1,5 +1,5 @@
-// A ready-made embedding for lab models: texts that share words point the same way.
-// Deterministic and offline, which is all a lab about retrieval needs.
+// A ready-made embedding for the local model: texts that share words point the same way.
+// Deterministic and offline, which is all a repo about retrieval needs.
 
 const STOP = new Set('a an and are as at be by for from has in is it its of on or that the to was with'.split(' '))
 

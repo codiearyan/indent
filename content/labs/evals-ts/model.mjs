@@ -1,4 +1,4 @@
-// Lab model behavior for Pebblebrook Plants: ticket triage, reply drafts and a judge.
+// Local model behavior for Pebblebrook Plants: ticket triage, reply drafts and a judge.
 // Replies depend only on the request.
 
 export function hash(text) {

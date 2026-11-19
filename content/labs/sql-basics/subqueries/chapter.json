@@ -22,7 +22,7 @@
         "Write a query that returns the average price of one category.",
         "Use it as a subquery in WHERE for that one category.",
         "Make the subquery follow the category of the outer row.",
-        "Add the sort and compare with the averages from the previous chapter."
+        "Add the sort and compare with the averages from the previous issue."
       ],
       "hints": [
         "A subquery in parentheses that returns one value can stand anywhere a number can.",

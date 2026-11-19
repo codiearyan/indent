@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Your health check and fleet list are live, and the booking page can read them. Now it needs to send something back. By the end of this chapter you will be able to:
+Your health check and fleet list are live, and the booking page can read them. Now it needs to send something back. By the end of this issue you will be able to:
 
 - collect a request body from a stream, with a size limit
 - turn the body into JSON and refuse text that is not JSON

@@ -101,8 +101,8 @@ export function ChatPanel(): React.JSX.Element {
                 submit()
               }
             }}
-            placeholder="Ask about this chapter"
-            aria-label="Ask about this chapter"
+            placeholder="Ask about this issue"
+            aria-label="Ask about this issue"
             disabled={!provider || outOfMessages}
             className="max-h-40 min-h-16 resize-none border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent dark:bg-transparent"
           />
@@ -169,7 +169,7 @@ function EmptyState({
   return (
     <div className="flex flex-col gap-3 text-sm text-muted-foreground">
       <p>
-        Ask about this chapter: why a task fails, what a line does, or where to start. The tutor
+        Ask about this issue: why a task fails, what a line does, or where to start. The tutor
         guides you to the answer rather than writing it for you.
       </p>
       <p>It sees the lesson, the tasks, the file you have open and your latest check.</p>

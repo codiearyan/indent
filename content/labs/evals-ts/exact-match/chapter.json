@@ -3,7 +3,7 @@
   "title": "A test set and a pass rate",
   "files": ["src/cases.ts", "src/evaluate.ts", "src/triage.ts", "src/run.ts", "data/tickets.jsonl"],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/run.ts evals-triage-v1"
   },
   "tasks": [

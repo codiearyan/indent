@@ -1,4 +1,4 @@
-// Lab model behavior for the Kestrel Parcels support assistant. Replies depend only on the request.
+// Local model behavior for the Kestrel Parcels support assistant. Replies depend only on the request.
 import { countTokens } from '../../kit/tokens.mjs'
 
 export const CHAT_CONTEXT_TOKENS = 400

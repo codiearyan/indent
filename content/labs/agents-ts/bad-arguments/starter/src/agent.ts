@@ -1,7 +1,7 @@
 // Task 3: an agent that survives bad tool calls.
 //
 // toolSpecs(registry): turn the registry into the tools list the API expects, in registry order.
-// runAgent below is the loop from the last chapter. It trusts every call the model makes, so one
+// runAgent below is the loop from the last issue. It trusts every call the model makes, so one
 // made-up tool name or bad argument crashes the whole run. Send tools from toolSpecs and answer
 // every call with executeToolCall so the model sees its mistakes and can recover.
 // `node src/demo.ts` runs two reservations.

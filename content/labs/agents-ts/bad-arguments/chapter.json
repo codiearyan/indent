@@ -3,7 +3,7 @@
   "title": "Tools that fail politely",
   "files": ["src/registry.ts", "src/agent.ts", "src/tools.ts", "src/data.ts", "src/demo.ts"],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/demo.ts"
   },
   "tasks": [

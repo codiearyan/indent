@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Brindle Bakehouse bakes bread, pastries and cakes for cafes in four coastal towns. Tobias Venn runs the ovens and Odile Marsh runs everything else: deliveries, invoices and the phone. Every order lives in a small SQLite database, and until today the only way to get an answer from it was to ask the person who set it up years ago. You are the bakehouse's first developer. By the end of this chapter you will be able to:
+Brindle Bakehouse bakes bread, pastries and cakes for cafes in four coastal towns. Tobias Venn runs the ovens and Odile Marsh runs everything else: deliveries, invoices and the phone. Every order lives in a small SQLite database, and until today the only way to get an answer from it was to ask the person who set it up years ago. You are the bakehouse's first developer. By the end of this issue you will be able to:
 
 - pick the columns you want from a table and rename them
 - keep only the rows that match a condition, using comparisons, AND, OR, IN and LIKE

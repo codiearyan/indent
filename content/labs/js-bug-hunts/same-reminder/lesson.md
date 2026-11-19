@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Cinderbay started sending a text to each customer shortly before their boat is ready. The code was copied from an old script on the till. By the end of this chapter you will be able to:
+Cinderbay started sending a text to each customer shortly before their boat is ready. The code was copied from an old script on the till. By the end of this issue you will be able to:
 
 - explain what a closure captures: a variable, not the value it had
 - explain why `var` in a loop gives every callback the last value
