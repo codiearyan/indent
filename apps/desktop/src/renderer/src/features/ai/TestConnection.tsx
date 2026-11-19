@@ -32,14 +32,16 @@ export function TestConnection({ className }: { className?: string }): React.JSX
         disabled={state.status === 'testing'}
         onClick={() => void run()}
       >
-        {state.status === 'testing' && <Loader2 className="animate-spin" />}
+        {state.status === 'testing' && (
+          <Loader2 className="animate-spin motion-reduce:animate-none" />
+        )}
         {state.status === 'testing'
           ? 'Testing'
           : state.status === 'error'
             ? 'Try again'
             : 'Test connection'}
       </Button>
-      <p aria-live="polite" className="text-[13px] empty:hidden">
+      <p aria-live="polite" className="text-[13px]">
         {state.status === 'ok' && (
           <span className="motion-enter flex gap-2">
             <Check className="mt-0.5 size-4 shrink-0 text-success" strokeWidth={2} aria-hidden />

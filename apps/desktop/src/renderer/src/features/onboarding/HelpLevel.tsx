@@ -54,7 +54,9 @@ export function HelpLevel({ staged }: { staged: boolean }): React.JSX.Element {
       >
         {LEVELS.map(({ value, title, text }) => (
           <ChoiceCard key={value} value={value} title={title}>
-            <Demo key={plays[value]} level={value} />
+            <div aria-hidden="true">
+              <Demo key={plays[value]} level={value} />
+            </div>
             <p className="text-[13px] leading-5 text-muted-foreground">{text}</p>
           </ChoiceCard>
         ))}

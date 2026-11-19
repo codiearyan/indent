@@ -68,6 +68,7 @@ export function HowItWorks({ staged }: { staged: boolean }): React.JSX.Element {
         value={point}
         onValueChange={(value) => setPoint(value as Point)}
         onPointerDown={takeOver}
+        onFocusCapture={takeOver}
         onKeyDown={(e) => /^(Arrow|Home|End)/.test(e.key) && takeOver()}
         className="grid grid-cols-[280px_1fr] items-stretch gap-6"
       >
