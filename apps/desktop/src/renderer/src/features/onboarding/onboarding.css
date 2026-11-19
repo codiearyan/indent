@@ -181,3 +181,33 @@ html:active-view-transition-type(onboarding-finish) {
     transition-delay: 0s !important;
   }
 }
+
+/* Code scene: lines type in whole characters, output follows. */
+.ob-type {
+  display: inline-block;
+  overflow: hidden;
+  white-space: pre;
+  vertical-align: top;
+  /* One spare step: Chromium holds a steps() animation one step short at its end. */
+  width: calc((var(--chars) + 1) * 1ch);
+  animation-name: ob-type;
+  animation-timing-function: steps(var(--steps), end);
+  animation-fill-mode: both;
+}
+
+@keyframes ob-type {
+  from {
+    width: 0;
+  }
+}
+
+.ob-appear {
+  animation: ob-appear var(--motion-enter) var(--ease-out) both;
+}
+
+@keyframes ob-appear {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
