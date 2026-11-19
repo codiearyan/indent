@@ -1,0 +1,65 @@
+{
+  "id": "chunking",
+  "title": "Cutting the handbook into chunks",
+  "files": ["src/chunk.ts", "src/handbook.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo chunks the Saltmarsh handbook with your code.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "split",
+      "title": "Split text into whole-word chunks",
+      "file": "src/chunk.ts",
+      "description": "Implement `chunkText(text, size)` in `src/chunk.ts`. It returns a `string[]` of chunks:\n\n- Words are separated by any whitespace (spaces, tabs, line breaks). A chunk is its words joined by single spaces.\n- Fill each chunk with as many words as fit in `size` characters, then start the next chunk.\n- Never cut a word. A single word longer than `size` becomes a chunk on its own.\n- Blank text gives `[]`.\n\nThe check calls `chunkText` with no overlap on handbook articles and on short edge cases (messy whitespace, a very long word, blank text) and compares the chunks.",
+      "nextSteps": [
+        "Run `node src/demo.ts` and read the error for chunkText.",
+        "Split the text into words and drop the empty ones.",
+        "Walk the words, adding each to the current chunk while it still fits.",
+        "Run the demo again and check no chunk is longer than 80 characters."
+      ],
+      "hints": [
+        "Work with a list of words, not with character positions. Then a word can never be cut.",
+        "A chunk's length is the sum of its word lengths plus one space between each pair of words.",
+        "Start a new chunk when the current length + 1 + the next word's length is more than size. A chunk always takes at least its first word, even when that word alone is too long."
+      ],
+      "points": 10
+    },
+    {
+      "id": "overlap",
+      "title": "Overlap neighbouring chunks",
+      "file": "src/chunk.ts",
+      "description": "Add the `overlap` parameter to `chunkText(text, size, overlap = 0)`.\n\n- After a chunk, the next chunk starts by repeating the last words of that chunk, as many as fit in `overlap` characters (counting single spaces between them). Then it fills up to `size` as before.\n- Never carry the whole previous chunk, so every chunk starts at least one word later than the one before.\n- Stop once a chunk ends with the last word of the text.\n- Throw an `Error` when `size` is below 1, `overlap` is negative, or `overlap` is not smaller than `size`.\n\nThe check compares your chunks on handbook articles and small word lists, makes sure the function always finishes, and tries the invalid settings.",
+      "nextSteps": [
+        "Validate the arguments at the top of the function.",
+        "After building a chunk, work out which word the next chunk starts from.",
+        "Walk backwards from the end of the chunk while the carried words still fit in overlap.",
+        "Run the demo and compare the 80 and 80/20 outputs."
+      ],
+      "hints": [
+        "Keep a start index into the words list. Each chunk is words from start up to some end.",
+        "Walking backwards from the chunk's end, count the carried length the same way you count a chunk: word lengths plus single spaces.",
+        "The next start must stay greater than the current start. Stop walking back one word before you reach it, and stop the loop when end reaches the last word."
+      ],
+      "points": 10
+    },
+    {
+      "id": "docs",
+      "title": "Keep where each chunk came from",
+      "file": "src/chunk.ts",
+      "description": "Implement `chunkDocs(docs, size, overlap = 0)` in `src/chunk.ts`. It chunks every document with `chunkText` and returns a flat `Chunk[]` in document order. Each chunk is:\n\n```ts\n{ id: 'weather#2', source: 'weather', index: 2, text: '...' }\n```\n\n- `source` is the document's `id`.\n- `index` is the chunk's position inside its own document, starting at 0 for every document.\n- `id` is `'<source>#<index>'`, unique across the whole handbook.\n- A document with empty text has no chunks.\n\nThe check uses a few hidden documents and the full handbook, and type-checks `src/chunk.ts`.",
+      "nextSteps": [
+        "Call chunkText once for each document.",
+        "Turn each chunk string into a Chunk object with its metadata.",
+        "Flatten the per-document lists into one list.",
+        "Run the demo and read the chunk counts per document."
+      ],
+      "hints": [
+        "The array method that maps and flattens in one step fits this well.",
+        "The second argument of a map callback is the position, which is exactly the index you need.",
+        "For each doc, map the strings chunkText gives you to objects, building the id from the doc's id, a # and the position."
+      ],
+      "points": 10
+    }
+  ]
+}

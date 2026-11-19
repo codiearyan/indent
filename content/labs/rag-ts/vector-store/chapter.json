@@ -1,0 +1,64 @@
+{
+  "id": "vector-store",
+  "title": "A tiny vector store",
+  "files": ["src/store.ts", "src/demo.ts", "src/embed.ts", "src/chunk.ts", "src/handbook.ts"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo indexes the handbook and searches it with your store.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "index",
+      "title": "Index the chunks",
+      "file": "src/store.ts",
+      "description": "Implement `indexChunks(chunks, client)` in `src/store.ts`. It returns `Promise<Entry[]>`, one `{ chunk, vector }` per chunk, in the same order:\n\n- `chunk` is the chunk object, unchanged.\n- `vector` is the embedding of `chunk.text`.\n- Embed all the texts with one call to `embed` from `embed.ts`, which already batches them (29 chunks take 2 requests).\n- An empty list gives `[]`.\n\nThe check indexes the handbook at chunk size 200 with overlap 40 and watches the requests you send.",
+      "nextSteps": [
+        "Run `node src/demo.ts` and read the error for indexChunks.",
+        "Collect the text of every chunk and embed them in one call.",
+        "Pair each chunk with the vector at the same position.",
+        "Run the demo and check how many chunks were indexed."
+      ],
+      "hints": [
+        "embed() from embed.ts is already written and returns vectors in the order of its texts.",
+        "Calling embed inside a loop would send one request per chunk. Build the list of texts first.",
+        "After one embed call over all texts, a map over chunks with its position gives you each { chunk, vector }."
+      ],
+      "points": 10
+    },
+    {
+      "id": "search",
+      "title": "Search for the top k",
+      "file": "src/store.ts",
+      "description": "Implement `search(index, question, k, minScore = 0, client)` in `src/store.ts`. It returns `Promise<Hit[]>`:\n\n- Embed the question with one request. The index already holds the chunk vectors.\n- Score every entry with `cosine(questionVector, entry.vector)`.\n- Return the best `k` as `{ chunk, score }`, highest score first. `k` larger than the index returns everything; `k` of 0 returns `[]`.\n- Do not reorder or change `index` itself.\n\nLeave `minScore` for the next task. The check searches the handbook for several questions and values of `k` and compares chunk ids and scores.",
+      "nextSteps": [
+        "Embed the question and keep its vector.",
+        "Turn every entry into a hit with its score.",
+        "Sort the hits and keep the first k.",
+        "Run the demo and read the top 3 for each question."
+      ],
+      "hints": [
+        "embed() takes a list, so wrap the question in an array and take the first vector back.",
+        "Array.prototype.sort changes the array it is called on. Make sure that array is your new list of hits, not the index.",
+        "Map entries to { chunk, score }, sort by score from high to low, then slice from 0 to k."
+      ],
+      "points": 10
+    },
+    {
+      "id": "cutoff",
+      "title": "Say nothing when nothing matches",
+      "file": "src/store.ts",
+      "description": "Top k always returns k chunks, even for a question the handbook never mentions. Use the `minScore` parameter of `search`:\n\n- Drop every hit whose score is below `minScore`. A score equal to `minScore` stays.\n- Then return at most `k` of what is left, highest first.\n- With the default `minScore` of 0, nothing changes.\n\nThe check asks about surfboards (every chunk scores below 0.2), checks a question that keeps only some of its hits at 0.2, tries a cut-off equal to the best score, and type-checks `src/store.ts`.",
+      "nextSteps": [
+        "Run the demo and compare the two blocks of results.",
+        "Filter the hits by score before you take the top k.",
+        "Run the demo again: the surfboard question should find nothing at 0.2."
+      ],
+      "hints": [
+        "Filtering before or after sorting gives the same hits; filtering before slicing is what matters.",
+        "Read the task again for the word 'equal'.",
+        "Add a filter that keeps hits with score >= minScore, between building the hits and slicing to k."
+      ],
+      "points": 10
+    }
+  ]
+}

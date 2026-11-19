@@ -1,0 +1,74 @@
+{
+  "id": "measuring-retrieval",
+  "title": "Measuring retrieval",
+  "files": [
+    "src/metrics.ts",
+    "src/evaluate.ts",
+    "src/config.ts",
+    "src/sweep.ts",
+    "src/labelled.ts",
+    "src/store.ts",
+    "src/embed.ts",
+    "src/chunk.ts",
+    "src/handbook.ts"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the sweep measures retrieval on the labelled questions.",
+    "suggestedCommand": "node src/sweep.ts"
+  },
+  "tasks": [
+    {
+      "id": "metrics",
+      "title": "Hit rate and recall at k",
+      "file": "src/metrics.ts",
+      "description": "Implement two functions in `src/metrics.ts`. Each takes `results: Retrieval[]`, where a `Retrieval` is `{ expected, retrieved }`: the article ids that answer a question, and the article ids of its hits in rank order (repeats are possible). Only the first `k` retrieved ids count.\n\n- `hitRate(results, k)`: the share of questions with at least one expected id in the top `k`.\n- `recallAtK(results, k)`: for each question, the share of its expected ids found in the top `k`, counting each id once; then the average over all questions.\n- Both return `0` for an empty list.\n\nThe check runs both on a hidden set of results at several values of `k`, including repeated ids and an empty list.",
+      "nextSteps": [
+        "Work out the hit rate and recall of a two-question example on paper.",
+        "Write hitRate with the top k ids of each question.",
+        "Write recallAtK the same way, one score per question, then average.",
+        "Handle the empty list in both."
+      ],
+      "hints": [
+        "Slicing retrieved from 0 to k gives the ids that count.",
+        "A question that expects two articles and finds one has recall 0.5 and is still a hit.",
+        "Put the top k ids in a Set and count how many expected ids it has. That way a repeated id cannot count twice."
+      ],
+      "points": 10
+    },
+    {
+      "id": "evaluate",
+      "title": "Run the labelled questions",
+      "file": "src/evaluate.ts",
+      "description": "Implement `evaluate(settings, questions = labelled, client)` in `src/evaluate.ts`. It returns `Promise<{ hitRate, recall }>`:\n\n- Chunk the handbook with `settings.chunkSize` and `settings.overlap` and index the chunks.\n- Search each question with `settings.k` and no minimum score.\n- Build one `Retrieval` per question: `expected` from the label, `retrieved` as the `source` of each hit (the article id, not the chunk id), in rank order.\n- Return `hitRate` and `recallAtK` of those results at `settings.k`.\n\nUse the parameters, not the values in `config.ts`. The check compares your scores with the correct ones for several settings and for a shorter list of questions.",
+      "nextSteps": [
+        "Build the index once from the settings.",
+        "Loop over the questions and search each one.",
+        "Map each question's hits to article ids.",
+        "Return both metrics and run `node src/sweep.ts`."
+      ],
+      "hints": [
+        "chunkDocs, indexChunks and search are already in the workspace and work as in earlier chapters.",
+        "Labels name articles, such as 'weather'. A chunk id like 'weather#1' never equals 'weather', which would make every score 0.",
+        "For each question, keep its expected list next to the source of each of its hits. After the loop, pass all of them and settings.k to both metrics."
+      ],
+      "points": 10
+    },
+    {
+      "id": "tune",
+      "title": "Find and fix the bad setting",
+      "file": "src/config.ts",
+      "description": "The answer box runs with the settings in `src/config.ts`, and one of them is hurting retrieval. Use `node src/sweep.ts` to measure, then fix `config.ts`.\n\nTeam limits:\n\n- `TOP_K` from 1 to 3: the prompt has room for three passages.\n- `CHUNK_SIZE` from 1 to 500 characters.\n- `CHUNK_OVERLAP` from 0 up to less than `CHUNK_SIZE`.\n\nGoal: every labelled question finds all of its articles, so hit rate and recall are both 100%. The check measures your settings with a correct `evaluate`, and type-checks `config.ts`, `evaluate.ts` and `metrics.ts`.",
+      "nextSteps": [
+        "Run `node src/sweep.ts` and read the line for config.ts.",
+        "Compare it with the rows of the grid below it.",
+        "Change the setting the numbers point at, and run the sweep again."
+      ],
+      "hints": [
+        "TOP_K is already at the team limit, so the fix is not a bigger k.",
+        "Read the chunks that 20 characters gives you in your head: how many words fit in one?",
+        "Pick a chunk size, with some overlap, whose k=3 column reads 100% for both numbers, then run the sweep to confirm it."
+      ],
+      "points": 10
+    }
+  ]
+}

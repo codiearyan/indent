@@ -1,0 +1,13 @@
+{
+  "id": "rag-ts",
+  "title": "Retrieval from scratch",
+  "description": "Saltmarsh Paddle Co. hires kayaks from a harbour quay, and its front desk answers the same handbook questions all summer. Build their answer box by hand: chunk the handbook, embed it, search it, answer with cited sources, and measure whether retrieval really works.",
+  "category": "AI engineering",
+  "language": "typescript",
+  "tags": ["TypeScript", "AI"],
+  "kind": "lab",
+  "parts": [
+    { "title": "Turning the handbook into vectors", "chapters": ["chunking", "embeddings", "vector-store"] },
+    { "title": "Answering and measuring", "chapters": ["grounded-answers", "measuring-retrieval"] }
+  ]
+}
