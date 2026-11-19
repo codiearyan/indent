@@ -100,6 +100,12 @@ Lab model: `node content/kit/lab-model.mjs` prints `{"port":N}` as its first std
 `POST /v1/chat/completions` on 127.0.0.1. Learner code reaches it with `new OpenAI()` because the
 environment sets `OPENAI_BASE_URL`, `OPENAI_API_KEY` and `LAB_MODEL_URL`.
 
+A lab gives the model its behavior in `content/labs/<labId>/model.mjs`: `models` maps a model name to
+a function from the request to the reply (a string, or `{ content, tool_calls }` for tool calling),
+and `embeddings` maps an embedding model name to a function from text to a vector (`kit/embed.mjs`
+has a ready-made one). It also serves `POST /v1/embeddings`. Prefix model names with the lab's own
+name so labs never collide.
+
 ## DSA patterns
 
 `features/dsa/` holds the animated algorithm patterns. A pattern is data and logic with no React:

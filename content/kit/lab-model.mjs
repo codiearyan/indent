@@ -1,5 +1,8 @@
 // The lab model: a deterministic, offline, OpenAI-compatible server.
-// Each content/labs/<labId>/model.mjs exports `models`: { [name]: (request) => string }.
+// Each content/labs/<labId>/model.mjs may export:
+//   models:     { [name]: (request) => string | { content?: string, tool_calls?: [{ name, arguments }] } }
+//               A reply with tool_calls ends with finish_reason "tool_calls".
+//   embeddings: { [name]: (text) => number[] }   (see embed.mjs for a ready-made one)
 // A model function may throw an Error with `status` and `code` to answer with that API error.
 import { createServer } from 'node:http'
 import { readdirSync, existsSync } from 'node:fs'
@@ -11,16 +14,23 @@ const labsDir = fileURLToPath(new URL('../labs/', import.meta.url))
 
 async function loadModels() {
   const models = {}
+  const embeddings = {}
   for (const entry of readdirSync(labsDir, { withFileTypes: true })) {
     const file = join(labsDir, entry.name, 'model.mjs')
-    if (entry.isDirectory() && existsSync(file)) {
-      Object.assign(models, (await import(pathToFileURL(file).href)).models)
+    if (!entry.isDirectory() || !existsSync(file)) continue
+    try {
+      const lab = await import(pathToFileURL(file).href)
+      Object.assign(models, lab.models)
+      Object.assign(embeddings, lab.embeddings)
+    } catch (err) {
+      // One broken lab must not take the model away from every other lab.
+      process.stderr.write(`lab model: skipped ${entry.name}/model.mjs: ${err.message}\n`)
     }
   }
-  return models
+  return { models, embeddings }
 }
 
-const models = await loadModels()
+const { models, embeddings } = await loadModels()
 let counter = 0
 
 function sendJson(res, status, body) {
@@ -45,8 +55,23 @@ function promptTokens(messages) {
   return messages.reduce((sum, m) => sum + countTokens(typeof m.content === 'string' ? m.content : ''), 0)
 }
 
+// Ids depend only on the conversation so far, so a run is the same every time.
+function toolCalls(request, calls) {
+  const earlier = (request.messages ?? []).flatMap((m) => m.tool_calls ?? []).length
+  return calls.map((call, i) => ({
+    id: `call_lab_${earlier + i + 1}`,
+    type: 'function',
+    function: {
+      name: call.name,
+      arguments: typeof call.arguments === 'string' ? call.arguments : JSON.stringify(call.arguments ?? {})
+    }
+  }))
+}
+
 function complete(request) {
-  const full = models[request.model](request)
+  const reply = models[request.model](request)
+  const full = typeof reply === 'string' ? reply : (reply.content ?? '')
+  const calls = typeof reply === 'string' ? [] : (reply.tool_calls ?? [])
   const limit = request.max_completion_tokens ?? request.max_tokens
   const cut = limit == null ? full : truncateTokens(full, limit)
   const usage = {
@@ -54,10 +79,12 @@ function complete(request) {
     completion_tokens: countTokens(cut)
   }
   usage.total_tokens = usage.prompt_tokens + usage.completion_tokens
-  return { text: cut, finishReason: cut === full ? 'stop' : 'length', usage }
+  if (cut !== full) return { text: cut, finishReason: 'length', usage }
+  if (calls.length === 0) return { text: cut, finishReason: 'stop', usage }
+  return { text: cut, toolCalls: toolCalls(request, calls), finishReason: 'tool_calls', usage }
 }
 
-function streamReply(res, base, { text, finishReason, usage }, includeUsage) {
+function streamReply(res, base, { text, toolCalls, finishReason, usage }, includeUsage) {
   res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' })
   const chunk = (delta, finish_reason = null) => ({
     ...base,
@@ -67,6 +94,15 @@ function streamReply(res, base, { text, finishReason, usage }, includeUsage) {
   const write = (obj) => res.write(`data: ${JSON.stringify(obj)}\n\n`)
   write(chunk({ role: 'assistant', content: '' }))
   for (const piece of text.match(/\S+\s*|\s+/g) ?? []) write(chunk({ content: piece }))
+  // Like the real API: the name first, then the arguments in pieces the client must join.
+  for (const [index, call] of (toolCalls ?? []).entries()) {
+    const { arguments: args, name } = call.function
+    const half = Math.ceil(args.length / 2)
+    write(chunk({ tool_calls: [{ index, id: call.id, type: 'function', function: { name, arguments: '' } }] }))
+    for (const part of [args.slice(0, half), args.slice(half)]) {
+      if (part) write(chunk({ tool_calls: [{ index, function: { arguments: part } }] }))
+    }
+  }
   write(chunk({}, finishReason))
   if (includeUsage) write({ ...base, object: 'chat.completion.chunk', choices: [], usage })
   res.end('data: [DONE]\n\n')
@@ -107,7 +143,12 @@ async function chatCompletions(req, res) {
     choices: [
       {
         index: 0,
-        message: { role: 'assistant', content: reply.text, refusal: null },
+        message: {
+          role: 'assistant',
+          content: reply.toolCalls && !reply.text ? null : reply.text,
+          refusal: null,
+          ...(reply.toolCalls ? { tool_calls: reply.toolCalls } : {})
+        },
         logprobs: null,
         finish_reason: reply.finishReason
       }
@@ -116,16 +157,61 @@ async function chatCompletions(req, res) {
   })
 }
 
+async function createEmbeddings(req, res) {
+  let request
+  try {
+    request = JSON.parse(await readBody(req))
+  } catch {
+    return sendError(res, 400, 'The request body is not valid JSON.', 'invalid_json')
+  }
+  const embed = embeddings[request.model]
+  if (!embed) {
+    return sendError(
+      res,
+      404,
+      `The embedding model \`${request.model}\` does not exist on the lab model.`,
+      'model_not_found'
+    )
+  }
+  const inputs = Array.isArray(request.input) ? request.input : [request.input]
+  if (inputs.some((input) => typeof input !== 'string' || input === '')) {
+    return sendError(res, 400, 'Each input must be a non-empty string.', 'invalid_input')
+  }
+  // The OpenAI client asks for base64 by default: the raw bytes of 32-bit floats.
+  const encode = (vector) =>
+    request.encoding_format === 'base64'
+      ? Buffer.from(new Float32Array(vector).buffer).toString('base64')
+      : vector
+  const tokens = inputs.reduce((sum, input) => sum + countTokens(input), 0)
+  sendJson(res, 200, {
+    object: 'list',
+    data: inputs.map((input, index) => ({ object: 'embedding', index, embedding: encode(embed(input)) })),
+    model: request.model,
+    usage: { prompt_tokens: tokens, total_tokens: tokens }
+  })
+}
+
 const server = createServer((req, res) => {
   const path = req.url.split('?')[0].replace(/\/+$/, '')
   if (req.method === 'GET' && path === '/v1/models') {
     return sendJson(res, 200, {
       object: 'list',
-      data: Object.keys(models).map((id) => ({ id, object: 'model', created: 1700000000, owned_by: 'lab' }))
+      data: [...Object.keys(models), ...Object.keys(embeddings)].map((id) => ({
+        id,
+        object: 'model',
+        created: 1700000000,
+        owned_by: 'lab'
+      }))
     })
   }
   if (req.method === 'POST' && path === '/v1/chat/completions') {
     return chatCompletions(req, res).catch((err) => {
+      if (!res.headersSent) sendError(res, 500, `Lab model error: ${err.message}`, null, 'server_error')
+      else res.end()
+    })
+  }
+  if (req.method === 'POST' && path === '/v1/embeddings') {
+    return createEmbeddings(req, res).catch((err) => {
       if (!res.headersSent) sendError(res, 500, `Lab model error: ${err.message}`, null, 'server_error')
       else res.end()
     })
