@@ -24,7 +24,7 @@ export function InputPanel({
 
   return (
     <form
-      className="space-y-4 border-t border-border pt-5"
+      className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault()
         run(values)

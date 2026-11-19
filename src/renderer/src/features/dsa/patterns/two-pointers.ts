@@ -120,7 +120,7 @@ Each step throws away one value for good, so the two pointers meet after at most
     { name: 'target', label: 'Target sum' }
   ],
   presets: [
-    { label: 'A pair exists', values: { nums: '1, 3, 4, 6, 8, 11, 13', target: '14' } },
+    { label: 'A pair exists', values: { nums: '1, 3, 4, 6, 8, 11, 13', target: '10' } },
     { label: 'No pair', values: { nums: '2, 5, 9, 12', target: '13' } },
     { label: 'Duplicates', values: { nums: '1, 2, 2, 4, 7', target: '4' } }
   ],

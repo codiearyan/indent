@@ -70,13 +70,18 @@ export function TreeView({ frame }: { frame: TreeFrame }): React.JSX.Element {
                 className={MOVE}
                 style={{ transform: `translate(${at.x}px, ${at.y}px)` }}
               >
-                <circle r={R} className="fill-card" />
-                <circle r={R} className={cn(MOVE, toneShape[tone])} strokeWidth={1.5} />
+                <NodeShape label={String(node.value)} className="fill-card" />
+                <NodeShape
+                  label={String(node.value)}
+                  className={cn(MOVE, toneShape[tone])}
+                  strokeWidth={1.5}
+                />
                 <text
                   textAnchor="middle"
                   dominantBaseline="central"
                   className={cn(
-                    'font-mono text-[13px]',
+                    'font-mono',
+                    String(node.value).length > 3 ? 'text-[11px]' : 'text-[13px]',
                     MOVE,
                     tone === 'muted' ? 'fill-muted-foreground' : 'fill-foreground'
                   )}
@@ -104,4 +109,13 @@ export function TreeView({ frame }: { frame: TreeFrame }): React.JSX.Element {
       )}
     </div>
   )
+}
+
+/** A circle for short labels; a pill that grows with the text for longer ones. */
+function NodeShape({
+  label,
+  ...props
+}: { label: string } & React.SVGProps<SVGRectElement>): React.JSX.Element {
+  const width = Math.max(2 * R, label.length * 7 + 14)
+  return <rect x={-width / 2} y={-R} width={width} height={2 * R} rx={R} {...props} />
 }

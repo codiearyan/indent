@@ -45,6 +45,11 @@ function build(values: Record<string, string>): Step[] {
   const done = new Set<number>()
   const steps: Step[] = []
   let shown = input.map((_, k) => k)
+  // Both number lines share one scale, so a merged interval sits right under its sources.
+  const domain = {
+    min: Math.min(...input.map(([start]) => start)),
+    max: Math.max(...input.map(([, end]) => end))
+  }
 
   const snapshot = (
     lines: number[],
@@ -58,6 +63,7 @@ function build(values: Record<string, string>): Step[] {
         {
           kind: 'intervals',
           label: 'intervals',
+          domain,
           items: shown.map((k) => ({
             key: `in${k}`,
             start: input[k][0],
@@ -69,6 +75,7 @@ function build(values: Record<string, string>): Step[] {
         {
           kind: 'intervals',
           label: 'merged',
+          domain,
           items: merged.map((interval, m) => ({
             key: `m${m}`,
             start: interval[0],

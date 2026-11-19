@@ -51,6 +51,8 @@ export interface MapFrame {
 export interface IntervalsFrame {
   kind: 'intervals'
   label?: string
+  /** Fixes the number line. Without it the line fits the items, so it rescales as they change. */
+  domain?: { min: number; max: number }
   items: { key: string; start: number; end: number; label?: string; tone?: Tone }[]
 }
 

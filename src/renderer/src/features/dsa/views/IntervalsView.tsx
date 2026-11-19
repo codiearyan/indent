@@ -16,8 +16,10 @@ function ticksFor(min: number, max: number): number[] {
 
 export function IntervalsView({ frame }: { frame: IntervalsFrame }): React.JSX.Element {
   const { items } = frame
-  const min = items.length ? Math.min(...items.map((item) => item.start)) : 0
-  const rawMax = items.length ? Math.max(...items.map((item) => item.end)) : 1
+  const starts = items.map((item) => item.start)
+  const ends = items.map((item) => item.end)
+  const min = frame.domain?.min ?? (items.length ? Math.min(...starts) : 0)
+  const rawMax = frame.domain?.max ?? (items.length ? Math.max(...ends) : 1)
   const max = rawMax > min ? rawMax : min + 1
   const pct = (value: number): string => `${((value - min) / (max - min)) * 100}%`
   const ticks = ticksFor(min, max)

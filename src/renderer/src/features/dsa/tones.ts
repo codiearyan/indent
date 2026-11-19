@@ -24,7 +24,7 @@ export const toneText: Record<Tone | 'none', string> = {
 
 /** SVG shapes: tree and graph nodes. */
 export const toneShape: Record<Tone | 'none', string> = {
-  none: 'fill-card stroke-border',
+  none: 'fill-card stroke-muted-foreground/50',
   active: 'fill-brand/15 stroke-brand',
   compare: 'fill-warning/15 stroke-warning',
   good: 'fill-success/15 stroke-success',
@@ -34,7 +34,7 @@ export const toneShape: Record<Tone | 'none', string> = {
 
 /** SVG lines: tree and graph edges, list links. */
 export const toneLine: Record<Tone | 'none', string> = {
-  none: 'stroke-border',
+  none: 'stroke-muted-foreground/50',
   active: 'stroke-brand',
   compare: 'stroke-warning',
   good: 'stroke-success',

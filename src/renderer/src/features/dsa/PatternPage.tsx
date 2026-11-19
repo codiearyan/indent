@@ -12,7 +12,7 @@ import { CodeView } from './CodeView'
 import { InputPanel } from './InputPanel'
 import { Player } from './Player'
 import { patterns, findPattern } from './registry'
-import type { Pattern, Step } from './types'
+import type { Frame, Pattern, Step } from './types'
 import { usePlayer } from './usePlayer'
 import { FrameView } from './views/FrameView'
 
@@ -49,21 +49,24 @@ function PatternView({ pattern }: { pattern: Pattern }): React.JSX.Element {
       <div className="grid gap-4 lg:grid-cols-[3fr_2fr] lg:items-start">
         <section
           aria-label="Animation"
-          className="flex min-w-0 flex-col gap-5 rounded-xl border border-border bg-card p-5"
+          className="flex min-w-0 flex-col gap-4 rounded-xl border border-border bg-card p-5"
         >
-          <div className="min-h-64 min-w-0 space-y-8">
-            {step.frames.map((frame, i) => (
-              <FrameView key={i} frame={frame} />
-            ))}
+          {/* Controls and the note stay in view above the frames, however tall the stage gets. */}
+          <div className="sticky top-0 z-10 -mx-5 -mt-5 space-y-4 rounded-t-xl bg-card px-5 pt-5">
+            <Player player={player} />
+            <p aria-live="polite" className="h-12 overflow-y-auto text-sm leading-6">
+              {step.note}
+            </p>
+            <Vars vars={step.vars} />
           </div>
-          <Vars vars={step.vars} />
-          <p aria-live="polite" className="h-[4.5rem] overflow-y-auto text-sm leading-6">
-            {step.note}
-          </p>
-          <Player player={player} />
-          <InputPanel pattern={pattern} onRun={setSteps} />
+          <Frames frames={step.frames} />
         </section>
-        <CodeView code={pattern.code} lines={step.lines} />
+        <div className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-0">
+          <CodeView code={pattern.code} lines={step.lines} />
+          <div className="rounded-xl border border-border bg-card p-5">
+            <InputPanel pattern={pattern} onRun={setSteps} />
+          </div>
+        </div>
       </div>
 
       <section aria-label="About this pattern" className="grid gap-4 md:grid-cols-2">
@@ -148,6 +151,30 @@ function NeighborButton({
     <IconButton label={`${direction}: ${pattern.title}`} asChild>
       <Link to={`/dsa/${pattern.id}`}>{icon}</Link>
     </IconButton>
+  )
+}
+
+/** Tall, narrow stacks stand beside the other frames instead of pushing them down. */
+function Frames({ frames }: { frames: Frame[] }): React.JSX.Element {
+  const keyed = frames.map((frame, i) => ({ frame, key: i }))
+  const isStack = (frame: Frame): boolean => frame.kind === 'bucket' && frame.shape === 'stack'
+  const side = keyed.filter(({ frame }) => isStack(frame))
+  const main = keyed.filter(({ frame }) => !isStack(frame))
+  return (
+    <div className="flex min-h-56 min-w-0 items-start justify-center gap-8 border-t border-border pt-5">
+      <div className="min-w-0 flex-1 space-y-5">
+        {main.map(({ frame, key }) => (
+          <FrameView key={key} frame={frame} />
+        ))}
+      </div>
+      {side.length > 0 && (
+        <div className="shrink-0 space-y-5">
+          {side.map(({ frame, key }) => (
+            <FrameView key={key} frame={frame} />
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
