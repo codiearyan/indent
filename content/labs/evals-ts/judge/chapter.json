@@ -1,0 +1,72 @@
+{
+  "id": "judge",
+  "title": "A model as the judge",
+  "files": [
+    "src/verdict.ts",
+    "src/judge.ts",
+    "src/judge-prompt.ts",
+    "src/draft.ts",
+    "src/tickets.ts",
+    "src/run.ts"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/run.ts"
+  },
+  "tasks": [
+    {
+      "id": "parse",
+      "title": "Read the verdict defensively",
+      "file": "src/verdict.ts",
+      "description": "In `src/verdict.ts`, implement `parseVerdict(text: string): Verdict`, returning `{ verdict, reason }` where `verdict` is `'pass'`, `'fail'` or `'unknown'`.\n\n- A verdict label is the word `verdict` in any case, then optional spaces, `*` or `:`, then the whole word `pass` or `fail` in any case. `VERDICT: PASS` and `**Verdict:** fail` both count, wherever they appear in the text.\n- If every verdict label in the text agrees, that is the verdict. If there is none, or two disagree, the verdict is `'unknown'`. Never read a verdict from a loose `pass` or `fail` elsewhere in the text.\n- `reason`: for pass or fail, the rest of the line after a `reason` label written the same way, trimmed, or `''` when there is none. For unknown, a sentence that starts with `could not judge`.\n\nThe check runs hidden judge replies, some clean, some wrapped in extra words, some with no verdict at all.",
+      "nextSteps": [
+        "Read the example judge replies in the lesson and decide which ones hold a clear verdict.",
+        "Write one regular expression for the verdict label and find every match.",
+        "Decide what to return for zero, one or several different matches.",
+        "Read the reason the same way."
+      ],
+      "hints": [
+        "The judge's unclear replies contain the word \"pass\" in normal sentences. Only a label counts.",
+        "`text.matchAll(/\\bverdict\\b[\\s*:]*.../gi)` finds every label. Put the lowercased words in a `Set` to see how many different verdicts there are.",
+        "A `Set` of size 1 is a verdict; any other size is unknown. For the reason, match `reason` the same way and capture `(.*)`, which stops at the end of the line."
+      ],
+      "points": 10
+    },
+    {
+      "id": "judge",
+      "title": "Ask the judge, and know when it could not judge",
+      "file": "src/judge.ts",
+      "description": "In `src/judge.ts`, implement `judgeDraft(ticket, draft, rubric, client = new OpenAI()): Promise<Verdict>`.\n\n- Send `buildJudgeMessages(ticket, draft, rubric)` to `JUDGE_MODEL` with `temperature: 0`, and parse the reply with `parseVerdict`.\n- If the verdict is unknown, ask once more: the same messages, then the judge's reply as an `assistant` message, then `FOLLOW_UP` as a `user` message.\n- Never make more than 2 requests. If the second reply is still unclear, return its unknown verdict.\n- If a request throws, return `{ verdict: 'unknown', reason }` where `reason` starts with `could not judge` and includes the error message.\n\nUse the `client` parameter for every request; the check passes in fake clients.",
+      "nextSteps": [
+        "Make the first request and parse it.",
+        "Return early when the verdict is pass or fail.",
+        "Build the follow-up conversation and ask once more.",
+        "Wrap the requests so an error becomes an unknown verdict."
+      ],
+      "hints": [
+        "A small inner `ask(messages)` function that returns the reply text keeps the two requests short.",
+        "The follow-up is a conversation: the original messages, what the judge said, then your nudge. Spread the first array and add the two new messages.",
+        "One try/catch around both requests is enough. In the catch, build the reason from `(err as Error).message`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "report",
+      "title": "Grade every draft",
+      "file": "src/judge.ts",
+      "description": "In `src/judge.ts`, implement `evaluateDrafts(cases, rubric, client = new OpenAI()): Promise<DraftReport>`.\n\nFor each case, draft a reply with `draftReply(case.ticket, client)`, judge it with `judgeDraft`, and return:\n\n- `results`: `{ id, draft, verdict, reason }` per case, in case order\n- `pass`, `fail`, `unknown`: how many cases got each verdict\n- `passRate`: `pass / (pass + fail)`, or `0` when nothing was judged\n\nUnknown verdicts are reported, never counted as a pass or a fail. The check runs hidden tickets with the team rubric, and with a rubric that has a rule the judge cannot check.",
+      "nextSteps": [
+        "Loop over the cases: draft, then judge.",
+        "Count each kind of verdict.",
+        "Compute the pass rate from the judged cases only.",
+        "Run `node src/run.ts` and compare the two rubrics."
+      ],
+      "hints": [
+        "Spread the verdict into the result: `{ id, draft, ...verdict }`.",
+        "A small `count(kind)` helper that filters the results keeps the three counts readable.",
+        "The denominator is `pass + fail`, not the number of cases. Guard it for zero."
+      ],
+      "points": 10
+    }
+  ]
+}

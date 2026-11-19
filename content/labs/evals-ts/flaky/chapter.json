@@ -1,0 +1,63 @@
+{
+  "id": "flaky",
+  "title": "Answers that change between runs",
+  "files": ["src/stability.ts", "src/cases.ts", "src/triage.ts", "src/run.ts"],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/run.ts 5"
+  },
+  "tasks": [
+    {
+      "id": "repeat",
+      "title": "Run one case several times",
+      "file": "src/stability.ts",
+      "description": "In `src/stability.ts`, implement `runRepeated(c: Case, model: string, seeds: number[]): Promise<CaseRuns>`.\n\nCall `triage(c.input, model, seed)` once per seed, in the order given, and return `{ id, runs, passRate }`:\n\n- `runs`: one `{ seed, output, passed }` per seed, where `output` is what `triage` returned and `passed` is `output === c.expected`\n- `passRate`: passing runs divided by all runs\n\nAn empty list of seeds throws an `Error`. The check compares every output with what `evals-triage-v3` answers for that seed.",
+      "nextSteps": [
+        "Read `triage` in `src/triage.ts` and find where the seed goes.",
+        "Loop over the seeds and record one run each.",
+        "Compute the pass rate and guard the empty case."
+      ],
+      "hints": [
+        "If every output for an ambiguous ticket is the same, the seed is not reaching the model.",
+        "Keep the seed in each run. Without it, a failing run cannot be reproduced.",
+        "A plain `for...of` over `seeds` with `await` inside keeps the runs in seed order."
+      ],
+      "points": 10
+    },
+    {
+      "id": "flag",
+      "title": "Name what you see",
+      "file": "src/stability.ts",
+      "description": "In `src/stability.ts`, implement `flagCase(r: CaseRuns): CaseStability`, returning `{ id, passRate, status, failingSeeds }`:\n\n- `status`: `'stable-pass'` when every run passed, `'stable-fail'` when none did, `'flaky'` for any mix, even one miss in five\n- `failingSeeds`: the seeds of the failing runs, in run order\n- `passRate`: passing runs divided by all runs\n\nA case with no runs throws an `Error`.",
+      "nextSteps": [
+        "Collect the seeds of the failing runs.",
+        "Decide the status from how many failed compared with how many ran.",
+        "Return the four fields."
+      ],
+      "hints": [
+        "There are exactly three outcomes, and only the two ends are stable.",
+        "Count failures once and reuse the number: zero, all, or something in between.",
+        "Do not use a threshold like \"80% is good enough\". A case that fails one run in five is the one you need to know about."
+      ],
+      "points": 10
+    },
+    {
+      "id": "report",
+      "title": "Report flaky cases instead of averaging them",
+      "file": "src/stability.ts",
+      "description": "In `src/stability.ts`, implement `runStabilityEval(cases: Case[], model: string, runs: number): Promise<StabilityReport>`.\n\nRun every case with seeds `1` up to `runs` and return `{ model, runs, results, flaky, stablePassRate, meanPassRate }`:\n\n- `results`: `flagCase` output per case, in case order\n- `flaky`: the ids of the flaky cases, in case order\n- `stablePassRate`: the share of cases that are `stable-pass`\n- `meanPassRate`: the average `passRate` over cases\n\nBoth rates are `0` with no cases. `runs` must be a whole number of at least 2; otherwise throw an `Error` that mentions `runs`.",
+      "nextSteps": [
+        "Validate `runs` and build the list of seeds.",
+        "Run and flag every case.",
+        "Compute the flaky list and both rates.",
+        "Run `node src/run.ts 5` and compare the two rates."
+      ],
+      "hints": [
+        "`Array.from({ length: runs }, (_, i) => i + 1)` gives you the seeds.",
+        "Cases are independent, so you can run them with `Promise.all` and still keep the results in case order.",
+        "`stablePassRate` counts only stable-pass cases; `meanPassRate` sums the per-case pass rates. Guard both divisions for zero cases."
+      ],
+      "points": 10
+    }
+  ]
+}

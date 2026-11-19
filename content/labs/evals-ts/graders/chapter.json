@@ -1,0 +1,63 @@
+{
+  "id": "graders",
+  "title": "Graders that give partial credit",
+  "files": ["src/graders.ts", "src/suite.ts", "src/cases.ts", "src/triage.ts", "src/run.ts"],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/run.ts"
+  },
+  "tasks": [
+    {
+      "id": "graders",
+      "title": "Write four small graders",
+      "file": "src/graders.ts",
+      "description": "In `src/graders.ts`, implement four factories. Each returns a `Grader`: a function from the raw model output to `{ pass, reason }`. `reason` is `''` when the grader passes and a short explanation when it fails.\n\n- `contains(text)`: the output contains `text`, case-sensitive. A failing reason quotes `text`.\n- `matches(pattern, flags = '')`: `new RegExp(pattern, flags)` finds a match. A failing reason shows `pattern`.\n- `fieldEquals(field, expected)`: the output parses as a JSON object whose top-level `field` is `=== expected`. A failing reason names the field and the value it found.\n- `near(field, target, tolerance)`: that field is a number no further than `tolerance` from `target`, edges included. A failing reason names the field and the value it found.\n\nThe JSON graders must never throw. When the output is not a JSON object (text around it, an array, `null`), they fail with a reason that mentions JSON.",
+      "nextSteps": [
+        "Write `contains` and `matches` first; they never look inside the JSON.",
+        "Write one helper that parses the output and reads a field without throwing.",
+        "Build `fieldEquals` and `near` on that helper.",
+        "Try each grader in a scratch file on a few outputs from `node src/run.ts`."
+      ],
+      "hints": [
+        "A factory is a function that returns a function. The outer one captures the settings, the inner one receives the output.",
+        "`JSON.parse` throws on text like a code fence. Wrap it in try/catch and turn the error into a failing result.",
+        "`JSON.parse('null')` and `JSON.parse('[1]')` succeed, so check the parsed value is an object that is not null and not an array before reading a field."
+      ],
+      "points": 10
+    },
+    {
+      "id": "score",
+      "title": "Give partial credit",
+      "file": "src/graders.ts",
+      "description": "In `src/graders.ts`, implement `gradeOutput(output: string, graders: Grader[]): CaseGrade`.\n\nRun every grader on the output and return:\n\n- `score`: the share of graders that passed, from 0 to 1\n- `passed`: `true` only when every grader passed\n- `reasons`: the reasons of the failing graders, in grader order\n\nA grader that throws counts as a failure whose reason starts with `grader error`, and the other graders still run. An empty list of graders throws an `Error`, because a case that checks nothing would always pass.",
+      "nextSteps": [
+        "Guard against an empty list first.",
+        "Run each grader inside a try/catch.",
+        "Count the passes and collect the failing reasons."
+      ],
+      "hints": [
+        "Map the graders to results first, then compute the three fields from that list.",
+        "Write a tiny `safely(grader, output)` that returns a failing result when the grader throws.",
+        "`score` is passing results divided by all results; `reasons` is the failing results mapped to their reason."
+      ],
+      "points": 10
+    },
+    {
+      "id": "suite",
+      "title": "Compose graders per case",
+      "file": "src/suite.ts",
+      "description": "Each case in `src/cases.ts` lists its checks as plain data (`CheckSpec`). In `src/suite.ts`, implement:\n\n- `buildGrader(spec: CheckSpec): Grader`: `contains` uses `text`, `regex` uses `pattern` and `flags`, `field` uses `field` and `equals`, `near` uses `field`, `value` and `tolerance`. An unknown `kind` throws an `Error` that names the kind.\n- `runSuite(cases: JsonCase[], model: string): Promise<SuiteReport>`: send each input through `triageJson(input, model)`, grade the reply with that case's checks and return `{ model, total, passed, meanScore, results }`. `results` holds `{ id, score, passed, reasons }` per case, in case order. `passed` counts cases where every check passed. `meanScore` is the average case score, or `0` with no cases.\n\nThe check runs hidden cases, including a reply wrapped in a code fence.",
+      "nextSteps": [
+        "Write `buildGrader` as a switch on `spec.kind`.",
+        "Loop over the cases, call the model and grade each reply.",
+        "Compute the totals, then run `node src/run.ts`."
+      ],
+      "hints": [
+        "Inside each `case` of the switch, TypeScript knows which fields that spec has.",
+        "`c.checks.map(buildGrader)` gives you the grader list for one case; hand it to `gradeOutput` with the reply.",
+        "Spread the result of `gradeOutput` into `{ id: c.id, ... }` and keep the results in an array. The mean is the sum of scores over the count, guarded for zero."
+      ],
+      "points": 10
+    }
+  ]
+}

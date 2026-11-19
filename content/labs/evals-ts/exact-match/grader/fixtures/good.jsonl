@@ -1,0 +1,6 @@
+{"id":"a1","input":"Where is my parcel?","expected":"shipping"}
+
+{"id":"a2","input":"Refund please.","expected":"refund"}
+   
+{"id":"a3","input":"Hello there","expected":"other"}
+
