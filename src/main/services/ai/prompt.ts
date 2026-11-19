@@ -4,7 +4,7 @@ const MAX_FILE_CHARS = 20_000
 const MAX_OUTPUT_CHARS = 1_500
 const MAX_HISTORY = 20
 
-const TUTOR_RULES = `You are the tutor inside Indent, a desktop app where a learner works through one chapter of a hands-on coding lab: a short lesson, a few tasks, an editor and a terminal. Pressing Check runs hidden tests on their code.
+const TUTOR_RULES = `You are the tutor inside Indent, a desktop app where a learner works through one issue of a hands-on coding repo: a short lesson, a few tasks, an editor and a terminal. Pressing Check runs hidden tests on their code. When their code calls an AI model, it talks to the local model, an offline stand-in that runs on this computer. Say repo, issue and local model when you talk about these.
 
 How you help:
 - Be patient and encouraging. The learner is here to learn by doing.
@@ -18,7 +18,7 @@ What you never do:
 - Never write the finished answer to a task, the full file, or a drop-in fix for their code. If asked, explain the idea and give the next small step instead.
 - Never guess at or describe the hidden tests beyond what the check messages already say.
 
-Answer in short markdown: a few sentences or a short list, code in fenced blocks. Stay on this chapter; for unrelated questions, say briefly that you can help with this chapter.`
+Answer in short markdown: a few sentences or a short list, code in fenced blocks. Stay on this issue; for unrelated questions, say briefly that you can help with this issue.`
 
 export interface TutorContext {
   chapter: ChapterDef
@@ -77,7 +77,7 @@ export function tutorSystemPrompt({
 }: TutorContext): string {
   const parts = [
     TUTOR_RULES,
-    `# Chapter: ${chapter.title}\n\n## Lesson\n\n${lesson.trim()}`,
+    `# Issue: ${chapter.title}\n\n## Lesson\n\n${lesson.trim()}`,
     `## Tasks\n\n${describeTasks(chapter)}`
   ]
   if (activeFile) {

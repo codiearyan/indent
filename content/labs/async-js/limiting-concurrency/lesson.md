@@ -6,7 +6,7 @@ Every evening Tidewell emails a reminder to everyone sailing the next morning. B
 
 > **Bram:** The mail service started refusing us. It says three connections at a time, no more. Most reminders bounced, and one customer with a full mailbox stopped the whole run.
 
-By the end of this chapter you can run a long list of tasks with at most N in flight, keep the results in input order, and choose what a single failure should do to the rest.
+By the end of this issue you can run a long list of tasks with at most N in flight, keep the results in input order, and choose what a single failure should do to the rest.
 
 ## Why not everything at once
 

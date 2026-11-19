@@ -1,4 +1,4 @@
-// Copied into every sandbox as .grader/helpers.mjs. Tools the chapter drivers share.
+// Copied into every sandbox as .grader/helpers.mjs. Tools the issue drivers share.
 
 export const describe = (err) => ({ name: err?.name ?? 'Error', message: err?.message ?? String(err) })
 

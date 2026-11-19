@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Every evening the till sends the day's bookings to Cinderbay's online booking system. The job prints "synced" and the laptop closes. By the end of this chapter you will be able to:
+Every evening the till sends the day's bookings to Cinderbay's online booking system. The job prints "synced" and the laptop closes. By the end of this issue you will be able to:
 
 - explain why `forEach` with an async callback does not wait for anything
 - explain where the errors from those callbacks go

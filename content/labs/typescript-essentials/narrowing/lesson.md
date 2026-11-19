@@ -4,7 +4,7 @@
 
 Spokewell is a bike repair shop with two workshops and a booking app that customers use to drop off their bikes. The app was written in plain JavaScript over a few busy summers. Marit Solberg, who owns the shop, has hired you to move it to TypeScript, and Dele Ashby, the developer who wrote most of it, reviews your work.
 
-By the end of this chapter you will be able to:
+By the end of this issue you will be able to:
 
 - annotate a function's parameters and return value
 - accept more than one kind of input with a union type

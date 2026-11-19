@@ -3,7 +3,7 @@
   "title": "Structured output",
   "files": ["src/orders.ts", "src/demo.ts"],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/demo.ts"
   },
   "tasks": [
@@ -45,7 +45,7 @@
       "id": "extract",
       "title": "Extract an order with one repair",
       "file": "src/orders.ts",
-      "description": "Implement `extractOrder(email: string, client?: OpenAI): Promise<Order>`.\n\n1. Send `[system: ORDER_PROMPT, user: email]` to `MODEL` through `client`.\n2. Parse the reply with `parseJsonReply` and check it with `validateOrder`. A parse error counts as a problem: use its message.\n3. If there are no problems, return the order.\n4. Otherwise make exactly one repair request: the same messages, plus the bad reply as an `assistant` message, plus a `user` message that lists every problem.\n5. Parse and validate again. Return the order, or throw an `Error` whose message contains `invalid order`.\n\nThe lab model gets some emails wrong on the first try and fixes a mistake only when the repair message names it. The check counts your requests: 1 for a clean email, 2 for a repaired one, and 2 before giving up.",
+      "description": "Implement `extractOrder(email: string, client?: OpenAI): Promise<Order>`.\n\n1. Send `[system: ORDER_PROMPT, user: email]` to `MODEL` through `client`.\n2. Parse the reply with `parseJsonReply` and check it with `validateOrder`. A parse error counts as a problem: use its message.\n3. If there are no problems, return the order.\n4. Otherwise make exactly one repair request: the same messages, plus the bad reply as an `assistant` message, plus a `user` message that lists every problem.\n5. Parse and validate again. Return the order, or throw an `Error` whose message contains `invalid order`.\n\nThe local model gets some emails wrong on the first try and fixes a mistake only when the repair message names it. The check counts your requests: 1 for a clean email, 2 for a repaired one, and 2 before giving up.",
       "nextSteps": [
         "Write a small helper that turns a reply into either an order or a list of problems.",
         "Make the first request and return straight away when it is valid.",

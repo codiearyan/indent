@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Kes now holds real conversations on the Kestrel Parcels website, remembering what the customer said earlier in the chat. After this chapter you will be able to:
+Kes now holds real conversations on the Kestrel Parcels website, remembering what the customer said earlier in the chat. After this issue you will be able to:
 
 - explain what a context window is and why chat history counts against it
 - reproduce the moment a growing conversation stops working
@@ -28,7 +28,7 @@ The API log for that session:
 
 A chat model has no memory between requests. It feels like a conversation because your code resends the whole history every time: the system prompt, every question and every answer. Each turn the request grows.
 
-Every model has a context window, a maximum number of tokens it accepts per request. Once the history is larger than that window, every request fails until the history shrinks. Real windows are far larger than the lab model's 400 tokens, but real conversations, documents and tool results are larger too, and the cost of each request grows with its size long before the hard limit.
+Every model has a context window, a maximum number of tokens it accepts per request. Once the history is larger than that window, every request fails until the history shrinks. Real windows are far larger than the local model's 400 tokens, but real conversations, documents and tool results are larger too, and the cost of each request grows with its size long before the hard limit.
 
 The usual fix is a sliding window: keep the instructions, drop the oldest turns.
 

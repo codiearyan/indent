@@ -32,9 +32,9 @@ export function ResetDialog(props: {
     <AlertDialog {...props}>
       <AlertDialogContent className="bg-popover">
         <AlertDialogHeader>
-          <AlertDialogTitle>Reset this chapter&apos;s files?</AlertDialogTitle>
+          <AlertDialogTitle>Reset this issue&apos;s files?</AlertDialogTitle>
           <AlertDialogDescription>
-            Your edits in this chapter are replaced with the starter files. Passed tasks and points
+            Your edits in this issue are replaced with the starter files. Passed tasks and points
             stay as they are.
           </AlertDialogDescription>
         </AlertDialogHeader>

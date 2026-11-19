@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-You can now score one version of a feature. The real question at Pebblebrook Plants is always about two: the one running today and the one Dev wants to ship. By the end of this chapter you will be able to:
+You can now score one version of a feature. The real question at Pebblebrook Plants is always about two: the one running today and the one Dev wants to ship. By the end of this issue you will be able to:
 
 - run the same test set against a baseline and a candidate
 - sort every case into fixed, broken or unchanged

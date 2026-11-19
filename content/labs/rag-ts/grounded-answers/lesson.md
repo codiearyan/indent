@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-The store finds the right chunks. Now the answer box has to turn them into a reply a customer can read, without making anything up. By the end of this chapter you will be able to:
+The store finds the right chunks. Now the answer box has to turn them into a reply a customer can read, without making anything up. By the end of this issue you will be able to:
 
 - build a prompt that grounds the model in retrieved text
 - number sources so the model can cite them, and turn citations back into chunks
@@ -36,7 +36,7 @@ Three details make this robust. A number can appear more than once, so keep each
 
 Returning the cited chunks, with their ids, lets the front desk check an answer in seconds and lets you measure later whether answers used the right parts of the handbook.
 
-## The lab chat model
+## The local chat model
 
 `rag-chat-1` is an offline stand-in that behaves like a careful model. It reads the numbered lines and the `Question:` line from your prompt, picks the source sentences that share the most words with the question, and cites them. If no sentence shares enough words, it says it does not know. If the prompt holds no sources at all, it says it cannot answer.
 

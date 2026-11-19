@@ -9,7 +9,7 @@
     "src/demo.ts"
   ],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/demo.ts"
   },
   "tasks": [
@@ -17,7 +17,7 @@
       "id": "reproduce",
       "title": "Catch the model cutting a summary short",
       "file": "src/reproduce.ts",
-      "description": "Before you change anything, prove what is happening. In `src/reproduce.ts`, implement `reproduceCutoff()`.\n\nIt should call the lab model directly with the same settings `summarizeComplaint` uses: `MODEL`, `MAX_TOKENS` and `buildMessages(longComplaint)`. Return an object with:\n\n- `text`: the message content of the reply, unchanged\n- `finishReason`: the `finish_reason` of that same reply\n\nThe check runs your function against the original `summarize.ts`.",
+      "description": "Before you change anything, prove what is happening. In `src/reproduce.ts`, implement `reproduceCutoff()`.\n\nIt should call the local model directly with the same settings `summarizeComplaint` uses: `MODEL`, `MAX_TOKENS` and `buildMessages(longComplaint)`. Return an object with:\n\n- `text`: the message content of the reply, unchanged\n- `finishReason`: the `finish_reason` of that same reply\n\nThe check runs your function against the original `summarize.ts`.",
       "nextSteps": [
         "Run `node src/demo.ts` and read the summary it prints.",
         "Create a client with `new OpenAI()` and call `chat.completions.create` with the same options.",
@@ -61,7 +61,7 @@
         "Ask yourself what a version that only raises the limit would still get wrong."
       ],
       "hints": [
-        "Look at a full summary from the lab model. What does its last character tell you?",
+        "Look at a full summary from the local model. What does its last character tell you?",
         "For the error case, `await expect(promise).rejects.toThrow(...)` lets you assert on the message.",
         "A larger limit fixes the long complaint but not the endless one. Your second test is the one that catches that fix."
       ],

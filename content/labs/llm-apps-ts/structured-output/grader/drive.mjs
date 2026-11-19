@@ -1,5 +1,5 @@
 // Copied into the sandbox as .grader/drive.mjs. Runs extractOrder through a client that records
-// every request: either the real lab model, or a fake that always sends `reply`.
+// every request: either the real local model, or a fake that always sends `reply`.
 import OpenAI from 'openai'
 import { extractOrder } from '../src/orders.ts'
 

@@ -1,4 +1,4 @@
-// The booking model, finished in the last chapter and agreed with Dele. You do not need to
+// The booking model, finished in the last issue and agreed with Dele. You do not need to
 // change this file. Every type in the other files is built from these two.
 export type ServiceLevel = 'basic' | 'full' | 'overhaul'
 

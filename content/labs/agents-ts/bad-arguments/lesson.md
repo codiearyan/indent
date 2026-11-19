@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Pip can now loop through as many tool calls as a question needs. It also trusts every one of them. By the end of this chapter you will be able to:
+Pip can now loop through as many tool calls as a question needs. It also trusts every one of them. By the end of this issue you will be able to:
 
 - keep tools in a registry that both describes them and runs them
 - parse and validate tool arguments against their schema
@@ -36,7 +36,7 @@ Good error text names the field and shows what was received. That is exactly wha
 
 ## Errors are results
 
-The key move in this chapter is small. Instead of throwing, the code that runs a tool call returns a JSON string either way:
+The key move in this issue is small. Instead of throwing, the code that runs a tool call returns a JSON string either way:
 
 ```
 {"total": 12.5}
@@ -49,10 +49,10 @@ Catch failures from the tool itself too. A `run` function can throw, or return a
 
 ## What the model does next
 
-The lab model behaves like a careful but imperfect assistant. Asked to reserve honey, it first calls `find_product`, which is not a tool. Told that, it searches with `search_products`, then reserves with the quantity as text. Told that the quantity must be an integer, it tries again correctly. With your error handling in place that is five model requests and a correct answer. Without it, the first mistake crashes the run.
+The local model behaves like a careful but imperfect assistant. Asked to reserve honey, it first calls `find_product`, which is not a tool. Told that, it searches with `search_products`, then reserves with the quantity as text. Told that the quantity must be an integer, it tries again correctly. With your error handling in place that is five model requests and a correct answer. Without it, the first mistake crashes the run.
 
-The step limit from the last chapter still matters here. A model that keeps making the same mistake is now a loop instead of a crash, and the limit ends it.
+The step limit from the last issue still matters here. A model that keeps making the same mistake is now a loop instead of a crash, and the limit ends it.
 
-## Your work in this chapter
+## Your work in this issue
 
 In `src/registry.ts` write `parseArguments`, then `executeToolCall`. In `src/agent.ts` write `toolSpecs` and change the loop to use `executeToolCall`. `src/tools.ts` holds the shop's registry. `node src/demo.ts` shows three bad calls answered as results, then runs two reservations end to end.

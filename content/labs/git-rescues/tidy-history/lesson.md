@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-History is read far more often than it is written. Reviewers, bisect and future you all depend on commits that each say one clear thing. By the end of this chapter you will be able to:
+History is read far more often than it is written. Reviewers, bisect and future you all depend on commits that each say one clear thing. By the end of this issue you will be able to:
 
 - decide when rewriting history is fine and when it is not
 - keep a backup branch before any rewrite
@@ -19,7 +19,7 @@ Run `node setup.mjs`, then `cd repo`. You are on `route-planner`. Compare it wit
 
 ## When rewriting is fine
 
-Chapter one said not to rewrite shared history. This branch has never been pushed, and nobody else has its commits. Rewriting it hurts no one, and it is the polite thing to do before review. The rule is about who else has the commits, not about the commands themselves.
+The first issue said not to rewrite shared history. This branch has never been pushed, and nobody else has its commits. Rewriting it hurts no one, and it is the polite thing to do before review. The rule is about who else has the commits, not about the commands themselves.
 
 Before any rewrite, put a name on where you are:
 

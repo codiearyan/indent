@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Pebblebrook Plants is testing a second feature: it drafts a reply to each ticket so an agent only has to check and send it. A draft is free text. No regex can tell you whether it is a good reply. By the end of this chapter you will be able to:
+Pebblebrook Plants is testing a second feature: it drafts a reply to each ticket so an agent only has to check and send it. A draft is free text. No regex can tell you whether it is a good reply. By the end of this issue you will be able to:
 
 - grade free text by asking a judge model with a written rubric
 - read the judge's verdict defensively, even when it wraps it in extra words
@@ -27,7 +27,7 @@ Judges are useful because they can read meaning. They are also models, so you tr
 
 ## What the judge actually sends back
 
-The lab judge follows the format most of the time. Sometimes it does not:
+The local judge follows the format most of the time. Sometimes it does not:
 
 - `Sure, here is my assessment.` and then the verdict line
 - `**Verdict:** pass` in markdown bold

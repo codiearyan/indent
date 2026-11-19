@@ -31,11 +31,11 @@ export function TaskList({ chapter }: { chapter: Chapter }): React.JSX.Element {
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium">Every task passed</p>
             <p className="text-[13px] text-muted-foreground tabular-nums">
-              You earned {earned} points in this chapter.
+              You earned {earned} points in this issue.
             </p>
           </div>
           <Button size="sm" className="shrink-0" onClick={() => navigate(next)}>
-            {chapter.nextChapterId ? 'Next chapter' : 'Back to the lab'}
+            {chapter.nextChapterId ? 'Next issue' : 'Back to the repo'}
             <ArrowRight />
           </Button>
         </div>

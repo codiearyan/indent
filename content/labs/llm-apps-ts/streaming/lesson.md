@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Moss now answers care questions, sorts the inbox and fills in the order sheet. Odile wants customers to talk to Moss directly, in a chat window on the shop's website. By the end of this chapter you will be able to:
+Moss now answers care questions, sorts the inbox and fills in the order sheet. Odile wants customers to talk to Moss directly, in a chat window on the shop's website. By the end of this issue you will be able to:
 
 - ask the model to stream its reply
 - assemble the full text from the chunks as they arrive
@@ -43,7 +43,7 @@ Notice the field is `delta`, not `message`. Each chunk holds only what is new.
 
 The full reply is every `delta.content` joined in order. Code that reads chunks has to be forgiving about their shape: content may be missing or empty, and `choices` may be empty. A loop that reads `chunk.choices[0].delta.content` without checking will crash on the very last chunk of a perfectly good stream.
 
-The finish reason matters as much as it did in chapter one. `stop` means the answer is complete and `length` means the token limit cut it. There is also a third case that only streams have: the connection drops and the chunks simply stop. No finish reason ever arrives. Treat that as an error, because the text you have is incomplete and nothing else will tell you.
+The finish reason matters as much as it did in the first issue. `stop` means the answer is complete and `length` means the token limit cut it. There is also a third case that only streams have: the connection drops and the chunks simply stop. No finish reason ever arrives. Treat that as an error, because the text you have is incomplete and nothing else will tell you.
 
 ## Reporting progress
 

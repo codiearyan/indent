@@ -30,7 +30,7 @@ async function runTask(taskId) {
   try {
     details = checks[taskId]
       ? await checks[taskId](t)
-      : [{ name: 'Checks exist', passed: false, message: `This chapter has no checks for task ${taskId}.` }]
+      : [{ name: 'Checks exist', passed: false, message: `This issue has no checks for task ${taskId}.` }]
   } catch (err) {
     details = [{ name: 'Check ran', passed: false, message: `The check itself failed: ${err?.message ?? err}` }]
   } finally {

@@ -1,5 +1,5 @@
-// Shared grading for every sql-basics chapter. Each chapter keeps its own schema and seeds in grader/,
-// and the reference answers are the chapter's solution/ files.
+// Shared grading for every sql-basics issue. Each issue keeps its own schema and seeds in grader/,
+// and the reference answers are the issue's solution/ files.
 import { join } from 'node:path'
 
 const child = join(import.meta.dirname, 'sql-child.mjs')

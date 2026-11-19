@@ -60,7 +60,7 @@ async function runtimeStatus(): Promise<RuntimeStatus> {
     return {
       node,
       ready: false,
-      error: `Labs need Node 22.18 or newer. This computer has ${node}.`
+      error: `Repos need Node 22.18 or newer. This computer has ${node}.`
     }
   }
   return { node, ready: await depsInstalled() }
@@ -74,7 +74,7 @@ async function install(): Promise<RuntimeStatus> {
     await mkdir(root, { recursive: true })
     await copyFile(runtimePackage(), join(root, 'package.json'))
   } catch (error) {
-    return { ...status, error: `Could not prepare the lab dependencies: ${String(error)}` }
+    return { ...status, error: `Could not prepare the runtime dependencies: ${String(error)}` }
   }
   const run = await runProcess('npm', ['install', '--no-audit', '--no-fund'], {
     cwd: root,
@@ -85,7 +85,7 @@ async function install(): Promise<RuntimeStatus> {
     const reason = run.timedOut ? 'The install took too long.' : tail(run.stderr)
     return {
       ...status,
-      error: `Could not install the lab dependencies. Check your internet connection and try again.\n${reason}`
+      error: `Could not install the runtime dependencies. Check your internet connection and try again.\n${reason}`
     }
   }
   return runtimeStatus()
@@ -111,7 +111,7 @@ async function runCheck(
   const status = await ensureRuntime()
   let results: CheckResult[]
   if (!status.ready) {
-    const error = status.error ?? 'The lab dependencies are not installed.'
+    const error = status.error ?? 'The runtime dependencies are not installed.'
     results = failedResults(ids, error, 0, new Date().toISOString())
   } else {
     await labModelReady()

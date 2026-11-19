@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Some of the team's questions have a question hidden inside them. "Which products are dear?" really means "which products cost more than the average, and what is the average?" You could run two queries and copy a number from one into the other, but the number goes stale the moment a price changes. By the end of this chapter you will be able to:
+Some of the team's questions have a question hidden inside them. "Which products are dear?" really means "which products cost more than the average, and what is the average?" You could run two queries and copy a number from one into the other, but the number goes stale the moment a price changes. By the end of this issue you will be able to:
 
 - use a subquery in WHERE to compare against a value worked out on the fly
 - write a correlated subquery that runs once per outer row
@@ -45,4 +45,4 @@ Each name works like a table for the rest of the statement, and you can use it m
 
 ## How your work is checked
 
-The hidden dataset in this chapter has different prices and orders, so averages and totals change. A query that types in a number it saw in the shipped data will match there and fail on the hidden data. Let the query work every value out.
+The hidden dataset in this issue has different prices and orders, so averages and totals change. A query that types in a number it saw in the shipped data will match there and fail on the hidden data. Let the query work every value out.

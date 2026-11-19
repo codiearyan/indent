@@ -9,7 +9,7 @@
     "src/demo.ts"
   ],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/demo.ts"
   },
   "tasks": [
@@ -60,7 +60,7 @@
         "Ask which of your tests a fix without shape checks would still pass."
       ],
       "hints": [
-        "Each entry in messages.ts makes the lab model answer in a different way. Use them as your cases.",
+        "Each entry in messages.ts makes the local model answer in a different way. Use them as your cases.",
         "Assert on `result.ok` first; that is the part of the contract callers rely on.",
         "A version that only adds try/catch passes the fenced and no-JSON cases. The missingId and unknownAction messages are what catch it."
       ],

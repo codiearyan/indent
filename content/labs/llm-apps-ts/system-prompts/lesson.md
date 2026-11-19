@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Moss can answer care questions now, and Odile is pleased. The next request comes from Ravi Quayle, who reads the shop inbox every morning. By the end of this chapter you will be able to:
+Moss can answer care questions now, and Odile is pleased. The next request comes from Ravi Quayle, who reads the shop inbox every morning. By the end of this issue you will be able to:
 
 - write a system message that fixes the model's role and the shape of its reply
 - add worked examples to a conversation so the model copies a format exactly
@@ -16,7 +16,7 @@ Ravi's inbox view is code, not a person. Code needs the reply in the same shape 
 
 ## A reply your code can rely on
 
-Ask a model "what is this message about?" and you get a friendly sentence. That is fine for a person and useless for a program. Try it: once `labelMessage` sends its request, run `node src/demo.ts` while `LABEL_PROMPT` is still empty. The lab model answers like a helpful colleague, in prose, and your function has nothing it can use.
+Ask a model "what is this message about?" and you get a friendly sentence. That is fine for a person and useless for a program. Try it: once `labelMessage` sends its request, run `node src/demo.ts` while `LABEL_PROMPT` is still empty. The local model answers like a helpful colleague, in prose, and your function has nothing it can use.
 
 The fix is to tell the model, before anything else, what job it has and exactly what to send back. That is what the system message is for. A good system message for a classifier does three things:
 
@@ -24,7 +24,7 @@ The fix is to tell the model, before anything else, what job it has and exactly 
 - lists the allowed answers, word for word
 - says to reply with only the answer, nothing around it
 
-The lab model behaves like a careful real one here: it switches to bare answers only when the instructions are that explicit.
+The local model behaves like a careful real one here: it switches to bare answers only when the instructions are that explicit.
 
 ## Show, do not only tell
 
@@ -39,7 +39,7 @@ const messages = [
 ]
 ```
 
-The model sees an earlier question and its own answer, and continues the pattern. Two or three examples are usually enough. Pick examples that differ from each other, so the model learns the format and not one particular answer. The lab model copies the keys and separators of the most recent example reply, which is why one sloppy example can break every answer after it.
+The model sees an earlier question and its own answer, and continues the pattern. Two or three examples are usually enough. Pick examples that differ from each other, so the model learns the format and not one particular answer. The local model copies the keys and separators of the most recent example reply, which is why one sloppy example can break every answer after it.
 
 ## Trust, then verify
 

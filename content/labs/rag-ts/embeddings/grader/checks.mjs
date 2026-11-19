@@ -42,10 +42,10 @@ export const checks = {
     const manyRequests = many.ok ? many.value.requests : []
     return tidy([
       {
-        name: 'Returns one vector per text from the lab model',
+        name: 'Returns one vector per text from the local model',
         passed: vectorsMatch(small, three) && small.value.vectors.length === 3,
         message: small.ok
-          ? "The vectors are not the ones the lab model sends for these texts. Return each item's embedding, one per text, in the order of texts."
+          ? "The vectors are not the ones the local model sends for these texts. Return each item's embedding, one per text, in the order of texts."
           : 'embed threw an error. Read it below.',
         output: `embed(${JSON.stringify(three)})\n${small.ok ? brief(small.value.vectors) : small.error}`
       },

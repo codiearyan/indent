@@ -27,7 +27,7 @@ export function TopBar(): React.JSX.Element {
       className="app-drag flex h-12 shrink-0 items-center gap-1 bg-background pr-2"
       style={{ paddingLeft: 'calc(var(--titlebar-inset) + 8px)' }}
     >
-      <IconButton label="Back to the lab" onClick={() => navigate(`/labs/${labId}`)}>
+      <IconButton label="Back to the repo" onClick={() => navigate(`/labs/${labId}`)}>
         <ArrowLeft />
       </IconButton>
       <nav
@@ -35,7 +35,7 @@ export function TopBar(): React.JSX.Element {
         className="ml-1 flex min-w-0 flex-1 items-center gap-1.5 text-[13px]"
       >
         <Link to="/labs" className={crumb}>
-          Labs
+          Repos
         </Link>
         <span className="text-muted-foreground/60">/</span>
         <Link to={`/labs/${labId}`} className={`${crumb} min-w-0 shrink truncate`}>
@@ -45,18 +45,18 @@ export function TopBar(): React.JSX.Element {
           <>
             <span className="text-muted-foreground/60">/</span>
             <span className="min-w-0 shrink-[0.5] truncate font-medium" aria-current="page">
-              Chapter {chapter.number}: {chapter.title}
+              Issue {chapter.number}: {chapter.title}
             </span>
             <span className="ml-1 flex shrink-0 items-center">
               <IconButton
-                label="Previous chapter"
+                label="Previous issue"
                 disabled={!chapter.prevChapterId}
                 onClick={() => goToChapter(chapter.prevChapterId)}
               >
                 <ChevronLeft />
               </IconButton>
               <IconButton
-                label="Next chapter"
+                label="Next issue"
                 disabled={!chapter.nextChapterId}
                 onClick={() => goToChapter(chapter.nextChapterId)}
               >

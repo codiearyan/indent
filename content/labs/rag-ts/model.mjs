@@ -1,4 +1,4 @@
-// Lab model behavior for the Saltmarsh Paddle Co. help desk. Replies depend only on the request.
+// Local model behavior for the Saltmarsh Paddle Co. help desk. Replies depend only on the request.
 import { bagOfWords } from '../../kit/embed.mjs'
 
 export const EMBED_DIMS = 1024

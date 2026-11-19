@@ -4,7 +4,7 @@
 
 Saltmarsh Paddle Co. hires kayaks and canoes from a small quay on the harbour. Every summer the front desk answers the same questions hundreds of times: what the deposit is, whether dogs can come, what happens when the wind picks up. The answers are all in the staff handbook, but nobody has time to search it with a queue at the hut.
 
-Noor Halloran, the owner, has hired you to build an answer box that finds the right part of the handbook and answers from it. By the end of this chapter you will be able to:
+Noor Halloran, the owner, has hired you to build an answer box that finds the right part of the handbook and answers from it. By the end of this issue you will be able to:
 
 - explain why retrieval works on chunks rather than whole documents
 - split text into chunks of a maximum size without cutting words
@@ -47,7 +47,7 @@ Two rules keep it safe:
 
 ## Knowing where a chunk came from
 
-A chunk on its own is just text. Later chapters need to say which article an answer came from and to measure whether the right article was found. So every chunk keeps:
+A chunk on its own is just text. Later issues need to say which article an answer came from and to measure whether the right article was found. So every chunk keeps:
 
 - `source`: the id of its document, such as `weather`
 - `index`: its position inside that document, starting at 0

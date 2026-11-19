@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Kestrel Parcels is a same-day courier with a support assistant called Kes. Kes runs on a language model, and you are the newest developer on the team. By the end of this chapter you will be able to:
+Kestrel Parcels is a same-day courier with a support assistant called Kes. Kes runs on a language model, and you are the newest developer on the team. By the end of this issue you will be able to:
 
 - explain what `finish_reason` is and why every caller should read it
 - reproduce a reply that was cut off by `max_tokens`
@@ -41,7 +41,7 @@ const choice = res.choices[0]
 console.log(choice.finish_reason) // 'stop' or 'length'
 ```
 
-The lab model behaves like a real one here. It counts tokens (roughly a word or a punctuation mark each), and when the full reply does not fit it stops there and reports `length`.
+The local model behaves like a real one here. It counts tokens (roughly a word or a punctuation mark each), and when the full reply does not fit it stops there and reports `length`.
 
 Raising the limit makes the bug rarer, not gone. Some inputs will always produce a reply longer than any fixed budget, and the cost of a reply grows with the tokens it uses. Interviewers like this bug because the honest fix is about checking a signal, not picking a bigger number.
 

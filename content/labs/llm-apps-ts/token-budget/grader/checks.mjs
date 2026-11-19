@@ -56,7 +56,7 @@ export const checks = {
         name: 'The model sees every earlier question',
         passed: /\(I can see 3 of your messages\.\)$/.test(v.replies?.[2] ?? '') && /^Moss here\./.test(v.replies?.[2] ?? ''),
         message:
-          'The lab model says how many of your messages it can see. On the third question it should see all three, and the system prompt.',
+          'The local model says how many of your messages it can see. On the third question it should see all three, and the system prompt.',
         output: show(r)
       },
       {

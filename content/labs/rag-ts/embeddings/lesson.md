@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-The handbook is now in chunks. Next, the answer box needs a way to tell which chunk is closest to a question. By the end of this chapter you will be able to:
+The handbook is now in chunks. Next, the answer box needs a way to tell which chunk is closest to a question. By the end of this issue you will be able to:
 
 - explain what an embedding is and what the numbers in it mean
 - call an embeddings endpoint with many texts in one request, in batches
@@ -19,7 +19,7 @@ Comparing meaning is what embeddings are for.
 
 An embedding model turns a text into a list of numbers, a vector. Texts about the same thing get vectors that point in similar directions, so closeness between vectors stands in for closeness in meaning. Real embedding models learn this from huge amounts of text, which is how they know that "hound" and "dog" are related.
 
-The lab model behind `rag-embed-1` is much simpler, so you can see exactly what happens. It hashes each meaningful word into one of 1024 slots and counts it there, then scales the vector to length 1. Two texts are similar when they share words. It does not know synonyms, so it rewards questions that use the handbook's own words. That is enough to learn every idea in this lab, and it means scores are exact and repeatable.
+The local model behind `rag-embed-1` is much simpler, so you can see exactly what happens. It hashes each meaningful word into one of 1024 slots and counts it there, then scales the vector to length 1. Two texts are similar when they share words. It does not know synonyms, so it rewards questions that use the handbook's own words. That is enough to learn every idea in this repo, and it means scores are exact and repeatable.
 
 ## Calling the endpoint in batches
 
@@ -44,7 +44,7 @@ To compare two vectors, look at the angle between them rather than at how long t
 
 The result is 1 when they point the same way, 0 when they share nothing, and -1 when they point in opposite directions. Dividing by the lengths matters: without it, a long text with many words would score higher simply because its vector is bigger.
 
-The lab model already scales its vectors to length 1, so here the dot product alone happens to give the same number. Write the full formula anyway. Your code should not depend on a promise the next model might not keep, and the check uses vectors of other lengths.
+The local model already scales its vectors to length 1, so here the dot product alone happens to give the same number. Write the full formula anyway. Your code should not depend on a promise the next model might not keep, and the check uses vectors of other lengths.
 
 A zero vector has no direction. A text made only of words like "the" and "of" embeds to all zeros, so return 0 instead of dividing by zero and getting `NaN`.
 

@@ -6,7 +6,7 @@ Tidewell Ferries runs three small boats from Tidewell Quay to Gull Island and He
 
 > **Bram:** Every screen here waits on something slow. The tide gauge, the timetable, the sea sensor. Half the code uses callbacks, half uses promises, and when something fails the board just goes blank. Can you start with the departure board?
 
-By the end of this chapter you can turn a callback function into a promise, chain small steps with `then`, and combine two services where the second needs an answer from the first.
+By the end of this issue you can turn a callback function into a promise, chain small steps with `then`, and combine two services where the second needs an answer from the first.
 
 ## What a promise is
 
@@ -55,7 +55,7 @@ Leave out the `return` (or use curly braces and forget it) and two things go wro
 
 ## Why your functions take their services as parameters
 
-Every function in this lab takes the slow thing it depends on as a parameter with a real default, like `read = readTideTable`. In the demo you get the real fake services with their delays. The check passes its own versions that answer instantly and record how they were called, so it can test failures and ordering without waiting.
+Every function in this repo takes the slow thing it depends on as a parameter with a real default, like `read = readTideTable`. In the demo you get the real fake services with their delays. The check passes its own versions that answer instantly and record how they were called, so it can test failures and ordering without waiting.
 
 ## Try it
 

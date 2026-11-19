@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Pebble Lane Pantry is a neighbourhood grocer that delivers by cargo bike. Noor Haddad runs the shop floor, and she wants an assistant called Pip that staff can ask about orders and stock. You are the developer building Pip. By the end of this chapter you will be able to:
+Pebble Lane Pantry is a neighbourhood grocer that delivers by cargo bike. Noor Haddad runs the shop floor, and she wants an assistant called Pip that staff can ask about orders and stock. You are the developer building Pip. By the end of this issue you will be able to:
 
 - describe a function to a model with a JSON schema
 - read the tool call the model sends back
@@ -54,7 +54,7 @@ To give the model the result, you send the conversation again with two new messa
 1. the assistant message that asked for the tool, exactly as it came back
 2. a message with `role: 'tool'`, the `tool_call_id` of the call it answers, and the result as a string
 
-The API checks this pairing. A tool message whose id does not match a call in the assistant message just before it is rejected with a 400 error. So is an assistant message with tool calls that nobody answered. The lab model enforces the same rules, so you will see these errors if the order is off.
+The API checks this pairing. A tool message whose id does not match a call in the assistant message just before it is rejected with a 400 error. So is an assistant message with tool calls that nobody answered. The local model enforces the same rules, so you will see these errors if the order is off.
 
 `JSON.stringify` is the usual way to turn a result into text. The model reads JSON well, and an error object such as `{ "error": "No order with id PL-9999" }` is a result too. Send it back the same way and let the model explain it.
 
@@ -62,7 +62,7 @@ The API checks this pairing. A tool message whose id does not match a call in th
 
 With the result in the conversation, the second request comes back as a normal reply: `finish_reason` is `stop` and `content` is the answer, now based on real data instead of a guess. That is the whole protocol: request, tool call, your function, tool message, answer.
 
-## Your work in this chapter
+## Your work in this issue
 
 Everything happens in `src/assistant.ts`. First you describe `get_order` so the model can ask for it. Then you send a question and read back the tool call. Finally you do the full round trip and return Pip's answer. `src/tools.ts` already has `getOrder`, and `src/data.ts` holds today's orders.
 

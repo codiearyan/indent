@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Customers can now ask Kes to change a delivery in plain words, and Kes turns the message into a request the depot system understands. After this chapter you will be able to:
+Customers can now ask Kes to change a delivery in plain words, and Kes turns the message into a request the depot system understands. After this issue you will be able to:
 
 - explain why "reply with JSON only" in a prompt is a wish, not a guarantee
 - reproduce a crash caused by a reply that is almost JSON

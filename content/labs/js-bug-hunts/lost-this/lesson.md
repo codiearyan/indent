@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Cinderbay bought a barcode scanner for the dock, so staff can scan a boat out and back in instead of writing it on a whiteboard. By the end of this chapter you will be able to:
+Cinderbay bought a barcode scanner for the dock, so staff can scan a boat out and back in instead of writing it on a whiteboard. By the end of this issue you will be able to:
 
 - explain how JavaScript decides what `this` is in a function call
 - reproduce a method that loses its object when it is passed as a callback

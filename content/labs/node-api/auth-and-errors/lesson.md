@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-The booking page is live, and the back office can add and retire boats. That is also the problem: anyone who finds the URL can. By the end of this chapter you will be able to:
+The booking page is live, and the back office can add and retire boats. That is also the problem: anyone who finds the URL can. By the end of this issue you will be able to:
 
 - protect the routes that change data with a bearer token
 - tell 401 and 403 apart, and send the header clients expect

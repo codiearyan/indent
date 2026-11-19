@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Triage at Pebblebrook Plants has grown up. It no longer replies with a single word: it returns a JSON object with a category, an urgency from 1 to 5, the order id if the customer gave one, and a one line summary. Exact match cannot score that. By the end of this chapter you will be able to:
+Triage at Pebblebrook Plants has grown up. It no longer replies with a single word: it returns a JSON object with a category, an urgency from 1 to 5, the order id if the customer gave one, and a one line summary. Exact match cannot score that. By the end of this issue you will be able to:
 
 - write small grader functions that each check one property of an output
 - combine graders per case and give partial credit

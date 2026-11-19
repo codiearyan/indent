@@ -136,10 +136,10 @@ export const checks = {
         output: show(broken)
       },
       {
-        name: 'Works with the lab judge',
+        name: 'Works with the local judge',
         passed:
           real.ok && real.value?.verdict === 'fail' && unjudgeable.ok && unjudgeable.value?.verdict === 'unknown',
-        message: 'Run against the lab judge, a rambling first reply should end in a verdict after the follow-up, and a rule the judge cannot check should end in unknown.',
+        message: 'Run against the local judge, a rambling first reply should end in a verdict after the follow-up, and a rule the judge cannot check should end in unknown.',
         output: `${show(real)}\n${show(unjudgeable)}`
       }
     ])

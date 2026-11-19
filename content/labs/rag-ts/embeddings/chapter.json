@@ -3,7 +3,7 @@
   "title": "Embeddings and similarity",
   "files": ["src/embed.ts", "src/demo.ts", "src/handbook.ts"],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model and its embedding endpoint.",
+    "description": "A shell in your workspace, already pointed at the offline local model and its embedding endpoint.",
     "suggestedCommand": "node src/demo.ts"
   },
   "tasks": [
@@ -36,7 +36,7 @@
         "Handle the zero vector, then divide."
       ],
       "hints": [
-        "The lab model already scales its vectors to length 1, so a dot product alone looks right in the demo. The check also uses vectors that are not length 1.",
+        "The local model already scales its vectors to length 1, so a dot product alone looks right in the demo. The check also uses vectors that are not length 1.",
         "Three running sums are enough: a times b, a times a, and b times b.",
         "If either squared length is 0, the answer is 0. Otherwise divide the dot product by the square root of the two squared lengths multiplied together."
       ],

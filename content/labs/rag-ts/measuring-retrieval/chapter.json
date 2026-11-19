@@ -47,7 +47,7 @@
         "Return both metrics and run `node src/sweep.ts`."
       ],
       "hints": [
-        "chunkDocs, indexChunks and search are already in the workspace and work as in earlier chapters.",
+        "chunkDocs, indexChunks and search are already in the workspace and work as in earlier issues.",
         "Labels name articles, such as 'weather'. A chunk id like 'weather#1' never equals 'weather', which would make every score 0.",
         "For each question, keep its expected list next to the source of each of its hits. After the loop, pass all of them and settings.k to both metrics."
       ],

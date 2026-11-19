@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-import { CalendarDays, FlaskConical, House, Moon, Route, Sun, Workflow } from 'lucide-react'
+import { CalendarDays, FolderGit2, House, Moon, Route, Sun, Workflow } from 'lucide-react'
 import { toast } from 'sonner'
 import { levelFor } from '@shared/rules'
 import { APP_NAME, BrandMark } from '@/components/app/Brand'
@@ -11,10 +11,10 @@ import { useSettings } from '@/stores/settings'
 
 const NAV = [
   { to: '/', label: 'Home', icon: House },
-  { to: '/labs', label: 'Labs', icon: FlaskConical },
-  { to: '/paths', label: 'Paths', icon: Route },
-  { to: '/dsa', label: 'DSA patterns', icon: Workflow },
-  { to: '/year', label: 'Year board', icon: CalendarDays }
+  { to: '/labs', label: 'Repos', icon: FolderGit2 },
+  { to: '/paths', label: 'Roadmaps', icon: Route },
+  { to: '/dsa', label: 'Patterns', icon: Workflow },
+  { to: '/year', label: 'Activity', icon: CalendarDays }
 ]
 
 const row =
@@ -27,7 +27,7 @@ export function AppShell(): React.JSX.Element {
 
   useEffect(() => {
     Promise.all([loadCatalog(), loadProgress()]).catch((error: unknown) => {
-      toast.error(error instanceof Error ? error.message : 'Could not load your labs.')
+      toast.error(error instanceof Error ? error.message : 'Could not load your repos.')
     })
   }, [loadCatalog, loadProgress])
 

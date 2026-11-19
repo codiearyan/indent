@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Commits feel fragile when a branch disappears, but git rarely throws anything away at once. By the end of this chapter you will be able to:
+Commits feel fragile when a branch disappears, but git rarely throws anything away at once. By the end of this issue you will be able to:
 
 - explain why a deleted branch or a hard reset does not delete commits
 - read `git reflog` to find where a branch and HEAD used to point

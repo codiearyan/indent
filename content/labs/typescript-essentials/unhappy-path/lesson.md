@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-The happy path of the booking app is typed. The last part of the move is everything that goes wrong: old data, thrown errors, and the parts supplier that answers late or not at all. By the end of this chapter you will be able to:
+The happy path of the booking app is typed. The last part of the move is everything that goes wrong: old data, thrown errors, and the parts supplier that answers late or not at all. By the end of this issue you will be able to:
 
 - explain the difference between `unknown` and `any`, and use `unknown` for data you do not control
 - narrow a caught error before you read it
@@ -56,4 +56,4 @@ One trap: a function typed to return a promise can still throw before it returns
 2. `src/errors.ts`: `errorMessage` and `describeOrderFailure` for anything a `catch` can catch.
 3. `src/quotes.ts`: a `Result` type, an async `getQuote` that never rejects, and `unwrapOr`.
 
-Run `node src/demo.ts` and `npm run types` as you go. The check throws real values at your code and type-checks your file with hidden uses and misuses. Any `any` fails it, which in this chapter is the whole point.
+Run `node src/demo.ts` and `npm run types` as you go. The check throws real values at your code and type-checks your file with hidden uses and misuses. Any `any` fails it, which in this issue is the whole point.

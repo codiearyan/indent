@@ -9,7 +9,7 @@
     "src/demo.ts"
   ],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/demo.ts"
   },
   "tasks": [
@@ -61,7 +61,7 @@
       ],
       "hints": [
         "Use a fresh `ChatSession` in each test so they do not depend on each other.",
-        "The lab model only introduces itself as Kes when the first message it receives is the system prompt.",
+        "The local model only introduces itself as Kes when the first message it receives is the system prompt.",
         "Dropping the oldest messages also drops the system prompt. Assert on the last reply's opening words and on `history[0]`."
       ],
       "points": 10

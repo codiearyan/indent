@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-So far you have only read data. Now Odile wants you to keep the database up to date: new cafes, a price review, a cancelled order. Reading a wrong answer costs a minute; writing a wrong change can cost a week of invoices. By the end of this chapter you will be able to:
+So far you have only read data. Now Odile wants you to keep the database up to date: new cafes, a price review, a cancelled order. Reading a wrong answer costs a minute; writing a wrong change can cost a week of invoices. By the end of this issue you will be able to:
 
 - add rows with INSERT and let the database choose ids
 - change rows with UPDATE and remove them with DELETE, touching only the rows you mean to

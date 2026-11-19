@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Customers love the chat window. Some of them love it a little too much: they keep chatting for half an hour about every plant they own. By the end of this chapter you will be able to:
+Customers love the chat window. Some of them love it a little too much: they keep chatting for half an hour about every plant they own. By the end of this issue you will be able to:
 
 - keep a conversation's history so the model remembers earlier turns
 - count the tokens a request will carry before you send it
@@ -19,11 +19,11 @@ Both problems come from the same place: the list of messages you send.
 
 Each request stands alone. The model does not remember the last one, so a conversation only feels continuous because you send the earlier turns again every time. That is what history is: the system message, then each question and reply in order, growing by two messages per turn.
 
-Fix the first problem and you create the second. History grows without end, and every model has a context limit: the most tokens it will read in one request. The lab model refuses anything over 400 tokens with a clear error. Real limits are larger, but so are real conversations, and every token you send is also a token you pay for.
+Fix the first problem and you create the second. History grows without end, and every model has a context limit: the most tokens it will read in one request. The local model refuses anything over 400 tokens with a clear error. Real limits are larger, but so are real conversations, and every token you send is also a token you pay for.
 
 ## Counting before you send
 
-You cannot know whether a request fits unless you count. `src/tokens.ts` gives you `countTokens` for one string and `countMessageTokens` for a list of messages, using the same rule as the lab model. Real providers publish their own tokenizers. The idea is the same: measure the request, compare it with a budget, act before the model has to refuse.
+You cannot know whether a request fits unless you count. `src/tokens.ts` gives you `countTokens` for one string and `countMessageTokens` for a list of messages, using the same rule as the local model. Real providers publish their own tokenizers. The idea is the same: measure the request, compare it with a budget, act before the model has to refuse.
 
 Set your budget below the model's limit. The reply needs room too, and a margin protects you when your count and the provider's count differ slightly.
 

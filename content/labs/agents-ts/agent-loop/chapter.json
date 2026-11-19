@@ -3,7 +3,7 @@
   "title": "The loop that knows when to stop",
   "files": ["src/agent.ts", "src/tools.ts", "src/data.ts", "src/demo.ts"],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/demo.ts"
   },
   "tasks": [
@@ -18,7 +18,7 @@
         "Run the function and wrap its result in a tool message."
       ],
       "hints": [
-        "This is the same tool message you built by hand in the last chapter, once per call.",
+        "This is the same tool message you built by hand in the last issue, once per call.",
         "Check `call.type === 'function'` before you read `call.function`. A `filter` before the `map` keeps TypeScript happy.",
         "`toolFunctions[call.function.name](JSON.parse(call.function.arguments))` gives you the result to stringify."
       ],
@@ -38,7 +38,7 @@
       "hints": [
         "One question can need several rounds: the model looks up the order first, then each product in it.",
         "Count requests as you make them, not tool calls. A reply with tool calls and the final reply are both steps.",
-        "The loop body is the round trip from the last chapter: push `reply`, then spread `runToolCalls(reply.tool_calls)` into the same array."
+        "The loop body is the round trip from the last issue: push `reply`, then spread `runToolCalls(reply.tool_calls)` into the same array."
       ],
       "points": 10
     },

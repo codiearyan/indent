@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Odile liked last week's lists, and now she wants numbers. How many orders are waiting? What does a typical cake cost us to sell? Which cafes order again and again? Lists of rows cannot answer these, but summaries can. By the end of this chapter you will be able to:
+Odile liked last week's lists, and now she wants numbers. How many orders are waiting? What does a typical cake cost us to sell? Which cafes order again and again? Lists of rows cannot answer these, but summaries can. By the end of this issue you will be able to:
 
 - count, add up and average a column with aggregate functions
 - split rows into groups and get one summary line per group

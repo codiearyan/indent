@@ -48,7 +48,7 @@ export function YearBoardPage(): React.JSX.Element {
     <div className="space-y-6">
       <header className="flex items-start justify-between gap-6">
         <div>
-          <h1 className="text-[22px] leading-7 font-semibold">Year board</h1>
+          <h1 className="text-[22px] leading-7 font-semibold">Activity</h1>
           <p className="mt-1 text-sm text-muted-foreground tabular-nums">
             {summary.tasksPassed > 0
               ? `In ${year} you passed ${summary.tasksPassed} ${summary.tasksPassed === 1 ? 'task' : 'tasks'} on ${summary.activeDays} ${days(summary.activeDays)} for ${summary.points} points.`

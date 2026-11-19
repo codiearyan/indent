@@ -1,4 +1,4 @@
-// Lab model behavior for Pip, the operations assistant at Pebble Lane Pantry.
+// Local model behavior for Pip, the operations assistant at Pebble Lane Pantry.
 // A scripted policy: it reads the request, the tools offered and the tool results so far,
 // then asks for the next tool call or writes the final answer. Replies depend only on the request.
 

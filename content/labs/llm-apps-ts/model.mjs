@@ -1,4 +1,4 @@
-// Lab model behavior for Fernhollow, a small plant shop, and its assistant Moss.
+// Local model behavior for Fernhollow, a small plant shop, and its assistant Moss.
 // Replies depend only on the request.
 import { countTokens } from '../../kit/tokens.mjs'
 
@@ -41,13 +41,13 @@ export function findPlant(sentence) {
   return PLANTS.find((plant) => new RegExp(`\\b${plant}(e?s)?\\b`).test(lower)) ?? null
 }
 
-// Chapters 1 and 4: one care question, one answer.
+// Issues 1 and 4: one care question, one answer.
 export function careReply(messages) {
   const plant = findPlant(lastUser(messages))
   return (hasPersona(messages) ? 'Moss here. ' : '') + (plant ? CARE[plant] : UNKNOWN_PLANT)
 }
 
-// Chapter 2: sorting the inbox. The reply follows the system message and the examples.
+// Issue 2: sorting the inbox. The reply follows the system message and the examples.
 export const LABELS = ['watering', 'light', 'pests', 'order', 'other']
 
 export function labelFor(message) {
@@ -94,7 +94,7 @@ export function sortReply(messages) {
   } well.`
 }
 
-// Chapter 3: order emails. The first reply has the mistakes a real model makes; a repair message
+// Issue 3: order emails. The first reply has the mistakes a real model makes; a repair message
 // that names a mistake gets it fixed.
 const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 }
 
@@ -140,7 +140,7 @@ export function orderReply(messages) {
   return 'Here is the order:\n```json\n' + json + '\n```'
 }
 
-// Chapter 5: a conversation with a context limit.
+// Issue 5: a conversation with a context limit.
 export function chatReply(messages) {
   const used = messages.reduce((sum, m) => sum + countTokens(text(m)), 0)
   if (used > CHAT_CONTEXT_TOKENS) {

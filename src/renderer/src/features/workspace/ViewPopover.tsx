@@ -197,7 +197,7 @@ export function ViewPopover(): React.JSX.Element {
               }}
             >
               <RotateCcw />
-              Reset chapter files
+              Reset issue files
             </button>
           </div>
         </PopoverContent>

@@ -24,7 +24,7 @@ export const checks = {
         name: 'error is the error the model sent',
         passed: typeof error === 'string' && /context length/i.test(error),
         message:
-          'error should be the message of the error that send threw. It comes from the lab model and explains why it refused.',
+          'error should be the message of the error that send threw. It comes from the local model and explains why it refused.',
         output: show(r)
       },
       {

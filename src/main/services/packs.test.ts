@@ -86,7 +86,7 @@ describe('packs', () => {
   })
 
   it('rejects a chapter that is not listed in the lab', async () => {
-    await expect(getChapter(root, 'alpha', 'nope')).rejects.toThrow('not part of lab')
+    await expect(getChapter(root, 'alpha', 'nope')).rejects.toThrow('not part of repo')
   })
 
   it('reads paths', async () => {

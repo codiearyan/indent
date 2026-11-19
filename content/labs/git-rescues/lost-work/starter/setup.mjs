@@ -1,4 +1,4 @@
-// Chapter 2: get lost work back.
+// Issue 2: get lost work back.
 //
 // Run `node setup.mjs` to build the scenario in ./repo. Running it again starts over.
 //

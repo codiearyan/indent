@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Fernhollow's inbox is sorted now, and Ravi has noticed that a third of it is orders written as plain emails. By the end of this chapter you will be able to:
+Fernhollow's inbox is sorted now, and Ravi has noticed that a third of it is orders written as plain emails. By the end of this issue you will be able to:
 
 - ask a model for JSON and pull it out of whatever the model wraps it in
 - check the shape of the data by hand, field by field
@@ -49,7 +49,7 @@ When the reply is wrong, ask again, but do not just repeat the question. A model
 2. the bad reply, as an `assistant` message
 3. a new `user` message that lists the problems
 
-Now the model can see its own mistake and your notes about it. The lab model works like this on purpose: it fixes a field only when your repair message names it.
+Now the model can see its own mistake and your notes about it. The local model works like this on purpose: it fixes a field only when your repair message names it.
 
 Do this once. If the second reply is still wrong, something bigger is off, and an error that says so is better than a third request or a half-filled order sheet.
 

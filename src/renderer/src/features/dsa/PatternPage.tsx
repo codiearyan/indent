@@ -22,7 +22,7 @@ export function PatternPage(): React.JSX.Element {
     return (
       <EmptyState title="This pattern does not exist">
         <Button variant="outline" size="sm" asChild>
-          <Link to="/dsa">Back to DSA patterns</Link>
+          <Link to="/dsa">Back to patterns</Link>
         </Button>
       </EmptyState>
     )
@@ -106,7 +106,7 @@ function PatternHeader({ pattern }: { pattern: Pattern }): React.JSX.Element {
         className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground"
       >
         <ArrowLeft className="size-4" strokeWidth={1.5} />
-        DSA patterns
+        Patterns
       </Link>
       <div className="mt-3 flex items-start justify-between gap-3">
         <div className="min-w-0">

@@ -3,7 +3,7 @@
   "title": "A conversation with a token budget",
   "files": ["src/conversation.ts", "src/tokens.ts", "src/demo.ts"],
   "terminal": {
-    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "description": "A shell in your workspace, already pointed at the offline local model.",
     "suggestedCommand": "node src/demo.ts"
   },
   "tasks": [
@@ -11,7 +11,7 @@
       "id": "history",
       "title": "Keep the conversation's history",
       "file": "src/conversation.ts",
-      "description": "Implement `Conversation.send(text: string): Promise<string>` so Moss remembers the conversation.\n\n- Add `{ role: 'user', content: text }` to `this.history`.\n- Send the whole history to `MODEL` through `this.client`.\n- Add the reply as `{ role: 'assistant', content: reply }` and return the reply text.\n\nThe check holds a three-question conversation with the lab model. The model tells you how many of your messages it can see, so on the third question it should see three. History should then hold 7 messages: the system message and three question and reply pairs.",
+      "description": "Implement `Conversation.send(text: string): Promise<string>` so Moss remembers the conversation.\n\n- Add `{ role: 'user', content: text }` to `this.history`.\n- Send the whole history to `MODEL` through `this.client`.\n- Add the reply as `{ role: 'assistant', content: reply }` and return the reply text.\n\nThe check holds a three-question conversation with the local model. The model tells you how many of your messages it can see, so on the third question it should see three. History should then hold 7 messages: the system message and three question and reply pairs.",
       "nextSteps": [
         "Push the user message onto this.history.",
         "Send this.history with `this.client.chat.completions.create`.",
@@ -47,7 +47,7 @@
       "id": "budget",
       "title": "Stay under the budget on every turn",
       "file": "src/conversation.ts",
-      "description": "Change `Conversation.send` so a long conversation never goes over `this.budget`.\n\n- Build the messages for this turn: the history plus the new user message.\n- Trim them with `fitToBudget(messages, this.budget)` and send the trimmed messages.\n- Make the trimmed messages plus the reply the new `this.history`.\n\nThe lab model refuses any request over 400 tokens, and the default budget is 300. The check holds a 30-question conversation and a 12-question one created with a budget of 150. It measures every request, checks that each one starts with the system prompt, and checks that each request is the previous history plus the new question, trimmed with `fitToBudget`.",
+      "description": "Change `Conversation.send` so a long conversation never goes over `this.budget`.\n\n- Build the messages for this turn: the history plus the new user message.\n- Trim them with `fitToBudget(messages, this.budget)` and send the trimmed messages.\n- Make the trimmed messages plus the reply the new `this.history`.\n\nThe local model refuses any request over 400 tokens, and the default budget is 300. The check holds a 30-question conversation and a 12-question one created with a budget of 150. It measures every request, checks that each one starts with the system prompt, and checks that each request is the previous history plus the new question, trimmed with `fitToBudget`.",
       "nextSteps": [
         "Run `node src/demo.ts` and find the turn where it fails.",
         "Trim the messages before the request instead of sending the whole history.",

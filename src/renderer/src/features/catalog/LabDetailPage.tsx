@@ -11,7 +11,7 @@ import { EmptyState } from './EmptyState'
 import { Figures } from './Figures'
 import { chapterState, labProgress } from './labStatus'
 
-const ACTION = { 'not-started': 'Start lab', 'in-progress': 'Continue', completed: 'Review' }
+const ACTION = { 'not-started': 'Start repo', 'in-progress': 'Continue', completed: 'Review' }
 
 function BackLink(): React.JSX.Element {
   return (
@@ -20,7 +20,7 @@ function BackLink(): React.JSX.Element {
       className="inline-flex items-center gap-1.5 rounded-md text-[13px] text-muted-foreground outline-none hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
     >
       <ArrowLeft className="size-4" strokeWidth={1.5} />
-      Labs
+      Repos
     </Link>
   )
 }
@@ -46,8 +46,8 @@ export function LabDetailPage(): React.JSX.Element {
     return (
       <div className="space-y-6">
         <BackLink />
-        <h1 className="text-[22px] leading-7 font-semibold">Lab not found</h1>
-        <EmptyState title="There is no lab with this id. It may have been removed." />
+        <h1 className="text-[22px] leading-7 font-semibold">Repo not found</h1>
+        <EmptyState title="There is no repo with this id. It may have been removed." />
       </div>
     )
   }
@@ -77,10 +77,10 @@ export function LabDetailPage(): React.JSX.Element {
       </header>
 
       <Figures
-        label="Lab progress"
+        label="Repo progress"
         figures={[
           {
-            label: 'Chapters finished',
+            label: 'Issues finished',
             value: summary.chaptersDone,
             unit: `of ${summary.chapterCount}`
           },

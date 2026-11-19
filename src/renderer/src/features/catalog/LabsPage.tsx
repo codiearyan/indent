@@ -71,11 +71,11 @@ export function LabsPage(): React.JSX.Element {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-[22px] leading-7 font-semibold">Labs</h1>
+        <h1 className="text-[22px] leading-7 font-semibold">Repos</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {loading
-            ? 'Loading your labs.'
-            : `${plural(rows.length, 'lab')}, ${count('in-progress')} in progress`}
+            ? 'Loading your repos.'
+            : `${plural(rows.length, 'repo')}, ${count('in-progress')} in progress`}
         </p>
       </header>
 
@@ -107,8 +107,8 @@ export function LabsPage(): React.JSX.Element {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search labs"
-              aria-label="Search labs"
+              placeholder="Search repos"
+              aria-label="Search repos"
               className="h-8 pl-8 shadow-none"
             />
           </div>
@@ -126,7 +126,7 @@ export function LabsPage(): React.JSX.Element {
             </SelectContent>
           </Select>
           <span className="ml-auto text-[13px] text-muted-foreground tabular-nums">
-            {loading ? '' : `${plural(visible.length, 'lab')} shown`}
+            {loading ? '' : `${plural(visible.length, 'repo')} shown`}
           </span>
         </div>
       </div>
@@ -141,7 +141,7 @@ export function LabsPage(): React.JSX.Element {
         ) : (
           <li className="flex h-32 flex-col items-center justify-center gap-1 text-sm">
             <p className="text-muted-foreground">
-              {rows.length ? 'No labs match these filters.' : 'No labs are installed yet.'}
+              {rows.length ? 'No repos match these filters.' : 'No repos are installed yet.'}
             </p>
             {rows.length > 0 && (
               <Button variant="link" size="sm" className="text-foreground" onClick={clearFilters}>
@@ -181,7 +181,7 @@ function LabRow({
           {lab.tags.join(', ')}
         </span>
         <span className="w-36 shrink-0 text-right text-[13px] text-muted-foreground tabular-nums">
-          {plural(progress.chapterCount, 'chapter')}, {plural(progress.taskCount, 'task')}
+          {plural(progress.chapterCount, 'issue')}, {plural(progress.taskCount, 'task')}
         </span>
         <BuildStrip lab={lab} chapters={chapters} className="w-[180px] shrink-0" />
         <span className="w-16 shrink-0 text-right text-[13px] tabular-nums">

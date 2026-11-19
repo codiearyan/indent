@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Gullwick Ferries runs the Gull Island ferry, and every timetable and price lives in one small git repository. You look after it. By the end of this chapter you will be able to:
+Gullwick Ferries runs the Gull Island ferry, and every timetable and price lives in one small git repository. You look after it. By the end of this issue you will be able to:
 
 - read a repository's history from the terminal
 - undo one commit with `git revert`, without an editor popping up
@@ -57,7 +57,7 @@ Your main is now one commit ahead of `origin/main`, so a plain push is a fast-fo
 git push origin main
 ```
 
-The remote in this chapter refuses non-fast-forward pushes, like many team servers do. If you tried a reset, your push would be rejected, which is the remote protecting everyone else's history. Do not reach for `--force` on a shared branch. Run `node setup.mjs` again to start over instead.
+The remote in this issue refuses non-fast-forward pushes, like many team servers do. If you tried a reset, your push would be rejected, which is the remote protecting everyone else's history. Do not reach for `--force` on a shared branch. Run `node setup.mjs` again to start over instead.
 
 ## How it is checked
 

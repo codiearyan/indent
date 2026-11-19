@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Fernhollow is a small plant shop by the canal, run by Odile Brandt. Customers write in all day with care questions: why is my fern going brown, how often do I water a cactus. Odile wants an assistant called Moss to answer the easy ones, and you are the developer who will build it. By the end of this chapter you will be able to:
+Fernhollow is a small plant shop by the canal, run by Odile Brandt. Customers write in all day with care questions: why is my fern going brown, how often do I water a cactus. Odile wants an assistant called Moss to answer the easy ones, and you are the developer who will build it. By the end of this issue you will be able to:
 
 - describe a conversation as a list of messages with roles
 - send a chat completion request with the OpenAI client
@@ -20,13 +20,13 @@ A chat model does not take a single string. It takes a list of messages, and eac
 
 - `system`: instructions about who the model is and how it should answer. The customer never sees it.
 - `user`: what the person typed.
-- `assistant`: what the model said earlier. You will use this role in later chapters.
+- `assistant`: what the model said earlier. You will use this role in later issues.
 
 The model reads the whole list from top to bottom and writes the next assistant message. Putting the system message first is a convention every provider follows, and it is how Moss learns its own name and tone.
 
 ## Sending a request
 
-The OpenAI client reads its address and key from the environment, so `new OpenAI()` is enough. In this lab the address points at an offline lab model on your machine, so every answer is free and the same each time.
+The OpenAI client reads its address and key from the environment, so `new OpenAI()` is enough. In this repo the address points at an offline local model on your machine, so every answer is free and the same each time.
 
 ```ts
 import OpenAI from 'openai'
@@ -54,7 +54,7 @@ A cut reply still arrives with status 200 and a normal string. Only `finish_reas
 
 ## Counting tokens
 
-Models read and write tokens, which are pieces of words. The lab model counts a word or a punctuation mark as one token. The `usage` object reports three numbers:
+Models read and write tokens, which are pieces of words. The local model counts a word or a punctuation mark as one token. The `usage` object reports three numbers:
 
 - `prompt_tokens`: what you sent
 - `completion_tokens`: what the model wrote

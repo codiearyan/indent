@@ -91,8 +91,8 @@ export const checks = {
       {
         name: 'The model can answer from it',
         passed: reply !== DONT_KNOW && /\[\d+\]/.test(reply) && reply === expectedReply(VOUCHERS),
-        message: 'The lab model read this prompt and could not answer with citations. Check the source lines and the Question line.',
-        output: `the lab model replied: ${reply}`
+        message: 'The local model read this prompt and could not answer with citations. Check the source lines and the Question line.',
+        output: `the local model replied: ${reply}`
       },
       {
         name: 'Works with no hits',

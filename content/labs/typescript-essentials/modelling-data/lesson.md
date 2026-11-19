@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Your first helpers are typed and Dele has merged them. Now the shop's data needs types of its own. By the end of this chapter you will be able to:
+Your first helpers are typed and Dele has merged them. Now the shop's data needs types of its own. By the end of this issue you will be able to:
 
 - describe an object with an interface or a type alias, and know when each fits
 - mark members as optional or read-only
@@ -29,7 +29,7 @@ interface Mechanic {
 type ShiftLength = 4 | 6 | 8
 ```
 
-An `interface` describes an object and can be extended. A `type` alias can name any type: an object, a union, a literal, a function. Many teams use interfaces for plain object shapes and aliases for everything else, which is the habit this lab follows. Both are erased when Node runs the file, so they cost nothing at runtime.
+An `interface` describes an object and can be extended. A `type` alias can name any type: an object, a union, a literal, a function. Many teams use interfaces for plain object shapes and aliases for everything else, which is the habit this repo follows. Both are erased when Node runs the file, so they cost nothing at runtime.
 
 ## Optional and read-only members
 

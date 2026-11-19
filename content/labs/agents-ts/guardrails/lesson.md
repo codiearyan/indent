@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Pip looks things up, recovers from mistakes and works in parallel. Now it gets a tool that moves money. By the end of this chapter you will be able to:
+Pip looks things up, recovers from mistakes and works in parallel. Now it gets a tool that moves money. By the end of this issue you will be able to:
 
 - mark tools that must not run without a person's approval
 - hold those calls until a confirm callback says yes, and pass a refusal back to the model
@@ -38,7 +38,7 @@ Note the `await`. A confirm that returns a promise is truthy before anyone has c
 
 ## A refusal is a result
 
-When the answer is no, the model still asked a question and still needs an answer. Send a tool message that says the call was refused, with a reason. The model then explains this to the person instead of guessing or trying again blindly. The lab model reads `refused: true` and replies that the refund was not approved.
+When the answer is no, the model still asked a question and still needs an answer. Send a tool message that says the call was refused, with a reason. The model then explains this to the person instead of guessing or trying again blindly. The local model reads `refused: true` and replies that the refund was not approved.
 
 The safe default for the confirm callback is to refuse. If someone forgets to wire it up, nothing risky happens.
 
@@ -46,12 +46,12 @@ The safe default for the confirm callback is to refuse. If someone forgets to wi
 
 A trace is a list of plain objects, one per event, in the order they happened: each model reply with its tool call ids, each tool call with its raw arguments, and then its result or its refusal. It is simple to build. Push an entry at each point in the loop where something happens. It pays off three ways: you can print it when debugging, store it for an audit, and compare it in tests.
 
-Running guarded calls one at a time keeps the trace easy to read and means a person is never asked two questions at once. For a mix of reads and actions you could run the reads in parallel as in the last chapter, but keep the trace order fixed.
+Running guarded calls one at a time keeps the trace easy to read and means a person is never asked two questions at once. For a mix of reads and actions you could run the reads in parallel as in the last issue, but keep the trace order fixed.
 
 ## Testing the guardrail
 
 A good test for this guardrail checks two different things, because each catches a different bug. The ledger of refunds shows whether money moved, which catches a guard that acts before asking. The trace shows whether the refusal was recorded as a refusal, which catches an agent that hides it. A test that checks only one of them can be fooled.
 
-## Your work in this chapter
+## Your work in this issue
 
 Write `guardedCall` in `src/guard.ts`, then `runAgent` with its trace in `src/agent.ts`, then the test in `src/agent.test.ts`. `src/trace.ts` defines the trace entries and the confirm callback. Run `node src/demo.ts`, answer the approval question, and read the trace it prints.

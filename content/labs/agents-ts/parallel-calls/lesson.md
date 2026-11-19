@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Pip now recovers from its own mistakes. It is also slow on busy mornings. By the end of this chapter you will be able to:
+Pip now recovers from its own mistakes. It is also slow on busy mornings. By the end of this issue you will be able to:
 
 - recognise a reply that asks for several tools at once
 - run those calls concurrently instead of one after another
@@ -37,12 +37,12 @@ const quotes = await Promise.all(couriers.map((name) => fetchQuote(name)))
 
 Imagine collecting results by pushing each one into an array as it arrives. Today oat milk is slowest. Tomorrow the eggs aisle is. The conversation you send changes from run to run, and so can the model's answer. Logs stop lining up, tests become flaky, and a bug that pairs the wrong result with the wrong id shows up only on some days.
 
-The lab model reads each result by its id and checks that the product in the result is the one the call asked about. If a result lands under the wrong id, Pip says so in its answer. Keep two things fixed: the order is the order of the calls, and each message is built from its own call.
+The local model reads each result by its id and checks that the product in the result is the one the call asked about. If a result lands under the wrong id, Pip says so in its answer. Keep two things fixed: the order is the order of the calls, and each message is built from its own call.
 
 ## What concurrency does not fix
 
-Running calls together is right when they are independent reads, like stock checks. Be careful with calls that change things. Two reservations against the same shelf can race. In this shop only reads come in parallel, and the next chapter adds a safeguard for the actions that matter. A slow tool still needs a timeout in a real system, and the step limit still applies to the whole run.
+Running calls together is right when they are independent reads, like stock checks. Be careful with calls that change things. Two reservations against the same shelf can race. In this shop only reads come in parallel, and the next issue adds a safeguard for the actions that matter. A slow tool still needs a timeout in a real system, and the step limit still applies to the whole run.
 
-## Your work in this chapter
+## Your work in this issue
 
 Write `runToolCalls` in `src/parallel.ts`: first make the calls run at the same time, then make sure the results come back in call order and matched by id. Then switch `runAgent` in `src/agent.ts` from its inner loop to `runToolCalls`. `node src/demo.ts` times three scans of 60, 20 and 40 milliseconds, then a full stock check through Pip.

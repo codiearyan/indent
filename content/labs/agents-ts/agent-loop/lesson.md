@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Pip can now answer a question with one lookup. Most real questions need more than one. By the end of this chapter you will be able to:
+Pip can now answer a question with one lookup. Most real questions need more than one. By the end of this issue you will be able to:
 
 - run every tool call in a reply and answer each one
 - write the agent loop: ask, run tools, ask again, until the model answers
@@ -16,7 +16,7 @@ Pip can now answer a question with one lookup. Most real questions need more tha
 
 ## The loop
 
-An agent is mostly a loop around the round trip you wrote in the last chapter:
+An agent is mostly a loop around the round trip you wrote in the last issue:
 
 1. send the conversation and the tools
 2. if the reply has no tool calls, that reply is the answer
@@ -40,7 +40,7 @@ const answer = (id: string, name: string, args: string) => ({
 })
 ```
 
-The map from a tool name to a function is the seed of a tool registry. The next chapter grows it.
+The map from a tool name to a function is the seed of a tool registry. The next issue grows it.
 
 ## Why a step limit
 
@@ -54,6 +54,6 @@ In this workspace, "Wait until order PL-2047 is delivered" is that kind of reque
 
 Count model requests, not tool calls. A run that answers straight away is one step. A run with one tool round is two steps: the request that asked for the tool and the request that answered. With a limit of `maxSteps`, the request numbered `maxSteps` is still allowed, and if that one answers, the run succeeds. Off-by-one mistakes here are common, so the check looks at exactly that edge.
 
-## Your work in this chapter
+## Your work in this issue
 
 All three tasks live in `src/agent.ts`. `src/tools.ts` already describes `get_order` and `check_stock` in `toolSpecs` and maps them to functions in `toolFunctions`. Write `runToolCalls`, then `runAgent`, then add the step limit. Run `node src/demo.ts`: it asks one question that ends and one that never would, and prints what happens to each.

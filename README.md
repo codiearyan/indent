@@ -1,13 +1,14 @@
 # Indent
 
-A local-first desktop app for hands-on coding labs. Each lab is a story: a small company has a
-problem and you are its developer. Read a short lesson, write the code, press Check.
+A local-first desktop app where developers learn by doing. Each repo is a story: a small company
+has a problem and you are its developer. Work through its issues: read a short lesson, write the
+code, press Check.
 
 No account and no server. Lessons, your files and your progress live on your computer.
 
 ## What is in it
 
-- **Lab workspace**: lesson and tasks on the left, a code editor in the middle, a real terminal
+- **Workspace**: lesson and tasks on the left, a code editor in the middle, a real terminal
   below, an AI tutor on the right.
 - **Check**: hidden tests run against your code in about a second. Each task turns green, or shows
   what your code produced and says in plain words what to look at.
@@ -15,19 +16,19 @@ No account and no server. Lessons, your files and your progress live on your com
 - **AI without a sign-in**: uses a coding CLI you are already logged in to (Claude Code, Codex,
   OpenCode, Gemini CLI) or your own Anthropic, OpenAI or Gemini key. Tutor chat that explains
   rather than answers, and optional grey inline suggestions accepted with Tab.
-- **Lab model**: labs about language models talk to a small offline model that answers the same
+- **Local model**: repos about language models talk to a small offline model that answers the same
   way every time, so nothing costs money and tests are repeatable.
 - **Read aloud**, a guided tour, text size per panel, layout options, dark and light themes.
-- **DSA patterns**: 18 algorithm patterns as step-through animations (two pointers, sliding window,
+- **Patterns**: 18 algorithm patterns as step-through animations (two pointers, sliding window,
   binary search, linked lists, heaps, BFS and DFS, topological sort, union-find, backtracking,
   dynamic programming and more). Each step highlights the line of code that runs and says what
   happened and why. Play, pause, scrub, change speed, and try your own input.
-- **Labs**: 12 story labs (55 chapters, 162 tasks): LLM apps, retrieval, agents and
-  evals against the offline lab model; TypeScript, async JavaScript and a JSON API with plain Node;
+- **Repos**: 12 story repos (55 issues, 162 tasks): LLM apps, retrieval, agents and
+  evals against the offline local model; TypeScript, async JavaScript and a JSON API with plain Node;
   SQL on built-in SQLite; Git rescues done in the real terminal; and bug hunts in JavaScript and
-  LLM code. Three learning paths put them in order.
-- **Catalog**: dashboard, labs with search and filters, learning paths and a year board
-  of your activity, points, levels and streaks.
+  LLM code. Three roadmaps put them in order.
+- **Catalog**: home, repos with search and filters, roadmaps, and an activity board of your
+  passed tasks, points, levels and streaks.
 
 ## Run it
 
@@ -50,15 +51,15 @@ npm test            # unit tests
 npm run build:mac   # package the app (also build:win, build:linux)
 ```
 
-## Add a lab
+## Add a repo
 
-Labs are plain files under `content/labs/<labId>/`: a `lab.json`, and per chapter a `chapter.json`,
+Repos are plain files under `content/labs/<labId>/`: a `lab.json`, and per issue a `chapter.json`,
 `lesson.md`, `starter/`, `solution/` and hidden tests in `grader/checks.mjs`. The format and the
 grader contract are documented in [AGENTS.md](AGENTS.md); `content/labs/llm-bug-hunts-ts` is a
-complete example. Restart the app to pick up a new lab.
+complete example. Restart the app to pick up a new repo.
 
 ## Where things are stored
 
 Everything is under the app's data folder (`~/Library/Application Support/indent` on macOS):
-`workspaces/` holds your files per chapter, `progress.json` your points and history. API keys are
+`workspaces/` holds your files per issue, `progress.json` your points and history. API keys are
 encrypted with the operating system's keychain.
