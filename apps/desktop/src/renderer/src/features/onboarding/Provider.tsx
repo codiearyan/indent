@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import type { AiProviderInfo } from '@shared/types'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAi } from '@/features/ai/aiStore'
-import { cn } from '@/lib/utils'
+import { cn, errorMessage } from '@/lib/utils'
 import { StepLayout } from './StepLayout'
 
 export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
@@ -114,26 +116,112 @@ function ProviderRow({
   index: number
 }): React.JSX.Element {
   const id = `provider-${provider.id}`
+  const keyed = provider.kind === 'api'
   return (
     <li
-      className="motion-enter flex min-h-12 items-center gap-3 border-b border-rule px-4 last:border-b-0"
+      className="motion-enter border-b border-rule px-4 last:border-b-0"
       style={{ '--i': index } as React.CSSProperties}
     >
-      <RadioGroupItem id={id} value={provider.id} disabled={!provider.available} />
-      <label
-        htmlFor={id}
-        className={cn('text-sm', provider.available ? 'cursor-pointer' : 'text-muted-foreground')}
-      >
-        {provider.label}
-      </label>
-      <span
-        className={cn(
-          'ml-auto min-w-0 truncate text-right text-xs text-muted-foreground',
-          provider.available && 'font-mono'
+      <div className="flex min-h-12 items-center gap-3">
+        <RadioGroupItem id={id} value={provider.id} disabled={!provider.available} />
+        <label
+          htmlFor={id}
+          className={cn(
+            'shrink-0 text-sm',
+            provider.available ? 'cursor-pointer' : 'text-muted-foreground'
+          )}
+        >
+          {provider.label}
+        </label>
+        {keyed ? (
+          <KeyField provider={provider} />
+        ) : (
+          <span
+            className={cn(
+              'ml-auto min-w-0 truncate text-right text-xs text-muted-foreground',
+              provider.available && 'font-mono'
+            )}
+          >
+            {provider.detail}
+          </span>
         )}
-      >
-        {provider.detail ?? 'No key yet'}
-      </span>
+      </div>
     </li>
+  )
+}
+
+/** Paste and save a key; once saved it shows masked with a way to remove it. */
+function KeyField({ provider }: { provider: AiProviderInfo }): React.JSX.Element {
+  const setKey = useAi((s) => s.setKey)
+  const [draft, setDraft] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const save = async (value: string | null): Promise<void> => {
+    setSaving(true)
+    setError(null)
+    try {
+      await setKey(provider.id, value)
+      setDraft('')
+    } catch (e) {
+      setError(errorMessage(e))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (provider.available) {
+    return (
+      <span className="ml-auto flex min-w-0 items-center gap-2">
+        <span className="truncate font-mono text-xs text-muted-foreground">{provider.detail}</span>
+        <Button
+          variant="ghost"
+          size="xs"
+          className="press font-normal text-muted-foreground hover:text-foreground"
+          disabled={saving}
+          onClick={() => void save(null)}
+        >
+          Remove
+        </Button>
+      </span>
+    )
+  }
+
+  return (
+    <form
+      className="ml-auto flex min-w-0 flex-1 flex-col items-end gap-1 py-2"
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (draft.trim()) void save(draft)
+      }}
+    >
+      <span className="flex w-full max-w-60 gap-1.5">
+        <Input
+          type="password"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="Paste an API key"
+          aria-label={`${provider.label} API key`}
+          aria-invalid={!!error}
+          autoComplete="off"
+          spellCheck={false}
+          className="h-7 min-w-0 font-mono text-xs shadow-none md:text-xs"
+        />
+        <Button
+          type="submit"
+          variant="outline"
+          size="xs"
+          className="press h-7 border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
+          disabled={!draft.trim() || saving}
+        >
+          {saving ? 'Saving' : 'Save'}
+        </Button>
+      </span>
+      {error && (
+        <span role="alert" className="motion-enter text-xs text-destructive">
+          {error}
+        </span>
+      )}
+    </form>
   )
 }

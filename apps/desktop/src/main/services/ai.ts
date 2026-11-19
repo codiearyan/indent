@@ -27,7 +27,7 @@ import {
   trimHistory,
   tutorSystemPrompt
 } from './ai/prompt'
-import { readSettings, suggestionMode, type AiSettings } from './ai/settings'
+import { readSettings, suggestionMode, withKey, type AiSettings } from './ai/settings'
 
 type ApiProviderId = Exclude<AiProviderId, CliProviderId>
 
@@ -302,7 +302,8 @@ async function testConnection(): Promise<string> {
       }
     })
   } catch (error) {
-    if (timeout.aborted) throw new Error(`No reply within ${limit / 1000} seconds.`)
+    if (timeout.aborted)
+      throw new Error(`No reply within ${limit / 1000} seconds.`, { cause: error })
     throw error
   }
   const reply = text.trim().replace(/\s+/g, ' ').slice(0, 200)
@@ -334,14 +335,9 @@ export function register(): void {
 
     setKey: async (provider, key) => {
       if (!API_PROVIDERS.some((p) => p.id === provider)) throw new Error('Unknown provider')
-      const stored = { ...(await loadKeys()) }
-      if (key?.trim()) {
-        if (!safeStorage.isEncryptionAvailable()) {
-          throw new Error('This computer offers no secure storage for keys.')
-        }
-        stored[provider as ApiProviderId] = key.trim()
-      } else {
-        delete stored[provider as ApiProviderId]
+      const stored = withKey(await loadKeys(), provider as ApiProviderId, key)
+      if (stored[provider as ApiProviderId] && !safeStorage.isEncryptionAvailable()) {
+        throw new Error('This computer offers no secure storage for keys.')
       }
       await writeFile(keysFile(), safeStorage.encryptString(JSON.stringify(stored)))
       keys = stored
