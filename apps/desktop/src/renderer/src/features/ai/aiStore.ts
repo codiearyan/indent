@@ -17,7 +17,16 @@ export const useAi = create<AiStore>()((set) => ({
   config: null,
   menuOpen: false,
   load: async () => set({ config: await api.ai.getConfig() }),
-  update: async (patch) => set({ config: await api.ai.setConfig(patch) }),
+  // Shown at once: the reply can wait seconds behind the search for installed CLIs.
+  update: async (patch) => {
+    set((s) => (s.config ? { config: { ...s.config, ...patch } } : s))
+    try {
+      set({ config: await api.ai.setConfig(patch) })
+    } catch (error) {
+      set({ config: await api.ai.getConfig() })
+      throw error
+    }
+  },
   setKey: async (provider, key) => set({ config: await api.ai.setKey(provider, key) }),
   setMenuOpen: (menuOpen) => set({ menuOpen }),
   openMenu: () => set({ menuOpen: true })

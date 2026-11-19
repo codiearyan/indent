@@ -42,6 +42,9 @@ export function Onboarding(): React.JSX.Element {
   const View = STEPS[step]
 
   const finish = useCallback((): void => {
+    // The provider shown as picked is saved even when the person only pressed Continue.
+    const { config, update } = useAi.getState()
+    if (config?.enabled && config.provider) void update({ provider: config.provider })
     window.location.hash = '#/'
     viewTransition('onboarding-finish', () => useSettings.getState().setOnboarded(true))
   }, [])
@@ -59,7 +62,7 @@ export function Onboarding(): React.JSX.Element {
   useEffect(() => {
     const onKey = (event: KeyboardEvent): void => {
       const target = event.target as HTMLElement
-      if (event.key !== 'Enter' || event.isComposing) return
+      if (event.key !== 'Enter' || event.isComposing || event.repeat) return
       // Radio items cancel Enter themselves (it must not pick an option), so they are let through.
       if (event.defaultPrevented && target.getAttribute('role') !== 'radio') return
       if (target !== document.body && !rootRef.current?.contains(target)) return
@@ -82,6 +85,7 @@ export function Onboarding(): React.JSX.Element {
   }, [step])
 
   useEffect(() => {
+    stepRef.current?.scrollTo(0, 0)
     stepRef.current?.querySelector<HTMLElement>('[data-step-heading]')?.focus({
       preventScroll: true
     })
