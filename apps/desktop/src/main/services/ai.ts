@@ -64,6 +64,8 @@ const CLI_FAST_MODEL: Partial<Record<CliProviderId, string>> = { 'claude-code': 
 
 const CHAT_TIMEOUT_MS = 120_000
 const AI_OFF = 'AI is off. Turn it on from the AI menu.'
+// A CLI starts a whole agent before it answers, so it gets longer than an HTTP call.
+const TEST_TIMEOUT_MS = { cli: 45_000, api: 20_000 }
 const COMPLETE_TIMEOUT_MS = { cli: 20_000, api: 8_000 }
 
 const settingsFile = (): string => dataFile('ai.json')
@@ -280,6 +282,33 @@ async function complete(request: AiCompleteRequest): Promise<string> {
   }
 }
 
+async function testConnection(): Promise<string> {
+  const config = await buildConfig()
+  if (!config.enabled) throw new Error(AI_OFF)
+  const provider = config.providers.find((p) => p.id === config.provider)
+  if (!provider) throw new Error('No AI provider is set up yet.')
+  const limit = TEST_TIMEOUT_MS[provider.kind]
+  const timeout = AbortSignal.timeout(limit)
+  let text = ''
+  try {
+    await streamReply(config, {
+      system: 'You check that a connection works. Answer in one short sentence.',
+      messages: [{ role: 'user', content: 'Greet a learner in five words or fewer.' }],
+      quick: false,
+      signal: timeout,
+      onDelta: (delta) => {
+        text += delta
+      }
+    })
+  } catch (error) {
+    if (timeout.aborted) throw new Error(`No reply within ${limit / 1000} seconds.`)
+    throw error
+  }
+  const reply = text.trim().replace(/\s+/g, ' ').slice(0, 200)
+  if (!reply) throw new Error(`${provider.label} answered with nothing.`)
+  return reply
+}
+
 export function register(): void {
   handle('ai', {
     getConfig: () => buildConfig(true),
@@ -326,7 +355,9 @@ export function register(): void {
       return requestId
     },
 
-    complete
+    complete,
+
+    test: testConnection
   })
 
   listen('ai', {
