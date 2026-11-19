@@ -71,7 +71,7 @@ signature has to change, change it there and in every caller in the same change.
 ## Design system
 
 The look in one line: a dark frame holds the navigation, the work sits on a sheet one step lighter,
-the chrome is neutral, and the one hue is a vivid orange.
+the chrome is neutral, and the one hue is a calm orange.
 
 - **Three levels, no more.** The frame is `bg-background`. The sheet is `bg-card rounded-2xl border`
   inset 8px from the window edges. Cards on the sheet are `rounded-lg border border-border` with no
