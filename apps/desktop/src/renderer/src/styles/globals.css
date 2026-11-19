@@ -16,6 +16,11 @@ html.platform-darwin {
   --sidebar-top: 52px;
 }
 
+html.window-fullscreen {
+  --titlebar-inset: 0px;
+  --sidebar-top: 16px;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
