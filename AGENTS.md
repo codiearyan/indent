@@ -64,7 +64,7 @@ src/renderer/src/
   components/app/        small shared app components (ThemeToggle, LevelBadge, LanguageIcon)
   lib/                   api.ts (typed window.api), utils.ts (cn)
   stores/                zustand: settings (persisted), progress, catalog, workspace
-  features/<name>/       catalog, workspace, editor, terminal, ai, tour, dsa
+  features/<name>/       catalog, workspace, editor, terminal, ai, tour, dsa, onboarding
 ```
 
 `src/shared/types.ts` is the contract between content, main and renderer. Read it first. If a
@@ -136,6 +136,18 @@ the chrome is neutral, and the one hue is a calm orange.
 - To look at a change: `pnpm dev` starts the app; `node scripts/cdp.mjs navshot "#/labs|/tmp/x.png"`
   navigates the running window and saves a screenshot (start Electron with
   `--remote-debugging-port=9222`, or set `CDP_PORT`).
+
+## First-run setup
+
+`features/onboarding/` is the setup shown instead of the app while `useSettings().onboarded` is false.
+It is not a route: finishing or skipping sets `onboarded` and the app takes over on Home; "Run setup
+again" in the AI menu clears it. `steps.ts` is the pure step machine (which steps exist for the
+choices, next, back, the progress cells, the help level mapping) with its tests. Every choice writes
+the real setting at once (`ai.setConfig`, `ai.setKey`), so skipping keeps what was picked. Step
+changes run through `lib/viewTransition.ts` with the type `onboarding-step`; `onboarding.css` holds
+the transition, the staged entrances and the scenes, all on the motion tokens, with a
+reduced-motion block that turns movement into fades and shows each scene's last frame. The scenes in
+`scenes/` are built from app components and tokens, never images.
 
 ## Content packs
 
