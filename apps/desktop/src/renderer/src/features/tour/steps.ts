@@ -77,7 +77,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     anchor: TOUR.aiSuggestions,
     title: 'AI help',
-    text: 'Pick the AI that helps you, and turn grey inline suggestions in the editor on or off.'
+    text: 'Turn AI on or off, pick the AI that helps you, and choose when grey suggestions appear.'
   },
   {
     anchor: TOUR.view,
