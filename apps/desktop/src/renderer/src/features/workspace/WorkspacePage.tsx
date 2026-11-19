@@ -6,6 +6,7 @@ import { useWorkspace } from '@/stores/workspace'
 import { EditorPane } from '@/features/editor/EditorPane'
 import { TerminalPane } from '@/features/terminal/TerminalPane'
 import { ChatPanel } from '@/features/ai/ChatPanel'
+import { useAiEnabled } from '@/features/ai/aiStore'
 import { Tour } from '@/features/tour/Tour'
 import { TopBar } from './TopBar'
 import { LeftPanel } from './LeftPanel'
@@ -24,6 +25,8 @@ export function WorkspacePage(): React.JSX.Element {
   const lessonSide = useSettings((s) => s.lessonSide)
   const setPanel = useSettings((s) => s.setPanel)
   const terminalRef = usePanelRef()
+  const aiOn = useAiEnabled()
+  const chat = panels.chat && !panels.zen && aiOn
 
   useEffect(() => {
     if (labId && chapterId) void open(labId, chapterId)
@@ -87,8 +90,8 @@ export function WorkspacePage(): React.JSX.Element {
           </Panel>
           {lessonSide === 'right' && lesson && <Separator className={`w-px ${separator}`} />}
           {lessonSide === 'right' && lesson}
-          {panels.chat && !panels.zen && <Separator className={`w-px ${separator}`} />}
-          {panels.chat && !panels.zen && (
+          {chat && <Separator className={`w-px ${separator}`} />}
+          {chat && (
             <Panel id="chat" defaultSize="26%" minSize="20%">
               <ChatPanel />
             </Panel>

@@ -23,6 +23,11 @@ export const useAi = create<AiStore>()((set) => ({
   openMenu: () => set({ menuOpen: true })
 }))
 
+/** True until the config says otherwise, so the tutor does not flicker in while it loads. */
+export function useAiEnabled(): boolean {
+  return useAi((s) => s.config?.enabled ?? true)
+}
+
 export function activeProvider(config: AiConfig | null): AiProviderInfo | undefined {
   return config?.providers.find((p) => p.id === config.provider)
 }

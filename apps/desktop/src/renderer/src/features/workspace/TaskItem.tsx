@@ -28,6 +28,7 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
   const result = taskProgress?.lastResult
   const failed = result?.passed === false
   const isChecking = checking?.includes(task.id) ?? false
+  const aiOn = useAi((s) => s.config?.enabled ?? false)
   const nudge = useAi((s) => s.config?.nudge ?? false)
 
   const askWhy = (): void => {
@@ -75,7 +76,7 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
             <Compass />
             Next step
           </Button>
-          {failed && nudge && !isChecking && <AskWhy onClick={askWhy} />}
+          {failed && aiOn && nudge && !isChecking && <AskWhy onClick={askWhy} />}
         </div>
         {stepsOpen && (
           <div className="space-y-2 rounded-lg border border-border p-3 text-sm">
@@ -84,7 +85,7 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
                 <li key={i}>{step}</li>
               ))}
             </ol>
-            {failed && !nudge && <AskWhy onClick={askWhy} className="-ml-2" />}
+            {failed && aiOn && !nudge && <AskWhy onClick={askWhy} className="-ml-2" />}
           </div>
         )}
         <TaskHints hints={task.hints} unlocked={hintsUnlocked(progress?.nonGreenChecks ?? 0)} />

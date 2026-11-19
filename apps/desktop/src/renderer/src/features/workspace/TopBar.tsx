@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AiMenu } from '@/features/ai/AiMenu'
+import { useAiEnabled } from '@/features/ai/aiStore'
 import { cn } from '@/lib/utils'
 import { TOUR } from '@/features/tour/anchors'
 import { useSettings } from '@/stores/settings'
@@ -17,6 +18,7 @@ export function TopBar(): React.JSX.Element {
   const chapter = useWorkspace((s) => s.chapter)
   const chatOpen = useSettings((s) => s.panels.chat)
   const togglePanel = useSettings((s) => s.togglePanel)
+  const aiOn = useAiEnabled()
 
   const goToChapter = (id?: string): void => {
     if (id) navigate(`/learn/${labId}/${id}`)
@@ -67,20 +69,22 @@ export function TopBar(): React.JSX.Element {
         )}
       </nav>
       <div className="flex shrink-0 items-center gap-0.5">
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-pressed={chatOpen}
-          onClick={() => togglePanel('chat')}
-          data-tour={TOUR.chat}
-          className={cn(
-            'font-normal text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]',
-            chatOpen && 'bg-accent text-foreground'
-          )}
-        >
-          <MessageCircle />
-          Tutor
-        </Button>
+        {aiOn && (
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-pressed={chatOpen}
+            onClick={() => togglePanel('chat')}
+            data-tour={TOUR.chat}
+            className={cn(
+              'font-normal text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]',
+              chatOpen && 'bg-accent text-foreground'
+            )}
+          >
+            <MessageCircle />
+            Tutor
+          </Button>
+        )}
         <AiMenu />
         <ViewPopover />
       </div>

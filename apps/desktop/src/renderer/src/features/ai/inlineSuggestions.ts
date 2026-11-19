@@ -41,7 +41,7 @@ export function registerInlineSuggestions(monaco: typeof Monaco): Monaco.IDispos
       const chapter = useWorkspace.getState().chapter
       const explicit = context.triggerKind === monaco.languages.InlineCompletionTriggerKind.Explicit
       const mode = config?.suggestions ?? 'off'
-      if (!config?.provider || !chapter || mode === 'off') return none
+      if (!config?.enabled || !config.provider || !chapter || mode === 'off') return none
       if (mode === 'manual' && !explicit) return none
       // Monaco cancels the token on the next keystroke, so only a real pause gets through.
       if (!explicit && !(await pause(PAUSE_MS, token))) return none
