@@ -1,0 +1,108 @@
+---
+import type { Repo } from '../lib/content'
+import BuildStrip from './BuildStrip.astro'
+import SectionHead from './SectionHead.astro'
+
+interface Props {
+  repos: Repo[]
+}
+
+const { repos } = Astro.props
+const issues = repos.reduce((n, r) => n + r.issues.length, 0)
+const tasks = repos.reduce((n, r) => n + r.tasks, 0)
+const languageCode: Record<string, string> = {
+  javascript: 'JS',
+  typescript: 'TS',
+  sql: 'SQL',
+  shell: 'SH'
+}
+const languageName: Record<string, string> = {
+  javascript: 'JavaScript',
+  typescript: 'TypeScript',
+  sql: 'SQL',
+  shell: 'Shell and git'
+}
+const figures = [
+  { label: 'Repos', value: repos.length },
+  { label: 'Issues', value: issues },
+  { label: 'Tasks', value: tasks },
+  { label: 'Hints per task', value: 3 }
+]
+---
+
+<section id="repos" aria-labelledby="repos-title" class="scroll-mt-8 py-28 sm:py-40">
+  <div class="wrap">
+    <SectionHead
+      id="repos-title"
+      label="/repos"
+      step={1}
+      muted={`${repos.length} small companies with a problem.`}
+      bright="You are the developer"
+      accent="they just hired."
+    >
+      <p>
+        A repo is a story told through its issues. An issue is a short lesson and a few tasks, and
+        every task is checked by hidden tests. Pick the one that matches what you want to get good
+        at.
+      </p>
+    </SectionHead>
+
+    <dl
+      class="mt-16 grid grid-cols-2 overflow-hidden rounded-lg border border-border sm:grid-cols-4"
+    >
+      {
+        figures.map((figure, i) => (
+          <div
+            class:list={[
+              'flex flex-col gap-3 p-6 sm:p-7',
+              i % 2 === 1 && 'border-l border-rule',
+              i >= 2 && 'border-t border-rule sm:border-t-0',
+              i === 2 && 'sm:border-l'
+            ]}
+          >
+            <dt class="text-[13px] text-muted-foreground">{figure.label}</dt>
+            <dd class="text-[32px] leading-none tracking-[-0.02em] tabular-nums sm:text-[40px]">
+              {figure.value}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <ul
+      class="mt-6 grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-2 lg:grid-cols-3"
+    >
+      {
+        repos.map((repo) => (
+          <li class="group flex flex-col bg-background p-6 sm:p-7">
+            <div class="flex items-center justify-between gap-3">
+              <span
+                class="inline-flex h-6 min-w-8 items-center justify-center rounded-sm border border-border px-1.5 font-mono text-[11px] text-muted-foreground"
+                title={languageName[repo.language] ?? repo.language}
+              >
+                {languageCode[repo.language] ?? repo.language}
+              </span>
+              <span class="text-[13px] text-muted-foreground">{repo.category}</span>
+            </div>
+            <h3 class="mt-6 text-[19px] leading-snug font-medium tracking-[-0.01em]">
+              {repo.title}
+            </h3>
+            <p class="mt-2.5 mb-8 text-[15px] leading-[1.6] text-muted-foreground">
+              {repo.problem}
+            </p>
+            <div class="mt-auto flex flex-col gap-3">
+              <BuildStrip groups={repo.issues.map((issue) => issue.tasks)} hoverFill />
+              <span class="font-mono text-[12px] text-muted-foreground tabular-nums">
+                {repo.issues.length} issues, {repo.tasks} tasks
+              </span>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="mt-6 text-[14px] text-muted-foreground">
+      Each strip is one repo: a group per issue, a cell per task. In the app the cells fill as your
+      tasks pass.
+    </p>
+  </div>
+</section>

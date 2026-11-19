@@ -1,0 +1,76 @@
+---
+import Plus from '@lucide/astro/icons/plus'
+import BuildStrip from './BuildStrip.astro'
+
+const faqs = [
+  {
+    q: 'Do I need an account?',
+    a: 'No. There is no sign-in and no server. You open the app and start a repo.'
+  },
+  {
+    q: 'Does it work without internet?',
+    a: 'Yes, once it is set up. The first Check installs the test tools into the app’s data folder, once. After that every repo runs offline, including the ones about language models, which talk to the local model inside the app. Only the tutor needs whatever network its CLI or API key needs.'
+  },
+  {
+    q: 'Do I need an API key?',
+    a: 'No. The LLM, retrieval, agents and evals repos run against the local model, an offline stand-in for a model API that answers the same way every time. A key is one of two ways to power the optional tutor; the other is a coding CLI you already have installed.'
+  },
+  {
+    q: 'Which platforms does it run on?',
+    a: 'macOS first. Indent is a desktop app, and it runs your code and the checks with your own Node.js (22.18 or newer).'
+  },
+  {
+    q: 'Which languages can I learn?',
+    a: 'JavaScript and TypeScript, including async code and a JSON API with plain Node. SQL on built-in SQLite. Git, in the real terminal. The AI repos (LLM apps, retrieval, agents, evals) are written in TypeScript.'
+  },
+  {
+    q: 'Where is my work stored?',
+    a: 'In folders on your computer. Each issue has its own workspace with the starter files, which you edit like any project. Your progress is stored locally too. The hidden tests are never copied into your workspace.'
+  },
+  {
+    q: 'Will the hints or the tutor just give me the answer?',
+    a: 'No. Check messages say what to look at in plain words and never give the answer. Hints open one at a time as you keep trying, and the tutor explains rather than writes the code for you.'
+  },
+  {
+    q: 'Is it free?',
+    a: 'There is nothing to buy or sign up for in Indent itself: no account, no server. If you use the tutor, any cost is between you and the provider behind your CLI or API key.'
+  }
+]
+---
+
+<section id="faq" aria-labelledby="faq-title" class="scroll-mt-8 border-t border-rule py-28 sm:py-40">
+  <div class="wrap grid gap-14 lg:grid-cols-12">
+    <div class="lg:col-span-5">
+      <div class="flex items-center gap-3">
+        <p class="font-mono text-[13px] text-muted-foreground">/faq</p>
+        <BuildStrip groups={[8]} filled={8} />
+      </div>
+      <h2 id="faq-title" class="headline mt-6 text-[38px] sm:text-[48px] lg:text-[60px]">
+        <span class="text-muted-foreground">Questions,</span>{' '}
+        <span>answered plainly.</span>
+      </h2>
+      <p class="mt-6 max-w-[380px] text-[17px] leading-[1.6] text-muted-foreground">
+        What people ask before they install a learning tool that runs on their own machine.
+      </p>
+    </div>
+    <div class="border-b border-rule lg:col-span-7">
+      {
+        faqs.map((item) => (
+          <details class="group border-t border-rule">
+            <summary class="flex cursor-pointer items-center justify-between gap-6 rounded-sm py-6 text-[18px] font-medium tracking-[-0.01em]">
+              {item.q}
+              <Plus
+                class="faq-icon size-5 shrink-0 text-muted-foreground transition-transform duration-200"
+                stroke-width={1.5}
+                aria-hidden="true"
+              />
+            </summary>
+            <p class="-mt-1 max-w-[620px] pb-7 text-[16px] leading-[1.65] text-muted-foreground">
+              {item.a}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>

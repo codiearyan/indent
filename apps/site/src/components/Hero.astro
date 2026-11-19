@@ -1,0 +1,91 @@
+---
+import ArrowRight from '@lucide/astro/icons/arrow-right'
+import CodeTexture from './CodeTexture.astro'
+import Shot from './Shot.astro'
+import workspace from '../assets/screens/workspace.png'
+
+interface Props {
+  repos: number
+  issues: number
+  tasks: number
+}
+
+const { repos, issues, tasks } = Astro.props
+---
+
+<section id="top" aria-labelledby="hero-title" class="relative pt-36 sm:pt-44">
+  <CodeTexture />
+  <div class="wrap relative flex flex-col items-center text-center">
+    <p
+      class="inline-flex items-center gap-2.5 rounded-full border border-border bg-background py-1 pr-4 pl-1 text-[14px] text-muted-foreground"
+    >
+      <span class="rounded-full bg-primary px-2.5 py-0.5 text-[13px] font-medium text-primary-foreground">
+        macOS
+      </span>
+      A desktop app. No account, no server.
+    </p>
+    <h1
+      id="hero-title"
+      class="display mt-8 max-w-[1100px] text-[44px] text-balance sm:text-[72px] lg:text-[104px]"
+    >
+      Learn to code by fixing real problems
+    </h1>
+    <p
+      class="mt-7 max-w-[640px] text-[17px] leading-[1.6] text-balance text-muted-foreground sm:text-[19px]"
+    >
+      Each repo is a small company with a problem, and you are its developer. Read a short lesson,
+      write the code in a real editor, run it in a real terminal, and press Check.
+    </p>
+    <div class="mt-10 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
+      <a
+        href="#run"
+        class="inline-flex h-13 w-full items-center justify-center gap-2 rounded-full bg-primary px-7 text-[16px] font-medium text-primary-foreground transition-opacity hover:opacity-90 sm:w-auto"
+      >
+        Get Indent for macOS
+        <ArrowRight class="size-4" stroke-width={2} aria-hidden="true" />
+      </a>
+      <a
+        href="#repos"
+        class="inline-flex h-13 w-full items-center justify-center rounded-full border border-input px-7 text-[16px] font-medium transition-colors hover:bg-accent sm:w-auto"
+      >
+        See the {repos} repos
+      </a>
+    </div>
+    <p class="mt-7 text-[14px] text-muted-foreground tabular-nums">
+      <span class="text-foreground">{repos}</span> repos,{' '}
+      <span class="text-foreground">{issues}</span> issues,{' '}
+      <span class="text-foreground">{tasks}</span> tasks. All of it on your disk.
+    </p>
+  </div>
+
+  <div class="relative mx-auto mt-20 w-full max-w-[1400px] px-3 sm:mt-24 sm:px-8">
+    <div class="brand-halo pointer-events-none absolute inset-x-0 top-0 -bottom-24" aria-hidden="true">
+    </div>
+    <figure class="relative">
+      <div
+        class="absolute -top-5 right-4 z-10 flex items-center gap-2.5 rounded-full border border-border bg-popover py-2 pr-4 pl-3 text-[14px] shadow-2xl sm:right-10"
+      >
+        <span class="size-2 rounded-full bg-success" aria-hidden="true"></span>
+        <span class="text-foreground">3 of 3 tasks pass</span>
+        <span class="hidden text-muted-foreground sm:inline">Issue 1 of 5</span>
+      </div>
+      <div class="rounded-[22px] border border-border bg-card p-1.5 shadow-2xl sm:p-2">
+        <Shot
+          src={workspace}
+          alt="The Indent workspace. On the left, the tasks of the issue A server that answers, all three passed. In the middle, src/respond.js in the editor. Below, the terminal shows node try.js answering GET /health, GET /boats, a 404 and a 405."
+          maxWidth={1340}
+          eager
+          class="hidden rounded-[16px] sm:block"
+        />
+        <Shot
+          src={workspace}
+          crop={[0, 70, 1300, 1300]}
+          alt="The Indent workspace: the tasks of the issue A server that answers, all three passed, next to src/respond.js in the editor."
+          maxWidth={640}
+          class="rounded-[12px] sm:hidden"
+        />
+      </div>
+      <figcaption class="sr-only">The workspace after every task of an issue has passed.</figcaption>
+    </figure>
+  </div>
+</section>

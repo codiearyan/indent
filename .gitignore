@@ -6,3 +6,5 @@ out
 *.log*
 
 .taste-skill
+.astro
+*.tsbuildinfo

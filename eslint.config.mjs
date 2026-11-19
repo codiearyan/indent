@@ -11,6 +11,7 @@ export default defineConfig(
       '**/node_modules',
       '**/dist',
       '**/out',
+      '**/.astro',
       'content/**',
       'scripts/**',
       'apps/desktop/src/renderer/src/components/ui/**'
