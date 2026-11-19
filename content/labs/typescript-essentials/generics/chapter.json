@@ -1,0 +1,65 @@
+{
+  "id": "generics",
+  "title": "Generics",
+  "files": ["src/lists.ts", "src/latest.ts", "src/queue.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. The demo batches jobs, finds the newest note and runs a small queue, and `npm run types` type-checks your files.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "lists",
+      "title": "Helpers for any kind of list",
+      "file": "src/lists.ts",
+      "description": "In `src/lists.ts`, write two generic functions. The item type of the list must flow into the result.\n\n- `lastItem(items)` returns the last item, or `undefined` for an empty list. Called with a list of strings, its type is `string | undefined`.\n- `chunk(items, size)` splits the list into lists of `size` items, in order; the last chunk holds what is left. A `size` below 1 throws an `Error`. An empty list gives `[]`, and the input list is not changed. Called with a list of numbers, its type is `number[][]`.\n- Both accept read-only arrays.\n\nThe check calls both functions with hidden lists. It also type-checks your file with hidden code: the results must keep the item type, and misuse (reading the last string as a number, a size given as text) must be a type error. Code that uses `any` or loses the item type to `unknown` is rejected.",
+      "nextSteps": [
+        "Add a type parameter to `lastItem` and use it for the parameter and the return type.",
+        "Do the same for `chunk`, then build the chunks with a loop.",
+        "Throw for a size below 1 and run `node src/demo.ts`.",
+        "Run `npm run types`."
+      ],
+      "hints": [
+        "A type parameter is a name, usually `T`, that stands for whatever type the caller's list holds. TypeScript fills it in at each call.",
+        "`readonly T[]` accepts both normal and read-only arrays, and `slice` on it still gives you a normal `T[]`.",
+        "`items[items.length - 1]` has the type `T` in this compiler setup, but it can be missing. Your declared return type is where you say so."
+      ],
+      "points": 10
+    },
+    {
+      "id": "latest",
+      "title": "The newest note, whatever it is attached to",
+      "file": "src/latest.ts",
+      "description": "In `src/latest.ts`, write two generic functions with constraints:\n\n- `latest(items)` accepts items that have at least `updatedAt: number`, and returns the one with the largest `updatedAt` (the first of them on a tie), or `undefined` for an empty list.\n- `findById(items, id)` accepts items that have at least `id: string`, and returns the item with that `id`, or `undefined`.\n\nThe result must keep the full item type: `latest(notes)?.text` is a string when the notes have a `text`. The check calls both functions with hidden lists. It also type-checks your file with hidden code: correct uses must compile, and misuse (items without `updatedAt`, an `updatedAt` that is text, numeric ids) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Give `latest` a type parameter constrained with `extends`.",
+        "Find the newest item with a loop and return the whole item.",
+        "Write `findById` the same way with its own constraint.",
+        "Run `npm run types` and `node src/demo.ts`."
+      ],
+      "hints": [
+        "A parameter typed `{ updatedAt: number }[]` would accept the notes but return only `{ updatedAt: number }`, and `.text` would be lost.",
+        "`<T extends { updatedAt: number }>` keeps the caller's real item type in `T` and still lets you read `item.updatedAt` inside the function.",
+        "Keep the best item so far in a variable of type `T | undefined` and replace it only when an item's time is strictly larger."
+      ],
+      "points": 10
+    },
+    {
+      "id": "queue",
+      "title": "A queue for any kind of job",
+      "file": "src/queue.ts",
+      "description": "In `src/queue.ts`:\n\n- Export a generic interface `Queue<T>` with `add(item: T): void`, `next(): T | undefined` (removes and returns the front item), `peek(): T | undefined` (returns it without removing) and `size(): number`.\n- Export `createQueue(initial)`, which returns a `Queue` holding the initial items in order. `initial` is optional and defaults to an empty list. The item type is inferred from the argument, so `createQueue([1, 2])` is a `Queue<number>`, and `createQueue<string>()` makes an empty queue of strings. The array passed in is never changed.\n\nThe check runs hidden sequences of `add`, `next`, `peek` and `size`. It also type-checks your file with hidden code: correct uses must compile, and misuse (adding a string to a queue of numbers, treating `next()` as never empty) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Write the `Queue<T>` interface.",
+        "Annotate `createQueue` with a type parameter, a default for `initial` and the return type.",
+        "Copy the initial items into a private array and return an object with the four methods.",
+        "Run `npm run types` and `node src/demo.ts`."
+      ],
+      "hints": [
+        "Methods in an interface use the type parameter of the interface, so `Queue<number>` has `add(item: number)`.",
+        "When a parameter has the type `readonly T[]`, TypeScript infers `T` from the array you pass. You do not need to write `createQueue<number>([1, 2])`.",
+        "Spread `initial` into a new array inside `createQueue`, and let the returned methods close over that array. `shift()` already returns `T | undefined`."
+      ],
+      "points": 10
+    }
+  ]
+}

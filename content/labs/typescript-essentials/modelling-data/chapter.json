@@ -1,0 +1,65 @@
+{
+  "id": "modelling-data",
+  "title": "Modelling data",
+  "files": ["src/levels.ts", "src/booking.ts", "src/status.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. The demo builds a booking and prints job statuses, and `npm run types` type-checks your files.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "levels",
+      "title": "Service levels as exact values",
+      "file": "src/levels.ts",
+      "description": "In `src/levels.ts`:\n\n- Replace the placeholder `ServiceLevel` with a union of the string literals `'basic'`, `'full'` and `'overhaul'`, and keep it exported.\n- `parseLevel(input: string): ServiceLevel | null` trims the input, ignores upper and lower case, and returns the matching level, or `null` when the text is not a level.\n- `levelPrice(level: ServiceLevel): number` returns the price in cents: basic `3500`, full `6500`, overhaul `12000`.\n\nThe check calls both functions with hidden inputs. It also type-checks your file with hidden code: `ServiceLevel` must be exactly those three values, correct uses must compile, and misuse (`levelPrice('quick')`, treating the result of `parseLevel` as never null) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Write the `ServiceLevel` union.",
+        "Annotate `levelPrice` and return a price for each level.",
+        "Write `parseLevel` so its result has the type `ServiceLevel | null`, not `string`.",
+        "Run `npm run types`, then `node src/demo.ts`."
+      ],
+      "hints": [
+        "A string literal type such as `'full'` allows exactly one string. A union of three of them allows exactly three.",
+        "If `levelPrice` switches over every level and returns in each case, TypeScript knows the function cannot fall off the end.",
+        "Comparing a lowercased string with `=== 'basic'` narrows it to the literal `'basic'`, so returning the compared value has the right type without a cast."
+      ],
+      "points": 10
+    },
+    {
+      "id": "booking",
+      "title": "The shape of a booking",
+      "file": "src/booking.ts",
+      "description": "In `src/booking.ts`, export two interfaces and a function:\n\n- `Bike`: `serial` (a string that cannot be reassigned), `make` (a string) and `electric` (an optional boolean).\n- `Booking`: `id` (a string that cannot be reassigned), `bike` (a `Bike`), `level` (a `ServiceLevel` from `levels.ts`) and `notes` (an optional string).\n- `createBooking(id, bike, level, notes?)` returns a new `Booking`. When `notes` is not given, the booking has no `notes` key at all.\n\nThe check calls `createBooking` and looks at the keys of what it returns. It also type-checks your file with hidden code: bookings and bikes with and without the optional members must compile, and misuse (changing an `id` or a `serial`, a bike without a make, notes that are a number) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Write the `Bike` interface and mark which members are optional or read-only.",
+        "Write the `Booking` interface the same way.",
+        "Annotate `createBooking` with an optional last parameter and build the object.",
+        "Run `npm run types` and `node src/demo.ts`."
+      ],
+      "hints": [
+        "`?` after a member name makes it optional, and `readonly` before it stops reassignment after the object is made.",
+        "`readonly` is checked by the compiler only. At runtime the object is a plain object, so it costs nothing.",
+        "Spreading or writing `notes: notes` always creates the key, even when the value is `undefined`. Return a different object literal when there are no notes."
+      ],
+      "points": 10
+    },
+    {
+      "id": "status",
+      "title": "Where is my bike?",
+      "file": "src/status.ts",
+      "description": "In `src/status.ts`, export a type `JobStatus` that is a union of four object types, told apart by `kind`:\n\n- `{ kind: 'waiting' }`\n- `{ kind: 'in-repair', mechanic: string }`\n- `{ kind: 'waiting-for-parts', part: string, days: number }`\n- `{ kind: 'ready', totalCents: number }`\n\nThen write `statusMessage(status: JobStatus): string`:\n\n- waiting: `'In the queue'`\n- in-repair: `'<mechanic> is working on it'`\n- waiting-for-parts: `'Waiting for <part>, about <days> days'`, with `day` when `days` is 1\n- ready: `'Ready for pickup, EUR <euros>'` with two decimals, for example `EUR 65.50`\n\nUse a `switch` on `kind`. Its `default` branch assigns `status` to a variable of type `never` and throws an `Error`, so an unknown kind from old data throws and a fifth kind added later is a type error until it is handled.\n\nThe check calls `statusMessage` for every kind and for an unknown one, looks for the `never` check, and type-checks your file with hidden code: every variant must compile, and misuse (a ready job without a total, a kind that does not exist, members from the wrong variant) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Write the `JobStatus` union with the four variants.",
+        "Annotate `statusMessage` and switch on `status.kind`.",
+        "Return the right message in each case, reading only that variant's members.",
+        "Add the `never` default branch, then run `npm run types`."
+      ],
+      "hints": [
+        "Every variant has a `kind` member with a different literal type. That shared member is what lets TypeScript tell them apart.",
+        "Inside `case 'ready':`, TypeScript has already narrowed `status` to the ready variant, so `status.totalCents` type-checks there and nowhere else.",
+        "After all four cases, nothing is left in the union, so the type of `status` in `default` is `never`. Assign it to `const unhandled: never` and throw."
+      ],
+      "points": 10
+    }
+  ]
+}

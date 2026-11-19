@@ -1,0 +1,65 @@
+{
+  "id": "types-from-types",
+  "title": "Types from types",
+  "files": ["src/fields.ts", "src/changes.ts", "src/rules.ts", "src/booking.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. The demo plucks fields, applies a change and runs a few rules on the sample bookings, and `npm run types` type-checks your files.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "fields",
+      "title": "Reading fields by name",
+      "file": "src/fields.ts",
+      "description": "In `src/fields.ts`, replace the placeholders and write `pluck`. `Booking` lives in `src/booking.ts` and does not change.\n\n- `BookingKey`: the union of every property name of `Booking`, written with `keyof`.\n- `CustomerInfo`: the type of `Booking`'s `customer` property, written as an indexed access type.\n- `pluck(items, key)` returns a new list holding `item[key]` for every item, in order. It is generic over the item type and the key, so `pluck(bookings, 'priceCents')` has the type `number[]`, it works on any kind of item, and a key the items do not have is a type error.\n\nThe check calls `pluck` with hidden lists. It also type-checks your file with hidden code: both types must be exactly right, correct uses must compile, and misuse (`pluck(bookings, 'colour')`, reading prices as strings) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Write `BookingKey` with `keyof` and `CustomerInfo` with square brackets.",
+        "Give `pluck` two type parameters: the item type and a key of it.",
+        "Use an indexed access type for the return type, then implement it with `map`.",
+        "Run `npm run types` and `node src/demo.ts`."
+      ],
+      "hints": [
+        "`keyof SomeType` is a union of string literals, one per property. Square brackets on a type, `SomeType['name']`, give the type of one property.",
+        "The second type parameter needs a constraint so it can only be a key of the first: `K extends keyof T`.",
+        "If `item` is a `T` and `key` is a `K`, then `item[key]` is a `T[K]`. A list of those is the return type."
+      ],
+      "points": 10
+    },
+    {
+      "id": "changes",
+      "title": "Drafts, changes and counts",
+      "file": "src/changes.ts",
+      "description": "In `src/changes.ts`, build three types from `Booking` and `ServiceLevel` with utility types, then write two functions.\n\n- `NewBooking`: a `Booking` without `id`. Use `Omit`.\n- `BookingChange`: `level`, `dropOff` and `notes` from `Booking`, each optional, and no other member. Use `Pick` and `Partial`.\n- `LevelCounts`: a number for every `ServiceLevel`. Use `Record`.\n- `applyChange(booking: Booking, change: BookingChange): Booking` returns a new booking with the change applied. A key that is missing or `undefined` in the change keeps the old value; an empty string for `notes` is a real value. The original booking is not modified.\n- `countLevels(bookings)` returns `LevelCounts`, with `0` for levels nobody booked.\n\nThe check calls both functions with hidden bookings. It also type-checks your file with hidden code: valid drafts, changes and counts must compile, and misuse (a draft with an `id`, a change to the price, counts missing a level) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Write the three types with `Omit`, `Pick`, `Partial` and `Record`.",
+        "Annotate both functions with them.",
+        "Write `countLevels` starting from an object with every level at 0.",
+        "Write `applyChange`, then run `npm run types` and `node src/demo.ts`."
+      ],
+      "hints": [
+        "Utility types take types as arguments. `Omit<Booking, 'id'>` is a new type; nothing at runtime changes.",
+        "`Pick` chooses the members and `Partial` makes them optional, so the order you nest them in matters for which members end up optional.",
+        "`{ ...booking, ...change }` copies a key whose value is `undefined` and wipes the old value. Set each changed member with `??` instead."
+      ],
+      "points": 10
+    },
+    {
+      "id": "rules",
+      "title": "Rules for any record",
+      "file": "src/rules.ts",
+      "description": "In `src/rules.ts`, write a mapped type of your own and use it.\n\n- `Rules<T>`: for every key `K` of `T`, an optional function that takes a value of type `T[K]` and returns a `boolean`. So in a `Rules<Booking>`, the `priceCents` rule receives a number and the `notes` rule a string.\n- `brokenRules(value, rules)` runs each rule against the matching member of `value` and returns the keys whose rule returned `false`, in the order the rules object lists them. Its return type is a list of keys of the value's type.\n\nThe check calls `brokenRules` with hidden records and rules. It also type-checks your file with hidden code: rules whose parameters are typed from the record must compile, an empty rules object must compile, and misuse (a price rule that takes a string, a rule for a key that does not exist, a rule that does not return a boolean) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Write `Rules<T>` with `[K in keyof T]` and the `?` modifier.",
+        "Annotate `brokenRules` with one type parameter.",
+        "Loop over the keys of `rules` and collect the broken ones.",
+        "Run `npm run types` and `node src/demo.ts`."
+      ],
+      "hints": [
+        "A mapped type walks over a union of keys and builds one member per key: `{ [K in SomeKeys]: ... }`. Inside, `K` is one key at a time.",
+        "`Object.keys` returns `string[]` because objects can have extra keys at runtime. Telling TypeScript they are `(keyof T)[]` with `as` is the usual move here, and it is not `any`.",
+        "A rule can be missing, so read `rules[key]` into a variable and call it only when it is defined, passing `value[key]`."
+      ],
+      "points": 10
+    }
+  ]
+}

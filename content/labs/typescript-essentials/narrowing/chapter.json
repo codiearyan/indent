@@ -1,0 +1,65 @@
+{
+  "id": "narrowing",
+  "title": "Types and narrowing",
+  "files": ["src/price.ts", "src/contact.ts", "src/greeting.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. The demo runs your functions, and `npm run types` type-checks them.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "to-cents",
+      "title": "Prices from two kinds of input",
+      "file": "src/price.ts",
+      "description": "Type and implement `toCents(amount)` in `src/price.ts`. The old booking form sends a price as a number of euros or as the text a person typed.\n\n- Parameter: a `number` or a `string`. Return: a number of cents, or `null`.\n- A number is euros: return `amount * 100` rounded to whole cents. A negative or non-finite number gives `null`.\n- A string is trimmed first. Digits with an optional dot and one or two decimals (`'12'`, `'12.5'`, `'12.50'`) give cents. Anything else (`''`, `'abc'`, `'-3'`, `'12.345'`) gives `null`.\n\nThe check calls `toCents` with hidden inputs. It also type-checks your file in strict mode together with hidden code that uses `toCents` correctly (must compile) and code that misuses it (must be a type error, for example passing a boolean or treating the result as a plain number). Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Write the parameter type and the return type in the signature.",
+        "Split the two cases with `typeof` and handle the number case.",
+        "Handle the string case, then run `node src/demo.ts`.",
+        "Run `npm run types` and make sure it prints nothing for `src/price.ts`."
+      ],
+      "hints": [
+        "A union type in the signature lets callers pass either kind of value, and a union in the return type tells them the answer can be missing.",
+        "After `if (typeof amount === 'number') { ... return }`, TypeScript knows that `amount` is a string in the rest of the function, so `.trim()` is allowed.",
+        "For the string case, test the trimmed text against a regular expression for digits, an optional dot and one or two digits before converting it with `Number`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "contact",
+      "title": "Email or phone",
+      "file": "src/contact.ts",
+      "description": "Implement and annotate two functions in `src/contact.ts`. The types `EmailContact`, `PhoneContact` and `Contact` are already there.\n\n- `isEmailContact(contact: Contact)` returns `true` for an email contact. Its return type must be a type predicate, so that after `if (isEmailContact(c))` TypeScript knows `c.email` exists, and in the `else` branch knows `c.phone` exists.\n- `contactLine(contact: Contact): string` returns `'Email <email>'`, `'Text <phone>'` when `textOk` is true, or `'Call <phone>'` when it is false.\n\nNarrow with `in` or with your guard, not with `as`. The check calls both functions with hidden contacts and type-checks your file with hidden code: correct uses (reading `email` after the guard) must compile, and misuse (a contact with a `fax`, using the line as a number) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Annotate both parameters with `Contact`.",
+        "Write `isEmailContact` with the `in` operator.",
+        "Change its return type from a plain boolean to a type predicate.",
+        "Use the guard in `contactLine` and run `npm run types`."
+      ],
+      "hints": [
+        "Only one member of the union has an `email` property. That is enough to tell them apart at runtime.",
+        "A function whose return type is `value is SomeType` returns a boolean, and TypeScript narrows `value` wherever the function is called in an `if`.",
+        "With `contact is EmailContact` as the return type, the code after an early `return` in `contactLine` sees a `PhoneContact`, so `contact.textOk` type-checks."
+      ],
+      "points": 10
+    },
+    {
+      "id": "greeting",
+      "title": "Customers who might not be there",
+      "file": "src/greeting.ts",
+      "description": "Annotate and implement two functions in `src/greeting.ts`, using the `Customer` type in the file.\n\n- `findCustomer(customers, id)` takes a list of customers and a numeric id. It returns the matching customer, or `undefined` when there is none, and its return type says so.\n- `greeting(customers, id)` returns `'Hi <nickname>'` when the customer has a nickname with at least one non-space character, `'Hi <name>'` otherwise, and `'Hi there'` when no customer has that id. A nickname can be missing, `null` or an empty or blank string.\n\nThe check calls both functions with hidden customers and type-checks your file with hidden code: correct uses must compile, and misuse (assigning the result of `findCustomer` to a plain `Customer`, or passing the id as text) must be a type error. Code that uses `any` is rejected.",
+      "nextSteps": [
+        "Annotate `findCustomer` and return the result of `Array.prototype.find`.",
+        "In `greeting`, handle the customer that is not found first.",
+        "Decide which nicknames count, then run `node src/demo.ts`.",
+        "Run `npm run types` and read any message about `undefined` or `null`."
+      ],
+      "hints": [
+        "`find` already returns the element type or `undefined`. Let your return type say the same thing instead of hiding it.",
+        "Optional chaining (`?.`) stops at `null` and `undefined`, so you can trim a nickname that might not exist without an `if`.",
+        "`??` only falls back on `null` and `undefined`, while `||` also falls back on an empty string. A trimmed blank nickname is an empty string."
+      ],
+      "points": 10
+    }
+  ]
+}
