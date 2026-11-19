@@ -1,0 +1,71 @@
+{
+  "id": "changing-data",
+  "title": "Changing data safely",
+  "files": [
+    "queries/1-new-cafe.sql",
+    "queries/2-price-review.sql",
+    "queries/3-cancel-order.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs a file against a fresh copy of the bakehouse database, so changes are never saved.",
+    "suggestedCommand": "node run.mjs queries/1-new-cafe.sql"
+  },
+  "tasks": [
+    {
+      "id": "new-cafe",
+      "title": "Sign up a new cafe",
+      "file": "queries/1-new-cafe.sql",
+      "description": "A new cafe has signed up and placed its first order on the same day.\n\nIn `queries/1-new-cafe.sql`, write two `INSERT` statements:\n\n1. Add a cafe named `The Lantern Room` in the town `Wyndham Cross`, with contact email `hello@lanternroom.example`, joined on `2026-11-19`.\n2. Add an order for that cafe, ordered on `2026-11-19`, with status `pending` and no driver (`NULL`).\n\nDo not type any ids. Let the database choose the new ids, and look up the new cafe's id with a subquery by its name.\n\nThe check runs your file and compares the whole `cafes` and `orders` tables with the expected tables, on the shipped data and on a hidden dataset with a different number of cafes and orders.",
+      "nextSteps": [
+        "Insert the cafe, listing the columns you fill in.",
+        "Add `SELECT * FROM cafes;` at the end of the file and run it to see the new row.",
+        "Insert the order, finding the cafe id with a subquery.",
+        "Check the new order points at the new cafe, then remove the extra SELECT if you like."
+      ],
+      "hints": [
+        "Leave id out of the column list and SQLite gives an INTEGER PRIMARY KEY column the next free number.",
+        "A value in VALUES can be a subquery in parentheses, as long as it returns one value.",
+        "For the order, put (SELECT id FROM cafes WHERE name = 'The Lantern Room') where the cafe_id value goes, and write NULL for driver_id."
+      ],
+      "points": 10
+    },
+    {
+      "id": "price-review",
+      "title": "Apply the price review",
+      "file": "queries/2-price-review.sql",
+      "description": "Flour went up, and Tobias has two changes for the product list. In `queries/2-price-review.sql`:\n\n1. `UPDATE`: raise the price of every product in the `bread` category by 5%, rounded to 2 decimals with `ROUND(..., 2)`. No other product changes.\n2. `DELETE`: remove products that are out of stock (`stock` is 0) **and** have never been ordered (they appear in no `order_items` row). Products that are out of stock but appear in past orders must stay, or old orders would point at nothing.\n\nThe check runs your file and compares the whole `products` table with the expected table, on the shipped data and on a hidden dataset.",
+      "nextSteps": [
+        "Write each WHERE clause as a SELECT first and check which rows it finds.",
+        "Turn the first SELECT into the UPDATE and run it with a SELECT after it.",
+        "Turn the second SELECT into the DELETE.",
+        "Check that out-of-stock products with past orders are still there."
+      ],
+      "hints": [
+        "An UPDATE or DELETE without a WHERE clause changes every row in the table.",
+        "SET can use the old value of the column: price = price * 1.05 reads the current price of each row.",
+        "The delete needs both conditions: stock = 0 AND the id is NOT IN the list of product ids from order_items."
+      ],
+      "points": 10
+    },
+    {
+      "id": "cancel-order",
+      "title": "Cancel an order in one transaction",
+      "file": "queries/3-cancel-order.sql",
+      "description": "The cafe behind order `27` has closed for repairs, and the order must be cancelled. Its items were set aside from stock when it was placed, so they go back on the shelf.\n\nIn `queries/3-cancel-order.sql`, inside one transaction (`BEGIN;` ... `COMMIT;`):\n\n1. Add the `quantity` of each item in order 27 back to that product's `stock`. Other products do not change.\n2. Set the status of order 27 to `cancelled`.\n\nKeep the order's rows in `order_items`. Do not type the product ids or quantities: read them from `order_items`, because the hidden dataset has different items in order 27.\n\nThe check compares the `products`, `orders` and `order_items` tables with the expected tables on both datasets, checks that your file opens and commits a transaction, and checks that the total stock went up by exactly the number of items in the order.",
+      "nextSteps": [
+        "SELECT the items of order 27 and the current stock of those products.",
+        "Write the stock UPDATE with a subquery and check the new stock values.",
+        "Add the status UPDATE.",
+        "Wrap both in BEGIN and COMMIT and run the file."
+      ],
+      "hints": [
+        "The new stock of a product depends on its own row in order_items, so the UPDATE needs a correlated subquery.",
+        "Inside SET, (SELECT quantity FROM order_items WHERE order_id = 27 AND product_id = products.id) is the amount for the row being updated.",
+        "Without a WHERE on the UPDATE, products not in the order get NULL from the subquery, and SQLite refuses to store a NULL stock. Limit the UPDATE to ids IN the order's product ids."
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "sql-basics",
+  "title": "SQL from zero",
+  "description": "Brindle Bakehouse bakes bread and cakes for a dozen cafes along the coast, and every order sits in a small SQLite database nobody has learned to query. As its first developer, you answer the team's questions with SQL, from simple lists to joins and subqueries, and then change the data without breaking it.",
+  "category": "Databases",
+  "language": "sql",
+  "tags": ["SQL"],
+  "kind": "lab",
+  "parts": [
+    { "title": "Asking the database questions", "chapters": ["reading-rows", "summaries", "joins", "subqueries"] },
+    { "title": "Changing what is stored", "chapters": ["changing-data"] }
+  ]
+}

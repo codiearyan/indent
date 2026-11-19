@@ -1,0 +1,71 @@
+{
+  "id": "subqueries",
+  "title": "Queries inside queries",
+  "files": [
+    "queries/1-above-average.sql",
+    "queries/2-cake-buyers.sql",
+    "queries/3-big-spenders.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs a query file against a fresh copy of the bakehouse database.",
+    "suggestedCommand": "node run.mjs queries/1-above-average.sql"
+  },
+  "tasks": [
+    {
+      "id": "above-average",
+      "title": "Spot the dear products in each category",
+      "file": "queries/1-above-average.sql",
+      "description": "Tobias wants to know which products cost more than is usual for their own category. A loaf is not dear just because it costs more than a croissant.\n\nIn `queries/1-above-average.sql`, return `name`, `category` and `price` for every product whose price is **above the average price of products in the same category**. Sort by `category` from A to Z, then by `price` from highest to lowest.\n\nWork the averages out inside the query. The hidden dataset has different prices, so typed-in numbers will fail.",
+      "nextSteps": [
+        "Write a query that returns the average price of one category.",
+        "Use it as a subquery in WHERE for that one category.",
+        "Make the subquery follow the category of the outer row.",
+        "Add the sort and compare with the averages from the previous chapter."
+      ],
+      "hints": [
+        "A subquery in parentheses that returns one value can stand anywhere a number can.",
+        "The subquery needs to know which category the outer row has. Give the outer table an alias so the inner query can refer to it.",
+        "Inside the subquery, filter with WHERE category = p.category, where p is the alias of the outer products table."
+      ],
+      "points": 10
+    },
+    {
+      "id": "cake-buyers",
+      "title": "List the cafes that buy cake",
+      "file": "queries/2-cake-buyers.sql",
+      "description": "Tobias is launching a new cake and wants to tell the cafes that already buy cakes.\n\nIn `queries/2-cake-buyers.sql`, return `name` and `town` of every cafe that has **at least one delivered order containing a product in the `cake` category**. Each cafe appears **once**, however many cakes it bought. Row order does not matter.\n\nUse `EXISTS` with a subquery. The check compares your rows with the expected rows on the shipped data and on a hidden dataset.",
+      "nextSteps": [
+        "Write a query that lists the cake items in delivered orders for one cafe id.",
+        "Wrap it in EXISTS inside a query on cafes.",
+        "Connect the inner query to the outer cafe.",
+        "Check that no cafe appears twice."
+      ],
+      "hints": [
+        "Joining cafes straight to orders and items gives one row per cake bought, so busy cafes repeat.",
+        "EXISTS (subquery) is true when the subquery returns at least one row. What it selects does not matter, so SELECT 1 is common.",
+        "Inside EXISTS, join orders, order_items and products, and add o.cafe_id = c.id to the conditions along with the status and category."
+      ],
+      "points": 10
+    },
+    {
+      "id": "big-spenders",
+      "title": "Find the cafes that spend above average",
+      "file": "queries/3-big-spenders.sql",
+      "description": "Odile wants to offer a discount to the cafes that spend the most.\n\nA cafe's spend is the sum of `quantity * price` over the items in its **delivered** orders, using the product's current price. Consider only cafes with at least one delivered order.\n\nIn `queries/3-big-spenders.sql`, return:\n\n- `cafe`: the cafe's name\n- `spend`: its spend, rounded to 2 decimals\n\nfor every cafe whose spend is **above the average spend of those cafes**. Sort by `spend` from highest to lowest. Compare unrounded values; round only in the final SELECT.\n\nUse a common table expression (`WITH`) for the per-cafe spend. The check compares rows and their order on the shipped data and on a hidden dataset.",
+      "nextSteps": [
+        "Write a query that returns cafe_id and spend for every cafe with delivered orders.",
+        "Put it in a WITH block and give it a name.",
+        "Select from that name, keeping cafes above the average of the same name.",
+        "Join to cafes for the name, then round and sort."
+      ],
+      "hints": [
+        "Break it into two questions: what did each cafe spend, and what is the average of those numbers?",
+        "A WITH block works like a named table for the rest of the query, and you can read it more than once, including inside a subquery.",
+        "In the final query: FROM your named result, JOIN cafes, and WHERE total > (SELECT AVG(total) FROM your named result)."
+      ],
+      "points": 10
+    }
+  ]
+}
