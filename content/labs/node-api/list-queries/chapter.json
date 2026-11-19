@@ -1,0 +1,65 @@
+{
+  "id": "list-queries",
+  "title": "Lists people can use",
+  "files": ["src/listQuery.js", "src/app.js", "try.js", "src/boats.js", "src/store.js", "src/errors.js", "src/body.js", "src/respond.js", "src/quote.js", "src/fleet.js", "server.js"],
+  "terminal": {
+    "description": "A shell in your workspace where try.js asks your API for pages, filters and sort orders of the fleet.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "parse-query",
+      "title": "Read the query string",
+      "file": "src/listQuery.js",
+      "description": "Implement `parseListQuery(searchParams)` in `src/listQuery.js`. It takes a `URLSearchParams` and returns `{ type, available, sortBy, order, limit, offset }`:\n\n| Parameter | Accepts | Default |\n| --- | --- | --- |\n| `type` | one of `BOAT_TYPES` | `null` |\n| `available` | `true` or `false`, returned as a boolean | `null` |\n| `sort` | `code`, `name` or `hourlyCents`, with a leading `-` for descending; sets `sortBy` and `order` (`'asc'` or `'desc'`) | `sortBy: 'code'`, `order: 'asc'` |\n| `limit` | a whole number from 1 to 50 | `10` |\n| `offset` | a whole number from 0 | `0` |\n\nUnknown parameters are ignored. A whole number is written with digits only, so `2.5`, `10abc`, `1e3` and an empty value are all bad. When any value is bad, throw `new HttpError(400, 'invalid_query', message, details)` with one `{ field, message }` per bad parameter, every problem at once.",
+      "nextSteps": [
+        "Start from an object holding the defaults.",
+        "Read each parameter with `searchParams.get` and handle `null` as not given.",
+        "Write one small helper for whole numbers and use it for limit and offset.",
+        "Collect problems and throw once at the end, then press Check."
+      ],
+      "hints": [
+        "Everything in a query string is text. Your job is to turn text into typed values, or say clearly why you cannot.",
+        "`Number('')` is 0 and `parseInt('10abc')` is 10, so neither is strict enough on its own. A regular expression that only matches digits is.",
+        "For sort, check `sort.startsWith('-')`, slice it off, then check what is left against the three field names."
+      ],
+      "points": 10
+    },
+    {
+      "id": "apply-query",
+      "title": "Filter, sort and page",
+      "file": "src/listQuery.js",
+      "description": "Implement `applyListQuery(boats, query)` in `src/listQuery.js`. It takes the boats and a query shaped like the result of `parseListQuery`, and returns `{ data, total, limit, offset }`:\n\n- keep the boats whose `type` and `available` match; a `null` value means no filter\n- sort by `sortBy` in `order`; boats with the same value are ordered by `code`, ascending, in both directions\n- `total` is the number of matching boats **before** paging\n- `data` holds at most `limit` boats, starting at `offset`; an offset past the end gives `[]`\n\nIt must not change the order of the `boats` array it is given. The check runs it on the fleet in reverse order.",
+      "nextSteps": [
+        "Filter first, keeping the result in a new array.",
+        "Write a compare function for the sort that falls back to the code.",
+        "Count, then slice the page.",
+        "Run `node try.js` once the route is done too."
+      ],
+      "hints": [
+        "Filter, sort, count, slice. The order of these steps decides what total means.",
+        "`available: false` is a filter. A check like `if (query.available)` skips it by accident.",
+        "`filter` returns a new array, so sorting that one is safe. In the compare function, multiply the field comparison by -1 for desc, and use `|| compareCodes` for ties."
+      ],
+      "points": 10
+    },
+    {
+      "id": "list-route",
+      "title": "Serve the list",
+      "file": "src/app.js",
+      "description": "Fill in `listBoats` in `src/app.js` so `GET /boats` answers `200` with the envelope `{ data, total, limit, offset }`.\n\n- read the query string from `req.url`\n- parse it with `parseListQuery`\n- apply it to `store.list()` with `applyListQuery`\n\nA bad parameter answers `400` with code `invalid_query` and its details. The check also creates a boat and then lists it, so the list must come from the store.",
+      "nextSteps": [
+        "Get a `URLSearchParams` for the request.",
+        "Pass it through both helpers.",
+        "Send the result with `sendJson`.",
+        "Run `node try.js` and read every answer."
+      ],
+      "hints": [
+        "You already took the pathname out of `req.url` in handleRequest. The same object has the query.",
+        "`new URL(req.url, 'http://localhost').searchParams` is exactly what parseListQuery takes.",
+        "Do not catch the HttpError from parseListQuery. createApp already turns it into a 400."
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "node-api",
+  "title": "Build a JSON API with Node",
+  "description": "Larchmere Kayaks rents boats from a shed on Lake Marrow, and its bookings still live on a whiteboard. Build their JSON API from plain Node, one chapter at a time: routes, request bodies, a full resource, lists with filters and pages, then tokens, safe errors and request ids.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": ["Node.js", "Project"],
+  "kind": "lab",
+  "parts": [
+    { "title": "Answering requests", "chapters": ["first-routes", "json-bodies"] },
+    { "title": "The fleet behind an API", "chapters": ["boat-crud", "list-queries", "auth-and-errors"] }
+  ]
+}
