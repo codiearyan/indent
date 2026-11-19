@@ -28,7 +28,7 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
   const result = taskProgress?.lastResult
   const failed = result?.passed === false
   const isChecking = checking?.includes(task.id) ?? false
-  const aiOn = useAi((s) => s.config?.enabled ?? false)
+  const aiOn = useAi((s) => !!s.config?.enabled && !!s.config.provider)
   const nudge = useAi((s) => s.config?.nudge ?? false)
 
   const askWhy = (): void => {
