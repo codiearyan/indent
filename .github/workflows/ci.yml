@@ -1,13 +1,21 @@
 name: CI
 
+# CI minutes are limited: pull requests only, nothing for docs or lab content,
+# and a newer push to the same pull request cancels the older run.
 on:
   pull_request:
-  push:
-    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'content/**'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

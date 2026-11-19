@@ -120,6 +120,10 @@ environment sets `OPENAI_BASE_URL`, `OPENAI_API_KEY` and `LAB_MODEL_URL`.
   `docs/<name>`) and its own pull request against `main`. One concern per pull request.
 - Before opening a pull request: `npm run typecheck`, `npm run lint` and `npm test` pass.
 - Pull requests are squash-merged. The squash title is the pull request title plus its number.
+- CI minutes are limited. CI runs on pull requests only and skips docs and lab content. Verify
+  locally, push once per pull request, and batch small related fixes into one pull request instead
+  of opening several.
+- Pull request text is a plain description of the change. No generated-by or tool attribution lines.
 - Commit and pull request titles are `type(scope): message` (`feat(editor): ...`, `fix(checks): ...`,
   `chore: ...`). Commits are authored by the repository owner, with no co-author or other trailers.
 - Describe everything on its own terms. Never name or allude to another product, course, site or
