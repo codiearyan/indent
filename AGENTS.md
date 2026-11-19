@@ -1,4 +1,4 @@
-# Labbench
+# Indent
 
 A local-first Electron desktop app for hands-on coding labs. Each lab is a story: a small company has a
 problem and the learner is its developer. A chapter is a short lesson plus tasks; the learner writes
@@ -37,34 +37,63 @@ signature has to change, change it there and in every caller in the same change.
 
 ## Design system
 
-- Tokens live in `styles/globals.css` in three layers: primitives, semantic, Tailwind mapping.
-  Components only use the Tailwind utilities of semantic tokens: `bg-background`, `bg-card`,
-  `bg-popover`, `bg-muted`, `bg-accent`, `text-foreground`, `text-muted-foreground`, `border-border`,
-  `bg-primary text-primary-foreground`, `text-brand`, `bg-brand`, `text-success`, `text-warning`,
-  `text-destructive`, with opacity modifiers for soft fills (`bg-success/10`).
-  Never write hex, rgb or oklch in a component, and never use Tailwind palette colors (`bg-zinc-900`).
-- Meaning of color: primary (inverted neutral) is the one main action in a view. brand (cobalt) is
-  active state, progress, links and AI. success is a passed check, destructive a failed one,
-  warning is hints and hard mode. Do not use brand for pass or fail.
-- Type: Geist (`font-sans`) for UI, Geist Mono (`font-mono`) for code, file names and log lines.
-  Body 14px (`text-sm`), secondary 13px/12px muted, page titles `text-2xl font-medium tracking-tight`.
-  Weights 400 and 500 only; 600 only inside prose.
-- Shape: `rounded-md` controls, `rounded-lg` cards and popovers, `rounded-xl` large cards. 1px borders,
-  no drop shadows on flat surfaces (popovers keep the shadcn shadow). Spacing on the 4px grid.
-- Icons: `lucide-react`, `size-4` in controls, stroke default. Icon-only buttons get a Tooltip and
-  an `aria-label`.
-- Build from `components/ui/*` (Button, Badge, Card, Dialog, DropdownMenu, Popover, Tooltip, Tabs,
-  Slider, Progress, ScrollArea, Switch, ToggleGroup, Select, Input, Textarea, Skeleton, Collapsible,
+The look in one line: a dark frame holds the navigation, the work sits on a sheet one step lighter,
+the chrome is neutral, and the one hue is the yellow of a highlighted line of code.
+
+- **Three levels, no more.** The frame is `bg-background`. The sheet is `bg-card rounded-2xl border`
+  inset 8px from the window edges. Cards on the sheet are `rounded-lg border border-border` with no
+  fill of their own and no shadow. Shadows are only for what floats (menus, popovers, dialogs).
+- **Colour is meaning.** `brand` is the yellow. It marks progress (a filled task cell in the build
+  strip, the level meter, the activity heatmap) and it is the one main action of a view
+  (`bg-primary text-primary-foreground`: a yellow button with ink text). `success` is the small green
+  mark of a passed check and `destructive` the red mark of a failed one; they are status marks, never
+  fills for large areas. `warning` is only the "being compared" tone in the DSA animations.
+  Nothing else has a hue: links, active navigation, selected tabs, hints and AI are neutral.
+  - Selected or active: a neutral pill (`bg-accent text-foreground`) or ink text. Never the brand.
+  - Links: `text-muted-foreground hover:text-foreground`, or ink with an underline in prose.
+  - Never set text in the brand colour on a light surface; use it as a fill with ink text on top.
+  - Soft status fills use opacity (`bg-success/10 text-success`, `bg-destructive/10`).
+- **Tokens only.** Use the Tailwind utilities of the semantic tokens in `styles/globals.css`
+  (`bg-background`, `bg-card`, `bg-muted`, `bg-accent`, `text-foreground`, `text-muted-foreground`,
+  `border-border`, `border-rule`, `border-input`, `bg-primary`, `text-success`, `text-warning`,
+  `text-destructive`). Never hex, rgb or oklch in a component, never Tailwind palette colours.
+- **Lines in three steps.** `border-border` for the edge of a card or the sheet, `border-rule` for
+  rules between rows inside a card, `border-input` for controls.
+- **Type.** IBM Plex Sans (`font-sans`) for the interface, IBM Plex Mono (`font-mono`) for code, file
+  names, ids and commands. Page title `text-[22px] leading-7 font-semibold`, card title
+  `text-sm font-semibold`, body `text-sm`, meta `text-[13px]` or `text-xs` in `text-muted-foreground`.
+  Weights 400, 500 and 600. Figures that matter are 24px at regular weight with `tabular-nums`; the
+  label sits above in 13px grey. Sentence case everywhere; no uppercase tracked labels.
+- **Shape.** `rounded-lg` (8px) cards and popovers, `rounded-md` (6px) controls, `rounded-sm` (4px)
+  chips, `rounded-2xl` for the sheet only. Spacing on the 4px grid; one gap (`gap-6`) between cards;
+  rows 48 to 56px tall.
+- **Figures are type, not tiles.** A set of numbers is one container split by `border-rule` hairlines.
+  No icon in a tinted square, no sparkline, no coloured figure.
+- **Lists are rules and alignment.** Rows separated by `border-rule`, no zebra, no header band,
+  numbers right-aligned in tabular figures, one status mark per row.
+- **Progress is the build strip.** A lab's progress is drawn with `components/app/BuildStrip`: one
+  group per chapter, one cell per task, green when passed. Use it instead of a generic progress bar
+  wherever a lab's progress is shown.
+- **Empty states keep the frame**: the card and its header stay, with one plain sentence inside.
+- **Never:** gradients, glows, glass or backdrop blur, emoji, a greeting as the title, a hue on the
+  chrome, more than one filled button in a view.
+- Icons: `lucide-react`, `size-4`, `strokeWidth={1.5}` in navigation. Icon-only buttons get a Tooltip
+  and an `aria-label`.
+- Build from `components/ui/*` (Button, Badge, Dialog, DropdownMenu, Popover, Tooltip, Tabs, Slider,
+  Progress, ScrollArea, Switch, ToggleGroup, Select, Input, Textarea, Skeleton, Collapsible,
   AlertDialog, sonner `toast`). Do not hand-roll a control that exists there.
 - Long-form markdown (lessons, task text, AI replies) is rendered inside `.prose-lab`
   (`.prose-lab.prose-compact` for dense places).
-- Text size zones: the lesson scroll area gets `.zone-lesson`, the tasks list `.zone-tasks`; the
-  editor and terminal multiply their font size by `useSettings().textScale.editor|terminal`.
-- Both themes must work. Check every view in light and dark (`useSettings().theme`).
-- The window is frameless on macOS: top bars are `.app-drag` and leave `var(--titlebar-inset)` free
-  on the left for the traffic lights.
+- Text size zones: the lesson content gets `.zone-lesson`, the tasks list `.zone-tasks`; the editor
+  and terminal multiply their font size by `useSettings().textScale.editor|terminal`.
+- Both themes must work; dark is the default. Check every view in both.
+- The window is frameless on macOS: the frame is `.app-drag`; a top bar leaves
+  `var(--titlebar-inset)` free on the left and the sidebar starts at `var(--sidebar-top)`.
 - Copy is plain and short. No em dashes. Sentence case.
 - Guided tour: elements the tour points at carry `data-tour={TOUR.x}` from `features/tour/anchors.ts`.
+- To look at a change: `npm run dev` starts the app; `node scripts/cdp.mjs navshot "#/labs|/tmp/x.png"`
+  navigates the running window and saves a screenshot (start Electron with
+  `--remote-debugging-port=9222`, or set `CDP_PORT`).
 
 ## Content packs
 
@@ -118,8 +147,7 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
 
 ## Rules of the product
 
-- Hard mode pays full task points, easy mode half. Easy mode shows the solution after a check. Once a
-  solution is opened in a chapter, that chapter stays in easy mode.
+- Every task pays its points once, the first time it passes.
 - Each task has three hints. The first unlocks after 3 checks that are not all green, then one per check.
 - All of it is in `src/shared/rules.ts`; do not re-implement the numbers elsewhere.
 

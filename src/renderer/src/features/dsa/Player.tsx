@@ -59,11 +59,11 @@ export function Player({ player }: { player: PlayerControls }): React.JSX.Elemen
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              variant="ghost"
-              size="sm"
+              variant="outline"
+              size="xs"
               onClick={player.cycleSpeed}
               aria-label={`Speed ${speed}x`}
-              className="w-12 font-mono text-xs tabular-nums"
+              className="ml-1 w-11 bg-transparent font-mono font-normal tabular-nums shadow-none dark:bg-transparent"
             >
               {speed}x
             </Button>
@@ -78,7 +78,7 @@ export function Player({ player }: { player: PlayerControls }): React.JSX.Elemen
         step={1}
         onValueChange={([value]) => player.seek(value)}
         aria-label="Step"
-        className="min-w-32 flex-1"
+        className="min-w-32 flex-1 [&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-track]]:bg-accent"
       />
       <span className="text-xs whitespace-nowrap text-muted-foreground tabular-nums">
         Step {index + 1} of {count}

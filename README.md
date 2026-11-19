@@ -1,4 +1,4 @@
-# Labbench
+# Indent
 
 A local-first desktop app for hands-on coding labs. Each lab is a story: a small company has a
 problem and you are its developer. Read a short lesson, write the code, press Check.
@@ -11,23 +11,22 @@ No account and no server. Lessons, your files and your progress live on your com
   below, an AI tutor on the right.
 - **Check**: hidden tests run against your code in about a second. Each task turns green, or shows
   what your code produced and says in plain words what to look at.
-- **Hints and modes**: three hints per task that unlock as you try. Hard mode pays full points;
-  easy mode shows the solution after a check for half points.
+- **Hints**: three hints per task, from a light nudge to almost there, that open as you try.
 - **AI without a sign-in**: uses a coding CLI you are already logged in to (Claude Code, Codex,
   OpenCode, Gemini CLI) or your own Anthropic, OpenAI or Gemini key. Tutor chat that explains
   rather than answers, and optional grey inline suggestions accepted with Tab.
 - **Lab model**: labs about language models talk to a small offline model that answers the same
   way every time, so nothing costs money and tests are repeatable.
-- **Listen to the chapter**, a guided tour, text size per panel, layout options, light and dark.
+- **Read aloud**, a guided tour, text size per panel, layout options, dark and light themes.
 - **DSA patterns**: 18 algorithm patterns as step-through animations (two pointers, sliding window,
   binary search, linked lists, heaps, BFS and DFS, topological sort, union-find, backtracking,
   dynamic programming and more). Each step highlights the line of code that runs and says what
   happened and why. Play, pause, scrub, change speed, and try your own input.
-- **Labs**: 12 story labs and 8 challenges (63 chapters, 186 tasks): LLM apps, retrieval, agents and
+- **Labs**: 12 story labs (55 chapters, 162 tasks): LLM apps, retrieval, agents and
   evals against the offline lab model; TypeScript, async JavaScript and a JSON API with plain Node;
   SQL on built-in SQLite; Git rescues done in the real terminal; and bug hunts in JavaScript and
   LLM code. Three learning paths put them in order.
-- **Catalog**: dashboard, labs with search and filters, learning paths, challenges and a year board
+- **Catalog**: dashboard, labs with search and filters, learning paths and a year board
   of your activity, points, levels and streaks.
 
 ## Run it
@@ -60,6 +59,6 @@ complete example. Restart the app to pick up a new lab.
 
 ## Where things are stored
 
-Everything is under the app's data folder (`~/Library/Application Support/labbench` on macOS):
+Everything is under the app's data folder (`~/Library/Application Support/indent` on macOS):
 `workspaces/` holds your files per chapter, `progress.json` your points and history. API keys are
 encrypted with the operating system's keychain.

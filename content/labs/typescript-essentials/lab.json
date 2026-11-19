@@ -5,7 +5,6 @@
   "category": "JavaScript and TypeScript",
   "language": "typescript",
   "tags": ["TypeScript"],
-  "kind": "lab",
   "parts": [
     { "title": "Typing what is already there", "chapters": ["narrowing", "modelling-data"] },
     { "title": "Types that do more of the work", "chapters": ["generics", "types-from-types", "unhappy-path"] }

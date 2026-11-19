@@ -2,8 +2,6 @@
 
 // ---------- Content ----------
 
-export type LabKind = 'lab' | 'challenge'
-
 /** content/labs/<labId>/lab.json */
 export interface LabMeta {
   id: string
@@ -15,9 +13,6 @@ export interface LabMeta {
   language: string
   /** Short labels on the card, e.g. ["TypeScript", "Interview"]. */
   tags: string[]
-  kind: LabKind
-  /** Challenges only. */
-  difficulty?: 'easy' | 'medium' | 'hard'
   parts: { title: string; chapters: string[] }[]
 }
 
@@ -37,11 +32,11 @@ export interface LabSummary extends LabMeta {
 export interface TaskDef {
   id: string
   title: string
-  /** The file this task is mostly about; its solution is solution/<file>. */
+  /** The file this task is mostly about. */
   file: string
   /** Markdown. */
   description: string
-  /** "What do I do next?": short ordered steps, no answers. */
+  /** "Next step": short ordered steps, no answers. */
   nextSteps: string[]
   /** Exactly three, from a light nudge to "almost there". */
   hints: string[]
@@ -121,21 +116,14 @@ export interface RuntimeStatus {
 
 // ---------- Progress ----------
 
-export type Mode = 'hard' | 'easy'
-
 export interface TaskProgress {
   passed: boolean
   pointsEarned: number
   passedAt?: string
-  passedMode?: Mode
-  solutionOpened: boolean
   lastResult?: CheckResult
 }
 
 export interface ChapterProgress {
-  mode: Mode
-  /** True once a solution was opened; the chapter can no longer return to hard mode. */
-  easyLocked: boolean
   /** Checks that were not all green. Drives hint unlocking. */
   nonGreenChecks: number
   tasks: Record<string, TaskProgress>
@@ -244,13 +232,6 @@ export interface Api {
     get(): Promise<ProgressState>
     /** Records the chapter as opened, creating its progress entry. */
     touch(labId: string, chapterId: string): Promise<ProgressState>
-    setMode(labId: string, chapterId: string, mode: Mode): Promise<ProgressState>
-    /** Easy mode only. Locks the chapter to easy mode. */
-    openSolution(
-      labId: string,
-      chapterId: string,
-      taskId: string
-    ): Promise<{ solution: WorkspaceFile; progress: ProgressState }>
   }
   terminal: {
     create(opts: { labId: string; chapterId: string; cols: number; rows: number }): Promise<string>
@@ -281,7 +262,7 @@ export const INVOKE_METHODS = {
   content: ['listLabs', 'getChapter', 'listPaths'],
   workspace: ['open', 'writeFile', 'reset'],
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
-  progress: ['get', 'touch', 'setMode', 'openSolution'],
+  progress: ['get', 'touch'],
   terminal: ['create'],
   ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete']
 } as const

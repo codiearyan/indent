@@ -12,12 +12,9 @@ export const TOUR = {
   editor: 'editor',
   checkAll: 'check-all',
   terminal: 'terminal',
-  mode: 'mode',
-  level: 'level',
-  aiSuggestions: 'ai-suggestions',
-  reset: 'reset',
   chat: 'chat',
-  textSize: 'text-size'
+  aiSuggestions: 'ai-suggestions',
+  view: 'view'
 } as const
 
 export type TourAnchor = (typeof TOUR)[keyof typeof TOUR]

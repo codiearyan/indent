@@ -146,7 +146,7 @@ export function cliInvocation(
 /** Runs one prompt in an empty temp folder and streams the reply's text. */
 export async function runCli(options: CliRun): Promise<void> {
   const { provider, path, signal, onDelta } = options
-  const cwd = await mkdtemp(join(tmpdir(), 'labbench-ai-'))
+  const cwd = await mkdtemp(join(tmpdir(), 'indent-ai-'))
   try {
     const { args, stdin, env } = cliInvocation(provider, options, cwd)
     const child = spawn(path, args, {

@@ -4,7 +4,7 @@ import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
 import { languageFor, monaco, pathOf, uriFor } from './monaco'
 
-const themeName = (theme: 'dark' | 'light'): string => `labbench-${theme}`
+const themeName = (theme: 'dark' | 'light'): string => `indent-${theme}`
 const fontSizeFor = (scale: number): number => Math.round(13 * scale)
 
 interface Props {
@@ -27,7 +27,7 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
     const editor = monaco.editor.create(hostRef.current!, {
       model: null,
       theme: themeName(theme),
-      fontFamily: 'Geist Mono Variable',
+      fontFamily: 'IBM Plex Mono',
       fontSize: fontSizeFor(textScale.editor),
       lineHeight: 1.6,
       folding: true,

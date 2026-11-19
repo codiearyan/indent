@@ -5,7 +5,6 @@
   "category": "JavaScript and TypeScript",
   "language": "javascript",
   "tags": ["Node.js", "Project"],
-  "kind": "lab",
   "parts": [
     { "title": "Answering requests", "chapters": ["first-routes", "json-bodies"] },
     { "title": "The fleet behind an API", "chapters": ["boat-crud", "list-queries", "auth-and-errors"] }

@@ -154,12 +154,12 @@ function ProviderRow({ provider }: { provider: AiProviderInfo }): React.JSX.Elem
         >
           <span
             className={cn(
-              'flex size-3.5 shrink-0 items-center justify-center rounded-full border',
-              selected && 'border-brand',
+              'flex size-3.5 shrink-0 items-center justify-center rounded-full border border-input',
+              selected && 'border-foreground',
               !provider.available && 'opacity-50'
             )}
           >
-            {selected && <span className="size-1.5 rounded-full bg-brand" />}
+            {selected && <span className="size-1.5 rounded-full bg-foreground" />}
           </span>
           <span className={cn('text-sm', !provider.available && 'text-muted-foreground')}>
             {provider.label}

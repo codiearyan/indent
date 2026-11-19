@@ -5,7 +5,6 @@
   "category": "JavaScript and TypeScript",
   "language": "javascript",
   "tags": ["JavaScript"],
-  "kind": "lab",
   "parts": [
     { "title": "Waiting well", "chapters": ["promises", "async-await", "many-at-once"] },
     { "title": "When services push back", "chapters": ["limiting-concurrency", "retries-and-cancellation"] }

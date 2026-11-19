@@ -10,7 +10,6 @@ const lab: LabSummary = {
   category: 'AI engineering',
   language: 'typescript',
   tags: [],
-  kind: 'lab',
   parts: [{ title: 'One', chapters: ['a', 'b'] }],
   chapters: [
     { id: 'a', number: 1, title: 'A', part: 'One', taskCount: 2, points: 20 },
@@ -20,10 +19,8 @@ const lab: LabSummary = {
 
 function chapter(completed: boolean, pointsEarned = 0): ChapterProgress {
   return {
-    mode: 'hard',
-    easyLocked: false,
     nonGreenChecks: 0,
-    tasks: { t1: { passed: completed, pointsEarned, solutionOpened: false } },
+    tasks: { t1: { passed: completed, pointsEarned } },
     startedAt: '2026-01-01T00:00:00Z',
     lastOpenedAt: '2026-01-02T00:00:00Z',
     completedAt: completed ? '2026-01-02T00:00:00Z' : undefined
@@ -48,6 +45,7 @@ describe('labProgress', () => {
     const p = labProgress(lab, { 'lab/a': chapter(true, 10), 'lab/b': chapter(false) })
     expect(p).toMatchObject({ status: 'in-progress', chaptersDone: 1, nextChapterId: 'b' })
     expect(p.pointsEarned).toBe(10)
+    expect(p.tasksPassed).toBe(1)
   })
 
   it('is completed when every chapter is, and goes back to the first chapter', () => {

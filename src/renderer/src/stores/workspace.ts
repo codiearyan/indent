@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Chapter, CheckResult, Mode, WorkspaceFile } from '@shared/types'
+import type { Chapter, CheckResult, WorkspaceFile } from '@shared/types'
 import { api } from '@/lib/api'
 import { useProgress } from './progress'
 import { useSettings } from './settings'
@@ -30,8 +30,6 @@ interface WorkspaceStore {
   reset(): Promise<void>
   /** Runs the hidden tests for some tasks, or all. */
   check(taskIds?: string[]): Promise<CheckResult[]>
-  setMode(mode: Mode): Promise<void>
-  openSolution(taskId: string): Promise<WorkspaceFile>
   setTourOpen(open: boolean): void
 }
 
@@ -129,16 +127,6 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       } finally {
         set({ checking: null })
       }
-    },
-
-    setMode: async (mode) => {
-      useProgress.getState().set(await api.progress.setMode(...ids(), mode))
-    },
-
-    openSolution: async (taskId) => {
-      const { solution, progress } = await api.progress.openSolution(...ids(), taskId)
-      useProgress.getState().set(progress)
-      return solution
     },
 
     setTourOpen: (tourOpen) => set({ tourOpen })

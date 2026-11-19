@@ -77,8 +77,8 @@ function defineTheme(name: string, base: 'vs' | 'vs-dark', p: CodePalette): void
   })
 }
 
-defineTheme('labbench-dark', 'vs-dark', codePalette.dark)
-defineTheme('labbench-light', 'vs', codePalette.light)
+defineTheme('indent-dark', 'vs-dark', codePalette.dark)
+defineTheme('indent-light', 'vs', codePalette.light)
 
 registerInlineSuggestions(monaco)
 

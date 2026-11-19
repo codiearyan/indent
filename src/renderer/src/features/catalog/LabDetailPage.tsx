@@ -1,17 +1,29 @@
-import { ArrowLeft, Circle, CircleCheck, CircleDashed } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import type { ChapterSummary, LabSummary, ProgressState } from '@shared/types'
-import { Badge } from '@/components/ui/badge'
+import { BuildStrip } from '@/components/app/BuildStrip'
 import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
-import { LanguageIcon } from '@/components/app/LanguageIcon'
+import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
 import { EmptyState } from './EmptyState'
+import { Figures } from './Figures'
 import { chapterState, labProgress } from './labStatus'
 
 const ACTION = { 'not-started': 'Start lab', 'in-progress': 'Continue', completed: 'Review' }
+
+function BackLink(): React.JSX.Element {
+  return (
+    <Link
+      to="/labs"
+      className="inline-flex items-center gap-1.5 rounded-md text-[13px] text-muted-foreground outline-none hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
+    >
+      <ArrowLeft className="size-4" strokeWidth={1.5} />
+      Labs
+    </Link>
+  )
+}
 
 export function LabDetailPage(): React.JSX.Element {
   const { labId } = useParams()
@@ -20,11 +32,11 @@ export function LabDetailPage(): React.JSX.Element {
 
   if (!labs || !progress) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-4 w-2/3" />
-        <Skeleton className="h-64 w-full rounded-xl" />
+      <div className="space-y-6">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-7 w-1/2" />
+        <Skeleton className="h-20 w-full rounded-lg" />
+        <Skeleton className="h-64 w-full rounded-lg" />
       </div>
     )
   }
@@ -32,96 +44,70 @@ export function LabDetailPage(): React.JSX.Element {
   const lab = labs.find((l) => l.id === labId)
   if (!lab) {
     return (
-      <EmptyState title="This lab does not exist">
-        <Button variant="outline" size="sm" asChild>
-          <Link to="/labs">Back to my labs</Link>
-        </Button>
-      </EmptyState>
+      <div className="space-y-6">
+        <BackLink />
+        <h1 className="text-[22px] leading-7 font-semibold">Lab not found</h1>
+        <EmptyState title="There is no lab with this id. It may have been removed." />
+      </div>
     )
   }
 
   const summary = labProgress(lab, progress.chapters)
-  const back =
-    lab.kind === 'challenge'
-      ? { to: '/challenges', label: 'Challenges' }
-      : { to: '/labs', label: 'My labs' }
 
   return (
-    <div className="space-y-8">
-      <Link
-        to={back.to}
-        className="inline-flex items-center gap-1.5 rounded-md text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
-      >
-        <ArrowLeft className="size-4" />
-        {back.label}
-      </Link>
+    <div className="space-y-6">
+      <BackLink />
 
-      <header className="space-y-4">
-        <div className="flex items-start gap-3">
-          <LanguageIcon language={lab.language} className="mt-1 size-7 text-xs" />
-          <div className="min-w-0 space-y-2">
-            <h1 className="text-2xl font-medium tracking-tight">{lab.title}</h1>
-            <p className="max-w-2xl text-sm text-muted-foreground">{lab.description}</p>
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-1">
-          <Badge variant="outline" className="font-normal text-muted-foreground">
-            {lab.category}
-          </Badge>
-          {lab.tags.map((tag) => (
-            <Badge key={tag} variant="outline" className="font-normal text-muted-foreground">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-      </header>
-
-      <section className="flex flex-wrap items-center gap-x-8 gap-y-4 rounded-xl border border-border bg-card p-5">
-        <Summary label="Chapters" value={`${summary.chaptersDone} / ${summary.chapterCount}`} />
-        <Summary label="Tasks" value={String(summary.taskCount)} />
-        <Summary label="Points" value={`${summary.pointsEarned} / ${summary.points}`} />
-        <div className="min-w-40 flex-1">
-          <Progress
-            value={summary.chapterCount ? (summary.chaptersDone / summary.chapterCount) * 100 : 0}
-            aria-label={`${summary.chaptersDone} of ${summary.chapterCount} chapters completed`}
-            className="h-1"
-          />
+      <header className="flex items-start gap-6">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-[22px] leading-7 font-semibold">{lab.title}</h1>
+          <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{lab.description}</p>
+          <p className="mt-2 text-[13px] text-muted-foreground">
+            {[lab.category, ...lab.tags].join(', ')}
+          </p>
         </div>
         {summary.nextChapterId && (
           <Button asChild>
-            <Link to={`/learn/${lab.id}/${summary.nextChapterId}`}>{ACTION[summary.status]}</Link>
+            <Link to={`/learn/${lab.id}/${summary.nextChapterId}`}>
+              {ACTION[summary.status]}
+              <ArrowRight />
+            </Link>
           </Button>
         )}
-      </section>
+      </header>
 
-      <div className="space-y-8">
-        {lab.parts.map((part) => (
-          <section key={part.title} className="space-y-2">
-            <h2 className="text-sm font-medium text-muted-foreground">{part.title}</h2>
-            <ol className="divide-y divide-border overflow-hidden rounded-xl border border-border">
-              {lab.chapters
-                .filter((c) => part.chapters.includes(c.id))
-                .map((chapter) => (
-                  <ChapterRow
-                    key={chapter.id}
-                    lab={lab}
-                    chapter={chapter}
-                    chapters={progress.chapters}
-                  />
-                ))}
-            </ol>
-          </section>
-        ))}
-      </div>
-    </div>
-  )
-}
+      <Figures
+        label="Lab progress"
+        figures={[
+          {
+            label: 'Chapters finished',
+            value: summary.chaptersDone,
+            unit: `of ${summary.chapterCount}`
+          },
+          { label: 'Tasks passed', value: summary.tasksPassed, unit: `of ${summary.taskCount}` },
+          { label: 'Points earned', value: summary.pointsEarned, unit: `of ${summary.points}` }
+        ]}
+      />
 
-function Summary({ label, value }: { label: string; value: string }): React.JSX.Element {
-  return (
-    <div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="text-lg font-medium tabular-nums">{value}</div>
+      <BuildStrip lab={lab} chapters={progress.chapters} className="h-2" />
+
+      {lab.parts.map((part) => (
+        <section key={part.title}>
+          <h2 className="mb-2 text-[13px] text-muted-foreground">{part.title}</h2>
+          <ol className="overflow-hidden rounded-lg border border-border">
+            {lab.chapters
+              .filter((c) => part.chapters.includes(c.id))
+              .map((chapter) => (
+                <ChapterRow
+                  key={chapter.id}
+                  lab={lab}
+                  chapter={chapter}
+                  chapters={progress.chapters}
+                />
+              ))}
+          </ol>
+        </section>
+      ))}
     </div>
   )
 }
@@ -136,40 +122,44 @@ function ChapterRow({
   chapters: ProgressState['chapters']
 }): React.JSX.Element {
   const { status, tasksPassed } = chapterState(lab.id, chapter, chapters)
+  const label =
+    status === 'completed'
+      ? 'Finished'
+      : status === 'in-progress'
+        ? `${tasksPassed} of ${chapter.taskCount} tasks`
+        : 'Not started'
   return (
-    <li>
+    <li className="border-b border-rule last:border-b-0">
       <Link
         to={`/learn/${lab.id}/${chapter.id}`}
-        className="flex items-center gap-4 px-4 py-3 text-sm transition-colors outline-none hover:bg-accent/40 focus-visible:bg-accent/40 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:ring-inset"
+        className="flex h-[52px] items-center gap-4 px-5 text-sm transition-colors outline-none hover:bg-muted/60 focus-visible:bg-muted/60"
       >
         <span className="w-6 shrink-0 font-mono text-xs text-muted-foreground tabular-nums">
           {String(chapter.number).padStart(2, '0')}
         </span>
         <span className="min-w-0 flex-1 truncate">{chapter.title}</span>
-        <span className="hidden shrink-0 text-xs text-muted-foreground tabular-nums sm:inline">
-          {chapter.taskCount} tasks, {chapter.points} points
+        <span
+          role="img"
+          aria-label={`${tasksPassed} of ${chapter.taskCount} tasks passed`}
+          className="flex w-24 shrink-0 gap-px"
+        >
+          {Array.from({ length: chapter.taskCount }, (_, i) => (
+            <span
+              key={i}
+              className={cn(
+                'h-1.5 flex-1 first:rounded-l-full last:rounded-r-full',
+                i < tasksPassed ? 'bg-brand' : 'bg-accent'
+              )}
+            />
+          ))}
         </span>
-        <span className="flex w-32 shrink-0 items-center justify-end gap-1.5 text-xs">
-          {status === 'completed' && (
-            <>
-              <CircleCheck className="size-4 text-success" />
-              Completed
-            </>
+        <span
+          className={cn(
+            'w-24 shrink-0 text-right text-[13px] tabular-nums',
+            status === 'not-started' && 'text-muted-foreground'
           )}
-          {status === 'in-progress' && (
-            <>
-              <CircleDashed className="size-4 text-brand" />
-              <span className="tabular-nums">
-                {tasksPassed} of {chapter.taskCount} tasks
-              </span>
-            </>
-          )}
-          {status === 'not-started' && (
-            <>
-              <Circle className="size-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Not started</span>
-            </>
-          )}
+        >
+          {label}
         </span>
       </Link>
     </li>

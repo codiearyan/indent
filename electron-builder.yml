@@ -1,5 +1,5 @@
-appId: com.labbench.app
-productName: Labbench
+appId: com.indent.app
+productName: Indent
 directories:
   buildResources: build
 files:
@@ -13,7 +13,7 @@ asarUnpack:
   - resources/**
   - node_modules/node-pty/**
 win:
-  executableName: labbench
+  executableName: indent
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

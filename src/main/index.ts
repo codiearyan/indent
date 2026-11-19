@@ -1,5 +1,6 @@
 import { app, shell, BrowserWindow } from 'electron'
-import { join } from 'path'
+import { copyFileSync, existsSync, mkdirSync, renameSync } from 'fs'
+import { dirname, join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import * as content from './services/content'
@@ -19,7 +20,7 @@ function createWindow(): void {
     autoHideMenuBar: true,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     trafficLightPosition: { x: 16, y: 18 },
-    backgroundColor: '#0b0c0f',
+    backgroundColor: '#0a0a0b',
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -46,8 +47,28 @@ function createWindow(): void {
   }
 }
 
+/** Carries a learner's progress and files over from the data folder of the app's earlier name. */
+function adoptEarlierData(): void {
+  const current = app.getPath('userData')
+  const earlier = join(dirname(current), 'labbench')
+  if (!existsSync(join(earlier, 'progress.json')) || existsSync(join(current, 'progress.json'))) {
+    return
+  }
+  try {
+    mkdirSync(current, { recursive: true })
+    copyFileSync(join(earlier, 'progress.json'), join(current, 'progress.json'))
+    if (existsSync(join(earlier, 'workspaces')) && !existsSync(join(current, 'workspaces'))) {
+      renameSync(join(earlier, 'workspaces'), join(current, 'workspaces'))
+    }
+  } catch (error) {
+    console.warn('Could not carry over earlier data:', error)
+  }
+}
+
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.labbench.app')
+  adoptEarlierData()
+  if (is.dev) app.dock?.setIcon(icon)
+  electronApp.setAppUserModelId('com.indent.app')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

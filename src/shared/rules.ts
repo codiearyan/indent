@@ -1,14 +1,9 @@
-import type { ChapterProgress, Mode, ProgressState } from './types'
+import type { ChapterProgress, ProgressState } from './types'
 
 export const MAX_HINTS = 3
 export const CHECKS_BEFORE_FIRST_HINT = 3
 
 export const chapterKey = (labId: string, chapterId: string): string => `${labId}/${chapterId}`
-
-/** Hard mode pays full points, easy mode half. */
-export function pointsFor(taskPoints: number, mode: Mode): number {
-  return mode === 'hard' ? taskPoints : Math.floor(taskPoints / 2)
-}
 
 /** The first hint unlocks after 3 checks that are not all green, then one more per check. */
 export function hintsUnlocked(nonGreenChecks: number): number {

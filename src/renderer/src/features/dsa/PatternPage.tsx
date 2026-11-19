@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/stores/settings'
@@ -43,16 +42,16 @@ function PatternView({ pattern }: { pattern: Pattern }): React.JSX.Element {
   }, [atEnd, markDsaWatched, pattern.id])
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <PatternHeader pattern={pattern} />
 
-      <div className="grid gap-4 lg:grid-cols-[3fr_2fr] lg:items-start">
+      <div className="grid gap-6 lg:grid-cols-[3fr_2fr] lg:items-start">
         <section
           aria-label="Animation"
-          className="flex min-w-0 flex-col gap-4 rounded-xl border border-border bg-card p-5"
+          className="flex min-w-0 flex-col gap-5 rounded-lg border border-border p-5"
         >
           {/* Controls and the note stay in view above the frames, however tall the stage gets. */}
-          <div className="sticky top-0 z-10 -mx-5 -mt-5 space-y-4 rounded-t-xl bg-card px-5 pt-5">
+          <div className="sticky top-0 z-10 -mx-5 -mt-5 space-y-3 rounded-t-lg border-b border-rule bg-card px-5 pt-5 pb-4">
             <Player player={player} />
             <p aria-live="polite" className="h-12 overflow-y-auto text-sm leading-6">
               {step.note}
@@ -61,39 +60,34 @@ function PatternView({ pattern }: { pattern: Pattern }): React.JSX.Element {
           </div>
           <Frames frames={step.frames} />
         </section>
-        <div className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-0">
+        <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-0 lg:self-start">
           <CodeView code={pattern.code} lines={step.lines} />
-          <div className="rounded-xl border border-border bg-card p-5">
-            <InputPanel pattern={pattern} onRun={setSteps} />
-          </div>
+          <InputPanel pattern={pattern} onRun={setSteps} />
         </div>
       </div>
 
-      <section aria-label="About this pattern" className="grid gap-4 md:grid-cols-2">
+      <section
+        aria-label="About this pattern"
+        className="grid overflow-hidden rounded-lg border border-border md:grid-cols-2"
+      >
         <Panel title="The idea">
           <Markdown compact>{pattern.idea}</Markdown>
         </Panel>
-        <Panel title="Reach for it when">
+        <Panel title="Reach for it when" className="border-t md:border-t-0 md:border-l">
           <BulletList items={pattern.signals} />
         </Panel>
-        <Panel title="Complexity">
-          <div className="flex flex-wrap gap-2 text-[13px] text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              Time
-              <Badge variant="outline" className="font-mono">
-                {pattern.complexity.time}
-              </Badge>
-            </span>
-            <span className="flex items-center gap-1.5">
-              Space
-              <Badge variant="outline" className="font-mono">
-                {pattern.complexity.space}
-              </Badge>
-            </span>
+        <Panel title="Complexity" className="border-t">
+          <div className="flex gap-8">
+            {(['time', 'space'] as const).map((key) => (
+              <div key={key}>
+                <div className="text-[13px] text-muted-foreground capitalize">{key}</div>
+                <div className="mt-0.5 font-mono text-sm">{pattern.complexity[key]}</div>
+              </div>
+            ))}
           </div>
-          <p className="mt-3 text-sm leading-6 text-foreground/85">{pattern.complexity.why}</p>
+          <p className="mt-3 text-sm leading-6">{pattern.complexity.why}</p>
         </Panel>
-        <Panel title="Common mistakes">
+        <Panel title="Common mistakes" className="border-t md:border-l">
           <BulletList items={pattern.mistakes} />
         </Panel>
       </section>
@@ -106,26 +100,25 @@ function PatternHeader({ pattern }: { pattern: Pattern }): React.JSX.Element {
   const prev = patterns[at - 1]
   const next = patterns[at + 1]
   return (
-    <header className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <Button variant="ghost" size="sm" className="-ml-2.5 text-muted-foreground" asChild>
-          <Link to="/dsa">
-            <ArrowLeft />
-            DSA patterns
-          </Link>
-        </Button>
+    <header>
+      <Link
+        to="/dsa"
+        className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground"
+      >
+        <ArrowLeft className="size-4" strokeWidth={1.5} />
+        DSA patterns
+      </Link>
+      <div className="mt-3 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-[22px] leading-7 font-semibold">{pattern.title}</h1>
+          <p className="mt-1 text-[13px] text-muted-foreground">{pattern.group}</p>
+        </div>
         <div className="flex items-center gap-1">
           <NeighborButton pattern={prev} direction="Previous" />
           <NeighborButton pattern={next} direction="Next" />
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-medium tracking-tight">{pattern.title}</h1>
-        <Badge variant="outline" className="font-normal text-muted-foreground">
-          {pattern.group}
-        </Badge>
-      </div>
-      <div className="max-w-3xl">
+      <div className="mt-4 max-w-3xl">
         <Markdown compact>{pattern.problem}</Markdown>
       </div>
     </header>
@@ -161,7 +154,7 @@ function Frames({ frames }: { frames: Frame[] }): React.JSX.Element {
   const side = keyed.filter(({ frame }) => isStack(frame))
   const main = keyed.filter(({ frame }) => !isStack(frame))
   return (
-    <div className="flex min-h-56 min-w-0 items-start justify-center gap-8 border-t border-border pt-5">
+    <div className="flex min-h-56 min-w-0 items-start justify-center gap-8">
       <div className="min-w-0 flex-1 space-y-5">
         {main.map(({ frame, key }) => (
           <FrameView key={key} frame={frame} />
@@ -180,15 +173,15 @@ function Frames({ frames }: { frames: Frame[] }): React.JSX.Element {
 
 function Vars({ vars }: { vars: Step['vars'] }): React.JSX.Element {
   return (
-    <div className="flex min-h-7 flex-wrap gap-2">
+    <div className="flex min-h-6 flex-wrap gap-1.5">
       {Object.entries(vars ?? {}).map(([name, value]) => (
         <span
           key={name}
           className={cn(
-            'flex h-7 items-center gap-1.5 rounded-md border px-2 font-mono text-xs',
+            'flex h-6 items-center gap-1.5 rounded-sm border px-2 font-mono text-xs',
             name === 'answer'
               ? 'border-success/40 bg-success/10 text-success'
-              : 'border-border bg-muted/40'
+              : 'border-border bg-muted'
           )}
         >
           <span className={name === 'answer' ? undefined : 'text-muted-foreground'}>{name}</span>
@@ -201,14 +194,16 @@ function Vars({ vars }: { vars: Step['vars'] }): React.JSX.Element {
 
 function Panel({
   title,
+  className,
   children
 }: {
   title: string
+  className?: string
   children: React.ReactNode
 }): React.JSX.Element {
   return (
-    <div className="min-w-0 rounded-xl border border-border bg-card p-5">
-      <h2 className="mb-3 text-sm font-medium">{title}</h2>
+    <div className={cn('min-w-0 border-rule p-5', className)}>
+      <h2 className="mb-3 text-sm font-semibold">{title}</h2>
       {children}
     </div>
   )
@@ -216,10 +211,29 @@ function Panel({
 
 function BulletList({ items }: { items: string[] }): React.JSX.Element {
   return (
-    <ul className="list-disc space-y-2 pl-5 text-sm leading-6 text-foreground/85 marker:text-muted-foreground">
+    <ul className="list-disc space-y-2 pl-5 text-sm leading-6 marker:text-muted-foreground">
       {items.map((item) => (
-        <li key={item}>{item}</li>
+        <li key={item}>
+          <InlineCode text={item} />
+        </li>
       ))}
     </ul>
+  )
+}
+
+/** Pattern notes mark code with backticks; show those spans as code. */
+function InlineCode({ text }: { text: string }): React.JSX.Element {
+  return (
+    <>
+      {text.split('`').map((part, i) =>
+        i % 2 === 1 ? (
+          <code key={i} className="rounded-sm bg-muted px-1 py-0.5 font-mono text-[0.85em]">
+            {part}
+          </code>
+        ) : (
+          part
+        )
+      )}
+    </>
   )
 }

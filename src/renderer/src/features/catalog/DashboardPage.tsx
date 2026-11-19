@@ -1,221 +1,406 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { chapterKey, currentStreak, levelFor } from '@shared/rules'
-import type { LabSummary, ProgressState } from '@shared/types'
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import { Skeleton } from '@/components/ui/skeleton'
+import { ArrowRight, ChevronRight } from 'lucide-react'
+import { chapterKey, currentStreak, levelFor, localDate } from '@shared/rules'
+import type { LabSummary, PathDef, ProgressState } from '@shared/types'
+import { BuildStrip } from '@/components/app/BuildStrip'
 import { LanguageIcon } from '@/components/app/LanguageIcon'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { api } from '@/lib/api'
+import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
-import { recentWeeks } from './activity'
-import { Heatmap, HeatmapLegend } from './Heatmap'
-import { LabGrid, LabCard } from './LabCard'
-import { labProgress } from './labStatus'
-import { StatTile, StatTileSkeleton } from './StatTile'
+import { parseDate, recentWeeks } from './activity'
+import { Heatmap } from './Heatmap'
+import { labProgress, type LabProgress } from './labStatus'
 
-function greeting(hour = new Date().getHours()): string {
-  if (hour < 12) return 'Good morning'
-  if (hour < 18) return 'Good afternoon'
-  return 'Good evening'
+interface LabRow {
+  lab: LabSummary
+  progress: LabProgress
+}
+
+/** Labs in the order the paths teach them, then any lab no path mentions. */
+function teachingOrder(labs: LabSummary[], paths: PathDef[]): LabSummary[] {
+  const ids = [...new Set(paths.flatMap((path) => path.stages.flatMap((stage) => stage.labs)))]
+  const ordered = ids.flatMap((id) => labs.find((lab) => lab.id === id) ?? [])
+  return [...ordered, ...labs.filter((lab) => !ids.includes(lab.id))]
+}
+
+function daysAgo(iso: string): string {
+  const days = Math.round(
+    (parseDate(localDate()).getTime() - parseDate(localDate(new Date(iso))).getTime()) / 86_400_000
+  )
+  if (days <= 0) return 'Today'
+  return days === 1 ? 'Yesterday' : `${days} days ago`
 }
 
 export function DashboardPage(): React.JSX.Element {
   const labs = useCatalog((s) => s.labs)
+  const paths = useCatalog((s) => s.paths)
   const progress = useProgress((s) => s.progress)
-  const weeks = useMemo(() => recentWeeks(12), [])
+  const weeks = useMemo(() => recentWeeks(17), [])
 
-  if (!labs || !progress) {
+  if (!labs || !paths || !progress) {
     return (
-      <div className="space-y-8">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-32 w-full rounded-xl" />
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {Array.from({ length: 4 }, (_, i) => (
-            <StatTileSkeleton key={i} />
-          ))}
+      <div className="space-y-6">
+        <Skeleton className="h-7 w-40" />
+        <div className="grid grid-cols-12 gap-6">
+          <Skeleton className="col-span-8 h-52 rounded-lg" />
+          <Skeleton className="col-span-4 h-52 rounded-lg" />
+          <Skeleton className="col-span-8 h-56 rounded-lg" />
+          <Skeleton className="col-span-4 h-56 rounded-lg" />
         </div>
       </div>
     )
   }
 
-  const { level, into, span } = levelFor(progress.totalPoints)
-  const completed = Object.values(progress.chapters).filter((c) => c.completedAt).length
-  const inProgress = labs
-    .filter((lab) => lab.kind === 'lab')
-    .map((lab) => ({ lab, progress: labProgress(lab, progress.chapters) }))
-    .filter((r) => r.progress.status === 'in-progress')
+  const rows: LabRow[] = teachingOrder(labs, paths).map((lab) => ({
+    lab,
+    progress: labProgress(lab, progress.chapters)
+  }))
+  const inProgress = rows
+    .filter((row) => row.progress.status === 'in-progress')
     .sort((a, b) => (b.progress.lastOpenedAt ?? '').localeCompare(a.progress.lastOpenedAt ?? ''))
-    .slice(0, 3)
+  const notStarted = rows.filter((row) => row.progress.status === 'not-started')
+  const last = rows.find(
+    (row) => row.lab.id === progress.lastOpened?.labId && row.progress.status !== 'completed'
+  )
+  const next = last ?? inProgress[0] ?? notStarted[0]
+
+  const streak = currentStreak(progress.activity)
+  const passedToday = progress.activity[localDate()]?.tasksPassed ?? 0
+  const chaptersDone = Object.values(progress.chapters).filter((c) => c.completedAt).length
+  const chapterCount = labs.reduce((sum, lab) => sum + lab.chapters.length, 0)
+  const thisWeek =
+    weeks
+      .at(-1)
+      ?.reduce((sum, day) => sum + ((day && progress.activity[day]?.tasksPassed) || 0), 0) ?? 0
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-medium tracking-tight">{greeting()}</h1>
+    <div className="space-y-6">
+      <header>
+        <h1 className="text-[22px] leading-7 font-semibold">Home</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {passedToday > 0
+            ? `${passedToday} ${passedToday === 1 ? 'task' : 'tasks'} passed today. Your streak is ${streak} ${streak === 1 ? 'day' : 'days'}.`
+            : streak > 0
+              ? `Pass one task today to keep your ${streak} day streak.`
+              : 'Pass a task today to start a streak.'}
+        </p>
+      </header>
 
-      <ContinueCard labs={labs} progress={progress} />
+      <div className="grid grid-cols-12 gap-6">
+        <UpNext row={next} lastOpened={progress.lastOpened} chapters={progress.chapters} />
+        <Stats
+          totalPoints={progress.totalPoints}
+          streak={streak}
+          chaptersDone={chaptersDone}
+          chapterCount={chapterCount}
+        />
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatTile
-          label="Level"
-          value={level}
-          detail={`${span - into} points to level ${level + 1}`}
+        <Panel
+          className="col-span-8"
+          title="In progress"
+          action={{ to: '/labs', label: 'All labs' }}
         >
-          <Progress
-            value={(into / span) * 100}
-            aria-label={`${into} of ${span} points into level ${level}`}
-            className="mt-2 h-1"
-          />
-        </StatTile>
-        <StatTile label="Total points" value={progress.totalPoints} />
-        <StatTile label="Current streak" value={currentStreak(progress.activity)} detail="days" />
-        <StatTile label="Chapters completed" value={completed} />
-      </div>
-
-      {inProgress.length > 0 && (
-        <section className="space-y-3">
-          <SectionHeader title="In progress" to="/labs" link="All labs" />
-          <LabGrid>
-            {inProgress.map(({ lab, progress }) => (
-              <LabCard key={lab.id} lab={lab} progress={progress} />
-            ))}
-          </LabGrid>
-        </section>
-      )}
-
-      <div className="grid gap-8 lg:grid-cols-[auto_1fr]">
-        <section className="space-y-3">
-          <SectionHeader title="Last 12 weeks" to="/year" link="Year board" />
-          <div className="space-y-3 rounded-xl border border-border bg-card p-5">
+          {inProgress.length === 0 ? (
+            <Empty>Labs you start show up here.</Empty>
+          ) : (
+            <ul>
+              {inProgress.slice(0, 3).map(({ lab, progress: p }) => (
+                <LabLine
+                  key={lab.id}
+                  lab={lab}
+                  to={`/learn/${lab.id}/${p.nextChapterId}`}
+                  meta={`Chapter ${p.chaptersDone + 1} of ${p.chapterCount}`}
+                  chapters={progress.chapters}
+                />
+              ))}
+            </ul>
+          )}
+        </Panel>
+        <Panel
+          className="col-span-4"
+          title="Last 4 months"
+          action={{ to: '/year', label: 'Year board' }}
+        >
+          <div className="px-5 py-4">
             <Heatmap weeks={weeks} activity={progress.activity} />
-            <HeatmapLegend />
+            <p className="mt-3 text-[13px] text-muted-foreground">
+              <span className="text-foreground tabular-nums">{thisWeek}</span>{' '}
+              {thisWeek === 1 ? 'task' : 'tasks'} passed this week
+            </p>
           </div>
-        </section>
-        <RecentlyCompleted labs={labs} chapters={progress.chapters} />
+        </Panel>
+
+        <Panel className="col-span-8" title="Start next" action={{ to: '/paths', label: 'Paths' }}>
+          {notStarted.length === 0 ? (
+            <Empty>You have started every lab.</Empty>
+          ) : (
+            <ul>
+              {notStarted.slice(0, 3).map(({ lab, progress: p }) => (
+                <LabLine
+                  key={lab.id}
+                  lab={lab}
+                  to={`/labs/${lab.id}`}
+                  meta={`${p.chapterCount} chapters, ${p.taskCount} tasks`}
+                />
+              ))}
+            </ul>
+          )}
+        </Panel>
+        <Panel className="col-span-4" title="Recently finished">
+          <Finished labs={labs} chapters={progress.chapters} />
+        </Panel>
       </div>
     </div>
   )
 }
 
-function SectionHeader({
-  title,
-  to,
-  link
+/** The screen's answer: the next thing to do, with the one primary action. */
+function UpNext({
+  row,
+  lastOpened,
+  chapters
 }: {
-  title: string
-  to: string
-  link: string
+  row: LabRow | undefined
+  lastOpened: ProgressState['lastOpened']
+  chapters: ProgressState['chapters']
 }): React.JSX.Element {
-  return (
-    <div className="flex items-baseline justify-between gap-4">
-      <h2 className="text-sm font-medium">{title}</h2>
-      <Link
-        to={to}
-        className="rounded-sm text-xs text-brand outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50"
-      >
-        {link}
-      </Link>
-    </div>
-  )
-}
+  const lab = row?.lab
+  const started = row?.progress.status === 'in-progress'
+  const open = lab && lastOpened?.labId === lab.id ? lastOpened.chapterId : undefined
+  const openDone = lab && open ? chapters[chapterKey(lab.id, open)]?.completedAt : undefined
+  const chapterId = open && !openDone ? open : row?.progress.nextChapterId
+  const chapter = lab?.chapters.find((c) => c.id === chapterId)
+  const nextTask = useNextTask(lab?.id, chapterId, chapters)
 
-function ContinueCard({
-  labs,
-  progress
-}: {
-  labs: LabSummary[]
-  progress: ProgressState
-}): React.JSX.Element {
-  const last = progress.lastOpened
-  const lab = last && labs.find((l) => l.id === last.labId)
-  const chapter = last && lab?.chapters.find((c) => c.id === last.chapterId)
-
-  if (!last || !lab || !chapter) {
+  if (!lab || !chapter) {
     return (
-      <section className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-6">
-        <div className="space-y-1">
-          <h2 className="text-base font-medium">Pick your first lab</h2>
-          <p className="text-sm text-muted-foreground">
-            Each lab is a short story with chapters. Read the lesson, write the code, press Check.
-          </p>
-        </div>
-        <Button asChild>
-          <Link to="/labs">Browse labs</Link>
-        </Button>
+      <section className="col-span-8 rounded-lg border border-border p-6">
+        <h2 className="text-base font-semibold">Every lab is finished</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Nothing is waiting. The DSA patterns are still there to step through.
+        </p>
       </section>
     )
   }
 
-  const tasks = progress.chapters[chapterKey(lab.id, chapter.id)]?.tasks ?? {}
-  const passed = Object.values(tasks).filter((t) => t.passed).length
-
   return (
-    <section className="flex flex-wrap items-center gap-4 rounded-xl border border-border bg-card p-6">
-      <LanguageIcon language={lab.language} className="size-10 text-xs" />
-      <div className="min-w-0 flex-1 space-y-1">
-        <p className="text-xs text-muted-foreground">Continue where you left off</p>
-        <h2 className="truncate text-base font-medium">{lab.title}</h2>
-        <p className="truncate text-sm text-muted-foreground">
-          Chapter {chapter.number}: {chapter.title}
-          <span className="tabular-nums">
-            {' '}
-            · {passed} of {chapter.taskCount} tasks passed
-          </span>
+    <section className="col-span-8 flex flex-col rounded-lg border border-border p-6">
+      <p className="text-[13px] text-muted-foreground">{started ? 'Up next' : 'Start here'}</p>
+      <div className="mt-2 flex items-start gap-6">
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-lg leading-6 font-semibold">{lab.title}</h2>
+          <p className="mt-1 truncate text-sm text-muted-foreground">
+            Chapter {chapter.number}: {chapter.title}
+          </p>
+        </div>
+        <Button asChild>
+          <Link to={`/learn/${lab.id}/${chapter.id}`}>
+            {started ? 'Continue' : 'Start lab'}
+            <ArrowRight />
+          </Link>
+        </Button>
+      </div>
+      <p className="mt-5 min-h-5 text-sm">
+        {nextTask && (
+          <>
+            <span className="text-muted-foreground">Next task </span>
+            {nextTask}
+          </>
+        )}
+      </p>
+      <div className="mt-auto pt-5">
+        <BuildStrip lab={lab} chapters={chapters} />
+        <p className="mt-2 text-xs text-muted-foreground tabular-nums">
+          {row.progress.pointsEarned > 0 || started
+            ? `${passedTasks(lab, chapters)} of ${row.progress.taskCount} tasks passed`
+            : `${row.progress.chapterCount} chapters, ${row.progress.taskCount} tasks. Each cell is one task.`}
         </p>
       </div>
-      <Button asChild>
-        <Link to={`/learn/${lab.id}/${chapter.id}`}>Continue</Link>
-      </Button>
     </section>
   )
 }
 
-function RecentlyCompleted({
+function passedTasks(lab: LabSummary, chapters: ProgressState['chapters']): number {
+  return lab.chapters.reduce(
+    (sum, chapter) =>
+      sum +
+      Object.values(chapters[chapterKey(lab.id, chapter.id)]?.tasks ?? {}).filter((t) => t.passed)
+        .length,
+    0
+  )
+}
+
+/** The title of the first task not yet passed in a chapter. */
+function useNextTask(
+  labId: string | undefined,
+  chapterId: string | undefined,
+  chapters: ProgressState['chapters']
+): string | null {
+  const [titles, setTitles] = useState<{ key: string; tasks: { id: string; title: string }[] }>()
+  const key = labId && chapterId ? chapterKey(labId, chapterId) : undefined
+
+  useEffect(() => {
+    if (!labId || !chapterId || !key) return
+    let stale = false
+    void api.content.getChapter(labId, chapterId).then(
+      (chapter) => !stale && setTitles({ key, tasks: chapter.tasks }),
+      () => {}
+    )
+    return () => {
+      stale = true
+    }
+  }, [labId, chapterId, key])
+
+  if (!key || titles?.key !== key) return null
+  const passed = chapters[key]?.tasks ?? {}
+  return titles.tasks.find((task) => !passed[task.id]?.passed)?.title ?? null
+}
+
+/** Four figures in one container, split by hairlines. */
+function Stats({
+  totalPoints,
+  streak,
+  chaptersDone,
+  chapterCount
+}: {
+  totalPoints: number
+  streak: number
+  chaptersDone: number
+  chapterCount: number
+}): React.JSX.Element {
+  const { level, into, span } = levelFor(totalPoints)
+  const cells = [
+    { label: 'Level', value: level, note: `${span - into} points to level ${level + 1}` },
+    { label: 'Points', value: totalPoints.toLocaleString('en-US') },
+    { label: 'Streak', value: streak, unit: streak === 1 ? 'day' : 'days' },
+    { label: 'Chapters finished', value: chaptersDone, unit: `/ ${chapterCount}` }
+  ]
+  return (
+    <section
+      aria-label="Your numbers"
+      className="col-span-4 grid grid-cols-2 overflow-hidden rounded-lg border border-border"
+    >
+      {cells.map((cell, i) => (
+        <div
+          key={cell.label}
+          className={cn(
+            'flex flex-col justify-center px-5 py-4',
+            i % 2 === 1 && 'border-l border-rule',
+            i > 1 && 'border-t border-rule'
+          )}
+        >
+          <span className="text-[13px] text-muted-foreground">{cell.label}</span>
+          <span className="mt-1 text-2xl leading-8 tabular-nums">
+            {cell.value}
+            {cell.unit && <span className="ml-1.5 text-sm text-muted-foreground">{cell.unit}</span>}
+          </span>
+          {cell.note && <span className="text-xs text-muted-foreground">{cell.note}</span>}
+        </div>
+      ))}
+    </section>
+  )
+}
+
+function Panel({
+  title,
+  action,
+  className,
+  children
+}: {
+  title: string
+  action?: { to: string; label: string }
+  className?: string
+  children: React.ReactNode
+}): React.JSX.Element {
+  return (
+    <section className={cn('flex flex-col rounded-lg border border-border', className)}>
+      <header className="flex h-11 shrink-0 items-center justify-between border-b border-rule px-5">
+        <h2 className="text-sm font-semibold">{title}</h2>
+        {action && (
+          <Link
+            to={action.to}
+            className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {action.label}
+          </Link>
+        )}
+      </header>
+      {children}
+    </section>
+  )
+}
+
+function Empty({ children }: { children: React.ReactNode }): React.JSX.Element {
+  return <p className="px-5 py-6 text-sm text-muted-foreground">{children}</p>
+}
+
+function LabLine({
+  lab,
+  to,
+  meta,
+  chapters
+}: {
+  lab: LabSummary
+  to: string
+  meta: string
+  chapters?: ProgressState['chapters']
+}): React.JSX.Element {
+  return (
+    <li className="border-b border-rule last:border-b-0">
+      <Link
+        to={to}
+        className="flex h-14 items-center gap-3 px-5 outline-none transition-colors hover:bg-muted/60 focus-visible:bg-muted/60"
+      >
+        <LanguageIcon language={lab.language} className="size-7 shrink-0" />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-medium">{lab.title}</span>
+          <span className="block truncate text-xs text-muted-foreground tabular-nums">{meta}</span>
+        </span>
+        {chapters && <BuildStrip lab={lab} chapters={chapters} className="w-44 shrink-0" />}
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+      </Link>
+    </li>
+  )
+}
+
+function Finished({
   labs,
   chapters
 }: {
   labs: LabSummary[]
   chapters: ProgressState['chapters']
 }): React.JSX.Element {
-  const rows = labs
+  const finished = labs
     .flatMap((lab) =>
       lab.chapters.flatMap((chapter) => {
-        const completedAt = chapters[chapterKey(lab.id, chapter.id)]?.completedAt
-        return completedAt ? [{ lab, chapter, completedAt }] : []
+        const at = chapters[chapterKey(lab.id, chapter.id)]?.completedAt
+        return at ? { lab, chapter, at } : []
       })
     )
-    .sort((a, b) => b.completedAt.localeCompare(a.completedAt))
-    .slice(0, 5)
+    .sort((a, b) => b.at.localeCompare(a.at))
+    .slice(0, 3)
 
+  if (finished.length === 0) return <Empty>Chapters you finish show up here.</Empty>
   return (
-    <section className="min-w-0 space-y-3">
-      <h2 className="text-sm font-medium">Recently completed</h2>
-      {rows.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-border p-5 text-sm text-muted-foreground">
-          Chapters you finish show up here.
-        </p>
-      ) : (
-        <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
-          {rows.map(({ lab, chapter, completedAt }) => (
-            <li key={chapterKey(lab.id, chapter.id)}>
-              <Link
-                to={`/learn/${lab.id}/${chapter.id}`}
-                className="flex items-center gap-3 px-4 py-2.5 transition-colors outline-none hover:bg-accent/40 focus-visible:bg-accent/40 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:ring-inset"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm">{chapter.title}</div>
-                  <div className="truncate text-xs text-muted-foreground">{lab.title}</div>
-                </div>
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  {new Date(completedAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric'
-                  })}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+    <ul>
+      {finished.map(({ lab, chapter, at }) => (
+        <li key={`${lab.id}/${chapter.id}`} className="border-b border-rule last:border-b-0">
+          <Link
+            to={`/learn/${lab.id}/${chapter.id}`}
+            className="flex h-14 items-center gap-3 px-5 outline-none transition-colors hover:bg-muted/60 focus-visible:bg-muted/60"
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-medium">{chapter.title}</span>
+              <span className="block truncate text-xs text-muted-foreground">{lab.title}</span>
+            </span>
+            <span className="shrink-0 text-xs text-muted-foreground">{daysAgo(at)}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
   )
 }

@@ -5,7 +5,6 @@
   "category": "DevOps and tools",
   "language": "shell",
   "tags": ["Git"],
-  "kind": "lab",
   "parts": [
     { "title": "Undo and recover", "chapters": ["shared-bad-commit", "lost-work"] },
     { "title": "Work with history", "chapters": ["merge-conflict", "find-the-break", "tidy-history"] }

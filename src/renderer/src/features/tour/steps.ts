@@ -20,31 +20,31 @@ const showTerminal = (): void => useSettings.getState().setPanel('zen', false)
 export const TOUR_STEPS: TourStep[] = [
   {
     anchor: TOUR.tasksTab,
-    title: 'Your tasks',
+    title: 'Tasks',
     text: 'This is what you build in this chapter. A task turns green once your code passes its hidden checks.',
     prepare: showLeft('tasks')
   },
   {
     anchor: TOUR.insightsTab,
-    title: 'Chapter insights',
+    title: 'Lesson',
     text: 'The lesson: the story, the problem and the ideas you need for the tasks.',
     prepare: showLeft('insights')
   },
   {
     anchor: TOUR.audio,
-    title: 'Listen instead',
+    title: 'Read aloud',
     text: 'Have the lesson read aloud, part by part, while you keep reading or coding.',
     prepare: showLeft('insights')
   },
   {
     anchor: TOUR.taskCheck,
-    title: 'Check one task',
+    title: 'Check',
     text: 'Runs the hidden tests for just this task and tells you in plain words what to look at.',
     prepare: showLeft('tasks')
   },
   {
     anchor: TOUR.taskNext,
-    title: 'Stuck on where to start?',
+    title: 'Next step',
     text: 'Short steps that point you in the right direction without giving the answer away.',
     prepare: showLeft('tasks')
   },
@@ -60,24 +60,19 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     anchor: TOUR.checkAll,
-    title: 'Check all tasks',
+    title: 'Run checks',
     text: 'Runs every check at once when you think you are done.'
   },
   {
     anchor: TOUR.terminal,
     title: 'A real terminal',
-    text: 'A shell in your chapter folder. Run your code and explore. You do not need it to check your work.',
+    text: 'A shell in your chapter folder. Run your code and explore. Checks do not need it.',
     prepare: showTerminal
   },
   {
-    anchor: TOUR.mode,
-    title: 'Hard or easy',
-    text: 'Hard mode pays full points. Easy mode pays half and lets you open solutions after a check.'
-  },
-  {
-    anchor: TOUR.level,
-    title: 'Your level',
-    text: 'Points from passed tasks add up here. Open it to see how far the next level is.'
+    anchor: TOUR.chat,
+    title: 'Tutor',
+    text: 'A chat that knows the lesson, your tasks, the open file and your latest check.'
   },
   {
     anchor: TOUR.aiSuggestions,
@@ -85,18 +80,8 @@ export const TOUR_STEPS: TourStep[] = [
     text: 'Pick the AI that helps you, and turn grey inline suggestions in the editor on or off.'
   },
   {
-    anchor: TOUR.reset,
-    title: 'Start the files over',
-    text: 'Brings back the starter files. Your passed tasks and points stay.'
-  },
-  {
-    anchor: TOUR.chat,
-    title: 'Ask the tutor',
-    text: 'A chat that knows the lesson, your tasks, the open file and your latest check.'
-  },
-  {
-    anchor: TOUR.textSize,
-    title: 'Text size',
-    text: 'Make the lesson, tasks, editor or terminal bigger or smaller. It is saved on this device.'
+    anchor: TOUR.view,
+    title: 'View',
+    text: 'Text size, layout, theme, the tour and reset live here.'
   }
 ]

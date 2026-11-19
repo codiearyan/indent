@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { MessageCircle, SendHorizontal, Sparkles, Square, X } from 'lucide-react'
+import { SendHorizontal, Square, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -34,22 +34,22 @@ export function ChatPanel(): React.JSX.Element {
   }
 
   return (
-    <aside className="flex h-full min-w-0 flex-col bg-background">
-      <header className="flex h-12 shrink-0 items-center gap-2 border-b pr-2 pl-4">
-        <MessageCircle className="size-4 text-muted-foreground" />
-        <h2 className="flex-1 text-sm font-medium">AI chat</h2>
+    <aside className="flex h-full min-w-0 flex-col bg-card">
+      <header className="flex h-11 shrink-0 items-center gap-2 border-b border-border pr-2 pl-4">
+        <h2 className="flex-1 text-sm font-medium">Tutor</h2>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon-sm"
-              aria-label="Close chat"
+              aria-label="Close tutor"
+              className="text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]"
               onClick={() => setPanel('chat', false)}
             >
               <X />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Close chat</TooltipContent>
+          <TooltipContent>Close tutor</TooltipContent>
         </Tooltip>
       </header>
 
@@ -69,7 +69,7 @@ export function ChatPanel(): React.JSX.Element {
               message.role === 'user' ? (
                 <div
                   key={i}
-                  className="ml-8 self-end rounded-lg bg-muted px-3 py-2 text-sm whitespace-pre-wrap"
+                  className="ml-8 self-end rounded-lg bg-muted px-3 py-2 text-sm leading-6 whitespace-pre-wrap"
                 >
                   {message.content}
                 </div>
@@ -79,7 +79,7 @@ export function ChatPanel(): React.JSX.Element {
                   {busy && i === messages.length - 1 && (
                     <span
                       aria-label="Writing"
-                      className="inline-block h-4 w-1.5 animate-pulse rounded-sm bg-brand align-text-bottom"
+                      className="inline-block h-4 w-1.5 animate-pulse rounded-sm bg-foreground align-text-bottom"
                     />
                   )}
                 </div>
@@ -90,7 +90,7 @@ export function ChatPanel(): React.JSX.Element {
         {error && <p className="mt-4 text-[13px] text-destructive">{error}</p>}
       </div>
 
-      <div className="shrink-0 border-t p-3">
+      <div className="shrink-0 border-t border-border p-3">
         <div className="flex items-end gap-2">
           <Textarea
             value={draft}
@@ -104,16 +104,29 @@ export function ChatPanel(): React.JSX.Element {
             placeholder="Ask about this chapter"
             aria-label="Ask about this chapter"
             disabled={!provider || outOfMessages}
-            className="max-h-40 min-h-16 resize-none"
+            className="max-h-40 min-h-16 resize-none border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent dark:bg-transparent"
           />
           <Tooltip>
             <TooltipTrigger asChild>
               {busy ? (
-                <Button size="icon" variant="secondary" aria-label="Stop" onClick={stop}>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  aria-label="Stop"
+                  className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
+                  onClick={stop}
+                >
                   <Square />
                 </Button>
               ) : (
-                <Button size="icon" aria-label="Send" disabled={!canSend} onClick={submit}>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  aria-label="Send"
+                  className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
+                  disabled={!canSend}
+                  onClick={submit}
+                >
                   <SendHorizontal />
                 </Button>
               )}
@@ -123,7 +136,7 @@ export function ChatPanel(): React.JSX.Element {
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
           {provider ? `Using ${provider.label}` : 'No AI provider yet'}
-          {budgeted && ` · ${remaining} of ${MESSAGE_BUDGET} messages left this session`}
+          {budgeted && `, ${remaining} of ${MESSAGE_BUDGET} messages left this session`}
         </p>
       </div>
     </aside>
@@ -148,7 +161,6 @@ function EmptyState({
           key.
         </p>
         <Button variant="outline" size="sm" onClick={openMenu}>
-          <Sparkles />
           Set up AI
         </Button>
       </div>

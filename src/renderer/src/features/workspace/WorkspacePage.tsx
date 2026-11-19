@@ -13,7 +13,8 @@ import { LeftPanel } from './LeftPanel'
 /** Height of the terminal's header bar, which stays visible while the terminal is collapsed. */
 export const TERMINAL_HEADER_PX = 41
 
-const separator = 'bg-border transition-colors hover:bg-brand data-[separator=active]:bg-brand'
+const separator =
+  'bg-border transition-colors hover:bg-foreground/30 data-[separator=active]:bg-foreground/40'
 
 export function WorkspacePage(): React.JSX.Element {
   const { labId, chapterId } = useParams()
@@ -56,42 +57,44 @@ export function WorkspacePage(): React.JSX.Element {
   return (
     <div className="flex h-full flex-col bg-background">
       <TopBar />
-      <Group orientation="horizontal" className="min-h-0 flex-1 border-t">
-        {lessonSide === 'left' && lesson}
-        {lessonSide === 'left' && lesson && <Separator className={`w-px ${separator}`} />}
-        <Panel id="work" minSize="30%">
-          <Group orientation="vertical">
-            <Panel id="editor" minSize="20%">
-              <EditorPane />
-            </Panel>
-            <Separator className={`h-px ${separator}`} />
-            <Panel
-              id="terminal"
-              panelRef={terminalRef}
-              collapsible
-              collapsedSize={TERMINAL_HEADER_PX}
-              minSize={160}
-              defaultSize={panels.terminal ? '40%' : TERMINAL_HEADER_PX}
-              onResize={(size) => {
-                const collapsed = size.inPixels <= TERMINAL_HEADER_PX + 1
-                if (collapsed === useSettings.getState().panels.terminal) {
-                  setPanel('terminal', !collapsed)
-                }
-              }}
-            >
-              <TerminalPane />
-            </Panel>
-          </Group>
-        </Panel>
-        {lessonSide === 'right' && lesson && <Separator className={`w-px ${separator}`} />}
-        {lessonSide === 'right' && lesson}
-        {panels.chat && !panels.zen && <Separator className={`w-px ${separator}`} />}
-        {panels.chat && !panels.zen && (
-          <Panel id="chat" defaultSize="26%" minSize="20%">
-            <ChatPanel />
+      <div className="mx-2 mb-2 min-h-0 flex-1 overflow-hidden rounded-2xl border border-border bg-card">
+        <Group orientation="horizontal">
+          {lessonSide === 'left' && lesson}
+          {lessonSide === 'left' && lesson && <Separator className={`w-px ${separator}`} />}
+          <Panel id="work" minSize="30%">
+            <Group orientation="vertical">
+              <Panel id="editor" minSize="20%">
+                <EditorPane />
+              </Panel>
+              <Separator className={`h-px ${separator}`} />
+              <Panel
+                id="terminal"
+                panelRef={terminalRef}
+                collapsible
+                collapsedSize={TERMINAL_HEADER_PX}
+                minSize={160}
+                defaultSize={panels.terminal ? '40%' : TERMINAL_HEADER_PX}
+                onResize={(size) => {
+                  const collapsed = size.inPixels <= TERMINAL_HEADER_PX + 1
+                  if (collapsed === useSettings.getState().panels.terminal) {
+                    setPanel('terminal', !collapsed)
+                  }
+                }}
+              >
+                <TerminalPane />
+              </Panel>
+            </Group>
           </Panel>
-        )}
-      </Group>
+          {lessonSide === 'right' && lesson && <Separator className={`w-px ${separator}`} />}
+          {lessonSide === 'right' && lesson}
+          {panels.chat && !panels.zen && <Separator className={`w-px ${separator}`} />}
+          {panels.chat && !panels.zen && (
+            <Panel id="chat" defaultSize="26%" minSize="20%">
+              <ChatPanel />
+            </Panel>
+          )}
+        </Group>
+      </div>
       <Tour />
     </div>
   )

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { copyStarter, emptyDir, readWorkspace, resolveInside } from './workspaceFiles'
 
 async function tree(files: Record<string, string | Buffer>): Promise<string> {
-  const dir = await mkdtemp(join(tmpdir(), 'labbench-ws-'))
+  const dir = await mkdtemp(join(tmpdir(), 'indent-ws-'))
   for (const [path, content] of Object.entries(files)) {
     await mkdir(join(dir, path, '..'), { recursive: true })
     await writeFile(join(dir, path), content)
@@ -38,7 +38,7 @@ describe('workspace files', () => {
       'logo.png': Buffer.from([0x89, 0x50, 0x00, 0x01]),
       'big.txt': 'x'.repeat(1024 * 1024 + 1)
     })
-    const dir = join(await mkdtemp(join(tmpdir(), 'labbench-ws-')), 'lab', 'chapter')
+    const dir = join(await mkdtemp(join(tmpdir(), 'indent-ws-')), 'lab', 'chapter')
     await copyStarter(starter, dir)
     const files = await readWorkspace(dir, ['src/z.ts', 'main.ts', 'missing.ts'])
     expect(files.map((f) => f.path)).toEqual(['src/z.ts', 'main.ts', 'a.ts', 'b.ts'])
@@ -46,7 +46,7 @@ describe('workspace files', () => {
   })
 
   it('creates an empty folder when the chapter has no starter', async () => {
-    const dir = join(await mkdtemp(join(tmpdir(), 'labbench-ws-')), 'w')
+    const dir = join(await mkdtemp(join(tmpdir(), 'indent-ws-')), 'w')
     await copyStarter(join(dir, 'no-starter'), dir)
     expect(await readWorkspace(dir, [])).toEqual([])
   })
