@@ -5,7 +5,9 @@
   "author": "Aryan Bhati",
   "scripts": {
     "dev": "pnpm --filter @indent/desktop dev",
+    "dev:site": "pnpm --filter @indent/site dev",
     "build": "pnpm --filter @indent/desktop build",
+    "build:site": "pnpm --filter @indent/site build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "lint": "eslint --cache .",

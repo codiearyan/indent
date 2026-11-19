@@ -6,3 +6,5 @@ out
 *.log*
 
 .taste-skill
+.next
+next-env.d.ts
