@@ -1,0 +1,64 @@
+{
+  "id": "agent-loop",
+  "title": "The loop that knows when to stop",
+  "files": ["src/agent.ts", "src/tools.ts", "src/data.ts", "src/demo.ts"],
+  "terminal": {
+    "description": "A shell in your workspace, already pointed at the offline lab model.",
+    "suggestedCommand": "node src/demo.ts"
+  },
+  "tasks": [
+    {
+      "id": "run-tools",
+      "title": "Run every call in a reply",
+      "file": "src/agent.ts",
+      "description": "Implement `runToolCalls(calls)` in `src/agent.ts`.\n\nIt receives the `tool_calls` of one assistant message. For each call, look up the function by name in `toolFunctions` (from `src/tools.ts`), run it with the parsed arguments, and build a tool message:\n\n```ts\n{ role: 'tool', tool_call_id: call.id, content: JSON.stringify(result) }\n```\n\nReturn the messages in the same order as the calls. An empty list gives an empty array. An error object returned by a tool, such as an unknown order, is a normal result. For now you can assume the model only asks for tools that exist.",
+      "nextSteps": [
+        "Read `toolFunctions` in `src/tools.ts`: it maps a tool name to a function.",
+        "Map over the calls and parse each call's arguments.",
+        "Run the function and wrap its result in a tool message."
+      ],
+      "hints": [
+        "This is the same tool message you built by hand in the last chapter, once per call.",
+        "Check `call.type === 'function'` before you read `call.function`. A `filter` before the `map` keeps TypeScript happy.",
+        "`toolFunctions[call.function.name](JSON.parse(call.function.arguments))` gives you the result to stringify."
+      ],
+      "points": 10
+    },
+    {
+      "id": "loop",
+      "title": "Keep going until there is an answer",
+      "file": "src/agent.ts",
+      "description": "Implement `runAgent(question, options?)` in `src/agent.ts`.\n\nStart the conversation with `SYSTEM` and the question. Then repeat:\n\n1. Send the whole conversation to `MODEL` with `tools: toolSpecs`.\n2. If the reply has no tool calls, you are done.\n3. Otherwise append the assistant message and the tool messages from `runToolCalls`, and go again.\n\nReturn `{ answer, steps }`: the content of the final reply and the number of model requests made. Use `options.client` when it is given. The check asks questions that need one, two and three tool calls, and runs a scripted model to see that each request carries the whole conversation.",
+      "nextSteps": [
+        "Build the messages array once, before the loop.",
+        "Inside a loop, make the request and look at the reply's `tool_calls`.",
+        "Return when there are none; otherwise append and loop again.",
+        "Run `node src/demo.ts` and check the step count."
+      ],
+      "hints": [
+        "One question can need several rounds: the model looks up the order first, then each product in it.",
+        "Count requests as you make them, not tool calls. A reply with tool calls and the final reply are both steps.",
+        "The loop body is the round trip from the last chapter: push `reply`, then spread `runToolCalls(reply.tool_calls)` into the same array."
+      ],
+      "points": 10
+    },
+    {
+      "id": "step-limit",
+      "title": "Stop a run that would never end",
+      "file": "src/agent.ts",
+      "description": "Some requests never finish. Ask Pip to wait until order PL-2047 is delivered and the model will check the order again and again, because nothing in this run changes it.\n\nGive `runAgent` a step limit: `options.maxSteps`, default `6`. If the model still wants tools after `maxSteps` requests, throw `new StepLimitError(maxSteps)` (already defined in `src/agent.ts`).\n\nThe check runs a model that never stops and expects exactly `maxSteps` requests, then the error. It also makes sure an answer that arrives on the last allowed request is still returned.",
+      "nextSteps": [
+        "Run `node src/demo.ts` and watch the second question.",
+        "Bound your loop by `maxSteps`.",
+        "Throw `StepLimitError` after the loop ends without an answer.",
+        "Test the edge: an answer on request number `maxSteps` must still win."
+      ],
+      "hints": [
+        "A `for` loop with a counter is easier to reason about here than `while (true)`.",
+        "The error belongs after the loop, not inside it: you only reach that line when every allowed step asked for tools.",
+        "Count from 1 and keep going while `step <= maxSteps`. Then the request numbered `maxSteps` still runs."
+      ],
+      "points": 10
+    }
+  ]
+}
