@@ -68,13 +68,7 @@ export const useSettings = create<SettingsState>()(
       setOnboarded: (onboarded) => set({ onboarded }),
       resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' })
     }),
-    {
-      name: 'indent-settings',
-      version: 2,
-      // Settings saved before the first-run setup existed belong to someone already set up.
-      migrate: (saved, version) =>
-        (version < 2 ? { ...(saved as object), onboarded: true } : saved) as SettingsState
-    }
+    { name: 'indent-settings', version: 1 }
   )
 )
 
