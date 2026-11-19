@@ -1,0 +1,62 @@
+{
+  "id": "tidy-history",
+  "title": "Tidy history before sharing",
+  "files": ["setup.mjs", "NOTES.md"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the setup to build the repository, then work inside repo/ with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "backup",
+      "title": "Keep a safety net",
+      "file": "setup.mjs",
+      "description": "Run `node setup.mjs`, then work inside `repo/`.\n\nBefore you rewrite anything, create a branch named `route-planner-backup`.\n\nThe check expects `route-planner-backup` to point at exactly the last of the five original commits on `route-planner` (`fix typo again`).",
+      "nextSteps": [
+        "Run `node setup.mjs`, `cd repo`, then `git log --oneline --all`.",
+        "Create the backup branch while route-planner still has its original commits.",
+        "Confirm it with `git log --oneline -n 1 route-planner-backup`."
+      ],
+      "hints": [
+        "A branch is just a name for a commit, so a backup costs nothing.",
+        "`git branch <name>` with no other argument creates the branch at the commit you are on.",
+        "Run it while you are on route-planner and before any reset or rebase. If you already rewrote, look up the old commit in the reflog."
+      ],
+      "points": 10
+    },
+    {
+      "id": "squash",
+      "title": "One commit on top of main",
+      "file": "setup.mjs",
+      "description": "Turn `route-planner` into a single commit.\n\nThe check expects:\n\n- `route-planner` is exactly one commit whose parent is `main`'s last commit (`Add fares table`)\n- the files on `route-planner` are exactly the same as at the end of the original five commits\n- `main` still points at `Add fares table`\n- no rebase or merge is left half done, and the working tree is clean\n\nAny non-interactive route works: a soft reset, fixups with autosquash, or a squash merge.",
+      "nextSteps": [
+        "Look at what the branch changes overall with `git diff main route-planner --stat`.",
+        "Move route-planner back to main while keeping all its changes staged.",
+        "Commit once, then compare the branch with your backup."
+      ],
+      "hints": [
+        "You do not need to edit any file. Only the commits change.",
+        "One kind of reset moves the branch but leaves the index and files alone.",
+        "On route-planner, `git reset --soft main` followed by one `git commit -m` gives one commit. `git diff route-planner-backup route-planner` should then print nothing."
+      ],
+      "points": 10
+    },
+    {
+      "id": "message",
+      "title": "A message worth reading",
+      "file": "setup.mjs",
+      "description": "Give the squashed commit a clear message.\n\nThe check reads the subject (first line) of the last commit on `route-planner` and expects:\n\n- 10 to 72 characters\n- no throwaway words such as `wip`, `typo`, `tmp`, `maybe`, `fixup!` or `squash!`\n- not one of the original five messages\n\nA body after a blank line is welcome but not required.",
+      "nextSteps": [
+        "Read the diff of the branch and say in one sentence what it adds.",
+        "Use that sentence as the subject when you commit.",
+        "Check it with `git log -1`."
+      ],
+      "hints": [
+        "Write for Ines, who has not seen your scrappy commits.",
+        "Start the subject with a verb that describes the change, such as Add or Fix.",
+        "If you already committed, `git commit --amend -m \"<subject>\"` replaces the message of the last commit without an editor."
+      ],
+      "points": 10
+    }
+  ]
+}

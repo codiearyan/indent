@@ -1,0 +1,46 @@
+{
+  "id": "lost-work",
+  "title": "Get lost work back",
+  "files": ["setup.mjs", "NOTES.md"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the setup to build the repository, then work inside repo/ with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "branch",
+      "title": "Bring back the deleted branch",
+      "file": "setup.mjs",
+      "description": "Run `node setup.mjs`, then work inside `repo/`.\n\nThe branch `harbour-alerts` held three unmerged commits by Pavel and was deleted. Recreate it.\n\nThe check expects:\n\n- a branch named exactly `harbour-alerts`\n- it contains all three of Pavel's commits\n- it points at exactly the last commit the branch had before it was deleted, with nothing new on top",
+      "nextSteps": [
+        "Run `node setup.mjs`, then `cd repo` and `git reflog`.",
+        "Find the last commit HEAD made while it was on harbour-alerts.",
+        "Look at that commit with `git show` before you use it.",
+        "Create the branch at that commit and list it with `git log --oneline harbour-alerts`."
+      ],
+      "hints": [
+        "Deleting a branch removes a name, not the commits. Something still remembers where HEAD has been.",
+        "In the reflog, the checkout line that says it moved from harbour-alerts to main tells you which entry just below it is the branch's last commit.",
+        "`git branch <name> <hash>` creates a branch at any commit. Use the hash of the newest commit Pavel made on that branch."
+      ],
+      "points": 10
+    },
+    {
+      "id": "main",
+      "title": "Undo the reset on main",
+      "file": "setup.mjs",
+      "description": "`main` was reset two commits too far, dropping `Add winter timetable note` and `Add bike rack notice`. Put `main` back.\n\nThe check expects:\n\n- `main` points at the commit it pointed at just before the reset\n- `README.md` and `timetable.txt` on `main` match that commit\n- the working tree is clean and nothing is left half done",
+      "nextSteps": [
+        "Run `git reflog show main` and find the reset line.",
+        "Identify where main was one move before the reset.",
+        "Move main there, files included, then run `git status` and `git log --oneline`."
+      ],
+      "hints": [
+        "The reset itself is in the reflog. The entry just below it is where main stood before.",
+        "You can name that moment without copying a hash: the reflog syntax `main@{n}`.",
+        "While on main, a hard reset to the reflog entry from before the reset moves the branch and the files together. Then `git status` should be clean."
+      ],
+      "points": 10
+    }
+  ]
+}

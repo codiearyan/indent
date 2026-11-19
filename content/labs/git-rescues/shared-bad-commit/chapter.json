@@ -1,0 +1,46 @@
+{
+  "id": "shared-bad-commit",
+  "title": "Undo a commit everyone already has",
+  "files": ["setup.mjs", "NOTES.md"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the setup to build the repository, then work inside repo/ with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "revert",
+      "title": "Undo the bad fares without rewriting history",
+      "file": "setup.mjs",
+      "description": "Run `node setup.mjs`, then work inside `repo/`.\n\nThe commit `Load spring fares` on `main` multiplied every price by ten, and it is already shared. Undo it on `main`.\n\nThe check reads your repository and expects:\n\n- `fares.txt` on `main` is exactly what it was before `Load spring fares`\n- `timetable.txt` on `main` still has the Sunday sailings\n- all four original commits, including the bad one, are still in `main`'s history\n- no merge, revert or rebase is left half done, and the working tree is clean",
+      "nextSteps": [
+        "Run `node setup.mjs`, then `cd repo` and list the history with `git log --oneline`.",
+        "Use `git show` on the suspicious commit to see exactly what it changed.",
+        "Undo that one commit with a new commit, without opening an editor.",
+        "Run `git log --oneline` and `git status` to confirm the result."
+      ],
+      "hints": [
+        "Moving main backwards would remove commits other people already have. Look for a command that adds a commit instead.",
+        "`git revert` takes the commit you want to cancel, not the one you want to go back to.",
+        "Pass the hash of `Load spring fares` to `git revert` together with `--no-edit`, then check `git status` is clean."
+      ],
+      "points": 10
+    },
+    {
+      "id": "share",
+      "title": "Share the fix",
+      "file": "setup.mjs",
+      "description": "Push your fixed `main` to the shared remote `origin` (it lives in `.shared.git` next to `repo/`).\n\nThe check expects:\n\n- `main` on `origin` has the original fares and the Sunday sailings\n- `main` on `origin` still contains all four original commits (the remote refuses forced, non-fast-forward pushes)\n- your local `main`, your `origin/main` and `main` on `origin` all point at the same commit",
+      "nextSteps": [
+        "Run `git status` and read how far main is ahead of origin/main.",
+        "Push main to origin.",
+        "Run `git log --oneline --decorate -n 3` and check where origin/main points."
+      ],
+      "hints": [
+        "If your main only adds commits on top of what origin has, a plain push works.",
+        "If the push was rejected as non-fast-forward, your main lost commits that origin has. Run setup again and undo with a new commit.",
+        "Run `git push origin main` after the revert. Afterwards `git status` should say your branch is up to date with origin/main."
+      ],
+      "points": 10
+    }
+  ]
+}

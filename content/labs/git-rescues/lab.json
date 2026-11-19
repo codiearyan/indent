@@ -1,0 +1,13 @@
+{
+  "id": "git-rescues",
+  "title": "Git rescues",
+  "description": "You look after the code at Gullwick Ferries, a small island ferry company whose timetable, fares and tools all live in one repository. Each chapter drops you into a real mess in that repository, and you fix it in the terminal with your own git: undo, recover, merge, hunt down a bad commit and tidy history before sharing.",
+  "category": "DevOps and tools",
+  "language": "shell",
+  "tags": ["Git"],
+  "kind": "lab",
+  "parts": [
+    { "title": "Undo and recover", "chapters": ["shared-bad-commit", "lost-work"] },
+    { "title": "Work with history", "chapters": ["merge-conflict", "find-the-break", "tidy-history"] }
+  ]
+}

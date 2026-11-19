@@ -1,0 +1,47 @@
+{
+  "id": "find-the-break",
+  "title": "Find the commit that broke it",
+  "files": ["setup.mjs", "NOTES.md"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the setup to build the repository, then work inside repo/ with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "find",
+      "title": "Name the first bad commit",
+      "file": "setup.mjs",
+      "description": "Run `node setup.mjs`, then work inside `repo/`.\n\n`node check.mjs` fails on `main` but passed at the commit `Add fare calculator and check`. Use `git bisect` (by hand or with `git bisect run`) to find the first commit where it fails.\n\nWrite that commit's hash in `repo/bisect-result.txt` (the full hash, or at least 7 characters). The check reads the first hash in the file and expects it to be exactly the first bad commit, not the last good one and not a later broken one.",
+      "nextSteps": [
+        "Run `node setup.mjs`, `cd repo`, then `node check.mjs` to see the failure.",
+        "Find the hash of the commit that added the fare calculator with `git log --oneline`.",
+        "Start a bisect between main and that commit, and test each step.",
+        "Save the hash bisect reports into `bisect-result.txt`."
+      ],
+      "hints": [
+        "You have a known good commit, a known bad one and a script that tells them apart. That is all bisect needs.",
+        "`check.mjs` exits 1 when a case fails, so `git bisect run` can run it at each step for you.",
+        "Start with main as bad and the fare calculator commit as good. The line ending in `is the first bad commit` has the hash to save."
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Fix it in a new commit",
+      "file": "setup.mjs",
+      "description": "Fix the group discount in `fares.mjs` on `main`.\n\nThe check expects:\n\n- `main` has at least one new commit on top of the original history, which is otherwise unchanged\n- the original `node check.mjs` passes on `main`'s last commit\n- bike tickets, added after the bug, still work: they cost 100 and do not count towards the group size\n- the bisect is over, HEAD is on `main`, and the working tree is clean (`bisect-result.txt` is ignored by the repository)",
+      "nextSteps": [
+        "End the bisect so you are back on main.",
+        "Compare the first bad commit with its parent to see what changed.",
+        "Fix `fares.mjs` on main and run `node check.mjs`.",
+        "Commit the fix without opening an editor."
+      ],
+      "hints": [
+        "The guilty commit was a rewrite, and only one small detail of it changed the behavior.",
+        "Read the condition that decides whether the discount applies. Which group sizes does it include?",
+        "Groups of exactly four should get the discount. Change that comparison on main, keep the bike code, then `git commit -am` with a clear message."
+      ],
+      "points": 10
+    }
+  ]
+}
