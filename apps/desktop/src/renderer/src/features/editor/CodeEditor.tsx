@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
+import { bindSuggestShortcut } from '@/features/ai/inlineSuggestions'
 import { TOUR } from '@/features/tour/anchors'
 import { languageFor, monaco, pathOf, uriFor } from './monaco'
 
@@ -48,6 +49,7 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
       void useWorkspace.getState().flush()
     })
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, onCheck)
+    bindSuggestShortcut(monaco, editor)
     return () => {
       editor.dispose()
       editorRef.current = null
