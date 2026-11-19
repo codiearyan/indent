@@ -1,0 +1,95 @@
+@import 'tailwindcss';
+@import '@indent/design/tokens.css';
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    overflow-x: clip;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0s !important;
+      animation-duration: 0s !important;
+    }
+  }
+}
+
+@utility wrap {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1240px;
+  padding-inline: 20px;
+  @media (min-width: 40rem) {
+    padding-inline: 32px;
+  }
+}
+
+@utility display {
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+@utility headline {
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+}
+
+/* The one soft brand tint the page allows, behind the hero screenshot. */
+.brand-halo {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklch, var(--brand) 22%, transparent),
+    transparent
+  );
+}
+
+/* Hollow in the middle so the headline sits on a clean field, gone before the screenshot. */
+.fade-mask {
+  mask-image:
+    radial-gradient(ellipse 38% 42% at 50% 38%, transparent 35%, black 100%),
+    linear-gradient(to bottom, black 30%, transparent 78%);
+  mask-composite: intersect;
+}
+
+.wordmark-mask {
+  mask-image: linear-gradient(to bottom, black 10%, transparent 95%);
+}
+
+.cell {
+  transition: background-color 240ms ease;
+}
+
+.group:hover .cell.fills,
+.group:focus-within .cell.fills {
+  background-color: var(--brand);
+}
+
+details > summary {
+  list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+details[open] .faq-icon {
+  transform: rotate(45deg);
+}

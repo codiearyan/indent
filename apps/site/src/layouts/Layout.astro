@@ -1,0 +1,39 @@
+---
+import { getImage } from 'astro:assets'
+import logo from '@indent/design/logo.png'
+import '../styles/global.css'
+
+interface Props {
+  title: string
+  description: string
+}
+
+const { title, description } = Astro.props
+const icon = await getImage({ src: logo, width: 64, height: 64, format: 'png' })
+const touchIcon = await getImage({ src: logo, width: 180, height: 180, format: 'png' })
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/png" href={icon.src} />
+    <link rel="apple-touch-icon" href={touchIcon.src} />
+  </head>
+  <body class="bg-background text-[15px] text-foreground">
+    <a
+      href="#main"
+      class="sr-only rounded-md bg-foreground px-3 py-2 text-background focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50"
+    >
+      Skip to content
+    </a>
+    <slot />
+  </body>
+</html>

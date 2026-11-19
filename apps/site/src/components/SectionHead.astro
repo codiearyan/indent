@@ -1,0 +1,41 @@
+---
+import BuildStrip from './BuildStrip.astro'
+
+interface Props {
+  id: string
+  label: string
+  step: number
+  muted: string
+  bright: string
+  accent?: string
+}
+
+const { id, label, step, muted, bright, accent } = Astro.props
+const hasAside = Astro.slots.has('default')
+---
+
+<div class="grid gap-10 lg:grid-cols-12 lg:items-end">
+  <div class:list={[hasAside ? 'lg:col-span-8' : 'lg:col-span-10']}>
+    <div class="flex items-center gap-3">
+      <p class="font-mono text-[13px] text-muted-foreground">{label}</p>
+      <BuildStrip groups={[8]} filled={step} />
+    </div>
+    <h2
+      id={id}
+      class="headline mt-6 text-[38px] text-balance sm:text-[48px] lg:text-[60px] scroll-mt-28"
+    >
+      <span class="text-muted-foreground">{muted}</span>{' '}
+      <span class="text-foreground">
+        {bright}{accent && ' '}
+        {accent && <span class="text-brand">{accent}</span>}
+      </span>
+    </h2>
+  </div>
+  {
+    hasAside && (
+      <div class="text-[17px] leading-[1.6] text-pretty text-muted-foreground lg:col-span-4 lg:pb-2">
+        <slot />
+      </div>
+    )
+  }
+</div>

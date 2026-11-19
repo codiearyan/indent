@@ -1,0 +1,65 @@
+---
+import HardDrive from '@lucide/astro/icons/hard-drive'
+import UserRoundX from '@lucide/astro/icons/user-round-x'
+import WifiOff from '@lucide/astro/icons/wifi-off'
+import SquareTerminal from '@lucide/astro/icons/square-terminal'
+import SectionHead from './SectionHead.astro'
+
+const cells = [
+  {
+    icon: HardDrive,
+    title: 'Everything is on disk',
+    body: 'Lessons, the files you write and your progress all live in folders on your computer. Each issue gets its own workspace, and the hidden tests stay outside it.'
+  },
+  {
+    icon: UserRoundX,
+    title: 'No account',
+    body: 'Open the app and start. There is no sign-in, no server and nothing to sync. Your points, levels and streak are kept on disk too.'
+  },
+  {
+    icon: WifiOff,
+    title: 'The local model works offline',
+    body: 'The LLM, retrieval, agents and evals repos talk to a small model inside the app instead of a paid API. It answers the same way every time, so the checks are repeatable, and it needs no key and no network.'
+  },
+  {
+    icon: SquareTerminal,
+    title: 'Your own AI tools',
+    body: 'The tutor works through a coding CLI you already use (Claude Code, Codex, OpenCode or Gemini CLI) or through your own API key. Indent runs no model service of its own.'
+  }
+]
+---
+
+<section
+  id="local"
+  aria-labelledby="local-title"
+  class="scroll-mt-8 border-t border-rule py-28 sm:py-40"
+>
+  <div class="wrap">
+    <SectionHead
+      id="local-title"
+      label="/local first"
+      step={4}
+      muted="Local first, on purpose."
+      bright="Nothing to sign up for, nothing to keep online."
+    >
+      <p>
+        Indent is a desktop app, not a website you log in to. Your code runs with your own Node, in
+        your own shell, on your own machine.
+      </p>
+    </SectionHead>
+
+    <ul class="mt-16 grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-2">
+      {
+        cells.map(({ icon: Icon, title, body }) => (
+          <li class="bg-background p-7 sm:p-12">
+            <span class="inline-flex size-12 items-center justify-center rounded-[12px] border border-border bg-card">
+              <Icon class="size-5" stroke-width={1.5} aria-hidden="true" />
+            </span>
+            <h3 class="mt-8 text-[22px] font-medium tracking-[-0.015em]">{title}</h3>
+            <p class="mt-3 max-w-[480px] text-[16px] leading-[1.65] text-muted-foreground">{body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

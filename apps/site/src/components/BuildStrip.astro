@@ -1,0 +1,39 @@
+---
+interface Props {
+  groups: number[]
+  filled?: number
+  hoverFill?: boolean
+  size?: 'sm' | 'md'
+  class?: string
+}
+
+const { groups, filled = 0, hoverFill = false, size = 'sm', class: className } = Astro.props
+let index = 0
+const rows = groups.map((count) =>
+  Array.from({ length: count }, () => {
+    const i = index++
+    return { i, on: i < filled }
+  })
+)
+const cellSize = size === 'md' ? 'h-2 w-5' : 'h-1.5 w-3.5'
+---
+
+<div class:list={['flex flex-wrap items-center gap-1.5', className]} aria-hidden="true">
+  {
+    rows.map((cells) => (
+      <span class="flex gap-0.5">
+        {cells.map(({ i, on }) => (
+          <span
+            class:list={[
+              'cell rounded-[2px]',
+              cellSize,
+              on ? 'bg-brand' : 'bg-accent',
+              hoverFill && !on && 'fills'
+            ]}
+            style={hoverFill ? `transition-delay: ${i * 18}ms` : undefined}
+          />
+        ))}
+      </span>
+    ))
+  }
+</div>

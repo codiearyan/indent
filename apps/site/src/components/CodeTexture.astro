@@ -1,0 +1,43 @@
+---
+import { readSource } from '../lib/content'
+
+const files = [
+  'first-routes/solution/src/app.js',
+  'list-queries/solution/src/listQuery.js',
+  'boat-crud/solution/src/app.js'
+]
+const columns = files.map((path) =>
+  readSource('node-api', path)
+    .split('\n')
+    .filter((line) => line.trim() && !line.trim().startsWith('//'))
+    .slice(0, 44)
+    .map((line) => {
+      const depth = Math.floor((line.length - line.trimStart().length) / 2)
+      return { depth, text: line.trim() }
+    })
+)
+---
+
+<div
+  class="fade-mask pointer-events-none absolute inset-0 overflow-hidden select-none"
+  aria-hidden="true"
+>
+  <div
+    class="absolute top-6 left-1/2 flex w-[1600px] -translate-x-1/2 gap-16 font-mono text-[12.5px] leading-[24px] text-foreground/[0.07]"
+  >
+    {
+      columns.map((lines, c) => (
+        <div class:list={['w-[480px] shrink-0', c === 1 && 'pt-24', c === 2 && 'pt-10']}>
+          {lines.map(({ depth, text }) => (
+            <div class="flex h-6 whitespace-pre">
+              {Array.from({ length: depth }, () => (
+                <span class="h-full w-[2ch] shrink-0 border-l border-foreground/[0.06]" />
+              ))}
+              <span class="truncate">{text}</span>
+            </div>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</div>

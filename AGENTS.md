@@ -37,11 +37,13 @@ Run from the repo root.
 ## Layout
 
 A pnpm workspaces monorepo. Install, lint and format from the root. Lab content is shared at the
-root so other apps (a future site) can read it. Each app is a workspace under `apps/`:
+root so every app can read it. Each app is a workspace under `apps/`:
 
 ```
 content/                 lab packs and the grader kit (plain files, shipped as an extra resource)
 apps/desktop/            the Electron app (@indent/desktop); src/ paths below are relative to it
+apps/site/               the landing page (@indent/site): a static Astro site that reads content/ at
+                         build time; `pnpm dev:site`, `pnpm build:site`
 packages/design/         @indent/design: tokens.css (colours, type, theme), code-palette.ts, the logo;
                          every app imports its look from here, never redefines it
 ```

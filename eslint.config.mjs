@@ -11,8 +11,7 @@ export default defineConfig(
       '**/node_modules',
       '**/dist',
       '**/out',
-      '**/.next',
-      '**/next-env.d.ts',
+      '**/.astro',
       'content/**',
       'scripts/**',
       'apps/desktop/src/renderer/src/components/ui/**'
@@ -37,15 +36,6 @@ export default defineConfig(
     rules: {
       ...eslintPluginReactHooks.configs.recommended.rules,
       ...eslintPluginReactRefresh.configs.vite.rules
-    }
-  },
-  {
-    files: ['apps/site/app/**/*.tsx'],
-    rules: {
-      'react-refresh/only-export-components': [
-        'error',
-        { allowExportNames: ['metadata', 'viewport', 'generateMetadata'] }
-      ]
     }
   },
   eslintConfigPrettier

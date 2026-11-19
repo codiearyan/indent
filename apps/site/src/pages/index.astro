@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Nav from '../components/Nav.astro'
+import Hero from '../components/Hero.astro'
+import Repos from '../components/Repos.astro'
+import Steps from '../components/Steps.astro'
+import Help from '../components/Help.astro'
+import LocalFirst from '../components/LocalFirst.astro'
+import Extras from '../components/Extras.astro'
+import Faq from '../components/Faq.astro'
+import Closing from '../components/Closing.astro'
+import { listRepos } from '../lib/content'
+
+const repos = listRepos().sort(
+  (a, b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title)
+)
+const issues = repos.reduce((n, repo) => n + repo.issues.length, 0)
+const tasks = repos.reduce((n, repo) => n + repo.tasks, 0)
+---
+
+<Layout
+  title="Indent: learn to code by fixing real problems"
+  description={`A local-first desktop app where you learn by doing. ${repos.length} repos, ${issues} issues and ${tasks} tasks, each checked by hidden tests on your own machine.`}
+>
+  <Nav />
+  <main id="main">
+    <Hero repos={repos.length} issues={issues} tasks={tasks} />
+    <Repos repos={repos} />
+    <Steps />
+    <Help />
+    <LocalFirst />
+    <Extras repos={repos} />
+    <Faq />
+  </main>
+  <Closing />
+</Layout>

@@ -1,0 +1,37 @@
+---
+import { Image } from 'astro:assets'
+import type { ImageMetadata } from 'astro'
+
+interface Props {
+  src: ImageMetadata
+  alt: string
+  /** The part of the source image to show, in source pixels: [x, y, width, height]. */
+  crop?: [number, number, number, number]
+  /** The widest the frame is drawn on the page, in CSS pixels. */
+  maxWidth: number
+  eager?: boolean
+  class?: string
+}
+
+const { src, alt, crop, maxWidth, eager = false, class: className } = Astro.props
+const [x, y, w, h] = crop ?? [0, 0, src.width, src.height]
+const pct = (n: number): string => `${(n * 100).toFixed(4)}%`
+const grow = src.width / w
+// A crop draws the whole image larger than its frame, so the browser must pick a wider file.
+const sizes = `(min-width: ${maxWidth}px) ${Math.round(maxWidth * grow)}px, ${Math.round(100 * grow)}vw`
+const widths = [960, 1440, 1920, 2400, 2880].filter((n) => n <= src.width)
+---
+
+<div class:list={['relative overflow-hidden', className]} style={`aspect-ratio: ${w} / ${h}`}>
+  <Image
+    src={src}
+    alt={alt}
+    widths={widths}
+    sizes={sizes}
+    quality={82}
+    loading={eager ? 'eager' : 'lazy'}
+    fetchpriority={eager ? 'high' : 'auto'}
+    class="absolute max-w-none"
+    style={`width: ${pct(grow)}; left: ${pct(-x / w)}; top: ${pct(-y / h)}`}
+  />
+</div>
