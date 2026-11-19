@@ -1,0 +1,12 @@
+{
+  "id": "js-foundations",
+  "title": "JavaScript foundations",
+  "description": "Larkspur Tea is a two-person online tea shop, and you just became its developer. Turn a messy pile of orders into answers the owners can use, then build the small helpers behind their loyalty cards. Along the way you learn array methods and closures by writing real functions.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": ["JavaScript"],
+  "kind": "lab",
+  "parts": [
+    { "title": "A week at Larkspur Tea", "chapters": ["order-reports", "loyalty-cards"] }
+  ]
+}
