@@ -3,6 +3,9 @@ import { api } from '@/lib/api'
 import { useWorkspace } from '@/stores/workspace'
 import { useAi } from './aiStore'
 
+/** Asks for a suggestion in `manual` mode, written the way the platform writes shortcuts. */
+export const SUGGEST_SHORTCUT = window.platform === 'darwin' ? '⌥\\' : 'Alt+\\'
+
 const PAUSE_MS = 500
 const PREFIX_CHARS = 4000
 const SUFFIX_CHARS = 1000
@@ -17,18 +20,31 @@ function pause(ms: number, token: Monaco.CancellationToken): Promise<boolean> {
   })
 }
 
+/** Binds SUGGEST_SHORTCUT to Monaco's explicit trigger; Monaco ships it without a key. */
+export function bindSuggestShortcut(
+  monaco: typeof Monaco,
+  editor: Monaco.editor.IStandaloneCodeEditor
+): void {
+  editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Backslash, () =>
+    editor.trigger('keyboard', 'editor.action.inlineSuggest.trigger', {})
+  )
+}
+
 /** Registers the grey, Tab-to-accept suggestions. The editor calls this once after Monaco loads. */
 export function registerInlineSuggestions(monaco: typeof Monaco): Monaco.IDisposable {
   return monaco.languages.registerInlineCompletionsProvider('*', {
     displayName: 'Indent AI',
 
-    provideInlineCompletions: async (model, position, _context, token) => {
+    provideInlineCompletions: async (model, position, context, token) => {
       const none = { items: [] }
       const { config } = useAi.getState()
       const chapter = useWorkspace.getState().chapter
-      if (config?.suggestions !== 'auto' || !config.provider || !chapter) return none
+      const explicit = context.triggerKind === monaco.languages.InlineCompletionTriggerKind.Explicit
+      const mode = config?.suggestions ?? 'off'
+      if (!config?.provider || !chapter || mode === 'off') return none
+      if (mode === 'manual' && !explicit) return none
       // Monaco cancels the token on the next keystroke, so only a real pause gets through.
-      if (!(await pause(PAUSE_MS, token))) return none
+      if (!explicit && !(await pause(PAUSE_MS, token))) return none
 
       const offset = model.getOffsetAt(position)
       const text = model.getValue()
