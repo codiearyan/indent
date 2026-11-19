@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { codePalette } from '@/lib/code-palette'
+import { codePalette } from '@indent/design/code-palette'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/stores/settings'
 import { tokenize, type TokenKind } from './highlight'

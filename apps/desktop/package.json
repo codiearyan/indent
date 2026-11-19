@@ -26,8 +26,7 @@
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^2.0.0",
-    "@fontsource/ibm-plex-mono": "^5.3.0",
-    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@indent/design": "workspace:*",
     "@monaco-editor/react": "^4.7.0",
     "@tailwindcss/vite": "^4.3.5",
     "@types/node": "^24.19.2",

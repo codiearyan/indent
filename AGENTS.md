@@ -42,6 +42,8 @@ root so other apps (a future site) can read it. Each app is a workspace under `a
 ```
 content/                 lab packs and the grader kit (plain files, shipped as an extra resource)
 apps/desktop/            the Electron app (@indent/desktop); src/ paths below are relative to it
+packages/design/         @indent/design: tokens.css (colours, type, theme), code-palette.ts, the logo;
+                         every app imports its look from here, never redefines it
 ```
 
 Inside `apps/desktop/`:
@@ -55,10 +57,10 @@ src/main/                Electron main process
   services/<name>.ts     one file per Api namespace, each exports register()
 src/preload/             builds window.api from INVOKE_METHODS / SEND_METHODS / EVENTS in shared/types.ts
 src/renderer/src/
-  styles/globals.css     the design system (tokens)
+  styles/globals.css     imports @indent/design/tokens.css; holds only what the app alone needs
   components/ui/         shadcn primitives (do not restyle per feature; extend with variants)
   components/app/        small shared app components (ThemeToggle, LevelBadge, LanguageIcon)
-  lib/                   api.ts (typed window.api), utils.ts (cn), code-palette.ts (hex mirror of tokens)
+  lib/                   api.ts (typed window.api), utils.ts (cn)
   stores/                zustand: settings (persisted), progress, catalog, workspace
   features/<name>/       catalog, workspace, editor, terminal, ai, tour, dsa
 ```
@@ -69,14 +71,14 @@ signature has to change, change it there and in every caller in the same change.
 ## Design system
 
 The look in one line: a dark frame holds the navigation, the work sits on a sheet one step lighter,
-the chrome is neutral, and the one hue is the yellow of a highlighted line of code.
+the chrome is neutral, and the one hue is a vivid orange.
 
 - **Three levels, no more.** The frame is `bg-background`. The sheet is `bg-card rounded-2xl border`
   inset 8px from the window edges. Cards on the sheet are `rounded-lg border border-border` with no
   fill of their own and no shadow. Shadows are only for what floats (menus, popovers, dialogs).
-- **Colour is meaning.** `brand` is the yellow. It marks progress (a filled task cell in the build
+- **Colour is meaning.** `brand` is the orange. It marks progress (a filled task cell in the build
   strip, the level meter, the activity heatmap) and it is the one main action of a view
-  (`bg-primary text-primary-foreground`: a yellow button with ink text). `success` is the small green
+  (`bg-primary text-primary-foreground`: an orange button with ink text). `success` is the small green
   mark of a passed check and `destructive` the red mark of a failed one; they are status marks, never
   fills for large areas. `warning` is only the "being compared" tone in the DSA animations.
   Nothing else has a hue: links, active navigation, selected tabs, hints and AI are neutral.
@@ -84,7 +86,7 @@ the chrome is neutral, and the one hue is the yellow of a highlighted line of co
   - Links: `text-muted-foreground hover:text-foreground`, or ink with an underline in prose.
   - Never set text in the brand colour on a light surface; use it as a fill with ink text on top.
   - Soft status fills use opacity (`bg-success/10 text-success`, `bg-destructive/10`).
-- **Tokens only.** Use the Tailwind utilities of the semantic tokens in `styles/globals.css`
+- **Tokens only.** Use the Tailwind utilities of the semantic tokens in `packages/design/tokens.css`
   (`bg-background`, `bg-card`, `bg-muted`, `bg-accent`, `text-foreground`, `text-muted-foreground`,
   `border-border`, `border-rule`, `border-input`, `bg-primary`, `text-success`, `text-warning`,
   `text-destructive`). Never hex, rgb or oklch in a component, never Tailwind palette colours.
