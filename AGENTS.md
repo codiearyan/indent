@@ -28,15 +28,15 @@ the picture: a repo has issues, an issue has tasks, tasks have checks ("Start re
 
 Run from the repo root.
 
-- `npm install` installs every workspace
-- `npm run dev` start the app with hot reload
-- `npm run typecheck` both tsconfigs (node and web)
-- `npm test` vitest unit tests
-- `npx prettier --write <files>` and `npx eslint <files>` before finishing a change
+- `pnpm install` installs every workspace
+- `pnpm dev` start the app with hot reload
+- `pnpm typecheck` both tsconfigs (node and web)
+- `pnpm test` vitest unit tests
+- `pnpm prettier --write <files>` and `pnpm eslint <files>` before finishing a change
 
 ## Layout
 
-An npm workspaces monorepo. Install, lint and format from the root. Lab content is shared at the
+A pnpm workspaces monorepo. Install, lint and format from the root. Lab content is shared at the
 root so other apps (a future site) can read it. Each app is a workspace under `apps/`:
 
 ```
@@ -193,7 +193,7 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
 - The repository is private on GitHub. `main` is always releasable and is never committed to directly.
 - Every feature and every fix gets its own branch (`feat/<name>`, `fix/<name>`, `chore/<name>`,
   `docs/<name>`) and its own pull request against `main`. One concern per pull request.
-- Before opening a pull request: `npm run typecheck`, `npm run lint` and `npm test` pass.
+- Before opening a pull request: `pnpm typecheck`, `pnpm lint` and `pnpm test` pass.
 - Pull requests are squash-merged. The squash title is the pull request title plus its number.
 - CI minutes are limited. CI runs on pull requests only and skips docs and lab content. Verify
   locally, push once per pull request, and batch small related fixes into one pull request instead

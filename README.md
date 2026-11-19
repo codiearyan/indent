@@ -32,11 +32,11 @@ No account and no server. Lessons, your files and your progress live on your com
 
 ## Run it
 
-Requires Node.js 22.18 or newer on your machine (the app runs your code and the checks with it).
+Requires Node.js 22.18 or newer (the app runs your code and the checks with it) and pnpm 11.
 
 ```sh
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 The first Check installs the learner dependencies (vitest, typescript, openai) once, into the app's
@@ -45,13 +45,13 @@ data folder.
 Other commands:
 
 ```sh
-npm run typecheck   # both TypeScript projects
-npm run lint
-npm test            # unit tests
-npm run build:mac -w @labbench/desktop   # package the app (also build:win, build:linux)
+pnpm typecheck      # both TypeScript projects
+pnpm lint
+pnpm test           # unit tests
+pnpm --filter @labbench/desktop build:mac   # package the app (also build:win, build:linux)
 ```
 
-The repository is an npm workspaces monorepo: the desktop app is in `apps/desktop`, and the content
+The repository is a pnpm workspaces monorepo: the desktop app is in `apps/desktop`, and the content
 stays in `content/` at the root so other apps can share it.
 
 ## Add a repo
