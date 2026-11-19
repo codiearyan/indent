@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useAi } from '@/features/ai/aiStore'
+import { ModelSelect } from '@/features/ai/AiMenu'
+import { activeProvider, useAi } from '@/features/ai/aiStore'
+import { TestConnection } from '@/features/ai/TestConnection'
 import { cn, errorMessage } from '@/lib/utils'
 import { StepLayout } from './StepLayout'
 
@@ -22,6 +24,7 @@ export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
   const clis = config?.providers.filter((p) => p.kind === 'cli') ?? []
   const apis = config?.providers.filter((p) => p.kind === 'api') ?? []
   const nothing = !config?.providers.some((p) => p.available)
+  const active = loading ? undefined : activeProvider(config)
 
   return (
     <StepLayout
@@ -62,6 +65,23 @@ export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
           ))}
         </ProviderCard>
       </RadioGroup>
+      <div className="mt-6 flex min-h-16 items-start gap-6">
+        {active ? (
+          <>
+            <div className="flex w-60 shrink-0 flex-col gap-1.5">
+              <span className="text-[13px] text-muted-foreground">Model</span>
+              <ModelSelect className="h-8" />
+            </div>
+            <TestConnection key={`${active.id}/${config?.model}`} className="pt-[26px]" />
+          </>
+        ) : (
+          !loading && (
+            <p className="text-[13px] text-muted-foreground">
+              No provider yet. You can continue and pick one later from the AI menu.
+            </p>
+          )
+        )}
+      </div>
     </StepLayout>
   )
 }
