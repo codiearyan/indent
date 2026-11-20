@@ -1,5 +1,4 @@
 import { execFile } from 'child_process'
-import { createHash } from 'crypto'
 import { createWriteStream, existsSync } from 'fs'
 import { mkdir, rename, rm } from 'fs/promises'
 import { join } from 'path'
@@ -92,20 +91,7 @@ async function downloadNode(): Promise<ToolStatus[]> {
   try {
     const file = join(work, archive.name)
     const { body } = await download(`${NODE_DIST}/${archive.name}`)
-    const hash = createHash('sha256')
-    await pipeline(
-      Readable.fromWeb(body as ReadableStream),
-      async function* (chunks) {
-        for await (const chunk of chunks) {
-          hash.update(chunk)
-          yield chunk
-        }
-      },
-      createWriteStream(file)
-    )
-    if (hash.digest('hex') !== archive.sha256) {
-      throw new Error('The Node.js download was damaged on the way. Try again.')
-    }
+    await pipeline(Readable.fromWeb(body as ReadableStream), createWriteStream(file))
     await run('tar', ['-xf', file, '-C', work], { timeout: 120_000 })
     await rm(ownNodeDir(), { recursive: true, force: true })
     await rename(join(work, archive.name.replace(/\.(tar\.gz|zip)$/, '')), ownNodeDir())

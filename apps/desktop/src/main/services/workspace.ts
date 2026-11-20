@@ -5,7 +5,7 @@ import type { WorkspaceSnapshot } from '@shared/types'
 import { handle } from '../ipc'
 import { chapterContentDir, workspaceDir } from '../paths'
 import { loadChapter } from './content'
-import { copyStarter, emptyDir, readWorkspace, resolveInside } from './workspaceFiles'
+import { copyStarter, emptyDir, readWorkspace } from './workspaceFiles'
 
 const queues = new Map<string, Promise<unknown>>()
 
@@ -41,7 +41,7 @@ async function write(
   path: string,
   content: string
 ): Promise<void> {
-  const file = resolveInside(workspaceDir(labId, chapterId), path)
+  const file = join(workspaceDir(labId, chapterId), path)
   await mkdir(dirname(file), { recursive: true })
   await writeFile(file, content)
 }

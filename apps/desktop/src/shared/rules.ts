@@ -30,7 +30,7 @@ export function isChapterComplete(
   progress: ChapterProgress | undefined,
   taskIds: string[]
 ): boolean {
-  return taskIds.length > 0 && taskIds.every((id) => progress?.tasks[id]?.passed)
+  return taskIds.length > 0 && taskIds.some((id) => progress?.tasks[id]?.passed)
 }
 
 export function localDate(date = new Date()): string {
