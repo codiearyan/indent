@@ -15,6 +15,11 @@ function resolveShellPath(): Promise<string> {
     .catch(() => process.env.PATH ?? '')
 }
 
+/** Asks the login shell again, so a CLI installed while the app is open is found. */
+export function refreshShellPath(): void {
+  shellPath = undefined
+}
+
 /** Called once the lab model server is listening. */
 export function setLabModelUrl(url: string): void {
   labModelUrl = url
