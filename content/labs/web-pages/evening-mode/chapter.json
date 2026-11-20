@@ -1,0 +1,65 @@
+{
+  "id": "evening-mode",
+  "title": "An evening theme and a focus you can see",
+  "files": ["styles.css", "theme.js", "index.html"],
+  "terminal": {
+    "description": "The page runs in the Browser panel and reloads every time you save. Press the Evening mode button and Tab through the page there. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "dark-theme",
+      "title": "Give the evening mode its colours",
+      "file": "styles.css",
+      "description": "The Evening mode button already sets `data-theme=\"dark\"` on the `<html>` element. Make the page answer it.\n\nThe check sets `data-theme=\"dark\"` on `<html>` and looks for:\n\n- at least one rule whose selector matches that attribute, and that rule only sets custom properties (`color-scheme` is allowed too)\n- the page background turns dark\n- the page text, an event description, an event date and a \"Save a place\" link each have a contrast of at least 4.5 to 1 with the background behind them\n\nThe light theme stays as it is.",
+      "nextSteps": [
+        "Press Evening mode in the Browser panel. Nothing changes yet.",
+        "Add a rule for the html element with `data-theme=\"dark\"` below your `:root` rule.",
+        "Give the background and text colours new values there, then look at the page in both themes.",
+        "Find the colours that are hard to read in the dark and give them new values too. If one custom property is used for two different jobs, split it in two. Then press Check."
+      ],
+      "hints": [
+        "Your rules already use custom properties for every colour. The dark theme only has to change what those names point to.",
+        "An attribute selector looks like `[data-theme='dark']`. Put it on `:root` or `html` so it wins over the plain `:root` rule.",
+        "The dark navy of the header is also the link colour in the cards, which is unreadable on a dark card. Give the link its own custom property, then re-point it in the dark rule."
+      ],
+      "points": 10
+    },
+    {
+      "id": "focus-ring",
+      "title": "Show where the keyboard is",
+      "file": "styles.css",
+      "description": "Keyboard users cannot see where they are on the page, because a rule hides the focus outline. Bring it back, clearly.\n\nThe check looks for:\n\n- no rule in `styles.css` sets `outline: none` or `outline: 0` (a rule whose selector has `:not(:focus-visible)` is allowed)\n- a rule with `:focus-visible` (or `:focus`) in its selector that reaches links, buttons and text fields, and sets an outline at least 2px thick",
+      "nextSteps": [
+        "Press Tab a few times in the Browser panel. Where is the focus?",
+        "Find the rule that removes the outline and delete it.",
+        "Add a focus rule with a thick outline and a little offset.",
+        "Tab through the page in both themes, then press Check."
+      ],
+      "hints": [
+        "Someone removed the outline because it showed up on mouse clicks. There is a selector that matches only when the browser thinks a focus ring is useful.",
+        "`:focus-visible` on its own matches any element that has keyboard focus.",
+        "An outline takes a width, a style and a colour. `currentColor` makes it match the text, so it shows on the dark header and the light page alike."
+      ],
+      "points": 10
+    },
+    {
+      "id": "toggle-state",
+      "title": "Let the evening button say whether it is on",
+      "file": "theme.js",
+      "description": "A screen reader announces the Evening mode button, but not whether it is on. Tell it.\n\nThe check clicks the button with id `theme-toggle` twice and looks for:\n\n- before any click, the button has `aria-pressed=\"false\"`\n- after one click, `<html>` has `data-theme=\"dark\"` and the button has `aria-pressed=\"true\"`\n- after the second click, the theme is not dark and the button has `aria-pressed=\"false\"` again\n- the page has no script errors",
+      "nextSteps": [
+        "Read `theme.js`. It flips the theme but tells nobody.",
+        "Give the button its starting state in `index.html`.",
+        "In the click handler, work out whether the theme is now dark and set the attribute to match.",
+        "Click the button in the Browser panel, inspect it, then press Check."
+      ],
+      "hints": [
+        "A toggle button has one attribute that a screen reader reads as \"pressed\" or \"not pressed\".",
+        "`aria-pressed` holds the text `\"true\"` or `\"false\"`. `setAttribute` with `String(someBoolean)` gives you either one.",
+        "Compute one boolean, use it for both the theme and the attribute, and they can never disagree."
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "page-outline",
+  "title": "A page a screen reader can walk",
+  "files": ["index.html", "styles.css"],
+  "terminal": {
+    "description": "The page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "landmarks",
+      "title": "Mark the parts of the page",
+      "file": "index.html",
+      "description": "Give the page its landmarks in `index.html`, so a screen reader can jump between them.\n\nThe check looks for:\n\n- a `<header>` around the library name and the menu, outside `<main>`\n- a `<nav>` that holds the menu links, outside `<main>`\n- exactly one `<main>`, and the page title, the events and the sign-up form are inside it\n- a `<footer>` around the \"Visit us\" block, outside `<main>`\n\nKeep the classes and ids the elements already have. They are what the stylesheet hangs on.",
+      "nextSteps": [
+        "Read the page in the Browser panel and name its four big parts out loud.",
+        "Find the `div` that starts each part in `index.html`.",
+        "Swap each one for the element that says what it is. Change the closing tag too.",
+        "Save, check the page still looks the same, and press Check."
+      ],
+      "hints": [
+        "Most of the work is renaming tags. The attributes on each `div` can stay as they are.",
+        "There are four parts: the strip at the top, the menu inside it, the middle of the page, and the block at the bottom.",
+        "The `div` with class `top` is the start of the page and the `div` with class `menu` sits inside it. The `div` with class `content` and the one with id `visit` are the other two. Each element's name is a plain English word for its part."
+      ],
+      "points": 10
+    },
+    {
+      "id": "headings",
+      "title": "Turn the big text into headings",
+      "file": "index.html",
+      "description": "Replace the text that only looks like a heading with real headings in `index.html`.\n\nThe check looks for:\n\n- exactly one `<h1>`, and its text is `What's on in December`\n- the titles `Events`, `Save a place` and `Visit us` are headings\n- the five event titles are headings\n- no level is skipped: going down the page, each heading is at most one level deeper than the one before it\n\nThe text of each heading stays exactly as it is now.",
+      "nextSteps": [
+        "List every bit of big or bold text on the page and decide its level.",
+        "Make the page title the `h1`.",
+        "Make the section titles one level below it and the event titles one level below those.",
+        "Remove the `font-weight` from the style attributes you no longer need, then press Check."
+      ],
+      "hints": [
+        "Think of the page as a table of contents. Which titles belong under which?",
+        "A `<b>` only changes how text looks. A heading also tells a screen reader where a new part starts.",
+        "There are three levels: the page title, then the three section titles, then the event titles, which live under Events."
+      ],
+      "points": 10
+    },
+    {
+      "id": "event-list",
+      "title": "List the events with real dates",
+      "file": "index.html",
+      "description": "Mark up the event cards so a screen reader knows how many there are and a computer can read their dates.\n\nThe check looks for:\n\n- each of the five events is an `<article>` (keep the class `event` on it)\n- each article sits in its own `<li>`, and all five are in one `<ul>` or `<ol>` (keep the class `event-list` on the list)\n- each event's date is inside a `<time>` whose `datetime` attribute is the date as `YYYY-MM-DD`, optionally followed by `T` and the start time as `HH:MM`\n\nThe visible date can read however you like. Write the `datetime` from the date on the card.",
+      "nextSteps": [
+        "Turn the `div` with class `event-list` into a list.",
+        "Wrap each card in a list item and turn the card itself into an article.",
+        "Wrap each date in a `time` element and write its `datetime`.",
+        "If the list shows bullets, add a rule for `.event-list` in `styles.css`, then press Check."
+      ],
+      "hints": [
+        "The cards are a set of things of the same kind. Which HTML structure says \"here are five things\"?",
+        "A list item holds an article, which holds the image, the heading, the date, the text and the footer of the card.",
+        "December 2026 dates look like `2026-12-05`. With a start time: `2026-12-05T10:00`, in 24-hour time."
+      ],
+      "points": 10
+    }
+  ]
+}

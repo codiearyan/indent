@@ -1,0 +1,15 @@
+{
+  "id": "web-pages",
+  "title": "Web pages that hold up",
+  "description": "Quillmoor Library is a small-town public library. A volunteer built its \"What's on\" events page in a hurry and moved away. You are the library's first developer, and visitors and staff keep reporting problems with that page. Fix them one by one, and learn to write HTML that everyone can use and CSS that holds up on any screen.",
+  "category": "Web and frontend",
+  "language": "html",
+  "tags": ["HTML", "CSS"],
+  "parts": [
+    { "title": "A page everyone can read", "chapters": ["page-outline", "signup-form"] },
+    {
+      "title": "A page that looks right everywhere",
+      "chapters": ["one-stylesheet", "cards-that-fit", "evening-mode"]
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>What's on at Quillmoor Library</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <img src="logo.svg" alt="" width="40" height="40" />
+        <span class="library-name">Quillmoor Library</span>
+      </div>
+      <nav class="menu" aria-label="Main">
+        <a href="#events">Events</a>
+        <a href="#signup">Save a place</a>
+        <a href="#visit">Visit us</a>
+        <button id="theme-toggle" type="button">Evening mode</button>
+      </nav>
+    </header>
+
+    <main class="content">
+      <h1>What's on in December</h1>
+      <p class="intro">
+        Free events for all ages at Quillmoor Library. Most need no booking. For the two that do,
+        save a place with the form further down.
+      </p>
+
+      <section id="events">
+        <h2>Events</h2>
+        <ul class="event-list">
+          <li>
+            <article class="event">
+              <img src="pictures/garden.svg" alt="" />
+              <h3>Seed swap in the reading garden</h3>
+              <p class="when">
+                <time datetime="2026-12-05T10:00">Saturday 5 December, 10:00</time> to 12:00
+              </p>
+              <p>
+                Bring seeds you saved this year and take home someone else's. Envelopes and pencils
+                are on the table by the gate.
+              </p>
+              <div class="event-footer">
+                <span>Reading garden</span>
+                <span>Just turn up</span>
+              </div>
+            </article>
+          </li>
+          <li>
+            <article class="event">
+              <img src="pictures/yarn.svg" alt="" />
+              <h3>Knit and natter</h3>
+              <p class="when">
+                <time datetime="2026-12-08T14:00">Tuesday 8 December, 14:00</time> to 16:00
+              </p>
+              <p>
+                Bring whatever you are making, or learn to cast on. Spare needles and wool live in
+                the basket by the window.
+              </p>
+              <div class="event-footer">
+                <span>Upstairs room</span>
+                <span>Just turn up</span>
+              </div>
+            </article>
+          </li>
+          <li>
+            <article class="event">
+              <img src="pictures/book.svg" alt="" />
+              <h3>Homework club</h3>
+              <p class="when">
+                <time datetime="2026-12-10T16:00">Thursday 10 December, 16:00</time> to 17:30
+              </p>
+              <p>
+                For ages 9 to 14. Volunteers help with reading, maths and projects. Places are
+                limited, so save one first.
+              </p>
+              <div class="event-footer">
+                <span>Study room</span>
+                <a class="book" href="#signup">Save a place</a>
+              </div>
+            </article>
+          </li>
+          <li>
+            <article class="event">
+              <img src="pictures/book.svg" alt="" />
+              <h3>Winter reading challenge launch</h3>
+              <p class="when">
+                <time datetime="2026-12-12T11:00">Saturday 12 December, 11:00</time>
+              </p>
+              <p>
+                Read six books before February and collect a stamp for each one. Share your
+                favourites with #QuillmoorWinterReadingChallenge.
+              </p>
+              <div class="event-footer">
+                <span>Children's corner</span>
+                <span>Just turn up</span>
+              </div>
+            </article>
+          </li>
+          <li>
+            <article class="event">
+              <img src="pictures/walk.svg" alt="" />
+              <h3>History walk along the old mill race</h3>
+              <p class="when">
+                <time datetime="2026-12-19T13:30">Saturday 19 December, 13:30</time> to 15:00
+              </p>
+              <p>
+                A gentle walk with Odile Varga of the Quillmoor History Society. About two miles on
+                paths that can be muddy, so wear boots.
+              </p>
+              <div class="event-footer">
+                <span>Meet at the front steps</span>
+                <a class="book" href="#signup">Save a place</a>
+              </div>
+            </article>
+          </li>
+        </ul>
+      </section>
+
+      <section id="signup">
+        <h2>Save a place</h2>
+        <p>
+          Homework club and the history walk have limited places. Everything else, just turn up.
+        </p>
+        <form class="signup" action="#" method="post">
+          <div class="field">
+            <label for="name">Your name</label>
+            <input id="name" type="text" name="name" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" autocomplete="email" required />
+          </div>
+          <div class="field">
+            <label for="phone">Phone (optional)</label>
+            <input id="phone" type="tel" name="phone" autocomplete="tel" />
+          </div>
+          <fieldset class="field">
+            <legend>Which event?</legend>
+            <label
+              ><input type="radio" name="event" value="homework-club" required /> Homework club,
+              Thursday 10 December</label
+            ><br />
+            <label
+              ><input type="radio" name="event" value="history-walk" /> History walk, Saturday 19
+              December</label
+            >
+          </fieldset>
+          <div class="field">
+            <label for="people">How many people?</label>
+            <input id="people" type="number" name="people" value="1" min="1" max="6" />
+          </div>
+          <div class="field">
+            <label
+              ><input type="checkbox" name="newsletter" /> Send me the monthly events letter</label
+            >
+          </div>
+          <button type="submit">Save my place</button>
+        </form>
+      </section>
+    </main>
+
+    <footer class="bottom" id="visit">
+      <h2>Visit us</h2>
+      <p>
+        Quillmoor Library, 4 Tanner's Row. Open Tuesday to Saturday, 9:30 to 17:00. The step-free
+        entrance is on Mill Lane.
+      </p>
+    </footer>
+
+    <script src="theme.js"></script>
+  </body>
+</html>

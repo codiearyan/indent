@@ -1,0 +1,65 @@
+{
+  "id": "signup-form",
+  "title": "A sign-up form that works without a mouse",
+  "files": ["index.html", "styles.css"],
+  "terminal": {
+    "description": "The page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "labels",
+      "title": "Tie every label to its field",
+      "file": "index.html",
+      "description": "Give every field of the sign-up form a label that belongs to it.\n\nThe check finds the fields by their `name` attributes, so keep those: `name`, `email`, `phone`, `people`, `newsletter` and the two radio buttons named `event`.\n\nFor each field it checks that a `<label>` is tied to it, either by wrapping the field or by a `for` attribute that matches the field's `id`, and that the label has text. Each radio button needs its own label.",
+      "nextSteps": [
+        "Click the words \"Your name\" in the Browser panel and notice nothing happens.",
+        "Give the name field an `id` and wrap its text in a `label` that points at it.",
+        "Do the same for email, phone and how many people.",
+        "Wrap each radio button and the checkbox together with its words in a `label`, then press Check."
+      ],
+      "hints": [
+        "Text that sits next to a field is just text. A screen reader landing on the field hears nothing.",
+        "There are two ways to tie a label to a field: put the field inside the label, or give the label a `for` that matches the field's `id`.",
+        "For the radio buttons and the checkbox, wrapping is the shortest: one `label` around the input and the words after it."
+      ],
+      "points": 10
+    },
+    {
+      "id": "types",
+      "title": "Ask for the right kind of answer",
+      "file": "index.html",
+      "description": "Tell the browser what each field expects, so it can bring up the right keyboard and stop a form that is not ready.\n\nThe check looks for:\n\n- `name` is required\n- `email` has the email type and is required\n- `phone` has the phone number type and is not required\n- `people` is a number field with a smallest value of `1` and a largest of `6`\n- one of the `event` radio buttons is required, so a choice must be made",
+      "nextSteps": [
+        "Look at the `type` of each field. They are all `text` right now.",
+        "Change the types of email, phone and people.",
+        "Add the limits to the people field.",
+        "Mark the fields that must be filled in, then press Check."
+      ],
+      "hints": [
+        "An input's `type` changes what the browser accepts and, on a phone, which keyboard opens.",
+        "One attribute with no value makes a field required. A number field takes two more for its limits.",
+        "The types you need are `email`, `tel` and `number`. A radio group is required when any one of its buttons has the attribute."
+      ],
+      "points": 10
+    },
+    {
+      "id": "form-and-button",
+      "title": "Group the choices and send with a real button",
+      "file": "index.html",
+      "description": "Make the form a real form that a keyboard can send.\n\nThe check looks for:\n\n- one `<form>` element, and all the fields are inside it\n- the two `event` radio buttons are in one `<fieldset>` whose `<legend>` has text\n- a submit button inside the form: a `<button>` (with no type, or `type=\"submit\"`) or an `<input type=\"submit\">`, with text on it\n- no element with the class `button` that is not a real button\n\nKeep the class `signup` on the form so it keeps its look.",
+      "nextSteps": [
+        "Press Tab in the Browser panel until you reach the yellow button. You never will.",
+        "Turn the `div` with class `signup` into a form.",
+        "Put the radio buttons in a fieldset and move the question into its legend.",
+        "Replace the yellow `div` with a real button, then press Tab again and press Check."
+      ],
+      "hints": [
+        "A styled `div` cannot be reached with Tab or pressed with Enter. The right element gets both for free.",
+        "A fieldset draws a border and a legend sits in it. A rule in `styles.css` can take the border away if you do not want it.",
+        "The question \"Which event?\" becomes the legend, and the styled `div` at the bottom becomes a button whose type is submit."
+      ],
+      "points": 10
+    }
+  ]
+}
