@@ -3,9 +3,8 @@ import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { bindSuggestShortcut } from '@/features/ai/inlineSuggestions'
 import { TOUR } from '@/features/tour/anchors'
-import { languageFor, monaco, pathOf, uriFor } from './monaco'
+import { languageFor, monaco, pathOf, themeName, uriFor } from './monaco'
 
-const themeName = (theme: 'dark' | 'light'): string => `indent-${theme}`
 const fontSizeFor = (scale: number): number => Math.round(13 * scale)
 
 interface Props {
@@ -21,18 +20,19 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
   const files = useWorkspace((s) => s.files)
   const activePath = useWorkspace((s) => s.activePath)
   const theme = useSettings((s) => s.theme)
+  const codeTheme = useSettings((s) => s.codeTheme)
+  const options = useSettings((s) => s.editor)
   const editorScale = useSettings((s) => s.textScale.editor)
 
   useEffect(() => {
-    const { theme, textScale } = useSettings.getState()
+    const { theme, codeTheme, textScale } = useSettings.getState()
     const editor = monaco.editor.create(hostRef.current!, {
       model: null,
-      theme: themeName(theme),
+      theme: themeName(codeTheme, theme),
       fontFamily: 'IBM Plex Mono',
       fontSize: fontSizeFor(textScale.editor),
       lineHeight: 1.6,
       folding: true,
-      minimap: { enabled: false },
       scrollbar: { verticalScrollbarSize: 10, horizontalScrollbarSize: 10 },
       overviewRulerBorder: false,
       smoothScrolling: true,
@@ -109,8 +109,16 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
   }, [activePath, files, editorRef])
 
   useEffect(() => {
-    monaco.editor.setTheme(themeName(theme))
-  }, [theme])
+    monaco.editor.setTheme(themeName(codeTheme, theme))
+  }, [codeTheme, theme])
+
+  useEffect(() => {
+    editorRef.current?.updateOptions({
+      wordWrap: options.wordWrap ? 'on' : 'off',
+      lineNumbers: options.lineNumbers ? 'on' : 'off',
+      minimap: { enabled: options.minimap }
+    })
+  }, [options, editorRef])
 
   useEffect(() => {
     editorRef.current?.updateOptions({ fontSize: fontSizeFor(editorScale) })

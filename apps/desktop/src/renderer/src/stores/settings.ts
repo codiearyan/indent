@@ -1,7 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { DEFAULT_CODE_THEME, type CodeThemeId } from '@indent/design/code-palette'
+import { mergeSettings } from './mergeSettings'
 
 export type Theme = 'dark' | 'light'
+export type Appearance = Theme | 'system'
+export type EditorOption = 'wordWrap' | 'lineNumbers' | 'minimap'
 export type TextZone = 'lesson' | 'tasks' | 'editor' | 'terminal'
 export type PanelKey = 'files' | 'terminal' | 'chat' | 'zen' | 'browser'
 
@@ -9,8 +13,13 @@ export const TEXT_SCALE_MIN = 0.8
 export const TEXT_SCALE_MAX = 1.6
 export const TEXT_SCALE_PRESETS = { S: 0.9, M: 1, L: 1.15, XL: 1.3 } as const
 
-interface SettingsState {
+export interface SettingsState {
+  /** What the person picked; `system` follows the computer. */
+  appearance: Appearance
+  /** The theme on screen now: `appearance` with `system` resolved. */
   theme: Theme
+  codeTheme: CodeThemeId
+  editor: Record<EditorOption, boolean>
   /** 1 = 100%. Lesson and tasks scale through CSS; editor and terminal multiply their font size. */
   textScale: Record<TextZone, number>
   /** Which optional panels are showing. `zen` hides everything but the editor. */
@@ -24,6 +33,9 @@ interface SettingsState {
   dsaWatched: string[]
   markDsaWatched(id: string): void
   toggleTheme(): void
+  setAppearance(appearance: Appearance): void
+  setCodeTheme(codeTheme: CodeThemeId): void
+  setEditorOption(option: EditorOption, on: boolean): void
   setTextScale(zone: TextZone, value: number): void
   setAllTextScale(value: number): void
   setPanel(key: PanelKey, open: boolean): void
@@ -44,10 +56,25 @@ const defaultPanels: Record<PanelKey, boolean> = {
   browser: true
 }
 
+const defaultEditor: Record<EditorOption, boolean> = {
+  wordWrap: false,
+  lineNumbers: true,
+  minimap: false
+}
+
+const systemTheme = (): Theme =>
+  window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+
+const resolve = (appearance: Appearance): Theme =>
+  appearance === 'system' ? systemTheme() : appearance
+
 export const useSettings = create<SettingsState>()(
   persist(
     (set) => ({
+      appearance: 'dark',
       theme: 'dark',
+      codeTheme: DEFAULT_CODE_THEME,
+      editor: defaultEditor,
       textScale: defaultScale,
       panels: defaultPanels,
       lessonSide: 'left',
@@ -57,7 +84,14 @@ export const useSettings = create<SettingsState>()(
       dsaWatched: [],
       markDsaWatched: (id) =>
         set((s) => (s.dsaWatched.includes(id) ? s : { dsaWatched: [...s.dsaWatched, id] })),
-      toggleTheme: () => set((s) => ({ theme: s.theme === 'dark' ? 'light' : 'dark' })),
+      toggleTheme: () =>
+        set((s) => {
+          const theme = s.theme === 'dark' ? 'light' : 'dark'
+          return { appearance: theme, theme }
+        }),
+      setAppearance: (appearance) => set({ appearance, theme: resolve(appearance) }),
+      setCodeTheme: (codeTheme) => set({ codeTheme }),
+      setEditorOption: (option, on) => set((s) => ({ editor: { ...s.editor, [option]: on } })),
       setTextScale: (zone, value) => set((s) => ({ textScale: { ...s.textScale, [zone]: value } })),
       setAllTextScale: (value) =>
         set({ textScale: { lesson: value, tasks: value, editor: value, terminal: value } }),
@@ -72,11 +106,7 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'indent-settings',
       version: 1,
-      // Settings saved before a panel existed must still get that panel's default.
-      merge: (saved, current) => {
-        const persisted = saved as Partial<SettingsState> | undefined
-        return { ...current, ...persisted, panels: { ...current.panels, ...persisted?.panels } }
-      }
+      merge: (saved, current) => mergeSettings(saved, current, systemTheme())
     }
   )
 )
@@ -90,3 +120,8 @@ function applyToDocument({ theme, textScale }: SettingsState): void {
 
 applyToDocument(useSettings.getState())
 useSettings.subscribe(applyToDocument)
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  const { appearance, setAppearance } = useSettings.getState()
+  if (appearance === 'system') setAppearance('system')
+})

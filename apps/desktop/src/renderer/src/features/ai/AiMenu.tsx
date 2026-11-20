@@ -104,7 +104,7 @@ function SettingRow({
   )
 }
 
-function AiSwitch(): React.JSX.Element {
+export function AiSwitch(): React.JSX.Element {
   const { config, update } = useAi()
   const on = config?.enabled ?? false
   return (
@@ -122,7 +122,7 @@ function AiSwitch(): React.JSX.Element {
   )
 }
 
-function AiSettings(): React.JSX.Element {
+export function AiSettings(): React.JSX.Element {
   const { config, update } = useAi()
   const active = activeProvider(config)
   const clis = config?.providers.filter((p) => p.kind === 'cli') ?? []

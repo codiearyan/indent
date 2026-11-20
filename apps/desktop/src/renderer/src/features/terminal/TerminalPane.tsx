@@ -15,7 +15,7 @@ import type { Chapter } from '@shared/types'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { api } from '@/lib/api'
-import { codePalette } from '@indent/design/code-palette'
+import { codeChrome } from '@indent/design/code-palette'
 import { cn } from '@/lib/utils'
 import { useSettings, type Theme } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
@@ -26,7 +26,7 @@ const REFRESH_QUIET_MS = 500
 type Status = 'idle' | 'connected' | 'exited'
 
 function xtermTheme(theme: Theme): ITheme {
-  const p = codePalette[theme]
+  const p = codeChrome[theme]
   const { black, red, green, yellow, blue, magenta, cyan, white } = p.ansi
   return {
     background: p.background,

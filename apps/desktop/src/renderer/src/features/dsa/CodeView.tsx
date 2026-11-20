@@ -14,7 +14,8 @@ const TOKEN_CLASS: Record<TokenKind, string> = {
 
 export function CodeView({ code, lines }: { code: string; lines: number[] }): React.JSX.Element {
   const theme = useSettings((s) => s.theme)
-  const palette = codePalette[theme]
+  const codeTheme = useSettings((s) => s.codeTheme)
+  const palette = codePalette(codeTheme, theme)
   const tokenized = useMemo(() => code.split('\n').map(tokenize), [code])
   const scrollRef = useRef<HTMLDivElement>(null)
   const firstLine = lines[0]
