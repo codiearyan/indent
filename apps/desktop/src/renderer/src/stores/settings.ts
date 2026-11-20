@@ -29,6 +29,8 @@ export interface SettingsState {
   tourSeen: boolean
   /** The first-run setup was finished or skipped. */
   onboarded: boolean
+  /** The request for a star on GitHub was answered or closed; it is never shown again. */
+  starAsked: boolean
   /** Ids of DSA patterns whose animation was played to the end. */
   dsaWatched: string[]
   markDsaWatched(id: string): void
@@ -44,6 +46,7 @@ export interface SettingsState {
   setLeftTab(tab: 'insights' | 'tasks'): void
   setTourSeen(seen: boolean): void
   setOnboarded(onboarded: boolean): void
+  setStarAsked(asked: boolean): void
   resetLayout(): void
 }
 
@@ -81,6 +84,7 @@ export const useSettings = create<SettingsState>()(
       leftTab: 'insights',
       tourSeen: false,
       onboarded: false,
+      starAsked: false,
       dsaWatched: [],
       markDsaWatched: (id) =>
         set((s) => (s.dsaWatched.includes(id) ? s : { dsaWatched: [...s.dsaWatched, id] })),
@@ -101,6 +105,7 @@ export const useSettings = create<SettingsState>()(
       setLeftTab: (leftTab) => set({ leftTab }),
       setTourSeen: (tourSeen) => set({ tourSeen }),
       setOnboarded: (onboarded) => set({ onboarded }),
+      setStarAsked: (starAsked) => set({ starAsked }),
       resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' })
     }),
     {

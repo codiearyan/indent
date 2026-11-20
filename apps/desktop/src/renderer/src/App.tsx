@@ -11,6 +11,7 @@ import { DsaPage } from '@/features/dsa/DsaPage'
 import { PatternPage } from '@/features/dsa/PatternPage'
 import { Onboarding } from '@/features/onboarding/Onboarding'
 import { SettingsDialog } from '@/features/settings/SettingsDialog'
+import { StarPrompt } from '@/features/star/StarPrompt'
 import { WorkspacePage } from '@/features/workspace/WorkspacePage'
 import { useSettings } from '@/stores/settings'
 
@@ -24,6 +25,7 @@ export default function App(): React.JSX.Element {
       ) : (
         <>
           <SettingsDialog />
+          <StarPrompt />
           <HashRouter>
             <Routes>
               <Route element={<AppShell />}>
