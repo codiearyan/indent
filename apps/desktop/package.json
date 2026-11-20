@@ -5,7 +5,7 @@
   "description": "A local-first desktop app for hands-on coding labs",
   "main": "./out/main/index.js",
   "author": "Aryan Bhati",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "scripts": {
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",

@@ -71,6 +71,11 @@ encrypted with the operating system's keychain.
 
 ## License
 
-[MIT](LICENSE). You may use, change and share the code, the repos and the pictures, as long as the
-copyright notice stays with them. The names and logos of other products that appear in the app
-(AI providers, programming languages) belong to their owners.
+Copyright (C) 2026 Aryan Bhati
+
+Indent is free software under the [GNU General Public License, version 3](LICENSE). You may use,
+change and share the code, the repos and the pictures. If you share a version of your own, it has
+to come with its source under the same license. There is no warranty.
+
+The names and logos of other products that appear in the app (AI providers, programming languages)
+belong to their owners.
