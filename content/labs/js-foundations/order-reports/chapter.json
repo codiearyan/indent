@@ -1,7 +1,7 @@
 {
   "id": "order-reports",
   "title": "Turning orders into answers",
-  "files": ["src/orderTotal.js", "src/topCandles.js", "src/revenueByDay.js", "src/orders.js", "src/demo.js"],
+  "files": ["src/reports.js", "src/orders.js", "src/demo.js"],
   "terminal": {
     "description": "A shell in your workspace where you can run the demo against last week's orders.",
     "suggestedCommand": "node src/demo.js"
@@ -10,10 +10,10 @@
     {
       "id": "total",
       "title": "Total one order",
-      "file": "src/orderTotal.js",
-      "description": "Implement `orderTotal(order)` in `src/orderTotal.js`.\n\nReturn the order's total in cents:\n\n- add up `qty * priceCents` for every entry in `order.items`\n- subtract `order.discountCents` when the order has one\n- the total never goes below `0`\n\nAn order with no items totals `0`.",
+      "file": "src/reports.js",
+      "description": "Implement `orderTotal(order)` under `// Task 1` in `src/reports.js`.\n\nReturn the order's total in cents:\n\n- add up `qty * priceCents` for every entry in `order.items`\n- subtract `order.discountCents` when the order has one\n- the total never goes below `0`\n\nAn order with no items totals `0`.",
       "nextSteps": [
-        "Open `src/orders.js` and look at the shape of one order.",
+        "Read the example order at the top of `src/reports.js`.",
         "Add up the items with `reduce`, starting from 0.",
         "Take the discount off and make sure the result cannot go negative.",
         "Run `node src/demo.js` and check the first two lines."
@@ -28,8 +28,8 @@
     {
       "id": "top",
       "title": "Find the best sellers",
-      "file": "src/topCandles.js",
-      "description": "Implement `topCandles(orders, n)` in `src/topCandles.js`.\n\nCount the units sold per sku, skipping orders whose `status` is `'cancelled'`. Return an array of `{ sku, units }` for the `n` skus with the most units:\n\n- most units first\n- on a tie, the sku that comes first alphabetically goes first\n- if fewer than `n` skus were sold, return all of them",
+      "file": "src/reports.js",
+      "description": "Implement `topCandles(orders, n)` under `// Task 2` in `src/reports.js`.\n\nCount the units sold per sku, skipping orders whose `status` is `'cancelled'`. Return an array of `{ sku, units }` for the `n` skus with the most units:\n\n- most units first\n- on a tie, the sku that comes first alphabetically goes first\n- if fewer than `n` skus were sold, return all of them",
       "nextSteps": [
         "Filter out the cancelled orders.",
         "Count units per sku in an object or a `Map`.",
@@ -46,8 +46,8 @@
     {
       "id": "revenue",
       "title": "Revenue per day",
-      "file": "src/revenueByDay.js",
-      "description": "Implement `revenueByDay(orders)` in `src/revenueByDay.js`.\n\nReturn an object that maps each day to that day's revenue in cents, for example `{ '2026-11-02': 3200 }`.\n\n- only orders with `status` `'paid'` count\n- the day is the date part of `placedAt` (its first 10 characters)\n- an order's revenue is its total with the discount taken off, so `orderTotal` helps\n- days without paid orders do not appear",
+      "file": "src/reports.js",
+      "description": "Implement `revenueByDay(orders)` under `// Task 3` in `src/reports.js`.\n\nReturn an object that maps each day to that day's revenue in cents, for example `{ '2026-11-02': 3200 }`.\n\n- only orders with `status` `'paid'` count\n- the day is the date part of `placedAt` (its first 10 characters)\n- an order's revenue is its total with the discount taken off, so `orderTotal` from Task 1 helps\n- days without paid orders do not appear",
       "nextSteps": [
         "Start from an empty object.",
         "Loop over the orders and skip the ones that are not paid.",

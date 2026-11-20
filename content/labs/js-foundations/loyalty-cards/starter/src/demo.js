@@ -1,7 +1,5 @@
 // Run with: node src/demo.js
-import { createStampCard } from './stampCard.js'
-import { memoize } from './memoize.js'
-import { once } from './once.js'
+import { createStampCard, memoize, once } from './helpers.js'
 
 function show(label, run) {
   try {

@@ -5,6 +5,7 @@
   "category": "JavaScript and TypeScript",
   "language": "javascript",
   "tags": ["JavaScript"],
+  "level": "easy",
   "parts": [
     { "title": "A week at Wickhollow Candles", "chapters": ["order-reports", "loyalty-cards"] }
   ]

@@ -1,8 +1,6 @@
 // Run with: node src/demo.js
 import { orders } from './orders.js'
-import { orderTotal } from './orderTotal.js'
-import { topCandles } from './topCandles.js'
-import { revenueByDay } from './revenueByDay.js'
+import { orderTotal, topCandles, revenueByDay } from './reports.js'
 
 function show(label, run) {
   try {
