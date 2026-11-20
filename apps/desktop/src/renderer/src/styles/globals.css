@@ -61,6 +61,11 @@ html.window-fullscreen {
     -webkit-app-region: no-drag;
   }
 
+  /* A frame swallows the pointer, which would end a panel resize the moment it crosses one. */
+  body:has([data-separator='active']) iframe {
+    pointer-events: none;
+  }
+
   /* Text size zones: scale a whole panel, spacing included */
   .zone-lesson {
     zoom: var(--scale-lesson);

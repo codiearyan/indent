@@ -64,7 +64,7 @@ src/renderer/src/
   components/app/        small shared app components (ThemeToggle, LevelBadge, LanguageIcon)
   lib/                   api.ts (typed window.api), utils.ts (cn)
   stores/                zustand: settings (persisted), progress, catalog, workspace
-  features/<name>/       catalog, workspace, editor, terminal, ai, tour, dsa, onboarding
+  features/<name>/       catalog, workspace, editor, terminal, browser, ai, tour, dsa, onboarding
 ```
 
 `src/shared/types.ts` is the contract between content, main and renderer. Read it first. If a
@@ -154,13 +154,15 @@ reduced-motion block that turns movement into fades and shows each scene's last 
 ```
 content/
   paths.json                         PathDef[]
-  runtime/package.json               dependencies of learner code (vitest, typescript, openai, @types/node);
+  runtime/package.json               dependencies of learner code (vitest, typescript, openai, react, jsdom,
+                                     esbuild, @types/node);
                                      installed once into <userData>/workspaces so every workspace resolves them
   kit/run-check.mjs                  grader CLI, see below
   kit/lab-model.mjs                  the lab model: a deterministic, offline, OpenAI-compatible server
+  kit/page.mjs                       t.page(): a workspace page in a headless DOM, see below
   labs/<labId>/lab.json              LabMeta
   labs/<labId>/<chapterId>/
-    chapter.json                     ChapterDef
+    chapter.json                     ChapterDef; `preview` names a page for the Browser panel
     lesson.md                        `##` headings split it into the parts the audio player reads
     starter/**                       copied into the workspace on first open and on reset
     solution/**                      solved files, same relative paths
@@ -173,6 +175,24 @@ to the system voice when it does not. `node scripts/narrate.mjs [labId ...]` rec
 have no recording yet with a neural voice (it needs `uvx` and `ffmpeg`, and sends the lesson text to
 the voice service) and removes recordings whose text is gone. Run it after writing or editing a
 lesson. `apps/desktop/src/shared/narration.ts` holds the splitting and the key both sides use.
+
+### Pages in the browser
+
+An issue whose `chapter.json` has `"preview": "index.html"` gets a Browser panel beside the editor
+(`features/browser/`). The page is served straight from the workspace on disk through the
+`indent-preview:` scheme (`src/main/services/preview.ts`), one origin per workspace, and it reloads
+after every save. `.html`, `.css` and `.js` files are served as they are. A `.jsx`, `.tsx` or `.ts`
+file is bundled on request with the runtime's esbuild, so a React issue loads
+`<script type="module" src="src/main.jsx">` and imports `react` like any project. Console output and
+uncaught errors of the page show in the panel's console. The page is the learner's code: it runs in
+a sandboxed frame on its own origin and never sees `window.api`.
+
+Checks open the same page without a browser. `const page = await t.page()` (`kit/page.mjs`) loads
+it into a headless DOM, runs its scripts and returns `document`, `$`, `$$`, `text`, `click`, `type`,
+`press`, `submit`, `settle`, `errors`, `logs`, `reloads` and `style(target, { width })`. `style`
+gives the CSS that applies to an element at a viewport width (cascade, inheritance, `var()` and
+width media queries, shorthands expanded); it knows nothing about layout, so checks ask what was
+declared, not where a box ended up. Options: `t.page(file, { dir, fetch, storage, width })`.
 
 Grader CLI, run by the main process with system Node and `labEnv()`:
 

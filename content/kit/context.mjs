@@ -4,6 +4,7 @@ import { cp, copyFile, mkdir, mkdtemp, rm } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { openPage } from './page.mjs'
 
 const DEFAULT_TIMEOUT = 15000
 const MAX_OUTPUT = 4000
@@ -47,6 +48,7 @@ function binFrom(dir, pkg, bin) {
 
 export function createContext({ chapter, workspace, sandboxRoot }) {
   const sandboxes = []
+  const pages = []
 
   const t = {
     workspace,
@@ -119,6 +121,16 @@ export function createContext({ chapter, workspace, sandboxRoot }) {
     },
 
     /**
+     * Opens a page of the workspace (or of `dir`) in a headless DOM with its scripts run.
+     * See page.mjs for what the returned page can do.
+     */
+    async page(file = 'index.html', { dir = workspace, ...options } = {}) {
+      const page = await openPage(dir, file, options)
+      pages.push(page)
+      return page
+    },
+
+    /**
      * Runs the learner's test file beside the original bug, a correct fix and a plausible wrong fix.
      * A good test fails, passes, fails.
      */
@@ -157,8 +169,11 @@ export function createContext({ chapter, workspace, sandboxRoot }) {
     }
   }
 
-  const cleanup = () =>
-    Promise.all(sandboxes.map((dir) => rm(dir, { recursive: true, force: true })))
+  const cleanup = () => {
+    // Closing a page stops its timers, which would otherwise keep the grader alive.
+    for (const page of pages) page.close()
+    return Promise.all(sandboxes.map((dir) => rm(dir, { recursive: true, force: true })))
+  }
 
   return { t, cleanup }
 }

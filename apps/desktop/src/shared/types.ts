@@ -50,6 +50,8 @@ export interface ChapterDef {
   /** Editor tab order; paths relative to the workspace. */
   files: string[]
   terminal: { description: string; suggestedCommand?: string }
+  /** A page of the workspace to show in the Browser panel, e.g. "index.html". */
+  preview?: string
   tasks: TaskDef[]
 }
 

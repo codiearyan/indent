@@ -58,6 +58,8 @@ export function ViewPopover(): React.JSX.Element {
   const settings = useSettings()
   const ready = useWorkspace((s) => s.status === 'ready')
   const setTourOpen = useWorkspace((s) => s.setTourOpen)
+  const hasPage = useWorkspace((s) => Boolean(s.chapter?.preview))
+  const switches = hasPage ? [...SWITCHES, { key: 'browser' as const, label: 'Browser' }] : SWITCHES
 
   const values = Object.values(settings.textScale)
   const preset =
@@ -157,7 +159,7 @@ export function ViewPopover(): React.JSX.Element {
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
-            {SWITCHES.map(({ key, label }) => (
+            {switches.map(({ key, label }) => (
               <label key={key} className="flex items-center justify-between text-sm">
                 {label}
                 <Switch

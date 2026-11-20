@@ -14,6 +14,8 @@ interface WorkspaceStore {
   dir: string
   files: WorkspaceFile[]
   activePath: string | null
+  /** Counts writes to disk, so the Browser panel knows when to reload. */
+  revision: number
   /** Task ids being checked right now, or null. */
   checking: string[] | null
   tourOpen: boolean
@@ -46,7 +48,10 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     clearTimeout(pendingSaves.get(path))
     pendingSaves.delete(path)
     const file = get().files.find((f) => f.path === path)
-    return file ? api.workspace.writeFile(...ids(), path, file.content) : Promise.resolve()
+    if (!file) return Promise.resolve()
+    return api.workspace
+      .writeFile(...ids(), path, file.content)
+      .then(() => set((s) => ({ revision: s.revision + 1 })))
   }
 
   const applySnapshot = (files: WorkspaceFile[], dir: string): void => {
@@ -66,6 +71,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     dir: '',
     files: [],
     activePath: null,
+    revision: 0,
     checking: null,
     tourOpen: false,
 
@@ -112,6 +118,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       pendingSaves.clear()
       const snapshot = await api.workspace.reset(...ids())
       applySnapshot(snapshot.files, snapshot.dir)
+      set((s) => ({ revision: s.revision + 1 }))
     },
 
     check: async (taskIds) => {
