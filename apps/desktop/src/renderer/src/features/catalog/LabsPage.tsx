@@ -268,7 +268,6 @@ function Cover({ lab }: { lab: LabSummary }): React.JSX.Element {
         <img
           src={coverUrl(lab.id)}
           alt=""
-          loading="lazy"
           draggable={false}
           onError={() => setMissing(true)}
           className="size-full object-cover"
