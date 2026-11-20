@@ -1,7 +1,8 @@
 ---
 import { Image } from 'astro:assets'
 import logo from '@indent/design/logo.png'
-import BuildStrip from './BuildStrip.astro'
+import Download from '@lucide/astro/icons/download'
+import { DOWNLOADS, REPO_URL, VERSION } from '../lib/downloads'
 
 const links = [
   { href: '#repos', label: 'Repos' },
@@ -13,9 +14,9 @@ const links = [
   { href: '#faq', label: 'FAQ' }
 ]
 const requirements = [
-  { label: 'System', value: 'macOS first' },
-  { label: 'Node.js', value: '22.18 or newer' },
-  { label: 'Package manager', value: 'pnpm 11' }
+  { label: 'Version', value: VERSION },
+  { label: 'System', value: 'macOS, Windows or Linux' },
+  { label: 'Node.js', value: '22.18 or newer, or Indent downloads it' }
 ]
 ---
 
@@ -28,33 +29,56 @@ const requirements = [
 
     <div class="mt-16 grid overflow-hidden rounded-lg border border-border lg:grid-cols-12">
       <div class="p-6 sm:p-10 lg:col-span-5">
-        <h3 class="text-[22px] font-medium tracking-[-0.015em]">Run it on your computer</h3>
+        <h3 class="text-[22px] font-medium tracking-[-0.015em]">Download Indent</h3>
         <p class="mt-3 max-w-[420px] text-[16px] leading-[1.6] text-muted-foreground">
-          Indent runs your code and the checks with your own Node. The first Check installs the test
-          tools once, into the app’s data folder.
+          One installer, nothing to sign up for. Indent runs your code and the checks with Node, and
+          the first Check installs the test tools once, into the app’s data folder.
         </p>
         <dl class="mt-8">
           {
             requirements.map((item) => (
               <div class="flex items-center justify-between gap-4 border-t border-rule py-3.5 text-[14px]">
                 <dt class="text-muted-foreground">{item.label}</dt>
-                <dd>{item.value}</dd>
+                <dd class="text-right">{item.value}</dd>
               </div>
             ))
           }
         </dl>
       </div>
       <div class="border-t border-border bg-card p-6 sm:p-10 lg:col-span-7 lg:border-t-0 lg:border-l">
-        <div class="flex items-center justify-between">
-          <p class="font-mono text-[13px] text-muted-foreground">Terminal</p>
-          <BuildStrip groups={[3]} filled={3} />
-        </div>
-        <pre
-          class="mt-6 overflow-x-auto font-mono text-[15px] leading-[2] sm:text-[16px]"><code><span class="text-muted-foreground select-none">$ </span>pnpm install
-<span class="text-muted-foreground select-none">$ </span>pnpm dev</code></pre>
+        <ul>
+          {
+            DOWNLOADS.map((download) => (
+              <li class="flex items-center justify-between gap-4 border-b border-rule py-4 first:pt-0">
+                <div>
+                  <p class="text-[16px] font-medium">{download.label}</p>
+                  <p class="mt-0.5 text-[14px] text-muted-foreground">{download.note}</p>
+                </div>
+                <a
+                  href={download.href}
+                  class="inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-input px-4 text-[14px] font-medium transition-colors hover:bg-accent"
+                >
+                  <Download class="size-4" stroke-width={2} aria-hidden="true" />
+                  Download
+                  <span class="sr-only">for {download.label}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
         <p class="mt-6 text-[14px] leading-[1.6] text-muted-foreground">
-          The app opens on Home. Pick a repo, start its first issue, and press Check when you are
-          ready.
+          Indent is not signed by Apple or Microsoft yet, so the first open needs one extra step. On
+          macOS, open System Settings, Privacy and Security, and choose Open Anyway. On Windows,
+          choose More info, then Run anyway.
+        </p>
+        <p class="mt-3 text-[14px] leading-[1.6] text-muted-foreground">
+          Or build it yourself from the{' '}
+          <a
+            href={REPO_URL}
+            class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+          >
+            source on GitHub
+          </a>.
         </p>
       </div>
     </div>
