@@ -165,6 +165,8 @@
   --color-warning: var(--warning);
   --color-panel: var(--panel);
   --color-editor: var(--editor);
+  /* The canvas a web page is drawn on: white in both themes, as in any browser. */
+  --color-page: var(--paper-0);
 
   /* Tight radii: 4 chips, 6 controls, 8 cards. Only the sheet is soft (rounded-2xl, 16px). */
   --radius-sm: 4px;

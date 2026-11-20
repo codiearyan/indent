@@ -93,7 +93,7 @@ async function install(): Promise<RuntimeStatus> {
 
 let installing: Promise<RuntimeStatus> | undefined
 
-function ensureRuntime(): Promise<RuntimeStatus> {
+export function ensureRuntime(): Promise<RuntimeStatus> {
   return (installing ??= install().finally(() => (installing = undefined)))
 }
 

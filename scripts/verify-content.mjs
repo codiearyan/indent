@@ -1,5 +1,5 @@
 // Proves every issue grades correctly: starter fails every task, solution passes every task.
-// node scripts/verify-content.mjs <root with content/runtime dependencies installed>
+// node scripts/verify-content.mjs <root with content/runtime dependencies installed> [labId ...]
 import { spawn } from 'node:child_process'
 import { cp, mkdtemp, readFile, rm } from 'node:fs/promises'
 import { existsSync, readdirSync } from 'node:fs'
@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url'
 
 const root = process.argv[2] && resolve(process.argv[2])
 if (!root || !existsSync(join(root, 'node_modules'))) {
-  console.error('Usage: node scripts/verify-content.mjs <root with node_modules>')
+  console.error('Usage: node scripts/verify-content.mjs <root with node_modules> [labId ...]')
   process.exit(2)
 }
 
@@ -93,8 +93,10 @@ async function verify(labId, chapterId, env) {
   }
 }
 
+const only = process.argv.slice(3)
 const jobs = []
 for (const labId of readdirSync(join(content, 'labs')).sort()) {
+  if (only.length && !only.includes(labId)) continue
   const labFile = join(content, 'labs', labId, 'lab.json')
   if (!existsSync(labFile)) continue
   const lab = JSON.parse(await readFile(labFile, 'utf8'))

@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 
 export type Theme = 'dark' | 'light'
 export type TextZone = 'lesson' | 'tasks' | 'editor' | 'terminal'
-export type PanelKey = 'files' | 'terminal' | 'chat' | 'zen'
+export type PanelKey = 'files' | 'terminal' | 'chat' | 'zen' | 'browser'
 
 export const TEXT_SCALE_MIN = 0.8
 export const TEXT_SCALE_MAX = 1.6
@@ -40,7 +40,8 @@ const defaultPanels: Record<PanelKey, boolean> = {
   files: false,
   terminal: false,
   chat: false,
-  zen: false
+  zen: false,
+  browser: true
 }
 
 export const useSettings = create<SettingsState>()(
@@ -68,7 +69,15 @@ export const useSettings = create<SettingsState>()(
       setOnboarded: (onboarded) => set({ onboarded }),
       resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' })
     }),
-    { name: 'indent-settings', version: 1 }
+    {
+      name: 'indent-settings',
+      version: 1,
+      // Settings saved before a panel existed must still get that panel's default.
+      merge: (saved, current) => {
+        const persisted = saved as Partial<SettingsState> | undefined
+        return { ...current, ...persisted, panels: { ...current.panels, ...persisted?.panels } }
+      }
+    }
   )
 )
 

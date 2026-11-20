@@ -7,7 +7,9 @@ const LABELS: Record<string, string> = {
   go: 'GO',
   rust: 'RS',
   java: 'JV',
-  sql: 'SQL'
+  sql: 'SQL',
+  html: '<>',
+  react: 'JSX'
 }
 
 export function LanguageIcon({

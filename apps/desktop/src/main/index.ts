@@ -9,6 +9,10 @@ import * as checks from './services/checks'
 import * as progress from './services/progress'
 import * as terminal from './services/terminal'
 import * as ai from './services/ai'
+import * as preview from './services/preview'
+
+// Has to happen before the app is ready.
+preview.registerScheme()
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -83,7 +87,9 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window, { zoom: true })
   })
 
-  for (const service of [content, workspace, checks, progress, terminal, ai]) service.register()
+  for (const service of [content, workspace, checks, progress, terminal, ai, preview]) {
+    service.register()
+  }
 
   createWindow()
 

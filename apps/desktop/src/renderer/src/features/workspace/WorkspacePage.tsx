@@ -5,6 +5,7 @@ import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { EditorPane } from '@/features/editor/EditorPane'
 import { TerminalPane } from '@/features/terminal/TerminalPane'
+import { BrowserPane } from '@/features/browser/BrowserPane'
 import { ChatPanel } from '@/features/ai/ChatPanel'
 import { useAiEnabled } from '@/features/ai/aiStore'
 import { Tour } from '@/features/tour/Tour'
@@ -27,6 +28,7 @@ export function WorkspacePage(): React.JSX.Element {
   const terminalRef = usePanelRef()
   const aiOn = useAiEnabled()
   const chat = panels.chat && !panels.zen && aiOn
+  const browser = useWorkspace((s) => Boolean(s.chapter?.preview)) && panels.browser
 
   useEffect(() => {
     if (labId && chapterId) void open(labId, chapterId)
@@ -65,27 +67,37 @@ export function WorkspacePage(): React.JSX.Element {
           {lessonSide === 'left' && lesson}
           {lessonSide === 'left' && lesson && <Separator className={`w-px ${separator}`} />}
           <Panel id="work" minSize="30%">
-            <Group orientation="vertical">
-              <Panel id="editor" minSize="20%">
-                <EditorPane />
+            <Group orientation="horizontal">
+              <Panel id="code" minSize="30%">
+                <Group orientation="vertical">
+                  <Panel id="editor" minSize="20%">
+                    <EditorPane />
+                  </Panel>
+                  <Separator className={`h-px ${separator}`} />
+                  <Panel
+                    id="terminal"
+                    panelRef={terminalRef}
+                    collapsible
+                    collapsedSize={TERMINAL_HEADER_PX}
+                    minSize={160}
+                    defaultSize={panels.terminal ? '40%' : TERMINAL_HEADER_PX}
+                    onResize={(size) => {
+                      const collapsed = size.inPixels <= TERMINAL_HEADER_PX + 1
+                      if (collapsed === useSettings.getState().panels.terminal) {
+                        setPanel('terminal', !collapsed)
+                      }
+                    }}
+                  >
+                    <TerminalPane />
+                  </Panel>
+                </Group>
               </Panel>
-              <Separator className={`h-px ${separator}`} />
-              <Panel
-                id="terminal"
-                panelRef={terminalRef}
-                collapsible
-                collapsedSize={TERMINAL_HEADER_PX}
-                minSize={160}
-                defaultSize={panels.terminal ? '40%' : TERMINAL_HEADER_PX}
-                onResize={(size) => {
-                  const collapsed = size.inPixels <= TERMINAL_HEADER_PX + 1
-                  if (collapsed === useSettings.getState().panels.terminal) {
-                    setPanel('terminal', !collapsed)
-                  }
-                }}
-              >
-                <TerminalPane />
-              </Panel>
+              {browser && <Separator className={`w-px ${separator}`} />}
+              {browser && (
+                <Panel id="browser" defaultSize="45%" minSize="20%">
+                  <BrowserPane />
+                </Panel>
+              )}
             </Group>
           </Panel>
           {lessonSide === 'right' && lesson && <Separator className={`w-px ${separator}`} />}
