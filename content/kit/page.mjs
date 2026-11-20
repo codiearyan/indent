@@ -17,9 +17,20 @@ const INHERITED = new Set([
   'line-height',
   'list-style-type',
   'text-align',
+  'overflow-wrap',
   'text-transform',
-  'visibility'
+  'visibility',
+  'white-space',
+  'word-break'
 ])
+
+// A promise the page never catches would otherwise end the whole grader. It cannot be traced to
+// one page, so every open page gets it as an error; with no page open it is the grader's own bug.
+const openPages = new Set()
+process.on('unhandledRejection', (reason) => {
+  if (!openPages.size) throw reason
+  for (const errors of openPages) errors.push(`Uncaught (in promise) ${reason?.message ?? reason}`)
+})
 
 /** Bundles a module the same way the Browser panel does, wrapped so the page can run it. */
 async function bundle(esbuild, options) {
@@ -55,8 +66,17 @@ function matchesMedia(query, width) {
     if (range[1] === '>=') return width >= limit
     return range[1] === '<' ? width < limit : width > limit
   }
-  const strip = (piece) => piece.trim().replace(/^\(|\)$/g, '').trim()
-  return query.split(',').some((part) => part.split(/\band\b/).map(strip).every(holds))
+  const strip = (piece) =>
+    piece
+      .trim()
+      .replace(/^\(|\)$/g, '')
+      .trim()
+  return query.split(',').some((part) =>
+    part
+      .split(/\band\b/)
+      .map(strip)
+      .every(holds)
+  )
 }
 
 // shortcut: a count of ids, classes and element names. :is(), :not() and :where() are not
@@ -79,7 +99,8 @@ function parseCss(text, media = [], rules = []) {
   for (let open = css.indexOf('{', at); open !== -1; open = css.indexOf('{', at)) {
     let depth = 1
     let end = open + 1
-    for (; end < css.length && depth; end++) depth += css[end] === '{' ? 1 : css[end] === '}' ? -1 : 0
+    for (; end < css.length && depth; end++)
+      depth += css[end] === '{' ? 1 : css[end] === '}' ? -1 : 0
     const head = css.slice(at, open).split(';').pop().trim()
     const body = css.slice(open + 1, end - 1)
     if (head.startsWith('@media')) parseCss(body, [...media, head.slice(6)], rules)
@@ -122,7 +143,8 @@ function styleOf(rules, element, width) {
     const hits = rule.selectors.filter((selector) => matches(element, selector))
     if (!hits.length) continue
     const weight = Math.max(...hits.map(specificity))
-    for (const d of rule.declarations) found.push({ ...d, weight: weight + (d.important ? 1e9 : 0) })
+    for (const d of rule.declarations)
+      found.push({ ...d, weight: weight + (d.important ? 1e9 : 0) })
   }
   for (const property of element.style) {
     found.push({ property, value: element.style.getPropertyValue(property), weight: 1e8 })
@@ -131,8 +153,10 @@ function styleOf(rules, element, width) {
   found.sort((a, b) => a.weight - b.weight)
 
   const variables = {}
-  for (const [name, value] of Object.entries(parent)) if (name.startsWith('--')) variables[name] = value
-  for (const { property, value } of found) if (property.startsWith('--')) variables[property] = value
+  for (const [name, value] of Object.entries(parent))
+    if (name.startsWith('--')) variables[name] = value
+  for (const { property, value } of found)
+    if (property.startsWith('--')) variables[property] = value
   const resolve = (value, depth = 0) =>
     depth > 8
       ? value
@@ -168,12 +192,17 @@ function styleOf(rules, element, width) {
  * `fetch` replaces the page's fetch (by default it reads files of the workspace), `storage` fills
  * localStorage before any script runs, and `width` is the viewport width media queries see.
  */
-export async function openPage(dir, file = 'index.html', { fetch, storage = {}, width = 1024 } = {}) {
+export async function openPage(
+  dir,
+  file = 'index.html',
+  { fetch, storage = {}, width = 1024 } = {}
+) {
   const require = createRequire(join(dir, 'noop.js'))
   const { JSDOM, VirtualConsole } = require('jsdom')
   const esbuild = require('esbuild')
 
   const errors = []
+  openPages.add(errors)
   const logs = []
   const virtualConsole = new VirtualConsole()
   for (const level of ['log', 'info', 'warn', 'error']) {
@@ -181,8 +210,9 @@ export async function openPage(dir, file = 'index.html', { fetch, storage = {}, 
   }
   let reloads = 0
   virtualConsole.on('jsdomError', (error) => {
-    if (/Not implemented: navigation|form submission/i.test(error.message)) reloads++
-    else if (!/Not implemented/.test(error.message)) errors.push(error.detail?.message ?? error.message)
+    if (/Not implemented: (navigation|.*submit)/i.test(error.message)) reloads++
+    else if (!/Not implemented/.test(error.message))
+      errors.push(error.detail?.message ?? error.message)
   })
 
   const html = await readFile(join(dir, file), 'utf8')
@@ -267,7 +297,12 @@ export async function openPage(dir, file = 'index.html', { fetch, storage = {}, 
         clearTimeout(quiet)
         quiet = setTimeout(finish, QUIET_MS)
       })
-      observer.observe(document, { subtree: true, childList: true, attributes: true, characterData: true })
+      observer.observe(document, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+        characterData: true
+      })
       function finish() {
         clearTimeout(quiet)
         clearTimeout(limit)
@@ -327,6 +362,9 @@ export async function openPage(dir, file = 'index.html', { fetch, storage = {}, 
       const css = [...document.querySelectorAll('style')].map((style) => style.textContent)
       return styleOf(parseCss(css.join('\n')), find(target), at)
     },
-    close: () => window.close()
+    close() {
+      openPages.delete(errors)
+      window.close()
+    }
   }
 }
