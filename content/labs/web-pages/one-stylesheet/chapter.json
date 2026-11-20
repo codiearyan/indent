@@ -1,0 +1,65 @@
+{
+  "id": "one-stylesheet",
+  "title": "Forty style attributes, one stylesheet",
+  "files": ["index.html", "styles.css"],
+  "terminal": {
+    "description": "The page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files, for example `grep -c 'style=' index.html`."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "no-inline",
+      "title": "Move every style attribute into the stylesheet",
+      "file": "index.html",
+      "description": "Move all the styling out of `index.html` and into `styles.css`.\n\nThe check looks for:\n\n- no element in `index.html` has a `style` attribute\n- there is no `<style>` element in `index.html`\n- the page still looks the same: the header and footer background, the header text colour, the size of the page title and the event titles, the background, padding and border of the event cards, the text size of the card footers and the colour of the submit button keep the values the style attributes gave them\n\nAdd classes where you need a hook, or use selectors for the elements you already have.",
+      "nextSteps": [
+        "Count the style attributes: `grep -c 'style=' index.html` in the shell.",
+        "Start with the five event cards. They repeat the same four attributes, so four rules replace twenty of them.",
+        "Work down the page: header, title, cards, form, footer.",
+        "After each move, save and compare the page in the Browser panel, then press Check."
+      ],
+      "hints": [
+        "Elements that look alike can share one rule. Find the attributes that repeat.",
+        "You do not need a class on everything. `.event h3` reaches every event title, and `form button` reaches the submit button.",
+        "Two elements need a class for a rule of their own: the library name and the \"Save a place\" links in the cards. The rest already have a tag, a class or an id to hang a rule on."
+      ],
+      "points": 10
+    },
+    {
+      "id": "custom-properties",
+      "title": "Name the colours once",
+      "file": "styles.css",
+      "description": "Give the page's colours and spacing names, so a change of colour is one edit.\n\nThe check looks for:\n\n- at least three custom properties on `:root` (or `html`) whose values are colours\n- no declaration in `styles.css` spells out a colour as hex, `rgb()` or `hsl()`, except the custom properties themselves\n- at least one `padding`, `margin` or `gap` declaration uses `var()`\n\nName them however you like.",
+      "nextSteps": [
+        "List every colour the stylesheet uses. Some appear many times.",
+        "Add a `:root` rule at the top and give each colour a name there.",
+        "Replace each colour value with `var()` and the name.",
+        "Do the same for the spacing steps you use most, then press Check."
+      ],
+      "hints": [
+        "The page uses about ten colours. Name them by what they are for, not by what they look like, and the next change is easier.",
+        "A custom property is declared like `--name: value;` and used like `color: var(--name);`.",
+        "Search `styles.css` for `#` and `rgb` when you think you are done. The only matches left should be inside `:root`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "no-important",
+      "title": "End the fight over the date colour",
+      "file": "styles.css",
+      "description": "The event dates are green only because of `!important`. Make them green the normal way.\n\nThe check looks for:\n\n- no `!important` anywhere in `styles.css`\n- every element with the class `when` is green, `#2e6b45`, or a custom property with that value\n- the description paragraphs in the event cards stay grey, `#5b5750`\n\nChange the selectors so the right rule wins on its own.",
+      "nextSteps": [
+        "Remove `!important` and watch the dates turn grey in the Browser panel.",
+        "Find the rule that makes them grey and compare its selector with the date rule's.",
+        "Change one of the two selectors so the date rule wins.",
+        "Check that the descriptions are still grey, then press Check."
+      ],
+      "hints": [
+        "When two rules set the same property, the more specific selector wins, whatever order they come in.",
+        "An id in a selector outweighs any number of classes. Does the grey rule need its id?",
+        "Two classes beat one class and an element. Try a selector for the paragraphs inside a card, and one for the date inside a card."
+      ],
+      "points": 10
+    }
+  ]
+}

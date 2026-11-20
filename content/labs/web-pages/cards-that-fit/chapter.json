@@ -1,0 +1,65 @@
+{
+  "id": "cards-that-fit",
+  "title": "Event cards that fit any screen",
+  "files": ["index.html", "styles.css"],
+  "terminal": {
+    "description": "The page runs in the Browser panel and reloads every time you save. Make the panel narrow and wide to see the page as a phone and a desktop would. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "flex-rows",
+      "title": "Swap the floats for flex rows",
+      "file": "styles.css",
+      "description": "Lay out the two rows on the page with flexbox instead of floats.\n\nThe check looks at the page's `<header>` and at each card's `.event-footer`. For both it wants:\n\n- `display: flex` at every width\n- the items spread to the two ends of the row: `justify-content` is `space-between`, `space-around` or `space-evenly`, or one item has an `auto` left margin\n- `flex-wrap: wrap`, so items can move to a new line on a phone\n\nIt also checks that no `float: left` or `float: right` is left in `styles.css`.",
+      "nextSteps": [
+        "Find every `float` in `styles.css` and the `overflow: hidden` rules that were there to hold them.",
+        "Make the header a flex container and spread its two groups apart.",
+        "Do the same for `.event-footer`.",
+        "Make the Browser panel narrow, check that the rows wrap instead of overlapping, then press Check."
+      ],
+      "hints": [
+        "Flex works on the children of the element you set it on. Set it on the row, not on the items.",
+        "Free space in a flex row goes where `justify-content` says. Space between the items pushes the first and last to the ends.",
+        "Each row needs three declarations: `display`, `justify-content` and `flex-wrap`. `align-items: center` and a `gap` make it look tidy too."
+      ],
+      "points": 10
+    },
+    {
+      "id": "card-grid",
+      "title": "One column on a phone, several on a wide screen",
+      "file": "styles.css",
+      "description": "Lay out the event list as a grid that adapts to the screen.\n\nThe check looks for:\n\n- a `<meta name=\"viewport\">` in the head whose content includes `width=device-width`\n- `.event-list` is a grid with at least two columns at 1280px wide\n- one column at 375px wide (a grid with one column, or no grid at all)\n- the list items and the `.event` cards no longer set a `width` (other than `auto` or `100%`)\n\nEither a `grid-template-columns` that fills the row with columns of a smallest size, or a media query that changes the columns, is fine. The check assumes the list has about 912px of room at 1280px wide and 327px at 375px wide.",
+      "nextSteps": [
+        "Add the viewport meta tag to the head of `index.html`.",
+        "Remove the `display: inline-block` and `width` rule that put the cards side by side.",
+        "Make `.event-list` a grid with a gap.",
+        "Choose its columns so a phone gets one and a wide screen gets several, then press Check."
+      ],
+      "hints": [
+        "Percent widths shrink with the screen, so three cards stay side by side on a phone and get squashed. A grid can change the number of columns instead.",
+        "`repeat(auto-fill, minmax(...))` makes as many columns as fit, each at least a given size.",
+        "Pick a smallest column size that fits once in 327px but at least twice in 912px, such as somewhere between 14rem and 20rem."
+      ],
+      "points": 10
+    },
+    {
+      "id": "no-overflow",
+      "title": "Keep pictures and long words inside the card",
+      "file": "styles.css",
+      "description": "Stop the pictures and the long hashtag from poking out of narrow cards.\n\nThe check looks for:\n\n- every picture in an `.event` card has `max-width: 100%` (or `width: 100%`), and its height is `auto` or not set, unless you set `object-fit` or `aspect-ratio`\n- the paragraph with `#QuillmoorWinterReadingChallenge`, or an element around it, has `overflow-wrap` (or `word-break`) set to a value that lets a long word break",
+      "nextSteps": [
+        "Make the Browser panel narrow and find what sticks out of the cards.",
+        "Replace the fixed picture width with a limit of the card's width.",
+        "Let the height follow the width so the picture keeps its shape.",
+        "Let long words break inside the cards, then press Check."
+      ],
+      "hints": [
+        "A fixed width in pixels does not care how wide its box is. A limit in percent does.",
+        "When you set only the width of an image, the browser works out the height from its shape. A fixed height stretches it.",
+        "`overflow-wrap` decides what happens to a word too long for its line. It is inherited, so setting it on the card covers every paragraph in it."
+      ],
+      "points": 10
+    }
+  ]
+}
