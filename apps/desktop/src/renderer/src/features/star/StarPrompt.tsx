@@ -1,0 +1,123 @@
+import { useEffect, useState } from 'react'
+import { Star } from 'lucide-react'
+import { toast } from 'sonner'
+import { REPO_URL } from '@shared/repo'
+import { APP_NAME } from '@/components/app/Brand'
+import { Button } from '@/components/ui/button'
+import { api } from '@/lib/api'
+import { useProgress } from '@/stores/progress'
+import { useSettings } from '@/stores/settings'
+import { TASKS_BEFORE_ASKING, passedTasks, whenIdle } from './starLogic'
+
+const TOAST_ID = 'star-prompt'
+const THANKS_MS = 5000
+
+let shownThisRun = false
+
+/**
+ * Asks once for a star on GitHub: after a few passed tasks, when the person has paused, and
+ * never again once it was answered or closed. Renders nothing itself; the request is a toast.
+ */
+export function StarPrompt(): null {
+  const due = useProgress((s) => passedTasks(s.progress) >= TASKS_BEFORE_ASKING)
+  const asked = useSettings((s) => s.starAsked)
+
+  useEffect(() => {
+    if (!due || asked || shownThisRun) return
+    return whenIdle(() => {
+      if (useSettings.getState().starAsked || shownThisRun) return
+      shownThisRun = true
+      toast.custom(() => <StarToast />, {
+        id: TOAST_ID,
+        duration: Infinity,
+        onDismiss: () => useSettings.getState().setStarAsked(true)
+      })
+    })
+  }, [due, asked])
+
+  return null
+}
+
+function StarToast(): React.JSX.Element {
+  const [state, setState] = useState<'ask' | 'starring' | 'thanks'>('ask')
+  const close = (): void => {
+    useSettings.getState().setStarAsked(true)
+    toast.dismiss(TOAST_ID)
+  }
+
+  const star = async (): Promise<void> => {
+    setState('starring')
+    useSettings.getState().setStarAsked(true)
+    if (await api.github.star().catch(() => false)) {
+      setState('thanks')
+      celebrate()
+      setTimeout(() => toast.dismiss(TOAST_ID), THANKS_MS)
+      return
+    }
+    // No GitHub CLI to star with: the repository's page has the button.
+    window.open(REPO_URL, '_blank')
+    toast.dismiss(TOAST_ID)
+  }
+
+  const thanks = state === 'thanks'
+  return (
+    <div
+      role="status"
+      className="flex w-[356px] gap-3 rounded-lg border border-border bg-popover p-4 text-popover-foreground shadow-lg"
+    >
+      <Star
+        className="mt-0.5 size-4 shrink-0 fill-brand text-brand"
+        strokeWidth={1.5}
+        aria-hidden
+      />
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium">
+          {thanks ? 'Thanks for the star!' : `Enjoying ${APP_NAME}?`}
+        </p>
+        <p className="mt-0.5 text-[13px] text-muted-foreground">
+          {thanks
+            ? `It really helps ${APP_NAME} grow.`
+            : 'Give it a star on GitHub to let us know.'}
+        </p>
+        {!thanks && (
+          <div className="mt-3 flex justify-end gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="font-normal text-muted-foreground hover:text-foreground"
+              onClick={close}
+            >
+              Dismiss
+            </Button>
+            <Button size="sm" disabled={state === 'starring'} onClick={() => void star()}>
+              {state === 'starring' ? 'Starring' : 'Star on GitHub'}
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/** One burst from the corner the toast sits in, in the app's own colours. */
+function celebrate(): void {
+  const style = getComputedStyle(document.documentElement)
+  const colors = ['--brand', '--foreground', '--muted-foreground'].map((token) =>
+    style.getPropertyValue(token).trim()
+  )
+  void import('canvas-confetti')
+    .then(({ default: confetti }) =>
+      confetti({
+        particleCount: 140,
+        spread: 110,
+        angle: 120,
+        startVelocity: 42,
+        gravity: 1.4,
+        ticks: 140,
+        origin: { x: 0.92, y: 0.94 },
+        colors,
+        disableForReducedMotion: true
+      })
+    )
+    .catch(() => undefined)
+}

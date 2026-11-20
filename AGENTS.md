@@ -64,7 +64,7 @@ src/renderer/src/
   components/app/        small shared app components (ThemeToggle, LevelBadge, LanguageIcon)
   lib/                   api.ts (typed window.api), utils.ts (cn)
   stores/                zustand: settings (persisted), progress, catalog, workspace
-  features/<name>/       catalog, workspace, editor, terminal, browser, ai, tour, dsa, onboarding, settings
+  features/<name>/       catalog, workspace, editor, terminal, browser, ai, tour, dsa, onboarding, settings, star
 ```
 
 `src/shared/types.ts` is the contract between content, main and renderer. Read it first. If a

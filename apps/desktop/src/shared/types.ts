@@ -275,6 +275,10 @@ export interface Api {
     /** Downloads Node into the app's own folder. Other programs do not see it. */
     installNode(): Promise<ToolStatus[]>
   }
+  github: {
+    /** Stars the app's repository with the person's own GitHub CLI. False when that is not possible. */
+    star(): Promise<boolean>
+  }
   ai: {
     getConfig(): Promise<AiConfig>
     setConfig(patch: AiSettingsPatch): Promise<AiConfig>
@@ -299,6 +303,7 @@ export const INVOKE_METHODS = {
   progress: ['get', 'touch'],
   terminal: ['create'],
   tools: ['status', 'installNode'],
+  github: ['star'],
   ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test']
 } as const
 
