@@ -1,0 +1,68 @@
+[
+  {
+    "id": "gr-01",
+    "title": "Lantern Season",
+    "artist": "Wren Abernathy",
+    "year": 1972,
+    "genre": "Folk",
+    "condition": "Good",
+    "price": 21,
+    "sold": false,
+    "sleeve": "#7a8b4f"
+  },
+  {
+    "id": "gr-02",
+    "title": "Iron Kettle Stomp",
+    "artist": "The Boxcar Saints",
+    "year": 1965,
+    "genre": "Blues",
+    "condition": "Fair",
+    "price": 16,
+    "sold": true,
+    "sleeve": "#6b4a32"
+  },
+  {
+    "id": "gr-03",
+    "title": "Mothlight Parade",
+    "artist": "Juniper Sound System",
+    "year": 1981,
+    "genre": "Reggae",
+    "condition": "Very good",
+    "price": 29,
+    "sold": false,
+    "sleeve": "#2e7d4f"
+  },
+  {
+    "id": "gr-04",
+    "title": "Seven Quiet Rooms",
+    "artist": "Hollis Ware",
+    "year": 1976,
+    "genre": "Jazz",
+    "condition": "Near mint",
+    "price": 38,
+    "sold": false,
+    "sleeve": "#1f3b57"
+  },
+  {
+    "id": "gr-05",
+    "title": "Chrome Lullaby",
+    "artist": "Velour Machines",
+    "year": 1984,
+    "genre": "Electronic",
+    "condition": "Good",
+    "price": 24,
+    "sold": true,
+    "sleeve": "#6a3d7a"
+  },
+  {
+    "id": "gr-06",
+    "title": "The Moth Variations",
+    "artist": "Corin Ash Ensemble",
+    "year": 1962,
+    "genre": "Classical",
+    "condition": "Very good",
+    "price": 30,
+    "sold": false,
+    "sleeve": "#8c2f39"
+  }
+]

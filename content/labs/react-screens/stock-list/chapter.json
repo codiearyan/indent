@@ -1,0 +1,73 @@
+{
+  "id": "stock-list",
+  "title": "One long component",
+  "files": [
+    "src/App.jsx",
+    "src/RecordCard.jsx",
+    "src/StockList.jsx",
+    "src/main.jsx",
+    "src/stock.js",
+    "src/format.js",
+    "styles.css",
+    "index.html"
+  ],
+  "terminal": {
+    "description": "The app runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "record-card",
+      "title": "A card for one record",
+      "file": "src/RecordCard.jsx",
+      "description": "Fill in `RecordCard` in `src/RecordCard.jsx`. Keep the named export `RecordCard`. It takes one prop, `record` (an object like the ones in `src/stock.js`), and returns one card:\n\n- an `<article className=\"record-card\">`\n- the record's `title` in an `<h3>`\n- the `artist`, the `year`, and the `price` written with `formatPrice` from `src/format.js`\n\nEvery value comes from `record`; nothing is typed in by hand. The check renders your card on its own with records it picks, and also looks for `<RecordCard` in `src/StockList.jsx`.",
+      "nextSteps": [
+        "Copy the markup of one card from `App.jsx` into the return of `RecordCard`.",
+        "Replace each typed-in value with the matching field of `record`.",
+        "Import `formatPrice` and use it for the price.",
+        "Use `<RecordCard record={...} />` inside `StockList`."
+      ],
+      "hints": [
+        "A component is a function that receives its props as one object. `{ record }` in the parameter list pulls out the one you need.",
+        "Inside JSX, curly braces switch back to JavaScript: `<h3>{record.title}</h3>`.",
+        "Leave the Sold mark out for now or copy it as it is; the third task is about it. Each value that was typed in becomes `{record.something}`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "stock-list",
+      "title": "Every record in the stock, from the data",
+      "file": "src/StockList.jsx",
+      "description": "Fill in `StockList` in `src/StockList.jsx`. Keep the named export `StockList`. It takes a `records` prop (an array) and returns a `<ul className=\"stock-list\">` with one `<li>` per record, in the order of the array, each holding a `RecordCard`.\n\nGive each `<li>` a `key` that belongs to the record itself (its `id`), not to its position, so React still knows which item is which when the order changes.\n\nThen make `App` render `<StockList records={stock} />` with the `stock` from `src/stock.js` in place of the hand-written cards. The check swaps in a different stock and expects the screen to follow it, with no key warning in the console.",
+      "nextSteps": [
+        "Import `RecordCard` into `StockList.jsx`.",
+        "Turn `records` into list items with `records.map`.",
+        "Put a `key` on the element you return from `map`.",
+        "In `App.jsx`, import `stock` and replace the hand-written list with `StockList`."
+      ],
+      "hints": [
+        "JSX can hold an array of elements, so mapping data to JSX is how a list is drawn from data.",
+        "The `key` goes on the outermost element returned from the `map` callback, here the `<li>`.",
+        "The index from `map` changes when the order changes. Each record already carries something that never changes."
+      ],
+      "points": 10
+    },
+    {
+      "id": "sold-mark",
+      "title": "Sold only when it is sold",
+      "file": "src/RecordCard.jsx",
+      "description": "Every card says Sold, but most records are still in the racks. In `RecordCard`, show `<span className=\"sold-mark\">Sold</span>` only when `record.sold` is `true`. A record with `sold: false` has no mark and no word Sold anywhere on its card.\n\nThe check renders sold and unsold records on their own and then looks at the whole screen with a stock it picks.",
+      "nextSteps": [
+        "Find where the card draws the Sold mark.",
+        "Make that part depend on `record.sold`.",
+        "Look at the Browser panel: only two of the shop's records should be marked."
+      ],
+      "hints": [
+        "JSX does not have an `if` inside it, but an expression can decide what to render.",
+        "`{condition && <span>...</span>}` renders the span only when the condition is true.",
+        "React renders nothing for `false`, `null` and `undefined`, so `record.sold && ...` is safe for a boolean."
+      ],
+      "points": 10
+    }
+  ]
+}

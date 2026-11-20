@@ -1,0 +1,71 @@
+{
+  "id": "hold-shelf",
+  "title": "A hold button that does nothing",
+  "files": [
+    "src/App.jsx",
+    "src/StockList.jsx",
+    "src/RecordCard.jsx",
+    "src/HoldShelf.jsx",
+    "src/stock.js",
+    "styles.css"
+  ],
+  "terminal": {
+    "description": "The app runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "hold-a-record",
+      "title": "Put a record on hold",
+      "file": "src/App.jsx",
+      "description": "Clicking a card's `Hold` button (the `button` with the class `hold-button`) puts that record on the hold shelf, which lists it as an `<li>` inside `.hold-shelf` (the `HoldShelf` component already draws that).\n\n- Keep the held records in state in `App` with `useState`, for example as an array of record ids.\n- Pass what the cards need down through `StockList` to `RecordCard` as props.\n- Change the state by setting a new array. Never push into the old one.\n\nThe check uses its own stock, holds three records one after another and expects all three on the shelf, with the stock list unchanged.",
+      "nextSteps": [
+        "Add a state variable for the held ids in `App`.",
+        "Write a function in `App` that adds an id, and pass it down to the cards.",
+        "Call it from the button's `onClick` in `RecordCard`.",
+        "Work out `heldRecords` from the stock and the held ids."
+      ],
+      "hints": [
+        "A plain variable in a component is made fresh on every render, so nothing you put in it survives. State is the memory React keeps for you.",
+        "The card cannot reach the state in `App`. Hand it a function as a prop, and let the button call that function.",
+        "React only re-renders when you give it a new value. `setHeldIds([...heldIds, id])` builds a new array; `push` changes the old one and React sees nothing new."
+      ],
+      "points": 10
+    },
+    {
+      "id": "release",
+      "title": "Take it off the shelf",
+      "file": "src/RecordCard.jsx",
+      "description": "The same button works both ways. Its label reads `Hold` when the record is not on the shelf and `Release` when it is. Clicking `Release` takes the record off the shelf and the label goes back to `Hold`; every other held record stays.\n\nRemove the id by making a new array without it, not by changing the old one.",
+      "nextSteps": [
+        "Give `RecordCard` a prop that says whether its record is held.",
+        "Choose the button label from that prop.",
+        "Make the click toggle: add the id when it is missing, remove it when it is there.",
+        "Hold two records and release one in the Browser panel."
+      ],
+      "hints": [
+        "The card does not need its own state for this. Whether it is held is already in `App`; pass it down.",
+        "`filter` returns a new array, which is exactly what removing needs.",
+        "One function can decide with `ids.includes(id)` whether to add or remove, and the updater form `setHeldIds((ids) => ...)` always starts from the latest ids."
+      ],
+      "points": 10
+    },
+    {
+      "id": "shelf-count",
+      "title": "A count in the header",
+      "file": "src/App.jsx",
+      "description": "The header always says `0 on hold`. Make the element with the class `hold-count` show the real number of held records, in the form `N on hold` (`0 on hold`, `1 on hold`, `3 on hold`).\n\nWork the number out from the same state the shelf uses. Do not add a second state for it.",
+      "nextSteps": [
+        "Find the typed-in count in `App.jsx`.",
+        "Replace the number with a value worked out from the held state.",
+        "Hold a few records and watch the header."
+      ],
+      "hints": [
+        "Anything you can work out from state during render does not need state of its own.",
+        "A second state for the count would have to be kept in step by hand, and sooner or later it would drift.",
+        "The length of the held array is the number you need."
+      ],
+      "points": 10
+    }
+  ]
+}

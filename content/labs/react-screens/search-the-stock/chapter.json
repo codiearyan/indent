@@ -1,0 +1,73 @@
+{
+  "id": "search-the-stock",
+  "title": "Nobody can find a record",
+  "files": [
+    "src/App.jsx",
+    "src/Toolbar.jsx",
+    "src/StockList.jsx",
+    "src/RecordCard.jsx",
+    "src/stock.js",
+    "styles.css"
+  ],
+  "terminal": {
+    "description": "The app runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "search-box",
+      "title": "Search by title or artist",
+      "file": "src/Toolbar.jsx",
+      "description": "Make the search box (`#search` in `src/Toolbar.jsx`) narrow the stock list.\n\n- Keep the text in state in `App` and make the input a controlled input: its `value` comes from that state and its `onChange` updates it.\n- Show only the records whose `title` or `artist` contains the text, ignoring upper and lower case and the spaces around the text. An empty box shows every record.\n- The `Clear` button empties the box and shows every record again.\n\nThe check types into the box on a stock it picks and reads the titles of the cards.",
+      "nextSteps": [
+        "Add a state for the search text in `App`.",
+        "Pass the text and a way to change it to `Toolbar` as props.",
+        "Wire the input's `value` and `onChange`.",
+        "Work out the visible records in `App` and give those to `StockList`.",
+        "Wire `Clear`."
+      ],
+      "hints": [
+        "The toolbar and the list both need the search text, so it has to live in the component that holds both of them.",
+        "In `onChange`, `event.target.value` is what the box would show next. Hand it to the setter.",
+        "If Clear brings the list back but the box still shows text, the input is not reading `value` from state. Turn both sides to lower case and `trim` the text before you compare."
+      ],
+      "points": 10
+    },
+    {
+      "id": "genre-filter",
+      "title": "Pick a genre",
+      "file": "src/Toolbar.jsx",
+      "description": "Make the genre select (`#genre`) work.\n\n- Its first option stays `All genres` with the value `all`. After it comes one option per genre found in the stock, each genre once, sorted A to Z, with the genre name as both value and text.\n- Keep the picked genre in state in `App` and make the select controlled (`value` and `onChange`).\n- A record is shown when it passes both the genre and the search.\n- `Clear` also puts the select back to `all`.\n\nThe check uses a stock with genres your code has never seen.",
+      "nextSteps": [
+        "Work out the list of genres from the stock in `App`.",
+        "Pass it to `Toolbar` and render one option per genre.",
+        "Add a state for the picked genre and wire the select.",
+        "Add the genre test to the visible records, and reset it in `Clear`."
+      ],
+      "hints": [
+        "Any list you can work out from the stock should be worked out, not typed in. The check uses a different stock.",
+        "A `Set` keeps each value once, and spreading it back into an array lets you `sort` it.",
+        "The filter now asks two questions per record: is the genre `all` or equal to the record's genre, and does the text match."
+      ],
+      "points": 10
+    },
+    {
+      "id": "result-count",
+      "title": "Say how many match",
+      "file": "src/App.jsx",
+      "description": "Above the list, add an element with the class `result-count` that reads `Showing N of M records`, where N is the number of visible records and M the size of the stock. When nothing matches, show `<p className=\"empty-line\">No records match.</p>` in place of the list.\n\nThe visible records are worked out during render from the stock, the search text and the genre. Keep no second copy of the list in state, and use no `useEffect` in `src/`: the check looks for it.",
+      "nextSteps": [
+        "Find where `App` works out the visible records.",
+        "Add the count line above the list.",
+        "Render the empty line in place of the list when nothing is visible.",
+        "Type something silly into the search box and look at the screen."
+      ],
+      "hints": [
+        "Everything this line says is already known during render. Nothing new needs to be stored.",
+        "A list kept in state next to the stock has to be updated every time the search, the genre or the stock changes. Worked out during render, it can never be stale.",
+        "A ternary in JSX picks one of two things: `{visible.length === 0 ? <p>...</p> : <StockList ... />}`."
+      ],
+      "points": 10
+    }
+  ]
+}
