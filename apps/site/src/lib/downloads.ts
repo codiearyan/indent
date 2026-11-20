@@ -1,7 +1,7 @@
 import desktop from '../../../desktop/package.json'
 
 export const VERSION = desktop.version
-export const REPO_URL = 'https://github.com/codiearyan/labbench'
+export const REPO_URL = 'https://github.com/codiearyan/indent'
 
 // The release workflow gives each installer a name without a version, so these never change.
 export const RELEASES_URL = `${REPO_URL}/releases/latest`
