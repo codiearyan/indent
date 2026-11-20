@@ -259,7 +259,7 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
 
 ## Workflow
 
-- The repository is private on GitHub. `main` is always releasable and is never committed to directly.
+- The repository is public on GitHub. `main` is always releasable and is never committed to directly.
 - Every feature and every fix gets its own branch (`feat/<name>`, `fix/<name>`, `chore/<name>`,
   `docs/<name>`) and its own pull request against `main`. One concern per pull request.
 - Before opening a pull request: `pnpm typecheck`, `pnpm lint` and `pnpm test` pass.
