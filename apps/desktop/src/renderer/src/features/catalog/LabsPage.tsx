@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Check, Search } from 'lucide-react'
+import { ArrowUpRight, Check, Search } from 'lucide-react'
 import { coverUrl } from '@shared/cover'
+import { repoRequestUrl } from '@shared/repo'
 import type { LabSummary, ProgressState } from '@shared/types'
 import { BuildStrip } from '@/components/app/BuildStrip'
 import { LanguageIcon } from '@/components/app/LanguageIcon'
@@ -147,29 +148,57 @@ export function LabsPage(): React.JSX.Element {
           ))}
         </ul>
       ) : visible.length > 0 ? (
-        <ul className={grid}>
-          {visible.map(({ lab, progress: p }) => (
-            <RepoCard key={lab.id} lab={lab} progress={p} chapters={progress.chapters} />
-          ))}
-        </ul>
+        <>
+          <ul className={grid}>
+            {visible.map(({ lab, progress: p }) => (
+              <RepoCard key={lab.id} lab={lab} progress={p} chapters={progress.chapters} />
+            ))}
+          </ul>
+          <p className="text-center text-[13px] text-muted-foreground">
+            Can&apos;t find what you want to learn? <RequestRepo topic={filters.query} />
+          </p>
+        </>
       ) : (
-        <div className="flex h-40 flex-col items-center justify-center gap-1 rounded-lg border border-border text-sm">
-          <p className="text-muted-foreground">
+        <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-border px-6 py-12 text-center text-sm">
+          <p className="font-medium">
             {rows.length ? 'No repos match these filters.' : 'No repos are installed yet.'}
           </p>
           {rows.length > 0 && (
-            <Button
-              variant="link"
-              size="sm"
-              className="text-foreground"
-              onClick={() => setFilters(NO_FILTERS)}
-            >
-              Clear filters
-            </Button>
+            <>
+              <p className="max-w-[420px] text-[13px] leading-5 text-muted-foreground">
+                Can&apos;t find what you want to learn? Ask for it on GitHub and it may become the
+                next repo.
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={() => setFilters(NO_FILTERS)}>
+                  Clear filters
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href={repoRequestUrl(filters.query)} target="_blank" rel="noreferrer">
+                    Request a repo
+                    <ArrowUpRight aria-hidden />
+                  </a>
+                </Button>
+              </div>
+            </>
           )}
         </div>
       )}
     </div>
+  )
+}
+
+/** A link that opens a new issue on GitHub asking for a repo about `topic`. */
+function RequestRepo({ topic }: { topic: string }): React.JSX.Element {
+  return (
+    <a
+      href={repoRequestUrl(topic)}
+      target="_blank"
+      rel="noreferrer"
+      className="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+    >
+      Request a repo on GitHub
+    </a>
   )
 }
 
