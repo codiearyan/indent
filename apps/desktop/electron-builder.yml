@@ -26,6 +26,23 @@ mac:
   notarize: false
 dmg:
   artifactName: Indent-mac-${arch}.${ext}
+  title: Indent
+  # The picture is drawn from build/dmg/background.html. Its two tiles sit where `contents`
+  # puts the icons (x and y are the centre of each icon), so change both together.
+  background: build/background.png
+  window:
+    width: 660
+    height: 420
+  iconSize: 104
+  iconTextSize: 13
+  contents:
+    - x: 190
+      y: 205
+      type: file
+    - x: 470
+      y: 205
+      type: link
+      path: /Applications
 linux:
   # Without this the name comes from the package name, whose "@" and "/" Linux does not allow.
   executableName: indent
