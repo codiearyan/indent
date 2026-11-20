@@ -129,7 +129,11 @@ export function LabsPage(): React.JSX.Element {
           />
           <Facet
             label="Language"
-            options={languages.map((id) => ({ value: id, label: languageName(id) }))}
+            options={languages.map((id) => ({
+              value: id,
+              label: languageName(id),
+              icon: <LanguageIcon language={id} className="size-3.5 text-[7px]" />
+            }))}
             value={filters.languages}
             onChange={(next) => set({ languages: next })}
           />
@@ -177,7 +181,7 @@ function Facet({
   onChange
 }: {
   label: string
-  options: { value: string; label: string }[]
+  options: { value: string; label: string; icon?: React.ReactNode }[]
   value: string[]
   onChange(next: string[]): void
 }): React.JSX.Element {
@@ -198,6 +202,7 @@ function Facet({
             value={option.value}
             className="h-7 min-w-0 rounded-full border border-input px-3 text-[13px] font-normal text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:border-transparent data-[state=on]:bg-accent data-[state=on]:text-foreground"
           >
+            {option.icon}
             {option.label}
           </ToggleGroupItem>
         ))}
@@ -223,9 +228,10 @@ function RepoCard({
       >
         <Cover lab={lab} />
         <div className="flex flex-1 flex-col p-4">
-          <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
-            <LanguageIcon language={lab.language} className="size-5 rounded-sm text-[9px]" />
-            <span className="truncate">{lab.category}</span>
+          <div className="flex items-center gap-2 text-[13px]">
+            <LanguageIcon language={lab.language} className="size-[18px] text-[8px]" />
+            <span className="shrink-0 font-medium">{languageName(lab.language)}</span>
+            <span className="truncate text-muted-foreground">{lab.category}</span>
           </div>
           <h2 className="mt-2.5 text-sm font-semibold">{lab.title}</h2>
           <p className="mt-1 line-clamp-2 text-[13px] leading-5 text-muted-foreground">

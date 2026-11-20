@@ -84,6 +84,9 @@ the chrome is neutral, and the one hue is a calm orange.
   mark of a passed check and `destructive` the red mark of a failed one; they are status marks, never
   fills for large areas. `warning` is only the "being compared" tone in the DSA animations.
   Nothing else has a hue: links, active navigation, selected tabs, hints and AI are neutral.
+  The one exception is a language's logo (`components/app/LanguageIcon`, drawn from
+  `@icons-pack/react-simple-icons`): it keeps its own colour, because that colour is how people
+  recognise it. Logos that are near black take the muted text colour instead.
   - Selected or active: a neutral pill (`bg-accent text-foreground`) or ink text. Never the brand.
   - Links: `text-muted-foreground hover:text-foreground`, or ink with an underline in prose.
   - Never set text in the brand colour on a light surface; use it as a fill with ink text on top.
