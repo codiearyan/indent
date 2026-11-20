@@ -68,3 +68,9 @@ complete example. Restart the app to pick up a new repo.
 Everything is under the app's data folder (`~/Library/Application Support/indent` on macOS):
 `workspaces/` holds your files per issue, `progress.json` your points and history. API keys are
 encrypted with the operating system's keychain.
+
+## License
+
+[MIT](LICENSE). You may use, change and share the code, the repos and the pictures, as long as the
+copyright notice stays with them. The names and logos of other products that appear in the app
+(AI providers, programming languages) belong to their owners.
