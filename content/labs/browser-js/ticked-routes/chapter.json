@@ -1,0 +1,65 @@
+{
+  "id": "ticked-routes",
+  "title": "Ticks that do not stick",
+  "preview": "index.html",
+  "files": ["src/board.js", "src/ticks.js", "src/main.js", "src/routes.js", "index.html"],
+  "terminal": {
+    "description": "The route board runs in the Browser panel and reloads every time you save. This shell is in your workspace if you want to look around."
+  },
+  "tasks": [
+    {
+      "id": "tick-state",
+      "title": "Show which routes are ticked",
+      "file": "src/board.js",
+      "description": "`renderBoard(list, routes, ticked)` now gets a `Set` of ticked route ids. Every route item already has a `<button class=\"tick\">`. Make the board show the state:\n\n- the button has `aria-pressed=\"true\"` when the route's id is in `ticked`, and `aria-pressed=\"false\"` when it is not\n- the `<li class=\"route\">` of a ticked route also has the class `ticked`\n- give the button `type=\"button\"` so it never submits anything\n\nThe check clicks one tick and reads both.",
+      "nextSteps": [
+        "Read `src/main.js` to see how a click turns into a change to `ticked` and a new `render()`.",
+        "In `routeItem`, set `aria-pressed` on the button from `isTicked`.",
+        "Add or leave out the `ticked` class on the item the same way.",
+        "Save, click a tick in the Browser panel and see the button fill in."
+      ],
+      "hints": [
+        "`routeItem` already receives `isTicked`. Nothing uses it yet.",
+        "`setAttribute` takes strings. `String(true)` is `'true'`.",
+        "`item.classList.toggle('ticked', isTicked)` adds the class when the second argument is true and removes it when it is false."
+      ],
+      "points": 10
+    },
+    {
+      "id": "one-listener",
+      "title": "One listener for the whole list",
+      "file": "src/ticks.js",
+      "description": "Staff report that the first tick works and then nothing does. `watchTicks(list, onToggle)` in `src/ticks.js` puts a listener on each button that exists when the page loads.\n\nRewrite it so it adds one `click` listener to `list` itself and works out which route was clicked from the event. It calls `onToggle(id)` with the `data-id` of the route whose `.tick` button was clicked, and does nothing for clicks elsewhere in the list.\n\nThe check ticks, unticks and ticks again, and it also clicks a route item that was put into the list after the page loaded.",
+      "nextSteps": [
+        "Click two ticks in the Browser panel and notice that the second does nothing.",
+        "Find where the board throws away its old buttons and makes new ones.",
+        "Replace the loop with a single listener on `list`.",
+        "Inside it, find the `.tick` button the click came from, and its route."
+      ],
+      "hints": [
+        "Every `render()` builds brand new buttons. The listeners were attached to the old ones, which are gone.",
+        "A click on a button bubbles up through its parents. A listener on the list hears clicks on everything inside it, now and later.",
+        "In the listener, `event.target.closest('.tick')` gives you the button, or `null` when the click was somewhere else. From the button, `closest('.route')` gives you the item and its `dataset.id`."
+      ],
+      "points": 10
+    },
+    {
+      "id": "tick-count",
+      "title": "A count that stays right",
+      "file": "src/board.js",
+      "description": "Write `renderCount(element, routes, ticked)` in `src/board.js`. It sets the text of `element` (the `<p id=\"tick-count\">` in the header) to:\n\n`N of M ticked`\n\nwhere `M` is the number of routes and `N` is how many of those routes are in `ticked`. With no routes it reads `0 of 0 ticked`. `render()` already calls it after every change.",
+      "nextSteps": [
+        "Count the routes whose id is in `ticked`.",
+        "Build the sentence with a template literal.",
+        "Set it with `textContent`.",
+        "Tick and untick a few routes and watch the header."
+      ],
+      "hints": [
+        "The count is a number made from the routes array. `filter` and `length` will do.",
+        "Count routes that are ticked, not the size of the set. Later the set may hold ids of routes that are no longer on the board.",
+        "The check compares the text exactly: a number, the word `of`, a number and the word `ticked`, with single spaces and nothing else."
+      ],
+      "points": 10
+    }
+  ]
+}

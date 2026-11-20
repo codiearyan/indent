@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gritstone Climbing route board</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <div>
+        <p class="gym">Gritstone Climbing</p>
+        <h1>Route board</h1>
+      </div>
+      <p id="tick-count" class="tick-count">0 of 0 ticked</p>
+    </header>
+
+    <main class="layout">
+      <section class="board" aria-labelledby="board-title">
+        <div class="board-head">
+          <h2 id="board-title">On the walls</h2>
+          <div class="filters">
+            <label>
+              <span>Search</span>
+              <input id="search" type="search" placeholder="Route name" autocomplete="off" />
+            </label>
+            <label>
+              <span>Grade</span>
+              <select id="grade-filter">
+                <option value="">Any grade</option>
+                <option value="easy">Easy, V0 to V2</option>
+                <option value="mid">Medium, V3 to V5</option>
+                <option value="hard">Hard, V6 and up</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <p id="board-status" class="status" hidden></p>
+        <ul id="route-list" class="route-list"></ul>
+        <p id="board-empty" class="empty" hidden>No routes on the walls yet.</p>
+        <p id="no-match" class="empty" hidden>No routes match.</p>
+      </section>
+
+      <aside class="panel" aria-labelledby="form-title">
+        <h2 id="form-title">Log a new route</h2>
+        <form id="new-route" class="route-form">
+          <label for="route-name">Route name</label>
+          <input id="route-name" name="name" autocomplete="off" required />
+
+          <label for="route-grade">Grade</label>
+          <select id="route-grade" name="grade">
+                <option>V0</option>
+                <option>V1</option>
+                <option>V2</option>
+                <option>V3</option>
+                <option>V4</option>
+                <option>V5</option>
+                <option>V6</option>
+                <option>V7</option>
+                <option>V8</option>
+                <option>V9</option>
+                <option>V10</option>
+          </select>
+
+          <label for="route-colour">Hold colour</label>
+          <select id="route-colour" name="colour">
+                <option>Red</option>
+                <option>Orange</option>
+                <option>Yellow</option>
+                <option>Green</option>
+                <option>Blue</option>
+                <option>Purple</option>
+                <option>Pink</option>
+                <option>Black</option>
+                <option>White</option>
+          </select>
+
+          <label for="route-setter">Setter</label>
+          <input id="route-setter" name="setter" autocomplete="off" required />
+
+          <p id="form-error" class="form-error" role="alert" hidden></p>
+          <button type="submit">Add route</button>
+        </form>
+      </aside>
+    </main>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

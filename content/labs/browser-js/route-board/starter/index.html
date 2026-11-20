@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gritstone Climbing route board</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <div>
+        <p class="gym">Gritstone Climbing</p>
+        <h1>Route board</h1>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="board" aria-labelledby="board-title">
+        <div class="board-head">
+          <h2 id="board-title">On the walls</h2>
+        </div>
+
+        <!-- Typed by hand. Out of date the day after every reset. -->
+        <ul id="route-list" class="route-list">
+          <li class="route">
+            <span class="grade">V0</span>
+            <div class="route-body">
+              <span class="route-name">Morning Chalk</span>
+              <span class="route-meta"
+                ><span class="swatch" data-colour="Yellow"></span>Yellow holds, set by Hollis</span
+              >
+            </div>
+          </li>
+          <li class="route">
+            <span class="grade">V2</span>
+            <div class="route-body">
+              <span class="route-name">Slab Happy</span>
+              <span class="route-meta"
+                ><span class="swatch" data-colour="Green"></span>Green holds, set by Wren</span
+              >
+            </div>
+          </li>
+          <li class="route">
+            <span class="grade">V4</span>
+            <div class="route-body">
+              <span class="route-name">The Long Reach</span>
+              <span class="route-meta"
+                ><span class="swatch" data-colour="Blue"></span>Blue holds, set by Hollis</span
+              >
+            </div>
+          </li>
+          <li class="route">
+            <span class="grade">V5</span>
+            <div class="route-body">
+              <span class="route-name">Sloper Season</span>
+              <span class="route-meta"
+                ><span class="swatch" data-colour="Red"></span>Red holds, set by Saskia</span
+              >
+            </div>
+          </li>
+        </ul>
+        <p id="board-empty" class="empty" hidden>No routes on the walls yet.</p>
+      </section>
+    </main>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

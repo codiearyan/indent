@@ -1,0 +1,65 @@
+{
+  "id": "board-remembers",
+  "title": "The board forgets everything overnight",
+  "preview": "index.html",
+  "files": ["src/routes.js", "src/main.js", "src/store.js", "data/routes.json", "index.html"],
+  "terminal": {
+    "description": "The route board runs in the Browser panel and reloads every time you save. This shell is in your workspace if you want to look around, for example at data/routes.json."
+  },
+  "tasks": [
+    {
+      "id": "load-routes",
+      "title": "Load the routes from the file",
+      "file": "src/routes.js",
+      "description": "The office now writes the real route list to `data/routes.json` every night. Load the board from it:\n\n- fetch `data/routes.json` with a path relative to the page and read the JSON\n- before you fetch, show the `<p id=\"board-status\">` line (it starts hidden) with a sentence that says the routes are loading, for example `Loading routes...`\n- once the routes arrive, hide `#board-status`, draw the board and the count\n\nThe old array in `src/routes.js` should no longer be used. A good shape is an `async` function in `src/routes.js` that returns the routes, called from `src/main.js`. Search, ticks and the form keep working with the loaded routes.",
+      "nextSteps": [
+        "Open `data/routes.json` and compare it with the old array.",
+        "Write an async function in `src/routes.js` that fetches the file and returns the parsed routes.",
+        "In `main.js`, keep the routes in a variable that starts empty and fill it once they arrive.",
+        "Show the loading line first, then hide it and call `render()` after the routes are in."
+      ],
+      "hints": [
+        "The board cannot be drawn at load time any more, because the routes are not there yet. Drawing has to wait for them.",
+        "`fetch` gives a response, and `await response.json()` gives the data. Both need `await` inside an `async` function.",
+        "`routes` in `main.js` has to change once the data arrives, so it can no longer be an import. Use `let routes = []` and assign the loaded array to it before rendering."
+      ],
+      "points": 10
+    },
+    {
+      "id": "load-failure",
+      "title": "Say when the routes cannot load",
+      "file": "src/main.js",
+      "description": "Sometimes the file is missing or the network is down. Then `#board-status` stays visible with a line that contains `Could not load` (any letter case), for example `Could not load the routes. Check the connection and reload the page.`\n\nThis covers two cases the check tries:\n\n- the server answers with an error status such as 500\n- `fetch` itself fails\n\nNo error should escape to the console in either case.",
+      "nextSteps": [
+        "Rename `data/routes.json` for a moment and look at the board. Put the name back after.",
+        "Check `response.ok` after the fetch and throw when it is false.",
+        "Wrap the loading in `try` and `catch` in `main.js`.",
+        "In the `catch`, put the failure sentence in `#board-status`."
+      ],
+      "hints": [
+        "`fetch` only rejects when no answer came back at all. A 404 or 500 is still an answer.",
+        "Throwing your own error for a bad status lets one `catch` handle both cases.",
+        "In the `catch`, change the text of the line that already says loading. Leave it visible and skip drawing the board."
+      ],
+      "points": 10
+    },
+    {
+      "id": "remember-ticks",
+      "title": "Remember ticks overnight",
+      "file": "src/store.js",
+      "description": "Write `loadTicks()` and `saveTicks(ticked)` in `src/store.js`, and use them in `src/main.js`.\n\n- the ticked route ids are saved in `localStorage` under the key `gritstone-ticks`, as a JSON array of ids\n- they are saved after every tick and every untick\n- on load the saved ids come back, so those routes show ticked\n- the count only counts routes that are on the board, even if the save holds old ids\n- when the saved value is missing or is not valid JSON, the board loads with nothing ticked",
+      "nextSteps": [
+        "Tick a route, reload the Browser panel and see the tick disappear.",
+        "In `saveTicks`, turn the set into an array and save it as JSON.",
+        "In `loadTicks`, read the key, parse it and turn it back into a `Set`.",
+        "Use both in `main.js`: load once at the start, save in the tick handler."
+      ],
+      "hints": [
+        "`localStorage` only stores strings. A `Set` needs to become an array and then JSON on the way in, and go the other way on the way out.",
+        "`JSON.parse` throws on text that is not JSON, and `getItem` gives `null` for a key that was never saved.",
+        "`[...ticked]` makes an array from a set and `new Set(array)` goes back. Wrap the parse in `try` and return an empty set from the `catch`."
+      ],
+      "points": 10
+    }
+  ]
+}
