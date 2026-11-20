@@ -1,7 +1,9 @@
 ---
+import ChevronDown from '@lucide/astro/icons/chevron-down'
 import Download from '@lucide/astro/icons/download'
-import { DOWNLOADS, REPO_URL, VERSION } from '../lib/downloads'
+import { DOWNLOADS, RELEASES_URL, REPO_URL, VERSION } from '../lib/downloads'
 import CodeTexture from './CodeTexture.astro'
+import OsIcons from './OsIcons.astro'
 import Shot from './Shot.astro'
 import workspace from '../assets/screens/workspace.png'
 
@@ -12,7 +14,10 @@ interface Props {
 }
 
 const { repos, issues, tasks } = Astro.props
+const SYSTEMS = ['mac', 'windows', 'linux'] as const
 ---
+
+<OsIcons />
 
 <section id="top" aria-labelledby="hero-title" class="relative pt-36 sm:pt-44">
   <CodeTexture />
@@ -38,14 +43,71 @@ const { repos, issues, tasks } = Astro.props
       write the code in a real editor, run it in a real terminal, and press Check.
     </p>
     <div class="mt-10 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
-      <a
-        href={DOWNLOADS[0].href}
-        data-download-main
-        class="inline-flex h-13 w-full items-center justify-center gap-2.5 rounded-full bg-primary px-7 text-[16px] font-medium text-primary-foreground transition-opacity hover:opacity-90 sm:w-auto"
-      >
-        <Download class="size-4" stroke-width={2} aria-hidden="true" />
-        <span data-download-label>{DOWNLOADS[0].button}</span>
-      </a>
+      <div class="relative flex h-13 w-full sm:w-auto">
+        <a
+          href={DOWNLOADS[0].href}
+          data-download-main
+          class="inline-flex h-full flex-1 items-center justify-center gap-2.5 rounded-l-full bg-primary pr-5 pl-7 text-[16px] font-medium text-primary-foreground transition-opacity hover:opacity-90"
+        >
+          {
+            SYSTEMS.map((os) => (
+              <span data-download-icon={os} hidden={os !== DOWNLOADS[0].os}>
+                <svg class="size-[18px]" fill="currentColor" aria-hidden="true">
+                  <use href={`#os-${os}`} />
+                </svg>
+              </span>
+            ))
+          }
+          <span data-download-icon="none" hidden>
+            <Download class="size-4" stroke-width={2} aria-hidden="true" />
+          </span>
+          <span data-download-label>{DOWNLOADS[0].button}</span>
+        </a>
+        <details class="group h-full" data-download-menu>
+          <summary
+            aria-label="All downloads"
+            class="flex h-full w-12 cursor-pointer list-none items-center justify-center rounded-r-full border-l border-primary-foreground/25 bg-primary text-primary-foreground transition-opacity hover:opacity-90 [&::-webkit-details-marker]:hidden"
+          >
+            <ChevronDown
+              class="size-4 transition-transform group-open:rotate-180"
+              stroke-width={2}
+              aria-hidden="true"
+            />
+          </summary>
+          <ul
+            class="absolute top-full left-0 z-20 mt-2 w-full rounded-2xl border border-border bg-popover p-1.5 text-left shadow-2xl sm:w-[330px]"
+          >
+            {
+              DOWNLOADS.map((download) => (
+                <li>
+                  <a
+                    href={download.href}
+                    data-download-id={download.id}
+                    data-download-os={download.os}
+                    data-download-button={download.button}
+                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] hover:bg-accent"
+                  >
+                    <svg class="size-[18px] shrink-0" fill="currentColor" aria-hidden="true">
+                      <use href={`#os-${download.os}`} />
+                    </svg>
+                    <span class="font-medium">{download.name}</span>
+                    <span class="ml-auto text-[14px] text-muted-foreground">{download.detail}</span>
+                  </a>
+                </li>
+              ))
+            }
+            <li class="mt-1.5 border-t border-border pt-1.5">
+              <a
+                href={RELEASES_URL}
+                class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] hover:bg-accent"
+              >
+                <span class="w-[18px]"></span>
+                <span class="font-medium">All downloads</span>
+              </a>
+            </li>
+          </ul>
+        </details>
+      </div>
       <a
         href={REPO_URL}
         class="inline-flex h-13 w-full items-center justify-center gap-2.5 rounded-full border border-input px-7 text-[16px] font-medium transition-colors hover:bg-accent sm:w-auto"
@@ -55,28 +117,10 @@ const { repos, issues, tasks } = Astro.props
             d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
           ></path>
         </svg>
-        View on GitHub
+        Star on GitHub
       </a>
     </div>
-    <ul
-      class="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[14px] text-muted-foreground"
-      aria-label="Other downloads"
-    >
-      <li data-download-also>Also for</li>
-      {
-        DOWNLOADS.map((download, i) => (
-          <li hidden={i === 0} data-download-id={download.id} data-download-button={download.button}>
-            <a
-              href={download.href}
-              class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
-            >
-              {download.label}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-    <p class="mt-5 text-[14px] text-muted-foreground tabular-nums">
+    <p class="mt-7 text-[14px] text-muted-foreground tabular-nums">
       <span class="text-foreground">{repos}</span> repos,{' '}
       <span class="text-foreground">{issues}</span> issues,{' '}
       <span class="text-foreground">{tasks}</span> tasks. All of it on your disk.
@@ -117,7 +161,7 @@ const { repos, issues, tasks } = Astro.props
 
 <script>
   // The page is built with the Apple Silicon download in the main button. This swaps in the
-  // download for the visitor's own system and lists the other three next to it.
+  // download for the visitor's own system; the menu beside it always lists every download.
   type Id = 'mac-arm64' | 'mac-x64' | 'windows' | 'linux'
 
   async function detect(): Promise<Id | null> {
@@ -147,25 +191,41 @@ const { repos, issues, tasks } = Astro.props
 
   const main = document.querySelector<HTMLAnchorElement>('[data-download-main]')
   const label = document.querySelector<HTMLElement>('[data-download-label]')
-  const others = [...document.querySelectorAll<HTMLElement>('[data-download-id]')]
+  const menu = document.querySelector<HTMLDetailsElement>('[data-download-menu]')
+
+  function show(icon: string): void {
+    for (const el of document.querySelectorAll<HTMLElement>('[data-download-icon]')) {
+      el.toggleAttribute('hidden', el.dataset.downloadIcon !== icon)
+    }
+  }
 
   void detect().then((id) => {
     if (!main || !label) return
-    if (!id) {
+    const mine = id && menu?.querySelector<HTMLAnchorElement>(`[data-download-id="${id}"]`)
+    if (!mine) {
       // A phone or a system with no build: point at the list of downloads instead.
       main.href = '#run'
       label.textContent = 'Get Indent'
-      for (const item of others) item.hidden = false
-      document.querySelector('[data-download-also]')?.replaceChildren('Downloads for')
+      show('none')
       return
     }
-    for (const item of others) {
-      const mine = item.dataset.downloadId === id
-      item.hidden = mine
-      if (mine) {
-        main.href = item.querySelector('a')!.href
-        label.textContent = item.dataset.downloadButton ?? label.textContent
-      }
-    }
+    main.href = mine.href
+    label.textContent = mine.dataset.downloadButton ?? label.textContent
+    show(mine.dataset.downloadOs ?? 'none')
   })
+
+  if (menu) {
+    const close = (): void => void (menu.open = false)
+    document.addEventListener('click', (event) => {
+      const target = event.target as Node
+      // Outside the menu, or on one of its links: either way the menu is done.
+      if (!menu.contains(target) || (target as HTMLElement).closest?.('a')) close()
+    })
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && menu.open) {
+        close()
+        menu.querySelector('summary')?.focus()
+      }
+    })
+  }
 </script>
