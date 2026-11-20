@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-import { CalendarDays, FolderGit2, House, Moon, Route, Sun, Workflow } from 'lucide-react'
+import { Bug, CalendarDays, FolderGit2, House, Moon, Route, Sun, Workflow } from 'lucide-react'
 import { toast } from 'sonner'
 import { levelFor } from '@shared/rules'
 import { APP_NAME, BrandMark } from '@/components/app/Brand'
 import { cn } from '@/lib/utils'
+import { viewTransition } from '@/lib/viewTransition'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
@@ -60,7 +61,10 @@ export function AppShell(): React.JSX.Element {
         </nav>
         <div className="mt-auto space-y-3">
           <LevelMeter />
-          <ThemeRow />
+          <div className="flex flex-col gap-0.5">
+            <ThemeRow />
+            {import.meta.env.DEV && <SetupRow />}
+          </div>
         </div>
       </aside>
       <main className="my-2 mr-2 min-w-0 flex-1 overflow-auto rounded-2xl border border-border bg-card">
@@ -110,6 +114,22 @@ function ThemeRow(): React.JSX.Element {
     >
       <Icon className="size-4" strokeWidth={1.5} />
       {theme === 'dark' ? 'Light theme' : 'Dark theme'}
+    </button>
+  )
+}
+
+/** Development only: opens the first-run setup again without clearing any saved data. */
+function SetupRow(): React.JSX.Element {
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        viewTransition('onboarding-finish', () => useSettings.getState().setOnboarded(false))
+      }
+      className={cn(row, 'w-full text-muted-foreground hover:text-foreground')}
+    >
+      <Bug className="size-4" strokeWidth={1.5} />
+      Run setup again
     </button>
   )
 }
