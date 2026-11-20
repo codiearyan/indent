@@ -1,5 +1,8 @@
 // Hex mirror of the design tokens for libraries that cannot read CSS variables
 // (Monaco themes, xterm themes). Keep in step with tokens.css.
+//
+// Code follows the app: neutral text in three steps of lightness, and the one hue. Keywords
+// take the brand orange, strings a quieter tint of it, numbers the gold. No blues or greens.
 export interface CodePalette {
   background: string
   foreground: string
@@ -30,19 +33,19 @@ export interface CodePalette {
 export const codePalette: Record<'dark' | 'light', CodePalette> = {
   dark: {
     background: '#111112',
-    foreground: '#e8ebe9',
+    foreground: '#e8e8eb',
     muted: '#a1a1a6',
     border: '#262628',
     selection: '#3d2418',
     lineHighlight: '#19191b',
     cursor: '#ea6030',
     comment: '#7c7c85',
-    keyword: '#79b8ff',
-    string: '#e6b673',
-    number: '#b5d68a',
-    type: '#5fd0c0',
-    function: '#d8c88a',
-    variable: '#e8ebe9',
+    keyword: '#ea6030',
+    string: '#e8b796',
+    number: '#e5c14b',
+    type: '#fafafa',
+    function: '#fafafa',
+    variable: '#d2d2d7',
     ansi: {
       black: '#262628',
       red: '#f0556a',
@@ -63,12 +66,12 @@ export const codePalette: Record<'dark' | 'light', CodePalette> = {
     lineHighlight: '#f4f4f5',
     cursor: '#111113',
     comment: '#6b6b75',
-    keyword: '#1f5fbf',
-    string: '#9a4a12',
-    number: '#1b7a4c',
-    type: '#0f7480',
-    function: '#6f5600',
-    variable: '#111113',
+    keyword: '#b8431c',
+    string: '#7d4a2a',
+    number: '#8a6400',
+    type: '#111113',
+    function: '#111113',
+    variable: '#3a3a40',
     ansi: {
       black: '#111113',
       red: '#c4242a',

@@ -46,15 +46,30 @@ function hex(color: string): string {
 function defineTheme(name: string, base: 'vs' | 'vs-dark', p: CodePalette): void {
   monaco.editor.defineTheme(name, {
     base,
-    inherit: true,
+    // Nothing is inherited, so no colour of the base theme shows up in any language.
+    inherit: false,
     rules: [
       { token: '', foreground: hex(p.foreground) },
       { token: 'comment', foreground: hex(p.comment), fontStyle: 'italic' },
+      { token: 'metatag', foreground: hex(p.comment) },
+      { token: 'delimiter.html', foreground: hex(p.muted) },
+      { token: 'delimiter.xml', foreground: hex(p.muted) },
       { token: 'keyword', foreground: hex(p.keyword) },
+      { token: 'tag', foreground: hex(p.keyword) },
       { token: 'string', foreground: hex(p.string) },
+      { token: 'attribute.value', foreground: hex(p.string) },
+      { token: 'regexp', foreground: hex(p.string) },
       { token: 'number', foreground: hex(p.number) },
+      { token: 'attribute.value.number', foreground: hex(p.number) },
+      { token: 'attribute.value.unit', foreground: hex(p.number) },
+      { token: 'attribute.value.hex', foreground: hex(p.number) },
+      { token: 'constant', foreground: hex(p.number) },
       { token: 'type', foreground: hex(p.type) },
+      { token: 'variable', foreground: hex(p.type) },
+      { token: 'attribute.name', foreground: hex(p.type) },
+      { token: 'string.key', foreground: hex(p.type) },
       { token: 'function', foreground: hex(p.function) },
+      { token: 'predefined', foreground: hex(p.function) },
       { token: 'identifier', foreground: hex(p.variable) }
     ],
     colors: {
@@ -69,6 +84,10 @@ function defineTheme(name: string, base: 'vs' | 'vs-dark', p: CodePalette): void
       'editorIndentGuide.background1': p.border,
       'editorWidget.border': p.border,
       'editorGutter.background': p.background,
+      // Monaco colours bracket pairs gold, pink and blue by default.
+      ...Object.fromEntries(
+        [1, 2, 3, 4, 5, 6].map((n) => [`editorBracketHighlight.foreground${n}`, p.foreground])
+      ),
       'scrollbar.shadow': '#00000000',
       'scrollbarSlider.background': p.muted + '33',
       'scrollbarSlider.hoverBackground': p.muted + '59',
