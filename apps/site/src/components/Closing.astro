@@ -50,9 +50,14 @@ const requirements = [
           {
             DOWNLOADS.map((download) => (
               <li class="flex items-center justify-between gap-4 border-b border-rule py-4 first:pt-0">
-                <div>
-                  <p class="text-[16px] font-medium">{download.label}</p>
-                  <p class="mt-0.5 text-[14px] text-muted-foreground">{download.note}</p>
+                <div class="flex items-center gap-4">
+                  <svg class="size-5 shrink-0 text-muted-foreground" fill="currentColor" aria-hidden="true">
+                    <use href={`#os-${download.os}`} />
+                  </svg>
+                  <div>
+                    <p class="text-[16px] font-medium">{download.label}</p>
+                    <p class="mt-0.5 text-[14px] text-muted-foreground">{download.note}</p>
+                  </div>
                 </div>
                 <a
                   href={download.href}
