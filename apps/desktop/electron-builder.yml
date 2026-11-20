@@ -14,25 +14,23 @@ asarUnpack:
   - node_modules/node-pty/**
 win:
   executableName: indent
+# Installer names carry no version, so the newest one always has the same download address.
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: Indent-windows-${arch}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 mac:
+  target: dmg
   entitlementsInherit: build/entitlements.mac.plist
   notarize: false
 dmg:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: Indent-mac-${arch}.${ext}
 linux:
-  target:
-    - AppImage
-    - snap
-    - deb
-  maintainer: electronjs.org
-  category: Utility
+  target: AppImage
+  category: Education
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: Indent-linux-${arch}.${ext}
 npmRebuild: false
 extraResources:
   - from: ../../content
