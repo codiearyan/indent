@@ -27,6 +27,8 @@ mac:
 dmg:
   artifactName: Indent-mac-${arch}.${ext}
 linux:
+  # Without this the name comes from the package name, whose "@" and "/" Linux does not allow.
+  executableName: indent
   target: AppImage
   category: Education
 appImage:
