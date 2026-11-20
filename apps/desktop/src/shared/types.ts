@@ -85,6 +85,8 @@ export interface WorkspaceSnapshot {
   /** Absolute folder on disk; the terminal opens here. */
   dir: string
   files: WorkspaceFile[]
+  /** The issue's starter files by path, to tell which files the learner has changed. */
+  starter: Record<string, string>
 }
 
 // ---------- Checks ----------

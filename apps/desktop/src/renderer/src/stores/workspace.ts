@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Chapter, CheckResult, WorkspaceFile } from '@shared/types'
+import type { Chapter, CheckResult, WorkspaceFile, WorkspaceSnapshot } from '@shared/types'
 import { api } from '@/lib/api'
 import { useProgress } from './progress'
 import { useSettings } from './settings'
@@ -13,6 +13,8 @@ interface WorkspaceStore {
   /** Absolute workspace folder on disk. */
   dir: string
   files: WorkspaceFile[]
+  /** Starter content by path; a file that differs from it, or has none, counts as edited. */
+  starter: Record<string, string>
   activePath: string | null
   /** Counts writes to disk, so the Browser panel knows when to reload. */
   revision: number
@@ -54,12 +56,13 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       .then(() => set((s) => ({ revision: s.revision + 1 })))
   }
 
-  const applySnapshot = (files: WorkspaceFile[], dir: string): void => {
+  const applySnapshot = ({ files, dir, starter }: WorkspaceSnapshot): void => {
     const { activePath, chapter } = get()
     const stillThere = files.some((f) => f.path === activePath)
     set({
       files,
       dir,
+      starter,
       activePath: stillThere ? activePath : (chapter?.files[0] ?? files[0]?.path ?? null)
     })
   }
@@ -70,6 +73,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     chapter: null,
     dir: '',
     files: [],
+    starter: {},
     activePath: null,
     revision: 0,
     checking: null,
@@ -77,7 +81,14 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
 
     open: async (labId, chapterId) => {
       await get().flush()
-      set({ status: 'loading', error: null, chapter: null, files: [], activePath: null })
+      set({
+        status: 'loading',
+        error: null,
+        chapter: null,
+        files: [],
+        starter: {},
+        activePath: null
+      })
       try {
         const [chapter, snapshot, progress] = await Promise.all([
           api.content.getChapter(labId, chapterId),
@@ -86,7 +97,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         ])
         useProgress.getState().set(progress)
         set({ chapter, status: 'ready' })
-        applySnapshot(snapshot.files, snapshot.dir)
+        applySnapshot(snapshot)
       } catch (error) {
         set({ status: 'error', error: error instanceof Error ? error.message : String(error) })
       }
@@ -110,14 +121,14 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     refresh: async () => {
       if (!get().chapter || pendingSaves.size > 0) return
       const snapshot = await api.workspace.open(...ids())
-      if (pendingSaves.size === 0) applySnapshot(snapshot.files, snapshot.dir)
+      if (pendingSaves.size === 0) applySnapshot(snapshot)
     },
 
     reset: async () => {
       for (const timer of pendingSaves.values()) clearTimeout(timer)
       pendingSaves.clear()
       const snapshot = await api.workspace.reset(...ids())
-      applySnapshot(snapshot.files, snapshot.dir)
+      applySnapshot(snapshot)
       set((s) => ({ revision: s.revision + 1 }))
     },
 
