@@ -198,6 +198,10 @@ gives the CSS that applies to an element at a viewport width (cascade, inheritan
 width media queries, shorthands expanded); it knows nothing about layout, so checks ask what was
 declared, not where a box ended up. Options: `t.page(file, { dir, fetch, storage, width })`.
 
+Node comes from the learner's PATH. When it is missing or older than 22.18, Settings (Tools) can
+download a copy into `<userData>/tools/node`; `labEnv()` puts that copy first on the PATH, so the
+checks, the terminal and the runtime install all use it. `services/tools.ts` owns this.
+
 Grader CLI, run by the main process with system Node and `labEnv()`:
 
 ```

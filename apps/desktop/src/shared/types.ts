@@ -116,6 +116,20 @@ export interface RuntimeStatus {
   error?: string
 }
 
+/** Something the repos need on this computer, such as Node. */
+export interface ToolStatus {
+  id: 'node' | 'git'
+  label: string
+  /** The version found, or null when the tool is missing. */
+  version: string | null
+  /** Found, and new enough for the repos. */
+  ok: boolean
+  /** What it is for and what is wrong, in plain words. */
+  note: string
+  /** The app can download its own copy. */
+  installable: boolean
+}
+
 // ---------- Progress ----------
 
 export interface TaskProgress {
@@ -256,6 +270,11 @@ export interface Api {
     onData(listener: (id: string, data: string) => void): Unsubscribe
     onExit(listener: (id: string, exitCode: number) => void): Unsubscribe
   }
+  tools: {
+    status(): Promise<ToolStatus[]>
+    /** Downloads Node into the app's own folder. Other programs do not see it. */
+    installNode(): Promise<ToolStatus[]>
+  }
   ai: {
     getConfig(): Promise<AiConfig>
     setConfig(patch: AiSettingsPatch): Promise<AiConfig>
@@ -279,6 +298,7 @@ export const INVOKE_METHODS = {
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],
+  tools: ['status', 'installNode'],
   ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test']
 } as const
 

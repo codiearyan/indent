@@ -1,5 +1,8 @@
 import { execFile } from 'child_process'
+import { existsSync } from 'fs'
+import { delimiter } from 'path'
 import { promisify } from 'util'
+import { ownNodeBin } from './paths'
 
 const run = promisify(execFile)
 
@@ -32,7 +35,10 @@ export async function shellEnv(): Promise<Record<string, string>> {
   for (const [key, value] of Object.entries(process.env)) {
     if (value !== undefined && !key.startsWith('ELECTRON_')) env[key] = value
   }
-  env.PATH = await shellPath
+  // The app's own Node goes first: it is only downloaded when the computer's is missing or old.
+  // shortcut: it keeps winning after the learner installs a newer Node; add a way to remove it then.
+  const own = ownNodeBin()
+  env.PATH = existsSync(own) ? `${own}${delimiter}${await shellPath}` : await shellPath
   return env
 }
 

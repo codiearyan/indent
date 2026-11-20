@@ -117,3 +117,50 @@ export function LayoutControls({ browser }: { browser: boolean }): React.JSX.Ele
     </>
   )
 }
+
+/** A titled block of one settings section. */
+export function Group({
+  title,
+  action,
+  children
+}: {
+  title: string
+  action?: React.ReactNode
+  children: React.ReactNode
+}): React.JSX.Element {
+  return (
+    <section className="mt-6">
+      <header className="flex h-6 items-center justify-between">
+        <h3 className="text-[13px] font-medium text-muted-foreground">{title}</h3>
+        {action}
+      </header>
+      <div className="mt-2">{children}</div>
+    </section>
+  )
+}
+
+export const card = 'divide-y divide-rule rounded-lg border border-border'
+
+export function Row({
+  id,
+  label,
+  hint,
+  children
+}: {
+  id?: string
+  label: string
+  hint?: string
+  children: React.ReactNode
+}): React.JSX.Element {
+  return (
+    <div className="flex min-h-14 items-center justify-between gap-6 px-4 py-2.5">
+      <div>
+        <label htmlFor={id} className="text-sm">
+          {label}
+        </label>
+        {hint && <p className="text-[13px] text-muted-foreground">{hint}</p>}
+      </div>
+      {children}
+    </div>
+  )
+}
