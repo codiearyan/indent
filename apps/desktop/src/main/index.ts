@@ -10,6 +10,7 @@ import * as progress from './services/progress'
 import * as terminal from './services/terminal'
 import * as ai from './services/ai'
 import * as preview from './services/preview'
+import * as tools from './services/tools'
 
 // Has to happen before the app is ready.
 preview.registerScheme()
@@ -87,7 +88,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window, { zoom: true })
   })
 
-  for (const service of [content, workspace, checks, progress, terminal, ai, preview]) {
+  for (const service of [content, workspace, checks, progress, terminal, ai, preview, tools]) {
     service.register()
   }
 

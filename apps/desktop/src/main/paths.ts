@@ -13,6 +13,20 @@ export function workspacesRoot(): string {
   return join(app.getPath('userData'), 'workspaces')
 }
 
+/** Tools the app downloaded for itself. Nothing outside the app looks here. */
+export function toolsDir(): string {
+  return join(app.getPath('userData'), 'tools')
+}
+
+/** Where the app's own copy of Node goes, and the folder inside it that holds `node`. */
+export function ownNodeDir(): string {
+  return join(toolsDir(), 'node')
+}
+
+export function ownNodeBin(): string {
+  return process.platform === 'win32' ? ownNodeDir() : join(ownNodeDir(), 'bin')
+}
+
 export function dataFile(name: string): string {
   return join(app.getPath('userData'), name)
 }
