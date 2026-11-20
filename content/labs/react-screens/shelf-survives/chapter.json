@@ -1,0 +1,71 @@
+{
+  "id": "shelf-survives",
+  "title": "The hold shelf empties on refresh",
+  "files": [
+    "src/App.jsx",
+    "src/DetailsPanel.jsx",
+    "src/RecordCard.jsx",
+    "src/StockList.jsx",
+    "src/HoldShelf.jsx"
+  ],
+  "terminal": {
+    "description": "The app runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "read-saved-shelf",
+      "title": "Start from the saved shelf",
+      "file": "src/App.jsx",
+      "description": "When the screen opens, the hold shelf starts with the ids saved in `localStorage` under the key `sidewinder.hold`, a JSON array of record ids such as `[\"sw-104\",\"sw-107\"]`.\n\n- Read the saved value once, when the held state is created: pass `useState` a function that reads it.\n- If nothing is saved, or the saved text is not valid JSON, or it is not an array, start with an empty shelf. The page must not crash.\n\nThe check opens the page with values it saves first and reads the shelf, the count and the buttons.",
+      "nextSteps": [
+        "Write a small function outside `App` that reads and parses the saved value.",
+        "Return an empty array when there is nothing usable.",
+        "Pass that function to the held state's `useState`.",
+        "Hold something, save it by hand in the console with `localStorage.setItem`, and reload."
+      ],
+      "hints": [
+        "`useState(value)` uses the value only on the first render, but the expression is still worked out on every render. A function given to `useState` runs only once.",
+        "`localStorage.getItem` returns a string or `null`, and `JSON.parse` throws on text that is not JSON.",
+        "Wrap the parse in `try` and `catch`, and check the result with `Array.isArray` before you trust it."
+      ],
+      "points": 10
+    },
+    {
+      "id": "save-shelf",
+      "title": "Save it when it changes",
+      "file": "src/App.jsx",
+      "description": "Whenever the held ids change, save them to `localStorage` under `sidewinder.hold` as a JSON array of ids. Do it in a `useEffect` that depends on the held ids, so every hold and every release is saved.\n\nThe check holds and releases records, reads `localStorage`, then opens the page again with what you saved and expects the same shelf.",
+      "nextSteps": [
+        "Import `useEffect` from `react`.",
+        "Add an effect in `App` that writes the held ids with `JSON.stringify`.",
+        "Give it a dependency array with the held ids in it.",
+        "Hold two records, refresh the Browser panel and look at the shelf."
+      ],
+      "hints": [
+        "Saving is not part of drawing the screen. It is keeping something outside React in step with state, which is what effects are for.",
+        "The dependency array tells React when to run the effect again: after any render where one of those values changed.",
+        "If the shelf empties on refresh even though saving works, check that the first task reads the value before the first save can overwrite it."
+      ],
+      "points": 10
+    },
+    {
+      "id": "escape-closes",
+      "title": "Escape closes the details",
+      "file": "src/App.jsx",
+      "description": "Clicking a record's title opens the details panel (`.details-panel`). Staff want to close it with the Escape key too.\n\n- While the panel is open, a `keydown` listener on `window` (or `document`) closes it when `event.key` is `'Escape'`. Other keys do nothing.\n- Add the listener in a `useEffect`, and return a cleanup function that removes the same listener.\n- The Close button keeps working.\n\nThe check opens and closes the panel several times and counts the `keydown` listeners left attached; at most one may remain.",
+      "nextSteps": [
+        "Add an effect in `App` that depends on which record is open.",
+        "Skip it when nothing is open.",
+        "Define the listener inside the effect and add it with `addEventListener`.",
+        "Return a function that removes that same listener."
+      ],
+      "hints": [
+        "The page's keyboard is outside React, so listening to it is a job for an effect.",
+        "Without a cleanup every opening adds one more listener, and they pile up for as long as the page is open.",
+        "`removeEventListener` only removes the exact function that was added. Keep the listener in a variable inside the effect and use it in both calls."
+      ],
+      "points": 10
+    }
+  ]
+}

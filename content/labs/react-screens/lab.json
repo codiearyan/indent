@@ -1,0 +1,18 @@
+{
+  "id": "react-screens",
+  "title": "React, one screen at a time",
+  "description": "Sidewinder Records sells second-hand vinyl, and its counter tablet runs one screen: the stock, and a hold shelf where staff set records aside for customers. It was written as one long component and most of it does not work yet. As the shop's first developer you fix it one reported problem at a time, and learn components, state, effects and loading data by keeping a real screen working.",
+  "category": "Web and frontend",
+  "language": "react",
+  "tags": ["React"],
+  "parts": [
+    {
+      "title": "A screen made of parts",
+      "chapters": ["stock-list", "hold-shelf", "search-the-stock"]
+    },
+    {
+      "title": "A screen that keeps up with the world",
+      "chapters": ["shelf-survives", "stock-arrives-late"]
+    }
+  ]
+}

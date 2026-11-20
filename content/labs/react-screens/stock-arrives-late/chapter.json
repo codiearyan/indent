@@ -1,0 +1,66 @@
+{
+  "id": "stock-arrives-late",
+  "title": "Stock that arrives late",
+  "files": ["src/App.jsx", "src/useStock.js", "data/stock.json"],
+  "terminal": {
+    "description": "The app runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "load-stock",
+      "title": "Load the stock from the server",
+      "file": "src/App.jsx",
+      "description": "The stock no longer ships inside the code. It lives on the shop's server at `data/stock.json`, and the screen is empty.\n\nLoad it with `fetch('data/stock.json')` inside a `useEffect`, parse the JSON and keep the records in state, so the list, the genres and the hold shelf work again. The request is made once when the screen opens, not after every render.\n\nYou can write this in `App` first; the third task moves it into a hook. The check answers the request itself with a stock your code has never seen and counts the requests.",
+      "nextSteps": [
+        "Add a state for the records, starting as an empty array.",
+        "Add an effect with an empty dependency array.",
+        "Inside it, fetch `data/stock.json`, read `response.json()`, and set the records.",
+        "Use the records wherever `stock` was used."
+      ],
+      "hints": [
+        "Talking to a server is something that happens outside React, so it belongs in an effect, not in the body of the component.",
+        "Setting state during render starts another render, which would fetch again, and again.",
+        "`fetch` returns a promise of a response, and `response.json()` returns another promise. Chain them with `then`, or use an `async` function inside the effect."
+      ],
+      "points": 10
+    },
+    {
+      "id": "loading-and-failure",
+      "title": "Say what is happening",
+      "file": "src/App.jsx",
+      "description": "The tablet's network is slow and sometimes gone. Track the request's status (`'loading'`, `'ready'` or `'failed'`) and show it:\n\n- While loading: a `<p className=\"status-line\">` that says `Loading the stock...`\n- On failure: a `<p className=\"status-line\">` that says `The stock could not be loaded.` with a `<button>` reading `Try again` that asks the server again.\n- Once ready: no status line, just the list.\n\nA failure is a request that throws, and also an answer whose `response.ok` is false (for example status 500); `fetch` does not throw for that on its own. The check answers slowly, with status 500, and not at all, and then clicks Try again.",
+      "nextSteps": [
+        "Add a state for the status, starting at `'loading'`.",
+        "Set it to `'ready'` after the records arrive and `'failed'` in a `catch`.",
+        "Throw when `response.ok` is false.",
+        "Render the status line for loading and failure, and the list only when ready.",
+        "Make Try again start the request again."
+      ],
+      "hints": [
+        "One status value is easier to keep right than separate true or false flags that can disagree.",
+        "An effect runs again when a value in its dependency array changes. A counter in state that Try again increases is a simple way to ask for another run.",
+        "Set the status back to `'loading'` at the start of every attempt, and remember that a 500 answer reaches your `then`, not your `catch`, unless you throw."
+      ],
+      "points": 10
+    },
+    {
+      "id": "use-stock-hook",
+      "title": "Move it into a hook",
+      "file": "src/useStock.js",
+      "description": "`App` now mixes drawing the screen with talking to the server. Move the loading into the custom hook `useStock` in `src/useStock.js` (keep the named export).\n\n`useStock()` takes no arguments and returns `{ records, status, retry }`:\n\n- `records`: the stock, an empty array until it arrives\n- `status`: `'loading'`, `'ready'` or `'failed'`\n- `retry`: a function that asks the server again\n\n`App` calls `useStock()` and no longer calls `fetch` itself. The check calls `useStock()` from a component of its own, with a slow and a failing server.",
+      "nextSteps": [
+        "Move the records state, the status state and the effect into `useStock`.",
+        "Return the three values as one object.",
+        "In `App`, replace them with one call to `useStock()`.",
+        "Check the Browser panel still loads the stock."
+      ],
+      "hints": [
+        "A custom hook is a plain function whose name starts with `use` and that calls other hooks. Each component that calls it gets its own state.",
+        "Nothing about the code has to change on the way into the hook; it moves, and `App` reads the results.",
+        "Destructuring with a new name keeps the rest of `App` as it was: `const { records: stock, status, retry } = useStock()`."
+      ],
+      "points": 10
+    }
+  ]
+}
