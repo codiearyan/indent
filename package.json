@@ -3,6 +3,7 @@
   "private": true,
   "description": "A local-first desktop app for hands-on coding labs",
   "author": "Aryan Bhati",
+  "license": "MIT",
   "scripts": {
     "dev": "pnpm --filter @indent/desktop dev",
     "dev:site": "pnpm --filter @indent/site dev",
