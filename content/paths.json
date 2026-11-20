@@ -79,6 +79,39 @@
     ]
   },
   {
+    "id": "web-frontend",
+    "title": "Frontend from the page up",
+    "tagline": "A page people can use, the code that makes it move, then components",
+    "description": "Start with a page that is well built and looks right on any screen, learn the language behind it, make the page respond in plain JavaScript, and finish by building a screen out of React components.",
+    "stages": [
+      {
+        "title": "The page",
+        "labs": [
+          "web-pages"
+        ]
+      },
+      {
+        "title": "The language",
+        "labs": [
+          "js-foundations",
+          "async-js"
+        ]
+      },
+      {
+        "title": "Pages that respond",
+        "labs": [
+          "browser-js"
+        ]
+      },
+      {
+        "title": "Components",
+        "labs": [
+          "react-screens"
+        ]
+      }
+    ]
+  },
+  {
     "id": "interview-prep",
     "title": "Interview prep",
     "tagline": "The language questions and the bug stories interviewers ask for",
