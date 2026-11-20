@@ -78,7 +78,7 @@ export function HowItWorks({ staged }: { staged: boolean }): React.JSX.Element {
               key={p.id}
               value={p.id}
               className={cn(
-                'relative h-auto w-full flex-col items-start gap-0.5 overflow-hidden rounded-md border-0 px-3 py-2.5 text-left font-normal whitespace-normal',
+                'relative h-auto w-full flex-col items-start gap-0.5 overflow-hidden rounded-md border-0 px-3 py-2 text-left font-normal whitespace-normal',
                 'transition-none hover:bg-accent/60 data-[state=active]:bg-accent! data-[state=active]:shadow-none! dark:data-[state=active]:border-transparent'
               )}
             >
@@ -88,7 +88,7 @@ export function HowItWorks({ staged }: { staged: boolean }): React.JSX.Element {
                 <span
                   key={point}
                   aria-hidden
-                  className="ob-dwell absolute inset-x-3 bottom-1 h-px origin-left bg-foreground/25"
+                  className="ob-dwell absolute inset-x-3 bottom-0.5 h-px origin-left bg-foreground/25"
                   style={{ animationDuration: `${DWELL_MS}ms` }}
                 />
               )}
@@ -99,7 +99,7 @@ export function HowItWorks({ staged }: { staged: boolean }): React.JSX.Element {
           <TabsContent
             key={p.id}
             value={p.id}
-            className="ob-scene relative flex min-h-[340px] items-center justify-center overflow-hidden rounded-lg border border-border p-8"
+            className="ob-scene relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-lg border border-border p-6"
           >
             <p.scene />
           </TabsContent>

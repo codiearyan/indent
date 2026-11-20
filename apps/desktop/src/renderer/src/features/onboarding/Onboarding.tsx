@@ -112,9 +112,10 @@ export function Onboarding(): React.JSX.Element {
       </header>
 
       <main className="mx-2 mb-2 flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card">
+        {/* Every step fits the smallest window. Scrolling stays as a way out, without a bar. */}
         <div
           ref={stepRef}
-          className="flex min-h-0 flex-1 flex-col overflow-y-auto px-12 py-10"
+          className="flex min-h-0 flex-1 flex-col overflow-y-auto px-12 py-6 [scrollbar-width:none]"
           style={{ viewTransitionName: 'onboarding-step' }}
         >
           <div key={step} className="ob-view my-auto w-full">
