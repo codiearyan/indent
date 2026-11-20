@@ -39,7 +39,7 @@ export function StepLayout({
         </p>
       )}
       {children && (
-        <div className={cn('mt-8', stage(2).className)} style={stage(2).style}>
+        <div className={cn('mt-6', stage(2).className)} style={stage(2).style}>
           {children}
         </div>
       )}

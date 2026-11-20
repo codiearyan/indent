@@ -72,7 +72,10 @@ export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
               <span className="text-[13px] text-muted-foreground">Model</span>
               <ModelSelect className="h-8" />
             </div>
-            <TestConnection key={`${active.id}/${config?.model}`} className="pt-[26px]" />
+            <TestConnection
+              key={`${active.id}/${config?.model}`}
+              className="flex-row items-center gap-3 pt-[26px]"
+            />
           </>
         ) : (
           !loading && (

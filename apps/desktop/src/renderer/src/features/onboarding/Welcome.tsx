@@ -7,7 +7,8 @@ import { Figures } from '@/features/catalog/Figures'
 import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
 
-const PLACEHOLDER_ROWS = 12
+/** The list stays this long however many repos there are, so the step never outgrows the window. */
+const SHOWN = 10
 
 export function Welcome({ staged }: { staged: boolean }): React.JSX.Element {
   const labs = useCatalog((s) => s.labs)
@@ -30,7 +31,7 @@ export function Welcome({ staged }: { staged: boolean }): React.JSX.Element {
           data-step-heading
           aria-label={`${APP_NAME}. Learn to code by fixing real problems.`}
           className={cn(
-            'mt-8 text-[40px] leading-[1.08] font-semibold tracking-[-0.03em] text-balance outline-none',
+            'mt-6 text-[40px] leading-[1.08] font-semibold tracking-[-0.03em] text-balance outline-none',
             stage(1).className
           )}
           style={stage(1).style}
@@ -44,7 +45,7 @@ export function Welcome({ staged }: { staged: boolean }): React.JSX.Element {
           Each repo is a small company with a problem, and you are its developer. Read the issue,
           write the code, run it, and press Check.
         </p>
-        <div className={cn('mt-8', stage(3).className)} style={stage(3).style}>
+        <div className={cn('mt-6', stage(3).className)} style={stage(3).style}>
           <Figures
             label={`What is in ${APP_NAME}`}
             figures={[
@@ -70,7 +71,7 @@ export function Welcome({ staged }: { staged: boolean }): React.JSX.Element {
         </header>
         <ul className="grid grid-cols-2">
           {labs
-            ? labs.map((lab, i) => (
+            ? labs.slice(0, SHOWN).map((lab, i) => (
                 <li
                   key={lab.id}
                   className={cn(
@@ -86,7 +87,7 @@ export function Welcome({ staged }: { staged: boolean }): React.JSX.Element {
                   </div>
                 </li>
               ))
-            : Array.from({ length: PLACEHOLDER_ROWS }, (_, i) => (
+            : Array.from({ length: SHOWN }, (_, i) => (
                 <li
                   key={i}
                   className="flex items-center gap-3 border-rule px-5 py-3 odd:border-r [&:nth-last-child(n+3)]:border-b"
@@ -99,6 +100,11 @@ export function Welcome({ staged }: { staged: boolean }): React.JSX.Element {
                 </li>
               ))}
         </ul>
+        {labs && labs.length > SHOWN && (
+          <p className="border-t border-rule px-5 py-3 text-[13px] text-muted-foreground">
+            And {labs.length - SHOWN} more on Home.
+          </p>
+        )}
       </section>
     </div>
   )
