@@ -4,7 +4,13 @@ import TsWorker from 'monaco-editor/language/typescript/ts.worker?worker'
 import JsonWorker from 'monaco-editor/language/json/json.worker?worker'
 import CssWorker from 'monaco-editor/language/css/css.worker?worker'
 import HtmlWorker from 'monaco-editor/language/html/html.worker?worker'
-import { codePalette, type CodePalette } from '@indent/design/code-palette'
+import {
+  CODE_THEMES,
+  codePalette,
+  type CodeMode,
+  type CodePalette,
+  type CodeThemeId
+} from '@indent/design/code-palette'
 import { registerInlineSuggestions } from '@/features/ai/inlineSuggestions'
 
 self.MonacoEnvironment = {
@@ -96,8 +102,12 @@ function defineTheme(name: string, base: 'vs' | 'vs-dark', p: CodePalette): void
   })
 }
 
-defineTheme('indent-dark', 'vs-dark', codePalette.dark)
-defineTheme('indent-light', 'vs', codePalette.light)
+export const themeName = (theme: CodeThemeId, mode: CodeMode): string => `indent-${theme}-${mode}`
+
+for (const { id } of CODE_THEMES) {
+  defineTheme(themeName(id, 'dark'), 'vs-dark', codePalette(id, 'dark'))
+  defineTheme(themeName(id, 'light'), 'vs', codePalette(id, 'light'))
+}
 
 registerInlineSuggestions(monaco)
 

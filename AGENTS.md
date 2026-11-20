@@ -64,7 +64,7 @@ src/renderer/src/
   components/app/        small shared app components (ThemeToggle, LevelBadge, LanguageIcon)
   lib/                   api.ts (typed window.api), utils.ts (cn)
   stores/                zustand: settings (persisted), progress, catalog, workspace
-  features/<name>/       catalog, workspace, editor, terminal, browser, ai, tour, dsa, onboarding
+  features/<name>/       catalog, workspace, editor, terminal, browser, ai, tour, dsa, onboarding, settings
 ```
 
 `src/shared/types.ts` is the contract between content, main and renderer. Read it first. If a
@@ -129,6 +129,10 @@ the chrome is neutral, and the one hue is a calm orange.
 - Text size zones: the lesson content gets `.zone-lesson`, the tasks list `.zone-tasks`; the editor
   and terminal multiply their font size by `useSettings().textScale.editor|terminal`.
 - Both themes must work; dark is the default. Check every view in both.
+- Code has its own themes (`CODE_THEMES` in `packages/design/code-palette.ts`). A code theme only
+  sets the colours of the code, once for dark and once for light; the frame of the editor, the
+  terminal and the Patterns code view always follows the app. Settings are edited in one window,
+  `features/settings/SettingsDialog`, with a section per subject.
 - The window is frameless on macOS: the frame is `.app-drag`; a top bar leaves
   `var(--titlebar-inset)` free on the left and the sidebar starts at `var(--sidebar-top)`.
 - Copy is plain and short. No em dashes. Sentence case.

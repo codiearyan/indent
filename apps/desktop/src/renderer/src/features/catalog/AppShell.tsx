@@ -1,6 +1,16 @@
 import { useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-import { Bug, CalendarDays, FolderGit2, House, Moon, Route, Sun, Workflow } from 'lucide-react'
+import {
+  Bug,
+  CalendarDays,
+  FolderGit2,
+  House,
+  Moon,
+  Route,
+  Settings,
+  Sun,
+  Workflow
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { levelFor } from '@shared/rules'
 import { APP_NAME, BrandMark } from '@/components/app/Brand'
@@ -8,6 +18,7 @@ import { cn } from '@/lib/utils'
 import { viewTransition } from '@/lib/viewTransition'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
+import { useSettingsDialog } from '@/features/settings/dialogStore'
 import { useSettings } from '@/stores/settings'
 
 const NAV = [
@@ -62,6 +73,14 @@ export function AppShell(): React.JSX.Element {
         <div className="mt-auto space-y-3">
           <LevelMeter />
           <div className="flex flex-col gap-0.5">
+            <button
+              type="button"
+              onClick={() => useSettingsDialog.getState().show()}
+              className={cn(row, 'w-full text-muted-foreground hover:text-foreground')}
+            >
+              <Settings className="size-4" strokeWidth={1.5} />
+              Settings
+            </button>
             <ThemeRow />
             {import.meta.env.DEV && <SetupRow />}
           </div>

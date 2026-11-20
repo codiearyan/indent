@@ -10,6 +10,7 @@ import { YearBoardPage } from '@/features/catalog/YearBoardPage'
 import { DsaPage } from '@/features/dsa/DsaPage'
 import { PatternPage } from '@/features/dsa/PatternPage'
 import { Onboarding } from '@/features/onboarding/Onboarding'
+import { SettingsDialog } from '@/features/settings/SettingsDialog'
 import { WorkspacePage } from '@/features/workspace/WorkspacePage'
 import { useSettings } from '@/stores/settings'
 
@@ -21,20 +22,23 @@ export default function App(): React.JSX.Element {
       {!onboarded ? (
         <Onboarding />
       ) : (
-        <HashRouter>
-          <Routes>
-            <Route element={<AppShell />}>
-              <Route index element={<DashboardPage />} />
-              <Route path="labs" element={<LabsPage />} />
-              <Route path="labs/:labId" element={<LabDetailPage />} />
-              <Route path="paths" element={<PathsPage />} />
-              <Route path="dsa" element={<DsaPage />} />
-              <Route path="dsa/:patternId" element={<PatternPage />} />
-              <Route path="year" element={<YearBoardPage />} />
-            </Route>
-            <Route path="learn/:labId/:chapterId" element={<WorkspacePage />} />
-          </Routes>
-        </HashRouter>
+        <>
+          <SettingsDialog />
+          <HashRouter>
+            <Routes>
+              <Route element={<AppShell />}>
+                <Route index element={<DashboardPage />} />
+                <Route path="labs" element={<LabsPage />} />
+                <Route path="labs/:labId" element={<LabDetailPage />} />
+                <Route path="paths" element={<PathsPage />} />
+                <Route path="dsa" element={<DsaPage />} />
+                <Route path="dsa/:patternId" element={<PatternPage />} />
+                <Route path="year" element={<YearBoardPage />} />
+              </Route>
+              <Route path="learn/:labId/:chapterId" element={<WorkspacePage />} />
+            </Routes>
+          </HashRouter>
+        </>
       )}
       <Toaster />
     </TooltipProvider>

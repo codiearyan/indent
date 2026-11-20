@@ -1,41 +1,17 @@
 import { useState } from 'react'
-import { CircleHelp, PanelLeft, PanelRight, RotateCcw, SlidersHorizontal } from 'lucide-react'
+import { CircleHelp, RotateCcw, Settings, SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { LayoutControls, TextSizeControls } from '@/features/settings/controls'
+import { useSettingsDialog } from '@/features/settings/dialogStore'
 import { TOUR } from '@/features/tour/anchors'
 import { cn } from '@/lib/utils'
-import {
-  TEXT_SCALE_MAX,
-  TEXT_SCALE_MIN,
-  TEXT_SCALE_PRESETS,
-  useSettings,
-  type PanelKey,
-  type TextZone
-} from '@/stores/settings'
+import { TEXT_SCALE_PRESETS, useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { IconButton } from './IconButton'
 import { ResetDialog } from './ResetDialog'
 
-const ZONES: { zone: TextZone; label: string }[] = [
-  { zone: 'lesson', label: 'Lesson' },
-  { zone: 'tasks', label: 'Tasks' },
-  { zone: 'editor', label: 'Code editor' },
-  { zone: 'terminal', label: 'Terminal' }
-]
-
-const SWITCHES: { key: PanelKey; label: string }[] = [
-  { key: 'files', label: 'File list' },
-  { key: 'terminal', label: 'Terminal' },
-  { key: 'zen', label: 'Focus mode' }
-]
-
-type Preset = keyof typeof TEXT_SCALE_PRESETS
-
-const segment =
-  'h-7 flex-1 rounded-sm font-normal text-muted-foreground data-[state=on]:font-medium data-[state=on]:text-foreground'
 const section = 'space-y-3 border-t border-rule px-4 py-3 first:border-t-0'
 const row =
   'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:stroke-[1.5]'
@@ -59,13 +35,6 @@ export function ViewPopover(): React.JSX.Element {
   const ready = useWorkspace((s) => s.status === 'ready')
   const setTourOpen = useWorkspace((s) => s.setTourOpen)
   const hasPage = useWorkspace((s) => Boolean(s.chapter?.preview))
-  const switches = hasPage ? [...SWITCHES, { key: 'browser' as const, label: 'Browser' }] : SWITCHES
-
-  const values = Object.values(settings.textScale)
-  const preset =
-    (Object.keys(TEXT_SCALE_PRESETS) as Preset[]).find((key) =>
-      values.every((v) => v === TEXT_SCALE_PRESETS[key])
-    ) ?? ''
 
   return (
     <>
@@ -90,43 +59,7 @@ export function ViewPopover(): React.JSX.Element {
             >
               Text size
             </SectionTitle>
-            <ToggleGroup
-              type="single"
-              size="sm"
-              spacing={1}
-              className="w-full rounded-md border border-input p-0.5"
-              value={preset}
-              onValueChange={(key) =>
-                key && settings.setAllTextScale(TEXT_SCALE_PRESETS[key as Preset])
-              }
-            >
-              {(Object.keys(TEXT_SCALE_PRESETS) as Preset[]).map((key) => (
-                <ToggleGroupItem
-                  key={key}
-                  value={key}
-                  className={segment}
-                  aria-label={`Size ${key}`}
-                >
-                  {key}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-            {ZONES.map(({ zone, label }) => (
-              <div key={zone} className="grid grid-cols-[6rem_1fr_3rem] items-center gap-3 text-sm">
-                <span>{label}</span>
-                <Slider
-                  aria-label={`${label} text size`}
-                  min={TEXT_SCALE_MIN}
-                  max={TEXT_SCALE_MAX}
-                  step={0.05}
-                  value={[settings.textScale[zone]]}
-                  onValueChange={([value]) => settings.setTextScale(zone, value)}
-                />
-                <span className="text-right text-xs text-muted-foreground tabular-nums">
-                  {Math.round(settings.textScale[zone] * 100)}%
-                </span>
-              </div>
-            ))}
+            <TextSizeControls />
           </div>
 
           <div className={section}>
@@ -139,35 +72,7 @@ export function ViewPopover(): React.JSX.Element {
             >
               Layout
             </SectionTitle>
-            <div className="flex items-center justify-between gap-3 text-sm">
-              Lesson side
-              <ToggleGroup
-                type="single"
-                size="sm"
-                spacing={1}
-                className="w-40 rounded-md border border-input p-0.5"
-                value={settings.lessonSide}
-                onValueChange={(side) => side && settings.setLessonSide(side as 'left' | 'right')}
-              >
-                <ToggleGroupItem value="left" className={segment}>
-                  <PanelLeft />
-                  Left
-                </ToggleGroupItem>
-                <ToggleGroupItem value="right" className={segment}>
-                  <PanelRight />
-                  Right
-                </ToggleGroupItem>
-              </ToggleGroup>
-            </div>
-            {switches.map(({ key, label }) => (
-              <label key={key} className="flex items-center justify-between text-sm">
-                {label}
-                <Switch
-                  checked={settings.panels[key]}
-                  onCheckedChange={(on) => settings.setPanel(key, on)}
-                />
-              </label>
-            ))}
+            <LayoutControls browser={hasPage} />
           </div>
 
           <div className={section}>
@@ -178,6 +83,17 @@ export function ViewPopover(): React.JSX.Element {
           </div>
 
           <div className="space-y-0.5 border-t border-rule p-2">
+            <button
+              type="button"
+              className={row}
+              onClick={() => {
+                setOpen(false)
+                useSettingsDialog.getState().show()
+              }}
+            >
+              <Settings />
+              All settings
+            </button>
             <button
               type="button"
               className={row}
