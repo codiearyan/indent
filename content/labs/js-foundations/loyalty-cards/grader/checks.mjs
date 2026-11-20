@@ -30,7 +30,7 @@ export const checks = {
   stamp(t) {
     return runCases(t, 'createStampCard', [
       {
-        name: 'Gives a free cup on the goal stamp',
+        name: 'Gives a free candle on the goal stamp',
         run: 'stampRun',
         args: [3, 3],
         expected: { results: [false, false, true], stamps: 0 },
@@ -43,7 +43,7 @@ export const checks = {
         args: [2, 5],
         expected: { results: [false, true, false, true, false], stamps: 1 },
         setup: 'createStampCard(2), stamp() 5 times, then stamps()',
-        hint: 'After a free cup the count should go back to 0 and keep counting from there.'
+        hint: 'After a free candle the count should go back to 0 and keep counting from there.'
       },
       {
         name: 'Counts stamps before the goal',

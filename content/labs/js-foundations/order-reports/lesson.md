@@ -1,10 +1,10 @@
 # Turning orders into answers
 
-## Welcome to Larkspur Tea
+## Welcome to Wickhollow Candles
 
-Larkspur Tea sells loose leaf tea online. Two people run it: Ines packs the parcels and Theo answers every email. Until now, Theo copied orders into a spreadsheet by hand every Sunday. That stopped working when the shop got its first mention in a newsletter.
+Wickhollow Candles pours candles by hand and sells them online. Two people run it: Ines packs the parcels and Theo answers every email. Until now, Theo copied orders into a spreadsheet by hand every Sunday. That stopped working when the shop got its first mention in a newsletter.
 
-> **Theo:** We have a file of last week's orders. I just want three answers: what each order came to, which teas sold best, and how much we made each day. Can you write that?
+> **Theo:** We have a file of last week's orders. I just want three answers: what each order came to, which candles sold best, and how much we made each day. Can you write that?
 
 Open `src/orders.js`. Every order is a plain object with an `id`, a `placedAt` timestamp, a `status` and an array of `items`. Prices are stored in cents, so `1250` means 12.50. Working in whole cents avoids rounding surprises when you add money.
 

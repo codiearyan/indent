@@ -1,7 +1,7 @@
 // Run with: node src/demo.js
 import { orders } from './orders.js'
 import { orderTotal } from './orderTotal.js'
-import { topTeas } from './topTeas.js'
+import { topCandles } from './topCandles.js'
 import { revenueByDay } from './revenueByDay.js'
 
 function show(label, run) {
@@ -12,7 +12,7 @@ function show(label, run) {
   }
 }
 
-show('orderTotal(LT-1001):', () => orderTotal(orders[0]))
-show('orderTotal(LT-1002):', () => orderTotal(orders[1]))
-show('topTeas(orders, 2):', () => topTeas(orders, 2))
+show('orderTotal(WC-1001):', () => orderTotal(orders[0]))
+show('orderTotal(WC-1002):', () => orderTotal(orders[1]))
+show('topCandles(orders, 2):', () => topCandles(orders, 2))
 show('revenueByDay(orders):', () => revenueByDay(orders))

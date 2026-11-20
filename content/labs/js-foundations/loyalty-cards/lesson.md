@@ -4,7 +4,7 @@
 
 Theo loved the order report. Now Ines has an idea of her own.
 
-> **Ines:** I want to put a stamp card in every parcel. Ten stamps and the next bag of tea is free. Could the site keep track of the stamps? And while you are in there, the brewing guide page is slow, and last week one customer got the welcome email three times.
+> **Ines:** I want to put a stamp card in every parcel. Ten stamps and the next candle is free. Could the site keep track of the stamps? And while you are in there, the burn time guide page is slow, and last week one customer got the welcome email three times.
 
 Three small jobs, one idea behind all of them: a function that remembers something between calls.
 
@@ -46,7 +46,7 @@ Both methods see the same `total`. A second tally gets a second `total`.
 
 ## Caching with memoize
 
-The brewing guide calls a slow function that works out the steep time for a tea. The answer for `'sencha'` never changes, so computing it twice is waste. **Memoizing** means wrapping a function so it saves each answer by its argument and reuses it.
+The burn time guide calls a slow function that works out how long a candle burns. The answer for `'cedar'` never changes, so computing it twice is waste. **Memoizing** means wrapping a function so it saves each answer by its argument and reuses it.
 
 The saved answers live in a closure, and a `Map` is the right home. A plain object would turn the number `1` and the string `'1'` into the same key. There is a second trap: a saved answer might be `0` or `undefined`. If you check "is there a value?" by reading it, those look missing and get computed again. Ask the `Map` whether it **has** the key instead.
 
@@ -62,4 +62,4 @@ const wrapper = (...args) => fn(...args)
 
 ## Try it
 
-Run `node src/demo.js` in the terminal. It stamps a card five times, asks for a brewing time three times and tries to send a welcome email twice. Implement one file at a time and watch the output change. The check uses its own functions too, including ones that return `0` and `undefined`.
+Run `node src/demo.js` in the terminal. It stamps a card five times, asks for a burn time three times and tries to send a welcome email twice. Implement one file at a time and watch the output change. The check uses its own functions too, including ones that return `0` and `undefined`.

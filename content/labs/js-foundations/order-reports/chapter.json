@@ -1,7 +1,7 @@
 {
   "id": "order-reports",
   "title": "Turning orders into answers",
-  "files": ["src/orderTotal.js", "src/topTeas.js", "src/revenueByDay.js", "src/orders.js", "src/demo.js"],
+  "files": ["src/orderTotal.js", "src/topCandles.js", "src/revenueByDay.js", "src/orders.js", "src/demo.js"],
   "terminal": {
     "description": "A shell in your workspace where you can run the demo against last week's orders.",
     "suggestedCommand": "node src/demo.js"
@@ -28,8 +28,8 @@
     {
       "id": "top",
       "title": "Find the best sellers",
-      "file": "src/topTeas.js",
-      "description": "Implement `topTeas(orders, n)` in `src/topTeas.js`.\n\nCount the units sold per sku, skipping orders whose `status` is `'cancelled'`. Return an array of `{ sku, units }` for the `n` skus with the most units:\n\n- most units first\n- on a tie, the sku that comes first alphabetically goes first\n- if fewer than `n` skus were sold, return all of them",
+      "file": "src/topCandles.js",
+      "description": "Implement `topCandles(orders, n)` in `src/topCandles.js`.\n\nCount the units sold per sku, skipping orders whose `status` is `'cancelled'`. Return an array of `{ sku, units }` for the `n` skus with the most units:\n\n- most units first\n- on a tie, the sku that comes first alphabetically goes first\n- if fewer than `n` skus were sold, return all of them",
       "nextSteps": [
         "Filter out the cancelled orders.",
         "Count units per sku in an object or a `Map`.",

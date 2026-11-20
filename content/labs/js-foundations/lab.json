@@ -1,11 +1,11 @@
 {
   "id": "js-foundations",
   "title": "JavaScript foundations",
-  "description": "Larkspur Tea is a two-person online tea shop, and you just became its developer. Turn a messy pile of orders into answers the owners can use, then build the small helpers behind their loyalty cards. Along the way you learn array methods and closures by writing real functions.",
+  "description": "Wickhollow Candles is a two-person online shop that pours candles by hand, and you just became its developer. Turn a messy pile of orders into answers the owners can use, then build the small helpers behind their loyalty cards. Along the way you learn array methods and closures by writing real functions.",
   "category": "JavaScript and TypeScript",
   "language": "javascript",
   "tags": ["JavaScript"],
   "parts": [
-    { "title": "A week at Larkspur Tea", "chapters": ["order-reports", "loyalty-cards"] }
+    { "title": "A week at Wickhollow Candles", "chapters": ["order-reports", "loyalty-cards"] }
   ]
 }

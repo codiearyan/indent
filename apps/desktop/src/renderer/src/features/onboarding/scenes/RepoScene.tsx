@@ -39,7 +39,8 @@ export function RepoScene(): React.JSX.Element {
         <div className="min-w-0">
           <p className="text-sm font-semibold">{LAB.title}</p>
           <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
-            Larkspur Tea is a two-person online tea shop, and you just became its developer.
+            Wickhollow Candles is a two-person online candle shop, and you just became its
+            developer.
           </p>
         </div>
       </div>
