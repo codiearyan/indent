@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  FileIcon,
   Loader2Icon,
   Maximize2Icon,
   Minimize2Icon,
@@ -19,6 +18,8 @@ import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
 import { CodeEditor } from './CodeEditor'
+import { FileLabel } from './FileTab'
+import { fileChange } from './fileChange'
 import type { monaco } from './monaco'
 
 function checkAll(): void {
@@ -33,6 +34,7 @@ export function EditorPane(): React.JSX.Element {
   const status = useWorkspace((s) => s.status)
   const error = useWorkspace((s) => s.error)
   const files = useWorkspace((s) => s.files)
+  const starter = useWorkspace((s) => s.starter)
   const activePath = useWorkspace((s) => s.activePath)
   const setActive = useWorkspace((s) => s.setActive)
   const checking = useWorkspace((s) => s.checking)
@@ -67,28 +69,9 @@ export function EditorPane(): React.JSX.Element {
           {panels.files ? <PanelLeftCloseIcon /> : <PanelLeftIcon />}
         </IconButton>
         <div className="mx-1 h-5 w-px shrink-0 bg-border" />
-        <div
-          role="tablist"
-          data-tour={TOUR.editorTabs}
-          className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto [scrollbar-width:none]"
-        >
-          {files.map((file) => (
-            <Button
-              key={file.path}
-              role="tab"
-              aria-selected={file.path === activePath}
-              variant="ghost"
-              size="sm"
-              onClick={() => setActive(file.path)}
-              className={cn(
-                'h-7 px-2.5 font-mono text-[13px] font-normal text-muted-foreground hover:bg-accent/60 hover:text-foreground',
-                file.path === activePath && 'bg-accent text-foreground hover:bg-accent'
-              )}
-            >
-              {file.path}
-            </Button>
-          ))}
-        </div>
+        <p className="min-w-0 flex-1 truncate px-1 text-[13px] text-muted-foreground">
+          {showSummary ? <CheckSummary /> : 'Saved as you type. Run checks when you are ready.'}
+        </p>
         <IconButton label="Focus mode" onClick={() => togglePanel('zen')}>
           {panels.zen ? <Minimize2Icon /> : <Maximize2Icon />}
         </IconButton>
@@ -111,8 +94,30 @@ export function EditorPane(): React.JSX.Element {
         </Button>
       </div>
 
-      <div className="shrink-0 border-b border-border px-4 pb-2.5 text-[13px] text-muted-foreground">
-        {showSummary ? <CheckSummary /> : 'Saved as you type. Run checks when you are ready.'}
+      <div
+        role="tablist"
+        data-tour={TOUR.editorTabs}
+        className="flex h-9 shrink-0 overflow-x-auto border-t border-border [scrollbar-width:none]"
+      >
+        {files.map((file) => {
+          const active = file.path === activePath
+          return (
+            <button
+              key={file.path}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => setActive(file.path)}
+              className={cn(
+                'flex shrink-0 items-center gap-2 border-r border-b border-r-rule border-b-border px-3 font-mono text-[13px] text-muted-foreground outline-none hover:bg-accent/40 focus-visible:bg-accent/60',
+                active && 'border-b-transparent bg-editor hover:bg-editor'
+              )}
+            >
+              <FileLabel path={file.path} change={fileChange(starter, file)} active={active} />
+            </button>
+          )
+        })}
+        <div className="min-w-4 flex-1 border-b border-border" />
       </div>
 
       <div className="flex min-h-0 flex-1">
@@ -125,12 +130,15 @@ export function EditorPane(): React.JSX.Element {
                 size="sm"
                 onClick={() => setActive(file.path)}
                 className={cn(
-                  'h-7 w-full justify-start px-2 font-mono text-[13px] font-normal text-muted-foreground hover:bg-accent/60 hover:text-foreground [&_svg]:stroke-[1.5]',
+                  'h-7 w-full justify-start gap-2 px-2 font-mono text-[13px] font-normal text-muted-foreground hover:bg-accent/60 hover:text-foreground',
                   file.path === activePath && 'bg-accent text-foreground hover:bg-accent'
                 )}
               >
-                <FileIcon />
-                <span className="truncate">{file.path}</span>
+                <FileLabel
+                  path={file.path}
+                  change={fileChange(starter, file)}
+                  active={file.path === activePath}
+                />
               </Button>
             ))}
           </div>

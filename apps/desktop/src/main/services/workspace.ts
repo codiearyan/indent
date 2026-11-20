@@ -23,11 +23,15 @@ function open(labId: string, chapterId: string, reset = false): Promise<Workspac
   const dir = workspaceDir(labId, chapterId)
   return oneAtATime(dir, async () => {
     const chapter = await loadChapter(labId, chapterId)
+    const starterDir = join(chapterContentDir(labId, chapterId), 'starter')
     if (reset) await emptyDir(dir)
-    if (reset || !existsSync(dir)) {
-      await copyStarter(join(chapterContentDir(labId, chapterId), 'starter'), dir)
+    if (reset || !existsSync(dir)) await copyStarter(starterDir, dir)
+    const starter = existsSync(starterDir) ? await readWorkspace(starterDir, []) : []
+    return {
+      dir,
+      files: await readWorkspace(dir, chapter.files),
+      starter: Object.fromEntries(starter.map((f) => [f.path, f.content]))
     }
-    return { dir, files: await readWorkspace(dir, chapter.files) }
   })
 }
 
