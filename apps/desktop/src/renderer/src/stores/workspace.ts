@@ -63,7 +63,11 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       files,
       dir,
       starter,
-      activePath: stillThere ? activePath : (chapter?.files[0] ?? files[0]?.path ?? null)
+      activePath: stillThere
+        ? activePath
+        : (chapter?.files.find((path) => files.some((f) => f.path === path)) ??
+          files[0]?.path ??
+          null)
     })
   }
 

@@ -19,7 +19,7 @@ import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
 import { CodeEditor } from './CodeEditor'
 import { FileLabel } from './FileTab'
-import { fileChange } from './fileChange'
+import { fileChange, missingFiles } from './fileChange'
 import type { monaco } from './monaco'
 
 function checkAll(): void {
@@ -58,6 +58,7 @@ export function EditorPane(): React.JSX.Element {
     setShowSummary(false)
   }
   const hideSummary = useCallback(() => setShowSummary(false), [])
+  const outdated = status === 'ready' && missingFiles(chapter?.files ?? [], files).length > 0
 
   return (
     <div className="flex h-full flex-col bg-editor">
@@ -70,7 +71,13 @@ export function EditorPane(): React.JSX.Element {
         </IconButton>
         <div className="mx-1 h-5 w-px shrink-0 bg-border" />
         <p className="min-w-0 flex-1 truncate px-1 text-[13px] text-muted-foreground">
-          {showSummary ? <CheckSummary /> : 'Saved as you type. Run checks when you are ready.'}
+          {outdated ? (
+            'This issue has changed. Reset issue files, in the menu at the top right, to get its new files.'
+          ) : showSummary ? (
+            <CheckSummary />
+          ) : (
+            'Saved as you type. Run checks when you are ready.'
+          )}
         </p>
         <IconButton label="Focus mode" onClick={() => togglePanel('zen')}>
           {panels.zen ? <Minimize2Icon /> : <Maximize2Icon />}
