@@ -165,6 +165,7 @@ content/
   kit/lab-model.mjs                  the lab model: a deterministic, offline, OpenAI-compatible server
   kit/page.mjs                       t.page(): a workspace page in a headless DOM, see below
   labs/<labId>/lab.json              LabMeta
+  labs/<labId>/cover.webp           the repo's picture on its card, 960 by 540; see "Covers" below
   labs/<labId>/<chapterId>/
     chapter.json                     ChapterDef; `preview` names a page for the Browser panel
     lesson.md                        `##` headings split it into the parts the audio player reads
@@ -173,6 +174,13 @@ content/
     grader/checks.mjs                hidden tests, never copied into the workspace
     audio/<key>.ogg                  recorded narration, one file per lesson part (see below)
 ```
+
+Covers. Every repo has one picture, shown at the top of its card. It shows the topic the repo
+teaches (a table and a query for SQL, a browser window for the DOM), never the story's place or
+people. All covers are one set: flat screen-print shapes with rounded corners and a light grain, in
+four inks only (charcoal #1B1B1E as the background, mid grey #55555C, cream #EFE3D0, orange #EA6030),
+with no text, letters, logos or people. A repo without a cover shows the name of its language. The
+main process serves the file at `indent-cover://<labId>/`.
 
 Read aloud plays a recording when one exists for the exact text of a lesson part, and falls back
 to the system voice when it does not. `node scripts/narrate.mjs [labId ...]` records the parts that
