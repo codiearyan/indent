@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ChapterProgress, DayActivity, LabSummary } from '../../../../shared/types'
+import { NO_FILTERS, matchesFilters } from './labFilters'
 import { labProgress } from './labStatus'
 import { intensity, longestStreak, recentWeeks, yearSummary, yearWeeks } from './activity'
 
@@ -105,5 +106,24 @@ describe('streaks and year summary', () => {
     )
     expect(s).toMatchObject({ points: 30, tasksPassed: 3, activeDays: 2 })
     expect(s.monthPoints.slice(0, 3)).toEqual([20, 0, 10])
+  })
+})
+
+describe('matchesFilters', () => {
+  it('keeps everything when nothing is picked', () => {
+    expect(matchesFilters(lab, 'not-started', NO_FILTERS)).toBe(true)
+  })
+
+  it('needs every kind of filter to match, and any choice inside one kind', () => {
+    const picked = { ...NO_FILTERS, fields: ['Databases', 'AI engineering'] }
+    expect(matchesFilters(lab, 'not-started', picked)).toBe(true)
+    expect(matchesFilters(lab, 'not-started', { ...picked, languages: ['sql'] })).toBe(false)
+    expect(matchesFilters(lab, 'not-started', { ...picked, languages: ['typescript'] })).toBe(true)
+    expect(matchesFilters(lab, 'not-started', { ...picked, status: 'completed' })).toBe(false)
+  })
+
+  it('searches the title, shelf and tags without minding case', () => {
+    expect(matchesFilters(lab, 'not-started', { ...NO_FILTERS, query: ' ENGINEER ' })).toBe(true)
+    expect(matchesFilters(lab, 'not-started', { ...NO_FILTERS, query: 'python' })).toBe(false)
   })
 })

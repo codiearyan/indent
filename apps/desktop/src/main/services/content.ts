@@ -1,5 +1,8 @@
+import { net, protocol } from 'electron'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
+import { pathToFileURL } from 'url'
+import { COVER_SCHEME } from '@shared/cover'
 import type { Chapter } from '@shared/types'
 import { handle } from '../ipc'
 import { chapterContentDir, contentDir, safeId } from '../paths'
@@ -22,6 +25,14 @@ async function narration(
 }
 
 export function register(): void {
+  protocol.handle(COVER_SCHEME, async (request) => {
+    try {
+      const cover = join(contentDir(), 'labs', safeId(new URL(request.url).hostname), 'cover.webp')
+      return await net.fetch(pathToFileURL(cover).toString())
+    } catch {
+      return new Response('Not found', { status: 404 })
+    }
+  })
   handle('content', {
     listLabs: () => listLabs(contentDir()),
     getChapter: loadChapter,

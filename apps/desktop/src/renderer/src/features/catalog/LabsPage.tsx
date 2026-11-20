@@ -1,70 +1,60 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Search } from 'lucide-react'
+import { Check, Search } from 'lucide-react'
+import { coverUrl } from '@shared/cover'
 import type { LabSummary, ProgressState } from '@shared/types'
 import { BuildStrip } from '@/components/app/BuildStrip'
 import { LanguageIcon } from '@/components/app/LanguageIcon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { languageName } from '@/lib/languages'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
-import { labProgress, type LabProgress, type Status } from './labStatus'
+import { NO_FILTERS, matchesFilters, type LabFilters } from './labFilters'
+import { labProgress, type LabProgress } from './labStatus'
 
-type StatusFilter = 'all' | Status
-
-const STATUS_TABS: { value: StatusFilter; label: string }[] = [
+const STATUS_TABS: { value: LabFilters['status']; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'in-progress', label: 'In progress' },
   { value: 'not-started', label: 'Not started' },
   { value: 'completed', label: 'Finished' }
 ]
 
-const ALL_SHELVES = 'all'
-
 const plural = (n: number, word: string): string => `${n} ${n === 1 ? word : `${word}s`}`
+
+const grid = 'grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6'
 
 export function LabsPage(): React.JSX.Element {
   const labs = useCatalog((s) => s.labs)
   const progress = useProgress((s) => s.progress)
-  const [query, setQuery] = useState('')
-  const [status, setStatus] = useState<StatusFilter>('all')
-  const [shelf, setShelf] = useState(ALL_SHELVES)
+  const [filters, setFilters] = useState<LabFilters>(NO_FILTERS)
+  const set = (patch: Partial<LabFilters>): void => setFilters((f) => ({ ...f, ...patch }))
 
   const rows = useMemo(
     () =>
       (labs ?? []).map((lab) => ({ lab, progress: labProgress(lab, progress?.chapters ?? {}) })),
     [labs, progress]
   )
-  const shelves = useMemo(() => [...new Set(rows.map((r) => r.lab.category))].sort(), [rows])
-
-  const count = (value: StatusFilter): number =>
-    value === 'all' ? rows.length : rows.filter((r) => r.progress.status === value).length
-
-  const needle = query.trim().toLowerCase()
-  const visible = rows.filter(
-    ({ lab, progress }) =>
-      (status === 'all' || progress.status === status) &&
-      (shelf === ALL_SHELVES || lab.category === shelf) &&
-      (!needle ||
-        [lab.title, lab.description, lab.category, ...lab.tags].some((text) =>
-          text.toLowerCase().includes(needle)
-        ))
+  const fields = useMemo(() => [...new Set(rows.map((r) => r.lab.category))].sort(), [rows])
+  const languages = useMemo(
+    () =>
+      [...new Set(rows.map((r) => r.lab.language))].sort((a, b) =>
+        languageName(a).localeCompare(languageName(b))
+      ),
+    [rows]
   )
 
-  const clearFilters = (): void => {
-    setQuery('')
-    setStatus('all')
-    setShelf(ALL_SHELVES)
-  }
+  const count = (status: LabFilters['status']): number =>
+    status === 'all' ? rows.length : rows.filter((r) => r.progress.status === status).length
+  const visible = rows.filter((r) => matchesFilters(r.lab, r.progress.status, filters))
+  const filtered =
+    filters.query !== '' ||
+    filters.status !== 'all' ||
+    filters.fields.length > 0 ||
+    filters.languages.length > 0
 
   const loading = !labs || !progress
 
@@ -80,7 +70,10 @@ export function LabsPage(): React.JSX.Element {
       </header>
 
       <div className="space-y-4">
-        <Tabs value={status} onValueChange={(value) => setStatus(value as StatusFilter)}>
+        <Tabs
+          value={filters.status}
+          onValueChange={(status) => set({ status: status as LabFilters['status'] })}
+        >
           <TabsList
             variant="line"
             aria-label="Filter by status"
@@ -102,60 +95,118 @@ export function LabsPage(): React.JSX.Element {
         </Tabs>
 
         <div className="flex items-center gap-3">
-          <div className="relative w-[280px]">
+          <div className="relative w-[320px]">
             <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              value={filters.query}
+              onChange={(e) => set({ query: e.target.value })}
               placeholder="Search repos"
               aria-label="Search repos"
               className="h-8 pl-8 shadow-none"
             />
           </div>
-          <Select value={shelf} onValueChange={setShelf}>
-            <SelectTrigger size="sm" aria-label="Shelf" className="min-w-40 shadow-none">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent position="popper" align="start">
-              <SelectItem value={ALL_SHELVES}>All shelves</SelectItem>
-              {shelves.map((name) => (
-                <SelectItem key={name} value={name}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <span className="ml-auto text-[13px] text-muted-foreground tabular-nums">
             {loading ? '' : `${plural(visible.length, 'repo')} shown`}
           </span>
+          {filtered && (
+            <Button
+              variant="ghost"
+              size="xs"
+              className="font-normal text-muted-foreground hover:text-foreground"
+              onClick={() => setFilters(NO_FILTERS)}
+            >
+              Clear filters
+            </Button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-[5rem_1fr] items-start gap-x-3 gap-y-2.5">
+          <Facet
+            label="Field"
+            options={fields.map((field) => ({ value: field, label: field }))}
+            value={filters.fields}
+            onChange={(next) => set({ fields: next })}
+          />
+          <Facet
+            label="Language"
+            options={languages.map((id) => ({ value: id, label: languageName(id) }))}
+            value={filters.languages}
+            onChange={(next) => set({ languages: next })}
+          />
         </div>
       </div>
 
-      <ul className="overflow-hidden rounded-lg border border-border">
-        {loading ? (
-          Array.from({ length: 6 }, (_, i) => <SkeletonRow key={i} />)
-        ) : visible.length > 0 ? (
-          visible.map(({ lab, progress: p }) => (
-            <LabRow key={lab.id} lab={lab} progress={p} chapters={progress.chapters} />
-          ))
-        ) : (
-          <li className="flex h-32 flex-col items-center justify-center gap-1 text-sm">
-            <p className="text-muted-foreground">
-              {rows.length ? 'No repos match these filters.' : 'No repos are installed yet.'}
-            </p>
-            {rows.length > 0 && (
-              <Button variant="link" size="sm" className="text-foreground" onClick={clearFilters}>
-                Clear filters
-              </Button>
-            )}
-          </li>
-        )}
-      </ul>
+      {loading ? (
+        <ul className={grid} aria-busy>
+          {Array.from({ length: 6 }, (_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </ul>
+      ) : visible.length > 0 ? (
+        <ul className={grid}>
+          {visible.map(({ lab, progress: p }) => (
+            <RepoCard key={lab.id} lab={lab} progress={p} chapters={progress.chapters} />
+          ))}
+        </ul>
+      ) : (
+        <div className="flex h-40 flex-col items-center justify-center gap-1 rounded-lg border border-border text-sm">
+          <p className="text-muted-foreground">
+            {rows.length ? 'No repos match these filters.' : 'No repos are installed yet.'}
+          </p>
+          {rows.length > 0 && (
+            <Button
+              variant="link"
+              size="sm"
+              className="text-foreground"
+              onClick={() => setFilters(NO_FILTERS)}
+            >
+              Clear filters
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   )
 }
 
-function LabRow({
+/** One kind of filter as a row of chips. Any number can be on; none on means all. */
+function Facet({
+  label,
+  options,
+  value,
+  onChange
+}: {
+  label: string
+  options: { value: string; label: string }[]
+  value: string[]
+  onChange(next: string[]): void
+}): React.JSX.Element {
+  return (
+    <>
+      <span className="pt-1 text-[13px] text-muted-foreground">{label}</span>
+      <ToggleGroup
+        type="multiple"
+        spacing={1.5}
+        aria-label={`Filter by ${label.toLowerCase()}`}
+        value={value}
+        onValueChange={onChange}
+        className="w-full flex-wrap"
+      >
+        {options.map((option) => (
+          <ToggleGroupItem
+            key={option.value}
+            value={option.value}
+            className="h-7 min-w-0 rounded-full border border-input px-3 text-[13px] font-normal text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:border-transparent data-[state=on]:bg-accent data-[state=on]:text-foreground"
+          >
+            {option.label}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+    </>
+  )
+}
+
+function RepoCard({
   lab,
   progress,
   chapters
@@ -165,43 +216,78 @@ function LabRow({
   chapters: ProgressState['chapters']
 }): React.JSX.Element {
   return (
-    <li className="border-b border-rule last:border-b-0">
+    <li>
       <Link
         to={`/labs/${lab.id}`}
-        className="flex h-16 items-center gap-4 px-5 transition-colors outline-none hover:bg-muted/60 focus-visible:bg-muted/60"
+        className="flex h-full flex-col overflow-hidden rounded-lg border border-border transition-colors outline-none hover:border-input focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
       >
-        <LanguageIcon language={lab.language} className="size-7" />
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium">{lab.title}</span>
-          <span className="block truncate text-[13px] text-muted-foreground">
+        <Cover lab={lab} />
+        <div className="flex flex-1 flex-col p-4">
+          <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
+            <LanguageIcon language={lab.language} className="size-5 rounded-sm text-[9px]" />
+            <span className="truncate">{lab.category}</span>
+          </div>
+          <h2 className="mt-2.5 text-sm font-semibold">{lab.title}</h2>
+          <p className="mt-1 line-clamp-2 text-[13px] leading-5 text-muted-foreground">
             {lab.description}
-          </span>
-        </span>
-        <span className="hidden w-44 shrink-0 truncate text-[13px] text-muted-foreground xl:block">
-          {lab.tags.join(', ')}
-        </span>
-        <span className="w-36 shrink-0 text-right text-[13px] text-muted-foreground tabular-nums">
-          {plural(progress.chapterCount, 'issue')}, {plural(progress.taskCount, 'task')}
-        </span>
-        <BuildStrip lab={lab} chapters={chapters} className="w-[180px] shrink-0" />
-        <span className="w-16 shrink-0 text-right text-[13px] tabular-nums">
-          {progress.tasksPassed} of {progress.taskCount}
-        </span>
-        <ChevronRight className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+          </p>
+          <div className="mt-auto pt-4">
+            <BuildStrip lab={lab} chapters={chapters} />
+            <div className="mt-2.5 flex items-center justify-between gap-3 text-[13px] text-muted-foreground tabular-nums">
+              <span>
+                {plural(progress.chapterCount, 'issue')}, {plural(progress.taskCount, 'task')}
+              </span>
+              {progress.status === 'completed' ? (
+                <span className="flex items-center gap-1.5 text-foreground">
+                  <Check className="size-4 text-success" strokeWidth={2} aria-hidden />
+                  Finished
+                </span>
+              ) : (
+                <span className="text-foreground">
+                  {progress.tasksPassed} of {progress.taskCount}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
       </Link>
     </li>
   )
 }
 
-function SkeletonRow(): React.JSX.Element {
+/** The repo's picture. A repo without one shows its language instead. */
+function Cover({ lab }: { lab: LabSummary }): React.JSX.Element {
+  const [missing, setMissing] = useState(false)
   return (
-    <li className="flex h-16 items-center gap-4 border-b border-rule px-5 last:border-b-0">
-      <Skeleton className="size-7" />
-      <span className="flex-1 space-y-2">
+    <div className="flex aspect-[16/9] items-center justify-center border-b border-rule bg-muted">
+      {missing ? (
+        <span className="font-mono text-[13px] text-muted-foreground">
+          {languageName(lab.language)}
+        </span>
+      ) : (
+        <img
+          src={coverUrl(lab.id)}
+          alt=""
+          loading="lazy"
+          draggable={false}
+          onError={() => setMissing(true)}
+          className="size-full object-cover"
+        />
+      )}
+    </div>
+  )
+}
+
+function SkeletonCard(): React.JSX.Element {
+  return (
+    <li className="overflow-hidden rounded-lg border border-border">
+      <Skeleton className="aspect-[16/9] rounded-none" />
+      <div className="space-y-2.5 p-4">
+        <Skeleton className="h-3 w-24" />
         <Skeleton className="h-3.5 w-48" />
-        <Skeleton className="h-3 w-80" />
-      </span>
-      <Skeleton className="h-1.5 w-[180px]" />
+        <Skeleton className="h-3 w-full" />
+        <Skeleton className="mt-4 h-1.5 w-full" />
+      </div>
     </li>
   )
 }
