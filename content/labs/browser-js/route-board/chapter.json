@@ -1,0 +1,65 @@
+{
+  "id": "route-board",
+  "title": "The board that was typed by hand",
+  "preview": "index.html",
+  "files": ["src/board.js", "src/main.js", "src/routes.js", "index.html", "styles.css"],
+  "terminal": {
+    "description": "The route board runs in the Browser panel and reloads every time you save. This shell is in your workspace if you want to look around."
+  },
+  "tasks": [
+    {
+      "id": "render-list",
+      "title": "Draw the board from the data",
+      "file": "src/board.js",
+      "description": "Write `renderBoard(list, routes)` in `src/board.js`. It fills `list` (the `<ul id=\"route-list\">`) with one item per route, in the order of the array, and nothing else.\n\nEach item is an `<li class=\"route\">` with:\n\n- a `data-id` attribute set to the route's `id`\n- an element with the class `route-name` holding the name as plain text\n- the hold colour and the setter's name somewhere in the item, for example `Blue holds, set by Hollis`\n\nBuild the elements with `document.createElement` and put text in with `textContent`. A name like `Jump <Start>` must show exactly like that.\n\nThe check swaps `src/routes.js` for a file with routes of its own, so keep exporting `routes` from it.",
+      "nextSteps": [
+        "Open `src/routes.js` and look at the shape of one route.",
+        "In `renderBoard`, create one `<li>` for a single route and append it to `list`.",
+        "Turn that into a loop over every route, and clear the list first so the hand-typed items go.",
+        "Add the name, colour and setter with `textContent`, then save and look at the Browser panel."
+      ],
+      "hints": [
+        "The hand-typed items in `index.html` show the markup one route should have. Your job is to build that same markup from an object.",
+        "`document.createElement('li')` gives you an element that is not on the page yet. Set its class, `dataset.id` and children, then `append` it to the list.",
+        "Clear the list with `list.replaceChildren()` before adding items, and set every piece of text with `textContent`, never `innerHTML`, so `<Start>` stays text."
+      ],
+      "points": 10
+    },
+    {
+      "id": "grade-badge",
+      "title": "Grade badges at a glance",
+      "file": "src/board.js",
+      "description": "Give every route item a grade badge: an element with the class `grade` whose text is the grade, such as `V4`.\n\nThe badge also gets a class for its band, so the stylesheet can colour it:\n\n- `grade-easy` for `V0` to `V2`\n- `grade-mid` for `V3` to `V5`\n- `grade-hard` for `V6` and up, including two-digit grades like `V10`\n\nSo a `V4` badge has the classes `grade grade-mid`.",
+      "nextSteps": [
+        "Write a small function that takes a grade like `'V4'` and returns `'easy'`, `'mid'` or `'hard'`.",
+        "Create a `<span>` for the badge in each route item and set its text to the grade.",
+        "Add the `grade` class and the band class to it.",
+        "Save and check that the badges on the board change colour."
+      ],
+      "hints": [
+        "The grade is a string. The band depends on the number after the `V`.",
+        "`'V10'.slice(1)` is `'10'`, and `Number()` turns that into a number you can compare.",
+        "Compare the number with 2 and 5 to pick the band, then set `className` to `grade grade-` followed by it."
+      ],
+      "points": 10
+    },
+    {
+      "id": "empty-state",
+      "title": "An empty wall says so",
+      "file": "src/main.js",
+      "description": "On reset days every route comes down and the routes array is empty. The board should then say so instead of showing a blank box.\n\nIn `src/main.js`:\n\n- when `routes` is empty, `#route-list` has no items and the `<p id=\"board-empty\">` line is visible\n- when there are routes, `#board-empty` stays hidden\n\n`#board-empty` starts with the `hidden` attribute in `index.html`.",
+      "nextSteps": [
+        "Find `#board-empty` in `index.html` and notice its `hidden` attribute.",
+        "In `main.js`, select it with `document.querySelector`.",
+        "Set whether it is hidden from the length of `routes`.",
+        "Try it: empty the array in `src/routes.js` for a moment, save, and look at the board. Put the routes back after."
+      ],
+      "hints": [
+        "Elements have a `hidden` property that mirrors the attribute. You can set it to `true` or `false`.",
+        "If the list still shows the hand-typed routes with no data, `renderBoard` is not clearing the list before it adds items.",
+        "One line does it: hidden should be true exactly when `routes.length` is greater than 0."
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "log-a-climb",
+  "title": "The form that reloaded the page",
+  "preview": "index.html",
+  "files": ["src/form.js", "src/main.js", "index.html", "src/board.js"],
+  "terminal": {
+    "description": "The route board runs in the Browser panel and reloads every time you save. This shell is in your workspace if you want to look around."
+  },
+  "tasks": [
+    {
+      "id": "handle-submit",
+      "title": "Keep the page on submit",
+      "file": "src/form.js",
+      "description": "Write `watchForm(form, { isTaken, onAdd })` in `src/form.js`. It listens for `submit` on the form `#new-route` and:\n\n- stops the browser from leaving the page\n- reads the fields with `FormData`: `name`, `grade`, `colour` and `setter`\n- calls `onAdd({ name, grade, colour, setter })`, with spaces trimmed from the name and the setter\n\n`main.js` already passes an `onAdd` that puts the route on top of the board. The check fills the form, submits it and then ticks the new route.",
+      "nextSteps": [
+        "Submit the form in the Browser panel and watch the board start over.",
+        "Add a `submit` listener to `form` and stop the default action first.",
+        "Make a `FormData` from the form and read the four fields by their `name`.",
+        "Call `onAdd` with an object of the four values."
+      ],
+      "hints": [
+        "Submitting a form is a navigation: the browser sends the fields to a new page. You need to cancel that.",
+        "The event passed to your listener has a method that cancels what the browser would do next.",
+        "`new FormData(form).get('grade')` reads a field by its `name` attribute, selects included. Trim the text fields before you pass them on."
+      ],
+      "points": 10
+    },
+    {
+      "id": "explain-problems",
+      "title": "Explain bad input",
+      "file": "src/form.js",
+      "description": "Some input passes the browser's `required` check but is still wrong. Before calling `onAdd`, refuse it with a plain sentence in `<p id=\"form-error\">` (it starts hidden):\n\n- a name that is empty once spaces are trimmed\n- a name already on the board, in any letter case (`isTaken(name)` tells you)\n\nA refused route is not added and the page does not reload. After a good route is added, `#form-error` is hidden again.",
+      "nextSteps": [
+        "Type only spaces as a name and submit. Notice that the browser lets it through.",
+        "Work out the message, or an empty string when the input is fine.",
+        "Show or hide `#form-error` from that and stop when there is a problem.",
+        "Try a name from the board in capitals."
+      ],
+      "hints": [
+        "Your checks belong after the default action is stopped and the fields are read, but before `onAdd`.",
+        "Keep one variable for the problem. Set its text on `#form-error` and its `hidden` from whether it is empty.",
+        "Return early from the listener when there is a problem, so nothing below runs. Write the message as a short sentence, such as what is missing."
+      ],
+      "points": 10
+    },
+    {
+      "id": "ready-again",
+      "title": "Ready for the next route",
+      "file": "src/form.js",
+      "description": "Setters log several routes in a row. After a route is added:\n\n- the form is cleared, so `#route-name` and `#route-setter` are empty\n- the focus is back in `#route-name`\n\nAfter a refused route, the fields keep what was typed so it can be fixed.",
+      "nextSteps": [
+        "Add two routes in a row in the Browser panel and notice what you have to delete by hand.",
+        "Clear the form after `onAdd`.",
+        "Move the focus to the name field.",
+        "Check that a refused route still keeps its fields."
+      ],
+      "hints": [
+        "Forms have a method that puts every field back to its starting value.",
+        "Any field can take the focus with a method call. `form.elements.name` is the name field.",
+        "Do both only on the success path, after `onAdd`, never before the early return."
+      ],
+      "points": 10
+    }
+  ]
+}

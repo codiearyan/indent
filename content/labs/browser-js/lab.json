@@ -1,0 +1,12 @@
+{
+  "id": "browser-js",
+  "title": "JavaScript in the browser",
+  "description": "Gritstone Climbing is an indoor climbing gym, and the screen at its front desk shows the route board: every route on the walls with its grade, colour and setter. Someone typed the board into the HTML by hand and nothing on it works. As the gym's first developer you rebuild it from data, make it respond to clicks, typing and forms, and teach it to load and remember. Along the way you learn the DOM, events and fetch in plain JavaScript.",
+  "category": "Web and frontend",
+  "language": "javascript",
+  "tags": ["JavaScript", "DOM"],
+  "parts": [
+    { "title": "A board made from data", "chapters": ["route-board", "ticked-routes", "find-a-route"] },
+    { "title": "A board that keeps up", "chapters": ["log-a-climb", "board-remembers"] }
+  ]
+}
