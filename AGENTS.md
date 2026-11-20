@@ -279,3 +279,19 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
 - Describe everything on its own terms. Never name or allude to another product, course, site or
   codebase that a feature resembles or was modelled on: not in code, comments, commit messages,
   pull request text, docs, or lab content. Lab stories, names and wording are original.
+
+## Code Review Rules
+
+The automated review of each pull request reads this section. Report these as high priority.
+
+- Text that names or alludes to another product, course, site or codebase, anywhere in the change.
+- An id or path from the renderer that reaches the file system without `safeId` or `resolveInside`.
+- A changed signature in `src/shared/types.ts` with a caller left on the old one.
+- A hex, rgb or oklch colour or a Tailwind palette colour in a component. Language logos are the
+  one exception.
+- A grader message that gives the answer away, an issue whose starter passes a task, or one whose
+  solution fails a task.
+- Copy a person sees that uses the code's words (lab, chapter, path) instead of the app's (repo,
+  issue, roadmap).
+- Points, hints or level numbers written anywhere but `src/shared/rules.ts`.
+- A change to the files of an issue that leaves a learner's existing workspace without a way forward.
