@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Check, Copy } from 'lucide-react'
 import type { AiProviderInfo } from '@shared/types'
+import { ProviderIcon } from '@/components/app/ProviderIcon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -7,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ModelSelect } from '@/features/ai/AiMenu'
 import { activeProvider, useAi } from '@/features/ai/aiStore'
 import { TestConnection } from '@/features/ai/TestConnection'
+import { IconButton } from '@/features/workspace/IconButton'
 import { cn, errorMessage } from '@/lib/utils'
 import { StepLayout } from './StepLayout'
 
@@ -21,9 +24,13 @@ export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
     void load().finally(() => setLoading(false))
   }, [load])
 
+  const lookAgain = (): void => {
+    setLoading(true)
+    void load().finally(() => setLoading(false))
+  }
+
   const clis = config?.providers.filter((p) => p.kind === 'cli') ?? []
   const apis = config?.providers.filter((p) => p.kind === 'api') ?? []
-  const nothing = !config?.providers.some((p) => p.available)
   const active = loading ? undefined : activeProvider(config)
 
   return (
@@ -31,7 +38,12 @@ export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
       wide
       staged={staged}
       title="Connect a provider"
-      lead="The tutor runs on an AI you already have. Pick one here, or set it up later from the AI menu."
+      lead={
+        <span className="text-foreground">
+          Every AI call goes from this computer straight to the provider you pick, on your own plan
+          or key.
+        </span>
+      }
     >
       <RadioGroup
         aria-label="AI provider"
@@ -41,18 +53,15 @@ export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
       >
         <ProviderCard
           title="On this computer"
-          hint="Coding CLIs you are signed in to."
+          hint="Coding CLIs, on your own plan."
           loading={loading}
           rows={4}
-          empty={
-            !loading && nothing
-              ? 'No coding CLI was found. Install one and sign in, or use an API key.'
-              : undefined
-          }
         >
-          {clis.map((p, i) => (
-            <ProviderRow key={p.id} provider={p} index={i} />
-          ))}
+          {clis.some((p) => p.available) ? (
+            clis.map((p, i) => <ProviderRow key={p.id} provider={p} index={i} />)
+          ) : (
+            <InstallHelp onCheck={lookAgain} />
+          )}
         </ProviderCard>
         <ProviderCard
           title="Your own key"
@@ -94,14 +103,12 @@ function ProviderCard({
   hint,
   loading,
   rows,
-  empty,
   children
 }: {
   title: string
   hint: string
   loading: boolean
   rows: number
-  empty?: string
   children: React.ReactNode
 }): React.JSX.Element {
   return (
@@ -110,9 +117,6 @@ function ProviderCard({
         <h2 className="text-sm font-semibold">{title}</h2>
         <span className="text-xs text-muted-foreground">{hint}</span>
       </header>
-      {empty && (
-        <p className="border-b border-rule px-4 py-3 text-[13px] text-muted-foreground">{empty}</p>
-      )}
       <ul aria-busy={loading}>
         {loading
           ? Array.from({ length: rows }, (_, i) => (
@@ -150,26 +154,78 @@ function ProviderRow({
         <label
           htmlFor={id}
           className={cn(
-            'shrink-0 text-sm',
+            'flex shrink-0 items-center gap-2.5 text-sm',
             provider.available ? 'cursor-pointer' : 'text-muted-foreground'
           )}
         >
+          <ProviderIcon id={provider.id} />
           {provider.label}
         </label>
         {keyed ? (
           <KeyField provider={provider} />
         ) : (
-          <span
-            className={cn(
-              'ml-auto min-w-0 truncate text-right text-xs text-muted-foreground',
-              provider.available && 'font-mono'
-            )}
-          >
-            {provider.detail}
-          </span>
+          !provider.available && (
+            <span className="ml-auto text-xs text-muted-foreground">Not installed</span>
+          )
         )}
       </div>
     </li>
+  )
+}
+
+const INSTALL_OPENCODE =
+  window.platform === 'win32'
+    ? 'npm install -g @opencode/cli'
+    : 'curl -fsSL https://opencode.ai/v2/install | bash'
+
+/** Stands in for the list when no coding CLI is installed: the two commands that set one up. */
+function InstallHelp({ onCheck }: { onCheck(): void }): React.JSX.Element {
+  return (
+    <li className="motion-enter flex flex-col gap-2.5 px-4 py-3.5">
+      <p className="flex gap-2.5 text-[13px] leading-5 text-muted-foreground">
+        <ProviderIcon id="opencode" className="mt-0.5 text-foreground" />
+        <span>
+          None found yet. <span className="text-foreground">OpenCode</span> is open source and takes
+          two commands in a terminal.
+        </span>
+      </p>
+      <Command name="install" text={INSTALL_OPENCODE} />
+      <Command name="sign-in" text="opencode auth login" />
+      <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          className="press border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
+          onClick={onCheck}
+        >
+          Check again
+        </Button>
+        <span className="text-xs text-muted-foreground">
+          Claude Code, Codex and Gemini CLI work too.
+        </span>
+      </div>
+    </li>
+  )
+}
+
+function Command({ name, text }: { name: string; text: string }): React.JSX.Element {
+  const [copied, setCopied] = useState(false)
+  const copy = async (): Promise<void> => {
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
+  return (
+    <div className="flex h-8 items-center gap-1 rounded-md border border-input pr-1 pl-2.5">
+      <code className="min-w-0 flex-1 truncate font-mono text-[11px]">{text}</code>
+      <IconButton
+        label={copied ? 'Copied' : `Copy the ${name} command`}
+        className="size-6"
+        onClick={() => void copy()}
+      >
+        {copied ? <Check /> : <Copy />}
+      </IconButton>
+    </div>
   )
 }
 

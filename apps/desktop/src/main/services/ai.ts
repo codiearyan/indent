@@ -13,7 +13,7 @@ import type {
 } from '@shared/types'
 import { EVENTS } from '@shared/types'
 import { emit, handle, listen } from '../ipc'
-import { shellEnv } from '../labEnv'
+import { refreshShellPath, shellEnv } from '../labEnv'
 import { chapterContentDir, dataFile } from '../paths'
 import { CLI_BINS, cliModels, cliVersion, runCli, which } from './ai/cli'
 import { GEMINI_URL, OPENAI_URL, anthropicStream, openAiCompatibleStream } from './ai/http'
@@ -103,6 +103,7 @@ async function loadKeys(): Promise<Partial<Record<ApiProviderId, string>>> {
 
 function detectClis(): Promise<AiProviderInfo[]> {
   detected = (async () => {
+    refreshShellPath()
     const env = await shellEnv()
     return Promise.all(
       CLI_PROVIDERS.map(async ({ id, label }): Promise<AiProviderInfo> => {
