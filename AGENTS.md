@@ -267,6 +267,12 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
 - CI minutes are limited. CI runs on pull requests only and skips docs and lab content. Verify
   locally, push once per pull request, and batch small related fixes into one pull request instead
   of opening several.
+- Releases are built by `.github/workflows/release.yml`, never on pull requests. Set the version in
+  `apps/desktop/package.json`, merge, then push the tag `v<version>` (or run the workflow by hand).
+  It builds `Indent-mac-arm64.dmg`, `Indent-mac-x64.dmg`, `Indent-windows-x64-setup.exe` and
+  `Indent-linux-x86_64.AppImage` and attaches them to a GitHub release. The names carry no version
+  on purpose: the site links to `releases/latest/download/<name>`, so do not rename them. The macOS
+  apps are signed ad-hoc, not with a Developer ID, so macOS asks to confirm the first open.
 - Pull request text is a plain description of the change. No generated-by or tool attribution lines.
 - Commit and pull request titles are `type(scope): message` (`feat(editor): ...`, `fix(checks): ...`,
   `chore: ...`). Commits are authored by the repository owner, with no co-author or other trailers.
