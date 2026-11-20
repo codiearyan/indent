@@ -14,7 +14,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { languageName } from '@/lib/languages'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
-import { NO_FILTERS, matchesFilters, type LabFilters } from './labFilters'
+import { LEVELS, NO_FILTERS, matchesFilters, type LabFilters } from './labFilters'
 import { labProgress, type LabProgress } from './labStatus'
 
 const STATUS_TABS: { value: LabFilters['status']; label: string }[] = [
@@ -55,7 +55,8 @@ export function LabsPage(): React.JSX.Element {
     filters.query !== '' ||
     filters.status !== 'all' ||
     filters.fields.length > 0 ||
-    filters.languages.length > 0
+    filters.languages.length > 0 ||
+    filters.levels.length > 0
 
   const loading = !labs || !progress
 
@@ -122,6 +123,12 @@ export function LabsPage(): React.JSX.Element {
         </div>
 
         <div className="grid grid-cols-[5rem_1fr] items-start gap-x-3 gap-y-2.5">
+          <Facet
+            label="Level"
+            options={LEVELS}
+            value={filters.levels}
+            onChange={(next) => set({ levels: next as LabFilters['levels'] })}
+          />
           <Facet
             label="Field"
             options={fields.map((field) => ({ value: field, label: field }))}
@@ -261,6 +268,11 @@ function RepoCard({
             <LanguageIcon language={lab.language} className="size-[18px] text-[8px]" />
             <span className="shrink-0 font-medium">{languageName(lab.language)}</span>
             <span className="truncate text-muted-foreground">{lab.category}</span>
+            {lab.level && (
+              <span className="ml-auto shrink-0 rounded-sm border border-input px-1.5 text-xs leading-5 text-muted-foreground">
+                {LEVELS.find((l) => l.value === lab.level)?.label}
+              </span>
+            )}
           </div>
           <h2 className="mt-2.5 text-sm font-semibold">{lab.title}</h2>
           <p className="mt-1 line-clamp-2 text-[13px] leading-5 text-muted-foreground">

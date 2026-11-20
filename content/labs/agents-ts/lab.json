@@ -5,6 +5,7 @@
   "category": "AI engineering",
   "language": "typescript",
   "tags": ["TypeScript", "AI"],
+  "level": "hard",
   "parts": [
     { "title": "Talking to tools", "chapters": ["one-tool-call", "agent-loop"] },
     { "title": "Agents you can trust", "chapters": ["bad-arguments", "parallel-calls", "guardrails"] }

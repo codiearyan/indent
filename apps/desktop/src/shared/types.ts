@@ -3,6 +3,12 @@
 // ---------- Content ----------
 
 /** content/labs/<labId>/lab.json */
+/**
+ * How much a repo asks. Easy keeps each issue in one file, medium spreads a change over a few
+ * files, hard is a whole project laid out by its own conventions.
+ */
+export type Level = 'easy' | 'medium' | 'hard'
+
 export interface LabMeta {
   id: string
   title: string
@@ -13,6 +19,8 @@ export interface LabMeta {
   language: string
   /** Short labels on the card, e.g. ["TypeScript", "Interview"]. */
   tags: string[]
+  /** Optional so a pack without one still loads; it then matches no level filter. */
+  level?: Level
   parts: { title: string; chapters: string[] }[]
 }
 

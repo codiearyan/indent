@@ -5,6 +5,7 @@
   "category": "Web and frontend",
   "language": "html",
   "tags": ["HTML", "CSS"],
+  "level": "easy",
   "parts": [
     { "title": "A page everyone can read", "chapters": ["page-outline", "signup-form"] },
     {
