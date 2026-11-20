@@ -1,6 +1,6 @@
 {
   "id": "agents-ts",
-  "title": "Agents from scratch",
+  "title": "Build an agent by hand",
   "description": "Pebble Lane Pantry, a neighbourhood grocer that delivers by cargo bike, wants an assistant called Pip that can look up orders, check shelves and issue refunds. Build its agent by hand with no framework: tool calls, the loop, error recovery, parallel calls, and guardrails with a trace you can test.",
   "category": "AI engineering",
   "language": "typescript",

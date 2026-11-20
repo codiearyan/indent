@@ -11,7 +11,7 @@
       "id": "stamp",
       "title": "A stamp card that remembers",
       "file": "src/stampCard.js",
-      "description": "Implement `createStampCard(goal)` in `src/stampCard.js`. It returns a card object with two methods:\n\n- `stamp()` adds one stamp. When the card reaches `goal` stamps it returns `true` (a free cup) and the card starts again from `0`. Otherwise it returns `false`.\n- `stamps()` returns how many stamps the card holds right now.\n\nEvery card keeps its own count.",
+      "description": "Implement `createStampCard(goal)` in `src/stampCard.js`. It returns a card object with two methods:\n\n- `stamp()` adds one stamp. When the card reaches `goal` stamps it returns `true` (a free candle) and the card starts again from `0`. Otherwise it returns `false`.\n- `stamps()` returns how many stamps the card holds right now.\n\nEvery card keeps its own count.",
       "nextSteps": [
         "Declare a `count` variable inside `createStampCard`.",
         "Return an object with `stamp` and `stamps` methods that use it.",
@@ -34,7 +34,7 @@
         "Create a `Map` inside `memoize`.",
         "Return a function that looks up its argument first.",
         "Call `fn` only when the argument has not been seen, and save the result.",
-        "Run the demo and check that `brews` is 2."
+        "Run the demo and check that `lookups` is 2."
       ],
       "hints": [
         "This is the same trick as the stamp card: a variable inside the outer function that the returned function keeps using.",

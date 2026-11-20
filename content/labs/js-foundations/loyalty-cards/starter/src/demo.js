@@ -16,13 +16,13 @@ show('stamp card, goal 3, five stamps:', () => {
   return [1, 2, 3, 4, 5].map(() => card.stamp())
 })
 
-show('memoize, brewing time asked three times:', () => {
-  let brews = 0
-  const brewSeconds = memoize((tea) => {
-    brews += 1
-    return tea === 'sencha' ? 60 : 180
+show('memoize, burn time asked three times:', () => {
+  let lookups = 0
+  const burnHours = memoize((candle) => {
+    lookups += 1
+    return candle === 'cedar' ? 40 : 60
   })
-  return { answers: [brewSeconds('sencha'), brewSeconds('sencha'), brewSeconds('assam')], brews }
+  return { answers: [burnHours('cedar'), burnHours('cedar'), burnHours('birch')], lookups }
 })
 
 show('once, welcome email sent twice:', () => {

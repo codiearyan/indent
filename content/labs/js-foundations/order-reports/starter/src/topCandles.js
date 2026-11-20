@@ -5,6 +5,6 @@
 // - most units first
 // - when two skus sold the same number of units, the one that comes first alphabetically wins
 // - if fewer than `n` skus were sold, return all of them
-export function topTeas(orders, n) {
+export function topCandles(orders, n) {
   throw new Error('Not implemented')
 }

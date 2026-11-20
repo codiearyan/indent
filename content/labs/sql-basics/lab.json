@@ -1,6 +1,6 @@
 {
   "id": "sql-basics",
-  "title": "SQL from zero",
+  "title": "SQL for everyday questions",
   "description": "Brindle Bakehouse bakes bread and cakes for a dozen cafes along the coast, and every order sits in a small SQLite database nobody has learned to query. As its first developer, you answer the team's questions with SQL, from simple lists to joins and subqueries, and then change the data without breaking it.",
   "category": "Databases",
   "language": "sql",
