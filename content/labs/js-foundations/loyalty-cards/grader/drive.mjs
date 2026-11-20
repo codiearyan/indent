@@ -1,7 +1,5 @@
 // Copied into the sandbox as .grader/drive.mjs. Drives the learner's functions and reports what happened.
-import { createStampCard } from '../src/stampCard.js'
-import { memoize } from '../src/memoize.js'
-import { once } from '../src/once.js'
+import { createStampCard, memoize, once } from '../src/helpers.js'
 
 export function stampRun(goal, times) {
   const card = createStampCard(goal)

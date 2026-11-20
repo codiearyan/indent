@@ -62,4 +62,4 @@ const wrapper = (...args) => fn(...args)
 
 ## Try it
 
-Run `node src/demo.js` in the terminal. It stamps a card five times, asks for a burn time three times and tries to send a welcome email twice. Implement one file at a time and watch the output change. The check uses its own functions too, including ones that return `0` and `undefined`.
+Run `node src/demo.js` in the terminal. It stamps a card five times, asks for a burn time three times and tries to send a welcome email twice. All three tasks are in `src/helpers.js`. Write them one at a time and watch the output change. The check uses its own functions too, including ones that return `0` and `undefined`.

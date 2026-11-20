@@ -9,9 +9,23 @@ const order = (status, placedAt, items, discountCents) => ({
   ...(discountCents === undefined ? {} : { discountCents })
 })
 
-// Runs every case in its own call; a function that still throws 'Not implemented' gets one detail.
-async function runCases(t, dir, file, fn, cases) {
-  const runs = await Promise.all(cases.map((c) => t.call(dir, file, fn, c.args)))
+const FILE = 'src/reports.js'
+
+// Runs every case in its own call. A file that does not load, or a function that still throws
+// 'Not implemented', gets one detail instead of one confusing failure per case.
+async function runCases(t, dir, fn, cases) {
+  const runs = await Promise.all(cases.map((c) => t.call(dir, FILE, fn, c.args)))
+  const broken = runs.find((r) => !r.ok && /^SyntaxError/.test(r.error))
+  if (broken) {
+    return [
+      {
+        name: `${FILE} runs`,
+        passed: false,
+        message: `${FILE} does not run, so no task in it can be checked. Fix the error below first.`,
+        output: broken.error
+      }
+    ]
+  }
   const unwritten = runs.find((r) => !r.ok && /Not implemented/.test(r.error))
   if (unwritten) {
     return [
@@ -41,7 +55,7 @@ const day2 = '2026-11-03T23:59:00Z'
 export const checks = {
   async total(t) {
     const dir = await t.sandbox()
-    return runCases(t, dir, 'src/orderTotal.js', 'orderTotal', [
+    return runCases(t, dir, 'orderTotal', [
       {
         name: 'Adds up several items',
         args: [order('paid', day1, [item('cedar', 2, 1250), item('lavender', 3, 1100)])],
@@ -89,7 +103,7 @@ export const checks = {
       order('pending', day2, [item('cedar', 3, 1250), item('lavender', 1, 1100)]),
       order('paid', day2, [item('amber', 1, 900), item('sage', 2, 1800)])
     ]
-    return runCases(t, dir, 'src/topCandles.js', 'topCandles', [
+    return runCases(t, dir, 'topCandles', [
       {
         name: 'Ranks the top two',
         args: [week, 2],
@@ -138,8 +152,8 @@ export const checks = {
   },
 
   async revenue(t) {
-    const dir = await t.sandbox({ 'src/orderTotal.js': t.chapterPath('solution/src/orderTotal.js') })
-    return runCases(t, dir, 'src/revenueByDay.js', 'revenueByDay', [
+    const dir = await t.sandbox()
+    const details = await runCases(t, dir, 'revenueByDay', [
       {
         name: 'Groups paid orders by day',
         args: [
@@ -177,5 +191,21 @@ export const checks = {
         hint: 'With no orders the result is an object with no keys.'
       }
     ])
+    // Task 3 may build on orderTotal, which now lives in the same file, so a wrong Task 1 can
+    // look like a wrong Task 3. Say so instead of leaving the learner to guess.
+    if (details.length === 1 || details.every((d) => d.passed)) return details
+    const probe = order('paid', day2, [item('sage', 2, 1800)], 600)
+    const total = await t.call(dir, FILE, 'orderTotal', [probe])
+    if (total.ok && total.value === 3000) return details
+    return [
+      {
+        name: 'orderTotal from Task 1 gives the right totals',
+        passed: false,
+        message:
+          'If revenueByDay uses orderTotal, it can only be as right as Task 1. Get Task 1 passing, then check again.',
+        output: `orderTotal(${JSON.stringify(probe)})\n${total.ok ? `returned ${JSON.stringify(total.value)}` : total.error}`
+      },
+      ...details
+    ]
   }
 }

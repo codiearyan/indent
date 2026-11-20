@@ -6,7 +6,7 @@ Wickhollow Candles pours candles by hand and sells them online. Two people run i
 
 > **Theo:** We have a file of last week's orders. I just want three answers: what each order came to, which candles sold best, and how much we made each day. Can you write that?
 
-Open `src/orders.js`. Every order is a plain object with an `id`, a `placedAt` timestamp, a `status` and an array of `items`. Prices are stored in cents, so `1250` means 12.50. Working in whole cents avoids rounding surprises when you add money.
+Open `src/reports.js`. All three tasks live in this one file, in order, and the top of it shows one order as an example. Every order is a plain object with an `id`, a `placedAt` timestamp, a `status` and an array of `items`. The whole week is in `src/orders.js` if you want to look. Prices are stored in cents, so `1250` means 12.50. Working in whole cents avoids rounding surprises when you add money.
 
 ## Arrays answer questions
 

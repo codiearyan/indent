@@ -3,6 +3,17 @@ import { isDeepStrictEqual } from 'node:util'
 async function runCases(t, fn, cases) {
   const dir = await t.sandbox({ '.grader/drive.mjs': t.chapterPath('grader/drive.mjs') })
   const runs = await Promise.all(cases.map((c) => t.call(dir, '.grader/drive.mjs', c.run, c.args)))
+  const broken = runs.find((r) => !r.ok && /^SyntaxError/.test(r.error))
+  if (broken) {
+    return [
+      {
+        name: 'src/helpers.js runs',
+        passed: false,
+        message: 'src/helpers.js does not run, so no task in it can be checked. Fix the error below first.',
+        output: broken.error
+      }
+    ]
+  }
   const unwritten = runs.find((r) => !r.ok && /Not implemented/.test(r.error))
   if (unwritten) {
     return [
