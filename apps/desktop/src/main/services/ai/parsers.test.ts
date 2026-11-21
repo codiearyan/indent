@@ -103,15 +103,13 @@ describe('sse', () => {
   })
 })
 
-// The line a real run printed with `--print-logs` when the free limit was reached.
+// Trimmed from the line a real run printed with `--print-logs` when the free limit was reached.
 const LIMIT_LOG =
-  'timestamp=2026-11-21T20:31:23.857Z level=ERROR run=56b2d686 message="stream error" providerID=opencode modelID=big-pickle session.id=ses_e00319d4 small=false agent=build mode=primary error.error="AI_APICallError: Free usage limit reached. Free models work in OpenCode (https://opencode.ai); subscribe to OpenCode Go to keep going: https://opencode.ai/go"'
+  'timestamp=2026-11-21T20:31:23.857Z level=ERROR run=56b2d686 message="stream error" providerID=opencode modelID=big-pickle session.id=ses_e00319d4 small=false agent=build mode=primary error.error="AI_APICallError: Free usage limit reached."'
 
 describe('opencodeLogError', () => {
   it('reads the reason OpenCode logged for a reply that failed', () => {
-    expect(opencodeLogError(LIMIT_LOG)).toBe(
-      'Free usage limit reached. Free models work in OpenCode (https://opencode.ai); subscribe to OpenCode Go to keep going: https://opencode.ai/go'
-    )
+    expect(opencodeLogError(LIMIT_LOG)).toBe('Free usage limit reached.')
   })
 
   it('keeps a reason that has no error class in front and reads its quotes', () => {
