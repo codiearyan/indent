@@ -1,0 +1,211 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "marguerite",
+        "label": "Marguerite",
+        "kind": "story"
+      },
+      {
+        "id": "reader",
+        "label": "Screen reader",
+        "kind": "story"
+      },
+      {
+        "id": "html",
+        "label": "index.html",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "css",
+        "label": "styles.css",
+        "kind": "file"
+      },
+      {
+        "id": "page",
+        "label": "What's on page",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "html",
+        "to": "reader",
+        "label": "elements"
+      },
+      {
+        "from": "reader",
+        "to": "marguerite",
+        "label": "parts to jump to"
+      },
+      {
+        "from": "html",
+        "to": "page",
+        "label": "content"
+      },
+      {
+        "from": "css",
+        "to": "page",
+        "label": "look"
+      }
+    ],
+    "note": "A screen reader reads the elements in index.html, not the pixels, so Marguerite only hears the shape the page looks like it has once the HTML says it."
+  },
+  "tasks": {
+    "landmarks": {
+      "steps": [
+        {
+          "active": [
+            "page"
+          ],
+          "note": "Look at the page in the Browser panel. To your eyes it clearly has a top, a middle and an end."
+        },
+        {
+          "active": [
+            "html",
+            "html->reader",
+            "reader"
+          ],
+          "note": "In index.html each of those parts starts with an element that says nothing about what it is, so the screen reader finds no parts at all."
+        },
+        {
+          "active": [
+            "html"
+          ],
+          "note": "Give each part a landmark: a header around the name and the menu, a nav for the menu links, one main for the middle and a footer for the Visit us block."
+        },
+        {
+          "active": [
+            "css",
+            "css->page",
+            "page"
+          ],
+          "note": "The classes and ids stay where they are, so styles.css still finds every part and the page looks just as it did."
+        },
+        {
+          "active": [
+            "reader",
+            "reader->marguerite",
+            "marguerite"
+          ],
+          "note": "Now Marguerite can ask for the list of landmarks and go straight to the events, skipping the menu."
+        }
+      ]
+    },
+    "headings": {
+      "steps": [
+        {
+          "active": [
+            "page"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "titles that only look like titles",
+            "values": [
+              "What's on in December",
+              "Events",
+              "Save a place",
+              "Visit us",
+              "five event titles"
+            ]
+          },
+          "note": "Some text on the page is set big or bold so that it looks like a title."
+        },
+        {
+          "active": [
+            "html",
+            "html->reader",
+            "reader"
+          ],
+          "note": "To the screen reader that text is ordinary text, so Marguerite cannot move from one title to the next."
+        },
+        {
+          "active": [
+            "html"
+          ],
+          "note": "Turn each of those titles into a real heading, with exactly one top heading for the page title. The words of each heading stay the same."
+        },
+        {
+          "active": [
+            "html",
+            "html->reader"
+          ],
+          "note": "Read the headings from the top of the page to the bottom. Each one goes at most one level deeper than the one before it."
+        },
+        {
+          "active": [
+            "reader",
+            "reader->marguerite",
+            "marguerite"
+          ],
+          "note": "The headings become the page's table of contents, and Marguerite can jump through it."
+        }
+      ]
+    },
+    "event-list": {
+      "steps": [
+        {
+          "active": [
+            "page"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "the first event card",
+            "entries": [
+              {
+                "key": "title",
+                "value": "Seed swap in the reading garden"
+              },
+              {
+                "key": "on the card",
+                "value": "Sat 5 Dec, 10am to 12 noon"
+              },
+              {
+                "key": "where",
+                "value": "Reading garden"
+              }
+            ]
+          },
+          "note": "There are five event cards like this one, and each card makes sense on its own."
+        },
+        {
+          "active": [
+            "html",
+            "html->reader",
+            "reader"
+          ],
+          "note": "Right now the screen reader cannot tell where one card ends and the next begins, or how many there are."
+        },
+        {
+          "active": [
+            "html"
+          ],
+          "note": "Make each card an article, put each article in its own list item, and keep all five in one list. The classes event and event-list stay on."
+        },
+        {
+          "active": [
+            "html"
+          ],
+          "note": "The date a person reads has no year. Wrap it in a time element whose datetime gives the full date as YYYY-MM-DD, written from the card, with the start time after it if you like."
+        },
+        {
+          "active": [
+            "css",
+            "css->page",
+            "page"
+          ],
+          "note": "If the new list draws marks in front of the cards, a rule in styles.css can tidy that up."
+        },
+        {
+          "active": [
+            "reader",
+            "reader->marguerite",
+            "marguerite"
+          ],
+          "note": "Marguerite hears how many events are coming, and every date can be read with its year."
+        }
+      ]
+    }
+  }
+}

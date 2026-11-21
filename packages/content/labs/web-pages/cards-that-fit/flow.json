@@ -1,0 +1,182 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "tomasz",
+        "label": "Tomasz",
+        "kind": "story"
+      },
+      {
+        "id": "phone",
+        "label": "A phone, 375px",
+        "kind": "story"
+      },
+      {
+        "id": "laptop",
+        "label": "A wide screen, 1280px",
+        "kind": "story"
+      },
+      {
+        "id": "html",
+        "label": "index.html",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "css",
+        "label": "styles.css",
+        "kind": "file",
+        "mine": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "tomasz",
+        "to": "phone",
+        "label": "on the bus"
+      },
+      {
+        "from": "html",
+        "to": "phone",
+        "label": "the page"
+      },
+      {
+        "from": "css",
+        "to": "phone",
+        "label": "narrow layout"
+      },
+      {
+        "from": "css",
+        "to": "laptop",
+        "label": "wide layout"
+      }
+    ],
+    "note": "The page was only ever checked on a laptop. After this issue the same files lay it out well on Tomasz's phone and on a wide screen."
+  },
+  "tasks": {
+    "flex-rows": {
+      "steps": [
+        {
+          "active": [
+            "tomasz",
+            "tomasz->phone",
+            "phone"
+          ],
+          "note": "On Tomasz's phone the menu sits on top of the library name, and the two parts of each card footer run into each other."
+        },
+        {
+          "active": [
+            "css"
+          ],
+          "note": "Both rows, the page header and each card's .event-footer, are held together with floats in styles.css. Take every float out."
+        },
+        {
+          "active": [
+            "css",
+            "css->laptop",
+            "laptop"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "the header row",
+            "values": [
+              "library name",
+              "menu"
+            ]
+          },
+          "note": "Make each row a flex row at every width, with its two groups at opposite ends."
+        },
+        {
+          "active": [
+            "css",
+            "css->phone",
+            "phone"
+          ],
+          "note": "When the phone is too narrow for both groups, the second one moves to a new line instead of landing on the first."
+        }
+      ]
+    },
+    "card-grid": {
+      "steps": [
+        {
+          "active": [
+            "html",
+            "html->phone",
+            "phone"
+          ],
+          "note": "Without being told, a phone draws the page as if it were a wide screen and shrinks it. The head of index.html tells it the page is as wide as the device."
+        },
+        {
+          "active": [
+            "tomasz",
+            "tomasz->phone",
+            "phone"
+          ],
+          "note": "Every card is a fixed share of the row, so on the phone there are still three thin strips side by side."
+        },
+        {
+          "active": [
+            "css"
+          ],
+          "note": "Make .event-list a grid that decides how wide the cards are, and take away the widths the list items and the cards set for themselves."
+        },
+        {
+          "active": [
+            "css",
+            "css->laptop",
+            "laptop"
+          ],
+          "note": "On a wide screen the grid holds at least two cards side by side."
+        },
+        {
+          "active": [
+            "css",
+            "css->phone",
+            "phone"
+          ],
+          "note": "On the phone the cards stack in a single column, one under the other."
+        }
+      ]
+    },
+    "no-overflow": {
+      "steps": [
+        {
+          "active": [
+            "tomasz",
+            "tomasz->phone",
+            "phone"
+          ],
+          "note": "With the cards narrower, the pictures stick out past the card's edge on Tomasz's phone."
+        },
+        {
+          "active": [
+            "css",
+            "css->phone"
+          ],
+          "note": "Let each picture in an .event card shrink with its card, so a narrow card holds the whole picture."
+        },
+        {
+          "active": [
+            "phone"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "one long word",
+            "values": [
+              "#QuillmoorWinterReadingChallenge"
+            ]
+          },
+          "note": "The reading challenge card has a hashtag with no space in it, so it runs off the edge of the card."
+        },
+        {
+          "active": [
+            "css",
+            "css->phone",
+            "phone"
+          ],
+          "note": "Tell the browser it may break a word that would overflow, and the hashtag folds onto the next line inside the card."
+        }
+      ]
+    }
+  }
+}
