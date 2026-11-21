@@ -44,8 +44,8 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     anchor: TOUR.taskNext,
-    title: 'Next step',
-    text: 'Short steps that point you in the right direction without giving the answer away.',
+    title: 'Help',
+    text: 'Next steps, then hints as checks fail, then the tutor. It says what you can open now and what unlocks next.',
     prepare: showLeft('tasks')
   },
   {
