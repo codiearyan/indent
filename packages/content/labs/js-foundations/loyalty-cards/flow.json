@@ -4,9 +4,9 @@
       { "id": "customer", "label": "Customer", "kind": "story" },
       { "id": "guide", "label": "Burn time guide", "kind": "story" },
       { "id": "button", "label": "Welcome button", "kind": "story" },
-      { "id": "stamp", "label": "createStampCard()", "kind": "function", "mine": true },
-      { "id": "memo", "label": "memoize()", "kind": "function", "mine": true },
-      { "id": "once", "label": "once()", "kind": "function", "mine": true },
+      { "id": "stamp", "label": "createStampCard()", "kind": "function", "mine": true, "fn": "createStampCard" },
+      { "id": "memo", "label": "memoize()", "kind": "function", "mine": true, "fn": "memoize" },
+      { "id": "once", "label": "once()", "kind": "function", "mine": true, "fn": "once" },
       { "id": "reward", "label": "Free candle", "kind": "story" },
       { "id": "slow", "label": "burnHours()", "kind": "function" },
       { "id": "email", "label": "Welcome email", "kind": "story" }

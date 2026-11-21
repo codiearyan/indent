@@ -127,6 +127,8 @@ export interface FlowNode {
   kind: FlowNodeKind
   /** The learner's part, the one place a flow uses the brand colour. */
   mine?: boolean
+  /** For a function node: the name of the learner's function it stands for, used by tracing. */
+  fn?: string
 }
 
 export interface FlowEdge {
@@ -163,6 +165,21 @@ export interface FlowStep {
   note: string
 }
 
+/** The story's example, run on the learner's code to record the path it takes. */
+export interface FlowTrace {
+  /** A learner file, relative to the workspace. */
+  file: string
+  /** An exported function of that file; the `fn` of a node in the scene. */
+  call: string
+  /** JSON values passed to the call. */
+  args: unknown[]
+}
+
+export interface TaskFlow {
+  steps: FlowStep[]
+  trace?: FlowTrace
+}
+
 /**
  * <issue>/flow.json, or labs/<labId>/flow.json with only a scene. Data only: it shows what goes
  * in and the shape of what comes out, never a task's answer.
@@ -170,7 +187,7 @@ export interface FlowStep {
 export interface Flow {
   scene: FlowScene
   /** Keyed by task id. */
-  tasks?: Record<string, { steps: FlowStep[] }>
+  tasks?: Record<string, TaskFlow>
 }
 
 /** content/paths.json */

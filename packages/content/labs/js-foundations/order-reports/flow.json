@@ -2,9 +2,9 @@
   "scene": {
     "nodes": [
       { "id": "orders", "label": "orders.js", "kind": "file" },
-      { "id": "total", "label": "orderTotal()", "kind": "function", "mine": true },
-      { "id": "top", "label": "topCandles()", "kind": "function", "mine": true },
-      { "id": "revenue", "label": "revenueByDay()", "kind": "function", "mine": true },
+      { "id": "total", "label": "orderTotal()", "kind": "function", "mine": true, "fn": "orderTotal" },
+      { "id": "top", "label": "topCandles()", "kind": "function", "mine": true, "fn": "topCandles" },
+      { "id": "revenue", "label": "revenueByDay()", "kind": "function", "mine": true, "fn": "revenueByDay" },
       { "id": "theo", "label": "Theo's answers", "kind": "story" }
     ],
     "edges": [
@@ -19,6 +19,19 @@
   },
   "tasks": {
     "total": {
+      "trace": {
+        "file": "src/reports.js",
+        "call": "orderTotal",
+        "args": [
+          {
+            "id": "WC-1002",
+            "placedAt": "2026-11-02T17:40:00Z",
+            "status": "paid",
+            "discountCents": 500,
+            "items": [{ "sku": "sage", "qty": 1, "priceCents": 1800 }]
+          }
+        ]
+      },
       "steps": [
         {
           "active": ["orders", "orders->total"],
