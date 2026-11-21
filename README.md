@@ -66,9 +66,10 @@ complete example. Restart the app to pick up a new repo.
 
 ## Where things are stored
 
-Everything is under the app's data folder (`~/Library/Application Support/indent` on macOS):
-`workspaces/` holds your files per issue, `progress.json` your points and history. API keys are
-encrypted with the operating system's keychain.
+Your files are in the folder you picked for your work, `~/Indent` by default (Settings, Editor).
+The app's data folder (`~/Library/Application Support/Indent` on macOS) holds `progress.json`, your
+points and history, and `content/`, the repos: the ones the app ships with and the ones downloaded
+from the repo library. API keys are encrypted with the operating system's keychain.
 
 ## Usage stats
 

@@ -185,6 +185,11 @@ four inks only (charcoal #1B1B1E as the background, mid grey #55555C, cream #EFE
 with no text, letters, logos or people. A repo without a cover shows the name of its language. The
 main process serves the file at `indent-cover://<labId>/`.
 
+The packaged app reads content from `<userData>/content`: on start it copies the kit, the runtime,
+the roadmaps and the shipped repos there, and it downloads the other repos from the library the site
+publishes (`scripts/build-packs.mjs`, `main/library.ts`). `pnpm dev` reads `content/` directly; to
+try downloads, serve a `build-packs.mjs` output and start with `INDENT_PACKS_URL=<its address>`.
+
 Read aloud plays a recording when one exists for the exact text of a lesson part, and falls back
 to the system voice when it does not. `node scripts/narrate.mjs [labId ...]` records the parts that
 have no recording yet with a neural voice (it needs `uvx` and `ffmpeg`, and sends the lesson text to
