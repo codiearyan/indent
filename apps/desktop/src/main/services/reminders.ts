@@ -1,6 +1,6 @@
 import { app, BrowserWindow, dialog, Menu, Notification, powerMonitor, Tray } from 'electron'
 import { readFileSync } from 'fs'
-import { mkdir, rm, writeFile } from 'fs/promises'
+import { mkdir, rename, rm, writeFile } from 'fs/promises'
 import { homedir } from 'os'
 import { dirname, join } from 'path'
 import {
@@ -52,7 +52,19 @@ function load(): Saved {
   }
 }
 
-const save = (): Promise<void> => writeFile(file(), JSON.stringify(saved, null, 2))
+let saving: Promise<void> = Promise.resolve()
+
+/** Saves are queued and replace the file whole, so two close together never leave a broken one. */
+function save(): Promise<void> {
+  const json = JSON.stringify(saved, null, 2)
+  saving = saving
+    .catch(() => {})
+    .then(async () => {
+      await writeFile(`${file()}.tmp`, json)
+      await rename(`${file()}.tmp`, file())
+    })
+  return saving
+}
 
 /** Closing the window leaves the app running in the tray. */
 export const keepsRunning = (): boolean => saved.tray
