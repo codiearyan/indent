@@ -16,10 +16,12 @@ import { levelFor } from '@shared/rules'
 import { APP_NAME, BrandMark } from '@/components/app/Brand'
 import { cn } from '@/lib/utils'
 import { viewTransition } from '@/lib/viewTransition'
+import { Button } from '@/components/ui/button'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
 import { useSettingsDialog } from '@/features/settings/dialogStore'
 import { useSettings } from '@/stores/settings'
+import { EmptyState } from './EmptyState'
 
 const NAV = [
   { to: '/', label: 'Home', icon: House },
@@ -36,6 +38,8 @@ const row =
 export function AppShell(): React.JSX.Element {
   const loadCatalog = useCatalog((s) => s.load)
   const loadProgress = useProgress((s) => s.load)
+
+  const catalogFailed = useCatalog((s) => s.error && !s.labs)
 
   useEffect(() => {
     Promise.all([loadCatalog(), loadProgress()]).catch((error: unknown) => {
@@ -88,7 +92,13 @@ export function AppShell(): React.JSX.Element {
       </aside>
       <main className="my-2 mr-2 min-w-0 flex-1 overflow-auto rounded-2xl border border-border bg-card">
         <div className="mx-auto w-full max-w-[1180px] px-10 py-9">
-          <Outlet />
+          {catalogFailed ? (
+            <EmptyState title="Could not read the repos.">
+              <Button onClick={() => void loadCatalog()}>Try again</Button>
+            </EmptyState>
+          ) : (
+            <Outlet />
+          )}
         </div>
       </main>
     </div>

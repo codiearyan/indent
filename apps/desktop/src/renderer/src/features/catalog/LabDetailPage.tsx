@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
+import { RELEASES_URL } from '@shared/repo'
 import type { ChapterSummary, LabSummary, ProgressState } from '@shared/types'
 import { BuildStrip } from '@/components/app/BuildStrip'
 import { Button } from '@/components/ui/button'
@@ -65,14 +66,29 @@ export function LabDetailPage(): React.JSX.Element {
           <p className="mt-2 text-[13px] text-muted-foreground">
             {[lab.category, ...lab.tags].join(', ')}
           </p>
+          {lab.availability && (
+            <p className="mt-1 text-[13px] text-muted-foreground">
+              {lab.availability === 'download'
+                ? 'Downloads when you start it.'
+                : 'This repo needs a newer version of Indent.'}
+            </p>
+          )}
         </div>
-        {summary.nextChapterId && (
+        {lab.availability === 'app-update' ? (
           <Button asChild>
-            <Link to={`/learn/${lab.id}/${summary.nextChapterId}`}>
-              {ACTION[summary.status]}
-              <ArrowRight />
-            </Link>
+            <a href={RELEASES_URL} target="_blank" rel="noreferrer">
+              Get the new version
+            </a>
           </Button>
+        ) : (
+          summary.nextChapterId && (
+            <Button asChild>
+              <Link to={`/learn/${lab.id}/${summary.nextChapterId}`}>
+                {ACTION[summary.status]}
+                <ArrowRight />
+              </Link>
+            </Button>
+          )
         )}
       </header>
 
