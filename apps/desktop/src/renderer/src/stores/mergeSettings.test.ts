@@ -21,10 +21,17 @@ const defaults = {
   panels: { files: false, terminal: false, chat: false, zen: false, browser: true },
   typography,
   shortcuts: {},
-  guide: null
+  guide: null,
+  goals: [] as string[]
 } as SettingsState
 
 describe('mergeSettings', () => {
+  it('turns the one goal saved by an older version into the list of goals', () => {
+    expect(mergeSettings({ goal: 'backend' }, defaults, 'dark').goals).toEqual(['backend'])
+    expect(mergeSettings({ goal: null }, defaults, 'dark').goals).toEqual([])
+    expect(mergeSettings({ goals: ['a', 'b'] }, defaults, 'dark').goals).toEqual(['a', 'b'])
+  })
+
   it('does not start the guide for someone whose settings were saved before it existed', () => {
     expect(mergeSettings({ onboarded: true, tourSeen: true }, defaults, 'dark').guide).toBeNull()
   })

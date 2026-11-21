@@ -3,24 +3,26 @@ import type { Experience } from '@/stores/settings'
 
 const LEVEL_ORDER: Record<Level, number> = { easy: 0, medium: 1, hard: 2 }
 
-export function goalLabIds(paths: PathDef[], goal: string | null): string[] {
-  const path = paths.find((p) => p.id === goal)
-  return path ? path.stages.flatMap((stage) => stage.labs) : []
+/** The repos of the roadmaps picked as goals, in the order the goals were picked. */
+export function goalLabIds(paths: PathDef[], goals: string[]): string[] {
+  return goals.flatMap(
+    (goal) => paths.find((p) => p.id === goal)?.stages.flatMap((stage) => stage.labs) ?? []
+  )
 }
 
 /**
- * Repos in the order to suggest them: the goal's roadmap first, then every roadmap's order, then
- * repos no roadmap names. Outside the goal, new learners, and anyone without a goal who is not
- * experienced, get easy repos first; experienced ones get easy repos last.
+ * Repos in the order to suggest them: the roadmaps picked as goals first, then every roadmap's
+ * order, then repos no roadmap names. Outside the goals, new learners, and anyone without a goal
+ * who is not experienced, get easy repos first; experienced ones get easy repos last.
  */
 export function recommendedOrder(
   labs: LabSummary[],
   paths: PathDef[],
-  goal: string | null,
+  goals: string[],
   experience: Experience | null
 ): LabSummary[] {
   const byId = new Map(labs.map((lab) => [lab.id, lab]))
-  const fromGoal = goalLabIds(paths, goal)
+  const fromGoal = goalLabIds(paths, goals)
   const everyPath = paths.flatMap((path) => path.stages.flatMap((stage) => stage.labs))
   const ids = [...new Set([...fromGoal, ...everyPath, ...labs.map((lab) => lab.id)])]
   const ordered = ids.flatMap((id) => byId.get(id) ?? [])

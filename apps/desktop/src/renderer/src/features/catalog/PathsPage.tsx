@@ -15,8 +15,9 @@ export function PathsPage(): React.JSX.Element {
   const labs = useCatalog((s) => s.labs)
   const paths = useCatalog((s) => s.paths)
   const progress = useProgress((s) => s.progress)
-  const goal = useSettings((s) => s.goal)
-  const ordered = paths && [...paths].sort((a, b) => Number(b.id === goal) - Number(a.id === goal))
+  const goals = useSettings((s) => s.goals)
+  const ordered =
+    paths && [...paths].sort((a, b) => Number(goals.includes(b.id)) - Number(goals.includes(a.id)))
 
   return (
     <div className="space-y-6">
@@ -37,7 +38,7 @@ export function PathsPage(): React.JSX.Element {
             path={path}
             labs={labs}
             chapters={progress.chapters}
-            isGoal={path.id === goal}
+            isGoal={goals.includes(path.id)}
           />
         ))
       )}
@@ -57,7 +58,9 @@ function PathCard({
   isGoal: boolean
 }): React.JSX.Element {
   const byId = new Map(labs.map((lab) => [lab.id, lab]))
-  const setGoal = useSettings((s) => s.setGoal)
+  const goals = useSettings((s) => s.goals)
+  const setGoals = useSettings((s) => s.setGoals)
+  const quiet = 'font-normal text-muted-foreground hover:text-foreground'
 
   return (
     <section className="rounded-lg border border-border">
@@ -65,15 +68,25 @@ function PathCard({
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-base font-semibold">{path.title}</h2>
           {isGoal ? (
-            <Badge variant="secondary">Your goal</Badge>
+            <span className="flex items-center gap-2">
+              <Badge variant="secondary">Your goal</Badge>
+              <Button
+                variant="ghost"
+                size="xs"
+                className={quiet}
+                onClick={() => setGoals(goals.filter((id) => id !== path.id))}
+              >
+                Remove
+              </Button>
+            </span>
           ) : (
             <Button
               variant="ghost"
               size="xs"
-              className="font-normal text-muted-foreground hover:text-foreground"
-              onClick={() => setGoal(path.id)}
+              className={quiet}
+              onClick={() => setGoals([...goals, path.id])}
             >
-              Make this my goal
+              {goals.length > 0 ? 'Add to my goals' : 'Make this my goal'}
             </Button>
           )}
         </div>
