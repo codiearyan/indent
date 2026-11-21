@@ -1,5 +1,6 @@
 import type * as Monaco from 'monaco-editor'
 import { api } from '@/lib/api'
+import { track } from '@/lib/telemetry'
 import { useWorkspace } from '@/stores/workspace'
 import { useAi } from './aiStore'
 
@@ -56,6 +57,8 @@ export function registerInlineSuggestions(monaco: typeof Monaco): Monaco.IDispos
       // Monaco cancels the token on the next keystroke, so only a real pause gets through.
       if (!explicit && !(await pause(PAUSE_MS, token))) return none
 
+      // Suggestions as you type fire on every pause, so only the ones asked for are counted.
+      if (explicit) track('suggestion_requested', { repo: chapter.labId, issue: chapter.id })
       const offset = model.getOffsetAt(position)
       const text = model.getValue()
       const insertText = await api.ai.complete({

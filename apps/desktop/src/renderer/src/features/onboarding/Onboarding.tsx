@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { APP_NAME, BrandMark } from '@/components/app/Brand'
 import { Button } from '@/components/ui/button'
-import { useAi } from '@/features/ai/aiStore'
+import { activeProvider, useAi } from '@/features/ai/aiStore'
+import { track } from '@/lib/telemetry'
 import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
 import { StepStrip } from './StepStrip'
@@ -11,7 +12,7 @@ import { Ready } from './Ready'
 import { HowItWorks } from './HowItWorks'
 import { Provider } from './Provider'
 import { Welcome } from './Welcome'
-import { nextStep, prevStep, type Choices, type StepId } from './steps'
+import { helpLevelFor, nextStep, prevStep, type Choices, type StepId } from './steps'
 import './onboarding.css'
 
 const STEPS: Record<StepId, (props: { staged: boolean }) => React.JSX.Element> = {
@@ -41,16 +42,22 @@ export function Onboarding(): React.JSX.Element {
   const back = prevStep(step, choices)
   const View = STEPS[step]
 
-  const finish = useCallback((): void => {
+  const finish = useCallback((from: StepId): void => {
     // The provider shown as picked is saved even when the person only pressed Continue.
     const { config, update } = useAi.getState()
     if (config?.enabled && config.provider) void update({ provider: config.provider })
+    track('onboarding_finished', {
+      from,
+      ai: config?.enabled === false ? 'off' : (activeProvider(config)?.kind ?? 'none'),
+      help: helpLevelFor(config?.suggestions ?? 'off')
+    })
     window.location.hash = '#/'
     viewTransition('onboarding-finish', () => useSettings.getState().setOnboarded(true))
   }, [])
 
   const go = (to: StepId | null): void => {
-    if (!to) return finish()
+    if (!to) return finish(step)
+    track('onboarding_step', { step: to })
     viewTransition('onboarding-step', () => {
       setVisited((seen) => new Set(seen).add(step))
       setStep(to)
@@ -105,7 +112,7 @@ export function Onboarding(): React.JSX.Element {
           variant="ghost"
           size="sm"
           className="font-normal text-muted-foreground hover:text-foreground"
-          onClick={finish}
+          onClick={() => finish(step)}
         >
           Skip setup
         </Button>
