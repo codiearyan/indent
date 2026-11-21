@@ -2,7 +2,7 @@ import { BrowserWindow, dialog } from 'electron'
 import { existsSync } from 'fs'
 import { mkdir, writeFile } from 'fs/promises'
 import { dirname, join, resolve } from 'path'
-import type { WorkspaceSnapshot } from '@shared/types'
+import type { FolderMove, WorkspaceSnapshot } from '@shared/types'
 import { handle } from '../ipc'
 import {
   chapterContentDir,
@@ -12,7 +12,7 @@ import {
   workspacesRoot
 } from '../paths'
 import { loadChapter } from './content'
-import { isEmptyFolder, isInsideOrSame, moveContents } from './moveFolder'
+import { moveContents, planMove } from './moveFolder'
 import { killAll } from './terminal'
 import { copyStarter, emptyDir, readWorkspace, resolveInside } from './workspaceFiles'
 
@@ -55,11 +55,12 @@ async function write(
   await writeFile(file, content)
 }
 
-/** Asks for a new folder and moves all work there. Null when the person cancels. */
-async function chooseRoot(): Promise<string | null> {
+/** Asks for a folder and says where the work would go. Null when the person cancels. */
+async function pickRoot(): Promise<FolderMove | null> {
   const current = workspacesRoot()
   const options: Electron.OpenDialogOptions = {
     title: 'Choose a folder for your work',
+    message: 'Your work moves to the folder you pick. It must be empty.',
     buttonLabel: 'Use this folder',
     defaultPath: dirname(current),
     properties: ['openDirectory', 'createDirectory']
@@ -69,13 +70,17 @@ async function chooseRoot(): Promise<string | null> {
     ? dialog.showOpenDialog(window, options)
     : dialog.showOpenDialog(options))
   if (picked.canceled || !picked.filePaths[0]) return null
-  const next = resolve(picked.filePaths[0])
+  const plan = await planMove(current, picked.filePaths[0], contentDir())
+  return { from: current, ...plan }
+}
+
+/** Moves all work to `to`, which the renderer got from pickRoot; checked again here. */
+async function moveRoot(to: string): Promise<string> {
+  const current = workspacesRoot()
+  const next = resolve(to)
+  const plan = await planMove(current, next, contentDir())
+  if (plan.inside || plan.to !== next) throw new Error('Pick an empty folder, or make a new one.')
   if (next === current) return current
-  if (isInsideOrSame(next, current) || isInsideOrSame(current, next)) {
-    throw new Error('Pick a folder that is not inside the current one, and does not hold it.')
-  }
-  if (isInsideOrSame(next, contentDir())) throw new Error('Pick a folder outside the app.')
-  if (!(await isEmptyFolder(next))) throw new Error('Pick an empty folder, or make a new one.')
   // Shells running inside the old folder would keep it busy and lose their place.
   killAll()
   await moveContents(current, next, ['.sandbox'])
@@ -89,6 +94,7 @@ export function register(): void {
     writeFile: write,
     reset: (labId, chapterId) => open(labId, chapterId, true),
     getRoot: async () => workspacesRoot(),
-    chooseRoot
+    pickRoot,
+    moveRoot
   })
 }

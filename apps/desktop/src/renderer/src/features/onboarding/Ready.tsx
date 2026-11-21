@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { activeProvider, useAi } from '@/features/ai/aiStore'
 import { useSettings } from '@/stores/settings'
+import { FolderNote, MoveFolderDialog } from '@/features/workspace/FolderMove'
 import { useWorkspaceRoot } from '@/features/workspace/useWorkspaceRoot'
 import { StepLayout } from './StepLayout'
 import { helpLevelFor } from './steps'
@@ -64,11 +65,13 @@ export function Ready({ staged }: { staged: boolean }): React.JSX.Element {
               disabled={folder.moving}
               onClick={() => void folder.change()}
             >
-              {folder.moving ? 'Moving...' : 'Change'}
+              Change
             </Button>
           </dd>
         </div>
       </dl>
+      <FolderNote folder={folder} className="mt-2 px-5" />
+      <MoveFolderDialog folder={folder} />
       <p className="mt-6 text-[13px] text-muted-foreground">
         Pick a repo on Home and open its first issue. The lesson, the tasks and the editor are all
         in one place.
