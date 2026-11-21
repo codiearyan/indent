@@ -95,6 +95,18 @@ export function EditorPane(): React.JSX.Element {
     return () => window.removeEventListener('keydown', onKey, true)
   }, [command])
 
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent): void => {
+      // Inside the editor, its own binding has handled the keys already.
+      if (event.defaultPrevented || !isShortcut(event, 'closeFile')) return
+      event.preventDefault()
+      const { activePath, closeFile } = useWorkspace.getState()
+      if (activePath) closeFile(activePath)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   return (
     <div className="flex h-full flex-col bg-editor">
       <div className="flex h-11 shrink-0 items-center gap-1 px-2">
@@ -213,7 +225,7 @@ export function EditorPane(): React.JSX.Element {
                     <XIcon className="size-3.5" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Close file</TooltipContent>
+                <TooltipContent>Close file ({shortcutLabel('closeFile')})</TooltipContent>
               </Tooltip>
             </div>
           )
