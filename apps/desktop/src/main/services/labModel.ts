@@ -27,7 +27,8 @@ async function start(): Promise<void> {
   status = { state: 'starting' }
   const proc = spawn('node', [join(contentDir(), 'kit', 'lab-model.mjs')], {
     env: await labEnv(),
-    stdio: ['ignore', 'pipe', 'inherit']
+    stdio: ['ignore', 'pipe', 'inherit'],
+    windowsHide: true
   })
   child = proc
   const lines = createInterface({ input: proc.stdout! })

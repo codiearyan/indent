@@ -1,11 +1,8 @@
-import { execFile } from 'child_process'
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs'
 import { delimiter, dirname } from 'path'
-import { promisify } from 'util'
 import { dataFile, ownNodeBin } from './paths'
 import { freshWindowsPath, regPath } from './windowsPath'
-
-const run = promisify(execFile)
+import { run } from './run'
 
 let shellPath: Promise<string> | undefined
 let labModelUrl: string | undefined

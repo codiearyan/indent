@@ -1,10 +1,7 @@
-import { execFile } from 'child_process'
-import { promisify } from 'util'
 import { REPO } from '@shared/repo'
 import { handle } from '../ipc'
 import { shellEnv } from '../labEnv'
-
-const run = promisify(execFile)
+import { run } from '../run'
 
 /**
  * Stars the app's repository through the GitHub CLI the person is signed in to. It only runs

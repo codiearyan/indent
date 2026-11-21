@@ -21,7 +21,7 @@ function runProcess(cmd: string, args: string[], options: ExecFileOptions): Prom
     execFile(
       cmd,
       args,
-      { ...options, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 },
+      { ...options, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, windowsHide: true },
       (error, stdout, stderr) => {
         const exitCode = !error ? 0 : typeof error.code === 'number' ? error.code : null
         resolve({
@@ -95,6 +95,8 @@ async function install(): Promise<RuntimeStatus> {
   }
   const run = await runProcess('npm', ['install', '--no-audit', '--no-fund'], {
     cwd: root,
+    // On Windows npm is npm.cmd, which only a shell can start.
+    shell: process.platform === 'win32',
     env: await labEnv(),
     timeout: INSTALL_TIMEOUT_MS
   })
