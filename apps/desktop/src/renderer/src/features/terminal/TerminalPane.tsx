@@ -5,12 +5,13 @@ import '@xterm/xterm/css/xterm.css'
 import { ChevronDown, ChevronUp, Maximize2, Minimize2, RotateCw } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Chapter } from '@shared/types'
+import { ShortcutKeys } from '@/components/app/ShortcutKeys'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { api } from '@/lib/api'
 import { codeChrome } from '@indent/design/code-palette'
 import { fontStack } from '@/lib/fonts'
-import { isAppShortcut, shortcutLabel, type ShortcutId } from '@/lib/shortcuts'
+import { isAppShortcut, type ShortcutId } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { useSettings, type Theme } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
@@ -344,7 +345,12 @@ function IconButton({
       </TooltipTrigger>
       <TooltipContent>
         {label}
-        {shortcut && ` (${shortcutLabel(shortcut)})`}
+        {shortcut && (
+          <>
+            {' '}
+            (<ShortcutKeys id={shortcut} />)
+          </>
+        )}
       </TooltipContent>
     </Tooltip>
   )

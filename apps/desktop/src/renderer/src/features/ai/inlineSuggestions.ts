@@ -1,8 +1,9 @@
 import type * as Monaco from 'monaco-editor'
 import { api } from '@/lib/api'
-import { monacoShortcut } from '@/lib/shortcuts'
+import { monacoShortcut, SHORTCUTS } from '@/lib/shortcuts'
 import { track } from '@/lib/telemetry'
 import { useWorkspace } from '@/stores/workspace'
+import { bindShortcuts } from '@/features/editor/shortcutBindings'
 import { useAi } from './aiStore'
 
 const PAUSE_MS = 500
@@ -32,11 +33,15 @@ export function bindSuggestShortcut(
   }
   sync()
   editor.onDidDispose(useAi.subscribe(sync))
-  editor.addCommand(
-    monacoShortcut('suggest', monaco),
-    () => editor.trigger('keyboard', 'editor.action.inlineSuggest.trigger', {}),
-    'suggestOnRequest'
-  )
+  bindShortcuts(editor, () => [
+    editor.addAction({
+      id: 'indent.suggest',
+      label: SHORTCUTS.suggest.label,
+      keybindings: [monacoShortcut('suggest', monaco)],
+      keybindingContext: 'suggestOnRequest',
+      run: () => editor.trigger('keyboard', 'editor.action.inlineSuggest.trigger', {})
+    })
+  ])
 }
 
 /** Registers the grey, Tab-to-accept suggestions. The editor calls this once after Monaco loads. */

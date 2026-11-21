@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { SHORTCUTS } from '@/lib/shortcuts'
+import { applyOverrides, SHORTCUTS } from '@/lib/shortcuts'
 import { shortcutGroups } from './list'
 
 const ids = (groups: ReturnType<typeof shortcutGroups>): string[] =>
@@ -46,5 +46,12 @@ describe('shortcutGroups', () => {
 
   it('finds nothing for a search nothing matches', () => {
     expect(shortcutGroups('linux', 'no such thing')).toEqual([])
+  })
+  it('shows and finds the keys a person picked', () => {
+    const shortcuts = applyOverrides({ check: 'Mod+K' })
+    const groups = shortcutGroups('darwin', '⌘K', shortcuts)
+    expect(groups.flatMap((g) => g.rows)).toEqual([
+      { id: 'check', label: 'Run checks', keys: ['⌘K'] }
+    ])
   })
 })

@@ -4,6 +4,7 @@ import { chapterKey } from '@shared/rules'
 import { monacoShortcut } from '@/lib/shortcuts'
 import { useProgress } from '@/stores/progress'
 import { useWorkspace } from '@/stores/workspace'
+import { bindShortcuts } from '@/features/editor/shortcutBindings'
 import { useAi } from './aiStore'
 import { codeAttachment, taskForFile } from './attachments'
 import { useChat } from './chatStore'
@@ -81,15 +82,17 @@ export function bindTutorActions(
     useWorkspace.subscribe((s, previous) => s.chapter !== previous.chapter && sync())
   )
 
-  editor.addAction({
-    id: 'indent.tutor.explain',
-    label: 'Explain this',
-    precondition: 'tutorOn',
-    keybindings: [monacoShortcut('explainCode', monaco)],
-    contextMenuGroupId: 'tutor',
-    contextMenuOrder: 1,
-    run: explain
-  })
+  bindShortcuts(editor, () => [
+    editor.addAction({
+      id: 'indent.tutor.explain',
+      label: 'Explain this',
+      precondition: 'tutorOn',
+      keybindings: [monacoShortcut('explainCode', monaco)],
+      contextMenuGroupId: 'tutor',
+      contextMenuOrder: 1,
+      run: explain
+    })
+  ])
   editor.addAction({
     id: 'indent.tutor.whyFails',
     label: 'Why does this fail?',

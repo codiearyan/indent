@@ -10,10 +10,11 @@ import {
   XIcon
 } from 'lucide-react'
 import { isChapterComplete } from '@shared/rules'
+import { ShortcutKeys } from '@/components/app/ShortcutKeys'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { shortcutLabel, type ShortcutId } from '@/lib/shortcuts'
+import type { ShortcutId } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { useChapterProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
@@ -130,7 +131,7 @@ export function EditorPane(): React.JSX.Element {
             </TooltipTrigger>
             <TooltipContent>
               Runs <span className="font-mono">{command}</span> in the terminal (
-              {shortcutLabel('runCommand')})
+              <ShortcutKeys id="runCommand" />)
             </TooltipContent>
           </Tooltip>
         )}
@@ -148,7 +149,9 @@ export function EditorPane(): React.JSX.Element {
               {checking ? (toolsInstalling ? 'Getting ready...' : 'Running...') : 'Run checks'}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Checks every task ({shortcutLabel('check')})</TooltipContent>
+          <TooltipContent>
+            Checks every task (<ShortcutKeys id="check" />)
+          </TooltipContent>
         </Tooltip>
       </div>
 
@@ -195,7 +198,9 @@ export function EditorPane(): React.JSX.Element {
                     <XIcon className="size-3.5" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Close file ({shortcutLabel('closeFile')})</TooltipContent>
+                <TooltipContent>
+                  Close file (<ShortcutKeys id="closeFile" />)
+                </TooltipContent>
               </Tooltip>
             </div>
           )
@@ -275,7 +280,12 @@ function IconButton({
       </TooltipTrigger>
       <TooltipContent>
         {label}
-        {shortcut && ` (${shortcutLabel(shortcut)})`}
+        {shortcut && (
+          <>
+            {' '}
+            (<ShortcutKeys id={shortcut} />)
+          </>
+        )}
       </TooltipContent>
     </Tooltip>
   )

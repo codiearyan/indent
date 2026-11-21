@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { DEFAULT_CODE_THEME, type CodeThemeId } from '@indent/design/code-palette'
 import { fontStack } from '@/lib/fonts'
+import { setShortcutOverrides, type ShortcutOverrides } from '@/lib/shortcuts'
 import { mergeSettings } from './mergeSettings'
 
 export type Theme = 'dark' | 'light'
@@ -71,6 +72,9 @@ export interface SettingsState {
   experience: Experience | null
   /** Ids of DSA patterns whose animation was played to the end. */
   dsaWatched: string[]
+  /** Keys picked in Settings, only for the shortcuts that differ from their defaults. */
+  shortcuts: ShortcutOverrides
+  setShortcuts(shortcuts: ShortcutOverrides): void
   markDsaWatched(id: string): void
   toggleTheme(): void
   setAppearance(appearance: Appearance): void
@@ -137,6 +141,8 @@ export const useSettings = create<SettingsState>()(
       goal: null,
       experience: null,
       dsaWatched: [],
+      shortcuts: {},
+      setShortcuts: (shortcuts) => set({ shortcuts }),
       markDsaWatched: (id) =>
         set((s) => (s.dsaWatched.includes(id) ? s : { dsaWatched: [...s.dsaWatched, id] })),
       toggleTheme: () =>
@@ -188,9 +194,13 @@ function applyToDocument({ theme, textScale, typography: t }: SettingsState): vo
 }
 
 applyToDocument(useSettings.getState())
+setShortcutOverrides(useSettings.getState().shortcuts)
 // Read back from storage above, so this counts this start on top of the earlier ones.
 useSettings.setState((s) => ({ launches: s.launches + 1 }))
 useSettings.subscribe(applyToDocument)
+useSettings.subscribe((s, previous) => {
+  if (s.shortcuts !== previous.shortcuts) setShortcutOverrides(s.shortcuts)
+})
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
   const { appearance, setAppearance } = useSettings.getState()

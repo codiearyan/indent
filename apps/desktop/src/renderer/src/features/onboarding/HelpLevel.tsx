@@ -9,7 +9,7 @@ import { StepLayout } from './StepLayout'
 import { Typed, MS_PER_CHAR } from './scenes/Typed'
 import { helpLevelFor, suggestionsFor, type HelpLevel as Level } from './steps'
 
-const LEVELS: { value: Level; title: string; text: string }[] = [
+const levels = (): { value: Level; title: string; text: string }[] => [
   {
     value: 'tutor',
     title: 'Only when I ask',
@@ -52,7 +52,7 @@ export function HelpLevel({ staged }: { staged: boolean }): React.JSX.Element {
         onValueChange={(value) => choose(value as Level)}
         className="grid-cols-3 gap-4"
       >
-        {LEVELS.map(({ value, title, text }) => (
+        {levels().map(({ value, title, text }) => (
           <ChoiceCard key={value} value={value} title={title}>
             <div aria-hidden="true">
               <Demo key={plays[value]} level={value} />

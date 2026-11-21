@@ -43,10 +43,17 @@ function matches(shortcut: Shortcut, platform: string, query: string): boolean {
   return text.some((t) => t.toLowerCase().includes(query))
 }
 
-/** Every shortcut grouped by where it works, keeping those whose label or keys hold `query`. */
-export function shortcutGroups(platform: string, query = ''): ShortcutGroup[] {
+/**
+ * Every shortcut grouped by where it works, keeping those whose label or keys hold `query`.
+ * `shortcuts` is the registry with a person's own keys applied.
+ */
+export function shortcutGroups(
+  platform: string,
+  query = '',
+  shortcuts: Record<ShortcutId, Shortcut> = SHORTCUTS
+): ShortcutGroup[] {
   const q = query.trim().toLowerCase()
-  const entries = Object.entries(SHORTCUTS) as [ShortcutId, Shortcut][]
+  const entries = Object.entries(shortcuts) as [ShortcutId, Shortcut][]
   return GROUPS.map(({ scope, title }) => ({
     title,
     rows: entries

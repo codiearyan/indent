@@ -1,9 +1,11 @@
 import { CODE_THEMES, DEFAULT_CODE_THEME } from '@indent/design/code-palette'
+import { cleanOverrides } from '@/lib/shortcuts'
 import type { SettingsState, Theme } from './settings'
 
 /**
  * Saved settings over the defaults. Settings saved before an option existed still get that
- * option's default, and a code theme that no longer exists falls back to the default one.
+ * option's default, a code theme that no longer exists falls back to the default one, and keys
+ * saved for a shortcut that no longer exists are dropped.
  */
 export function mergeSettings(
   saved: unknown,
@@ -21,6 +23,7 @@ export function mergeSettings(
     codeTheme: known ? persisted.codeTheme! : DEFAULT_CODE_THEME,
     panels: { ...current.panels, ...persisted.panels },
     editor: { ...current.editor, ...persisted.editor },
-    typography: { ...current.typography, ...persisted.typography }
+    typography: { ...current.typography, ...persisted.typography },
+    shortcuts: cleanOverrides(persisted.shortcuts)
   }
 }

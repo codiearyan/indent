@@ -91,7 +91,19 @@ export function formatKeys(keys: string, platform: string): string {
 
 type KeyEvent = Pick<KeyboardEvent, 'key' | 'code' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey'>
 
-const CODES: Record<string, string> = { '/': 'Slash', ',': 'Comma', '\\': 'Backslash' }
+const CODES: Record<string, string> = {
+  '/': 'Slash',
+  ',': 'Comma',
+  '\\': 'Backslash',
+  '.': 'Period',
+  ';': 'Semicolon',
+  "'": 'Quote',
+  '[': 'BracketLeft',
+  ']': 'BracketRight',
+  '-': 'Minus',
+  '=': 'Equal',
+  '`': 'Backquote'
+}
 
 function codeFor(key: string): string | undefined {
   if (/^[a-z]$/i.test(key)) return `Key${key.toUpperCase()}`
@@ -118,8 +130,20 @@ const MONACO_KEYS: Record<string, keyof typeof Monaco.KeyCode> = {
   Enter: 'Enter',
   Escape: 'Escape',
   Space: 'Space',
-  '\\': 'Backslash',
-  ',': 'Comma'
+  Tab: 'Tab',
+  Backspace: 'Backspace',
+  Delete: 'Delete',
+  Home: 'Home',
+  End: 'End',
+  PageUp: 'PageUp',
+  PageDown: 'PageDown',
+  ArrowUp: 'UpArrow',
+  ArrowDown: 'DownArrow',
+  ArrowLeft: 'LeftArrow',
+  ArrowRight: 'RightArrow',
+  ...Object.fromEntries(
+    Object.entries(CODES).map(([key, code]) => [key, code as keyof typeof Monaco.KeyCode])
+  )
 }
 
 /** The Monaco keybinding for these keys, for `editor.addCommand`. */
@@ -128,9 +152,10 @@ export function toMonacoKeys(
   monaco: Pick<typeof Monaco, 'KeyMod' | 'KeyCode'>
 ): number {
   const { modifiers, key } = parse(keys)
-  const code = /^[a-z0-9]$/i.test(key)
-    ? (`${/\d/.test(key) ? 'Digit' : 'Key'}${key.toUpperCase()}` as keyof typeof Monaco.KeyCode)
-    : MONACO_KEYS[key]
+  let code = MONACO_KEYS[key]
+  if (/^[a-z]$/i.test(key)) code = `Key${key.toUpperCase()}` as keyof typeof Monaco.KeyCode
+  else if (/^\d$/.test(key)) code = `Digit${key}` as keyof typeof Monaco.KeyCode
+  else if (/^F\d{1,2}$/.test(key)) code = key as keyof typeof Monaco.KeyCode
   if (!code) throw new Error(`No Monaco key for ${keys}`)
   const mods: Record<Modifier, number> = {
     Mod: monaco.KeyMod.CtrlCmd,
@@ -145,19 +170,200 @@ export function keysOf(shortcut: Shortcut): string[] {
   return shortcut.also ? [shortcut.keys, shortcut.also] : [shortcut.keys]
 }
 
+/** Keys a person picked in Settings, by shortcut id. Only the ones that differ are kept. */
+export type ShortcutOverrides = Partial<Record<ShortcutId, string>>
+
+/** The saved overrides that still name a shortcut and hold keys; anything else is dropped. */
+export function cleanOverrides(saved: unknown): ShortcutOverrides {
+  if (!saved || typeof saved !== 'object') return {}
+  return Object.fromEntries(
+    Object.entries(saved).filter(
+      ([id, keys]) => Object.hasOwn(SHORTCUTS, id) && typeof keys === 'string' && keys !== ''
+    )
+  )
+}
+
+/** The shortcuts with a person's keys in place of the defaults. New keys replace the extra ones. */
+export function applyOverrides(overrides: unknown): Record<ShortcutId, Shortcut> {
+  const clean = cleanOverrides(overrides)
+  return Object.fromEntries(
+    Object.entries(SHORTCUTS).map(([id, s]: [string, Shortcut]) => {
+      const keys = clean[id as ShortcutId]
+      return [id, keys ? { label: s.label, scope: s.scope, keys } : s]
+    })
+  ) as Record<ShortcutId, Shortcut>
+}
+
+let effective = applyOverrides({})
+const listeners = new Set<() => void>()
+
+/** Called by the settings store whenever the saved keys change. */
+export function setShortcutOverrides(overrides: unknown): void {
+  effective = applyOverrides(overrides)
+  listeners.forEach((listener) => listener())
+}
+
+/** Runs `listener` after the keys of any shortcut change. Returns the unsubscribe. */
+export function onShortcutsChange(listener: () => void): () => void {
+  listeners.add(listener)
+  return () => listeners.delete(listener)
+}
+
+export function shortcutOf(id: ShortcutId): Shortcut {
+  return effective[id]
+}
+
 export function shortcutLabel(id: ShortcutId): string {
-  return formatKeys(SHORTCUTS[id].keys, window.platform)
+  return formatKeys(effective[id].keys, window.platform)
 }
 
 export function isShortcut(event: KeyEvent, id: ShortcutId): boolean {
-  return keysOf(SHORTCUTS[id]).some((keys) => matchesKeys(event, keys))
+  return keysOf(effective[id]).some((keys) => matchesKeys(event, keys))
 }
 
 export function monacoShortcut(
   id: ShortcutId,
   monaco: Pick<typeof Monaco, 'KeyMod' | 'KeyCode'>
 ): number {
-  return toMonacoKeys(SHORTCUTS[id].keys, monaco)
+  return toMonacoKeys(effective[id].keys, monaco)
+}
+
+// Which scopes can be live at the same moment.
+const OVERLAPS: Record<ShortcutScope, ShortcutScope[]> = {
+  everywhere: ['everywhere', 'workspace', 'editor', 'chat', 'tour', 'patterns'],
+  workspace: ['everywhere', 'workspace', 'editor', 'chat', 'tour'],
+  editor: ['everywhere', 'workspace', 'editor'],
+  chat: ['everywhere', 'workspace', 'chat'],
+  tour: ['everywhere', 'workspace', 'tour'],
+  patterns: ['everywhere', 'patterns'],
+  onboarding: ['onboarding']
+}
+
+export function scopesOverlap(a: ShortcutScope, b: ShortcutScope): boolean {
+  return OVERLAPS[a].includes(b)
+}
+
+export function sameKeys(a: string, b: string): boolean {
+  const normal = (keys: string): string => {
+    const parts = keys.toLowerCase().split('+')
+    const key = parts.pop()
+    return [...parts.sort(), key].join('+')
+  }
+  return normal(a) === normal(b)
+}
+
+/** The first other shortcut that would answer these keys at the same moment as `id`. */
+export function conflictOf(
+  shortcuts: Record<ShortcutId, Shortcut>,
+  id: ShortcutId,
+  keys: string
+): ShortcutId | null {
+  const { scope } = shortcuts[id]
+  const entries = Object.entries(shortcuts) as [ShortcutId, Shortcut][]
+  const found = entries.find(
+    ([other, s]) =>
+      other !== id && scopesOverlap(scope, s.scope) && keysOf(s).some((k) => sameKeys(k, keys))
+  )
+  return found?.[0] ?? null
+}
+
+/** The overrides with `id` on `keys`, dropping the override when the keys are the default. */
+export function withKeys(
+  overrides: ShortcutOverrides,
+  id: ShortcutId,
+  keys: string
+): ShortcutOverrides {
+  const next = { ...overrides, [id]: keys }
+  if (sameKeys(keys, SHORTCUTS[id].keys)) delete next[id]
+  return next
+}
+
+/**
+ * Gives `id` the keys `other` has now and `other` the keys `id` had. Null when the old keys do
+ * not suit `other` or clash with a third shortcut there.
+ */
+export function swapKeys(
+  overrides: ShortcutOverrides,
+  id: ShortcutId,
+  other: ShortcutId,
+  keys: string,
+  platform: string
+): ShortcutOverrides | null {
+  const shortcuts = applyOverrides(overrides)
+  const old = shortcuts[id].keys
+  if (refusal(old, shortcuts[other].scope, platform)) return null
+  const next = withKeys(withKeys(overrides, id, keys), other, old)
+  const after = applyOverrides(next)
+  if (conflictOf(after, id, keys) || conflictOf(after, other, old)) return null
+  return next
+}
+
+const RECORD_CODES: Record<string, string> = Object.fromEntries(
+  Object.entries(CODES).map(([key, code]) => [code, key])
+)
+const NAMED_KEYS = new Set([...Object.keys(MONACO_KEYS).filter((k) => k.length > 1), 'Escape'])
+const PLAIN_SCOPES: ShortcutScope[] = ['patterns', 'tour', 'chat', 'onboarding']
+
+/**
+ * The keys an event presses, in the registry's format: `Mod` for Cmd on macOS and Ctrl
+ * elsewhere, then Alt and Shift. Null while only modifiers are held, or for a key the app cannot
+ * bind. Ctrl on macOS and the Windows key elsewhere are left out; they are not app modifiers.
+ */
+export function keysFromEvent(event: KeyEvent, platform: string): string | null {
+  const code = event.code
+  let key: string | undefined
+  if (/^Key[A-Z]$/.test(code)) key = code.slice(3)
+  else if (/^Digit\d$/.test(code)) key = code.slice(5)
+  else if (RECORD_CODES[code]) key = RECORD_CODES[code]
+  else if (code === 'Space' || event.key === ' ') key = 'Space'
+  else if (/^F\d{1,2}$/.test(event.key) || NAMED_KEYS.has(event.key)) key = event.key
+  if (!key) return null
+  const mod = platform === 'darwin' ? event.metaKey : event.ctrlKey
+  const modifiers = [mod && 'Mod', event.altKey && 'Alt', event.shiftKey && 'Shift'].filter(Boolean)
+  return [...modifiers, key].join('+')
+}
+
+/** Keys no shortcut can take, because the system, the editor or the terminal needs them. */
+export const RESERVED_KEYS: { keys: string; platform?: 'darwin' | 'other'; reason: string }[] = [
+  { keys: 'Mod+Q', platform: 'darwin', reason: 'quits the app' },
+  { keys: 'Mod+H', platform: 'darwin', reason: 'hides the app' },
+  { keys: 'Mod+M', platform: 'darwin', reason: 'minimizes the window' },
+  { keys: 'Mod+`', platform: 'darwin', reason: 'switches windows' },
+  { keys: 'Mod+Tab', platform: 'darwin', reason: 'switches apps' },
+  { keys: 'Alt+Tab', platform: 'other', reason: 'switches apps' },
+  { keys: 'Alt+F4', platform: 'other', reason: 'closes the window' },
+  { keys: 'Mod+C', reason: 'copies' },
+  { keys: 'Mod+V', reason: 'pastes' },
+  { keys: 'Mod+X', reason: 'cuts' },
+  { keys: 'Mod+Z', reason: 'undoes' },
+  { keys: 'Mod+Shift+Z', reason: 'redoes' },
+  { keys: 'Mod+A', reason: 'selects everything' },
+  { keys: 'Mod+F', reason: 'finds in the editor' },
+  { keys: 'Mod+D', reason: 'selects the next match in the editor' },
+  { keys: 'Mod+L', reason: 'selects a line in the editor and clears the terminal' },
+  { keys: 'Mod+]', reason: 'indents in the editor' },
+  { keys: 'Mod+[', reason: 'outdents in the editor' },
+  { keys: 'F1', reason: 'opens the editor commands' },
+  { keys: 'Tab', reason: 'moves focus' },
+  { keys: 'Shift+Tab', reason: 'moves focus' }
+]
+
+/**
+ * Why these keys cannot be a shortcut of this scope, in plain words, or null when they can.
+ * App-wide shortcuts need Cmd, Ctrl or Alt, or a function key, so typing never sets them off.
+ */
+export function refusal(keys: string, scope: ShortcutScope, platform: string): string | null {
+  const shown = formatKeys(keys, platform)
+  const kind = platform === 'darwin' ? 'darwin' : 'other'
+  const reserved = RESERVED_KEYS.find(
+    (r) => (!r.platform || r.platform === kind) && sameKeys(r.keys, keys)
+  )
+  if (reserved) return `${shown} ${reserved.reason}. Pick other keys.`
+  const { modifiers, key } = parse(keys)
+  const held = modifiers.includes('Mod') || modifiers.includes('Alt')
+  if (held || /^F\d{1,2}$/.test(key) || PLAIN_SCOPES.includes(scope)) return null
+  const names = platform === 'darwin' ? 'Cmd or Option' : 'Ctrl or Alt'
+  return `Hold ${names} with the key, so typing does not set it off.`
 }
 
 interface GuardedEvent extends KeyEvent {
@@ -197,7 +403,7 @@ export function skipsShortcut(event: GuardedEvent, keys: string, platform: strin
 /** Whether the app takes this key press from the terminal for one of its own shortcuts. */
 export function isAppShortcut(event: KeyEvent): boolean {
   if (isShellKey(event)) return false
-  return Object.values(SHORTCUTS).some(
+  return Object.values(effective).some(
     (s: Shortcut) =>
       (s.scope === 'everywhere' || s.scope === 'workspace') &&
       keysOf(s).some((keys) => matchesKeys(event, keys))

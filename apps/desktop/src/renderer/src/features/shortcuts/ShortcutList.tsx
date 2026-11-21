@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { applyOverrides } from '@/lib/shortcuts'
+import { useSettings } from '@/stores/settings'
 import { useShortcutList } from './dialogStore'
 import { shortcutGroups } from './list'
 
@@ -9,7 +11,8 @@ import { shortcutGroups } from './list'
 export function ShortcutList(): React.JSX.Element {
   const { open, setOpen } = useShortcutList()
   const [query, setQuery] = useState('')
-  const groups = shortcutGroups(window.platform, query)
+  const overrides = useSettings((s) => s.shortcuts)
+  const groups = shortcutGroups(window.platform, query, applyOverrides(overrides))
 
   return (
     <Dialog

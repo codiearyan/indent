@@ -10,7 +10,14 @@ import {
   SHORTCUTS,
   skipsShortcut,
   toMonacoKeys,
-  type ShortcutScope
+  applyOverrides,
+  conflictOf,
+  keysFromEvent,
+  refusal,
+  setShortcutOverrides,
+  swapKeys,
+  withKeys,
+  type ShortcutId
 } from './shortcuts'
 
 const KeyMod = { CtrlCmd: 2048, Shift: 1024, Alt: 512, WinCtrl: 256 }
@@ -115,7 +122,7 @@ describe('toMonacoKeys', () => {
   })
 
   it('refuses a key it has no code for', () => {
-    expect(() => toMonacoKeys('Mod+ArrowUp', monaco)).toThrow()
+    expect(() => toMonacoKeys('Mod+Pause', monaco)).toThrow()
   })
 })
 
@@ -199,33 +206,14 @@ describe('isAppShortcut', () => {
   })
 })
 
-// Which scopes can be live at the same moment.
-const OVERLAPS: Record<ShortcutScope, ShortcutScope[]> = {
-  everywhere: ['everywhere', 'workspace', 'editor', 'chat', 'tour', 'patterns'],
-  workspace: ['everywhere', 'workspace', 'editor', 'chat', 'tour'],
-  editor: ['everywhere', 'workspace', 'editor'],
-  chat: ['everywhere', 'workspace', 'chat'],
-  tour: ['everywhere', 'workspace', 'tour'],
-  patterns: ['everywhere', 'patterns'],
-  onboarding: ['onboarding']
-}
-
-const normal = (keys: string): string => {
-  const parts = keys.toLowerCase().split('+')
-  const key = parts.pop()
-  return [...parts.sort(), key].join('+')
-}
-
 describe('SHORTCUTS', () => {
   it('never gives the same keys to two shortcuts that can be live together', () => {
-    const entries = Object.entries(SHORTCUTS).flatMap(([id, s]) =>
-      keysOf(s).map((keys) => ({ id, scope: s.scope, keys: normal(keys) }))
-    )
-    const clashes = entries.flatMap((x, i) =>
-      entries
-        .slice(i + 1)
-        .filter((y) => OVERLAPS[x.scope].includes(y.scope) && x.keys === y.keys)
-        .map((y) => `${x.id} and ${y.id}`)
+    const shortcuts = applyOverrides({})
+    const clashes = (Object.keys(SHORTCUTS) as ShortcutId[]).flatMap((id) =>
+      keysOf(SHORTCUTS[id]).flatMap((keys) => {
+        const other = conflictOf(shortcuts, id, keys)
+        return other ? [`${id} and ${other}`] : []
+      })
     )
     expect(clashes).toEqual([])
   })
@@ -236,5 +224,166 @@ describe('SHORTCUTS', () => {
       true
     )
     expect(isShortcut(press('/', {}, 'Slash'), 'shortcutList')).toBe(false)
+  })
+})
+
+const keyEvent = (
+  key: string,
+  code: string,
+  mods: Partial<Record<'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey', boolean>> = {}
+): Pick<KeyboardEvent, 'key' | 'code' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey'> =>
+  press(key, mods, code)
+
+describe('keysFromEvent', () => {
+  it('writes Cmd as Mod on macOS and Ctrl as Mod elsewhere', () => {
+    expect(keysFromEvent(keyEvent('k', 'KeyK', { metaKey: true }), 'darwin')).toBe('Mod+K')
+    expect(keysFromEvent(keyEvent('k', 'KeyK', { ctrlKey: true }), 'win32')).toBe('Mod+K')
+    expect(keysFromEvent(keyEvent('k', 'KeyK', { ctrlKey: true }), 'darwin')).toBe('K')
+    expect(keysFromEvent(keyEvent('k', 'KeyK', { metaKey: true }), 'linux')).toBe('K')
+  })
+
+  it('puts Mod, Alt and Shift in that order', () => {
+    const all = { metaKey: true, ctrlKey: true, altKey: true, shiftKey: true }
+    expect(keysFromEvent(keyEvent('K', 'KeyK', all), 'darwin')).toBe('Mod+Alt+Shift+K')
+    expect(keysFromEvent(keyEvent('K', 'KeyK', all), 'linux')).toBe('Mod+Alt+Shift+K')
+  })
+
+  it('reads the physical key when Shift or Option changes the character', () => {
+    expect(keysFromEvent(keyEvent('˚', 'KeyK', { altKey: true }), 'darwin')).toBe('Alt+K')
+    expect(keysFromEvent(keyEvent('!', 'Digit1', { shiftKey: true, ctrlKey: true }), 'win32')).toBe(
+      'Mod+Shift+1'
+    )
+    expect(keysFromEvent(keyEvent('?', 'Slash', { shiftKey: true, metaKey: true }), 'darwin')).toBe(
+      'Mod+Shift+/'
+    )
+  })
+
+  it('names Enter, arrows, Space and function keys', () => {
+    expect(keysFromEvent(keyEvent('Enter', 'Enter', { metaKey: true }), 'darwin')).toBe('Mod+Enter')
+    expect(keysFromEvent(keyEvent('ArrowLeft', 'ArrowLeft'), 'linux')).toBe('ArrowLeft')
+    expect(keysFromEvent(keyEvent(' ', 'Space'), 'linux')).toBe('Space')
+    expect(keysFromEvent(keyEvent('F5', 'F5'), 'win32')).toBe('F5')
+  })
+
+  it('keeps waiting while only modifiers are held', () => {
+    expect(keysFromEvent(keyEvent('Meta', 'MetaLeft', { metaKey: true }), 'darwin')).toBeNull()
+    expect(keysFromEvent(keyEvent('Shift', 'ShiftLeft', { shiftKey: true }), 'linux')).toBeNull()
+    expect(keysFromEvent(keyEvent('Control', 'ControlLeft', { ctrlKey: true }), 'win32')).toBeNull()
+  })
+
+  it('records keys the editor can bind', () => {
+    for (const keys of ['Mod+Alt+Shift+K', 'Mod+Shift+/', 'Mod+Enter', 'Alt+F5', 'Mod+ArrowUp']) {
+      expect(() => toMonacoKeys(keys, monaco)).not.toThrow()
+    }
+  })
+})
+
+describe('refusal', () => {
+  it('refuses the keys the system keeps on macOS only', () => {
+    expect(refusal('Mod+Q', 'workspace', 'darwin')).toBe('⌘Q quits the app. Pick other keys.')
+    expect(refusal('Mod+H', 'everywhere', 'darwin')).toMatch(/hides the app/)
+    expect(refusal('Mod+Q', 'workspace', 'win32')).toBeNull()
+    expect(refusal('Alt+F4', 'workspace', 'win32')).toMatch(/closes the window/)
+  })
+
+  it('refuses editing keys everywhere, in any modifier order', () => {
+    expect(refusal('Mod+C', 'editor', 'linux')).toBe('Ctrl+C copies. Pick other keys.')
+    expect(refusal('Mod+V', 'patterns', 'darwin')).toMatch(/pastes/)
+    expect(refusal('Shift+Mod+Z', 'workspace', 'darwin')).toMatch(/redoes/)
+  })
+
+  it('needs Mod or Alt for app-wide shortcuts, except function keys', () => {
+    expect(refusal('K', 'workspace', 'darwin')).toMatch(/Hold Cmd or Option/)
+    expect(refusal('Shift+K', 'everywhere', 'linux')).toMatch(/Hold Ctrl or Alt/)
+    expect(refusal('Enter', 'editor', 'linux')).not.toBeNull()
+    expect(refusal('Tab', 'patterns', 'linux')).toMatch(/moves focus/)
+    expect(refusal('F5', 'workspace', 'linux')).toBeNull()
+    expect(refusal('Alt+K', 'workspace', 'darwin')).toBeNull()
+  })
+
+  it('lets Patterns, the tour, the tutor and setup take plain keys', () => {
+    expect(refusal('K', 'patterns', 'darwin')).toBeNull()
+    expect(refusal('ArrowDown', 'tour', 'darwin')).toBeNull()
+    expect(refusal('Shift+Enter', 'chat', 'linux')).toBeNull()
+  })
+
+  it('accepts every default', () => {
+    const refused = Object.entries(SHORTCUTS).flatMap(([id, s]) =>
+      ['darwin', 'win32'].flatMap((p) => (refusal(s.keys, s.scope, p) ? [`${id} on ${p}`] : []))
+    )
+    expect(refused).toEqual([])
+  })
+})
+
+describe('applyOverrides', () => {
+  it('uses the saved keys, drops the extra ones and ignores unknown ids', () => {
+    const shortcuts = applyOverrides({ check: 'Mod+K', shortcutList: 'Mod+Alt+/', gone: 'Mod+G' })
+    expect(shortcuts.check).toEqual({ ...SHORTCUTS.check, keys: 'Mod+K' })
+    expect(keysOf(shortcuts.shortcutList)).toEqual(['Mod+Alt+/'])
+    expect(shortcuts.save).toBe(SHORTCUTS.save)
+    expect('gone' in shortcuts).toBe(false)
+  })
+
+  it('ignores what is not keys', () => {
+    expect(applyOverrides({ check: 4, save: '' }).check).toBe(SHORTCUTS.check)
+    expect(applyOverrides(null).save).toBe(SHORTCUTS.save)
+  })
+
+  it('is what the registry helpers read', () => {
+    setShortcutOverrides({ check: 'Mod+K' })
+    expect(isShortcut(press('k', { metaKey: true }), 'check')).toBe(true)
+    expect(isShortcut(press('Enter', { metaKey: true }), 'check')).toBe(false)
+    expect(isAppShortcut(press('Enter', { metaKey: true }))).toBe(false)
+    setShortcutOverrides({})
+    expect(isShortcut(press('Enter', { metaKey: true }), 'check')).toBe(true)
+  })
+})
+
+describe('conflictOf', () => {
+  const defaults = applyOverrides({})
+
+  it('finds a shortcut with the same keys whose scope can be live together', () => {
+    expect(conflictOf(defaults, 'check', 'Mod+J')).toBe('toggleTerminal')
+    expect(conflictOf(defaults, 'save', 'Shift+Mod+Enter')).toBe('runCommand')
+    expect(conflictOf(defaults, 'check', 'Mod+Shift+/')).toBe('shortcutList')
+  })
+
+  it('ignores scopes that are never live together and the shortcut itself', () => {
+    expect(conflictOf(defaults, 'continueSetup', 'Space')).toBeNull()
+    expect(conflictOf(defaults, 'playPause', 'Enter')).toBeNull()
+    expect(conflictOf(defaults, 'check', 'Mod+Enter')).toBeNull()
+  })
+
+  it('sees the keys a person picked', () => {
+    const shortcuts = applyOverrides({ toggleTerminal: 'Mod+K' })
+    expect(conflictOf(shortcuts, 'check', 'Mod+J')).toBeNull()
+    expect(conflictOf(shortcuts, 'check', 'Mod+K')).toBe('toggleTerminal')
+  })
+})
+
+describe('withKeys', () => {
+  it('keeps an override only while it differs from the default', () => {
+    expect(withKeys({}, 'check', 'Mod+K')).toEqual({ check: 'Mod+K' })
+    expect(withKeys({ check: 'Mod+K' }, 'check', 'Mod+Enter')).toEqual({})
+  })
+})
+
+describe('swapKeys', () => {
+  it('gives the other shortcut the old keys', () => {
+    expect(swapKeys({}, 'check', 'toggleTerminal', 'Mod+J', 'darwin')).toEqual({
+      check: 'Mod+J',
+      toggleTerminal: 'Mod+Enter'
+    })
+  })
+
+  it('swaps back to the defaults with no overrides left', () => {
+    const swapped = { check: 'Mod+J', toggleTerminal: 'Mod+Enter' }
+    expect(swapKeys(swapped, 'check', 'toggleTerminal', 'Mod+Enter', 'darwin')).toEqual({})
+  })
+
+  it('refuses a swap that leaves the other shortcut on keys it cannot take', () => {
+    const overrides = { playPause: 'Mod+,' }
+    expect(swapKeys({}, 'playPause', 'openSettings', 'Mod+,', 'darwin')).toBeNull()
+    expect(swapKeys(overrides, 'stepBack', 'playPause', 'Mod+,', 'darwin')).toBeNull()
   })
 })
