@@ -4,6 +4,7 @@ import type { Chapter } from '@shared/types'
 import { MAX_HINTS, hintsUnlocked, isChapterComplete } from '@shared/rules'
 import { Button } from '@/components/ui/button'
 import { useChapterProgress } from '@/stores/progress'
+import { RuntimeNotice } from './RuntimeNotice'
 import { TaskItem } from './TaskItem'
 
 export function TaskList({ chapter }: { chapter: Chapter }): React.JSX.Element {
@@ -25,6 +26,7 @@ export function TaskList({ chapter }: { chapter: Chapter }): React.JSX.Element {
 
   return (
     <div className="px-6 pt-2 pb-10">
+      <RuntimeNotice />
       {complete && (
         <div className="mt-4 flex items-center gap-3 rounded-lg bg-success/10 py-3 pr-3 pl-4">
           <CircleCheck className="size-5 shrink-0 text-success" strokeWidth={1.5} />

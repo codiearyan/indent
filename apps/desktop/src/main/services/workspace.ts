@@ -11,6 +11,7 @@ import {
   workspaceDir,
   workspacesRoot
 } from '../paths'
+import { ensureRuntime } from './checks'
 import { loadChapter } from './content'
 import { moveContents, planMove } from './moveFolder'
 import { killAll } from './terminal'
@@ -29,6 +30,8 @@ function oneAtATime<T>(key: string, job: () => Promise<T>): Promise<T> {
 }
 
 function open(labId: string, chapterId: string, reset = false): Promise<WorkspaceSnapshot> {
+  // The repo tools install while the learner reads, not inside their first Check.
+  void ensureRuntime()
   const dir = workspaceDir(labId, chapterId)
   return oneAtATime(dir, async () => {
     const chapter = await loadChapter(labId, chapterId)

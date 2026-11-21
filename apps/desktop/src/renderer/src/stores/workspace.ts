@@ -176,6 +176,8 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         const key = chapterKey(chapter.labId, chapter.id)
         const before = useProgress.getState().progress?.chapters[key]
         const { results, progress } = await api.checks.run(chapter.labId, chapter.id, taskIds)
+        // No results: the repo tools are not ready, and the notice above the tasks says why.
+        if (results.length === 0) return results
         useProgress.getState().set(progress)
         const after = progress.chapters[key]
         const ids = { repo: chapter.labId, issue: chapter.id }

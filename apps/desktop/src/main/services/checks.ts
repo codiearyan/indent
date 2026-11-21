@@ -3,14 +3,15 @@ import { existsSync } from 'fs'
 import { copyFile, mkdir, readFile } from 'fs/promises'
 import { join } from 'path'
 import type { CheckResult, ProgressState, RuntimeStatus } from '@shared/types'
+import { EVENTS } from '@shared/types'
 import { chapterKey } from '@shared/rules'
-import { handle } from '../ipc'
+import { emit, handle } from '../ipc'
 import { labEnv } from '../labEnv'
 import { chapterContentDir, contentDir, workspaceDir, workspacesRoot } from '../paths'
 import { loadChapter } from './content'
 import { failedResults, gradeRun, nodeSupported, tail, type RunOutcome } from './grader'
 import { labModelProblem, labModelReady, startLabModel } from './labModel'
-import { recordCheck } from './progress'
+import { getProgress, recordCheck } from './progress'
 
 const CHECK_TIMEOUT_MS = 90_000
 const INSTALL_TIMEOUT_MS = 10 * 60_000
@@ -66,15 +67,31 @@ async function runtimeStatus(): Promise<RuntimeStatus> {
   return { node, ready: await depsInstalled() }
 }
 
+/** The last status sent to the renderer, which shows it above the tasks and in Settings. */
+let latest: RuntimeStatus | undefined
+
+function publish(status: RuntimeStatus): RuntimeStatus {
+  latest = status
+  emit(EVENTS.runtime, status)
+  return status
+}
+
+const OFFLINE = /ENOTFOUND|EAI_AGAIN|ECONNREFUSED|ECONNRESET|ETIMEDOUT|ENETUNREACH/
+
 async function install(): Promise<RuntimeStatus> {
   const status = await runtimeStatus()
-  if (status.ready || status.error) return status
+  if (status.ready || status.error) return publish(status)
+  publish({ ...status, installing: true })
   const root = workspacesRoot()
   try {
     await mkdir(root, { recursive: true })
     await copyFile(runtimePackage(), join(root, 'package.json'))
   } catch (error) {
-    return { ...status, error: `Could not prepare the runtime dependencies: ${String(error)}` }
+    return publish({
+      ...status,
+      error: 'Could not get the repo tools ready.',
+      details: String(error)
+    })
   }
   const run = await runProcess('npm', ['install', '--no-audit', '--no-fund'], {
     cwd: root,
@@ -82,13 +99,14 @@ async function install(): Promise<RuntimeStatus> {
     timeout: INSTALL_TIMEOUT_MS
   })
   if (run.exitCode !== 0) {
-    const reason = run.timedOut ? 'The install took too long.' : tail(run.stderr)
-    return {
-      ...status,
-      error: `Could not install the runtime dependencies. Check your internet connection and try again.\n${reason}`
-    }
+    const error = OFFLINE.test(run.stderr)
+      ? 'Getting the repo tools needs an internet connection once. Connect and try again.'
+      : run.timedOut
+        ? 'Getting the repo tools took too long. Try again.'
+        : 'Could not get the repo tools ready. Try again.'
+    return publish({ ...status, error, details: tail(run.stderr) })
   }
-  return runtimeStatus()
+  return publish(await runtimeStatus())
 }
 
 let installing: Promise<RuntimeStatus> | undefined
@@ -109,10 +127,10 @@ async function runCheck(
   if (unknown) throw new Error(`Unknown task: ${unknown}`)
 
   const status = await ensureRuntime()
-  if (status.ready) await labModelReady()
-  const error = status.ready
-    ? labModelProblem(labId)
-    : (status.error ?? 'The runtime dependencies are not installed.')
+  // The notice above the tasks says what is wrong; the tasks are not failed for it.
+  if (!status.ready) return { results: [], progress: await getProgress() }
+  await labModelReady()
+  const error = labModelProblem(labId)
   let results: CheckResult[]
   if (error) {
     results = failedResults(ids, error, 0, new Date().toISOString())
@@ -155,5 +173,9 @@ function run(labId: string, chapterId: string, taskIds?: string[]): ReturnType<t
 
 export function register(): void {
   startLabModel()
-  handle('checks', { run, runtimeStatus, ensureRuntime })
+  handle('checks', {
+    run,
+    runtimeStatus: async () => (installing && latest ? latest : runtimeStatus()),
+    ensureRuntime
+  })
 }
