@@ -40,6 +40,20 @@ it('marks steps without recorded calls as not checked', () => {
   })
 })
 
+it('says every step was followed when only steps without a function are unchecked', () => {
+  const comparison: TraceComparison = { steps: [{ status: 'not-checked' }, ...reached.steps] }
+  expect(traceView(comparison, trace, false).summary).toBe('Your code followed every step.')
+})
+
+it('says the trace was partial when a step with a function was not recorded', () => {
+  const comparison: TraceComparison = {
+    steps: [...reached.steps, { status: 'not-checked', fn: 'orderTotal' }]
+  }
+  expect(traceView(comparison, trace, false).summary).toBe(
+    'The trace could only check part of the flow.'
+  )
+})
+
 it('hides recorded rows after an edit', () => {
   expect(traceView(reached, trace, true)).toEqual({
     summary: 'Your code changed since this trace. Trace again.'

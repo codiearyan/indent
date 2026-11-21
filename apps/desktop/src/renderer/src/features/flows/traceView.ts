@@ -29,9 +29,12 @@ export function traceView(
   }
 
   const { divergence, steps } = comparison
+  // A step that names no function has nothing to check; one that names a function but was not
+  // recorded means the trace saw only part of the flow.
+  const unchecked = steps.some((step) => step.status === 'not-checked' && step.fn)
   const summary = divergence
     ? short(divergence.message)
-    : trace.truncated || !trace.ok || !steps.some((step) => step.status === 'reached')
+    : unchecked || trace.truncated || !trace.ok || !steps.some((step) => step.status === 'reached')
       ? 'The trace could only check part of the flow.'
       : 'Your code followed every step.'
 
