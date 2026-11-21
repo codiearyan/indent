@@ -17,6 +17,7 @@ import { useProgress } from './progress'
 import { useSettings } from './settings'
 import { useOpenTabs } from './tabs'
 import { closeTab, initialTabs, openTab, pruneTabs, type OpenTabs } from '@/features/editor/tabs'
+import { movedPath } from '@/features/editor/fileTree'
 
 const SAVE_DELAY_MS = 400
 
@@ -34,6 +35,8 @@ interface WorkspaceStore {
   /** Absolute workspace folder on disk. */
   dir: string
   files: WorkspaceFile[]
+  /** Every folder, empty ones too. */
+  folders: string[]
   /** Starter content by path; a file that differs from it, or has none, counts as edited. */
   starter: Record<string, string>
   /** Files the learner changed that a repo update changed too. */
@@ -64,6 +67,13 @@ interface WorkspaceStore {
   refresh(): Promise<void>
   /** Restores the starter files. */
   reset(): Promise<void>
+  /** Makes an empty file and opens it. */
+  createFile(path: string): Promise<void>
+  createFolder(path: string): Promise<void>
+  /** Renames a file or folder; its open tabs and expanded folders follow. */
+  renamePath(from: string, to: string): Promise<void>
+  /** Deletes a file, or a folder with everything in it, and closes their tabs. */
+  removePath(path: string): Promise<void>
   /** Keeps the learner's version of a conflicted file, or takes the new one. */
   resolveConflict(path: string, choice: ConflictChoice): Promise<void>
   /** Runs the hidden tests for some tasks, or all. */
@@ -102,7 +112,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
 
   /** `opening` restores the issue's remembered tabs; otherwise tabs of files that are gone close. */
   const applySnapshot = (
-    { files, dir, starter, conflicts, updated, remembered }: WorkspaceSnapshot,
+    { files, folders, dir, starter, conflicts, updated, remembered }: WorkspaceSnapshot,
     opening = false
   ): void => {
     const { openPaths, activePath, chapter } = get()
@@ -115,8 +125,15 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       set((s) => ({ revision: s.revision + 1 }))
       if (conflicts.length === 0) toast('This issue was updated. Your changes are kept.')
     }
-    set({ files, dir, starter, conflicts, remembered })
+    set({ files, folders, dir, starter, conflicts, remembered })
     setTabs(tabs)
+  }
+
+  /** Pending edits are written first, or the snapshot would replace them with what is on disk. */
+  const change = async (job: () => Promise<WorkspaceSnapshot>): Promise<void> => {
+    await get().flush()
+    applySnapshot(await job())
+    set((s) => ({ revision: s.revision + 1 }))
   }
 
   return {
@@ -125,6 +142,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     chapter: null,
     dir: '',
     files: [],
+    folders: [],
     starter: {},
     conflicts: [],
     remembered: true,
@@ -142,6 +160,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         error: null,
         chapter: null,
         files: [],
+        folders: [],
         starter: {},
         conflicts: [],
         openPaths: [],
@@ -204,6 +223,35 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       applySnapshot(snapshot)
       set((s) => ({ revision: s.revision + 1 }))
     },
+
+    createFile: async (path) => {
+      await change(() => api.workspace.createFile(...ids(), path))
+      get().openFile(path)
+    },
+
+    createFolder: (path) => change(() => api.workspace.createFolder(...ids(), path)),
+
+    renamePath: async (from, to) => {
+      await change(async () => {
+        const snapshot = await api.workspace.rename(...ids(), from, to)
+        const { openPaths, activePath } = get()
+        set({
+          openPaths: openPaths.map((p) => movedPath(p, from, to)),
+          activePath: activePath && movedPath(activePath, from, to)
+        })
+        return snapshot
+      })
+      const key = chapterKey(...ids())
+      const tabs = useOpenTabs.getState()
+      const expanded = tabs.expandedByChapter[key]
+      if (expanded)
+        tabs.rememberExpanded(
+          key,
+          expanded.map((p) => movedPath(p, from, to))
+        )
+    },
+
+    removePath: (path) => change(() => api.workspace.remove(...ids(), path)),
 
     resolveConflict: async (path, choice) => {
       await get().flush()
