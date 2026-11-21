@@ -18,7 +18,11 @@ export function RuntimeNotice(): React.JSX.Element | null {
       >
         <Loader2 className="size-4 shrink-0 animate-spin text-muted-foreground motion-reduce:animate-none" />
         <p className="text-[13px] text-muted-foreground">
-          Getting the repo tools ready. This happens once, about a minute.
+          Getting the repo tools ready
+          {status.progress !== undefined && (
+            <span className="tabular-nums">, {Math.round(status.progress * 100)}%</span>
+          )}
+          . This happens once, about a minute.
         </p>
       </div>
     )
@@ -29,9 +33,11 @@ export function RuntimeNotice(): React.JSX.Element | null {
   return (
     <div role="alert" className="mt-4 space-y-3 rounded-lg border border-border px-4 py-3">
       <p className="text-sm">{status.error}</p>
-      <Button variant="outline" size="sm" className={outline} onClick={retryRuntime}>
-        Try again
-      </Button>
+      {status.retry !== false && (
+        <Button variant="outline" size="sm" className={outline} onClick={retryRuntime}>
+          Try again
+        </Button>
+      )}
       {status.details && (
         <Collapsible>
           <CollapsibleTrigger className="group flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground">

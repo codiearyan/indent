@@ -1,0 +1,107 @@
+name: Repo tools
+
+# Builds the repo tools (packages/content/runtime/node_modules) once per system and publishes them
+# as the release tools-js-<version>, which the app downloads instead of running npm.
+#
+# The version comes from the lockfile (scripts/tools-version.mjs), so each set of tools is built
+# once: a version whose release exists is skipped. It runs when the runtime changes on main, or by
+# hand. The release is a prerelease and never latest, because the in-app updater and the site's
+# download links follow the latest release.
+on:
+  push:
+    branches: [main]
+    paths: ['packages/content/runtime/**']
+  workflow_dispatch:
+
+concurrency:
+  group: tools
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      exists: ${{ steps.version.outputs.exists }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(node scripts/tools-version.mjs)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if gh release view "tools-js-$version" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: plan
+    if: needs.plan.outputs.exists != 'true'
+    name: build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # Each on its own system, so every native package is the one for it and is tried there.
+        os: [windows-latest, macos-latest, macos-15-intel, ubuntu-latest]
+    defaults:
+      run:
+        shell: bash
+        working-directory: packages/content/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci --no-audit --no-fund
+      - name: Try the tools
+        run: |
+          node -e "require('esbuild').transformSync('const a: number = 1', { loader: 'ts' })"
+          node node_modules/typescript/bin/tsc --version
+          node node_modules/vitest/vitest.mjs --version
+      - id: pack
+        run: |
+          name=$(node -p "'javascript-tools-' + process.platform + '-' + process.arch + '.tar.gz'")
+          tar -czf "$name" node_modules
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.pack.outputs.name }}
+          path: packages/content/runtime/${{ steps.pack.outputs.name }}
+          compression-level: 0
+          if-no-files-found: error
+
+  publish:
+    needs: [plan, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: tools
+          merge-multiple: true
+      - name: Write checksums.json
+        working-directory: tools
+        run: |
+          node -e "
+            const { createHash } = require('crypto')
+            const fs = require('fs')
+            const sums = {}
+            for (const file of fs.readdirSync('.').filter((f) => f.endsWith('.tar.gz'))) {
+              const data = fs.readFileSync(file)
+              sums[file] = { sha256: createHash('sha256').update(data).digest('hex'), size: data.length }
+            }
+            fs.writeFileSync('checksums.json', JSON.stringify(sums, null, 2))
+          "
+          cat checksums.json
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: tools-js-${{ needs.plan.outputs.version }}
+        run: |
+          gh release create "$TAG" tools/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --prerelease --latest=false --title "Repo tools ${TAG#tools-js-}" \
+            --notes "The repo tools for each system, downloaded by the app. Built from packages/content/runtime/package-lock.json."

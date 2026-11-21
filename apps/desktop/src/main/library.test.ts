@@ -1,5 +1,14 @@
+import { execFileSync } from 'child_process'
 import { createHash } from 'crypto'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'fs'
+import {
+  existsSync,
+  linkSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  symlinkSync,
+  writeFileSync
+} from 'fs'
 import { createServer, type Server } from 'http'
 import type { AddressInfo } from 'net'
 import { tmpdir } from 'os'
@@ -14,7 +23,8 @@ import {
   parseIndex,
   recordVersion,
   seedContent,
-  staleRepos
+  staleRepos,
+  unpack
 } from './library'
 
 const temp = (prefix: string): string => mkdtempSync(join(tmpdir(), prefix))
@@ -231,5 +241,28 @@ describe('staleRepos', () => {
       ]
     }
     expect(staleRepos(index, root).map((e) => e.id)).toEqual(['shop', 'cafe'])
+  })
+})
+
+describe('unpack', () => {
+  it('takes a link only when asked to and only when it stays inside', async () => {
+    const dir = write(temp('src-'), { 'a/file.txt': 'x' })
+    symlinkSync('../a/file.txt', join(dir, 'link'))
+    execFileSync('tar', ['-czf', 'links.tar.gz', 'a', 'link'], { cwd: dir })
+    const archive = join(dir, 'links.tar.gz')
+    const reason = (promise: Promise<unknown>): Promise<string> =>
+      promise.then(
+        () => 'ok',
+        (error: InstallError) => error.reason
+      )
+    expect(await reason(unpack(archive, temp('dest-')))).toBe('broken')
+    const dest = temp('dest-')
+    expect(await reason(unpack(archive, join(dest, 'in'), { links: true }))).toBe('broken')
+    symlinkSync('a/file.txt', join(dir, 'inside'))
+    linkSync(join(dir, 'a/file.txt'), join(dir, 'hard'))
+    execFileSync('tar', ['-czf', 'inside.tar.gz', 'a', 'inside', 'hard'], { cwd: dir })
+    await unpack(join(dir, 'inside.tar.gz'), dest, { links: true })
+    expect(readFileSync(join(dest, 'inside'), 'utf8')).toBe('x')
+    expect(readFileSync(join(dest, 'hard'), 'utf8')).toBe('x')
   })
 })

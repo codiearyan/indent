@@ -11,7 +11,7 @@ import {
   writeFileSync
 } from 'fs'
 import { mkdir, rename, rm } from 'fs/promises'
-import { isAbsolute, join } from 'path'
+import { isAbsolute, join, posix } from 'path'
 import { Readable } from 'stream'
 import { pipeline } from 'stream/promises'
 import type { ReadableStream } from 'stream/web'
@@ -184,10 +184,10 @@ export function staleRepos(index: PackIndex, root: string): PackEntry[] {
   )
 }
 
-async function download(
+export async function download(
   url: string,
   file: string,
-  entry: PackEntry,
+  entry: Pick<PackEntry, 'size' | 'sha256'>,
   onProgress: (done: number) => void
 ): Promise<void> {
   const response = await fetch(url, { signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS) }).catch(
@@ -222,24 +222,58 @@ async function download(
   }
 }
 
-/** Only plain files and folders, every one inside the target. */
-async function unpack(archive: string, dest: string): Promise<void> {
+const leaves = (path: string): boolean =>
+  isAbsolute(path) || /^[a-z]:/i.test(path) || path.split(/[\\/]/).includes('..')
+
+/**
+ * A link entry of `tar -tv` that stays inside the archive: a symlink, `<name> -> <target>` with the
+ * target relative to the link, or a hard link, `<name> link to <target>` relative to the root.
+ */
+function linkInside(line: string, name: string): boolean {
+  const absolute = (path: string): boolean => isAbsolute(path) || /^[a-z]:/i.test(path)
+  const symlink = `${name} -> `
+  const hard = `${name} link to `
+  if (line.startsWith('l') && line.includes(symlink)) {
+    const target = line.slice(line.lastIndexOf(symlink) + symlink.length)
+    return !absolute(target) && !leaves(posix.normalize(posix.join(posix.dirname(name), target)))
+  }
+  if (line.startsWith('h') && line.includes(hard)) {
+    return !leaves(line.slice(line.lastIndexOf(hard) + hard.length))
+  }
+  return false
+}
+
+/**
+ * Only plain files and folders, every one inside the target. With `links`, also links that point
+ * inside it, which a node_modules folder has on macOS and Linux.
+ */
+export async function unpack(archive: string, dest: string, { links = false } = {}): Promise<void> {
   const [{ stdout: listing }, { stdout: names }] = await Promise.all([
-    run('tar', ['-tvzf', archive]),
-    run('tar', ['-tzf', archive])
+    run('tar', ['-tvzf', archive], { maxBuffer: 64 * 1024 * 1024 }),
+    run('tar', ['-tzf', archive], { maxBuffer: 64 * 1024 * 1024 })
   ])
+  const lines = listing.split('\n').filter(Boolean)
+  const paths = names.split('\n').filter(Boolean)
   const unsafe =
-    listing.split('\n').some((line) => line && !/^[-d]/.test(line)) ||
-    names
-      .split('\n')
-      .filter(Boolean)
-      .some(
-        (name) => isAbsolute(name) || /^[a-z]:/i.test(name) || name.split(/[\\/]/).includes('..')
-      )
+    lines.length !== paths.length ||
+    paths.some(leaves) ||
+    lines.some((line, i) => !/^[-d]/.test(line) && !(links && linkInside(line, paths[i])))
   if (unsafe) throw new InstallError('broken')
   await mkdir(dest, { recursive: true })
   // -m: the archive's fixed times would date every file 1970.
   await run('tar', ['-xzmf', archive, '-C', dest])
+}
+
+/** Puts `fresh` at `target`, moving what was there to `aside`, and back if the move fails. */
+export async function replaceFolder(fresh: string, target: string, aside: string): Promise<void> {
+  const had = existsSync(target)
+  if (had) await rename(target, aside)
+  try {
+    await rename(fresh, target)
+  } catch (error) {
+    if (had) await rename(aside, target)
+    throw error
+  }
 }
 
 /** Every issue loads, with its lesson and its checks. `root` holds the repo in labs/<id>. */
@@ -277,14 +311,7 @@ export async function installPack(
     await unpack(archive, fresh)
     await verify(work, entry.id)
     await mkdir(join(root, 'labs'), { recursive: true })
-    const had = existsSync(target)
-    if (had) await rename(target, aside)
-    try {
-      await rename(fresh, target)
-    } catch (error) {
-      if (had) await rename(aside, target)
-      throw error
-    }
+    await replaceFolder(fresh, target, aside)
     recordVersion(root, entry.id, entry.version)
   } catch (error) {
     throw asInstallError(error)

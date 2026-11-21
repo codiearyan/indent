@@ -12,6 +12,14 @@ import { loadChapter } from './content'
 import { failedResults, gradeRun, nodeSupported, tail, type RunOutcome } from './grader'
 import { labModelProblem, labModelReady, startLabModel } from './labModel'
 import { getProgress, recordCheck } from './progress'
+import { InstallError } from '../library'
+import {
+  downloadTools,
+  installedTools,
+  recordTools,
+  TOOLS_RELEASES,
+  toolsVersion
+} from '../repoTools'
 
 const CHECK_TIMEOUT_MS = 90_000
 const INSTALL_TIMEOUT_MS = 10 * 60_000
@@ -35,14 +43,18 @@ function runProcess(cmd: string, args: string[], options: ExecFileOptions): Prom
   })
 }
 
-const runtimePackage = (): string => join(contentDir(), 'runtime', 'package.json')
+const runtimeFile = (name: string): string => join(contentDir(), 'runtime', name)
+
+async function wantedTools(): Promise<string> {
+  return toolsVersion(await readFile(runtimeFile('package-lock.json'), 'utf8').catch(() => ''))
+}
 
 async function depsInstalled(): Promise<boolean> {
   const root = workspacesRoot()
-  const wanted = await readFile(runtimePackage(), 'utf8').catch(() => '')
-  const current = await readFile(join(root, 'package.json'), 'utf8').catch(() => '')
-  if (!wanted || wanted !== current) return false
-  const pkg = JSON.parse(wanted) as Record<string, Record<string, string> | undefined>
+  if (installedTools(root) !== (await wantedTools())) return false
+  const pkg = JSON.parse(
+    await readFile(runtimeFile('package.json'), 'utf8').catch(() => '{}')
+  ) as Record<string, Record<string, string> | undefined>
   const deps = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies })
   return deps.every((dep) => existsSync(join(root, 'node_modules', dep, 'package.json')))
 }
@@ -78,36 +90,82 @@ function publish(status: RuntimeStatus): RuntimeStatus {
 
 const OFFLINE = /ENOTFOUND|EAI_AGAIN|ECONNREFUSED|ECONNRESET|ETIMEDOUT|ENETUNREACH/
 
+const MESSAGES = {
+  offline: 'Getting the repo tools needs an internet connection once. Connect and try again.',
+  noSpace: 'There is not enough free space to get the repo tools. Free some space and try again.',
+  noNpm: 'Indent could not start npm on this computer.',
+  npmFailed: 'npm stopped with an error.',
+  slow: 'Getting the repo tools took too long. Try again.',
+  failed: 'Could not get the repo tools ready. Try again.'
+}
+
+function npmFailure(run: RunOutcome): Pick<RuntimeStatus, 'error' | 'details' | 'retry'> {
+  // The notice above the tasks only shows a failure that has details.
+  const details = tail(run.stderr) || `npm exited with code ${run.exitCode}.`
+  if (run.timedOut) return { error: MESSAGES.slow, details }
+  if (OFFLINE.test(run.stderr)) return { error: MESSAGES.offline, details }
+  if (/ENOSPC/.test(run.stderr)) return { error: MESSAGES.noSpace, details }
+  // Through the Windows shell a missing npm exits 1 with "is not recognized".
+  if (run.exitCode === null || /is not recognized/.test(run.stderr)) {
+    return { error: MESSAGES.noNpm, details, retry: false }
+  }
+  return { error: MESSAGES.npmFailed, details }
+}
+
+/** `<platform>-<arch>` of the Node that runs the repos, which picks the tools to download. */
+async function nodeSystem(env: Record<string, string>): Promise<string | null> {
+  const run = await runProcess('node', ['-p', 'process.platform + "-" + process.arch'], {
+    env,
+    timeout: 10_000
+  })
+  return run.exitCode === 0 ? run.stdout.trim() : null
+}
+
+/**
+ * Downloads the repo tools built for this system. Without a build for it, or when the download
+ * fails, npm installs the same versions from the lockfile.
+ */
 async function install(): Promise<RuntimeStatus> {
   const status = await runtimeStatus()
   if (status.ready || status.error) return publish(status)
   publish({ ...status, installing: true })
   const root = workspacesRoot()
+  const env = await labEnv()
   try {
     await mkdir(root, { recursive: true })
-    await copyFile(runtimePackage(), join(root, 'package.json'))
+    await copyFile(runtimeFile('package.json'), join(root, 'package.json'))
+    await copyFile(runtimeFile('package-lock.json'), join(root, 'package-lock.json'))
   } catch (error) {
-    return publish({
-      ...status,
-      error: 'Could not get the repo tools ready.',
-      details: String(error)
-    })
+    return publish({ ...status, error: MESSAGES.failed, details: String(error) })
   }
-  const run = await runProcess('npm', ['install', '--no-audit', '--no-fund'], {
+  const version = await wantedTools()
+  const system = await nodeSystem(env)
+  if (system) {
+    let shown = 0
+    try {
+      await downloadTools(root, TOOLS_RELEASES, version, system, (done) => {
+        // A percent at a time, not an event per chunk.
+        if (done - shown < 0.01 && done < 1) return
+        shown = done
+        publish({ ...status, installing: true, progress: done })
+      })
+      return publish(await runtimeStatus())
+    } catch (error) {
+      if (error instanceof InstallError && error.reason === 'no-space') {
+        return publish({ ...status, error: MESSAGES.noSpace, details: error.message })
+      }
+      publish({ ...status, installing: true })
+    }
+  }
+  const run = await runProcess('npm', ['ci', '--no-audit', '--no-fund'], {
     cwd: root,
     // On Windows npm is npm.cmd, which only a shell can start.
     shell: process.platform === 'win32',
-    env: await labEnv(),
+    env,
     timeout: INSTALL_TIMEOUT_MS
   })
-  if (run.exitCode !== 0) {
-    const error = OFFLINE.test(run.stderr)
-      ? 'Getting the repo tools needs an internet connection once. Connect and try again.'
-      : run.timedOut
-        ? 'Getting the repo tools took too long. Try again.'
-        : 'Could not get the repo tools ready. Try again.'
-    return publish({ ...status, error, details: tail(run.stderr) })
-  }
+  if (run.exitCode !== 0) return publish({ ...status, ...npmFailure(run) })
+  recordTools(root, version)
   return publish(await runtimeStatus())
 }
 
