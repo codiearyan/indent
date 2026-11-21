@@ -1,0 +1,174 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "orders", "label": "orders.js", "kind": "file" },
+      { "id": "total", "label": "orderTotal()", "kind": "function", "mine": true },
+      { "id": "top", "label": "topCandles()", "kind": "function", "mine": true },
+      { "id": "revenue", "label": "revenueByDay()", "kind": "function", "mine": true },
+      { "id": "theo", "label": "Theo's answers", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "orders", "to": "total", "label": "one order" },
+      { "from": "orders", "to": "top", "label": "orders, n" },
+      { "from": "orders", "to": "revenue", "label": "orders" },
+      { "from": "total", "to": "theo", "label": "cents" },
+      { "from": "top", "to": "theo", "label": "best sellers" },
+      { "from": "revenue", "to": "theo", "label": "per day" }
+    ],
+    "note": "Last week's orders go into three functions in reports.js, and each one hands Theo one of his answers."
+  },
+  "tasks": {
+    "total": {
+      "steps": [
+        {
+          "active": ["orders", "orders->total"],
+          "value": {
+            "kind": "map",
+            "label": "the example order",
+            "entries": [
+              { "key": "id", "value": "WC-1002" },
+              { "key": "status", "value": "paid" },
+              { "key": "items", "value": "1 entry" }
+            ]
+          },
+          "note": "Theo hands orderTotal() one order, like WC-1002 from the top of reports.js."
+        },
+        {
+          "active": ["total"],
+          "value": {
+            "kind": "map",
+            "label": "an entry in items",
+            "entries": [
+              { "key": "sku", "value": "sage" },
+              { "key": "qty", "value": 1 },
+              { "key": "priceCents", "value": 1800 }
+            ]
+          },
+          "note": "Every entry in items is worth its qty times its priceCents, and all the entries add up."
+        },
+        {
+          "active": ["total"],
+          "value": {
+            "kind": "map",
+            "label": "only on some orders",
+            "entries": [{ "key": "discountCents", "value": 500 }]
+          },
+          "note": "This order carries a discount, so it comes off the sum. Many orders have no discountCents field at all."
+        },
+        {
+          "active": ["total", "total->theo", "theo"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "total", "value": "whole cents" }]
+          },
+          "note": "One number in cents goes back to Theo. It never drops below 0, and an order with no items is worth 0."
+        }
+      ]
+    },
+    "top": {
+      "steps": [
+        {
+          "active": ["orders", "orders->top"],
+          "value": {
+            "kind": "map",
+            "label": "status of each order",
+            "entries": [
+              { "key": "WC-1001", "value": "paid" },
+              { "key": "WC-1002", "value": "paid" },
+              { "key": "WC-1003", "value": "cancelled" },
+              { "key": "WC-1004", "value": "paid" },
+              { "key": "WC-1005", "value": "pending" }
+            ]
+          },
+          "note": "The whole week comes in, along with n, how many best sellers Theo wants to see."
+        },
+        {
+          "active": ["top"],
+          "value": {
+            "kind": "map",
+            "label": "WC-1003, cancelled",
+            "entries": [{ "key": "cedar", "value": 5 }]
+          },
+          "note": "WC-1003 was cancelled, so its five cedar candles were never sold. They do not count."
+        },
+        {
+          "active": ["top"],
+          "value": {
+            "kind": "map",
+            "label": "units per sku after WC-1001",
+            "entries": [
+              { "key": "cedar", "value": 2 },
+              { "key": "smoked-fig", "value": 1 }
+            ]
+          },
+          "note": "Every other order adds the qty of each item to that sku's count."
+        },
+        {
+          "active": ["top"],
+          "note": "The skus are ranked by units, most first. When two sold the same, the one that comes first alphabetically goes first."
+        },
+        {
+          "active": ["top", "top->theo", "theo"],
+          "value": {
+            "kind": "map",
+            "label": "each item that comes back",
+            "entries": [
+              { "key": "sku", "value": "a sku" },
+              { "key": "units", "value": "units sold" }
+            ]
+          },
+          "note": "Theo gets the first n as a list of { sku, units }, or all of them when fewer skus sold."
+        }
+      ]
+    },
+    "revenue": {
+      "steps": [
+        {
+          "active": ["orders", "orders->revenue"],
+          "value": {
+            "kind": "map",
+            "label": "status of each order",
+            "entries": [
+              { "key": "WC-1001", "value": "paid" },
+              { "key": "WC-1002", "value": "paid" },
+              { "key": "WC-1003", "value": "cancelled" },
+              { "key": "WC-1004", "value": "paid" },
+              { "key": "WC-1005", "value": "pending" }
+            ]
+          },
+          "note": "The week of orders comes in. Only the paid ones are money the shop made."
+        },
+        {
+          "active": ["revenue"],
+          "value": {
+            "kind": "map",
+            "label": "WC-1001",
+            "entries": [
+              { "key": "placedAt", "value": "2026-11-02T08:15:00Z" },
+              { "key": "day", "value": "2026-11-02" }
+            ]
+          },
+          "note": "The day of an order is the date part of placedAt, its first 10 characters."
+        },
+        {
+          "active": ["revenue", "total"],
+          "note": "orderTotal() from Task 1 already knows what one order came to, discount taken off."
+        },
+        {
+          "active": ["revenue"],
+          "value": {
+            "kind": "map",
+            "label": "one key per day",
+            "entries": [{ "key": "2026-11-02", "value": "cents that day" }]
+          },
+          "note": "Paid orders from the same day add up under that day's key."
+        },
+        {
+          "active": ["revenue", "revenue->theo", "theo"],
+          "note": "Theo gets one object with a key for each day that had paid orders. Days without any are left out."
+        }
+      ]
+    }
+  }
+}

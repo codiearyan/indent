@@ -1,0 +1,21 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "checkout", "label": "Checkout", "kind": "story" },
+      { "id": "orders", "label": "orders.js", "kind": "file" },
+      { "id": "reports", "label": "reports.js", "kind": "file", "mine": true },
+      { "id": "theo", "label": "Theo's answers", "kind": "story" },
+      { "id": "customers", "label": "Customers", "kind": "story" },
+      { "id": "helpers", "label": "helpers.js", "kind": "file", "mine": true },
+      { "id": "site", "label": "Shop site", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "checkout", "to": "orders", "label": "exports" },
+      { "from": "orders", "to": "reports", "label": "orders" },
+      { "from": "reports", "to": "theo", "label": "answers" },
+      { "from": "customers", "to": "helpers", "label": "clicks" },
+      { "from": "helpers", "to": "site", "label": "remembers" }
+    ],
+    "note": "First you turn the shop's orders into answers for Theo, then you write the helpers that let the site remember things for its customers."
+  }
+}
