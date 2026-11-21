@@ -37,9 +37,9 @@ export function RuntimeNotice(): React.JSX.Element | null {
     return (
       <div
         role="alert"
-        className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-border px-4 py-3"
+        className="mt-4 flex flex-wrap items-center gap-3 rounded-lg bg-destructive/10 px-4 py-3"
       >
-        <p className="min-w-0 flex-1 text-sm">{status.error}</p>
+        <p className="min-w-0 flex-1 text-sm text-destructive">{status.error}</p>
         {node && !node.ok && <ToolInstallButton tool={node} />}
       </div>
     )
