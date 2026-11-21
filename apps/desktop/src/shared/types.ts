@@ -412,12 +412,21 @@ export type AiChatEvent =
   | { requestId: string; type: 'done' }
   | { requestId: string; type: 'error'; message: string }
 
+/** The task a suggestion helps with: what the learner reads, never its hints or solution. */
+export interface AiCompletionTask {
+  title: string
+  description: string
+  /** Names of the task's checks that failed on its latest run. */
+  failing: string[]
+}
+
 export interface AiCompleteRequest {
   labId: string
   chapterId: string
   path: string
   prefix: string
   suffix: string
+  task?: AiCompletionTask
 }
 
 // ---------- IPC ----------
