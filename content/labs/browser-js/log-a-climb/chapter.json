@@ -23,6 +23,11 @@
         "The event passed to your listener has a method that cancels what the browser would do next.",
         "`new FormData(form).get('grade')` reads a field by its `name` attribute, selects included. Trim the text fields before you pass them on."
       ],
+      "docs": [
+        { "title": "Event.preventDefault()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault" },
+        { "title": "FormData", "url": "https://developer.mozilla.org/en-US/docs/Web/API/FormData" },
+        { "title": "HTMLFormElement submit event", "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/submit_event" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "Keep one variable for the problem. Set its text on `#form-error` and its `hidden` from whether it is empty.",
         "Return early from the listener when there is a problem, so nothing below runs. Write the message as a short sentence, such as what is missing."
       ],
+      "docs": [
+        { "title": "Node.textContent", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent" },
+        { "title": "HTMLElement.hidden", "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/hidden" },
+        { "title": "return", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "Forms have a method that puts every field back to its starting value.",
         "Any field can take the focus with a method call. `form.elements.name` is the name field.",
         "Do both only on the success path, after `onAdd`, never before the early return."
+      ],
+      "docs": [
+        { "title": "HTMLFormElement.reset()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/reset" },
+        { "title": "HTMLElement.focus()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus" },
+        { "title": "HTMLFormElement.elements", "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/elements" }
       ],
       "points": 10
     }

@@ -29,6 +29,11 @@
         "You can import MODEL, MAX_TOKENS and buildMessages from summarize.ts, so your call matches the buggy one exactly.",
         "The value you want is `res.choices[0].finish_reason`. For this complaint it should not say the model stopped on its own."
       ],
+      "docs": [
+        { "title": "Chat completions API reference", "url": "https://developers.openai.com/api/reference/resources/chat" },
+        { "title": "Managing tokens", "url": "https://developers.openai.com/api/docs/guides/advanced-usage#managing-tokens" },
+        { "title": "OpenAI Node SDK usage", "url": "https://github.com/openai/openai-node#usage" }
+      ],
       "points": 10
     },
     {
@@ -47,6 +52,11 @@
         "Keep the budget in a variable outside the loop so each attempt can use a larger one.",
         "Inside the loop, return early when `finish_reason` is not 'length'. After the loop ends, the only thing left to do is throw."
       ],
+      "docs": [
+        { "title": "Managing tokens", "url": "https://developers.openai.com/api/docs/guides/advanced-usage#managing-tokens" },
+        { "title": "Chat completions API reference", "url": "https://developers.openai.com/api/reference/resources/chat" },
+        { "title": "throw", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw" }
+      ],
       "points": 10
     },
     {
@@ -64,6 +74,10 @@
         "Look at a full summary from the local model. What does its last character tell you?",
         "For the error case, `await expect(promise).rejects.toThrow(...)` lets you assert on the message.",
         "A larger limit fixes the long complaint but not the endless one. Your second test is the one that catches that fix."
+      ],
+      "docs": [
+        { "title": "Managing tokens", "url": "https://developers.openai.com/api/docs/guides/advanced-usage#managing-tokens" },
+        { "title": "Chat completions API reference", "url": "https://developers.openai.com/api/reference/resources/chat" }
       ],
       "points": 10
     }

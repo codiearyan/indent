@@ -22,6 +22,11 @@
         "`calls.map(async (call) => ...)` gives you an array of promises that have all started already.",
         "`Promise.all` on that array waits for every one and resolves with an array of tool messages."
       ],
+      "docs": [
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
+        { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises#composition" },
+        { "title": "Parallel function calling", "url": "https://developers.openai.com/api/docs/guides/function-calling#parallel-function-calling" }
+      ],
       "points": 10
     },
     {
@@ -39,6 +44,11 @@
         "`Promise.all` keeps the order of the promises you give it, no matter which settles first.",
         "`executeToolCall` never throws, so one failing call cannot reject the whole `Promise.all`. Keep it that way."
       ],
+      "docs": [
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
+        { "title": "Parallel function calling", "url": "https://developers.openai.com/api/docs/guides/function-calling#parallel-function-calling" },
+        { "title": "Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" }
+      ],
       "points": 10
     },
     {
@@ -55,6 +65,11 @@
         "Only the part between pushing the assistant message and the next request changes.",
         "`runToolCalls` wants function tool calls. Filter `reply.tool_calls` on `type === 'function'` first.",
         "Spread the result into the conversation: `messages.push(...(await runToolCalls(registry, calls)))`."
+      ],
+      "docs": [
+        { "title": "Parallel function calling", "url": "https://developers.openai.com/api/docs/guides/function-calling#parallel-function-calling" },
+        { "title": "Handling function calls", "url": "https://developers.openai.com/api/docs/guides/function-calling#handling-function-calls" },
+        { "title": "Manage conversation state", "url": "https://developers.openai.com/api/docs/guides/conversation-state#manually-manage-conversation-state" }
       ],
       "points": 10
     }

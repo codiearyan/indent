@@ -23,6 +23,11 @@
         "`fetch` gives a response, and `await response.json()` gives the data. Both need `await` inside an `async` function.",
         "`routes` in `main.js` has to change once the data arrives, so it can no longer be an import. Use `let routes = []` and assign the loaded array to it before rendering."
       ],
+      "docs": [
+        { "title": "Using the Fetch API", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch" },
+        { "title": "Response.json()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/json" },
+        { "title": "HTMLElement.hidden", "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/hidden" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "Throwing your own error for a bad status lets one `catch` handle both cases.",
         "In the `catch`, change the text of the line that already says loading. Leave it visible and skip drawing the board."
       ],
+      "docs": [
+        { "title": "Response.ok", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/ok" },
+        { "title": "fetch()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "`localStorage` only stores strings. A `Set` needs to become an array and then JSON on the way in, and go the other way on the way out.",
         "`JSON.parse` throws on text that is not JSON, and `getItem` gives `null` for a key that was never saved.",
         "`[...ticked]` makes an array from a set and `new Set(array)` goes back. Wrap the parse in `try` and return an empty set from the `catch`."
+      ],
+      "docs": [
+        { "title": "Window.localStorage", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" },
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" },
+        { "title": "JSON.stringify()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" }
       ],
       "points": 10
     }

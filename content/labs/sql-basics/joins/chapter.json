@@ -29,6 +29,10 @@
         "Both cafes and drivers have a column called name. Give each table a short alias and write c.name, d.name with AS to tell them apart.",
         "Write JOIN cafes AS c ON c.id = o.cafe_id and JOIN drivers AS d ON d.id = o.driver_id, then WHERE on status and BETWEEN on the two dates."
       ],
+      "docs": [
+        { "title": "FROM and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "BETWEEN", "url": "https://www.sqlite.org/lang_expr.html#between" }
+      ],
       "points": 10
     },
     {
@@ -46,6 +50,10 @@
         "LEFT JOIN keeps every row from the left table and fills the right side with NULL when nothing matches.",
         "COUNT(*) counts that NULL-filled row as 1. Count a column from the orders side, such as o.id, which is NULL when there is no match."
       ],
+      "docs": [
+        { "title": "FROM and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "count()", "url": "https://www.sqlite.org/lang_aggfunc.html#count" }
+      ],
       "points": 10
     },
     {
@@ -62,6 +70,10 @@
         "A product with orders matches one or more order_items rows. A product without orders matches none.",
         "After a LEFT JOIN, the right side of an unmatched row is NULL in every column.",
         "Filter with WHERE on a column from order_items that is never NULL in real rows, such as its product_id, being IS NULL."
+      ],
+      "docs": [
+        { "title": "FROM and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "IS and IS NOT", "url": "https://www.sqlite.org/lang_expr.html#isisnot" }
       ],
       "points": 10
     }

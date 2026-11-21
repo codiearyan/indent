@@ -31,6 +31,11 @@
         "In `onChange`, `event.target.value` is what the box would show next. Hand it to the setter.",
         "If Clear brings the list back but the box still shows text, the input is not reading `value` from state. Turn both sides to lower case and `trim` the text before you compare."
       ],
+      "docs": [
+        { "title": "Controlling an input with a state variable", "url": "https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable" },
+        { "title": "Sharing state between components", "url": "https://react.dev/learn/sharing-state-between-components" },
+        { "title": "String.prototype.includes()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes" }
+      ],
       "points": 10
     },
     {
@@ -49,6 +54,11 @@
         "A `Set` keeps each value once, and spreading it back into an array lets you `sort` it.",
         "The filter now asks two questions per record: is the genre `all` or equal to the record's genre, and does the text match."
       ],
+      "docs": [
+        { "title": "Controlling a select box with a state variable", "url": "https://react.dev/reference/react-dom/components/select#controlling-a-select-box-with-a-state-variable" },
+        { "title": "Set", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set" },
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" }
+      ],
       "points": 10
     },
     {
@@ -66,6 +76,11 @@
         "Everything this line says is already known during render. Nothing new needs to be stored.",
         "A list kept in state next to the stock has to be updated every time the search, the genre or the stock changes. Worked out during render, it can never be stale.",
         "A ternary in JSX picks one of two things: `{visible.length === 0 ? <p>...</p> : <StockList ... />}`."
+      ],
+      "docs": [
+        { "title": "You might not need an effect", "url": "https://react.dev/learn/you-might-not-need-an-effect" },
+        { "title": "Avoid redundant state", "url": "https://react.dev/learn/choosing-the-state-structure#avoid-redundant-state" },
+        { "title": "Conditional rendering", "url": "https://react.dev/learn/conditional-rendering" }
       ],
       "points": 10
     }

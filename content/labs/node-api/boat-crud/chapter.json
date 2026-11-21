@@ -23,6 +23,11 @@
         "Objects are shared by reference. If the store keeps the same object it hands out, a caller can change the store without asking. A spread like `{ ...boat }` makes a shallow copy.",
         "For update, spread the old boat, then the changes, then put the original `code` back last. `map.delete(code)` already returns true or false."
       ],
+      "docs": [
+        { "title": "Map", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" },
+        { "title": "Spread syntax", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax" },
+        { "title": "Map.prototype.delete()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/delete" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "The 409 comes from the store. If you let its HttpError bubble up, createApp sends it for you.",
         "In createBoat: `const boat = store.create(validateBoat(await readJson(req)))`, then `res.setHeader('location', ...)` and `sendJson(res, 201, boat)`."
       ],
+      "docs": [
+        { "title": "201 Created", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/201" },
+        { "title": "Location", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location" },
+        { "title": "409 Conflict", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "PATCH sends only what changes. PUT would replace the whole thing, which is not what the booking page wants.",
         "204 means there is no body at all, so `sendJson` is the wrong tool here.",
         "For delete, `if (!store.remove(params.code)) throw boatNotFound(params.code)`, then `res.writeHead(204)` and `res.end()`."
+      ],
+      "docs": [
+        { "title": "PATCH", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/PATCH" },
+        { "title": "204 No Content", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/204" },
+        { "title": "response.end()", "url": "https://nodejs.org/docs/latest/api/http.html#responseenddata-encoding-callback" }
       ],
       "points": 10
     }

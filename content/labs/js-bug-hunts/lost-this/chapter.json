@@ -29,6 +29,11 @@
         "A small helper that runs a function and returns the message of whatever it throws keeps this short.",
         "Both messages say that something is undefined while reading `out`. That something is `this`."
       ],
+      "docs": [
+        { "title": "this", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this" },
+        { "title": "TypeError", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" }
+      ],
       "points": 10
     },
     {
@@ -47,6 +52,11 @@
         "Fixing the call inside `freeBoats` only fixes that one caller. The scanner in `dock.js` calls the methods as plain functions too.",
         "Arrow functions take `this` from where they are created. A class field like `isFree = (id) => ...` creates one per fleet, tied to it. Binding each method in the constructor also works."
       ],
+      "docs": [
+        { "title": "this", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this" },
+        { "title": "Function.prototype.bind()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind" },
+        { "title": "Arrow function expressions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions" }
+      ],
       "points": 10
     },
     {
@@ -64,6 +74,11 @@
         "A test that only calls methods as `fleet.method()` will never see this bug. Use the methods the way other code does.",
         "Import `createScanner` and `connectScanner` from `dock.js`. The real wiring is the best test of it.",
         "The freeBoats only fix passes your first test. Only the scanner test fails beside it, because `checkOut` still loses `this`."
+      ],
+      "docs": [
+        { "title": "this", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this" },
+        { "title": "Destructuring", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring" },
+        { "title": "Callback function", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Callback_function" }
       ],
       "points": 10
     }

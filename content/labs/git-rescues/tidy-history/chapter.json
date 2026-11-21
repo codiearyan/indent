@@ -22,6 +22,10 @@
         "`git branch <name>` with no other argument creates the branch at the commit you are on.",
         "Run it while you are on route-planner and before any reset or rebase. If you already rewrote, look up the old commit in the reflog."
       ],
+      "docs": [
+        { "title": "git branch", "url": "https://git-scm.com/docs/git-branch" },
+        { "title": "git reflog", "url": "https://git-scm.com/docs/git-reflog" }
+      ],
       "points": 10
     },
     {
@@ -39,6 +43,11 @@
         "One kind of reset moves the branch but leaves the index and files alone.",
         "On route-planner, `git reset --soft main` followed by one `git commit -m` gives one commit. `git diff route-planner-backup route-planner` should then print nothing."
       ],
+      "docs": [
+        { "title": "git reset", "url": "https://git-scm.com/docs/git-reset" },
+        { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" },
+        { "title": "git diff", "url": "https://git-scm.com/docs/git-diff" }
+      ],
       "points": 10
     },
     {
@@ -55,6 +64,10 @@
         "Write for Ines, who has not seen your scrappy commits.",
         "Start the subject with a verb that describes the change, such as Add or Fix.",
         "If you already committed, `git commit --amend -m \"<subject>\"` replaces the message of the last commit without an editor."
+      ],
+      "docs": [
+        { "title": "Commit messages", "url": "https://git-scm.com/docs/git-commit#_discussion" },
+        { "title": "git commit --amend", "url": "https://git-scm.com/docs/git-commit#Documentation/git-commit.txt---amend" }
       ],
       "points": 10
     }

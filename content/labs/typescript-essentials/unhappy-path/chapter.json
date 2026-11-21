@@ -23,6 +23,11 @@
         "After `typeof value === 'object' && value !== null`, TypeScript lets you write `'id' in value`, and after that `value.id` is readable with the type `unknown`.",
         "`Array.isArray` narrows the parsed data to an array, and `filter` with your type guard as the callback returns `BookingRecord[]`."
       ],
+      "docs": [
+        { "title": "unknown", "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#unknown" },
+        { "title": "Using type predicates", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates" },
+        { "title": "Array.isArray()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "`instanceof Error` narrows to `Error` and covers `TypeError` and your own subclasses. `typeof` handles the string case.",
         "For the object case you need three steps: an object, not `null`, has `message`. Then check that `message` is a string before returning it."
       ],
+      "docs": [
+        { "title": "instanceof narrowing", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#instanceof-narrowing" },
+        { "title": "The in operator narrowing", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#the-in-operator-narrowing" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "`ok: true` and `ok: false` are literal types, so `Result` is a discriminated union just like `JobStatus` was.",
         "In an async function, `return { ok: true, value: price }` is enough. The `Promise` around it comes from the `async` keyword.",
         "Put `await fetchPrice(partId)` inside the `try`. A sync throw and a rejected promise then both land in the same `catch`, where the caught value is `unknown`."
+      ],
+      "docs": [
+        { "title": "Discriminated unions", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions" },
+        { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" }
       ],
       "points": 10
     }

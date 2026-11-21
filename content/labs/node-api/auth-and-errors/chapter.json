@@ -23,6 +23,11 @@
         "A regular expression with the `i` flag can match the scheme in any case and capture the token after it.",
         "Check the token before `readJson`, otherwise a client with no token learns about JSON errors first. `/^Bearer +(\\S+)$/i` captures the token in group 1."
       ],
+      "docs": [
+        { "title": "HTTP authentication", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication" },
+        { "title": "401 Unauthorized", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401" },
+        { "title": "403 Forbidden", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "The client needs to know that it failed and how to report it. The team needs the details. Each gets its own channel.",
         "Use `err instanceof HttpError` to choose the branch, `log('request', requestId, 'failed:', err)` for the details, and a constant message in the 500 body."
       ],
+      "docs": [
+        { "title": "instanceof", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof" },
+        { "title": "response.headersSent", "url": "https://nodejs.org/docs/latest/api/http.html#responseheaderssent" },
+        { "title": "500 Internal Server Error", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "An id that comes from the client is input like any other. It will end up in your logs, so only accept a safe shape.",
         "Setting the header before routing means every answer has it, even ones you did not think about.",
         "`/^[\\w.-]{1,64}$/` matches the allowed shape. `req.headers['x-request-id']` is a string or undefined."
+      ],
+      "docs": [
+        { "title": "crypto.randomUUID()", "url": "https://nodejs.org/docs/latest/api/crypto.html#cryptorandomuuidoptions" },
+        { "title": "message.headers", "url": "https://nodejs.org/docs/latest/api/http.html#messageheaders" },
+        { "title": "response.setHeader()", "url": "https://nodejs.org/docs/latest/api/http.html#responsesetheadername-value" }
       ],
       "points": 10
     }

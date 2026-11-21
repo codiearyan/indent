@@ -23,6 +23,11 @@
         "`ids.map(...)` calls a function for every id straight away and gives you an array of whatever it returned.",
         "`Promise.all` takes an array of promises and gives you one promise of their values, in the array's order. It rejects as soon as any of them rejects."
       ],
+      "docs": [
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
+        { "title": "Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" },
+        { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "`Promise.allSettled` never rejects. It resolves with one object per promise that has a `status`, plus `value` or `reason`.",
         "The results come back in the same order as the promises, so result `i` belongs to `ports[i]`."
       ],
+      "docs": [
+        { "title": "Promise.allSettled()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled" },
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
+        { "title": "Error.prototype.message", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/message" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "You need two promises competing: the real work, and one that only ever rejects, after `ms`.",
         "`Promise.race` settles the same way as whichever promise settles first, and keeps listening to the others, so a late failure is not unhandled.",
         "Keep the id that `setTimeout` returns in a variable. `.finally(...)` on the raced promise is a tidy place to clear it, whichever way the race ended."
+      ],
+      "docs": [
+        { "title": "Promise.race()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race" },
+        { "title": "setTimeout()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout" },
+        { "title": "Promise.prototype.finally()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally" }
       ],
       "points": 10
     }

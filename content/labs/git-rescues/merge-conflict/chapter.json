@@ -23,6 +23,10 @@
         "The lines between `<<<<<<<` and `=======` are main's version; the lines between `=======` and `>>>>>>>` are Pavel's.",
         "The file should end up with the 08:00 line followed by the 08:30 line, and no `<<<<<<<`, `=======` or `>>>>>>>` lines anywhere."
       ],
+      "docs": [
+        { "title": "How conflicts are presented", "url": "https://git-scm.com/docs/git-merge#_how_conflicts_are_presented" },
+        { "title": "How to resolve conflicts", "url": "https://git-scm.com/docs/git-merge#_how_to_resolve_conflicts" }
+      ],
       "points": 10
     },
     {
@@ -40,6 +44,10 @@
         "Take Pavel's line as the shape, then put Ines's price in it.",
         "The result is a single line starting with `adult (16+)`, followed by the price from main."
       ],
+      "docs": [
+        { "title": "How conflicts are presented", "url": "https://git-scm.com/docs/git-merge#_how_conflicts_are_presented" },
+        { "title": "How to resolve conflicts", "url": "https://git-scm.com/docs/git-merge#_how_to_resolve_conflicts" }
+      ],
       "points": 10
     },
     {
@@ -56,6 +64,11 @@
         "Staging resolved files does not end the merge. One more command does.",
         "`git commit` accepts a flag that keeps the suggested merge message and skips the editor.",
         "After `git commit --no-edit`, `git log --graph` should show two lines joining at the top, and `git status` should be clean."
+      ],
+      "docs": [
+        { "title": "git merge", "url": "https://git-scm.com/docs/git-merge" },
+        { "title": "git add", "url": "https://git-scm.com/docs/git-add" },
+        { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" }
       ],
       "points": 10
     }

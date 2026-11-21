@@ -22,6 +22,11 @@
         "Keep the seed in each run. Without it, a failing run cannot be reproduced.",
         "A plain `for...of` over `seeds` with `await` inside keeps the runs in seed order."
       ],
+      "docs": [
+        { "title": "Reproducible outputs", "url": "https://developers.openai.com/api/docs/guides/advanced-usage#reproducible-outputs" },
+        { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" },
+        { "title": "Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" }
+      ],
       "points": 10
     },
     {
@@ -38,6 +43,11 @@
         "There are exactly three outcomes, and only the two ends are stable.",
         "Count failures once and reuse the number: zero, all, or something in between.",
         "Do not use a threshold like \"80% is good enough\". A case that fails one run in five is the one you need to know about."
+      ],
+      "docs": [
+        { "title": "Array.prototype.every()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every" },
+        { "title": "Array.prototype.filter()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter" },
+        { "title": "Input variability", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices#input-variability" }
       ],
       "points": 10
     },
@@ -56,6 +66,11 @@
         "`Array.from({ length: runs }, (_, i) => i + 1)` gives you the seeds.",
         "Cases are independent, so you can run them with `Promise.all` and still keep the results in case order.",
         "`stablePassRate` counts only stable-pass cases; `meanPassRate` sums the per-case pass rates. Guard both divisions for zero cases."
+      ],
+      "docs": [
+        { "title": "Reproducible outputs", "url": "https://developers.openai.com/api/docs/guides/advanced-usage#reproducible-outputs" },
+        { "title": "How to read evals", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices#how-to-read-evals" },
+        { "title": "Array.from()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from" }
       ],
       "points": 10
     }

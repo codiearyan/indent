@@ -28,6 +28,11 @@
         "A caught value is typed `unknown`. Treat it as an `Error` to read its `message`.",
         "The fenced and chatty messages both make JSON.parse throw. Either one works; return its text and `err.message`."
       ],
+      "docs": [
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "Error.prototype.message", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/message" }
+      ],
       "points": 10
     },
     {
@@ -46,6 +51,11 @@
         "The JSON object starts at the first `{` and ends at the last `}`. JSON.parse can still fail, so give it a try/catch.",
         "`as DeliveryRequest` only silences the compiler. Write a small function that checks the type of each field and returns a boolean."
       ],
+      "docs": [
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" },
+        { "title": "Narrowing", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html" },
+        { "title": "Structured outputs vs JSON mode", "url": "https://developers.openai.com/api/docs/guides/structured-outputs#structured-outputs-vs-json-mode" }
+      ],
       "points": 10
     },
     {
@@ -63,6 +73,10 @@
         "Each entry in messages.ts makes the local model answer in a different way. Use them as your cases.",
         "Assert on `result.ok` first; that is the part of the contract callers rely on.",
         "A version that only adds try/catch passes the fenced and no-JSON cases. The missingId and unknownAction messages are what catch it."
+      ],
+      "docs": [
+        { "title": "Structured outputs vs JSON mode", "url": "https://developers.openai.com/api/docs/guides/structured-outputs#structured-outputs-vs-json-mode" },
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" }
       ],
       "points": 10
     }

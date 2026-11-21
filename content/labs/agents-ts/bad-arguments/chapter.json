@@ -23,6 +23,11 @@
         "`typeof null` is `'object'` and so is `typeof []`. You need two more checks to rule them out.",
         "For the type rule, `Number.isInteger(value)` covers `integer`; for the others compare `typeof value` with the type name, and make sure `number` is a finite number."
       ],
+      "docs": [
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "Array.isArray()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray" }
+      ],
       "points": 10
     },
     {
@@ -39,6 +44,11 @@
         "Think of the model as a colleague reading your error message: it can only fix what the message tells it.",
         "`Object.keys(registry)` gives you the names to list. `Object.hasOwn` is a safer lookup than reading the property directly.",
         "`try { return JSON.stringify(await tool.run(args)) } catch (err) { ... }` catches both kinds of failure, because the `await` sits inside the `try`."
+      ],
+      "docs": [
+        { "title": "Formatting tool results", "url": "https://developers.openai.com/api/docs/guides/function-calling#formatting-results" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" }
       ],
       "points": 10
     },
@@ -57,6 +67,11 @@
         "The registry already holds everything the API needs. `toolSpecs` only reshapes it.",
         "In `runAgent`, the line that reads `registry[call.function.name].run(...)` is where the crash happens.",
         "`executeToolCall` already returns a JSON string, so its result goes straight into the tool message's `content`."
+      ],
+      "docs": [
+        { "title": "Defining functions", "url": "https://developers.openai.com/api/docs/guides/function-calling#defining-functions" },
+        { "title": "Handling function calls", "url": "https://developers.openai.com/api/docs/guides/function-calling#handling-function-calls" },
+        { "title": "Object.entries()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries" }
       ],
       "points": 10
     }

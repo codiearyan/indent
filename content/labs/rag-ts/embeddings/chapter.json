@@ -23,6 +23,11 @@
         "Slicing texts from `start` to `start + MAX_BATCH` gives one batch. The loop moves start forward by MAX_BATCH.",
         "An item with index i in the batch that began at start belongs at position start + i of the result."
       ],
+      "docs": [
+        { "title": "How to get embeddings", "url": "https://developers.openai.com/api/docs/guides/embeddings#how-to-get-embeddings" },
+        { "title": "Create embeddings API reference", "url": "https://developers.openai.com/api/reference/resources/embeddings/methods/create" },
+        { "title": "Array.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice" }
+      ],
       "points": 10
     },
     {
@@ -40,6 +45,11 @@
         "Three running sums are enough: a times b, a times a, and b times b.",
         "If either squared length is 0, the answer is 0. Otherwise divide the dot product by the square root of the two squared lengths multiplied together."
       ],
+      "docs": [
+        { "title": "Which distance function to use", "url": "https://developers.openai.com/api/docs/guides/embeddings#which-distance-function-should-i-use" },
+        { "title": "Math.sqrt()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sqrt" },
+        { "title": "Array.prototype.reduce()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce" }
+      ],
       "points": 10
     },
     {
@@ -56,6 +66,11 @@
         "Put the query first in the list you send to embed, so its vector is easy to find.",
         "Array destructuring can split the first vector from the rest in one line.",
         "Map each text to { text, score: cosine(queryVector, vectors[i]) }, then sort by score, highest first."
+      ],
+      "docs": [
+        { "title": "Embeddings", "url": "https://developers.openai.com/api/docs/guides/embeddings" },
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" },
+        { "title": "Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" }
       ],
       "points": 10
     }

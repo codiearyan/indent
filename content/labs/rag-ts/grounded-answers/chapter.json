@@ -23,6 +23,11 @@
         "The second argument of a map callback is the position. Join the lines with '\\n'.",
         "The user message can be the joined source lines, a blank line, then `Question: ${question}` as its last line."
       ],
+      "docs": [
+        { "title": "Include relevant context", "url": "https://developers.openai.com/api/docs/guides/prompt-engineering#include-relevant-context-information" },
+        { "title": "Message roles", "url": "https://developers.openai.com/api/docs/guides/prompt-engineering#message-roles-and-instruction-following" },
+        { "title": "Array.prototype.join()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "A regular expression with the g flag and matchAll finds every [n] in order.",
         "A Set keeps the first position of each number. Filter out numbers below 1 or above hits.length before turning them into chunks."
       ],
+      "docs": [
+        { "title": "Synthesizing responses", "url": "https://developers.openai.com/api/docs/guides/retrieval#synthesizing-responses" },
+        { "title": "String.prototype.matchAll()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll" },
+        { "title": "Set", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set" }
+      ],
       "points": 10
     },
     {
@@ -57,6 +67,10 @@
         "Look at what the local model says when the prompt has no sources at all. That is a wasted request.",
         "The earlier you return, the less work you do: the check counts chat requests.",
         "If hits.length is 0, return the NOT_FOUND result before building any prompt."
+      ],
+      "docs": [
+        { "title": "Ranking and score threshold", "url": "https://developers.openai.com/api/docs/guides/retrieval#ranking" },
+        { "title": "return", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return" }
       ],
       "points": 10
     }

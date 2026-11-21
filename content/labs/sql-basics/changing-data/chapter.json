@@ -29,6 +29,11 @@
         "A value in VALUES can be a subquery in parentheses, as long as it returns one value.",
         "For the order, put (SELECT id FROM cafes WHERE name = 'The Lantern Room') where the cafe_id value goes, and write NULL for driver_id."
       ],
+      "docs": [
+        { "title": "INSERT", "url": "https://www.sqlite.org/lang_insert.html" },
+        { "title": "ROWID and INTEGER PRIMARY KEY", "url": "https://www.sqlite.org/lang_createtable.html#rowid" },
+        { "title": "Subquery expressions", "url": "https://www.sqlite.org/lang_expr.html#subq" }
+      ],
       "points": 10
     },
     {
@@ -47,6 +52,11 @@
         "SET can use the old value of the column: price = price * 1.05 reads the current price of each row.",
         "The delete needs both conditions: stock = 0 AND the id is NOT IN the list of product ids from order_items."
       ],
+      "docs": [
+        { "title": "UPDATE", "url": "https://www.sqlite.org/lang_update.html" },
+        { "title": "DELETE", "url": "https://www.sqlite.org/lang_delete.html" },
+        { "title": "IN and NOT IN", "url": "https://www.sqlite.org/lang_expr.html#the_in_and_not_in_operators" }
+      ],
       "points": 10
     },
     {
@@ -64,6 +74,11 @@
         "The new stock of a product depends on its own row in order_items, so the UPDATE needs a correlated subquery.",
         "Inside SET, (SELECT quantity FROM order_items WHERE order_id = 27 AND product_id = products.id) is the amount for the row being updated.",
         "Without a WHERE on the UPDATE, products not in the order get NULL from the subquery, and SQLite refuses to store a NULL stock. Limit the UPDATE to ids IN the order's product ids."
+      ],
+      "docs": [
+        { "title": "BEGIN TRANSACTION", "url": "https://www.sqlite.org/lang_transaction.html" },
+        { "title": "UPDATE", "url": "https://www.sqlite.org/lang_update.html" },
+        { "title": "Correlated subqueries", "url": "https://www.sqlite.org/lang_expr.html#cosub" }
       ],
       "points": 10
     }

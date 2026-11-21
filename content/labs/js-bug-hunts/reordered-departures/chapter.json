@@ -29,6 +29,11 @@
         "`[...harbourTour]` makes a new array. If `before` and `after` are the same array, they will always look the same.",
         "Return the same array you passed to `nextDepartures` as `after`. It should now start with 1020."
       ],
+      "docs": [
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" },
+        { "title": "Spread syntax (...)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax" },
+        { "title": "Copying and mutating array methods", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array#copying_methods_and_mutating_methods" }
+      ],
       "points": 10
     },
     {
@@ -47,6 +52,10 @@
         "`sort` changes the array it is called on and returns that same array. `filter`, `slice` and spread all return a new one.",
         "Sort a new array with a compare function that returns a negative number when `a` should come first, such as the difference of the two."
       ],
+      "docs": [
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" },
+        { "title": "Copying and mutating array methods", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array#copying_methods_and_mutating_methods" }
+      ],
       "points": 10
     },
     {
@@ -64,6 +73,11 @@
         "Use an array you own in the test, not the shared `harbourTour`, so one test cannot change another.",
         "Keep a reference to the array you pass in, call the function, then `expect` that same array to equal the order you wrote.",
         "The in place fix returns the right answer. Only the test that checks the input array afterwards can catch it, so the input must start out of order."
+      ],
+      "docs": [
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" },
+        { "title": "Copying and mutating array methods", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array#copying_methods_and_mutating_methods" },
+        { "title": "Object.freeze()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze" }
       ],
       "points": 10
     }

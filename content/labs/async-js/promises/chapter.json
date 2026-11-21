@@ -23,6 +23,10 @@
         "`new Promise((resolve, reject) => { ... })` runs its body straight away, so calling `read` inside it is fine.",
         "In the callback, look at the first argument: if it is set, pass it to `reject`, otherwise pass the second argument to `resolve`."
       ],
+      "docs": [
+        { "title": "Promise() constructor", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise" },
+        { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +45,11 @@
         "Times written as 'HH:MM' compare correctly as strings, so `'17:15' >= '12:00'` is true. `toFixed(1)` gives one decimal.",
         "`find` returns `undefined` when nothing matches. Check for that in the last step and build the 'No high tide after' sentence there. Do not add a `catch`."
       ],
+      "docs": [
+        { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" },
+        { "title": "Array.prototype.find()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find" },
+        { "title": "Number.prototype.toFixed()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +67,11 @@
         "The sea state needs the time, so the two calls cannot happen side by side.",
         "When a `then` callback returns a promise, the promise from `then` waits for it and takes on its result. Forgetting the `return` loses both the value and any error.",
         "Return `getSeaState(sailing.time).then(...)` from the first callback, and build the final object in the inner `then`, where both `sailing` and `sea` are in scope."
+      ],
+      "docs": [
+        { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" },
+        { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" },
+        { "title": "Promise", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" }
       ],
       "points": 10
     }

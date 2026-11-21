@@ -29,6 +29,10 @@
         "`AS` gives a column a new name in the result without changing the table.",
         "The query has four parts in this order: SELECT, FROM, WHERE, ORDER BY. ORDER BY sorts from A to Z unless you say otherwise."
       ],
+      "docs": [
+        { "title": "SELECT", "url": "https://www.sqlite.org/lang_select.html" },
+        { "title": "ORDER BY", "url": "https://www.sqlite.org/lang_select.html#the_order_by_clause" }
+      ],
       "points": 10
     },
     {
@@ -47,6 +51,11 @@
         "In LIKE, `%` matches any run of characters, so put it on both sides of the word. In SQLite, LIKE ignores the case of plain letters.",
         "AND binds tighter than OR. Wrap the category and price conditions in parentheses together, then OR the name condition."
       ],
+      "docs": [
+        { "title": "LIKE", "url": "https://www.sqlite.org/lang_expr.html#like" },
+        { "title": "IN and NOT IN", "url": "https://www.sqlite.org/lang_expr.html#the_in_and_not_in_operators" },
+        { "title": "Operators and precedence", "url": "https://www.sqlite.org/lang_expr.html#operators_and_parse_affecting_attributes" }
+      ],
       "points": 10
     },
     {
@@ -63,6 +72,11 @@
         "NULL means no value at all, so it is never equal to anything, not even to NULL.",
         "SQL has a special test for missing values: `IS NULL`. `= NULL` returns no rows.",
         "Dates stored as YYYY-MM-DD text sort correctly as text. Add DESC after the column in ORDER BY, then LIMIT 5 at the very end."
+      ],
+      "docs": [
+        { "title": "NULL handling", "url": "https://www.sqlite.org/nulls.html" },
+        { "title": "IS and IS NOT", "url": "https://www.sqlite.org/lang_expr.html#isisnot" },
+        { "title": "LIMIT and OFFSET", "url": "https://www.sqlite.org/lang_select.html#the_limit_clause" }
       ],
       "points": 10
     }

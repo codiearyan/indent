@@ -23,6 +23,11 @@
         "Free space in a flex row goes where `justify-content` says. Space between the items pushes the first and last to the ends.",
         "Each row needs three declarations: `display`, `justify-content` and `flex-wrap`. `align-items: center` and a `gap` make it look tidy too."
       ],
+      "docs": [
+        { "title": "Basic concepts of flexbox", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Flexible_box_layout/Basic_concepts" },
+        { "title": "CSS justify-content", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/justify-content" },
+        { "title": "CSS flex-wrap", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-wrap" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "`repeat(auto-fill, minmax(...))` makes as many columns as fit, each at least a given size.",
         "Pick a smallest column size that fits once in 327px but at least twice in 912px, such as somewhere between 14rem and 20rem."
       ],
+      "docs": [
+        { "title": "CSS grid-template-columns", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns" },
+        { "title": "minmax()", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/minmax" },
+        { "title": "Viewport meta tag", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/viewport" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "A fixed width in pixels does not care how wide its box is. A limit in percent does.",
         "When you set only the width of an image, the browser works out the height from its shape. A fixed height stretches it.",
         "`overflow-wrap` decides what happens to a word too long for its line. It is inherited, so setting it on the card covers every paragraph in it."
+      ],
+      "docs": [
+        { "title": "CSS max-width", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/max-width" },
+        { "title": "CSS height", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/height" },
+        { "title": "CSS overflow-wrap", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/overflow-wrap" }
       ],
       "points": 10
     }

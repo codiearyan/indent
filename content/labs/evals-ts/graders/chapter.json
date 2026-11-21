@@ -23,6 +23,11 @@
         "`JSON.parse` throws on text like a code fence. Wrap it in try/catch and turn the error into a failing result.",
         "`JSON.parse('null')` and `JSON.parse('[1]')` succeed, so check the parsed value is an object that is not null and not an array before reading a field."
       ],
+      "docs": [
+        { "title": "String check graders", "url": "https://developers.openai.com/api/docs/guides/graders#string-check-graders" },
+        { "title": "RegExp() constructor", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/RegExp" },
+        { "title": "Math.abs()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/abs" }
+      ],
       "points": 10
     },
     {
@@ -40,6 +45,11 @@
         "Write a tiny `safely(grader, output)` that returns a failing result when the grader throws.",
         "`score` is passing results divided by all results; `reasons` is the failing results mapped to their reason."
       ],
+      "docs": [
+        { "title": "Graders", "url": "https://developers.openai.com/api/docs/guides/graders" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "Array.prototype.filter()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter" }
+      ],
       "points": 10
     },
     {
@@ -56,6 +66,11 @@
         "Inside each `case` of the switch, TypeScript knows which fields that spec has.",
         "`c.checks.map(buildGrader)` gives you the grader list for one case; hand it to `gradeOutput` with the reply.",
         "Spread the result of `gradeOutput` into `{ id: c.id, ... }` and keep the results in an array. The mean is the sum of scores over the count, guarded for zero."
+      ],
+      "docs": [
+        { "title": "switch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/switch" },
+        { "title": "Graders", "url": "https://developers.openai.com/api/docs/guides/graders" },
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" }
       ],
       "points": 10
     }

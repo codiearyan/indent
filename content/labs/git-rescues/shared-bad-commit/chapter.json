@@ -23,6 +23,10 @@
         "`git revert` takes the commit you want to cancel, not the one you want to go back to.",
         "Pass the hash of `Load spring fares` to `git revert` together with `--no-edit`, then check `git status` is clean."
       ],
+      "docs": [
+        { "title": "git revert", "url": "https://git-scm.com/docs/git-revert" },
+        { "title": "git log", "url": "https://git-scm.com/docs/git-log" }
+      ],
       "points": 10
     },
     {
@@ -39,6 +43,10 @@
         "If your main only adds commits on top of what origin has, a plain push works.",
         "If the push was rejected as non-fast-forward, your main lost commits that origin has. Run setup again and undo with a new commit.",
         "Run `git push origin main` after the revert. Afterwards `git status` should say your branch is up to date with origin/main."
+      ],
+      "docs": [
+        { "title": "git push", "url": "https://git-scm.com/docs/git-push" },
+        { "title": "Note about fast-forwards", "url": "https://git-scm.com/docs/git-push#_note_about_fast_forwards" }
       ],
       "points": 10
     }

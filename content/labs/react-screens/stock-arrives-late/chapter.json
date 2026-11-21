@@ -23,6 +23,11 @@
         "Setting state during render starts another render, which would fetch again, and again.",
         "`fetch` returns a promise of a response, and `response.json()` returns another promise. Chain them with `then`, or use an `async` function inside the effect."
       ],
+      "docs": [
+        { "title": "Fetching data with effects", "url": "https://react.dev/reference/react/useEffect#fetching-data-with-effects" },
+        { "title": "Using the Fetch API", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch" },
+        { "title": "Response.json()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/json" }
+      ],
       "points": 10
     },
     {
@@ -42,6 +47,11 @@
         "An effect runs again when a value in its dependency array changes. A counter in state that Try again increases is a simple way to ask for another run.",
         "Set the status back to `'loading'` at the start of every attempt, and remember that a 500 answer reaches your `then`, not your `catch`, unless you throw."
       ],
+      "docs": [
+        { "title": "Response.ok", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/ok" },
+        { "title": "Avoid contradictions in state", "url": "https://react.dev/learn/choosing-the-state-structure#avoid-contradictions-in-state" },
+        { "title": "Specifying reactive dependencies", "url": "https://react.dev/reference/react/useEffect#specifying-reactive-dependencies" }
+      ],
       "points": 10
     },
     {
@@ -59,6 +69,10 @@
         "A custom hook is a plain function whose name starts with `use` and that calls other hooks. Each component that calls it gets its own state.",
         "Nothing about the code has to change on the way into the hook; it moves, and `App` reads the results.",
         "Destructuring with a new name keeps the rest of `App` as it was: `const { records: stock, status, retry } = useStock()`."
+      ],
+      "docs": [
+        { "title": "Reusing logic with custom hooks", "url": "https://react.dev/learn/reusing-logic-with-custom-hooks" },
+        { "title": "Rules of Hooks", "url": "https://react.dev/reference/rules/rules-of-hooks" }
       ],
       "points": 10
     }

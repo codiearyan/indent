@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { useWorkspace } from '@/stores/workspace'
 import { CheckDetails } from './CheckDetails'
 import { Markdown } from './Markdown'
+import { TaskDocs } from './TaskDocs'
 import { TaskHints } from './TaskHints'
 
 interface Props {
@@ -89,6 +90,7 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
           </div>
         )}
         <TaskHints hints={task.hints} unlocked={hintsUnlocked(progress?.nonGreenChecks ?? 0)} />
+        <TaskDocs task={task} progress={taskProgress} />
       </div>
     </li>
   )

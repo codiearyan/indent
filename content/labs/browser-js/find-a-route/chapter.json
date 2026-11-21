@@ -23,6 +23,11 @@
         "The `change` event of a text box fires only when it loses focus. `input` fires on every keystroke.",
         "Trim the query and lower-case both strings, then use `includes`. An empty string is included in every name, which is exactly what an empty search needs."
       ],
+      "docs": [
+        { "title": "Element input event", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Element/input_event" },
+        { "title": "String.prototype.toLowerCase()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase" },
+        { "title": "String.prototype.includes()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "Export it from `board.js` if it is not exported, and import it with a relative path ending in `.js`.",
         "The band test is: the band is empty, or the route's band equals it. Combine it with the name test using `&&` or an early return."
       ],
+      "docs": [
+        { "title": "export", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export" },
+        { "title": "import", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import" },
+        { "title": "HTMLElement change event", "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/change_event" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "Two different empty boards need two different sentences. What tells them apart?",
         "`routes` is everything on the wall and `shown` is what passed the filters. You need both.",
         "The line is hidden when there are no routes at all, or when at least one route is shown."
+      ],
+      "docs": [
+        { "title": "HTMLElement.hidden", "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/hidden" },
+        { "title": "Array.prototype.filter()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter" },
+        { "title": "Array length", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length" }
       ],
       "points": 10
     }

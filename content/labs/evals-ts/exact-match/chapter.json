@@ -23,6 +23,11 @@
         "`JSON.parse` throws on bad input. Catch that and throw your own error that says which line it was.",
         "The line number is the array index plus one, counted before you skip blank lines. A `Set` of ids tells you when one repeats."
       ],
+      "docs": [
+        { "title": "fs.readFileSync()", "url": "https://nodejs.org/docs/latest/api/fs.html#fsreadfilesyncpath-options" },
+        { "title": "String.prototype.split()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split" },
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" }
+      ],
       "points": 10
     },
     {
@@ -39,6 +44,11 @@
         "Normalization fixes formatting, not meaning. Every rule should remove noise without changing which word the model chose.",
         "A chain of `.replace()` calls with small regular expressions keeps each rule on its own line. Anchor them with `^` and `$` so you only touch the edges.",
         "Trim again after removing the prefix and the punctuation, then replace `/[\\s_]+/g` last."
+      ],
+      "docs": [
+        { "title": "Regular expressions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions" },
+        { "title": "String.prototype.replace()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace" },
+        { "title": "String.prototype.trim()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim" }
       ],
       "points": 10
     },
@@ -57,6 +67,11 @@
         "Use the model name you are given. The check calls runEval with two different models and expects different results.",
         "Keep a `failures` array and push to it inside the loop. `passed` is then the total minus the number of failures.",
         "Guard the division: when `total` is 0, `passRate` should be 0, not `NaN`."
+      ],
+      "docs": [
+        { "title": "Create an eval for a task", "url": "https://developers.openai.com/api/docs/guides/evals#create-an-eval-for-a-task" },
+        { "title": "Metric-based evals", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices#metric-based-evals" },
+        { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" }
       ],
       "points": 10
     }

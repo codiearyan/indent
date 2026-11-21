@@ -23,6 +23,11 @@
         "An attribute selector looks like `[data-theme='dark']`. Put it on `:root` or `html` so it wins over the plain `:root` rule.",
         "The dark navy of the header is also the link colour in the cards, which is unreadable on a dark card. Give the link its own custom property, then re-point it in the dark rule."
       ],
+      "docs": [
+        { "title": "Using CSS custom properties", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties" },
+        { "title": "Attribute selectors", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/Attribute_selectors" },
+        { "title": "Color contrast", "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/Guides/Understanding_WCAG/Perceivable/Color_contrast" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "`:focus-visible` on its own matches any element that has keyboard focus.",
         "An outline takes a width, a style and a colour. `currentColor` makes it match the text, so it shows on the dark header and the light page alike."
       ],
+      "docs": [
+        { "title": ":focus-visible", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/:focus-visible" },
+        { "title": "CSS outline", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/outline" },
+        { "title": ":not()", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/:not" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "A toggle button has one attribute that a screen reader reads as \"pressed\" or \"not pressed\".",
         "`aria-pressed` holds the text `\"true\"` or `\"false\"`. `setAttribute` with `String(someBoolean)` gives you either one.",
         "Compute one boolean, use it for both the theme and the attribute, and they can never disagree."
+      ],
+      "docs": [
+        { "title": "aria-pressed", "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-pressed" },
+        { "title": "Element.setAttribute()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute" },
+        { "title": "ARIA button role", "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/button_role" }
       ],
       "points": 10
     }

@@ -23,6 +23,11 @@
         "Not every order has `discountCents`. Reading a missing field gives `undefined`, and `undefined` in arithmetic gives `NaN`.",
         "Compute the subtotal with reduce, subtract the discount (or 0 when there is none), then keep the larger of that and 0."
       ],
+      "docs": [
+        { "title": "Array.prototype.reduce()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce" },
+        { "title": "Nullish coalescing operator (??)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing" },
+        { "title": "Math.max()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/max" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "A `Map` from sku to units makes counting easy: read the old count (or 0), add qty, write it back.",
         "Your sort compare function needs two rules. When `b.units - a.units` is 0, fall back to comparing the two skus as strings."
       ],
+      "docs": [
+        { "title": "Map", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" },
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" },
+        { "title": "String.prototype.localeCompare()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "This is grouping: many orders go into one bucket per day. An object whose keys are dates is the bucket.",
         "`'2026-11-02T08:15:00Z'.slice(0, 10)` gives you the date part.",
         "The first time you see a day its key is missing, so add to `days[day] ?? 0` instead of `days[day]`."
+      ],
+      "docs": [
+        { "title": "Property accessors", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors" },
+        { "title": "Nullish coalescing operator (??)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing" },
+        { "title": "String.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/slice" }
       ],
       "points": 10
     }

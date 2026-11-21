@@ -22,6 +22,11 @@
         "Check `call.type === 'function'` before you read `call.function`. A `filter` before the `map` keeps TypeScript happy.",
         "`toolFunctions[call.function.name](JSON.parse(call.function.arguments))` gives you the result to stringify."
       ],
+      "docs": [
+        { "title": "Handling function calls", "url": "https://developers.openai.com/api/docs/guides/function-calling#handling-function-calls" },
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" },
+        { "title": "JSON.stringify()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" }
+      ],
       "points": 10
     },
     {
@@ -40,6 +45,11 @@
         "Count requests as you make them, not tool calls. A reply with tool calls and the final reply are both steps.",
         "The loop body is the round trip from the last issue: push `reply`, then spread `runToolCalls(reply.tool_calls)` into the same array."
       ],
+      "docs": [
+        { "title": "The tool calling flow", "url": "https://developers.openai.com/api/docs/guides/function-calling#the-tool-calling-flow" },
+        { "title": "Manage conversation state", "url": "https://developers.openai.com/api/docs/guides/conversation-state#manually-manage-conversation-state" },
+        { "title": "while", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/while" }
+      ],
       "points": 10
     },
     {
@@ -57,6 +67,11 @@
         "A `for` loop with a counter is easier to reason about here than `while (true)`.",
         "The error belongs after the loop, not inside it: you only reach that line when every allowed step asked for tools.",
         "Count from 1 and keep going while `step <= maxSteps`. Then the request numbered `maxSteps` still runs."
+      ],
+      "docs": [
+        { "title": "The tool calling flow", "url": "https://developers.openai.com/api/docs/guides/function-calling#the-tool-calling-flow" },
+        { "title": "for", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for" },
+        { "title": "throw", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw" }
       ],
       "points": 10
     }

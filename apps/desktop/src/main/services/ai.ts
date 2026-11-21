@@ -9,20 +9,28 @@ import type {
   AiConfig,
   AiProviderId,
   AiProviderInfo,
-  ChapterDef
+  ChapterDef,
+  ProgressState,
+  WorkspaceFile
 } from '@shared/types'
 import { EVENTS } from '@shared/types'
+import { FAILS_BEFORE_TIP, chapterKey } from '@shared/rules'
 import { emit, handle, listen } from '../ipc'
 import { refreshShellPath, shellEnv } from '../labEnv'
-import { chapterContentDir, dataFile } from '../paths'
+import { chapterContentDir, dataFile, workspaceDir } from '../paths'
+import { getProgress, saveTip } from './progress'
+import { resolveInside } from './workspaceFiles'
 import { CLI_BINS, cliModels, cliVersion, runCli, which } from './ai/cli'
 import { GEMINI_URL, OPENAI_URL, anthropicStream, openAiCompatibleStream } from './ai/http'
 import type { CliProviderId } from './ai/parsers'
 import {
   COMPLETION_RULES,
+  TIP_RULES,
   cleanCompletion,
+  cleanTip,
   completionPrompt,
   maskKey,
+  tipPrompt,
   transcript,
   trimHistory,
   tutorSystemPrompt
@@ -206,9 +214,11 @@ async function loadChapter(labId: string, chapterId: string): Promise<[ChapterDe
 const chats = new Map<string, AbortController>()
 let completion: AbortController | undefined
 let testing: AbortController | undefined
+const tips = new Map<string, AbortController>()
 
 function stopEverything(): void {
   for (const chat of chats.values()) chat.abort()
+  for (const tip of tips.values()) tip.abort()
   completion?.abort()
   testing?.abort()
 }
@@ -224,7 +234,10 @@ async function runChat(
 ): Promise<void> {
   const timeout = AbortSignal.timeout(CHAT_TIMEOUT_MS)
   try {
-    const [chapter, lesson] = await loadChapter(request.labId, request.chapterId)
+    const [[chapter, lesson], progress] = await Promise.all([
+      loadChapter(request.labId, request.chapterId),
+      getProgress()
+    ])
     const messages = trimHistory(request.messages)
     if (messages[messages.length - 1]?.role !== 'user') throw new Error('Ask a question first.')
     await streamReply(await buildConfig(), {
@@ -232,7 +245,8 @@ async function runChat(
         chapter,
         lesson,
         activeFile: request.activeFile,
-        lastCheck: request.lastCheck
+        lastCheck: request.lastCheck,
+        progress: progress.chapters[chapterKey(request.labId, request.chapterId)]
       }),
       messages,
       quick: false,
@@ -324,6 +338,66 @@ async function testConnection(): Promise<string> {
   return reply
 }
 
+async function readTaskFile(
+  labId: string,
+  chapterId: string,
+  path: string
+): Promise<WorkspaceFile | undefined> {
+  try {
+    const content = await readFile(resolveInside(workspaceDir(labId, chapterId), path), 'utf8')
+    return { path, content }
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * Writes the one tip a task gets once it has failed FAILS_BEFORE_TIP checks, and saves it. Does
+ * nothing (and resolves with the progress as it is) when AI is off or the task needs no tip.
+ */
+async function tip(labId: string, chapterId: string, taskId: string): Promise<ProgressState> {
+  const [state, config, [chapter]] = await Promise.all([
+    getProgress(),
+    buildConfig(),
+    loadChapter(labId, chapterId)
+  ])
+  const key = `${chapterKey(labId, chapterId)}/${taskId}`
+  const task = chapter.tasks.find((t) => t.id === taskId)
+  const progress = state.chapters[chapterKey(labId, chapterId)]?.tasks[taskId]
+  const provider = config.providers.find((p) => p.id === config.provider)
+  const due = progress && !progress.passed && !progress.tip
+  if (!config.enabled || !provider || !task || !due || tips.has(key)) return state
+  if ((progress.failedChecks ?? 0) < FAILS_BEFORE_TIP) return state
+  const cancel = new AbortController()
+  tips.set(key, cancel)
+  try {
+    let text = ''
+    await streamReply(config, {
+      system: TIP_RULES,
+      messages: [
+        {
+          role: 'user',
+          content: tipPrompt(task, progress, await readTaskFile(labId, chapterId, task.file))
+        }
+      ],
+      quick: false,
+      signal: AbortSignal.any([cancel.signal, AbortSignal.timeout(TEST_TIMEOUT_MS[provider.kind])]),
+      onDelta: (delta) => {
+        text += delta
+      }
+    })
+    // Turning AI off mid-way stops the tip, and a stopped tip is never saved.
+    if (cancel.signal.aborted) return state
+    const written = cleanTip(text)
+    return written ? await saveTip(labId, chapterId, taskId, written) : state
+  } catch (error) {
+    if (cancel.signal.aborted) return state
+    throw error
+  } finally {
+    tips.delete(key)
+  }
+}
+
 export function register(): void {
   handle('ai', {
     getConfig: () => buildConfig(true),
@@ -376,7 +450,8 @@ export function register(): void {
 
     complete,
 
-    test: testConnection
+    test: testConnection,
+    tip
   })
 
   listen('ai', {

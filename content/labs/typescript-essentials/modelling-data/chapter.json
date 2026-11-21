@@ -23,6 +23,11 @@
         "If `levelPrice` switches over every level and returns in each case, TypeScript knows the function cannot fall off the end.",
         "Comparing a lowercased string with `=== 'basic'` narrows it to the literal `'basic'`, so returning the compared value has the right type without a cast."
       ],
+      "docs": [
+        { "title": "Literal types", "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types" },
+        { "title": "Union types", "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types" },
+        { "title": "Equality narrowing", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#equality-narrowing" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "`readonly` is checked by the compiler only. At runtime the object is a plain object, so it costs nothing.",
         "Spreading or writing `notes: notes` always creates the key, even when the value is `undefined`. Return a different object literal when there are no notes."
       ],
+      "docs": [
+        { "title": "Optional properties", "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#optional-properties" },
+        { "title": "readonly properties", "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#readonly-properties" },
+        { "title": "Interfaces", "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#interfaces" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "Every variant has a `kind` member with a different literal type. That shared member is what lets TypeScript tell them apart.",
         "Inside `case 'ready':`, TypeScript has already narrowed `status` to the ready variant, so `status.totalCents` type-checks there and nowhere else.",
         "After all four cases, nothing is left in the union, so the type of `status` in `default` is `never`. Assign it to `const unhandled: never` and throw."
+      ],
+      "docs": [
+        { "title": "Discriminated unions", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions" },
+        { "title": "The never type", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#the-never-type" },
+        { "title": "Exhaustiveness checking", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#exhaustiveness-checking" }
       ],
       "points": 10
     }

@@ -23,6 +23,10 @@
         "The constructor already put the system message in this.history. You only add to it.",
         "The reply is at `res.choices[0].message.content`, which can be null, so fall back to ''."
       ],
+      "docs": [
+        { "title": "Manage conversation state", "url": "https://developers.openai.com/api/docs/guides/conversation-state#manually-manage-conversation-state" },
+        { "title": "Array.prototype.push()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +45,11 @@
         "Checking the impossible case first means your trimming loop can never remove the last message.",
         "`rest.shift()` drops the oldest message. A while loop around `countMessageTokens([system, ...rest]) > budget` does the trimming."
       ],
+      "docs": [
+        { "title": "Managing the context window", "url": "https://developers.openai.com/api/docs/guides/conversation-state#managing-the-context-window" },
+        { "title": "Counting tokens", "url": "https://developers.openai.com/api/docs/guides/token-counting" },
+        { "title": "Array.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +67,10 @@
         "Read the error from the failed turn: the model says how many tokens it got and how many it allows.",
         "Trim the messages you are about to send, not the history after the reply, so the request itself is always within budget.",
         "`const messages = fitToBudget([...this.history, userMessage], this.budget)` and later `this.history = [...messages, replyMessage]`."
+      ],
+      "docs": [
+        { "title": "Managing the context window", "url": "https://developers.openai.com/api/docs/guides/conversation-state#managing-the-context-window" },
+        { "title": "Manage conversation state", "url": "https://developers.openai.com/api/docs/guides/conversation-state#manually-manage-conversation-state" }
       ],
       "points": 10
     }

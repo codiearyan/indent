@@ -23,6 +23,11 @@
         "After `if (typeof amount === 'number') { ... return }`, TypeScript knows that `amount` is a string in the rest of the function, so `.trim()` is allowed.",
         "For the string case, test the trimmed text against a regular expression for digits, an optional dot and one or two digits before converting it with `Number`."
       ],
+      "docs": [
+        { "title": "Union types", "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types" },
+        { "title": "typeof type guards", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#typeof-type-guards" },
+        { "title": "Number.isFinite()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isFinite" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,10 @@
         "A function whose return type is `value is SomeType` returns a boolean, and TypeScript narrows `value` wherever the function is called in an `if`.",
         "With `contact is EmailContact` as the return type, the code after an early `return` in `contactLine` sees a `PhoneContact`, so `contact.textOk` type-checks."
       ],
+      "docs": [
+        { "title": "Using type predicates", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates" },
+        { "title": "The in operator narrowing", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#the-in-operator-narrowing" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +67,11 @@
         "`find` already returns the element type or `undefined`. Let your return type say the same thing instead of hiding it.",
         "Optional chaining (`?.`) stops at `null` and `undefined`, so you can trim a nickname that might not exist without an `if`.",
         "`??` only falls back on `null` and `undefined`, while `||` also falls back on an empty string. A trimmed blank nickname is an empty string."
+      ],
+      "docs": [
+        { "title": "null and undefined", "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#null-and-undefined" },
+        { "title": "Optional chaining (?.)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining" },
+        { "title": "Nullish coalescing operator (??)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing" }
       ],
       "points": 10
     }

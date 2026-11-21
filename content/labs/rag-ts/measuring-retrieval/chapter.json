@@ -33,6 +33,11 @@
         "A question that expects two articles and finds one has recall 0.5 and is still a hit.",
         "Put the top k ids in a Set and count how many expected ids it has. That way a repeated id cannot count twice."
       ],
+      "docs": [
+        { "title": "Metric-based evals", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices#metric-based-evals" },
+        { "title": "Array.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice" },
+        { "title": "Set", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set" }
+      ],
       "points": 10
     },
     {
@@ -51,6 +56,11 @@
         "Labels name articles, such as 'weather'. A chunk id like 'weather#1' never equals 'weather', which would make every score 0.",
         "For each question, keep its expected list next to the source of each of its hits. After the loop, pass all of them and settings.k to both metrics."
       ],
+      "docs": [
+        { "title": "Example: Q and A over docs", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices#example-qa-over-docs" },
+        { "title": "Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" },
+        { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" }
+      ],
       "points": 10
     },
     {
@@ -67,6 +77,10 @@
         "TOP_K is already at the team limit, so the fix is not a bigger k.",
         "Read the chunks that 20 characters gives you in your head: how many words fit in one?",
         "Pick a chunk size, with some overlap, whose k=3 column reads 100% for both numbers, then run the sweep to confirm it."
+      ],
+      "docs": [
+        { "title": "Chunking in retrieval", "url": "https://developers.openai.com/api/docs/guides/retrieval#chunking" },
+        { "title": "Use evals to improve performance", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices#use-evals-to-improve-performance" }
       ],
       "points": 10
     }
