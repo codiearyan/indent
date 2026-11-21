@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Bram", "say": "Seat 4B is still locked.", "note": "After a ticket email bounced." },
+    { "title": "Ticket office", "text": "Waits on slow calls one by one.", "note": "And freezes when one fails." },
+    {
+      "title": "Your code",
+      "file": "booking.js",
+      "mine": true,
+      "gap": "A failure skips the unlock",
+      "tasks": ["Rewrite with await", "Wait only when needed", "Always unlock the seat"]
+    },
+    {
+      "title": "Booking",
+      "rows": [["Booking", "saved"], ["Ticket email", "bounced"], ["Seat 4B", "unlocked"]],
+      "mark": 2
+    }
+  ],
+  "ticket": { "label": "Seat 4B", "wrong": "locked", "why": "Never freed", "right": "unlocked" },
+  "captions": [
+    "The board works again. Now Bram finds seat 4B still locked after an email bounced.",
+    "One failed email froze the booking, and the seat was never unlocked.",
+    "You write it with await, in three tasks.",
+    "Now the booking is saved, the bounce is noted and seat 4B is unlocked.",
+    "Less waiting, and the seat is always freed, whatever fails."
+  ]
+}

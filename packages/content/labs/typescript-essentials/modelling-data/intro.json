@@ -1,0 +1,29 @@
+{
+  "stations": [
+    { "title": "Booking desk", "say": "Book a quik service.", "note": "A typo nobody caught." },
+    { "title": "Booking app", "text": "Takes any text as a level.", "note": "So the price comes out blank." },
+    {
+      "title": "Your code",
+      "file": "levels.ts",
+      "mine": true,
+      "gap": "Nothing says what a level is",
+      "tasks": ["Three exact levels", "Shape a booking", "Say where a bike is"]
+    },
+    {
+      "title": "Service levels",
+      "rows": [
+        ["basic, full, overhaul"],
+        ["quik", "not a level"]
+      ],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "quik", "wrong": "price blank", "why": "A typo", "right": "not a level" },
+  "captions": [
+    "Your helpers are merged. Next, Marit: someone booked a quik service last week.",
+    "Any text passed as a level, so the price came out blank.",
+    "You give the shop's data exact shapes, in three tasks.",
+    "Now quik is caught as not a level before anyone sees a price.",
+    "Same typo, caught early. Levels, bookings and job states have shapes."
+  ]
+}

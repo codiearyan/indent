@@ -1,0 +1,20 @@
+{
+  "stations": [
+    { "title": "Tobias", "say": "Which products are dear?", "note": "Dear for their own category." },
+    { "title": "A typed number", "text": "An average worked out once, copied by hand.", "note": "Stale when a price changes." },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "gap": "Two queries, a copied number",
+      "tasks": ["Above own average", "List cake buyers once", "Find big spenders"]
+    }
+  ],
+  "ticket": { "label": "Dear products", "wrong": "stale", "why": "Typed number", "right": "up to date" },
+  "captions": [
+    "Tobias asks which products are dear, and that hides a second question: dear next to what?",
+    "Today an average is worked out once and typed in. It goes stale when a price moves.",
+    "You write queries with a question inside them, in three tasks.",
+    "Now each query works its own averages out every time it runs.",
+    "Same question, no copied numbers. A new price list still works."
+  ]
+}

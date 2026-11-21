@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Odile", "say": "Can it type like a person?", "note": "In the chat window on her phone." },
+    { "title": "Moss", "text": "Writes a reply in small pieces.", "note": "Each piece holds only what is new." },
+    {
+      "title": "Your code",
+      "file": "stream.ts",
+      "mine": true,
+      "gap": "Nothing reads the pieces",
+      "tasks": ["Join the pieces", "Show the text so far", "Stream the answer"]
+    },
+    { "title": "Chat window", "text": "Shows the reply as it grows.", "note": "On the shop's website." }
+  ],
+  "ticket": { "label": "Orchid tip", "wrong": "all at once", "why": "A long wait", "right": "word by word" },
+  "captions": [
+    "Moss fills in orders now. Odile tries the new chat window on her phone.",
+    "A customer asks about an orchid, and the bubble stays empty until it all lands.",
+    "You write the code that reads the stream, in three tasks.",
+    "Now the orchid answer appears word by word as Moss writes it.",
+    "Same answer, no blank wait. And a cut reply never passes as a whole one."
+  ]
+}

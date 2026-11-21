@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Ravi", "say": "Can Moss tag each message?", "note": "Every morning, in the shop inbox." },
+    { "title": "Moss", "text": "Answers in friendly prose.", "note": "Code cannot use a sentence." },
+    {
+      "title": "Your prompts",
+      "file": "inbox.ts",
+      "mine": true,
+      "gap": "Nothing fixes the reply's shape",
+      "tasks": ["Ask for one label", "Show worked examples", "Parse the triage line"]
+    },
+    {
+      "title": "Ravi's inbox view",
+      "rows": [["Soggy snake plant"], ["Where is my order?"], ["Pothos gnats"]],
+      "mark": 2
+    }
+  ],
+  "ticket": { "label": "Pothos gnats", "wrong": "a paragraph", "why": "Prose", "right": "tagged" },
+  "captions": [
+    "Moss can talk now. Ravi wants every inbox message tagged before he opens it.",
+    "Asked about gnats in a pothos, Moss replies with a friendly paragraph.",
+    "You write the prompts and a strict parser, in three tasks.",
+    "Now every reply comes back in one shape your code can read.",
+    "Same inbox, sorted in minutes. Moss answers in a shape code can trust."
+  ]
+}

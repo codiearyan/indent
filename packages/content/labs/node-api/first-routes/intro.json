@@ -1,0 +1,29 @@
+{
+  "stations": [
+    { "title": "Luka", "say": "Can I get the list of boats?", "note": "For the new booking page." },
+    { "title": "The server", "text": "Starts, but has no routes.", "note": "Plain node:http." },
+    {
+      "title": "Your code",
+      "file": "app.js",
+      "mine": true,
+      "gap": "No route answers yet",
+      "tasks": ["Send JSON", "Answer two routes", "Say no clearly"]
+    },
+    {
+      "title": "Fleet",
+      "rows": [
+        ["Heron", "single"],
+        ["Otter", "double"],
+        ["Wren", "paddleboard"]
+      ]
+    }
+  ],
+  "ticket": { "label": "GET /boats", "wrong": "a 500", "why": "No route", "right": "all the boats" },
+  "captions": [
+    "At Larchmere Kayaks, Luka needs the list of boats for his booking page.",
+    "The server starts, but no route answers, so every request fails.",
+    "You write the routes and the JSON answers, in three tasks.",
+    "Now GET /boats answers with the whole fleet as JSON.",
+    "Same request, a real answer. And a clear no for anything else."
+  ]
+}

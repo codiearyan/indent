@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Customer", "say": "Is KP-60100 still on the van?", "note": "Then asks again, all afternoon." },
+    { "title": "Kes", "text": "Answers in a chat that remembers.", "note": "On the Kestrel Parcels site." },
+    {
+      "title": "Your code",
+      "file": "chat.ts",
+      "mine": true,
+      "gap": "Long chats stop answering",
+      "tasks": ["Break a long chat", "Keep long chats going", "Test that catches it"]
+    },
+    { "title": "Customer chat", "text": "Shows each answer from Kes." }
+  ],
+  "ticket": { "label": "Van checks", "wrong": "fail midway", "why": "Chat dies", "right": "all answered" },
+  "captions": [
+    "Depot requests are safe now. Next, a customer chats with Kes all afternoon.",
+    "Partway through, every new question ends in an error.",
+    "You make it fail, fix it and write the test, in three tasks.",
+    "Now every check gets an answer, however long the chat runs.",
+    "Same customer, no dead chat. Kes stays itself to the last answer."
+  ]
+}

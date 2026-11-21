@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Undo Pavel's spring fares?", "note": "Keep my Sunday sailings." },
+    { "title": "Main", "text": "Has the bad fares commit.", "note": "Everyone has pulled it." },
+    {
+      "title": "Your commands",
+      "file": "fares.txt",
+      "mine": true,
+      "gap": "No safe undo yet",
+      "tasks": ["Undo in a new commit", "Share the fix"]
+    },
+    {
+      "title": "Shared repo",
+      "rows": [["Add fares table"], ["Load spring fares"], ["Add Sunday sailings"]],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Adult fare", "wrong": "65 pounds", "why": "Ten times", "right": "as before" },
+  "captions": [
+    "At Gullwick Ferries, Ines asks you to undo Pavel's spring fares.",
+    "Everyone already has the bad commit, and the machines charge 65 pounds.",
+    "You write the commands that undo it and share the fix, in two tasks.",
+    "The fare is back, the Sunday sailings stay, and the shared repo takes the push.",
+    "Nothing was rewritten, so everyone can pull the fix."
+  ]
+}

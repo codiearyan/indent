@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Customer",
+      "say": "How often to water my monstera?",
+      "note": "Written to Fernhollow."
+    },
+    {
+      "title": "Odile and Ravi",
+      "text": "Answer the same questions every week.",
+      "note": "By hand, one by one."
+    },
+    {
+      "title": "Your code",
+      "file": "ask.ts",
+      "mine": true,
+      "gap": "Nothing asks Moss yet",
+      "tasks": [
+        "Build the messages",
+        "Send it, read a reply",
+        "Read why it stopped"
+      ]
+    },
+    {
+      "title": "Moss",
+      "text": "A local care model.",
+      "note": "It only knows what it is sent."
+    }
+  ],
+  "ticket": {
+    "label": "Monstera",
+    "wrong": "waits for Ravi",
+    "why": "By hand",
+    "right": "Moss replied"
+  },
+  "captions": [
+    "At Fernhollow, a customer asks how often to water a monstera.",
+    "Moss cannot hear the question yet, so Odile or Ravi answers by hand.",
+    "You write the call to the model, in three tasks.",
+    "Now Moss answers, and you can tell if the reply came back whole.",
+    "One question in, one answer out. Moss can talk."
+  ]
+}

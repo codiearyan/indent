@@ -1,0 +1,20 @@
+{
+  "stations": [
+    { "title": "Odile", "say": "How many orders are pending?", "note": "Every Monday morning." },
+    { "title": "Bakehouse database", "text": "One row per order, and many orders.", "note": "A list of rows is not a number." },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "gap": "Lists, but no totals",
+      "tasks": ["Count by status", "Sum up each category", "Find the regulars"]
+    }
+  ],
+  "ticket": { "label": "Pending orders", "wrong": "a list", "why": "Hand count", "right": "counted" },
+  "captions": [
+    "Odile liked the lists. Now she starts each Monday asking how many orders are pending.",
+    "A query can list every order, but then someone counts the rows by hand.",
+    "You write queries that fold rows into summaries, in three tasks.",
+    "Now your query gives one line per status, already counted.",
+    "Same orders, a number instead of a list. Groups do the counting."
+  ]
+}

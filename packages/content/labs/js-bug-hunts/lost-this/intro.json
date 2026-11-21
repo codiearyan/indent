@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dario", "say": "Scanner beeps, then nothing.", "note": "First morning. CPC-23." },
+    { "title": "Dock scanner", "text": "Hands each boat id to the fleet.", "note": "Scanned: K1 going out." },
+    {
+      "title": "Your code",
+      "file": "fleet.js",
+      "mine": true,
+      "gap": "A scan ends in an error",
+      "tasks": ["Catch both crashes", "Fix the fleet", "Write the test"]
+    },
+    { "title": "Free boat list", "text": "Shows which boats are free.", "note": "On the board by the dock." }
+  ],
+  "ticket": { "label": "K1", "wrong": "scan fails", "why": "An error", "right": "checked out" },
+  "captions": [
+    "Next, Dario's new dock scanner beeps, then nothing, and the free boat list is blank.",
+    "Scanning K1 out ends in an error, and so does the list of free boats.",
+    "You catch both crashes, fix the fleet and write the test, in three tasks.",
+    "Now K1 is checked out and the board lists the boats that are free.",
+    "Same scanner, same fleet. Dario can put the whiteboard away."
+  ]
+}

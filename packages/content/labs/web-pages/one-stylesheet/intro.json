@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Ruth",
+      "say": "Use the new warmer cream.",
+      "note": "To match the new signs."
+    },
+    {
+      "title": "Style attributes",
+      "text": "The same colours typed 40 times.",
+      "note": "One copy is always missed."
+    },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "No one place for a colour",
+      "tasks": ["Move styles out", "Name the colours once", "End the date fight"]
+    },
+    {
+      "title": "What's on page",
+      "rows": [["Header", "new cream"], ["Menu links", "old cream"]],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "New cream",
+    "wrong": "missed a spot",
+    "why": "An afternoon",
+    "right": "everywhere"
+  },
+  "captions": [
+    "The form works. Next, Ruth wants the page in the warmer cream of the new signs.",
+    "The colour is typed in forty places, so it takes all afternoon and one is missed.",
+    "You move every style into one stylesheet and name the colours, in three tasks.",
+    "Now the new cream is one edit, and it reaches the menu links too.",
+    "Same page, same look. Every colour now lives in one place."
+  ]
+}

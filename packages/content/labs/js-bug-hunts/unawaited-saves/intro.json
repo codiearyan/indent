@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Rosa", "say": "Sunday's bookings never arrived.", "note": "The log says all saved. CPC-31." },
+    {
+      "title": "Evening bookings",
+      "rows": [["b101", "Amara"], ["b102", "Joon"], ["b103", "Priya"]],
+      "note": "Synced on Sunday evening."
+    },
+    {
+      "title": "Your code",
+      "file": "sync.js",
+      "mine": true,
+      "gap": "Done before the saves are",
+      "tasks": ["Catch the early finish", "Wait for every save", "Write the test"]
+    },
+    { "title": "Online system", "text": "Where the dock checks bookings.", "note": "Looked up when people arrive." }
+  ],
+  "ticket": { "label": "3 bookings", "wrong": "not saved", "why": "Said saved", "right": "saved" },
+  "captions": [
+    "Last, Rosa reports that three Sunday bookings never reached the online system.",
+    "The sync says it saved all three in the same second, and no error is ever logged.",
+    "You catch the early finish, fix the sync and write the test, in three tasks.",
+    "Now the sync is done only when every save is, and a failed save is reported.",
+    "Same three bookings. The log tells the truth, and the dock knows them all."
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "stations": [
+    { "title": "Odile", "say": "Which cafes are in Port Ellery?", "note": "Planning the delivery round." },
+    { "title": "Bakehouse database", "text": "Every cafe and order, in SQLite.", "note": "Only its builder ever queried it." },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "gap": "Nobody here can ask it",
+      "tasks": ["Cafes in one town", "Pick counter treats", "Find missing emails"]
+    }
+  ],
+  "ticket": { "label": "Port Ellery", "wrong": "no list", "why": "A long wait", "right": "cafes listed" },
+  "captions": [
+    "At Brindle Bakehouse, Odile needs every cafe in Port Ellery for her delivery round.",
+    "The answer is in the database, but nobody here knows how to ask it.",
+    "You write the queries that pick rows and columns, in three tasks.",
+    "Now your query lists the Port Ellery cafes with their emails.",
+    "Same database, a real answer. You ask the questions now."
+  ]
+}

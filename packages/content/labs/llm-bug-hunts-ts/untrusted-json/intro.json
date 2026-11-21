@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Customer",
+      "say": "Please change my delivery.",
+      "note": "One of many messages."
+    },
+    {
+      "title": "Kes",
+      "text": "Turns a message into a depot request.",
+      "note": "Most replies go through."
+    },
+    {
+      "title": "Your code",
+      "file": "parse.ts",
+      "mine": true,
+      "gap": "Odd replies crash or slip by",
+      "tasks": [
+        "Crash it on purpose",
+        "Stop trusting replies",
+        "Test that catches it"
+      ]
+    },
+    {
+      "title": "Depot system",
+      "text": "Acts on every change it gets."
+    }
+  ],
+  "ticket": {
+    "label": "Change request",
+    "wrong": "crashed",
+    "why": "A 500 error",
+    "right": "passed on"
+  },
+  "captions": [
+    "Summaries are whole now. Next, customers ask Kes to change a delivery.",
+    "Kes replies, but the change endpoint crashes before the depot hears of it.",
+    "You crash it on purpose, fix it and write the test, in three tasks.",
+    "Now the request reaches the depot instead of crashing on the way.",
+    "Same message, no 500. And a test keeps it that way."
+  ]
+}

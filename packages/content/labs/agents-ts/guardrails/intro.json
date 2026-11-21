@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Delivery desk",
+      "say": "My eggs arrived broken. Refund?",
+      "note": "Order PL-2043."
+    },
+    {
+      "title": "Pip",
+      "text": "Can now call a refund tool.",
+      "note": "It moves real money."
+    },
+    {
+      "title": "Your code",
+      "file": "guard.ts",
+      "mine": true,
+      "gap": "Nobody is asked first",
+      "tasks": [
+        "Hold risky tools",
+        "Record every step",
+        "Prove it with a test"
+      ]
+    },
+    {
+      "title": "Staff",
+      "say": "Yes, refund it.",
+      "note": "No yes, no refund."
+    }
+  ],
+  "ticket": {
+    "label": "Refund PL-2043",
+    "wrong": "paid",
+    "why": "Nobody asked",
+    "right": "approved"
+  },
+  "captions": [
+    "A customer's eggs arrived broken, and Pip can now issue refunds.",
+    "Nothing stops Pip from paying out money that nobody approved.",
+    "You write the guard, the trace and a test that proves it.",
+    "Now a refund waits until someone on the staff says yes.",
+    "Money moves only after a yes, and every step is on record."
+  ]
+}

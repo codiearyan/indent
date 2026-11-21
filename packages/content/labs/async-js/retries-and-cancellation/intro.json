@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Odile", "say": "Fetch the list for sailing S2.", "note": "Then she cancels it for weather." },
+    { "title": "Harbour server", "text": "Often says it is busy.", "note": "Shared by every boat on the coast." },
+    {
+      "title": "Your code",
+      "file": "retry.js",
+      "mine": true,
+      "gap": "No retry, no way to stop",
+      "tasks": ["Retry with backoff", "A sleep you can cancel", "Stop when asked"]
+    },
+    {
+      "title": "Odile's tablet",
+      "rows": [["S1", "list ready"], ["X9", "no such sailing"], ["S2", "cancelled"]],
+      "mark": 2
+    }
+  ],
+  "ticket": { "label": "S2 download", "wrong": "retrying", "why": "Never stops", "right": "stopped" },
+  "captions": [
+    "Odile's tablet fetches the passenger list for sailing S2 from a busy harbour server.",
+    "Odile cancels S2 for weather, but the tablet keeps retrying.",
+    "You write the retry and a sleep you can cancel, in three tasks.",
+    "Now busy calls wait longer each time, and S2 stops the moment it is cancelled.",
+    "Try again politely, and nothing runs after you say stop."
+  ]
+}

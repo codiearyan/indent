@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Bram", "say": "Can my dog come?", "note": "A customer at the hut." },
+    { "title": "Text search", "text": "Matches exact words only.", "note": "The article says dogs." },
+    {
+      "title": "Your code",
+      "file": "embed.ts",
+      "mine": true,
+      "gap": "No way to compare meaning",
+      "tasks": ["Embed in batches", "Cosine by hand", "Rank by meaning"]
+    },
+    {
+      "title": "Handbook",
+      "rows": [["Booking a kayak"], ["Paddling with dogs"], ["Weather and wind"]],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Dog question", "wrong": "no match", "why": "Exact words", "right": "matched" },
+  "captions": [
+    "The handbook is in pieces now. A customer asks Bram if their dog can come.",
+    "A plain text search looks for the word dog, and the article says dogs.",
+    "You write embeddings, cosine similarity and a ranking, in three tasks.",
+    "Now the question is compared by meaning, and it finds the dogs article.",
+    "Different words, same meaning. The right article still turns up."
+  ]
+}

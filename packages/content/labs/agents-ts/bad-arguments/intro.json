@@ -1,0 +1,56 @@
+{
+  "stations": [
+    {
+      "title": "Noor",
+      "say": "Set aside 3 jars of honey for Ben.",
+      "note": "In the staff chat."
+    },
+    {
+      "title": "Pip",
+      "text": "Sometimes sends a bad tool call.",
+      "note": "A wrong name, or a number as text."
+    },
+    {
+      "title": "Your code",
+      "file": "registry.ts",
+      "mine": true,
+      "gap": "A bad call ends the run",
+      "tasks": [
+        "Check the arguments",
+        "Make failures results",
+        "Let the model retry"
+      ]
+    },
+    {
+      "title": "Pantry stock",
+      "rows": [
+        [
+          "HNY-250",
+          "12 left"
+        ],
+        [
+          "EGG-12",
+          "6 left"
+        ],
+        [
+          "RYE-800",
+          "0 left"
+        ]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "3 honey jars",
+    "wrong": "crashed",
+    "why": "A bad call",
+    "right": "set aside"
+  },
+  "captions": [
+    "Noor asks Pip to set aside three jars of honey for Ben's order.",
+    "Pip sends a tool call that is slightly wrong, and the whole run crashes.",
+    "You write the part that checks each call, in three tasks.",
+    "Now a bad call comes back as a result Pip can read, and it tries again.",
+    "Same request, no stack trace. The honey is set aside."
+  ]
+}

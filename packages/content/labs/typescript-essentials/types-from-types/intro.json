@@ -1,0 +1,29 @@
+{
+  "stations": [
+    { "title": "Front desk", "say": "Move SW-1042 to the 22nd.", "note": "On the edit form." },
+    { "title": "Old copies", "text": "Hand-written copies of a booking.", "note": "One never got the drop-off date." },
+    {
+      "title": "Your code",
+      "file": "changes.ts",
+      "mine": true,
+      "gap": "Copies drift from Booking",
+      "tasks": ["Read fields by name", "Drafts and changes", "Rules for any record"]
+    },
+    {
+      "title": "Bookings",
+      "rows": [
+        ["SW-1042", "Petra, full"],
+        ["SW-1043", "Omar, basic"]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": { "label": "SW-1042", "wrong": "date dropped", "why": "Copy drifted", "right": "date moved" },
+  "captions": [
+    "Generics are in. Next, Petra's bike, SW-1042, moves to the 22nd on the edit form.",
+    "The form uses an old copy of a booking with no drop-off date, so the date is lost.",
+    "You build every copy from Booking itself, in three tasks.",
+    "Now the change keeps every member, and the date moves.",
+    "One Booking, every type built from it. A new member reaches them all."
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "stations": [
+    { "title": "Pavel", "say": "Where is harbour-alerts?", "note": "Ines wants it live today." },
+    { "title": "Last night", "text": "A branch deleted, main reset too far.", "note": "The log shows none of it." },
+    {
+      "title": "Your commands",
+      "file": "alerts.txt",
+      "mine": true,
+      "gap": "No branch leads to them",
+      "tasks": ["Bring the branch back", "Undo the reset on main"]
+    },
+    {
+      "title": "Pavel's commits",
+      "rows": [["Add alerts file"], ["Add storm alert wording"], ["Add fog alert wording"]]
+    }
+  ],
+  "ticket": { "label": "harbour-alerts", "wrong": "is gone", "why": "Deleted", "right": "is back" },
+  "captions": [
+    "Pavel needs his harbour-alerts branch. Ines wants the storm wording live today.",
+    "Last night you deleted it and reset main too far. The log shows none of it.",
+    "You write the commands that bring the work back, in two tasks.",
+    "The branch is back with all three commits, and main has its notes again.",
+    "Nothing was really lost. It was only hidden."
+  ]
+}

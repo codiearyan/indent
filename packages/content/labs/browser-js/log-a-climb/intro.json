@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Hollis", "say": "Add Ladder to Nowhere, V1.", "note": "Just set, yellow holds." },
+    { "title": "New route form", "text": "Reloads the whole page.", "note": "The route never shows." },
+    {
+      "title": "Your code",
+      "file": "form.js",
+      "mine": true,
+      "gap": "Nobody listens to the form",
+      "tasks": ["Keep the page", "Explain bad input", "Clear for the next"]
+    },
+    {
+      "title": "Route board",
+      "rows": [["Ladder to Nowhere", "V1"], ["Morning Chalk", "V0"], ["Slab Happy", "V2"]],
+      "mark": 0
+    }
+  ],
+  "ticket": { "label": "Ladder to Nowhere", "wrong": "lost", "why": "Page reload", "right": "on top" },
+  "captions": [
+    "Members can find routes now. Hollis wants to add new ones from the desk.",
+    "He fills in the form, the page flashes, and Ladder to Nowhere is not there.",
+    "You write the code that takes over the form, in three tasks.",
+    "Now the page stays, and the new route lands on top of the board.",
+    "Fill in, add, type the next one. Bad input gets a plain sentence."
+  ]
+}

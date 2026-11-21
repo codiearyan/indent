@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dev", "say": "v2 scores higher. Ship it?", "note": "He wants to switch today." },
+    { "title": "Pass rates", "text": "One number per version.", "note": "An average hides what broke." },
+    {
+      "title": "Your code",
+      "file": "compare.ts",
+      "mine": true,
+      "gap": "Nobody looks case by case",
+      "tasks": ["Compare case by case", "Write the ship rule", "Test the rule"]
+    },
+    { "title": "Ines", "say": "Did any ticket break?", "note": "Before her team finds out." }
+  ],
+  "ticket": { "label": "v2", "wrong": "shipped", "why": "Rate only", "right": "checked per ticket" },
+  "captions": [
+    "Each version has a score now. Dev wants to ship v2 because its pass rate is higher.",
+    "A higher average can still hide tickets that used to work and now fail.",
+    "You write the case by case comparison, the ship rule and its tests.",
+    "Now v2 is checked ticket by ticket, and any break is named.",
+    "Same two versions, a decision with reasons. A rate cannot talk around it."
+  ]
+}

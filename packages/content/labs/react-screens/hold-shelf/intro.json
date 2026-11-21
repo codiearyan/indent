@@ -1,0 +1,28 @@
+{
+  "stations": [
+    { "title": "Noor", "say": "Keep 2 for Saturday, please.", "note": "A regular on the phone." },
+    { "title": "Hold button", "text": "On every card. A click does nothing.", "note": "The shelf is a plain list." },
+    {
+      "title": "Your code",
+      "file": "App.jsx",
+      "mine": true,
+      "gap": "Clicks are forgotten",
+      "tasks": ["Hold a record", "Release it again", "Count what is held"]
+    },
+    {
+      "title": "Hold shelf",
+      "rows": [
+        ["Low Tide Sessions", "held"],
+        ["Copper Wire Blues", "held"]
+      ]
+    }
+  ],
+  "ticket": { "label": "2 records", "wrong": "not held", "why": "No memory", "right": "on the shelf" },
+  "captions": [
+    "The stock shows up now. A regular wants a jazz and a blues record kept for Saturday.",
+    "Noor presses Hold on both, and the shelf still says nothing is on hold.",
+    "You give the screen a memory in App, in three tasks.",
+    "Now Hold puts a record on the shelf, Release takes it off, and the header counts.",
+    "Same two records, kept until Saturday. Every part of the screen agrees."
+  ]
+}

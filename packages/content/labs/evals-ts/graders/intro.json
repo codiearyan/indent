@@ -1,0 +1,25 @@
+{
+  "stations": [
+    { "title": "Dev", "say": "Is the PB-30561 reply fine?", "note": "Exact match fails them all." },
+    { "title": "Triage", "text": "Now replies with a JSON object.", "note": "Category, urgency, order, summary." },
+    {
+      "title": "Your code",
+      "file": "graders.ts",
+      "mine": true,
+      "gap": "One check for the whole reply",
+      "tasks": ["Write four graders", "Give partial credit", "Build checks per case"]
+    },
+    {
+      "title": "Reply fields",
+      "rows": [["category"], ["order id"], ["urgency"]]
+    }
+  ],
+  "ticket": { "label": "PB-30561", "wrong": "failed", "why": "All or none", "right": "scored by field" },
+  "captions": [
+    "Triage has a pass rate. Now it answers in JSON, and Dev asks which replies are fine.",
+    "Exact match wants the summary word for word, so every reply fails.",
+    "You write small graders, one per field, and give partial credit.",
+    "Now the PB-30561 reply is scored field by field, with a reason for each miss.",
+    "Same replies, a score that moves, and words that say what to fix."
+  ]
+}

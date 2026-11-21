@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dario", "say": "The board shows 17:00 first.", "note": "At ten in the morning. CPC-12." },
+    { "title": "Timetable", "text": "Tours from 09:00 to 18:30, in order.", "note": "Dario checked the file." },
+    {
+      "title": "Your code",
+      "file": "departures.js",
+      "mine": true,
+      "gap": "The day comes out scrambled",
+      "tasks": ["Catch the reorder", "Sort by time", "Write the test"]
+    },
+    { "title": "Dock board", "text": "Next three tours, then the day.", "note": "Where people queue." }
+  ],
+  "ticket": { "label": "Next tours", "wrong": "17:00 first", "why": "Wrong order", "right": "in time order" },
+  "captions": [
+    "With the receipts fixed, Dario says the dock board shows the wrong next tours.",
+    "At ten in the morning it puts 17:00 first, and the whole day is scrambled too.",
+    "You catch it, fix the order and leave the timetable alone, in three tasks.",
+    "Now the next tours come up in time order and the day stays as written.",
+    "Same timetable, same board. People queue for the right boat."
+  ]
+}

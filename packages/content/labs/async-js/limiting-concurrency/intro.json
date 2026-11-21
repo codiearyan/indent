@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Bram", "say": "Send tomorrow's reminders.", "note": "Every evening." },
+    { "title": "Mail service", "text": "Takes three connections at most.", "note": "And refuses the rest." },
+    {
+      "title": "Your code",
+      "file": "mapLimit.js",
+      "mine": true,
+      "gap": "Sends them all at once",
+      "tasks": ["Send in batches", "Keep three busy", "Finish past a failure"]
+    },
+    {
+      "title": "Bookings",
+      "rows": [["B8", "booked"], ["B9", "mailbox full"], ["B10", "booked"]],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Reminders", "wrong": "mostly bounced", "why": "Too many", "right": "all out but B9" },
+  "captions": [
+    "Bram sends tomorrow's reminders all at once, the way he learned last week.",
+    "The mail service takes three at a time, so most bounce, and B9 stops the run.",
+    "You write the code that keeps at most three sending, in three tasks.",
+    "Now every reminder goes out three at a time, and B9's full mailbox stops nobody.",
+    "A long list, a hard limit, and one failure costs only itself."
+  ]
+}

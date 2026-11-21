@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Rosa", "say": "Why did Priya get three texts?", "note": "Saturday morning. CPC-19." },
+    {
+      "title": "Bookings",
+      "rows": [["Amara", "09:00"], ["Joon", "09:30"], ["Priya", "10:00"]],
+      "mark": 0
+    },
+    {
+      "title": "Your code",
+      "file": "reminders.js",
+      "mine": true,
+      "gap": "Texts all go to one phone",
+      "tasks": ["Catch the wrong texts", "One customer, one text", "Write the test"]
+    },
+    { "title": "Customers' phones", "text": "A reminder before each booking." }
+  ],
+  "ticket": { "label": "Amara's text", "wrong": "to Priya", "why": "Wrong phone", "right": "to Amara" },
+  "captions": [
+    "Next, Rosa forwards a complaint: Priya got three reminder texts, Amara got none.",
+    "Each text goes out on time, but every one of them goes to Priya's phone.",
+    "You catch it, fix the reminders and write the test, in three tasks.",
+    "Now Amara's reminder reaches Amara, and each text finds its own person.",
+    "Same bookings, same times. Every customer gets their own text."
+  ]
+}

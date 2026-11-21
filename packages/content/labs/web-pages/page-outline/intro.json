@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Marguerite",
+      "say": "Where does each event start?",
+      "note": "She uses a screen reader."
+    },
+    {
+      "title": "Screen reader",
+      "text": "Reads the HTML, not the pixels.",
+      "note": "Every part is a plain box."
+    },
+    {
+      "title": "Your HTML",
+      "file": "index.html",
+      "mine": true,
+      "gap": "One long paragraph",
+      "tasks": ["Mark the parts", "Make real headings", "List the events"]
+    },
+    {
+      "title": "What's on page",
+      "rows": [["Seed swap"], ["Knit and natter"], ["Homework club"]],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "Knit and natter",
+    "wrong": "lost",
+    "why": "No shape",
+    "right": "found"
+  },
+  "captions": [
+    "Marguerite runs the knitting circle at Quillmoor Library and wants to find it on the page.",
+    "Her screen reader hears the page as one long paragraph, so the event is lost.",
+    "You give the HTML its parts, headings and a list, in three tasks.",
+    "Now she can jump straight to the events and to Knit and natter.",
+    "Same page, same look. It now says what each part is."
+  ]
+}

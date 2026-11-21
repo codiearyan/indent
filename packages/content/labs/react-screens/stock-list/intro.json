@@ -1,0 +1,29 @@
+{
+  "stations": [
+    { "title": "Noor", "say": "Show what is really there.", "note": "8 in the racks, only 2 sold." },
+    { "title": "Stock file", "text": "Lists all 8 records.", "note": "Nothing reads it." },
+    {
+      "title": "Your code",
+      "file": "RecordCard.jsx",
+      "mine": true,
+      "gap": "3 cards typed by hand",
+      "tasks": ["One card per record", "List the whole stock", "Sold only if sold"]
+    },
+    {
+      "title": "Counter screen",
+      "rows": [
+        ["Paper Moon Engine", "sold"],
+        ["Neon Orchard", "for sale"],
+        ["Static Garden", "for sale"]
+      ]
+    }
+  ],
+  "ticket": { "label": "8 records", "wrong": "3, all sold", "why": "Hand typed", "right": "8, 2 sold" },
+  "captions": [
+    "At Sidewinder Records, Noor wants the counter screen to show the real stock.",
+    "The screen shows three cards typed by hand, and every one says sold.",
+    "You write the card and the list that draw from the data, in three tasks.",
+    "Now every record in the stock gets a card, and only the sold ones say so.",
+    "Same eight records, a true screen. The parts come from the data."
+  ]
+}

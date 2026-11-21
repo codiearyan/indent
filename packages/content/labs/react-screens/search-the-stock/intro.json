@@ -1,0 +1,29 @@
+{
+  "stations": [
+    { "title": "Customer", "say": "Anything with moth in the band?", "note": "At the counter on Saturday." },
+    { "title": "Toolbar", "text": "A search box and a genre menu.", "note": "Nothing connects them to the list." },
+    {
+      "title": "Your code",
+      "file": "Toolbar.jsx",
+      "mine": true,
+      "gap": "Typing changes nothing",
+      "tasks": ["Search title or artist", "Pick a genre", "Say how many match"]
+    },
+    {
+      "title": "Stock",
+      "rows": [
+        ["Paper Moon Engine", "Rock"],
+        ["Neon Orchard", "Electronic"],
+        ["Static Garden", "Rock"]
+      ]
+    }
+  ],
+  "ticket": { "label": "moth", "wrong": "scrolled twice", "why": "Not wired", "right": "none in stock" },
+  "captions": [
+    "The hold shelf works. Then a customer asks for a band with moth in the name.",
+    "Typing in the search box does nothing, so Noor scrolls the whole screen twice.",
+    "You wire the search, the genre menu and a count line, in three tasks.",
+    "Now the list narrows as you type and says plainly when nothing matches.",
+    "Same question, a straight answer in seconds. The list is worked out, never stored."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Marit", "say": "Can the board use Hollis's list?", "note": "The owner of Gritstone." },
+    { "title": "Front desk screen", "text": "Typed in by hand.", "note": "Shows a route taken down." },
+    {
+      "title": "Your code",
+      "file": "board.js",
+      "mine": true,
+      "gap": "The list never reaches it",
+      "tasks": ["Draw from the data", "Add grade badges", "Say the wall is bare"]
+    },
+    {
+      "title": "Route list",
+      "rows": [["Morning Chalk", "V0"], ["Slab Happy", "V2"], ["Pinch Me", "V5"]],
+      "note": "Kept by Hollis."
+    }
+  ],
+  "ticket": { "label": "Sloper Season", "wrong": "still up", "why": "Out of date", "right": "gone" },
+  "captions": [
+    "At Gritstone Climbing, Marit wants the route board to follow the real list.",
+    "The board was typed by hand, so it still shows Sloper Season, long gone.",
+    "You write the code that draws the board from the list, in three tasks.",
+    "Now the board shows what is on the walls, and Sloper Season is off it.",
+    "Change the list and the board follows. They can never disagree again."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Member", "say": "I just climbed Slab Happy!", "note": "Taps Tick on the board." },
+    { "title": "Tick button", "text": "Marit put one on every route.", "note": "Taps do nothing." },
+    {
+      "title": "Your code",
+      "file": "ticks.js",
+      "mine": true,
+      "gap": "Ticks do not show",
+      "tasks": ["Show the tick", "One listener for all", "Keep the count right"]
+    },
+    {
+      "title": "Route board",
+      "rows": [["Morning Chalk", "V0"], ["Slab Happy", "V2"], ["Pinch Me", "V5"]],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Slab Happy", "wrong": "not ticked", "why": "Lost tap", "right": "ticked" },
+  "captions": [
+    "The board comes from data now. Members want to tick the routes they climbed.",
+    "A member taps Tick on Slab Happy, and nothing on the board changes.",
+    "You make the board show ticks and hear every tap, in three tasks.",
+    "Now the tap reaches the board, and Slab Happy shows as ticked.",
+    "Tick, untick, tick again. The buttons and the count always agree."
+  ]
+}

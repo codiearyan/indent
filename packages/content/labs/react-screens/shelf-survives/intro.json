@@ -1,0 +1,29 @@
+{
+  "stations": [
+    { "title": "Noor", "say": "Who was promised what?", "note": "The tablet restarted overnight." },
+    { "title": "Hold shelf", "text": "Kept in memory only.", "note": "A reload wipes it." },
+    {
+      "title": "Your code",
+      "file": "App.jsx",
+      "mine": true,
+      "gap": "Nothing is saved",
+      "tasks": ["Read the saved shelf", "Save every change", "Escape closes details"]
+    },
+    {
+      "title": "Saved shelf",
+      "rows": [
+        ["Neon Orchard", "held"],
+        ["Static Garden", "held"]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": { "label": "Neon Orchard", "wrong": "gone", "why": "Restarted", "right": "still held" },
+  "captions": [
+    "Staff rely on the hold shelf now. Then the tablet restarts overnight.",
+    "Every hold from last week is gone, and nobody knows who was promised what.",
+    "You save the shelf and read it back, and make Escape close the details.",
+    "Now a hold survives a reload, and the details panel closes from the keyboard.",
+    "Same hold, still there on Monday. The screen keeps step with the world outside."
+  ]
+}

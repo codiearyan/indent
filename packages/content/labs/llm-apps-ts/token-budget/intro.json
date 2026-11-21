@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ravi", "say": "Can Moss keep up a long chat?", "note": "Two problems in the chat logs." },
+    { "title": "Chat history", "text": "Grows by two messages every turn.", "note": "Today it is not even kept." },
+    {
+      "title": "Your code",
+      "file": "conversation.ts",
+      "mine": true,
+      "gap": "No memory, no limit",
+      "tasks": ["Keep the history", "Trim to the budget", "Trim on every turn"]
+    },
+    { "title": "Moss", "text": "A local care model.", "note": "It refuses a request that is too big." }
+  ],
+  "ticket": { "label": "Long chat", "wrong": "ends in Error", "why": "Too long", "right": "keeps going" },
+  "captions": [
+    "Customers chat with Moss now. Ravi finds long chats going wrong in the logs.",
+    "Moss forgets each turn, and once a chat grows too long, every message gets Error.",
+    "You write the history and the trimming, in three tasks.",
+    "Now Moss remembers recent turns, and every request fits the budget.",
+    "Same long chat, still answered. Moss is ready for real customers."
+  ]
+}

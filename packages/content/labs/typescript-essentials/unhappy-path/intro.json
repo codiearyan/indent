@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Customer", "say": "What does a hub gear cost?", "note": "At the quote screen." },
+    { "title": "Parts supplier", "text": "Answers late, or not at all.", "note": "Today it is offline." },
+    {
+      "title": "Your code",
+      "file": "quotes.ts",
+      "mine": true,
+      "gap": "A failure is never handled",
+      "tasks": ["Check the old export", "Read any caught error", "Quotes that can fail"]
+    },
+    { "title": "Quote screen", "text": "Shows a price or a plain reason.", "note": "Words a customer understands." }
+  ],
+  "ticket": { "label": "Hub gear quote", "wrong": "undefined", "why": "Not handled", "right": "says why" },
+  "captions": [
+    "The happy path is typed. Now a customer asks what a hub gear costs.",
+    "The supplier is offline, and the quote screen just shows undefined.",
+    "You type every value you cannot trust, in three tasks.",
+    "Now a failed quote comes back as a result the screen can explain.",
+    "Same outage, a plain message. Nothing reaches the shop unchecked."
+  ]
+}

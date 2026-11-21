@@ -1,0 +1,29 @@
+{
+  "stations": [
+    { "title": "Bram", "say": "Can I add Kestrel, TW-09?", "note": "A new single for the dock." },
+    { "title": "fleet.js", "text": "A typed list. Only you can edit it.", "note": "Every change is a request to you." },
+    {
+      "title": "Your code",
+      "file": "app.js",
+      "mine": true,
+      "gap": "No way to change boats",
+      "tasks": ["Keep boats in memory", "Create and read", "Change and retire"]
+    },
+    {
+      "title": "Fleet",
+      "rows": [
+        ["Heron", "single"],
+        ["Otter", "double"],
+        ["Pike", "single"]
+      ]
+    }
+  ],
+  "ticket": { "label": "Kestrel", "wrong": "waits on you", "why": "Hand edits", "right": "in the fleet" },
+  "captions": [
+    "Quotes work. Now Bram at the dock wants to add Kestrel, a new single.",
+    "The fleet is a typed list, so every change waits for you to edit a file.",
+    "You write a boat store and the routes around it, in three tasks.",
+    "Now Bram adds Kestrel himself, and can change or retire any boat.",
+    "Same boat, no file edits. The fleet is a resource now."
+  ]
+}

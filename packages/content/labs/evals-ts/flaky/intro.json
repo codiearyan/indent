@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Same cracked pot, two queues?", "note": "Same words both times." },
+    { "title": "Triage", "text": "v3 samples, so answers can change.", "note": "The eval ran it once." },
+    {
+      "title": "Your code",
+      "file": "stability.ts",
+      "mine": true,
+      "gap": "One run, one draw",
+      "tasks": ["Run it per seed", "Name each case", "Report flaky cases"]
+    },
+    {
+      "title": "Stability report",
+      "rows": [["stable pass"], ["stable fail"], ["flaky"]],
+      "mark": 2
+    }
+  ],
+  "ticket": { "label": "Cracked pot", "wrong": "passed once", "why": "One run", "right": "is flaky" },
+  "captions": [
+    "Triage moved to v3. The same cracked pot email went to two queues, and Ines asks why.",
+    "The eval ran that ticket once, saw a pass and called it done.",
+    "You write the runs per seed, a status per case and the report.",
+    "Now the cracked pot runs with several seeds and shows up as flaky.",
+    "Same ticket, many runs. The report names what an average would hide."
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "stations": [
+    {
+      "title": "Noor",
+      "say": "Is all of PL-2041 on the shelf?",
+      "note": "Before a rider leaves."
+    },
+    {
+      "title": "Pip",
+      "text": "Asks for one lookup at a time.",
+      "note": "The order first, then each item."
+    },
+    {
+      "title": "Your code",
+      "file": "agent.ts",
+      "mine": true,
+      "gap": "One lookup, then it stops",
+      "tasks": [
+        "Run every call",
+        "Loop until it answers",
+        "Stop a run with no end"
+      ]
+    },
+    {
+      "title": "Pantry records",
+      "rows": [
+        [
+          "PL-2041",
+          "2 items"
+        ],
+        [
+          "OAT-1L",
+          "14 left"
+        ],
+        [
+          "RYE-800",
+          "0 left"
+        ]
+      ],
+      "mark": 2
+    }
+  ],
+  "ticket": {
+    "label": "PL-2041",
+    "wrong": "has 2 items",
+    "why": "Half done",
+    "right": "rye loaf is out"
+  },
+  "captions": [
+    "Noor wants to know if a whole order is on the shelf before a rider leaves.",
+    "That takes several lookups. Today Pip does one and stops halfway.",
+    "You write the loop that keeps going, in three tasks.",
+    "Now Pip looks up the order, then each item, until it can answer.",
+    "One question, as many lookups as it needs. And it always stops."
+  ]
+}
