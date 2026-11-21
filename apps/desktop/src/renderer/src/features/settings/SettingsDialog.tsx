@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { AiSettings, AiSwitch } from '@/features/ai/AiMenu'
 import { useAi } from '@/features/ai/aiStore'
+import { useWorkspaceRoot } from '@/features/workspace/useWorkspaceRoot'
 import { viewTransition } from '@/lib/viewTransition'
 import {
   TEXT_SCALE_PRESETS,
@@ -235,6 +236,10 @@ function EditorSection(): React.JSX.Element {
         </div>
       </Group>
 
+      <Group title="Your work">
+        <WorkspaceFolder />
+      </Group>
+
       <Group
         title="Layout of an issue"
         action={
@@ -267,6 +272,23 @@ function PrivacySection(): React.JSX.Element {
         </Row>
       </div>
     </Group>
+  )
+}
+
+function WorkspaceFolder(): React.JSX.Element {
+  const { root, moving, change } = useWorkspaceRoot()
+  return (
+    <div className={card}>
+      <div className="flex min-h-14 items-center justify-between gap-6 px-4 py-2.5">
+        <div className="min-w-0">
+          <p className="text-sm">Folder for your work</p>
+          <p className="truncate font-mono text-xs text-muted-foreground">{root}</p>
+        </div>
+        <Button variant="outline" size="sm" disabled={moving} onClick={() => void change()}>
+          {moving ? 'Moving...' : 'Change'}
+        </Button>
+      </div>
+    </div>
   )
 }
 
