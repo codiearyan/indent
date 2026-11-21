@@ -1,7 +1,9 @@
+import { toast } from 'sonner'
 import { create } from 'zustand'
 import type {
   Chapter,
   CheckResult,
+  ConflictChoice,
   ProgressState,
   WorkspaceFile,
   WorkspaceSnapshot
@@ -32,6 +34,8 @@ interface WorkspaceStore {
   files: WorkspaceFile[]
   /** Starter content by path; a file that differs from it, or has none, counts as edited. */
   starter: Record<string, string>
+  /** Files the learner changed that a repo update changed too. */
+  conflicts: string[]
   activePath: string | null
   /** Counts writes to disk, so the Browser panel knows when to reload. */
   revision: number
@@ -51,6 +55,8 @@ interface WorkspaceStore {
   refresh(): Promise<void>
   /** Restores the starter files. */
   reset(): Promise<void>
+  /** Keeps the learner's version of a conflicted file, or takes the new one. */
+  resolveConflict(path: string, choice: ConflictChoice): Promise<void>
   /** Runs the hidden tests for some tasks, or all. */
   check(taskIds?: string[]): Promise<CheckResult[]>
   /** Saves, then runs the issue's suggested command in the terminal. */
@@ -77,13 +83,18 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       .then(() => set((s) => ({ revision: s.revision + 1 })))
   }
 
-  const applySnapshot = ({ files, dir, starter }: WorkspaceSnapshot): void => {
+  const applySnapshot = ({ files, dir, starter, conflicts, updated }: WorkspaceSnapshot): void => {
     const { activePath, chapter } = get()
     const stillThere = files.some((f) => f.path === activePath)
+    if (updated.length > 0) {
+      set((s) => ({ revision: s.revision + 1 }))
+      if (conflicts.length === 0) toast('This issue was updated. Your changes are kept.')
+    }
     set({
       files,
       dir,
       starter,
+      conflicts,
       activePath: stillThere
         ? activePath
         : (chapter?.files.find((path) => files.some((f) => f.path === path)) ??
@@ -99,6 +110,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     dir: '',
     files: [],
     starter: {},
+    conflicts: [],
     activePath: null,
     revision: 0,
     checking: null,
@@ -113,6 +125,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         chapter: null,
         files: [],
         starter: {},
+        conflicts: [],
         activePath: null
       })
       const catalog = useCatalog.getState()
@@ -163,6 +176,13 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       for (const timer of pendingSaves.values()) clearTimeout(timer)
       pendingSaves.clear()
       const snapshot = await api.workspace.reset(...ids())
+      applySnapshot(snapshot)
+      set((s) => ({ revision: s.revision + 1 }))
+    },
+
+    resolveConflict: async (path, choice) => {
+      await get().flush()
+      const snapshot = await api.workspace.resolveConflict(...ids(), path, choice)
       applySnapshot(snapshot)
       set((s) => ({ revision: s.revision + 1 }))
     },
