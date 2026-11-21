@@ -25,6 +25,9 @@ export function AiChoice({ staged }: { staged: boolean }): React.JSX.Element {
             A tutor that explains and asks the right questions, but never hands over the answer.
             Grey suggestions in the editor if you want them.
           </p>
+          <p className="text-[13px] leading-5">
+            It can cost nothing. The next step shows two free ways to connect it.
+          </p>
           <p className="mt-auto text-xs text-muted-foreground">
             Your questions and code go to the provider you pick.
           </p>
