@@ -1,5 +1,5 @@
-import { RELEASES_URL } from '@shared/repo'
 import { Button } from '@/components/ui/button'
+import { getNewVersion } from '@/stores/updates'
 import { Progress } from '@/components/ui/progress'
 import { useCatalog } from '@/stores/catalog'
 import { useWorkspace } from '@/stores/workspace'
@@ -39,11 +39,7 @@ export function RepoNotice({
         {error ?? 'This issue could not be opened.'}
       </p>
       {tooNew ? (
-        <Button asChild>
-          <a href={RELEASES_URL} target="_blank" rel="noreferrer">
-            Get the new version
-          </a>
-        </Button>
+        <Button onClick={getNewVersion}>Get the new version</Button>
       ) : (
         <Button onClick={() => void open(labId, chapterId)}>Try again</Button>
       )}

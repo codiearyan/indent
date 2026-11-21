@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { Code, Palette, Shield, Sparkles, Wrench, type LucideIcon } from 'lucide-react'
+import { Code, Info, Palette, Shield, Sparkles, Wrench, type LucideIcon } from 'lucide-react'
+import { REPO_URL } from '@shared/repo'
 import {
   CODE_THEMES,
   codePalette,
@@ -14,6 +15,7 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AiSettings, AiSwitch } from '@/features/ai/AiMenu'
 import { useAi } from '@/features/ai/aiStore'
+import { UpdateCard } from '@/features/updates/UpdateCard'
 import { FolderNote, MoveFolderDialog } from '@/features/workspace/FolderMove'
 import { useWorkspaceRoot } from '@/features/workspace/useWorkspaceRoot'
 import { isShortcut } from '@/lib/shortcuts'
@@ -35,7 +37,8 @@ const SECTIONS: {
   { id: 'editor', label: 'Editor', icon: Code, view: EditorSection },
   { id: 'ai', label: 'AI', icon: Sparkles, view: AiSection },
   { id: 'tools', label: 'Tools', icon: Wrench, view: ToolsSection },
-  { id: 'privacy', label: 'Privacy', icon: Shield, view: PrivacySection }
+  { id: 'privacy', label: 'Privacy', icon: Shield, view: PrivacySection },
+  { id: 'about', label: 'About', icon: Info, view: AboutSection }
 ]
 
 /** Every setting in one window. Opens from the sidebar, the View menu, or with Cmd or Ctrl and comma. */
@@ -287,5 +290,38 @@ function AiSection(): React.JSX.Element {
         Run setup again
       </Button>
     </div>
+  )
+}
+
+function AboutSection(): React.JSX.Element {
+  const autoUpdate = useSettings((s) => s.autoUpdate)
+  const setAutoUpdate = useSettings((s) => s.setAutoUpdate)
+
+  return (
+    <Group title="Version">
+      <div className={card}>
+        <div className="space-y-3 px-4 py-3.5">
+          <p className="text-sm">
+            Indent <span className="font-mono">{__APP_VERSION__}</span>
+          </p>
+          <UpdateCard />
+        </div>
+        <Row
+          id="auto-update"
+          label="Check for updates automatically"
+          hint="When the app opens, and every few hours."
+        >
+          <Switch id="auto-update" checked={autoUpdate} onCheckedChange={setAutoUpdate} />
+        </Row>
+      </div>
+      <a
+        href={`${REPO_URL}/releases`}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-3 inline-block text-[13px] text-muted-foreground hover:text-foreground"
+      >
+        All releases
+      </a>
+    </Group>
   )
 }

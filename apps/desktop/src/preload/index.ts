@@ -32,6 +32,7 @@ api.content.onInstallProgress = subscribe(EVENTS.contentInstall)
 api.content.onChanged = subscribe(EVENTS.contentChanged)
 api.checks.onRuntime = subscribe(EVENTS.runtime)
 api.tools.onInstallProgress = subscribe(EVENTS.toolInstall)
+api.updates.onStatus = subscribe(EVENTS.update)
 
 contextBridge.exposeInMainWorld('platform', process.platform)
 contextBridge.exposeInMainWorld('api', api)

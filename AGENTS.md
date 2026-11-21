@@ -281,7 +281,8 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
   major), commits that to `main` as `chore: release <version>`, tags it, and builds. Do not edit
   the version in a pull request. It builds `Indent-mac-arm64.dmg`, `Indent-mac-x64.dmg`, `Indent-windows-x64-setup.exe` and
   `Indent-linux-x86_64.AppImage` and attaches them to a GitHub release. The names carry no version
-  on purpose: the site links to `releases/latest/download/<name>`, so do not rename them. The macOS
+  on purpose: the site links to `releases/latest/download/<name>` and the app's updater
+  (`main/services/updates.ts`) finds its file by name, so do not rename them. The macOS
   apps are signed ad-hoc, not with a Developer ID, so macOS asks to confirm the first open.
 - Pull request text is a plain description of the change. No generated-by or tool attribution lines.
 - Commit and pull request titles are `type(scope): message` (`feat(editor): ...`, `fix(checks): ...`,

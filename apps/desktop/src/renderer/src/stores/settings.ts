@@ -60,6 +60,10 @@ export interface SettingsState {
   starAsked: boolean
   /** Anonymous usage stats; on unless turned off in Settings. Nothing is sent while false. */
   telemetry: boolean
+  /** Look for a new version of the app on start and every few hours. */
+  autoUpdate: boolean
+  /** The app version seen last, so a new one can say what changed once. */
+  lastVersion: string | null
   /** Id of the roadmap picked as a goal in the setup or on Roadmaps; null when not sure yet. */
   goal: string | null
   experience: Experience | null
@@ -81,6 +85,8 @@ export interface SettingsState {
   setOnboarded(onboarded: boolean): void
   setStarAsked(asked: boolean): void
   setTelemetry(telemetry: boolean): void
+  setAutoUpdate(autoUpdate: boolean): void
+  setLastVersion(lastVersion: string): void
   setGoal(goal: string | null): void
   setExperience(experience: Experience): void
   resetLayout(): void
@@ -123,6 +129,8 @@ export const useSettings = create<SettingsState>()(
       onboarded: false,
       starAsked: false,
       telemetry: true,
+      autoUpdate: true,
+      lastVersion: null,
       goal: null,
       experience: null,
       dsaWatched: [],
@@ -148,6 +156,8 @@ export const useSettings = create<SettingsState>()(
       setOnboarded: (onboarded) => set({ onboarded }),
       setStarAsked: (starAsked) => set({ starAsked }),
       setTelemetry: (telemetry) => set({ telemetry }),
+      setAutoUpdate: (autoUpdate) => set({ autoUpdate }),
+      setLastVersion: (lastVersion) => set({ lastVersion }),
       setGoal: (goal) => set({ goal }),
       setExperience: (experience) => set({ experience }),
       resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' })

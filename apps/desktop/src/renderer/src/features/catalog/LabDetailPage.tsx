@@ -1,9 +1,9 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
-import { RELEASES_URL } from '@shared/repo'
 import type { ChapterSummary, LabSummary, ProgressState } from '@shared/types'
 import { BuildStrip } from '@/components/app/BuildStrip'
 import { Button } from '@/components/ui/button'
+import { getNewVersion } from '@/stores/updates'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
@@ -77,11 +77,7 @@ export function LabDetailPage(): React.JSX.Element {
           )}
         </div>
         {lab.availability === 'app-update' ? (
-          <Button asChild>
-            <a href={RELEASES_URL} target="_blank" rel="noreferrer">
-              Get the new version
-            </a>
-          </Button>
+          <Button onClick={getNewVersion}>Get the new version</Button>
         ) : (
           summary.nextChapterId && (
             <Button asChild>
