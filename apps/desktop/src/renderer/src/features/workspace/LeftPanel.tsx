@@ -2,6 +2,7 @@ import type { Chapter } from '@shared/types'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { FlowFigure } from '@/features/flows/FlowPlayer'
 import { TOUR } from '@/features/tour/anchors'
 import { useChapterProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
@@ -55,6 +56,11 @@ export function LeftPanel(): React.JSX.Element {
                   labId={chapter.labId}
                   chapterId={chapter.id}
                 />
+                {chapter.flow && (
+                  <div className="rounded-lg border border-border p-4">
+                    <FlowFigure scene={chapter.flow.scene} />
+                  </div>
+                )}
                 <Markdown>{chapter.lesson}</Markdown>
               </div>
             </ScrollArea>

@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Check, Circle, Compass, ListChecks, Loader2, Sparkles, X } from 'lucide-react'
-import type { ChapterProgress, TaskDef } from '@shared/types'
+import { Check, Circle, Compass, ListChecks, Loader2, Sparkles, Workflow, X } from 'lucide-react'
+import type { ChapterProgress, FlowScene, FlowStep, TaskDef } from '@shared/types'
 import { Button } from '@/components/ui/button'
 import { useAi } from '@/features/ai/aiStore'
 import { useChat } from '@/features/ai/chatStore'
+import { FlowPlayer } from '@/features/flows/FlowPlayer'
 import { TOUR } from '@/features/tour/anchors'
 import { cn } from '@/lib/utils'
 import { useRuntime } from '@/stores/runtime'
@@ -18,13 +19,17 @@ interface Props {
   number: number
   progress: ChapterProgress | undefined
   first: boolean
+  /** The issue's scene and this task's steps, when the issue has a flow for it. */
+  scene?: FlowScene
+  flow?: FlowStep[]
 }
 
-export function TaskItem({ task, number, progress, first }: Props): React.JSX.Element {
+export function TaskItem({ task, number, progress, first, scene, flow }: Props): React.JSX.Element {
   const checking = useWorkspace((s) => s.checking)
   const toolsInstalling = useRuntime((s) => !!s.status?.installing)
   const check = useWorkspace((s) => s.check)
   const [stepsOpen, setStepsOpen] = useState(false)
+  const [flowOpen, setFlowOpen] = useState(false)
 
   const taskProgress = progress?.tasks[task.id]
   const result = taskProgress?.lastResult
@@ -78,8 +83,25 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
             <Compass />
             Next step
           </Button>
+          {scene && flow && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="font-normal text-muted-foreground hover:text-foreground"
+              aria-expanded={flowOpen}
+              onClick={() => setFlowOpen(!flowOpen)}
+            >
+              <Workflow />
+              See the flow
+            </Button>
+          )}
           {failed && aiOn && nudge && !isChecking && <AskWhy onClick={askWhy} />}
         </div>
+        {flowOpen && scene && flow && (
+          <div className="rounded-lg border border-border p-3">
+            <FlowPlayer scene={scene} steps={flow} />
+          </div>
+        )}
         {stepsOpen && (
           <div className="space-y-2 rounded-lg border border-border p-3 text-sm">
             <ol className="list-decimal space-y-1 pl-5">
