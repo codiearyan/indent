@@ -75,7 +75,7 @@ export function Typography(): React.JSX.Element {
           }
         />
         <div className="mx-4 space-y-3">
-          <CodeSample t={t} />
+          <EditorSample t={t} />
           <TerminalSample t={t} />
         </div>
       </div>
@@ -243,7 +243,14 @@ function LessonSample({ size }: { size: number }): React.JSX.Element {
 }
 
 /** A changed line in the current code theme, with characters that are easy to confuse. */
-function CodeSample({ t }: { t: Options }): React.JSX.Element {
+export function EditorSample({
+  t,
+  children
+}: {
+  t: Options
+  /** Shown under the code, inside the frame. */
+  children?: React.ReactNode
+}): React.JSX.Element {
   const theme = useSettings((s) => s.theme)
   const codeTheme = useSettings((s) => s.codeTheme)
   const p = codePalette(codeTheme, theme)
@@ -315,11 +322,20 @@ function CodeSample({ t }: { t: Options }): React.JSX.Element {
         )}
         {line(3, '', '}')}
       </pre>
+      {children}
     </div>
   )
 }
 
-function TerminalSample({ t }: { t: Options }): React.JSX.Element {
+export function TerminalSample({
+  t,
+  compact = false
+}: {
+  t: Options
+  /** Leaves out the empty lines, for where the sample has little room. */
+  compact?: boolean
+}): React.JSX.Element {
+  const gap = compact ? '\n' : '\n\n'
   const theme = useSettings((s) => s.theme)
   const p = codeChrome[theme]
   const cursor = {
@@ -345,11 +361,11 @@ function TerminalSample({ t }: { t: Options }): React.JSX.Element {
         lineHeight: 1.5
       }}
     >
-      {prompt}npm test{'\n\n'}
+      {prompt}npm test{gap}
       <span style={{ color: p.ansi.green }}>{'  ✓ 12 passed'}</span>
       {'   '}
       <span style={{ color: p.ansi.red }}>✗ 1 failed</span>
-      {'\n\n'}
+      {gap}
       {prompt}
       <span
         className={`inline-block align-text-bottom ${cursor}`}

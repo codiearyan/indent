@@ -9,19 +9,27 @@ export function StepLayout({
   lead,
   staged,
   wide = false,
+  className,
   children
 }: {
   title: React.ReactNode
   lead?: React.ReactNode
   staged: boolean
   wide?: boolean
+  className?: string
   children?: React.ReactNode
 }): React.JSX.Element {
   const stage = (index: number): { className?: string; style?: React.CSSProperties } =>
     staged ? { className: 'ob-stage', style: { '--stage': index } as React.CSSProperties } : {}
 
   return (
-    <div className={cn('mx-auto flex w-full flex-col', wide ? 'max-w-[880px]' : 'max-w-[600px]')}>
+    <div
+      className={cn(
+        'mx-auto flex w-full flex-col',
+        wide ? 'max-w-[880px]' : 'max-w-[600px]',
+        className
+      )}
+    >
       <h1
         tabIndex={-1}
         data-step-heading
