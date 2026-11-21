@@ -281,8 +281,9 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
   major), commits that to `main` as `chore: release <version>`, tags it, and builds. Do not edit
   the version in a pull request. It builds `Indent-mac-arm64.dmg`, `Indent-mac-x64.dmg`, `Indent-windows-x64-setup.exe` and
   `Indent-linux-x86_64.AppImage` and attaches them to a GitHub release. The names carry no version
-  on purpose: the site links to `releases/latest/download/<name>` and the app's updater
-  (`main/services/updates.ts`) finds its file by name, so do not rename them. The macOS
+  on purpose: the site links to `releases/latest/download/<name>`, so do not rename them. Next to
+  them the release carries what the in-app updater (`electron-updater`, `main/services/updates.ts`)
+  reads: `latest.yml`, `latest-mac.yml`, `latest-linux.yml`, the blockmaps and the macOS `.zip`. The macOS
   apps are signed with the Developer ID and notarized when the repository has the secrets
   `MAC_CERT_P12_BASE64`, `MAC_CERT_PASSWORD`, `APPLE_API_KEY_P8`, `APPLE_API_KEY_ID` and
   `APPLE_API_ISSUER`; without them they are signed ad-hoc and macOS asks to confirm the first open.

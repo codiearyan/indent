@@ -25,7 +25,11 @@ nsis:
 # Signed with a Developer ID and notarized when the release has the Apple secrets (release.yml);
 # electron-builder notarizes on its own once APPLE_API_KEY, _ID and _ISSUER are set.
 mac:
-  target: dmg
+  # The .dmg is what people download; the .zip is what the in-app updater installs.
+  target:
+    - dmg
+    - zip
+  artifactName: Indent-mac-${arch}.${ext}
   hardenedRuntime: true
   entitlements: build/entitlements.mac.plist
   entitlementsInherit: build/entitlements.mac.plist
@@ -55,6 +59,12 @@ linux:
   category: Education
 appImage:
   artifactName: Indent-linux-${arch}.${ext}
+# Where the in-app updater looks: the GitHub release. The release workflow uploads the latest*.yml
+# files and blockmaps electron-builder writes next to the installers (it never publishes itself).
+publish:
+  provider: github
+  owner: codiearyan
+  repo: indent
 npmRebuild: false
 beforePack: build/pack-index.mjs
 extraResources:

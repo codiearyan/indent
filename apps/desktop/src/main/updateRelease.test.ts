@@ -1,27 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { assetName, isNewer, shortNotes } from './updateRelease'
+import { releaseNoteText, shortNotes } from './updateRelease'
 
-describe('isNewer', () => {
-  it('compares versions part by part', () => {
-    expect(isNewer('v0.1.1', '0.1.0')).toBe(true)
-    expect(isNewer('v0.10.0', '0.9.9')).toBe(true)
-    expect(isNewer('v0.1.0', '0.1.0')).toBe(false)
-    expect(isNewer('v0.0.9', '0.1.0')).toBe(false)
-  })
-})
-
-describe('assetName', () => {
-  it('picks the file for this computer', () => {
-    expect(assetName('darwin', 'arm64', false)).toBe('Indent-mac-arm64.dmg')
-    expect(assetName('darwin', 'x64', false)).toBe('Indent-mac-x64.dmg')
-    expect(assetName('win32', 'x64', false)).toBe('Indent-windows-x64-setup.exe')
-    expect(assetName('linux', 'x64', true)).toBe('Indent-linux-x86_64.AppImage')
-    expect(assetName('linux', 'x64', false)).toBeNull()
-  })
-})
-
-describe('shortNotes', () => {
-  it('keeps the bullets without authors, links or commit prefixes', () => {
+describe('release notes', () => {
+  it('keeps the bullets of a markdown body without authors, links or commit prefixes', () => {
     const body = [
       "## What's Changed",
       '* feat(tools): install any missing tool by @a in https://github.com/x/y/pull/137',
@@ -33,5 +14,13 @@ describe('shortNotes', () => {
       'Install any missing tool',
       'Keep the terminal inside its box'
     ])
+  })
+
+  it('reads the HTML the updater hands over', () => {
+    const html =
+      "<h2>What's Changed</h2><ul><li>feat(updates): restart into the update &amp; keep work by " +
+      '<a href="https://github.com/a">@a</a> in <a href="https://github.com/x/y/pull/141">#141</a></li></ul>'
+    expect(shortNotes(releaseNoteText(html))).toEqual(['Restart into the update & keep work'])
+    expect(releaseNoteText([{ note: '<li>one</li>' }, { note: null }])).toBe('\n* one\n')
   })
 })

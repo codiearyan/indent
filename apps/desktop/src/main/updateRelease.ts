@@ -1,24 +1,19 @@
-/** True when `latest` ("v1.5.0" or "1.5.0") is a newer release than `current`. */
-export function isNewer(latest: string, current: string): boolean {
-  const parts = (v: string): number[] =>
-    v
-      .replace(/^v/, '')
-      .split('.')
-      .map((n) => parseInt(n, 10) || 0)
-  const [a, b] = [parts(latest), parts(current)]
-  for (let i = 0; i < 3; i++) if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) > (b[i] ?? 0)
-  return false
-}
-
 /**
- * The release file for this computer. The names carry no version on purpose (the site links to
- * them), so they are fixed here. Linux updates only as an AppImage.
+ * The release notes as plain text with `* ` bullets. The updater hands them over as the release's
+ * HTML, or as a list of notes per version.
  */
-export function assetName(platform: string, arch: string, appImage: boolean): string | null {
-  if (platform === 'darwin') return `Indent-mac-${arch === 'arm64' ? 'arm64' : 'x64'}.dmg`
-  if (platform === 'win32') return 'Indent-windows-x64-setup.exe'
-  if (platform === 'linux' && appImage) return 'Indent-linux-x86_64.AppImage'
-  return null
+export function releaseNoteText(
+  notes: string | { note: string | null }[] | null | undefined
+): string {
+  const text = typeof notes === 'string' ? notes : (notes ?? []).map((n) => n.note ?? '').join('\n')
+  return text
+    .replace(/<li[^>]*>/gi, '\n* ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
 }
 
 /** A few plain lines from a generated release body: its bullets, without authors and links. */
@@ -30,7 +25,7 @@ export function shortNotes(body: string, max = 5): string[] {
     .map((line) =>
       line
         .replace(/^[*-] /, '')
-        .replace(/ by @\S+ in https?:\/\/\S+$/, '')
+        .replace(/ by @\S+ in \S+$/, '')
         .replace(/^\w+(\([^)]*\))?!?: /, '')
     )
     .map((line) => line.charAt(0).toUpperCase() + line.slice(1))

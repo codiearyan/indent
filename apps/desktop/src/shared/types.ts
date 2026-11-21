@@ -220,8 +220,7 @@ export type UpdateStatus =
   | { state: 'current'; version: string }
   | { state: 'available'; version: string; notes: string[]; size: number }
   | { state: 'downloading'; version: string; done: number; size: number }
-  /** `manual` on macOS: the installer opens and the person drags the app in. */
-  | { state: 'ready'; version: string; manual: boolean }
+  | { state: 'ready'; version: string }
   | { state: 'failed'; message: string; version?: string }
 
 export interface ToolInstallResult {
@@ -440,10 +439,8 @@ export interface Api {
     /** Downloads the release file for this computer; progress comes through onStatus. */
     download(): Promise<UpdateStatus>
     cancel(): Promise<void>
-    /** Restarts into the update; on macOS opens its installer. */
+    /** Quits, installs the update and opens the app again. A downloaded update also goes in on quit. */
     install(): Promise<UpdateStatus>
-    /** Puts the update in place when the app quits. */
-    installOnQuit(): Promise<void>
     onStatus(listener: (status: UpdateStatus) => void): Unsubscribe
   }
   tools: {
@@ -495,7 +492,7 @@ export const INVOKE_METHODS = {
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],
-  updates: ['status', 'check', 'download', 'cancel', 'install', 'installOnQuit'],
+  updates: ['status', 'check', 'download', 'cancel', 'install'],
   tools: [
     'status',
     'install',
