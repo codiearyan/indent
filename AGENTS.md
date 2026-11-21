@@ -148,14 +148,23 @@ the chrome is neutral, and the one hue is a calm orange.
 ## First-run setup
 
 `features/onboarding/` is the setup shown instead of the app while `useSettings().onboarded` is false.
-It is not a route: finishing or skipping sets `onboarded` and the app takes over on Home; "Run setup
-again" in the AI menu clears it. `steps.ts` is the pure step machine (which steps exist for the
-choices, next, back, the progress cells, the help level mapping) with its tests. Every choice writes
-the real setting at once (`ai.setConfig`, `ai.setKey`), so skipping keeps what was picked. Step
-changes run through `lib/viewTransition.ts` with the type `onboarding-step`; `onboarding.css` holds
-the transition, the staged entrances and the scenes, all on the motion tokens, with a
-reduced-motion block that turns movement into fades and shows each scene's last frame. The scenes in
-`scenes/` are built from app components and tokens, never images.
+It is not a route: finishing or skipping sets `onboarded` and the app takes over on Home; "Run
+setup again" in the AI menu clears it. It has three steps: welcome, goal and AI. `steps.ts` is the
+pure step machine (the steps, next, back, the progress cells) with its tests. Every choice writes
+the real setting at once (`ai.setConfig`, `ai.setKey`), so skipping keeps what was picked. What the
+setup does not ask (help in the editor, the tutor after a failed check) keeps its default and is
+changed in Settings. The AI step shows the provider found on this computer and the work folder;
+"Change" opens every provider (`Provider.tsx`) in a dialog. Step changes run through
+`lib/viewTransition.ts` with the type `onboarding-step`; `onboarding.css` holds the transition, the
+staged entrances and the scenes, all on the motion tokens, with a reduced-motion block that turns
+movement into fades and shows each scene's last frame. The welcome step holds the one picture of the
+setup (`welcome.webp`, in the style and inks of the covers) with a scene laid over its corner. The
+scenes in `scenes/` are built from app components and tokens, never images.
+
+Finishing or skipping the setup starts the guide into the first issue (`useSettings().guide`,
+`features/tour/GuideTour`): a few steps on Home, a few on the repo page, then the workspace tour on
+the issue. `features/tour/guide.ts` holds its stages and steps with their tests, and
+`showTourAgain()` starts it again.
 
 ## Content packs
 
@@ -354,6 +363,9 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
 
 - Every task pays its points once, the first time it passes.
 - Each task has three hints. The first unlocks after 3 checks that are not all green, then one per check.
+- A day keeps the streak when it meets the daily goal (1, 2 or 3 tasks, set in Settings). Days carry
+  the goal they were played with, freezes earned along a streak cover missed days, and milestones are
+  kept with the date they were reached (`main/services/progressLogic.ts` records all three).
 - All of it is in `src/shared/rules.ts`; do not re-implement the numbers elsewhere.
 
 ## Code style

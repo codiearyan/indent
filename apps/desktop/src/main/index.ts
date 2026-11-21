@@ -14,13 +14,20 @@ import * as tools from './services/tools'
 import * as github from './services/github'
 import * as telemetry from './services/telemetry'
 import * as updates from './services/updates'
+import * as reminders from './services/reminders'
 import { seedContent } from './library'
 import { bundledContentDir, contentDir, usesLibrary } from './paths'
 
 // Privileged schemes have to be registered before the app is ready.
 preview.registerScheme()
 
-function createWindow(): void {
+// One copy runs at a time, so an app kept in the tray is opened again instead of started twice.
+// Only when packaged: a dev build shares its data folder with the installed app.
+const secondCopy = app.isPackaged && !app.requestSingleInstanceLock()
+if (secondCopy) app.quit()
+app.on('second-instance', () => showWindow())
+
+function createWindow(route?: string): void {
   const mainWindow = new BrowserWindow({
     width: 1440,
     height: 900,
@@ -60,9 +67,21 @@ function createWindow(): void {
   })
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + (route ? `#${route}` : ''))
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html'), { hash: route })
+  }
+}
+
+/** Brings the window back, or opens a new one, on `route` when given. */
+function showWindow(route?: string): void {
+  const window = BrowserWindow.getAllWindows()[0]
+  if (!window) return createWindow(route)
+  if (window.isMinimized()) window.restore()
+  window.show()
+  window.focus()
+  if (route) {
+    window.webContents.executeJavaScript(`location.hash = ${JSON.stringify(route)}`).catch(() => {})
   }
 }
 
@@ -85,6 +104,7 @@ function adoptEarlierData(): void {
 }
 
 app.whenReady().then(() => {
+  if (secondCopy) return
   adoptEarlierData()
   try {
     if (usesLibrary()) seedContent(bundledContentDir(), contentDir(), app.getVersion())
@@ -113,8 +133,9 @@ app.whenReady().then(() => {
   ]) {
     service.register()
   }
+  reminders.register(showWindow)
 
-  createWindow()
+  if (!reminders.startsHidden()) createWindow()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
@@ -122,5 +143,5 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
+  if (process.platform !== 'darwin' && !reminders.keepsRunning()) app.quit()
 })

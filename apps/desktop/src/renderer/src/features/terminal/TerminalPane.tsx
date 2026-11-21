@@ -258,9 +258,13 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
       style={overlay}
       className={cn('flex h-full flex-col bg-editor', maximized && 'border-t border-border')}
     >
+      {/* The whole bar opens and closes the terminal. The arrow is the button the keyboard uses. */}
       <div
         data-tour={TOUR.terminal}
-        className="flex h-[41px] shrink-0 items-center gap-2 border-b border-border px-2 text-sm"
+        className="flex h-[41px] shrink-0 cursor-pointer items-center gap-2 border-b border-border px-2 text-sm select-none"
+        onClick={(event) => {
+          if (!(event.target as HTMLElement).closest('button')) toggleOpen()
+        }}
       >
         <IconButton
           label={open ? 'Collapse terminal' : 'Expand terminal'}

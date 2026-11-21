@@ -1,0 +1,50 @@
+/* The finished repo, staged: strip, figures, stars, then the rest. Delays come from the page. */
+
+.done-stage {
+  animation: done-rise var(--motion-enter) var(--ease-out) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes done-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* An earned star lands: it grows past its size and settles, never from nothing. */
+.done-star {
+  animation: done-star calc(var(--motion-enter) * 1.5) var(--ease-out) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes done-star {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) rotate(-14deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.14) rotate(4deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+.done-issue {
+  transition: color var(--motion-state) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .done-stage,
+  .done-star {
+    animation: done-fade var(--motion-enter) var(--ease-out) both;
+  }
+}
+
+@keyframes done-fade {
+  from {
+    opacity: 0;
+  }
+}

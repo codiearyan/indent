@@ -24,7 +24,7 @@ const TOTAL = stepOffset('workspace') + TOUR_STEPS.length
 export function GuideTour(): React.JSX.Element | null {
   const stage = useSettings((s) => s.guide)
   const setGuide = useSettings((s) => s.setGuide)
-  const goal = useSettings((s) => s.goal)
+  const goals = useSettings((s) => s.goals)
   const experience = useSettings((s) => s.experience)
   const labs = useCatalog((s) => s.labs)
   const paths = useCatalog((s) => s.paths)
@@ -46,9 +46,9 @@ export function GuideTour(): React.JSX.Element | null {
   const suggested = useMemo(
     () =>
       labs && paths && progress
-        ? suggestedRepo(labs, paths, goal, experience, progress)
+        ? suggestedRepo(labs, paths, goals, experience, progress)
         : undefined,
-    [labs, paths, progress, goal, experience]
+    [labs, paths, progress, goals, experience]
   )
   const lab = shown === 'repo' ? labs?.find((l) => pathname === `/labs/${l.id}`) : undefined
 
@@ -56,13 +56,13 @@ export function GuideTour(): React.JSX.Element | null {
     if (!labs || !paths || !progress) return null
     if (shown === 'home') {
       return homeSteps({
-        goal: !!suggested && goalLabIds(paths, goal).includes(suggested.id),
+        goal: !!suggested && goalLabIds(paths, goals).includes(suggested.id),
         started: !!suggested && labProgress(suggested, progress.chapters).status === 'in-progress'
       })
     }
     if (shown === 'repo' && lab) return repoSteps(lab, progress.chapters)
     return null
-  }, [shown, lab, suggested, labs, paths, progress, goal])
+  }, [shown, lab, suggested, labs, paths, progress, goals])
 
   if (!shown || !steps || !progress) return null
 

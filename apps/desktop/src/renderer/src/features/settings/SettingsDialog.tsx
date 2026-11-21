@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
 import {
+  CalendarCheck,
+  CalendarClock,
   Code,
   HardDrive,
   Info,
@@ -34,8 +36,10 @@ import { viewTransition } from '@/lib/viewTransition'
 import { useSettings, type EditorOption } from '@/stores/settings'
 import { Group, LayoutControls, Row, card } from './controls'
 import { DataSection } from './DataSection'
+import { GoalSection } from './GoalSection'
 import { useSettingsDialog, type SettingsSection } from './dialogStore'
 import { KeyboardSection } from './KeyboardSection'
+import { PracticeSection } from './PracticeSection'
 import { ThemeCards } from './ThemeCards'
 import { ToolsSection } from './ToolsSection'
 import { Typography } from './Typography'
@@ -50,6 +54,8 @@ const SECTIONS: {
   { id: 'editor', label: 'Editor', icon: Code, view: EditorSection },
   { id: 'keyboard', label: 'Keyboard', icon: Keyboard, view: KeyboardSection },
   { id: 'ai', label: 'AI', icon: Sparkles, view: AiSection },
+  { id: 'practice', label: 'Practice', icon: CalendarClock, view: PracticeSection },
+  { id: 'goal', label: 'Streak', icon: CalendarCheck, view: GoalSection },
   { id: 'tools', label: 'Tools', icon: Wrench, view: ToolsSection },
   { id: 'data', label: 'Your data', icon: HardDrive, view: DataSection },
   { id: 'privacy', label: 'Privacy', icon: Shield, view: PrivacySection },

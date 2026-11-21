@@ -4,6 +4,7 @@ import { mkdir, readFile, rename, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { pathToFileURL } from 'url'
 import { COVER_SCHEME } from '@shared/cover'
+import type { MilestoneCatalog } from '@shared/rules'
 import { checkFlow } from '@shared/flow'
 import { checkIntro } from '@shared/intro'
 import { PACKS_URL } from '@shared/packs'
@@ -155,6 +156,15 @@ async function listRepos(): Promise<LabSummary[]> {
 
 async function listRoadmaps(): Promise<PathDef[]> {
   return cachedIndex()?.paths ?? listPaths(contentDir())
+}
+
+/** The repos and roadmaps as milestones read them, without refreshing the library. */
+export async function milestoneCatalog(): Promise<MilestoneCatalog> {
+  const [labs, paths] = await Promise.all([listAll(contentDir(), cachedIndex()), listRoadmaps()])
+  return {
+    labs: labs.map((lab) => ({ id: lab.id, chapters: lab.chapters.map((c) => c.id) })),
+    paths: paths.map((path) => ({ labs: path.stages.flatMap((stage) => stage.labs) }))
+  }
 }
 
 /** Downloads the repo first when only the library has it. */

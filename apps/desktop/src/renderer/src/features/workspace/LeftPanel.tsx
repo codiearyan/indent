@@ -5,12 +5,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { FlowFigure } from '@/features/flows/FlowPlayer'
 import { IntroPlayer } from '@/features/intro/IntroPlayer'
 import { TOUR } from '@/features/tour/anchors'
+import { cn } from '@/lib/utils'
 import { useChapterProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { AudioCard } from './AudioCard'
 import { Markdown } from './Markdown'
 import { TaskList } from './TaskList'
+import { useLessonPart } from './useLessonPart'
 
 // Both tabs stay mounted so the audio keeps playing and scroll positions survive a tab switch.
 const content = 'min-h-0 data-[state=inactive]:hidden'
@@ -26,6 +28,7 @@ export function LeftPanel(): React.JSX.Element {
   const status = useWorkspace((s) => s.status)
   const leftTab = useSettings((s) => s.leftTab)
   const setLeftTab = useSettings((s) => s.setLeftTab)
+  useLessonPart(chapter)
 
   return (
     <Tabs
@@ -49,15 +52,9 @@ export function LeftPanel(): React.JSX.Element {
         <PanelSkeleton />
       ) : (
         <>
-          <TabsContent value="insights" forceMount className={content}>
-            <ScrollArea className={scroll}>
+          <TabsContent value="insights" forceMount className={cn(content, 'flex flex-col')}>
+            <ScrollArea className={cn(scroll, 'min-h-0 flex-1')}>
               <div className="zone-lesson space-y-6 px-6 pt-5 pb-10">
-                <AudioCard
-                  key={`${chapter.labId}/${chapter.id}`}
-                  lesson={chapter.lesson}
-                  labId={chapter.labId}
-                  chapterId={chapter.id}
-                />
                 {chapter.intro ? (
                   <IssueIntro
                     key={`${chapter.labId}/${chapter.id}`}
@@ -74,6 +71,15 @@ export function LeftPanel(): React.JSX.Element {
                 <Markdown>{chapter.lesson}</Markdown>
               </div>
             </ScrollArea>
+            {/* Under the lesson, not in it, so it stays put while the lesson scrolls. */}
+            <div className="shrink-0 border-t border-border px-6 py-3 empty:hidden">
+              <AudioCard
+                key={`${chapter.labId}/${chapter.id}`}
+                lesson={chapter.lesson}
+                labId={chapter.labId}
+                chapterId={chapter.id}
+              />
+            </div>
           </TabsContent>
           <TabsContent value="tasks" forceMount className={content}>
             <ScrollArea className={scroll}>
@@ -119,7 +125,6 @@ function TaskCount({ chapter }: { chapter: Chapter }): React.JSX.Element {
 function PanelSkeleton(): React.JSX.Element {
   return (
     <div className="space-y-4 p-6">
-      <Skeleton className="h-12 w-full rounded-lg" />
       <Skeleton className="h-8 w-2/3" />
       <Skeleton className="h-4 w-full" />
       <Skeleton className="h-4 w-full" />

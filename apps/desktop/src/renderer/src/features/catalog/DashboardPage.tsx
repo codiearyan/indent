@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ChevronRight } from 'lucide-react'
-import { chapterKey, currentStreak, levelFor, localDate } from '@shared/rules'
+import { chapterKey, currentStreak, goalFor, levelFor, localDate } from '@shared/rules'
 import type { LabSummary, ProgressState } from '@shared/types'
 import { BuildStrip } from '@/components/app/BuildStrip'
 import { LanguageIcon } from '@/components/app/LanguageIcon'
@@ -12,9 +12,11 @@ import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
+import { todayLine } from '@/features/progress/copy'
 import { TOUR } from '@/features/tour/anchors'
 import { parseDate, recentWeeks } from './activity'
 import { Heatmap } from './Heatmap'
+import { NextSession } from './NextSession'
 import { labProgress, type LabProgress } from './labStatus'
 import { goalLabIds, recommendedOrder } from './recommend'
 
@@ -35,7 +37,7 @@ export function DashboardPage(): React.JSX.Element {
   const labs = useCatalog((s) => s.labs)
   const paths = useCatalog((s) => s.paths)
   const progress = useProgress((s) => s.progress)
-  const goal = useSettings((s) => s.goal)
+  const goals = useSettings((s) => s.goals)
   const experience = useSettings((s) => s.experience)
   const weeks = useMemo(() => recentWeeks(17), [])
 
@@ -53,8 +55,8 @@ export function DashboardPage(): React.JSX.Element {
     )
   }
 
-  const onRoadmap = new Set(goalLabIds(paths, goal))
-  const rows: LabRow[] = recommendedOrder(labs, paths, goal, experience).map((lab) => ({
+  const onRoadmap = new Set(goalLabIds(paths, goals))
+  const rows: LabRow[] = recommendedOrder(labs, paths, goals, experience).map((lab) => ({
     lab,
     progress: labProgress(lab, progress.chapters)
   }))
@@ -81,12 +83,9 @@ export function DashboardPage(): React.JSX.Element {
       <header>
         <h1 className="text-[22px] leading-7 font-semibold">Home</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {passedToday > 0
-            ? `${passedToday} ${passedToday === 1 ? 'task' : 'tasks'} passed today. Your streak is ${streak} ${streak === 1 ? 'day' : 'days'}.`
-            : streak > 0
-              ? `Pass one task today to keep your ${streak} day streak.`
-              : 'Pass a task today to start a streak.'}
+          {todayLine(passedToday, goalFor(progress), streak)}
         </p>
+        <NextSession activity={progress.activity} />
       </header>
 
       <div className="grid grid-cols-12 gap-6">

@@ -6,6 +6,7 @@ import { REPO_URL } from '@shared/repo'
 import { APP_NAME } from '@/components/app/Brand'
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
+import { celebrate } from '@/lib/confetti'
 import { useSettings } from '@/stores/settings'
 import { shouldAskForStar } from './starLogic'
 
@@ -94,7 +95,7 @@ function StarToast(): React.JSX.Element {
     useSettings.getState().setStarAsked(true)
     if (await api.github.star().catch(() => false)) {
       setState('thanks')
-      celebrate()
+      celebrate(BURST)
       setTimeout(() => toast.dismiss(TOAST_ID), THANKS_MS)
       return
     }
@@ -143,25 +144,13 @@ function StarToast(): React.JSX.Element {
   )
 }
 
-/** One burst from the corner the toast sits in, in the app's own colours. */
-function celebrate(): void {
-  const style = getComputedStyle(document.documentElement)
-  const colors = ['--brand', '--foreground', '--muted-foreground'].map((token) =>
-    style.getPropertyValue(token).trim()
-  )
-  void import('canvas-confetti')
-    .then(({ default: confetti }) =>
-      confetti({
-        particleCount: 140,
-        spread: 110,
-        angle: 120,
-        startVelocity: 42,
-        gravity: 1.4,
-        ticks: 140,
-        origin: { x: 0.92, y: 0.94 },
-        colors,
-        disableForReducedMotion: true
-      })
-    )
-    .catch(() => undefined)
+/** One burst from the corner the toast sits in. */
+const BURST = {
+  particleCount: 140,
+  spread: 110,
+  angle: 120,
+  startVelocity: 42,
+  gravity: 1.4,
+  ticks: 140,
+  origin: { x: 0.92, y: 0.94 }
 }

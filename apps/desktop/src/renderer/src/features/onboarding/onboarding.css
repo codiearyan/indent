@@ -63,18 +63,7 @@ html:active-view-transition-type(onboarding-finish) {
   }
 }
 
-/* The progress strip: each cell fills from its left edge, skipped steps fold away. */
-.ob-cell {
-  transition:
-    flex-grow var(--motion-state) var(--ease-in-out),
-    margin var(--motion-state) var(--ease-in-out),
-    opacity var(--motion-state) var(--ease-out);
-}
-.ob-cell[data-state='skipped'] {
-  flex-grow: 0;
-  margin-left: -4px;
-  opacity: 0;
-}
+/* The progress strip: each cell fills from its left edge. */
 .ob-fill {
   transform: scaleX(0);
   transform-origin: left;
@@ -123,9 +112,6 @@ html:active-view-transition-type(onboarding-finish) {
     transform: none;
     opacity: 1;
   }
-  .ob-cell {
-    transition: opacity var(--motion-state) linear;
-  }
   .ob-choice:active {
     transform: none;
   }
@@ -161,18 +147,7 @@ html:active-view-transition-type(onboarding-finish) {
   }
 }
 
-/* How it works: the line under the playing point shows when the next one comes. */
-.ob-dwell {
-  animation: ob-dwell linear both;
-}
-
-@keyframes ob-dwell {
-  from {
-    transform: scaleX(0);
-  }
-}
-
-/* Scenes play once when selected. With reduced motion they show their final frame at once. */
+/* Scenes play once. With reduced motion they show their final frame at once. */
 @media (prefers-reduced-motion: reduce) {
   .ob-scene *,
   .ob-scene *::before,
@@ -184,7 +159,7 @@ html:active-view-transition-type(onboarding-finish) {
   }
 }
 
-/* Code scene: lines type in whole characters, output follows. */
+/* Welcome scene: the line types in whole characters. */
 .ob-type {
   display: inline-block;
   overflow: hidden;
@@ -207,18 +182,7 @@ html:active-view-transition-type(onboarding-finish) {
   }
 }
 
-.ob-appear {
-  animation: ob-appear var(--motion-enter) var(--ease-out) both;
-}
-
-@keyframes ob-appear {
-  from {
-    opacity: 0;
-    transform: translateY(3px);
-  }
-}
-
-/* Check scene: a light press on Check, then each status mark fills while its tick draws. */
+/* Welcome scene: a light press on Check, then each status mark fills while its tick draws. */
 .ob-press {
   animation: ob-press var(--motion-state) var(--ease-out) both;
 }
@@ -257,49 +221,15 @@ html:active-view-transition-type(onboarding-finish) {
   stroke-dashoffset: 0;
 }
 
-/* Patterns scene: pointers move on the on-screen curve, cells change tone, days fill in. */
-.ob-move {
-  transition: transform var(--motion-enter) var(--ease-in-out);
+/* AI step: the provider row dims when AI is off, and a newly picked provider fades in. */
+.ob-dim {
+  transition: opacity var(--motion-state) var(--ease-out);
 }
-.ob-tone {
-  transition:
-    border-color var(--motion-state) var(--ease-out),
-    background-color var(--motion-state) var(--ease-out);
+.ob-dim[data-on='false'] {
+  opacity: 0.4;
 }
-.ob-day {
-  animation: ob-day var(--motion-enter) var(--ease-out) both;
-}
-
-@keyframes ob-day {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-}
-
-/* Help level demos: a key is pressed, grey text appears, Tab turns it into code. */
-.ob-ghost {
-  color: var(--muted-foreground);
-  opacity: 0.8;
+.ob-swap {
   animation: ob-fade-in var(--motion-enter) var(--ease-out) both;
-}
-.ob-ghost.ob-accept {
-  animation:
-    ob-fade-in var(--motion-enter) var(--ease-out) both,
-    ob-accept var(--motion-state) var(--ease-out) forwards;
-}
-
-@keyframes ob-accept {
-  to {
-    color: var(--foreground);
-    opacity: 1;
-  }
-}
-
-.ob-key {
-  animation:
-    ob-appear var(--motion-enter) var(--ease-out) both,
-    ob-press var(--motion-state) var(--ease-out) both;
 }
 
 /* A step is drawn for the smallest window; larger windows scale it up instead of leaving it adrift. */

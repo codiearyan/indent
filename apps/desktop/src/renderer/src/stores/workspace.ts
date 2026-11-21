@@ -14,6 +14,7 @@ import { errorMessage } from '@/lib/utils'
 import { track } from '@/lib/telemetry'
 import { useCatalog } from './catalog'
 import { useProgress } from './progress'
+import { noticeMoment } from '@/features/progress/momentStore'
 import { useSettings } from './settings'
 import { useOpenTabs } from './tabs'
 import { movedPath } from '@/features/editor/fileTree'
@@ -295,7 +296,9 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         useSettings.getState().setLeftTab('tasks')
         // No results: the repo tools are not ready, and the notice above the tasks says why.
         if (results.length === 0) return results
+        const previous = useProgress.getState().progress
         useProgress.getState().set(progress)
+        if (previous) noticeMoment(previous, progress)
         const after = progress.chapters[key]
         const ids = { repo: chapter.labId, issue: chapter.id }
         const passed = results.filter((r) => r.passed).length

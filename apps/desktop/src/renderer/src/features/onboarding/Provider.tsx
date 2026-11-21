@@ -12,7 +12,6 @@ import { activeProvider, useAi } from '@/features/ai/aiStore'
 import { TestConnection } from '@/features/ai/TestConnection'
 import { IconButton } from '@/features/workspace/IconButton'
 import { cn, errorMessage } from '@/lib/utils'
-import { StepLayout } from './StepLayout'
 
 type ProviderId = AiProviderInfo['id']
 
@@ -23,7 +22,8 @@ const freeFirst = (a: AiProviderInfo, b: AiProviderInfo): number =>
 
 const GEMINI_KEY_URL = 'https://aistudio.google.com/apikey'
 
-export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
+/** Every provider with what it needs, the model and a test. Shown from the AI step of the setup. */
+export function ProviderPicker(): React.JSX.Element {
   const config = useAi((s) => s.config)
   const load = useAi((s) => s.load)
   const update = useAi((s) => s.update)
@@ -44,18 +44,7 @@ export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
   const active = loading ? undefined : activeProvider(config)
 
   return (
-    <StepLayout
-      wide
-      staged={staged}
-      title="Connect a provider"
-      lead={
-        <span className="text-foreground">
-          Every AI call goes from this computer straight to the provider you pick, on your own plan
-          or key. Two ways cost nothing: the free models of OpenCode and a free Gemini key. Both
-          have a usage limit.
-        </span>
-      }
-    >
+    <>
       <RadioGroup
         aria-label="AI provider"
         value={config?.provider ?? ''}
@@ -100,7 +89,7 @@ export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
           )
         )}
       </div>
-    </StepLayout>
+    </>
   )
 }
 

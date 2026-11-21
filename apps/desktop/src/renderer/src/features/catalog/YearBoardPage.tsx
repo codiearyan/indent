@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { currentStreak, levelFor } from '@shared/rules'
+import { currentStreak, levelFor, walkStreak } from '@shared/rules'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -9,6 +9,9 @@ import { useProgress } from '@/stores/progress'
 import { longestStreak, parseDate, yearSummary, yearWeeks } from './activity'
 import { Figures } from './Figures'
 import { Heatmap, HeatmapLegend } from './Heatmap'
+import { freezeLine } from '@/features/progress/copy'
+import { MilestoneList } from '@/features/progress/MilestoneList'
+import { PointsCard, WeeklyCard } from '@/features/progress/ProgressCharts'
 
 const MONTHS = Array.from({ length: 12 }, (_, m) =>
   new Date(2000, m, 1).toLocaleDateString('en-US', { month: 'short' })
@@ -76,8 +79,11 @@ export function YearBoardPage(): React.JSX.Element {
 
       <section className="rounded-lg border border-border px-5 pt-4 pb-5">
         <Heatmap weeks={weeks} activity={progress.activity} fill />
-        <div className="mt-3 flex justify-end">
-          <HeatmapLegend />
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+          <p className="text-[13px] text-muted-foreground">
+            {freezeLine(walkStreak(progress.activity).freezes)}
+          </p>
+          <HeatmapLegend freeze />
         </div>
       </section>
 
@@ -92,6 +98,17 @@ export function YearBoardPage(): React.JSX.Element {
           { label: 'Level', value: levelFor(progress.totalPoints).level }
         ]}
       />
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <WeeklyCard activity={progress.activity} className="lg:col-span-7" />
+        <PointsCard
+          activity={progress.activity}
+          totalPoints={progress.totalPoints}
+          className="lg:col-span-5"
+        />
+      </div>
+
+      <MilestoneList milestones={progress.milestones} />
 
       <section className="rounded-lg border border-border">
         <header className="flex h-11 items-center border-b border-rule px-5">

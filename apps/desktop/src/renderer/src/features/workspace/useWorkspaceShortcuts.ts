@@ -10,6 +10,7 @@ import { useProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { hintKey, nextHint, useShownHints } from './hints'
+import { showHint } from './recordHint'
 
 export function checkAll(): void {
   useWorkspace
@@ -45,9 +46,11 @@ function showNextHint(): void {
   const chapter = useWorkspace.getState().chapter
   if (!chapter) return
   const progress = useProgress.getState().progress?.chapters[chapterKey(chapter.labId, chapter.id)]
-  const { shown, setShown, setOpen } = useShownHints.getState()
+  const { shown, setOpen } = useShownHints.getState()
   const key = (taskId: string): string => hintKey(chapter.labId, chapter.id, taskId)
-  const next = nextHint(chapter.tasks, progress, (taskId) => shown[key(taskId)] ?? 0)
+  const next = nextHint(chapter.tasks, progress, (taskId) =>
+    Math.max(shown[key(taskId)] ?? 0, progress?.tasks[taskId]?.hintsShown ?? 0)
+  )
   if (next.kind === 'done') return void toast('Every task passes.')
   if (next.kind !== 'show') {
     return void toast(
@@ -56,7 +59,7 @@ function showNextHint(): void {
         : `Every hint for task ${next.task} is showing.`
     )
   }
-  setShown(key(next.taskId), next.hint)
+  showHint(key(next.taskId), next.hint)
   setOpen(key(next.taskId), true)
   showLesson()
   useSettings.getState().setLeftTab('tasks')
