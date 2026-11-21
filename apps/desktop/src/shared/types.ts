@@ -213,6 +213,14 @@ export interface NodeOption {
   supported: boolean
 }
 
+export interface ToolInstallResult {
+  tools: ToolStatus[]
+  /** An installer opened in its own window; the person finishes it there, then checks again. */
+  waiting?: boolean
+  /** Nothing here can install it; the page to get it by hand. */
+  url?: string
+}
+
 export interface ToolStatus {
   id: ToolId
   label: string
@@ -222,8 +230,10 @@ export interface ToolStatus {
   ok: boolean
   /** What it is for and what is wrong, in plain words. */
   note: string
-  /** The app can download its own copy. */
+  /** The app can install it here: its own download for Node, the system's installer for others. */
   installable: boolean
+  /** Where to get it by hand when the app can't install it. */
+  url?: string
 }
 
 // ---------- Progress ----------
@@ -415,13 +425,15 @@ export interface Api {
   tools: {
     status(): Promise<ToolStatus[]>
     /** Downloads Node into the app's own folder. Other programs do not see it. */
-    installNode(): Promise<ToolStatus[]>
+    /** Installs a missing tool for the learner. Node reports its download through onInstallProgress. */
+    install(id: ToolId): Promise<ToolInstallResult>
+    /** Stops the Node download. */
+    cancelInstall(): Promise<void>
+    onInstallProgress(listener: (id: ToolId, done: number) => void): Unsubscribe
     /** Every Node found, and the one picked; null picked means automatic. */
     nodeOptions(): Promise<{ options: NodeOption[]; picked: string | null }>
     /** Picks a Node from nodeOptions, or null for automatic. */
     pickNode(bin: string | null): Promise<ToolStatus[]>
-    /** macOS only: opens Apple's installer for its developer tools, which include Git. */
-    installGit(): Promise<void>
     /** Whether the local model runs, and why not. */
     labModel(): Promise<LabModelStatus>
     /** Starts the local model again; resolves with its status a few seconds later at most. */
@@ -461,10 +473,10 @@ export const INVOKE_METHODS = {
   terminal: ['create'],
   tools: [
     'status',
-    'installNode',
+    'install',
+    'cancelInstall',
     'nodeOptions',
     'pickNode',
-    'installGit',
     'labModel',
     'restartLabModel'
   ],
@@ -486,5 +498,6 @@ export const EVENTS = {
   aiChat: 'ai:chatEvent',
   contentInstall: 'content:installProgress',
   contentChanged: 'content:changed',
-  runtime: 'checks:runtime'
+  runtime: 'checks:runtime',
+  toolInstall: 'tools:installProgress'
 } as const

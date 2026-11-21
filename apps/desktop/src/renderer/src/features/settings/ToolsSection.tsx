@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Check, Loader2 } from 'lucide-react'
 import type { LabModelStatus, NodeOption, ToolStatus } from '@shared/types'
+import { ToolInstallButton } from '@/components/app/ToolInstallButton'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -27,7 +28,9 @@ export function ToolsSection(): React.JSX.Element {
       .filter((lab) => lab.tools?.includes(tool.id))
       .map((lab) => lab.title)
       .join(', ')
-  const [downloading, setDownloading] = useState(false)
+  const downloading = useTools((s) =>
+    Object.values(s.installs).some((install) => install?.state === 'running')
+  )
   const [error, setError] = useState<string | null>(null)
   const [model, setModel] = useState<LabModelStatus | null>(null)
   const [restarting, setRestarting] = useState(false)
@@ -66,31 +69,8 @@ export function ToolsSection(): React.JSX.Element {
     }
   }
 
-  const download = async (): Promise<void> => {
-    setDownloading(true)
-    setError(null)
-    try {
-      setTools(await api.tools.installNode())
-      setModel(await api.tools.labModel())
-    } catch (e) {
-      show(e)
-    } finally {
-      setDownloading(false)
-    }
-  }
-
-  const downloadButton = (label: string): React.JSX.Element => (
-    <Button
-      variant="outline"
-      size="sm"
-      className="press shrink-0 border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
-      disabled={downloading}
-      onClick={() => void download()}
-    >
-      {downloading && <Loader2 className="animate-spin motion-reduce:animate-none" />}
-      {downloading ? 'Downloading' : `Download ${label}`}
-    </Button>
-  )
+  // A Node that was missing can start the local model.
+  useEffect(() => void api.tools.labModel().then(setModel, show), [tools])
 
   return (
     <Group
@@ -121,7 +101,7 @@ export function ToolsSection(): React.JSX.Element {
                       <Check className="size-4 text-success" strokeWidth={2} aria-label="Ready" />
                     ) : (
                       // Every Node found can be too old: the download stays the way forward.
-                      tool.installable && downloadButton(tool.label)
+                      <ToolInstallButton tool={tool} explain />
                     )}
                     <Select
                       value={nodes.picked ?? 'auto'}
@@ -155,8 +135,8 @@ export function ToolsSection(): React.JSX.Element {
                     <Check className="size-4 text-success" strokeWidth={2} aria-label="Ready" />
                     {tool.version}
                   </span>
-                ) : tool.installable ? (
-                  downloadButton(tool.label)
+                ) : tool.installable || tool.url ? (
+                  <ToolInstallButton tool={tool} explain />
                 ) : (
                   <span className="shrink-0 text-xs text-muted-foreground">Not found</span>
                 )}
