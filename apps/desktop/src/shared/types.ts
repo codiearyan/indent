@@ -400,6 +400,19 @@ export interface ProgressState {
   lastOpened?: { labId: string; chapterId: string }
 }
 
+export interface ProgressSummary {
+  totalPoints: number
+  tasksPassed: number
+}
+
+/** A picked progress file next to the progress on this computer, shown before it is replaced. */
+export interface ProgressImport {
+  /** Name of the picked file, without its folder. */
+  file: string
+  current: ProgressSummary
+  incoming: ProgressSummary
+}
+
 // ---------- AI ----------
 
 /** CLI providers reuse a login the learner already has; API providers use a stored key. */
@@ -571,6 +584,12 @@ export interface Api {
     get(): Promise<ProgressState>
     /** Records the chapter as opened, creating its progress entry. */
     touch(labId: string, chapterId: string): Promise<ProgressState>
+    /** Asks where to save and writes the progress there. The file's path, or null when cancelled. */
+    exportFile(): Promise<string | null>
+    /** Asks for a progress file and reads it. Null when cancelled; throws when it is not one. */
+    pickImport(): Promise<ProgressImport | null>
+    /** Makes the last picked file the progress. The replaced progress is kept aside on disk. */
+    applyImport(): Promise<ProgressState>
   }
   terminal: {
     create(opts: { labId: string; chapterId: string; cols: number; rows: number }): Promise<string>
@@ -652,7 +671,7 @@ export const INVOKE_METHODS = {
     'moveRoot'
   ],
   checks: ['run', 'trace', 'runtimeStatus', 'ensureRuntime'],
-  progress: ['get', 'touch'],
+  progress: ['get', 'touch', 'exportFile', 'pickImport', 'applyImport'],
   terminal: ['create'],
   updates: ['status', 'check', 'download', 'cancel', 'install'],
   tools: [
