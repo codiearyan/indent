@@ -58,6 +58,8 @@ export interface SettingsState {
   onboarded: boolean
   /** The request for a star on GitHub was answered or closed; it is never shown again. */
   starAsked: boolean
+  /** How many times the app has opened, this time included. */
+  launches: number
   /** Anonymous usage stats; on unless turned off in Settings. Nothing is sent while false. */
   telemetry: boolean
   /** Look for a new version of the app on start and every few hours. */
@@ -128,6 +130,7 @@ export const useSettings = create<SettingsState>()(
       tourSeen: false,
       onboarded: false,
       starAsked: false,
+      launches: 0,
       telemetry: true,
       autoUpdate: true,
       lastVersion: null,
@@ -185,6 +188,8 @@ function applyToDocument({ theme, textScale, typography: t }: SettingsState): vo
 }
 
 applyToDocument(useSettings.getState())
+// Read back from storage above, so this counts this start on top of the earlier ones.
+useSettings.setState((s) => ({ launches: s.launches + 1 }))
 useSettings.subscribe(applyToDocument)
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {

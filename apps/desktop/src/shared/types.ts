@@ -522,6 +522,8 @@ export interface Api {
   github: {
     /** Stars the app's repository with the person's own GitHub CLI. False when that is not possible. */
     star(): Promise<boolean>
+    /** Whether the person's GitHub account already starred it; null when that can't be told. */
+    starred(): Promise<boolean | null>
   }
   ai: {
     getConfig(): Promise<AiConfig>
@@ -561,7 +563,7 @@ export const INVOKE_METHODS = {
     'labModel',
     'restartLabModel'
   ],
-  github: ['star'],
+  github: ['star', 'starred'],
   ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test', 'tip']
 } as const
 

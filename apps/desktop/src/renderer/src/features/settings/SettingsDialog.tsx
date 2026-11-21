@@ -15,6 +15,7 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AiSettings, AiSwitch } from '@/features/ai/AiMenu'
 import { useAi } from '@/features/ai/aiStore'
+import { StarPromptDevTools } from '@/features/star/StarPrompt'
 import { UpdateCard } from '@/features/updates/UpdateCard'
 import { FolderNote, MoveFolderDialog } from '@/features/workspace/FolderMove'
 import { useWorkspaceRoot } from '@/features/workspace/useWorkspaceRoot'
@@ -322,6 +323,7 @@ function AboutSection(): React.JSX.Element {
       >
         All releases
       </a>
+      {import.meta.env.DEV && <StarPromptDevTools />}
     </Group>
   )
 }

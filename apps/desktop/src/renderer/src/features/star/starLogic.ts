@@ -1,43 +1,15 @@
-// Relative imports keep this file loadable by vitest, which has no path aliases.
-import type { ProgressState } from '../../../../shared/types'
-
-/** The request waits for this many passed tasks: enough to know whether the app is any good. */
-export const TASKS_BEFORE_ASKING = 5
-
-/** How long the person has to leave the app alone before the request appears. */
-export const IDLE_MS = 30_000
-
-export function passedTasks(progress: ProgressState | null): number {
-  if (!progress) return 0
-  return Object.values(progress.chapters).reduce(
-    (sum, chapter) => sum + Object.values(chapter.tasks).filter((task) => task.passed).length,
-    0
-  )
+export interface StarMoment {
+  /** Star or Dismiss was pressed once; the request never comes back. */
+  answered: boolean
+  shownThisRun: boolean
+  /** How many times the app has opened, this time included. */
+  launches: number
+  /** The person just left a repo for the rest of the app. */
+  closedRepo: boolean
 }
 
-const ACTIVITY = ['pointerdown', 'keydown', 'wheel'] as const
-
-/**
- * Calls `run` once the window has had focus and no input for `ms`, so the request never lands
- * in the middle of typing. Returns a function that calls it off.
- */
-export function whenIdle(run: () => void, ms = IDLE_MS): () => void {
-  let timer: ReturnType<typeof setTimeout>
-  const stop = (): void => {
-    clearTimeout(timer)
-    for (const type of ACTIVITY) window.removeEventListener(type, restart, true)
-  }
-  function restart(): void {
-    clearTimeout(timer)
-    timer = setTimeout(() => {
-      // Input in another app never reaches this window, so quiet there proves nothing.
-      if (!document.hasFocus()) return restart()
-      stop()
-      run()
-    }, ms)
-  }
-  for (const type of ACTIVITY)
-    window.addEventListener(type, restart, { capture: true, passive: true })
-  restart()
-  return stop
+/** Asks at a natural pause: after a repo was closed, or from the second time the app opens. */
+export function shouldAskForStar(moment: StarMoment): boolean {
+  if (moment.answered || moment.shownThisRun) return false
+  return moment.closedRepo || moment.launches >= 2
 }
