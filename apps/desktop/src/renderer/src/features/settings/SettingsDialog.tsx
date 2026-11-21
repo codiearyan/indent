@@ -14,6 +14,7 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AiSettings, AiSwitch } from '@/features/ai/AiMenu'
 import { useAi } from '@/features/ai/aiStore'
+import { FolderNote, MoveFolderDialog } from '@/features/workspace/FolderMove'
 import { useWorkspaceRoot } from '@/features/workspace/useWorkspaceRoot'
 import { viewTransition } from '@/lib/viewTransition'
 import { useSettings, type EditorOption } from '@/stores/settings'
@@ -60,7 +61,7 @@ export function SettingsDialog(): React.JSX.Element {
           orientation="vertical"
           value={section}
           onValueChange={(value) => setSection(value as SettingsSection)}
-          className="min-h-0 gap-0"
+          className="min-h-0 min-w-0 gap-0"
         >
           <div className="flex w-48 shrink-0 flex-col border-r border-rule p-3">
             <DialogTitle className="px-2.5 pt-1.5 pb-3 text-sm font-semibold">Settings</DialogTitle>
@@ -238,18 +239,25 @@ function PrivacySection(): React.JSX.Element {
 }
 
 function WorkspaceFolder(): React.JSX.Element {
-  const { root, moving, change } = useWorkspaceRoot()
+  const folder = useWorkspaceRoot()
   return (
     <div className={card}>
       <div className="flex min-h-14 items-center justify-between gap-6 px-4 py-2.5">
         <div className="min-w-0">
           <p className="text-sm">Folder for your work</p>
-          <p className="truncate font-mono text-xs text-muted-foreground">{root}</p>
+          <p className="truncate font-mono text-xs text-muted-foreground">{folder.root}</p>
+          <FolderNote folder={folder} className="mt-1" />
         </div>
-        <Button variant="outline" size="sm" disabled={moving} onClick={() => void change()}>
-          {moving ? 'Moving...' : 'Change'}
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={folder.moving}
+          onClick={() => void folder.change()}
+        >
+          Change
         </Button>
       </div>
+      <MoveFolderDialog folder={folder} />
     </div>
   )
 }

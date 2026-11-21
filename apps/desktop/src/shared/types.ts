@@ -124,6 +124,14 @@ export interface WorkspaceFile {
   content: string
 }
 
+/** Where the work would move after a folder was picked. */
+export interface FolderMove {
+  from: string
+  to: string
+  /** The picked folder had files, so `to` is a new folder inside it. */
+  inside: boolean
+}
+
 export interface WorkspaceSnapshot {
   /** Absolute folder on disk; the terminal opens here. */
   dir: string
@@ -323,8 +331,10 @@ export interface Api {
     reset(labId: string, chapterId: string): Promise<WorkspaceSnapshot>
     /** The folder that holds every workspace. */
     getRoot(): Promise<string>
-    /** Asks for a new folder and moves all work there; null when cancelled. */
-    chooseRoot(): Promise<string | null>
+    /** Asks for a folder and says where the work would go; null when cancelled. */
+    pickRoot(): Promise<FolderMove | null>
+    /** Moves all work to the folder the last pickRoot approved. Returns the new root. */
+    moveRoot(): Promise<string>
   }
   checks: {
     /** Runs the hidden tests for the given tasks (all when omitted) and records progress. */
@@ -383,7 +393,7 @@ export interface Api {
 /** Methods the preload bridges with ipcRenderer.invoke, per namespace. */
 export const INVOKE_METHODS = {
   content: ['listLabs', 'getChapter', 'listPaths', 'narration', 'install'],
-  workspace: ['open', 'writeFile', 'reset', 'getRoot', 'chooseRoot'],
+  workspace: ['open', 'writeFile', 'reset', 'getRoot', 'pickRoot', 'moveRoot'],
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],

@@ -1,5 +1,5 @@
 import { cp, mkdir, readdir, rename, rm } from 'fs/promises'
-import { join, relative, isAbsolute } from 'path'
+import { isAbsolute, join, relative, resolve } from 'path'
 
 const IGNORED = new Set(['.DS_Store', 'Thumbs.db', 'desktop.ini'])
 
@@ -15,6 +15,34 @@ export async function isEmptyFolder(dir: string): Promise<boolean> {
     throw error
   })
   return entries.every((name) => IGNORED.has(name))
+}
+
+/** A folder made inside a picked folder that already has files. */
+export const NEW_FOLDER = 'indent'
+
+/**
+ * Where work goes when the person picks `picked`: the folder itself when it is empty, or a new
+ * folder inside it when it has files. Throws, in words for the person, when neither can be used.
+ */
+export async function planMove(
+  current: string,
+  picked: string,
+  appDir: string
+): Promise<{ to: string; inside: boolean }> {
+  const next = resolve(picked)
+  if (next === current) return { to: current, inside: false }
+  if (isInsideOrSame(next, current) || isInsideOrSame(current, next)) {
+    throw new Error('Pick a folder that is not inside your current one, and does not hold it.')
+  }
+  if (isInsideOrSame(next, appDir)) throw new Error('Pick a folder outside the app.')
+  if (await isEmptyFolder(next)) return { to: next, inside: false }
+  const nested = join(next, NEW_FOLDER)
+  if (!(await isEmptyFolder(nested))) {
+    throw new Error(
+      `This folder has files, and so does the ${NEW_FOLDER} folder inside it. Pick another folder.`
+    )
+  }
+  return { to: nested, inside: true }
 }
 
 /**
