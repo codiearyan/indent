@@ -83,6 +83,9 @@ export function SettingsDialog(): React.JSX.Element {
                 </TabsTrigger>
               ))}
             </TabsList>
+            <p className="mt-auto px-2.5 text-xs text-muted-foreground select-text">
+              Version <span className="font-mono">{__APP_VERSION__}</span>
+            </p>
           </div>
           {SECTIONS.map(({ id, label, view: View }) => (
             <TabsContent key={id} value={id} className="min-w-0 overflow-y-auto px-8 pt-6 pb-8">
