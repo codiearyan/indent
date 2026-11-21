@@ -97,7 +97,7 @@
         },
         {
           "active": ["signal", "signal->retry", "retry"],
-          "note": "Aborting cannot reach inside a running promise. retry looks at the signal each time it gets control back: before an attempt, when one fails, and after a wait."
+          "note": "Partway through, the sailing is called off and Odile cancels. From that moment no new attempt and no new wait may begin."
         },
         {
           "active": ["task", "retry"],

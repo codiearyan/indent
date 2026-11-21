@@ -79,11 +79,11 @@
               ["quay", "answered"]
             ]
           },
-          "note": "The reef radio stays silent and its ping rejects. That is an answer for the page, not a reason to give up on the others."
+          "note": "The reef radio stays silent and its ping rejects. Reef still gets its line on the page, and the other ports still count."
         },
         {
           "active": ["status"],
-          "note": "portStatus() waits until every ping has settled, one way or the other, and reads the results in the order of the ports."
+          "note": "portStatus() waits until it has heard from every radio, answered or silent."
         },
         {
           "active": ["status", "status->odile", "odile"],
@@ -107,7 +107,7 @@
         },
         {
           "active": ["timeout", "timeout->clock", "clock"],
-          "note": "It starts exactly one timer for that many milliseconds. The forecast and the timer now race."
+          "note": "It starts exactly one timer for that many milliseconds. The page now waits on whichever ends first, the forecast or the timer."
         },
         {
           "active": ["forecast", "timeout", "timeout->odile", "odile"],
@@ -127,7 +127,7 @@
         },
         {
           "active": ["forecast", "timeout"],
-          "note": "Giving up does not stop the forecast. If it fails later, something is still listening, so the failure is not left unhandled."
+          "note": "Giving up does not stop the forecast. If it fails later, that failure is not left unhandled."
         }
       ]
     }

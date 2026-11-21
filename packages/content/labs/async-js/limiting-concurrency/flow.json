@@ -12,8 +12,8 @@
       { "from": "bookings", "to": "batches", "label": "items, size" },
       { "from": "bookings", "to": "pool", "label": "items, limit" },
       { "from": "bookings", "to": "settled", "label": "items, limit" },
-      { "from": "settled", "to": "pool", "label": "a job that never rejects" },
-      { "from": "batches", "to": "send", "label": "a slice at a time" },
+      { "from": "settled", "to": "send", "label": "every item, failed or not" },
+      { "from": "batches", "to": "send", "label": "a batch at a time" },
       { "from": "pool", "to": "send", "label": "as slots free up" },
       { "from": "send", "to": "mail", "label": "at most 3 open" }
     ],
@@ -29,13 +29,13 @@
             "label": "items",
             "values": ["B1", "B2", "B3", "B4", "B5", "B6", "B7"]
           },
-          "note": "Seven reminders, at most three at a time. The list is cut into slices of three."
+          "note": "Seven reminders, in batches of three."
         },
         {
           "active": ["batches", "batches->send", "send"],
           "value": {
             "kind": "grid",
-            "label": "the slices",
+            "label": "the batches",
             "rowLabels": ["first", "second", "third"],
             "cells": [
               ["B1", "B2", "B3"],
@@ -43,19 +43,19 @@
               ["B7", "", ""]
             ]
           },
-          "note": "The whole first slice starts at once. Each job is told its item and its position in the whole list."
+          "note": "The whole first batch starts at once. Each job is told its item and its position in the whole list."
         },
         {
           "active": ["batches", "send"],
-          "note": "B2 finishes early, but nothing new starts. The second slice waits until every job in the first one is done."
+          "note": "B2 finishes early, but nothing new starts. The second batch waits until every job in the first one is done."
         },
         {
           "active": ["batches", "batches->send", "send", "send->mail", "mail"],
-          "note": "The last slice holds only B7. A slice is only as fast as its slowest reminder."
+          "note": "The last batch holds only B7. A batch is only as fast as its slowest reminder."
         },
         {
           "active": ["batches"],
-          "note": "The results come back in the order of the list. If a job fails, the run rejects with that error and starts no further slice."
+          "note": "The results come back in the order of the list. If a job fails, the run rejects with that error and starts no further batch."
         }
       ]
     },
@@ -64,7 +64,7 @@
         {
           "active": ["bookings", "bookings->pool", "pool"],
           "value": { "kind": "array", "label": "items", "values": ["B1", "B2", "B3", "B4", "B5"] },
-          "note": "Five reminders with a limit of three. Think of three workers sharing one queue."
+          "note": "Five reminders, at most three sending at a time."
         },
         {
           "active": ["pool", "pool->send", "send"],
@@ -79,7 +79,7 @@
               ["B5", "B4", "B3"]
             ]
           },
-          "note": "Each worker takes the next item in list order. The moment B2 is done its slot takes B4, while B1 and B3 are still sending."
+          "note": "Reminders start in list order. The moment B2 is done, its place goes to B4, while B1 and B3 are still sending."
         },
         {
           "active": ["send", "send->mail", "mail"],
@@ -92,7 +92,7 @@
             "label": "the shape of the result",
             "values": ["result for B1", "result for B2", "result for B3", "result for B4", "result for B5"]
           },
-          "note": "Each result is stored at its item's position, so the order holds whoever finished first."
+          "note": "The results come back in the order of the list, whoever finished first."
         },
         {
           "active": ["pool"],
@@ -108,12 +108,12 @@
           "note": "Tonight's run includes B9, whose mailbox is full."
         },
         {
-          "active": ["settled", "settled->pool", "pool"],
-          "note": "Each job is wrapped so that it never rejects: a success and a failure both become a value. The pool keeps the limit and the order."
+          "active": ["settled", "settled->send", "send"],
+          "note": "Reminders start in list order, at most three at a time, just as with mapLimit."
         },
         {
-          "active": ["pool", "pool->send", "send", "send->mail", "mail"],
-          "note": "B9 fails, its slot frees up like any other, and the next reminder starts. Nobody else loses their reminder."
+          "active": ["settled", "settled->send", "send", "send->mail", "mail"],
+          "note": "B9 fails, its place frees up like any other, and the next reminder starts. Nobody else loses their reminder."
         },
         {
           "active": ["settled"],

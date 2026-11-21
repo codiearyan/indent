@@ -31,7 +31,7 @@
       "steps": [
         {
           "active": ["report", "report->sailing", "sailing"],
-          "note": "The async sailingReport() asks for the gull-heron sailing and pauses at await. The rest of the office keeps running."
+          "note": "The async sailingReport() asks for the gull-heron sailing. The rest of the office keeps running while it waits."
         },
         {
           "active": ["report", "report->sea", "sea"],
@@ -43,7 +43,7 @@
               { "key": "time", "value": "HH:MM" }
             ]
           },
-          "note": "With the sailing in a const, it asks for the sea state at that time and pauses again."
+          "note": "Once the sailing is back, it asks for the sea state at that time."
         },
         {
           "active": ["report"],
@@ -56,11 +56,11 @@
               { "key": "sea", "value": "text" }
             ]
           },
-          "note": "A return resolves the promise with the same report as before."
+          "note": "It resolves with the same report as before."
         },
         {
           "active": ["report"],
-          "note": "An awaited rejection throws right there. With no catch it rejects the report, and a failed sailing never reaches the sea sensor."
+          "note": "If either service fails, the report fails with that same error, and a failed sailing never reaches the sea sensor."
         }
       ]
     },
@@ -95,7 +95,7 @@
               { "key": "crew", "value": "a list of names" }
             ]
           },
-          "note": "Everything is waited for in a way that listens to every promise from the start, so an early weather failure is never left unheard."
+          "note": "The dashboard comes back with all three parts. If the weather fails early, the dashboard fails with that error and the failure never goes unhandled."
         }
       ]
     },
@@ -121,7 +121,7 @@
         },
         {
           "active": ["booking", "booking->email", "email"],
-          "note": "Once it is stored, the ticket email is sent and awaited. A bounced email is a failure you have an answer for."
+          "note": "Once it is stored, the ticket email goes out. If it bounces, the booking still counts."
         },
         {
           "active": ["booking", "booking->unlock", "unlock"],

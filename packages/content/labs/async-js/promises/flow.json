@@ -42,7 +42,7 @@
         },
         {
           "active": ["read", "load->read", "load"],
-          "note": "The callback settles the promise: an error rejects it with that same error, a table fulfils it. A reader that calls back straight away must work too."
+          "note": "Then the board's promise settles: a failure with that same error, a table with the table. A reader that answers straight away must work too."
         }
       ]
     },
@@ -78,7 +78,7 @@
         },
         {
           "active": ["next"],
-          "note": "One then looks for the first tide at or after the time that is 3 m or more. It may find nothing."
+          "note": "The board needs the first tide at or after midday that is 3 m or more. There may not be one."
         },
         {
           "active": ["next", "next->board", "board"],
@@ -87,7 +87,7 @@
             "label": "the shape of the line",
             "values": ["HH:MM (h.h m)", "or", "No high tide after HH:MM"]
           },
-          "note": "The next then turns it into one line for the board. If the load failed, the error travels down the chain untouched."
+          "note": "That tide becomes one line for the board. If the load failed, the board gets that same error."
         }
       ]
     },
@@ -112,7 +112,7 @@
         },
         {
           "active": ["report", "report->sea", "sea"],
-          "note": "Now the sea sensor is asked about that time. The then callback returns this promise, so the chain waits for it."
+          "note": "Now the sea sensor is asked about that time. The report is not ready until its answer is back too."
         },
         {
           "active": ["report", "report->board", "board"],
