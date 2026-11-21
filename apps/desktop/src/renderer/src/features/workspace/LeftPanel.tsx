@@ -22,7 +22,6 @@ const scroll = 'h-full [&_[data-slot=scroll-area-viewport]>div]:block!'
 export function LeftPanel(): React.JSX.Element {
   const chapter = useWorkspace((s) => s.chapter)
   const status = useWorkspace((s) => s.status)
-  const error = useWorkspace((s) => s.error)
   const leftTab = useSettings((s) => s.leftTab)
   const setLeftTab = useSettings((s) => s.setLeftTab)
 
@@ -43,9 +42,7 @@ export function LeftPanel(): React.JSX.Element {
           </TabsTrigger>
         </TabsList>
       </div>
-      {status === 'error' ? (
-        <p className="p-6 text-sm text-destructive">{error}</p>
-      ) : status === 'loading' || !chapter ? (
+      {status === 'loading' || !chapter ? (
         <PanelSkeleton />
       ) : (
         <>

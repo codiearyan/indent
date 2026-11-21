@@ -11,6 +11,8 @@ import { useAiEnabled } from '@/features/ai/aiStore'
 import { Tour } from '@/features/tour/Tour'
 import { TopBar } from './TopBar'
 import { LeftPanel } from './LeftPanel'
+import { useCatalog } from '@/stores/catalog'
+import { RepoNotice } from './RepoNotice'
 
 /** Height of the terminal's header bar, which stays visible while the terminal is collapsed. */
 export const TERMINAL_HEADER_PX = 41
@@ -29,6 +31,10 @@ export function WorkspacePage(): React.JSX.Element {
   const aiOn = useAiEnabled()
   const chat = panels.chat && !panels.zen && aiOn
   const browser = useWorkspace((s) => Boolean(s.chapter?.preview)) && panels.browser
+  const status = useWorkspace((s) => s.status)
+  const downloading = useCatalog((s) => !!labId && s.downloads[labId]?.state === 'running')
+  // The sheet shows the repo's download, or why the issue could not open.
+  const notice = status === 'error' || (status === 'loading' && downloading)
 
   useEffect(() => {
     if (labId && chapterId) void open(labId, chapterId)
@@ -63,52 +69,56 @@ export function WorkspacePage(): React.JSX.Element {
     <div className="flex h-full flex-col bg-background">
       <TopBar />
       <div className="mx-2 mb-2 min-h-0 flex-1 overflow-hidden rounded-2xl border border-border bg-card">
-        <Group orientation="horizontal">
-          {lessonSide === 'left' && lesson}
-          {lessonSide === 'left' && lesson && <Separator className={`w-px ${separator}`} />}
-          <Panel id="work" minSize="30%">
-            <Group orientation="horizontal">
-              <Panel id="code" minSize="30%">
-                <Group orientation="vertical">
-                  <Panel id="editor" minSize="20%">
-                    <EditorPane />
-                  </Panel>
-                  <Separator className={`h-px ${separator}`} />
-                  <Panel
-                    id="terminal"
-                    panelRef={terminalRef}
-                    collapsible
-                    collapsedSize={TERMINAL_HEADER_PX}
-                    minSize={160}
-                    defaultSize={panels.terminal ? '40%' : TERMINAL_HEADER_PX}
-                    onResize={(size) => {
-                      const collapsed = size.inPixels <= TERMINAL_HEADER_PX + 1
-                      if (collapsed === useSettings.getState().panels.terminal) {
-                        setPanel('terminal', !collapsed)
-                      }
-                    }}
-                  >
-                    <TerminalPane />
-                  </Panel>
-                </Group>
-              </Panel>
-              {browser && <Separator className={`w-px ${separator}`} />}
-              {browser && (
-                <Panel id="browser" defaultSize="45%" minSize="20%">
-                  <BrowserPane />
+        {notice && labId && chapterId ? (
+          <RepoNotice labId={labId} chapterId={chapterId} />
+        ) : (
+          <Group orientation="horizontal">
+            {lessonSide === 'left' && lesson}
+            {lessonSide === 'left' && lesson && <Separator className={`w-px ${separator}`} />}
+            <Panel id="work" minSize="30%">
+              <Group orientation="horizontal">
+                <Panel id="code" minSize="30%">
+                  <Group orientation="vertical">
+                    <Panel id="editor" minSize="20%">
+                      <EditorPane />
+                    </Panel>
+                    <Separator className={`h-px ${separator}`} />
+                    <Panel
+                      id="terminal"
+                      panelRef={terminalRef}
+                      collapsible
+                      collapsedSize={TERMINAL_HEADER_PX}
+                      minSize={160}
+                      defaultSize={panels.terminal ? '40%' : TERMINAL_HEADER_PX}
+                      onResize={(size) => {
+                        const collapsed = size.inPixels <= TERMINAL_HEADER_PX + 1
+                        if (collapsed === useSettings.getState().panels.terminal) {
+                          setPanel('terminal', !collapsed)
+                        }
+                      }}
+                    >
+                      <TerminalPane />
+                    </Panel>
+                  </Group>
                 </Panel>
-              )}
-            </Group>
-          </Panel>
-          {lessonSide === 'right' && lesson && <Separator className={`w-px ${separator}`} />}
-          {lessonSide === 'right' && lesson}
-          {chat && <Separator className={`w-px ${separator}`} />}
-          {chat && (
-            <Panel id="chat" defaultSize="26%" minSize="20%">
-              <ChatPanel />
+                {browser && <Separator className={`w-px ${separator}`} />}
+                {browser && (
+                  <Panel id="browser" defaultSize="45%" minSize="20%">
+                    <BrowserPane />
+                  </Panel>
+                )}
+              </Group>
             </Panel>
-          )}
-        </Group>
+            {lessonSide === 'right' && lesson && <Separator className={`w-px ${separator}`} />}
+            {lessonSide === 'right' && lesson}
+            {chat && <Separator className={`w-px ${separator}`} />}
+            {chat && (
+              <Panel id="chat" defaultSize="26%" minSize="20%">
+                <ChatPanel />
+              </Panel>
+            )}
+          </Group>
+        )}
       </div>
       <Tour />
     </div>
