@@ -214,9 +214,11 @@ async function loadChapter(labId: string, chapterId: string): Promise<[ChapterDe
 const chats = new Map<string, AbortController>()
 let completion: AbortController | undefined
 let testing: AbortController | undefined
+const tips = new Map<string, AbortController>()
 
 function stopEverything(): void {
   for (const chat of chats.values()) chat.abort()
+  for (const tip of tips.values()) tip.abort()
   completion?.abort()
   testing?.abort()
 }
@@ -349,8 +351,6 @@ async function readTaskFile(
   }
 }
 
-const tipping = new Set<string>()
-
 /**
  * Writes the one tip a task gets once it has failed FAILS_BEFORE_TIP checks, and saves it. Does
  * nothing (and resolves with the progress as it is) when AI is off or the task needs no tip.
@@ -366,9 +366,10 @@ async function tip(labId: string, chapterId: string, taskId: string): Promise<Pr
   const progress = state.chapters[chapterKey(labId, chapterId)]?.tasks[taskId]
   const provider = config.providers.find((p) => p.id === config.provider)
   const due = progress && !progress.passed && !progress.tip
-  if (!config.enabled || !provider || !task || !due || tipping.has(key)) return state
+  if (!config.enabled || !provider || !task || !due || tips.has(key)) return state
   if ((progress.failedChecks ?? 0) < FAILS_BEFORE_TIP) return state
-  tipping.add(key)
+  const cancel = new AbortController()
+  tips.set(key, cancel)
   try {
     let text = ''
     await streamReply(config, {
@@ -380,15 +381,20 @@ async function tip(labId: string, chapterId: string, taskId: string): Promise<Pr
         }
       ],
       quick: false,
-      signal: AbortSignal.timeout(TEST_TIMEOUT_MS[provider.kind]),
+      signal: AbortSignal.any([cancel.signal, AbortSignal.timeout(TEST_TIMEOUT_MS[provider.kind])]),
       onDelta: (delta) => {
         text += delta
       }
     })
+    // Turning AI off mid-way stops the tip, and a stopped tip is never saved.
+    if (cancel.signal.aborted) return state
     const written = cleanTip(text)
     return written ? await saveTip(labId, chapterId, taskId, written) : state
+  } catch (error) {
+    if (cancel.signal.aborted) return state
+    throw error
   } finally {
-    tipping.delete(key)
+    tips.delete(key)
   }
 }
 
