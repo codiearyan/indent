@@ -384,6 +384,8 @@ export interface Api {
     status(): Promise<ToolStatus[]>
     /** Downloads Node into the app's own folder. Other programs do not see it. */
     installNode(): Promise<ToolStatus[]>
+    /** macOS only: opens Apple's installer for its developer tools, which include Git. */
+    installGit(): Promise<void>
     /** Whether the local model runs, and why not. */
     labModel(): Promise<LabModelStatus>
     /** Starts the local model again; resolves with its status a few seconds later at most. */
@@ -421,7 +423,7 @@ export const INVOKE_METHODS = {
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],
-  tools: ['status', 'installNode', 'labModel', 'restartLabModel'],
+  tools: ['status', 'installNode', 'installGit', 'labModel', 'restartLabModel'],
   github: ['star'],
   ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test', 'tip']
 } as const

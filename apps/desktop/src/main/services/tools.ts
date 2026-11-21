@@ -132,10 +132,29 @@ function installNode(): Promise<ToolStatus[]> {
     .finally(() => (installing = undefined)))
 }
 
+/** Opens Apple's installer window; the person finishes it there, then checks again. */
+async function installGit(): Promise<void> {
+  if (process.platform !== 'darwin') throw new Error('Get Git from git-scm.com/downloads.')
+  try {
+    await run('xcode-select', ['--install'], { timeout: 10_000 })
+  } catch (error) {
+    // It also exits non-zero when the tools are already there, which is fine.
+    if (!/already installed/i.test(String((error as { stderr?: string }).stderr))) {
+      throw new Error(
+        "Could not open Apple's installer. Run xcode-select --install in a terminal.",
+        {
+          cause: error
+        }
+      )
+    }
+  }
+}
+
 export function register(): void {
   handle('tools', {
     status,
     installNode,
+    installGit,
     labModel: async () => labModelStatus(),
     restartLabModel
   })
