@@ -14,7 +14,7 @@ export function resolveInside(dir: string, path: string): string {
   return full
 }
 
-/** The app's own folder in each workspace: the starter the learner was given, and backups. */
+/** The app's own folder in each workspace: the starter the learner was given. */
 export const APP_DIR = '.indent'
 
 /** The learner's editor and pages never reach the app's own folder. */

@@ -147,19 +147,16 @@ export async function resetWorkspace(
   return snapshot(dir, first, next)
 }
 
-const backupStamp = (now: Date): string => now.toISOString().replace(/[:.]/g, '-')
-
 /**
  * Settles one conflicted file. `mine` keeps the learner's file and takes the new starter as its
- * base. `new` saves the learner's file under .indent/backup first, then takes the new version.
+ * base. `new` replaces the learner's file with the new version.
  */
 export async function resolveConflict(
   starterDir: string,
   dir: string,
   first: string[],
   path: string,
-  choice: ConflictChoice,
-  now = new Date()
+  choice: ConflictChoice
 ): Promise<WorkspaceSnapshot> {
   if (!isSafePath(dir, path)) throw new Error(`Not a file of this issue: ${path}`)
   const old = await readRemembered(dir)
@@ -171,11 +168,6 @@ export async function resolveConflict(
     throw new Error('This file has no new version to choose.')
   }
   if (choice === 'new') {
-    if (Object.hasOwn(mine, path)) {
-      const backup = join(dir, APP_DIR, 'backup', backupStamp(now), `${path}.bak`)
-      await mkdir(dirname(backup), { recursive: true })
-      await copyFile(resolveInside(dir, path), backup)
-    }
     if (Object.hasOwn(next, path)) await takeFromStarter(starterDir, dir, path)
     else await removeFile(dir, path)
   }

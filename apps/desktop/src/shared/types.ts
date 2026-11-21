@@ -158,7 +158,7 @@ export interface WorkspaceSnapshot {
   remembered: boolean
 }
 
-/** For a conflicted file: keep the learner's version, or take the new one after a backup. */
+/** For a conflicted file: keep the learner's version, or replace it with the new one. */
 export type ConflictChoice = 'mine' | 'new'
 
 // ---------- Checks ----------

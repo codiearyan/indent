@@ -38,8 +38,8 @@ export function ConflictDialog(props: {
         <DialogHeader>
           <DialogTitle>Choose a version</DialogTitle>
           <DialogDescription>
-            This issue was updated, and you changed these files too. Use new version saves a copy of
-            yours in the .indent/backup folder first.
+            This issue was updated, and you changed these files too. Use new version replaces your
+            changes to that file.
           </DialogDescription>
         </DialogHeader>
         <ul className="rounded-lg border border-border">

@@ -63,7 +63,7 @@ export function createContext({ chapter, workspace, sandboxRoot }) {
       sandboxes.push(dir)
       await cp(workspace, dir, {
         recursive: true,
-        // .indent holds the app's copy of the starter and backups, never learner code.
+        // .indent holds the app's copy of the starter, never learner code.
         filter: (src) => {
           const parts = relative(workspace, src).split(/[\\/]/)
           return !parts.includes('node_modules') && parts[0] !== '.indent'

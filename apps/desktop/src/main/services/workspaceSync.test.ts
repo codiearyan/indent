@@ -128,12 +128,11 @@ describe('resolveConflict', () => {
     expect(snap.starter['src/a.ts']).toBe('a 2')
   })
 
-  it('takes the new version after a backup of mine', async () => {
+  it('takes the new version and keeps no copy of mine', async () => {
     const { starterDir, dir } = await conflicted()
-    const now = new Date('2026-11-21T10:00:00.000Z')
-    const snap = await resolveConflict(starterDir, dir, [], 'src/a.ts', 'new', now)
+    const snap = await resolveConflict(starterDir, dir, [], 'src/a.ts', 'new')
     expect(await read(dir, 'src/a.ts')).toBe('a 2')
-    expect(await read(dir, '.indent/backup/2026-11-21T10-00-00-000Z/src/a.ts.bak')).toBe('my a')
+    expect(await readdir(join(dir, '.indent'))).toEqual(['starter.json'])
     expect(snap.conflicts).toEqual(['b.ts'])
     expect(snap.starter['src/a.ts']).toBe('a 2')
   })
