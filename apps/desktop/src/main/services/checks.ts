@@ -15,7 +15,6 @@ import {
   gradeRun,
   nodeSupported,
   parseTrace,
-  tail,
   type RunOutcome
 } from './grader'
 import { labModelProblem, labModelReady, startLabModel } from './labModel'
@@ -24,8 +23,10 @@ import { InstallError } from '../library'
 import {
   downloadTools,
   installedTools,
+  npmFailed,
   recordTools,
   TOOLS_RELEASES,
+  toolsFailed,
   toolsVersion
 } from '../repoTools'
 
@@ -97,30 +98,6 @@ function publish(status: RuntimeStatus): RuntimeStatus {
   return status
 }
 
-const OFFLINE = /ENOTFOUND|EAI_AGAIN|ECONNREFUSED|ECONNRESET|ETIMEDOUT|ENETUNREACH/
-
-const MESSAGES = {
-  offline: 'Getting the repo tools needs an internet connection once. Connect and try again.',
-  noSpace: 'There is not enough free space to get the repo tools. Free some space and try again.',
-  noNpm: 'Indent could not start npm on this computer.',
-  npmFailed: 'npm stopped with an error.',
-  slow: 'Getting the repo tools took too long. Try again.',
-  failed: 'Could not get the repo tools ready. Try again.'
-}
-
-function npmFailure(run: RunOutcome): Pick<RuntimeStatus, 'error' | 'details' | 'retry'> {
-  // The notice above the tasks only shows a failure that has details.
-  const details = tail(run.stderr) || `npm exited with code ${run.exitCode}.`
-  if (run.timedOut) return { error: MESSAGES.slow, details }
-  if (OFFLINE.test(run.stderr)) return { error: MESSAGES.offline, details }
-  if (/ENOSPC/.test(run.stderr)) return { error: MESSAGES.noSpace, details }
-  // Through the Windows shell a missing npm exits 1 with "is not recognized".
-  if (run.exitCode === null || /is not recognized/.test(run.stderr)) {
-    return { error: MESSAGES.noNpm, details, retry: false }
-  }
-  return { error: MESSAGES.npmFailed, details }
-}
-
 /** `<platform>-<arch>` of the Node that runs the repos, which picks the tools to download. */
 async function nodeSystem(env: Record<string, string>): Promise<string | null> {
   const run = await runProcess('node', ['-p', 'process.platform + "-" + process.arch'], {
@@ -145,7 +122,7 @@ async function install(): Promise<RuntimeStatus> {
     await copyFile(runtimeFile('package.json'), join(root, 'package.json'))
     await copyFile(runtimeFile('package-lock.json'), join(root, 'package-lock.json'))
   } catch (error) {
-    return publish({ ...status, error: MESSAGES.failed, details: String(error) })
+    return publish({ ...status, ...toolsFailed('failed', String(error)) })
   }
   const version = await wantedTools()
   const system = await nodeSystem(env)
@@ -158,10 +135,10 @@ async function install(): Promise<RuntimeStatus> {
         shown = done
         publish({ ...status, installing: true, progress: done })
       })
-      return publish(await runtimeStatus())
+      return publish({ ...(await runtimeStatus()), via: 'download' })
     } catch (error) {
       if (error instanceof InstallError && error.reason === 'no-space') {
-        return publish({ ...status, error: MESSAGES.noSpace, details: error.message })
+        return publish({ ...status, ...toolsFailed('no-space', error.message) })
       }
       publish({ ...status, installing: true })
     }
@@ -173,9 +150,9 @@ async function install(): Promise<RuntimeStatus> {
     env,
     timeout: INSTALL_TIMEOUT_MS
   })
-  if (run.exitCode !== 0) return publish({ ...status, ...npmFailure(run) })
+  if (run.exitCode !== 0) return publish({ ...status, ...npmFailed(run) })
   recordTools(root, version)
-  return publish(await runtimeStatus())
+  return publish({ ...(await runtimeStatus()), via: 'npm' })
 }
 
 let installing: Promise<RuntimeStatus> | undefined

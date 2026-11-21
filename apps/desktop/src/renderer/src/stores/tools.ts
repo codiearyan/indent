@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { LabMeta, ToolId, ToolStatus } from '@shared/types'
 import { api } from '@/lib/api'
+import { track } from '@/lib/telemetry'
 import { errorMessage } from '@/lib/utils'
 import { retryRuntime, useRuntime } from '@/stores/runtime'
 
@@ -36,20 +37,31 @@ export async function refreshTools(): Promise<ToolStatus[]> {
   return tools
 }
 
+let cancelled = false
+
 /** Installs a tool for the learner, or opens its download page when nothing here can. */
 export async function installTool(id: ToolId): Promise<void> {
+  cancelled = false
   setInstall(id, { state: 'running', done: id === 'node' ? 0 : null })
   try {
     const result = await api.tools.install(id)
     useTools.setState({ tools: result.tools })
     if (result.url) window.open(result.url, '_blank')
     setInstall(id, result.waiting ? { state: 'waiting' } : undefined)
+    track('tool_install', {
+      tool: id,
+      result: result.url ? 'page' : result.waiting ? 'waiting' : 'done'
+    })
   } catch (error) {
     setInstall(id, { state: 'failed', message: errorMessage(error) })
+    track('tool_install', { tool: id, result: cancelled ? 'cancelled' : 'failed' })
   }
 }
 
-export const cancelInstall = (): void => void api.tools.cancelInstall()
+export function cancelInstall(): void {
+  cancelled = true
+  void api.tools.cancelInstall()
+}
 
 /** The tools a repo needs that are missing; Node alone for a repo that names none. */
 export function missingTools(

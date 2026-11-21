@@ -3,6 +3,8 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { mkdir, rm } from 'fs/promises'
 import { join } from 'path'
 import { REPO_URL } from '@shared/repo'
+import type { RuntimeFailure, RuntimeStatus } from '@shared/types'
+import { tail, type RunOutcome } from './services/grader'
 import { asInstallError, download, InstallError, replaceFolder, unpack } from './library'
 
 // The repo tools: runtime/node_modules, built once per system by .github/workflows/tools.yml and
@@ -85,4 +87,35 @@ export async function downloadTools(
   } finally {
     await rm(work, { recursive: true, force: true })
   }
+}
+
+const MESSAGES: Record<RuntimeFailure, string> = {
+  offline: 'Getting the repo tools needs an internet connection once. Connect and try again.',
+  'no-space':
+    'There is not enough free space to get the repo tools. Free some space and try again.',
+  'no-npm': 'Indent could not start npm on this computer.',
+  'npm-failed': 'npm stopped with an error.',
+  slow: 'Getting the repo tools took too long. Try again.',
+  failed: 'Could not get the repo tools ready. Try again.'
+}
+
+type Failed = Pick<RuntimeStatus, 'failure' | 'error' | 'details' | 'retry'>
+
+/** The status fields of a failed install. The notice above the tasks only shows one with details. */
+export function toolsFailed(failure: RuntimeFailure, details: string): Failed {
+  return { failure, error: MESSAGES[failure], details, retry: failure !== 'no-npm' }
+}
+
+const OFFLINE = /ENOTFOUND|EAI_AGAIN|ECONNREFUSED|ECONNRESET|ETIMEDOUT|ENETUNREACH/
+
+export function npmFailed(run: RunOutcome): Failed {
+  const details = tail(run.stderr) || `npm exited with code ${run.exitCode}.`
+  if (run.timedOut) return toolsFailed('slow', details)
+  if (OFFLINE.test(run.stderr)) return toolsFailed('offline', details)
+  if (/ENOSPC/.test(run.stderr)) return toolsFailed('no-space', details)
+  // Through the Windows shell a missing npm exits 1 with "is not recognized".
+  if (run.exitCode === null || /is not recognized/.test(run.stderr)) {
+    return toolsFailed('no-npm', details)
+  }
+  return toolsFailed('npm-failed', details)
 }

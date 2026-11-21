@@ -287,6 +287,9 @@ export interface CheckResult {
   error?: string
 }
 
+/** Why the repo tools could not be installed, also sent with usage stats. */
+export type RuntimeFailure = 'offline' | 'no-space' | 'no-npm' | 'npm-failed' | 'slow' | 'failed'
+
 export interface RuntimeStatus {
   /** Node version found on the machine, or null. */
   node: string | null
@@ -301,6 +304,9 @@ export interface RuntimeStatus {
   details?: string
   /** False when trying again cannot help. */
   retry?: boolean
+  /** Set by the install that just ended: how it failed, or how the tools came when ready. */
+  failure?: RuntimeFailure
+  via?: 'download' | 'npm'
 }
 
 /** Something the repos need on this computer, such as Node. */
@@ -496,6 +502,9 @@ export type TelemetryEvent =
   | 'issue_completed'
   | 'tutor_asked'
   | 'suggestion_requested'
+  | 'tool_missing'
+  | 'tool_install'
+  | 'repo_tools_install'
 
 /** Ids, counts and choices only: never code, file names, messages or keys. */
 export type TelemetryProps = Record<string, string | number>
