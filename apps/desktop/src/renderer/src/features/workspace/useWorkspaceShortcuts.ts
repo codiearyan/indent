@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { chapterKey } from '@shared/rules'
 import { useAiEnabled } from '@/features/ai/aiStore'
-import { monaco } from '@/features/editor/monaco'
+import { focusEditorSoon, focusedEditor } from '@/features/editor/editors'
+import { useQuickOpen } from '@/features/editor/quickOpenStore'
 import { useShortcuts } from '@/lib/useShortcuts'
 import { errorMessage } from '@/lib/utils'
 import { useProgress } from '@/stores/progress'
@@ -83,7 +84,16 @@ export function useWorkspaceShortcuts(): void {
       const { activePath, closeFile } = useWorkspace.getState()
       if (activePath) closeFile(activePath)
     },
-    focusEditor: () => monaco.editor.getEditors()[0]?.focus(),
+    quickOpen: ready && (() => useQuickOpen.getState().setOpen(true)),
+    openToSide:
+      ready &&
+      (() => {
+        const { activePath, openToSide } = useWorkspace.getState()
+        if (!activePath) return
+        openToSide(activePath)
+        focusEditorSoon()
+      }),
+    focusEditor: () => focusedEditor()?.focus(),
     focusLesson: () => {
       showLesson()
       focusSoon('#lesson-panel [role="tab"][aria-selected="true"]')

@@ -39,6 +39,8 @@ export const SHORTCUTS = {
   nextHint: { label: 'Show the next hint', keys: 'Mod+Shift+H', scope: 'workspace' },
   readAloud: { label: 'Read aloud: play or pause', keys: 'Mod+Shift+P', scope: 'workspace' },
   closeFile: { label: 'Close file', keys: 'Mod+W', scope: 'workspace' },
+  quickOpen: { label: 'Open a file by name', keys: 'Mod+P', scope: 'workspace' },
+  openToSide: { label: 'Open to the side', keys: 'Mod+\\', scope: 'workspace' },
   save: { label: 'Save', keys: 'Mod+S', scope: 'editor' },
   suggest: { label: 'Ask for a suggestion', keys: 'Alt+\\', scope: 'editor' },
   explainCode: { label: 'Explain this code', keys: 'Mod+Shift+E', scope: 'editor' },

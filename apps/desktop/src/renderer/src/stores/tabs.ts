@@ -1,13 +1,13 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { OpenTabs } from '@/features/editor/tabs'
+import type { StoredTabs } from '@/features/editor/layout'
 
 interface TabsState {
-  /** Open tabs by `labId/chapterId`. */
-  byChapter: Record<string, OpenTabs>
+  /** Open tabs and the split by `labId/chapterId`. */
+  byChapter: Record<string, StoredTabs>
   /** Expanded folders of the files panel by `labId/chapterId`. */
   expandedByChapter: Record<string, string[]>
-  remember(key: string, tabs: OpenTabs): void
+  remember(key: string, tabs: StoredTabs): void
   rememberExpanded(key: string, folders: string[]): void
 }
 

@@ -16,8 +16,21 @@ import { useCatalog } from './catalog'
 import { useProgress } from './progress'
 import { useSettings } from './settings'
 import { useOpenTabs } from './tabs'
-import { closeTab, initialTabs, openTab, pruneTabs, type OpenTabs } from '@/features/editor/tabs'
 import { movedPath } from '@/features/editor/fileTree'
+import {
+  activeOf,
+  clampSplit,
+  closeInGroup,
+  focusGroup,
+  initialLayout,
+  NO_LAYOUT,
+  openInGroup,
+  openToSide,
+  pruneLayout,
+  renameInLayout,
+  storedTabs,
+  type EditorLayout
+} from '@/features/editor/layout'
 
 const SAVE_DELAY_MS = 400
 
@@ -43,8 +56,9 @@ interface WorkspaceStore {
   conflicts: string[]
   /** Reset keeps the files the learner added; false for a workspace from before that. */
   remembered: boolean
-  /** Files open as tabs, in the order they were opened. */
-  openPaths: string[]
+  /** The editor groups and their tabs. */
+  layout: EditorLayout
+  /** The active file of the focused group. */
   activePath: string | null
   /** Counts writes to disk, so the Browser panel knows when to reload. */
   revision: number
@@ -55,10 +69,15 @@ interface WorkspaceStore {
   tourOpen: boolean
 
   open(labId: string, chapterId: string): Promise<void>
-  /** Opens a file as a tab, or switches to its tab, and makes it the active file. */
-  openFile(path: string): void
-  /** Closes a file's tab. The file stays on disk. */
-  closeFile(path: string): void
+  /** Opens a file as a tab of a group, the focused one by default, and makes it active. */
+  openFile(path: string, group?: number): void
+  /** Opens a file in the other group, adding a second group when there is one only. */
+  openToSide(path: string, from?: number): void
+  /** Closes a file's tab in a group, the focused one by default. The file stays on disk. */
+  closeFile(path: string, group?: number): void
+  focusGroup(group: number): void
+  /** Sets the width of the first group, in percent. */
+  setSplit(split: number): void
   /** Updates the buffer and saves to disk after a short pause. */
   edit(path: string, content: string): void
   /** Writes pending edits now. */
@@ -102,11 +121,11 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       .then(() => set((s) => ({ revision: s.revision + 1 })))
   }
 
-  const setTabs = ({ paths, active }: OpenTabs): void => {
-    set({ openPaths: paths, activePath: active })
+  const setLayout = (layout: EditorLayout): void => {
+    set({ layout, activePath: activeOf(layout) })
     const chapter = get().chapter
     if (chapter) {
-      useOpenTabs.getState().remember(chapterKey(chapter.labId, chapter.id), { paths, active })
+      useOpenTabs.getState().remember(chapterKey(chapter.labId, chapter.id), storedTabs(layout))
     }
   }
 
@@ -115,18 +134,18 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     { files, folders, dir, starter, conflicts, updated, remembered }: WorkspaceSnapshot,
     opening = false
   ): void => {
-    const { openPaths, activePath, chapter } = get()
+    const { layout, chapter } = get()
     const existing = files.map((f) => f.path)
     const saved = chapter && useOpenTabs.getState().byChapter[chapterKey(chapter.labId, chapter.id)]
-    const tabs = opening
-      ? initialTabs(saved ?? undefined, chapter?.files ?? [], existing)
-      : pruneTabs({ paths: openPaths, active: activePath }, existing)
+    const next = opening
+      ? initialLayout(saved ?? undefined, chapter?.files ?? [], existing)
+      : pruneLayout(layout, existing)
     if (updated.length > 0) {
       set((s) => ({ revision: s.revision + 1 }))
       if (conflicts.length === 0) toast('This issue was updated. Your changes are kept.')
     }
     set({ files, folders, dir, starter, conflicts, remembered })
-    setTabs(tabs)
+    setLayout(next)
   }
 
   /** Pending edits are written first, or the snapshot would replace them with what is on disk. */
@@ -146,7 +165,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     starter: {},
     conflicts: [],
     remembered: true,
-    openPaths: [],
+    layout: NO_LAYOUT,
     activePath: null,
     revision: 0,
     checking: null,
@@ -163,7 +182,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         folders: [],
         starter: {},
         conflicts: [],
-        openPaths: [],
+        layout: NO_LAYOUT,
         activePath: null
       })
       const catalog = useCatalog.getState()
@@ -189,13 +208,20 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       }
     },
 
-    openFile: (path) =>
-      setTabs(openTab({ paths: get().openPaths, active: get().activePath }, path)),
+    openFile: (path, group) => setLayout(openInGroup(get().layout, path, group)),
 
-    closeFile: (path) => {
+    openToSide: (path, from) => setLayout(openToSide(get().layout, path, from)),
+
+    closeFile: (path, group) => {
       if (pendingSaves.has(path)) void save(path)
-      setTabs(closeTab({ paths: get().openPaths, active: get().activePath }, path))
+      setLayout(closeInGroup(get().layout, path, group))
     },
+
+    focusGroup: (group) => {
+      if (group !== get().layout.focused) setLayout(focusGroup(get().layout, group))
+    },
+
+    setSplit: (split) => setLayout({ ...get().layout, split: clampSplit(split) }),
 
     edit: (path, content) => {
       set((s) => ({ files: s.files.map((f) => (f.path === path ? { ...f, content } : f)) }))
@@ -234,11 +260,8 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     renamePath: async (from, to) => {
       await change(async () => {
         const snapshot = await api.workspace.rename(...ids(), from, to)
-        const { openPaths, activePath } = get()
-        set({
-          openPaths: openPaths.map((p) => movedPath(p, from, to)),
-          activePath: activePath && movedPath(activePath, from, to)
-        })
+        const layout = renameInLayout(get().layout, from, to)
+        set({ layout, activePath: activeOf(layout) })
         return snapshot
       })
       const key = chapterKey(...ids())

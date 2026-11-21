@@ -6,7 +6,9 @@ import { useWorkspace } from '@/stores/workspace'
 import { bindSuggestShortcut } from '@/features/ai/inlineSuggestions'
 import { bindTutorActions } from '@/features/ai/tutorActions'
 import { TOUR } from '@/features/tour/anchors'
-import { languageFor, monaco, pathOf, themeName, uriFor } from './monaco'
+import { registerEditor } from './editors'
+import { monaco, themeName, uriFor } from './monaco'
+import { useQuickOpen } from './quickOpenStore'
 import { bindShortcuts } from './shortcutBindings'
 
 const fontOptions = (t: Typography, scale: number): monaco.editor.IEditorOptions => ({
@@ -17,18 +19,18 @@ const fontOptions = (t: Typography, scale: number): monaco.editor.IEditorOptions
 })
 
 interface Props {
-  editorRef: React.RefObject<monaco.editor.IStandaloneCodeEditor | null>
-  onEdit(): void
+  /** The editor group this editor shows. */
+  group: number
   onCheck(): void
   onRun(): void
 }
 
-export function CodeEditor({ editorRef, onEdit, onCheck, onRun }: Props): React.JSX.Element {
+export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element {
   const hostRef = useRef<HTMLDivElement>(null)
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const viewStates = useRef(new Map<string, monaco.editor.ICodeEditorViewState | null>())
-  const applyingExternal = useRef(false)
   const files = useWorkspace((s) => s.files)
-  const activePath = useWorkspace((s) => s.activePath)
+  const activePath = useWorkspace((s) => s.layout.groups[group]?.active ?? null)
   const theme = useSettings((s) => s.theme)
   const codeTheme = useSettings((s) => s.codeTheme)
   const options = useSettings((s) => s.editor)
@@ -54,6 +56,8 @@ export function CodeEditor({ editorRef, onEdit, onCheck, onRun }: Props): React.
       renderLineHighlight: 'line'
     })
     editorRef.current = editor
+    const unregister = registerEditor(group, editor)
+    editor.onDidFocusEditorWidget(() => useWorkspace.getState().focusGroup(group))
     bindShortcuts(editor, () => [
       editor.addAction({
         id: 'indent.save',
@@ -82,58 +86,36 @@ export function CodeEditor({ editorRef, onEdit, onCheck, onRun }: Props): React.
         label: SHORTCUTS.closeFile.label,
         keybindings: [monacoShortcut('closeFile', monaco)],
         run: () => {
-          const { activePath, closeFile } = useWorkspace.getState()
-          if (activePath) closeFile(activePath)
+          const { layout, closeFile } = useWorkspace.getState()
+          const path = layout.groups[group]?.active
+          if (path) closeFile(path, group)
         }
+      }),
+      editor.addAction({
+        id: 'indent.openToSide',
+        label: SHORTCUTS.openToSide.label,
+        keybindings: [monacoShortcut('openToSide', monaco)],
+        run: () => {
+          const { layout, openToSide } = useWorkspace.getState()
+          const path = layout.groups[group]?.active
+          if (path) openToSide(path, group)
+        }
+      }),
+      editor.addAction({
+        id: 'indent.quickOpen',
+        label: SHORTCUTS.quickOpen.label,
+        keybindings: [monacoShortcut('quickOpen', monaco)],
+        run: () => useQuickOpen.getState().setOpen(true)
       })
     ])
     bindSuggestShortcut(monaco, editor)
     bindTutorActions(monaco, editor)
     return () => {
+      unregister()
       editor.dispose()
       editorRef.current = null
     }
-  }, [editorRef, onCheck, onRun])
-
-  useEffect(() => {
-    const editor = editorRef.current
-    if (!editor) return
-    const listener = editor.onDidChangeModelContent(() => {
-      const model = editor.getModel()
-      if (applyingExternal.current || !model) return
-      useWorkspace.getState().edit(pathOf(model.uri), model.getValue())
-      onEdit()
-    })
-    return () => listener.dispose()
-  }, [editorRef, onEdit])
-
-  useEffect(() => {
-    const wanted = new Set<string>()
-    for (const file of files) {
-      const uri = uriFor(file.path)
-      wanted.add(uri.toString())
-      const model = monaco.editor.getModel(uri)
-      if (!model) {
-        monaco.editor.createModel(file.content, languageFor(file.path), uri)
-      } else if (model.getValue() !== file.content) {
-        // Changed on disk (terminal, reset): replace as one undoable edit and do not echo it back.
-        applyingExternal.current = true
-        model.pushEditOperations(
-          [],
-          [{ range: model.getFullModelRange(), text: file.content }],
-          () => null
-        )
-        applyingExternal.current = false
-      }
-    }
-    for (const model of monaco.editor.getModels()) {
-      const key = model.uri.toString()
-      if (model.uri.scheme === 'file' && !wanted.has(key)) {
-        viewStates.current.delete(key)
-        model.dispose()
-      }
-    }
-  }, [files])
+  }, [group, onCheck, onRun])
 
   useEffect(() => {
     const editor = editorRef.current
@@ -141,11 +123,13 @@ export function CodeEditor({ editorRef, onEdit, onCheck, onRun }: Props): React.
     const next = activePath ? monaco.editor.getModel(uriFor(activePath)) : null
     const current = editor.getModel()
     if (current === next) return
-    if (current) viewStates.current.set(current.uri.toString(), editor.saveViewState())
+    if (current && !current.isDisposed()) {
+      viewStates.current.set(current.uri.toString(), editor.saveViewState())
+    }
     editor.setModel(next)
     const saved = next && viewStates.current.get(next.uri.toString())
     if (saved) editor.restoreViewState(saved)
-  }, [activePath, files, editorRef])
+  }, [activePath, files])
 
   useEffect(() => {
     monaco.editor.setTheme(themeName(codeTheme, theme))
@@ -157,13 +141,19 @@ export function CodeEditor({ editorRef, onEdit, onCheck, onRun }: Props): React.
       lineNumbers: options.lineNumbers ? 'on' : 'off',
       minimap: { enabled: options.minimap }
     })
-  }, [options, editorRef])
+  }, [options])
 
   useEffect(() => {
     editorRef.current?.updateOptions(fontOptions(typography, editorScale))
     // Monaco caches glyph widths per font; a new font needs them measured again.
     monaco.editor.remeasureFonts()
-  }, [typography, editorScale, editorRef])
+  }, [typography, editorScale])
 
-  return <div ref={hostRef} data-tour={TOUR.editor} className="h-full min-w-0 flex-1" />
+  return (
+    <div
+      ref={hostRef}
+      data-tour={group === 0 ? TOUR.editor : undefined}
+      className="h-full min-w-0 flex-1"
+    />
+  )
 }

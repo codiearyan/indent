@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
+import { Group, Panel, Separator } from 'react-resizable-panels'
 import {
   Loader2Icon,
   Maximize2Icon,
@@ -6,8 +7,7 @@ import {
   PanelLeftCloseIcon,
   PanelLeftIcon,
   PlayIcon,
-  WandSparklesIcon,
-  XIcon
+  WandSparklesIcon
 } from 'lucide-react'
 import { isChapterComplete } from '@shared/rules'
 import { ShortcutKeys } from '@/components/app/ShortcutKeys'
@@ -15,29 +15,25 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { ShortcutId } from '@/lib/shortcuts'
-import { cn } from '@/lib/utils'
 import { useChapterProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
 import { checkAll, runCommand } from '@/features/workspace/useWorkspaceShortcuts'
 import { useRuntime } from '@/stores/runtime'
-import { CodeEditor } from './CodeEditor'
 import { ConflictDialog } from './ConflictDialog'
-import { FileLabel } from './FileTab'
+import { EditorGroup } from './EditorGroup'
+import { focusedEditor } from './editors'
 import { FilesPanel } from './FilesPanel'
-import { fileChange, missingFiles } from './fileChange'
-import type { monaco } from './monaco'
+import { missingFiles } from './fileChange'
+import { useModels } from './models'
+import { QuickOpen } from './QuickOpen'
 
 export function EditorPane(): React.JSX.Element {
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const status = useWorkspace((s) => s.status)
   const files = useWorkspace((s) => s.files)
-  const starter = useWorkspace((s) => s.starter)
-  const openPaths = useWorkspace((s) => s.openPaths)
-  const activePath = useWorkspace((s) => s.activePath)
-  const openFile = useWorkspace((s) => s.openFile)
-  const closeFile = useWorkspace((s) => s.closeFile)
+  const split = useWorkspace((s) => s.layout.groups.length > 1)
+  const splitAt = useWorkspace((s) => s.layout.split)
   const checking = useWorkspace((s) => s.checking)
   const toolsInstalling = useRuntime((s) => !!s.status?.installing)
   const conflicts = useWorkspace((s) => s.conflicts)
@@ -65,6 +61,7 @@ export function EditorPane(): React.JSX.Element {
     setShowSummary(false)
   }
   const hideSummary = useCallback(() => setShowSummary(false), [])
+  useModels(files, hideSummary)
   const outdated = status === 'ready' && missingFiles(chapter?.files ?? [], files).length > 0
   const command = chapter?.terminal.suggestedCommand
 
@@ -111,7 +108,7 @@ export function EditorPane(): React.JSX.Element {
         </IconButton>
         <IconButton
           label="Format file"
-          onClick={() => void editorRef.current?.getAction('editor.action.formatDocument')?.run()}
+          onClick={() => void focusedEditor()?.getAction('editor.action.formatDocument')?.run()}
         >
           <WandSparklesIcon />
         </IconButton>
@@ -155,78 +152,32 @@ export function EditorPane(): React.JSX.Element {
         </Tooltip>
       </div>
 
-      <div
-        role="tablist"
-        data-tour={TOUR.editorTabs}
-        className="flex h-9 shrink-0 overflow-x-auto border-t border-border [scrollbar-width:none]"
-      >
-        {openPaths.map((path) => {
-          const file = files.find((f) => f.path === path)
-          if (!file) return null
-          const active = path === activePath
-          const name = path.slice(path.lastIndexOf('/') + 1)
-          return (
-            <div
-              key={path}
-              onMouseDown={(event) => event.button === 1 && event.preventDefault()}
-              onAuxClick={(event) => event.button === 1 && closeFile(path)}
-              className={cn(
-                'group flex shrink-0 items-center border-r border-b border-r-rule border-b-border text-muted-foreground hover:bg-accent/40 has-focus-visible:bg-accent/60',
-                active && 'border-b-transparent bg-editor hover:bg-editor'
-              )}
-            >
-              <button
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => openFile(path)}
-                className="flex h-full items-center gap-2 pr-1 pl-3 font-mono text-[13px] outline-none"
-              >
-                <FileLabel path={path} change={fileChange(starter, file)} active={active} />
-              </button>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label={`Close ${name}`}
-                    onClick={() => closeFile(path)}
-                    className={cn(
-                      'mr-1.5 flex size-5 items-center justify-center rounded-sm text-muted-foreground opacity-0 outline-none group-hover:opacity-100 hover:bg-accent hover:text-foreground focus-visible:bg-accent focus-visible:opacity-100',
-                      active && 'opacity-100'
-                    )}
-                  >
-                    <XIcon className="size-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Close file (<ShortcutKeys id="closeFile" />)
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          )
-        })}
-        <div className="min-w-4 flex-1 border-b border-border" />
-      </div>
-
-      <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 flex-1 border-t border-border">
         {panels.files && status === 'ready' && (
           <div className="flex w-[200px] shrink-0 flex-col border-r border-border">
             <FilesPanel />
           </div>
         )}
         {status === 'ready' ? (
-          <div className="relative flex min-w-0 flex-1">
-            <CodeEditor
-              editorRef={editorRef}
-              onEdit={hideSummary}
-              onCheck={checkAll}
-              onRun={runCommand}
-            />
-            {!activePath && (
-              <p className="absolute inset-0 flex items-center justify-center bg-editor text-sm text-muted-foreground">
-                Open a file from the files panel.
-              </p>
-            )}
+          <div className="min-w-0 flex-1">
+            <Group
+              orientation="horizontal"
+              onLayoutChanged={(layout) => {
+                if (layout.right !== undefined) useWorkspace.getState().setSplit(layout.left)
+              }}
+            >
+              <Panel id="left" minSize="20%">
+                <EditorGroup group={0} onCheck={checkAll} onRun={runCommand} />
+              </Panel>
+              {split && (
+                <Separator className="w-px bg-border transition-colors hover:bg-foreground/30 focus-visible:bg-foreground/40 data-[separator=active]:bg-foreground/40" />
+              )}
+              {split && (
+                <Panel id="right" minSize="20%" defaultSize={`${100 - splitAt}%`}>
+                  <EditorGroup group={1} onCheck={checkAll} onRun={runCommand} />
+                </Panel>
+              )}
+            </Group>
           </div>
         ) : (
           <div className="flex-1 space-y-3 p-6">
@@ -237,6 +188,7 @@ export function EditorPane(): React.JSX.Element {
         )}
       </div>
       <ConflictDialog open={conflictsOpen} onOpenChange={setConflictsOpen} />
+      <QuickOpen />
     </div>
   )
 }

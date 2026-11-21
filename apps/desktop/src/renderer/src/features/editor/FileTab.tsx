@@ -51,22 +51,28 @@ export function FileLabel({
           {path.slice(slash + 1)}
         </span>
       </span>
-      {change && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span
-              aria-label={CHANGES[change].label}
-              className={cn(
-                'ml-auto w-3 shrink-0 text-center font-mono text-xs font-medium',
-                CHANGES[change].tone
-              )}
-            >
-              {CHANGES[change].letter}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>{CHANGES[change].label}</TooltipContent>
-        </Tooltip>
-      )}
+      <ChangeLetter change={change} />
     </>
+  )
+}
+
+/** The `M` or `U` letter of a file that changed from the starter. */
+export function ChangeLetter({ change }: { change: FileChange }): React.JSX.Element | null {
+  if (!change) return null
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span
+          aria-label={CHANGES[change].label}
+          className={cn(
+            'ml-auto w-3 shrink-0 text-center font-mono text-xs font-medium',
+            CHANGES[change].tone
+          )}
+        >
+          {CHANGES[change].letter}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>{CHANGES[change].label}</TooltipContent>
+    </Tooltip>
   )
 }
