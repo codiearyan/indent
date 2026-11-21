@@ -72,7 +72,9 @@ async function check(): Promise<UpdateStatus> {
 
 /** Downloads the release file for this computer and checks it against the release's checksum. */
 async function download(): Promise<UpdateStatus> {
-  if (!release || status.state === 'downloading') return status
+  if (status.state === 'downloading') return status
+  // A newer release without this computer's file, or none read yet: look again first.
+  if (!release) return check()
   const { version, notes, asset } = release
   abort = new AbortController()
   const { signal } = abort
@@ -120,12 +122,23 @@ async function download(): Promise<UpdateStatus> {
   }
 }
 
-/** Puts the downloaded update in place: the silent installer on Windows, the new AppImage on Linux. */
-function putInPlace(reopen: boolean): void {
+/**
+ * Puts the downloaded update in place: the silent installer on Windows, the new AppImage on Linux.
+ * Resolves once the installer has started, so a file that can't run is reported, not quit on.
+ */
+async function putInPlace(reopen: boolean): Promise<void> {
   if (!file) return
   if (process.platform === 'win32') {
     const args = ['/S', '--updated', ...(reopen ? ['--force-run'] : [])]
-    spawn(file, args, { detached: true, stdio: 'ignore' }).unref()
+    const installer = file
+    await new Promise<void>((resolve, reject) => {
+      const child = spawn(installer, args, { detached: true, stdio: 'ignore' })
+      child.once('error', reject)
+      child.once('spawn', () => {
+        child.unref()
+        resolve()
+      })
+    })
   } else if (process.platform === 'linux' && process.env.APPIMAGE) {
     const next = `${process.env.APPIMAGE}.new`
     copyFileSync(file, next)
@@ -142,9 +155,9 @@ async function install(): Promise<UpdateStatus> {
     return failure ? set({ state: 'failed', version: status.version, message: OFFLINE }) : status
   }
   try {
+    await putInPlace(true)
     // Shells running in the work folder would hold it open while the app is replaced.
     killAll()
-    putInPlace(true)
   } catch (error) {
     console.error('Could not put the update in place', error)
     return set({
@@ -164,11 +177,9 @@ async function install(): Promise<UpdateStatus> {
 export function register(): void {
   app.on('will-quit', () => {
     if (!installOnQuit || status.state !== 'ready' || process.platform === 'darwin') return
-    try {
-      putInPlace(false)
-    } catch (error) {
+    putInPlace(false).catch((error) =>
       console.error('Could not put the update in place on quit', error)
-    }
+    )
   })
   handle('updates', {
     status: async () => status,
