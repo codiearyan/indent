@@ -31,6 +31,24 @@ describe('moveContents', () => {
     expect(existsSync(from)).toBe(false)
   })
 
+  it('puts everything back when one entry cannot move', async () => {
+    const base = await tempDir()
+    const from = join(base, 'old')
+    const to = join(base, 'new')
+    await mkdir(join(from, 'a-lab', 'issue'), { recursive: true })
+    await writeFile(join(from, 'a-lab', 'issue', 'index.js'), 'mine')
+    await mkdir(join(from, 'b-lab', 'issue'), { recursive: true })
+    // A folder with content already at the target makes the second rename fail.
+    await mkdir(join(to, 'b-lab', 'taken'), { recursive: true })
+
+    await expect(moveContents(from, to)).rejects.toThrow()
+
+    expect(await readFile(join(from, 'a-lab', 'issue', 'index.js'), 'utf8')).toBe('mine')
+    expect(existsSync(join(from, 'b-lab', 'issue'))).toBe(true)
+    expect(existsSync(join(to, 'a-lab'))).toBe(false)
+    expect(existsSync(join(to, 'b-lab', 'taken'))).toBe(true)
+  })
+
   it('creates the new folder when there is nothing to move', async () => {
     const base = await tempDir()
     await moveContents(join(base, 'missing'), join(base, 'new'))
