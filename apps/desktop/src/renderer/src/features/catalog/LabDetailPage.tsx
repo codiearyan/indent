@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import type { ChapterSummary, LabSummary, ProgressState } from '@shared/types'
 import { BuildStrip } from '@/components/app/BuildStrip'
+import { Cover } from '@/components/app/Cover'
 import { Button } from '@/components/ui/button'
 import { getNewVersion } from '@/stores/updates'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -37,7 +38,14 @@ export function LabDetailPage(): React.JSX.Element {
     return (
       <div className="space-y-6">
         <Skeleton className="h-4 w-16" />
-        <Skeleton className="h-7 w-1/2" />
+        <div className="flex flex-wrap items-start gap-6">
+          <Skeleton className="aspect-[16/9] w-80 max-w-full rounded-lg" />
+          <div className="min-w-96 flex-1 space-y-3">
+            <Skeleton className="h-7 w-1/2" />
+            <Skeleton className="h-4 w-full max-w-3xl" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+        </div>
         <Skeleton className="h-20 w-full rounded-lg" />
         <Skeleton className="h-64 w-full rounded-lg" />
       </div>
@@ -61,9 +69,13 @@ export function LabDetailPage(): React.JSX.Element {
     <div className="space-y-6">
       <BackLink />
 
-      <header className="flex items-start gap-6">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-[22px] leading-7 font-semibold">{lab.title}</h1>
+      <header className="flex flex-wrap items-start gap-6">
+        <Cover
+          lab={lab}
+          className="w-80 max-w-full shrink-0 overflow-hidden rounded-lg border border-border"
+        />
+        <div className="min-w-96 flex-1">
+          <h1 className="text-[22px] leading-7 font-semibold text-balance">{lab.title}</h1>
           <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{lab.description}</p>
           <p className="mt-2 text-[13px] text-muted-foreground">
             {[lab.category, ...lab.tags].join(', ')}
@@ -76,19 +88,21 @@ export function LabDetailPage(): React.JSX.Element {
                 : 'This repo needs a newer version of Indent.'}
             </p>
           )}
+          <div className="mt-4 empty:hidden">
+            {lab.availability === 'app-update' ? (
+              <Button onClick={getNewVersion}>Get the new version</Button>
+            ) : (
+              summary.nextChapterId && (
+                <Button asChild>
+                  <Link to={`/learn/${lab.id}/${summary.nextChapterId}`}>
+                    {ACTION[summary.status]}
+                    <ArrowRight />
+                  </Link>
+                </Button>
+              )
+            )}
+          </div>
         </div>
-        {lab.availability === 'app-update' ? (
-          <Button onClick={getNewVersion}>Get the new version</Button>
-        ) : (
-          summary.nextChapterId && (
-            <Button asChild>
-              <Link to={`/learn/${lab.id}/${summary.nextChapterId}`}>
-                {ACTION[summary.status]}
-                <ArrowRight />
-              </Link>
-            </Button>
-          )
-        )}
       </header>
 
       <Figures
