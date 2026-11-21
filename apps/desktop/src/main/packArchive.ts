@@ -45,16 +45,20 @@ function tarHeader(name: string, size: number): Buffer {
   return header
 }
 
-/**
- * A repo as a tar.gz with fixed modes and times, so the same files always give the same bytes:
- * an app holding an older index still gets the archive whose checksum it expects.
- */
-export function packArchive(dir: string): Buffer {
+/** Files as a tar.gz with fixed modes and times. */
+export function tarGz(entries: { name: string; data: Buffer }[]): Buffer {
   const parts: Buffer[] = []
-  for (const file of packFiles(dir)) {
-    const data = readFileSync(join(dir, file))
-    parts.push(tarHeader(file, data.length), data, Buffer.alloc((512 - (data.length % 512)) % 512))
+  for (const { name, data } of entries) {
+    parts.push(tarHeader(name, data.length), data, Buffer.alloc((512 - (data.length % 512)) % 512))
   }
   parts.push(Buffer.alloc(1024))
   return gzipSync(Buffer.concat(parts), { level: 9 })
+}
+
+/**
+ * A repo as a tar.gz, so the same files always give the same bytes: an app holding an older
+ * index still gets the archive whose checksum it expects.
+ */
+export function packArchive(dir: string): Buffer {
+  return tarGz(packFiles(dir).map((name) => ({ name, data: readFileSync(join(dir, name)) })))
 }

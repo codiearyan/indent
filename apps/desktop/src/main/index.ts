@@ -13,6 +13,8 @@ import * as preview from './services/preview'
 import * as tools from './services/tools'
 import * as github from './services/github'
 import * as telemetry from './services/telemetry'
+import { seedContent } from './library'
+import { bundledContentDir, contentDir, usesLibrary } from './paths'
 
 // Both have to happen before the app is ready, in this order: Electron keeps only the last
 // list of privileged schemes, and the preview scheme must be in it.
@@ -85,6 +87,11 @@ function adoptEarlierData(): void {
 
 app.whenReady().then(() => {
   adoptEarlierData()
+  try {
+    if (usesLibrary()) seedContent(bundledContentDir(), contentDir(), app.getVersion())
+  } catch (error) {
+    console.error('Could not copy the shipped repos into the data folder:', error)
+  }
   if (is.dev) app.dock?.setIcon(icon)
   electronApp.setAppUserModelId('com.indent.app')
 

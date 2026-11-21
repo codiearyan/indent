@@ -28,6 +28,8 @@ for (const [namespace, methods] of Object.entries(SEND_METHODS)) {
 api.terminal.onData = subscribe(EVENTS.terminalData)
 api.terminal.onExit = subscribe(EVENTS.terminalExit)
 api.ai.onChatEvent = subscribe(EVENTS.aiChat)
+api.content.onInstallProgress = subscribe(EVENTS.contentInstall)
+api.content.onChanged = subscribe(EVENTS.contentChanged)
 
 contextBridge.exposeInMainWorld('platform', process.platform)
 contextBridge.exposeInMainWorld('api', api)

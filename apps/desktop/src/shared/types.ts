@@ -21,6 +21,8 @@ export interface LabMeta {
   tags: string[]
   /** Optional so a pack without one still loads; it then matches no level filter. */
   level?: Level
+  /** What this repo needs from the app, compared with PACK_FORMAT; 1 when missing. */
+  format?: number
   parts: { title: string; chapters: string[] }[]
 }
 
@@ -35,7 +37,33 @@ export interface ChapterSummary {
 
 export interface LabSummary extends LabMeta {
   chapters: ChapterSummary[]
+  /** Missing when the repo is on disk: `download` when it is in the library, `app-update` when it needs a newer app. */
+  availability?: 'download' | 'app-update'
 }
+
+/** One repo in the library's index.json. */
+export interface PackEntry {
+  id: string
+  /** A hash of the repo's files. */
+  version: string
+  format: number
+  /** The archive, relative to the index. */
+  file: string
+  size: number
+  sha256: string
+  /** The cover picture, relative to the index. */
+  cover?: string
+  summary: LabSummary
+}
+
+export interface PackIndex {
+  paths: PathDef[]
+  labs: PackEntry[]
+}
+
+export type InstallFailure = 'offline' | 'missing' | 'damaged' | 'no-space' | 'broken' | 'too-new'
+
+export type InstallResult = { ok: true } | { ok: false; reason: InstallFailure; message: string }
 
 export interface TaskDef {
   id: string
@@ -278,6 +306,12 @@ export interface Api {
     listPaths(): Promise<PathDef[]>
     /** The recording of one lesson part, named by `narrationKey` of its text; null when there is none. */
     narration(labId: string, chapterId: string, key: string): Promise<Uint8Array | null>
+    /** Downloads a repo from the library, or a newer version of it. */
+    install(labId: string): Promise<InstallResult>
+    /** Download progress of a repo, from 0 to 1. */
+    onInstallProgress(listener: (labId: string, done: number) => void): Unsubscribe
+    /** The list of repos or roadmaps changed: a newer index, an install or an update. */
+    onChanged(listener: () => void): Unsubscribe
   }
   workspace: {
     /** Creates the folder from the starter files on first open; otherwise reads it from disk. */
@@ -346,7 +380,7 @@ export interface Api {
 
 /** Methods the preload bridges with ipcRenderer.invoke, per namespace. */
 export const INVOKE_METHODS = {
-  content: ['listLabs', 'getChapter', 'listPaths', 'narration'],
+  content: ['listLabs', 'getChapter', 'listPaths', 'narration', 'install'],
   workspace: ['open', 'writeFile', 'reset', 'getRoot', 'chooseRoot'],
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
@@ -367,5 +401,7 @@ export const SEND_METHODS = {
 export const EVENTS = {
   terminalData: 'terminal:data',
   terminalExit: 'terminal:exit',
-  aiChat: 'ai:chatEvent'
+  aiChat: 'ai:chatEvent',
+  contentInstall: 'content:installProgress',
+  contentChanged: 'content:changed'
 } as const
