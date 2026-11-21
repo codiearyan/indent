@@ -10,6 +10,7 @@ import { useWorkspace } from '@/stores/workspace'
 import { AudioCard } from './AudioCard'
 import { Markdown } from './Markdown'
 import { TaskList } from './TaskList'
+import { useLessonPart } from './useLessonPart'
 
 // Both tabs stay mounted so the audio keeps playing and scroll positions survive a tab switch.
 const content = 'min-h-0 data-[state=inactive]:hidden'
@@ -25,6 +26,7 @@ export function LeftPanel(): React.JSX.Element {
   const status = useWorkspace((s) => s.status)
   const leftTab = useSettings((s) => s.leftTab)
   const setLeftTab = useSettings((s) => s.setLeftTab)
+  useLessonPart(chapter)
 
   return (
     <Tabs

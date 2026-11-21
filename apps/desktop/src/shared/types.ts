@@ -374,6 +374,8 @@ export interface TaskProgress {
   failedNames?: Record<string, number>
   /** A short note from the AI after repeated fails; written once. */
   tip?: string
+  /** The highest hint the learner opened; missing when none. */
+  hintsShown?: number
 }
 
 export interface ChapterProgress {
@@ -383,6 +385,8 @@ export interface ChapterProgress {
   startedAt: string
   lastOpenedAt: string
   completedAt?: string
+  /** Checks run on this issue; missing in progress saved before it was counted. */
+  checks?: number
 }
 
 export interface DayActivity {
@@ -622,6 +626,8 @@ export interface Api {
     pickImport(): Promise<ProgressImport | null>
     /** Makes the last picked file the progress. The replaced progress is kept aside on disk. */
     applyImport(): Promise<ProgressState>
+    /** Records that hint `hint` (from 1) of a task was shown. */
+    showHint(labId: string, chapterId: string, taskId: string, hint: number): Promise<ProgressState>
   }
   terminal: {
     create(opts: { labId: string; chapterId: string; cols: number; rows: number }): Promise<string>
@@ -711,7 +717,7 @@ export const INVOKE_METHODS = {
     'moveRoot'
   ],
   checks: ['run', 'trace', 'runtimeStatus', 'ensureRuntime'],
-  progress: ['get', 'touch', 'exportFile', 'pickImport', 'applyImport'],
+  progress: ['get', 'touch', 'exportFile', 'pickImport', 'applyImport', 'showHint'],
   terminal: ['create'],
   updates: ['status', 'check', 'download', 'cancel', 'install'],
   tools: [

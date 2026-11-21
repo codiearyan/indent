@@ -4,7 +4,7 @@ import { app, BrowserWindow, dialog } from 'electron'
 import { localDate } from '@shared/rules'
 import type { CheckResult, ProgressImport, ProgressState, TaskDef } from '@shared/types'
 import { handle } from '../ipc'
-import { dataFile } from '../paths'
+import { dataFile, safeId } from '../paths'
 import * as rules from './progressLogic'
 
 let state: Promise<ProgressState> | undefined
@@ -131,6 +131,10 @@ export function register(): void {
     touch: (labId, chapterId) => update((s) => rules.touch(s, labId, chapterId, new Date())),
     exportFile,
     pickImport,
-    applyImport
+    applyImport,
+    showHint: (labId, chapterId, taskId, hint) =>
+      update((s) =>
+        rules.showHint(s, safeId(labId), safeId(chapterId), safeId(taskId), hint, new Date())
+      )
   })
 }
