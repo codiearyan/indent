@@ -20,6 +20,9 @@ import { Button } from '@/components/ui/button'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
 import { useSettingsDialog } from '@/features/settings/dialogStore'
+import { UpdateCard } from '@/features/updates/UpdateCard'
+import { useUpdateNeedsAttention } from '@/stores/updates'
+import { REPO_URL } from '@shared/repo'
 import { useSettings } from '@/stores/settings'
 import { EmptyState } from './EmptyState'
 
@@ -40,6 +43,21 @@ export function AppShell(): React.JSX.Element {
   const loadProgress = useProgress((s) => s.load)
 
   const catalogFailed = useCatalog((s) => s.error && !s.labs)
+  const update = useUpdateNeedsAttention()
+
+  // Once per new version: what changed, linked to its release.
+  useEffect(() => {
+    const { lastVersion, setLastVersion } = useSettings.getState()
+    if (lastVersion && lastVersion !== __APP_VERSION__) {
+      toast(`Indent ${__APP_VERSION__} is installed.`, {
+        action: {
+          label: "What's new",
+          onClick: () => window.open(`${REPO_URL}/releases/tag/v${__APP_VERSION__}`, '_blank')
+        }
+      })
+    }
+    setLastVersion(__APP_VERSION__)
+  }, [])
 
   useEffect(() => {
     Promise.all([loadCatalog(), loadProgress()]).catch((error: unknown) => {
@@ -75,6 +93,11 @@ export function AppShell(): React.JSX.Element {
           ))}
         </nav>
         <div className="mt-auto space-y-3">
+          {update && (
+            <div className="rounded-lg border border-border bg-card p-3">
+              <UpdateCard compact />
+            </div>
+          )}
           <LevelMeter />
           <div className="flex flex-col gap-0.5">
             <button
@@ -84,6 +107,12 @@ export function AppShell(): React.JSX.Element {
             >
               <Settings className="size-4" strokeWidth={1.5} />
               Settings
+              {update && (
+                <span
+                  className="ml-auto size-1.5 rounded-full bg-primary"
+                  aria-label="Update available"
+                />
+              )}
             </button>
             <ThemeRow />
             {import.meta.env.DEV && <SetupRow />}

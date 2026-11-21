@@ -213,6 +213,17 @@ export interface NodeOption {
   supported: boolean
 }
 
+/** Where the app's own update is. */
+export type UpdateStatus =
+  | { state: 'idle' }
+  | { state: 'checking' }
+  | { state: 'current'; version: string }
+  | { state: 'available'; version: string; notes: string[]; size: number }
+  | { state: 'downloading'; version: string; done: number; size: number }
+  /** `manual` on macOS: the installer opens and the person drags the app in. */
+  | { state: 'ready'; version: string; manual: boolean }
+  | { state: 'failed'; message: string; version?: string }
+
 export interface ToolInstallResult {
   tools: ToolStatus[]
   /** An installer opened in its own window; the person finishes it there, then checks again. */
@@ -422,6 +433,19 @@ export interface Api {
     onData(listener: (id: string, data: string) => void): Unsubscribe
     onExit(listener: (id: string, exitCode: number) => void): Unsubscribe
   }
+  updates: {
+    status(): Promise<UpdateStatus>
+    /** Looks for a newer release. */
+    check(): Promise<UpdateStatus>
+    /** Downloads the release file for this computer; progress comes through onStatus. */
+    download(): Promise<UpdateStatus>
+    cancel(): Promise<void>
+    /** Restarts into the update; on macOS opens its installer. */
+    install(): Promise<UpdateStatus>
+    /** Puts the update in place when the app quits. */
+    installOnQuit(): Promise<void>
+    onStatus(listener: (status: UpdateStatus) => void): Unsubscribe
+  }
   tools: {
     status(): Promise<ToolStatus[]>
     /** Downloads Node into the app's own folder. Other programs do not see it. */
@@ -471,6 +495,7 @@ export const INVOKE_METHODS = {
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],
+  updates: ['status', 'check', 'download', 'cancel', 'install', 'installOnQuit'],
   tools: [
     'status',
     'install',
@@ -499,5 +524,6 @@ export const EVENTS = {
   contentInstall: 'content:installProgress',
   contentChanged: 'content:changed',
   runtime: 'checks:runtime',
-  toolInstall: 'tools:installProgress'
+  toolInstall: 'tools:installProgress',
+  update: 'updates:status'
 } as const

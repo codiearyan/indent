@@ -13,6 +13,7 @@ import * as preview from './services/preview'
 import * as tools from './services/tools'
 import * as github from './services/github'
 import * as telemetry from './services/telemetry'
+import * as updates from './services/updates'
 import { seedContent } from './library'
 import { bundledContentDir, contentDir, usesLibrary } from './paths'
 
@@ -107,7 +108,8 @@ app.whenReady().then(() => {
     preview,
     tools,
     github,
-    telemetry
+    telemetry,
+    updates
   ]) {
     service.register()
   }
