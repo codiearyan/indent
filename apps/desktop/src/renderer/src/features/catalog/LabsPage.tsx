@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, Check, Search } from 'lucide-react'
-import { coverUrl } from '@shared/cover'
 import { repoRequestUrl } from '@shared/repo'
 import type { LabSummary, ProgressState } from '@shared/types'
 import { BuildStrip } from '@/components/app/BuildStrip'
+import { Cover } from '@/components/app/Cover'
 import { LanguageIcon } from '@/components/app/LanguageIcon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -263,7 +263,7 @@ function RepoCard({
         to={`/labs/${lab.id}`}
         className="flex h-full flex-col overflow-hidden rounded-lg border border-border transition-colors outline-none hover:border-input focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
       >
-        <Cover lab={lab} />
+        <Cover lab={lab} className="border-b border-rule" />
         <div className="flex flex-1 flex-col p-4">
           <div className="flex items-center gap-2 text-[13px]">
             <LanguageIcon language={lab.language} className="size-[18px] text-[8px]" />
@@ -301,28 +301,6 @@ function RepoCard({
         </div>
       </Link>
     </li>
-  )
-}
-
-/** The repo's picture. A repo without one shows its language instead. */
-function Cover({ lab }: { lab: LabSummary }): React.JSX.Element {
-  const [missing, setMissing] = useState(false)
-  return (
-    <div className="flex aspect-[16/9] items-center justify-center border-b border-rule bg-muted">
-      {missing ? (
-        <span className="font-mono text-[13px] text-muted-foreground">
-          {languageName(lab.language)}
-        </span>
-      ) : (
-        <img
-          src={coverUrl(lab.id)}
-          alt=""
-          draggable={false}
-          onError={() => setMissing(true)}
-          className="size-full object-cover"
-        />
-      )}
-    </div>
   )
 }
 
