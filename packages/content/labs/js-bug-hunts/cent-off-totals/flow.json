@@ -1,0 +1,161 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "orders", "label": "orders.js", "kind": "file" },
+      { "id": "reproduce", "label": "reproduceCentDrift()", "kind": "function", "mine": true, "fn": "reproduceCentDrift" },
+      { "id": "receipt", "label": "receipt()", "kind": "function", "mine": true, "fn": "receipt" },
+      { "id": "printed", "label": "Printed receipt", "kind": "story" },
+      { "id": "ticket", "label": "CPC-7", "kind": "story" },
+      { "id": "test", "label": "receipt.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "orders", "to": "reproduce", "label": "an order" },
+      { "from": "reproduce", "to": "receipt", "label": "lines, percent" },
+      { "from": "orders", "to": "receipt", "label": "lines, percent" },
+      { "from": "receipt", "to": "printed", "label": "three lines" },
+      { "from": "printed", "to": "ticket", "label": "a cent off" },
+      { "from": "test", "to": "receipt", "label": "exact receipts" }
+    ],
+    "note": "The till hands every order to receipt(), and a member found a printed receipt that is a cent off."
+  },
+  "tasks": {
+    "reproduce": {
+      "trace": { "file": "src/reproduce.js", "call": "reproduceCentDrift", "args": [] },
+      "steps": [
+        {
+          "active": ["orders", "orders->reproduce", "reproduce"],
+          "value": {
+            "kind": "map",
+            "label": "an order in orders.js",
+            "entries": [
+              { "key": "lines", "value": "a list of { name, price, qty }" },
+              { "key": "discountPercent", "value": "a number" }
+            ]
+          },
+          "note": "reproduceCentDrift() picks an order from orders.js. The one from the ticket is a good start."
+        },
+        {
+          "active": ["reproduce", "reproduce->receipt", "receipt"],
+          "note": "It runs that order through the original receipt() and keeps what comes back as shown, untouched."
+        },
+        {
+          "active": ["reproduce"],
+          "value": {
+            "kind": "map",
+            "label": "correct",
+            "entries": [
+              { "key": "subtotal", "value": "text, two decimals" },
+              { "key": "discount", "value": "text, two decimals" },
+              { "key": "total", "value": "text, two decimals" }
+            ]
+          },
+          "note": "Then it writes correct: the receipt you worked out by hand for the same order, in the same shape."
+        },
+        {
+          "active": ["reproduce", "printed", "printed->ticket", "ticket"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "lines", "value": "the order's lines" },
+              { "key": "discountPercent", "value": "its percent" },
+              { "key": "shown", "value": "{ subtotal, discount, total }" },
+              { "key": "correct", "value": "{ subtotal, discount, total }" }
+            ]
+          },
+          "note": "The order and both receipts go on CPC-7 side by side. The proof is that shown and correct differ."
+        }
+      ]
+    },
+    "fix": {
+      "trace": {
+        "file": "src/receipt.js",
+        "call": "receipt",
+        "args": [
+          [
+            { "name": "Canoe, 1 hour", "price": 21.45, "qty": 2 },
+            { "name": "Buoyancy aid", "price": 3.35, "qty": 1 }
+          ],
+          10
+        ]
+      },
+      "steps": [
+        {
+          "active": ["orders", "orders->receipt", "receipt"],
+          "value": {
+            "kind": "map",
+            "label": "a canoe order",
+            "entries": [
+              { "key": "lines", "value": "2 entries" },
+              { "key": "discountPercent", "value": 10 }
+            ]
+          },
+          "note": "The till hands receipt() an order's lines and its discount, like two hours of canoe and a buoyancy aid with the 10% member discount."
+        },
+        {
+          "active": ["receipt"],
+          "value": {
+            "kind": "map",
+            "label": "a line",
+            "entries": [
+              { "key": "name", "value": "Canoe, 1 hour" },
+              { "key": "price", "value": 21.45 },
+              { "key": "qty", "value": 2 }
+            ]
+          },
+          "note": "Every line is worth its price times its qty, and the lines add up to the subtotal. Prices have at most two decimals."
+        },
+        {
+          "active": ["receipt"],
+          "note": "The discount is discountPercent of the subtotal, rounded to the nearest cent, with half a cent rounding up."
+        },
+        {
+          "active": ["receipt"],
+          "note": "The total is exactly the subtotal minus that discount, so the three lines always agree."
+        },
+        {
+          "active": ["receipt", "receipt->printed", "printed"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "subtotal", "value": "text, two decimals" },
+              { "key": "discount", "value": "text, two decimals" },
+              { "key": "total", "value": "text, two decimals" }
+            ]
+          },
+          "note": "Three strings with two decimals go on the printed receipt, right to the cent for every order."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->receipt", "receipt"],
+          "note": "receipt.test.js calls receipt() and asserts exact receipts for orders where the cents are tricky, such as the ticket order."
+        },
+        {
+          "active": ["test", "receipt", "printed", "printed->ticket", "ticket"],
+          "note": "First it runs beside the original receipt.js, the one behind CPC-7. There it must fail."
+        },
+        {
+          "active": ["test", "receipt"],
+          "note": "Then it runs beside a correct fix, where it must pass."
+        },
+        {
+          "active": ["test", "receipt"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the test file",
+            "entries": [
+              { "key": "original receipt.js", "value": "must fail" },
+              { "key": "a correct fix", "value": "must pass" },
+              { "key": "rounds each value at the end", "value": "must fail" }
+            ]
+          },
+          "note": "Last it runs beside a fix that keeps adding floats and rounds each value at the end. That one must fail too."
+        }
+      ]
+    }
+  }
+}

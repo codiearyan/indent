@@ -1,0 +1,24 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "till", "label": "Till", "kind": "story" },
+      { "id": "receipt", "label": "receipt.js", "kind": "file", "mine": true },
+      { "id": "board", "label": "Dock board", "kind": "story" },
+      { "id": "departures", "label": "departures.js", "kind": "file", "mine": true },
+      { "id": "reminders", "label": "reminders.js", "kind": "file", "mine": true },
+      { "id": "phones", "label": "Customers' phones", "kind": "story" },
+      { "id": "scanner", "label": "Dock scanner", "kind": "story" },
+      { "id": "fleet", "label": "fleet.js", "kind": "file", "mine": true },
+      { "id": "sync", "label": "sync.js", "kind": "file", "mine": true },
+      { "id": "online", "label": "Online bookings", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "till", "to": "receipt", "label": "orders" },
+      { "from": "departures", "to": "board", "label": "next tours" },
+      { "from": "reminders", "to": "phones", "label": "texts" },
+      { "from": "scanner", "to": "fleet", "label": "boat ids" },
+      { "from": "sync", "to": "online", "label": "saves" }
+    ],
+    "note": "Five tickets from around the Cinderbay dock, and for each one you prove the bug, fix the file it lives in and write the test that guards it."
+  }
+}

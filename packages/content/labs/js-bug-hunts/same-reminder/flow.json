@@ -1,0 +1,131 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bookings", "label": "bookings.js", "kind": "file" },
+      { "id": "reproduce", "label": "reproduceSameReminder()", "kind": "function", "mine": true, "fn": "reproduceSameReminder" },
+      { "id": "schedule", "label": "scheduleReminders()", "kind": "function", "mine": true, "fn": "scheduleReminders" },
+      { "id": "timers", "label": "Timers", "kind": "story" },
+      { "id": "phones", "label": "Customers' phones", "kind": "story" },
+      { "id": "test", "label": "reminders.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "bookings", "to": "reproduce", "label": "saturday" },
+      { "from": "reproduce", "to": "schedule", "label": "send, fake timer" },
+      { "from": "bookings", "to": "schedule", "label": "bookings" },
+      { "from": "schedule", "to": "timers", "label": "one per booking" },
+      { "from": "timers", "to": "phones", "label": "a text" },
+      { "from": "test", "to": "schedule", "label": "fake timer" }
+    ],
+    "note": "scheduleReminders() sets one timer per booking, and on Saturday the texts those timers sent did not reach the right people."
+  },
+  "tasks": {
+    "reproduce": {
+      "trace": { "file": "src/reproduce.js", "call": "reproduceSameReminder", "args": [] },
+      "steps": [
+        {
+          "active": ["bookings", "bookings->reproduce", "reproduce"],
+          "value": {
+            "kind": "map",
+            "label": "a Saturday booking",
+            "entries": [
+              { "key": "name", "value": "Amara" },
+              { "key": "boat", "value": "double kayak" },
+              { "key": "time", "value": "09:00" },
+              { "key": "remindInMs", "value": 30 }
+            ]
+          },
+          "note": "reproduceSameReminder() takes Saturday's bookings from bookings.js."
+        },
+        {
+          "active": ["reproduce", "reproduce->schedule", "schedule"],
+          "note": "It calls the original scheduleReminders() with a send(to, text) that records each { to, text }, and a fake setTimer(callback, ms) that only saves callback."
+        },
+        {
+          "active": ["schedule", "schedule->timers", "timers"],
+          "note": "No real time passes. After scheduleReminders() returns, it calls every saved callback."
+        },
+        {
+          "active": ["timers", "timers->phones", "phones", "reproduce"],
+          "value": {
+            "kind": "map",
+            "label": "each entry that comes back",
+            "entries": [
+              { "key": "to", "value": "a phone number" },
+              { "key": "text", "value": "a reminder text" }
+            ]
+          },
+          "note": "Each callback sends a text, and the list of { to, text } goes on CPC-19 as the text log, without waiting a whole morning."
+        }
+      ]
+    },
+    "fix": {
+      "steps": [
+        {
+          "active": ["bookings", "bookings->schedule", "schedule"],
+          "value": {
+            "kind": "map",
+            "label": "a booking",
+            "entries": [
+              { "key": "name", "value": "Joon" },
+              { "key": "phone", "value": "+44 7700 900202" },
+              { "key": "boat", "value": "paddleboard" },
+              { "key": "time", "value": "09:30" },
+              { "key": "remindInMs", "value": 60 }
+            ]
+          },
+          "note": "scheduleReminders() gets the bookings, a send and a setTimer, which is setTimeout unless the caller gives another."
+        },
+        {
+          "active": ["schedule", "schedule->timers", "timers"],
+          "note": "For each booking it calls setTimer once, with a callback and that booking's remindInMs."
+        },
+        {
+          "active": ["timers", "timers->phones", "phones"],
+          "note": "When a callback runs, it calls send with that booking's phone and its text: Hi, the name, the boat and the time."
+        },
+        {
+          "active": ["schedule", "bookings"],
+          "note": "Nothing is sent before its timer fires, and the caller may empty or reuse its bookings right after scheduling."
+        },
+        {
+          "active": ["schedule"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "count", "value": "a number" }]
+          },
+          "note": "It returns how many reminders it scheduled."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->schedule", "schedule"],
+          "note": "reminders.test.js calls scheduleReminders() with its own fake setTimer that saves each callback and delay."
+        },
+        {
+          "active": ["schedule", "timers"],
+          "note": "It checks that nothing is sent while the reminders are being scheduled."
+        },
+        {
+          "active": ["timers", "timers->phones", "phones"],
+          "note": "Once it runs the saved callbacks, each customer got a text about their own booking."
+        },
+        {
+          "active": ["test", "schedule"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the test file",
+            "entries": [
+              { "key": "original reminders.js", "value": "must fail" },
+              { "key": "a correct fix", "value": "must pass" },
+              { "key": "sends each text right away", "value": "must fail" }
+            ]
+          },
+          "note": "The file runs beside the original, beside a correct fix and beside a fix that builds each text right but sends it straight away."
+        }
+      ]
+    }
+  }
+}

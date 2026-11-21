@@ -1,0 +1,118 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "timetable", "label": "timetable.js", "kind": "file" },
+      { "id": "reproduce", "label": "reproduceReorder()", "kind": "function", "mine": true, "fn": "reproduceReorder" },
+      { "id": "next", "label": "nextDepartures()", "kind": "function", "mine": true, "fn": "nextDepartures" },
+      { "id": "board", "label": "Dock board", "kind": "story" },
+      { "id": "ticket", "label": "CPC-12", "kind": "story" },
+      { "id": "test", "label": "departures.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "timetable", "to": "reproduce", "label": "a copy" },
+      { "from": "reproduce", "to": "next", "label": "copy, 600" },
+      { "from": "timetable", "to": "next", "label": "times, now" },
+      { "from": "next", "to": "board", "label": "next tours" },
+      { "from": "timetable", "to": "board", "label": "full day" },
+      { "from": "board", "to": "ticket", "label": "a photo" },
+      { "from": "test", "to": "next", "label": "times it owns" }
+    ],
+    "note": "The dock board asks nextDepartures() for the next tours and then prints the whole day, and at ten in the morning Dario sent a photo of it."
+  },
+  "tasks": {
+    "reproduce": {
+      "trace": { "file": "src/reproduce.js", "call": "reproduceReorder", "args": [] },
+      "steps": [
+        {
+          "active": ["timetable", "timetable->reproduce", "reproduce"],
+          "note": "reproduceReorder() copies harbourTour into a new array, and keeps a second copy as before, so nothing can change it."
+        },
+        {
+          "active": ["reproduce", "reproduce->next", "next"],
+          "note": "It hands the first copy to the original nextDepartures() with now at 600, ten in the morning, and keeps what comes back as result."
+        },
+        {
+          "active": ["reproduce"],
+          "note": "after is your copy, read once the call is done."
+        },
+        {
+          "active": ["reproduce", "board", "board->ticket", "ticket"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "before", "value": "a list of times" },
+              { "key": "result", "value": "up to 3 times" },
+              { "key": "after", "value": "a list of times" }
+            ]
+          },
+          "note": "Three lists go on CPC-12, and together they show what Dario's photo shows."
+        }
+      ]
+    },
+    "fix": {
+      "trace": {
+        "file": "src/departures.js",
+        "call": "nextDepartures",
+        "args": [[1050, 480, 75, 930, 660], 500, 3]
+      },
+      "steps": [
+        {
+          "active": ["timetable", "timetable->next", "next"],
+          "value": {
+            "kind": "array",
+            "label": "a summer timetable",
+            "values": [1050, 480, 75, 930, 660]
+          },
+          "note": "The board hands nextDepartures() times in any order, like this summer list with a night paddle at 01:15, and now, here 500 (08:20)."
+        },
+        {
+          "active": ["next"],
+          "note": "Only departures at or after now are kept."
+        },
+        {
+          "active": ["next"],
+          "note": "They come back earliest first, as numbers, and never more than count of them. Here count is 3."
+        },
+        {
+          "active": ["next", "next->board", "board"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "result", "value": "up to 3 numbers" }]
+          },
+          "note": "The board shows them as the next tours."
+        },
+        {
+          "active": ["timetable", "timetable->board", "board"],
+          "note": "Then the board prints the full day from the same list. It must find it exactly as it went in, so a frozen list works too."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->next", "next"],
+          "note": "departures.test.js checks that the next departures come back in time order, for times that sort differently as text."
+        },
+        {
+          "active": ["test", "next", "timetable"],
+          "note": "It also checks that the array passed to nextDepartures() is exactly the same afterwards."
+        },
+        {
+          "active": ["test", "next"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the test file",
+            "entries": [
+              { "key": "original departures.js", "value": "must fail" },
+              { "key": "a correct fix", "value": "must pass" },
+              { "key": "numbers right, still in place", "value": "must fail" }
+            ]
+          },
+          "note": "The file runs beside the original, beside a correct fix and beside a fix that compares numbers but still sorts the caller's array in place."
+        }
+      ]
+    }
+  }
+}
