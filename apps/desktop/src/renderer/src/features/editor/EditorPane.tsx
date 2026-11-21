@@ -24,6 +24,7 @@ import { useRuntime } from '@/stores/runtime'
 import { CodeEditor } from './CodeEditor'
 import { ConflictDialog } from './ConflictDialog'
 import { FileLabel } from './FileTab'
+import { FilesPanel } from './FilesPanel'
 import { fileChange, missingFiles } from './fileChange'
 import type { monaco } from './monaco'
 
@@ -235,25 +236,8 @@ export function EditorPane(): React.JSX.Element {
 
       <div className="flex min-h-0 flex-1">
         {panels.files && status === 'ready' && (
-          <div className="w-[200px] shrink-0 space-y-0.5 overflow-y-auto border-r border-border p-2">
-            {files.map((file) => (
-              <Button
-                key={file.path}
-                variant="ghost"
-                size="sm"
-                onClick={() => openFile(file.path)}
-                className={cn(
-                  'h-7 w-full justify-start gap-2 px-2 font-mono text-[13px] font-normal text-muted-foreground hover:bg-accent/60 hover:text-foreground',
-                  file.path === activePath && 'bg-accent text-foreground hover:bg-accent'
-                )}
-              >
-                <FileLabel
-                  path={file.path}
-                  change={fileChange(starter, file)}
-                  active={file.path === activePath}
-                />
-              </Button>
-            ))}
+          <div className="flex w-[200px] shrink-0 flex-col border-r border-border">
+            <FilesPanel />
           </div>
         )}
         {status === 'ready' ? (
