@@ -17,7 +17,7 @@ function inTextField(target: EventTarget | null): boolean {
 
 type KeyInput = Pick<
   KeyboardEvent,
-  'key' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'target' | 'defaultPrevented'
+  'key' | 'code' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'target' | 'defaultPrevented'
 > & { preventDefault(): void }
 
 function onPlayerKey(event: KeyInput, player: PlayerControls): void {

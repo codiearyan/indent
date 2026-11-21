@@ -4,6 +4,7 @@ import type { Chapter } from '@shared/types'
 import { MAX_HINTS, hintsUnlocked, isChapterComplete } from '@shared/rules'
 import { Button } from '@/components/ui/button'
 import { useChapterProgress } from '@/stores/progress'
+import { hintKey } from './hints'
 import { RuntimeNotice } from './RuntimeNotice'
 import { TaskItem } from './TaskItem'
 
@@ -47,6 +48,7 @@ export function TaskList({ chapter }: { chapter: Chapter }): React.JSX.Element {
           <TaskItem
             key={`${chapter.id}/${task.id}`}
             task={task}
+            hintKey={hintKey(chapter.labId, chapter.id, task.id)}
             number={i + 1}
             progress={progress}
             first={i === 0}

@@ -3,19 +3,43 @@ import type * as Monaco from 'monaco-editor'
 export type ShortcutScope =
   'everywhere' | 'editor' | 'workspace' | 'patterns' | 'tour' | 'chat' | 'onboarding'
 
-interface Shortcut {
+export interface Shortcut {
   label: string
   /** `Mod` is Cmd on macOS and Ctrl elsewhere, e.g. `Mod+Shift+K`. */
   keys: string
+  /** More keys for the same command, for where the first ones belong to the editor. */
+  also?: string
   scope: ShortcutScope
 }
 
 export const SHORTCUTS = {
   openSettings: { label: 'Open settings', keys: 'Mod+,', scope: 'everywhere' },
-  save: { label: 'Save', keys: 'Mod+S', scope: 'editor' },
-  check: { label: 'Run checks', keys: 'Mod+Enter', scope: 'editor' },
+  shortcutList: {
+    label: 'Keyboard shortcuts',
+    keys: 'Mod+/',
+    also: 'Mod+Shift+/',
+    scope: 'everywhere'
+  },
+  goHome: { label: 'Go to Home', keys: 'Mod+Alt+1', scope: 'everywhere' },
+  goRepos: { label: 'Go to Repos', keys: 'Mod+Alt+2', scope: 'everywhere' },
+  goRoadmaps: { label: 'Go to Roadmaps', keys: 'Mod+Alt+3', scope: 'everywhere' },
+  goPatterns: { label: 'Go to Patterns', keys: 'Mod+Alt+4', scope: 'everywhere' },
+  goActivity: { label: 'Go to Activity', keys: 'Mod+Alt+5', scope: 'everywhere' },
+  check: { label: 'Run checks', keys: 'Mod+Enter', scope: 'workspace' },
+  runCommand: { label: 'Run the command', keys: 'Mod+Shift+Enter', scope: 'workspace' },
+  focusEditor: { label: 'Focus the editor', keys: 'Mod+1', scope: 'workspace' },
+  focusLesson: { label: 'Focus the lesson and tasks', keys: 'Mod+2', scope: 'workspace' },
+  focusTerminal: { label: 'Focus the terminal', keys: 'Mod+3', scope: 'workspace' },
+  toggleTerminal: { label: 'Show or hide the terminal', keys: 'Mod+J', scope: 'workspace' },
+  toggleFiles: { label: 'Show or hide the file list', keys: 'Mod+B', scope: 'workspace' },
+  toggleFocusMode: { label: 'Focus mode', keys: 'Mod+Shift+F', scope: 'workspace' },
+  nextIssue: { label: 'Next issue', keys: 'Mod+Alt+ArrowRight', scope: 'workspace' },
+  previousIssue: { label: 'Previous issue', keys: 'Mod+Alt+ArrowLeft', scope: 'workspace' },
+  openTutor: { label: 'Open the tutor', keys: 'Mod+Shift+T', scope: 'workspace' },
+  nextHint: { label: 'Show the next hint', keys: 'Mod+Shift+H', scope: 'workspace' },
+  readAloud: { label: 'Read aloud: play or pause', keys: 'Mod+Shift+P', scope: 'workspace' },
   closeFile: { label: 'Close file', keys: 'Mod+W', scope: 'workspace' },
-  runCommand: { label: 'Run the command', keys: 'Mod+Enter', scope: 'workspace' },
+  save: { label: 'Save', keys: 'Mod+S', scope: 'editor' },
   suggest: { label: 'Ask for a suggestion', keys: 'Alt+\\', scope: 'editor' },
   explainCode: { label: 'Explain this code', keys: 'Mod+Shift+E', scope: 'editor' },
   sendMessage: { label: 'Send', keys: 'Enter', scope: 'chat' },
@@ -65,20 +89,29 @@ export function formatKeys(keys: string, platform: string): string {
   return [...mods, OTHER_KEYS[name] ?? name].join('+')
 }
 
-type KeyEvent = Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey'>
+type KeyEvent = Pick<KeyboardEvent, 'key' | 'code' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey'>
+
+const CODES: Record<string, string> = { '/': 'Slash', ',': 'Comma', '\\': 'Backslash' }
+
+function codeFor(key: string): string | undefined {
+  if (/^[a-z]$/i.test(key)) return `Key${key.toUpperCase()}`
+  if (/^\d$/.test(key)) return `Digit${key}`
+  return CODES[key]
+}
 
 /**
- * Whether the event presses these keys. Every modifier named must be held, and `Mod` accepts
- * Cmd or Ctrl on every platform. Modifiers the keys do not name are not checked: a caller that
- * must not fire with one held rules it out itself.
+ * Whether the event presses exactly these keys: every modifier named is held and no other.
+ * `Mod` accepts Cmd or Ctrl on every platform. Shift and Alt change the character a key types
+ * (Shift+1 types `!`), so with either held the physical key counts as well.
  */
 export function matchesKeys(event: KeyEvent, keys: string): boolean {
   const { modifiers, key } = parse(keys)
+  if ((event.metaKey || event.ctrlKey) !== modifiers.includes('Mod')) return false
+  if (event.altKey !== modifiers.includes('Alt')) return false
+  if (event.shiftKey !== modifiers.includes('Shift')) return false
   const pressed = event.key === ' ' ? 'Space' : event.key
-  if (pressed.toLowerCase() !== key.toLowerCase()) return false
-  return modifiers.every((m) =>
-    m === 'Mod' ? event.metaKey || event.ctrlKey : m === 'Alt' ? event.altKey : event.shiftKey
-  )
+  if (pressed.toLowerCase() === key.toLowerCase()) return true
+  return (event.shiftKey || event.altKey) && event.code === codeFor(key)
 }
 
 const MONACO_KEYS: Record<string, keyof typeof Monaco.KeyCode> = {
@@ -107,12 +140,17 @@ export function toMonacoKeys(
   return modifiers.reduce((binding, m) => binding | mods[m], monaco.KeyCode[code] as number)
 }
 
+/** Every key combination of a shortcut, the main one first. */
+export function keysOf(shortcut: Shortcut): string[] {
+  return shortcut.also ? [shortcut.keys, shortcut.also] : [shortcut.keys]
+}
+
 export function shortcutLabel(id: ShortcutId): string {
   return formatKeys(SHORTCUTS[id].keys, window.platform)
 }
 
 export function isShortcut(event: KeyEvent, id: ShortcutId): boolean {
-  return matchesKeys(event, SHORTCUTS[id].keys)
+  return keysOf(SHORTCUTS[id]).some((keys) => matchesKeys(event, keys))
 }
 
 export function monacoShortcut(
@@ -120,4 +158,48 @@ export function monacoShortcut(
   monaco: Pick<typeof Monaco, 'KeyMod' | 'KeyCode'>
 ): number {
   return toMonacoKeys(SHORTCUTS[id].keys, monaco)
+}
+
+interface GuardedEvent extends KeyEvent {
+  defaultPrevented: boolean
+  repeat: boolean
+  target: EventTarget | null
+  getModifierState?(key: string): boolean
+}
+
+const TEXT_FIELDS = 'input, textarea, select, [contenteditable="true"], .monaco-editor, .xterm'
+
+/**
+ * Ctrl with a letter or a symbol is a control key for the shell (Ctrl+B, Ctrl+J, Ctrl+W), so
+ * the terminal keeps it, even where Ctrl is the app's Mod.
+ */
+export function isShellKey(event: KeyEvent): boolean {
+  if (!event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return false
+  return event.key.length === 1 && !/\d/.test(event.key)
+}
+
+/**
+ * Whether a window shortcut should leave this key press alone: something focused already
+ * handled it (the code editor runs its own bindings), it repeats while held, it was typed with
+ * AltGr, a dialog is open, or it has no Mod and focus is where people type. Ctrl and a letter
+ * also stay with the terminal, and on macOS with every text field, where they move the cursor.
+ */
+export function skipsShortcut(event: GuardedEvent, keys: string, platform: string): boolean {
+  if (event.defaultPrevented || event.repeat) return true
+  if (event.getModifierState?.('AltGraph')) return true
+  const inside = (selector: string): boolean =>
+    !!(event.target as Partial<Element> | null)?.closest?.(selector)
+  if (inside('[role="dialog"], [role="alertdialog"]')) return true
+  if (!parse(keys).modifiers.includes('Mod') && inside(TEXT_FIELDS)) return true
+  return isShellKey(event) && inside(platform === 'darwin' ? TEXT_FIELDS : '.xterm')
+}
+
+/** Whether the app takes this key press from the terminal for one of its own shortcuts. */
+export function isAppShortcut(event: KeyEvent): boolean {
+  if (isShellKey(event)) return false
+  return Object.values(SHORTCUTS).some(
+    (s: Shortcut) =>
+      (s.scope === 'everywhere' || s.scope === 'workspace') &&
+      keysOf(s).some((keys) => matchesKeys(event, keys))
+  )
 }

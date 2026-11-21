@@ -28,6 +28,7 @@ export function LeftPanel(): React.JSX.Element {
 
   return (
     <Tabs
+      id="lesson-panel"
       value={leftTab}
       onValueChange={(tab) => setLeftTab(tab as typeof leftTab)}
       className="h-full gap-0 bg-card"

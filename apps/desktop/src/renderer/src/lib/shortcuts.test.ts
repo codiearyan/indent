@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import type * as Monaco from 'monaco-editor'
-import { formatKeys, matchesKeys, SHORTCUTS, toMonacoKeys } from './shortcuts'
+import {
+  formatKeys,
+  isAppShortcut,
+  isShellKey,
+  isShortcut,
+  keysOf,
+  matchesKeys,
+  SHORTCUTS,
+  skipsShortcut,
+  toMonacoKeys,
+  type ShortcutScope
+} from './shortcuts'
 
 const KeyMod = { CtrlCmd: 2048, Shift: 1024, Alt: 512, WinCtrl: 256 }
 const KeyCode = {
@@ -17,9 +28,11 @@ const monaco = { KeyMod, KeyCode } as unknown as Pick<typeof Monaco, 'KeyMod' | 
 
 const press = (
   key: string,
-  mods: Partial<Record<'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey', boolean>> = {}
-): Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey'> => ({
+  mods: Partial<Record<'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey', boolean>> = {},
+  code = ''
+): Pick<KeyboardEvent, 'key' | 'code' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey'> => ({
   key,
+  code,
   metaKey: false,
   ctrlKey: false,
   altKey: false,
@@ -54,11 +67,26 @@ describe('matchesKeys', () => {
     expect(matchesKeys(press('.', { metaKey: true }), 'Mod+,')).toBe(false)
   })
 
-  it('needs every modifier it names and leaves the others to the caller', () => {
+  it('needs exactly the modifiers it names', () => {
     expect(matchesKeys(press('Enter', { altKey: true }), 'Alt+Enter')).toBe(true)
     expect(matchesKeys(press('Enter'), 'Alt+Enter')).toBe(false)
-    expect(matchesKeys(press('Enter', { shiftKey: true }), 'Enter')).toBe(true)
+    expect(matchesKeys(press('Enter', { shiftKey: true }), 'Enter')).toBe(false)
+    expect(matchesKeys(press('Enter', { metaKey: true }), 'Enter')).toBe(false)
     expect(matchesKeys(press('S', { shiftKey: true, metaKey: true }), 'Mod+Shift+S')).toBe(true)
+    expect(matchesKeys(press('Enter', { metaKey: true, shiftKey: true }), 'Mod+Enter')).toBe(false)
+    expect(matchesKeys(press('Enter', { metaKey: true, shiftKey: true }), 'Mod+Shift+Enter')).toBe(
+      true
+    )
+  })
+
+  it('reads the physical key when Shift or Alt changes the character', () => {
+    expect(
+      matchesKeys(press('!', { metaKey: true, shiftKey: true }, 'Digit1'), 'Mod+Shift+1')
+    ).toBe(true)
+    expect(matchesKeys(press('?', { ctrlKey: true, shiftKey: true }, 'Slash'), 'Mod+Shift+/')).toBe(
+      true
+    )
+    expect(matchesKeys(press('h', { metaKey: true }, 'KeyJ'), 'Mod+J')).toBe(false)
   })
 
   it('reads the space bar and letters in either case', () => {
@@ -72,6 +100,9 @@ describe('toMonacoKeys', () => {
   it('maps the editor shortcuts', () => {
     expect(toMonacoKeys(SHORTCUTS.save.keys, monaco)).toBe(KeyMod.CtrlCmd | KeyCode.KeyS)
     expect(toMonacoKeys(SHORTCUTS.check.keys, monaco)).toBe(KeyMod.CtrlCmd | KeyCode.Enter)
+    expect(toMonacoKeys(SHORTCUTS.runCommand.keys, monaco)).toBe(
+      KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.Enter
+    )
     expect(toMonacoKeys(SHORTCUTS.suggest.keys, monaco)).toBe(KeyMod.Alt | KeyCode.Backslash)
     expect(toMonacoKeys(SHORTCUTS.explainCode.keys, monaco)).toBe(
       KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KeyE
@@ -85,5 +116,125 @@ describe('toMonacoKeys', () => {
 
   it('refuses a key it has no code for', () => {
     expect(() => toMonacoKeys('Mod+ArrowUp', monaco)).toThrow()
+  })
+})
+
+/** A stand-in for a focused element: `closest` finds the selectors it is inside. */
+const inside = (...selectors: string[]): EventTarget =>
+  ({
+    closest: (query: string) => (query.split(', ').some((q) => selectors.includes(q)) ? {} : null)
+  }) as unknown as EventTarget
+
+const event = (
+  key: string,
+  mods: Partial<Record<'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey', boolean>> = {},
+  target: EventTarget | null = null,
+  extra: { defaultPrevented?: boolean; repeat?: boolean; altGraph?: boolean } = {}
+): Parameters<typeof skipsShortcut>[0] => ({
+  ...press(key, mods),
+  target,
+  defaultPrevented: extra.defaultPrevented ?? false,
+  repeat: extra.repeat ?? false,
+  getModifierState: (k: string) => k === 'AltGraph' && !!extra.altGraph
+})
+
+const skips = (e: Parameters<typeof skipsShortcut>[0], keys: string, platform = 'linux'): boolean =>
+  skipsShortcut(e, keys, platform)
+
+describe('skipsShortcut', () => {
+  it('takes Mod shortcuts while typing, but not plain keys', () => {
+    expect(skips(event('j', { metaKey: true }, inside('textarea')), 'Mod+J')).toBe(false)
+    expect(skips(event('j', { metaKey: true }, inside('.monaco-editor')), 'Mod+J')).toBe(false)
+    expect(skips(event('Enter', {}, inside('textarea')), 'Enter')).toBe(true)
+    expect(skips(event('ArrowLeft', {}, inside('input')), 'ArrowLeft')).toBe(true)
+    expect(skips(event('ArrowLeft', {}, inside('.xterm')), 'ArrowLeft')).toBe(true)
+    expect(skips(event('ArrowLeft', {}, inside('button')), 'ArrowLeft')).toBe(false)
+  })
+
+  it('leaves Ctrl and a letter to the shell in the terminal', () => {
+    expect(skips(event('j', { ctrlKey: true }, inside('.xterm')), 'Mod+J')).toBe(true)
+    expect(skips(event('j', { metaKey: true }, inside('.xterm')), 'Mod+J')).toBe(false)
+    expect(skips(event('j', { ctrlKey: true }, inside('button')), 'Mod+J')).toBe(false)
+    expect(skips(event('1', { ctrlKey: true }, inside('.xterm')), 'Mod+1')).toBe(false)
+  })
+
+  it('leaves Ctrl and a letter to every text field on macOS', () => {
+    expect(skips(event('b', { ctrlKey: true }, inside('textarea')), 'Mod+B', 'darwin')).toBe(true)
+    expect(skips(event('w', { ctrlKey: true }, inside('.monaco-editor')), 'Mod+W', 'darwin')).toBe(
+      true
+    )
+    expect(skips(event('b', { metaKey: true }, inside('textarea')), 'Mod+B', 'darwin')).toBe(false)
+    expect(skips(event('b', { ctrlKey: true }, inside('button')), 'Mod+B', 'darwin')).toBe(false)
+    expect(skips(event('b', { ctrlKey: true }, inside('textarea')), 'Mod+B', 'win32')).toBe(false)
+  })
+
+  it('skips keys something else handled, repeats, AltGr and open dialogs', () => {
+    const mod = { metaKey: true }
+    expect(skips(event('/', mod, null, { defaultPrevented: true }), 'Mod+/')).toBe(true)
+    expect(skips(event('j', mod, null, { repeat: true }), 'Mod+J')).toBe(true)
+    expect(skips(event('2', mod, null, { altGraph: true }), 'Mod+Alt+2')).toBe(true)
+    expect(skips(event('j', mod, inside('[role="dialog"]')), 'Mod+J')).toBe(true)
+    expect(skips(event('j', mod), 'Mod+J')).toBe(false)
+  })
+})
+
+describe('isShellKey', () => {
+  it('is Ctrl alone with a letter or a symbol', () => {
+    expect(isShellKey(press('c', { ctrlKey: true }))).toBe(true)
+    expect(isShellKey(press('/', { ctrlKey: true }))).toBe(true)
+    expect(isShellKey(press('c', { metaKey: true }))).toBe(false)
+    expect(isShellKey(press('1', { ctrlKey: true }))).toBe(false)
+    expect(isShellKey(press('Enter', { ctrlKey: true }))).toBe(false)
+    expect(isShellKey(press('F', { ctrlKey: true, shiftKey: true }))).toBe(false)
+  })
+})
+
+describe('isAppShortcut', () => {
+  it('takes the app keys from the terminal and leaves the rest', () => {
+    expect(isAppShortcut(press('Enter', { metaKey: true }))).toBe(true)
+    expect(isAppShortcut(press('j', { metaKey: true }))).toBe(true)
+    expect(isAppShortcut(press('j', { ctrlKey: true }))).toBe(false)
+    expect(isAppShortcut(press('c', { metaKey: true }))).toBe(false)
+    expect(isAppShortcut(press('ArrowLeft'))).toBe(false)
+  })
+})
+
+// Which scopes can be live at the same moment.
+const OVERLAPS: Record<ShortcutScope, ShortcutScope[]> = {
+  everywhere: ['everywhere', 'workspace', 'editor', 'chat', 'tour', 'patterns'],
+  workspace: ['everywhere', 'workspace', 'editor', 'chat', 'tour'],
+  editor: ['everywhere', 'workspace', 'editor'],
+  chat: ['everywhere', 'workspace', 'chat'],
+  tour: ['everywhere', 'workspace', 'tour'],
+  patterns: ['everywhere', 'patterns'],
+  onboarding: ['onboarding']
+}
+
+const normal = (keys: string): string => {
+  const parts = keys.toLowerCase().split('+')
+  const key = parts.pop()
+  return [...parts.sort(), key].join('+')
+}
+
+describe('SHORTCUTS', () => {
+  it('never gives the same keys to two shortcuts that can be live together', () => {
+    const entries = Object.entries(SHORTCUTS).flatMap(([id, s]) =>
+      keysOf(s).map((keys) => ({ id, scope: s.scope, keys: normal(keys) }))
+    )
+    const clashes = entries.flatMap((x, i) =>
+      entries
+        .slice(i + 1)
+        .filter((y) => OVERLAPS[x.scope].includes(y.scope) && x.keys === y.keys)
+        .map((y) => `${x.id} and ${y.id}`)
+    )
+    expect(clashes).toEqual([])
+  })
+
+  it('opens the shortcut list with either of its keys', () => {
+    expect(isShortcut(press('/', { metaKey: true }, 'Slash'), 'shortcutList')).toBe(true)
+    expect(isShortcut(press('?', { metaKey: true, shiftKey: true }, 'Slash'), 'shortcutList')).toBe(
+      true
+    )
+    expect(isShortcut(press('/', {}, 'Slash'), 'shortcutList')).toBe(false)
   })
 })

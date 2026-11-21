@@ -14,6 +14,7 @@ import { TopBar } from './TopBar'
 import { LeftPanel } from './LeftPanel'
 import { useCatalog } from '@/stores/catalog'
 import { RepoNotice } from './RepoNotice'
+import { useWorkspaceShortcuts } from './useWorkspaceShortcuts'
 
 /** Height of the terminal's header bar, which stays visible while the terminal is collapsed. */
 export const TERMINAL_HEADER_PX = 41
@@ -36,6 +37,7 @@ export function WorkspacePage(): React.JSX.Element {
   const downloading = useCatalog((s) => !!labId && s.downloads[labId]?.state === 'running')
   // The sheet shows the repo's download, or why the issue could not open.
   const notice = status === 'error' || (status === 'loading' && downloading)
+  useWorkspaceShortcuts()
 
   useEffect(() => {
     if (labId && chapterId) void open(labId, chapterId)

@@ -17,6 +17,7 @@ import { TaskHints } from './TaskHints'
 
 interface Props {
   task: TaskDef
+  hintKey: string
   number: number
   progress: ChapterProgress | undefined
   first: boolean
@@ -25,7 +26,15 @@ interface Props {
   flow?: FlowStep[]
 }
 
-export function TaskItem({ task, number, progress, first, scene, flow }: Props): React.JSX.Element {
+export function TaskItem({
+  task,
+  hintKey,
+  number,
+  progress,
+  first,
+  scene,
+  flow
+}: Props): React.JSX.Element {
   const checking = useWorkspace((s) => s.checking)
   const toolsInstalling = useRuntime((s) => !!s.status?.installing)
   const check = useWorkspace((s) => s.check)
@@ -134,6 +143,7 @@ export function TaskItem({ task, number, progress, first, scene, flow }: Props):
           </div>
         )}
         <TaskHints
+          id={hintKey}
           hints={task.hints}
           nonGreenChecks={progress?.nonGreenChecks ?? 0}
           passed={!!taskProgress?.passed}

@@ -10,6 +10,8 @@ import { YearBoardPage } from '@/features/catalog/YearBoardPage'
 import { DsaPage } from '@/features/dsa/DsaPage'
 import { PatternPage } from '@/features/dsa/PatternPage'
 import { Onboarding } from '@/features/onboarding/Onboarding'
+import { AppShortcuts } from '@/features/shortcuts/AppShortcuts'
+import { ShortcutList } from '@/features/shortcuts/ShortcutList'
 import { SettingsDialog } from '@/features/settings/SettingsDialog'
 import { StarPrompt } from '@/features/star/StarPrompt'
 import { WorkspacePage } from '@/features/workspace/WorkspacePage'
@@ -25,7 +27,9 @@ export default function App(): React.JSX.Element {
       ) : (
         <>
           <SettingsDialog />
+          <ShortcutList />
           <HashRouter>
+            <AppShortcuts />
             {/* Inside the router: it watches routes to know when a repo is closed. */}
             <StarPrompt />
             <Routes>
