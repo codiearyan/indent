@@ -2,6 +2,7 @@ import type {
   ChapterProgress,
   CheckResult,
   ProgressState,
+  ProgressSummary,
   TaskDef,
   TaskProgress
 } from '../../shared/types'
@@ -99,4 +100,89 @@ export function recordCheck(
   if (!chapter.completedAt && isChapterComplete(chapter, allTaskIds)) {
     chapter.completedAt = now.toISOString()
   }
+}
+
+export const NOT_A_PROGRESS_FILE = 'That is not an Indent progress file.'
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === 'object' && !Array.isArray(value)
+const isCount = (value: unknown): boolean =>
+  typeof value === 'number' && Number.isFinite(value) && value >= 0
+const isText = (value: unknown): boolean => typeof value === 'string'
+const optional = (value: unknown, is: (value: unknown) => boolean): boolean =>
+  value === undefined || is(value)
+const everyValue = (value: unknown, is: (value: unknown) => boolean): boolean =>
+  isRecord(value) && Object.values(value).every(is)
+
+const isTask = (task: unknown): boolean =>
+  isRecord(task) &&
+  typeof task.passed === 'boolean' &&
+  isCount(task.pointsEarned) &&
+  optional(task.passedAt, isText) &&
+  optional(task.failedChecks, isCount) &&
+  optional(task.failedNames, (names) => everyValue(names, isCount)) &&
+  optional(task.tip, isText)
+
+const isChapter = (chapter: unknown): boolean =>
+  isRecord(chapter) &&
+  isCount(chapter.nonGreenChecks) &&
+  everyValue(chapter.tasks, isTask) &&
+  isText(chapter.startedAt) &&
+  isText(chapter.lastOpenedAt) &&
+  optional(chapter.completedAt, isText)
+
+const isDay = (day: unknown): boolean =>
+  isRecord(day) && isCount(day.points) && isCount(day.checks) && isCount(day.tasksPassed)
+
+const isResult = (result: unknown): boolean =>
+  isRecord(result) &&
+  isText(result.taskId) &&
+  typeof result.passed === 'boolean' &&
+  Array.isArray(result.details) &&
+  result.details.every(
+    (detail) =>
+      isRecord(detail) &&
+      isText(detail.name) &&
+      typeof detail.passed === 'boolean' &&
+      optional(detail.message, isText) &&
+      optional(detail.output, isText)
+  ) &&
+  optional(result.error, isText)
+
+/**
+ * Reads a progress file a person picked. It throws unless every part the app reads has its
+ * shape, because what it returns becomes the progress. A last result that is damaged is dropped:
+ * the next check writes a new one.
+ */
+export function readProgressFile(text: string): ProgressState {
+  const notAFile = new Error(NOT_A_PROGRESS_FILE)
+  let data: unknown
+  try {
+    data = JSON.parse(text)
+  } catch {
+    throw notAFile
+  }
+  const valid =
+    isRecord(data) &&
+    everyValue(data.chapters, isChapter) &&
+    everyValue(data.activity, isDay) &&
+    isCount(data.totalPoints) &&
+    optional(
+      data.lastOpened,
+      (opened) => isRecord(opened) && isText(opened.labId) && isText(opened.chapterId)
+    )
+  if (!valid) throw notAFile
+  const state = data as unknown as ProgressState
+  for (const chapter of Object.values(state.chapters)) {
+    for (const task of Object.values(chapter.tasks)) {
+      if (!isResult(task.lastResult)) delete task.lastResult
+    }
+  }
+  dropOldToolErrors(state)
+  return state
+}
+
+export function summarize(state: ProgressState): ProgressSummary {
+  const tasks = Object.values(state.chapters).flatMap((chapter) => Object.values(chapter.tasks))
+  return { totalPoints: state.totalPoints, tasksPassed: tasks.filter((t) => t.passed).length }
 }

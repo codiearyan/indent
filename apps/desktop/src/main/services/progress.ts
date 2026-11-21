@@ -1,5 +1,8 @@
-import { readFile, rename, writeFile } from 'fs/promises'
-import type { CheckResult, ProgressState, TaskDef } from '@shared/types'
+import { copyFile, readFile, rename, stat, writeFile } from 'fs/promises'
+import { basename, join } from 'path'
+import { app, BrowserWindow, dialog } from 'electron'
+import { localDate } from '@shared/rules'
+import type { CheckResult, ProgressImport, ProgressState, TaskDef } from '@shared/types'
 import { handle } from '../ipc'
 import { dataFile } from '../paths'
 import * as rules from './progressLogic'
@@ -60,9 +63,74 @@ export function saveTip(
   return update((s) => rules.setTip(s, labId, chapterId, taskId, tip, new Date()))
 }
 
+const FILE_KIND = [{ name: 'Indent progress', extensions: ['json'] }]
+// Far above any real progress file; keeps a wrong pick from being read into memory.
+const MAX_FILE_BYTES = 20 * 1024 * 1024
+
+async function exportFile(): Promise<string | null> {
+  const options: Electron.SaveDialogOptions = {
+    title: 'Export your progress',
+    buttonLabel: 'Export',
+    defaultPath: join(app.getPath('documents'), `indent-progress-${localDate()}.json`),
+    filters: FILE_KIND
+  }
+  const window = BrowserWindow.getFocusedWindow()
+  const result = await (window
+    ? dialog.showSaveDialog(window, options)
+    : dialog.showSaveDialog(options))
+  if (result.canceled || !result.filePath) return null
+  await writeFile(result.filePath, JSON.stringify(await getState(), null, 2))
+  return result.filePath
+}
+
+/** The progress read from the last pick; applyImport takes only this, never a renderer's data. */
+let picked: ProgressState | null = null
+
+async function pickImport(): Promise<ProgressImport | null> {
+  picked = null
+  const options: Electron.OpenDialogOptions = {
+    title: 'Import your progress',
+    message: 'Pick a progress file you exported from Indent.',
+    buttonLabel: 'Import',
+    filters: FILE_KIND,
+    properties: ['openFile']
+  }
+  const window = BrowserWindow.getFocusedWindow()
+  const result = await (window
+    ? dialog.showOpenDialog(window, options)
+    : dialog.showOpenDialog(options))
+  const file = result.filePaths[0]
+  if (result.canceled || !file) return null
+  if ((await stat(file)).size > MAX_FILE_BYTES) throw new Error(rules.NOT_A_PROGRESS_FILE)
+  const incoming = rules.readProgressFile(await readFile(file, 'utf8'))
+  picked = incoming
+  return {
+    file: basename(file),
+    current: rules.summarize(await getState()),
+    incoming: rules.summarize(incoming)
+  }
+}
+
+async function applyImport(): Promise<ProgressState> {
+  if (!picked) throw new Error('Pick a progress file first.')
+  const next = picked
+  picked = null
+  const file = dataFile('progress.json')
+  await saving.catch(() => {})
+  // A copy, so the progress on disk stays whole until the new one is written over it.
+  await copyFile(file, `${file}.replaced-${Date.now()}`).catch((error: NodeJS.ErrnoException) => {
+    if (error.code !== 'ENOENT') throw error
+  })
+  state = Promise.resolve(next)
+  return update(() => {})
+}
+
 export function register(): void {
   handle('progress', {
     get: getState,
-    touch: (labId, chapterId) => update((s) => rules.touch(s, labId, chapterId, new Date()))
+    touch: (labId, chapterId) => update((s) => rules.touch(s, labId, chapterId, new Date())),
+    exportFile,
+    pickImport,
+    applyImport
   })
 }

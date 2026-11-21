@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import type { CheckResult, ProgressState, TaskDef } from '../../shared/types'
 import { localDate } from '../../shared/rules'
-import { dropOldToolErrors, emptyProgress, recordCheck, setTip, touch } from './progressLogic'
+import {
+  dropOldToolErrors,
+  emptyProgress,
+  readProgressFile,
+  recordCheck,
+  setTip,
+  summarize,
+  touch
+} from './progressLogic'
 
 const now = new Date('2026-11-19T10:00:00')
 const later = new Date('2026-11-19T11:00:00')
@@ -147,5 +155,67 @@ describe('dropOldToolErrors', () => {
     expect(saved.t2.lastResult).toBeUndefined()
     expect(saved.t3.lastResult?.error).toBe('The checker stopped with an error.')
     expect(state.totalPoints).toBe(10)
+  })
+})
+
+describe('progress file', () => {
+  const saved = (): ProgressState => {
+    const state = emptyProgress()
+    touch(state, 'lab', 'c1', now)
+    recordCheck(state, 'lab', 'c1', tasks, [result('t1', true), result('t2', false)], now)
+    return state
+  }
+  const notAFile = 'That is not an Indent progress file.'
+
+  it('reads back what the app saved', () => {
+    const state = saved()
+    expect(readProgressFile(JSON.stringify(state))).toEqual(state)
+  })
+
+  it('reads a file with no progress in it yet', () => {
+    expect(readProgressFile(JSON.stringify(emptyProgress()))).toEqual(emptyProgress())
+  })
+
+  it('refuses text that is not JSON', () => {
+    expect(() => readProgressFile('level 4')).toThrow(notAFile)
+  })
+
+  it.each([
+    ['another JSON file', { name: 'indent', version: '1.0.0' }],
+    ['a list', []],
+    ['nothing', null],
+    ['points that are not a number', { ...saved(), totalPoints: '90' }],
+    ['negative points', { ...saved(), totalPoints: -5 }],
+    ['an issue with no tasks', { ...saved(), chapters: { 'lab/c1': { nonGreenChecks: 0 } } }],
+    [
+      'a task with no result',
+      {
+        ...saved(),
+        chapters: {
+          'lab/c1': { ...saved().chapters['lab/c1'], tasks: { t1: { pointsEarned: 10 } } }
+        }
+      }
+    ],
+    ['a day that is not counts', { ...saved(), activity: { [today]: { points: 'many' } } }],
+    ['a last opened issue with no ids', { ...saved(), lastOpened: { labId: 7 } }]
+  ])('refuses %s', (_name, data) => {
+    expect(() => readProgressFile(JSON.stringify(data))).toThrow(notAFile)
+  })
+
+  it('keeps a task and drops its last result when the result is damaged', () => {
+    const state = saved()
+    const damaged = structuredClone(state) as unknown as {
+      chapters: Record<string, { tasks: Record<string, { lastResult: unknown }> }>
+    }
+    damaged.chapters['lab/c1'].tasks.t1.lastResult = { details: 'all green' }
+
+    const task = readProgressFile(JSON.stringify(damaged)).chapters['lab/c1'].tasks.t1
+
+    expect(task.passed).toBe(true)
+    expect(task.lastResult).toBeUndefined()
+  })
+
+  it('sums up points and passed tasks', () => {
+    expect(summarize(saved())).toEqual({ totalPoints: 10, tasksPassed: 1 })
   })
 })
