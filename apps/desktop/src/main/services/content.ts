@@ -151,7 +151,8 @@ export async function loadChapter(labId: string, chapterId: string): Promise<Cha
   return getChapter(contentDir(), labId, safeId(chapterId))
 }
 
-async function openChapter(labId: string, chapterId: string): Promise<Chapter> {
+/** The chapter with its flow, when the flow passes the checks in flow.ts. */
+export async function openChapter(labId: string, chapterId: string): Promise<Chapter> {
   const chapter = await loadChapter(labId, chapterId)
   const taskIds = chapter.tasks.map((task) => task.id)
   const flow = await readFlow(chapterContentDir(labId, chapterId), `${labId}/${chapterId}`, taskIds)

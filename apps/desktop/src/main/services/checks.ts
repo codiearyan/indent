@@ -2,14 +2,22 @@ import { execFile, type ExecFileOptions } from 'child_process'
 import { existsSync } from 'fs'
 import { copyFile, mkdir, readFile } from 'fs/promises'
 import { join } from 'path'
-import type { CheckResult, ProgressState, RuntimeStatus } from '@shared/types'
+import type { CheckResult, ProgressState, RuntimeStatus, TraceResult } from '@shared/types'
 import { EVENTS } from '@shared/types'
 import { chapterKey } from '@shared/rules'
 import { emit, handle } from '../ipc'
 import { labEnv } from '../labEnv'
-import { chapterContentDir, contentDir, workspaceDir, workspacesRoot } from '../paths'
-import { loadChapter } from './content'
-import { failedResults, gradeRun, nodeSupported, tail, type RunOutcome } from './grader'
+import { chapterContentDir, contentDir, safeId, workspaceDir, workspacesRoot } from '../paths'
+import { loadChapter, openChapter } from './content'
+import {
+  failedResults,
+  failedTrace,
+  gradeRun,
+  nodeSupported,
+  parseTrace,
+  tail,
+  type RunOutcome
+} from './grader'
 import { labModelProblem, labModelReady, startLabModel } from './labModel'
 import { getProgress, recordCheck } from './progress'
 import { InstallError } from '../library'
@@ -22,6 +30,7 @@ import {
 } from '../repoTools'
 
 const CHECK_TIMEOUT_MS = 90_000
+const TRACE_TIMEOUT_MS = 30_000
 const INSTALL_TIMEOUT_MS = 10 * 60_000
 
 function runProcess(cmd: string, args: string[], options: ExecFileOptions): Promise<RunOutcome> {
@@ -175,6 +184,42 @@ export function ensureRuntime(): Promise<RuntimeStatus> {
   return (installing ??= install().finally(() => (installing = undefined)))
 }
 
+const sandboxRoot = async (): Promise<string> => {
+  const dir = join(workspacesRoot(), '.sandbox')
+  await mkdir(dir, { recursive: true })
+  return dir
+}
+
+/**
+ * Runs the example in a task's flow on the learner's code. It needs no check first: when to offer
+ * it is the renderer's call.
+ */
+async function trace(labId: string, chapterId: string, taskId: string): Promise<TraceResult> {
+  const chapter = await openChapter(labId, chapterId)
+  if (!chapter.tasks.some((task) => task.id === safeId(taskId)))
+    throw new Error(`Unknown task: ${taskId}`)
+  if (!chapter.flow?.tasks?.[taskId]?.trace) throw new Error(`Task ${taskId} has no trace`)
+
+  const status = await ensureRuntime()
+  if (!status.ready) return failedTrace(status.error ?? 'The repo tools are not ready yet.')
+  await labModelReady()
+  const error = labModelProblem(labId)
+  if (error) return failedTrace(error)
+  const args = [
+    join(contentDir(), 'kit', 'run-trace.mjs'),
+    ...['--chapter', chapterContentDir(labId, chapterId)],
+    ...['--workspace', workspaceDir(labId, chapterId)],
+    ...['--sandbox-root', await sandboxRoot()],
+    ...['--task', taskId]
+  ]
+  const run = await runProcess('node', args, {
+    env: await labEnv(),
+    timeout: TRACE_TIMEOUT_MS,
+    killSignal: 'SIGKILL'
+  })
+  return parseTrace(run, TRACE_TIMEOUT_MS / 1000)
+}
+
 async function runCheck(
   labId: string,
   chapterId: string,
@@ -195,13 +240,11 @@ async function runCheck(
   if (error) {
     results = failedResults(ids, error, 0, new Date().toISOString())
   } else {
-    const sandboxRoot = join(workspacesRoot(), '.sandbox')
-    await mkdir(sandboxRoot, { recursive: true })
     const args = [
       join(contentDir(), 'kit', 'run-check.mjs'),
       ...['--chapter', chapterContentDir(labId, chapterId)],
       ...['--workspace', workspaceDir(labId, chapterId)],
-      ...['--sandbox-root', sandboxRoot],
+      ...['--sandbox-root', await sandboxRoot()],
       ...ids.flatMap((id) => ['--task', id])
     ]
     const started = Date.now()
@@ -235,6 +278,7 @@ export function register(): void {
   startLabModel()
   handle('checks', {
     run,
+    trace,
     runtimeStatus: async () => (installing && latest ? latest : runtimeStatus()),
     ensureRuntime
   })

@@ -550,6 +550,8 @@ export interface Api {
       chapterId: string,
       taskIds?: string[]
     ): Promise<{ results: CheckResult[]; progress: ProgressState }>
+    /** Runs the example in the task's flow on the learner's code and records their calls. */
+    trace(labId: string, chapterId: string, taskId: string): Promise<TraceResult>
     runtimeStatus(): Promise<RuntimeStatus>
     /** Installs the lab dependencies if needed. */
     ensureRuntime(): Promise<RuntimeStatus>
@@ -640,7 +642,7 @@ export const INVOKE_METHODS = {
     'pickRoot',
     'moveRoot'
   ],
-  checks: ['run', 'runtimeStatus', 'ensureRuntime'],
+  checks: ['run', 'trace', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],
   updates: ['status', 'check', 'download', 'cancel', 'install'],

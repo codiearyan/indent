@@ -166,6 +166,7 @@ packages/content/
                                      esbuild, @types/node);
                                      installed once into <userData>/workspaces so every workspace resolves them
   kit/run-check.mjs                  grader CLI, see below
+  kit/run-trace.mjs                  tracer CLI: runs a task's example and records the calls, see below
   kit/lab-model.mjs                  the lab model: a deterministic, offline, OpenAI-compatible server
   kit/page.mjs                       t.page(): a workspace page in a headless DOM, see below
   labs/<labId>/lab.json              LabMeta
@@ -213,6 +214,16 @@ one-sentence note, and for an issue `tasks` keyed by task id, each a few steps t
 `scripts/build-packs.mjs` fails on a bad one and the app leaves a bad one out. A flow shows what
 goes in and the shape of what comes out, never a task's answer or a value a check compares against.
 
+Tracing runs a task's example on the learner's code. A `function` node may name the learner's
+function in `fn`, and a task may have `trace: { file, call, args }`: a learner file, one of its
+exports (the `fn` of a scene node) and JSON arguments from the story. The pack check also confirms
+the file is in `starter/` and each `fn` is a top-level `function` declaration there.
+`checks.trace(labId, chapterId, taskId)` runs `kit/run-trace.mjs`, and `shared/trace.ts`
+(`compareTrace`) lays the recorded calls over the steps: reached, missed or not checked, and the
+first place the path left the flow's, said in plain words without the expected value. Only
+top-level `function` declarations of ES modules (`.js`, `.mjs`, `.ts`, `.mts`) are traced, not
+`const f = () => {}`.
+
 ### Pages in the browser
 
 An issue whose `chapter.json` has `"preview": "index.html"` gets a Browser panel beside the editor
@@ -246,6 +257,19 @@ It prints exactly one JSON line last on stdout:
 `{"results":[{"taskId":"...","passed":false,"details":[{"name":"...","passed":false,"message":"...","output":"..."}]}]}`
 and exits 0 whether tasks pass or fail. A non-zero exit means the grader itself crashed.
 Messages say what to look at in plain words and never give the answer.
+
+Tracer CLI, run the same way, with the same sandbox root:
+
+```
+node packages/content/kit/run-trace.mjs --chapter <abs chapter dir> --workspace <abs workspace dir> \
+     --sandbox-root <abs dir for temp copies> --task <taskId>
+```
+
+It reads only the chapter's `flow.json`, never `grader/` or `solution/`, runs the call in a child
+with the same timeout and output caps as `t.call`, and prints one JSON line last on stdout:
+`{"trace":{"ok":true,"calls":[{"fn":"orderTotal","file":"src/reports.js","depth":0,"args":["{...}"],"returned":"1300"}],"timedOut":false,"truncated":false,"stdout":""}}`
+(`error` when the call threw or timed out, `threw` on a call that threw; values are previews cut to
+160 characters; at most 300 calls). It exits 0 whether the learner's code works or throws.
 
 Lab model: `node packages/content/kit/lab-model.mjs` prints `{"port":N}` as its first stdout line, then serves
 `POST /v1/chat/completions` on 127.0.0.1. Learner code reaches it with `new OpenAI()` because the
