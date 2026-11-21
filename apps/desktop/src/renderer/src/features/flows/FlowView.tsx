@@ -133,7 +133,7 @@ export function FlowView({ scene, active = [], stepKey = 0 }: Props): React.JSX.
             >
               <span
                 className={cn(
-                  'truncate leading-4',
+                  'line-clamp-2 leading-4 wrap-anywhere',
                   node.kind === 'file' || node.kind === 'function'
                     ? 'font-mono text-xs'
                     : 'text-[13px]'

@@ -9,9 +9,10 @@ function cellSize(cols: number): number {
   return 36
 }
 
-export function GridView({ frame }: { frame: GridFrame }): React.JSX.Element {
+export function GridView({ frame, fit }: { frame: GridFrame; fit?: boolean }): React.JSX.Element {
   const cols = Math.max(0, ...frame.cells.map((row) => row.length))
   const size = cellSize(cols)
+  const track = fit ? `minmax(${size}px, auto)` : `${size}px`
   const { rowLabels, colLabels } = frame
   const label = 'flex items-center font-mono text-xs text-muted-foreground'
 
@@ -22,8 +23,8 @@ export function GridView({ frame }: { frame: GridFrame }): React.JSX.Element {
         <div
           className="mx-auto grid w-max gap-1"
           style={{
-            gridTemplateColumns: `${rowLabels ? 'auto ' : ''}repeat(${cols}, ${size}px)`,
-            gridAutoRows: `${size}px`
+            gridTemplateColumns: `${rowLabels ? 'auto ' : ''}repeat(${cols}, ${track})`,
+            gridAutoRows: track
           }}
         >
           {colLabels && (
@@ -51,7 +52,14 @@ export function GridView({ frame }: { frame: GridFrame }): React.JSX.Element {
                       toneBox[frame.tones?.[`${r},${c}`] ?? 'none']
                     )}
                   >
-                    <span className="truncate px-0.5">{text}</span>
+                    <span
+                      className={cn(
+                        'px-0.5',
+                        fit ? 'max-w-40 py-1 text-center wrap-anywhere' : 'truncate'
+                      )}
+                    >
+                      {text}
+                    </span>
                   </div>
                 )
               })}

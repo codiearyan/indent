@@ -18,7 +18,39 @@ function valueSize(value: string): string {
   return 'text-[10px] tracking-tight'
 }
 
-export function ArrayView({ frame }: { frame: ArrayFrame }): React.JSX.Element {
+/** Cells as wide as their text, up to a limit and then wrapped. Flows draw no pointers or range. */
+function FitArray({ frame }: { frame: ArrayFrame }): React.JSX.Element {
+  return (
+    <div className="flex w-full flex-col items-center gap-2">
+      {frame.label && <FrameLabel>{frame.label}</FrameLabel>}
+      <div className="flex max-w-full flex-wrap justify-center gap-1.5">
+        {frame.values.map((value, i) => {
+          const text = String(value)
+          return (
+            <div
+              key={frame.keys?.[i] ?? String(i)}
+              className="flex max-w-full min-w-11 flex-col items-center"
+            >
+              <div
+                className={cn(
+                  'flex min-h-11 w-full max-w-56 items-center justify-center rounded-md border px-2 py-1 text-center font-mono wrap-anywhere',
+                  text.length <= 3 ? 'text-sm' : 'text-xs',
+                  toneBox[frame.tones?.[i] ?? 'none']
+                )}
+              >
+                {text}
+              </div>
+              <span className="font-mono text-xs leading-5 text-muted-foreground">{i}</span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+export function ArrayView({ frame, fit }: { frame: ArrayFrame; fit?: boolean }): React.JSX.Element {
+  if (fit) return <FitArray frame={frame} />
   const n = frame.values.length
   const width = (n + 2) * STEP - GAP
 
