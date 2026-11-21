@@ -12,8 +12,11 @@ import * as ai from './services/ai'
 import * as preview from './services/preview'
 import * as tools from './services/tools'
 import * as github from './services/github'
+import * as telemetry from './services/telemetry'
 
-// Has to happen before the app is ready.
+// Both have to happen before the app is ready, in this order: Electron keeps only the last
+// list of privileged schemes, and the preview scheme must be in it.
+telemetry.init()
 preview.registerScheme()
 
 function createWindow(): void {
@@ -98,7 +101,8 @@ app.whenReady().then(() => {
     ai,
     preview,
     tools,
-    github
+    github,
+    telemetry
   ]) {
     service.register()
   }

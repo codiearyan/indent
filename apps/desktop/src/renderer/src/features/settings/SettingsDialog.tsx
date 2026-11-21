@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Code, Palette, Sparkles, Wrench, type LucideIcon } from 'lucide-react'
+import { Code, Palette, Shield, Sparkles, Wrench, type LucideIcon } from 'lucide-react'
 import {
   CODE_THEMES,
   codePalette,
@@ -35,7 +35,8 @@ const SECTIONS: {
   { id: 'appearance', label: 'Appearance', icon: Palette, view: AppearanceSection },
   { id: 'editor', label: 'Editor', icon: Code, view: EditorSection },
   { id: 'ai', label: 'AI', icon: Sparkles, view: AiSection },
-  { id: 'tools', label: 'Tools', icon: Wrench, view: ToolsSection }
+  { id: 'tools', label: 'Tools', icon: Wrench, view: ToolsSection },
+  { id: 'privacy', label: 'Privacy', icon: Shield, view: PrivacySection }
 ]
 
 /** Every setting in one window. Opens from the sidebar, the View menu, or with Cmd or Ctrl and comma. */
@@ -247,6 +248,25 @@ function EditorSection(): React.JSX.Element {
         </div>
       </Group>
     </>
+  )
+}
+
+function PrivacySection(): React.JSX.Element {
+  const telemetry = useSettings((s) => s.telemetry)
+  const setTelemetry = useSettings((s) => s.setTelemetry)
+
+  return (
+    <Group title="Usage stats">
+      <div className={card}>
+        <Row
+          id="privacy-telemetry"
+          label="Share anonymous usage stats"
+          hint="Counts like repos started, checks run and issues finished, with the app version and system. Never your code, files, chats or keys."
+        >
+          <Switch id="privacy-telemetry" checked={telemetry} onCheckedChange={setTelemetry} />
+        </Row>
+      </div>
+    </Group>
   )
 }
 

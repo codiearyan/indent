@@ -1,4 +1,5 @@
 import { activeProvider, useAi } from '@/features/ai/aiStore'
+import { useSettings } from '@/stores/settings'
 import { StepLayout } from './StepLayout'
 import { helpLevelFor } from './steps'
 
@@ -12,8 +13,9 @@ export function Ready({ staged }: { staged: boolean }): React.JSX.Element {
   const config = useAi((s) => s.config)
   const provider = activeProvider(config)
   const on = config?.enabled ?? true
+  const telemetry = useSettings((s) => s.telemetry)
 
-  const rows: [string, string][] = on
+  const ai: [string, string][] = on
     ? [
         ['AI help', 'On'],
         [
@@ -26,12 +28,13 @@ export function Ready({ staged }: { staged: boolean }): React.JSX.Element {
         ['Tutor after a failed check', config?.nudge ? 'Offered' : 'Not offered']
       ]
     : [['AI help', 'Off']]
+  const rows: [string, string][] = [...ai, ['Usage stats', telemetry ? 'Shared' : 'Not shared']]
 
   return (
     <StepLayout
       staged={staged}
       title="Ready to start"
-      lead="Here is what you picked. All of it can be changed later from the AI menu."
+      lead="Here is what you picked. All of it can be changed later in Settings."
     >
       <dl className="rounded-lg border border-border">
         {rows.map(([label, value], i) => (

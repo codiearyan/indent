@@ -35,6 +35,9 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^1.10.0
         version: 1.10.0(zod@4.6.7)
+      '@aptabase/electron':
+        specifier: ^0.3.1
+        version: 0.3.1(electron@44.11.5)
       '@electron-toolkit/utils':
         specifier: ^4.0.0
         version: 4.0.0(electron@44.11.5)
@@ -195,6 +198,11 @@ packages:
     peerDependenciesMeta:
       zod:
         optional: true
+
+  '@aptabase/electron@0.3.1':
+    resolution: {integrity: sha512-FECaGsjuoQu70F+M6V1evdgLP7yaq/sne9fC60AZZ6B9RsCDlxFBnJzdq3+xevHlUx6AB5o9ygUhQ+ONT9EqiA==}
+    peerDependencies:
+      electron: '>= 3.x'
 
   '@astrojs/astro2tsx@0.1.4':
     resolution: {integrity: sha512-5dJqY4i1AlXxcsSFHkaegnrgdVs9J4U93y/YF0xmvmSOcNYVQnf4db3IhvqHZ5v8biLPlPlFmlYsqHj0c4/ZSA==}
@@ -5142,6 +5150,10 @@ snapshots:
       standardwebhooks: 1.3.0
     optionalDependencies:
       zod: 4.6.7
+
+  '@aptabase/electron@0.3.1(electron@44.11.5)':
+    dependencies:
+      electron: 44.11.5
 
   '@astrojs/astro2tsx@0.1.4':
     dependencies:

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { AiChatEvent, AiMessage, CheckResult } from '@shared/types'
 import { chapterKey } from '@shared/rules'
 import { api } from '@/lib/api'
+import { track } from '@/lib/telemetry'
 import { useProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
@@ -94,6 +95,7 @@ export const useChat = create<ChatStore>()((set, get) => {
       const key = chapterKey(chapter.labId, chapter.id)
       if (isBudgeted() && get().remaining <= 0) return
 
+      track('tutor_asked', { repo: chapter.labId, issue: chapter.id })
       const history = [...(get().threads[key] ?? []), { role: 'user' as const, content: question }]
       const sent = (get().sent[key] ?? 0) + 1
       set((s) => ({

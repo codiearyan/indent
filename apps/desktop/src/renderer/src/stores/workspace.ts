@@ -1,10 +1,25 @@
 import { create } from 'zustand'
-import type { Chapter, CheckResult, WorkspaceFile, WorkspaceSnapshot } from '@shared/types'
+import type {
+  Chapter,
+  CheckResult,
+  ProgressState,
+  WorkspaceFile,
+  WorkspaceSnapshot
+} from '@shared/types'
+import { chapterKey, hintsUnlocked } from '@shared/rules'
 import { api } from '@/lib/api'
+import { track } from '@/lib/telemetry'
 import { useProgress } from './progress'
 import { useSettings } from './settings'
 
 const SAVE_DELAY_MS = 400
+
+/** True right after the first issue of a repo was opened for the first time. */
+function repoJustStarted(progress: ProgressState, labId: string, chapterId: string): boolean {
+  const opened = Object.keys(progress.chapters).filter((key) => key.startsWith(`${labId}/`))
+  const entry = progress.chapters[chapterKey(labId, chapterId)]
+  return opened.length === 1 && entry?.startedAt === entry?.lastOpenedAt
+}
 
 interface WorkspaceStore {
   status: 'idle' | 'loading' | 'ready' | 'error'
@@ -100,6 +115,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
           api.progress.touch(labId, chapterId)
         ])
         useProgress.getState().set(progress)
+        if (repoJustStarted(progress, labId, chapterId)) track('repo_started', { repo: labId })
         set({ chapter, status: 'ready' })
         applySnapshot(snapshot)
       } catch (error) {
@@ -142,8 +158,19 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       set({ checking: taskIds ?? chapter.tasks.map((t) => t.id) })
       try {
         await get().flush()
+        const key = chapterKey(chapter.labId, chapter.id)
+        const before = useProgress.getState().progress?.chapters[key]
         const { results, progress } = await api.checks.run(chapter.labId, chapter.id, taskIds)
         useProgress.getState().set(progress)
+        const after = progress.chapters[key]
+        const ids = { repo: chapter.labId, issue: chapter.id }
+        const passed = results.filter((r) => r.passed).length
+        track('check_run', { ...ids, passed, failed: results.length - passed })
+        const hints = hintsUnlocked(after?.nonGreenChecks ?? 0)
+        if (hints > hintsUnlocked(before?.nonGreenChecks ?? 0)) {
+          track('hints_unlocked', { ...ids, hints })
+        }
+        if (after?.completedAt && !before?.completedAt) track('issue_completed', ids)
         useSettings.getState().setLeftTab('tasks')
         return results
       } finally {
