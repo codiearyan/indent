@@ -1,0 +1,138 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Refund request",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Pip assistant",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "work",
+        "label": "Shop decision",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "output",
+        "label": "Recorded outcome",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "A refund requires a shop decision, and the conversation records what happened."
+  },
+  "tasks": {
+    "confirm": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer asks for a refund."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Pip sends the request to the shop."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The shop owner can decide whether it goes ahead."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "Pip receives the outcome of that decision."
+        }
+      ]
+    },
+    "trace": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Pip asks the shop to act."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The app records what Pip asked for."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The request may go through or be refused."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The record shows what happened before Pip replied."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer requests a refund the owner declines."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Pip brings the request to the owner."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The shop can inspect whether anything changed."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The record lets the shop verify how the request ended."
+        }
+      ]
+    }
+  }
+}

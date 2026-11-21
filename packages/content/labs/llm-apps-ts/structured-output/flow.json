@@ -1,0 +1,138 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Model reply",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Reply parser",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "work",
+        "label": "Order validation",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "output",
+        "label": "Order result",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "A nursery email becomes an order only when the reply can be read and the order makes sense."
+  },
+  "tasks": {
+    "parse": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Moss replies to an order email."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The reply can contain prose around the order."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The order data needs to be readable."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "Unreadable data becomes a problem for the caller."
+        }
+      ]
+    },
+    "validate": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "An order arrives from the model."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The app reads the order fields."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "A field may have an unexpected value."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The caller can see which part of the order needs attention."
+        }
+      ]
+    },
+    "extract": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer email reaches Moss."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The first reply may need work."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The app can send the problems back to Moss."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The caller gets an order or a clear failure."
+        }
+      ]
+    }
+  }
+}

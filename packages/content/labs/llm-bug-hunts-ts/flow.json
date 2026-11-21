@@ -1,0 +1,82 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "customer",
+        "label": "Parcel customers",
+        "kind": "story"
+      },
+      {
+        "id": "model",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "summaries",
+        "label": "Complaint summaries",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "changes",
+        "label": "Delivery requests",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "chat",
+        "label": "Chat sessions",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "support",
+        "label": "Support desk",
+        "kind": "story"
+      },
+      {
+        "id": "depot",
+        "label": "Depot system",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "customer",
+        "to": "model",
+        "label": "messages"
+      },
+      {
+        "from": "model",
+        "to": "summaries",
+        "label": "summary"
+      },
+      {
+        "from": "model",
+        "to": "changes",
+        "label": "reply text"
+      },
+      {
+        "from": "model",
+        "to": "chat",
+        "label": "chat reply"
+      },
+      {
+        "from": "summaries",
+        "to": "support",
+        "label": "ticket notes"
+      },
+      {
+        "from": "changes",
+        "to": "depot",
+        "label": "changes"
+      },
+      {
+        "from": "chat",
+        "to": "customer",
+        "label": "answers"
+      }
+    ],
+    "note": "At Kestrel Parcels, you investigate what happens when model replies become ticket notes, depot requests and answers in a customer chat."
+  }
+}

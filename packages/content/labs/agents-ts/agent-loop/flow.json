@@ -1,0 +1,137 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Customer question",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Pip conversation",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "work",
+        "label": "Shop tools",
+        "kind": "story"
+      },
+      {
+        "id": "output",
+        "label": "Final answer",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "Pip can gather more shop information over several rounds."
+  },
+  "tasks": {
+    "run-tools": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Pip receives a question."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "A reply can ask the shop to do several things."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "Each request produces its own result."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "Pip can read the results in context."
+        }
+      ]
+    },
+    "loop": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer asks something that needs more than one lookup."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Pip asks the shop for information."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The result joins the conversation before the next reply."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The customer gets an answer once Pip has enough information."
+        }
+      ]
+    },
+    "step-limit": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer asks Pip to wait for a change."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Pip keeps asking the shop for updates."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The shop cannot guarantee a change during the run."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The app can end the attempt when it runs out of steps."
+        }
+      ]
+    }
+  }
+}

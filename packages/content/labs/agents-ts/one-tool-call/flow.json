@@ -1,0 +1,137 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Order question",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Pip assistant",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "work",
+        "label": "Order lookup",
+        "kind": "story"
+      },
+      {
+        "id": "output",
+        "label": "Customer answer",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "Pip can answer an order question using a lookup from the shop."
+  },
+  "tasks": {
+    "describe-tool": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer wants an order update."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Pip needs to know what the shop can look up."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The lookup description tells Pip what information it needs."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "Pip can request a lookup for the question."
+        }
+      ]
+    },
+    "read-call": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "An order question reaches Pip."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Pip chooses to ask the shop for information."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The app receives the requested action and its details."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The caller can inspect that request."
+        }
+      ]
+    },
+    "round-trip": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer asks about an order."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Pip asks to look it up."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The shop sends the lookup result back."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "Pip uses that result to answer the customer."
+        }
+      ]
+    }
+  }
+}

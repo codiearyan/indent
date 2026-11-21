@@ -1,0 +1,137 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Inbox message",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Prompt builder",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "work",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "output",
+        "label": "Triage result",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "Ravi uses Moss to sort nursery messages before reading them."
+  },
+  "tasks": {
+    "label-only": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "An inbox message arrives."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Moss needs to know what kind of reply the inbox expects."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The model returns a label."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The inbox can accept a recognised label."
+        }
+      ]
+    },
+    "examples": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer asks about a plant."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The instructions describe the desired reply."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "Examples show what a triage reply looks like."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The model receives the new message with that context."
+        }
+      ]
+    },
+    "triage": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A message reaches the inbox."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The app sends the triage conversation."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The model replies with text."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The inbox needs fields it can display."
+        }
+      ]
+    }
+  }
+}

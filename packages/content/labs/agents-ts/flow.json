@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Shop customer",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Pip assistant",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "work",
+        "label": "Shop tools",
+        "kind": "story"
+      },
+      {
+        "id": "output",
+        "label": "Shop outcome",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "Pip answers customers using stock and order information from the shop."
+  }
+}

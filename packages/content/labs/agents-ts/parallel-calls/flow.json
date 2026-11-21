@@ -1,0 +1,137 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Stock question",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Pip tool calls",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "work",
+        "label": "Stock scans",
+        "kind": "story"
+      },
+      {
+        "id": "output",
+        "label": "Tool replies",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "Several stock scans can be underway during the same turn."
+  },
+  "tasks": {
+    "concurrent": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Pip needs stock information from several scans."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The requests reach the shop together."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "Scans can be in flight at the same time."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "Pip receives the results for that round."
+        }
+      ]
+    },
+    "in-order": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Pip asks for scans with different response times."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Each request has its own identity."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "Scans can finish in a different order from the requests."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "Pip gets each result alongside the request it belongs to."
+        }
+      ]
+    },
+    "agent": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer asks about several items."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Pip requests a group of scans."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The shop collects the results for the whole group."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "Pip sees the group’s results before it answers."
+        }
+      ]
+    }
+  }
+}

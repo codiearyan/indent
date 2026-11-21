@@ -1,0 +1,137 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Plant question",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Message builder",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "work",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "output",
+        "label": "Reply details",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "Moss answers a customer question and reports how the reply ended."
+  },
+  "tasks": {
+    "messages": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Start with a question about a fern."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The request needs the nursery’s instructions."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The question belongs in the same request."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The model receives the conversation."
+        }
+      ]
+    },
+    "ask": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "The customer asks about a fern."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The app prepares the conversation."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The model sends a reply."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The inbox gets the reply text."
+        }
+      ]
+    },
+    "details": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer asks for care advice."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The request has room for a limited reply."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The model reports how it stopped."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The caller sees the text and usage together."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Nursery inbox",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Moss app",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "work",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "output",
+        "label": "Inbox result",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "The nursery app turns customer messages into answers and order details using Moss."
+  }
+}

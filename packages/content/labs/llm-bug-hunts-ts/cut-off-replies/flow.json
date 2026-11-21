@@ -1,0 +1,219 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "complaint",
+        "label": "Customer complaint",
+        "kind": "data"
+      },
+      {
+        "id": "summarize",
+        "label": "summarize.ts",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "model",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "reply",
+        "label": "Model reply",
+        "kind": "data"
+      },
+      {
+        "id": "desk",
+        "label": "Support desk",
+        "kind": "story"
+      },
+      {
+        "id": "reproduce",
+        "label": "reproduce.ts",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "test",
+        "label": "summarize.test.ts",
+        "kind": "file",
+        "mine": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "complaint",
+        "to": "summarize",
+        "label": "complaint"
+      },
+      {
+        "from": "summarize",
+        "to": "model",
+        "label": "request"
+      },
+      {
+        "from": "model",
+        "to": "reply",
+        "label": "reply"
+      },
+      {
+        "from": "reply",
+        "to": "summarize",
+        "label": "result"
+      },
+      {
+        "from": "summarize",
+        "to": "desk",
+        "label": "summary"
+      },
+      {
+        "from": "complaint",
+        "to": "reproduce",
+        "label": "complaint"
+      },
+      {
+        "from": "reproduce",
+        "to": "model",
+        "label": "request"
+      },
+      {
+        "from": "reply",
+        "to": "reproduce",
+        "label": "evidence"
+      },
+      {
+        "from": "test",
+        "to": "summarize",
+        "label": "tests"
+      }
+    ],
+    "note": "Mira needs a complete briefing from Kes before her team can act on a delivery complaint."
+  },
+  "tasks": {
+    "reproduce": {
+      "steps": [
+        {
+          "active": [
+            "complaint"
+          ],
+          "note": "A customer reports a soaked carton, damaged posters and a missed pickup for the return."
+        },
+        {
+          "active": [
+            "complaint",
+            "complaint->reproduce",
+            "reproduce",
+            "reproduce->model",
+            "model"
+          ],
+          "note": "The same complaint goes to the local model under the settings used by the support desk."
+        },
+        {
+          "active": [
+            "model",
+            "model->reply",
+            "reply"
+          ],
+          "note": "The reply comes back before the customer\u2019s whole account is covered."
+        },
+        {
+          "active": [
+            "reply",
+            "reply->reproduce",
+            "reproduce"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "Ticket evidence",
+            "entries": [
+              {
+                "key": "text",
+                "value": "Reply text"
+              },
+              {
+                "key": "finishReason",
+                "value": "Reason the model stopped"
+              }
+            ]
+          },
+          "note": "The ticket gets the model\u2019s text and its stated reason for stopping."
+        }
+      ]
+    },
+    "fix": {
+      "steps": [
+        {
+          "active": [
+            "complaint",
+            "complaint->summarize",
+            "summarize"
+          ],
+          "note": "Mira opens a complaint about a crate that arrived with a broken seal."
+        },
+        {
+          "active": [
+            "summarize",
+            "summarize->model",
+            "model",
+            "model->reply",
+            "reply"
+          ],
+          "note": "The local model returns a reply for the ticket."
+        },
+        {
+          "active": [
+            "reply",
+            "reply->summarize",
+            "summarize",
+            "summarize->desk",
+            "desk"
+          ],
+          "note": "When a complete summary is ready, the desk receives it as text."
+        },
+        {
+          "active": [
+            "summarize",
+            "desk"
+          ],
+          "note": "If no complete summary is available, the desk gets an error it can act on."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": [
+            "test",
+            "test->summarize",
+            "summarize"
+          ],
+          "note": "The test opens a case with several details, including a wet label and a missed collection."
+        },
+        {
+          "active": [
+            "summarize",
+            "summarize->desk",
+            "desk"
+          ],
+          "note": "The resulting briefing should cover the whole complaint."
+        },
+        {
+          "active": [
+            "test",
+            "test->summarize",
+            "summarize"
+          ],
+          "note": "Another case represents a complaint whose briefing never fits."
+        },
+        {
+          "active": [
+            "summarize",
+            "desk",
+            "test"
+          ],
+          "note": "The support desk should get a clear failure for that case."
+        }
+      ]
+    }
+  }
+}

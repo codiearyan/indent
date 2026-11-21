@@ -1,0 +1,160 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Tool request",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Registry",
+        "kind": "function",
+        "mine": true,
+        "fn": "parseArguments"
+      },
+      {
+        "id": "work",
+        "label": "Shop tool",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "output",
+        "label": "Tool result",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "The shop can tell Pip why a tool request failed so the conversation can continue."
+  },
+  "tasks": {
+    "parse-args": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Pip asks a shop tool to do something."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The registry knows what that tool accepts."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "An unsuitable request is caught before the tool runs."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The result tells Pip there was a problem."
+        }
+      ],
+      "trace": {
+        "file": "src/registry.ts",
+        "call": "parseArguments",
+        "args": [
+          {
+            "description": "Read the stock count",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "sku": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "sku"
+              ]
+            }
+          },
+          "{\"sku\":\"HNY-31\"}"
+        ]
+      }
+    },
+    "execute": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Pip sends a tool request."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The shop looks for the requested tool."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "A tool may return information or fail while working."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "Pip receives a result either way."
+        }
+      ]
+    },
+    "recover": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer wants to reserve stock."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Pip may make a request the shop cannot fulfil."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The result tells Pip what went wrong."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "Pip can use that information in its next reply."
+        }
+      ]
+    }
+  }
+}

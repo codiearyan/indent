@@ -1,0 +1,138 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Reply stream",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Stream reader",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "work",
+        "label": "Partial text",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "output",
+        "label": "Final reply",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "The inbox can show Moss’s reply while the model is still sending it."
+  },
+  "tasks": {
+    "assemble": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "The model sends its reply in pieces."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Some pieces carry text."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The text grows as pieces arrive."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The caller needs to know how the stream ended."
+        }
+      ]
+    },
+    "partial": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A new reply begins."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "A piece can change the visible text."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The inbox sees the text collected so far."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The final result describes the whole reply."
+        }
+      ]
+    },
+    "stream-answer": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer asks a question."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The app opens a stream for the answer."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "The inbox can show updates during the request."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The caller gets the completed stream result."
+        }
+      ]
+    }
+  }
+}

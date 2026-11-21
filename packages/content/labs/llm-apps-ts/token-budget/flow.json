@@ -1,0 +1,137 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "New question",
+        "kind": "data"
+      },
+      {
+        "id": "request",
+        "label": "Conversation history",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "work",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "output",
+        "label": "Updated history",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "request"
+      },
+      {
+        "from": "request",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "output"
+      }
+    ],
+    "note": "Moss needs enough conversation to answer while staying inside the request budget."
+  },
+  "tasks": {
+    "history": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer asks a follow-up."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "Earlier turns give it context."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "Moss answers using the conversation it sees."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The reply becomes part of the conversation."
+        }
+      ]
+    },
+    "fit": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A new question joins a long conversation."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The app measures the messages against the budget."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "Moss can receive a smaller conversation."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "Some requests may be too large even after shortening."
+        }
+      ]
+    },
+    "budget": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer sends another question."
+        },
+        {
+          "active": [
+            "request",
+            "input->request"
+          ],
+          "note": "The app prepares a conversation within the budget."
+        },
+        {
+          "active": [
+            "work",
+            "request->work"
+          ],
+          "note": "Moss replies to the messages it received."
+        },
+        {
+          "active": [
+            "output",
+            "work->output"
+          ],
+          "note": "The next turn starts from the conversation used this time."
+        }
+      ]
+    }
+  }
+}
