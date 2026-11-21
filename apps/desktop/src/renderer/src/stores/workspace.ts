@@ -15,6 +15,8 @@ import { track } from '@/lib/telemetry'
 import { useCatalog } from './catalog'
 import { useProgress } from './progress'
 import { useSettings } from './settings'
+import { useOpenTabs } from './tabs'
+import { closeTab, initialTabs, openTab, pruneTabs, type OpenTabs } from '@/features/editor/tabs'
 
 const SAVE_DELAY_MS = 400
 
@@ -38,6 +40,8 @@ interface WorkspaceStore {
   conflicts: string[]
   /** Reset keeps the files the learner added; false for a workspace from before that. */
   remembered: boolean
+  /** Files open as tabs, in the order they were opened. */
+  openPaths: string[]
   activePath: string | null
   /** Counts writes to disk, so the Browser panel knows when to reload. */
   revision: number
@@ -48,7 +52,10 @@ interface WorkspaceStore {
   tourOpen: boolean
 
   open(labId: string, chapterId: string): Promise<void>
-  setActive(path: string): void
+  /** Opens a file as a tab, or switches to its tab, and makes it the active file. */
+  openFile(path: string): void
+  /** Closes a file's tab. The file stays on disk. */
+  closeFile(path: string): void
   /** Updates the buffer and saves to disk after a short pause. */
   edit(path: string, content: string): void
   /** Writes pending edits now. */
@@ -85,32 +92,31 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       .then(() => set((s) => ({ revision: s.revision + 1 })))
   }
 
-  const applySnapshot = ({
-    files,
-    dir,
-    starter,
-    conflicts,
-    updated,
-    remembered
-  }: WorkspaceSnapshot): void => {
-    const { activePath, chapter } = get()
-    const stillThere = files.some((f) => f.path === activePath)
+  const setTabs = ({ paths, active }: OpenTabs): void => {
+    set({ openPaths: paths, activePath: active })
+    const chapter = get().chapter
+    if (chapter) {
+      useOpenTabs.getState().remember(chapterKey(chapter.labId, chapter.id), { paths, active })
+    }
+  }
+
+  /** `opening` restores the issue's remembered tabs; otherwise tabs of files that are gone close. */
+  const applySnapshot = (
+    { files, dir, starter, conflicts, updated, remembered }: WorkspaceSnapshot,
+    opening = false
+  ): void => {
+    const { openPaths, activePath, chapter } = get()
+    const existing = files.map((f) => f.path)
+    const saved = chapter && useOpenTabs.getState().byChapter[chapterKey(chapter.labId, chapter.id)]
+    const tabs = opening
+      ? initialTabs(saved ?? undefined, chapter?.files ?? [], existing)
+      : pruneTabs({ paths: openPaths, active: activePath }, existing)
     if (updated.length > 0) {
       set((s) => ({ revision: s.revision + 1 }))
       if (conflicts.length === 0) toast('This issue was updated. Your changes are kept.')
     }
-    set({
-      files,
-      dir,
-      starter,
-      conflicts,
-      remembered,
-      activePath: stillThere
-        ? activePath
-        : (chapter?.files.find((path) => files.some((f) => f.path === path)) ??
-          files[0]?.path ??
-          null)
-    })
+    set({ files, dir, starter, conflicts, remembered })
+    setTabs(tabs)
   }
 
   return {
@@ -122,6 +128,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     starter: {},
     conflicts: [],
     remembered: true,
+    openPaths: [],
     activePath: null,
     revision: 0,
     checking: null,
@@ -137,6 +144,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         files: [],
         starter: {},
         conflicts: [],
+        openPaths: [],
         activePath: null
       })
       const catalog = useCatalog.getState()
@@ -156,13 +164,19 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         useProgress.getState().set(progress)
         if (repoJustStarted(progress, labId, chapterId)) track('repo_started', { repo: labId })
         set({ chapter, status: 'ready' })
-        applySnapshot(snapshot)
+        applySnapshot(snapshot, true)
       } catch (error) {
         set({ status: 'error', error: errorMessage(error) })
       }
     },
 
-    setActive: (activePath) => set({ activePath }),
+    openFile: (path) =>
+      setTabs(openTab({ paths: get().openPaths, active: get().activePath }, path)),
+
+    closeFile: (path) => {
+      if (pendingSaves.has(path)) void save(path)
+      setTabs(closeTab({ paths: get().openPaths, active: get().activePath }, path))
+    },
 
     edit: (path, content) => {
       set((s) => ({ files: s.files.map((f) => (f.path === path ? { ...f, content } : f)) }))

@@ -14,6 +14,7 @@ export const SHORTCUTS = {
   openSettings: { label: 'Open settings', keys: 'Mod+,', scope: 'everywhere' },
   save: { label: 'Save', keys: 'Mod+S', scope: 'editor' },
   check: { label: 'Run checks', keys: 'Mod+Enter', scope: 'editor' },
+  closeFile: { label: 'Close file', keys: 'Mod+W', scope: 'workspace' },
   runCommand: { label: 'Run the command', keys: 'Mod+Enter', scope: 'workspace' },
   suggest: { label: 'Ask for a suggestion', keys: 'Alt+\\', scope: 'editor' },
   sendMessage: { label: 'Send', keys: 'Enter', scope: 'chat' },

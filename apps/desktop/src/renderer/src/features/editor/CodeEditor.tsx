@@ -55,6 +55,10 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
       void useWorkspace.getState().flush()
     })
     editor.addCommand(monacoShortcut('check', monaco), onCheck)
+    editor.addCommand(monacoShortcut('closeFile', monaco), () => {
+      const { activePath, closeFile } = useWorkspace.getState()
+      if (activePath) closeFile(activePath)
+    })
     bindSuggestShortcut(monaco, editor)
     return () => {
       editor.dispose()
