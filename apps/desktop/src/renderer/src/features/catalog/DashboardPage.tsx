@@ -15,6 +15,7 @@ import { useSettings } from '@/stores/settings'
 import { TOUR } from '@/features/tour/anchors'
 import { parseDate, recentWeeks } from './activity'
 import { Heatmap } from './Heatmap'
+import { NextSession } from './NextSession'
 import { labProgress, type LabProgress } from './labStatus'
 import { goalLabIds, recommendedOrder } from './recommend'
 
@@ -35,7 +36,7 @@ export function DashboardPage(): React.JSX.Element {
   const labs = useCatalog((s) => s.labs)
   const paths = useCatalog((s) => s.paths)
   const progress = useProgress((s) => s.progress)
-  const goal = useSettings((s) => s.goal)
+  const goals = useSettings((s) => s.goals)
   const experience = useSettings((s) => s.experience)
   const weeks = useMemo(() => recentWeeks(17), [])
 
@@ -53,8 +54,8 @@ export function DashboardPage(): React.JSX.Element {
     )
   }
 
-  const onRoadmap = new Set(goalLabIds(paths, goal))
-  const rows: LabRow[] = recommendedOrder(labs, paths, goal, experience).map((lab) => ({
+  const onRoadmap = new Set(goalLabIds(paths, goals))
+  const rows: LabRow[] = recommendedOrder(labs, paths, goals, experience).map((lab) => ({
     lab,
     progress: labProgress(lab, progress.chapters)
   }))
@@ -87,6 +88,7 @@ export function DashboardPage(): React.JSX.Element {
               ? `Pass one task today to keep your ${streak} day streak.`
               : 'Pass a task today to start a streak.'}
         </p>
+        <NextSession activity={progress.activity} />
       </header>
 
       <div className="grid grid-cols-12 gap-6">

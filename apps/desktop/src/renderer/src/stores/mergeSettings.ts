@@ -12,7 +12,8 @@ export function mergeSettings(
   current: SettingsState,
   system: Theme
 ): SettingsState {
-  const persisted = (saved ?? {}) as Partial<SettingsState>
+  // `goal` is the one goal that versions before several goals saved.
+  const persisted = (saved ?? {}) as Partial<SettingsState> & { goal?: string | null }
   const appearance = persisted.appearance ?? persisted.theme ?? current.appearance
   const known = CODE_THEMES.some((theme) => theme.id === persisted.codeTheme)
   return {
@@ -24,6 +25,7 @@ export function mergeSettings(
     panels: { ...current.panels, ...persisted.panels },
     editor: { ...current.editor, ...persisted.editor },
     typography: { ...current.typography, ...persisted.typography },
-    shortcuts: cleanOverrides(persisted.shortcuts)
+    shortcuts: cleanOverrides(persisted.shortcuts),
+    goals: persisted.goals ?? (persisted.goal ? [persisted.goal] : current.goals)
   }
 }

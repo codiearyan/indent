@@ -58,11 +58,11 @@ export function stepOffset(stage: GuideStage): number {
 export function suggestedRepo(
   labs: LabSummary[],
   paths: PathDef[],
-  goal: string | null,
+  goals: string[],
   experience: Experience | null,
   progress: Pick<ProgressState, 'chapters' | 'lastOpened'>
 ): LabSummary | undefined {
-  const rows = recommendedOrder(labs, paths, goal, experience).map((lab) => ({
+  const rows = recommendedOrder(labs, paths, goals, experience).map((lab) => ({
     lab,
     progress: labProgress(lab, progress.chapters)
   }))
@@ -79,7 +79,7 @@ export function homeSteps({ goal, started }: { goal: boolean; started: boolean }
   const pick = started
     ? 'This is the one you worked on last.'
     : goal
-      ? 'This one fits the goal you picked, but any repo is fine.'
+      ? 'This one fits a goal you picked, but any repo is fine.'
       : 'This one is a good place to start, but any repo is fine.'
   return [
     {

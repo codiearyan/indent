@@ -102,12 +102,12 @@ describe('stages', () => {
 
 describe('suggestedRepo', () => {
   it('suggests the first repo of the goal', () => {
-    expect(suggestedRepo(labs, paths, 'backend', 'new', fresh)?.id).toBe('node')
+    expect(suggestedRepo(labs, paths, ['backend'], 'new', fresh)?.id).toBe('node')
   })
 
   it('suggests the first easy repo when no goal was picked', () => {
-    expect(suggestedRepo(labs, paths, null, null, fresh)?.id).toBe('sql')
-    expect(suggestedRepo(labs, paths, null, 'some', fresh)?.id).toBe('sql')
+    expect(suggestedRepo(labs, paths, [], null, fresh)?.id).toBe('sql')
+    expect(suggestedRepo(labs, paths, [], 'some', fresh)?.id).toBe('sql')
   })
 
   it('suggests the repo opened last for someone who has started', () => {
@@ -115,7 +115,7 @@ describe('suggestedRepo', () => {
       chapters: { 'react/a': opened('2026-01-02T00:00:00Z') },
       lastOpened: { labId: 'react', chapterId: 'a' }
     }
-    expect(suggestedRepo(labs, paths, 'backend', 'new', progress)?.id).toBe('react')
+    expect(suggestedRepo(labs, paths, ['backend'], 'new', progress)?.id).toBe('react')
   })
 
   it('suggests nothing when every repo is finished', () => {
@@ -128,7 +128,7 @@ describe('suggestedRepo', () => {
       ])
     )
     expect(
-      suggestedRepo(labs, paths, null, null, { chapters, lastOpened: undefined })
+      suggestedRepo(labs, paths, [], null, { chapters, lastOpened: undefined })
     ).toBeUndefined()
   })
 })

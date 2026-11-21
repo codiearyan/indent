@@ -256,10 +256,10 @@ function useNext(
   chapters: ProgressState['chapters']
 ): { lab: LabSummary; started: boolean; chapterId?: string; onRoadmap: boolean }[] {
   const paths = useCatalog((s) => s.paths) ?? []
-  const goal = useSettings((s) => s.goal)
+  const goals = useSettings((s) => s.goals)
   const experience = useSettings((s) => s.experience)
-  const onRoadmap = new Set(goalLabIds(paths, goal))
-  return recommendedOrder(labs, paths, goal, experience)
+  const onRoadmap = new Set(goalLabIds(paths, goals))
+  return recommendedOrder(labs, paths, goals, experience)
     .filter((other) => other.id !== lab.id && other.availability !== 'app-update')
     .map((other) => ({ other, progress: labProgress(other, chapters) }))
     .filter(({ progress }) => progress.status !== 'completed')

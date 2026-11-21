@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import {
+  CalendarClock,
   Code,
   HardDrive,
   Info,
@@ -36,6 +37,7 @@ import { Group, LayoutControls, Row, card } from './controls'
 import { DataSection } from './DataSection'
 import { useSettingsDialog, type SettingsSection } from './dialogStore'
 import { KeyboardSection } from './KeyboardSection'
+import { PracticeSection } from './PracticeSection'
 import { ThemeCards } from './ThemeCards'
 import { ToolsSection } from './ToolsSection'
 import { Typography } from './Typography'
@@ -50,6 +52,7 @@ const SECTIONS: {
   { id: 'editor', label: 'Editor', icon: Code, view: EditorSection },
   { id: 'keyboard', label: 'Keyboard', icon: Keyboard, view: KeyboardSection },
   { id: 'ai', label: 'AI', icon: Sparkles, view: AiSection },
+  { id: 'practice', label: 'Practice', icon: CalendarClock, view: PracticeSection },
   { id: 'tools', label: 'Tools', icon: Wrench, view: ToolsSection },
   { id: 'data', label: 'Your data', icon: HardDrive, view: DataSection },
   { id: 'privacy', label: 'Privacy', icon: Shield, view: PrivacySection },

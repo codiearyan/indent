@@ -38,19 +38,14 @@ const ids = (list: LabSummary[]): string[] => list.map((l) => l.id)
 
 describe('recommendedOrder', () => {
   it('puts easy repos first, then follows the roadmaps, without a goal', () => {
-    expect(ids(recommendedOrder(labs, paths, null, null))).toEqual([
-      'basics',
-      'sql',
-      'react',
-      'api'
-    ])
-    expect(ids(recommendedOrder(labs, paths, null, 'some'))).toEqual(
-      ids(recommendedOrder(labs, paths, null, null))
+    expect(ids(recommendedOrder(labs, paths, [], null))).toEqual(['basics', 'sql', 'react', 'api'])
+    expect(ids(recommendedOrder(labs, paths, [], 'some'))).toEqual(
+      ids(recommendedOrder(labs, paths, [], null))
     )
   })
 
   it('puts the goal roadmap first', () => {
-    expect(ids(recommendedOrder(labs, paths, 'backend', null))).toEqual([
+    expect(ids(recommendedOrder(labs, paths, ['backend'], null))).toEqual([
       'basics',
       'api',
       'react',
@@ -59,7 +54,7 @@ describe('recommendedOrder', () => {
   })
 
   it('gives new learners easy repos first outside the goal', () => {
-    expect(ids(recommendedOrder(labs, paths, 'backend', 'new'))).toEqual([
+    expect(ids(recommendedOrder(labs, paths, ['backend'], 'new'))).toEqual([
       'basics',
       'api',
       'sql',
@@ -68,13 +63,13 @@ describe('recommendedOrder', () => {
   })
 
   it('moves easy repos last for experienced learners, but keeps the goal order', () => {
-    expect(ids(recommendedOrder(labs, paths, 'frontend', 'experienced'))).toEqual([
+    expect(ids(recommendedOrder(labs, paths, ['frontend'], 'experienced'))).toEqual([
       'basics',
       'react',
       'api',
       'sql'
     ])
-    expect(ids(recommendedOrder(labs, paths, null, 'experienced'))).toEqual([
+    expect(ids(recommendedOrder(labs, paths, [], 'experienced'))).toEqual([
       'react',
       'api',
       'basics',
@@ -82,9 +77,24 @@ describe('recommendedOrder', () => {
     ])
   })
 
+  it('follows several goals in the order they were picked', () => {
+    expect(ids(recommendedOrder(labs, paths, ['backend', 'frontend'], null))).toEqual([
+      'basics',
+      'api',
+      'react',
+      'sql'
+    ])
+    expect(ids(recommendedOrder(labs, paths, ['frontend', 'backend'], 'new'))).toEqual([
+      'basics',
+      'react',
+      'api',
+      'sql'
+    ])
+  })
+
   it('ignores a goal whose roadmap is gone', () => {
-    expect(ids(recommendedOrder(labs, paths, 'removed', null))).toEqual(
-      ids(recommendedOrder(labs, paths, null, null))
+    expect(ids(recommendedOrder(labs, paths, ['removed'], null))).toEqual(
+      ids(recommendedOrder(labs, paths, [], null))
     )
   })
 })

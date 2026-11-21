@@ -7,24 +7,16 @@ import { track } from '@/lib/telemetry'
 import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
 import { StepStrip } from './StepStrip'
-import { AiChoice } from './AiChoice'
+import { Ai } from './Ai'
 import { Goal } from './Goal'
-import { HelpLevel } from './HelpLevel'
-import { Ready } from './Ready'
-import { HowItWorks } from './HowItWorks'
-import { Provider } from './Provider'
 import { Welcome } from './Welcome'
-import { helpLevelFor, nextStep, prevStep, type Choices, type StepId } from './steps'
+import { nextStep, prevStep, STEPS, type StepId } from './steps'
 import './onboarding.css'
 
-const STEPS: Record<StepId, (props: { staged: boolean }) => React.JSX.Element> = {
+const VIEWS: Record<StepId, (props: { staged: boolean }) => React.JSX.Element> = {
   welcome: Welcome,
-  how: HowItWorks,
   goal: Goal,
-  ai: AiChoice,
-  provider: Provider,
-  help: HelpLevel,
-  ready: Ready
+  ai: Ai
 }
 
 /** Elements where Enter already means something; everywhere else in the setup it continues. */
@@ -33,17 +25,15 @@ const OWNS_ENTER =
 
 /** The first-run setup. Shown instead of the app until it is finished or skipped. */
 export function Onboarding(): React.JSX.Element {
-  const aiEnabled = useAi((s) => s.config?.enabled ?? true)
   const [step, setStep] = useState<StepId>('welcome')
   const [visited, setVisited] = useState<ReadonlySet<StepId>>(() => new Set())
   const [complete, setComplete] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const stepRef = useRef<HTMLDivElement>(null)
 
-  const choices: Choices = { ai: aiEnabled }
-  const next = nextStep(step, choices)
-  const back = prevStep(step, choices)
-  const View = STEPS[step]
+  const next = nextStep(step)
+  const back = prevStep(step)
+  const View = VIEWS[step]
 
   const finish = useCallback((from: StepId): void => {
     // The provider shown as picked is saved even when the person only pressed Continue.
@@ -51,8 +41,7 @@ export function Onboarding(): React.JSX.Element {
     if (config?.enabled && config.provider) void update({ provider: config.provider })
     track('onboarding_finished', {
       from,
-      ai: config?.enabled === false ? 'off' : (activeProvider(config)?.kind ?? 'none'),
-      help: helpLevelFor(config?.suggestions ?? 'off')
+      ai: config?.enabled === false ? 'off' : (activeProvider(config)?.kind ?? 'none')
     })
     window.location.hash = '#/'
     viewTransition('onboarding-finish', () => {
@@ -89,7 +78,7 @@ export function Onboarding(): React.JSX.Element {
 
   // The one quiet celebration: once the last step has settled, its cell fills too.
   useEffect(() => {
-    if (step !== 'ready') return
+    if (step !== STEPS.at(-1)) return
     const timer = setTimeout(() => setComplete(true), 420)
     return () => {
       clearTimeout(timer)
@@ -148,7 +137,7 @@ export function Onboarding(): React.JSX.Element {
               </Button>
             )}
           </div>
-          <StepStrip step={step} choices={choices} complete={complete} />
+          <StepStrip step={step} complete={complete} />
           <div className="flex justify-end">
             <Button className="press min-w-32" onClick={() => go(next)}>
               {next ? 'Continue' : 'Start learning'}

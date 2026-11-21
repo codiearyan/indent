@@ -1,26 +1,11 @@
-import { useEffect } from 'react'
 import { APP_NAME, BrandMark } from '@/components/app/Brand'
-import { BuildStrip } from '@/components/app/BuildStrip'
-import { LanguageIcon } from '@/components/app/LanguageIcon'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Figures } from '@/features/catalog/Figures'
 import { cn } from '@/lib/utils'
-import { useCatalog } from '@/stores/catalog'
-
-/** The list stays this long however many repos there are, so the step never outgrows the window. */
-const SHOWN = 10
+import { WelcomeScene } from './scenes/WelcomeScene'
+import picture from './welcome.webp'
 
 export function Welcome({ staged }: { staged: boolean }): React.JSX.Element {
-  const labs = useCatalog((s) => s.labs)
-  const load = useCatalog((s) => s.load)
-  useEffect(() => void load(), [load])
-
   const stage = (index: number): { className?: string; style?: React.CSSProperties } =>
     staged ? { className: 'ob-stage', style: { '--stage': index } as React.CSSProperties } : {}
-
-  const chapters = labs?.flatMap((lab) => lab.chapters) ?? []
-  const count = (value: number): React.ReactNode =>
-    labs ? value : <Skeleton className="my-1 h-6 w-10" />
 
   return (
     <div className="mx-auto grid w-full max-w-[1040px] grid-cols-[minmax(0,5fr)_minmax(0,6fr)] items-center gap-12">
@@ -45,67 +30,33 @@ export function Welcome({ staged }: { staged: boolean }): React.JSX.Element {
           Each repo is a small company with a problem, and you are its developer. Read the issue,
           write the code, run it, and press Check.
         </p>
-        <div className={cn('mt-6', stage(3).className)} style={stage(3).style}>
-          <Figures
-            label={`What is in ${APP_NAME}`}
-            figures={[
-              { label: 'Repos', value: count(labs?.length ?? 0) },
-              { label: 'Issues', value: count(chapters.length) },
-              { label: 'Tasks', value: count(chapters.reduce((sum, c) => sum + c.taskCount, 0)) }
-            ]}
-          />
-          <p className="mt-4 text-[13px] text-muted-foreground">
-            Everything stays on this computer. No account needed.
-          </p>
-        </div>
+        <p
+          className={cn('mt-6 text-[13px] text-muted-foreground', stage(3).className)}
+          style={stage(3).style}
+        >
+          Everything stays on this computer. No account needed.
+        </p>
       </div>
 
-      <section
-        aria-label="The repos"
-        className={cn('rounded-lg border border-border', stage(2).className)}
-        style={stage(2).style}
-      >
-        <header className="flex items-baseline justify-between border-b border-rule px-5 py-3.5">
-          <h2 className="text-sm font-semibold">Your repos</h2>
-          <span className="text-[13px] text-muted-foreground">One cell per task</span>
-        </header>
-        <ul className="grid grid-cols-2">
-          {labs
-            ? labs.slice(0, SHOWN).map((lab, i) => (
-                <li
-                  key={lab.id}
-                  className={cn(
-                    'flex min-w-0 items-center gap-3 border-rule px-5 py-3 odd:border-r [&:nth-last-child(n+3)]:border-b',
-                    staged && 'motion-enter'
-                  )}
-                  style={{ '--i': i } as React.CSSProperties}
-                >
-                  <LanguageIcon language={lab.language} />
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-[13px] font-medium">{lab.title}</div>
-                    <BuildStrip lab={lab} chapters={{}} className="mt-2 h-1" />
-                  </div>
-                </li>
-              ))
-            : Array.from({ length: SHOWN }, (_, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-3 border-rule px-5 py-3 odd:border-r [&:nth-last-child(n+3)]:border-b"
-                >
-                  <Skeleton className="size-6 rounded-md" />
-                  <div className="flex-1">
-                    <Skeleton className="h-3.5 w-3/5" />
-                    <Skeleton className="mt-2 h-1 w-full" />
-                  </div>
-                </li>
-              ))}
-        </ul>
-        {labs && labs.length > SHOWN && (
-          <p className="border-t border-rule px-5 py-3 text-[13px] text-muted-foreground">
-            And {labs.length - SHOWN} more on Home.
-          </p>
-        )}
-      </section>
+      <div className="relative pr-4 pb-20">
+        <img
+          src={picture}
+          alt=""
+          width={1536}
+          height={1024}
+          className={cn(
+            'aspect-[3/2] w-full rounded-lg border border-border object-cover',
+            stage(2).className
+          )}
+          style={stage(2).style}
+        />
+        <div
+          className={cn('absolute right-0 bottom-0 w-[300px]', stage(5).className)}
+          style={stage(5).style}
+        >
+          <WelcomeScene />
+        </div>
+      </div>
     </div>
   )
 }

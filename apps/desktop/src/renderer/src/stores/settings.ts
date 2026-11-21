@@ -68,8 +68,8 @@ export interface SettingsState {
   autoUpdate: boolean
   /** The app version seen last, so a new one can say what changed once. */
   lastVersion: string | null
-  /** Id of the roadmap picked as a goal in the setup or on Roadmaps; null when not sure yet. */
-  goal: string | null
+  /** Ids of the roadmaps picked as goals in the setup or on Roadmaps, in the order picked. */
+  goals: string[]
   experience: Experience | null
   /** Ids of DSA patterns whose animation was played to the end. */
   dsaWatched: string[]
@@ -96,8 +96,7 @@ export interface SettingsState {
   setTelemetry(telemetry: boolean): void
   setAutoUpdate(autoUpdate: boolean): void
   setLastVersion(lastVersion: string): void
-  setGoal(goal: string | null): void
-  setExperience(experience: Experience): void
+  setGoals(goals: string[]): void
   resetLayout(): void
   setGuide(guide: GuideStage | null): void
 }
@@ -142,7 +141,7 @@ export const useSettings = create<SettingsState>()(
       telemetry: true,
       autoUpdate: true,
       lastVersion: null,
-      goal: null,
+      goals: [],
       experience: null,
       dsaWatched: [],
       shortcuts: {},
@@ -172,8 +171,7 @@ export const useSettings = create<SettingsState>()(
       setTelemetry: (telemetry) => set({ telemetry }),
       setAutoUpdate: (autoUpdate) => set({ autoUpdate }),
       setLastVersion: (lastVersion) => set({ lastVersion }),
-      setGoal: (goal) => set({ goal }),
-      setExperience: (experience) => set({ experience }),
+      setGoals: (goals) => set({ goals }),
       resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' }),
       setGuide: (guide) => set({ guide })
     }),
