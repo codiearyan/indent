@@ -39,7 +39,7 @@
         },
         {
           "active": ["price"],
-          "note": "The parameter is a number or a string. typeof splits the two, and inside the number branch TypeScript knows amount is a number."
+          "note": "The parameter is a number or a string, and each kind is read its own way."
         },
         {
           "active": ["price"],
@@ -48,7 +48,7 @@
         {
           "active": ["price"],
           "value": { "kind": "array", "label": "text that is a price", "values": ["24", "24.9", "24.90"] },
-          "note": "Text is trimmed first. After the number branch returns, amount is a string, so trim is allowed. Digits with an optional dot and one or two decimals count."
+          "note": "Text is trimmed first. Digits with an optional dot and one or two decimals count."
         },
         {
           "active": ["price", "price->page", "page"],
@@ -57,7 +57,7 @@
             "label": "what comes back",
             "entries": [{ "key": "price", "value": "whole cents, or null" }]
           },
-          "note": "The page gets whole cents, or null when the input is not a price. The return type says both, so no caller can forget the null."
+          "note": "The page gets whole cents, or null when the input is not a price."
         }
       ]
     },
@@ -82,7 +82,7 @@
         },
         {
           "active": ["line", "line->guard", "guard"],
-          "note": "contactLine asks isEmailContact first. Only an email contact has an email property, so the in operator tells them apart."
+          "note": "contactLine asks isEmailContact first whether this is an email contact."
         },
         {
           "active": ["guard"],
@@ -90,7 +90,7 @@
         },
         {
           "active": ["line"],
-          "note": "Past the email case, TypeScript knows this is a PhoneContact, so phone and textOk can be read with no cast."
+          "note": "This one is a phone contact, so the line depends on whether texts are ok."
         },
         {
           "active": ["line", "line->page", "page"],

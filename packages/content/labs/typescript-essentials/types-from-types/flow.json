@@ -78,7 +78,7 @@
         },
         {
           "active": ["pluck"],
-          "note": "pluck is generic over the item type and over a key of that type, so a key the items do not have is a type error."
+          "note": "pluck is generic over the item type and the key, so a key the items do not have is a type error."
         },
         {
           "active": ["pluck"],
@@ -168,7 +168,7 @@
         },
         {
           "active": ["broken"],
-          "note": "brokenRules runs each rule against the matching member of the booking. Keys without a rule are skipped."
+          "note": "brokenRules runs each rule against the matching member of the booking."
         },
         {
           "active": ["broken"],

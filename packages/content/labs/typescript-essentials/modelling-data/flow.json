@@ -86,7 +86,7 @@
         },
         {
           "active": ["create"],
-          "note": "No notes were given, so the booking has no notes key at all, not a notes key set to undefined."
+          "note": "No notes were given, so the booking has no notes key at all."
         },
         {
           "active": ["create"],
@@ -130,7 +130,7 @@
         },
         {
           "active": ["status"],
-          "note": "A switch on kind narrows the status, so inside this case part and days can be read. In another case they do not exist."
+          "note": "A switch on kind picks the case for a job waiting for parts, which has a part and a number of days."
         },
         {
           "active": ["status"],

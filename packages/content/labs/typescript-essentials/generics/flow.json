@@ -43,7 +43,7 @@
         },
         {
           "active": ["chunk"],
-          "note": "chunk has a type parameter for the item, so a list of job ids gives lists of job ids, and nothing is lost to unknown."
+          "note": "chunk is generic, so a list of job ids gives lists of job ids, and nothing is lost to unknown."
         },
         {
           "active": ["chunk"],
@@ -96,7 +96,7 @@
         },
         {
           "active": ["latest"],
-          "note": "latest accepts any item that has at least an updatedAt number. A constraint on the type parameter says that and keeps every other member."
+          "note": "latest accepts any item that has at least an updatedAt number, and gives back the same kind of item it got."
         },
         {
           "active": ["latest"],

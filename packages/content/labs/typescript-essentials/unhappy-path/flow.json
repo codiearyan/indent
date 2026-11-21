@@ -59,7 +59,7 @@
         },
         {
           "active": ["read", "read->guard", "guard"],
-          "note": "Each row goes through isBookingRecord. It rules out null and anything that is not an object first, then checks the type of every member."
+          "note": "Each row goes through isBookingRecord, which accepts only an object with a text id, a text customer and a number priceCents."
         },
         {
           "active": ["read", "read->app", "app"],
