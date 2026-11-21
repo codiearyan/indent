@@ -72,6 +72,10 @@ const repos: { labId: string; expected: string[] }[] = [
   {
     labId: 'evals-ts',
     expected: ['exact-match/load', 'judge/parse', 'compare/compare']
+  },
+  {
+    labId: 'agents-ts',
+    expected: ['bad-arguments/parse-args', 'bad-arguments/execute']
   }
 ]
 

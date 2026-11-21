@@ -1,0 +1,164 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "desk",
+        "label": "Delivery desk",
+        "kind": "story"
+      },
+      {
+        "id": "agent",
+        "label": "agent.ts",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "guard",
+        "label": "guardedCall()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "staff",
+        "label": "Staff decision",
+        "kind": "story"
+      },
+      {
+        "id": "ledger",
+        "label": "Refund ledger",
+        "kind": "data"
+      },
+      {
+        "id": "trace",
+        "label": "Run record",
+        "kind": "data"
+      },
+      {
+        "id": "test",
+        "label": "agent.test.ts",
+        "kind": "file",
+        "mine": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "desk",
+        "to": "agent",
+        "label": "request"
+      },
+      {
+        "from": "agent",
+        "to": "guard",
+        "label": "tool request"
+      },
+      {
+        "from": "guard",
+        "to": "staff",
+        "label": "approval"
+      },
+      {
+        "from": "guard",
+        "to": "ledger",
+        "label": "refund"
+      },
+      {
+        "from": "agent",
+        "to": "trace",
+        "label": "events"
+      },
+      {
+        "from": "ledger",
+        "to": "test",
+        "label": "refunds"
+      },
+      {
+        "from": "trace",
+        "to": "test",
+        "label": "run record"
+      }
+    ],
+    "note": "You give pantry staff control over refunds and keep a record they can use to check what happened."
+  },
+  "tasks": {
+    "confirm": {
+      "steps": [
+        {
+          "active": ["desk", "desk->agent", "agent", "agent->guard", "guard"],
+          "note": "The delivery desk receives a refund request for a damaged jar."
+        },
+        {
+          "active": ["guard", "guard->staff", "staff"],
+          "note": "A pantry worker is responsible for deciding whether that refund can go ahead."
+        },
+        {
+          "active": ["guard"],
+          "value": {
+            "kind": "map",
+            "label": "Guarded result",
+            "entries": [
+              {
+                "key": "Content",
+                "value": "tool report"
+              },
+              {
+                "key": "Decision",
+                "value": "refusal status"
+              }
+            ]
+          },
+          "note": "Pip gets a report that distinguishes a refusal from an ordinary tool outcome."
+        }
+      ]
+    },
+    "trace": {
+      "steps": [
+        {
+          "active": ["desk", "desk->agent", "agent"],
+          "note": "The delivery desk asks Pip to look up an order for a customer."
+        },
+        {
+          "active": ["agent", "agent->guard", "guard"],
+          "note": "The pantry handles the lookup while the agent collects events from the run."
+        },
+        {
+          "active": ["agent", "agent->trace", "trace"],
+          "note": "The run record lists what happened in the order it happened."
+        },
+        {
+          "active": ["agent", "trace"],
+          "value": {
+            "kind": "map",
+            "label": "Completed run",
+            "entries": [
+              {
+                "key": "Answer",
+                "value": "delivery update"
+              },
+              {
+                "key": "Trace",
+                "value": "list of events"
+              }
+            ]
+          },
+          "note": "The desk gets the delivery update alongside the record."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["desk", "desk->agent", "agent"],
+          "note": "Picture a staff member declining a refund for a damaged jar."
+        },
+        {
+          "active": ["agent", "agent->trace", "trace"],
+          "note": "Pip’s run leaves records that the pantry can review."
+        },
+        {
+          "active": ["ledger", "ledger->test", "trace", "trace->test", "test"],
+          "note": "The test checks the pantry records for that declined refund."
+        }
+      ]
+    }
+  }
+}

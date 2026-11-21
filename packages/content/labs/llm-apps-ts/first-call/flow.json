@@ -1,0 +1,116 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customer", "label": "Fernhollow customer", "kind": "story" },
+      { "id": "messages", "label": "buildMessages()", "kind": "function", "mine": true },
+      { "id": "request", "label": "Model messages", "kind": "data" },
+      { "id": "ask", "label": "ask()", "kind": "function", "mine": true },
+      { "id": "details", "label": "askWithDetails()", "kind": "function", "mine": true },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "answer", "label": "Care reply", "kind": "data" },
+      { "id": "report", "label": "Reply details", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "customer", "to": "messages", "label": "question" },
+      { "from": "messages", "to": "request", "label": "messages" },
+      { "from": "request", "to": "model", "label": "care request" },
+      { "from": "model", "to": "ask", "label": "response" },
+      { "from": "model", "to": "details", "label": "response" },
+      { "from": "ask", "to": "answer", "label": "care text" },
+      { "from": "details", "to": "report", "label": "details" }
+    ],
+    "note": "A Fernhollow care question goes to the local model, and your code gives Odile either Moss’s answer or a report on how the reply ended."
+  },
+  "tasks": {
+    "messages": {
+      "steps": [
+        {
+          "active": ["customer"],
+          "value": {
+            "kind": "array",
+            "label": "Customer question",
+            "values": ["Is my peace lily too close to the radiator?"]
+          },
+          "note": "A customer writes in about a peace lily in the shop’s care inbox."
+        },
+        {
+          "active": ["customer", "customer->messages", "messages"],
+          "note": "The question is the input to buildMessages()."
+        },
+        {
+          "active": ["messages", "messages->request", "request"],
+          "value": {
+            "kind": "array",
+            "label": "Output shape",
+            "values": ["List of model messages"]
+          },
+          "note": "Moss’s first model call needs this result as its input."
+        }
+      ]
+    },
+    "ask": {
+      "steps": [
+        {
+          "active": ["customer", "customer->messages", "messages"],
+          "value": {
+            "kind": "array",
+            "label": "Customer question",
+            "values": ["Will my monstera settle in beside the kitchen sink?"]
+          },
+          "note": "A customer asks about caring for a plant they have just moved."
+        },
+        {
+          "active": ["messages", "messages->request", "request"],
+          "note": "The request for Moss carries the customer’s care question."
+        },
+        {
+          "active": ["request", "request->model", "model"],
+          "note": "The local model prepares care advice for the question."
+        },
+        {
+          "active": ["model", "model->ask", "ask", "ask->answer", "answer"],
+          "value": {
+            "kind": "array",
+            "label": "Output shape",
+            "values": ["Care reply text"]
+          },
+          "note": "The caller gets the care answer as plain text."
+        }
+      ]
+    },
+    "details": {
+      "steps": [
+        {
+          "active": ["customer", "customer->messages", "messages"],
+          "value": {
+            "kind": "array",
+            "label": "Trial question",
+            "values": ["Can my orchid stay in the hallway overnight?"]
+          },
+          "note": "Odile uses one care question to see what a limit does to the reply."
+        },
+        {
+          "active": ["request", "request->model", "model"],
+          "note": "Odile sends the same question with two different limits on the answer."
+        },
+        {
+          "active": ["model", "model->details", "details", "details->report", "report"],
+          "value": {
+            "kind": "map",
+            "label": "Output shape",
+            "entries": [
+              { "key": "Care reply", "value": "Text" },
+              { "key": "Why it ended", "value": "Finish reason" },
+              { "key": "Token counts", "value": "Input, reply and total" }
+            ]
+          },
+          "note": "The report includes the reply, why it ended and how many tokens the exchange used."
+        },
+        {
+          "active": ["report"],
+          "note": "The report lets Odile tell a full answer from one that ran out of room."
+        }
+      ]
+    }
+  }
+}

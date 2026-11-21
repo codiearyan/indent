@@ -1,0 +1,116 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customer", "label": "Fernhollow customer", "kind": "story" },
+      { "id": "send", "label": "Conversation.send()", "kind": "function", "mine": true },
+      { "id": "history", "label": "Conversation history", "kind": "data" },
+      { "id": "fit", "label": "fitToBudget()", "kind": "function", "mine": true },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "reply", "label": "Care reply", "kind": "data" },
+      { "id": "next-history", "label": "History for next turn", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "customer", "to": "send", "label": "question" },
+      { "from": "history", "to": "send", "label": "past turns" },
+      { "from": "send", "to": "model", "label": "conversation" },
+      { "from": "history", "to": "fit", "label": "messages" },
+      { "from": "send", "to": "fit", "label": "current turn" },
+      { "from": "fit", "to": "model", "label": "within limit" },
+      { "from": "model", "to": "reply", "label": "answer" },
+      { "from": "reply", "to": "next-history", "label": "reply" }
+    ],
+    "note": "Your conversation code lets customers follow up with Moss and keeps long chats within the local model’s token budget."
+  },
+  "tasks": {
+    "history": {
+      "steps": [
+        {
+          "active": ["customer", "customer->send", "send"],
+          "value": {
+            "kind": "array",
+            "label": "First question",
+            "values": ["Can I move my fern to the bathroom shelf?"]
+          },
+          "note": "A customer mentions their fern at the start of a chat with Moss."
+        },
+        {
+          "active": ["history", "history->send", "send", "send->model", "model"],
+          "note": "The first question joins the chat, and Moss gets the request for this turn."
+        },
+        {
+          "active": ["model", "model->reply", "reply", "reply->next-history", "next-history"],
+          "note": "The care reply is available to the caller and becomes part of the chat record."
+        },
+        {
+          "active": ["next-history", "customer", "customer->send", "send"],
+          "value": {
+            "kind": "array",
+            "label": "Follow-up",
+            "values": ["Does steam from the shower make a difference?"]
+          },
+          "note": "The customer asks a follow-up about the same spot."
+        }
+      ]
+    },
+    "fit": {
+      "steps": [
+        {
+          "active": ["history"],
+          "value": {
+            "kind": "array",
+            "label": "Example question",
+            "values": ["Could the cactus go on the landing instead?"]
+          },
+          "note": "A customer tries several spots for a cactus and asks Moss about the landing next."
+        },
+        {
+          "active": ["history", "history->fit", "fit"],
+          "value": {
+            "kind": "array",
+            "label": "Input shape",
+            "values": ["List of messages", "Token budget"]
+          },
+          "note": "fitToBudget() gets the conversation and the amount of room available."
+        },
+        {
+          "active": ["fit", "fit->model"],
+          "value": {
+            "kind": "array",
+            "label": "Output shape",
+            "values": ["List of messages within budget"]
+          },
+          "note": "When the conversation can fit, the caller gets a list within the budget."
+        },
+        {
+          "active": ["fit"],
+          "note": "If there’s too little room for a usable request, the caller gets an error."
+        }
+      ]
+    },
+    "budget": {
+      "steps": [
+        {
+          "active": ["customer", "customer->send", "send"],
+          "value": {
+            "kind": "array",
+            "label": "Follow-up",
+            "values": ["Would the shelf near the back door suit it better?"]
+          },
+          "note": "After a long chat about a peace lily, the customer asks another question."
+        },
+        {
+          "active": ["history", "history->fit", "send", "send->fit", "fit"],
+          "note": "The exchange so far is long enough that it needs a budget."
+        },
+        {
+          "active": ["fit", "fit->model", "model"],
+          "note": "The request for this turn stays within the space available."
+        },
+        {
+          "active": ["model", "model->reply", "reply", "reply->next-history", "next-history"],
+          "note": "Moss’s answer comes back and the chat is ready for the next question."
+        }
+      ]
+    }
+  }
+}

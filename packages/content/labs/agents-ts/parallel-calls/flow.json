@@ -1,0 +1,144 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "model",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "batch",
+        "label": "runToolCalls()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "bakery",
+        "label": "Bakery shelf",
+        "kind": "story"
+      },
+      {
+        "id": "preserves",
+        "label": "Preserves shelf",
+        "kind": "story"
+      },
+      {
+        "id": "results",
+        "label": "Shelf reports",
+        "kind": "data"
+      },
+      {
+        "id": "agent",
+        "label": "agent.ts",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "answer",
+        "label": "Stock summary",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "model",
+        "to": "batch",
+        "label": "stock checks"
+      },
+      {
+        "from": "batch",
+        "to": "bakery",
+        "label": "lookup"
+      },
+      {
+        "from": "batch",
+        "to": "preserves",
+        "label": "lookup"
+      },
+      {
+        "from": "bakery",
+        "to": "results",
+        "label": "shelf report"
+      },
+      {
+        "from": "preserves",
+        "to": "results",
+        "label": "shelf report"
+      },
+      {
+        "from": "results",
+        "to": "agent",
+        "label": "batch result"
+      },
+      {
+        "from": "agent",
+        "to": "answer",
+        "label": "summary"
+      }
+    ],
+    "note": "Your agent can check several shelves together and bring their reports back to Pip."
+  },
+  "tasks": {
+    "concurrent": {
+      "steps": [
+        {
+          "active": ["model", "model->batch", "batch"],
+          "note": "Before packing a delivery, Pip asks about the bakery and preserves shelves together."
+        },
+        {
+          "active": ["batch", "batch->bakery", "bakery", "batch->preserves", "preserves"],
+          "note": "Both shelf checks are under way at the same time."
+        },
+        {
+          "active": ["bakery", "bakery->results", "preserves", "preserves->results", "results"],
+          "note": "The batch returns a stock report for each shelf."
+        }
+      ]
+    },
+    "in-order": {
+      "steps": [
+        {
+          "active": ["model", "model->batch", "batch"],
+          "note": "Pip asks about the bakery shelf and then the preserves shelf in one batch."
+        },
+        {
+          "active": ["preserves", "preserves->results", "results"],
+          "note": "The preserves shelf gets its report back first."
+        },
+        {
+          "active": ["bakery", "bakery->results", "results"],
+          "note": "The bakery report arrives later."
+        },
+        {
+          "active": ["results"],
+          "value": {
+            "kind": "array",
+            "label": "Batch result",
+            "values": ["Bakery shelf report", "Preserves shelf report"]
+          },
+          "note": "The combined reports follow the order of the original requests, with each report tied to its own shelf."
+        }
+      ]
+    },
+    "agent": {
+      "steps": [
+        {
+          "active": ["model", "model->batch", "batch"],
+          "note": "Pip’s stock question covers more than one shelf."
+        },
+        {
+          "active": ["batch", "batch->bakery", "bakery", "batch->preserves", "preserves"],
+          "note": "The pantry runs the checks from the reply as a batch."
+        },
+        {
+          "active": ["results", "results->agent", "agent"],
+          "note": "The agent has a set of stock reports for Pip’s question."
+        },
+        {
+          "active": ["agent", "agent->answer", "answer"],
+          "note": "The delivery desk gets a single stock summary for the shelves it asked about."
+        }
+      ]
+    }
+  }
+}

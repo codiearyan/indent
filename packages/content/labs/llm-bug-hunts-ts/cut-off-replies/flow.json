@@ -1,0 +1,100 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "complaint", "label": "Customer complaint", "kind": "data" },
+      { "id": "summarize", "label": "summarize.ts", "kind": "file", "mine": true },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "reply", "label": "Model reply", "kind": "data" },
+      { "id": "desk", "label": "Support desk", "kind": "story" },
+      { "id": "reproduce", "label": "reproduce.ts", "kind": "file", "mine": true },
+      { "id": "test", "label": "summarize.test.ts", "kind": "file", "mine": true },
+      { "id": "evidence", "label": "Ticket evidence", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "model", "to": "reply", "label": "reply" },
+      { "from": "reply", "to": "summarize", "label": "result" },
+      { "from": "summarize", "to": "desk", "label": "summary" },
+      { "from": "reproduce", "to": "model", "label": "request" },
+      { "from": "test", "to": "summarize", "label": "tests" },
+      { "from": "complaint", "to": "model", "label": "complaint" },
+      { "from": "reply", "to": "evidence", "label": "evidence" }
+    ],
+    "note": "Mira needs a complete briefing from Kes before her team can act on a delivery complaint."
+  },
+  "tasks": {
+    "reproduce": {
+      "steps": [
+        {
+          "active": ["complaint"],
+          "note": "A customer sends a long account of a soaked carton, damaged posters and a missed return pickup."
+        },
+        {
+          "active": ["reproduce", "reproduce->model", "model"],
+          "note": "The reproduction sends a complaint to the local model under the settings used by the support desk."
+        },
+        {
+          "active": ["model", "model->reply", "reply"],
+          "note": "The reply stops before it covers the whole complaint."
+        },
+        {
+          "active": ["reply", "reply->evidence", "evidence"],
+          "value": {
+            "kind": "map",
+            "label": "Ticket evidence",
+            "entries": [
+              {
+                "key": "text",
+                "value": "Reply text"
+              },
+              {
+                "key": "finishReason",
+                "value": "Reason the model stopped"
+              }
+            ]
+          },
+          "note": "The ticket gets the model’s text and its stated reason for stopping."
+        }
+      ]
+    },
+    "fix": {
+      "steps": [
+        {
+          "active": ["complaint"],
+          "note": "Mira opens a complaint about a crate that arrived with a broken seal."
+        },
+        {
+          "active": ["complaint", "complaint->model", "model", "model->reply", "reply"],
+          "note": "The local model returns a reply for the ticket."
+        },
+        {
+          "active": ["reply", "reply->summarize", "summarize", "summarize->desk", "desk"],
+          "note": "When a complete summary is ready, the desk receives it as text."
+        },
+        {
+          "active": ["summarize", "desk"],
+          "note": "If no complete summary is available, the desk gets an error."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->summarize", "summarize"],
+          "note": "The test opens a case with several details, including a wet label and a missed collection."
+        },
+        {
+          "active": ["summarize", "summarize->desk", "desk"],
+          "note": "The resulting briefing should cover the whole complaint."
+        },
+        {
+          "active": ["test", "test->summarize", "summarize"],
+          "note": "Another case represents a complaint whose briefing never fits."
+        },
+        {
+          "active": ["summarize", "desk", "test"],
+          "note": "The support desk should get a clear failure for that case."
+        }
+      ]
+    }
+  }
+}
