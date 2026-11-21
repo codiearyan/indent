@@ -1,0 +1,25 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "emails", "label": "Support emails", "kind": "story" },
+      { "id": "model", "label": "Triage and draft models", "kind": "story" },
+      { "id": "set", "label": "Test sets", "kind": "data", "mine": true },
+      { "id": "graders", "label": "Graders and the judge", "kind": "file", "mine": true },
+      { "id": "report", "label": "Pass rates and failures", "kind": "data", "mine": true },
+      { "id": "compare", "label": "Version comparison", "kind": "file", "mine": true },
+      { "id": "stability", "label": "Flakiness report", "kind": "file", "mine": true },
+      { "id": "team", "label": "Ines and Dev", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "emails", "to": "set", "label": "real tickets" },
+      { "from": "set", "to": "model", "label": "inputs" },
+      { "from": "model", "to": "graders", "label": "answers" },
+      { "from": "graders", "to": "report", "label": "verdicts" },
+      { "from": "report", "to": "compare", "label": "two versions" },
+      { "from": "model", "to": "stability", "label": "repeated answers" },
+      { "from": "compare", "to": "team", "label": "ship or not" },
+      { "from": "stability", "to": "team", "label": "flaky tickets" }
+    ],
+    "note": "You build the evals Pebblebrook Plants runs before every change to its support model, so the team ships on a measurement instead of a feeling."
+  }
+}
