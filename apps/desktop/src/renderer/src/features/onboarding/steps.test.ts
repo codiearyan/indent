@@ -19,7 +19,7 @@ describe('stepsFor', () => {
   })
 
   it('leaves out the provider and help steps without AI', () => {
-    expect(stepsFor(without)).toEqual(['welcome', 'how', 'ai', 'ready'])
+    expect(stepsFor(without)).toEqual(['welcome', 'how', 'goal', 'ai', 'ready'])
   })
 })
 
@@ -51,12 +51,12 @@ describe('nextStep and prevStep', () => {
 describe('progressCells', () => {
   it('fills the steps before the current one', () => {
     const states = progressCells('ai', withAi).map((c) => c.state)
-    expect(states).toEqual(['done', 'done', 'todo', 'todo', 'todo', 'todo'])
+    expect(states).toEqual(['done', 'done', 'done', 'todo', 'todo', 'todo', 'todo'])
   })
 
   it('marks the AI steps skipped without AI', () => {
     const states = progressCells('ready', without).map((c) => c.state)
-    expect(states).toEqual(['done', 'done', 'done', 'skipped', 'skipped', 'todo'])
+    expect(states).toEqual(['done', 'done', 'done', 'done', 'skipped', 'skipped', 'todo'])
   })
 
   it('fills the last cell once complete', () => {

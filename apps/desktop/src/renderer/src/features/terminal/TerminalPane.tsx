@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react'
 import { Terminal, type ITheme } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
@@ -22,6 +22,8 @@ import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
 
 const REFRESH_QUIET_MS = 500
+// The terminal drops input that arrives with Ctrl+C, so the command waits for the shell.
+const AFTER_INTERRUPT_MS = 150
 
 type Status = 'idle' | 'connected' | 'exited'
 
@@ -141,6 +143,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
         current.id = id
         // The panel may have expanded while the shell was starting.
         api.terminal.resize(id, term.cols, term.rows)
+        if (pendingCommand.current?.includes('\r')) awaitingRefresh = true
         if (pendingCommand.current) api.terminal.write(id, pendingCommand.current)
         pendingCommand.current = null
         term.focus()
@@ -205,6 +208,25 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
   }
 
   const suggested = chapter?.terminal.suggestedCommand
+
+  const runSuggested = useEffectEvent(() => {
+    if (!suggested) return
+    setPanel('terminal', true)
+    const current = termRef.current
+    if (!current?.id) return connect(`${suggested}\r`)
+    // Ctrl+C clears a half-typed line or stops the last run. Both go in as typed input, so the
+    // shell runs the command and the files refresh afterwards.
+    current.term.input('\x03', false)
+    setTimeout(() => current.term.input(`${suggested}\r`, false), AFTER_INTERRUPT_MS)
+  })
+
+  useEffect(
+    () =>
+      useWorkspace.subscribe((state, previous) => {
+        if (state.runs !== previous.runs) runSuggested()
+      }),
+    []
+  )
   const suggestion = suggested && (
     <button
       type="button"

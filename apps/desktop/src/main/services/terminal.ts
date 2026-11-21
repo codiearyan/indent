@@ -32,6 +32,11 @@ function size(value: number, fallback: number): number {
   return Number.isInteger(value) && value > 0 ? value : fallback
 }
 
+/** Ends every shell; each one reports its exit to the renderer as usual. */
+export function killAll(): void {
+  for (const pty of terminals.values()) pty.kill()
+}
+
 export function register(): void {
   ensureSpawnHelperExecutable()
 

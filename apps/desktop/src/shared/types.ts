@@ -272,6 +272,10 @@ export interface Api {
     writeFile(labId: string, chapterId: string, path: string, content: string): Promise<void>
     /** Restores the starter files. Progress is kept. */
     reset(labId: string, chapterId: string): Promise<WorkspaceSnapshot>
+    /** The folder that holds every workspace. */
+    getRoot(): Promise<string>
+    /** Asks for a new folder and moves all work there; null when cancelled. */
+    chooseRoot(): Promise<string | null>
   }
   checks: {
     /** Runs the hidden tests for the given tasks (all when omitted) and records progress. */
@@ -328,7 +332,7 @@ export interface Api {
 /** Methods the preload bridges with ipcRenderer.invoke, per namespace. */
 export const INVOKE_METHODS = {
   content: ['listLabs', 'getChapter', 'listPaths', 'narration'],
-  workspace: ['open', 'writeFile', 'reset'],
+  workspace: ['open', 'writeFile', 'reset', 'getRoot', 'chooseRoot'],
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],

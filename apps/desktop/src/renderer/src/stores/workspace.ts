@@ -35,6 +35,8 @@ interface WorkspaceStore {
   revision: number
   /** Task ids being checked right now, or null. */
   checking: string[] | null
+  /** Counts presses of Run; the terminal runs the issue's command on each change. */
+  runs: number
   tourOpen: boolean
 
   open(labId: string, chapterId: string): Promise<void>
@@ -49,6 +51,8 @@ interface WorkspaceStore {
   reset(): Promise<void>
   /** Runs the hidden tests for some tasks, or all. */
   check(taskIds?: string[]): Promise<CheckResult[]>
+  /** Saves, then runs the issue's suggested command in the terminal. */
+  run(): Promise<void>
   setTourOpen(open: boolean): void
 }
 
@@ -96,6 +100,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     activePath: null,
     revision: 0,
     checking: null,
+    runs: 0,
     tourOpen: false,
 
     open: async (labId, chapterId) => {
@@ -176,6 +181,12 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       } finally {
         set({ checking: null })
       }
+    },
+
+    run: async () => {
+      if (!get().chapter?.terminal.suggestedCommand) return
+      await get().flush()
+      set((s) => ({ runs: s.runs + 1 }))
     },
 
     setTourOpen: (tourOpen) => set({ tourOpen })

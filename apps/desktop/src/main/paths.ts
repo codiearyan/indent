@@ -1,5 +1,6 @@
 import { app } from 'electron'
-import { join } from 'path'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs'
+import { isAbsolute, join } from 'path'
 
 /** Lab packs: the repo root's content/ folder in dev, an extra resource when packaged. */
 export function contentDir(): string {
@@ -8,9 +9,67 @@ export function contentDir(): string {
     : join(app.getAppPath(), '..', '..', 'content')
 }
 
+let root: string | null = null
+
+/** Holds learner work in a lab folder (anything but the runtime and temp folders). */
+function hasWork(dir: string): boolean {
+  try {
+    return readdirSync(dir, { withFileTypes: true }).some(
+      (entry) => entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules'
+    )
+  } catch {
+    return false
+  }
+}
+
+const SYSTEM_FILES = new Set(['.DS_Store', 'Thumbs.db', 'desktop.ini'])
+
+/** Missing, empty, or already holding this app's runtime: safe to use without asking. */
+function freeOrOurs(dir: string): boolean {
+  if (!existsSync(dir)) return true
+  try {
+    const entries = readdirSync(dir).filter((name) => !SYSTEM_FILES.has(name))
+    if (entries.length === 0) return true
+    const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')) as { name?: unknown }
+    return pkg.name === 'indent-runtime'
+  } catch {
+    return false
+  }
+}
+
+/**
+ * The folder picked for the learner's work, saved in workspace.json. Work from before the folder
+ * could be picked stays in the data folder; everyone else starts in ~/Indent, or ~/Indent 2 and
+ * so on when that name already holds something else.
+ */
+function resolveRoot(): string {
+  try {
+    const saved = (
+      JSON.parse(readFileSync(dataFile('workspace.json'), 'utf8')) as { root?: unknown }
+    ).root
+    if (typeof saved === 'string' && isAbsolute(saved)) return saved
+  } catch {
+    // No saved folder yet.
+  }
+  const earlier = join(app.getPath('userData'), 'workspaces')
+  const home = app.getPath('home')
+  const fresh = ['Indent', ...[2, 3, 4, 5].map((n) => `Indent ${n}`)]
+    .map((name) => join(home, name))
+    .find(freeOrOurs)
+  const chosen = hasWork(earlier) || !fresh ? earlier : fresh
+  setWorkspacesRoot(chosen)
+  return chosen
+}
+
 /** Parent of every learner workspace. Lab dependencies are installed here so each workspace resolves them. */
 export function workspacesRoot(): string {
-  return join(app.getPath('userData'), 'workspaces')
+  root ??= resolveRoot()
+  return root
+}
+
+export function setWorkspacesRoot(dir: string): void {
+  writeFileSync(dataFile('workspace.json'), JSON.stringify({ root: dir }))
+  root = dir
 }
 
 /** Tools the app downloaded for itself. Nothing outside the app looks here. */
