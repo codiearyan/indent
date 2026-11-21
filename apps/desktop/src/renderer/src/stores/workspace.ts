@@ -4,6 +4,7 @@ import type {
   Chapter,
   CheckResult,
   ConflictChoice,
+  IdeInfo,
   ProgressState,
   WorkspaceFile,
   WorkspaceSnapshot
@@ -68,6 +69,10 @@ interface WorkspaceStore {
   /** Counts presses of Run; the terminal runs the issue's command on each change. */
   runs: number
   tourOpen: boolean
+  /** The issue is worked on in an IDE: the editor and terminal are away and the window is narrow. */
+  companion: boolean
+  /** `labId/chapterId` of the issue whose folder the IDE was last asked to open. */
+  ideIssue: string | null
 
   open(labId: string, chapterId: string): Promise<void>
   /** Opens a file as a tab of a group, the focused one by default, and makes it active. */
@@ -101,6 +106,10 @@ interface WorkspaceStore {
   /** Saves, then runs the issue's suggested command in the terminal. */
   run(): Promise<void>
   setTourOpen(open: boolean): void
+  /** Opens the issue's folder in an IDE and, once it opened, switches to the companion layout. */
+  openInIde(ide: IdeInfo): Promise<void>
+  /** Brings the editor back, with the files as the IDE left them. */
+  leaveCompanion(): Promise<void>
 }
 
 const pendingSaves = new Map<string, ReturnType<typeof setTimeout>>()
@@ -172,6 +181,8 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     checking: null,
     runs: 0,
     tourOpen: false,
+    companion: false,
+    ideIssue: null,
 
     open: async (labId, chapterId) => {
       await get().flush()
@@ -330,6 +341,22 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       set((s) => ({ runs: s.runs + 1 }))
     },
 
-    setTourOpen: (tourOpen) => set({ tourOpen })
+    setTourOpen: (tourOpen) => set({ tourOpen }),
+
+    openInIde: async (ide) => {
+      // What was typed here has to be on disk before the IDE reads the folder.
+      await get().flush()
+      const [labId, chapterId] = ids()
+      await api.ide.open(ide.id, labId, chapterId)
+      set({ companion: true, ideIssue: chapterKey(labId, chapterId) })
+      await api.ide.setCompact(true)
+    },
+
+    leaveCompanion: async () => {
+      if (!get().companion) return
+      set({ companion: false, ideIssue: null })
+      await api.ide.setCompact(false)
+      await get().refresh()
+    }
   }
 })

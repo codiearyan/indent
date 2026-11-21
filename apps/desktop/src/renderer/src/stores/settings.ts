@@ -71,6 +71,8 @@ export interface SettingsState {
   /** Ids of the roadmaps picked as goals in the setup or on Roadmaps, in the order picked. */
   goals: string[]
   experience: Experience | null
+  /** Id of the IDE issues open in; null takes the first one found. */
+  ide: string | null
   /** Ids of DSA patterns whose animation was played to the end. */
   dsaWatched: string[]
   /** Keys picked in Settings, only for the shortcuts that differ from their defaults. */
@@ -97,6 +99,7 @@ export interface SettingsState {
   setAutoUpdate(autoUpdate: boolean): void
   setLastVersion(lastVersion: string): void
   setGoals(goals: string[]): void
+  setIde(ide: string): void
   resetLayout(): void
   setGuide(guide: GuideStage | null): void
 }
@@ -144,6 +147,7 @@ export const useSettings = create<SettingsState>()(
       lastVersion: null,
       goals: [],
       experience: null,
+      ide: null,
       dsaWatched: [],
       shortcuts: {},
       guide: null,
@@ -173,6 +177,7 @@ export const useSettings = create<SettingsState>()(
       setAutoUpdate: (autoUpdate) => set({ autoUpdate }),
       setLastVersion: (lastVersion) => set({ lastVersion }),
       setGoals: (goals) => set({ goals }),
+      setIde: (ide) => set({ ide }),
       resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' }),
       setGuide: (guide) => set({ guide })
     }),

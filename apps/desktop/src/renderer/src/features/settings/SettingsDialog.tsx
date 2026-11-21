@@ -34,6 +34,7 @@ import { useSettingsDialog, type SettingsSection } from './dialogStore'
 import { KeyboardSection } from './KeyboardSection'
 import { PracticeSection } from './PracticeSection'
 import { CodeThemeCards } from './CodeSample'
+import { IdeRow } from './IdeRow'
 import { ThemeCards } from './ThemeCards'
 import { ToolsSection } from './ToolsSection'
 import { Typography } from './Typography'
@@ -157,6 +158,7 @@ function EditorSection(): React.JSX.Element {
               />
             </Row>
           ))}
+          <IdeRow />
         </div>
       </Group>
 

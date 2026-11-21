@@ -6,8 +6,10 @@ import { StreakStatus } from '@/features/progress/StreakStatus'
 import { useAiEnabled } from '@/features/ai/aiStore'
 import { cn } from '@/lib/utils'
 import { TOUR } from '@/features/tour/anchors'
+import { useIde } from '@/stores/ides'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
+import { OpenInIdeButton } from './CompanionBar'
 import { IconButton } from './IconButton'
 import { ViewPopover } from './ViewPopover'
 
@@ -22,6 +24,8 @@ export function TopBar(): React.JSX.Element {
   const aiOn = useAiEnabled()
   const ready = useWorkspace((s) => s.status === 'ready')
   const setTourOpen = useWorkspace((s) => s.setTourOpen)
+  const companion = useWorkspace((s) => s.companion)
+  const ide = useIde()
 
   const goToChapter = (id?: string): void => {
     if (id) navigate(`/learn/${labId}/${id}`)
@@ -39,17 +43,25 @@ export function TopBar(): React.JSX.Element {
         aria-label="Breadcrumb"
         className="ml-1 flex min-w-0 flex-1 items-center gap-1.5 text-[13px]"
       >
-        <Link to="/labs" className={crumb}>
-          Repos
-        </Link>
-        <span className="text-muted-foreground/60">/</span>
-        <Link to={`/labs/${labId}`} className={`${crumb} min-w-0 shrink truncate`}>
-          {chapter?.labTitle}
-        </Link>
+        {/* The narrow window beside an IDE has room for the issue only. */}
+        {!companion && (
+          <>
+            <Link to="/labs" className={crumb}>
+              Repos
+            </Link>
+            <span className="text-muted-foreground/60">/</span>
+            <Link to={`/labs/${labId}`} className={`${crumb} min-w-0 shrink truncate`}>
+              {chapter?.labTitle}
+            </Link>
+          </>
+        )}
         {chapter && (
           <>
-            <span className="text-muted-foreground/60">/</span>
-            <span className="min-w-0 shrink-[0.5] truncate font-medium" aria-current="page">
+            {!companion && <span className="text-muted-foreground/60">/</span>}
+            <span
+              className={cn('min-w-0 truncate font-medium', companion ? 'shrink' : 'shrink-[0.5]')}
+              aria-current="page"
+            >
               Issue {chapter.number}: {chapter.title}
             </span>
             <span className="ml-1 flex shrink-0 items-center">
@@ -74,7 +86,8 @@ export function TopBar(): React.JSX.Element {
         )}
       </nav>
       <div className="flex shrink-0 items-center gap-0.5">
-        <StreakStatus />
+        {!companion && <StreakStatus />}
+        {ide && ready && !companion && <OpenInIdeButton ide={ide} variant="ghost" />}
         {aiOn && (
           <Button
             variant="ghost"

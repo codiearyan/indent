@@ -11,6 +11,7 @@ import * as terminal from './services/terminal'
 import * as ai from './services/ai'
 import * as preview from './services/preview'
 import * as tools from './services/tools'
+import * as ide from './services/ide'
 import * as github from './services/github'
 import * as telemetry from './services/telemetry'
 import * as updates from './services/updates'
@@ -127,6 +128,7 @@ app.whenReady().then(() => {
     ai,
     preview,
     tools,
+    ide,
     github,
     telemetry,
     updates
