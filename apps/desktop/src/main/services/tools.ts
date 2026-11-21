@@ -61,7 +61,8 @@ async function status(): Promise<ToolStatus[]> {
   const env = await labEnv()
   const [node, git] = await Promise.all([versionOf('node', env), gitVersion(env)])
   const nodeOk = !!node && nodeSupported(node)
-  if (nodeOk) startLabModelIfNodeWasMissing()
+  // Awaited, so the local model's status read after this one already shows the restart.
+  if (nodeOk) await startLabModelIfNodeWasMissing()
   return [
     {
       id: 'node',

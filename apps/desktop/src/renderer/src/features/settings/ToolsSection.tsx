@@ -17,9 +17,13 @@ export function ToolsSection(): React.JSX.Element {
 
   const show = (e: unknown): void => setError(errorMessage(e))
 
+  // The model's status comes second: reading tools can restart it once Node is found.
   const refresh = (): void => {
-    void api.tools.status().then(setTools, show)
-    void api.tools.labModel().then(setModel, show)
+    void api.tools
+      .status()
+      .then(setTools)
+      .then(() => api.tools.labModel())
+      .then(setModel, show)
   }
   useEffect(refresh, [])
 
@@ -39,6 +43,7 @@ export function ToolsSection(): React.JSX.Element {
     setError(null)
     try {
       setTools(await api.tools.installNode())
+      setModel(await api.tools.labModel())
     } catch (e) {
       show(e)
     } finally {

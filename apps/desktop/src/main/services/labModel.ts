@@ -107,8 +107,8 @@ export function labModelProblem(labId: string): string | null {
 }
 
 /** After Node was found or downloaded: starts a local model that stopped for lack of it. */
-export function startLabModelIfNodeWasMissing(): void {
-  if (status.nodeMissing) void restartLabModel()
+export async function startLabModelIfNodeWasMissing(): Promise<void> {
+  if (status.nodeMissing) await restartLabModel()
 }
 
 /**
