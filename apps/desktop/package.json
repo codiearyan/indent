@@ -23,6 +23,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^1.10.0",
     "@electron-toolkit/utils": "^4.0.0",
+    "electron-updater": "6.8.12",
     "node-pty": "^1.1.0"
   },
   "devDependencies": {

@@ -143,10 +143,15 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: installer-${{ matrix.name }}
+          # The installers, plus what the in-app updater reads: the latest*.yml files, the blockmaps
+          # for downloading only what changed, and the macOS .zip it installs.
           path: |
             apps/desktop/dist/Indent-*.dmg
+            apps/desktop/dist/Indent-*.zip
             apps/desktop/dist/Indent-*.exe
             apps/desktop/dist/Indent-*.AppImage
+            apps/desktop/dist/*.blockmap
+            apps/desktop/dist/latest*.yml
           if-no-files-found: error
           compression-level: 0
           retention-days: 3

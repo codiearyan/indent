@@ -100,23 +100,14 @@ export function UpdateCard({ compact = false }: { compact?: boolean }): React.JS
   if (status.state === 'ready') {
     return (
       <div className="space-y-2">
-        <p className={cn(text, 'font-medium')}>
-          {status.manual ? `Indent ${status.version} is downloaded.` : 'Restart to update.'}
-        </p>
-        {status.manual && (
-          <p className="text-[13px] text-muted-foreground">
-            Open the installer, drag Indent to Applications, then open it again.
-          </p>
-        )}
+        <p className={cn(text, 'font-medium')}>Restart to update to {status.version}.</p>
         <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" onClick={() => void installUpdate()}>
-            {status.manual ? 'Open the installer' : 'Restart now'}
+            Restart now
           </Button>
-          {!status.manual && (
-            <Button variant="ghost" size="sm" onClick={() => installOnQuit(status.version)}>
-              Next time you open Indent
-            </Button>
-          )}
+          <Button variant="ghost" size="sm" onClick={() => installOnQuit(status.version)}>
+            Next time you open Indent
+          </Button>
         </div>
       </div>
     )
