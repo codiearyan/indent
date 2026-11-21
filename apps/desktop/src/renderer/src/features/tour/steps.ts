@@ -51,7 +51,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     anchor: TOUR.editorTabs,
     title: 'Your files',
-    text: 'The files this issue is about. Switch between them here.'
+    text: 'The files you have open, starting with the ones this issue is about. Switch or close them here.'
   },
   {
     anchor: TOUR.editor,
