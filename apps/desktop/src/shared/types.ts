@@ -151,6 +151,11 @@ export interface WorkspaceSnapshot {
   conflicts: string[]
   /** Files this open brought up to the repo's new version. */
   updated: string[]
+  /**
+   * The workspace knows which starter it was given, so Reset keeps the files the learner added.
+   * False for a workspace from before that was kept: Reset empties it.
+   */
+  remembered: boolean
 }
 
 /** For a conflicted file: keep the learner's version, or take the new one after a backup. */

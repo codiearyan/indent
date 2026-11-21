@@ -36,6 +36,8 @@ interface WorkspaceStore {
   starter: Record<string, string>
   /** Files the learner changed that a repo update changed too. */
   conflicts: string[]
+  /** Reset keeps the files the learner added; false for a workspace from before that. */
+  remembered: boolean
   activePath: string | null
   /** Counts writes to disk, so the Browser panel knows when to reload. */
   revision: number
@@ -83,7 +85,14 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       .then(() => set((s) => ({ revision: s.revision + 1 })))
   }
 
-  const applySnapshot = ({ files, dir, starter, conflicts, updated }: WorkspaceSnapshot): void => {
+  const applySnapshot = ({
+    files,
+    dir,
+    starter,
+    conflicts,
+    updated,
+    remembered
+  }: WorkspaceSnapshot): void => {
     const { activePath, chapter } = get()
     const stillThere = files.some((f) => f.path === activePath)
     if (updated.length > 0) {
@@ -95,6 +104,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       dir,
       starter,
       conflicts,
+      remembered,
       activePath: stillThere
         ? activePath
         : (chapter?.files.find((path) => files.some((f) => f.path === path)) ??
@@ -111,6 +121,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     files: [],
     starter: {},
     conflicts: [],
+    remembered: true,
     activePath: null,
     revision: 0,
     checking: null,

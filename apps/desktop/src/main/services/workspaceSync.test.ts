@@ -41,6 +41,7 @@ describe('openWorkspace', () => {
     expect(snap.starter).toEqual({ 'src/a.ts': 'a', 'b.ts': 'b' })
     expect(snap.conflicts).toEqual([])
     expect(snap.updated).toEqual([])
+    expect(snap.remembered).toBe(true)
     expect(await remembered(dir)).toEqual({ 'src/a.ts': 'a', 'b.ts': 'b' })
   })
 
@@ -101,6 +102,7 @@ describe('openWorkspace', () => {
     expect(snap.files.map((f) => f.path)).toEqual(['a.ts', 'gone.ts'])
     expect(snap.starter).toEqual({ 'a.ts': 'a', 'b.ts': 'b' })
     expect(snap.conflicts).toEqual([])
+    expect(snap.remembered).toBe(false)
     expect(existsSync(join(dir, '.indent'))).toBe(false)
   })
 })

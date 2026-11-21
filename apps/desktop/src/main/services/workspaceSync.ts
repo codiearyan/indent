@@ -92,10 +92,11 @@ async function snapshot(
   dir: string,
   first: string[],
   starter: Files,
+  remembered = true,
   conflicts: string[] = [],
   updated: string[] = []
 ): Promise<WorkspaceSnapshot> {
-  return { dir, files: await readWorkspace(dir, first), starter, conflicts, updated }
+  return { dir, files: await readWorkspace(dir, first), starter, conflicts, updated, remembered }
 }
 
 /**
@@ -114,14 +115,14 @@ export async function openWorkspace(
     return snapshot(dir, first, next)
   }
   const old = await readRemembered(dir)
-  if (!old) return snapshot(dir, first, next)
+  if (!old) return snapshot(dir, first, next, false)
   if (sameFiles(old, next)) return snapshot(dir, first, old)
   const paths = [...new Set([...Object.keys(old), ...Object.keys(next)])]
   const plan = planMerge(old, next, await readMine(dir, paths))
   for (const path of plan.writes) await takeFromStarter(starterDir, dir, path)
   for (const path of plan.deletes) await removeFile(dir, path)
   await remember(dir, plan.starter)
-  return snapshot(dir, first, plan.starter, plan.conflicts, [...plan.writes, ...plan.deletes])
+  return snapshot(dir, first, plan.starter, true, plan.conflicts, [...plan.writes, ...plan.deletes])
 }
 
 /**
