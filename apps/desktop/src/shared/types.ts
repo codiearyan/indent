@@ -142,9 +142,19 @@ export interface WorkspaceSnapshot {
   /** Absolute folder on disk; the terminal opens here. */
   dir: string
   files: WorkspaceFile[]
-  /** The issue's starter files by path, to tell which files the learner has changed. */
+  /**
+   * The starter files this workspace was given, by path, to tell which files the learner has
+   * changed. A workspace from before these were kept gets the issue's current starter.
+   */
   starter: Record<string, string>
+  /** Starter files the learner changed that a repo update changed too, waiting for a choice. */
+  conflicts: string[]
+  /** Files this open brought up to the repo's new version. */
+  updated: string[]
 }
+
+/** For a conflicted file: keep the learner's version, or take the new one after a backup. */
+export type ConflictChoice = 'mine' | 'new'
 
 // ---------- Checks ----------
 
@@ -345,8 +355,15 @@ export interface Api {
     /** Creates the folder from the starter files on first open; otherwise reads it from disk. */
     open(labId: string, chapterId: string): Promise<WorkspaceSnapshot>
     writeFile(labId: string, chapterId: string, path: string, content: string): Promise<void>
-    /** Restores the starter files. Progress is kept. */
+    /** Restores the starter files. Files the learner added and progress are kept. */
     reset(labId: string, chapterId: string): Promise<WorkspaceSnapshot>
+    /** Settles one file listed in `conflicts`. */
+    resolveConflict(
+      labId: string,
+      chapterId: string,
+      path: string,
+      choice: ConflictChoice
+    ): Promise<WorkspaceSnapshot>
     /** The folder that holds every workspace. */
     getRoot(): Promise<string>
     /** Asks for a folder and says where the work would go; null when cancelled. */
@@ -419,7 +436,7 @@ export interface Api {
 /** Methods the preload bridges with ipcRenderer.invoke, per namespace. */
 export const INVOKE_METHODS = {
   content: ['listLabs', 'getChapter', 'listPaths', 'narration', 'install'],
-  workspace: ['open', 'writeFile', 'reset', 'getRoot', 'pickRoot', 'moveRoot'],
+  workspace: ['open', 'writeFile', 'reset', 'resolveConflict', 'getRoot', 'pickRoot', 'moveRoot'],
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],

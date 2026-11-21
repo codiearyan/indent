@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, readdir, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { describe, expect, it } from 'vitest'
-import { copyStarter, emptyDir, readWorkspace, resolveInside } from './workspaceFiles'
+import { copyStarter, emptyDir, isAppPath, readWorkspace, resolveInside } from './workspaceFiles'
 
 async function tree(files: Record<string, string | Buffer>): Promise<string> {
   const dir = await mkdtemp(join(tmpdir(), 'indent-ws-'))
@@ -23,6 +23,15 @@ describe('resolveInside', () => {
 
   it.each(['../x.ts', '../ws2/a.ts', '/etc/passwd', 'a/../../x', '', '.'])('rejects %j', (p) => {
     expect(() => resolveInside(dir, p)).toThrow('outside workspace')
+  })
+})
+
+describe('isAppPath', () => {
+  it('marks only the app folder at the top of the workspace', () => {
+    expect(isAppPath('/tmp/ws', '/tmp/ws/.indent/starter.json')).toBe(true)
+    expect(isAppPath('/tmp/ws', '/tmp/ws/.indent')).toBe(true)
+    expect(isAppPath('/tmp/ws', '/tmp/ws/src/.indent/a.ts')).toBe(false)
+    expect(isAppPath('/tmp/ws', '/tmp/ws/.indentation.ts')).toBe(false)
   })
 })
 
