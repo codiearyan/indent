@@ -170,8 +170,10 @@ packages/content/
   kit/page.mjs                       t.page(): a workspace page in a headless DOM, see below
   labs/<labId>/lab.json              LabMeta
   labs/<labId>/cover.webp           the repo's picture on its card, 960 by 540; see "Covers" below
+  labs/<labId>/flow.json             the repo's scene on the repo page; see "Flows" below
   labs/<labId>/<chapterId>/
     chapter.json                     ChapterDef; `preview` names a page for the Browser panel
+    flow.json                        Flow: the issue's scene and a short flow per task, optional
     lesson.md                        `##` headings split it into the parts the audio player reads
     starter/**                       copied into the workspace on first open and on reset
     solution/**                      solved files, same relative paths
@@ -199,6 +201,17 @@ to the system voice when it does not. `node scripts/narrate.mjs [labId ...]` rec
 have no recording yet with a neural voice (it needs `uvx` and `ffmpeg`, and sends the lesson text to
 the voice service) and removes recordings whose text is gone. Run it after writing or editing a
 lesson. `apps/desktop/src/shared/narration.ts` holds the splitting and the key both sides use.
+
+### Flows
+
+A `flow.json` is data only (types in `shared/types.ts`): a `scene` of nodes (story parts, files,
+functions or data; `mine` marks the learner's part, the only brand colour in a flow), edges and a
+one-sentence note, and for an issue `tasks` keyed by task id, each a few steps that name the
+`active` nodes and edges (`from->to`), a note and an optional `value` in a Patterns frame shape
+(`array`, `map`, `grid`). The lesson shows the issue's scene, the repo page the repo's scene, and
+"See the flow" under a task plays its steps (`features/flows/`). `shared/flow.ts` checks a flow;
+`scripts/build-packs.mjs` fails on a bad one and the app leaves a bad one out. A flow shows what
+goes in and the shape of what comes out, never a task's answer or a value a check compares against.
 
 ### Pages in the browser
 

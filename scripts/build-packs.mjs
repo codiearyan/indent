@@ -2,10 +2,19 @@
 // node scripts/build-packs.mjs <out dir>
 // The site build writes it to apps/site/public/packs/v1; CI runs it to check content.
 import { createHash } from 'node:crypto'
-import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync
+} from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getChapter, listLabs, listPaths } from '../apps/desktop/src/main/services/packs.ts'
+import { checkFlow } from '../apps/desktop/src/shared/flow.ts'
 import { TOOL_IDS } from '../apps/desktop/src/shared/types.ts'
 import { packArchive, packVersion } from '../apps/desktop/src/main/packArchive.ts'
 
@@ -17,6 +26,12 @@ if (!out) {
 
 const content = fileURLToPath(new URL('../packages/content/', import.meta.url))
 const problems = []
+
+function checkFlowFile(dir, name, taskIds) {
+  const file = join(dir, 'flow.json')
+  if (!existsSync(file)) return
+  problems.push(...checkFlow(readFileSync(file, 'utf8'), `${name}/flow.json`, taskIds).problems)
+}
 
 const folders = readdirSync(join(content, 'labs'), { withFileTypes: true })
   .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
@@ -32,11 +47,18 @@ for (const lab of labs) {
   if (!Array.isArray(tools) || tools.some((tool) => !TOOL_IDS.includes(tool))) {
     problems.push(`${lab.id}: tools must be a list of ${TOOL_IDS.join(', ')}`)
   }
+  checkFlowFile(join(content, 'labs', lab.id), lab.id, null)
   for (const chapter of lab.chapters) {
     const dir = join(content, 'labs', lab.id, chapter.id)
-    await getChapter(content, lab.id, chapter.id).catch((error) =>
+    const loaded = await getChapter(content, lab.id, chapter.id).catch((error) => {
       problems.push(`${lab.id}/${chapter.id}: ${error.message}`)
-    )
+    })
+    if (loaded)
+      checkFlowFile(
+        dir,
+        `${lab.id}/${chapter.id}`,
+        loaded.tasks.map((task) => task.id)
+      )
     if (!existsSync(join(dir, 'grader', 'checks.mjs'))) {
       problems.push(`${lab.id}/${chapter.id}: grader/checks.mjs is missing`)
     }
