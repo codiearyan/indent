@@ -2,10 +2,10 @@
   "scene": {
     "nodes": [
       { "id": "customer", "label": "Fernhollow customer", "kind": "story" },
-      { "id": "answer", "label": "streamAnswer()", "kind": "function", "mine": true },
+      { "id": "answer", "label": "streamAnswer()", "kind": "function", "mine": true, "fn": "streamAnswer" },
       { "id": "model", "label": "Local model", "kind": "story" },
       { "id": "stream", "label": "Reply stream", "kind": "data" },
-      { "id": "collect", "label": "collectStream()", "kind": "function", "mine": true },
+      { "id": "collect", "label": "collectStream()", "kind": "function", "mine": true, "fn": "collectStream" },
       { "id": "chat", "label": "Chat window", "kind": "story" },
       { "id": "result", "label": "Reply and finish", "kind": "data" }
     ],
@@ -21,6 +21,40 @@
   },
   "tasks": {
     "assemble": {
+      "trace": {
+        "file": "src/stream.ts",
+        "call": "collectStream",
+        "args": [
+          [
+            {
+              "choices": [
+                {
+                  "delta": {
+                    "content": "Move the fern "
+                  }
+                }
+              ]
+            },
+            {
+              "choices": [
+                {
+                  "delta": {
+                    "content": "beside a shaded window."
+                  }
+                }
+              ]
+            },
+            {
+              "choices": [
+                {
+                  "delta": {},
+                  "finish_reason": "stop"
+                }
+              ]
+            }
+          ]
+        ]
+      },
       "steps": [
         {
           "active": ["stream"],
@@ -84,6 +118,11 @@
       ]
     },
     "stream-answer": {
+      "trace": {
+        "file": "src/stream.ts",
+        "call": "streamAnswer",
+        "args": ["Could a fern stay on a shelf by the back window?"]
+      },
       "steps": [
         {
           "active": ["customer", "customer->answer", "answer"],

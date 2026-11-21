@@ -4,7 +4,7 @@
       { "id": "labelled", "label": "labelled.ts", "kind": "data" },
       { "id": "config", "label": "config.ts", "kind": "file", "mine": true },
       { "id": "sweep", "label": "sweep.ts", "kind": "story" },
-      { "id": "evaluate", "label": "evaluate()", "kind": "function", "mine": true },
+      { "id": "evaluate", "label": "evaluate()", "kind": "function", "mine": true, "fn": "evaluate" },
       { "id": "store", "label": "Chunk, index, search", "kind": "file" },
       { "id": "hitRate", "label": "hitRate()", "kind": "function", "mine": true },
       { "id": "recall", "label": "recallAtK()", "kind": "function", "mine": true, "fn": "recallAtK" },
@@ -77,6 +77,25 @@
       ]
     },
     "evaluate": {
+      "trace": {
+        "file": "src/evaluate.ts",
+        "call": "evaluate",
+        "args": [
+          {
+            "chunkSize": 130,
+            "overlap": 15,
+            "k": 2
+          },
+          [
+            {
+              "question": "Where are spare paddle straps stored?",
+              "expected": [
+                "equipment"
+              ]
+            }
+          ]
+        ]
+      },
       "steps": [
         {
           "active": ["sweep", "sweep->evaluate", "evaluate"],

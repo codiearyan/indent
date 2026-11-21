@@ -9,8 +9,9 @@
       {
         "id": "agent",
         "label": "agent.ts",
-        "kind": "file",
-        "mine": true
+        "kind": "function",
+        "mine": true,
+        "fn": "runAgent"
       },
       {
         "id": "guard",
@@ -111,6 +112,13 @@
       ]
     },
     "trace": {
+      "trace": {
+        "file": "src/agent.ts",
+        "call": "runAgent",
+        "args": [
+          "Can you check the delivery status of order PL-9352?"
+        ]
+      },
       "steps": [
         {
           "active": ["desk", "desk->agent", "agent"],

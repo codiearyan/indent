@@ -2,7 +2,7 @@
   "scene": {
     "nodes": [
       { "id": "cases", "label": "src/cases.ts", "kind": "data" },
-      { "id": "suite", "label": "runSuite()", "kind": "function", "mine": true },
+      { "id": "suite", "label": "runSuite()", "kind": "function", "mine": true, "fn": "runSuite" },
       { "id": "triage", "label": "triageJson()", "kind": "function" },
       { "id": "model", "label": "JSON triage model", "kind": "story" },
       { "id": "build", "label": "buildGrader()", "kind": "function", "mine": true },
@@ -102,6 +102,20 @@
       ]
     },
     "suite": {
+      "trace": {
+        "file": "src/suite.ts",
+        "call": "runSuite",
+        "args": [
+          [
+            {
+              "id": "wrong-entrance",
+              "input": "The courier left my planter at the wrong entrance.",
+              "checks": [{ "kind": "contains", "text": "entrance" }]
+            }
+          ],
+          "evals-triage-json"
+        ]
+      },
       "steps": [
         {
           "active": ["cases", "cases->suite"],

@@ -4,7 +4,7 @@
       { "id": "customer", "label": "Fernhollow customer", "kind": "story" },
       { "id": "send", "label": "Conversation.send()", "kind": "function", "mine": true },
       { "id": "history", "label": "Conversation history", "kind": "data" },
-      { "id": "fit", "label": "fitToBudget()", "kind": "function", "mine": true },
+      { "id": "fit", "label": "fitToBudget()", "kind": "function", "mine": true, "fn": "fitToBudget" },
       { "id": "model", "label": "Local model", "kind": "story" },
       { "id": "reply", "label": "Care reply", "kind": "data" },
       { "id": "next-history", "label": "History for next turn", "kind": "data" }
@@ -53,6 +53,31 @@
       ]
     },
     "fit": {
+      "trace": {
+        "file": "src/conversation.ts",
+        "call": "fitToBudget",
+        "args": [
+          [
+            {
+              "role": "system",
+              "content": "Help the nursery customer."
+            },
+            {
+              "role": "user",
+              "content": "Can I keep a fern near a window?"
+            },
+            {
+              "role": "assistant",
+              "content": "Tell me how much light the window gets."
+            },
+            {
+              "role": "user",
+              "content": "It faces east."
+            }
+          ],
+          24
+        ]
+      },
       "steps": [
         {
           "active": ["history"],

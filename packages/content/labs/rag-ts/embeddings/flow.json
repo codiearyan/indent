@@ -2,11 +2,11 @@
   "scene": {
     "nodes": [
       { "id": "texts", "label": "Handbook texts", "kind": "data" },
-      { "id": "embed", "label": "embed()", "kind": "function", "mine": true },
+      { "id": "embed", "label": "embed()", "kind": "function", "mine": true, "fn": "embed" },
       { "id": "model", "label": "Local model", "kind": "story" },
       { "id": "vectors", "label": "One vector per text", "kind": "data" },
-      { "id": "cosine", "label": "cosine()", "kind": "function", "mine": true },
-      { "id": "rank", "label": "rank()", "kind": "function", "mine": true },
+      { "id": "cosine", "label": "cosine()", "kind": "function", "mine": true, "fn": "cosine" },
+      { "id": "rank", "label": "rank()", "kind": "function", "mine": true, "fn": "rank" },
       { "id": "desk", "label": "Front desk question", "kind": "story" }
     ],
     "edges": [
@@ -24,6 +24,16 @@
   },
   "tasks": {
     "batch": {
+      "trace": {
+        "file": "src/embed.ts",
+        "call": "embed",
+        "args": [
+          [
+            "Spare paddle straps are in the grey cabinet.",
+            "Life jackets are kept by the entrance."
+          ]
+        ]
+      },
       "steps": [
         {
           "active": ["texts", "texts->embed", "embed"],
@@ -62,6 +72,22 @@
       ]
     },
     "cosine": {
+      "trace": {
+        "file": "src/embed.ts",
+        "call": "cosine",
+        "args": [
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            1,
+            3,
+            0
+          ]
+        ]
+      },
       "steps": [
         {
           "active": ["vectors", "vectors->cosine", "cosine"],
@@ -101,6 +127,17 @@
       ]
     },
     "rank": {
+      "trace": {
+        "file": "src/embed.ts",
+        "call": "rank",
+        "args": [
+          "Where are spare paddle straps stored?",
+          [
+            "Spare paddle straps are in the grey cabinet.",
+            "Life jackets are kept by the entrance."
+          ]
+        ]
+      },
       "steps": [
         {
           "active": ["desk", "desk->rank", "rank"],

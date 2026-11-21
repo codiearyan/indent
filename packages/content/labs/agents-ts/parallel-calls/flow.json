@@ -30,8 +30,9 @@
       {
         "id": "agent",
         "label": "agent.ts",
-        "kind": "file",
-        "mine": true
+        "kind": "function",
+        "mine": true,
+        "fn": "runAgent"
       },
       {
         "id": "answer",
@@ -121,6 +122,13 @@
       ]
     },
     "agent": {
+      "trace": {
+        "file": "src/agent.ts",
+        "call": "runAgent",
+        "args": [
+          "Check stock for berry jam and oat biscuits."
+        ]
+      },
       "steps": [
         {
           "active": ["model", "model->batch", "batch"],

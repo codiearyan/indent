@@ -2,7 +2,7 @@
   "scene": {
     "nodes": [
       { "id": "customer", "label": "Customer message", "kind": "data" },
-      { "id": "parse", "label": "parse.ts", "kind": "file", "mine": true },
+      { "id": "parse", "label": "parse.ts", "kind": "function", "mine": true, "fn": "parseRequest" },
       { "id": "model", "label": "Local model", "kind": "story" },
       { "id": "reply", "label": "Reply text", "kind": "data" },
       { "id": "depot", "label": "Depot system", "kind": "story" },
@@ -57,6 +57,13 @@
       ]
     },
     "fix": {
+      "trace": {
+        "file": "src/parse.ts",
+        "call": "parseRequest",
+        "args": [
+          "Could you please deliver KP-86429 on Thursday?"
+        ]
+      },
       "steps": [
         {
           "active": ["customer", "customer->model", "model"],
