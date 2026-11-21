@@ -1,12 +1,10 @@
-import { execFile, spawn } from 'child_process'
+import { spawn } from 'child_process'
 import { access, constants, mkdtemp, readFile, rm } from 'fs/promises'
 import { homedir, tmpdir } from 'os'
 import { delimiter, join } from 'path'
-import { promisify } from 'util'
 import { lineSplitter, parseCliLine, type CliProviderId } from './parsers'
 import { withInstructions } from './prompt'
-
-const run = promisify(execFile)
+import { run } from '../../run'
 
 export const CLI_BINS: Record<CliProviderId, string> = {
   'claude-code': 'claude',
@@ -153,7 +151,8 @@ export async function runCli(options: CliRun): Promise<void> {
       cwd,
       env: { ...options.env, ...env },
       signal,
-      stdio: [stdin === undefined ? 'ignore' : 'pipe', 'pipe', 'pipe']
+      stdio: [stdin === undefined ? 'ignore' : 'pipe', 'pipe', 'pipe'],
+      windowsHide: true
     })
     let streamed = false
     let final: string | undefined

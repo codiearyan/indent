@@ -1,4 +1,3 @@
-import { execFile } from 'child_process'
 import { createHash } from 'crypto'
 import {
   copyFileSync,
@@ -16,16 +15,14 @@ import { isAbsolute, join } from 'path'
 import { Readable } from 'stream'
 import { pipeline } from 'stream/promises'
 import type { ReadableStream } from 'stream/web'
-import { promisify } from 'util'
 import { PACK_FORMAT } from '@shared/packs'
 import type { InstallFailure, LabSummary, PackEntry, PackIndex } from '@shared/types'
 import { packVersion } from './packArchive'
 import { getChapter, listLabs } from './services/packs'
+import { run } from './run'
 
 // The repo library: the content folder in user data, what the app ships into it and what is
 // downloaded into it. No Electron here, so all of it runs in tests on real folders.
-
-const run = promisify(execFile)
 
 const INDEX_TIMEOUT_MS = 8000
 const DOWNLOAD_TIMEOUT_MS = 5 * 60_000

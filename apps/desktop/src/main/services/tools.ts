@@ -1,4 +1,3 @@
-import { execFile } from 'child_process'
 import { app } from 'electron'
 import { createHash } from 'crypto'
 import { createWriteStream, existsSync } from 'fs'
@@ -7,7 +6,6 @@ import { join } from 'path'
 import { Readable } from 'stream'
 import { pipeline } from 'stream/promises'
 import type { ReadableStream } from 'stream/web'
-import { promisify } from 'util'
 import type { NodeOption, ToolId, ToolInstallResult, ToolStatus } from '@shared/types'
 import { EVENTS } from '@shared/types'
 import { emit, handle } from '../ipc'
@@ -19,8 +17,7 @@ import { labModelStatus, restartLabModel, startLabModelIfNodeWasMissing } from '
 import { nodeSupported } from './grader'
 import { pickNodeArchive } from './nodeArchive'
 import { byVersion, findNodeBins, nodeSource } from './nodeOptions'
-
-const run = promisify(execFile)
+import { run } from '../run'
 
 // The long-term support line that is downloaded. Any release of it runs the repos.
 const NODE_DIST = 'https://nodejs.org/dist/latest-v24.x'
