@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Check, Circle, Compass, ListChecks, Loader2, Sparkles, X } from 'lucide-react'
 import type { ChapterProgress, TaskDef } from '@shared/types'
-import { hintsUnlocked } from '@shared/rules'
 import { Button } from '@/components/ui/button'
 import { useAi } from '@/features/ai/aiStore'
 import { useChat } from '@/features/ai/chatStore'
@@ -91,7 +90,11 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
             {failed && aiOn && !nudge && <AskWhy onClick={askWhy} className="-ml-2" />}
           </div>
         )}
-        <TaskHints hints={task.hints} unlocked={hintsUnlocked(progress?.nonGreenChecks ?? 0)} />
+        <TaskHints
+          hints={task.hints}
+          nonGreenChecks={progress?.nonGreenChecks ?? 0}
+          passed={!!taskProgress?.passed}
+        />
         <TaskDocs task={task} progress={taskProgress} />
       </div>
     </li>
