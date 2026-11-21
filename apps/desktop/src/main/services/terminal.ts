@@ -6,6 +6,7 @@ import { spawn, type IPty } from 'node-pty'
 import { EVENTS } from '@shared/types'
 import { emit, handle, listen } from '../ipc'
 import { labEnv } from '../labEnv'
+import { labModelProblem } from './labModel'
 import { workspaceDir } from '../paths'
 
 const terminals = new Map<string, IPty>()
@@ -55,7 +56,13 @@ export function register(): void {
       })
       const id = randomUUID()
       terminals.set(id, pty)
-      pty.onData((data) => emit(EVENTS.terminalData, id, data))
+      // Goes in front of the shell's first output: anything sent before the renderer has the id is lost.
+      const problem = labModelProblem(labId)
+      let notice = problem ? `\x1b[2m${problem}\x1b[0m\r\n` : ''
+      pty.onData((data) => {
+        emit(EVENTS.terminalData, id, notice + data)
+        notice = ''
+      })
       pty.onExit(({ exitCode }) => {
         terminals.delete(id)
         emit(EVENTS.terminalExit, id, exitCode)

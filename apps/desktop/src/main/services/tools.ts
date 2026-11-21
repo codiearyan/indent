@@ -12,6 +12,7 @@ import { handle } from '../ipc'
 import { labEnv } from '../labEnv'
 import { ownNodeBin, ownNodeDir, toolsDir } from '../paths'
 import { which } from './ai/cli'
+import { labModelStatus, restartLabModel, startLabModelIfNodeWasMissing } from './labModel'
 import { nodeSupported } from './grader'
 import { pickNodeArchive } from './nodeArchive'
 
@@ -60,6 +61,7 @@ async function status(): Promise<ToolStatus[]> {
   const env = await labEnv()
   const [node, git] = await Promise.all([versionOf('node', env), gitVersion(env)])
   const nodeOk = !!node && nodeSupported(node)
+  if (nodeOk) startLabModelIfNodeWasMissing()
   return [
     {
       id: 'node',
@@ -122,5 +124,10 @@ function installNode(): Promise<ToolStatus[]> {
 }
 
 export function register(): void {
-  handle('tools', { status, installNode })
+  handle('tools', {
+    status,
+    installNode,
+    labModel: async () => labModelStatus(),
+    restartLabModel
+  })
 }
