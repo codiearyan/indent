@@ -250,9 +250,13 @@ export interface RuntimeStatus {
   ready: boolean
   /** They are being installed now. */
   installing?: boolean
+  /** How much of the download is done, 0 to 1, while installing. */
+  progress?: number
   error?: string
-  /** The end of the npm output when the install failed. */
+  /** What went wrong in full, such as the end of the npm output, when the install failed. */
   details?: string
+  /** False when trying again cannot help. */
+  retry?: boolean
 }
 
 /** Something the repos need on this computer, such as Node. */

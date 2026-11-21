@@ -167,7 +167,12 @@ export function ToolsSection(): React.JSX.Element {
               <span className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
                 <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden />
                 Installing
+                {runtime.progress !== undefined && (
+                  <span className="tabular-nums">{Math.round(runtime.progress * 100)}%</span>
+                )}
               </span>
+            ) : runtime.retry === false ? (
+              <span className="shrink-0 text-xs text-muted-foreground">Not ready</span>
             ) : (
               <Button
                 variant="outline"
