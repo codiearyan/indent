@@ -6,6 +6,7 @@ import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getChapter, listLabs, listPaths } from '../apps/desktop/src/main/services/packs.ts'
+import { TOOL_IDS } from '../apps/desktop/src/shared/types.ts'
 import { packArchive, packVersion } from '../apps/desktop/src/main/packArchive.ts'
 
 const out = process.argv[2] && resolve(process.argv[2])
@@ -27,6 +28,10 @@ for (const id of folders) {
 }
 
 for (const lab of labs) {
+  const tools = lab.tools ?? []
+  if (!Array.isArray(tools) || tools.some((tool) => !TOOL_IDS.includes(tool))) {
+    problems.push(`${lab.id}: tools must be a list of ${TOOL_IDS.join(', ')}`)
+  }
   for (const chapter of lab.chapters) {
     const dir = join(content, 'labs', lab.id, chapter.id)
     await getChapter(content, lab.id, chapter.id).catch((error) =>

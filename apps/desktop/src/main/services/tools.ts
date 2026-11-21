@@ -9,7 +9,7 @@ import type { ReadableStream } from 'stream/web'
 import { promisify } from 'util'
 import type { ToolStatus } from '@shared/types'
 import { handle } from '../ipc'
-import { labEnv } from '../labEnv'
+import { labEnv, refreshShellPath } from '../labEnv'
 import { ownNodeBin, ownNodeDir, toolsDir } from '../paths'
 import { which } from './ai/cli'
 import { ensureRuntime } from './checks'
@@ -51,7 +51,7 @@ function nodeNote(version: string | null, ok: boolean): string {
 }
 
 function gitNote(version: string | null): string {
-  const use = 'Used by the repos about git.'
+  const use = 'Keeps the history of a project.'
   if (version) return use
   return process.platform === 'darwin'
     ? `${use} To get it, run xcode-select --install in a terminal.`
@@ -59,6 +59,8 @@ function gitNote(version: string | null): string {
 }
 
 async function status(): Promise<ToolStatus[]> {
+  // A tool installed while the app is open is on the shell's PATH, not the one read at start.
+  refreshShellPath()
   const env = await labEnv()
   const [node, git] = await Promise.all([versionOf('node', env), gitVersion(env)])
   const nodeOk = !!node && nodeSupported(node)
@@ -130,10 +132,29 @@ function installNode(): Promise<ToolStatus[]> {
     .finally(() => (installing = undefined)))
 }
 
+/** Opens Apple's installer window; the person finishes it there, then checks again. */
+async function installGit(): Promise<void> {
+  if (process.platform !== 'darwin') throw new Error('Get Git from git-scm.com/downloads.')
+  try {
+    await run('xcode-select', ['--install'], { timeout: 10_000 })
+  } catch (error) {
+    // It also exits non-zero when the tools are already there, which is fine.
+    if (!/already installed/i.test(String((error as { stderr?: string }).stderr))) {
+      throw new Error(
+        "Could not open Apple's installer. Run xcode-select --install in a terminal.",
+        {
+          cause: error
+        }
+      )
+    }
+  }
+}
+
 export function register(): void {
   handle('tools', {
     status,
     installNode,
+    installGit,
     labModel: async () => labModelStatus(),
     restartLabModel
   })

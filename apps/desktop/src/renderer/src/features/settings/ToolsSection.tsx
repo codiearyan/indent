@@ -5,12 +5,21 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api'
 import { errorMessage } from '@/lib/utils'
+import { useCatalog } from '@/stores/catalog'
 import { retryRuntime, useRuntime } from '@/stores/runtime'
+import { refreshTools, useTools } from '@/stores/tools'
 import { Group, card } from './controls'
 
 /** What the repos need on this computer, and a download for the part the app can fetch itself. */
 export function ToolsSection(): React.JSX.Element {
-  const [tools, setTools] = useState<ToolStatus[] | null>(null)
+  const tools = useTools((s) => s.tools)
+  const setTools = (next: ToolStatus[]): void => useTools.setState({ tools: next })
+  const labs = useCatalog((s) => s.labs)
+  const usedBy = (tool: ToolStatus): string =>
+    (labs ?? [])
+      .filter((lab) => lab.tools?.includes(tool.id))
+      .map((lab) => lab.title)
+      .join(', ')
   const [downloading, setDownloading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [model, setModel] = useState<LabModelStatus | null>(null)
@@ -21,13 +30,12 @@ export function ToolsSection(): React.JSX.Element {
 
   // The model's status comes second: reading tools can restart it once Node is found.
   const refresh = (): void => {
-    void api.tools
-      .status()
-      .then(setTools)
+    void refreshTools()
       .then(() => api.tools.labModel())
       .then(setModel, show)
   }
   useEffect(refresh, [])
+  useEffect(() => void useCatalog.getState().load(), [])
 
   const restart = async (): Promise<void> => {
     setRestarting(true)
@@ -71,7 +79,10 @@ export function ToolsSection(): React.JSX.Element {
               >
                 <div>
                   <div className="text-sm">{tool.label}</div>
-                  <p className="text-[13px] text-muted-foreground">{tool.note}</p>
+                  <p className="text-[13px] text-muted-foreground">
+                    {tool.note}
+                    {tool.id !== 'node' && usedBy(tool) && ` Used by: ${usedBy(tool)}.`}
+                  </p>
                 </div>
                 {tool.ok ? (
                   <span className="flex shrink-0 items-center gap-2 font-mono text-xs text-muted-foreground">
