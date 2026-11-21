@@ -42,11 +42,11 @@
         },
         {
           "active": ["q1"],
-          "note": "For each product, a small query inside works out the average price of that product's category."
+          "note": "For each product, the average price of its own category is worked out."
         },
         {
           "active": ["q1"],
-          "note": "The inner query reads the category from the outer row, so it gives a different average for bread than for pastry."
+          "note": "Bread and pastry have different averages, so each product is measured against the right one."
         },
         {
           "active": ["q1"],
@@ -84,7 +84,7 @@
             "colLabels": ["order", "status", "product", "category"],
             "cells": [[31, "cancelled", "Lemon drizzle slice", "cake"]]
           },
-          "note": "For that cafe, the inner query walks from its orders to their items and on to each product's category."
+          "note": "Each order of this cafe has items, and each item is a product with a category."
         },
         {
           "active": ["q2"],
@@ -92,7 +92,7 @@
         },
         {
           "active": ["q2"],
-          "note": "The inner query only has to answer yes or no. One matching order is enough, so a cafe that bought ten cakes still appears once."
+          "note": "A cafe that bought ten cakes is still one cafe to Tobias, so it appears once."
         },
         {
           "active": ["q2", "q2->tobias", "tobias"],
@@ -130,11 +130,11 @@
         },
         {
           "active": ["q3"],
-          "note": "The average spend is worked out from that named table, over the cafes in it."
+          "note": "The average spend is taken over the cafes that have at least one delivered order."
         },
         {
           "active": ["q3"],
-          "note": "Each cafe's total is compared with the average before any rounding, then the cafe's name is joined in."
+          "note": "A cafe stays when its spend is above that average. The comparison uses the unrounded numbers."
         },
         {
           "active": ["q3", "q3->odile", "odile"],

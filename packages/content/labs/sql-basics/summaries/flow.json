@@ -41,18 +41,18 @@
           "active": ["q1"],
           "value": {
             "kind": "map",
-            "label": "these four rows, grouped by status",
+            "label": "these four rows, by status",
             "entries": [
               { "key": "delivered", "value": "orders 12 and 20" },
               { "key": "cancelled", "value": "order 13" },
               { "key": "pending", "value": "order 19" }
             ]
           },
-          "note": "Rows with the same status fall into one group. Here are only four of them; the real table has many more."
+          "note": "Orders that share a status belong on the same line of Odile's report. Here are only four of them; the real table has many more."
         },
         {
           "active": ["q1"],
-          "note": "Each group is counted and becomes one line."
+          "note": "Each status ends up as one line with its number of orders."
         },
         {
           "active": ["q1", "q1->odile", "odile"],
@@ -85,16 +85,16 @@
         },
         {
           "active": ["q2"],
-          "note": "Products with the same category form one group, so bread, pastry and cake each get their own line."
+          "note": "Bread, pastry and cake each get their own line in Tobias's review."
         },
         {
           "active": ["q2"],
           "value": {
             "kind": "array",
-            "label": "worked out for each group",
+            "label": "worked out for each category",
             "values": ["how many", "lowest price", "highest price", "average price"]
           },
-          "note": "Inside each group, four numbers are worked out from the prices."
+          "note": "For each category, Tobias wants four numbers about its products."
         },
         {
           "active": ["q2"],
@@ -131,15 +131,15 @@
         },
         {
           "active": ["q3"],
-          "note": "Only delivered orders count, so the other rows leave before any counting starts."
+          "note": "Only delivered orders count toward a regular. Cancelled and pending ones do not."
         },
         {
           "active": ["q3"],
-          "note": "The delivered orders that remain are grouped by cafe, and each group is counted."
+          "note": "Each cafe's delivered orders are counted."
         },
         {
           "active": ["q3"],
-          "note": "Now a whole group is kept or dropped: only cafes with at least 3 delivered orders stay. This filter runs after the counting."
+          "note": "A cafe with at least 3 delivered orders is a regular. The others are left off Odile's list."
         },
         {
           "active": ["q3", "q3->odile", "odile"],

@@ -24,7 +24,7 @@
       { "from": "q2", "to": "odile", "label": "rotas" },
       { "from": "q3", "to": "tobias", "label": "unwanted bakes" }
     ],
-    "note": "Orders hold only ids, so each query joins them to the tables that hold the names, and chooses which rows must survive a missing match."
+    "note": "Orders hold only ids, so each query brings in the names and records from the other tables."
   },
   "tasks": {
     "october-deliveries": {
@@ -43,19 +43,19 @@
           "active": ["cafes", "cafes->q1", "q1"],
           "value": {
             "kind": "map",
-            "label": "cafes, matched on id",
+            "label": "cafes, looked up",
             "entries": [{ "key": "cafe 1", "value": "Copper Kettle" }]
           },
-          "note": "The first join finds the cafe whose id matches the order's cafe_id and brings its name along."
+          "note": "Cafe 1 is looked up in the cafes table, and its name comes along."
         },
         {
           "active": ["drivers", "drivers->q1", "q1"],
           "value": {
             "kind": "map",
-            "label": "drivers, matched on id",
+            "label": "drivers, looked up",
             "entries": [{ "key": "driver 2", "value": "Priya Lund" }]
           },
-          "note": "The second join does the same for the driver. Both tables have a name column, so each needs its own name in the result."
+          "note": "Driver 2 is looked up the same way in the drivers table."
         },
         {
           "active": ["q1"],
@@ -96,7 +96,7 @@
               [3, "Callum Reyes", "Van 3"]
             ]
           },
-          "note": "Every driver must appear in the answer, so the drivers table is where the query starts."
+          "note": "Every driver must appear in Odile's list, even one who has no orders yet."
         },
         {
           "active": ["orders", "orders->q2", "q2"],
@@ -114,11 +114,11 @@
         },
         {
           "active": ["q2"],
-          "note": "A driver with no orders still keeps one row, with empty order columns. An inner join would drop that driver."
+          "note": "A driver with no orders matches nothing, but still belongs in Odile's list."
         },
         {
           "active": ["q2"],
-          "note": "The rows are grouped by driver and the matched orders counted. Counting only real order ids makes an empty match count as 0."
+          "note": "Each driver's orders are counted. A driver with none shows 0."
         },
         {
           "active": ["q2", "q2->odile", "odile"],
@@ -160,15 +160,15 @@
               [1, 1, 6]
             ]
           },
-          "note": "Each product is matched to the order lines that name it. These three products have been ordered."
+          "note": "Order lines name the products cafes have asked for. These three products have been ordered."
         },
         {
           "active": ["q3"],
-          "note": "A product nobody ordered still keeps a row, but its order_items columns come back empty."
+          "note": "Some products appear in no order line at all."
         },
         {
           "active": ["q3"],
-          "note": "Keeping only the rows where the match came back empty leaves the products that were never ordered."
+          "note": "Those are the ones Tobias is after. Every product that was ever ordered drops off his list."
         },
         {
           "active": ["q3", "q3->tobias", "tobias"],

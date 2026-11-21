@@ -43,7 +43,7 @@
               [14, "Pebble and Pine", "Saltmarsh"]
             ]
           },
-          "note": "The first insert names every column except id. The database picks the next id itself."
+          "note": "The new cafe comes after the last one, and the database chooses its id."
         },
         {
           "active": ["q1"],
@@ -88,7 +88,7 @@
         },
         {
           "active": ["items", "items->q2", "q2"],
-          "note": "Before deleting, the query asks order_items which products were ever ordered."
+          "note": "The lines in order_items show which products were ever ordered."
         },
         {
           "active": ["q2", "q2->products"],

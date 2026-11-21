@@ -47,7 +47,7 @@
             "label": "columns kept",
             "values": ["name", "contact_email, renamed email"]
           },
-          "note": "Only two columns stay. The email column gets a new name in the result, and the table itself does not change."
+          "note": "Only two columns stay, and the email goes out under the name Odile asked for."
         },
         {
           "active": ["q1"],
@@ -92,7 +92,7 @@
         },
         {
           "active": ["q2"],
-          "note": "A product joins the display when either half says yes. How the two halves are grouped changes which rows pass."
+          "note": "A product joins the display when either half says yes."
         },
         {
           "active": ["q2", "q2->tobias", "tobias"],
@@ -120,11 +120,11 @@
               ["Saffron Door", "Wyndham Cross", "team@saffrondoor.example", "2022-04-05"]
             ]
           },
-          "note": "Every cafe comes in. Some never gave an email, so that column holds NULL, no value at all."
+          "note": "Every cafe comes in. Some never gave an email, and theirs shows NULL."
         },
         {
           "active": ["q3"],
-          "note": "Only the cafes with no email stay. NULL is never equal to anything, so it needs its own test."
+          "note": "Only the cafes with no email stay. They are the ones Odile has to phone."
         },
         {
           "active": ["q3"],
