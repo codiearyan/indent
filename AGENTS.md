@@ -390,6 +390,32 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
 - Minimal comments: only the why that the code cannot show. No comment on self-explanatory code.
 - Clarity over cleverness. No abstractions, options or config nobody asked for.
 
+## Security and performance
+
+Weigh both in every change, not as a later pass.
+
+Security. The app runs code people write and content it downloads, so treat both as untrusted.
+
+- The renderer is sandboxed and reaches the system only through `window.api`. Keep it that way:
+  no `nodeIntegration`, no new preload surface beyond what `shared/types.ts` declares.
+- Every id or path from the renderer goes through `safeId` or `resolveInside` before it touches the
+  file system. Archives unpack with `unpack()`, which refuses entries that leave the folder.
+- Learner code, checks and the lab model run as child processes with `labEnv()`, never inside the
+  main process. Pages run in the `indent-preview:` frame on their own origin.
+- Downloads are checked (size and sha256) before use. Spawn processes with an argument array, never
+  a shell string built from input.
+- API keys stay in the main process and never reach the renderer, logs, or usage stats.
+
+Performance. The app is open for hours beside an editor and a terminal.
+
+- Never block the main process: use `fs/promises` and async child processes in services. Sync calls
+  only at startup or in one-off code where nothing is waiting.
+- Read a lot of files in parallel (`Promise.all`), not one `await` at a time in a loop.
+- Select the slice of a zustand store a component needs, not the whole store, so unrelated updates
+  do not re-render it.
+- Load heavy views and libraries (the editor, Patterns, the terminal) when they are first shown.
+- Clean up what you start: listeners, timers, watchers, child processes and terminals.
+
 ## Workflow
 
 - The repository is public on GitHub. `main` is always releasable and is never committed to directly.
