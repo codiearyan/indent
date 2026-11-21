@@ -7,7 +7,7 @@ export const listPatterns = (): { title: string; group: string; time: string }[]
   patterns.map((p) => ({ title: p.title, group: p.group, time: p.complexity.time }))
 
 // The shared repo packs at the monorepo root; the site builds with apps/site as the working directory.
-const contentDir = resolve(process.cwd(), '..', '..', 'content')
+const contentDir = resolve(process.cwd(), '..', '..', 'packages', 'content')
 
 export interface Issue {
   id: string

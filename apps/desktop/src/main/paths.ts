@@ -2,11 +2,11 @@ import { app } from 'electron'
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import { isAbsolute, join } from 'path'
 
-/** What the app ships: the repo root's content/ folder in dev, an extra resource when packaged. */
+/** What the app ships: packages/content in dev, an extra resource when packaged. */
 export function bundledContentDir(): string {
   return app.isPackaged
     ? join(process.resourcesPath, 'content')
-    : join(app.getAppPath(), '..', '..', 'content')
+    : join(app.getAppPath(), '..', '..', 'packages', 'content')
 }
 
 /** Repos come from the library when packaged, and in dev when INDENT_PACKS_URL names one. */
@@ -16,7 +16,7 @@ export function usesLibrary(): boolean {
 
 /**
  * Where every service reads repos, the kit and the runtime. With the library it is a folder in
- * user data that the shipped content is copied into and downloads add to; dev reads content/.
+ * user data that the shipped content is copied into and downloads add to; dev reads packages/content.
  */
 export function contentDir(): string {
   return usesLibrary() ? dataFile('content') : bundledContentDir()

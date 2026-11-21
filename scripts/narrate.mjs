@@ -1,6 +1,6 @@
 // Records every lesson part with a neural voice so "Read aloud" sounds like a person.
 // usage: node scripts/narrate.mjs [labId ...]     needs uvx (for edge-tts) and ffmpeg
-// Each part is saved as content/labs/<lab>/<issue>/audio/<key>.ogg, where the key is derived from
+// Each part is saved as packages/content/labs/<lab>/<issue>/audio/<key>.ogg, where the key is derived from
 // the part's text. Parts that already have a recording are skipped; recordings whose text no
 // longer exists are removed.
 import { execFile } from 'node:child_process'
@@ -22,7 +22,7 @@ const VOICE = 'en-US-AndrewNeural'
 // One part at a time: the voice service stops answering for a while when asked for many at once.
 const ATTEMPTS = 6
 const run = promisify(execFile)
-const labsDir = new URL('../content/labs/', import.meta.url).pathname
+const labsDir = new URL('../packages/content/labs/', import.meta.url).pathname
 const only = process.argv.slice(2)
 const scratch = mkdtempSync(join(tmpdir(), 'indent-narrate-'))
 

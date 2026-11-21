@@ -54,14 +54,13 @@ pnpm --filter @indent/desktop build:mac   # package the app (also build:win, bui
 ```
 
 The repository is a pnpm workspaces monorepo: the desktop app is in `apps/desktop`, the landing page in `apps/site`
-(`pnpm dev:site`), and the content
-stays in `content/` at the root so other apps can share it.
+(`pnpm dev:site`), and the repos and the grader kit, which both apps read, in `packages/content`.
 
 ## Add a repo
 
-Repos are plain files under `content/labs/<labId>/`: a `lab.json`, and per issue a `chapter.json`,
+Repos are plain files under `packages/content/labs/<labId>/`: a `lab.json`, and per issue a `chapter.json`,
 `lesson.md`, `starter/`, `solution/` and hidden tests in `grader/checks.mjs`. The format and the
-grader contract are documented in [AGENTS.md](AGENTS.md); `content/labs/llm-bug-hunts-ts` is a
+grader contract are documented in [AGENTS.md](AGENTS.md); `packages/content/labs/llm-bug-hunts-ts` is a
 complete example. Restart the app to pick up a new repo.
 
 ## Where things are stored

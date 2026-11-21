@@ -14,7 +14,7 @@ if (!out) {
   process.exit(2)
 }
 
-const content = fileURLToPath(new URL('../content/', import.meta.url))
+const content = fileURLToPath(new URL('../packages/content/', import.meta.url))
 const problems = []
 
 const folders = readdirSync(join(content, 'labs'), { withFileTypes: true })

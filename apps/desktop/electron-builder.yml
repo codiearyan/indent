@@ -55,7 +55,7 @@ appImage:
 npmRebuild: false
 beforePack: build/pack-index.mjs
 extraResources:
-  - from: ../../content
+  - from: ../../packages/content
     to: content
     filter:
       - kit/**
