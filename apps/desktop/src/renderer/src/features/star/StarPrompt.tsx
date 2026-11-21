@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Star } from 'lucide-react'
 import { toast } from 'sonner'
 import { REPO_URL } from '@shared/repo'
@@ -46,21 +47,23 @@ async function maybeAsk(closedRepo: boolean): Promise<void> {
  * after the app opens from its second launch on. Renders nothing itself; the request is a toast.
  */
 export function StarPrompt(): null {
+  const { pathname } = useLocation()
+  const previous = useRef(pathname)
+
   useEffect(() => {
     const timer = setTimeout(() => void maybeAsk(false), AFTER_START_MS)
-    // Leaving an issue (#/learn/...) for the rest of the app is closing the repo.
-    const onRoute = (event: HashChangeEvent): void => {
-      const from = new URL(event.oldURL).hash
-      if (from.startsWith('#/learn/') && !location.hash.startsWith('#/learn/')) {
-        setTimeout(() => void maybeAsk(true), AFTER_REPO_MS)
-      }
-    }
-    window.addEventListener('hashchange', onRoute)
-    return () => {
-      clearTimeout(timer)
-      window.removeEventListener('hashchange', onRoute)
-    }
+    return () => clearTimeout(timer)
   }, [])
+
+  // Leaving an issue (/learn/...) for the rest of the app is closing the repo. The router moves
+  // with the History API, so this reads its location rather than listening for hashchange.
+  useEffect(() => {
+    const closed = previous.current.startsWith('/learn/') && !pathname.startsWith('/learn/')
+    previous.current = pathname
+    if (!closed) return
+    const timer = setTimeout(() => void maybeAsk(true), AFTER_REPO_MS)
+    return () => clearTimeout(timer)
+  }, [pathname])
 
   return null
 }

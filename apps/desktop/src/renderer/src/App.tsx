@@ -25,8 +25,9 @@ export default function App(): React.JSX.Element {
       ) : (
         <>
           <SettingsDialog />
-          <StarPrompt />
           <HashRouter>
+            {/* Inside the router: it watches routes to know when a repo is closed. */}
+            <StarPrompt />
             <Routes>
               <Route element={<AppShell />}>
                 <Route index element={<DashboardPage />} />
