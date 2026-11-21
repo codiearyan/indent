@@ -1,10 +1,20 @@
 import { execFile } from 'child_process'
-import { chmodSync, cpSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'fs'
+import {
+  chmodSync,
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync
+} from 'fs'
 import { tmpdir } from 'os'
 import { dirname, join, resolve } from 'path'
 import { promisify } from 'util'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import type { TraceResult } from '../../shared/types'
+import { compareTrace } from '../../shared/trace'
+import type { Flow, TraceResult } from '../../shared/types'
 
 const content = resolve(__dirname, '../../../../../packages/content')
 const runTrace = join(content, 'kit', 'run-trace.mjs')
@@ -259,5 +269,19 @@ describe('run-trace.mjs', () => {
     expect(solution.ok).toBe(true)
     expect(path(solution)).toEqual(['orderTotal'])
     expect(solution.calls[0].returned).toMatch(/^\d+$/)
+
+    const flow = JSON.parse(readFileSync(join(orderReports, 'flow.json'), 'utf8')) as Flow
+    const steps = flow.tasks?.total.steps ?? []
+    const intended = compareTrace(flow.scene, steps, solution)
+    expect(intended.divergence).toBeUndefined()
+    expect(intended.steps.map((step) => step.status)).toEqual([
+      'not-checked',
+      'reached',
+      'reached',
+      'reached'
+    ])
+    expect(compareTrace(flow.scene, steps, starter).divergence?.message).toBe(
+      'orderTotal() threw: Not implemented'
+    )
   })
 })
