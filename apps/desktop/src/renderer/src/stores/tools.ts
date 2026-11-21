@@ -37,11 +37,12 @@ export async function refreshTools(): Promise<ToolStatus[]> {
   return tools
 }
 
-let cancelled = false
+// Cancel only stops the Node download.
+let nodeCancelled = false
 
 /** Installs a tool for the learner, or opens its download page when nothing here can. */
 export async function installTool(id: ToolId): Promise<void> {
-  cancelled = false
+  if (id === 'node') nodeCancelled = false
   setInstall(id, { state: 'running', done: id === 'node' ? 0 : null })
   try {
     const result = await api.tools.install(id)
@@ -54,12 +55,15 @@ export async function installTool(id: ToolId): Promise<void> {
     })
   } catch (error) {
     setInstall(id, { state: 'failed', message: errorMessage(error) })
-    track('tool_install', { tool: id, result: cancelled ? 'cancelled' : 'failed' })
+    track('tool_install', {
+      tool: id,
+      result: id === 'node' && nodeCancelled ? 'cancelled' : 'failed'
+    })
   }
 }
 
 export function cancelInstall(): void {
-  cancelled = true
+  nodeCancelled = true
   void api.tools.cancelInstall()
 }
 
