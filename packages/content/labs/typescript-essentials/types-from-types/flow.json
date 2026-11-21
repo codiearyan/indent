@@ -1,0 +1,189 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "booking", "label": "booking.ts", "kind": "file" },
+      { "id": "keys", "label": "BookingKey, CustomerInfo", "kind": "data", "mine": true },
+      { "id": "pluck", "label": "pluck()", "kind": "function", "mine": true, "fn": "pluck" },
+      { "id": "drafts", "label": "NewBooking, BookingChange", "kind": "data", "mine": true },
+      { "id": "apply", "label": "applyChange()", "kind": "function", "mine": true, "fn": "applyChange" },
+      { "id": "counts", "label": "LevelCounts", "kind": "data", "mine": true },
+      { "id": "count", "label": "countLevels()", "kind": "function", "mine": true },
+      { "id": "rules", "label": "Rules<T>", "kind": "data", "mine": true },
+      { "id": "broken", "label": "brokenRules()", "kind": "function", "mine": true },
+      { "id": "form", "label": "Edit form", "kind": "story" },
+      { "id": "desk", "label": "Front desk", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "booking", "to": "keys", "label": "built from" },
+      { "from": "booking", "to": "pluck", "label": "bookings" },
+      { "from": "pluck", "to": "desk", "label": "one field each" },
+      { "from": "booking", "to": "drafts", "label": "built from" },
+      { "from": "form", "to": "apply", "label": "a change" },
+      { "from": "drafts", "to": "apply", "label": "BookingChange" },
+      { "from": "apply", "to": "desk", "label": "updated booking" },
+      { "from": "booking", "to": "counts", "label": "ServiceLevel" },
+      { "from": "counts", "to": "count", "label": "LevelCounts" },
+      { "from": "count", "to": "desk", "label": "counts" },
+      { "from": "booking", "to": "rules", "label": "every key" },
+      { "from": "rules", "to": "broken", "label": "rules" },
+      { "from": "broken", "to": "form", "label": "broken keys" }
+    ],
+    "note": "Every copy of the booking type is rebuilt from Booking itself, so a new member like dropOff reaches all of them at once."
+  },
+  "tasks": {
+    "fields": {
+      "trace": {
+        "file": "src/fields.ts",
+        "call": "pluck",
+        "args": [
+          [
+            {
+              "id": "SW-1047",
+              "customer": { "name": "Ingrid Dahl", "email": "ingrid@example.com" },
+              "bike": { "serial": "KS-40528", "make": "Kestrel" },
+              "level": "overhaul",
+              "dropOff": "2026-11-24",
+              "priceCents": 12000,
+              "notes": "Wobbly back wheel"
+            },
+            {
+              "id": "SW-1048",
+              "customer": { "name": "Tomas Berg", "email": "tomas@example.com" },
+              "bike": { "serial": "NB-80211", "make": "Norrby" },
+              "level": "basic",
+              "dropOff": "2026-11-25",
+              "priceCents": 3500,
+              "notes": ""
+            }
+          ],
+          "dropOff"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["booking", "booking->pluck"],
+          "value": {
+            "kind": "map",
+            "label": "two bookings",
+            "entries": [
+              { "key": "SW-1047", "value": "Ingrid Dahl" },
+              { "key": "SW-1048", "value": "Tomas Berg" }
+            ]
+          },
+          "note": "The front desk wants the drop-off day of two bookings for this week."
+        },
+        {
+          "active": ["booking", "booking->keys", "keys"],
+          "note": "BookingKey is every property name of Booking, and CustomerInfo is the type of its customer member. Both follow Booking when it changes."
+        },
+        {
+          "active": ["pluck"],
+          "note": "pluck is generic over the item type and over a key of that type, so a key the items do not have is a type error."
+        },
+        {
+          "active": ["pluck"],
+          "note": "It reads that key from every item, in order, into a new list."
+        },
+        {
+          "active": ["pluck", "pluck->desk", "desk"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "list", "value": "the type of that key, once per item" }]
+          },
+          "note": "The type of the list follows the key, so dropOff gives a list of strings and priceCents a list of numbers."
+        }
+      ]
+    },
+    "changes": {
+      "trace": {
+        "file": "src/changes.ts",
+        "call": "applyChange",
+        "args": [
+          {
+            "id": "SW-1047",
+            "customer": { "name": "Ingrid Dahl", "email": "ingrid@example.com" },
+            "bike": { "serial": "KS-40528", "make": "Kestrel" },
+            "level": "overhaul",
+            "dropOff": "2026-11-24",
+            "priceCents": 12000,
+            "notes": "Wobbly back wheel"
+          },
+          { "level": "basic", "dropOff": "2026-11-27" }
+        ]
+      },
+      "steps": [
+        {
+          "active": ["form", "form->apply"],
+          "value": {
+            "kind": "map",
+            "label": "the change",
+            "entries": [
+              { "key": "level", "value": "basic" },
+              { "key": "dropOff", "value": "2026-11-27" }
+            ]
+          },
+          "note": "Ingrid moves her drop-off to the 27th and asks for a basic service instead."
+        },
+        {
+          "active": ["booking", "booking->drafts", "drafts", "drafts->apply"],
+          "note": "NewBooking and BookingChange are built from Booking with utility types, not copied, so dropOff can never go missing from them again."
+        },
+        {
+          "active": ["apply"],
+          "note": "applyChange builds a new booking. A key that is missing or undefined in the change keeps the old value, and an empty string for notes is a real value."
+        },
+        {
+          "active": ["apply", "apply->desk", "desk"],
+          "note": "The desk gets the updated copy, and the booking it started from stays as it was."
+        },
+        {
+          "active": ["counts", "counts->count", "count", "count->desk"],
+          "value": {
+            "kind": "map",
+            "label": "what countLevels gives",
+            "entries": [{ "key": "every ServiceLevel", "value": "a count" }]
+          },
+          "note": "countLevels gives a number for every service level, with 0 for levels nobody booked."
+        }
+      ]
+    },
+    "rules": {
+      "steps": [
+        {
+          "active": ["booking", "booking->rules", "rules"],
+          "note": "Rules<T> is a mapped type: for every key of T, an optional rule that takes that member's own type and returns a boolean."
+        },
+        {
+          "active": ["rules", "rules->broken"],
+          "value": {
+            "kind": "map",
+            "label": "in a Rules<Booking>",
+            "entries": [
+              { "key": "dropOff", "value": "gets a string" },
+              { "key": "priceCents", "value": "gets a number" }
+            ]
+          },
+          "note": "The edit form checks a booking with a few rules, and each rule receives only its own member."
+        },
+        {
+          "active": ["broken"],
+          "note": "brokenRules runs each rule against the matching member of the booking. Keys without a rule are skipped."
+        },
+        {
+          "active": ["broken"],
+          "note": "The keys whose rule returned false are kept, in the order the rules object lists them."
+        },
+        {
+          "active": ["broken", "broken->form", "form"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "broken", "value": "a list of keys of the booking" }]
+          },
+          "note": "The edit form gets a list of keys of Booking to mark, never a key Booking does not have."
+        }
+      ]
+    }
+  }
+}

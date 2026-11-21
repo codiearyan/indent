@@ -1,0 +1,157 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "form", "label": "Booking form", "kind": "story" },
+      { "id": "price", "label": "toCents()", "kind": "function", "mine": true, "fn": "toCents" },
+      { "id": "line", "label": "contactLine()", "kind": "function", "mine": true, "fn": "contactLine" },
+      { "id": "guard", "label": "isEmailContact()", "kind": "function", "mine": true, "fn": "isEmailContact" },
+      { "id": "greet", "label": "greeting()", "kind": "function", "mine": true, "fn": "greeting" },
+      { "id": "find", "label": "findCustomer()", "kind": "function", "mine": true, "fn": "findCustomer" },
+      { "id": "page", "label": "Booking page", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "form", "to": "price", "label": "euros or text" },
+      { "from": "form", "to": "line", "label": "a contact" },
+      { "from": "line", "to": "guard", "label": "is it email?" },
+      { "from": "form", "to": "greet", "label": "customers, id" },
+      { "from": "greet", "to": "find", "label": "id" },
+      { "from": "price", "to": "page", "label": "cents or null" },
+      { "from": "line", "to": "page", "label": "a line" },
+      { "from": "greet", "to": "page", "label": "a greeting" }
+    ],
+    "note": "Three helpers on the booking page each get a value that can be several things, and you give each one a type that names every case."
+  },
+  "tasks": {
+    "to-cents": {
+      "trace": { "file": "src/price.ts", "call": "toCents", "args": [" 24.90 "] },
+      "steps": [
+        {
+          "active": ["form", "form->price"],
+          "value": {
+            "kind": "map",
+            "label": "what the form sends",
+            "entries": [
+              { "key": "typed", "value": "' 24.90 '" },
+              { "key": "or", "value": "a number of euros" }
+            ]
+          },
+          "note": "A customer typed ' 24.90 ' into the price box. The old form can also send a plain number of euros."
+        },
+        {
+          "active": ["price"],
+          "note": "The parameter is a number or a string. typeof splits the two, and inside the number branch TypeScript knows amount is a number."
+        },
+        {
+          "active": ["price"],
+          "note": "A number is euros. A negative one, or one that is not finite, is not a price."
+        },
+        {
+          "active": ["price"],
+          "value": { "kind": "array", "label": "text that is a price", "values": ["24", "24.9", "24.90"] },
+          "note": "Text is trimmed first. After the number branch returns, amount is a string, so trim is allowed. Digits with an optional dot and one or two decimals count."
+        },
+        {
+          "active": ["price", "price->page", "page"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "price", "value": "whole cents, or null" }]
+          },
+          "note": "The page gets whole cents, or null when the input is not a price. The return type says both, so no caller can forget the null."
+        }
+      ]
+    },
+    "contact": {
+      "trace": {
+        "file": "src/contact.ts",
+        "call": "contactLine",
+        "args": [{ "phone": "0698 112 305", "textOk": false }]
+      },
+      "steps": [
+        {
+          "active": ["form", "form->line"],
+          "value": {
+            "kind": "map",
+            "label": "the contact",
+            "entries": [
+              { "key": "phone", "value": "0698 112 305" },
+              { "key": "textOk", "value": "false" }
+            ]
+          },
+          "note": "A customer left a phone number and asked not to get texts."
+        },
+        {
+          "active": ["line", "line->guard", "guard"],
+          "note": "contactLine asks isEmailContact first. Only an email contact has an email property, so the in operator tells them apart."
+        },
+        {
+          "active": ["guard"],
+          "note": "The guard's return type is a type predicate, not a plain boolean, so an if around it narrows the contact for the caller too."
+        },
+        {
+          "active": ["line"],
+          "note": "Past the email case, TypeScript knows this is a PhoneContact, so phone and textOk can be read with no cast."
+        },
+        {
+          "active": ["line", "line->page", "page"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "line", "value": "Email, Text or Call, then the detail" }]
+          },
+          "note": "One string goes back to the booking page."
+        }
+      ]
+    },
+    "greeting": {
+      "trace": {
+        "file": "src/greeting.ts",
+        "call": "greeting",
+        "args": [
+          [
+            { "id": 5, "name": "Ingrid Dahl", "nickname": "Ingi" },
+            { "id": 6, "name": "Tomas Berg", "nickname": "" },
+            { "id": 7, "name": "Lena Vos" }
+          ],
+          6
+        ]
+      },
+      "steps": [
+        {
+          "active": ["form", "form->greet"],
+          "value": {
+            "kind": "map",
+            "label": "nickname of each customer",
+            "entries": [
+              { "key": "5", "value": "Ingi" },
+              { "key": "6", "value": "empty string" },
+              { "key": "7", "value": "none" }
+            ]
+          },
+          "note": "The booking page asks for a greeting for customer 6."
+        },
+        {
+          "active": ["greet", "greet->find", "find"],
+          "note": "greeting looks the customer up with findCustomer, which gives the customer or undefined. Its return type has to say so."
+        },
+        {
+          "active": ["greet"],
+          "note": "No customer with that id still gets a polite greeting, with no name in it."
+        },
+        {
+          "active": ["greet"],
+          "note": "A nickname can be missing, null or an empty string. Only one with at least one non-space character is used. Otherwise the name is."
+        },
+        {
+          "active": ["greet", "greet->page", "page"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "greeting", "value": "Hi and a name" }]
+          },
+          "note": "One string goes back to the page, and Hi null can never come out."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "jobs", "label": "Today's jobs", "kind": "data" },
+      { "id": "notes", "label": "Notes and photos", "kind": "data" },
+      { "id": "last", "label": "lastItem()", "kind": "function", "mine": true },
+      { "id": "chunk", "label": "chunk()", "kind": "function", "mine": true, "fn": "chunk" },
+      { "id": "latest", "label": "latest()", "kind": "function", "mine": true, "fn": "latest" },
+      { "id": "byId", "label": "findById()", "kind": "function", "mine": true },
+      { "id": "queue", "label": "createQueue()", "kind": "function", "mine": true },
+      { "id": "board", "label": "Workshop board", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "jobs", "to": "last", "label": "jobs" },
+      { "from": "jobs", "to": "chunk", "label": "jobs, size" },
+      { "from": "notes", "to": "latest", "label": "notes" },
+      { "from": "notes", "to": "byId", "label": "notes, id" },
+      { "from": "jobs", "to": "queue", "label": "first jobs" },
+      { "from": "last", "to": "board", "label": "last job" },
+      { "from": "chunk", "to": "board", "label": "batches" },
+      { "from": "latest", "to": "board", "label": "newest" },
+      { "from": "byId", "to": "board", "label": "one note" },
+      { "from": "queue", "to": "board", "label": "next job" }
+    ],
+    "note": "One generic helper replaces each family of copies, and the item type that goes in is the one that comes out."
+  },
+  "tasks": {
+    "lists": {
+      "trace": {
+        "file": "src/lists.ts",
+        "call": "chunk",
+        "args": [["SW-1050", "SW-1051", "SW-1052", "SW-1053", "SW-1054", "SW-1055", "SW-1056"], 3]
+      },
+      "steps": [
+        {
+          "active": ["jobs", "jobs->chunk"],
+          "value": {
+            "kind": "array",
+            "label": "today's jobs",
+            "values": ["SW-1050", "SW-1051", "SW-1052", "SW-1053", "SW-1054", "SW-1055", "SW-1056"]
+          },
+          "note": "Seven jobs are booked today, and the board shows them in batches of 3."
+        },
+        {
+          "active": ["chunk"],
+          "note": "chunk has a type parameter for the item, so a list of job ids gives lists of job ids, and nothing is lost to unknown."
+        },
+        {
+          "active": ["chunk"],
+          "note": "It walks the list in order, size items at a time. The last batch holds whatever is left."
+        },
+        {
+          "active": ["chunk"],
+          "note": "A size below 1 throws an Error, and the list it was given stays as it was."
+        },
+        {
+          "active": ["chunk", "chunk->board", "board"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "batches", "value": "lists of the same item type" }]
+          },
+          "note": "The board gets a list of batches, each one a list of the same kind of item."
+        },
+        {
+          "active": ["jobs->last", "last", "last->board"],
+          "note": "lastItem works the same way: the last item with its own type, or undefined for an empty list."
+        }
+      ]
+    },
+    "latest": {
+      "trace": {
+        "file": "src/latest.ts",
+        "call": "latest",
+        "args": [
+          [
+            { "id": "n5", "updatedAt": 1763600000, "text": "Tyre patched" },
+            { "id": "n6", "updatedAt": 1763610000, "text": "Bell fitted" },
+            { "id": "n7", "updatedAt": 1763605000, "text": "Customer collected" }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["notes", "notes->latest"],
+          "value": {
+            "kind": "map",
+            "label": "updatedAt of each note",
+            "entries": [
+              { "key": "n5", "value": 1763600000 },
+              { "key": "n6", "value": 1763610000 },
+              { "key": "n7", "value": 1763605000 }
+            ]
+          },
+          "note": "Three notes on a bike come in, each with an id, a text and an updatedAt."
+        },
+        {
+          "active": ["latest"],
+          "note": "latest accepts any item that has at least an updatedAt number. A constraint on the type parameter says that and keeps every other member."
+        },
+        {
+          "active": ["latest"],
+          "note": "It keeps the item with the largest updatedAt. On a tie, the first one stays."
+        },
+        {
+          "active": ["latest", "latest->board", "board"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "newest", "value": "the same item type, or undefined" }]
+          },
+          "note": "One note comes back with its text still typed, or undefined when there are no notes."
+        },
+        {
+          "active": ["notes->byId", "byId", "byId->board"],
+          "note": "findById does the same for anything with a string id, and gives undefined when no item has it."
+        }
+      ]
+    },
+    "queue": {
+      "steps": [
+        {
+          "active": ["jobs", "jobs->queue"],
+          "value": { "kind": "array", "label": "the morning's jobs", "values": ["SW-1050", "SW-1051"] },
+          "note": "The day starts with two jobs waiting."
+        },
+        {
+          "active": ["queue"],
+          "note": "createQueue infers the item type from the list it gets, so these jobs make a queue of strings. With no list, the item type is given in angle brackets."
+        },
+        {
+          "active": ["queue"],
+          "note": "add puts a job at the back. next takes the front one off, peek only looks, and size counts what is waiting."
+        },
+        {
+          "active": ["queue"],
+          "note": "next and peek can find the queue empty, so their return type includes undefined."
+        },
+        {
+          "active": ["queue", "queue->board", "board"],
+          "note": "The board always gets the job at the front, and the list the queue started from is never changed."
+        }
+      ]
+    }
+  }
+}
