@@ -2,8 +2,9 @@ import { app } from 'electron'
 import type { TelemetryEvent, TelemetryProps } from '@shared/types'
 import { listen } from '../ipc'
 
-// Events go straight to Aptabase's ingestion API. The app key only allows sending events, so it
-// is safe to ship. Nothing is sent while usage stats are off: the renderer gates every event.
+// Events go straight to the analytics service's ingestion API. The app key only allows sending
+// events, so it is safe to ship. Nothing is sent while usage stats are off: the renderer gates
+// every event.
 const APP_KEY = 'A-EU-3530820487'
 const EVENT_URL = 'https://eu.aptabase.com/api/v0/event'
 const SESSION_IDLE_MS = 60 * 60 * 1000
@@ -13,7 +14,7 @@ export interface Session {
   lastAt: number
 }
 
-/** Aptabase counts a new session after an hour without events. The id is never stored. */
+/** A new session starts after an hour without events. The id is never stored. */
 export function nextSession(session: Session | null, now: number): Session {
   if (session && now - session.lastAt <= SESSION_IDLE_MS) return { ...session, lastAt: now }
   const random = Math.floor(Math.random() * 1e8)
