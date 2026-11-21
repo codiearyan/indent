@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { FlowScene } from '@shared/types'
 import { cn } from '@/lib/utils'
 import { layoutScene, NODE_H, NODE_W } from './layout'
+import { breakable } from './breakable'
 import './flows.css'
 
 const STATE = 'duration-(--motion-state) ease-out motion-reduce:transition-none'
@@ -133,13 +134,13 @@ export function FlowView({ scene, active = [], stepKey = 0 }: Props): React.JSX.
             >
               <span
                 className={cn(
-                  'truncate leading-4',
+                  'line-clamp-2 leading-4 wrap-anywhere',
                   node.kind === 'file' || node.kind === 'function'
                     ? 'font-mono text-xs'
                     : 'text-[13px]'
                 )}
               >
-                {node.label}
+                {breakable(node.label)}
               </span>
               {node.mine && (
                 <span className="text-[11px] leading-4 text-muted-foreground">Your part</span>

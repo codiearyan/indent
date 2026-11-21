@@ -2,7 +2,8 @@ import { edgeId } from '@shared/flow'
 import type { FlowNode, FlowScene } from '@shared/types'
 
 export const NODE_W = 136
-export const NODE_H = 48
+/** Room for a label of two lines and, on the learner's nodes, the "Your part" line. */
+export const NODE_H = 56
 const COL_GAP = 80
 const ROW_GAP = 16
 /** Room for the outline of an active node. */

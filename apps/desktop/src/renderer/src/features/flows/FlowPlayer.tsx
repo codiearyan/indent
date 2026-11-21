@@ -52,7 +52,7 @@ export function FlowPlayer({
                   aria-hidden={i !== index}
                   className={cn('[grid-area:1/1]', i !== index && 'invisible')}
                 >
-                  <FrameView frame={s.value} />
+                  <FrameView frame={s.value} fit />
                 </div>
               )
           )}
