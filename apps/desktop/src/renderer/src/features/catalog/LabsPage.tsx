@@ -16,6 +16,7 @@ import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
 import { LEVELS, NO_FILTERS, matchesFilters, type LabFilters } from './labFilters'
 import { labProgress, type LabProgress } from './labStatus'
+import { NeedsTools } from './NeedsTools'
 
 const STATUS_TABS: { value: LabFilters['status']; label: string }[] = [
   { value: 'all', label: 'All' },
@@ -278,6 +279,7 @@ function RepoCard({
           <p className="mt-1 line-clamp-2 text-[13px] leading-5 text-muted-foreground">
             {lab.description}
           </p>
+          <NeedsTools lab={lab} className="mt-2" />
           <div className="mt-auto pt-4">
             <BuildStrip lab={lab} chapters={chapters} />
             <div className="mt-2.5 flex items-center justify-between gap-3 text-[13px] text-muted-foreground tabular-nums">

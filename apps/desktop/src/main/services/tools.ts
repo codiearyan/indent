@@ -9,7 +9,7 @@ import type { ReadableStream } from 'stream/web'
 import { promisify } from 'util'
 import type { ToolStatus } from '@shared/types'
 import { handle } from '../ipc'
-import { labEnv } from '../labEnv'
+import { labEnv, refreshShellPath } from '../labEnv'
 import { ownNodeBin, ownNodeDir, toolsDir } from '../paths'
 import { which } from './ai/cli'
 import { ensureRuntime } from './checks'
@@ -51,7 +51,7 @@ function nodeNote(version: string | null, ok: boolean): string {
 }
 
 function gitNote(version: string | null): string {
-  const use = 'Used by the repos about git.'
+  const use = 'Keeps the history of a project.'
   if (version) return use
   return process.platform === 'darwin'
     ? `${use} To get it, run xcode-select --install in a terminal.`
@@ -59,6 +59,8 @@ function gitNote(version: string | null): string {
 }
 
 async function status(): Promise<ToolStatus[]> {
+  // A tool installed while the app is open is on the shell's PATH, not the one read at start.
+  refreshShellPath()
   const env = await labEnv()
   const [node, git] = await Promise.all([versionOf('node', env), gitVersion(env)])
   const nodeOk = !!node && nodeSupported(node)

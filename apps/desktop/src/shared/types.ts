@@ -2,6 +2,10 @@
 
 // ---------- Content ----------
 
+/** A development tool a repo can need on the learner's computer. */
+export type ToolId = 'node' | 'git'
+export const TOOL_IDS: ToolId[] = ['node', 'git']
+
 /** content/labs/<labId>/lab.json */
 /**
  * How much a repo asks. Easy keeps each issue in one file, medium spreads a change over a few
@@ -23,6 +27,8 @@ export interface LabMeta {
   level?: Level
   /** What this repo needs from the app, compared with PACK_FORMAT; 1 when missing. */
   format?: number
+  /** Tools it needs on the computer; Node alone when missing. */
+  tools?: ToolId[]
   parts: { title: string; chapters: string[] }[]
 }
 
@@ -183,7 +189,7 @@ export interface LabModelStatus {
 }
 
 export interface ToolStatus {
-  id: 'node' | 'git'
+  id: ToolId
   label: string
   /** The version found, or null when the tool is missing. */
   version: string | null

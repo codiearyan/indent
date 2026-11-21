@@ -10,6 +10,7 @@ import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
 import { EmptyState } from './EmptyState'
 import { Figures } from './Figures'
+import { NeedsTools } from './NeedsTools'
 import { chapterState, labProgress } from './labStatus'
 
 const ACTION = { 'not-started': 'Start repo', 'in-progress': 'Continue', completed: 'Review' }
@@ -66,6 +67,7 @@ export function LabDetailPage(): React.JSX.Element {
           <p className="mt-2 text-[13px] text-muted-foreground">
             {[lab.category, ...lab.tags].join(', ')}
           </p>
+          <NeedsTools lab={lab} className="mt-1" />
           {lab.availability && (
             <p className="mt-1 text-[13px] text-muted-foreground">
               {lab.availability === 'download'
