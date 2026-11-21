@@ -1,5 +1,5 @@
 // Proves every issue grades correctly: starter fails every task, solution passes every task.
-// node scripts/verify-content.mjs <root with content/runtime dependencies installed> [labId ...]
+// node scripts/verify-content.mjs <root with packages/content/runtime dependencies installed> [labId ...]
 import { spawn } from 'node:child_process'
 import { cp, mkdtemp, readFile, rm } from 'node:fs/promises'
 import { existsSync, readdirSync } from 'node:fs'
@@ -13,7 +13,7 @@ if (!root || !existsSync(join(root, 'node_modules'))) {
   process.exit(2)
 }
 
-const content = fileURLToPath(new URL('../content/', import.meta.url))
+const content = fileURLToPath(new URL('../packages/content/', import.meta.url))
 const kit = join(content, 'kit')
 const sandboxRoot = join(root, '.sandbox-verify')
 const CONCURRENCY = 4

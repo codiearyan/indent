@@ -36,14 +36,15 @@ Run from the repo root.
 
 ## Layout
 
-A pnpm workspaces monorepo. Install, lint and format from the root. Lab content is shared at the
-root so every app can read it. Each app is a workspace under `apps/`:
+A pnpm workspaces monorepo. Install, lint and format from the root. Each app is a workspace under
+`apps/`; what the apps share is a package under `packages/`:
 
 ```
-content/                 lab packs and the grader kit (plain files, shipped as an extra resource)
 apps/desktop/            the Electron app (@indent/desktop); src/ paths below are relative to it
-apps/site/               the landing page (@indent/site): a static Astro site that reads content/ at
-                         build time; `pnpm dev:site`, `pnpm build:site`
+apps/site/               the landing page (@indent/site): a static Astro site that reads
+                         packages/content at build time; `pnpm dev:site`, `pnpm build:site`
+packages/content/        @indent/content: lab packs and the grader kit (plain files, shipped as an
+                         extra resource); `content/` below means this folder
 packages/design/         @indent/design: tokens.css (colours, type, theme), code-palette.ts, the logo;
                          every app imports its look from here, never redefines it
 ```
@@ -159,7 +160,7 @@ reduced-motion block that turns movement into fades and shows each scene's last 
 ## Content packs
 
 ```
-content/
+packages/content/
   paths.json                         PathDef[]
   runtime/package.json               dependencies of learner code (vitest, typescript, openai, react, jsdom,
                                      esbuild, @types/node);
@@ -190,7 +191,7 @@ the roadmaps and the shipped repos there, and it downloads the other repos from 
 publishes (`scripts/build-packs.mjs`, `main/library.ts`). It ships only the repos listed in the
 `extraResources` filter of `apps/desktop/electron-builder.yml`, plus an index of all of them that
 `build/pack-index.mjs` writes before packing, so the catalog is complete offline. `pnpm dev` reads
-`content/` directly; to try downloads, serve a `build-packs.mjs` output and start with
+`packages/content` directly; to try downloads, serve a `build-packs.mjs` output and start with
 `INDENT_PACKS_URL=<its address>`.
 
 Read aloud plays a recording when one exists for the exact text of a lesson part, and falls back
@@ -224,7 +225,7 @@ checks, the terminal and the runtime install all use it. `services/tools.ts` own
 Grader CLI, run by the main process with system Node and `labEnv()`:
 
 ```
-node content/kit/run-check.mjs --chapter <abs chapter dir> --workspace <abs workspace dir> \
+node packages/content/kit/run-check.mjs --chapter <abs chapter dir> --workspace <abs workspace dir> \
      --sandbox-root <abs dir for temp copies> --task <taskId> [--task <taskId> ...]
 ```
 
@@ -233,11 +234,11 @@ It prints exactly one JSON line last on stdout:
 and exits 0 whether tasks pass or fail. A non-zero exit means the grader itself crashed.
 Messages say what to look at in plain words and never give the answer.
 
-Lab model: `node content/kit/lab-model.mjs` prints `{"port":N}` as its first stdout line, then serves
+Lab model: `node packages/content/kit/lab-model.mjs` prints `{"port":N}` as its first stdout line, then serves
 `POST /v1/chat/completions` on 127.0.0.1. Learner code reaches it with `new OpenAI()` because the
 environment sets `OPENAI_BASE_URL`, `OPENAI_API_KEY` and `LAB_MODEL_URL`.
 
-A lab gives the model its behavior in `content/labs/<labId>/model.mjs`: `models` maps a model name to
+A lab gives the model its behavior in `packages/content/labs/<labId>/model.mjs`: `models` maps a model name to
 a function from the request to the reply (a string, or `{ content, tool_calls }` for tool calling),
 and `embeddings` maps an embedding model name to a function from text to a vector (`kit/embed.mjs`
 has a ready-made one). It also serves `POST /v1/embeddings`. Prefix model names with the lab's own

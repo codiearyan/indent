@@ -12,7 +12,7 @@ export default defineConfig(
       '**/dist',
       '**/out',
       '**/.astro',
-      'content/**',
+      'packages/content/**',
       'scripts/**',
       'apps/desktop/build/**',
       'apps/desktop/src/renderer/src/components/ui/**'

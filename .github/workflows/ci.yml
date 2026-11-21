@@ -6,7 +6,7 @@ on:
   pull_request:
     paths-ignore:
       - '**/*.md'
-      - 'content/**'
+      - 'packages/content/**'
 
 concurrency:
   group: ci-${{ github.ref }}

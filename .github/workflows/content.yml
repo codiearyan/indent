@@ -5,7 +5,7 @@ name: Content
 on:
   pull_request:
     paths:
-      - 'content/**'
+      - 'packages/content/**'
       - 'scripts/build-packs.mjs'
 
 concurrency:

@@ -152,7 +152,7 @@ importers:
     dependencies:
       '@indent/content':
         specifier: workspace:*
-        version: link:../../content
+        version: link:../../packages/content
       '@indent/design':
         specifier: workspace:*
         version: link:../../packages/design
@@ -179,7 +179,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  content: {}
+  packages/content: {}
 
   packages/design:
     dependencies:
