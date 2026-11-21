@@ -2,7 +2,7 @@
 // node scripts/build-packs.mjs <out dir>
 // The site build writes it to apps/site/public/packs/v1; CI runs it to check content.
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getChapter, listLabs, listPaths } from '../apps/desktop/src/main/services/packs.ts'
@@ -51,6 +51,9 @@ const entries = labs.map((lab) => {
   const file = `${lab.id}-${version}.tar.gz`
   const archive = packArchive(dir)
   writeFileSync(join(out, file), archive)
+  // A card shows its cover before the repo is downloaded.
+  const cover = existsSync(join(dir, 'cover.webp')) ? `${lab.id}-${version}.webp` : undefined
+  if (cover) copyFileSync(join(dir, 'cover.webp'), join(out, cover))
   return {
     id: lab.id,
     version,
@@ -58,6 +61,7 @@ const entries = labs.map((lab) => {
     file,
     size: archive.length,
     sha256: createHash('sha256').update(archive).digest('hex'),
+    cover,
     summary: lab
   }
 })
