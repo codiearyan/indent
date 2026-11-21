@@ -43,10 +43,11 @@ yet, read `packages/content/labs/js-foundations/order-reports/`.
      - `description` is Markdown. It names the function or file, says exactly what it takes and
        returns, and ends by saying what the check does, in words.
      - `nextSteps`: three or four short ordered steps. They say where to look, never the answer.
-     - `hints`: exactly three, from a light nudge to almost there. The first names where to look,
-       the second the idea, and only the third may show the shape of the line.
+     - `hints`: one for each hint a task can unlock (`MAX_HINTS` in
+       `apps/desktop/src/shared/rules.ts`), from a light nudge to almost there. The first names
+       where to look, the next the idea, and only the last may show the shape of the line.
      - `docs`: two or three links to official reference pages for what the task tests.
-     - `points`: 10, like every task.
+     - `points`: the same as the tasks beside it; copy it from another task of the repo.
 4. **Write the starter and the solution** with the same relative paths.
    - The starter runs. Every function the learner writes throws `Not implemented`, and the file
      opens with a comment that lists the tasks in order.
@@ -100,8 +101,9 @@ args)`, `node`, `vitest`, `typecheck`, `page()` for an issue with a page, and `j
   lesson's example, not the flow, not the intro.
 - **Words.** Plain and short, sentence case, no em dashes. What a person reads uses the app's
   words: repo, issue, roadmap. Never lab, chapter or path.
-- **Numbers.** Three hints per task and 10 points per task. How hints unlock and what points do is
-  in `apps/desktop/src/shared/rules.ts`; do not restate those numbers in content.
+- **Numbers.** How many hints a task has, how they unlock and what points do is in
+  `apps/desktop/src/shared/rules.ts`. Read it there; do not write those numbers into a lesson, a
+  task or a skill.
 - **An AI repo** talks to the local model, never a real service: give the model its replies in
   `labs/<labId>/model.mjs`, with model names that start with the repo's name.
 - **Changing an existing issue.** Learners already have a copy of the old starter, and the checks
