@@ -2,41 +2,54 @@
   "scene": {
     "nodes": [
       {
-        "id": "input",
-        "label": "Shop customer",
-        "kind": "data"
-      },
-      {
-        "id": "request",
-        "label": "Pip assistant",
-        "kind": "function",
-        "mine": true
-      },
-      {
-        "id": "work",
-        "label": "Shop tools",
+        "id": "pantry",
+        "label": "Pantry staff",
         "kind": "story"
       },
       {
-        "id": "output",
-        "label": "Shop outcome",
+        "id": "agent",
+        "label": "Pip’s agent",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "model",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "records",
+        "label": "Orders and shelves",
         "kind": "data"
+      },
+      {
+        "id": "review",
+        "label": "Refund approval",
+        "kind": "story"
       }
     ],
     "edges": [
       {
-        "from": "input",
-        "to": "request"
+        "from": "pantry",
+        "to": "agent",
+        "label": "request"
       },
       {
-        "from": "request",
-        "to": "work"
+        "from": "agent",
+        "to": "model",
+        "label": "conversation"
       },
       {
-        "from": "work",
-        "to": "output"
+        "from": "agent",
+        "to": "records",
+        "label": "tool calls"
+      },
+      {
+        "from": "agent",
+        "to": "review",
+        "label": "approval"
       }
     ],
-    "note": "Pip answers customers using stock and order information from the shop."
+    "note": "At Pebble Lane Pantry, your code lets Pip answer delivery and stock questions and lets staff decide whether a refund can go ahead."
   }
 }

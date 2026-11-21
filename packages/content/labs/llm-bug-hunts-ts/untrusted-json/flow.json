@@ -1,81 +1,23 @@
 {
   "scene": {
     "nodes": [
-      {
-        "id": "customer",
-        "label": "Customer message",
-        "kind": "data"
-      },
-      {
-        "id": "parse",
-        "label": "parse.ts",
-        "kind": "file",
-        "mine": true
-      },
-      {
-        "id": "model",
-        "label": "Local model",
-        "kind": "story"
-      },
-      {
-        "id": "reply",
-        "label": "Reply text",
-        "kind": "data"
-      },
-      {
-        "id": "depot",
-        "label": "Depot system",
-        "kind": "story"
-      },
-      {
-        "id": "reproduce",
-        "label": "reproduce.ts",
-        "kind": "file",
-        "mine": true
-      },
-      {
-        "id": "test",
-        "label": "parse.test.ts",
-        "kind": "file",
-        "mine": true
-      }
+      { "id": "customer", "label": "Customer message", "kind": "data" },
+      { "id": "parse", "label": "parse.ts", "kind": "file", "mine": true },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "reply", "label": "Reply text", "kind": "data" },
+      { "id": "depot", "label": "Depot system", "kind": "story" },
+      { "id": "reproduce", "label": "reproduce.ts", "kind": "file", "mine": true },
+      { "id": "test", "label": "parse.test.ts", "kind": "file", "mine": true },
+      { "id": "report", "label": "Incident report", "kind": "data" }
     ],
     "edges": [
-      {
-        "from": "customer",
-        "to": "parse",
-        "label": "message"
-      },
-      {
-        "from": "parse",
-        "to": "model",
-        "label": "request"
-      },
-      {
-        "from": "model",
-        "to": "reply",
-        "label": "reply"
-      },
-      {
-        "from": "reply",
-        "to": "parse",
-        "label": "text"
-      },
-      {
-        "from": "parse",
-        "to": "depot",
-        "label": "change"
-      },
-      {
-        "from": "reproduce",
-        "to": "parse",
-        "label": "case"
-      },
-      {
-        "from": "test",
-        "to": "parse",
-        "label": "tests"
-      }
+      { "from": "model", "to": "reply", "label": "reply" },
+      { "from": "reply", "to": "parse", "label": "text" },
+      { "from": "parse", "to": "depot", "label": "change" },
+      { "from": "test", "to": "parse", "label": "tests" },
+      { "from": "customer", "to": "model", "label": "message" },
+      { "from": "reproduce", "to": "model", "label": "case" },
+      { "from": "parse", "to": "report", "label": "error" }
     ],
     "note": "Kes reads delivery changes from the inbox so the depot can act on them."
   },
@@ -83,43 +25,26 @@
     "reproduce": {
       "steps": [
         {
-          "active": [
-            "customer"
-          ],
-          "note": "Tomas reviews a ticket about moving a delivery to the end of the week."
+          "active": ["customer"],
+          "note": "Tomas reviews an incident from the delivery change inbox."
         },
         {
-          "active": [
-            "reproduce",
-            "reproduce->parse",
-            "parse",
-            "parse->model",
-            "model"
-          ],
+          "active": ["reproduce", "reproduce->model", "model"],
           "note": "The reproduction sends a customer message through the original delivery change endpoint."
         },
         {
-          "active": [
-            "model",
-            "model->reply",
-            "reply",
-            "reply->parse",
-            "parse",
-            "depot"
-          ],
+          "active": ["model", "model->reply", "reply", "reply->parse", "parse", "depot"],
           "note": "The model replies, but the endpoint fails before the depot gets a request."
         },
         {
-          "active": [
-            "reproduce"
-          ],
+          "active": ["parse", "parse->report", "report"],
           "value": {
             "kind": "map",
             "label": "Incident report",
             "entries": [
               {
                 "key": "message",
-                "value": "Customer\u2019s message"
+                "value": "Customer’s message"
               },
               {
                 "key": "error",
@@ -134,31 +59,15 @@
     "fix": {
       "steps": [
         {
-          "active": [
-            "customer",
-            "customer->parse",
-            "parse"
-          ],
-          "note": "A customer writes, \u201cCould you please deliver KP-86429 on Thursday?\u201d"
+          "active": ["customer", "customer->model", "model"],
+          "note": "A customer writes, “Could you please deliver KP-86429 on Thursday?”"
         },
         {
-          "active": [
-            "parse",
-            "parse->model",
-            "model",
-            "model->reply",
-            "reply"
-          ],
+          "active": ["model", "model->reply", "reply"],
           "note": "Kes replies with text about the requested change."
         },
         {
-          "active": [
-            "reply",
-            "reply->parse",
-            "parse",
-            "parse->depot",
-            "depot"
-          ],
+          "active": ["reply", "reply->parse", "parse", "parse->depot", "depot"],
           "value": {
             "kind": "map",
             "label": "Delivery request",
@@ -176,9 +85,7 @@
           "note": "When the request can be carried out, the depot receives a record of the change."
         },
         {
-          "active": [
-            "parse"
-          ],
+          "active": ["parse"],
           "note": "If the reply cannot be used, the caller receives a reason and the parcel stays on its current route."
         }
       ]
@@ -186,12 +93,8 @@
     "test": {
       "steps": [
         {
-          "active": [
-            "test",
-            "test->parse",
-            "parse"
-          ],
-          "note": "The test exercises the delivery change endpoint as an inbox message comes in."
+          "active": ["test", "test->parse", "parse"],
+          "note": "The test opens a case about a parcel that needs to go to a different address."
         },
         {
           "active": [
@@ -203,21 +106,14 @@
             "parse->depot",
             "depot"
           ],
-          "note": "One case checks that the depot receives a usable change request."
+          "note": "A reply in an unexpected format should still lead to a usable change request when it carries one."
         },
         {
-          "active": [
-            "reply",
-            "reply->parse",
-            "parse"
-          ],
-          "note": "Other cases cover replies the depot cannot act on."
+          "active": ["reply", "reply->parse", "parse"],
+          "note": "Other cases cover a reply with no change to make and a reply asking for a change the depot cannot carry out."
         },
         {
-          "active": [
-            "parse",
-            "test"
-          ],
+          "active": ["parse", "test"],
           "note": "An unusable reply should give the caller a normal failure response."
         }
       ]

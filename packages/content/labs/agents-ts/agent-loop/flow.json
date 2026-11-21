@@ -2,134 +2,136 @@
   "scene": {
     "nodes": [
       {
-        "id": "input",
-        "label": "Customer question",
-        "kind": "data"
+        "id": "desk",
+        "label": "Delivery desk",
+        "kind": "story"
       },
       {
-        "id": "request",
-        "label": "Pip conversation",
+        "id": "model",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "loop",
+        "label": "runAgent()",
         "kind": "function",
         "mine": true
       },
       {
-        "id": "work",
-        "label": "Shop tools",
-        "kind": "story"
+        "id": "tools",
+        "label": "runToolCalls()",
+        "kind": "function",
+        "mine": true
       },
       {
-        "id": "output",
-        "label": "Final answer",
+        "id": "records",
+        "label": "Pantry records",
+        "kind": "data"
+      },
+      {
+        "id": "outcome",
+        "label": "Run outcome",
         "kind": "data"
       }
     ],
     "edges": [
       {
-        "from": "input",
-        "to": "request"
+        "from": "desk",
+        "to": "loop",
+        "label": "question"
       },
       {
-        "from": "request",
-        "to": "work"
+        "from": "model",
+        "to": "loop",
+        "label": "reply"
       },
       {
-        "from": "work",
-        "to": "output"
+        "from": "loop",
+        "to": "tools",
+        "label": "work to do"
+      },
+      {
+        "from": "tools",
+        "to": "records",
+        "label": "lookups"
+      },
+      {
+        "from": "loop",
+        "to": "outcome",
+        "label": "run ends"
       }
     ],
-    "note": "Pip can gather more shop information over several rounds."
+    "note": "Your agent can handle several trips to the pantry records and bring the run to a close."
   },
   "tasks": {
     "run-tools": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "Pip receives a question."
+          "active": ["model", "model->loop", "loop", "loop->tools", "tools"],
+          "note": "One reply asks the pantry to check a shelf and look up a delivery."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "A reply can ask the shop to do several things."
+          "active": ["tools", "tools->records", "records"],
+          "note": "The stockroom and the order desk each supply the information requested."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "Each request produces its own result."
-        },
-        {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "Pip can read the results in context."
+          "active": ["tools"],
+          "value": {
+            "kind": "array",
+            "label": "Replies",
+            "values": ["Shelf lookup result", "Order lookup result"]
+          },
+          "note": "The results go back as a list, with a reply for each request in the original order."
         }
       ]
     },
     "loop": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "A customer asks something that needs more than one lookup."
+          "active": ["desk", "desk->loop", "loop"],
+          "note": "A staff member wants the latest delivery update before calling a customer."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "Pip asks the shop for information."
+          "active": ["model", "model->loop", "loop", "loop->tools", "tools"],
+          "note": "Pip needs information from the pantry before it can give an update."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "The result joins the conversation before the next reply."
+          "active": ["tools", "tools->records", "records"],
+          "note": "Results from the pantry contribute to the conversation until Pip has enough information."
         },
         {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "The customer gets an answer once Pip has enough information."
+          "active": ["loop", "loop->outcome", "outcome"],
+          "value": {
+            "kind": "map",
+            "label": "Completed run",
+            "entries": [
+              {
+                "key": "Answer",
+                "value": "delivery update"
+              },
+              {
+                "key": "Steps",
+                "value": "count"
+              }
+            ]
+          },
+          "note": "The desk gets a delivery update and a count of the run’s steps."
         }
       ]
     },
     "step-limit": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "A customer asks Pip to wait for a change."
+          "active": ["desk", "desk->loop", "loop"],
+          "note": "The delivery desk asks Pip to wait for a bike drop-off."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "Pip keeps asking the shop for updates."
+          "active": ["loop", "loop->tools", "tools", "tools->records", "records"],
+          "note": "The bike is still on its route, so looking again does not settle the question."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "The shop cannot guarantee a change during the run."
-        },
-        {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "The app can end the attempt when it runs out of steps."
+          "active": ["loop", "loop->outcome", "outcome"],
+          "note": "The run ends with a limit error and the desk can check again later."
         }
       ]
     }

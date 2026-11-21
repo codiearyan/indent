@@ -2,134 +2,138 @@
   "scene": {
     "nodes": [
       {
-        "id": "input",
-        "label": "Order question",
-        "kind": "data"
-      },
-      {
-        "id": "request",
-        "label": "Pip assistant",
-        "kind": "function",
-        "mine": true
-      },
-      {
-        "id": "work",
-        "label": "Order lookup",
+        "id": "desk",
+        "label": "Delivery desk",
         "kind": "story"
       },
       {
-        "id": "output",
-        "label": "Customer answer",
+        "id": "assistant",
+        "label": "assistant.ts",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "model",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "call",
+        "label": "Lookup request",
+        "kind": "data"
+      },
+      {
+        "id": "order",
+        "label": "Order lookup",
+        "kind": "data"
+      },
+      {
+        "id": "answer",
+        "label": "Delivery update",
         "kind": "data"
       }
     ],
     "edges": [
       {
-        "from": "input",
-        "to": "request"
+        "from": "desk",
+        "to": "assistant",
+        "label": "question"
       },
       {
-        "from": "request",
-        "to": "work"
+        "from": "assistant",
+        "to": "model",
+        "label": "lookup offer"
       },
       {
-        "from": "work",
-        "to": "output"
+        "from": "model",
+        "to": "call",
+        "label": "lookup"
+      },
+      {
+        "from": "call",
+        "to": "order",
+        "label": "order ref"
+      },
+      {
+        "from": "order",
+        "to": "answer",
+        "label": "order facts"
       }
     ],
-    "note": "Pip can answer an order question using a lookup from the shop."
+    "note": "Your assistant connects a question at the delivery desk to the pantry’s order records."
   },
   "tasks": {
     "describe-tool": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "A customer wants an order update."
+          "active": ["desk"],
+          "note": "The delivery desk wants Pip to answer questions about bike deliveries."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "Pip needs to know what the shop can look up."
+          "active": ["assistant"],
+          "note": "The assistant prepares a description of the order lookup."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "The lookup description tells Pip what information it needs."
-        },
-        {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "Pip can request a lookup for the question."
+          "active": ["assistant", "assistant->model", "model"],
+          "note": "The local model receives the lookup description with the information it needs to ask about an order."
         }
       ]
     },
     "read-call": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "An order question reaches Pip."
+          "active": ["desk", "desk->assistant", "assistant"],
+          "note": "A staff member asks about order PL-2086."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "Pip chooses to ask the shop for information."
+          "active": ["assistant", "assistant->model", "model"],
+          "note": "Pip takes the question to the local model with the order lookup available."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "The app receives the requested action and its details."
+          "active": ["model", "model->call", "call"],
+          "note": "The model asks the pantry to look up the order."
         },
         {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "The caller can inspect that request."
+          "active": ["call"],
+          "value": {
+            "kind": "map",
+            "label": "Lookup request",
+            "entries": [
+              {
+                "key": "Reference",
+                "value": "call reference"
+              },
+              {
+                "key": "Action",
+                "value": "lookup name"
+              },
+              {
+                "key": "Details",
+                "value": "order information"
+              }
+            ]
+          },
+          "note": "The assistant hands back a description of that request so the pantry can carry it out."
         }
       ]
     },
     "round-trip": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "A customer asks about an order."
+          "active": ["desk", "desk->assistant", "assistant", "assistant->model", "model"],
+          "note": "A customer at the pickup counter asks whether a delivery has already left."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "Pip asks to look it up."
+          "active": ["model", "model->call", "call"],
+          "note": "The model needs the pantry’s record to answer."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "The shop sends the lookup result back."
+          "active": ["call", "call->order", "order"],
+          "note": "The lookup brings back either order details or a report that the order is missing."
         },
         {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "Pip uses that result to answer the customer."
+          "active": ["order", "order->answer", "answer"],
+          "note": "Pip uses the lookup result to give the customer a short delivery update."
         }
       ]
     }

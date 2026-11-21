@@ -75,7 +75,7 @@ const repos: { labId: string; expected: string[] }[] = [
   },
   {
     labId: 'agents-ts',
-    expected: ['bad-arguments/parse-args']
+    expected: ['bad-arguments/parse-args', 'bad-arguments/execute']
   }
 ]
 
