@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { FlowScene } from '@shared/types'
-import { layoutScene, NODE_W } from './layout'
+import { labelHeight, layoutScene, NODE_W, spreadLabels, type PlacedEdge } from './layout'
 
 const node = (id: string): FlowScene['nodes'][number] => ({ id, label: id, kind: 'story' })
 
@@ -59,5 +59,26 @@ describe('layoutScene', () => {
     const layout = layoutScene(scene)
     expect(layout.width).toBeGreaterThan(NODE_W)
     expect(layout.width).toBeLessThan(NODE_W + 20)
+  })
+})
+
+describe('spreadLabels', () => {
+  const edge = (id: string, x: number, y: number, label = 'two words'): PlacedEdge => ({
+    id,
+    label,
+    d: '',
+    labelAt: { x, y }
+  })
+
+  it('moves a label down when it would cover the one above it in the same gap', () => {
+    const [a, b] = spreadLabels([edge('a', 300, 100), edge('b', 302, 106)])
+    expect(a.labelAt.y).toBe(100)
+    expect(b.labelAt.y).toBeGreaterThanOrEqual(100 + 2 + labelHeight('two words'))
+  })
+
+  it('leaves labels in other gaps and labels under the line alone', () => {
+    const below = { ...edge('c', 300, 104), below: true }
+    const [a, b, c] = spreadLabels([edge('a', 300, 100), edge('b', 520, 104), below])
+    expect([a.labelAt.y, b.labelAt.y, c.labelAt.y]).toEqual([100, 104, 104])
   })
 })

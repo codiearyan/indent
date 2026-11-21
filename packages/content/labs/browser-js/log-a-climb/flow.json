@@ -1,0 +1,122 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "setter", "label": "Setter", "kind": "story" },
+      { "id": "form", "label": "New route form", "kind": "story" },
+      { "id": "watch", "label": "watchForm()", "kind": "function", "mine": true },
+      { "id": "main", "label": "main.js", "kind": "file" },
+      { "id": "board", "label": "Route board", "kind": "story" },
+      { "id": "error", "label": "Form error line", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "setter", "to": "form", "label": "fills in" },
+      { "from": "form", "to": "watch", "label": "submit" },
+      { "from": "main", "to": "watch", "label": "isTaken" },
+      { "from": "watch", "to": "main", "label": "onAdd" },
+      { "from": "main", "to": "board", "label": "new route on top" },
+      { "from": "watch", "to": "error", "label": "what is wrong" },
+      { "from": "watch", "to": "form", "label": "ready again" }
+    ],
+    "note": "Setters log new routes from a form at the desk, and watchForm turns each submit into a route on the board or a plain sentence about what is wrong."
+  },
+  "tasks": {
+    "handle-submit": {
+      "steps": [
+        {
+          "active": ["setter", "setter->form", "form"],
+          "value": {
+            "kind": "map",
+            "label": "the form",
+            "entries": [
+              { "key": "name", "value": " Sloper Sunday " },
+              { "key": "grade", "value": "V3" },
+              { "key": "colour", "value": "Green" },
+              { "key": "setter", "value": "Wren" }
+            ]
+          },
+          "note": "Wren sets a new green V3 and fills in the form at the desk."
+        },
+        {
+          "active": ["form->watch", "watch"],
+          "note": "Pressing the button submits #new-route. watchForm hears it, and the browser stays on the board."
+        },
+        {
+          "active": ["watch"],
+          "value": {
+            "kind": "map",
+            "label": "read from the form",
+            "entries": [
+              { "key": "name", "value": "Sloper Sunday" },
+              { "key": "grade", "value": "V3" },
+              { "key": "colour", "value": "Green" },
+              { "key": "setter", "value": "Wren" }
+            ]
+          },
+          "note": "It reads the four fields with FormData, with the spaces trimmed from the name and the setter."
+        },
+        {
+          "active": ["watch->main", "main", "main->board", "board"],
+          "note": "It hands them to onAdd, and main.js puts the route on top of the board, ready to tick like any other."
+        }
+      ]
+    },
+    "explain-problems": {
+      "steps": [
+        {
+          "active": ["setter", "form", "form->watch", "watch"],
+          "value": {
+            "kind": "map",
+            "label": "the form",
+            "entries": [{ "key": "name", "value": "'   '" }]
+          },
+          "note": "A setter submits a name made only of spaces. The browser's required check lets it through."
+        },
+        {
+          "active": ["watch", "watch->error", "error"],
+          "note": "watchForm refuses it with a plain sentence in #form-error. Nothing is added, and the page does not reload."
+        },
+        {
+          "active": ["main->watch", "watch", "watch->error", "error"],
+          "value": {
+            "kind": "map",
+            "label": "the form",
+            "entries": [{ "key": "name", "value": "pinch me" }]
+          },
+          "note": "Next someone logs pinch me, but Pinch Me is already on the board. isTaken says so in any letter case, and #form-error explains."
+        },
+        {
+          "active": ["watch->main", "main", "main->board", "board", "error"],
+          "note": "A good route goes on the board, and #form-error is hidden again."
+        }
+      ]
+    },
+    "ready-again": {
+      "steps": [
+        {
+          "active": ["setter", "form", "form->watch", "watch", "watch->main", "main->board", "board"],
+          "note": "Wren logs Sloper Sunday, and it goes on the board."
+        },
+        {
+          "active": ["watch->form", "form"],
+          "value": {
+            "kind": "map",
+            "label": "the form after",
+            "entries": [
+              { "key": "#route-name", "value": "''" },
+              { "key": "#route-setter", "value": "''" }
+            ]
+          },
+          "note": "The form is cleared, so the name and setter fields are empty."
+        },
+        {
+          "active": ["form"],
+          "note": "The cursor is back in #route-name, so Wren can type the next route straight away."
+        },
+        {
+          "active": ["watch", "watch->error", "error", "form"],
+          "note": "When a route is refused, the fields keep what was typed, so it can be fixed."
+        }
+      ]
+    }
+  }
+}

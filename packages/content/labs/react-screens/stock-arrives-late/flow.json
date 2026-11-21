@@ -1,0 +1,113 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Stock service",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Stock loader",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Counter display",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "The counter waits for stock data and shows staff the outcome."
+  },
+  "tasks": {
+    "load-stock": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "The counter opens at the start of a shift."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Stock arrives from the service."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The stock view shows what came back."
+        }
+      ]
+    },
+    "loading-and-failure": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "The stock service takes time to respond."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Staff need to know whether the request is still underway or has failed."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The counter shows the current status."
+        }
+      ]
+    },
+    "use-stock-hook": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "The counter needs stock and its current status."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The loading code supplies that information together."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The screen can show staff what is happening with stock."
+        }
+      ]
+    }
+  }
+}

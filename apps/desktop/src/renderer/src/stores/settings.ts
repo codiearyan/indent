@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import { DEFAULT_CODE_THEME, type CodeThemeId } from '@indent/design/code-palette'
 import { fontStack } from '@/lib/fonts'
 import { setShortcutOverrides, type ShortcutOverrides } from '@/lib/shortcuts'
+import type { GuideStage } from '@/features/tour/guide'
 import { mergeSettings } from './mergeSettings'
 
 export type Theme = 'dark' | 'light'
@@ -74,6 +75,8 @@ export interface SettingsState {
   dsaWatched: string[]
   /** Keys picked in Settings, only for the shortcuts that differ from their defaults. */
   shortcuts: ShortcutOverrides
+  /** Where the guide from the setup into the first issue is; null when it is not running. */
+  guide: GuideStage | null
   setShortcuts(shortcuts: ShortcutOverrides): void
   markDsaWatched(id: string): void
   toggleTheme(): void
@@ -96,6 +99,7 @@ export interface SettingsState {
   setGoal(goal: string | null): void
   setExperience(experience: Experience): void
   resetLayout(): void
+  setGuide(guide: GuideStage | null): void
 }
 
 const defaultScale: Record<TextZone, number> = { lesson: 1, tasks: 1, editor: 1, terminal: 1 }
@@ -142,6 +146,7 @@ export const useSettings = create<SettingsState>()(
       experience: null,
       dsaWatched: [],
       shortcuts: {},
+      guide: null,
       setShortcuts: (shortcuts) => set({ shortcuts }),
       markDsaWatched: (id) =>
         set((s) => (s.dsaWatched.includes(id) ? s : { dsaWatched: [...s.dsaWatched, id] })),
@@ -169,7 +174,8 @@ export const useSettings = create<SettingsState>()(
       setLastVersion: (lastVersion) => set({ lastVersion }),
       setGoal: (goal) => set({ goal }),
       setExperience: (experience) => set({ experience }),
-      resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' })
+      resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' }),
+      setGuide: (guide) => set({ guide })
     }),
     {
       name: 'indent-settings',

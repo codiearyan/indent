@@ -1,13 +1,15 @@
-import { execFileSync } from 'node:child_process'
-import { cp, mkdtemp, readFile, rm } from 'node:fs/promises'
+import { execFileSync, spawn } from 'node:child_process'
+import { cp, mkdir, mkdtemp, readFile, rm, symlink } from 'node:fs/promises'
+import { createInterface } from 'node:readline'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { expect, it } from 'vitest'
+import { afterAll, beforeAll, expect, it } from 'vitest'
 import { compareTrace } from './trace'
 import type { Flow, LabMeta, TraceResult } from './types'
 
 const content = fileURLToPath(new URL('../../../../packages/content/', import.meta.url))
+const openai = fileURLToPath(new URL('../../node_modules/openai', import.meta.url))
 const repos: { labId: string; expected: string[] }[] = [
   {
     labId: 'js-foundations',
@@ -60,8 +62,115 @@ const repos: { labId: string; expected: string[] }[] = [
       'lost-this/reproduce',
       'unawaited-saves/reproduce'
     ]
+  },
+  {
+    labId: 'browser-js',
+    expected: ['find-a-route/search-names', 'find-a-route/grade-band']
+  },
+  {
+    labId: 'rag-ts',
+    expected: [
+      'chunking/split',
+      'chunking/overlap',
+      'chunking/docs',
+      'embeddings/batch',
+      'embeddings/cosine',
+      'embeddings/rank',
+      'grounded-answers/prompt',
+      'grounded-answers/answer',
+      'grounded-answers/not-found',
+      'measuring-retrieval/metrics',
+      'measuring-retrieval/evaluate',
+      'vector-store/index',
+      'vector-store/search',
+      'vector-store/cutoff'
+    ]
+  },
+  {
+    labId: 'evals-ts',
+    expected: [
+      'compare/compare',
+      'compare/decide',
+      'exact-match/load',
+      'exact-match/normalize',
+      'exact-match/report',
+      'flaky/repeat',
+      'flaky/flag',
+      'flaky/report',
+      'graders/suite',
+      'judge/parse',
+      'judge/judge',
+      'judge/report'
+    ]
+  },
+  {
+    labId: 'agents-ts',
+    expected: [
+      'agent-loop/run-tools',
+      'agent-loop/loop',
+      'agent-loop/step-limit',
+      'bad-arguments/parse-args',
+      'bad-arguments/execute',
+      'bad-arguments/recover',
+      'guardrails/trace',
+      'one-tool-call/describe-tool',
+      'one-tool-call/read-call',
+      'one-tool-call/round-trip',
+      'parallel-calls/agent'
+    ]
+  },
+  {
+    labId: 'llm-apps-ts',
+    expected: [
+      'first-call/messages',
+      'first-call/ask',
+      'first-call/details',
+      'streaming/assemble',
+      'streaming/stream-answer',
+      'structured-output/parse',
+      'structured-output/validate',
+      'structured-output/extract',
+      'system-prompts/label-only',
+      'system-prompts/examples',
+      'system-prompts/triage',
+      'token-budget/fit'
+    ]
+  },
+  {
+    labId: 'llm-bug-hunts-ts',
+    expected: ['cut-off-replies/reproduce', 'cut-off-replies/fix', 'untrusted-json/fix']
   }
 ]
+
+let model: ReturnType<typeof spawn>
+let modelUrl: string
+
+beforeAll(async () => {
+  model = spawn(process.execPath, [join(content, 'kit/lab-model.mjs')], {
+    stdio: ['ignore', 'pipe', 'inherit']
+  })
+  const lines = createInterface({ input: model.stdout! })
+  try {
+    modelUrl = await new Promise<string>((resolve, reject) => {
+      model.once('error', reject)
+      model.once('exit', (code) => reject(new Error(`Local model exited with code ${code}`)))
+      lines.once('line', (line) => {
+        try {
+          const { port } = JSON.parse(line)
+          resolve(`http://127.0.0.1:${port}/v1`)
+        } catch (error) {
+          reject(error)
+        }
+      })
+    })
+  } finally {
+    lines.close()
+  }
+})
+
+afterAll(() => {
+  model?.kill()
+})
 
 it.each(repos)(
   'follows every $labId trace example on its solution',
@@ -69,6 +178,9 @@ it.each(repos)(
     const repo = join(content, 'labs', labId)
     const scratch = await mkdtemp(join(tmpdir(), 'indent-trace-examples-'))
     try {
+      const modules = join(scratch, 'node_modules')
+      await mkdir(modules)
+      await symlink(openai, join(modules, 'openai'), 'junction')
       const examples: string[] = []
       // Only the issues lab.json lists: a repo can hold other folders, such as shared code.
       const lab: LabMeta = JSON.parse(await readFile(join(repo, 'lab.json'), 'utf8'))
@@ -94,7 +206,16 @@ it.each(repos)(
               '--task',
               taskId
             ],
-            { encoding: 'utf8', timeout: 10_000 }
+            {
+              encoding: 'utf8',
+              timeout: 10_000,
+              env: {
+                ...process.env,
+                LAB_MODEL_URL: modelUrl,
+                OPENAI_BASE_URL: modelUrl,
+                OPENAI_API_KEY: 'lab-model'
+              }
+            }
           )
           const { trace }: { trace: TraceResult } = JSON.parse(
             stdout.trim().split('\n').at(-1) ?? ''

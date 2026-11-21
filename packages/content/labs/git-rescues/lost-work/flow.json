@@ -1,0 +1,87 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Missing work",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Local history",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Recovered work",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "Gullwick needs to recover work that is no longer visible from the usual branch tips."
+  },
+  "tasks": {
+    "branch": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A deleted branch held work the ferry team still needs."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The task is to identify the earlier work it pointed to."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The recovered branch makes that work available again."
+        }
+      ]
+    },
+    "main": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "The main branch moved and a change disappeared from its tip."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Identify which earlier state contains the missing work."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "Main once again includes the recovered change."
+        }
+      ]
+    }
+  }
+}

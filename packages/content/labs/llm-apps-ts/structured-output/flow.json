@@ -1,0 +1,141 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "email", "label": "Order email", "kind": "story" },
+      { "id": "extract", "label": "extractOrder()", "kind": "function", "mine": true, "fn": "extractOrder" },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "parse", "label": "parseJsonReply()", "kind": "function", "mine": true, "fn": "parseJsonReply" },
+      { "id": "validate", "label": "validateOrder()", "kind": "function", "mine": true, "fn": "validateOrder" },
+      { "id": "problems", "label": "Order problems", "kind": "data" },
+      { "id": "sheet", "label": "Ravi’s order sheet", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "email", "to": "extract", "label": "order email" },
+      { "from": "extract", "to": "model", "label": "order query" },
+      { "from": "model", "to": "parse", "label": "reply text" },
+      { "from": "parse", "to": "validate", "label": "value" },
+      { "from": "validate", "to": "problems", "label": "problems" },
+      { "from": "validate", "to": "sheet", "label": "order record" }
+    ],
+    "note": "Ravi wants purchase emails to become order records, and your code checks what Moss sends back before the shop can use it."
+  },
+  "tasks": {
+    "parse": {
+      "trace": {
+        "file": "src/orders.ts",
+        "call": "parseJsonReply",
+        "args": [
+          "Order: {\"plant\":\"maranta\"}"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["model"],
+          "value": {
+            "kind": "array",
+            "label": "Input shape",
+            "values": ["Model reply as text"]
+          },
+          "note": "Moss sends back text about a gift order for a bookshop."
+        },
+        {
+          "active": ["model", "model->parse", "parse"],
+          "note": "parseJsonReply() reads the order data from the reply."
+        },
+        {
+          "active": ["parse", "parse->validate"],
+          "value": {
+            "kind": "array",
+            "label": "Output shape",
+            "values": ["Parsed value, ready to check"]
+          },
+          "note": "The next part of the app gets a value it can inspect for order details."
+        }
+      ]
+    },
+    "validate": {
+      "trace": {
+        "file": "src/orders.ts",
+        "call": "validateOrder",
+        "args": [
+          {
+            "plant": "maranta",
+            "quantity": 3,
+            "potSize": "medium",
+            "giftWrap": false
+          }
+        ]
+      },
+      "steps": [
+        {
+          "active": ["parse->validate", "validate"],
+          "value": {
+            "kind": "array",
+            "label": "Order details to check",
+            "values": ["Plant", "Quantity", "Pot size", "Gift wrap"]
+          },
+          "note": "A reply for a window display order has become a value the app can inspect."
+        },
+        {
+          "active": ["validate"],
+          "note": "Ravi needs to know whether the order details are usable before anyone packs the plants."
+        },
+        {
+          "active": ["validate", "validate->problems", "problems"],
+          "value": {
+            "kind": "array",
+            "label": "Output shape",
+            "values": ["List of problems"]
+          },
+          "note": "The result is a list of order problems, empty when the order is usable."
+        }
+      ]
+    },
+    "extract": {
+      "trace": {
+        "file": "src/orders.ts",
+        "call": "extractOrder",
+        "args": [
+          "Could you set aside 4 spider plants in small pots?"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["email", "email->extract", "extract"],
+          "value": {
+            "kind": "array",
+            "label": "Order email",
+            "values": ["I’d like six medium orchids for the studio reception, gift wrapped please."]
+          },
+          "note": "A customer emails Fernhollow about stocking a new studio."
+        },
+        {
+          "active": ["extract", "extract->model", "model"],
+          "note": "Moss returns a reply about the studio’s requested order."
+        },
+        {
+          "active": ["model", "model->parse", "parse", "parse->validate", "validate"],
+          "note": "The app assesses whether that reply can become an entry for the packing team."
+        },
+        {
+          "active": ["validate", "validate->sheet", "sheet"],
+          "value": {
+            "kind": "map",
+            "label": "Order shape",
+            "entries": [
+              { "key": "Plant", "value": "Name" },
+              { "key": "Quantity", "value": "Number" },
+              { "key": "Pot size", "value": "Size" },
+              { "key": "Gift wrap", "value": "Yes or no" }
+            ]
+          },
+          "note": "A usable result has the details Ravi needs on the order sheet."
+        },
+        {
+          "active": ["validate", "validate->problems", "problems"],
+          "note": "If the app cannot get a usable order, it reports a failure and Ravi has no record to pack from."
+        }
+      ]
+    }
+  }
+}

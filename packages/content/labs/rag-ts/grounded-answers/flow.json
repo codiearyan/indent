@@ -1,0 +1,172 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "desk", "label": "Front desk question", "kind": "story" },
+      { "id": "answer", "label": "answer()", "kind": "function", "mine": true, "fn": "answer" },
+      { "id": "search", "label": "search()", "kind": "function" },
+      { "id": "prompt", "label": "buildPrompt()", "kind": "function", "mine": true, "fn": "buildPrompt" },
+      { "id": "model", "label": "Local chat model", "kind": "story" },
+      { "id": "result", "label": "Answer and sources", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "desk", "to": "answer", "label": "question" },
+      { "from": "answer", "to": "search", "label": "question, TOP_K, MIN_SCORE" },
+      { "from": "search", "to": "answer", "label": "hits" },
+      { "from": "answer", "to": "prompt", "label": "question, hits" },
+      { "from": "prompt", "to": "answer", "label": "messages" },
+      { "from": "answer", "to": "model", "label": "messages" },
+      { "from": "model", "to": "answer", "label": "reply with [n]" },
+      { "from": "answer", "to": "result", "label": "{ answer, sources }" },
+      { "from": "result", "to": "desk", "label": "what Bram reads" }
+    ],
+    "note": "The closest chunks become numbered sources in the prompt, and the reply's citations lead back to the chunks it used."
+  },
+  "tasks": {
+    "prompt": {
+      "trace": {
+        "file": "src/answer.ts",
+        "call": "buildPrompt",
+        "args": [
+          "Where are the spare paddle straps?",
+          [
+            {
+              "chunk": {
+                "id": "spare-straps",
+                "text": "Spare paddle straps are in the grey cabinet."
+              },
+              "score": 0.71
+            }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["answer->prompt", "prompt"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "question", "value": "Can I keep the harbour map?" },
+              { "key": "hits", "value": "the chunks search found, in order" }
+            ]
+          },
+          "note": "A question and its hits go in."
+        },
+        {
+          "active": ["prompt"],
+          "note": "A system message sets the rules: answer only from the numbered sources, cite each source used as [n], and say so when the sources do not hold the answer."
+        },
+        {
+          "active": ["prompt"],
+          "note": "A user message holds one line per hit, [1] with its chunk text, then [2], and so on in the order of hits."
+        },
+        {
+          "active": ["prompt"],
+          "note": "The user message ends with the line Question: and the question. With no hits there are simply no numbered lines."
+        },
+        {
+          "active": ["prompt", "prompt->answer"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "system", "value": "the rules" },
+              { "key": "user", "value": "numbered sources and the question" }
+            ]
+          },
+          "note": "Back comes a list of chat messages that the local model can answer from."
+        }
+      ]
+    },
+    "answer": {
+      "trace": {
+        "file": "src/answer.ts",
+        "call": "answer",
+        "args": [
+          "Where are spare paddle straps stored?",
+          [
+            {
+              "chunk": {
+                "id": "spare-straps",
+                "docId": "equipment",
+                "text": "Spare paddle straps are in the grey cabinet."
+              },
+              "vector": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.447214,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.447214,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.447214,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.447214,0,0,0,0,0,0,0,0,0,0,0,0,0,0.447214,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["desk", "desk->answer", "answer", "answer->search", "search"],
+          "note": "A question comes in, and answer searches the index with TOP_K and MIN_SCORE."
+        },
+        {
+          "active": ["search->answer", "answer->prompt", "prompt", "prompt->answer"],
+          "note": "The hits go to buildPrompt, and the messages it returns are what gets sent."
+        },
+        {
+          "active": ["answer->model", "model", "model->answer"],
+          "note": "One request goes to CHAT_MODEL. The reply text comes back with citations like [n] in it."
+        },
+        {
+          "active": ["answer"],
+          "note": "A citation [n] points at hits[n - 1]. Each cited chunk is listed once, in the order it is first cited, and numbers that match no hit are left out."
+        },
+        {
+          "active": ["answer", "answer->result", "result", "result->desk"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "answer", "value": "the reply text, unchanged" },
+              { "key": "sources", "value": "the cited chunks, possibly none" }
+            ]
+          },
+          "note": "Bram gets the reply exactly as the model wrote it, and the chunks it rests on."
+        }
+      ]
+    },
+    "not-found": {
+      "trace": {
+        "file": "src/answer.ts",
+        "call": "answer",
+        "args": [
+          "Does the car park have an electric charger?",
+          []
+        ]
+      },
+      "steps": [
+        {
+          "active": ["desk", "desk->answer", "answer", "answer->search", "search"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "question", "value": "Can I park a camper van overnight?" }]
+          },
+          "note": "A question comes in that the handbook may not cover, and the search runs as before."
+        },
+        {
+          "active": ["search->answer", "answer"],
+          "note": "When the search finds no hit at or above MIN_SCORE, there is nothing to ground an answer in."
+        },
+        {
+          "active": ["answer", "answer->result", "result"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "answer", "value": "NOT_FOUND" },
+              { "key": "sources", "value": "an empty list" }
+            ]
+          },
+          "note": "Then answer gives back NOT_FOUND with no sources, and the chat model is never asked."
+        },
+        {
+          "active": ["answer->model", "model"],
+          "note": "A question the handbook does cover still sends exactly one chat request."
+        }
+      ]
+    }
+  }
+}
