@@ -136,32 +136,43 @@ const event = (
   getModifierState: (k: string) => k === 'AltGraph' && !!extra.altGraph
 })
 
+const skips = (e: Parameters<typeof skipsShortcut>[0], keys: string, platform = 'linux'): boolean =>
+  skipsShortcut(e, keys, platform)
+
 describe('skipsShortcut', () => {
   it('takes Mod shortcuts while typing, but not plain keys', () => {
-    expect(skipsShortcut(event('j', { metaKey: true }, inside('textarea')), 'Mod+J')).toBe(false)
-    expect(skipsShortcut(event('j', { metaKey: true }, inside('.monaco-editor')), 'Mod+J')).toBe(
-      false
-    )
-    expect(skipsShortcut(event('Enter', {}, inside('textarea')), 'Enter')).toBe(true)
-    expect(skipsShortcut(event('ArrowLeft', {}, inside('input')), 'ArrowLeft')).toBe(true)
-    expect(skipsShortcut(event('ArrowLeft', {}, inside('.xterm')), 'ArrowLeft')).toBe(true)
-    expect(skipsShortcut(event('ArrowLeft', {}, inside('button')), 'ArrowLeft')).toBe(false)
+    expect(skips(event('j', { metaKey: true }, inside('textarea')), 'Mod+J')).toBe(false)
+    expect(skips(event('j', { metaKey: true }, inside('.monaco-editor')), 'Mod+J')).toBe(false)
+    expect(skips(event('Enter', {}, inside('textarea')), 'Enter')).toBe(true)
+    expect(skips(event('ArrowLeft', {}, inside('input')), 'ArrowLeft')).toBe(true)
+    expect(skips(event('ArrowLeft', {}, inside('.xterm')), 'ArrowLeft')).toBe(true)
+    expect(skips(event('ArrowLeft', {}, inside('button')), 'ArrowLeft')).toBe(false)
   })
 
   it('leaves Ctrl and a letter to the shell in the terminal', () => {
-    expect(skipsShortcut(event('j', { ctrlKey: true }, inside('.xterm')), 'Mod+J')).toBe(true)
-    expect(skipsShortcut(event('j', { metaKey: true }, inside('.xterm')), 'Mod+J')).toBe(false)
-    expect(skipsShortcut(event('j', { ctrlKey: true }, inside('button')), 'Mod+J')).toBe(false)
-    expect(skipsShortcut(event('1', { ctrlKey: true }, inside('.xterm')), 'Mod+1')).toBe(false)
+    expect(skips(event('j', { ctrlKey: true }, inside('.xterm')), 'Mod+J')).toBe(true)
+    expect(skips(event('j', { metaKey: true }, inside('.xterm')), 'Mod+J')).toBe(false)
+    expect(skips(event('j', { ctrlKey: true }, inside('button')), 'Mod+J')).toBe(false)
+    expect(skips(event('1', { ctrlKey: true }, inside('.xterm')), 'Mod+1')).toBe(false)
+  })
+
+  it('leaves Ctrl and a letter to every text field on macOS', () => {
+    expect(skips(event('b', { ctrlKey: true }, inside('textarea')), 'Mod+B', 'darwin')).toBe(true)
+    expect(skips(event('w', { ctrlKey: true }, inside('.monaco-editor')), 'Mod+W', 'darwin')).toBe(
+      true
+    )
+    expect(skips(event('b', { metaKey: true }, inside('textarea')), 'Mod+B', 'darwin')).toBe(false)
+    expect(skips(event('b', { ctrlKey: true }, inside('button')), 'Mod+B', 'darwin')).toBe(false)
+    expect(skips(event('b', { ctrlKey: true }, inside('textarea')), 'Mod+B', 'win32')).toBe(false)
   })
 
   it('skips keys something else handled, repeats, AltGr and open dialogs', () => {
     const mod = { metaKey: true }
-    expect(skipsShortcut(event('/', mod, null, { defaultPrevented: true }), 'Mod+/')).toBe(true)
-    expect(skipsShortcut(event('j', mod, null, { repeat: true }), 'Mod+J')).toBe(true)
-    expect(skipsShortcut(event('2', mod, null, { altGraph: true }), 'Mod+Alt+2')).toBe(true)
-    expect(skipsShortcut(event('j', mod, inside('[role="dialog"]')), 'Mod+J')).toBe(true)
-    expect(skipsShortcut(event('j', mod), 'Mod+J')).toBe(false)
+    expect(skips(event('/', mod, null, { defaultPrevented: true }), 'Mod+/')).toBe(true)
+    expect(skips(event('j', mod, null, { repeat: true }), 'Mod+J')).toBe(true)
+    expect(skips(event('2', mod, null, { altGraph: true }), 'Mod+Alt+2')).toBe(true)
+    expect(skips(event('j', mod, inside('[role="dialog"]')), 'Mod+J')).toBe(true)
+    expect(skips(event('j', mod), 'Mod+J')).toBe(false)
   })
 })
 

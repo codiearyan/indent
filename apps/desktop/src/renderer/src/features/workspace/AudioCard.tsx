@@ -19,9 +19,10 @@ export function AudioCard({
 }): React.JSX.Element | null {
   const parts = useMemo(() => lessonParts(lesson), [lesson])
   const { status, index, rate, toggle, go, cycleRate } = useSpeech(parts, labId, chapterId)
-  useShortcuts({ readAloud: parts.length > 0 && toggle })
+  const canSpeak = parts.length > 0 && 'speechSynthesis' in window
+  useShortcuts({ readAloud: canSpeak && toggle })
 
-  if (parts.length === 0 || !('speechSynthesis' in window)) return null
+  if (!canSpeak) return null
 
   const playing = status === 'playing'
 

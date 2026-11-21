@@ -169,16 +169,17 @@ export function isShellKey(event: KeyEvent): boolean {
 /**
  * Whether a window shortcut should leave this key press alone: something focused already
  * handled it (the code editor runs its own bindings), it repeats while held, it was typed with
- * AltGr, a dialog is open, or it has no Mod and focus is where people type.
+ * AltGr, a dialog is open, or it has no Mod and focus is where people type. Ctrl and a letter
+ * also stay with the terminal, and on macOS with every text field, where they move the cursor.
  */
-export function skipsShortcut(event: GuardedEvent, keys: string): boolean {
+export function skipsShortcut(event: GuardedEvent, keys: string, platform: string): boolean {
   if (event.defaultPrevented || event.repeat) return true
   if (event.getModifierState?.('AltGraph')) return true
   const inside = (selector: string): boolean =>
     !!(event.target as Partial<Element> | null)?.closest?.(selector)
   if (inside('[role="dialog"], [role="alertdialog"]')) return true
   if (!parse(keys).modifiers.includes('Mod') && inside(TEXT_FIELDS)) return true
-  return inside('.xterm') && isShellKey(event)
+  return isShellKey(event) && inside(platform === 'darwin' ? TEXT_FIELDS : '.xterm')
 }
 
 /** Whether the app takes this key press from the terminal for one of its own shortcuts. */

@@ -6,7 +6,7 @@ export function useShortcuts(handlers: Partial<Record<ShortcutId, (() => void) |
   const onKey = useEffectEvent((event: KeyboardEvent) => {
     for (const [id, handler] of Object.entries(handlers) as [ShortcutId, (() => void) | false][]) {
       if (!handler || !isShortcut(event, id)) continue
-      if (skipsShortcut(event, SHORTCUTS[id].keys)) return
+      if (skipsShortcut(event, SHORTCUTS[id].keys, window.platform)) return
       event.preventDefault()
       handler()
       return
