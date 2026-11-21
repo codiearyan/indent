@@ -8,8 +8,9 @@ import { Readable } from 'stream'
 import { pipeline } from 'stream/promises'
 import type { ReadableStream } from 'stream/web'
 import { promisify } from 'util'
-import type { NodeOption, ToolStatus } from '@shared/types'
-import { handle } from '../ipc'
+import type { NodeOption, ToolId, ToolInstallResult, ToolStatus } from '@shared/types'
+import { EVENTS } from '@shared/types'
+import { emit, handle } from '../ipc'
 import { labEnv, pickedNode, pickNode, refreshShellPath, shellEnv } from '../labEnv'
 import { ownNodeBin, ownNodeDir, toolsDir } from '../paths'
 import { which } from './ai/cli'
@@ -54,10 +55,38 @@ function nodeNote(version: string | null, ok: boolean): string {
 
 function gitNote(version: string | null): string {
   const use = 'Keeps the history of a project.'
-  if (version) return use
-  return process.platform === 'darwin'
-    ? `${use} To get it, run xcode-select --install in a terminal.`
-    : `${use} Get it from git-scm.com.`
+  return version ? use : `${use} Not found on this computer.`
+}
+
+const GIT_PAGE = 'https://git-scm.com/downloads'
+
+// Tried in order on Linux, each with the arguments that install without asking again.
+const LINUX_MANAGERS: [string, string[]][] = [
+  ['apt-get', ['install', '-y']],
+  ['dnf', ['install', '-y']],
+  ['pacman', ['-S', '--noconfirm']],
+  ['zypper', ['--non-interactive', 'install']]
+]
+
+/**
+ * The command that installs Git here: Apple's installer, winget (Windows asks for permission), or
+ * the package manager through pkexec (which asks for the password). Null leaves the download page.
+ */
+async function gitInstaller(path: string): Promise<{ cmd: string; args: string[] } | null> {
+  if (process.platform === 'darwin') return { cmd: 'xcode-select', args: ['--install'] }
+  if (process.platform === 'win32') {
+    if (!(await which('winget', path))) return null
+    const args = ['install', '--id', 'Git.Git', '-e', '--source', 'winget']
+    return {
+      cmd: 'winget',
+      args: [...args, '--accept-package-agreements', '--accept-source-agreements']
+    }
+  }
+  if (!(await which('pkexec', path))) return null
+  for (const [manager, args] of LINUX_MANAGERS) {
+    if (await which(manager, path)) return { cmd: 'pkexec', args: [manager, ...args, 'git'] }
+  }
+  return null
 }
 
 async function status(): Promise<ToolStatus[]> {
@@ -66,6 +95,7 @@ async function status(): Promise<ToolStatus[]> {
   const env = await labEnv()
   const [node, git] = await Promise.all([versionOf('node', env), gitVersion(env)])
   const nodeOk = !!node && nodeSupported(node)
+  const gitInstallable = !git && !!(await gitInstaller(env.PATH ?? ''))
   // Awaited, so the local model's status read after this one already shows the restart.
   if (nodeOk) await startLabModelIfNodeWasMissing()
   return [
@@ -77,12 +107,24 @@ async function status(): Promise<ToolStatus[]> {
       note: nodeNote(node, nodeOk),
       installable: true
     },
-    { id: 'git', label: 'Git', version: git, ok: !!git, note: gitNote(git), installable: false }
+    {
+      id: 'git',
+      label: 'Git',
+      version: git,
+      ok: !!git,
+      note: gitNote(git),
+      installable: gitInstallable,
+      url: GIT_PAGE
+    }
   ]
 }
 
-async function download(url: string): Promise<Response> {
-  const response = await fetch(url).catch(() => null)
+let abort: AbortController | undefined
+const CANCELLED = 'The download was cancelled.'
+
+async function download(url: string, signal: AbortSignal): Promise<Response> {
+  const response = await fetch(url, { signal }).catch(() => null)
+  if (signal.aborted) throw new Error(CANCELLED)
   if (!response?.ok) {
     throw new Error('Could not download Node.js. Check your internet connection and try again.')
   }
@@ -90,7 +132,9 @@ async function download(url: string): Promise<Response> {
 }
 
 async function downloadNode(): Promise<ToolStatus[]> {
-  const checksums = await (await download(`${NODE_DIST}/SHASUMS256.txt`)).text()
+  abort = new AbortController()
+  const { signal } = abort
+  const checksums = await (await download(`${NODE_DIST}/SHASUMS256.txt`, signal)).text()
   const archive = pickNodeArchive(checksums, process.platform, process.arch)
   if (!archive) throw new Error('There is no Node.js download for this kind of computer.')
 
@@ -99,18 +143,27 @@ async function downloadNode(): Promise<ToolStatus[]> {
   await mkdir(work, { recursive: true })
   try {
     const file = join(work, archive.name)
-    const { body } = await download(`${NODE_DIST}/${archive.name}`)
+    const response = await download(`${NODE_DIST}/${archive.name}`, signal)
+    const total = Number(response.headers.get('content-length')) || 0
     const hash = createHash('sha256')
+    let received = 0
+    let shown = -1
     await pipeline(
-      Readable.fromWeb(body as ReadableStream),
+      Readable.fromWeb(response.body as ReadableStream),
       async function* (chunks) {
         for await (const chunk of chunks) {
           hash.update(chunk)
+          received += chunk.length
+          const percent = total ? Math.floor((received / total) * 100) : 0
+          if (percent !== shown) emit(EVENTS.toolInstall, 'node', (shown = percent) / 100)
           yield chunk
         }
       },
-      createWriteStream(file)
-    )
+      createWriteStream(file),
+      { signal }
+    ).catch((error) => {
+      throw signal.aborted ? new Error(CANCELLED) : error
+    })
     if (hash.digest('hex') !== archive.sha256) {
       throw new Error('The Node.js download was damaged on the way. Try again.')
     }
@@ -123,15 +176,10 @@ async function downloadNode(): Promise<ToolStatus[]> {
   return status()
 }
 
-let installing: Promise<ToolStatus[]> | undefined
-
-function installNode(): Promise<ToolStatus[]> {
-  return (installing ??= downloadNode()
-    .then((tools) => {
-      void ensureRuntime()
-      return tools
-    })
-    .finally(() => (installing = undefined)))
+async function installNode(): Promise<ToolInstallResult> {
+  const tools = await downloadNode()
+  void ensureRuntime()
+  return { tools }
 }
 
 async function nodeOptions(): Promise<{ options: NodeOption[]; picked: string | null }> {
@@ -164,31 +212,59 @@ async function choose(bin: string | null): Promise<ToolStatus[]> {
   return status()
 }
 
-/** Opens Apple's installer window; the person finishes it there, then checks again. */
-async function installGit(): Promise<void> {
-  if (process.platform !== 'darwin') throw new Error('Get Git from git-scm.com/downloads.')
-  try {
-    await run('xcode-select', ['--install'], { timeout: 10_000 })
-  } catch (error) {
-    // It also exits non-zero when the tools are already there, which is fine.
-    if (!/already installed/i.test(String((error as { stderr?: string }).stderr))) {
-      throw new Error(
-        "Could not open Apple's installer. Run xcode-select --install in a terminal.",
-        {
-          cause: error
-        }
-      )
+async function installGit(): Promise<ToolInstallResult> {
+  const env = await labEnv()
+  const installer = await gitInstaller(env.PATH ?? '')
+  if (!installer) return { tools: await status(), url: GIT_PAGE }
+  if (process.platform === 'darwin') {
+    try {
+      await run(installer.cmd, installer.args, { timeout: 10_000 })
+    } catch (error) {
+      // It also exits non-zero when the tools are already there, which is fine.
+      if (!/already installed/i.test(String((error as { stderr?: string }).stderr))) {
+        throw new Error("Could not open Apple's installer. Try again.", { cause: error })
+      }
     }
+    // Apple's installer runs in its own window; the person finishes it there, then checks again.
+    return { tools: await status(), waiting: true }
   }
+  try {
+    await run(installer.cmd, installer.args, { env, timeout: 15 * 60_000 })
+  } catch (error) {
+    // pkexec exits 126 when the password prompt is closed.
+    const cancelled = (error as { code?: unknown }).code === 126
+    throw new Error(cancelled ? 'The install was cancelled.' : 'Git did not install. Try again.', {
+      cause: error
+    })
+  }
+  const tools = await status()
+  // Windows gives a new PATH only to programs started after the install.
+  const restart = process.platform === 'win32' && !tools.find((tool) => tool.id === 'git')?.ok
+  return { tools, restart }
+}
+
+const installs = new Map<ToolId, Promise<ToolInstallResult>>()
+
+/** One install per tool at a time; a second call joins the first. */
+function install(id: ToolId): Promise<ToolInstallResult> {
+  const running = installs.get(id)
+  if (running) return running
+  const job = (id === 'node' ? installNode() : installGit()).finally(() => installs.delete(id))
+  installs.set(id, job)
+  return job
 }
 
 export function register(): void {
   handle('tools', {
     status,
-    installNode,
+    install,
+    cancelInstall: async () => abort?.abort(),
+    relaunch: async () => {
+      app.relaunch()
+      app.exit(0)
+    },
     nodeOptions,
     pickNode: choose,
-    installGit,
     labModel: async () => labModelStatus(),
     restartLabModel
   })

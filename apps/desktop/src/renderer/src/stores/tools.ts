@@ -1,15 +1,54 @@
 import { create } from 'zustand'
-import type { LabMeta, ToolStatus } from '@shared/types'
+import type { LabMeta, ToolId, ToolStatus } from '@shared/types'
 import { api } from '@/lib/api'
+import { errorMessage } from '@/lib/utils'
 
-/** Node and Git on this computer, read once and again on "Check again" or after a download. */
-export const useTools = create<{ tools: ToolStatus[] | null }>()(() => ({ tools: null }))
+/** Where a tool's install is: running (with Node's download share), waiting on a system window, or failed. */
+export type ToolInstall =
+  | { state: 'running'; done: number | null }
+  | { state: 'waiting' }
+  | { state: 'restart' }
+  | { state: 'failed'; message: string }
+
+interface ToolsStore {
+  /** Node and Git on this computer, read once and again on "Check again" or after an install. */
+  tools: ToolStatus[] | null
+  installs: Partial<Record<ToolId, ToolInstall>>
+}
+
+export const useTools = create<ToolsStore>()(() => ({ tools: null, installs: {} }))
+
+const setInstall = (id: ToolId, install?: ToolInstall): void =>
+  useTools.setState((s) => {
+    const installs = { ...s.installs }
+    if (install) installs[id] = install
+    else delete installs[id]
+    return { installs }
+  })
 
 export async function refreshTools(): Promise<ToolStatus[]> {
   const tools = await api.tools.status()
   useTools.setState({ tools })
   return tools
 }
+
+/** Installs a tool for the learner, or opens its download page when nothing here can. */
+export async function installTool(id: ToolId): Promise<void> {
+  setInstall(id, { state: 'running', done: id === 'node' ? 0 : null })
+  try {
+    const result = await api.tools.install(id)
+    useTools.setState({ tools: result.tools })
+    if (result.url) window.open(result.url, '_blank')
+    setInstall(
+      id,
+      result.waiting ? { state: 'waiting' } : result.restart ? { state: 'restart' } : undefined
+    )
+  } catch (error) {
+    setInstall(id, { state: 'failed', message: errorMessage(error) })
+  }
+}
+
+export const cancelInstall = (): void => void api.tools.cancelInstall()
 
 /** The tools a repo needs that are missing; Node alone for a repo that names none. */
 export function missingTools(
@@ -19,5 +58,10 @@ export function missingTools(
   if (!tools) return []
   return (lab.tools ?? ['node']).flatMap((id) => tools.filter((tool) => tool.id === id && !tool.ok))
 }
+
+api.tools.onInstallProgress((id, done) => {
+  if (useTools.getState().installs[id]?.state === 'running')
+    setInstall(id, { state: 'running', done })
+})
 
 void refreshTools().catch(() => {})

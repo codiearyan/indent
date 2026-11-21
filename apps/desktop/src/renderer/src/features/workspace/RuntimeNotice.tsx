@@ -1,7 +1,6 @@
 import { ChevronRight, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { useSettingsDialog } from '@/features/settings/dialogStore'
 import { retryRuntime, useRuntime } from '@/stores/runtime'
 
 const outline = 'border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent'
@@ -25,28 +24,14 @@ export function RuntimeNotice(): React.JSX.Element | null {
     )
   }
 
-  if (!status.error) return null
-  // Node itself is missing or too old: the fix is in Settings, Tools.
-  const nodeProblem = !status.details
+  // Without details it is Node itself that is missing or too old: the banner at the top has the fix.
+  if (!status.error || !status.details) return null
   return (
     <div role="alert" className="mt-4 space-y-3 rounded-lg border border-border px-4 py-3">
       <p className="text-sm">{status.error}</p>
-      <div className="flex items-center gap-2">
-        {nodeProblem ? (
-          <Button
-            variant="outline"
-            size="sm"
-            className={outline}
-            onClick={() => useSettingsDialog.getState().show('tools')}
-          >
-            Open Settings, Tools
-          </Button>
-        ) : (
-          <Button variant="outline" size="sm" className={outline} onClick={retryRuntime}>
-            Try again
-          </Button>
-        )}
-      </div>
+      <Button variant="outline" size="sm" className={outline} onClick={retryRuntime}>
+        Try again
+      </Button>
       {status.details && (
         <Collapsible>
           <CollapsibleTrigger className="group flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground">
