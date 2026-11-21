@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 import type { AiProviderInfo } from '@shared/types'
 import { ProviderIcon } from '@/components/app/ProviderIcon'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -12,6 +13,15 @@ import { TestConnection } from '@/features/ai/TestConnection'
 import { IconButton } from '@/features/workspace/IconButton'
 import { cn, errorMessage } from '@/lib/utils'
 import { StepLayout } from './StepLayout'
+
+type ProviderId = AiProviderInfo['id']
+
+/** The providers that cost nothing to start with, and the words for what is free. */
+const FREE: Partial<Record<ProviderId, string>> = { opencode: 'Free models', gemini: 'Free key' }
+const freeFirst = (a: AiProviderInfo, b: AiProviderInfo): number =>
+  Number(b.id in FREE) - Number(a.id in FREE)
+
+const GEMINI_KEY_URL = 'https://aistudio.google.com/apikey'
 
 export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
   const config = useAi((s) => s.config)
@@ -30,7 +40,7 @@ export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
   }
 
   const clis = config?.providers.filter((p) => p.kind === 'cli') ?? []
-  const apis = config?.providers.filter((p) => p.kind === 'api') ?? []
+  const apis = (config?.providers.filter((p) => p.kind === 'api') ?? []).sort(freeFirst)
   const active = loading ? undefined : activeProvider(config)
 
   return (
@@ -41,19 +51,20 @@ export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
       lead={
         <span className="text-foreground">
           Every AI call goes from this computer straight to the provider you pick, on your own plan
-          or key.
+          or key. Two ways cost nothing: the free models of OpenCode and a free Gemini key. Both
+          have a usage limit.
         </span>
       }
     >
       <RadioGroup
         aria-label="AI provider"
         value={config?.provider ?? ''}
-        onValueChange={(provider) => void update({ provider: provider as AiProviderInfo['id'] })}
+        onValueChange={(provider) => void update({ provider: provider as ProviderId })}
         className="grid-cols-2 items-start gap-6"
       >
         <ProviderCard
           title="On this computer"
-          hint="Coding CLIs, on your own plan."
+          hint="Coding CLIs you have installed."
           loading={loading}
           rows={4}
         >
@@ -63,12 +74,7 @@ export function Provider({ staged }: { staged: boolean }): React.JSX.Element {
             <InstallHelp onCheck={lookAgain} />
           )}
         </ProviderCard>
-        <ProviderCard
-          title="Your own key"
-          hint="Paid by you, stored encrypted."
-          loading={loading}
-          rows={3}
-        >
+        <ProviderCard title="Your own key" hint="Stored encrypted." loading={loading} rows={3}>
           {apis.map((p, i) => (
             <ProviderRow key={p.id} provider={p} index={i + clis.length} />
           ))}
@@ -160,6 +166,11 @@ function ProviderRow({
         >
           <ProviderIcon id={provider.id} />
           {provider.label}
+          {FREE[provider.id] && (
+            <Badge variant="outline" className="rounded-sm font-normal text-muted-foreground">
+              {FREE[provider.id]}
+            </Badge>
+          )}
         </label>
         {keyed ? (
           <KeyField provider={provider} />
@@ -169,6 +180,19 @@ function ProviderRow({
           )
         )}
       </div>
+      {provider.id === 'gemini' && !provider.available && (
+        <p className="pb-3 pl-7 text-xs leading-5 text-muted-foreground">
+          No card needed. Sign in with Google, create a key and paste it here.{' '}
+          <a
+            href={GEMINI_KEY_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="whitespace-nowrap text-foreground underline underline-offset-2"
+          >
+            Get a free key
+          </a>
+        </p>
+      )}
     </li>
   )
 }
@@ -178,19 +202,18 @@ const INSTALL_OPENCODE =
     ? 'npm install -g @opencode/cli'
     : 'curl -fsSL https://opencode.ai/v2/install | bash'
 
-/** Stands in for the list when no coding CLI is installed: the two commands that set one up. */
+/** Stands in for the list when no coding CLI is installed: the command that sets one up. */
 function InstallHelp({ onCheck }: { onCheck(): void }): React.JSX.Element {
   return (
     <li className="motion-enter flex flex-col gap-2.5 px-4 py-3.5">
       <p className="flex gap-2.5 text-[13px] leading-5 text-muted-foreground">
         <ProviderIcon id="opencode" className="mt-0.5 text-foreground" />
         <span>
-          None found yet. <span className="text-foreground">OpenCode</span> is open source and takes
-          two commands in a terminal.
+          None found yet. <span className="text-foreground">OpenCode</span> is open source and comes
+          with free models. One command in a terminal installs it.
         </span>
       </p>
       <Command name="install" text={INSTALL_OPENCODE} />
-      <Command name="sign-in" text="opencode auth login" />
       <div className="flex items-center gap-3">
         <Button
           variant="outline"
@@ -204,6 +227,10 @@ function InstallHelp({ onCheck }: { onCheck(): void }): React.JSX.Element {
           Claude Code, Codex and Gemini CLI work too.
         </span>
       </div>
+      <p className="text-xs text-muted-foreground">
+        Signing in is only for a paid plan or your own key:
+      </p>
+      <Command name="sign-in" text="opencode auth login" />
     </li>
   )
 }
