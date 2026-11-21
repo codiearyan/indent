@@ -8,7 +8,9 @@ import type {
 } from '@shared/types'
 import { FAILS_BEFORE_TIP, chapterKey, hintsUnlocked } from '@shared/rules'
 import { api } from '@/lib/api'
+import { errorMessage } from '@/lib/utils'
 import { track } from '@/lib/telemetry'
+import { useCatalog } from './catalog'
 import { useProgress } from './progress'
 import { useSettings } from './settings'
 
@@ -113,6 +115,14 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         starter: {},
         activePath: null
       })
+      const catalog = useCatalog.getState()
+      if (catalog.labs?.find((lab) => lab.id === labId)?.availability) {
+        if (!(await catalog.download(labId))) {
+          const failed = useCatalog.getState().downloads[labId]
+          set({ status: 'error', error: failed?.state === 'failed' ? failed.message : null })
+          return
+        }
+      }
       try {
         const [chapter, snapshot, progress] = await Promise.all([
           api.content.getChapter(labId, chapterId),
@@ -124,7 +134,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         set({ chapter, status: 'ready' })
         applySnapshot(snapshot)
       } catch (error) {
-        set({ status: 'error', error: error instanceof Error ? error.message : String(error) })
+        set({ status: 'error', error: errorMessage(error) })
       }
     },
 

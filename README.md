@@ -75,10 +75,11 @@ from the repo library. API keys are encrypted with the operating system's keycha
 
 On by default; turn them off in Settings (Privacy). While they are on, the app sends anonymous
 events to Aptabase (EU): app opened, setup step reached, setup finished (with the kind of AI
-picked), repo started, check run (passed and failed counts), hints unlocked, issue completed, tutor
-asked and suggestion requested, with repo and issue ids, the app version and the system. It never
-sends your code, file names, chats, keys or anything that identifies you. The events are listed in
-`TelemetryEvent` in `apps/desktop/src/shared/types.ts`.
+picked), repo started, repo downloaded or its download failed (with the kind of failure), check run
+(passed and failed counts), hints unlocked, issue completed, tutor asked and suggestion requested,
+with repo and issue ids, the app version and the system. It never sends your code, file names,
+chats, keys or anything that identifies you. The events are listed in `TelemetryEvent` in
+`apps/desktop/src/shared/types.ts`.
 
 ## License
 

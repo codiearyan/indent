@@ -289,6 +289,8 @@ export type TelemetryEvent =
   | 'onboarding_step'
   | 'onboarding_finished'
   | 'repo_started'
+  | 'repo_downloaded'
+  | 'repo_download_failed'
   | 'check_run'
   | 'hints_unlocked'
   | 'issue_completed'
