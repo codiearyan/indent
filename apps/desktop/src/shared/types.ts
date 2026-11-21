@@ -48,7 +48,14 @@ export interface TaskDef {
   nextSteps: string[]
   /** Exactly three, from a light nudge to "almost there". */
   hints: string[]
+  /** Official reference pages that explain what the task tests; shown after repeated fails. */
+  docs?: DocLink[]
   points: number
+}
+
+export interface DocLink {
+  title: string
+  url: string
 }
 
 /** content/labs/<labId>/<chapterId>/chapter.json */
@@ -147,6 +154,12 @@ export interface TaskProgress {
   pointsEarned: number
   passedAt?: string
   lastResult?: CheckResult
+  /** Checks of this task that ran and failed. */
+  failedChecks?: number
+  /** How often each named check of the task failed. */
+  failedNames?: Record<string, number>
+  /** A short note from the AI after repeated fails; written once. */
+  tip?: string
 }
 
 export interface ChapterProgress {
@@ -323,6 +336,8 @@ export interface Api {
     complete(request: AiCompleteRequest): Promise<string>
     /** Sends one tiny fixed prompt through the chosen provider and model; resolves with the reply. */
     test(): Promise<string>
+    /** Writes a tip for a task that keeps failing and saves it; resolves with the progress. */
+    tip(labId: string, chapterId: string, taskId: string): Promise<ProgressState>
   }
   telemetry: {
     track(event: TelemetryEvent, props?: TelemetryProps): void
@@ -338,7 +353,7 @@ export const INVOKE_METHODS = {
   terminal: ['create'],
   tools: ['status', 'installNode'],
   github: ['star'],
-  ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test']
+  ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test', 'tip']
 } as const
 
 /** Fire-and-forget renderer to main messages. */

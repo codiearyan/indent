@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { CheckResult, ProgressState, TaskDef } from '../../shared/types'
 import { localDate } from '../../shared/rules'
-import { emptyProgress, recordCheck, touch } from './progressLogic'
+import { emptyProgress, recordCheck, setTip, touch } from './progressLogic'
 
 const now = new Date('2026-11-19T10:00:00')
 const later = new Date('2026-11-19T11:00:00')
@@ -67,6 +67,25 @@ describe('progress rules', () => {
     expect(state.chapters['lab/c1'].tasks.t1.passed).toBe(true)
     expect(state.chapters['lab/c1'].tasks.t1.lastResult?.passed).toBe(false)
     expect(state.totalPoints).toBe(10)
+  })
+
+  it('counts failed checks per task and which named checks failed', () => {
+    const state = emptyProgress()
+    const failing = (names: string[]): CheckResult => ({
+      ...result('t1', false),
+      details: [
+        ...names.map((name) => ({ name, passed: false })),
+        { name: 'exports', passed: true }
+      ]
+    })
+    recordCheck(state, 'lab', 'c1', tasks, [failing(['empty list', 'one item'])], now)
+    recordCheck(state, 'lab', 'c1', tasks, [failing(['empty list'])], later)
+    recordCheck(state, 'lab', 'c1', tasks, [result('t1', false, 'timed out')], later)
+    const t1 = state.chapters['lab/c1'].tasks.t1
+    expect(t1.failedChecks).toBe(2)
+    expect(t1.failedNames).toEqual({ 'empty list': 2, 'one item': 1 })
+    setTip(state, 'lab', 'c1', 't1', 'Look at the empty list first.', later)
+    expect(state.chapters['lab/c1'].tasks.t1.tip).toBe('Look at the empty list first.')
   })
 
   it('does not count a run that could not execute toward hints', () => {

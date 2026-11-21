@@ -5,6 +5,10 @@ export const CHECKS_BEFORE_FIRST_HINT = 3
 
 export const chapterKey = (labId: string, chapterId: string): string => `${labId}/${chapterId}`
 
+/** A task's doc links show after it fails this many checks; the AI tip comes after this many. */
+export const FAILS_BEFORE_DOCS = 2
+export const FAILS_BEFORE_TIP = 3
+
 /** The first hint unlocks after 3 checks that are not all green, then one more per check. */
 export function hintsUnlocked(nonGreenChecks: number): number {
   return Math.min(MAX_HINTS, Math.max(0, nonGreenChecks - CHECKS_BEFORE_FIRST_HINT + 1))

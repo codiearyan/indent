@@ -6,7 +6,7 @@ import type {
   WorkspaceFile,
   WorkspaceSnapshot
 } from '@shared/types'
-import { chapterKey, hintsUnlocked } from '@shared/rules'
+import { FAILS_BEFORE_TIP, chapterKey, hintsUnlocked } from '@shared/rules'
 import { api } from '@/lib/api'
 import { track } from '@/lib/telemetry'
 import { useProgress } from './progress'
@@ -177,6 +177,16 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         }
         if (after?.completedAt && !before?.completedAt) track('issue_completed', ids)
         useSettings.getState().setLeftTab('tasks')
+        // The main process skips this when AI is off or the task already has its tip.
+        const tasks = progress.chapters[chapterKey(chapter.labId, chapter.id)]?.tasks ?? {}
+        for (const result of results) {
+          const task = tasks[result.taskId]
+          if (result.passed || task?.tip || (task?.failedChecks ?? 0) < FAILS_BEFORE_TIP) continue
+          api.ai
+            .tip(chapter.labId, chapter.id, result.taskId)
+            .then((next) => useProgress.getState().set(next))
+            .catch(() => {})
+        }
         return results
       } finally {
         set({ checking: null })

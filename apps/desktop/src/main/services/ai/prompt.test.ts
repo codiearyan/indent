@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import type { ChapterDef } from '@shared/types'
 import { cliInvocation } from './cli'
-import { cleanCompletion, maskKey, transcript, trimHistory, tutorSystemPrompt } from './prompt'
+import {
+  cleanCompletion,
+  cleanTip,
+  maskKey,
+  tipPrompt,
+  transcript,
+  trimHistory,
+  tutorSystemPrompt
+} from './prompt'
 
 const chapter: ChapterDef = {
   id: 'ch1',
@@ -51,8 +59,53 @@ describe('tutorSystemPrompt', () => {
     expect(prompt).not.toContain('SECRET HINT')
   })
 
+  it("lists each task's docs and how its checks went", () => {
+    const withDocs: ChapterDef = {
+      ...chapter,
+      tasks: [{ ...chapter.tasks[0], docs: [{ title: 'Finish reason', url: 'https://x.dev/f' }] }]
+    }
+    const prompt = tutorSystemPrompt({
+      chapter: withDocs,
+      lesson: '',
+      progress: {
+        nonGreenChecks: 3,
+        startedAt: '',
+        lastOpenedAt: '',
+        tasks: {
+          fix: {
+            passed: false,
+            pointsEarned: 0,
+            failedChecks: 3,
+            failedNames: { 'short notice': 1, 'long notice': 3 }
+          }
+        }
+      }
+    })
+    expect(prompt).toContain('[Finish reason](https://x.dev/f)')
+    expect(prompt).toContain(
+      'fix: failed 3 checks; failing most: long notice (3), short notice (1)'
+    )
+  })
+
   it('says when no check ran yet', () => {
     expect(tutorSystemPrompt({ chapter, lesson: '' })).toContain('has not run a check yet')
+  })
+})
+
+describe('tip', () => {
+  it('gives the task, its docs, its history and the file, and keeps the reply short', () => {
+    const task = { ...chapter.tasks[0], docs: [{ title: 'Finish reason', url: 'https://x.dev/f' }] }
+    const prompt = tipPrompt(
+      task,
+      { passed: false, pointsEarned: 0, failedChecks: 3, failedNames: { 'long notice': 3 } },
+      { path: 'notice.ts', content: 'export const x = 1' }
+    )
+    expect(prompt).toContain('Read finish_reason.')
+    expect(prompt).toContain('Finish reason')
+    expect(prompt).toContain('long notice (3)')
+    expect(prompt).toContain('export const x = 1')
+    expect(cleanTip('  ok  ')).toBe('ok')
+    expect(cleanTip('a'.repeat(700))).toHaveLength(603)
   })
 })
 

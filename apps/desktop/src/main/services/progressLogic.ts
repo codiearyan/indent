@@ -30,6 +30,25 @@ function taskEntry(chapter: ChapterProgress, taskId: string): TaskProgress {
   return (chapter.tasks[taskId] ??= { passed: false, pointsEarned: 0 })
 }
 
+function recordFailure(progress: TaskProgress, result: CheckResult): void {
+  progress.failedChecks = (progress.failedChecks ?? 0) + 1
+  const names = (progress.failedNames ??= {})
+  for (const detail of result.details) {
+    if (!detail.passed) names[detail.name] = (names[detail.name] ?? 0) + 1
+  }
+}
+
+export function setTip(
+  state: ProgressState,
+  labId: string,
+  chapterId: string,
+  taskId: string,
+  tip: string,
+  now: Date
+): void {
+  taskEntry(chapterEntry(state, labId, chapterId, now), taskId).tip = tip
+}
+
 export function touch(state: ProgressState, labId: string, chapterId: string, now: Date): void {
   chapterEntry(state, labId, chapterId, now).lastOpenedAt = now.toISOString()
   state.lastOpened = { labId, chapterId }
@@ -54,6 +73,7 @@ export function recordCheck(
     if (!task) continue
     const progress = taskEntry(chapter, task.id)
     progress.lastResult = result
+    if (!result.passed && !result.error) recordFailure(progress, result)
     if (!result.passed || progress.passed) continue
     const points = task.points
     Object.assign(progress, { passed: true, pointsEarned: points, passedAt: now.toISOString() })

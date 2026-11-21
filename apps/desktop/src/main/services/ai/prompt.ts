@@ -1,4 +1,12 @@
-import type { AiMessage, ChapterDef, CheckResult, WorkspaceFile } from '@shared/types'
+import type {
+  AiMessage,
+  ChapterDef,
+  ChapterProgress,
+  CheckResult,
+  TaskDef,
+  TaskProgress,
+  WorkspaceFile
+} from '@shared/types'
 
 const MAX_FILE_CHARS = 20_000
 const MAX_OUTPUT_CHARS = 1_500
@@ -11,6 +19,8 @@ How you help:
 - When a check failed, explain in plain words why, using the check message and output below.
 - When asked what a line or piece of code does, explain it.
 - Point to the part of the lesson that covers the idea, by its heading.
+- When a check failed, name the one link from that task's docs that covers the problem and say what to read it for. Use only the links listed with the task; never make one up.
+- Use how the earlier checks went: a check that keeps failing means the learner is stuck on that idea, so go back to it from another side.
 - Ask one guiding question when it helps the learner find the next step themselves.
 - Small examples are welcome, but they must show the idea on different names and data, never the task's own answer.
 
@@ -25,6 +35,7 @@ export interface TutorContext {
   lesson: string
   activeFile?: WorkspaceFile
   lastCheck?: CheckResult[]
+  progress?: ChapterProgress
 }
 
 function clip(text: string, max: number): string {
@@ -39,12 +50,33 @@ function describeTasks(chapter: ChapterDef): string {
         task.description,
         task.nextSteps.length
           ? `Suggested steps:\n${task.nextSteps.map((s) => `- ${s}`).join('\n')}`
-          : ''
+          : '',
+        describeDocs(task)
       ]
         .filter(Boolean)
         .join('\n\n')
     )
     .join('\n\n')
+}
+
+function describeDocs(task: TaskDef): string {
+  return task.docs?.length
+    ? `Docs:\n${task.docs.map((d) => `- [${d.title}](${d.url})`).join('\n')}`
+    : ''
+}
+
+function describeTaskHistory(task: TaskDef, progress: TaskProgress | undefined): string {
+  if (progress?.passed) return `- ${task.id}: passed`
+  const fails = progress?.failedChecks ?? 0
+  if (!fails) return `- ${task.id}: no failed checks yet`
+  const names = Object.entries(progress?.failedNames ?? {})
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, count]) => `${name} (${count})`)
+  return `- ${task.id}: failed ${fails} ${fails === 1 ? 'check' : 'checks'}${names.length ? `; failing most: ${names.join(', ')}` : ''}`
+}
+
+function describeHistory(chapter: ChapterDef, progress: ChapterProgress | undefined): string {
+  return chapter.tasks.map((task) => describeTaskHistory(task, progress?.tasks[task.id])).join('\n')
 }
 
 function describeChecks(results: CheckResult[]): string {
@@ -73,7 +105,8 @@ export function tutorSystemPrompt({
   chapter,
   lesson,
   activeFile,
-  lastCheck
+  lastCheck,
+  progress
 }: TutorContext): string {
   const parts = [
     TUTOR_RULES,
@@ -90,7 +123,34 @@ export function tutorSystemPrompt({
       ? `## Latest check results\n\n${describeChecks(lastCheck)}`
       : '## Latest check results\n\nThe learner has not run a check yet.'
   )
+  if (progress)
+    parts.push(`## How the checks have gone so far\n\n${describeHistory(chapter, progress)}`)
   return parts.join('\n\n')
+}
+
+export const TIP_RULES = `You write one short tip for a learner in Indent, a desktop app with hands-on coding issues. The learner has failed the checks of one task several times. In two or three plain sentences, say which idea they seem stuck on, judging by the checks that keep failing, and what to look at next. If one of the task's docs covers it, name it by its title. Never write the answer, code that solves the task, or a fix for their code. No greeting, no markdown headings.`
+
+/** Everything the tip needs: the task, its docs, how its checks went and the learner's file. */
+export function tipPrompt(
+  task: TaskDef,
+  progress: TaskProgress | undefined,
+  file: WorkspaceFile | undefined
+): string {
+  const parts = [
+    `## Task: ${task.title}\n\n${task.description}`,
+    describeDocs(task),
+    `## Checks so far\n\n${describeTaskHistory(task, progress)}`,
+    progress?.lastResult ? `## Latest result\n\n${describeChecks([progress.lastResult])}` : '',
+    file ? `## ${file.path}\n\n\`\`\`\n${clip(file.content, MAX_FILE_CHARS)}\n\`\`\`` : ''
+  ]
+  return parts.filter(Boolean).join('\n\n')
+}
+
+const MAX_TIP_CHARS = 600
+
+export function cleanTip(raw: string): string {
+  const text = raw.trim().replace(/\n{3,}/g, '\n\n')
+  return text.length > MAX_TIP_CHARS ? `${text.slice(0, MAX_TIP_CHARS).trimEnd()}...` : text
 }
 
 /** Keeps the latest turns, starting with a learner message, with only valid roles. */

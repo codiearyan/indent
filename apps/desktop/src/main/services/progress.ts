@@ -47,6 +47,17 @@ export function recordCheck(
   return update((s) => rules.recordCheck(s, labId, chapterId, tasks, results, new Date()))
 }
 
+export const getProgress = (): Promise<ProgressState> => getState()
+
+export function saveTip(
+  labId: string,
+  chapterId: string,
+  taskId: string,
+  tip: string
+): Promise<ProgressState> {
+  return update((s) => rules.setTip(s, labId, chapterId, taskId, tip, new Date()))
+}
+
 export function register(): void {
   handle('progress', {
     get: getState,
