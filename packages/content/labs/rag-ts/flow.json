@@ -1,0 +1,28 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "handbook", "label": "Staff handbook", "kind": "data" },
+      { "id": "chunks", "label": "Chunks", "kind": "file", "mine": true },
+      { "id": "vectors", "label": "Embeddings", "kind": "file", "mine": true },
+      { "id": "store", "label": "Vector store", "kind": "file", "mine": true },
+      { "id": "answers", "label": "Answers with sources", "kind": "file", "mine": true },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "desk", "label": "Bram at the front desk", "kind": "story" },
+      { "id": "labelled", "label": "Labelled questions", "kind": "data" },
+      { "id": "measure", "label": "Retrieval scores", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "handbook", "to": "chunks", "label": "articles" },
+      { "from": "chunks", "to": "vectors", "label": "chunk texts" },
+      { "from": "vectors", "to": "model", "label": "texts to embed" },
+      { "from": "vectors", "to": "store", "label": "chunks and vectors" },
+      { "from": "desk", "to": "store", "label": "a question" },
+      { "from": "store", "to": "answers", "label": "closest chunks" },
+      { "from": "answers", "to": "model", "label": "sources and question" },
+      { "from": "answers", "to": "desk", "label": "answer and sources" },
+      { "from": "labelled", "to": "measure", "label": "questions and articles" },
+      { "from": "store", "to": "measure", "label": "hits" }
+    ],
+    "note": "You build Saltmarsh's answer box by hand: the handbook becomes chunks and vectors, a question finds the closest chunks, the answer cites them, and the scores show whether retrieval really works."
+  }
+}

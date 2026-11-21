@@ -1,0 +1,24 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "office", "label": "Office", "kind": "story" },
+      { "id": "routes", "label": "Route list", "kind": "data" },
+      { "id": "board", "label": "board.js", "kind": "file", "mine": true },
+      { "id": "screen", "label": "Front desk screen", "kind": "story" },
+      { "id": "climbers", "label": "Climbers", "kind": "story" },
+      { "id": "setters", "label": "Setters", "kind": "story" },
+      { "id": "main", "label": "main.js", "kind": "file", "mine": true },
+      { "id": "saved", "label": "Saved ticks", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "office", "to": "routes", "label": "every night" },
+      { "from": "routes", "to": "main", "label": "routes" },
+      { "from": "climbers", "to": "main", "label": "ticks and searches" },
+      { "from": "setters", "to": "main", "label": "new routes" },
+      { "from": "main", "to": "board", "label": "draw again" },
+      { "from": "board", "to": "screen", "label": "the board" },
+      { "from": "main", "to": "saved", "label": "remembers" }
+    ],
+    "note": "You rebuild the front desk board from the route list, then teach it to answer clicks, typing and forms, and to load and remember."
+  }
+}

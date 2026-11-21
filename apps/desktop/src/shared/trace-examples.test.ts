@@ -60,6 +60,18 @@ const repos: { labId: string; expected: string[] }[] = [
       'lost-this/reproduce',
       'unawaited-saves/reproduce'
     ]
+  },
+  {
+    labId: 'browser-js',
+    expected: ['find-a-route/search-names', 'find-a-route/grade-band']
+  },
+  {
+    labId: 'rag-ts',
+    expected: ['chunking/split', 'chunking/overlap', 'chunking/docs', 'measuring-retrieval/metrics']
+  },
+  {
+    labId: 'evals-ts',
+    expected: ['exact-match/load', 'judge/parse', 'compare/compare']
   }
 ]
 

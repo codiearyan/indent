@@ -1,0 +1,107 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "office", "label": "Office", "kind": "story" },
+      { "id": "file", "label": "data/routes.json", "kind": "data" },
+      { "id": "routes", "label": "routes.js", "kind": "file", "mine": true },
+      { "id": "main", "label": "main.js", "kind": "file", "mine": true },
+      { "id": "status", "label": "Status line", "kind": "story" },
+      { "id": "board", "label": "Route board", "kind": "story" },
+      { "id": "count", "label": "Header count", "kind": "story" },
+      { "id": "climber", "label": "Climber", "kind": "story" },
+      { "id": "store", "label": "store.js", "kind": "file", "mine": true },
+      { "id": "saved", "label": "Saved ticks", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "office", "to": "file", "label": "every night" },
+      { "from": "file", "to": "routes", "label": "the routes" },
+      { "from": "routes", "to": "main", "label": "routes" },
+      { "from": "main", "to": "status", "label": "loading or not" },
+      { "from": "main", "to": "board", "label": "draw" },
+      { "from": "main", "to": "count", "label": "count" },
+      { "from": "climber", "to": "board", "label": "ticks" },
+      { "from": "board", "to": "main", "label": "route id" },
+      { "from": "main", "to": "store", "label": "ticked ids" },
+      { "from": "store", "to": "saved", "label": "save" },
+      { "from": "saved", "to": "store", "label": "on load" },
+      { "from": "store", "to": "main", "label": "ticks back" }
+    ],
+    "note": "The board now loads the night's route list from a file, and keeps each climber's ticks from one visit to the next."
+  },
+  "tasks": {
+    "load-routes": {
+      "steps": [
+        {
+          "active": ["office", "office->file", "file"],
+          "value": {
+            "kind": "array",
+            "label": "data/routes.json",
+            "values": ["Fresh Chalk", "Ladder to Nowhere", "Slab Happy", "..."]
+          },
+          "note": "Each night the office writes the real route list to data/routes.json. The old array in routes.js is out of date."
+        },
+        {
+          "active": ["main", "main->status", "status"],
+          "note": "Before anything arrives, #board-status shows a line that says the routes are loading."
+        },
+        {
+          "active": ["file->routes", "routes", "routes->main", "main"],
+          "note": "routes.js fetches data/routes.json with a path relative to the page, reads the JSON and hands the routes to main.js."
+        },
+        {
+          "active": ["main", "status", "main->board", "board", "main->count", "count"],
+          "note": "Once the routes arrive, #board-status is hidden and the board and the count are drawn."
+        },
+        {
+          "active": ["board"],
+          "note": "Search, ticks and the form keep working with the loaded routes."
+        }
+      ]
+    },
+    "load-failure": {
+      "steps": [
+        {
+          "active": ["file", "file->routes", "routes"],
+          "note": "One morning the file is missing, and the server answers with an error status such as 500."
+        },
+        {
+          "active": ["routes->main", "main", "main->status", "status"],
+          "note": "#board-status stays visible with a line that says Could not load, so the desk knows what happened."
+        },
+        {
+          "active": ["routes"],
+          "note": "Another morning the network is down, and fetch itself fails."
+        },
+        {
+          "active": ["main", "status"],
+          "note": "The same kind of line shows, and no error escapes to the console in either case."
+        }
+      ]
+    },
+    "remember-ticks": {
+      "steps": [
+        {
+          "active": ["climber", "climber->board", "board", "board->main", "main"],
+          "note": "A regular ticks Undercling Alley and Dyno Dynasty before going home."
+        },
+        {
+          "active": ["main->store", "store", "store->saved", "saved"],
+          "value": { "kind": "array", "label": "gritstone-ticks", "values": ["r205", "r208"] },
+          "note": "After every tick and every untick, store.js saves the ticked ids in localStorage under gritstone-ticks, as a JSON array."
+        },
+        {
+          "active": ["saved", "saved->store", "store", "store->main", "main", "main->board", "board"],
+          "note": "Next morning the page loads, the saved ids come back, and those routes show ticked."
+        },
+        {
+          "active": ["main->count", "count"],
+          "note": "The save may still hold the id of a route that came down overnight. The count only counts routes that are on the board."
+        },
+        {
+          "active": ["saved", "store", "board"],
+          "note": "When nothing was saved, or the saved value is not valid JSON, the board loads with nothing ticked."
+        }
+      ]
+    }
+  }
+}

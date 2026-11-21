@@ -1,0 +1,123 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "routes", "label": "routes.js", "kind": "file" },
+      { "id": "main", "label": "main.js", "kind": "file", "mine": true },
+      { "id": "render", "label": "renderBoard()", "kind": "function", "mine": true },
+      { "id": "list", "label": "Route board", "kind": "story" },
+      { "id": "empty", "label": "Reset day line", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "routes", "to": "main", "label": "routes" },
+      { "from": "main", "to": "render", "label": "list and routes" },
+      { "from": "render", "to": "list", "label": "one item per route" },
+      { "from": "main", "to": "empty", "label": "shown or hidden" }
+    ],
+    "note": "The board on the front desk screen is drawn from the routes array instead of being typed by hand."
+  },
+  "tasks": {
+    "render-list": {
+      "steps": [
+        {
+          "active": ["routes", "routes->main", "main"],
+          "value": {
+            "kind": "array",
+            "label": "first routes",
+            "values": ["Morning Chalk", "Slab Happy", "Jump <Start>"]
+          },
+          "note": "The front desk keeps every route on the walls in routes.js, and main.js imports the array."
+        },
+        {
+          "active": ["main", "main->render", "render"],
+          "note": "main.js hands renderBoard the <ul id=\"route-list\"> and the routes."
+        },
+        {
+          "active": ["render"],
+          "value": {
+            "kind": "map",
+            "label": "one route",
+            "entries": [
+              { "key": "id", "value": "r104" },
+              { "key": "name", "value": "The Long Reach" },
+              { "key": "colour", "value": "Blue" },
+              { "key": "setter", "value": "Hollis" }
+            ]
+          },
+          "note": "Each route becomes one item that carries its id, its name, and its hold colour and setter."
+        },
+        {
+          "active": ["render", "render->list", "list"],
+          "value": {
+            "kind": "array",
+            "label": "on the board",
+            "values": ["Morning Chalk", "Slab Happy", "Jump <Start>", "..."]
+          },
+          "note": "The board shows one item per route, in the order of the array, and nothing else."
+        },
+        {
+          "active": ["list"],
+          "note": "A name like Jump <Start> shows on the board exactly as it is written."
+        }
+      ]
+    },
+    "grade-badge": {
+      "steps": [
+        {
+          "active": ["routes", "routes->main", "main"],
+          "value": {
+            "kind": "map",
+            "label": "grades on the wall",
+            "entries": [
+              { "key": "Morning Chalk", "value": "V0" },
+              { "key": "The Long Reach", "value": "V4" },
+              { "key": "Roof of the World", "value": "V7" }
+            ]
+          },
+          "note": "Every route has a grade, from V0 for a first climb up to grades with two digits."
+        },
+        {
+          "active": ["main->render", "render"],
+          "note": "Each route item gets a badge that shows its grade as written, such as V4."
+        },
+        {
+          "active": ["render"],
+          "value": {
+            "kind": "map",
+            "label": "bands",
+            "entries": [
+              { "key": "V0 to V2", "value": "grade-easy" },
+              { "key": "V3 to V5", "value": "grade-mid" },
+              { "key": "V6 and up", "value": "grade-hard" }
+            ]
+          },
+          "note": "The badge also carries the class of its band, so the stylesheet can colour it."
+        },
+        {
+          "active": ["render->list", "list"],
+          "note": "Climbers at the desk see at a glance which routes are easy, medium or hard."
+        }
+      ]
+    },
+    "empty-state": {
+      "steps": [
+        {
+          "active": ["routes", "routes->main", "main"],
+          "value": { "kind": "array", "label": "routes on reset day", "values": [] },
+          "note": "On reset day every route comes down, and the routes array is empty."
+        },
+        {
+          "active": ["main->render", "render", "render->list", "list"],
+          "note": "The board draws nothing, so #route-list has no items at all."
+        },
+        {
+          "active": ["main", "main->empty", "empty"],
+          "note": "main.js shows the #board-empty line, so the screen says the walls are bare instead of showing a blank box."
+        },
+        {
+          "active": ["routes", "main", "list", "empty"],
+          "note": "Once the setters put routes back up, the board fills again and #board-empty stays hidden."
+        }
+      ]
+    }
+  }
+}

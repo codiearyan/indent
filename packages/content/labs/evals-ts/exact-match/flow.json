@@ -1,0 +1,158 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "tickets", "label": "data/tickets.jsonl", "kind": "data" },
+      { "id": "load", "label": "loadCases()", "kind": "function", "mine": true, "fn": "loadCases" },
+      { "id": "run", "label": "runEval()", "kind": "function", "mine": true },
+      { "id": "triage", "label": "triage()", "kind": "function" },
+      { "id": "model", "label": "Triage model", "kind": "story" },
+      { "id": "match", "label": "isExactMatch()", "kind": "function", "mine": true },
+      { "id": "normalize", "label": "normalizeLabel()", "kind": "function", "mine": true },
+      { "id": "report", "label": "Eval report", "kind": "data", "mine": true },
+      { "id": "ines", "label": "Ines, support lead", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "tickets", "to": "load", "label": "one case per line" },
+      { "from": "load", "to": "run", "label": "cases" },
+      { "from": "run", "to": "triage", "label": "each input" },
+      { "from": "triage", "to": "model", "label": "request" },
+      { "from": "model", "to": "match", "label": "raw label" },
+      { "from": "run", "to": "match", "label": "reply and expected" },
+      { "from": "match", "to": "normalize", "label": "both sides" },
+      { "from": "run", "to": "normalize", "label": "reply" },
+      { "from": "run", "to": "report", "label": "totals and misses" },
+      { "from": "report", "to": "ines", "label": "a number, not a feeling" }
+    ],
+    "note": "Triage gets its first real measurement: a fixed test set, a fair scorer and a report with a pass rate and every miss."
+  },
+  "tasks": {
+    "load": {
+      "trace": { "file": "src/cases.ts", "call": "loadCases", "args": ["data/tickets.jsonl"] },
+      "steps": [
+        {
+          "active": ["tickets"],
+          "value": {
+            "kind": "map",
+            "label": "one line of the test set",
+            "entries": [
+              { "key": "id", "value": "t03" },
+              { "key": "input", "value": "How often should I water a snake plant?" },
+              { "key": "expected", "value": "plant-care" }
+            ]
+          },
+          "note": "Each line of the test set is one case: an id, the ticket text and the queue it belongs in."
+        },
+        {
+          "active": ["tickets", "tickets->load", "load"],
+          "note": "loadCases reads the file. Lines that are empty or only spaces are skipped."
+        },
+        {
+          "active": ["load"],
+          "note": "A line that is not valid JSON, or has no string id, input or expected, stops the load with an Error that names the line. Lines count from 1, blank ones included, like an editor."
+        },
+        {
+          "active": ["load"],
+          "note": "Two cases with the same id stop the load too, and the message holds that id."
+        },
+        {
+          "active": ["load", "load->run", "run"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "cases", "value": "Case list, in file order" }]
+          },
+          "note": "The cases come back in the order of the file, ready for the eval."
+        }
+      ]
+    },
+    "normalize": {
+      "steps": [
+        {
+          "active": ["model", "model->match", "match"],
+          "value": {
+            "kind": "map",
+            "label": "a ticket about a forgotten password",
+            "entries": [
+              { "key": "output", "value": "Category: Account!" },
+              { "key": "expected", "value": "account" }
+            ]
+          },
+          "note": "The model picked the right queue but dressed it up. isExactMatch gets its reply and the label the case expects."
+        },
+        {
+          "active": ["match", "match->normalize", "normalize"],
+          "note": "Both sides go through normalizeLabel before anything is compared."
+        },
+        {
+          "active": ["normalize"],
+          "note": "normalizeLabel trims, lowercases, drops a leading category: label, drops quotes or backticks around the label and drops a trailing . or !."
+        },
+        {
+          "active": ["normalize"],
+          "note": "Spaces or underscores inside a label become a single -, so Plant care reads as plant-care."
+        },
+        {
+          "active": ["match"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "match", "value": "true or false" }]
+          },
+          "note": "The two clean labels are compared exactly. A reply that only contains the expected word is still a miss."
+        }
+      ]
+    },
+    "report": {
+      "steps": [
+        {
+          "active": ["load->run", "run"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "cases", "value": "Case list" },
+              { "key": "model", "value": "evals-triage-v1" }
+            ]
+          },
+          "note": "runEval gets the cases and the name of the model to score."
+        },
+        {
+          "active": ["run", "run->triage", "triage", "triage->model", "model"],
+          "note": "Each case's input goes through triage with that model, one case at a time."
+        },
+        {
+          "active": ["run->normalize", "normalize", "run->match", "match"],
+          "note": "The reply is normalized and checked against the case's expected label."
+        },
+        {
+          "active": ["run"],
+          "value": {
+            "kind": "map",
+            "label": "one failure",
+            "entries": [
+              { "key": "id", "value": "the case id" },
+              { "key": "expected", "value": "the case's label" },
+              { "key": "got", "value": "the normalized reply" }
+            ]
+          },
+          "note": "Every miss becomes a failure, in case order, so Ines can read what the model said instead."
+        },
+        {
+          "active": ["run->report", "report", "report->ines", "ines"],
+          "value": {
+            "kind": "map",
+            "label": "the report",
+            "entries": [
+              { "key": "model", "value": "the model name" },
+              { "key": "total", "value": "number of cases" },
+              { "key": "passed", "value": "number of matches" },
+              { "key": "passRate", "value": "passed / total" },
+              { "key": "failures", "value": "one per miss" }
+            ]
+          },
+          "note": "Ines gets a pass rate she can compare between versions, and the list of failures to act on."
+        }
+      ]
+    }
+  }
+}
