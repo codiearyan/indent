@@ -1,0 +1,24 @@
+name: Content
+
+# The full CI skips content, so this checks that every repo still loads and packs: seconds on
+# Linux, with no install.
+on:
+  pull_request:
+    paths:
+      - 'content/**'
+      - 'scripts/build-packs.mjs'
+
+concurrency:
+  group: content-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-packs.mjs "$RUNNER_TEMP/packs"
