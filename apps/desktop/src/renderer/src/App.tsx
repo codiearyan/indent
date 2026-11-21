@@ -5,6 +5,7 @@ import { AppShell } from '@/features/catalog/AppShell'
 import { DashboardPage } from '@/features/catalog/DashboardPage'
 import { LabsPage } from '@/features/catalog/LabsPage'
 import { LabDetailPage } from '@/features/catalog/LabDetailPage'
+import { CompletionPage } from '@/features/completion/CompletionPage'
 import { PathsPage } from '@/features/catalog/PathsPage'
 import { YearBoardPage } from '@/features/catalog/YearBoardPage'
 import { DsaPage } from '@/features/dsa/DsaPage'
@@ -37,6 +38,7 @@ export default function App(): React.JSX.Element {
                 <Route index element={<DashboardPage />} />
                 <Route path="labs" element={<LabsPage />} />
                 <Route path="labs/:labId" element={<LabDetailPage />} />
+                <Route path="labs/:labId/done" element={<CompletionPage />} />
                 <Route path="paths" element={<PathsPage />} />
                 <Route path="dsa" element={<DsaPage />} />
                 <Route path="dsa/:patternId" element={<PatternPage />} />

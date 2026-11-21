@@ -4,6 +4,7 @@ import type { TaskDef, TaskProgress } from '@shared/types'
 import { Button } from '@/components/ui/button'
 import { TOUR } from '@/features/tour/anchors'
 import { useShownHints } from './hints'
+import { showHint } from './recordHint'
 import { type HelpRow, afterChecks, afterFails, helpLadder } from './helpLadder'
 import { Markdown } from './Markdown'
 
@@ -37,9 +38,10 @@ export function TaskHelp({
   onAskTutor,
   onOffer
 }: Props): React.JSX.Element | null {
-  const shown = useShownHints((s) => s.shown[id] ?? 0)
+  const shownNow = useShownHints((s) => s.shown[id] ?? 0)
+  const shown = Math.max(shownNow, progress?.hintsShown ?? 0)
   const open = useShownHints((s) => s.open[id] ?? false)
-  const { setShown, setOpen } = useShownHints.getState()
+  const { setOpen } = useShownHints.getState()
   const [stepsOpen, setStepsOpen] = useState(false)
 
   const passed = !!progress?.passed
@@ -85,7 +87,7 @@ export function TaskHelp({
       if (row.state === 'ready') {
         return (
           <li key={key} className="px-3 py-1">
-            <RowButton icon={Lightbulb} onClick={() => setShown(id, row.hint)}>
+            <RowButton icon={Lightbulb} onClick={() => showHint(id, row.hint)}>
               Show hint {row.hint} of {task.hints.length}
             </RowButton>
           </li>
