@@ -301,6 +301,16 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
   `MAC_CERT_P12_BASE64`, `MAC_CERT_PASSWORD`, `APPLE_API_KEY_P8`, `APPLE_API_KEY_ID` and
   `APPLE_API_ISSUER`; without them they are signed ad-hoc and macOS asks to confirm the first open.
 - Pull request text is a plain description of the change. No generated-by or tool attribution lines.
+- Every pull request description has a **Before** and an **After**: what the person saw or what
+  happened before the change, and what happens now, in plain words. A refactor with no visible
+  change says so ("No change in behaviour").
+- A pull request that changes what a screen shows adds **before and after screenshots** of each
+  screen it touches, in both themes when it changes colours, at the same size so they compare.
+  Take them from a dev build of `main` and of the branch (`scripts/cdp.mjs`, a separate
+  `--user-data-dir` so nobody's own data is touched). Push the images to the `pr-assets` branch,
+  which holds only screenshots and is never merged, under `<pr number>/before-<name>.png` and
+  `<pr number>/after-<name>.png`, and link them in the description with
+  `https://github.com/codiearyan/indent/blob/pr-assets/<path>?raw=true`.
 - Commit and pull request titles are `type(scope): message` (`feat(editor): ...`, `fix(checks): ...`,
   `chore: ...`). Commits are authored by the repository owner, with no co-author or other trailers.
 - Describe everything on its own terms. Never name or allude to another product, course, site or
