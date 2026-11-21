@@ -9,6 +9,7 @@ import { FlowFigure } from '@/features/flows/FlowPlayer'
 import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
+import { TOUR } from '@/features/tour/anchors'
 import { EmptyState } from './EmptyState'
 import { Figures } from './Figures'
 import { NeedsTools } from './NeedsTools'
@@ -81,7 +82,7 @@ export function LabDetailPage(): React.JSX.Element {
           <Button onClick={getNewVersion}>Get the new version</Button>
         ) : (
           summary.nextChapterId && (
-            <Button asChild>
+            <Button asChild data-tour={TOUR.repoStart}>
               <Link to={`/learn/${lab.id}/${summary.nextChapterId}`}>
                 {ACTION[summary.status]}
                 <ArrowRight />
@@ -92,6 +93,7 @@ export function LabDetailPage(): React.JSX.Element {
       </header>
 
       <Figures
+        data-tour={TOUR.repoFigures}
         label="Repo progress"
         figures={[
           {
@@ -113,8 +115,8 @@ export function LabDetailPage(): React.JSX.Element {
         </section>
       )}
 
-      {lab.parts.map((part) => (
-        <section key={part.title}>
+      {lab.parts.map((part, i) => (
+        <section key={part.title} data-tour={i === 0 ? TOUR.repoIssues : undefined}>
           <h2 className="mb-2 text-[13px] text-muted-foreground">{part.title}</h2>
           <ol className="overflow-hidden rounded-lg border border-border">
             {lab.chapters

@@ -10,14 +10,17 @@ export interface Figure {
 export function Figures({
   figures,
   label,
-  className
+  className,
+  'data-tour': tour
 }: {
   figures: Figure[]
   label: string
   className?: string
+  'data-tour'?: string
 }): React.JSX.Element {
   return (
     <section
+      data-tour={tour}
       aria-label={label}
       className={cn('flex divide-x divide-rule rounded-lg border border-border', className)}
     >

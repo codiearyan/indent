@@ -37,13 +37,16 @@ const paths: PathDef[] = [
 const ids = (list: LabSummary[]): string[] => list.map((l) => l.id)
 
 describe('recommendedOrder', () => {
-  it('follows the roadmaps, then repos no roadmap names, without a goal', () => {
+  it('puts easy repos first, then follows the roadmaps, without a goal', () => {
     expect(ids(recommendedOrder(labs, paths, null, null))).toEqual([
       'basics',
+      'sql',
       'react',
-      'api',
-      'sql'
+      'api'
     ])
+    expect(ids(recommendedOrder(labs, paths, null, 'some'))).toEqual(
+      ids(recommendedOrder(labs, paths, null, null))
+    )
   })
 
   it('puts the goal roadmap first', () => {

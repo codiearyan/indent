@@ -1,0 +1,30 @@
+/* The tour fades in, its card rises in at each step, the ring glides to the next target. */
+.tour {
+  animation: motion-fade var(--motion-enter) var(--ease-out) both;
+}
+.tour[data-leaving] {
+  animation: tour-leave var(--motion-exit) var(--ease-out) both;
+}
+.tour-card {
+  animation: motion-rise var(--motion-enter) var(--ease-out) both;
+}
+.tour-ring {
+  transition-property: top, left, width, height;
+  transition-duration: var(--motion-state);
+  transition-timing-function: var(--ease-in-out);
+}
+
+@keyframes tour-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-card {
+    animation-name: motion-fade;
+  }
+  .tour-ring {
+    transition-property: none;
+  }
+}
