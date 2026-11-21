@@ -16,9 +16,7 @@ import * as telemetry from './services/telemetry'
 import { seedContent } from './library'
 import { bundledContentDir, contentDir, usesLibrary } from './paths'
 
-// Both have to happen before the app is ready, in this order: Electron keeps only the last
-// list of privileged schemes, and the preview scheme must be in it.
-telemetry.init()
+// Privileged schemes have to be registered before the app is ready.
 preview.registerScheme()
 
 function createWindow(): void {
