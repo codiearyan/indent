@@ -1,0 +1,29 @@
+{
+  "stations": [
+    { "title": "Odile", "say": "Please cancel order 27.", "note": "The cafe is closed for repairs." },
+    { "title": "Shelf stock", "text": "Its items were set aside from stock.", "note": "They must go back on the shelf." },
+    {
+      "title": "Your changes",
+      "mine": true,
+      "gap": "Nothing writes to it yet",
+      "tasks": ["Sign up a new cafe", "Apply the price review", "Cancel in one go"]
+    },
+    {
+      "title": "Orders",
+      "rows": [
+        ["Order 26", "pending"],
+        ["Order 27", "pending"],
+        ["Order 28", "delivered"]
+      ],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Order 27", "wrong": "half cancelled", "why": "Out of sync", "right": "cancelled" },
+  "captions": [
+    "So far you only read. Now the cafe behind order 27 has closed, and it must be cancelled.",
+    "Two changes belong together. If only one runs, the shelf and the order disagree.",
+    "You write the changes, from a new cafe to this cancel, in three tasks.",
+    "Now the stock goes back and the order is cancelled, together or not at all.",
+    "Your first writes. Each change touches only the rows it means to."
+  ]
+}

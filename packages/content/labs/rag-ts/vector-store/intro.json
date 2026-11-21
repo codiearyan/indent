@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Bram", "say": "Dogs in kayaks or canoes?", "note": "A Saturday in July." },
+    { "title": "Ranking", "text": "Embeds the whole handbook again.", "note": "For every question." },
+    {
+      "title": "Your code",
+      "file": "store.ts",
+      "mine": true,
+      "gap": "Nothing is remembered",
+      "tasks": ["Index once", "Find the top k", "Drop weak matches"]
+    },
+    {
+      "title": "Handbook",
+      "rows": [["Booking a kayak"], ["Paddling with dogs"], ["Weather and wind"]],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Dog question", "wrong": "all again", "why": "Work redone", "right": "quick match" },
+  "captions": [
+    "On a July Saturday the desk gets a question a minute, like one about dogs.",
+    "Today every question embeds the whole handbook again before it can rank.",
+    "You write a small vector store, in three tasks.",
+    "Now the handbook is embedded once, and only the question is new work.",
+    "The store remembers the handbook, and weak matches no longer come back."
+  ]
+}

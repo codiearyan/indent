@@ -1,0 +1,21 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "One commit, a proper message.", "note": "And leave main alone." },
+    { "title": "Route planner", "text": "Five commits of wip and typo.", "note": "Never pushed, so safe to rewrite." },
+    {
+      "title": "Your commands",
+      "mine": true,
+      "gap": "No clean commit yet",
+      "tasks": ["Keep a backup", "Make it one commit", "Write a clear message"]
+    },
+    { "title": "Review", "text": "One change, easy to read." }
+  ],
+  "ticket": { "label": "Planner", "wrong": "5 messy commits", "why": "Hard to read", "right": "one clear commit" },
+  "captions": [
+    "Ines will review your route planner, but not five commits called wip.",
+    "The planner works, but its history reads like a scratch pad.",
+    "You write the commands that tidy it, in three tasks.",
+    "One commit on top of main, with a message Ines can use.",
+    "Same files, cleaner history. The backup is there if anything slips."
+  ]
+}

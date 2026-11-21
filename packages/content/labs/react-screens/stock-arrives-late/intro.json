@@ -1,0 +1,29 @@
+{
+  "stations": [
+    { "title": "Noor", "say": "The screen is empty.", "note": "And the internet drops out." },
+    { "title": "Shop server", "text": "Has the stock as a file now.", "note": "Nobody asks for it." },
+    {
+      "title": "Your code",
+      "file": "App.jsx",
+      "mine": true,
+      "gap": "Nothing asks the server",
+      "tasks": ["Load the stock", "Say what is happening", "Move it into a hook"]
+    },
+    {
+      "title": "Counter screen",
+      "rows": [
+        ["Low Tide Sessions", "Jazz"],
+        ["Copper Wire Blues", "Blues"],
+        ["Neon Orchard", "Electronic"]
+      ]
+    }
+  ],
+  "ticket": { "label": "8 records", "wrong": "never shown", "why": "Not loaded", "right": "on screen" },
+  "captions": [
+    "The racks moved online, and the stock now lives on the shop's server.",
+    "Nothing asks the server for it, so the counter screen is empty.",
+    "You load the stock, say what is happening, and move it into a hook.",
+    "Now the stock arrives, and a slow or broken network gets a plain message.",
+    "Same eight records, back on screen. And a dropped line says so."
+  ]
+}

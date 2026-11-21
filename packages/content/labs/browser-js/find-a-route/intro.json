@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Member", "say": "Where is Pinch Me?", "note": "Asked at the front desk." },
+    { "title": "Hollis", "text": "Scrolls through sixty routes.", "note": "The search box does nothing." },
+    {
+      "title": "Your code",
+      "file": "filter.js",
+      "mine": true,
+      "gap": "Every route still shows",
+      "tasks": ["Search as you type", "Filter by grade", "Say when none match"]
+    },
+    {
+      "title": "Route board",
+      "rows": [["Pinch Me", "Red holds"]],
+      "mark": 0
+    }
+  ],
+  "ticket": { "label": "Pinch Me", "wrong": "lost in sixty", "why": "Scrolling", "right": "found" },
+  "captions": [
+    "Ticks work, and Hollis keeps setting routes. A member asks where Pinch Me is.",
+    "The search box does nothing, so Hollis scrolls through sixty routes.",
+    "You make the search and the grade list narrow the board, in three tasks.",
+    "Now a few letters of the name leave Pinch Me on the board.",
+    "Same question, no scrolling. The board shows only what matches."
+  ]
+}

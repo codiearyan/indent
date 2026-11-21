@@ -1,0 +1,30 @@
+{
+  "stations": [
+    { "title": "Luka", "say": "Available doubles, cheapest first?", "note": "Ten at a time, with a total." },
+    { "title": "GET /boats", "text": "Sends the whole fleet every time.", "note": "Luka filters in the browser." },
+    {
+      "title": "Your code",
+      "file": "listQuery.js",
+      "mine": true,
+      "gap": "No filter, no total",
+      "tasks": ["Read the query", "Filter, sort, page", "Serve the list"]
+    },
+    {
+      "title": "Fleet",
+      "rows": [
+        ["Heron", "single"],
+        ["Otter", "double"],
+        ["Wren", "paddleboard"]
+      ],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Doubles", "wrong": "the whole fleet", "why": "Too much", "right": "cheapest first" },
+  "captions": [
+    "Bram keeps adding boats. Luka's page only wants available doubles, cheapest first.",
+    "The API sends every boat on every visit, and the page sorts them out.",
+    "You write the part that reads the query and pages the list, in three tasks.",
+    "Now the API sends one page of doubles, in order, with a total.",
+    "Same question, less to send. Bad parameters get a clear 400."
+  ]
+}

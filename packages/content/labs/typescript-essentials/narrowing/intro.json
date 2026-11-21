@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Customer",
+      "say": "I typed 24.90 for the price.",
+      "note": "With spaces around it."
+    },
+    {
+      "title": "Old helpers",
+      "text": "Plain JavaScript that hopes for the best.",
+      "note": "Text or number, it never checks."
+    },
+    {
+      "title": "Your code",
+      "file": "price.ts",
+      "mine": true,
+      "gap": "No types say what comes in",
+      "tasks": [
+        "Read text or a number",
+        "Tell email from phone",
+        "Greet a missing one"
+      ]
+    },
+    {
+      "title": "Booking page",
+      "text": "Shows the price in cents.",
+      "note": "Or says it is not a price."
+    }
+  ],
+  "ticket": {
+    "label": "24.90",
+    "wrong": "read as text",
+    "why": "Unchecked",
+    "right": "in cents"
+  },
+  "captions": [
+    "At Spokewell, a customer types 24.90 into the price box of the booking form.",
+    "The old JavaScript gets text instead of a number and just hopes it works.",
+    "You give three helpers types that name every case, in three tasks.",
+    "Now the price is read either way and comes out in cents, or not at all.",
+    "Same form, no guessing. The compiler catches the case you forgot."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Marit", "say": "Where did yesterday's ticks go?", "note": "Tuesday morning." },
+    { "title": "Front desk screen", "text": "Restarts every morning.", "note": "And shows the old list." },
+    {
+      "title": "Your code",
+      "file": "store.js",
+      "mine": true,
+      "gap": "Forgets on every restart",
+      "tasks": ["Load the nightly file", "Say when it fails", "Remember the ticks"]
+    },
+    {
+      "title": "Route board",
+      "rows": [["Fresh Chalk", "V0"], ["Heel and Toe", "V5"], ["Gritstone Classic", "V8"]],
+      "note": "From the nightly file."
+    }
+  ],
+  "ticket": { "label": "40 ticks", "wrong": "gone", "why": "Restarted", "right": "kept" },
+  "captions": [
+    "The board does a lot now. But members ticked forty routes, and today they are gone.",
+    "The screen restarts each morning, losing every tick and keeping an old list.",
+    "You load the nightly file and save the ticks, in three tasks.",
+    "Now the board loads last night's routes, and the ticks come back.",
+    "A restart costs nothing now. The board loads, and it remembers."
+  ]
+}

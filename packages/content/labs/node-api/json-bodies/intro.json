@@ -1,0 +1,30 @@
+{
+  "stations": [
+    { "title": "Luka", "say": "Price for a double, 3 hours?", "note": "He copies rates from a photo." },
+    { "title": "POST /quotes", "text": "Wired up, but cannot read a body.", "note": "Luka will send broken stuff." },
+    {
+      "title": "Your code",
+      "file": "body.js",
+      "mine": true,
+      "gap": "The body is never read",
+      "tasks": ["Collect the body", "Parse it as JSON", "Check the fields"]
+    },
+    {
+      "title": "Hourly rates",
+      "rows": [
+        ["single", "1800 cents"],
+        ["double", "2600 cents"],
+        ["paddleboard", "1500 cents"]
+      ],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Double, 3 hours", "wrong": "fails", "why": "Not read", "right": "priced" },
+  "captions": [
+    "The fleet list works. Now Luka wants a price for a double for three hours.",
+    "The quote route is wired, but nothing reads what the page sends.",
+    "You write the part that reads and checks the body, in three tasks.",
+    "Now a good request gets its price, and a broken one gets a clear 400.",
+    "Same request, a real price. Bad input is refused, not trusted."
+  ]
+}

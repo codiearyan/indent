@@ -1,0 +1,56 @@
+{
+  "stations": [
+    {
+      "title": "Rider",
+      "say": "Where is order PL-2041?",
+      "note": "At the Pebble Lane Pantry desk."
+    },
+    {
+      "title": "Pip",
+      "text": "A chat model.",
+      "note": "It only knows what it is told."
+    },
+    {
+      "title": "Your code",
+      "file": "assistant.ts",
+      "mine": true,
+      "gap": "Nothing connects them yet",
+      "tasks": [
+        "Describe the lookup",
+        "Read the request",
+        "Send the result back"
+      ]
+    },
+    {
+      "title": "Order list",
+      "rows": [
+        [
+          "PL-2041",
+          "out for delivery"
+        ],
+        [
+          "PL-2042",
+          "packing"
+        ],
+        [
+          "PL-2043",
+          "delivered"
+        ]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "PL-2041",
+    "wrong": "delivered?",
+    "why": "A guess",
+    "right": "out for delivery"
+  },
+  "captions": [
+    "At Pebble Lane Pantry, riders keep asking where an order is.",
+    "Pip cannot read the order list, so it guesses.",
+    "You write the piece in between, in three tasks.",
+    "Now your code looks the order up.",
+    "Same question, real answer. You build the middle."
+  ]
+}

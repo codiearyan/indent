@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Bram", "say": "Why is the discount missed?", "note": "Since he tidied the settings." },
+    { "title": "Labelled questions", "text": "Each one names its article.", "note": "From last summer's desk log." },
+    {
+      "title": "Your code",
+      "file": "metrics.ts",
+      "mine": true,
+      "gap": "Nobody can measure it",
+      "tasks": ["Hit rate and recall", "Score the questions", "Fix the bad setting"]
+    },
+    {
+      "title": "Handbook",
+      "rows": [["Booking a kayak"], ["Groups and guided tours"], ["Gift vouchers"]],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Group discount", "wrong": "missed", "why": "No match", "right": "found" },
+  "captions": [
+    "Since Bram tidied the settings, the box misses the group discount.",
+    "Trying a few questions by hand cannot say if it is Bram or the box.",
+    "You write the scores, run the labelled questions and fix the bad setting.",
+    "Now the numbers point at the setting, and the discount is found again.",
+    "Every change is measured now, not guessed."
+  ]
+}

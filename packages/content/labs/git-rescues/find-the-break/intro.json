@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Why no group discount?", "note": "A family of four paid full." },
+    { "title": "Commit history", "text": "Eight commits since it worked.", "note": "Several touched the fares." },
+    {
+      "title": "Your commands",
+      "file": "fares.mjs",
+      "mine": true,
+      "gap": "Nobody knows which commit",
+      "tasks": ["Name the bad commit", "Fix it in a new commit"]
+    },
+    { "title": "Ticket desk", "text": "Charges what the fares code says." }
+  ],
+  "ticket": { "label": "Group of four", "wrong": "paid full", "why": "No discount", "right": "discounted" },
+  "captions": [
+    "Ines says the ticket desk charged a family of four the full price.",
+    "The discount worked eight commits ago. Nobody knows which commit broke it.",
+    "You search the history, name the bad commit and fix it, in two tasks.",
+    "The group discount is back on main, and bike tickets still work.",
+    "A few tests found one commit among many. The fix sits on top."
+  ]
+}

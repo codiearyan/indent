@@ -1,0 +1,30 @@
+{
+  "stations": [
+    { "title": "Bram", "say": "Who deleted Otter on Saturday?", "note": "She was on the dock all along." },
+    { "title": "Write routes", "text": "Open to anyone who finds the URL.", "note": "Errors leak their details too." },
+    {
+      "title": "Your code",
+      "file": "auth.js",
+      "mine": true,
+      "gap": "Anyone can delete a boat",
+      "tasks": ["Lock the write routes", "One place for errors", "An id on every answer"]
+    },
+    {
+      "title": "Fleet",
+      "rows": [
+        ["Heron", "single"],
+        ["Otter", "double"],
+        ["Pike", "single"]
+      ],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Delete Otter", "wrong": "done", "why": "No lock", "right": "refused" },
+  "captions": [
+    "Anyone can now change the fleet. On Saturday night, someone deleted Otter.",
+    "The write routes are open to the world, and errors show their insides.",
+    "You write the lock, one safe place for errors and a request id.",
+    "Now a delete without a staff token is refused, and Otter stays.",
+    "Only staff change the fleet, and every error is safe to show."
+  ]
+}

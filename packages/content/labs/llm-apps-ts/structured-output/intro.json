@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ravi", "say": "Can Moss fill the order sheet?", "note": "From each order email." },
+    { "title": "Moss", "text": "Sends JSON that is almost right.", "note": "Numbers as words, in a fence." },
+    {
+      "title": "Your code",
+      "file": "orders.ts",
+      "mine": true,
+      "gap": "Nothing checks the reply",
+      "tasks": ["Find the JSON", "Check each field", "Repair it once"]
+    },
+    { "title": "Order sheet", "text": "Plant, quantity, pot size, gift wrap.", "note": "Right types, every time." }
+  ],
+  "ticket": { "label": "Orchids", "wrong": "break the sheet", "why": "Unchecked", "right": "on the sheet" },
+  "captions": [
+    "The inbox is sorted. Now Ravi wants order emails copied into the order sheet.",
+    "An email asks for three orchids, and Moss sends back JSON that is almost right.",
+    "You write the code that finds, checks and repairs the reply, in three tasks.",
+    "Now the orchid order lands on the sheet with every field the right type.",
+    "Same email, no typing for Ravi. Nothing broken reaches the sheet."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Ten stamps, then a free candle?", "note": "A card in every parcel." },
+    {
+      "title": "Shop site",
+      "text": "Forgets everything between calls.",
+      "note": "A slow guide, repeat emails too."
+    },
+    {
+      "title": "Your code",
+      "file": "helpers.js",
+      "mine": true,
+      "gap": "Nothing is remembered",
+      "tasks": ["Keep a stamp count", "Save slow answers", "Send only once"]
+    },
+    { "title": "Customer", "say": "My next candle is free!" }
+  ],
+  "ticket": { "label": "10th stamp", "wrong": "forgotten", "why": "No memory", "right": "free candle" },
+  "captions": [
+    "Theo has his answers. Next, Ines wants a stamp card in every parcel.",
+    "The site forgets between calls, so the tenth stamp counts for nothing.",
+    "You write three helpers that remember, in three tasks.",
+    "Now the tenth stamp earns a free candle, and the card starts again.",
+    "One idea, three fixes: a stamp card, a faster guide, one welcome email."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Do drafts follow my 4 rules?", "note": "Never promise a refund." },
+    { "title": "Draft model", "text": "Writes a reply to each ticket.", "note": "Free text. No regex can grade it." },
+    {
+      "title": "Your code",
+      "file": "judge.ts",
+      "mine": true,
+      "gap": "Nobody checks the rules",
+      "tasks": ["Read the verdict", "Ask the judge", "Grade every draft"]
+    },
+    { "title": "Judge model", "text": "Reads a draft against the rules.", "note": "Its answer is not always clear." }
+  ],
+  "ticket": { "label": "Draft PB-20981", "wrong": "skimmed", "why": "A skim", "right": "judged" },
+  "captions": [
+    "Replies are scored. Next: Ines wants every reply draft checked against her four rules.",
+    "Today someone skims each draft, and one already promised a refund.",
+    "You write the code that asks a judge model and reads its answer, in three tasks.",
+    "Now the PB-20981 draft gets a verdict, and an unclear answer stays unknown.",
+    "Same drafts, a verdict for each, and no guess counted as a pass."
+  ]
+}

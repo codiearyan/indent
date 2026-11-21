@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Mira", "say": "Sum up the cake stand case.", "note": "She leads the support desk." },
+    { "title": "Kes", "text": "Sums up each complaint.", "note": "Runs on the local model." },
+    {
+      "title": "Your code",
+      "file": "summarize.ts",
+      "mine": true,
+      "gap": "Half summaries look done",
+      "tasks": ["Catch the cut-off", "Never return half", "Test that catches it"]
+    },
+    { "title": "Agents", "text": "Read the summary, not the complaint.", "note": "Mira's team." }
+  ],
+  "ticket": { "label": "Cake stand", "wrong": "half summary", "why": "Cut off", "right": "full summary" },
+  "captions": [
+    "At Kestrel Parcels, Mira's team reads a Kes summary of each complaint.",
+    "The cake stand summary stops mid-sentence, and nothing says so.",
+    "You catch it, fix it and write the test, in three tasks.",
+    "Now the cake stand summary reaches the agents in full.",
+    "Same complaint, whole summary. And a test keeps it that way."
+  ]
+}

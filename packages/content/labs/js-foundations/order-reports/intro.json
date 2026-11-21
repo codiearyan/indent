@@ -1,0 +1,25 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "What did last week bring in?", "note": "He copies orders by hand." },
+    {
+      "title": "Last week's orders",
+      "rows": [["WC-1001", "paid"], ["WC-1002", "paid"], ["WC-1003", "cancelled"]]
+    },
+    {
+      "title": "Your code",
+      "file": "reports.js",
+      "mine": true,
+      "gap": "Nobody adds them up",
+      "tasks": ["Total one order", "Rank best sellers", "Add up each day"]
+    },
+    { "title": "Theo's answers", "text": "Totals, best sellers, money per day." }
+  ],
+  "ticket": { "label": "Last week", "wrong": "copied by hand", "why": "Too slow", "right": "answered" },
+  "captions": [
+    "At Wickhollow Candles, Theo wants to know what last week brought in.",
+    "The orders sit in a file, and Theo copies them into a sheet by hand.",
+    "You write the reports in between, in three tasks.",
+    "Now last week's orders turn into totals, best sellers and money per day.",
+    "Same orders, no Sunday copying. Theo gets his three answers."
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "stations": [
+    {
+      "title": "Bram",
+      "say": "Next high tide at the quay?",
+      "note": "For the departure board."
+    },
+    {
+      "title": "Tide gauge",
+      "text": "Answers through an old callback.",
+      "note": "Slow, and it can fail."
+    },
+    {
+      "title": "Your code",
+      "file": "loadTides.js",
+      "mine": true,
+      "gap": "Callbacks and promises mixed",
+      "tasks": [
+        "Wrap the reader",
+        "Chain the high tide",
+        "Join two services"
+      ]
+    },
+    {
+      "title": "Quay tides",
+      "rows": [
+        [
+          "04:52",
+          "3.6 m"
+        ],
+        [
+          "11:07",
+          "0.9 m"
+        ],
+        [
+          "17:15",
+          "3.4 m"
+        ]
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Quay tide",
+    "wrong": "not shown",
+    "why": "Goes blank",
+    "right": "on the board"
+  },
+  "captions": [
+    "At Tidewell Ferries, Bram wants the quay's next high tide on the departure board.",
+    "The tide gauge answers through an old callback, and when it fails the board goes blank.",
+    "You write the promises in between, in three tasks.",
+    "Now the quay's high tide reaches the board, and a failure is passed along.",
+    "Same slow gauge, and a board that never just goes blank."
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Odile",
+      "say": "Who drove the October orders?",
+      "note": "A cafe says one never came."
+    },
+    {
+      "title": "Bakehouse database",
+      "text": "Orders hold ids, not names.",
+      "note": "Names live in other tables."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "gap": "Only ids, no names",
+      "tasks": [
+        "Log October deliveries",
+        "Orders per driver",
+        "Find unwanted bakes"
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "October log",
+    "wrong": "only ids",
+    "why": "Just numbers",
+    "right": "with names"
+  },
+  "captions": [
+    "A cafe says an October delivery never came, and Odile needs the delivery log.",
+    "An order only says cafe 9 and driver 3. That means nothing on the phone.",
+    "You write queries that bring tables together, in three tasks.",
+    "Now the October log shows each cafe and driver by name.",
+    "Same orders, read across tables. Ids turn back into names."
+  ]
+}

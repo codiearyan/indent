@@ -1,0 +1,25 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "How good is triage, really?", "note": "A number, not a feeling." },
+    { "title": "Triage", "text": "Picks one queue for each email.", "note": "Checked by pasting a few." },
+    {
+      "title": "Your code",
+      "file": "evaluate.ts",
+      "mine": true,
+      "gap": "Nobody measures it",
+      "tasks": ["Load the test set", "Compare labels fairly", "Score every case"]
+    },
+    {
+      "title": "Test set",
+      "rows": [["t01", "shipping"], ["t02", "refund"], ["t03", "plant-care"]]
+    }
+  ],
+  "ticket": { "label": "Triage v1", "wrong": "looks fine", "why": "A feeling", "right": "has a number" },
+  "captions": [
+    "At Pebblebrook Plants, Ines wants to know how good triage really is.",
+    "Today the team pastes a few tickets and reads the answers. That is a feeling.",
+    "You write the eval: a test set, a fair scorer and a report, in three tasks.",
+    "Now every ticket in the set runs, and triage gets a pass rate.",
+    "Same question, a real number, and a list of every miss."
+  ]
+}

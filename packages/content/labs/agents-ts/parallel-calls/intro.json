@@ -1,0 +1,55 @@
+{
+  "stations": [
+    {
+      "title": "Noor",
+      "say": "Do we have oat milk, rye and eggs?",
+      "note": "On a busy morning."
+    },
+    {
+      "title": "Pip",
+      "text": "Asks for three scans in one reply.",
+      "note": "They do not depend on each other."
+    },
+    {
+      "title": "Your code",
+      "file": "parallel.ts",
+      "mine": true,
+      "gap": "Each scan waits its turn",
+      "tasks": [
+        "Start calls together",
+        "Answer in call order",
+        "Use it in the loop"
+      ]
+    },
+    {
+      "title": "Shelf scanner",
+      "rows": [
+        [
+          "OAT-1L",
+          "14 left"
+        ],
+        [
+          "RYE-800",
+          "0 left"
+        ],
+        [
+          "EGG-12",
+          "6 left"
+        ]
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "3 scans",
+    "wrong": "one by one",
+    "why": "Slow",
+    "right": "all at once"
+  },
+  "captions": [
+    "On busy mornings Noor asks Pip about three products at once.",
+    "Pip asks for three scans together, but they run one after another.",
+    "You write the runner that starts them together, in three tasks.",
+    "Now the three scans run at the same time.",
+    "Same answer, a shorter wait. Every result still lands in order."
+  ]
+}

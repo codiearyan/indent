@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Pavel", "say": "Merge my weekend sailings?", "note": "Both new runs go out." },
+    { "title": "Ines", "text": "Added Seal Bay on main.", "note": "Same lines as Puffin Rock." },
+    {
+      "title": "Your commands",
+      "file": "timetable.txt",
+      "mine": true,
+      "gap": "The merge stops halfway",
+      "tasks": ["Keep both sailings", "Keep both fare changes", "Finish the merge"]
+    },
+    { "title": "Sailings board", "text": "Lists every sailing in time order." }
+  ],
+  "ticket": { "label": "Puffin Rock", "wrong": "not merged", "why": "A conflict", "right": "on the board" },
+  "captions": [
+    "Pavel asks you to merge his weekend sailings into main.",
+    "Ines changed the same lines on main, so the merge stops on a conflict.",
+    "You settle each conflict and finish the merge, in three tasks.",
+    "Both new runs and both fare changes make it onto main.",
+    "Two people, one merge. Nothing from either side was lost."
+  ]
+}

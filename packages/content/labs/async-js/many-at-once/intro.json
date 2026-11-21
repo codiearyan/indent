@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Odile",
+      "say": "Show me the forecast, fast.",
+      "note": "From the wheelhouse."
+    },
+    {
+      "title": "Forecast service",
+      "text": "Sometimes just hangs.",
+      "note": "And the page waits with it."
+    },
+    {
+      "title": "Your code",
+      "file": "withTimeout.js",
+      "mine": true,
+      "gap": "One hang holds up the page",
+      "tasks": [
+        "Load routes together",
+        "Sort radios up or down",
+        "Give up after a while"
+      ]
+    },
+    {
+      "title": "Status page",
+      "text": "Ready before the first sailing."
+    }
+  ],
+  "ticket": {
+    "label": "Forecast",
+    "wrong": "still loading",
+    "why": "Hangs",
+    "right": "skipped in time"
+  },
+  "captions": [
+    "Waiting is tidy now. Next, Odile wants one status page with the forecast on it.",
+    "The forecast service sometimes hangs, and the whole page waits with it.",
+    "You write the code that runs calls at once and gives up in time, in three tasks.",
+    "Now the page loads in one go, and a slow forecast is dropped after half a second.",
+    "Everything at once, and nothing waits forever."
+  ]
+}

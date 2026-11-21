@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Bram", "say": "Where is the dog rule?", "note": "At the front desk hut." },
+    { "title": "Staff handbook", "text": "Eleven articles.", "note": "The rule is one line inside." },
+    {
+      "title": "Your code",
+      "file": "chunk.ts",
+      "mine": true,
+      "gap": "Only whole articles",
+      "tasks": ["Cut at whole words", "Overlap neighbours", "Keep the source"]
+    },
+    {
+      "title": "Chunks",
+      "rows": [["dogs", "canoes, not kayaks"], ["dogs", "a life vest"], ["dogs", "rinse at the hose"]],
+      "mark": 0
+    }
+  ],
+  "ticket": { "label": "Dog rule", "wrong": "whole article", "why": "Too long", "right": "small piece" },
+  "captions": [
+    "At Saltmarsh Paddle Co., Bram needs the one line of the handbook about dogs.",
+    "The handbook is eleven articles, and today the box can only hand over a whole one.",
+    "You write the code that cuts it into small pieces, in three tasks.",
+    "Now the dog rule sits in a short piece that knows its article.",
+    "Same handbook, small pieces. Each one says where it came from."
+  ]
+}

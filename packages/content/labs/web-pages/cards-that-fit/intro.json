@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Tomasz",
+      "say": "My card is squashed on my phone.",
+      "note": "He runs the history walk."
+    },
+    {
+      "title": "Laptop layout",
+      "text": "Three fixed cards in every row.",
+      "note": "Only ever checked on a laptop."
+    },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "Nothing bends to fit",
+      "tasks": ["Rows that wrap", "Columns that fit", "Keep things inside"]
+    },
+    {
+      "title": "Tomasz's phone",
+      "rows": [["Knit and natter"], ["Homework club"], ["History walk"]],
+      "mark": 2
+    }
+  ],
+  "ticket": {
+    "label": "History walk",
+    "wrong": "squashed",
+    "why": "Too narrow",
+    "right": "fits"
+  },
+  "captions": [
+    "The styles live in one place. Next, Tomasz opens his history walk on his phone.",
+    "The cards are thin strips, pictures stick out and a word runs off the edge.",
+    "You write a layout that bends to the screen, in three tasks.",
+    "Now the history walk card fits his phone, and a wide screen too.",
+    "Same cards, any screen. Nothing pokes out any more."
+  ]
+}

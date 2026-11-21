@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Bram", "say": "Can dogs come in kayaks?", "note": "A customer at the hut." },
+    { "title": "Local model", "text": "Answers from what it learned.", "note": "Once it said dogs ride free." },
+    {
+      "title": "Your code",
+      "file": "answer.ts",
+      "mine": true,
+      "gap": "Nothing grounds the answer",
+      "tasks": ["Number the sources", "Return what it cites", "Say when it is missing"]
+    },
+    {
+      "title": "Handbook",
+      "rows": [["Booking a kayak"], ["Paddling with dogs"], ["Weather and wind"]],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Dog rule", "wrong": "ride free", "why": "Made up", "right": "canoes, cited" },
+  "captions": [
+    "The box finds the right pieces. Now a customer asks if dogs can ride in kayaks.",
+    "A trial chatbot once said dogs ride free. It answered from nothing.",
+    "You write the answer step: numbered sources, citations and an honest no.",
+    "Now the answer comes from the dogs article and names it as its source.",
+    "Every answer shows where it came from, or says the handbook has nothing."
+  ]
+}

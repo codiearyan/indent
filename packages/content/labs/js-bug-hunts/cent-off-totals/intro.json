@@ -1,0 +1,25 @@
+{
+  "stations": [
+    { "title": "Rosa", "say": "This receipt is a cent off.", "note": "A member spotted it. CPC-7." },
+    {
+      "title": "Till log",
+      "rows": [["Double kayak", "18.15"], ["Paddleboard", "24.50"], ["Member", "10% off"]]
+    },
+    {
+      "title": "Your code",
+      "file": "receipt.js",
+      "mine": true,
+      "gap": "The lines do not agree",
+      "tasks": ["Catch the bad receipt", "Make it add up", "Write the test"]
+    },
+    { "title": "Printed receipt", "text": "Subtotal, discount, total.", "note": "What the member takes home." }
+  ],
+  "ticket": { "label": "Receipt", "wrong": "does not add up", "why": "A cent off", "right": "adds up" },
+  "captions": [
+    "At Cinderbay Paddle Co., Rosa finds a member's receipt that is a cent off.",
+    "The till prints a subtotal, a discount and a total that do not agree.",
+    "You catch the bug, fix the receipt and write its test, in three tasks.",
+    "Now every receipt the till prints adds up to the cent.",
+    "Same order, same till. Every line on the receipt agrees."
+  ]
+}

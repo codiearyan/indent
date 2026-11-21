@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Dev",
+      "say": "Book homework club for my son.",
+      "note": "On a phone, then a keyboard."
+    },
+    {
+      "title": "Sign-up form",
+      "text": "Looks like a form, but it is boxes.",
+      "note": "The yellow button is a box too."
+    },
+    {
+      "title": "Your HTML",
+      "file": "index.html",
+      "mine": true,
+      "gap": "Nothing to send",
+      "tasks": ["Label every field", "Right kind of answer", "A real send button"]
+    },
+    {
+      "title": "Homework club",
+      "rows": [["Thu 10 Dec"], ["12 places"], ["3 booked online"]],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Homework club",
+    "wrong": "not sent",
+    "why": "Dead button",
+    "right": "booked"
+  },
+  "captions": [
+    "The page has a shape now. Next, Dev tries to book homework club for his son.",
+    "The yellow button does nothing, and a keyboard cannot even reach it.",
+    "You turn the boxes into a real form, in three tasks.",
+    "Now the form sends, from a phone or with the keyboard alone.",
+    "Same form, same look. Now anyone can book a place."
+  ]
+}

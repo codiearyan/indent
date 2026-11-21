@@ -1,0 +1,55 @@
+{
+  "stations": [
+    {
+      "title": "Dele",
+      "say": "Show the newest note.",
+      "note": "On the workshop board."
+    },
+    {
+      "title": "Old helpers",
+      "text": "One copy per kind of data.",
+      "note": "One shared copy loses the type."
+    },
+    {
+      "title": "Your code",
+      "file": "latest.ts",
+      "mine": true,
+      "gap": "Each kind has its own copy",
+      "tasks": [
+        "Helpers for any list",
+        "Find the newest",
+        "A queue for any job"
+      ]
+    },
+    {
+      "title": "Job notes",
+      "rows": [
+        [
+          "n1",
+          "Chain swapped"
+        ],
+        [
+          "n2",
+          "Customer called"
+        ],
+        [
+          "n3",
+          "Brake pads ordered"
+        ]
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Newest note",
+    "wrong": "is unknown",
+    "why": "Type lost",
+    "right": "has its text"
+  },
+  "captions": [
+    "The booking types are in. Dele wants the newest note on the workshop board.",
+    "One shared copy takes any list, but what comes back is unknown.",
+    "You write generic helpers that keep the real type, in three tasks.",
+    "Now the newest note comes back as a note, text and all.",
+    "One helper per job, no casts. The type that goes in comes out."
+  ]
+}

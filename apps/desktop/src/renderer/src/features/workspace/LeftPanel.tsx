@@ -3,6 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { FlowFigure } from '@/features/flows/FlowPlayer'
+import { IntroPlayer } from '@/features/intro/IntroPlayer'
 import { TOUR } from '@/features/tour/anchors'
 import { cn } from '@/lib/utils'
 import { useChapterProgress } from '@/stores/progress'
@@ -54,10 +55,18 @@ export function LeftPanel(): React.JSX.Element {
           <TabsContent value="insights" forceMount className={cn(content, 'flex flex-col')}>
             <ScrollArea className={cn(scroll, 'min-h-0 flex-1')}>
               <div className="zone-lesson space-y-6 px-6 pt-5 pb-10">
-                {chapter.flow && (
-                  <div className="rounded-lg border border-border p-4">
-                    <FlowFigure scene={chapter.flow.scene} />
-                  </div>
+                {chapter.intro ? (
+                  <IssueIntro
+                    key={`${chapter.labId}/${chapter.id}`}
+                    chapter={chapter}
+                    active={leftTab === 'insights'}
+                  />
+                ) : (
+                  chapter.flow && (
+                    <div className="rounded-lg border border-border p-4">
+                      <FlowFigure scene={chapter.flow.scene} />
+                    </div>
+                  )
                 )}
                 <Markdown>{chapter.lesson}</Markdown>
               </div>
@@ -82,6 +91,24 @@ export function LeftPanel(): React.JSX.Element {
         </>
       )}
     </Tabs>
+  )
+}
+
+/** The intro plays by itself until the first task of the issue has passed. */
+function IssueIntro({
+  chapter,
+  active
+}: {
+  chapter: Chapter
+  active: boolean
+}): React.JSX.Element | null {
+  const progress = useChapterProgress(chapter.labId, chapter.id)
+  if (!chapter.intro) return null
+  const started = chapter.tasks.some((task) => progress?.tasks[task.id]?.passed)
+  return (
+    <div className="rounded-lg border border-border p-4">
+      <IntroPlayer intro={chapter.intro} autoPlay={!started} active={active} />
+    </div>
   )
 }
 
