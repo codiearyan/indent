@@ -21,14 +21,21 @@ export interface LockedHint {
   checksLeft: number
 }
 
+/** Checks that are not all green still needed before hint `hint` (from 1) unlocks; 0 when open. */
+export function checksUntilHint(nonGreenChecks: number, hint: number): number {
+  return Math.max(0, CHECKS_BEFORE_FIRST_HINT + hint - 1 - Math.max(0, nonGreenChecks))
+}
+
 /** The next hint still locked for a task with `hintCount` hints, or null when all are open. */
 export function nextLockedHint(nonGreenChecks: number, hintCount = MAX_HINTS): LockedHint | null {
   const unlocked = hintsUnlocked(nonGreenChecks)
   if (unlocked >= Math.min(MAX_HINTS, hintCount)) return null
-  return {
-    hint: unlocked + 1,
-    checksLeft: CHECKS_BEFORE_FIRST_HINT + unlocked - Math.max(0, nonGreenChecks)
-  }
+  return { hint: unlocked + 1, checksLeft: checksUntilHint(nonGreenChecks, unlocked + 1) }
+}
+
+/** Failed checks of a task still needed before the AI writes its tip; 0 when it is due. */
+export function failsUntilTip(failedChecks: number): number {
+  return Math.max(0, FAILS_BEFORE_TIP - failedChecks)
 }
 
 export interface LevelInfo {

@@ -44,7 +44,7 @@ function showNextHint(): void {
   const chapter = useWorkspace.getState().chapter
   if (!chapter) return
   const progress = useProgress.getState().progress?.chapters[chapterKey(chapter.labId, chapter.id)]
-  const { shown, setShown } = useShownHints.getState()
+  const { shown, setShown, setOpen } = useShownHints.getState()
   const key = (taskId: string): string => hintKey(chapter.labId, chapter.id, taskId)
   const next = nextHint(chapter.tasks, progress, (taskId) => shown[key(taskId)] ?? 0)
   if (next.kind === 'done') return void toast('Every task passes.')
@@ -56,6 +56,7 @@ function showNextHint(): void {
     )
   }
   setShown(key(next.taskId), next.hint)
+  setOpen(key(next.taskId), true)
   showLesson()
   useSettings.getState().setLeftTab('tasks')
   requestAnimationFrame(() =>

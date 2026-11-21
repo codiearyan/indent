@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, Circle, Compass, ListChecks, Loader2, Sparkles, Workflow, X } from 'lucide-react'
+import { Check, Circle, ListChecks, Loader2, Workflow, X } from 'lucide-react'
 import type { ChapterProgress, CheckDetail, FlowScene, FlowStep, TaskDef } from '@shared/types'
 import { Button } from '@/components/ui/button'
 import { useAi } from '@/features/ai/aiStore'
@@ -7,13 +7,12 @@ import { checkAttachment, hintAttachment } from '@/features/ai/attachments'
 import { useChat } from '@/features/ai/chatStore'
 import { FlowPlayer } from '@/features/flows/FlowPlayer'
 import { TOUR } from '@/features/tour/anchors'
-import { cn } from '@/lib/utils'
 import { useRuntime } from '@/stores/runtime'
 import { useWorkspace } from '@/stores/workspace'
 import { CheckDetails } from './CheckDetails'
 import { Markdown } from './Markdown'
 import { TaskDocs } from './TaskDocs'
-import { TaskHints } from './TaskHints'
+import { TaskHelp } from './TaskHelp'
 
 interface Props {
   task: TaskDef
@@ -38,7 +37,6 @@ export function TaskItem({
   const checking = useWorkspace((s) => s.checking)
   const toolsInstalling = useRuntime((s) => !!s.status?.installing)
   const check = useWorkspace((s) => s.check)
-  const [stepsOpen, setStepsOpen] = useState(false)
   const [flowOpen, setFlowOpen] = useState(false)
 
   const taskProgress = progress?.tasks[task.id]
@@ -48,11 +46,18 @@ export function TaskItem({
   const aiOn = useAi((s) => !!s.config?.enabled && !!s.config.provider)
   const nudge = useAi((s) => s.config?.nudge ?? false)
 
-  const askWhy = (): void => {
-    const failing = result?.details.filter((d) => !d.passed).map((d) => d.name) ?? []
-    const checks = failing.length > 0 ? ` The failing checks: ${failing.join('; ')}.` : ''
-    useChat.getState().ask(`Why did task ${number}, "${task.title}", fail?${checks}`, {
-      focus: { task: number }
+  const askTutor = (): void => {
+    if (!failed) {
+      useChat.getState().ask(`Where should I start on task ${number}, "${task.title}"?`, {
+        focus: { task: number }
+      })
+      return
+    }
+    const [check, ...others] = result.details.filter((d) => !d.passed)
+    const more = others.length > 0 ? ` Also failing: ${others.map((d) => d.name).join('; ')}.` : ''
+    useChat.getState().ask(`Why did task ${number}, "${task.title}", fail?${more}`, {
+      attachment: check && checkAttachment(check),
+      focus: { task: number, check: check?.name }
     })
   }
 
@@ -69,8 +74,6 @@ export function TaskItem({
       focus: { task: number }
     })
   }
-
-  const hasFailedRows = result?.details.some((d) => !d.passed) ?? false
 
   return (
     <li className="flex gap-3 py-5">
@@ -100,17 +103,6 @@ export function TaskItem({
             {isChecking ? <Loader2 className="animate-spin" /> : <ListChecks />}
             {isChecking && toolsInstalling ? 'Getting ready...' : 'Check'}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="font-normal text-muted-foreground hover:text-foreground"
-            aria-expanded={stepsOpen}
-            onClick={() => setStepsOpen(!stepsOpen)}
-            data-tour={first ? TOUR.taskNext : undefined}
-          >
-            <Compass />
-            Next step
-          </Button>
           {scene && flow && (
             <Button
               variant="ghost"
@@ -123,55 +115,26 @@ export function TaskItem({
               See the flow
             </Button>
           )}
-          {failed && aiOn && nudge && !isChecking && <AskWhy onClick={askWhy} />}
         </div>
         {flowOpen && scene && flow && (
           <div className="rounded-lg border border-border p-3">
             <FlowPlayer scene={scene} steps={flow} />
           </div>
         )}
-        {stepsOpen && (
-          <div className="space-y-2 rounded-lg border border-border p-3 text-sm">
-            <ol className="list-decimal space-y-1 pl-5">
-              {task.nextSteps.map((step, i) => (
-                <li key={i}>{step}</li>
-              ))}
-            </ol>
-            {failed && aiOn && !nudge && !hasFailedRows && (
-              <AskWhy onClick={askWhy} className="-ml-2" />
-            )}
-          </div>
-        )}
-        <TaskHints
+        <TaskHelp
           id={hintKey}
-          hints={task.hints}
+          task={task}
+          progress={taskProgress}
           nonGreenChecks={progress?.nonGreenChecks ?? 0}
-          passed={!!taskProgress?.passed}
+          first={first}
+          aiOn={aiOn}
           onExplain={aiOn ? explainHint : undefined}
+          onAskTutor={aiOn ? askTutor : undefined}
+          onOffer={failed && aiOn && nudge && !isChecking ? askTutor : undefined}
         />
         <TaskDocs task={task} progress={taskProgress} />
       </div>
     </li>
-  )
-}
-
-function AskWhy({
-  onClick,
-  className
-}: {
-  onClick(): void
-  className?: string
-}): React.JSX.Element {
-  return (
-    <Button
-      variant="ghost"
-      size="sm"
-      className={cn('font-normal text-muted-foreground hover:text-foreground', className)}
-      onClick={onClick}
-    >
-      <Sparkles />
-      Ask the tutor why this failed
-    </Button>
   )
 }
 

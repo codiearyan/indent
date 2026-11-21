@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { currentStreak, hintsUnlocked, levelFor, nextLockedHint } from './rules'
+import {
+  checksUntilHint,
+  currentStreak,
+  failsUntilTip,
+  hintsUnlocked,
+  levelFor,
+  nextLockedHint
+} from './rules'
 
 describe('rules', () => {
   it('unlocks the first hint after 3 non-green checks, then one per check, capped at 3', () => {
@@ -37,6 +44,20 @@ describe('rules', () => {
     expect(nextLockedHint(3, 2)).toEqual({ hint: 2, checksLeft: 1 })
     expect(nextLockedHint(4, 2)).toBeNull()
     expect(nextLockedHint(4, 5)).toEqual({ hint: 3, checksLeft: 1 })
+  })
+
+  it('counts the checks left for any hint, not only the next one', () => {
+    expect([1, 2, 3].map((hint) => checksUntilHint(0, hint))).toEqual([3, 4, 5])
+    expect([1, 2, 3].map((hint) => checksUntilHint(3, hint))).toEqual([0, 1, 2])
+    for (let checks = 0; checks < 6; checks++) {
+      for (let hint = 1; hint <= 3; hint++) {
+        expect(hintsUnlocked(checks + checksUntilHint(checks, hint))).toBeGreaterThanOrEqual(hint)
+      }
+    }
+  })
+
+  it('counts the failed checks left before the tip is due', () => {
+    expect([0, 1, 2, 3, 7].map(failsUntilTip)).toEqual([3, 2, 1, 0, 0])
   })
 
   it('computes levels on the 0, 100, 300, 600 curve', () => {
