@@ -107,7 +107,11 @@ export function Player({
         step={1}
         onValueChange={([value]) => player.seek(value)}
         aria-label="Step"
-        className="min-w-32 flex-1 [&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-track]]:bg-accent"
+        className={cn(
+          'min-w-32 flex-1 [&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-track]]:bg-accent',
+          embedded &&
+            '[&_[data-slot=slider-range]]:bg-foreground [&_[data-slot=slider-thumb]]:border-foreground'
+        )}
       />
       <span className="text-xs whitespace-nowrap text-muted-foreground tabular-nums">
         Step {index + 1} of {count}
