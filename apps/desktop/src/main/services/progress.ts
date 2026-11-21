@@ -10,7 +10,9 @@ let saving: Promise<void> = Promise.resolve()
 async function load(): Promise<ProgressState> {
   const file = dataFile('progress.json')
   try {
-    return JSON.parse(await readFile(file, 'utf8')) as ProgressState
+    const saved = JSON.parse(await readFile(file, 'utf8')) as ProgressState
+    rules.dropOldToolErrors(saved)
+    return saved
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
       console.error('progress.json is unreadable; keeping it aside and starting fresh', error)

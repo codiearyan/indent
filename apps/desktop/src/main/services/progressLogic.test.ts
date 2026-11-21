@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { CheckResult, ProgressState, TaskDef } from '../../shared/types'
 import { localDate } from '../../shared/rules'
-import { emptyProgress, recordCheck, setTip, touch } from './progressLogic'
+import { dropOldToolErrors, emptyProgress, recordCheck, setTip, touch } from './progressLogic'
 
 const now = new Date('2026-11-19T10:00:00')
 const later = new Date('2026-11-19T11:00:00')
@@ -122,5 +122,30 @@ describe('progress rules', () => {
     recordCheck(state, 'lab', 'c1', tasks, [result('ghost', true)], now)
     expect(state.chapters['lab/c1'].tasks).toEqual({})
     expect(state.totalPoints).toBe(0)
+  })
+})
+
+describe('dropOldToolErrors', () => {
+  it('forgets the tool errors 0.1.0 saved on every task and keeps other results', () => {
+    const state = emptyProgress()
+    const all = [...tasks, task('t3', 5)]
+    recordCheck(state, 'lab', 'c1', all, [result('t1', true)], now)
+    recordCheck(
+      state,
+      'lab',
+      'c1',
+      all,
+      [
+        result('t2', false, 'Node.js was not found. Open Settings, then Tools, to download it.'),
+        result('t3', false, 'The checker stopped with an error.')
+      ],
+      later
+    )
+    dropOldToolErrors(state)
+    const saved = state.chapters['lab/c1'].tasks
+    expect(saved.t1.lastResult?.passed).toBe(true)
+    expect(saved.t2.lastResult).toBeUndefined()
+    expect(saved.t3.lastResult?.error).toBe('The checker stopped with an error.')
+    expect(state.totalPoints).toBe(10)
   })
 })
