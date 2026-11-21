@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CircleHelp, RotateCcw, Settings, SlidersHorizontal } from 'lucide-react'
+import { RotateCcw, Settings, SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
@@ -33,7 +33,6 @@ export function ViewPopover(): React.JSX.Element {
   const [resetOpen, setResetOpen] = useState(false)
   const settings = useSettings()
   const ready = useWorkspace((s) => s.status === 'ready')
-  const setTourOpen = useWorkspace((s) => s.setTourOpen)
   const hasPage = useWorkspace((s) => Boolean(s.chapter?.preview))
 
   return (
@@ -93,17 +92,6 @@ export function ViewPopover(): React.JSX.Element {
             >
               <Settings />
               All settings
-            </button>
-            <button
-              type="button"
-              className={row}
-              onClick={() => {
-                setOpen(false)
-                setTourOpen(true)
-              }}
-            >
-              <CircleHelp />
-              Take the tour
             </button>
             <button
               type="button"

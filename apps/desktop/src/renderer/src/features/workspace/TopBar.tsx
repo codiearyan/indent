@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react'
+import { ArrowLeft, ChevronLeft, ChevronRight, CircleHelp, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AiMenu } from '@/features/ai/AiMenu'
 import { useAiEnabled } from '@/features/ai/aiStore'
@@ -19,6 +19,8 @@ export function TopBar(): React.JSX.Element {
   const chatOpen = useSettings((s) => s.panels.chat)
   const togglePanel = useSettings((s) => s.togglePanel)
   const aiOn = useAiEnabled()
+  const ready = useWorkspace((s) => s.status === 'ready')
+  const setTourOpen = useWorkspace((s) => s.setTourOpen)
 
   const goToChapter = (id?: string): void => {
     if (id) navigate(`/learn/${labId}/${id}`)
@@ -87,6 +89,14 @@ export function TopBar(): React.JSX.Element {
         )}
         <AiMenu />
         <ViewPopover />
+        <IconButton
+          label="Take the tour"
+          disabled={!ready}
+          onClick={() => setTourOpen(true)}
+          data-tour={TOUR.help}
+        >
+          <CircleHelp />
+        </IconButton>
       </div>
     </header>
   )

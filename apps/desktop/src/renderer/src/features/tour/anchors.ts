@@ -14,7 +14,8 @@ export const TOUR = {
   terminal: 'terminal',
   chat: 'chat',
   aiSuggestions: 'ai-suggestions',
-  view: 'view'
+  view: 'view',
+  help: 'help'
 } as const
 
 export type TourAnchor = (typeof TOUR)[keyof typeof TOUR]

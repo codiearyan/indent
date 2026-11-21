@@ -82,6 +82,11 @@ export const TOUR_STEPS: TourStep[] = [
   {
     anchor: TOUR.view,
     title: 'View',
-    text: 'Text size, layout, theme, the tour and reset live here.'
+    text: 'Text size, layout, theme and reset live here.'
+  },
+  {
+    anchor: TOUR.help,
+    title: 'This tour',
+    text: 'Open it again any time from here.'
   }
 ]
