@@ -11,6 +11,7 @@ let child: ChildProcess | undefined
 let quitting = false
 let backoffMs = 1000
 let up = false
+let origin: string | undefined
 const waiters: (() => void)[] = []
 
 async function start(): Promise<void> {
@@ -27,7 +28,8 @@ async function start(): Promise<void> {
       proc.kill()
       return
     }
-    setLabModelUrl(`http://127.0.0.1:${port}/v1`)
+    origin = `http://127.0.0.1:${port}`
+    setLabModelUrl(`${origin}/v1`)
     up = true
     backoffMs = 1000
     for (const resolve of waiters.splice(0)) resolve()
@@ -51,9 +53,15 @@ export function startLabModel(): void {
   void start()
 }
 
-/** Loads the repos' models again after a repo was installed or updated; it restarts on exit. */
-export function restartLabModel(): void {
-  child?.kill()
+/**
+ * Loads the repos' models again after a repo was installed or updated. The server keeps its port,
+ * which open terminals hold in their environment. One still starting reads the new files anyway.
+ */
+export async function reloadLabModel(): Promise<void> {
+  if (!up || !origin) return
+  await fetch(`${origin}/reload`, { method: 'POST' }).catch((error) =>
+    console.warn('Could not reload the local model:', error)
+  )
 }
 
 /** Resolves once the lab model is listening, or after `timeoutMs` so checks that do not need it still run. */

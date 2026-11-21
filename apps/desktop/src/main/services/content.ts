@@ -19,7 +19,7 @@ import {
   staleRepos
 } from '../library'
 import { chapterContentDir, contentDir, safeId, usesLibrary } from '../paths'
-import { restartLabModel } from './labModel'
+import { reloadLabModel } from './labModel'
 import { getChapter, listPaths } from './packs'
 
 const packsUrl = (): string => process.env.INDENT_PACKS_URL ?? PACKS_URL
@@ -44,7 +44,7 @@ function installRepo(labId: string, retried = false): Promise<void> {
     await installPack(contentDir(), packsUrl(), entry, (done) =>
       emit(EVENTS.contentInstall, labId, done)
     )
-    if (existsSync(join(contentDir(), 'labs', labId, 'model.mjs'))) restartLabModel()
+    if (existsSync(join(contentDir(), 'labs', labId, 'model.mjs'))) await reloadLabModel()
   })().finally(() => installs.delete(labId))
   installs.set(labId, job)
   // An index from before the last site deploy can name an archive that is gone.
@@ -97,7 +97,9 @@ async function refreshLibrary(): Promise<void> {
   }
   const current = cachedIndex()
   if (!current) return
-  for (const entry of staleRepos(current, contentDir(), new Set(openLabId ? [openLabId] : []))) {
+  for (const entry of staleRepos(current, contentDir())) {
+    // Checked at each turn: the learner may open a repo while an earlier one downloads.
+    if (entry.id === openLabId) continue
     try {
       await installRepo(entry.id)
       emit(EVENTS.contentChanged)

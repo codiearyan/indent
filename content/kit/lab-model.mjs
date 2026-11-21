@@ -12,14 +12,16 @@ import { countTokens, truncateTokens } from './tokens.mjs'
 
 const labsDir = fileURLToPath(new URL('../labs/', import.meta.url))
 
-async function loadModels() {
+// The query makes import() read a model.mjs again after its repo was updated.
+// shortcut: files a model.mjs imports from its own repo stay cached; none do today, add the query to them if one does.
+async function loadModels(query = '') {
   const models = {}
   const embeddings = {}
   for (const entry of readdirSync(labsDir, { withFileTypes: true })) {
     const file = join(labsDir, entry.name, 'model.mjs')
     if (!entry.isDirectory() || !existsSync(file)) continue
     try {
-      const lab = await import(pathToFileURL(file).href)
+      const lab = await import(pathToFileURL(file).href + query)
       Object.assign(models, lab.models)
       Object.assign(embeddings, lab.embeddings)
     } catch (err) {
@@ -30,7 +32,7 @@ async function loadModels() {
   return { models, embeddings }
 }
 
-const { models, embeddings } = await loadModels()
+let { models, embeddings } = await loadModels()
 let counter = 0
 
 function sendJson(res, status, body) {
@@ -214,6 +216,13 @@ const server = createServer((req, res) => {
     return createEmbeddings(req, res).catch((err) => {
       if (!res.headersSent) sendError(res, 500, `Local model error: ${err.message}`, null, 'server_error')
       else res.end()
+    })
+  }
+  // The app asks for this after installing a repo, so the port, and every terminal using it, stays.
+  if (req.method === 'POST' && path === '/reload') {
+    return loadModels(`?v=${Date.now()}`).then((loaded) => {
+      ;({ models, embeddings } = loaded)
+      sendJson(res, 200, { ok: true })
     })
   }
   sendError(res, 404, `Unknown route ${req.method} ${path}.`, 'not_found')
