@@ -12,7 +12,6 @@ function hint(tool: ToolStatus, install: ToolInstall | undefined): string {
   if (install?.state === 'failed') return install.message
   if (install?.state === 'waiting')
     return "Finish Apple's installer that just opened, then check again."
-  if (install?.state === 'restart') return 'It is installed. Restart Indent so it can find it.'
   if (tool.id === 'node') {
     return tool.version
       ? `This computer has ${tool.version}; the repos need 22.18 or newer. The app can get one for itself.`

@@ -7,7 +7,6 @@ import { errorMessage } from '@/lib/utils'
 export type ToolInstall =
   | { state: 'running'; done: number | null }
   | { state: 'waiting' }
-  | { state: 'restart' }
   | { state: 'failed'; message: string }
 
 interface ToolsStore {
@@ -39,10 +38,7 @@ export async function installTool(id: ToolId): Promise<void> {
     const result = await api.tools.install(id)
     useTools.setState({ tools: result.tools })
     if (result.url) window.open(result.url, '_blank')
-    setInstall(
-      id,
-      result.waiting ? { state: 'waiting' } : result.restart ? { state: 'restart' } : undefined
-    )
+    setInstall(id, result.waiting ? { state: 'waiting' } : undefined)
   } catch (error) {
     setInstall(id, { state: 'failed', message: errorMessage(error) })
   }

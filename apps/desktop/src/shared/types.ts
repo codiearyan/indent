@@ -219,8 +219,6 @@ export interface ToolInstallResult {
   waiting?: boolean
   /** Nothing here can install it; the page to get it by hand. */
   url?: string
-  /** Installed, but this app only sees it after a restart (Windows). */
-  restart?: boolean
 }
 
 export interface ToolStatus {
@@ -431,8 +429,6 @@ export interface Api {
     install(id: ToolId): Promise<ToolInstallResult>
     /** Stops the Node download. */
     cancelInstall(): Promise<void>
-    /** Starts the app again, so it sees a PATH changed by an installer. */
-    relaunch(): Promise<void>
     onInstallProgress(listener: (id: ToolId, done: number) => void): Unsubscribe
     /** Every Node found, and the one picked; null picked means automatic. */
     nodeOptions(): Promise<{ options: NodeOption[]; picked: string | null }>
@@ -479,7 +475,6 @@ export const INVOKE_METHODS = {
     'status',
     'install',
     'cancelInstall',
-    'relaunch',
     'nodeOptions',
     'pickNode',
     'labModel',

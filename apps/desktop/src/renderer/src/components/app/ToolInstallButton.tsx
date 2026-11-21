@@ -1,7 +1,6 @@
 import { Loader2, X } from 'lucide-react'
 import type { ToolStatus } from '@shared/types'
 import { Button } from '@/components/ui/button'
-import { api } from '@/lib/api'
 import { cancelInstall, installTool, useTools } from '@/stores/tools'
 
 const outline =
@@ -37,18 +36,6 @@ export function ToolInstallButton({
           </Button>
         )}
       </span>
-    )
-  }
-  if (install?.state === 'restart') {
-    return (
-      <Button
-        variant="outline"
-        size="sm"
-        className={outline}
-        onClick={() => void api.tools.relaunch()}
-      >
-        Restart Indent
-      </Button>
     )
   }
   if (install?.state === 'waiting') {

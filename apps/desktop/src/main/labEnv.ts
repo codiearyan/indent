@@ -3,15 +3,35 @@ import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs'
 import { delimiter, dirname } from 'path'
 import { promisify } from 'util'
 import { dataFile, ownNodeBin } from './paths'
+import { freshWindowsPath, regPath } from './windowsPath'
 
 const run = promisify(execFile)
 
 let shellPath: Promise<string> | undefined
 let labModelUrl: string | undefined
 
+const readRegPath = (key: string): Promise<string> =>
+  run('reg', ['query', key, '/v', 'Path'], { timeout: 5000 })
+    .then(({ stdout }) => regPath(stdout))
+    .catch(() => '')
+
+/**
+ * Windows hands a program the PATH from when it started, so a tool installed since is missing from
+ * it. The registry has the current one; the app's own PATH stays after it for what it added itself.
+ */
+async function windowsPath(): Promise<string> {
+  const [system, user] = await Promise.all([
+    readRegPath('HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment'),
+    readRegPath('HKCU\\Environment')
+  ])
+  return [freshWindowsPath(system, user, process.env), process.env.PATH]
+    .filter(Boolean)
+    .join(delimiter)
+}
+
 /** Apps launched from Finder get a bare PATH; ask the login shell for the real one. */
 function resolveShellPath(): Promise<string> {
-  if (process.platform === 'win32') return Promise.resolve(process.env.PATH ?? '')
+  if (process.platform === 'win32') return windowsPath()
   const shell = process.env.SHELL || '/bin/zsh'
   return run(shell, ['-ilc', 'printf "__PATH__%s__PATH__" "$PATH"'], { timeout: 5000 })
     .then(({ stdout }) => stdout.match(/__PATH__(.*)__PATH__/s)?.[1] || process.env.PATH || '')

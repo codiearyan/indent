@@ -237,10 +237,8 @@ async function installGit(): Promise<ToolInstallResult> {
       cause: error
     })
   }
-  const tools = await status()
-  // Windows gives a new PATH only to programs started after the install.
-  const restart = process.platform === 'win32' && !tools.find((tool) => tool.id === 'git')?.ok
-  return { tools, restart }
+  // status() reads the PATH again (from the registry on Windows), so the new Git is found.
+  return { tools: await status() }
 }
 
 const installs = new Map<ToolId, Promise<ToolInstallResult>>()
@@ -259,10 +257,6 @@ export function register(): void {
     status,
     install,
     cancelInstall: async () => abort?.abort(),
-    relaunch: async () => {
-      app.relaunch()
-      app.exit(0)
-    },
     nodeOptions,
     pickNode: choose,
     labModel: async () => labModelStatus(),
