@@ -54,6 +54,7 @@ export function TopBar(): React.JSX.Element {
             <span className="ml-1 flex shrink-0 items-center">
               <IconButton
                 label="Previous issue"
+                shortcut="previousIssue"
                 disabled={!chapter.prevChapterId}
                 onClick={() => goToChapter(chapter.prevChapterId)}
               >
@@ -61,6 +62,7 @@ export function TopBar(): React.JSX.Element {
               </IconButton>
               <IconButton
                 label="Next issue"
+                shortcut="nextIssue"
                 disabled={!chapter.nextChapterId}
                 onClick={() => goToChapter(chapter.nextChapterId)}
               >

@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Pause, Play, SkipBack, SkipForward } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TOUR } from '@/features/tour/anchors'
+import { useShortcuts } from '@/lib/useShortcuts'
 import { IconButton } from './IconButton'
 import { lessonParts } from '@shared/narration'
 import { useSpeech } from './useSpeech'
@@ -18,6 +19,7 @@ export function AudioCard({
 }): React.JSX.Element | null {
   const parts = useMemo(() => lessonParts(lesson), [lesson])
   const { status, index, rate, toggle, go, cycleRate } = useSpeech(parts, labId, chapterId)
+  useShortcuts({ readAloud: parts.length > 0 && toggle })
 
   if (parts.length === 0 || !('speechSynthesis' in window)) return null
 

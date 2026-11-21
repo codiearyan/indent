@@ -102,6 +102,7 @@ export function ChatPanel(): React.JSX.Element {
       <div className="shrink-0 border-t border-border p-3">
         <div className="flex items-end gap-2">
           <Textarea
+            id="tutor-input"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {

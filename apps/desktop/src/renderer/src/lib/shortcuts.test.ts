@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import type * as Monaco from 'monaco-editor'
-import { formatKeys, matchesKeys, SHORTCUTS, toMonacoKeys } from './shortcuts'
+import {
+  formatKeys,
+  isAppShortcut,
+  isShellKey,
+  matchesKeys,
+  SHORTCUTS,
+  skipsShortcut,
+  toMonacoKeys,
+  type ShortcutScope
+} from './shortcuts'
 
 const KeyMod = { CtrlCmd: 2048, Shift: 1024, Alt: 512, WinCtrl: 256 }
 const KeyCode = {
@@ -105,5 +114,104 @@ describe('toMonacoKeys', () => {
 
   it('refuses a key it has no code for', () => {
     expect(() => toMonacoKeys('Mod+ArrowUp', monaco)).toThrow()
+  })
+})
+
+/** A stand-in for a focused element: `closest` finds the selectors it is inside. */
+const inside = (...selectors: string[]): EventTarget =>
+  ({
+    closest: (query: string) => (query.split(', ').some((q) => selectors.includes(q)) ? {} : null)
+  }) as unknown as EventTarget
+
+const event = (
+  key: string,
+  mods: Partial<Record<'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey', boolean>> = {},
+  target: EventTarget | null = null,
+  extra: { defaultPrevented?: boolean; repeat?: boolean; altGraph?: boolean } = {}
+): Parameters<typeof skipsShortcut>[0] => ({
+  ...press(key, mods),
+  target,
+  defaultPrevented: extra.defaultPrevented ?? false,
+  repeat: extra.repeat ?? false,
+  getModifierState: (k: string) => k === 'AltGraph' && !!extra.altGraph
+})
+
+describe('skipsShortcut', () => {
+  it('takes Mod shortcuts while typing, but not plain keys', () => {
+    expect(skipsShortcut(event('j', { metaKey: true }, inside('textarea')), 'Mod+J')).toBe(false)
+    expect(skipsShortcut(event('j', { metaKey: true }, inside('.monaco-editor')), 'Mod+J')).toBe(
+      false
+    )
+    expect(skipsShortcut(event('Enter', {}, inside('textarea')), 'Enter')).toBe(true)
+    expect(skipsShortcut(event('ArrowLeft', {}, inside('input')), 'ArrowLeft')).toBe(true)
+    expect(skipsShortcut(event('ArrowLeft', {}, inside('.xterm')), 'ArrowLeft')).toBe(true)
+    expect(skipsShortcut(event('ArrowLeft', {}, inside('button')), 'ArrowLeft')).toBe(false)
+  })
+
+  it('leaves Ctrl and a letter to the shell in the terminal', () => {
+    expect(skipsShortcut(event('j', { ctrlKey: true }, inside('.xterm')), 'Mod+J')).toBe(true)
+    expect(skipsShortcut(event('j', { metaKey: true }, inside('.xterm')), 'Mod+J')).toBe(false)
+    expect(skipsShortcut(event('j', { ctrlKey: true }, inside('button')), 'Mod+J')).toBe(false)
+    expect(skipsShortcut(event('1', { ctrlKey: true }, inside('.xterm')), 'Mod+1')).toBe(false)
+  })
+
+  it('skips keys something else handled, repeats, AltGr and open dialogs', () => {
+    const mod = { metaKey: true }
+    expect(skipsShortcut(event('/', mod, null, { defaultPrevented: true }), 'Mod+/')).toBe(true)
+    expect(skipsShortcut(event('j', mod, null, { repeat: true }), 'Mod+J')).toBe(true)
+    expect(skipsShortcut(event('2', mod, null, { altGraph: true }), 'Mod+Alt+2')).toBe(true)
+    expect(skipsShortcut(event('j', mod, inside('[role="dialog"]')), 'Mod+J')).toBe(true)
+    expect(skipsShortcut(event('j', mod), 'Mod+J')).toBe(false)
+  })
+})
+
+describe('isShellKey', () => {
+  it('is Ctrl alone with a letter or a symbol', () => {
+    expect(isShellKey(press('c', { ctrlKey: true }))).toBe(true)
+    expect(isShellKey(press('/', { ctrlKey: true }))).toBe(true)
+    expect(isShellKey(press('c', { metaKey: true }))).toBe(false)
+    expect(isShellKey(press('1', { ctrlKey: true }))).toBe(false)
+    expect(isShellKey(press('Enter', { ctrlKey: true }))).toBe(false)
+    expect(isShellKey(press('F', { ctrlKey: true, shiftKey: true }))).toBe(false)
+  })
+})
+
+describe('isAppShortcut', () => {
+  it('takes the app keys from the terminal and leaves the rest', () => {
+    expect(isAppShortcut(press('Enter', { metaKey: true }))).toBe(true)
+    expect(isAppShortcut(press('j', { metaKey: true }))).toBe(true)
+    expect(isAppShortcut(press('j', { ctrlKey: true }))).toBe(false)
+    expect(isAppShortcut(press('c', { metaKey: true }))).toBe(false)
+    expect(isAppShortcut(press('ArrowLeft'))).toBe(false)
+  })
+})
+
+// Which scopes can be live at the same moment.
+const OVERLAPS: Record<ShortcutScope, ShortcutScope[]> = {
+  everywhere: ['everywhere', 'workspace', 'editor', 'chat', 'tour', 'patterns'],
+  workspace: ['everywhere', 'workspace', 'editor', 'chat', 'tour'],
+  editor: ['everywhere', 'workspace', 'editor'],
+  chat: ['everywhere', 'workspace', 'chat'],
+  tour: ['everywhere', 'workspace', 'tour'],
+  patterns: ['everywhere', 'patterns'],
+  onboarding: ['onboarding']
+}
+
+const normal = (keys: string): string => {
+  const parts = keys.toLowerCase().split('+')
+  const key = parts.pop()
+  return [...parts.sort(), key].join('+')
+}
+
+describe('SHORTCUTS', () => {
+  it('never gives the same keys to two shortcuts that can be live together', () => {
+    const entries = Object.entries(SHORTCUTS)
+    const clashes = entries.flatMap(([a, x], i) =>
+      entries
+        .slice(i + 1)
+        .filter(([, y]) => OVERLAPS[x.scope].includes(y.scope) && normal(x.keys) === normal(y.keys))
+        .map(([b]) => `${a} and ${b}`)
+    )
+    expect(clashes).toEqual([])
   })
 })

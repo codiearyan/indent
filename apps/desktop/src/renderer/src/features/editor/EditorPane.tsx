@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
+import { useCallback, useRef, useState } from 'react'
 import {
   Loader2Icon,
   Maximize2Icon,
@@ -14,12 +13,13 @@ import { isChapterComplete } from '@shared/rules'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { isShortcut, shortcutLabel } from '@/lib/shortcuts'
+import { shortcutLabel, type ShortcutId } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { useChapterProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
+import { checkAll, runCommand } from '@/features/workspace/useWorkspaceShortcuts'
 import { useRuntime } from '@/stores/runtime'
 import { CodeEditor } from './CodeEditor'
 import { ConflictDialog } from './ConflictDialog'
@@ -27,20 +27,6 @@ import { FileLabel } from './FileTab'
 import { FilesPanel } from './FilesPanel'
 import { fileChange, missingFiles } from './fileChange'
 import type { monaco } from './monaco'
-
-function run(): void {
-  useWorkspace
-    .getState()
-    .run()
-    .catch((error) => toast.error(error instanceof Error ? error.message : String(error)))
-}
-
-function checkAll(): void {
-  useWorkspace
-    .getState()
-    .check()
-    .catch((error) => toast.error(error instanceof Error ? error.message : String(error)))
-}
 
 export function EditorPane(): React.JSX.Element {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
@@ -81,36 +67,12 @@ export function EditorPane(): React.JSX.Element {
   const outdated = status === 'ready' && missingFiles(chapter?.files ?? [], files).length > 0
   const command = chapter?.terminal.suggestedCommand
 
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent): void => {
-      // Inside the editor, its own bindings have handled these keys already.
-      if (event.defaultPrevented) return
-      if (isShortcut(event, 'check')) checkAll()
-      else if (command && isShortcut(event, 'runCommand')) run()
-      else return
-      event.preventDefault()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [command])
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent): void => {
-      // Inside the editor, its own binding has handled the keys already.
-      if (event.defaultPrevented || !isShortcut(event, 'closeFile')) return
-      event.preventDefault()
-      const { activePath, closeFile } = useWorkspace.getState()
-      if (activePath) closeFile(activePath)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
-
   return (
     <div className="flex h-full flex-col bg-editor">
       <div className="flex h-11 shrink-0 items-center gap-1 px-2">
         <IconButton
           label={panels.files ? 'Hide files' : 'Show files'}
+          shortcut="toggleFiles"
           onClick={() => togglePanel('files')}
         >
           {panels.files ? <PanelLeftCloseIcon /> : <PanelLeftIcon />}
@@ -139,7 +101,11 @@ export function EditorPane(): React.JSX.Element {
             )}
           </p>
         )}
-        <IconButton label="Focus mode" onClick={() => togglePanel('zen')}>
+        <IconButton
+          label="Focus mode"
+          shortcut="toggleFocusMode"
+          onClick={() => togglePanel('zen')}
+        >
           {panels.zen ? <Minimize2Icon /> : <Maximize2Icon />}
         </IconButton>
         <IconButton
@@ -156,7 +122,7 @@ export function EditorPane(): React.JSX.Element {
                 variant="outline"
                 className="ml-1"
                 disabled={status !== 'ready'}
-                onClick={run}
+                onClick={runCommand}
               >
                 <PlayIcon />
                 Run
@@ -245,7 +211,12 @@ export function EditorPane(): React.JSX.Element {
         )}
         {status === 'ready' ? (
           <div className="relative flex min-w-0 flex-1">
-            <CodeEditor editorRef={editorRef} onEdit={hideSummary} onCheck={checkAll} onRun={run} />
+            <CodeEditor
+              editorRef={editorRef}
+              onEdit={hideSummary}
+              onCheck={checkAll}
+              onRun={runCommand}
+            />
             {!activePath && (
               <p className="absolute inset-0 flex items-center justify-center bg-editor text-sm text-muted-foreground">
                 Open a file from the files panel.
@@ -280,10 +251,12 @@ function CheckSummary(): React.JSX.Element | null {
 
 function IconButton({
   label,
+  shortcut,
   onClick,
   children
 }: {
   label: string
+  shortcut?: ShortcutId
   onClick(): void
   children: React.ReactNode
 }): React.JSX.Element {
@@ -300,7 +273,10 @@ function IconButton({
           {children}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
+      <TooltipContent>
+        {label}
+        {shortcut && ` (${shortcutLabel(shortcut)})`}
+      </TooltipContent>
     </Tooltip>
   )
 }

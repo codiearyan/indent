@@ -1,11 +1,22 @@
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { shortcutLabel, type ShortcutId } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 
-type Props = React.ComponentProps<typeof Button> & { label: string; pressed?: boolean }
+type Props = React.ComponentProps<typeof Button> & {
+  label: string
+  pressed?: boolean
+  shortcut?: ShortcutId
+}
 
 /** Ghost icon button with a tooltip; works as a Popover or Dialog trigger child. */
-export function IconButton({ label, pressed, className, ...props }: Props): React.JSX.Element {
+export function IconButton({
+  label,
+  pressed,
+  shortcut,
+  className,
+  ...props
+}: Props): React.JSX.Element {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -22,7 +33,10 @@ export function IconButton({ label, pressed, className, ...props }: Props): Reac
           {...props}
         />
       </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
+      <TooltipContent>
+        {label}
+        {shortcut && ` (${shortcutLabel(shortcut)})`}
+      </TooltipContent>
     </Tooltip>
   )
 }

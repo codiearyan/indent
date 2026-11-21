@@ -12,10 +12,27 @@ interface Shortcut {
 
 export const SHORTCUTS = {
   openSettings: { label: 'Open settings', keys: 'Mod+,', scope: 'everywhere' },
-  save: { label: 'Save', keys: 'Mod+S', scope: 'editor' },
+  shortcutList: { label: 'Keyboard shortcuts', keys: 'Mod+/', scope: 'everywhere' },
+  goHome: { label: 'Go to Home', keys: 'Mod+Alt+1', scope: 'everywhere' },
+  goRepos: { label: 'Go to Repos', keys: 'Mod+Alt+2', scope: 'everywhere' },
+  goRoadmaps: { label: 'Go to Roadmaps', keys: 'Mod+Alt+3', scope: 'everywhere' },
+  goPatterns: { label: 'Go to Patterns', keys: 'Mod+Alt+4', scope: 'everywhere' },
+  goActivity: { label: 'Go to Activity', keys: 'Mod+Alt+5', scope: 'everywhere' },
   check: { label: 'Run checks', keys: 'Mod+Enter', scope: 'workspace' },
-  closeFile: { label: 'Close file', keys: 'Mod+W', scope: 'workspace' },
   runCommand: { label: 'Run the command', keys: 'Mod+Shift+Enter', scope: 'workspace' },
+  focusEditor: { label: 'Focus the editor', keys: 'Mod+1', scope: 'workspace' },
+  focusLesson: { label: 'Focus the lesson and tasks', keys: 'Mod+2', scope: 'workspace' },
+  focusTerminal: { label: 'Focus the terminal', keys: 'Mod+3', scope: 'workspace' },
+  toggleTerminal: { label: 'Show or hide the terminal', keys: 'Mod+J', scope: 'workspace' },
+  toggleFiles: { label: 'Show or hide the file list', keys: 'Mod+B', scope: 'workspace' },
+  toggleFocusMode: { label: 'Focus mode', keys: 'Mod+Shift+F', scope: 'workspace' },
+  nextIssue: { label: 'Next issue', keys: 'Mod+Alt+ArrowRight', scope: 'workspace' },
+  previousIssue: { label: 'Previous issue', keys: 'Mod+Alt+ArrowLeft', scope: 'workspace' },
+  openTutor: { label: 'Open the tutor', keys: 'Mod+Shift+T', scope: 'workspace' },
+  nextHint: { label: 'Show the next hint', keys: 'Mod+Shift+H', scope: 'workspace' },
+  readAloud: { label: 'Read aloud: play or pause', keys: 'Mod+Shift+P', scope: 'workspace' },
+  closeFile: { label: 'Close file', keys: 'Mod+W', scope: 'workspace' },
+  save: { label: 'Save', keys: 'Mod+S', scope: 'editor' },
   suggest: { label: 'Ask for a suggestion', keys: 'Alt+\\', scope: 'editor' },
   explainCode: { label: 'Explain this code', keys: 'Mod+Shift+E', scope: 'editor' },
   sendMessage: { label: 'Send', keys: 'Enter', scope: 'chat' },
@@ -129,4 +146,46 @@ export function monacoShortcut(
   monaco: Pick<typeof Monaco, 'KeyMod' | 'KeyCode'>
 ): number {
   return toMonacoKeys(SHORTCUTS[id].keys, monaco)
+}
+
+interface GuardedEvent extends KeyEvent {
+  defaultPrevented: boolean
+  repeat: boolean
+  target: EventTarget | null
+  getModifierState?(key: string): boolean
+}
+
+const TEXT_FIELDS = 'input, textarea, select, [contenteditable="true"], .monaco-editor, .xterm'
+
+/**
+ * Ctrl with a letter or a symbol is a control key for the shell (Ctrl+B, Ctrl+J, Ctrl+W), so
+ * the terminal keeps it, even where Ctrl is the app's Mod.
+ */
+export function isShellKey(event: KeyEvent): boolean {
+  if (!event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return false
+  return event.key.length === 1 && !/\d/.test(event.key)
+}
+
+/**
+ * Whether a window shortcut should leave this key press alone: something focused already
+ * handled it (the code editor runs its own bindings), it repeats while held, it was typed with
+ * AltGr, a dialog is open, or it has no Mod and focus is where people type.
+ */
+export function skipsShortcut(event: GuardedEvent, keys: string): boolean {
+  if (event.defaultPrevented || event.repeat) return true
+  if (event.getModifierState?.('AltGraph')) return true
+  const inside = (selector: string): boolean =>
+    !!(event.target as Partial<Element> | null)?.closest?.(selector)
+  if (inside('[role="dialog"], [role="alertdialog"]')) return true
+  if (!parse(keys).modifiers.includes('Mod') && inside(TEXT_FIELDS)) return true
+  return inside('.xterm') && isShellKey(event)
+}
+
+/** Whether the app takes this key press from the terminal for one of its own shortcuts. */
+export function isAppShortcut(event: KeyEvent): boolean {
+  if (isShellKey(event)) return false
+  return Object.values(SHORTCUTS).some(
+    (s: Shortcut) =>
+      (s.scope === 'everywhere' || s.scope === 'workspace') && matchesKeys(event, s.keys)
+  )
 }

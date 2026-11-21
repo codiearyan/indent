@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { api } from '@/lib/api'
 import { codeChrome } from '@indent/design/code-palette'
 import { fontStack } from '@/lib/fonts'
+import { isAppShortcut, shortcutLabel, type ShortcutId } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { useSettings, type Theme } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
@@ -105,6 +106,8 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
       theme: xtermTheme(theme),
       cursorBlink: true
     })
+    // The app's shortcuts pass through to the window instead of reaching the shell.
+    term.attachCustomKeyEventHandler((event) => event.type !== 'keydown' || !isAppShortcut(event))
     const fit = new FitAddon()
     term.loadAddon(fit)
     term.open(container)
@@ -258,7 +261,11 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
         data-tour={TOUR.terminal}
         className="flex h-[41px] shrink-0 items-center gap-2 border-b border-border px-2 text-sm"
       >
-        <IconButton label={open ? 'Collapse terminal' : 'Expand terminal'} onClick={toggleOpen}>
+        <IconButton
+          label={open ? 'Collapse terminal' : 'Expand terminal'}
+          shortcut="toggleTerminal"
+          onClick={toggleOpen}
+        >
           {open ? <ChevronDown /> : <ChevronUp />}
         </IconButton>
         <span className="shrink-0 font-medium">Terminal</span>
@@ -313,10 +320,12 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
 
 function IconButton({
   label,
+  shortcut,
   onClick,
   children
 }: {
   label: string
+  shortcut?: ShortcutId
   onClick: () => void
   children: React.ReactNode
 }): React.JSX.Element {
@@ -333,7 +342,10 @@ function IconButton({
           {children}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
+      <TooltipContent>
+        {label}
+        {shortcut && ` (${shortcutLabel(shortcut)})`}
+      </TooltipContent>
     </Tooltip>
   )
 }
