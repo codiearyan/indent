@@ -42,7 +42,6 @@ function checkAll(): void {
 export function EditorPane(): React.JSX.Element {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const status = useWorkspace((s) => s.status)
-  const error = useWorkspace((s) => s.error)
   const files = useWorkspace((s) => s.files)
   const starter = useWorkspace((s) => s.starter)
   const activePath = useWorkspace((s) => s.activePath)
@@ -197,10 +196,6 @@ export function EditorPane(): React.JSX.Element {
         )}
         {status === 'ready' ? (
           <CodeEditor editorRef={editorRef} onEdit={hideSummary} onCheck={checkAll} />
-        ) : status === 'error' ? (
-          <p className="p-6 text-sm text-muted-foreground">
-            Could not open the files. <span className="text-destructive">{error}</span>
-          </p>
         ) : (
           <div className="flex-1 space-y-3 p-6">
             <Skeleton className="h-4 w-2/3" />

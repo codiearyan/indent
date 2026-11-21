@@ -22,7 +22,8 @@ export function Tour(): React.JSX.Element | null {
     useSettings.getState().setTourSeen(true)
   }, [setTourOpen])
 
-  if (!open) return null
+  // Its anchors exist only while an issue is open, not while one loads or failed to open.
+  if (!open || !ready) return null
 
   return createPortal(<TourOverlay onClose={close} />, document.body)
 }
