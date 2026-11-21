@@ -44,7 +44,7 @@ export function useWorkspaceRoot(): WorkspaceRoot {
     try {
       const workspace = useWorkspace.getState()
       await workspace.flush()
-      setRoot(await api.workspace.moveRoot(pending.to))
+      setRoot(await api.workspace.moveRoot())
       setPending(null)
       const chapter = workspace.chapter
       if (chapter) await useWorkspace.getState().open(chapter.labId, chapter.id)

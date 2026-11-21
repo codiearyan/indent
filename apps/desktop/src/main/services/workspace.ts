@@ -1,7 +1,7 @@
 import { BrowserWindow, dialog } from 'electron'
 import { existsSync } from 'fs'
 import { mkdir, writeFile } from 'fs/promises'
-import { dirname, join, resolve } from 'path'
+import { dirname, join } from 'path'
 import type { FolderMove, WorkspaceSnapshot } from '@shared/types'
 import { handle } from '../ipc'
 import {
@@ -55,8 +55,12 @@ async function write(
   await writeFile(file, content)
 }
 
+/** The destination of the last pick; moveRoot moves only there, never to a renderer's path. */
+let picked: string | null = null
+
 /** Asks for a folder and says where the work would go. Null when the person cancels. */
 async function pickRoot(): Promise<FolderMove | null> {
+  picked = null
   const current = workspacesRoot()
   const options: Electron.OpenDialogOptions = {
     title: 'Choose a folder for your work',
@@ -66,18 +70,21 @@ async function pickRoot(): Promise<FolderMove | null> {
     properties: ['openDirectory', 'createDirectory']
   }
   const window = BrowserWindow.getFocusedWindow()
-  const picked = await (window
+  const result = await (window
     ? dialog.showOpenDialog(window, options)
     : dialog.showOpenDialog(options))
-  if (picked.canceled || !picked.filePaths[0]) return null
-  const plan = await planMove(current, picked.filePaths[0], contentDir())
+  if (result.canceled || !result.filePaths[0]) return null
+  const plan = await planMove(current, result.filePaths[0], contentDir())
+  picked = plan.to
   return { from: current, ...plan }
 }
 
-/** Moves all work to `to`, which the renderer got from pickRoot; checked again here. */
-async function moveRoot(to: string): Promise<string> {
+/** Moves all work to the folder the last pick approved, checked again in case it changed. */
+async function moveRoot(): Promise<string> {
+  if (!picked) throw new Error('Pick a folder first.')
   const current = workspacesRoot()
-  const next = resolve(to)
+  const next = picked
+  picked = null
   const plan = await planMove(current, next, contentDir())
   if (plan.inside || plan.to !== next) throw new Error('Pick an empty folder, or make a new one.')
   if (next === current) return current

@@ -333,8 +333,8 @@ export interface Api {
     getRoot(): Promise<string>
     /** Asks for a folder and says where the work would go; null when cancelled. */
     pickRoot(): Promise<FolderMove | null>
-    /** Moves all work to a folder pickRoot returned. Returns the new root. */
-    moveRoot(to: string): Promise<string>
+    /** Moves all work to the folder the last pickRoot approved. Returns the new root. */
+    moveRoot(): Promise<string>
   }
   checks: {
     /** Runs the hidden tests for the given tasks (all when omitted) and records progress. */
