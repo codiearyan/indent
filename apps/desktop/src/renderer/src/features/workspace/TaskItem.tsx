@@ -36,6 +36,8 @@ export function TaskItem({
 }: Props): React.JSX.Element {
   const checking = useWorkspace((s) => s.checking)
   const toolsInstalling = useRuntime((s) => !!s.status?.installing)
+  // The notice above the tasks says why and holds the fix.
+  const toolsBroken = useRuntime((s) => !!s.status?.error)
   const check = useWorkspace((s) => s.check)
   const [flowOpen, setFlowOpen] = useState(false)
 
@@ -96,7 +98,7 @@ export function TaskItem({
             variant="outline"
             size="sm"
             className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
-            disabled={checking !== null}
+            disabled={checking !== null || toolsBroken}
             onClick={() => void check([task.id])}
             data-tour={first ? TOUR.taskCheck : undefined}
           >
