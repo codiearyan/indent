@@ -82,18 +82,16 @@ export function EditorPane(): React.JSX.Element {
   const command = chapter?.terminal.suggestedCommand
 
   useEffect(() => {
-    if (!command) return
     const onKey = (event: KeyboardEvent): void => {
-      if (!isShortcut(event, 'runCommand') || event.shiftKey) return
-      const target = event.target as HTMLElement
-      // Other text fields keep their own Enter; the code editor's input is a textarea too.
-      if (target.closest('input, textarea') && !target.closest('.monaco-editor')) return
+      // Inside the editor, its own bindings have handled these keys already.
+      if (event.defaultPrevented) return
+      if (isShortcut(event, 'check')) checkAll()
+      else if (command && isShortcut(event, 'runCommand')) run()
+      else return
       event.preventDefault()
-      event.stopPropagation()
-      run()
     }
-    window.addEventListener('keydown', onKey, true)
-    return () => window.removeEventListener('keydown', onKey, true)
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
   }, [command])
 
   useEffect(() => {
@@ -170,17 +168,22 @@ export function EditorPane(): React.JSX.Element {
             </TooltipContent>
           </Tooltip>
         )}
-        <Button
-          size="sm"
-          variant={finished ? 'outline' : 'default'}
-          className="ml-1"
-          data-tour={TOUR.checkAll}
-          disabled={checking !== null || status !== 'ready'}
-          onClick={checkAll}
-        >
-          {checking && <Loader2Icon className="animate-spin" />}
-          {checking ? (toolsInstalling ? 'Getting ready...' : 'Running...') : 'Run checks'}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="sm"
+              variant={finished ? 'outline' : 'default'}
+              className="ml-1"
+              data-tour={TOUR.checkAll}
+              disabled={checking !== null || status !== 'ready'}
+              onClick={checkAll}
+            >
+              {checking && <Loader2Icon className="animate-spin" />}
+              {checking ? (toolsInstalling ? 'Getting ready...' : 'Running...') : 'Run checks'}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Checks every task ({shortcutLabel('check')})</TooltipContent>
+        </Tooltip>
       </div>
 
       <div
@@ -242,7 +245,7 @@ export function EditorPane(): React.JSX.Element {
         )}
         {status === 'ready' ? (
           <div className="relative flex min-w-0 flex-1">
-            <CodeEditor editorRef={editorRef} onEdit={hideSummary} onCheck={checkAll} />
+            <CodeEditor editorRef={editorRef} onEdit={hideSummary} onCheck={checkAll} onRun={run} />
             {!activePath && (
               <p className="absolute inset-0 flex items-center justify-center bg-editor text-sm text-muted-foreground">
                 Open a file from the files panel.

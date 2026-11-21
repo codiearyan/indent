@@ -19,9 +19,10 @@ interface Props {
   editorRef: React.RefObject<monaco.editor.IStandaloneCodeEditor | null>
   onEdit(): void
   onCheck(): void
+  onRun(): void
 }
 
-export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Element {
+export function CodeEditor({ editorRef, onEdit, onCheck, onRun }: Props): React.JSX.Element {
   const hostRef = useRef<HTMLDivElement>(null)
   const viewStates = useRef(new Map<string, monaco.editor.ICodeEditorViewState | null>())
   const applyingExternal = useRef(false)
@@ -56,6 +57,11 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
       void useWorkspace.getState().flush()
     })
     editor.addCommand(monacoShortcut('check', monaco), onCheck)
+    editor.addCommand(monacoShortcut('runCommand', monaco), () => {
+      // Without a command to run, the keys keep the editor's own meaning.
+      if (useWorkspace.getState().chapter?.terminal.suggestedCommand) onRun()
+      else editor.trigger('keyboard', 'editor.action.insertLineBefore', null)
+    })
     editor.addCommand(monacoShortcut('closeFile', monaco), () => {
       const { activePath, closeFile } = useWorkspace.getState()
       if (activePath) closeFile(activePath)
@@ -66,7 +72,7 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
       editor.dispose()
       editorRef.current = null
     }
-  }, [editorRef, onCheck])
+  }, [editorRef, onCheck, onRun])
 
   useEffect(() => {
     const editor = editorRef.current

@@ -105,7 +105,7 @@ export function ChatPanel(): React.JSX.Element {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
-              if (isShortcut(e, 'sendMessage') && !e.shiftKey && !e.nativeEvent.isComposing) {
+              if (isShortcut(e, 'sendMessage') && !e.nativeEvent.isComposing) {
                 e.preventDefault()
                 submit()
               }

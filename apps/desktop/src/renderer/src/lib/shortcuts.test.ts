@@ -17,9 +17,11 @@ const monaco = { KeyMod, KeyCode } as unknown as Pick<typeof Monaco, 'KeyMod' | 
 
 const press = (
   key: string,
-  mods: Partial<Record<'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey', boolean>> = {}
-): Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey'> => ({
+  mods: Partial<Record<'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey', boolean>> = {},
+  code = ''
+): Pick<KeyboardEvent, 'key' | 'code' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey'> => ({
   key,
+  code,
   metaKey: false,
   ctrlKey: false,
   altKey: false,
@@ -54,11 +56,26 @@ describe('matchesKeys', () => {
     expect(matchesKeys(press('.', { metaKey: true }), 'Mod+,')).toBe(false)
   })
 
-  it('needs every modifier it names and leaves the others to the caller', () => {
+  it('needs exactly the modifiers it names', () => {
     expect(matchesKeys(press('Enter', { altKey: true }), 'Alt+Enter')).toBe(true)
     expect(matchesKeys(press('Enter'), 'Alt+Enter')).toBe(false)
-    expect(matchesKeys(press('Enter', { shiftKey: true }), 'Enter')).toBe(true)
+    expect(matchesKeys(press('Enter', { shiftKey: true }), 'Enter')).toBe(false)
+    expect(matchesKeys(press('Enter', { metaKey: true }), 'Enter')).toBe(false)
     expect(matchesKeys(press('S', { shiftKey: true, metaKey: true }), 'Mod+Shift+S')).toBe(true)
+    expect(matchesKeys(press('Enter', { metaKey: true, shiftKey: true }), 'Mod+Enter')).toBe(false)
+    expect(matchesKeys(press('Enter', { metaKey: true, shiftKey: true }), 'Mod+Shift+Enter')).toBe(
+      true
+    )
+  })
+
+  it('reads the physical key when Shift or Alt changes the character', () => {
+    expect(
+      matchesKeys(press('!', { metaKey: true, shiftKey: true }, 'Digit1'), 'Mod+Shift+1')
+    ).toBe(true)
+    expect(matchesKeys(press('?', { ctrlKey: true, shiftKey: true }, 'Slash'), 'Mod+Shift+/')).toBe(
+      true
+    )
+    expect(matchesKeys(press('h', { metaKey: true }, 'KeyJ'), 'Mod+J')).toBe(false)
   })
 
   it('reads the space bar and letters in either case', () => {
@@ -72,6 +89,9 @@ describe('toMonacoKeys', () => {
   it('maps the editor shortcuts', () => {
     expect(toMonacoKeys(SHORTCUTS.save.keys, monaco)).toBe(KeyMod.CtrlCmd | KeyCode.KeyS)
     expect(toMonacoKeys(SHORTCUTS.check.keys, monaco)).toBe(KeyMod.CtrlCmd | KeyCode.Enter)
+    expect(toMonacoKeys(SHORTCUTS.runCommand.keys, monaco)).toBe(
+      KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.Enter
+    )
     expect(toMonacoKeys(SHORTCUTS.suggest.keys, monaco)).toBe(KeyMod.Alt | KeyCode.Backslash)
     expect(toMonacoKeys(SHORTCUTS.explainCode.keys, monaco)).toBe(
       KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KeyE

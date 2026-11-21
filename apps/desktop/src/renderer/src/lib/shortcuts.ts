@@ -13,9 +13,9 @@ interface Shortcut {
 export const SHORTCUTS = {
   openSettings: { label: 'Open settings', keys: 'Mod+,', scope: 'everywhere' },
   save: { label: 'Save', keys: 'Mod+S', scope: 'editor' },
-  check: { label: 'Run checks', keys: 'Mod+Enter', scope: 'editor' },
+  check: { label: 'Run checks', keys: 'Mod+Enter', scope: 'workspace' },
   closeFile: { label: 'Close file', keys: 'Mod+W', scope: 'workspace' },
-  runCommand: { label: 'Run the command', keys: 'Mod+Enter', scope: 'workspace' },
+  runCommand: { label: 'Run the command', keys: 'Mod+Shift+Enter', scope: 'workspace' },
   suggest: { label: 'Ask for a suggestion', keys: 'Alt+\\', scope: 'editor' },
   explainCode: { label: 'Explain this code', keys: 'Mod+Shift+E', scope: 'editor' },
   sendMessage: { label: 'Send', keys: 'Enter', scope: 'chat' },
@@ -65,20 +65,29 @@ export function formatKeys(keys: string, platform: string): string {
   return [...mods, OTHER_KEYS[name] ?? name].join('+')
 }
 
-type KeyEvent = Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey'>
+type KeyEvent = Pick<KeyboardEvent, 'key' | 'code' | 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey'>
+
+const CODES: Record<string, string> = { '/': 'Slash', ',': 'Comma', '\\': 'Backslash' }
+
+function codeFor(key: string): string | undefined {
+  if (/^[a-z]$/i.test(key)) return `Key${key.toUpperCase()}`
+  if (/^\d$/.test(key)) return `Digit${key}`
+  return CODES[key]
+}
 
 /**
- * Whether the event presses these keys. Every modifier named must be held, and `Mod` accepts
- * Cmd or Ctrl on every platform. Modifiers the keys do not name are not checked: a caller that
- * must not fire with one held rules it out itself.
+ * Whether the event presses exactly these keys: every modifier named is held and no other.
+ * `Mod` accepts Cmd or Ctrl on every platform. Shift and Alt change the character a key types
+ * (Shift+1 types `!`), so with either held the physical key counts as well.
  */
 export function matchesKeys(event: KeyEvent, keys: string): boolean {
   const { modifiers, key } = parse(keys)
+  if ((event.metaKey || event.ctrlKey) !== modifiers.includes('Mod')) return false
+  if (event.altKey !== modifiers.includes('Alt')) return false
+  if (event.shiftKey !== modifiers.includes('Shift')) return false
   const pressed = event.key === ' ' ? 'Space' : event.key
-  if (pressed.toLowerCase() !== key.toLowerCase()) return false
-  return modifiers.every((m) =>
-    m === 'Mod' ? event.metaKey || event.ctrlKey : m === 'Alt' ? event.altKey : event.shiftKey
-  )
+  if (pressed.toLowerCase() === key.toLowerCase()) return true
+  return (event.shiftKey || event.altKey) && event.code === codeFor(key)
 }
 
 const MONACO_KEYS: Record<string, keyof typeof Monaco.KeyCode> = {
