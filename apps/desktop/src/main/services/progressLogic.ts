@@ -8,8 +8,10 @@ import type {
 } from '../../shared/types'
 import {
   chapterKey,
+  checksRun,
   DAILY_GOALS,
   daysToFreeze,
+  hintsUnlocked,
   isChapterComplete,
   localDate,
   milestoneDates,
@@ -71,6 +73,21 @@ export function setTip(
   taskEntry(chapterEntry(state, labId, chapterId, now), taskId).tip = tip
 }
 
+/** Remembers the highest hint shown for a task, so a finished repo can count them. */
+export function showHint(
+  state: ProgressState,
+  labId: string,
+  chapterId: string,
+  taskId: string,
+  hint: number,
+  now: Date
+): void {
+  const chapter = chapterEntry(state, labId, chapterId, now)
+  if (!Number.isInteger(hint) || hint < 1 || hint > hintsUnlocked(chapter.nonGreenChecks)) return
+  const task = taskEntry(chapter, taskId)
+  task.hintsShown = Math.max(task.hintsShown ?? 0, hint)
+}
+
 export function touch(state: ProgressState, labId: string, chapterId: string, now: Date): void {
   chapterEntry(state, labId, chapterId, now).lastOpenedAt = now.toISOString()
   state.lastOpened = { labId, chapterId }
@@ -87,6 +104,7 @@ export function recordCheck(
   const chapter = chapterEntry(state, labId, chapterId, now)
   const day = (state.activity[localDate(now)] ??= { points: 0, checks: 0, tasksPassed: 0 })
   day.checks++
+  chapter.checks = checksRun(chapter) + 1
   if (state.dailyGoal) day.goal = state.dailyGoal
   // A run that could not execute (crash, timeout) says nothing about the code, so it unlocks no hint.
   if (!results.every((r) => r.passed) && !results.some((r) => r.error)) chapter.nonGreenChecks++
@@ -132,7 +150,8 @@ const isTask = (task: unknown): boolean =>
   optional(task.passedAt, isText) &&
   optional(task.failedChecks, isCount) &&
   optional(task.failedNames, (names) => everyValue(names, isCount)) &&
-  optional(task.tip, isText)
+  optional(task.tip, isText) &&
+  optional(task.hintsShown, isCount)
 
 const isChapter = (chapter: unknown): boolean =>
   isRecord(chapter) &&
@@ -140,7 +159,8 @@ const isChapter = (chapter: unknown): boolean =>
   everyValue(chapter.tasks, isTask) &&
   isText(chapter.startedAt) &&
   isText(chapter.lastOpenedAt) &&
-  optional(chapter.completedAt, isText)
+  optional(chapter.completedAt, isText) &&
+  optional(chapter.checks, isCount)
 
 const isDay = (day: unknown): boolean =>
   isRecord(day) &&

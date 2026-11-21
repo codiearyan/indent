@@ -1,0 +1,108 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customer", "label": "Customer question", "kind": "data" },
+      { "id": "chat", "label": "chat.ts", "kind": "file", "mine": true },
+      { "id": "history", "label": "Conversation history", "kind": "data" },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "reproduce", "label": "reproduce.ts", "kind": "file", "mine": true },
+      { "id": "test", "label": "chat.test.ts", "kind": "file", "mine": true },
+      { "id": "answer", "label": "Customer answer", "kind": "data" },
+      { "id": "failure", "label": "Incident report", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "customer", "to": "chat", "label": "question" },
+      { "from": "chat", "to": "history", "label": "messages" },
+      { "from": "history", "to": "model", "label": "context" },
+      { "from": "reproduce", "to": "chat", "label": "questions" },
+      { "from": "test", "to": "chat", "label": "tests" },
+      { "from": "model", "to": "answer", "label": "reply" },
+      { "from": "model", "to": "failure", "label": "error" }
+    ],
+    "note": "Mira needs Kes to stay available and answer as the support assistant throughout a customer’s chat."
+  },
+  "tasks": {
+    "reproduce": {
+      "steps": [
+        {
+          "active": ["customer", "customer->chat", "chat"],
+          "note": "A customer asks whether their parcel will reach the locker before it closes."
+        },
+        {
+          "active": [
+            "reproduce",
+            "reproduce->chat",
+            "chat",
+            "chat->history",
+            "history",
+            "history->model",
+            "model"
+          ],
+          "note": "Follow-up questions about the same delivery go through one session."
+        },
+        {
+          "active": ["model", "model->failure", "failure"],
+          "note": "Partway through the conversation, a request fails and the customer gets no answer."
+        },
+        {
+          "active": ["failure"],
+          "value": {
+            "kind": "map",
+            "label": "Incident report",
+            "entries": [
+              {
+                "key": "turns",
+                "value": "Turn number"
+              },
+              {
+                "key": "error",
+                "value": "Error text"
+              }
+            ]
+          },
+          "note": "The incident report identifies the failed turn and records the error."
+        }
+      ]
+    },
+    "fix": {
+      "steps": [
+        {
+          "active": ["customer", "customer->chat", "chat"],
+          "note": "The customer asks whether they can still collect the parcel this evening."
+        },
+        {
+          "active": ["chat", "chat->history", "history", "history->model", "model"],
+          "note": "The question goes to the local model with the context for this chat."
+        },
+        {
+          "active": ["model", "model->answer", "answer"],
+          "note": "Kes answers the customer and the session is ready for another question."
+        },
+        {
+          "active": ["customer", "answer"],
+          "note": "Later in the same chat, the customer can still get an answer from Kes."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->chat", "chat"],
+          "note": "The test starts a conversation about a parcel headed to a collection point."
+        },
+        {
+          "active": ["chat", "chat->history", "history", "history->model", "model"],
+          "note": "The customer keeps asking about the delivery as the conversation continues."
+        },
+        {
+          "active": ["model", "model->answer", "answer"],
+          "note": "Questions should still get answers late in the chat."
+        },
+        {
+          "active": ["answer", "test"],
+          "note": "The test also checks that the customer is still speaking with the Kestrel Parcels assistant."
+        }
+      ]
+    }
+  }
+}

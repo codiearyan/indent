@@ -1,0 +1,113 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Counter session",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Shelf and details",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Staff view",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "The counter keeps holds between visits and lets staff close record details from the keyboard."
+  },
+  "tasks": {
+    "read-saved-shelf": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A staff member reloads the counter after lunch."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The earlier holds are still available to the counter."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The shelf shows those records when the screen comes back."
+        }
+      ]
+    },
+    "save-shelf": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Staff release a record before closing the counter."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The shelf changes during the shift."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "When the counter opens again, it reflects the change."
+        }
+      ]
+    },
+    "escape-closes": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A staff member opens details for a record."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "They use the keyboard to dismiss the details."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The stock screen is available again."
+        }
+      ]
+    }
+  }
+}

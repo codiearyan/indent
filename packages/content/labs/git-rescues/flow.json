@@ -1,0 +1,33 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Ferry change",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Local history",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Shared repo",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "Gullwick Ferries keeps changes to fares, sailings and tools in its repo."
+  }
+}

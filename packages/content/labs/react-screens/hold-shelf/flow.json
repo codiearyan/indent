@@ -1,0 +1,113 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Counter action",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Hold shelf",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Counter display",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "Staff use the shelf to keep track of records promised to customers."
+  },
+  "tasks": {
+    "hold-a-record": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer asks the shop to set aside a folk record."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The staff member places it on hold."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The counter shows that the record is on the shelf."
+        }
+      ]
+    },
+    "release": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer changes their mind about a hold."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The staff member releases that record."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The counter shows the remaining holds."
+        }
+      ]
+    },
+    "shelf-count": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Staff set aside another record during a busy shift."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The shelf changes as records come and go."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The header gives staff a quick read on the shelf."
+        }
+      ]
+    }
+  }
+}

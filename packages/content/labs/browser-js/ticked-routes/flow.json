@@ -1,0 +1,107 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "climber", "label": "Climber", "kind": "story" },
+      { "id": "list", "label": "Route board", "kind": "story" },
+      { "id": "ticks", "label": "watchTicks()", "kind": "function", "mine": true },
+      { "id": "main", "label": "main.js", "kind": "file" },
+      { "id": "ticked", "label": "Ticked ids", "kind": "data" },
+      { "id": "board", "label": "renderBoard()", "kind": "function", "mine": true },
+      { "id": "count", "label": "renderCount()", "kind": "function", "mine": true },
+      { "id": "header", "label": "Header count", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "climber", "to": "list", "label": "ticks a route" },
+      { "from": "list", "to": "ticks", "label": "a click" },
+      { "from": "ticks", "to": "main", "label": "route id" },
+      { "from": "main", "to": "ticked", "label": "add or remove" },
+      { "from": "main", "to": "board", "label": "routes and ticks" },
+      { "from": "board", "to": "list", "label": "items" },
+      { "from": "main", "to": "count", "label": "routes and ticks" },
+      { "from": "count", "to": "header", "label": "a sentence" }
+    ],
+    "note": "A climber's tick travels from the board to main.js and comes back as a board and a header count that agree."
+  },
+  "tasks": {
+    "tick-state": {
+      "steps": [
+        {
+          "active": ["climber", "climber->list", "list"],
+          "note": "A climber at the desk ticks The Long Reach on the board."
+        },
+        {
+          "active": ["list->ticks", "ticks", "ticks->main", "main", "main->ticked", "ticked"],
+          "value": { "kind": "array", "label": "ticked", "values": ["r104"] },
+          "note": "main.js adds its id to the set of ticked routes and calls render() again."
+        },
+        {
+          "active": ["main->board", "board"],
+          "note": "renderBoard now gets that set along with the routes."
+        },
+        {
+          "active": ["board", "board->list", "list"],
+          "value": {
+            "kind": "map",
+            "label": "on the board",
+            "entries": [
+              { "key": "The Long Reach", "value": "ticked" },
+              { "key": "Morning Chalk", "value": "not ticked" },
+              { "key": "Pinch Me", "value": "not ticked" }
+            ]
+          },
+          "note": "The button of a ticked route shows it is pressed, and its item carries the class ticked. Every other route stays as it was."
+        },
+        {
+          "active": ["list"],
+          "note": "Each tick is a plain button of type button, so it never submits anything."
+        }
+      ]
+    },
+    "one-listener": {
+      "steps": [
+        {
+          "active": ["climber", "climber->list", "list"],
+          "note": "Staff tick Morning Chalk and it works. They tick Pinch Me next, and nothing happens."
+        },
+        {
+          "active": ["list", "list->ticks", "ticks"],
+          "note": "watchTicks now adds one click listener, on the list itself."
+        },
+        {
+          "active": ["ticks"],
+          "note": "From the click it works out which route's tick button was pressed. A click elsewhere in the list does nothing."
+        },
+        {
+          "active": ["ticks->main", "main", "main->ticked", "ticked"],
+          "value": { "kind": "array", "label": "ticked", "values": ["r101", "r105"] },
+          "note": "It calls onToggle with the data-id of that route, and main.js updates the set."
+        },
+        {
+          "active": ["climber", "list", "ticks"],
+          "note": "Tick, untick and tick again: every click keeps working, even on a route item put into the list after the page loaded."
+        }
+      ]
+    },
+    "tick-count": {
+      "steps": [
+        {
+          "active": ["main", "main->count", "count"],
+          "note": "render() already calls renderCount after every change, with the header line, the routes and the ticked set."
+        },
+        {
+          "active": ["ticked", "count"],
+          "value": { "kind": "array", "label": "ticked", "values": ["r104", "r106"] },
+          "note": "Nine routes are on the walls, and the climber has ticked The Long Reach and Roof of the World."
+        },
+        {
+          "active": ["count", "count->header", "header"],
+          "note": "The header reads N of M ticked: M is the number of routes, N how many of those routes are in the set."
+        },
+        {
+          "active": ["header"],
+          "note": "On a day with no routes at all, the header reads 0 of 0 ticked."
+        }
+      ]
+    }
+  }
+}

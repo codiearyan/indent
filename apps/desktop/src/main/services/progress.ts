@@ -4,7 +4,7 @@ import { app, BrowserWindow, dialog } from 'electron'
 import { chapterKey, localDate } from '@shared/rules'
 import type { CheckResult, ProgressImport, ProgressState, TaskDef } from '@shared/types'
 import { handle } from '../ipc'
-import { dataFile } from '../paths'
+import { dataFile, safeId } from '../paths'
 import { milestoneCatalog } from './content'
 import * as rules from './progressLogic'
 
@@ -150,6 +150,10 @@ export function register(): void {
     exportFile,
     pickImport,
     applyImport,
-    setDailyGoal: (goal) => update((s) => rules.setDailyGoal(s, goal, new Date()))
+    setDailyGoal: (goal) => update((s) => rules.setDailyGoal(s, goal, new Date())),
+    showHint: (labId, chapterId, taskId, hint) =>
+      update((s) =>
+        rules.showHint(s, safeId(labId), safeId(chapterId), safeId(taskId), hint, new Date())
+      )
   })
 }

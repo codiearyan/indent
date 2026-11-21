@@ -1,0 +1,113 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Search controls",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Stock matches",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Results area",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "The counter shows the stock that matches what staff are looking for."
+  },
+  "tasks": {
+    "search-box": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer remembers part of an artist’s name."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Staff enter the part they know."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The results show records that fit the search."
+        }
+      ]
+    },
+    "genre-filter": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A customer is browsing for soul records."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Staff select a genre while looking through stock."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The results reflect the selection and any search still in use."
+        }
+      ]
+    },
+    "result-count": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A staff member narrows the search."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The set of matches changes."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The counter shows how many records are in front of them."
+        }
+      ]
+    }
+  }
+}

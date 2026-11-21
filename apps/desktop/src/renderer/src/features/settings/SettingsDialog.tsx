@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import {
   CalendarCheck,
+  CalendarClock,
   Code,
   HardDrive,
   Info,
@@ -28,6 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AiSettings, AiSwitch } from '@/features/ai/AiMenu'
 import { useAi } from '@/features/ai/aiStore'
 import { StarPromptDevTools } from '@/features/star/StarPrompt'
+import { showTourAgain } from '@/features/tour/showTourAgain'
 import { UpdateCard } from '@/features/updates/UpdateCard'
 import { isShortcut } from '@/lib/shortcuts'
 import { viewTransition } from '@/lib/viewTransition'
@@ -37,6 +39,7 @@ import { DataSection } from './DataSection'
 import { GoalSection } from './GoalSection'
 import { useSettingsDialog, type SettingsSection } from './dialogStore'
 import { KeyboardSection } from './KeyboardSection'
+import { PracticeSection } from './PracticeSection'
 import { ThemeCards } from './ThemeCards'
 import { ToolsSection } from './ToolsSection'
 import { Typography } from './Typography'
@@ -51,8 +54,9 @@ const SECTIONS: {
   { id: 'editor', label: 'Editor', icon: Code, view: EditorSection },
   { id: 'keyboard', label: 'Keyboard', icon: Keyboard, view: KeyboardSection },
   { id: 'ai', label: 'AI', icon: Sparkles, view: AiSection },
-  { id: 'tools', label: 'Tools', icon: Wrench, view: ToolsSection },
+  { id: 'practice', label: 'Practice', icon: CalendarClock, view: PracticeSection },
   { id: 'goal', label: 'Streak', icon: CalendarCheck, view: GoalSection },
+  { id: 'tools', label: 'Tools', icon: Wrench, view: ToolsSection },
   { id: 'data', label: 'Your data', icon: HardDrive, view: DataSection },
   { id: 'privacy', label: 'Privacy', icon: Shield, view: PrivacySection },
   { id: 'about', label: 'About', icon: Info, view: AboutSection }
@@ -277,6 +281,17 @@ function AiSection(): React.JSX.Element {
         }}
       >
         Run setup again
+      </Button>
+      <Button
+        variant="link"
+        size="sm"
+        className="h-auto self-start p-0 text-xs font-normal text-muted-foreground no-underline hover:text-foreground hover:no-underline"
+        onClick={() => {
+          useSettingsDialog.getState().setOpen(false)
+          showTourAgain()
+        }}
+      >
+        Show the tour again
       </Button>
     </div>
   )

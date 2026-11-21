@@ -1,0 +1,167 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customer", "label": "Fernhollow customer", "kind": "story" },
+      { "id": "answer", "label": "streamAnswer()", "kind": "function", "mine": true, "fn": "streamAnswer" },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "stream", "label": "Reply stream", "kind": "data" },
+      { "id": "collect", "label": "collectStream()", "kind": "function", "mine": true, "fn": "collectStream" },
+      { "id": "chat", "label": "Chat window", "kind": "story" },
+      { "id": "result", "label": "Reply and finish", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "customer", "to": "answer", "label": "question" },
+      { "from": "answer", "to": "model", "label": "care request" },
+      { "from": "model", "to": "stream", "label": "reply pieces" },
+      { "from": "stream", "to": "collect", "label": "pieces" },
+      { "from": "collect", "to": "chat", "label": "updates" },
+      { "from": "collect", "to": "result", "label": "final result" }
+    ],
+    "note": "Moss’s care advice arrives a piece at a time so Fernhollow’s chat window can show an answer while it is still coming in."
+  },
+  "tasks": {
+    "assemble": {
+      "trace": {
+        "file": "src/stream.ts",
+        "call": "collectStream",
+        "args": [
+          [
+            {
+              "choices": [
+                {
+                  "delta": {
+                    "content": "Move the fern "
+                  }
+                }
+              ]
+            },
+            {
+              "choices": [
+                {
+                  "delta": {
+                    "content": "beside a shaded window."
+                  }
+                }
+              ]
+            },
+            {
+              "choices": [
+                {
+                  "delta": {},
+                  "finish_reason": "stop"
+                }
+              ]
+            }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["stream"],
+          "value": {
+            "kind": "array",
+            "label": "Stream for a planter question",
+            "values": ["Opening text", "More care text", "Finish information"]
+          },
+          "note": "Moss’s reply to a customer’s question about a new planter starts arriving."
+        },
+        {
+          "active": ["stream", "stream->collect", "collect"],
+          "note": "The pieces belong to the same care answer."
+        },
+        {
+          "active": ["collect", "collect->result", "result"],
+          "value": {
+            "kind": "map",
+            "label": "Output shape",
+            "entries": [
+              { "key": "Reply", "value": "Text" },
+              { "key": "Finish", "value": "Reason" }
+            ]
+          },
+          "note": "The caller gets the assembled answer and how it ended."
+        },
+        {
+          "active": ["stream", "collect"],
+          "note": "If the connection drops without a finish, the caller gets an error."
+        }
+      ]
+    },
+    "partial": {
+      "steps": [
+        {
+          "active": ["stream", "stream->collect", "collect"],
+          "note": "Moss is answering a question about a fern on a shop counter."
+        },
+        {
+          "active": ["collect", "collect->chat", "chat"],
+          "note": "The customer sees the answer begin to appear in the chat window.",
+          "value": {
+            "kind": "array",
+            "label": "What the customer sees",
+            "values": ["Beginning of the care reply"]
+          }
+        },
+        {
+          "active": ["stream", "stream->collect", "collect", "collect->chat", "chat"],
+          "note": "The customer can read more of the advice before the reply finishes.",
+          "value": {
+            "kind": "array",
+            "label": "What the customer sees later",
+            "values": ["More of the care reply"]
+          }
+        },
+        {
+          "active": ["collect", "collect->result", "result"],
+          "note": "The caller still gets the final answer and its finish reason."
+        }
+      ]
+    },
+    "stream-answer": {
+      "trace": {
+        "file": "src/stream.ts",
+        "call": "streamAnswer",
+        "args": ["Could a fern stay on a shelf by the back window?"]
+      },
+      "steps": [
+        {
+          "active": ["customer", "customer->answer", "answer"],
+          "value": {
+            "kind": "array",
+            "label": "Customer question",
+            "values": ["Is my pothos happy on a shelf above the desk?"]
+          },
+          "note": "A Fernhollow customer asks about moving a plant to a different room."
+        },
+        {
+          "active": ["answer", "answer->model", "model"],
+          "note": "The care request goes to the local model."
+        },
+        {
+          "active": [
+            "model",
+            "model->stream",
+            "stream",
+            "stream->collect",
+            "collect",
+            "collect->chat",
+            "chat"
+          ],
+          "note": "The customer can start reading as Moss’s answer arrives."
+        },
+        {
+          "active": ["collect", "collect->result", "result"],
+          "value": {
+            "kind": "map",
+            "label": "Output shape",
+            "entries": [
+              { "key": "Reply", "value": "Text" },
+              { "key": "Finish", "value": "Reason" }
+            ]
+          },
+          "note": "The caller gets the care text and how the reply ended."
+        }
+      ]
+    }
+  }
+}

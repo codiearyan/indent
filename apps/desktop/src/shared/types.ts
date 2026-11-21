@@ -374,6 +374,8 @@ export interface TaskProgress {
   failedNames?: Record<string, number>
   /** A short note from the AI after repeated fails; written once. */
   tip?: string
+  /** The highest hint the learner opened; missing when none. */
+  hintsShown?: number
 }
 
 export interface ChapterProgress {
@@ -383,6 +385,8 @@ export interface ChapterProgress {
   startedAt: string
   lastOpenedAt: string
   completedAt?: string
+  /** Checks run on this issue; missing in progress saved before it was counted. */
+  checks?: number
 }
 
 export interface DayActivity {
@@ -507,6 +511,38 @@ export interface AiCompleteRequest {
   task?: AiCompletionTask
 }
 
+// ---------- Reminders ----------
+
+/** 0 is Sunday, as `Date.getDay()` counts. */
+export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6
+
+export interface PracticeSchedule {
+  /** No days means no schedule. */
+  days: Weekday[]
+  /** Local time, `HH:MM`. */
+  time: string
+  /** How long a session is meant to be; only used in the reminder text and the calendar event. */
+  minutes: number | null
+  /** Send a notification at the session time. Off keeps the schedule, for the calendar and Home. */
+  notify: boolean
+}
+
+export interface ReminderSettings {
+  schedule: PracticeSchedule
+  /** Keep running in the tray or menu bar when the window closes. */
+  tray: boolean
+  /** Start in the background at login. */
+  openAtLogin: boolean
+}
+
+export interface ReminderConfig extends ReminderSettings {
+  /** macOS waits for the person to allow the login item in System Settings. */
+  loginNeedsApproval: boolean
+}
+
+/** `blocked`: the system did not show it, most likely because notifications are off for the app. */
+export type ReminderTestResult = { ok: true } | { ok: false; reason: 'unsupported' | 'blocked' }
+
 // ---------- IPC ----------
 
 type Unsubscribe = () => void
@@ -601,6 +637,8 @@ export interface Api {
     pickImport(): Promise<ProgressImport | null>
     /** Makes the last picked file the progress. The replaced progress is kept aside on disk. */
     applyImport(): Promise<ProgressState>
+    /** Records that hint `hint` (from 1) of a task was shown. */
+    showHint(labId: string, chapterId: string, taskId: string, hint: number): Promise<ProgressState>
     /** Sets how many tasks a day keep the streak: one of DAILY_GOALS. */
     setDailyGoal(goal: number): Promise<ProgressState>
   }
@@ -665,6 +703,14 @@ export interface Api {
   telemetry: {
     track(event: TelemetryEvent, props?: TelemetryProps): void
   }
+  reminders: {
+    get(): Promise<ReminderConfig>
+    set(patch: Partial<ReminderSettings>): Promise<ReminderConfig>
+    /** Shows a reminder now, with the text the schedule would send. */
+    test(): Promise<ReminderTestResult>
+    /** Asks where to save the schedule as a repeating calendar event. The path, or null when cancelled. */
+    saveCalendar(): Promise<string | null>
+  }
 }
 
 /** Methods the preload bridges with ipcRenderer.invoke, per namespace. */
@@ -684,7 +730,7 @@ export const INVOKE_METHODS = {
     'moveRoot'
   ],
   checks: ['run', 'trace', 'runtimeStatus', 'ensureRuntime'],
-  progress: ['get', 'touch', 'exportFile', 'pickImport', 'applyImport', 'setDailyGoal'],
+  progress: ['get', 'touch', 'exportFile', 'pickImport', 'applyImport', 'showHint', 'setDailyGoal'],
   terminal: ['create'],
   updates: ['status', 'check', 'download', 'cancel', 'install'],
   tools: [
@@ -697,7 +743,8 @@ export const INVOKE_METHODS = {
     'restartLabModel'
   ],
   github: ['star', 'starred'],
-  ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test', 'tip']
+  ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test', 'tip'],
+  reminders: ['get', 'set', 'test', 'saveCalendar']
 } as const
 
 /** Fire-and-forget renderer to main messages. */

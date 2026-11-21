@@ -1,0 +1,222 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "cases", "label": "src/cases.ts", "kind": "data" },
+      { "id": "eval", "label": "runStabilityEval()", "kind": "function", "mine": true, "fn": "runStabilityEval" },
+      { "id": "repeat", "label": "runRepeated()", "kind": "function", "mine": true, "fn": "runRepeated" },
+      { "id": "triage", "label": "triage()", "kind": "function" },
+      { "id": "model", "label": "Triage v3", "kind": "story" },
+      { "id": "flag", "label": "flagCase()", "kind": "function", "mine": true, "fn": "flagCase" },
+      { "id": "report", "label": "Stability report", "kind": "data", "mine": true },
+      { "id": "team", "label": "Ines and Dev", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "cases", "to": "eval", "label": "cases" },
+      { "from": "eval", "to": "repeat", "label": "a case and its seeds" },
+      { "from": "repeat", "to": "triage", "label": "input and seed" },
+      { "from": "triage", "to": "model", "label": "request" },
+      { "from": "repeat", "to": "flag", "label": "runs of one case" },
+      { "from": "flag", "to": "report", "label": "one status per case" },
+      { "from": "eval", "to": "report", "label": "flaky ids and rates" },
+      { "from": "report", "to": "team", "label": "which tickets wobble" }
+    ],
+    "note": "Triage v3 samples, so each ticket runs several times with known seeds and the report names the ones whose answer changes."
+  },
+  "tasks": {
+    "repeat": {
+      "trace": {
+        "file": "src/stability.ts",
+        "call": "runRepeated",
+        "args": [
+          {
+            "id": "wrong-entrance",
+            "input": "The courier left my planter at the wrong entrance.",
+            "expected": "delivery"
+          },
+          "evals-triage-v3",
+          [
+            23,
+            29,
+            31
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["cases"],
+          "value": {
+            "kind": "map",
+            "label": "one case",
+            "entries": [
+              { "key": "id", "value": "s03" },
+              { "key": "input", "value": "The pot arrived cracked and soil went everywhere." },
+              { "key": "expected", "value": "refund" }
+            ]
+          },
+          "note": "A ticket like the one Ines asked about: a cracked pot, a mess of soil, and a refund expected."
+        },
+        {
+          "active": ["repeat", "repeat->triage", "triage", "triage->model", "model"],
+          "note": "runRepeated calls triage with the case's input, the model and one seed, once per seed, in the order the seeds are given."
+        },
+        {
+          "active": ["repeat"],
+          "value": {
+            "kind": "map",
+            "label": "one run",
+            "entries": [
+              { "key": "seed", "value": "the seed used" },
+              { "key": "output", "value": "what triage returned" },
+              { "key": "passed", "value": "output === expected" }
+            ]
+          },
+          "note": "Each seed gives one run with the seed, the output and whether it equals the expected queue."
+        },
+        {
+          "active": ["repeat"],
+          "note": "An empty list of seeds has nothing to measure, so it throws an Error."
+        },
+        {
+          "active": ["repeat", "repeat->flag"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "id", "value": "the case id" },
+              { "key": "runs", "value": "one per seed" },
+              { "key": "passRate", "value": "passing runs / all runs" }
+            ]
+          },
+          "note": "The runs of one case go on to be named."
+        }
+      ]
+    },
+    "flag": {
+      "trace": {
+        "file": "src/stability.ts",
+        "call": "flagCase",
+        "args": [
+          {
+            "id": "spare-lock",
+            "runs": [
+              {
+                "seed": 23,
+                "output": "delivery",
+                "passed": true
+              },
+              {
+                "seed": 29,
+                "output": "other",
+                "passed": false
+              }
+            ],
+            "passRate": 0.5
+          }
+        ]
+      },
+      "steps": [
+        {
+          "active": ["repeat->flag", "flag"],
+          "value": {
+            "kind": "grid",
+            "label": "four runs of a late parcel ticket",
+            "colLabels": ["seed", "output", "passed"],
+            "cells": [
+              [1, "shipping", "yes"],
+              [2, "shipping", "yes"],
+              [3, "plant-care", "no"],
+              [4, "shipping", "yes"]
+            ]
+          },
+          "note": "flagCase gets the runs of one ticket, each with its seed and whether it passed."
+        },
+        {
+          "active": ["flag"],
+          "note": "When every run passed the case is stable-pass, and when none did it is stable-fail."
+        },
+        {
+          "active": ["flag"],
+          "note": "Any mix is flaky, even one miss in five."
+        },
+        {
+          "active": ["flag"],
+          "note": "The seeds of the failing runs are kept in run order. A case with no runs throws an Error."
+        },
+        {
+          "active": ["flag", "flag->report", "report"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "id", "value": "the case id" },
+              { "key": "passRate", "value": "passing runs / all runs" },
+              { "key": "status", "value": "stable-pass, stable-fail or flaky" },
+              { "key": "failingSeeds", "value": "seeds, in run order" }
+            ]
+          },
+          "note": "Each ticket gets one plain name for what was seen, and the seeds anyone can rerun."
+        }
+      ]
+    },
+    "report": {
+      "trace": {
+        "file": "src/stability.ts",
+        "call": "runStabilityEval",
+        "args": [
+          [
+            {
+              "id": "wrong-entrance",
+              "input": "The courier left my planter at the wrong entrance.",
+              "expected": "delivery"
+            }
+          ],
+          "evals-triage-v3",
+          3
+        ]
+      },
+      "steps": [
+        {
+          "active": ["cases", "cases->eval", "eval"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "cases", "value": "Case list" },
+              { "key": "model", "value": "evals-triage-v3" },
+              { "key": "runs", "value": "a whole number, 2 or more" }
+            ]
+          },
+          "note": "runStabilityEval gets the cases, the model and how many times to run each one. A runs that is not a whole number of at least 2 throws an Error that mentions runs."
+        },
+        {
+          "active": ["eval", "eval->repeat", "repeat"],
+          "note": "Every case runs with the seeds 1 up to runs."
+        },
+        {
+          "active": ["repeat", "repeat->flag", "flag"],
+          "note": "Each case's runs are named by flagCase, and the results stay in case order."
+        },
+        {
+          "active": ["flag->report", "eval->report", "report"],
+          "value": {
+            "kind": "map",
+            "label": "the stability report",
+            "entries": [
+              { "key": "model", "value": "the model name" },
+              { "key": "runs", "value": "runs per case" },
+              { "key": "results", "value": "flagCase output per case" },
+              { "key": "flaky", "value": "ids of flaky cases" },
+              { "key": "stablePassRate", "value": "share of stable-pass cases" },
+              { "key": "meanPassRate", "value": "average passRate over cases" }
+            ]
+          },
+          "note": "The report keeps the flaky tickets by name next to the two rates."
+        },
+        {
+          "active": ["report", "report->team", "team"],
+          "note": "Ines and Dev see which tickets change their answer, instead of one average that hides them."
+        }
+      ]
+    }
+  }
+}

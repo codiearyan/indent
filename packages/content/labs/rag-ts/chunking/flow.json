@@ -1,0 +1,176 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "handbook", "label": "handbook.ts", "kind": "data" },
+      { "id": "text", "label": "chunkText()", "kind": "function", "mine": true, "fn": "chunkText" },
+      { "id": "docs", "label": "chunkDocs()", "kind": "function", "mine": true, "fn": "chunkDocs" },
+      { "id": "chunks", "label": "Chunks with sources", "kind": "data" },
+      { "id": "demo", "label": "demo.ts", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "handbook", "to": "docs", "label": "articles" },
+      { "from": "docs", "to": "text", "label": "one article's text" },
+      { "from": "text", "to": "docs", "label": "chunk strings" },
+      { "from": "docs", "to": "chunks", "label": "Chunk[]" },
+      { "from": "chunks", "to": "demo", "label": "counts and texts" }
+    ],
+    "note": "The handbook is cut into small pieces of whole words, and every piece remembers which article it came from and where."
+  },
+  "tasks": {
+    "split": {
+      "trace": {
+        "file": "src/chunk.ts",
+        "call": "chunkText",
+        "args": [
+          "Bring the kayak back to the slipway by the time on your ticket.\nRinse the spray deck under the tap, then hand the paddles in at the hut window.",
+          45
+        ]
+      },
+      "steps": [
+        {
+          "active": ["text"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "text", "value": "the returns note, over two lines" },
+              { "key": "size", "value": 45 }
+            ]
+          },
+          "note": "The returns note goes in with a size of 45 characters, line break and all."
+        },
+        {
+          "active": ["text"],
+          "note": "Spaces, tabs and line breaks all separate words, and a chunk joins its words with single spaces."
+        },
+        {
+          "active": ["text"],
+          "note": "Each chunk takes as many words as fit in size, then the next chunk begins. No word is ever cut in two."
+        },
+        {
+          "active": ["text"],
+          "note": "A word longer than size still goes in whole, as a chunk of its own. Blank text gives no chunks at all."
+        },
+        {
+          "active": ["text", "text->docs"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "chunks", "value": "strings of whole words, in order" }]
+          },
+          "note": "Back comes a list of strings that, read in order, hold every word of the note once."
+        }
+      ]
+    },
+    "overlap": {
+      "trace": {
+        "file": "src/chunk.ts",
+        "call": "chunkText",
+        "args": [
+          "The tide turns twice a day at the harbour mouth. Ask at the hut for the times before you set out, and stay inside the yellow buoys when it runs fast.",
+          60,
+          15
+        ]
+      },
+      "steps": [
+        {
+          "active": ["text"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "text", "value": "the tides note" },
+              { "key": "size", "value": 60 },
+              { "key": "overlap", "value": 15 }
+            ]
+          },
+          "note": "The tides note goes in with a size of 60 and an overlap of 15 characters."
+        },
+        {
+          "active": ["text"],
+          "note": "First the settings are checked: a size below 1, a negative overlap, or an overlap not smaller than size is an Error."
+        },
+        {
+          "active": ["text"],
+          "note": "The first chunk fills up to size, the same way as before."
+        },
+        {
+          "active": ["text"],
+          "note": "The next chunk opens with the last words of the one before, as many as fit in overlap, then fills up to size again."
+        },
+        {
+          "active": ["text"],
+          "note": "No chunk carries the whole chunk before it, so each one starts at least a word further on. The last chunk ends with the note's last word."
+        },
+        {
+          "active": ["text", "text->docs"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "chunks", "value": "strings whose edges repeat a few words" }]
+          },
+          "note": "Back comes a list of strings, where a fact on the edge of one chunk also sits in the next."
+        }
+      ]
+    },
+    "docs": {
+      "trace": {
+        "file": "src/chunk.ts",
+        "call": "chunkDocs",
+        "args": [
+          [
+            {
+              "id": "slipway",
+              "title": "Using the slipway",
+              "text": "Wait for the boat ahead to clear the slipway. Carry the kayak with a partner and never drag it over the stones."
+            },
+            {
+              "id": "kit-room",
+              "title": "The kit room",
+              "text": "Spray decks hang on the left wall and helmets sit on the shelf by the door."
+            }
+          ],
+          50,
+          10
+        ]
+      },
+      "steps": [
+        {
+          "active": ["handbook", "handbook->docs", "docs"],
+          "value": {
+            "kind": "array",
+            "label": "articles",
+            "values": ["slipway", "kit-room"]
+          },
+          "note": "Two new articles go in, each with an id, a title and a text, plus a size of 50 and an overlap of 10."
+        },
+        {
+          "active": ["docs", "docs->text", "text"],
+          "note": "Each article's text is cut with chunkText and the same size and overlap."
+        },
+        {
+          "active": ["text->docs", "docs"],
+          "value": {
+            "kind": "map",
+            "label": "one chunk",
+            "entries": [
+              { "key": "id", "value": "source#index" },
+              { "key": "source", "value": "the article id" },
+              { "key": "index", "value": "its place in that article" },
+              { "key": "text", "value": "the chunk string" }
+            ]
+          },
+          "note": "Every chunk string becomes a Chunk. index counts from 0 again in each article, so the id is unique across the handbook."
+        },
+        {
+          "active": ["docs", "docs->chunks", "chunks"],
+          "note": "All chunks come back in one flat list, in article order. An article with empty text adds none."
+        },
+        {
+          "active": ["chunks", "chunks->demo", "demo"],
+          "note": "The demo prints how many chunks each article gave, so you can see the whole handbook cut up."
+        }
+      ]
+    }
+  }
+}

@@ -65,6 +65,10 @@ export function MomentCard(): React.JSX.Element | null {
     return () => clearTimeout(timer)
   }, [leaving])
 
+  // Leaving the workspace ends the moment, as when the completion view opens on a repo's last
+  // task. Kept, it would show again the next time an issue opens.
+  useEffect(() => () => useMoments.setState({ moment: null }), [])
+
   if (!moment) return null
   return (
     <div

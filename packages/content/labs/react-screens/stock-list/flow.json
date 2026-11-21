@@ -1,0 +1,113 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Stock records",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Record cards",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Counter screen",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "The counter needs to show what is in stock and what has already sold."
+  },
+  "tasks": {
+    "record-card": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A staff member wants to check a used jazz record."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Its stock entry carries the information the staff member needs."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The card lets them read that information at a glance."
+        }
+      ]
+    },
+    "stock-list": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A crate of used records arrives."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Each stock entry needs a place on the screen."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "Staff can browse the whole shipment at the counter."
+        }
+      ]
+    },
+    "sold-mark": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Some records in the crate have already sold."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Their cards need to communicate that status."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "Staff can tell which records may still be available."
+        }
+      ]
+    }
+  }
+}

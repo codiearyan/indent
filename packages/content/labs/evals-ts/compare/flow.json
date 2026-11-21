@@ -1,0 +1,201 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "cases", "label": "src/cases.ts", "kind": "data" },
+      { "id": "models", "label": "compareModels()", "kind": "function", "mine": true },
+      { "id": "runCases", "label": "runCases()", "kind": "function" },
+      { "id": "baseline", "label": "Baseline run", "kind": "data" },
+      { "id": "candidate", "label": "Candidate run", "kind": "data" },
+      { "id": "compare", "label": "compareRuns()", "kind": "function", "mine": true, "fn": "compareRuns" },
+      { "id": "decide", "label": "decide()", "kind": "function", "mine": true, "fn": "decide" },
+      { "id": "tests", "label": "decide.test.ts", "kind": "file", "mine": true },
+      { "id": "team", "label": "Dev and Ines", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "cases", "to": "models", "label": "the test set" },
+      { "from": "models", "to": "runCases", "label": "each model" },
+      { "from": "runCases", "to": "baseline", "label": "outcomes" },
+      { "from": "runCases", "to": "candidate", "label": "outcomes" },
+      { "from": "baseline", "to": "compare", "label": "id and passed" },
+      { "from": "candidate", "to": "compare", "label": "id and passed" },
+      { "from": "compare", "to": "decide", "label": "comparison" },
+      { "from": "decide", "to": "team", "label": "ship and reasons" },
+      { "from": "tests", "to": "decide", "label": "pins the rule" }
+    ],
+    "note": "Two versions of triage run on the same tickets, and the team ships only when no ticket that worked before stops working."
+  },
+  "tasks": {
+    "compare": {
+      "trace": {
+        "file": "src/compare.ts",
+        "call": "compareRuns",
+        "args": [
+          {
+            "model": "triage-old-prompt",
+            "cases": [
+              { "id": "t02", "passed": true, "got": "refund" },
+              { "id": "t06", "passed": true, "got": "refund" },
+              { "id": "t07", "passed": false, "got": "other" },
+              { "id": "t11", "passed": false, "got": "other" },
+              { "id": "t13", "passed": true, "got": "shipping" }
+            ]
+          },
+          {
+            "model": "triage-new-prompt",
+            "cases": [
+              { "id": "t13", "passed": true, "got": "shipping" },
+              { "id": "t11", "passed": true, "got": "plant-care" },
+              { "id": "t07", "passed": false, "got": "other" },
+              { "id": "t06", "passed": false, "got": "plant-care" },
+              { "id": "t02", "passed": true, "got": "refund" }
+            ]
+          }
+        ]
+      },
+      "steps": [
+        {
+          "active": ["baseline"],
+          "value": {
+            "kind": "map",
+            "label": "old prompt, passed per ticket",
+            "entries": [
+              { "key": "t02", "value": "pass" },
+              { "key": "t06", "value": "pass" },
+              { "key": "t07", "value": "fail" },
+              { "key": "t11", "value": "fail" },
+              { "key": "t13", "value": "pass" }
+            ]
+          },
+          "note": "Dev tried a new triage prompt. The run with the old one lists each ticket and whether it passed."
+        },
+        {
+          "active": ["candidate"],
+          "value": {
+            "kind": "array",
+            "label": "new prompt, order of its cases",
+            "values": ["t13", "t11", "t07", "t06", "t02"]
+          },
+          "note": "The run with the new prompt covers the same tickets, listed in another order."
+        },
+        {
+          "active": ["baseline->compare", "candidate->compare", "compare"],
+          "note": "compareRuns matches cases by id and sorts each id into fixed, broken or unchanged. All three lists follow the baseline's order."
+        },
+        {
+          "active": ["compare"],
+          "note": "An id that only one of the runs has means they are not the same test set, so compareRuns throws an Error that contains that id."
+        },
+        {
+          "active": ["compare", "compare->decide"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "baseline", "value": "model name" },
+              { "key": "candidate", "value": "model name" },
+              { "key": "baselineRate", "value": "passing cases / all cases" },
+              { "key": "candidateRate", "value": "passing cases / all cases" },
+              { "key": "fixed", "value": "ids" },
+              { "key": "broken", "value": "ids" },
+              { "key": "unchanged", "value": "ids" }
+            ]
+          },
+          "note": "The comparison says which tickets changed, not only how the two rates moved."
+        }
+      ]
+    },
+    "decide": {
+      "trace": {
+        "file": "src/decide.ts",
+        "call": "decide",
+        "args": [
+          {
+            "baseline": "current",
+            "candidate": "trial",
+            "baselineRate": 0.5,
+            "candidateRate": 1,
+            "fixed": [
+              "missing-pannier"
+            ],
+            "broken": [],
+            "unchanged": [
+              "pickup-window"
+            ]
+          }
+        ]
+      },
+      "steps": [
+        {
+          "active": ["compare->decide", "decide"],
+          "value": {
+            "kind": "map",
+            "label": "old prompt against new",
+            "entries": [
+              { "key": "fixed", "value": "t11" },
+              { "key": "broken", "value": "t06" },
+              { "key": "unchanged", "value": "t02, t07, t13" }
+            ]
+          },
+          "note": "decide gets the comparison of the two prompts."
+        },
+        {
+          "active": ["decide"],
+          "note": "The team's rule: no ticket that passed on the baseline may break."
+        },
+        {
+          "active": ["decide"],
+          "note": "Any broken id means ship is false, with one reason per broken id that contains it. A higher pass rate does not override the rule."
+        },
+        {
+          "active": ["decide"],
+          "note": "A comparison with no cases at all does not ship either, and its reason contains no cases."
+        },
+        {
+          "active": ["decide", "decide->team", "team"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "ship", "value": "true or false" },
+              { "key": "reasons", "value": "one per broken id, or empty" }
+            ]
+          },
+          "note": "Dev and Ines get a yes or a no, and the tickets that stand in the way."
+        },
+        {
+          "active": ["cases", "cases->models", "models", "models->runCases", "runCases"],
+          "note": "compareModels runs both models on the same cases with runCases, compares the two runs and returns the comparison with the decision."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["tests"],
+          "note": "decide.test.ts holds vitest tests for the ship rule. Their comparisons are written by hand or built with compareRuns, never from the model."
+        },
+        {
+          "active": ["tests", "tests->decide", "decide"],
+          "note": "A candidate that breaks a ticket that passed before is not shipped, even when its pass rate is higher, and every broken id shows up in the reasons."
+        },
+        {
+          "active": ["tests", "tests->decide", "decide"],
+          "note": "A candidate with no broken tickets ships, and a comparison with no cases does not."
+        },
+        {
+          "active": ["tests", "decide"],
+          "value": {
+            "kind": "map",
+            "label": "your tests beside three versions of decide",
+            "entries": [
+              { "key": "unfinished", "value": "must fail" },
+              { "key": "correct", "value": "must pass" },
+              { "key": "ships unless the rate drops", "value": "must fail" }
+            ]
+          },
+          "note": "The check runs your tests three times, once beside each version of decide.ts."
+        }
+      ]
+    }
+  }
+}

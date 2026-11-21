@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { FlowScene } from '@shared/types'
 import { cn } from '@/lib/utils'
-import { layoutScene, NODE_H, NODE_W } from './layout'
+import { LABEL_W, layoutScene, NODE_H, NODE_W } from './layout'
 import { breakable } from './breakable'
 import './flows.css'
 
@@ -85,27 +85,30 @@ export function FlowView({ scene, active = [], stepKey = 0 }: Props): React.JSX.
                 )}
               />
             ))}
-            {layout.edges.map(
-              (edge) =>
-                edge.label && (
-                  <text
-                    key={edge.id}
-                    x={edge.labelAt.x}
-                    y={edge.labelAt.y - 5}
-                    textAnchor="middle"
-                    paintOrder="stroke"
-                    strokeWidth={4}
-                    strokeLinejoin="round"
-                    className={cn(
-                      'stroke-card text-[11px]',
-                      on.has(edge.id) ? 'fill-foreground' : 'fill-muted-foreground'
-                    )}
-                  >
-                    {edge.label}
-                  </text>
-                )
-            )}
           </svg>
+
+          {layout.edges.map(
+            (edge) =>
+              edge.label && (
+                <span
+                  key={`label:${edge.id}`}
+                  title={edge.label}
+                  aria-hidden
+                  className={cn(
+                    'absolute line-clamp-2 -translate-x-1/2 rounded-sm bg-card px-0.5 text-center text-[11px] leading-[13px] wrap-break-word',
+                    !edge.below && '-translate-y-full',
+                    on.has(edge.id) ? 'text-foreground' : 'text-muted-foreground'
+                  )}
+                  style={{
+                    left: edge.labelAt.x,
+                    top: edge.labelAt.y + (edge.below ? 3 : -3),
+                    maxWidth: LABEL_W
+                  }}
+                >
+                  {edge.label}
+                </span>
+              )
+          )}
 
           {layout.edges
             .filter((edge) => on.has(edge.id))

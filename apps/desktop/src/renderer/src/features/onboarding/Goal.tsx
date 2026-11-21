@@ -1,73 +1,87 @@
 import { useEffect } from 'react'
-import { RadioGroup } from '@/components/ui/radio-group'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { segment, segmented } from '@/features/settings/controls'
+import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
-import { useSettings, type Experience } from '@/stores/settings'
-import { ChoiceCard } from './ChoiceCard'
+import { useSettings } from '@/stores/settings'
 import { StepLayout } from './StepLayout'
 
 const NOT_SURE = 'not-sure'
 
-const EXPERIENCE: { value: Experience; label: string }[] = [
-  { value: 'new', label: 'New to it' },
-  { value: 'some', label: 'Some' },
-  { value: 'experienced', label: 'A lot' }
-]
-
 export function Goal({ staged }: { staged: boolean }): React.JSX.Element {
   const paths = useCatalog((s) => s.paths)
   const load = useCatalog((s) => s.load)
-  const goal = useSettings((s) => s.goal)
-  const experience = useSettings((s) => s.experience)
-  const setGoal = useSettings((s) => s.setGoal)
-  const setExperience = useSettings((s) => s.setExperience)
+  const goals = useSettings((s) => s.goals)
+  const setGoals = useSettings((s) => s.setGoals)
 
   useEffect(() => void load(), [load])
+
+  // "Not sure yet" is no goal at all: picking it clears the others, and picking a goal clears it.
+  const picked = goals.length > 0 ? goals : [NOT_SURE]
+  const pick = (next: string[]): void =>
+    setGoals(
+      next.includes(NOT_SURE) && goals.length > 0 ? [] : next.filter((id) => id !== NOT_SURE)
+    )
+
+  const cards = [
+    ...(paths ?? []).map((path) => ({ value: path.id, title: path.title, text: path.tagline })),
+    { value: NOT_SURE, title: 'Not sure yet', text: 'Start with the basics and look around.' }
+  ]
 
   return (
     <StepLayout
       wide
       staged={staged}
       title="What do you want to get better at"
-      lead="Home suggests your next repo from this. You can pick another roadmap any time."
+      lead="Pick one or more. Home puts the repos that fit first, and you can change this any time."
     >
-      <RadioGroup
-        aria-label="Goal"
-        value={goal ?? NOT_SURE}
-        onValueChange={(value) => setGoal(value === NOT_SURE ? null : value)}
-        className="grid-cols-3 gap-3"
+      <ToggleGroup
+        type="multiple"
+        aria-label="Goals"
+        spacing={3}
+        value={picked}
+        onValueChange={pick}
+        className="grid w-full grid-cols-3 items-stretch"
       >
-        {paths?.map((path) => (
-          <ChoiceCard key={path.id} value={path.id} title={path.title}>
-            <p className="text-[13px] leading-5 text-muted-foreground">{path.tagline}</p>
-          </ChoiceCard>
-        ))}
-        <ChoiceCard value={NOT_SURE} title="Not sure yet">
-          <p className="text-[13px] leading-5 text-muted-foreground">
-            Start with the basics and look around.
-          </p>
-        </ChoiceCard>
-      </RadioGroup>
-
-      <div className="mt-6 flex items-center justify-between gap-6">
-        <p className="text-sm">How much code have you written?</p>
-        <ToggleGroup
-          type="single"
-          size="sm"
-          spacing={1}
-          aria-label="How much code have you written"
-          className={`w-72 shrink-0 ${segmented}`}
-          value={experience ?? ''}
-          onValueChange={(value) => value && setExperience(value as Experience)}
-        >
-          {EXPERIENCE.map(({ value, label }) => (
-            <ToggleGroupItem key={value} value={value} className={segment}>
-              {label}
+        {cards.map(({ value, title, text }, i) => {
+          const on = picked.includes(value)
+          return (
+            <ToggleGroupItem
+              key={value}
+              value={value}
+              className={cn(
+                'ob-choice h-auto w-auto flex-col items-stretch justify-start gap-3 rounded-lg border border-border p-5 text-left font-normal whitespace-normal',
+                'hover:border-input hover:bg-transparent hover:text-foreground data-[state=on]:border-foreground data-[state=on]:bg-accent/40',
+                staged && 'motion-enter'
+              )}
+              style={{ '--i': i + 3 } as React.CSSProperties}
+            >
+              <span className="flex items-center gap-2.5">
+                <span className="flex-1 text-sm font-semibold">{title}</span>
+                <span
+                  className={cn(
+                    'ob-status flex size-4 shrink-0 items-center justify-center rounded-sm border',
+                    on ? 'border-foreground bg-foreground text-background' : 'border-input'
+                  )}
+                  data-done={on}
+                >
+                  <svg viewBox="0 0 16 16" className="size-3" fill="none" aria-hidden>
+                    <path
+                      d="M3.5 8.5l3 3 6-7"
+                      stroke="currentColor"
+                      strokeWidth={2.2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      pathLength={1}
+                      className="ob-tick"
+                    />
+                  </svg>
+                </span>
+              </span>
+              <span className="text-[13px] leading-5 text-muted-foreground">{text}</span>
             </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-      </div>
+          )
+        })}
+      </ToggleGroup>
     </StepLayout>
   )
 }

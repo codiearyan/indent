@@ -223,3 +223,53 @@ export function milestoneDates(
 
 /** The points at which `level` starts, on the curve of levelFor. */
 export const levelStart = (level: number): number => 50 * level * (level - 1)
+
+/** A practice reminder still goes out this long after its time, as after sleep; later it is skipped. */
+export const REMINDER_GRACE_MINUTES = 30
+export const SNOOZE_MINUTES = 60
+/** The length of a calendar session when the schedule has none. */
+export const DEFAULT_SESSION_MINUTES = 30
+
+/** How a finished repo went, summed over its tasks. */
+export interface RepoRun {
+  tasks: number
+  /** Tasks that passed without a failed check. */
+  firstTry: number
+  failedChecks: number
+  /** Hints opened. */
+  hints: number
+}
+
+export type Stars = 1 | 2 | 3
+
+/**
+ * A finished repo earns the first row it meets in full, else one star: a share of tasks passed on
+ * the first try, and at most so many failed checks and hints per task. Stars never cost points.
+ */
+export const STAR_RULES: {
+  stars: Stars
+  firstTry: number
+  failsPerTask: number
+  hintsPerTask: number
+}[] = [
+  { stars: 3, firstTry: 0.6, failsPerTask: 1, hintsPerTask: 0.2 },
+  { stars: 2, firstTry: 0.3, failsPerTask: 3, hintsPerTask: 1 }
+]
+
+export function repoStars(run: RepoRun): Stars {
+  if (run.tasks === 0) return 1
+  const row = STAR_RULES.find(
+    (rule) =>
+      run.firstTry / run.tasks >= rule.firstTry &&
+      run.failedChecks / run.tasks <= rule.failsPerTask &&
+      run.hints / run.tasks <= rule.hintsPerTask
+  )
+  return row?.stars ?? 1
+}
+
+/**
+ * Checks run on an issue. Progress saved before they were counted has every check that was not
+ * green, plus the green one of a finished issue.
+ */
+export const checksRun = (chapter: ChapterProgress): number =>
+  chapter.checks ?? chapter.nonGreenChecks + (chapter.completedAt ? 1 : 0)
