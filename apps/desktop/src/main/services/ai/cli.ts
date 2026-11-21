@@ -2,7 +2,7 @@ import { spawn } from 'child_process'
 import { access, constants, mkdtemp, readFile, rm } from 'fs/promises'
 import { homedir, tmpdir } from 'os'
 import { delimiter, join } from 'path'
-import { lineSplitter, parseCliLine, type CliProviderId } from './parsers'
+import { lineSplitter, opencodeLogError, parseCliLine, type CliProviderId } from './parsers'
 import { withInstructions } from './prompt'
 import { run } from '../../run'
 
@@ -74,7 +74,11 @@ export interface CliRun {
   env: Record<string, string>
   signal: AbortSignal
   onDelta(text: string): void
+  /** How long OpenCode may stay silent after it logged an error before the run is stopped. */
+  quietAfterErrorMs?: number
 }
+
+const QUIET_AFTER_ERROR_MS = 15_000
 
 /** Text in, text out: every CLI runs without tools or file access, as far as each one allows. */
 export function cliInvocation(
@@ -123,7 +127,19 @@ export function cliInvocation(
       }
     case 'opencode':
       return {
-        args: ['run', '--format', 'json', '--dir', cwd, ...(model ? ['--model', model] : []), full],
+        args: [
+          'run',
+          '--format',
+          'json',
+          '--dir',
+          cwd,
+          // The reason a reply failed is only in the log; see opencodeLogError.
+          '--print-logs',
+          '--log-level',
+          'ERROR',
+          ...(model ? ['--model', model] : []),
+          full
+        ],
         env: { OPENCODE_CONFIG_CONTENT: '{"permission":{"*":"deny"}}' }
       }
     case 'gemini-cli':
@@ -145,12 +161,15 @@ export function cliInvocation(
 export async function runCli(options: CliRun): Promise<void> {
   const { provider, path, signal, onDelta } = options
   const cwd = await mkdtemp(join(tmpdir(), 'indent-ai-'))
+  // OpenCode logs why a reply failed and then waits in silence, so the run is stopped here.
+  const quiet = new AbortController()
+  let quietTimer: NodeJS.Timeout | undefined
   try {
     const { args, stdin, env } = cliInvocation(provider, options, cwd)
     const child = spawn(path, args, {
       cwd,
       env: { ...options.env, ...env },
-      signal,
+      signal: AbortSignal.any([signal, quiet.signal]),
       stdio: [stdin === undefined ? 'ignore' : 'pipe', 'pipe', 'pipe'],
       windowsHide: true
     })
@@ -158,6 +177,7 @@ export async function runCli(options: CliRun): Promise<void> {
     let final: string | undefined
     let failure: string | undefined
     let stderr = ''
+    let logged: string | undefined
     const push = lineSplitter((line) => {
       const parsed = parseCliLine(provider, line)
       if (parsed.delta) {
@@ -167,25 +187,43 @@ export async function runCli(options: CliRun): Promise<void> {
       if (parsed.final !== undefined) final = parsed.final
       if (parsed.error) failure ??= parsed.error
     })
-    child.stdout?.setEncoding('utf8').on('data', push)
+    const readLog = lineSplitter((line) => {
+      const reason = provider === 'opencode' ? opencodeLogError(line) : undefined
+      if (!reason) return
+      logged = `OpenCode could not answer: ${reason}`
+      clearTimeout(quietTimer)
+      quietTimer = setTimeout(
+        () => quiet.abort(new Error(logged)),
+        options.quietAfterErrorMs ?? QUIET_AFTER_ERROR_MS
+      )
+    })
+    child.stdout?.setEncoding('utf8').on('data', (chunk: string) => {
+      // Any output after a logged error means OpenCode tried again and got through.
+      clearTimeout(quietTimer)
+      push(chunk)
+    })
     child.stderr?.setEncoding('utf8').on('data', (chunk: string) => {
       stderr = (stderr + chunk).slice(-2000)
+      readLog(chunk)
     })
     if (stdin !== undefined) child.stdin?.end(stdin)
 
     const code = await new Promise<number | null>((resolve, reject) => {
       child.on('error', reject)
       child.on('close', resolve)
+    }).catch((error: unknown) => {
+      throw quiet.signal.aborted && !signal.aborted ? quiet.signal.reason : error
     })
     push('\n')
     if (signal.aborted) throw signal.reason
     if (failure) throw new Error(failure)
     if (!streamed && final) onDelta(final)
-    if (code !== 0 && !streamed) {
+    if (!streamed && (code !== 0 || logged)) {
       const lastLine = stderr.trim().split('\n').pop()
-      throw new Error(lastLine || `${CLI_BINS[provider]} exited with code ${code}`)
+      throw new Error(logged || lastLine || `${CLI_BINS[provider]} exited with code ${code}`)
     }
   } finally {
+    clearTimeout(quietTimer)
     await rm(cwd, { recursive: true, force: true })
   }
 }

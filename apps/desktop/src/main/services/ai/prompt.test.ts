@@ -263,6 +263,7 @@ describe('cliInvocation', () => {
   it('runs OpenCode with every permission denied', () => {
     const { args, env } = cliInvocation('opencode', run, '/tmp/x')
     expect(args.slice(0, 5)).toEqual(['run', '--format', 'json', '--dir', '/tmp/x'])
+    expect(args).toEqual(expect.arrayContaining(['--print-logs', '--log-level', 'ERROR']))
     expect(JSON.parse(env!.OPENCODE_CONFIG_CONTENT)).toEqual({ permission: { '*': 'deny' } })
   })
 })
