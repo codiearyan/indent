@@ -77,3 +77,9 @@ export function currentStreak(activity: ProgressState['activity'], today = new D
   }
   return streak
 }
+
+/** A practice reminder still goes out this long after its time, as after sleep; later it is skipped. */
+export const REMINDER_GRACE_MINUTES = 30
+export const SNOOZE_MINUTES = 60
+/** The length of a calendar session when the schedule has none. */
+export const DEFAULT_SESSION_MINUTES = 30

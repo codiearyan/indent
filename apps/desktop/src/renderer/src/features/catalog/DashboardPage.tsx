@@ -14,6 +14,7 @@ import { useProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
 import { parseDate, recentWeeks } from './activity'
 import { Heatmap } from './Heatmap'
+import { NextSession } from './NextSession'
 import { labProgress, type LabProgress } from './labStatus'
 import { goalLabIds, recommendedOrder } from './recommend'
 
@@ -86,6 +87,7 @@ export function DashboardPage(): React.JSX.Element {
               ? `Pass one task today to keep your ${streak} day streak.`
               : 'Pass a task today to start a streak.'}
         </p>
+        <NextSession activity={progress.activity} />
       </header>
 
       <div className="grid grid-cols-12 gap-6">
