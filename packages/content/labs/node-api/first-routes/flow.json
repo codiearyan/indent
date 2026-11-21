@@ -1,0 +1,131 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Booking page", "kind": "story" },
+      { "id": "app", "label": "createApp()", "kind": "file" },
+      { "id": "handle", "label": "handleRequest()", "kind": "function", "mine": true },
+      { "id": "fleet", "label": "fleet.js", "kind": "file" },
+      { "id": "send", "label": "sendJson()", "kind": "function", "mine": true },
+      { "id": "reply", "label": "Response", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "page", "to": "app", "label": "method and url" },
+      { "from": "app", "to": "handle", "label": "req, res" },
+      { "from": "fleet", "to": "handle", "label": "boats" },
+      { "from": "handle", "to": "send", "label": "status, body" },
+      { "from": "send", "to": "reply", "label": "JSON" },
+      { "from": "reply", "to": "page", "label": "answer" }
+    ],
+    "note": "Every request from Luka's booking page reaches handleRequest(), which picks an answer and sends it as JSON through sendJson()."
+  },
+  "tasks": {
+    "json": {
+      "steps": [
+        {
+          "active": ["handle", "handle->send"],
+          "value": {
+            "kind": "map",
+            "label": "what a route hands over",
+            "entries": [
+              { "key": "status", "value": "a number" },
+              { "key": "body", "value": "any JSON value" }
+            ]
+          },
+          "note": "A route calls sendJson() with the response, a status and a body, for example a note that the jetty at Lake Marrow is open."
+        },
+        {
+          "active": ["send"],
+          "note": "The body becomes JSON text first, because the size header has to describe that exact text."
+        },
+        {
+          "active": ["send"],
+          "value": {
+            "kind": "map",
+            "label": "headers on the answer",
+            "entries": [
+              { "key": "content-type", "value": "application/json; charset=utf-8" },
+              { "key": "content-length", "value": "size of the text in bytes" }
+            ]
+          },
+          "note": "The answer carries the status it was given and these two headers."
+        },
+        {
+          "active": ["send", "send->reply", "reply", "reply->page"],
+          "note": "The text goes out as the body and the response ends, so the booking page gets one complete answer."
+        }
+      ]
+    },
+    "routes": {
+      "steps": [
+        {
+          "active": ["page", "page->app", "app", "app->handle"],
+          "value": {
+            "kind": "map",
+            "label": "a request from the page",
+            "entries": [
+              { "key": "method", "value": "GET" },
+              { "key": "url", "value": "/boats?type=single" }
+            ]
+          },
+          "note": "Luka's page asks for the boats. The url it sends can carry a query string after the path."
+        },
+        {
+          "active": ["handle"],
+          "note": "handleRequest() looks only at the path part of the url, so /boats with or without a query string reaches the same route."
+        },
+        {
+          "active": ["handle", "fleet", "fleet->handle"],
+          "note": "GET /boats answers with the fleet from fleet.js, unchanged. GET /health answers that the API is up."
+        },
+        {
+          "active": ["handle", "handle->send", "send", "send->reply", "reply"],
+          "value": {
+            "kind": "map",
+            "label": "what goes back",
+            "entries": [
+              { "key": "status", "value": 200 },
+              { "key": "body", "value": "a list of boats" }
+            ]
+          },
+          "note": "Both routes answer through sendJson(), so the page always gets JSON with the right headers."
+        }
+      ]
+    },
+    "not-found": {
+      "steps": [
+        {
+          "active": ["page", "page->app", "app->handle", "handle"],
+          "value": {
+            "kind": "map",
+            "label": "two requests the API cannot serve",
+            "entries": [
+              { "key": "GET /paddles", "value": "no such path" },
+              { "key": "PUT /health", "value": "path exists" }
+            ]
+          },
+          "note": "Not every request matches a route. Luka will send some of these while he builds the page."
+        },
+        {
+          "active": ["handle", "handle->send", "send"],
+          "note": "A path with no route at all answers 404 with an error object whose code is not_found."
+        },
+        {
+          "active": ["handle", "handle->send", "send"],
+          "note": "A path that exists but not for this method answers 405 with the code method_not_allowed, plus an allow header naming the methods that path does accept."
+        },
+        {
+          "active": ["send", "send->reply", "reply", "reply->page"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of an error body",
+            "entries": [
+              { "key": "error.code", "value": "a short code" },
+              { "key": "error.message", "value": "a sentence for a developer" }
+            ]
+          },
+          "note": "Either way the page gets JSON it can read, never an empty answer."
+        }
+      ]
+    }
+  }
+}

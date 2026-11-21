@@ -1,0 +1,231 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "priya",
+        "label": "Priya",
+        "kind": "story"
+      },
+      {
+        "id": "alder",
+        "label": "Alder",
+        "kind": "story"
+      },
+      {
+        "id": "button",
+        "label": "Evening mode button",
+        "kind": "story"
+      },
+      {
+        "id": "theme",
+        "label": "theme.js",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "css",
+        "label": "styles.css",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "page",
+        "label": "What's on page",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "priya",
+        "to": "button",
+        "label": "click"
+      },
+      {
+        "from": "button",
+        "to": "theme",
+        "label": "click"
+      },
+      {
+        "from": "theme",
+        "to": "page",
+        "label": "data-theme"
+      },
+      {
+        "from": "css",
+        "to": "page",
+        "label": "colours, focus"
+      },
+      {
+        "from": "alder",
+        "to": "page",
+        "label": "Tab"
+      }
+    ],
+    "note": "Priya's button already flips a setting in theme.js but nothing answers it, and Alder's Tab key moves through the page without a trace. styles.css and theme.js fix both."
+  },
+  "tasks": {
+    "dark-theme": {
+      "steps": [
+        {
+          "active": [
+            "priya",
+            "priya->button",
+            "button",
+            "button->theme",
+            "theme"
+          ],
+          "note": "Priya presses Evening mode at three in the morning. theme.js sets data-theme=\"dark\" on the html element."
+        },
+        {
+          "active": [
+            "theme->page",
+            "page"
+          ],
+          "note": "No rule in styles.css matches that attribute yet, so the bright cream stays."
+        },
+        {
+          "active": [
+            "css"
+          ],
+          "note": "Add a rule that matches the dark theme. The task allows it to set only custom properties, and color-scheme."
+        },
+        {
+          "active": [
+            "css",
+            "css->page",
+            "page"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "text that must stay readable",
+            "values": [
+              "page text",
+              "an event description",
+              "an event date",
+              "a Save a place link"
+            ]
+          },
+          "note": "The background turns dark, and each of these keeps a contrast of at least 4.5 to 1 with what is behind it."
+        },
+        {
+          "active": [
+            "page"
+          ],
+          "note": "Without the attribute the light theme looks exactly as it did."
+        }
+      ]
+    },
+    "focus-ring": {
+      "steps": [
+        {
+          "active": [
+            "alder",
+            "alder->page",
+            "page"
+          ],
+          "note": "Alder presses Tab to move from link to link, and the page shows nothing at all."
+        },
+        {
+          "active": [
+            "css"
+          ],
+          "note": "Near the top of styles.css a rule takes the focus outline away from links, buttons and fields. That rule has to go."
+        },
+        {
+          "active": [
+            "css",
+            "css->page"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "what the keyboard lands on",
+            "values": [
+              "a link",
+              "a button",
+              "a text field"
+            ]
+          },
+          "note": "Add a focus rule that reaches all three, with an outline at least 2px thick."
+        },
+        {
+          "active": [
+            "page",
+            "alder"
+          ],
+          "note": "Now every Tab press shows Alder which link, button or field has the keyboard."
+        }
+      ]
+    },
+    "toggle-state": {
+      "steps": [
+        {
+          "active": [
+            "button"
+          ],
+          "note": "A screen reader reads the button as Evening mode, but not whether it is on or off."
+        },
+        {
+          "active": [
+            "button"
+          ],
+          "note": "Before anyone clicks, the button already says it is not pressed."
+        },
+        {
+          "active": [
+            "priya",
+            "priya->button",
+            "button",
+            "button->theme",
+            "theme",
+            "theme->page"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "after one click",
+            "entries": [
+              {
+                "key": "theme",
+                "value": "dark"
+              },
+              {
+                "key": "button",
+                "value": "pressed"
+              }
+            ]
+          },
+          "note": "One click turns the dark theme on, and the button says it is pressed."
+        },
+        {
+          "active": [
+            "button",
+            "button->theme",
+            "theme",
+            "theme->page",
+            "page"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "after a second click",
+            "entries": [
+              {
+                "key": "theme",
+                "value": "not dark"
+              },
+              {
+                "key": "button",
+                "value": "not pressed"
+              }
+            ]
+          },
+          "note": "A second click brings the light theme back, and the button says it is not pressed again."
+        },
+        {
+          "active": [
+            "page"
+          ],
+          "note": "Open the console in the Browser panel now and then. The page should have no script errors."
+        }
+      ]
+    }
+  }
+}

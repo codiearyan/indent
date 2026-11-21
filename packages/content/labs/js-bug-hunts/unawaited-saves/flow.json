@@ -1,0 +1,129 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "evening", "label": "Evening bookings", "kind": "data" },
+      { "id": "reproduce", "label": "reproduceEarlyReturn()", "kind": "function", "mine": true, "fn": "reproduceEarlyReturn" },
+      { "id": "store", "label": "createFakeStore()", "kind": "function", "fn": "createFakeStore" },
+      { "id": "sync", "label": "syncBookings()", "kind": "function", "mine": true, "fn": "syncBookings" },
+      { "id": "log", "label": "Sync log", "kind": "story" },
+      { "id": "test", "label": "sync.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "reproduce", "to": "store", "label": "a store" },
+      { "from": "reproduce", "to": "sync", "label": "evening, store" },
+      { "from": "evening", "to": "sync", "label": "bookings" },
+      { "from": "sync", "to": "store", "label": "save()" },
+      { "from": "sync", "to": "log", "label": "a count" },
+      { "from": "test", "to": "sync", "label": "fake stores" }
+    ],
+    "note": "syncBookings() saves the evening's bookings into the store, and on Sunday the log said they were saved while the online system had never heard of them."
+  },
+  "tasks": {
+    "reproduce": {
+      "trace": { "file": "src/reproduce.js", "call": "reproduceEarlyReturn", "args": [] },
+      "steps": [
+        {
+          "active": ["reproduce", "reproduce->store", "store"],
+          "note": "reproduceEarlyReturn() makes a store with createFakeStore(). Each save takes a little while, like the real one."
+        },
+        {
+          "active": ["evening", "reproduce->sync", "sync", "sync->store"],
+          "value": {
+            "kind": "map",
+            "label": "an evening booking",
+            "entries": [
+              { "key": "id", "value": "b101" },
+              { "key": "name", "value": "Amara" },
+              { "key": "boat", "value": "double kayak" }
+            ]
+          },
+          "note": "It awaits the original syncBookings() with the evening bookings and that store, and keeps what it resolved with as returned."
+        },
+        {
+          "active": ["reproduce", "store"],
+          "note": "Right after that await it reads store.saved().length as savedWhenReturned."
+        },
+        {
+          "active": ["reproduce", "store"],
+          "note": "Then it waits another 100 ms and reads the same length again as savedLater."
+        },
+        {
+          "active": ["reproduce", "sync->log", "log"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "returned", "value": "a number" },
+              { "key": "savedWhenReturned", "value": "a number" },
+              { "key": "savedLater", "value": "a number" }
+            ]
+          },
+          "note": "Three numbers go on CPC-31, next to what the Sunday log claimed."
+        }
+      ]
+    },
+    "fix": {
+      "steps": [
+        {
+          "active": ["evening", "evening->sync", "sync"],
+          "value": {
+            "kind": "map",
+            "label": "a booking",
+            "entries": [
+              { "key": "id", "value": "b103" },
+              { "key": "name", "value": "Priya" },
+              { "key": "boat", "value": "single kayak" }
+            ]
+          },
+          "note": "syncBookings() gets the evening's bookings and a store."
+        },
+        {
+          "active": ["sync", "sync->store", "store"],
+          "note": "It calls store.save(booking) for every booking, and each save takes a while to finish."
+        },
+        {
+          "active": ["sync", "sync->log", "log"],
+          "value": {
+            "kind": "map",
+            "label": "what it resolves with",
+            "entries": [{ "key": "count", "value": "the number of bookings" }]
+          },
+          "note": "It resolves with the number of bookings only after every save has finished, so the log tells the truth."
+        },
+        {
+          "active": ["store", "sync", "log"],
+          "note": "If a save fails, it rejects with that error, so a try...catch around the await sees it. No error escapes unhandled."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->sync", "sync", "store"],
+          "note": "sync.test.js runs syncBookings() with stores from createFakeStore, each with a small delayMs so the tests stay fast."
+        },
+        {
+          "active": ["sync", "sync->store", "store"],
+          "note": "It checks that every booking is in store.saved() as soon as syncBookings() resolves."
+        },
+        {
+          "active": ["store", "sync"],
+          "note": "It checks that when a save fails, set up with failOn, syncBookings() rejects with an error that names the booking."
+        },
+        {
+          "active": ["test", "sync"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the test file",
+            "entries": [
+              { "key": "original sync.js", "value": "must fail" },
+              { "key": "a correct fix", "value": "must pass" },
+              { "key": "await in front of forEach", "value": "must fail" }
+            ]
+          },
+          "note": "The file runs beside the original, beside a correct fix and beside a fix that puts await in front of forEach."
+        }
+      ]
+    }
+  }
+}

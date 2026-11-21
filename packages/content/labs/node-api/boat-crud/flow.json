@@ -1,0 +1,153 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "office", "label": "Back office", "kind": "story" },
+      { "id": "router", "label": "Router", "kind": "file" },
+      { "id": "handlers", "label": "Boat handlers", "kind": "file", "mine": true },
+      { "id": "validate", "label": "validateBoat()", "kind": "function" },
+      { "id": "store", "label": "createBoatStore()", "kind": "function", "mine": true },
+      { "id": "reply", "label": "Response", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "office", "to": "router", "label": "method and path" },
+      { "from": "router", "to": "handlers", "label": "req, res, { store, params }" },
+      { "from": "handlers", "to": "validate", "label": "body" },
+      { "from": "validate", "to": "handlers", "label": "known fields" },
+      { "from": "handlers", "to": "store", "label": "list, get, create, update, remove" },
+      { "from": "store", "to": "handlers", "label": "copies of boats" },
+      { "from": "handlers", "to": "reply", "label": "status and body" },
+      { "from": "reply", "to": "office", "label": "answer" }
+    ],
+    "note": "Bram changes the fleet from the back office: each request reaches a handler you write, which talks to the boat store you write."
+  },
+  "tasks": {
+    "store": {
+      "steps": [
+        {
+          "active": ["store"],
+          "value": {
+            "kind": "map",
+            "label": "a seed boat",
+            "entries": [
+              { "key": "code", "value": "TW-14" },
+              { "key": "name", "value": "Loon" },
+              { "key": "type", "value": "double" },
+              { "key": "hourlyCents", "value": 2400 }
+            ]
+          },
+          "note": "createBoatStore() starts from a seed list of boats and keeps its own copy, one entry per code."
+        },
+        {
+          "active": ["store", "store->handlers", "handlers"],
+          "value": {
+            "kind": "array",
+            "label": "the five methods it returns",
+            "values": ["list", "get", "create", "update", "remove"]
+          },
+          "note": "It hands back an object with five methods. list() keeps the order boats were added in."
+        },
+        {
+          "active": ["handlers", "handlers->store", "store"],
+          "value": {
+            "kind": "map",
+            "label": "when the code is not there",
+            "entries": [
+              { "key": "get", "value": "undefined" },
+              { "key": "update", "value": "undefined" },
+              { "key": "remove", "value": "false" }
+            ]
+          },
+          "note": "get(), update() and remove() each have a quiet answer for a code the store does not hold."
+        },
+        {
+          "active": ["store"],
+          "note": "create() with a code that is already taken throws a 409 conflict. update() merges the changes and never moves a boat to a new code."
+        },
+        {
+          "active": ["store", "store->handlers"],
+          "note": "Boats go in and come out as copies, so whatever a caller does to an object later, the store keeps what it had."
+        }
+      ]
+    },
+    "create-read": {
+      "steps": [
+        {
+          "active": ["office", "office->router", "router", "router->handlers", "handlers"],
+          "value": {
+            "kind": "map",
+            "label": "two requests from the back office",
+            "entries": [
+              { "key": "GET", "value": "/boats/:code" },
+              { "key": "POST", "value": "/boats" }
+            ]
+          },
+          "note": "The router fills params.code from the path and calls getBoat() or createBoat() with the store."
+        },
+        {
+          "active": ["handlers", "handlers->store", "store", "store->handlers"],
+          "note": "getBoat() asks the store for that code. A boat answers 200 with it, and no boat answers 404 with the code not_found."
+        },
+        {
+          "active": ["handlers", "handlers->validate", "validate", "validate->handlers"],
+          "value": {
+            "kind": "map",
+            "label": "a new boat Bram posts",
+            "entries": [
+              { "key": "code", "value": "TW-14" },
+              { "key": "name", "value": "Loon" },
+              { "key": "type", "value": "double" },
+              { "key": "hourlyCents", "value": 2400 }
+            ]
+          },
+          "note": "createBoat() reads the body with readJson() and checks it with validateBoat() before anything is stored."
+        },
+        {
+          "active": ["handlers", "handlers->store", "store"],
+          "note": "The checked boat goes into the store, which keeps its own copy."
+        },
+        {
+          "active": ["handlers", "handlers->reply", "reply", "reply->office"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of a created answer",
+            "entries": [
+              { "key": "status", "value": 201 },
+              { "key": "location", "value": "the new boat's path" },
+              { "key": "body", "value": "the stored boat" }
+            ]
+          },
+          "note": "Bram gets 201 with the boat as it was stored, and a location header pointing at its own path. A code that already exists answers 409 with the code conflict instead."
+        }
+      ]
+    },
+    "update-delete": {
+      "steps": [
+        {
+          "active": ["office", "office->router", "router", "router->handlers", "handlers"],
+          "value": {
+            "kind": "map",
+            "label": "a change Bram sends for TW-14",
+            "entries": [{ "key": "available", "value": "false" }]
+          },
+          "note": "Loon needs new straps, so Bram sends PATCH /boats/TW-14 to mark her as not available."
+        },
+        {
+          "active": ["handlers", "handlers->validate", "validate", "validate->handlers"],
+          "note": "updateBoat() checks the body with validateBoat() in partial mode, where every field is optional and a new code is refused."
+        },
+        {
+          "active": ["handlers", "handlers->store", "store", "store->handlers"],
+          "note": "The store merges the change, and updateBoat() answers 200 with the whole boat, every field included."
+        },
+        {
+          "active": ["handlers", "handlers->store", "store"],
+          "note": "When Loon is sold, DELETE /boats/TW-14 takes her out of the store."
+        },
+        {
+          "active": ["handlers", "handlers->reply", "reply", "reply->office"],
+          "note": "A delete answers 204 with no body. Both routes answer 404 with the code not_found when there is no such boat."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,217 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "family",
+        "label": "Dev's family",
+        "kind": "story"
+      },
+      {
+        "id": "browser",
+        "label": "Phone or laptop",
+        "kind": "story"
+      },
+      {
+        "id": "html",
+        "label": "index.html",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "css",
+        "label": "styles.css",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "booking",
+        "label": "A place at homework club",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "family",
+        "to": "browser",
+        "label": "taps, keys"
+      },
+      {
+        "from": "html",
+        "to": "browser",
+        "label": "the form"
+      },
+      {
+        "from": "css",
+        "to": "browser",
+        "label": "its look"
+      },
+      {
+        "from": "browser",
+        "to": "booking",
+        "label": "sends"
+      }
+    ],
+    "note": "The sign-up form in index.html only looks like a form, so neither a phone nor a keyboard can send it, and the homework club stays nearly empty."
+  },
+  "tasks": {
+    "labels": {
+      "steps": [
+        {
+          "active": [
+            "html"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "the fields, by name",
+            "values": [
+              "name",
+              "email",
+              "phone",
+              "event",
+              "event",
+              "people",
+              "newsletter"
+            ]
+          },
+          "note": "The form has these fields. The check finds them by their name, so every name stays as it is."
+        },
+        {
+          "active": [
+            "family",
+            "family->browser",
+            "browser"
+          ],
+          "note": "Dev lands on the email field. The words Email sit right above it, yet nothing tells the browser they belong to it."
+        },
+        {
+          "active": [
+            "html"
+          ],
+          "note": "Give every field a label element of its own that is tied to it and has words in it."
+        },
+        {
+          "active": [
+            "html"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "the two event choices",
+            "values": [
+              "Homework club, Thursday 10 December",
+              "History walk, Saturday 19 December"
+            ]
+          },
+          "note": "The two event choices share one name, but each choice still needs its own label."
+        },
+        {
+          "active": [
+            "html->browser",
+            "browser",
+            "family"
+          ],
+          "note": "Now a screen reader says what each field is for, and clicking the words picks the field."
+        }
+      ]
+    },
+    "types": {
+      "steps": [
+        {
+          "active": [
+            "family",
+            "family->browser",
+            "browser"
+          ],
+          "note": "On Dev's phone every field opens the same letter keyboard, and the form takes any answer at all, even an empty one."
+        },
+        {
+          "active": [
+            "html",
+            "html->browser"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "what each field expects",
+            "entries": [
+              {
+                "key": "name",
+                "value": "a name, needed"
+              },
+              {
+                "key": "email",
+                "value": "an email address, needed"
+              },
+              {
+                "key": "phone",
+                "value": "a phone number, optional"
+              },
+              {
+                "key": "people",
+                "value": "a number, with a smallest and a largest"
+              },
+              {
+                "key": "event",
+                "value": "one choice, needed"
+              }
+            ]
+          },
+          "note": "Write down in index.html what each field expects, as the task lists it."
+        },
+        {
+          "active": [
+            "browser"
+          ],
+          "note": "Tell the browser, and it does the rest: the right keyboard on a phone, and a form that will not send while something needed is missing."
+        },
+        {
+          "active": [
+            "browser",
+            "browser->booking",
+            "booking"
+          ],
+          "note": "Only a form that is ready reaches the library, so every booking has a name, an address and an event."
+        }
+      ]
+    },
+    "form-and-button": {
+      "steps": [
+        {
+          "active": [
+            "family",
+            "family->browser",
+            "browser"
+          ],
+          "note": "Dev's son presses Tab again and again on the laptop, but the yellow button at the bottom is never reached."
+        },
+        {
+          "active": [
+            "html"
+          ],
+          "note": "There is no form element yet, so there is nothing to send. Wrap all the fields in one form and keep the class signup on it."
+        },
+        {
+          "active": [
+            "html",
+            "html->browser"
+          ],
+          "note": "A screen reader should hear the question before the two event choices. Put the choices in one group with a caption that has words in it."
+        },
+        {
+          "active": [
+            "html",
+            "html->browser",
+            "browser"
+          ],
+          "note": "The last thing in the form is a real submit button with words on it, and nothing on the page only looks like a button any more."
+        },
+        {
+          "active": [
+            "browser",
+            "browser->booking",
+            "booking"
+          ],
+          "note": "Tab reaches the button, Enter sends the form, and a place at homework club is saved."
+        }
+      ]
+    }
+  }
+}

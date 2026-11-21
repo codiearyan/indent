@@ -1,0 +1,184 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Booking page", "kind": "story" },
+      { "id": "list", "label": "listBoats()", "kind": "function", "mine": true },
+      { "id": "parse", "label": "parseListQuery()", "kind": "function", "mine": true },
+      { "id": "store", "label": "store.list()", "kind": "data" },
+      { "id": "apply", "label": "applyListQuery()", "kind": "function", "mine": true, "fn": "applyListQuery" },
+      { "id": "envelope", "label": "{ data, total, limit, offset }", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "page", "to": "list", "label": "GET /boats?..." },
+      { "from": "list", "to": "parse", "label": "query string" },
+      { "from": "parse", "to": "apply", "label": "typed query" },
+      { "from": "store", "to": "apply", "label": "boats" },
+      { "from": "apply", "to": "envelope", "label": "one page" },
+      { "from": "envelope", "to": "page", "label": "answer" }
+    ],
+    "note": "Luka's page asks for a slice of the fleet in the query string, and your functions turn it into one page of boats with a count of all the matches."
+  },
+  "tasks": {
+    "parse-query": {
+      "steps": [
+        {
+          "active": ["page", "page->list", "list", "list->parse", "parse"],
+          "value": {
+            "kind": "map",
+            "label": "?type=paddleboard&available=true&sort=-name&limit=5",
+            "entries": [
+              { "key": "type", "value": "paddleboard" },
+              { "key": "available", "value": "true" },
+              { "key": "sort", "value": "-name" },
+              { "key": "limit", "value": "5" }
+            ]
+          },
+          "note": "Luka's page wants available paddleboards by name, last first, five at a time. parseListQuery() gets these as URLSearchParams."
+        },
+        {
+          "active": ["parse"],
+          "value": {
+            "kind": "map",
+            "label": "the defaults",
+            "entries": [
+              { "key": "type", "value": "null" },
+              { "key": "available", "value": "null" },
+              { "key": "sortBy", "value": "code" },
+              { "key": "order", "value": "asc" },
+              { "key": "limit", "value": 10 },
+              { "key": "offset", "value": 0 }
+            ]
+          },
+          "note": "Anything not given keeps its default, and parameters the API does not know are ignored."
+        },
+        {
+          "active": ["parse"],
+          "note": "type must be one of BOAT_TYPES and available must say true or false. sort names code, name or hourlyCents, and a leading - asks for descending."
+        },
+        {
+          "active": ["parse"],
+          "note": "limit is a whole number from 1 to 50 and offset a whole number from 0, written with digits only."
+        },
+        {
+          "active": ["parse", "parse->apply"],
+          "value": {
+            "kind": "map",
+            "label": "the shape that comes out",
+            "entries": [
+              { "key": "type", "value": "a boat type or null" },
+              { "key": "available", "value": "a boolean or null" },
+              { "key": "sortBy", "value": "a field name" },
+              { "key": "order", "value": "asc or desc" },
+              { "key": "limit", "value": "a number" },
+              { "key": "offset", "value": "a number" }
+            ]
+          },
+          "note": "A good query comes out as this object. Any bad value throws a 400 invalid_query, with one detail per bad parameter."
+        }
+      ]
+    },
+    "apply-query": {
+      "trace": {
+        "file": "src/listQuery.js",
+        "call": "applyListQuery",
+        "args": [
+          [
+            { "code": "TW-21", "name": "Puffin", "type": "single", "hourlyCents": 1700, "available": true },
+            { "code": "TW-22", "name": "Coot", "type": "double", "hourlyCents": 2500, "available": true },
+            { "code": "TW-23", "name": "Ibis", "type": "single", "hourlyCents": 1700, "available": false },
+            { "code": "TW-24", "name": "Gull", "type": "single", "hourlyCents": 2100, "available": true },
+            { "code": "TW-25", "name": "Swift", "type": "single", "hourlyCents": 1900, "available": true }
+          ],
+          { "type": "single", "available": true, "sortBy": "hourlyCents", "order": "desc", "limit": 2, "offset": 0 }
+        ]
+      },
+      "steps": [
+        {
+          "active": ["store", "store->apply", "apply"],
+          "value": {
+            "kind": "map",
+            "label": "the boats that come in",
+            "entries": [
+              { "key": "TW-21 Puffin", "value": "single, available" },
+              { "key": "TW-22 Coot", "value": "double, available" },
+              { "key": "TW-23 Ibis", "value": "single, out" },
+              { "key": "TW-24 Gull", "value": "single, available" },
+              { "key": "TW-25 Swift", "value": "single, available" }
+            ]
+          },
+          "note": "Five boats come in from the store, and this array must look the same when the function is done."
+        },
+        {
+          "active": ["parse->apply", "apply"],
+          "value": {
+            "kind": "map",
+            "label": "the query",
+            "entries": [
+              { "key": "type", "value": "single" },
+              { "key": "available", "value": "true" },
+              { "key": "sortBy", "value": "hourlyCents" },
+              { "key": "order", "value": "desc" },
+              { "key": "limit", "value": 2 },
+              { "key": "offset", "value": 0 }
+            ]
+          },
+          "note": "Luka wants available singles, dearest first, two to a page."
+        },
+        {
+          "active": ["apply"],
+          "note": "Only boats whose type and available match the query are kept. A null in the query means that field is not filtered."
+        },
+        {
+          "active": ["apply"],
+          "note": "The matches are ordered by sortBy in the query's order. Boats with the same value go by code, ascending, either way."
+        },
+        {
+          "active": ["apply", "apply->envelope", "envelope"],
+          "value": {
+            "kind": "map",
+            "label": "the shape that comes back",
+            "entries": [
+              { "key": "data", "value": "at most limit boats" },
+              { "key": "total", "value": "every match" },
+              { "key": "limit", "value": "from the query" },
+              { "key": "offset", "value": "from the query" }
+            ]
+          },
+          "note": "data starts at offset and holds at most limit boats. total counts the matches before paging, so Luka can number his pages."
+        }
+      ]
+    },
+    "list-route": {
+      "steps": [
+        {
+          "active": ["page", "page->list", "list"],
+          "value": {
+            "kind": "map",
+            "label": "a request from the page",
+            "entries": [
+              { "key": "method", "value": "GET" },
+              { "key": "url", "value": "/boats?type=paddleboard&limit=5" }
+            ]
+          },
+          "note": "The booking page asks for paddleboards, five at a time, and the router calls listBoats()."
+        },
+        {
+          "active": ["list", "list->parse", "parse"],
+          "note": "listBoats() reads the query string from req.url and hands it to parseListQuery()."
+        },
+        {
+          "active": ["parse", "parse->apply", "store", "store->apply", "apply"],
+          "note": "applyListQuery() gets the typed query and the boats from store.list(), so boats Bram just added show up too."
+        },
+        {
+          "active": ["apply", "apply->envelope", "envelope", "envelope->page"],
+          "note": "The page gets 200 with the envelope { data, total, limit, offset }."
+        },
+        {
+          "active": ["parse", "envelope->page"],
+          "note": "A bad parameter answers 400 with the code invalid_query and its details instead."
+        }
+      ]
+    }
+  }
+}

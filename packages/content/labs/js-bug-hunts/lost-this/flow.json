@@ -1,0 +1,119 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "reproduce", "label": "reproduceLostThis()", "kind": "function", "mine": true, "fn": "reproduceLostThis" },
+      { "id": "fleet", "label": "fleet.js", "kind": "file", "mine": true },
+      { "id": "create", "label": "createScanner()", "kind": "function", "fn": "createScanner" },
+      { "id": "connect", "label": "connectScanner()", "kind": "function", "fn": "connectScanner" },
+      { "id": "scanner", "label": "Dock scanner", "kind": "story" },
+      { "id": "board", "label": "Free boat list", "kind": "story" },
+      { "id": "test", "label": "fleet.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "reproduce", "to": "fleet", "label": "new Fleet" },
+      { "from": "reproduce", "to": "create", "label": "a scanner" },
+      { "from": "create", "to": "scanner", "label": "scan()" },
+      { "from": "reproduce", "to": "connect", "label": "scanner, fleet" },
+      { "from": "connect", "to": "fleet", "label": "checkOut, checkIn" },
+      { "from": "scanner", "to": "fleet", "label": "a boat id" },
+      { "from": "fleet", "to": "board", "label": "freeBoats()" },
+      { "from": "test", "to": "fleet", "label": "the dock's way" }
+    ],
+    "note": "The dock scanner and the free boat list both lean on Fleet, and on the first morning with the scanner neither of them worked."
+  },
+  "tasks": {
+    "reproduce": {
+      "trace": { "file": "src/reproduce.js", "call": "reproduceLostThis", "args": [] },
+      "steps": [
+        {
+          "active": ["reproduce", "reproduce->fleet", "fleet"],
+          "value": { "kind": "array", "label": "the fleet", "values": ["K1", "K2", "P1"] },
+          "note": "reproduceLostThis() makes a fleet of three boats with the original Fleet."
+        },
+        {
+          "active": ["fleet", "fleet->board", "board"],
+          "note": "It asks the fleet for freeBoats(), the call behind the board's list, and keeps the message of the error it throws."
+        },
+        {
+          "active": ["reproduce", "reproduce->create", "create", "create->scanner", "scanner"],
+          "note": "Then it makes a scanner with createScanner() from dock.js."
+        },
+        {
+          "active": ["reproduce", "reproduce->connect", "connect", "connect->fleet", "fleet"],
+          "note": "connectScanner() wires that scanner to the fleet, the same way the dock does each morning."
+        },
+        {
+          "active": ["scanner", "scanner->fleet", "fleet"],
+          "note": "A scan of K1 going out throws as well, and it keeps that error's message too."
+        },
+        {
+          "active": ["reproduce"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "freeBoatsError", "value": "text" },
+              { "key": "scannerError", "value": "text" }
+            ]
+          },
+          "note": "Both messages go back as strings, ready to paste into CPC-23."
+        }
+      ]
+    },
+    "fix": {
+      "steps": [
+        {
+          "active": ["fleet"],
+          "value": { "kind": "array", "label": "a fleet", "values": ["K1", "D1", "P1"] },
+          "note": "A Fleet keeps its own boats and which of them are out on the water."
+        },
+        {
+          "active": ["connect", "connect->fleet", "scanner", "scanner->fleet", "fleet"],
+          "note": "checkOut, checkIn and isFree must keep working when they are taken off the fleet and called as plain functions, like the scanner's handlers."
+        },
+        {
+          "active": ["fleet"],
+          "note": "Each method stays tied to the fleet it came from. Two fleets never share boats."
+        },
+        {
+          "active": ["fleet", "fleet->board", "board"],
+          "value": {
+            "kind": "map",
+            "label": "after D1 goes out",
+            "entries": [{ "key": "freeBoats()", "value": "the other ids, in fleet order" }]
+          },
+          "note": "freeBoats() gives the ids of the boats that are not out, in fleet order."
+        },
+        {
+          "active": ["scanner", "scanner->fleet", "fleet"],
+          "note": "Checking out a boat that is already out still throws an error that says already out. dock.js stays as it is."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->fleet", "fleet", "fleet->board", "board"],
+          "note": "fleet.test.js checks freeBoats() after a boat is checked out."
+        },
+        {
+          "active": ["test", "create", "connect", "connect->fleet", "scanner", "scanner->fleet", "fleet"],
+          "note": "It also checks boats out and in through a scanner from dock.js, wired with connectScanner()."
+        },
+        {
+          "active": ["test", "fleet"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the test file",
+            "entries": [
+              { "key": "original fleet.js", "value": "must fail" },
+              { "key": "a correct fix", "value": "must pass" },
+              { "key": "only repairs freeBoats", "value": "must fail" }
+            ]
+          },
+          "note": "The file runs beside the original, beside a correct fix and beside a fix that only repairs the call inside freeBoats."
+        }
+      ]
+    }
+  }
+}

@@ -1,11 +1,11 @@
 import { execFileSync } from 'node:child_process'
-import { cp, mkdtemp, readFile, readdir, rm } from 'node:fs/promises'
+import { cp, mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { expect, it } from 'vitest'
 import { compareTrace } from './trace'
-import type { Flow, TraceResult } from './types'
+import type { Flow, LabMeta, TraceResult } from './types'
 
 const content = fileURLToPath(new URL('../../../../packages/content/', import.meta.url))
 const repos: { labId: string; expected: string[] }[] = [
@@ -44,6 +44,22 @@ const repos: { labId: string; expected: string[] }[] = [
       'many-at-once/settled',
       'retries-and-cancellation/sleep'
     ]
+  },
+  {
+    labId: 'node-api',
+    expected: ['json-bodies/validate', 'list-queries/apply-query', 'auth-and-errors/request-ids']
+  },
+  {
+    labId: 'js-bug-hunts',
+    expected: [
+      'cent-off-totals/reproduce',
+      'cent-off-totals/fix',
+      'reordered-departures/reproduce',
+      'reordered-departures/fix',
+      'same-reminder/reproduce',
+      'lost-this/reproduce',
+      'unawaited-saves/reproduce'
+    ]
   }
 ]
 
@@ -54,14 +70,15 @@ it.each(repos)(
     const scratch = await mkdtemp(join(tmpdir(), 'indent-trace-examples-'))
     try {
       const examples: string[] = []
-      for (const issue of await readdir(repo, { withFileTypes: true })) {
-        if (!issue.isDirectory()) continue
-        const chapter = join(repo, issue.name)
+      // Only the issues lab.json lists: a repo can hold other folders, such as shared code.
+      const lab: LabMeta = JSON.parse(await readFile(join(repo, 'lab.json'), 'utf8'))
+      for (const name of lab.parts.flatMap((part) => part.chapters)) {
+        const chapter = join(repo, name)
         const flow: Flow = JSON.parse(await readFile(join(chapter, 'flow.json'), 'utf8'))
-        const workspace = join(scratch, issue.name)
+        const workspace = join(scratch, name)
         for (const [taskId, task] of Object.entries(flow.tasks ?? {})) {
           if (!task.trace) continue
-          examples.push(`${issue.name}/${taskId}`)
+          examples.push(`${name}/${taskId}`)
           await cp(join(chapter, 'starter'), workspace, { recursive: true })
           await cp(join(chapter, 'solution'), workspace, { recursive: true })
           const stdout = execFileSync(

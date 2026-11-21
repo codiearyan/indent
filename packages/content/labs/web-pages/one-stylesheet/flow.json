@@ -1,0 +1,175 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "ruth",
+        "label": "Ruth",
+        "kind": "story"
+      },
+      {
+        "id": "html",
+        "label": "index.html",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "css",
+        "label": "styles.css",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "page",
+        "label": "What's on page",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "ruth",
+        "to": "css",
+        "label": "one new cream"
+      },
+      {
+        "from": "html",
+        "to": "page",
+        "label": "content, style attributes"
+      },
+      {
+        "from": "css",
+        "to": "page",
+        "label": "rules"
+      }
+    ],
+    "note": "The page's look is spread over forty style attributes in index.html, and by the end it lives in styles.css alone, where one colour is one edit."
+  },
+  "tasks": {
+    "no-inline": {
+      "steps": [
+        {
+          "active": [
+            "ruth",
+            "ruth->css"
+          ],
+          "note": "Ruth wants a warmer cream to match the new signs. Today that one colour is typed again and again across index.html."
+        },
+        {
+          "active": [
+            "html",
+            "html->page"
+          ],
+          "note": "Search index.html for style attributes. Each one styles a single element and nothing else."
+        },
+        {
+          "active": [
+            "html",
+            "css"
+          ],
+          "note": "Move every declaration into styles.css. Add a class where you need a hook, or use a selector for an element that is already there."
+        },
+        {
+          "active": [
+            "css",
+            "css->page",
+            "page"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "what must look the same",
+            "values": [
+              "header and footer",
+              "page title",
+              "event cards",
+              "event titles",
+              "card footers",
+              "submit button"
+            ]
+          },
+          "note": "When index.html has no style attribute and no style element left, the page still looks exactly as it did."
+        }
+      ]
+    },
+    "custom-properties": {
+      "steps": [
+        {
+          "active": [
+            "css"
+          ],
+          "note": "styles.css now holds every rule, but the same colours are still written out in many of them."
+        },
+        {
+          "active": [
+            "css"
+          ],
+          "note": "Give the page's colours names as custom properties on :root. Pick the names yourself."
+        },
+        {
+          "active": [
+            "css",
+            "css->page"
+          ],
+          "note": "Every other rule uses a name instead of spelling out a colour, so each colour value is written once."
+        },
+        {
+          "active": [
+            "css"
+          ],
+          "note": "Do the same for the page's spacing, and use at least one of those names in a padding, a margin or a gap."
+        },
+        {
+          "active": [
+            "ruth",
+            "ruth->css",
+            "css->page",
+            "page"
+          ],
+          "note": "Next time Ruth asks for a new cream, it is one edit and every part of the page follows."
+        }
+      ]
+    },
+    "no-important": {
+      "steps": [
+        {
+          "active": [
+            "page"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "inside an event card",
+            "entries": [
+              {
+                "key": "date",
+                "value": "green"
+              },
+              {
+                "key": "description",
+                "value": "grey"
+              }
+            ]
+          },
+          "note": "In each event card the date should be green and the description grey."
+        },
+        {
+          "active": [
+            "css"
+          ],
+          "note": "Two rules in styles.css both reach the date, and the dates only come out green because of !important."
+        },
+        {
+          "active": [
+            "css"
+          ],
+          "note": "Take the !important out and the date turns grey. Change the selectors so the right rule wins on its own."
+        },
+        {
+          "active": [
+            "css",
+            "css->page",
+            "page"
+          ],
+          "note": "With no !important anywhere, every date is green again and every description is still grey."
+        }
+      ]
+    }
+  }
+}

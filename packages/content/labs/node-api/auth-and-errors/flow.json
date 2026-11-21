@@ -1,0 +1,144 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "office", "label": "Back office", "kind": "story" },
+      { "id": "app", "label": "createApp()", "kind": "file" },
+      { "id": "id", "label": "requestIdFor()", "kind": "function", "mine": true, "fn": "requestIdFor" },
+      { "id": "auth", "label": "requireStaff()", "kind": "function", "mine": true },
+      { "id": "handlers", "label": "Write handlers", "kind": "file" },
+      { "id": "errors", "label": "handleError()", "kind": "function", "mine": true },
+      { "id": "log", "label": "Team log", "kind": "story" },
+      { "id": "reply", "label": "Response", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "office", "to": "app", "label": "request" },
+      { "from": "app", "to": "id", "label": "req" },
+      { "from": "id", "to": "app", "label": "x-request-id" },
+      { "from": "app", "to": "handlers", "label": "req, res" },
+      { "from": "handlers", "to": "auth", "label": "req, res, tokens" },
+      { "from": "auth", "to": "handlers", "label": "role" },
+      { "from": "handlers", "to": "reply", "label": "status and body" },
+      { "from": "handlers", "to": "errors", "label": "thrown error" },
+      { "from": "errors", "to": "log", "label": "the details" },
+      { "from": "errors", "to": "reply", "label": "safe JSON" },
+      { "from": "reply", "to": "office", "label": "answer" }
+    ],
+    "note": "Every request gets an id, only staff may change the fleet, and every error leaves through one place."
+  },
+  "tasks": {
+    "auth": {
+      "steps": [
+        {
+          "active": ["office", "office->app", "app", "app->handlers", "handlers"],
+          "value": {
+            "kind": "map",
+            "label": "requests that change the fleet",
+            "entries": [
+              { "key": "POST", "value": "/boats" },
+              { "key": "PATCH", "value": "/boats/:code" },
+              { "key": "DELETE", "value": "/boats/:code" }
+            ]
+          },
+          "note": "These three handlers change the fleet. GET routes stay open, because the public booking page needs them."
+        },
+        {
+          "active": ["handlers", "handlers->auth", "auth"],
+          "value": {
+            "kind": "map",
+            "label": "the tokens map",
+            "entries": [
+              { "key": "shed-key-5d20", "value": "staff" },
+              { "key": "kiosk-key-88b1", "value": "viewer" }
+            ]
+          },
+          "note": "Each write handler calls requireStaff() at its very start, with the request, the response and the map from token to role."
+        },
+        {
+          "active": ["auth"],
+          "note": "No authorization header, one that is not Bearer and a token, or a token not in the map: the answer is 401 unauthorized, with www-authenticate: Bearer on the response."
+        },
+        {
+          "active": ["auth"],
+          "note": "A token the map knows whose role is not staff gets 403 forbidden. The word Bearer may arrive in any case."
+        },
+        {
+          "active": ["auth", "auth->handlers", "handlers", "handlers->reply"],
+          "note": "A staff token returns its role, and the handler goes on to change the fleet as before."
+        }
+      ]
+    },
+    "error-handler": {
+      "steps": [
+        {
+          "active": ["handlers", "handlers->errors", "errors"],
+          "note": "Whatever a handler throws, the catch in createApp() hands it to handleError() with the log from the options."
+        },
+        {
+          "active": ["errors", "errors->reply", "reply"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of an HttpError answer",
+            "entries": [
+              { "key": "error.code", "value": "the error's code" },
+              { "key": "error.message", "value": "the error's message" },
+              { "key": "error.details", "value": "the error's details" },
+              { "key": "requestId", "value": "the x-request-id header" }
+            ]
+          },
+          "note": "An HttpError answers with its own status and this body."
+        },
+        {
+          "active": ["errors", "errors->log", "log"],
+          "note": "Any other error is a bug. handleError() calls log() with the error."
+        },
+        {
+          "active": ["errors", "errors->reply", "reply", "reply->office"],
+          "note": "The client gets 500 with the code internal_error, a fixed sentence that says nothing about the error, and the requestId."
+        },
+        {
+          "active": ["errors"],
+          "note": "If the response has already started, handleError() destroys it instead of answering."
+        }
+      ]
+    },
+    "request-ids": {
+      "trace": {
+        "file": "src/requestId.js",
+        "call": "requestIdFor",
+        "args": [{ "method": "GET", "url": "/health", "headers": { "x-request-id": "kiosk-shed.0315" } }]
+      },
+      "steps": [
+        {
+          "active": ["office", "office->app", "app", "app->id", "id"],
+          "value": {
+            "kind": "map",
+            "label": "headers on the incoming request",
+            "entries": [{ "key": "x-request-id", "value": "kiosk-shed.0315" }]
+          },
+          "note": "The kiosk in the shed sends its own id with a request. createApp() calls requestIdFor() before anything else runs."
+        },
+        {
+          "active": ["id"],
+          "note": "An incoming id of 1 to 64 characters, all letters, digits, dots, underscores or dashes, is kept as it is."
+        },
+        {
+          "active": ["id"],
+          "note": "No header, or one of any other shape, gets a new id from randomUUID() instead."
+        },
+        {
+          "active": ["id", "id->app", "app"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "id", "value": "a string" }]
+          },
+          "note": "createApp() sets the id as the x-request-id header of the response, so every answer carries it, 404s and errors included."
+        },
+        {
+          "active": ["app", "app->handlers", "handlers", "handlers->errors", "errors", "errors->reply", "reply"],
+          "note": "handleError() puts the same value in error bodies as requestId, so Ines can match a customer's screenshot to the team's log."
+        }
+      ]
+    }
+  }
+}
