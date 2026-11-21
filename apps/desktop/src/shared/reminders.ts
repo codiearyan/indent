@@ -148,13 +148,11 @@ export function reminderText({
   const waiting = target
     ? `Issue ${target.number} of ${target.count} in ${target.labTitle} is waiting.`
     : 'Pick a repo and start its first issue.'
+  const title = 'Time to practice'
   if (streak > 0) {
-    return {
-      title: `Keep your ${streak} day streak`,
-      body: `${waiting} Pass one task to keep your ${streak} day streak.`
-    }
+    return { title, body: `${waiting} Pass one task to keep your ${streak} day streak.` }
   }
-  return { title: 'Time to practice', body: minutes ? `${waiting} ${minutes} minutes?` : waiting }
+  return { title, body: minutes ? `${waiting} ${minutes} minutes?` : waiting }
 }
 
 const plural = (day: Weekday): string => `${DAY_NAMES[day]}s`

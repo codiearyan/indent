@@ -141,7 +141,7 @@ describe('reminderText', () => {
 
   it('names a streak at risk', () => {
     expect(reminderText({ target, minutes: 20, streak: 6 })).toEqual({
-      title: 'Keep your 6 day streak',
+      title: 'Time to practice',
       body: 'Issue 3 of 5 in Tidy ledgers is waiting. Pass one task to keep your 6 day streak.'
     })
   })
