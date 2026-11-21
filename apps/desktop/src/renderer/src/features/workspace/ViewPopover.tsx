@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Keyboard, RotateCcw, Settings, SlidersHorizontal } from 'lucide-react'
+import { ShortcutKeys } from '@/components/app/ShortcutKeys'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
@@ -7,7 +8,6 @@ import { LayoutControls, TextSizeControls } from '@/features/settings/controls'
 import { useSettingsDialog } from '@/features/settings/dialogStore'
 import { useShortcutList } from '@/features/shortcuts/dialogStore'
 import { TOUR } from '@/features/tour/anchors'
-import { shortcutLabel } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { TEXT_SCALE_PRESETS, useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
@@ -106,7 +106,7 @@ export function ViewPopover(): React.JSX.Element {
               <Keyboard />
               Keyboard shortcuts
               <span className="ml-auto font-mono text-xs text-muted-foreground">
-                {shortcutLabel('shortcutList')}
+                <ShortcutKeys id="shortcutList" />
               </span>
             </button>
             <button

@@ -1,12 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { fontStack } from '@/lib/fonts'
-import { monacoShortcut } from '@/lib/shortcuts'
+import { monacoShortcut, SHORTCUTS } from '@/lib/shortcuts'
 import { useSettings, type Typography } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { bindSuggestShortcut } from '@/features/ai/inlineSuggestions'
 import { bindTutorActions } from '@/features/ai/tutorActions'
 import { TOUR } from '@/features/tour/anchors'
 import { languageFor, monaco, pathOf, themeName, uriFor } from './monaco'
+import { bindShortcuts } from './shortcutBindings'
 
 const fontOptions = (t: Typography, scale: number): monaco.editor.IEditorOptions => ({
   fontFamily: fontStack(t.monoFont, 'mono'),
@@ -53,19 +54,39 @@ export function CodeEditor({ editorRef, onEdit, onCheck, onRun }: Props): React.
       renderLineHighlight: 'line'
     })
     editorRef.current = editor
-    editor.addCommand(monacoShortcut('save', monaco), () => {
-      void useWorkspace.getState().flush()
-    })
-    editor.addCommand(monacoShortcut('check', monaco), onCheck)
-    editor.addCommand(monacoShortcut('runCommand', monaco), () => {
-      // Without a command to run, the keys keep the editor's own meaning.
-      if (useWorkspace.getState().chapter?.terminal.suggestedCommand) onRun()
-      else editor.trigger('keyboard', 'editor.action.insertLineBefore', null)
-    })
-    editor.addCommand(monacoShortcut('closeFile', monaco), () => {
-      const { activePath, closeFile } = useWorkspace.getState()
-      if (activePath) closeFile(activePath)
-    })
+    bindShortcuts(editor, () => [
+      editor.addAction({
+        id: 'indent.save',
+        label: SHORTCUTS.save.label,
+        keybindings: [monacoShortcut('save', monaco)],
+        run: () => void useWorkspace.getState().flush()
+      }),
+      editor.addAction({
+        id: 'indent.check',
+        label: SHORTCUTS.check.label,
+        keybindings: [monacoShortcut('check', monaco)],
+        run: onCheck
+      }),
+      editor.addAction({
+        id: 'indent.runCommand',
+        label: SHORTCUTS.runCommand.label,
+        keybindings: [monacoShortcut('runCommand', monaco)],
+        run: () => {
+          // Without a command to run, the keys keep the editor's own meaning.
+          if (useWorkspace.getState().chapter?.terminal.suggestedCommand) onRun()
+          else editor.trigger('keyboard', 'editor.action.insertLineBefore', null)
+        }
+      }),
+      editor.addAction({
+        id: 'indent.closeFile',
+        label: SHORTCUTS.closeFile.label,
+        keybindings: [monacoShortcut('closeFile', monaco)],
+        run: () => {
+          const { activePath, closeFile } = useWorkspace.getState()
+          if (activePath) closeFile(activePath)
+        }
+      })
+    ])
     bindSuggestShortcut(monaco, editor)
     bindTutorActions(monaco, editor)
     return () => {

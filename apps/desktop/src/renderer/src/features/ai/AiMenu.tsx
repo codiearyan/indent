@@ -26,7 +26,7 @@ import { TestConnection } from './TestConnection'
 // Radix Select needs a non-empty value; this one stands for "let the CLI choose".
 const CLI_DEFAULT = '__default__'
 
-const SUGGESTION_MODES: { value: SuggestionMode; label: string; hint: string }[] = [
+const suggestionModes = (): { value: SuggestionMode; label: string; hint: string }[] => [
   { value: 'off', label: 'Off', hint: 'No grey text in the editor.' },
   {
     value: 'manual',
@@ -147,14 +147,14 @@ export function AiSettings(): React.JSX.Element {
           onValueChange={(value) => value && void update({ suggestions: value as SuggestionMode })}
           className="w-full"
         >
-          {SUGGESTION_MODES.map(({ value, label }) => (
+          {suggestionModes().map(({ value, label }) => (
             <ToggleGroupItem key={value} value={value} className="flex-1 text-xs font-normal">
               {label}
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
         <p className="text-xs text-muted-foreground">
-          {SUGGESTION_MODES.find((m) => m.value === mode)?.hint}
+          {suggestionModes().find((m) => m.value === mode)?.hint}
         </p>
       </div>
 

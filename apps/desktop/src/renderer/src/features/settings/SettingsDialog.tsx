@@ -1,5 +1,14 @@
 import { useEffect } from 'react'
-import { Code, Info, Palette, Shield, Sparkles, Wrench, type LucideIcon } from 'lucide-react'
+import {
+  Code,
+  Info,
+  Keyboard,
+  Palette,
+  Shield,
+  Sparkles,
+  Wrench,
+  type LucideIcon
+} from 'lucide-react'
 import SiGithub from '@icons-pack/react-simple-icons/icons/SiGithub'
 import { REPO_URL } from '@shared/repo'
 import {
@@ -25,6 +34,7 @@ import { viewTransition } from '@/lib/viewTransition'
 import { useSettings, type EditorOption } from '@/stores/settings'
 import { Group, LayoutControls, Row, card } from './controls'
 import { useSettingsDialog, type SettingsSection } from './dialogStore'
+import { KeyboardSection } from './KeyboardSection'
 import { ThemeCards } from './ThemeCards'
 import { ToolsSection } from './ToolsSection'
 import { Typography } from './Typography'
@@ -37,6 +47,7 @@ const SECTIONS: {
 }[] = [
   { id: 'appearance', label: 'Appearance', icon: Palette, view: AppearanceSection },
   { id: 'editor', label: 'Editor', icon: Code, view: EditorSection },
+  { id: 'keyboard', label: 'Keyboard', icon: Keyboard, view: KeyboardSection },
   { id: 'ai', label: 'AI', icon: Sparkles, view: AiSection },
   { id: 'tools', label: 'Tools', icon: Wrench, view: ToolsSection },
   { id: 'privacy', label: 'Privacy', icon: Shield, view: PrivacySection },

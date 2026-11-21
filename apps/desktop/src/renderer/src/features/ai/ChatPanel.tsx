@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { SendHorizontal, Square, X } from 'lucide-react'
 import type { AiAttachment } from '@shared/types'
+import { ShortcutKeys } from '@/components/app/ShortcutKeys'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Markdown } from '@/features/workspace/Markdown'
-import { isShortcut, shortcutLabel } from '@/lib/shortcuts'
+import { isShortcut } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/stores/settings'
 import { activeProvider, useAi } from './aiStore'
@@ -201,7 +202,10 @@ function EmptyState({
       <p>It sees the lesson, the tasks, the file you have open and your latest check.</p>
       <p>
         To ask about some code, select it and pick Explain this from the right-click menu, or press{' '}
-        <kbd className="font-mono text-xs">{shortcutLabel('explainCode')}</kbd>.
+        <kbd className="font-mono text-xs">
+          <ShortcutKeys id="explainCode" />
+        </kbd>
+        .
       </p>
     </div>
   )

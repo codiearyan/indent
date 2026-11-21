@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
-export type SettingsSection = 'appearance' | 'editor' | 'ai' | 'tools' | 'privacy' | 'about'
+export type SettingsSection =
+  'appearance' | 'editor' | 'keyboard' | 'ai' | 'tools' | 'privacy' | 'about'
 
 interface SettingsDialogStore {
   open: boolean

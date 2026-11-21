@@ -1,6 +1,7 @@
+import { ShortcutKeys } from '@/components/app/ShortcutKeys'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { shortcutLabel, type ShortcutId } from '@/lib/shortcuts'
+import type { ShortcutId } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 
 type Props = React.ComponentProps<typeof Button> & {
@@ -35,7 +36,12 @@ export function IconButton({
       </TooltipTrigger>
       <TooltipContent>
         {label}
-        {shortcut && ` (${shortcutLabel(shortcut)})`}
+        {shortcut && (
+          <>
+            {' '}
+            (<ShortcutKeys id={shortcut} />)
+          </>
+        )}
       </TooltipContent>
     </Tooltip>
   )

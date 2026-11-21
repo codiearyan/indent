@@ -19,10 +19,20 @@ const defaults = {
   codeTheme: 'ember',
   editor: { wordWrap: false, lineNumbers: true, minimap: false },
   panels: { files: false, terminal: false, chat: false, zen: false, browser: true },
-  typography
+  typography,
+  shortcuts: {}
 } as SettingsState
 
 describe('mergeSettings', () => {
+  it('loads settings saved before shortcut keys existed with the defaults', () => {
+    expect(mergeSettings({ theme: 'light' }, defaults, 'dark').shortcuts).toEqual({})
+  })
+
+  it('keeps the shortcut keys that were saved and drops those of gone shortcuts', () => {
+    const saved = { shortcuts: { check: 'Mod+K', gone: 'Mod+G', save: 3 } }
+    expect(mergeSettings(saved, defaults, 'dark').shortcuts).toEqual({ check: 'Mod+K' })
+  })
+
   it('keeps the theme of settings saved before appearance existed', () => {
     const merged = mergeSettings({ theme: 'light', panels: { files: true } }, defaults, 'dark')
     expect(merged.appearance).toBe('light')

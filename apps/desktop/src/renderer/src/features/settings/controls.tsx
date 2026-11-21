@@ -153,7 +153,7 @@ export function Row({
 }: {
   id?: string
   label: string
-  hint?: string
+  hint?: React.ReactNode
   onReset?: () => void
   children: React.ReactNode
 }): React.JSX.Element {
@@ -166,7 +166,7 @@ export function Row({
           </label>
           {onReset && <ResetButton onClick={onReset} />}
         </div>
-        {hint && <p className="text-[13px] text-muted-foreground">{hint}</p>}
+        {hint && <div className="text-[13px] text-muted-foreground">{hint}</div>}
       </div>
       {children}
     </div>
