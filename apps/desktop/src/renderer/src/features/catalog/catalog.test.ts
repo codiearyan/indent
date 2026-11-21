@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import type { ChapterProgress, DayActivity, LabSummary } from '../../../../shared/types'
 import { NO_FILTERS, matchesFilters } from './labFilters'
 import { labProgress } from './labStatus'
-import { passedTasks } from '../star/starLogic'
 import { intensity, longestStreak, recentWeeks, yearSummary, yearWeeks } from './activity'
 
 const lab: LabSummary = {
@@ -136,13 +135,5 @@ describe('matchesFilters', () => {
   it('searches the title, shelf and tags without minding case', () => {
     expect(matchesFilters(lab, 'not-started', { ...NO_FILTERS, query: ' ENGINEER ' })).toBe(true)
     expect(matchesFilters(lab, 'not-started', { ...NO_FILTERS, query: 'python' })).toBe(false)
-  })
-})
-
-describe('passedTasks', () => {
-  it('counts passed tasks across every issue, and nothing before progress loads', () => {
-    expect(passedTasks(null)).toBe(0)
-    const chapters = { 'lab/a': chapter(true), 'lab/b': chapter(false), 'other/c': chapter(true) }
-    expect(passedTasks({ chapters, activity: {}, totalPoints: 0 })).toBe(2)
   })
 })

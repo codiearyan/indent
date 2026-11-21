@@ -23,6 +23,20 @@ async function star(): Promise<boolean> {
   }
 }
 
+/** Whether the signed-in account already starred the repo; null when the CLI can't tell. */
+async function starred(): Promise<boolean | null> {
+  try {
+    await run('gh', ['api', `user/starred/${REPO}`, '--silent'], {
+      env: await shellEnv(),
+      timeout: 10_000
+    })
+    return true
+  } catch (error) {
+    // GitHub answers 404 for a repo this account hasn't starred.
+    return /HTTP 404/.test(String((error as { stderr?: string }).stderr)) ? false : null
+  }
+}
+
 export function register(): void {
-  handle('github', { star })
+  handle('github', { star, starred })
 }
