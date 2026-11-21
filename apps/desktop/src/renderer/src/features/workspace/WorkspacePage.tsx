@@ -8,6 +8,7 @@ import { TerminalPane } from '@/features/terminal/TerminalPane'
 import { BrowserPane } from '@/features/browser/BrowserPane'
 import { ChatPanel } from '@/features/ai/ChatPanel'
 import { useAiEnabled } from '@/features/ai/aiStore'
+import { useOpenWhenFinished } from '@/features/completion/useOpenWhenFinished'
 import { Tour } from '@/features/tour/Tour'
 import { ToolNotice } from './ToolNotice'
 import { TopBar } from './TopBar'
@@ -38,6 +39,8 @@ export function WorkspacePage(): React.JSX.Element {
   // The sheet shows the repo's download, or why the issue could not open.
   const notice = status === 'error' || (status === 'loading' && downloading)
   useWorkspaceShortcuts()
+  // Here and not in the tasks list, which focus mode hides.
+  useOpenWhenFinished(labId)
 
   useEffect(() => {
     if (labId && chapterId) void open(labId, chapterId)

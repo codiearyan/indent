@@ -114,3 +114,10 @@ export function repoStars(run: RepoRun): Stars {
   )
   return row?.stars ?? 1
 }
+
+/**
+ * Checks run on an issue. Progress saved before they were counted has every check that was not
+ * green, plus the green one of a finished issue.
+ */
+export const checksRun = (chapter: ChapterProgress): number =>
+  chapter.checks ?? chapter.nonGreenChecks + (chapter.completedAt ? 1 : 0)

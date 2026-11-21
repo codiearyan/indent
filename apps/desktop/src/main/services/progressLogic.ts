@@ -6,7 +6,13 @@ import type {
   TaskDef,
   TaskProgress
 } from '../../shared/types'
-import { chapterKey, hintsUnlocked, isChapterComplete, localDate } from '../../shared/rules'
+import {
+  chapterKey,
+  checksRun,
+  hintsUnlocked,
+  isChapterComplete,
+  localDate
+} from '../../shared/rules'
 
 // Every rule mutates the given state in place; the service saves and returns it.
 
@@ -94,7 +100,7 @@ export function recordCheck(
   const chapter = chapterEntry(state, labId, chapterId, now)
   const day = (state.activity[localDate(now)] ??= { points: 0, checks: 0, tasksPassed: 0 })
   day.checks++
-  chapter.checks = (chapter.checks ?? 0) + 1
+  chapter.checks = checksRun(chapter) + 1
   // A run that could not execute (crash, timeout) says nothing about the code, so it unlocks no hint.
   if (!results.every((r) => r.passed) && !results.some((r) => r.error)) chapter.nonGreenChecks++
 

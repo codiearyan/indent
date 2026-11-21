@@ -59,3 +59,12 @@ describe('hints in progress', () => {
     expect(() => readProgressFile(JSON.stringify(old))).toThrow()
   })
 })
+
+describe('checks run on an issue', () => {
+  it('keeps the checks of progress saved before they were counted', () => {
+    const state = withFailedChecks(3)
+    delete state.chapters['lab/ch'].checks
+    recordCheck(state, 'lab', 'ch', [task], [failed], now)
+    expect(state.chapters['lab/ch'].checks).toBe(4)
+  })
+})

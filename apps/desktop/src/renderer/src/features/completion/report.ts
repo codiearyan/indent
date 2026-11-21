@@ -1,5 +1,12 @@
 import type { LabSummary, ProgressState } from '@shared/types'
-import { FAILS_BEFORE_DOCS, chapterKey, repoStars, type RepoRun, type Stars } from '@shared/rules'
+import {
+  FAILS_BEFORE_DOCS,
+  chapterKey,
+  checksRun,
+  repoStars,
+  type RepoRun,
+  type Stars
+} from '@shared/rules'
 import { labProgress } from '../catalog/labStatus'
 
 type Chapters = ProgressState['chapters']
@@ -26,8 +33,7 @@ export function repoReport(lab: LabSummary, chapters: Chapters): RepoReport {
     run.tasks += summary.taskCount
     const chapter = chapters[chapterKey(lab.id, summary.id)]
     if (!chapter) continue
-    // Progress saved before checks were counted: every check that was not green, plus the green one.
-    checks += chapter.checks ?? chapter.nonGreenChecks + (chapter.completedAt ? 1 : 0)
+    checks += checksRun(chapter)
     if (!startedAt || chapter.startedAt < startedAt) startedAt = chapter.startedAt
     if (chapter.completedAt && (!finishedAt || chapter.completedAt > finishedAt)) {
       finishedAt = chapter.completedAt
