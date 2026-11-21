@@ -168,9 +168,7 @@ describe('installPack', () => {
     expect(readFileSync(join(root, 'labs/shop/one/lesson.md'), 'utf8')).toBe('# One')
     expect(seen.at(-1)).toBe(1)
     expect(existsSync(join(root, '.download/shop'))).toBe(false)
-    expect(
-      staleRepos({ paths: [], labs: [entryFor('shop', archive, source)] }, root, new Set())
-    ).toEqual([])
+    expect(staleRepos({ paths: [], labs: [entryFor('shop', archive, source)] }, root)).toEqual([])
   })
 
   it('keeps the copy on disk when the download is damaged', async () => {
@@ -216,7 +214,7 @@ describe('installPack', () => {
 })
 
 describe('staleRepos', () => {
-  it('picks repos on disk whose version changed, skipping the open one and too new ones', () => {
+  it('picks repos on disk whose version changed, skipping too new ones', () => {
     const root = temp('root-')
     for (const id of ['shop', 'bank', 'cafe', 'deli']) write(join(root, 'labs', id), lab(id))
     for (const id of ['shop', 'bank', 'cafe', 'deli']) recordVersion(root, id, 'old')
@@ -232,6 +230,6 @@ describe('staleRepos', () => {
         entry('eel', 'new')
       ]
     }
-    expect(staleRepos(index, root, new Set(['cafe'])).map((e) => e.id)).toEqual(['shop'])
+    expect(staleRepos(index, root).map((e) => e.id)).toEqual(['shop', 'cafe'])
   })
 })

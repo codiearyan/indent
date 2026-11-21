@@ -177,12 +177,11 @@ function installedVersion(root: string, labId: string): string {
 }
 
 /** Repos on disk that the library has a newer version of and that this app can run. */
-export function staleRepos(index: PackIndex, root: string, skip: Set<string>): PackEntry[] {
+export function staleRepos(index: PackIndex, root: string): PackEntry[] {
   const installed = new Set(labFolders(join(root, 'labs')))
   return index.labs.filter(
     (entry) =>
       installed.has(entry.id) &&
-      !skip.has(entry.id) &&
       entry.format <= PACK_FORMAT &&
       installedVersion(root, entry.id) !== entry.version
   )
