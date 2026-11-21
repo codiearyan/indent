@@ -11,6 +11,19 @@ import { chapterKey, isChapterComplete, localDate } from '../../shared/rules'
 
 export const emptyProgress = (): ProgressState => ({ chapters: {}, activity: {}, totalPoints: 0 })
 
+// What 0.1.0 saved on every task when Node or the repo tools were missing. Later versions save no
+// result then, and without the tool no check runs to replace it.
+const OLD_TOOL_ERRORS =
+  /^(Node\.js was not found|Repos need Node|Could not prepare the runtime dependencies|Could not install the runtime dependencies)/
+
+export function dropOldToolErrors(state: ProgressState): void {
+  for (const chapter of Object.values(state.chapters)) {
+    for (const task of Object.values(chapter.tasks)) {
+      if (OLD_TOOL_ERRORS.test(task.lastResult?.error ?? '')) delete task.lastResult
+    }
+  }
+}
+
 function chapterEntry(
   state: ProgressState,
   labId: string,

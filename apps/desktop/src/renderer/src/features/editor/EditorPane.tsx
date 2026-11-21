@@ -37,6 +37,7 @@ export function EditorPane(): React.JSX.Element {
   const splitAt = useWorkspace((s) => s.layout.split)
   const checking = useWorkspace((s) => s.checking)
   const toolsInstalling = useRuntime((s) => !!s.status?.installing)
+  const toolsBroken = useRuntime((s) => !!s.status?.error)
   const conflicts = useWorkspace((s) => s.conflicts)
   const [conflictsOpen, setConflictsOpen] = useState(false)
   const panels = useSettings((s) => s.panels)
@@ -141,7 +142,7 @@ export function EditorPane(): React.JSX.Element {
               variant={finished ? 'outline' : 'default'}
               className="ml-1"
               data-tour={TOUR.checkAll}
-              disabled={checking !== null || status !== 'ready'}
+              disabled={checking !== null || status !== 'ready' || toolsBroken}
               onClick={checkAll}
             >
               {checking && <Loader2Icon className="animate-spin" />}

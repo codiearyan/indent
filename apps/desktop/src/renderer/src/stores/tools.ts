@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { LabMeta, ToolId, ToolStatus } from '@shared/types'
 import { api } from '@/lib/api'
 import { errorMessage } from '@/lib/utils'
+import { retryRuntime, useRuntime } from '@/stores/runtime'
 
 /** Where a tool's install is: running (with Node's download share), waiting on a system window, or failed. */
 export type ToolInstall =
@@ -28,6 +29,10 @@ const setInstall = (id: ToolId, install?: ToolInstall): void =>
 export async function refreshTools(): Promise<ToolStatus[]> {
   const tools = await api.tools.status()
   useTools.setState({ tools })
+  // A Node installed outside the app: the repo tools still hold the error from before until asked again.
+  const runtime = useRuntime.getState().status
+  const nodeOk = tools.some((tool) => tool.id === 'node' && tool.ok)
+  if (nodeOk && runtime?.error && !runtime.details) retryRuntime()
   return tools
 }
 

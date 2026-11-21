@@ -75,14 +75,14 @@ async function runtimeStatus(): Promise<RuntimeStatus> {
     return {
       node,
       ready: false,
-      error: 'Node.js was not found. Open Settings, then Tools, to download it.'
+      error: 'Checks need Node.js, which is not on this computer.'
     }
   }
   if (!nodeSupported(node)) {
     return {
       node,
       ready: false,
-      error: `Repos need Node 22.18 or newer. This computer has ${node}. Open Settings, then Tools, to download a newer one.`
+      error: `Checks need Node 22.18 or newer. This computer has ${node}.`
     }
   }
   return { node, ready: await depsInstalled() }

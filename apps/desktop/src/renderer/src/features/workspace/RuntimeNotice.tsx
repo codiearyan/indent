@@ -1,13 +1,16 @@
 import { ChevronRight, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { ToolInstallButton } from '@/components/app/ToolInstallButton'
 import { retryRuntime, useRuntime } from '@/stores/runtime'
+import { useTools } from '@/stores/tools'
 
 const outline = 'border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent'
 
-/** Above the tasks: the repo tools installing, or why they could not be. Checks wait for it. */
+/** Above the tasks: Node missing, the repo tools installing, or why they could not be. Checks wait for it. */
 export function RuntimeNotice(): React.JSX.Element | null {
   const status = useRuntime((s) => s.status)
+  const node = useTools((s) => s.tools?.find((tool) => tool.id === 'node'))
   if (!status || status.ready) return null
 
   if (status.installing) {
@@ -28,8 +31,19 @@ export function RuntimeNotice(): React.JSX.Element | null {
     )
   }
 
-  // Without details it is Node itself that is missing or too old: the banner at the top has the fix.
-  if (!status.error || !status.details) return null
+  if (!status.error) return null
+  // Without details it is Node itself that is missing or too old: its fix goes where Check is pressed.
+  if (!status.details) {
+    return (
+      <div
+        role="alert"
+        className="mt-4 flex flex-wrap items-center gap-3 rounded-lg bg-destructive/10 px-4 py-3"
+      >
+        <p className="min-w-0 flex-1 text-sm text-destructive">{status.error}</p>
+        {node && !node.ok && <ToolInstallButton tool={node} />}
+      </div>
+    )
+  }
   return (
     <div role="alert" className="mt-4 space-y-3 rounded-lg border border-border px-4 py-3">
       <p className="text-sm">{status.error}</p>
