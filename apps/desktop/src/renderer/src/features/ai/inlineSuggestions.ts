@@ -1,11 +1,9 @@
 import type * as Monaco from 'monaco-editor'
 import { api } from '@/lib/api'
+import { monacoShortcut } from '@/lib/shortcuts'
 import { track } from '@/lib/telemetry'
 import { useWorkspace } from '@/stores/workspace'
 import { useAi } from './aiStore'
-
-/** Asks for a suggestion in `manual` mode, written the way the platform writes shortcuts. */
-export const SUGGEST_SHORTCUT = window.platform === 'darwin' ? '⌥\\' : 'Alt+\\'
 
 const PAUSE_MS = 500
 const PREFIX_CHARS = 4000
@@ -21,7 +19,7 @@ function pause(ms: number, token: Monaco.CancellationToken): Promise<boolean> {
   })
 }
 
-/** Binds SUGGEST_SHORTCUT to Monaco's explicit trigger; Monaco ships it without a key. */
+/** Binds the suggest shortcut to Monaco's explicit trigger; Monaco ships it without a key. */
 export function bindSuggestShortcut(
   monaco: typeof Monaco,
   editor: Monaco.editor.IStandaloneCodeEditor
@@ -35,7 +33,7 @@ export function bindSuggestShortcut(
   sync()
   editor.onDidDispose(useAi.subscribe(sync))
   editor.addCommand(
-    monaco.KeyMod.Alt | monaco.KeyCode.Backslash,
+    monacoShortcut('suggest', monaco),
     () => editor.trigger('keyboard', 'editor.action.inlineSuggest.trigger', {}),
     'suggestOnRequest'
   )

@@ -16,11 +16,11 @@ import { Switch } from '@/components/ui/switch'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { TOUR } from '@/features/tour/anchors'
 import { IconButton } from '@/features/workspace/IconButton'
+import { shortcutLabel } from '@/lib/shortcuts'
 import { cn, errorMessage } from '@/lib/utils'
 import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
 import { activeProvider, useAi } from './aiStore'
-import { SUGGEST_SHORTCUT } from './inlineSuggestions'
 import { TestConnection } from './TestConnection'
 
 // Radix Select needs a non-empty value; this one stands for "let the CLI choose".
@@ -31,7 +31,7 @@ const SUGGESTION_MODES: { value: SuggestionMode; label: string; hint: string }[]
   {
     value: 'manual',
     label: 'When I ask',
-    hint: `Press ${SUGGEST_SHORTCUT} for a suggestion. Tab accepts.`
+    hint: `Press ${shortcutLabel('suggest')} for a suggestion. Tab accepts.`
   },
   { value: 'auto', label: 'As I type', hint: 'Grey text after a pause in typing. Tab accepts.' }
 ]

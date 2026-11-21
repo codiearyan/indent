@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { IconButton } from '@/features/workspace/IconButton'
+import { isShortcut, type ShortcutId } from '@/lib/shortcuts'
 import type { Player as PlayerControls } from './usePlayer'
 
 function inTextField(target: EventTarget | null): boolean {
@@ -23,16 +24,17 @@ export function Player({ player }: { player: PlayerControls }): React.JSX.Elemen
       if (inTextField(event.target)) return
       const target = event.target instanceof HTMLElement ? event.target : null
       // A focused button or slider already handles these keys itself.
-      if (event.key === ' ' && target?.closest('button')) return
-      if (event.key !== ' ' && target?.closest('[role="slider"]')) return
-      const actions: Record<string, () => void> = {
-        ' ': player.toggle,
-        ArrowLeft: player.prev,
-        ArrowRight: player.next,
-        Home: () => player.seek(0),
-        End: () => player.seek(last)
-      }
-      const action = actions[event.key]
+      const space = isShortcut(event, 'playPause')
+      if (space && target?.closest('button')) return
+      if (!space && target?.closest('[role="slider"]')) return
+      const actions: [ShortcutId, () => void][] = [
+        ['playPause', player.toggle],
+        ['stepBack', player.prev],
+        ['stepForward', player.next],
+        ['firstStep', () => player.seek(0)],
+        ['lastStep', () => player.seek(last)]
+      ]
+      const action = actions.find(([id]) => isShortcut(event, id))?.[1]
       if (!action) return
       event.preventDefault()
       action()

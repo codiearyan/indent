@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Markdown } from '@/features/workspace/Markdown'
+import { isShortcut } from '@/lib/shortcuts'
 import { useSettings } from '@/stores/settings'
 import { activeProvider, useAi } from './aiStore'
 import { MESSAGE_BUDGET, useChat } from './chatStore'
@@ -96,7 +97,7 @@ export function ChatPanel(): React.JSX.Element {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+              if (isShortcut(e, 'sendMessage') && !e.shiftKey && !e.nativeEvent.isComposing) {
                 e.preventDefault()
                 submit()
               }

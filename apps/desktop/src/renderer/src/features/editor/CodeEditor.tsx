@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { fontStack } from '@/lib/fonts'
+import { monacoShortcut } from '@/lib/shortcuts'
 import { useSettings, type Typography } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { bindSuggestShortcut } from '@/features/ai/inlineSuggestions'
@@ -50,10 +51,10 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
       renderLineHighlight: 'line'
     })
     editorRef.current = editor
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+    editor.addCommand(monacoShortcut('save', monaco), () => {
       void useWorkspace.getState().flush()
     })
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, onCheck)
+    editor.addCommand(monacoShortcut('check', monaco), onCheck)
     bindSuggestShortcut(monaco, editor)
     return () => {
       editor.dispose()

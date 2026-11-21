@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { isShortcut } from '@/lib/shortcuts'
 import { TOUR_STEPS } from './steps'
 import { cardPosition } from './position'
 
@@ -56,9 +57,9 @@ export function TourOverlay({ onClose }: { onClose(): void }): React.JSX.Element
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') onClose()
-      else if (event.key === 'ArrowRight') move(1)
-      else if (event.key === 'ArrowLeft') move(-1)
+      if (isShortcut(event, 'closeTour')) onClose()
+      else if (isShortcut(event, 'nextTourStep')) move(1)
+      else if (isShortcut(event, 'previousTourStep')) move(-1)
       else return
       event.preventDefault()
       event.stopPropagation()
