@@ -1,10 +1,12 @@
 import { useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import {
+  ArrowUpRight,
   Bug,
   CalendarDays,
   FolderGit2,
   House,
+  MessagesSquare,
   Moon,
   Route,
   Settings,
@@ -100,6 +102,16 @@ export function AppShell(): React.JSX.Element {
           )}
           <LevelMeter />
           <div className="flex flex-col gap-0.5">
+            <a
+              href={`${REPO_URL}/discussions`}
+              target="_blank"
+              rel="noreferrer"
+              className={cn(row, 'text-muted-foreground hover:text-foreground')}
+            >
+              <MessagesSquare className="size-4" strokeWidth={1.5} />
+              Community
+              <ArrowUpRight className="ml-auto size-3.5" strokeWidth={1.5} aria-hidden />
+            </a>
             <button
               type="button"
               onClick={() => useSettingsDialog.getState().show()}
