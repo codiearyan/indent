@@ -7,7 +7,8 @@ import {
   PanelLeftCloseIcon,
   PanelLeftIcon,
   PlayIcon,
-  WandSparklesIcon
+  WandSparklesIcon,
+  XIcon
 } from 'lucide-react'
 import { isChapterComplete } from '@shared/rules'
 import { Button } from '@/components/ui/button'
@@ -45,8 +46,10 @@ export function EditorPane(): React.JSX.Element {
   const status = useWorkspace((s) => s.status)
   const files = useWorkspace((s) => s.files)
   const starter = useWorkspace((s) => s.starter)
+  const openPaths = useWorkspace((s) => s.openPaths)
   const activePath = useWorkspace((s) => s.activePath)
-  const setActive = useWorkspace((s) => s.setActive)
+  const openFile = useWorkspace((s) => s.openFile)
+  const closeFile = useWorkspace((s) => s.closeFile)
   const checking = useWorkspace((s) => s.checking)
   const toolsInstalling = useRuntime((s) => !!s.status?.installing)
   const conflicts = useWorkspace((s) => s.conflicts)
@@ -172,22 +175,47 @@ export function EditorPane(): React.JSX.Element {
         data-tour={TOUR.editorTabs}
         className="flex h-9 shrink-0 overflow-x-auto border-t border-border [scrollbar-width:none]"
       >
-        {files.map((file) => {
-          const active = file.path === activePath
+        {openPaths.map((path) => {
+          const file = files.find((f) => f.path === path)
+          if (!file) return null
+          const active = path === activePath
+          const name = path.slice(path.lastIndexOf('/') + 1)
           return (
-            <button
-              key={file.path}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              onClick={() => setActive(file.path)}
+            <div
+              key={path}
+              onMouseDown={(event) => event.button === 1 && event.preventDefault()}
+              onAuxClick={(event) => event.button === 1 && closeFile(path)}
               className={cn(
-                'flex shrink-0 items-center gap-2 border-r border-b border-r-rule border-b-border px-3 font-mono text-[13px] text-muted-foreground outline-none hover:bg-accent/40 focus-visible:bg-accent/60',
+                'group flex shrink-0 items-center border-r border-b border-r-rule border-b-border text-muted-foreground hover:bg-accent/40 has-focus-visible:bg-accent/60',
                 active && 'border-b-transparent bg-editor hover:bg-editor'
               )}
             >
-              <FileLabel path={file.path} change={fileChange(starter, file)} active={active} />
-            </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => openFile(path)}
+                className="flex h-full items-center gap-2 pr-1 pl-3 font-mono text-[13px] outline-none"
+              >
+                <FileLabel path={path} change={fileChange(starter, file)} active={active} />
+              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={`Close ${name}`}
+                    onClick={() => closeFile(path)}
+                    className={cn(
+                      'mr-1.5 flex size-5 items-center justify-center rounded-sm text-muted-foreground opacity-0 outline-none group-hover:opacity-100 hover:bg-accent hover:text-foreground focus-visible:bg-accent focus-visible:opacity-100',
+                      active && 'opacity-100'
+                    )}
+                  >
+                    <XIcon className="size-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Close file</TooltipContent>
+              </Tooltip>
+            </div>
           )
         })}
         <div className="min-w-4 flex-1 border-b border-border" />
@@ -201,7 +229,7 @@ export function EditorPane(): React.JSX.Element {
                 key={file.path}
                 variant="ghost"
                 size="sm"
-                onClick={() => setActive(file.path)}
+                onClick={() => openFile(file.path)}
                 className={cn(
                   'h-7 w-full justify-start gap-2 px-2 font-mono text-[13px] font-normal text-muted-foreground hover:bg-accent/60 hover:text-foreground',
                   file.path === activePath && 'bg-accent text-foreground hover:bg-accent'
@@ -217,7 +245,14 @@ export function EditorPane(): React.JSX.Element {
           </div>
         )}
         {status === 'ready' ? (
-          <CodeEditor editorRef={editorRef} onEdit={hideSummary} onCheck={checkAll} />
+          <div className="relative flex min-w-0 flex-1">
+            <CodeEditor editorRef={editorRef} onEdit={hideSummary} onCheck={checkAll} />
+            {!activePath && (
+              <p className="absolute inset-0 flex items-center justify-center bg-editor text-sm text-muted-foreground">
+                Open a file from the files panel.
+              </p>
+            )}
+          </div>
         ) : (
           <div className="flex-1 space-y-3 p-6">
             <Skeleton className="h-4 w-2/3" />
