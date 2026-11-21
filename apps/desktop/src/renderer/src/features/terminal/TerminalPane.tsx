@@ -100,7 +100,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
     const { theme, textScale, typography } = useSettings.getState()
     const term = new Terminal({
       fontFamily: fontStack(typography.monoFont, 'mono'),
-      fontSize: typography.monoSize * textScale.terminal,
+      fontSize: Math.round(typography.monoSize * textScale.terminal),
       cursorStyle: typography.cursor,
       theme: xtermTheme(theme),
       cursorBlink: true
@@ -184,7 +184,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
     if (!current) return
     current.term.options.theme = xtermTheme(theme)
     current.term.options.fontFamily = fontStack(typography.monoFont, 'mono')
-    current.term.options.fontSize = typography.monoSize * scale
+    current.term.options.fontSize = Math.round(typography.monoSize * scale)
     current.term.options.cursorStyle = typography.cursor
     if (containerRef.current?.clientHeight) current.fit.fit()
   }, [theme, scale, typography])
@@ -292,7 +292,10 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
       <div className="min-h-0 flex-1">
         {status === 'idle' ? null : (
           <div className="flex h-full flex-col">
-            <div ref={containerRef} className="min-h-0 flex-1 overflow-hidden py-1 pl-3" />
+            {/* The fit add-on sizes the terminal from its parent, padding included, so the padding sits outside it. */}
+            <div className="min-h-0 flex-1 py-1 pl-3">
+              <div ref={containerRef} className="h-full overflow-hidden" />
+            </div>
             {status === 'exited' && (
               <div className="flex shrink-0 items-center gap-3 border-t border-border px-3 py-2 text-xs text-muted-foreground">
                 <span>Shell exited with code {exitCode}.</span>
