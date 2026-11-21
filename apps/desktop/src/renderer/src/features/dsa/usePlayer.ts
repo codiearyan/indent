@@ -1,5 +1,4 @@
 import { useEffect, useReducer, useState } from 'react'
-import type { Step } from './types'
 
 export const SPEEDS = [0.5, 1, 2] as const
 export const STEP_MS = 1100
@@ -54,7 +53,8 @@ export interface Player {
   cycleSpeed(): void
 }
 
-export function usePlayer(steps: Step[]): Player {
+/** Plays any list of steps; only its length and identity matter. */
+export function usePlayer(steps: readonly unknown[]): Player {
   const [state, dispatch] = useReducer(playerReducer, {
     count: steps.length,
     index: 0,

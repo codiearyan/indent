@@ -4,8 +4,9 @@ import { mkdir, readFile, rename, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { pathToFileURL } from 'url'
 import { COVER_SCHEME } from '@shared/cover'
+import { checkFlow } from '@shared/flow'
 import { PACKS_URL } from '@shared/packs'
-import type { Chapter, InstallResult, LabSummary, PackIndex, PathDef } from '@shared/types'
+import type { Chapter, Flow, InstallResult, LabSummary, PackIndex, PathDef } from '@shared/types'
 import { EVENTS } from '@shared/types'
 import { emit, handle } from '../ipc'
 import {
@@ -109,9 +110,29 @@ async function refreshLibrary(): Promise<void> {
   }
 }
 
+/** A flow.json that fails its checks is left out, so the repo and the issue still open. */
+async function readFlow(
+  dir: string,
+  name: string,
+  taskIds: string[] | null
+): Promise<Flow | undefined> {
+  const text = await readFile(join(dir, 'flow.json'), 'utf8').catch(() => undefined)
+  if (text === undefined) return undefined
+  const { flow, problems } = checkFlow(text, `${name}/flow.json`, taskIds)
+  if (problems.length) console.warn(`Leaving out a flow:\n  ${problems.join('\n  ')}`)
+  return flow ?? undefined
+}
+
 async function listRepos(): Promise<LabSummary[]> {
   void refreshLibrary()
-  return listAll(contentDir(), cachedIndex())
+  const labs = await listAll(contentDir(), cachedIndex())
+  return Promise.all(
+    labs.map(async (lab) => {
+      if (lab.availability) return lab
+      const flow = await readFlow(join(contentDir(), 'labs', lab.id), lab.id, null)
+      return flow ? { ...lab, scene: flow.scene } : lab
+    })
+  )
 }
 
 async function listRoadmaps(): Promise<PathDef[]> {
@@ -128,6 +149,13 @@ export async function loadChapter(labId: string, chapterId: string): Promise<Cha
     emit(EVENTS.contentChanged)
   }
   return getChapter(contentDir(), labId, safeId(chapterId))
+}
+
+async function openChapter(labId: string, chapterId: string): Promise<Chapter> {
+  const chapter = await loadChapter(labId, chapterId)
+  const taskIds = chapter.tasks.map((task) => task.id)
+  const flow = await readFlow(chapterContentDir(labId, chapterId), `${labId}/${chapterId}`, taskIds)
+  return flow ? { ...chapter, flow } : chapter
 }
 
 /** A recording exists only for the exact text it was made from, so the key is its file name. */
@@ -170,7 +198,7 @@ export function register(): void {
   })
   handle('content', {
     listLabs: listRepos,
-    getChapter: loadChapter,
+    getChapter: openChapter,
     listPaths: listRoadmaps,
     narration,
     install

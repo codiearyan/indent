@@ -1,0 +1,148 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customer", "label": "Customer", "kind": "story" },
+      { "id": "guide", "label": "Burn time guide", "kind": "story" },
+      { "id": "button", "label": "Welcome button", "kind": "story" },
+      { "id": "stamp", "label": "createStampCard()", "kind": "function", "mine": true },
+      { "id": "memo", "label": "memoize()", "kind": "function", "mine": true },
+      { "id": "once", "label": "once()", "kind": "function", "mine": true },
+      { "id": "reward", "label": "Free candle", "kind": "story" },
+      { "id": "slow", "label": "burnHours()", "kind": "function" },
+      { "id": "email", "label": "Welcome email", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "customer", "to": "stamp", "label": "a purchase" },
+      { "from": "guide", "to": "memo", "label": "a candle" },
+      { "from": "button", "to": "once", "label": "a click" },
+      { "from": "stamp", "to": "reward", "label": "at the goal" },
+      { "from": "memo", "to": "slow", "label": "new ones" },
+      { "from": "once", "to": "email", "label": "first time" }
+    ],
+    "note": "Three helpers in helpers.js stand between the shop and what it does, and each one remembers something between calls."
+  },
+  "tasks": {
+    "stamp": {
+      "steps": [
+        {
+          "active": ["customer", "customer->stamp", "stamp"],
+          "value": {
+            "kind": "map",
+            "label": "a new card",
+            "entries": [
+              { "key": "goal", "value": 10 },
+              { "key": "stamps()", "value": 0 }
+            ]
+          },
+          "note": "Ines makes a card for a customer. Ten stamps and the next candle is free."
+        },
+        {
+          "active": ["customer", "customer->stamp", "stamp"],
+          "value": {
+            "kind": "map",
+            "label": "after the first purchase",
+            "entries": [
+              { "key": "stamp()", "value": "false" },
+              { "key": "stamps()", "value": 1 }
+            ]
+          },
+          "note": "Each purchase calls stamp(). The card holds one stamp now, and it is not time for a reward."
+        },
+        {
+          "active": ["stamp"],
+          "value": {
+            "kind": "map",
+            "label": "after nine purchases",
+            "entries": [{ "key": "stamps()", "value": 9 }]
+          },
+          "note": "The count lives on between calls. Nine purchases later the card is one stamp away."
+        },
+        {
+          "active": ["stamp", "stamp->reward", "reward"],
+          "value": {
+            "kind": "map",
+            "label": "after the tenth purchase",
+            "entries": [
+              { "key": "stamp()", "value": "true" },
+              { "key": "stamps()", "value": 0 }
+            ]
+          },
+          "note": "The tenth stamp reaches the goal: a free candle, and the card starts again from 0."
+        },
+        {
+          "active": ["customer", "stamp"],
+          "note": "Another customer's card keeps its own count. Stamping one card never changes another."
+        }
+      ]
+    },
+    "memo": {
+      "steps": [
+        {
+          "active": ["guide", "guide->memo", "memo"],
+          "value": { "kind": "map", "label": "saved answers", "entries": [] },
+          "note": "The burn time guide asks for 'cedar'. Nothing has been saved yet."
+        },
+        {
+          "active": ["memo", "memo->slow", "slow"],
+          "value": {
+            "kind": "map",
+            "label": "saved answers",
+            "entries": [{ "key": "cedar", "value": 40 }]
+          },
+          "note": "So the slow burnHours() works it out, and the answer is saved under 'cedar'."
+        },
+        {
+          "active": ["guide", "guide->memo", "memo"],
+          "value": {
+            "kind": "map",
+            "label": "saved answers",
+            "entries": [{ "key": "cedar", "value": 40 }]
+          },
+          "note": "The guide asks for 'cedar' again. The saved answer comes straight back, and burnHours() is not called."
+        },
+        {
+          "active": ["memo", "memo->slow", "slow"],
+          "value": {
+            "kind": "map",
+            "label": "saved answers",
+            "entries": [
+              { "key": "cedar", "value": 40 },
+              { "key": "birch", "value": 60 }
+            ]
+          },
+          "note": "'birch' is new, so burnHours() runs once more. The number 1 and the text '1' would be two different keys."
+        }
+      ]
+    },
+    "once": {
+      "steps": [
+        {
+          "active": ["button", "button->once", "once"],
+          "note": "A customer clicks the welcome button, and the wrapper is called with 'Ines'."
+        },
+        {
+          "active": ["once", "once->email", "email"],
+          "value": {
+            "kind": "array",
+            "label": "emails sent",
+            "values": ["Ines"]
+          },
+          "note": "It is the first call, so the email function runs with the same arguments, and what it returns is kept."
+        },
+        {
+          "active": ["button", "button->once", "once"],
+          "value": {
+            "kind": "array",
+            "label": "emails sent",
+            "values": ["Ines"]
+          },
+          "note": "The customer clicks again, this time with 'Theo'. The email function is not called."
+        },
+        {
+          "active": ["once"],
+          "note": "Every later call hands back the first result, whatever arguments it gets. That holds even when the first result was undefined."
+        }
+      ]
+    }
+  }
+}

@@ -43,6 +43,8 @@ export interface ChapterSummary {
 
 export interface LabSummary extends LabMeta {
   chapters: ChapterSummary[]
+  /** The repo's own flow.json, on the repo page; missing when it has none or is not on disk. */
+  scene?: FlowScene
   /** Missing when the repo is on disk: `download` when it is in the library, `app-update` when it needs a newer app. */
   availability?: 'download' | 'app-update'
 }
@@ -112,6 +114,63 @@ export interface Chapter extends ChapterDef {
   lesson: string
   prevChapterId?: string
   nextChapterId?: string
+  /** flow.json; missing when the issue has none or it does not pass the checks in flow.ts. */
+  flow?: Flow
+}
+
+/** What a box in a flow stands for: a part of the story, a file, a function or a piece of data. */
+export type FlowNodeKind = 'story' | 'file' | 'function' | 'data'
+
+export interface FlowNode {
+  id: string
+  label: string
+  kind: FlowNodeKind
+  /** The learner's part, the one place a flow uses the brand colour. */
+  mine?: boolean
+}
+
+export interface FlowEdge {
+  from: string
+  to: string
+  label?: string
+}
+
+/** The parts of a system and what goes between them. */
+export interface FlowScene {
+  nodes: FlowNode[]
+  edges: FlowEdge[]
+  /** One plain sentence about what this issue or repo changes in the system. */
+  note: string
+}
+
+/** Example data shown at a step, in the shapes the Patterns views draw. */
+export type FlowValue =
+  | { kind: 'array'; label?: string; values: (number | string)[] }
+  | { kind: 'map'; label?: string; entries: { key: string; value: number | string }[] }
+  | {
+      kind: 'grid'
+      label?: string
+      cells: (number | string)[][]
+      rowLabels?: string[]
+      colLabels?: string[]
+    }
+
+export interface FlowStep {
+  /** Node ids, and edges written as `from->to`. */
+  active: string[]
+  value?: FlowValue
+  /** What happens at this step, in the story's words; also what a screen reader reads. */
+  note: string
+}
+
+/**
+ * <issue>/flow.json, or labs/<labId>/flow.json with only a scene. Data only: it shows what goes
+ * in and the shape of what comes out, never a task's answer.
+ */
+export interface Flow {
+  scene: FlowScene
+  /** Keyed by task id. */
+  tasks?: Record<string, { steps: FlowStep[] }>
 }
 
 /** content/paths.json */

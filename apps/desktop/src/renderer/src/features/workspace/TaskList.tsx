@@ -50,6 +50,8 @@ export function TaskList({ chapter }: { chapter: Chapter }): React.JSX.Element {
             number={i + 1}
             progress={progress}
             first={i === 0}
+            scene={chapter.flow?.scene}
+            flow={chapter.flow?.tasks?.[task.id]?.steps}
           />
         ))}
       </ol>

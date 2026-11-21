@@ -5,6 +5,7 @@ import { BuildStrip } from '@/components/app/BuildStrip'
 import { Button } from '@/components/ui/button'
 import { getNewVersion } from '@/stores/updates'
 import { Skeleton } from '@/components/ui/skeleton'
+import { FlowFigure } from '@/features/flows/FlowPlayer'
 import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
@@ -104,6 +105,13 @@ export function LabDetailPage(): React.JSX.Element {
       />
 
       <BuildStrip lab={lab} chapters={progress.chapters} className="h-2" />
+
+      {lab.scene && (
+        <section className="rounded-lg border border-border p-5">
+          <h2 className="mb-4 text-sm font-semibold">How the pieces fit</h2>
+          <FlowFigure scene={lab.scene} />
+        </section>
+      )}
 
       {lab.parts.map((part) => (
         <section key={part.title}>
