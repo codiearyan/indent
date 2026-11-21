@@ -15,7 +15,7 @@
       "mark": 1
     }
   ],
-  "ticket": { "label": "Group discount", "wrong": "missed", "why": "Tiny chunks", "right": "found" },
+  "ticket": { "label": "Group discount", "wrong": "missed", "why": "No match", "right": "found" },
   "captions": [
     "Since Bram tidied the settings, the box misses the group discount.",
     "Trying a few questions by hand cannot say if it is Bram or the box.",
