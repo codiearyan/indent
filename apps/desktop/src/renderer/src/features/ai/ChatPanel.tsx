@@ -5,6 +5,7 @@ import { ShortcutKeys } from '@/components/app/ShortcutKeys'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useSettingsDialog } from '@/features/settings/dialogStore'
 import { Markdown } from '@/features/workspace/Markdown'
 import { isShortcut } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
@@ -97,7 +98,21 @@ export function ChatPanel(): React.JSX.Element {
             )}
           </div>
         )}
-        {error && <p className="mt-4 text-[13px] text-destructive">{error}</p>}
+        {error && (
+          <div className="mt-4 flex flex-col items-start gap-1.5 text-[13px]">
+            <p role="alert" className="text-destructive">
+              {error}
+            </p>
+            <Button
+              variant="link"
+              size="sm"
+              className="h-auto p-0 text-[13px] font-normal text-muted-foreground no-underline hover:text-foreground hover:no-underline"
+              onClick={() => useSettingsDialog.getState().show('ai')}
+            >
+              Open AI settings
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="shrink-0 border-t border-border p-3">

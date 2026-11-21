@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { lineSplitter, openAiDelta, parseCliLine, sseParser } from './parsers'
+import { lineSplitter, openAiDelta, opencodeLogError, parseCliLine, sseParser } from './parsers'
 
 // Lines trimmed from real runs of each CLI.
 describe('parseCliLine', () => {
@@ -100,5 +100,34 @@ describe('sse', () => {
     expect(openAiDelta('{"choices":[{"delta":{"role":"assistant"}}]}')).toEqual({
       delta: undefined
     })
+  })
+})
+
+// Trimmed from the line a real run printed with `--print-logs` when the free limit was reached.
+const LIMIT_LOG =
+  'timestamp=2026-11-21T20:31:23.857Z level=ERROR run=56b2d686 message="stream error" providerID=opencode modelID=big-pickle session.id=ses_e00319d4 small=false agent=build mode=primary error.error="AI_APICallError: Free usage limit reached."'
+
+describe('opencodeLogError', () => {
+  it('reads the reason OpenCode logged for a reply that failed', () => {
+    expect(opencodeLogError(LIMIT_LOG)).toBe('Free usage limit reached.')
+  })
+
+  it('keeps a reason that has no error class in front and reads its quotes', () => {
+    const line =
+      'level=ERROR message="stream error" small=false error.error="Model \\"x/y\\" is not available"'
+    expect(opencodeLogError(line)).toBe('Model "x/y" is not available')
+  })
+
+  it('ignores an error of the small model that only names the session', () => {
+    expect(
+      opencodeLogError(LIMIT_LOG.replace('small=false agent=build', 'small=true agent=title'))
+    ).toBeUndefined()
+  })
+
+  it('ignores other log lines and plain text', () => {
+    expect(
+      opencodeLogError('timestamp=2026-11-21T20:31:19.5Z level=WARN message="server unavailable"')
+    ).toBeUndefined()
+    expect(opencodeLogError('Error: something else')).toBeUndefined()
   })
 })

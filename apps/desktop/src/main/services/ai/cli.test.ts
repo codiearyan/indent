@@ -47,6 +47,49 @@ describe.skipIf(process.platform === 'win32')('runCli', () => {
     await expect(runCli(options(path).run)).rejects.toThrow('Not logged in')
   })
 
+  describe('OpenCode', () => {
+    const limitLog =
+      'timestamp=2026-11-21T20:31:23.857Z level=ERROR message="stream error" small=false agent=build error.error="AI_APICallError: Free usage limit reached."'
+    const opencode = (path: string, quietAfterErrorMs: number): CliRun => ({
+      ...options(path).run,
+      provider: 'opencode',
+      quietAfterErrorMs
+    })
+
+    it('stops and gives the reason when it logs an error and goes quiet', async () => {
+      const path = await fakeCli(`echo '${limitLog}' >&2; sleep 10`)
+      const started = Date.now()
+      await expect(runCli(opencode(path, 200))).rejects.toThrow(
+        'OpenCode could not answer: Free usage limit reached.'
+      )
+      expect(Date.now() - started).toBeLessThan(5000)
+    })
+
+    it('keeps a reply that starts after an error it recovered from', async () => {
+      const path = await fakeCli(
+        `echo '${limitLog}' >&2; sleep 0.2; echo '{"type":"step_start"}'; sleep 0.8; echo '{"type":"text","part":{"text":"hello"}}'`
+      )
+      const run = opencode(path, 500)
+      const deltas: string[] = []
+      await runCli({ ...run, onDelta: (text) => deltas.push(text) })
+      expect(deltas).toEqual(['hello'])
+    })
+
+    it('gives the logged reason when it exits without a reply and without an error code', async () => {
+      const path = await fakeCli(`echo '${limitLog}' >&2`)
+      await expect(runCli(opencode(path, 5000))).rejects.toThrow(
+        'OpenCode could not answer: Free usage limit reached.'
+      )
+    })
+
+    it('gives the logged reason, not the log line, when it exits with an error', async () => {
+      const path = await fakeCli(`echo '${limitLog}' >&2; exit 1`)
+      await expect(runCli(opencode(path, 5000))).rejects.toThrow(
+        /^OpenCode could not answer: Free usage limit reached\.$/
+      )
+    })
+  })
+
   it('kills the child when cancelled', async () => {
     const path = await fakeCli('sleep 10')
     const cancel = new AbortController()

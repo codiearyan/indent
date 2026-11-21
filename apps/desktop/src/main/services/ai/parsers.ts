@@ -78,6 +78,16 @@ function opencodeLine(event: Json): CliLine {
   return {}
 }
 
+/**
+ * `opencode run --print-logs`: the reason a reply failed, which OpenCode writes to its log on
+ * stderr and nowhere else. Errors of the small model that only names the session do not count.
+ */
+export function opencodeLogError(line: string): string | undefined {
+  if (!/\blevel=ERROR\b/.test(line) || /\bsmall=true\b/.test(line)) return undefined
+  const logged = line.match(/\berror\.error="((?:[^"\\]|\\.)*)"/)?.[1]
+  return logged?.replace(/\\(.)/g, '$1').replace(/^\w*Error: /, '')
+}
+
 /** `gemini --output-format stream-json`; its `error` events are non-fatal warnings. */
 function geminiLine(event: Json): CliLine {
   if (event.type === 'message' && event.role === 'assistant') return { delta: text(event.content) }
