@@ -5,12 +5,17 @@ import { hintsUnlocked } from '@shared/rules'
 interface ShownHints {
   /** How many hints each task shows, by `hintKey`. Kept for the session. */
   shown: Record<string, number>
+  /** Which tasks have their help ladder open, by `hintKey`. */
+  open: Record<string, boolean>
   setShown(key: string, count: number): void
+  setOpen(key: string, open: boolean): void
 }
 
 export const useShownHints = create<ShownHints>()((set) => ({
   shown: {},
-  setShown: (key, count) => set((s) => ({ shown: { ...s.shown, [key]: count } }))
+  open: {},
+  setShown: (key, count) => set((s) => ({ shown: { ...s.shown, [key]: count } })),
+  setOpen: (key, open) => set((s) => ({ open: { ...s.open, [key]: open } }))
 }))
 
 export function hintKey(labId: string, chapterId: string, taskId: string): string {
