@@ -1,9 +1,9 @@
 import { edgeId } from '@shared/flow'
 import type { FlowNode, FlowScene } from '@shared/types'
 
-export const NODE_W = 144
+export const NODE_W = 136
 export const NODE_H = 48
-const COL_GAP = 72
+const COL_GAP = 80
 const ROW_GAP = 16
 /** Room for the outline of an active node. */
 const PAD = 6
