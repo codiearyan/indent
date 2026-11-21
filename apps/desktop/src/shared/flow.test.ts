@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkFlow, edgeId, traceFileProblem } from './flow'
+import { checkFlow, edgeId, tasksWithoutFlow, traceFileProblem } from './flow'
 
 const FILE = 'shop/orders/flow.json'
 
@@ -206,5 +206,18 @@ describe('traceFileProblem', () => {
 describe('edgeId', () => {
   it('joins the two ends with an arrow', () => {
     expect(edgeId({ from: 'form', to: 'total' })).toBe('form->total')
+  })
+})
+
+describe('tasksWithoutFlow', () => {
+  const flow = checkFlow(JSON.stringify(valid), FILE, ['total']).flow!
+
+  it('finds nothing when every task has a flow', () => {
+    expect(tasksWithoutFlow(flow, ['total'])).toEqual([])
+  })
+
+  it('names each task that has none, in the order of the issue', () => {
+    expect(tasksWithoutFlow(flow, ['top', 'total', 'revenue'])).toEqual(['top', 'revenue'])
+    expect(tasksWithoutFlow({ scene: flow.scene }, ['total'])).toEqual(['total'])
   })
 })

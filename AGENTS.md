@@ -184,8 +184,8 @@ packages/content/
   labs/<labId>/flow.json             the repo's scene on the repo page; see "Flows" below
   labs/<labId>/<chapterId>/
     chapter.json                     ChapterDef; `preview` names a page for the Browser panel
-    flow.json                        Flow: the issue's scene and a short flow per task, optional
-    intro.json                       Intro: the issue's story in five frames, optional; see "Intros"
+    flow.json                        Flow: the issue's scene and a short flow for every task
+    intro.json                       Intro: the issue's story in five frames; see "Intros"
     lesson.md                        `##` headings split it into the parts the audio player reads
     starter/**                       copied into the workspace on first open and on reset
     solution/**                      solved files, same relative paths
@@ -213,6 +213,22 @@ to the system voice when it does not. `node scripts/narrate.mjs [labId ...]` rec
 have no recording yet with a neural voice (it needs `uvx` and `ffmpeg`, and sends the lesson text to
 the voice service) and removes recordings whose text is gone. Run it after writing or editing a
 lesson. `apps/desktop/src/shared/narration.ts` holds the splitting and the key both sides use.
+
+### Writing repos and issues
+
+Four skills in `.claude/skills/` hold the conventions the repos share. Each has the steps, the
+rules and the commands that check the result; follow them whenever content is added or changed.
+
+- `new-repo`: the story, `lab.json`, the plan of issues, the repo's scene, the cover, the roadmap.
+- `new-issue`: the lesson, the tasks, the starter, the solution and the hidden checks.
+- `issue-flow`: an issue's `flow.json`, and what to update when its code or tasks change.
+- `issue-intro`: an issue's `intro.json`.
+
+An issue is not done without its flow and its intro. `scripts/build-packs.mjs` fails on an issue
+that has no `flow.json` or no `intro.json`, and on a task that has no flow, so a new issue cannot
+be merged without them. When an issue's code or tasks change, its flow and intro change with it.
+`node scripts/verify-content.mjs <root with the runtime's node_modules> [labId ...]` proves that
+every starter fails every task and every solution passes; the `new-issue` skill shows how to run it.
 
 ### Flows
 
@@ -429,6 +445,8 @@ The automated review of each pull request reads this section. Report these as hi
 - A grader message that gives the answer away, an issue whose starter passes a task, or one whose
   solution fails a task.
 - An intro that shows code, a hint or a value a check compares against.
+- A new issue without its flow or its intro, or a changed issue whose flow or intro was left
+  behind.
 - Copy a person sees that uses the code's words (lab, chapter, path) instead of the app's (repo,
   issue, roadmap).
 - Points, hints or level numbers written anywhere but `src/shared/rules.ts`.

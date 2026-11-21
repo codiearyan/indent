@@ -14,7 +14,7 @@ import {
 import { extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getChapter, listLabs, listPaths } from '../apps/desktop/src/main/services/packs.ts'
-import { checkFlow } from '../apps/desktop/src/shared/flow.ts'
+import { checkFlow, tasksWithoutFlow } from '../apps/desktop/src/shared/flow.ts'
 import { checkIntro } from '../apps/desktop/src/shared/intro.ts'
 import { TOOL_IDS } from '../apps/desktop/src/shared/types.ts'
 import { packArchive, packVersion } from '../apps/desktop/src/main/packArchive.ts'
@@ -67,21 +67,32 @@ function checkTraceNames(dir, name, flow) {
   }
 }
 
+// An issue is not done without its flow and its intro; a repo's own scene stays optional.
 function checkFlowFile(dir, name, taskIds) {
   const file = join(dir, 'flow.json')
-  if (!existsSync(file)) return
+  if (!existsSync(file)) {
+    if (taskIds) problems.push(`${name}: flow.json is missing; every issue has a flow`)
+    return
+  }
   const { flow, problems: found } = checkFlow(
     readFileSync(file, 'utf8'),
     `${name}/flow.json`,
     taskIds
   )
   problems.push(...found)
-  if (flow && taskIds) checkTraceNames(dir, name, flow)
+  if (!flow || !taskIds) return
+  for (const taskId of tasksWithoutFlow(flow, taskIds)) {
+    problems.push(`${name}/flow.json: task "${taskId}" has no flow; every task has one`)
+  }
+  checkTraceNames(dir, name, flow)
 }
 
 function checkIntroFile(dir, name) {
   const file = join(dir, 'intro.json')
-  if (!existsSync(file)) return
+  if (!existsSync(file)) {
+    problems.push(`${name}: intro.json is missing; every issue has an intro`)
+    return
+  }
   problems.push(...checkIntro(readFileSync(file, 'utf8'), `${name}/intro.json`).problems)
 }
 

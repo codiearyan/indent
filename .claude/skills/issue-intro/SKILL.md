@@ -9,8 +9,9 @@ An intro tells an issue's story in about 11 seconds, before the learner reads an
 one small file per issue, `packages/content/labs/<labId>/<chapterId>/intro.json`. You write content
 only. The app owns the motion and plays every intro the same way.
 
-Read "Intros" in `AGENTS.md` first, then `packages/content/labs/agents-ts/one-tool-call/intro.json`
-as the worked example.
+An intro is the last step of the `new-issue` skill, and it changes whenever the issue's tasks or
+story change. Read "Intros" in `AGENTS.md` first, then
+`packages/content/labs/agents-ts/one-tool-call/intro.json` as the worked example.
 
 ## What the learner sees
 
