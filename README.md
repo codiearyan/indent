@@ -63,6 +63,11 @@ Repos are plain files under `packages/content/labs/<labId>/`: a `lab.json`, and 
 grader contract are documented in [AGENTS.md](AGENTS.md); `packages/content/labs/llm-bug-hunts-ts` is a
 complete example. Restart the app to pick up a new repo.
 
+The conventions every repo follows are written down as skills in `.claude/skills/`: `new-repo`,
+`new-issue`, `issue-flow` and `issue-intro`. Each lists the steps and the commands that check the
+result. An issue needs its flow and its intro: the pack check
+(`node scripts/build-packs.mjs <out dir>`) fails without them.
+
 ## Where things are stored
 
 Your files are in the folder you picked for your work, `~/Indent` by default (Settings, Editor).

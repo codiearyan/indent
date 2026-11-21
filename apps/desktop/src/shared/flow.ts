@@ -153,6 +153,11 @@ function flowProblems(data: unknown, taskIds: string[] | null): string[] {
   return problems
 }
 
+/** The tasks of an issue that have no flow of their own; the pack build wants one for each. */
+export function tasksWithoutFlow(flow: Flow, taskIds: string[]): string[] {
+  return taskIds.filter((id) => !flow.tasks?.[id])
+}
+
 /** Why `file` cannot name a learner file of the workspace, or null when it can. */
 export function traceFileProblem(file: string): string | null {
   if (/^([\\/]|[A-Za-z]:)/.test(file)) return 'must be a path inside the workspace, not absolute'
