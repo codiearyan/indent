@@ -5,6 +5,8 @@ export const NODE_W = 136
 /** Room for a label of two lines and, on the learner's nodes, the "Your part" line. */
 export const NODE_H = 56
 const COL_GAP = 80
+/** An edge label wraps within the gap between two columns. */
+export const LABEL_W = COL_GAP - 8
 const ROW_GAP = 16
 /** Room for the outline of an active node. */
 const PAD = 6
@@ -22,6 +24,8 @@ export interface PlacedEdge {
   /** An SVG path, also used as the CSS offset-path of the moving dot. */
   d: string
   labelAt: { x: number; y: number }
+  /** The label sits under the line: a line back to an earlier column runs below the boxes. */
+  below?: boolean
 }
 
 export interface SceneLayout {
@@ -101,13 +105,47 @@ export function layoutScene(scene: FlowScene): SceneLayout {
     const a = { x: from.x + NODE_W / 2, y: from.y + NODE_H }
     const d = { x: to.x + NODE_W / 2 + (to === from ? 24 : 0), y: to.y + NODE_H }
     const low = bottom + BACK_DROP - 6
-    return { id, label: edge.label, ...curve(a, { x: a.x, y: low }, { x: d.x, y: low }, d) }
+    return {
+      id,
+      label: edge.label,
+      below: true,
+      ...curve(a, { x: a.x, y: low }, { x: d.x, y: low }, d)
+    }
   })
+  const backLabel = edges.some((edge) => edge.below && edge.label)
 
   return {
     width: PAD * 2 + used.length * (NODE_W + COL_GAP) - COL_GAP,
-    height: bottom + PAD + (goesBack ? BACK_DROP : 0),
+    height: bottom + PAD + (goesBack ? BACK_DROP : 0) + (backLabel ? LABEL_LINE + 4 : 0),
     nodes: [...placed.values()],
-    edges
+    edges: spreadLabels(edges)
   }
+}
+
+const LABEL_LINE = 13
+/** About how many characters of an 11px label fit on one line of LABEL_W. */
+const LABEL_CHARS = 12
+
+export function labelHeight(label: string): number {
+  return (label.length > LABEL_CHARS ? 2 : 1) * LABEL_LINE + 2
+}
+
+/**
+ * Labels sit above their line, at its middle. Lines that leave one box for the same column meet
+ * there, so a label that would cover the one above it moves down until it clears.
+ */
+export function spreadLabels(edges: PlacedEdge[]): PlacedEdge[] {
+  const placed = edges.map((edge) => ({ ...edge, labelAt: { ...edge.labelAt } }))
+  const above = placed
+    .filter((edge) => edge.label && !edge.below)
+    .sort((a, b) => a.labelAt.y - b.labelAt.y)
+  for (let i = 1; i < above.length; i++) {
+    const label = above[i]
+    for (const earlier of above.slice(0, i)) {
+      if (Math.abs(earlier.labelAt.x - label.labelAt.x) >= LABEL_W) continue
+      const top = earlier.labelAt.y + 2 + labelHeight(label.label!)
+      if (label.labelAt.y < top) label.labelAt.y = top
+    }
+  }
+  return placed
 }
