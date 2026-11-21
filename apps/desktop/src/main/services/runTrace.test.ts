@@ -208,12 +208,15 @@ describe('run-trace.mjs', () => {
   }, 30_000)
 
   it("keeps the learner's own output apart from the result, and cuts it", async () => {
-    const result = await trace('noisy')
-    expect(result.ok).toBe(true)
-    expect(result.calls[0].returned).toBe('"done"')
-    expect(result.stdout.startsWith('line 0\nline 1\n')).toBe(true)
-    expect(result.stdout.endsWith('... (output cut)')).toBe(true)
-    expect(result.stdout.length).toBeLessThan(4100)
+    // Several at once: on Linux a child that exits before its output is written loses the tail.
+    const results = await Promise.all(Array.from({ length: 6 }, () => trace('noisy')))
+    for (const result of results) {
+      expect(result.ok).toBe(true)
+      expect(result.calls[0].returned).toBe('"done"')
+      expect(result.stdout.startsWith('line 0\nline 1\n')).toBe(true)
+      expect(result.stdout.endsWith('... (output cut)')).toBe(true)
+      expect(result.stdout.length).toBeLessThan(4100)
+    }
   })
 
   it('traces a .ts file', async () => {
