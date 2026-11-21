@@ -101,9 +101,10 @@ async function install(): Promise<UpdateStatus> {
 }
 
 export function register(): void {
-  // The person decides: nothing downloads or installs unless they ask.
+  // Nothing downloads unless the person asks. Once they have, the update goes in at "Restart now"
+  // or when the app quits; the updater arms that only if this is on when the download finishes.
   autoUpdater.autoDownload = false
-  autoUpdater.autoInstallOnAppQuit = false
+  autoUpdater.autoInstallOnAppQuit = true
   autoUpdater.on('update-available', available)
   autoUpdater.on('update-not-available', () => set({ state: 'current', version: app.getVersion() }))
   autoUpdater.on('download-progress', (progress) => {
@@ -118,9 +119,6 @@ export function register(): void {
     check,
     download,
     cancel: async () => token?.cancel(),
-    install,
-    installOnQuit: async () => {
-      autoUpdater.autoInstallOnAppQuit = true
-    }
+    install
   })
 }

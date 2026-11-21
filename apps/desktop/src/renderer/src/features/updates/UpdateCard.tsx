@@ -7,7 +7,6 @@ import {
   cancelUpdate,
   checkForUpdates,
   downloadUpdate,
-  installOnQuit,
   installUpdate,
   updateLater,
   useUpdates
@@ -105,7 +104,7 @@ export function UpdateCard({ compact = false }: { compact?: boolean }): React.JS
           <Button size="sm" onClick={() => void installUpdate()}>
             Restart now
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => installOnQuit(status.version)}>
+          <Button variant="ghost" size="sm" onClick={() => updateLater(status.version)}>
             Next time you open Indent
           </Button>
         </div>

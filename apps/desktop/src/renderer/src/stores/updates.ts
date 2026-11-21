@@ -27,11 +27,6 @@ export async function installUpdate(): Promise<void> {
   await api.updates.install()
 }
 
-export function installOnQuit(version: string): void {
-  void api.updates.installOnQuit()
-  updateLater(version)
-}
-
 /** For a repo that needs a newer app: shows the update in Settings and looks for it. */
 export function getNewVersion(): void {
   useSettingsDialog.getState().show('about')
