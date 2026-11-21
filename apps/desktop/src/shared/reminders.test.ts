@@ -15,12 +15,12 @@ import type { LabSummary, PracticeSchedule, ProgressState } from './types'
 // November 2026: the 23rd is a Monday.
 const at = (day: number, hour = 12, minute = 0): Date => new Date(2026, 10, day, hour, minute)
 
-const MWF: PracticeSchedule = { days: [1, 3, 5], time: '19:00', minutes: 20, method: 'app' }
+const MWF: PracticeSchedule = { days: [1, 3, 5], time: '19:00', minutes: 20, notify: true }
 
 describe('readReminderSettings', () => {
   it('is all off when nothing is saved', () => {
     expect(readReminderSettings(undefined)).toEqual({
-      schedule: { days: [], time: '19:00', minutes: null, method: 'app' },
+      schedule: { days: [], time: '19:00', minutes: null, notify: true },
       tray: false,
       openAtLogin: false
     })
@@ -31,16 +31,17 @@ describe('readReminderSettings', () => {
     expect(readReminderSettings(saved)).toEqual({ schedule: MWF, tray: true, openAtLogin: true })
   })
 
-  it('drops what is not a day, a time, a length or a method', () => {
+  it('drops what is not a day, a time or a length, and only false turns notifications off', () => {
     const saved = {
-      schedule: { days: [1, 9, -1, 'x', 2.5], time: '25:00', minutes: -5, method: 'fax' }
+      schedule: { days: [1, 9, -1, 'x', 2.5], time: '25:00', minutes: -5, notify: 'no' }
     }
     expect(readReminderSettings(saved).schedule).toEqual({
       days: [1],
       time: '19:00',
       minutes: null,
-      method: 'app'
+      notify: true
     })
+    expect(readReminderSettings({ schedule: { notify: false } }).schedule.notify).toBe(false)
   })
 
   it('only takes true for the switches', () => {
@@ -105,8 +106,8 @@ describe('shouldRemind', () => {
     expect(shouldRemind({ ...base, now: at(23, 19), practicedToday: true })).toBeNull()
   })
 
-  it('stays quiet when reminders only go to the calendar', () => {
-    const schedule = { ...MWF, method: 'calendar' as const }
+  it('stays quiet when notifications are turned off', () => {
+    const schedule = { ...MWF, notify: false }
     expect(shouldRemind({ ...base, schedule, now: at(23, 19) })).toBeNull()
   })
 

@@ -501,8 +501,6 @@ export interface AiCompleteRequest {
 /** 0 is Sunday, as `Date.getDay()` counts. */
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
-export type ReminderMethod = 'app' | 'calendar' | 'both'
-
 export interface PracticeSchedule {
   /** No days means no schedule. */
   days: Weekday[]
@@ -510,7 +508,8 @@ export interface PracticeSchedule {
   time: string
   /** How long a session is meant to be; only used in the reminder text and the calendar event. */
   minutes: number | null
-  method: ReminderMethod
+  /** Send a notification at the session time. Off keeps the schedule, for the calendar and Home. */
+  notify: boolean
 }
 
 export interface ReminderSettings {

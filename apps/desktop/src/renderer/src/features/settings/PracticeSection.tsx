@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { DAY_NAMES, WEEK, WEEKDAYS, WEEKEND, describeSchedule } from '@shared/reminders'
-import type {
-  PracticeSchedule,
-  ReminderConfig,
-  ReminderMethod,
-  ReminderTestResult,
-  Weekday
-} from '@shared/types'
+import type { PracticeSchedule, ReminderConfig, ReminderTestResult, Weekday } from '@shared/types'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -35,12 +29,6 @@ const LENGTHS = [15, 20, 30, 45, 60]
 const TIMES = Array.from({ length: 96 }, (_, i) =>
   [Math.floor(i / 4), (i % 4) * 15].map((n) => String(n).padStart(2, '0')).join(':')
 )
-
-const METHODS: { method: ReminderMethod; label: string }[] = [
-  { method: 'app', label: 'Notification' },
-  { method: 'calendar', label: 'Calendar' },
-  { method: 'both', label: 'Both' }
-]
 
 const isMac = window.platform === 'darwin'
 const trayName = isMac ? 'menu bar' : 'tray'
@@ -75,8 +63,6 @@ function Schedule({ schedule }: { schedule: PracticeSchedule }): React.JSX.Eleme
   const update = (change: Partial<PracticeSchedule>): void =>
     void useReminders.getState().set({ schedule: { ...schedule, ...change } })
   const summary = describeSchedule(schedule)
-  const notifies = schedule.method !== 'calendar'
-  const calendar = schedule.method !== 'app'
 
   return (
     <Group
@@ -156,40 +142,41 @@ function Schedule({ schedule }: { schedule: PracticeSchedule }): React.JSX.Eleme
             </SelectContent>
           </Select>
         </Row>
-        <Row label="Remind me with" hint="A calendar reminder comes even when Indent is closed.">
-          <ToggleGroup
-            type="single"
-            size="sm"
-            spacing={1}
-            aria-label="Remind me with"
-            className={`w-72 ${segmented}`}
-            value={schedule.method}
-            onValueChange={(method) => method && update({ method: method as ReminderMethod })}
-          >
-            {METHODS.map(({ method, label }) => (
-              <ToggleGroupItem key={method} value={method} className={segment}>
-                {label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+        <Row
+          id="practice-notify"
+          label="Notifications"
+          hint="Indent reminds you at this time while it is running. Add the schedule to your calendar to be reminded when it is closed too."
+        >
+          <Switch
+            id="practice-notify"
+            checked={schedule.notify}
+            onCheckedChange={(notify) => update({ notify })}
+          />
         </Row>
       </div>
       <p className="mt-3 text-sm" aria-live="polite">
         {summary ?? <span className="text-muted-foreground">No days picked, so no reminders.</span>}
       </p>
-      {summary && <Actions notifies={notifies} calendar={calendar} />}
+      {summary && !schedule.notify && (
+        <div
+          className="mt-3 flex items-center justify-between gap-4 rounded-lg border border-border px-4 py-3"
+          role="status"
+        >
+          <p className="text-[13px] text-muted-foreground">
+            Notifications are off, so Indent will not remind you at this time.
+          </p>
+          <Button variant="outline" size="sm" onClick={() => update({ notify: true })}>
+            Turn on
+          </Button>
+        </div>
+      )}
+      {summary && <Actions notifies={schedule.notify} />}
     </Group>
   )
 }
 
 /** Try the reminder now, and save the calendar event. */
-function Actions({
-  notifies,
-  calendar
-}: {
-  notifies: boolean
-  calendar: boolean
-}): React.JSX.Element {
+function Actions({ notifies }: { notifies: boolean }): React.JSX.Element {
   const [result, setResult] = useState<ReminderTestResult | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -222,11 +209,9 @@ function Actions({
             Send a test reminder
           </Button>
         )}
-        {calendar && (
-          <Button variant="outline" size="sm" disabled={busy} onClick={() => void save()}>
-            Add to calendar
-          </Button>
-        )}
+        <Button variant="outline" size="sm" disabled={busy} onClick={() => void save()}>
+          Add to calendar
+        </Button>
       </div>
       {result && notifies && (
         <p className="mt-2 text-[13px] text-muted-foreground" role="status">

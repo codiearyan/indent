@@ -3,7 +3,6 @@ import type {
   LabSummary,
   PracticeSchedule,
   ProgressState,
-  ReminderMethod,
   ReminderSettings,
   Weekday
 } from './types'
@@ -22,7 +21,6 @@ export const DAY_NAMES = [
 export const WEEKDAYS: Weekday[] = [1, 2, 3, 4, 5]
 export const WEEKEND: Weekday[] = [6, 0]
 
-const METHODS: ReminderMethod[] = ['app', 'calendar', 'both']
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/
 const MINUTE = 60_000
 
@@ -45,7 +43,7 @@ export function readReminderSettings(saved: unknown): ReminderSettings {
       days,
       time: typeof p.time === 'string' && TIME.test(p.time) ? p.time : '19:00',
       minutes,
-      method: METHODS.includes(p.method as ReminderMethod) ? (p.method as ReminderMethod) : 'app'
+      notify: p.notify !== false
     },
     tray: s.tray === true,
     openAtLogin: s.openAtLogin === true
@@ -53,7 +51,7 @@ export function readReminderSettings(saved: unknown): ReminderSettings {
 }
 
 export const sendsNotifications = (schedule: PracticeSchedule): boolean =>
-  schedule.days.length > 0 && schedule.method !== 'calendar'
+  schedule.days.length > 0 && schedule.notify
 
 export const isPracticeDay = (schedule: PracticeSchedule, date: Date): boolean =>
   schedule.days.includes(date.getDay() as Weekday)
