@@ -17,7 +17,7 @@ import { moveContents, planMove } from './moveFolder'
 import { killAll } from './terminal'
 import { isAppPath, resolveInside } from './workspaceFiles'
 import { createFile, createFolder, removePath, renamePath } from './workspaceOps'
-import { openWorkspace, resetWorkspace, resolveConflict } from './workspaceSync'
+import { openWorkspace, resetWorkspace, resolveConflict, restoreMissing } from './workspaceSync'
 
 const queues = new Map<string, Promise<unknown>>()
 
@@ -115,6 +115,7 @@ export function register(): void {
     open: (labId, chapterId) => inWorkspace(labId, chapterId, openWorkspace),
     writeFile: write,
     reset: (labId, chapterId) => inWorkspace(labId, chapterId, resetWorkspace),
+    restoreMissing: (labId, chapterId) => inWorkspace(labId, chapterId, restoreMissing),
     resolveConflict: (labId, chapterId, path, choice) =>
       inWorkspace(labId, chapterId, (starterDir, dir, first) =>
         resolveConflict(starterDir, dir, first, String(path), choice === 'new' ? 'new' : 'mine')

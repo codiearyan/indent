@@ -58,6 +58,8 @@ interface WorkspaceStore {
   conflicts: string[]
   /** Reset keeps the files the learner added; false for a workspace from before that. */
   remembered: boolean
+  /** Starter files that are gone from disk; checks wait until they are back. */
+  missing: string[]
   /** The editor groups and their tabs. */
   layout: EditorLayout
   /** The active file of the focused group. */
@@ -92,6 +94,8 @@ interface WorkspaceStore {
   refresh(): Promise<void>
   /** Restores the starter files. */
   reset(): Promise<void>
+  /** Copies back the starter files in `missing`, leaving every other file alone. */
+  restoreMissing(): Promise<void>
   /** Makes an empty file and opens it. */
   createFile(path: string): Promise<void>
   createFolder(path: string): Promise<void>
@@ -144,7 +148,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
 
   /** `opening` restores the issue's remembered tabs; otherwise tabs of files that are gone close. */
   const applySnapshot = (
-    { files, folders, dir, starter, conflicts, updated, remembered }: WorkspaceSnapshot,
+    { files, folders, dir, starter, conflicts, updated, remembered, missing }: WorkspaceSnapshot,
     opening = false
   ): void => {
     const { layout, chapter } = get()
@@ -157,7 +161,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       set((s) => ({ revision: s.revision + 1 }))
       if (conflicts.length === 0) toast('This issue was updated. Your changes are kept.')
     }
-    set({ files, folders, dir, starter, conflicts, remembered })
+    set({ files, folders, dir, starter, conflicts, remembered, missing })
     setLayout(next)
   }
 
@@ -178,6 +182,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     starter: {},
     conflicts: [],
     remembered: true,
+    missing: [],
     layout: NO_LAYOUT,
     activePath: null,
     revision: 0,
@@ -197,6 +202,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         folders: [],
         starter: {},
         conflicts: [],
+        missing: [],
         layout: NO_LAYOUT,
         activePath: null
       })
@@ -265,6 +271,8 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       set((s) => ({ revision: s.revision + 1 }))
     },
 
+    restoreMissing: () => change(() => api.workspace.restoreMissing(...ids())),
+
     createFile: async (path) => {
       await change(() => api.workspace.createFile(...ids(), path))
       get().openFile(path)
@@ -308,8 +316,12 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         const before = useProgress.getState().progress?.chapters[key]
         const { results, progress } = await api.checks.run(chapter.labId, chapter.id, taskIds)
         useSettings.getState().setLeftTab('tasks')
-        // No results: the repo tools are not ready, and the notice above the tasks says why.
-        if (results.length === 0) return results
+        // No results: the repo tools are not ready or files are missing, and a notice says why.
+        if (results.length === 0) {
+          // A file deleted in the terminal changes nothing the window would notice.
+          await get().refresh()
+          return results
+        }
         const previous = useProgress.getState().progress
         useProgress.getState().set(progress)
         if (previous) noticeMoment(previous, progress)

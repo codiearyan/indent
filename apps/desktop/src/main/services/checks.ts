@@ -19,6 +19,7 @@ import {
 } from './grader'
 import { labModelProblem, labModelReady, startLabModel } from './labModel'
 import { getProgress, recordCheck } from './progress'
+import { findMissing } from './workspaceSync'
 import { InstallError } from '../library'
 import {
   downloadTools,
@@ -208,6 +209,11 @@ async function runCheck(
   const unknown = ids.find((id) => !known.includes(id))
   if (unknown) throw new Error(`Unknown task: ${unknown}`)
 
+  // The banner across the issue names the missing files; checks would only fail on their imports.
+  const starterDir = join(chapterContentDir(labId, chapterId), 'starter')
+  if ((await findMissing(starterDir, workspaceDir(labId, chapterId))).length > 0) {
+    return { results: [], progress: await getProgress() }
+  }
   const status = await ensureRuntime()
   // The notice above the tasks says what is wrong; the tasks are not failed for it.
   if (!status.ready) return { results: [], progress: await getProgress() }
