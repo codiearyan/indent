@@ -36,10 +36,12 @@ export function GuideTour(): React.JSX.Element | null {
   const route = routeOf(pathname)
   const shown = shownStage(stage, route)
 
+  // Only on arriving somewhere: a guide started again from inside an issue stays on Home's steps.
   useEffect(() => {
-    const next = stageOn(stage, route)
-    if (next !== stage) setGuide(next)
-  }, [stage, route, setGuide])
+    const { guide } = useSettings.getState()
+    const next = stageOn(guide, route)
+    if (next !== guide) setGuide(next)
+  }, [route, setGuide])
 
   const suggested = useMemo(
     () =>
