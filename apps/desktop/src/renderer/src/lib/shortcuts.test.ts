@@ -4,6 +4,8 @@ import {
   formatKeys,
   isAppShortcut,
   isShellKey,
+  isShortcut,
+  keysOf,
   matchesKeys,
   SHORTCUTS,
   skipsShortcut,
@@ -216,13 +218,23 @@ const normal = (keys: string): string => {
 
 describe('SHORTCUTS', () => {
   it('never gives the same keys to two shortcuts that can be live together', () => {
-    const entries = Object.entries(SHORTCUTS)
-    const clashes = entries.flatMap(([a, x], i) =>
+    const entries = Object.entries(SHORTCUTS).flatMap(([id, s]) =>
+      keysOf(s).map((keys) => ({ id, scope: s.scope, keys: normal(keys) }))
+    )
+    const clashes = entries.flatMap((x, i) =>
       entries
         .slice(i + 1)
-        .filter(([, y]) => OVERLAPS[x.scope].includes(y.scope) && normal(x.keys) === normal(y.keys))
-        .map(([b]) => `${a} and ${b}`)
+        .filter((y) => OVERLAPS[x.scope].includes(y.scope) && x.keys === y.keys)
+        .map((y) => `${x.id} and ${y.id}`)
     )
     expect(clashes).toEqual([])
+  })
+
+  it('opens the shortcut list with either of its keys', () => {
+    expect(isShortcut(press('/', { metaKey: true }, 'Slash'), 'shortcutList')).toBe(true)
+    expect(isShortcut(press('?', { metaKey: true, shiftKey: true }, 'Slash'), 'shortcutList')).toBe(
+      true
+    )
+    expect(isShortcut(press('/', {}, 'Slash'), 'shortcutList')).toBe(false)
   })
 })

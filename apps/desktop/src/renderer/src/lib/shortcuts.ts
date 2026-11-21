@@ -3,16 +3,23 @@ import type * as Monaco from 'monaco-editor'
 export type ShortcutScope =
   'everywhere' | 'editor' | 'workspace' | 'patterns' | 'tour' | 'chat' | 'onboarding'
 
-interface Shortcut {
+export interface Shortcut {
   label: string
   /** `Mod` is Cmd on macOS and Ctrl elsewhere, e.g. `Mod+Shift+K`. */
   keys: string
+  /** More keys for the same command, for where the first ones belong to the editor. */
+  also?: string
   scope: ShortcutScope
 }
 
 export const SHORTCUTS = {
   openSettings: { label: 'Open settings', keys: 'Mod+,', scope: 'everywhere' },
-  shortcutList: { label: 'Keyboard shortcuts', keys: 'Mod+/', scope: 'everywhere' },
+  shortcutList: {
+    label: 'Keyboard shortcuts',
+    keys: 'Mod+/',
+    also: 'Mod+Shift+/',
+    scope: 'everywhere'
+  },
   goHome: { label: 'Go to Home', keys: 'Mod+Alt+1', scope: 'everywhere' },
   goRepos: { label: 'Go to Repos', keys: 'Mod+Alt+2', scope: 'everywhere' },
   goRoadmaps: { label: 'Go to Roadmaps', keys: 'Mod+Alt+3', scope: 'everywhere' },
@@ -133,12 +140,17 @@ export function toMonacoKeys(
   return modifiers.reduce((binding, m) => binding | mods[m], monaco.KeyCode[code] as number)
 }
 
+/** Every key combination of a shortcut, the main one first. */
+export function keysOf(shortcut: Shortcut): string[] {
+  return shortcut.also ? [shortcut.keys, shortcut.also] : [shortcut.keys]
+}
+
 export function shortcutLabel(id: ShortcutId): string {
   return formatKeys(SHORTCUTS[id].keys, window.platform)
 }
 
 export function isShortcut(event: KeyEvent, id: ShortcutId): boolean {
-  return matchesKeys(event, SHORTCUTS[id].keys)
+  return keysOf(SHORTCUTS[id]).some((keys) => matchesKeys(event, keys))
 }
 
 export function monacoShortcut(
@@ -187,6 +199,7 @@ export function isAppShortcut(event: KeyEvent): boolean {
   if (isShellKey(event)) return false
   return Object.values(SHORTCUTS).some(
     (s: Shortcut) =>
-      (s.scope === 'everywhere' || s.scope === 'workspace') && matchesKeys(event, s.keys)
+      (s.scope === 'everywhere' || s.scope === 'workspace') &&
+      keysOf(s).some((keys) => matchesKeys(event, keys))
   )
 }
