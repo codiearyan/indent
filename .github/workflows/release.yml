@@ -67,8 +67,9 @@ jobs:
               exit 1
             fi
             version=$(cd apps/desktop && npm version "$BUMP" --no-git-tag-version | tr -d v)
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            # The repository owner's public GitHub address, so the commit is theirs like every other.
+            git config user.name 'Aryan Bhati'
+            git config user.email '123343302+codiearyan@users.noreply.github.com'
             git commit -am "chore: release $version"
             git tag "v$version"
             git push --atomic origin HEAD:main "v$version"
