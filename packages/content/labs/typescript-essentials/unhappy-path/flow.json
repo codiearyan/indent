@@ -1,0 +1,155 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "export", "label": "Old app's export", "kind": "story" },
+      { "id": "read", "label": "readBookings()", "kind": "function", "mine": true, "fn": "readBookings" },
+      { "id": "guard", "label": "isBookingRecord()", "kind": "function", "mine": true, "fn": "isBookingRecord" },
+      { "id": "app", "label": "New booking app", "kind": "story" },
+      { "id": "supplier", "label": "Parts supplier", "kind": "story" },
+      { "id": "describe", "label": "describeOrderFailure()", "kind": "function", "mine": true, "fn": "describeOrderFailure" },
+      { "id": "message", "label": "errorMessage()", "kind": "function", "mine": true, "fn": "errorMessage" },
+      { "id": "quote", "label": "getQuote()", "kind": "function", "mine": true },
+      { "id": "unwrap", "label": "unwrapOr()", "kind": "function", "mine": true, "fn": "unwrapOr" },
+      { "id": "screen", "label": "Quote screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "export", "to": "read", "label": "JSON text" },
+      { "from": "read", "to": "guard", "label": "each row" },
+      { "from": "read", "to": "app", "label": "valid rows" },
+      { "from": "supplier", "to": "describe", "label": "whatever was thrown" },
+      { "from": "describe", "to": "message", "label": "anything else" },
+      { "from": "describe", "to": "screen", "label": "a message" },
+      { "from": "supplier", "to": "quote", "label": "a price or a failure" },
+      { "from": "quote", "to": "unwrap", "label": "Result" },
+      { "from": "unwrap", "to": "screen", "label": "a price" }
+    ],
+    "note": "The old export, the supplier and every caught error hand you values you cannot trust, and you narrow each one before it reaches the shop."
+  },
+  "tasks": {
+    "import": {
+      "trace": {
+        "file": "src/import.ts",
+        "call": "readBookings",
+        "args": [
+          "[{\"id\":\"SW-0990\",\"customer\":\"Ingrid Dahl\",\"priceCents\":5400},{\"id\":\"SW-0991\",\"customer\":\"Tomas Berg\",\"priceCents\":\"48.00\"},{\"id\":\"SW-0992\",\"customer\":\"Asha Kemp\"},{\"id\":\"SW-0993\",\"customer\":\"Lena Vos\",\"priceCents\":2900}]"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["export", "export->read"],
+          "value": {
+            "kind": "map",
+            "label": "priceCents in each row",
+            "entries": [
+              { "key": "SW-0990", "value": 5400 },
+              { "key": "SW-0991", "value": "'48.00'" },
+              { "key": "SW-0992", "value": "missing" },
+              { "key": "SW-0993", "value": 2900 }
+            ]
+          },
+          "note": "Four rows come out of the old export as one JSON string, and not all of them are whole."
+        },
+        {
+          "active": ["read"],
+          "note": "JSON.parse returns any. Its result goes straight into a variable typed unknown, so nothing is read before it is checked."
+        },
+        {
+          "active": ["read"],
+          "note": "When the parsed value is not an array, readBookings throws an Error that says it wanted one."
+        },
+        {
+          "active": ["read", "read->guard", "guard"],
+          "note": "Each row goes through isBookingRecord, which accepts only an object with a text id, a text customer and a number priceCents."
+        },
+        {
+          "active": ["read", "read->app", "app"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "rows", "value": "BookingRecord list, in order" }]
+          },
+          "note": "Only the rows that pass reach the new app, in their order, typed as BookingRecord. The import no longer crashes halfway."
+        }
+      ]
+    },
+    "errors": {
+      "trace": {
+        "file": "src/errors.ts",
+        "call": "describeOrderFailure",
+        "args": [{ "message": "Courier lost the box", "code": 410 }]
+      },
+      "steps": [
+        {
+          "active": ["supplier", "supplier->describe"],
+          "value": {
+            "kind": "map",
+            "label": "what was thrown",
+            "entries": [
+              { "key": "message", "value": "Courier lost the box" },
+              { "key": "code", "value": 410 }
+            ]
+          },
+          "note": "The supplier's client threw a plain object, not an Error."
+        },
+        {
+          "active": ["describe"],
+          "note": "A caught value is unknown. The first question is whether it is a PartNotFoundError, and this object is not one."
+        },
+        {
+          "active": ["describe", "describe->message", "message"],
+          "note": "Anything else goes to errorMessage, which looks for an Error, then a string, then a non-null object whose message is text."
+        },
+        {
+          "active": ["message"],
+          "note": "A value that fits none of those gets one plain fallback sentence instead of a crash."
+        },
+        {
+          "active": ["describe", "describe->screen", "screen"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "line", "value": "Order failed, then a message" }]
+          },
+          "note": "The screen gets one string a customer can understand."
+        }
+      ]
+    },
+    "quotes": {
+      "trace": { "file": "src/quotes.ts", "call": "unwrapOr", "args": [{ "ok": true, "value": 2450 }, 0] },
+      "steps": [
+        {
+          "active": ["supplier", "supplier->quote", "quote"],
+          "note": "getQuote asks the supplier for a part's price. The supplier can answer, reject, or throw before it even returns a promise."
+        },
+        {
+          "active": ["quote"],
+          "note": "Every outcome becomes a Result: ok true with a value, or ok false with an error. getQuote itself never rejects."
+        },
+        {
+          "active": ["quote"],
+          "note": "A price below 0, or one that is not finite, is a failure too."
+        },
+        {
+          "active": ["quote", "quote->unwrap", "unwrap"],
+          "value": {
+            "kind": "map",
+            "label": "a quote for a saddle",
+            "entries": [
+              { "key": "ok", "value": "true" },
+              { "key": "value", "value": 2450 }
+            ]
+          },
+          "note": "The quote screen has a Result for a saddle and a fallback of 0, and hands both to unwrapOr."
+        },
+        {
+          "active": ["unwrap"],
+          "note": "unwrapOr gives the value of a successful result, or the fallback. The fallback has the same type as the value."
+        },
+        {
+          "active": ["unwrap", "unwrap->screen", "screen"],
+          "note": "The screen shows a price, and undefined never reaches a customer again."
+        }
+      ]
+    }
+  }
+}

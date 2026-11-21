@@ -1,0 +1,152 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "products", "label": "products", "kind": "data" },
+      { "id": "cafes", "label": "cafes", "kind": "data" },
+      { "id": "orders", "label": "orders and order_items", "kind": "data" },
+      { "id": "q1", "label": "1-above-average.sql", "kind": "file", "mine": true },
+      { "id": "q2", "label": "2-cake-buyers.sql", "kind": "file", "mine": true },
+      { "id": "q3", "label": "3-big-spenders.sql", "kind": "file", "mine": true },
+      { "id": "tobias", "label": "Tobias", "kind": "story" },
+      { "id": "odile", "label": "Odile", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "products", "to": "q1", "label": "prices" },
+      { "from": "cafes", "to": "q2", "label": "every cafe" },
+      { "from": "orders", "to": "q2", "label": "what they bought" },
+      { "from": "orders", "to": "q3", "label": "delivered items" },
+      { "from": "products", "to": "q3", "label": "prices" },
+      { "from": "q1", "to": "tobias", "label": "dear products" },
+      { "from": "q2", "to": "tobias", "label": "cake buyers" },
+      { "from": "q3", "to": "odile", "label": "big spenders" }
+    ],
+    "note": "Each query asks a small question inside a bigger one, so the numbers it compares against are worked out fresh every time it runs."
+  },
+  "tasks": {
+    "above-average": {
+      "steps": [
+        {
+          "active": ["products", "products->q1"],
+          "value": {
+            "kind": "grid",
+            "label": "a few rows of products",
+            "colLabels": ["name", "category", "price"],
+            "cells": [
+              ["Butter croissant", "pastry", 1.85],
+              ["Pain au chocolat", "pastry", 2.15],
+              ["White bloomer", "bread", 3.4],
+              ["Sesame bagel", "bread", 1.6]
+            ]
+          },
+          "note": "Every product comes in. A loaf and a croissant are not compared with each other, only with their own category."
+        },
+        {
+          "active": ["q1"],
+          "note": "For each product, the average price of its own category is worked out."
+        },
+        {
+          "active": ["q1"],
+          "note": "Bread and pastry have different averages, so each product is measured against the right one."
+        },
+        {
+          "active": ["q1"],
+          "note": "A product stays when its price is above its own category's average. No number is typed in, so a new price list still works."
+        },
+        {
+          "active": ["q1", "q1->tobias", "tobias"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["name", "category", "price"],
+            "cells": [["a product", "its category", "its price"]]
+          },
+          "note": "Tobias gets the dear products, by category from A to Z and dearest first within each."
+        }
+      ]
+    },
+    "cake-buyers": {
+      "steps": [
+        {
+          "active": ["cafes", "cafes->q2"],
+          "value": {
+            "kind": "grid",
+            "label": "one row of cafes",
+            "colLabels": ["id", "name", "town"],
+            "cells": [[14, "Pebble and Pine", "Saltmarsh"]]
+          },
+          "note": "The query looks at one cafe at a time."
+        },
+        {
+          "active": ["orders", "orders->q2", "q2"],
+          "value": {
+            "kind": "grid",
+            "label": "one order of this cafe, with its items",
+            "colLabels": ["order", "status", "product", "category"],
+            "cells": [[31, "cancelled", "Lemon drizzle slice", "cake"]]
+          },
+          "note": "Each order of this cafe has items, and each item is a product with a category."
+        },
+        {
+          "active": ["q2"],
+          "note": "Order 31 has a cake, but it was cancelled, so it does not count. Only a delivered order with a cake product does."
+        },
+        {
+          "active": ["q2"],
+          "note": "A cafe that bought ten cakes is still one cafe to Tobias, so it appears once."
+        },
+        {
+          "active": ["q2", "q2->tobias", "tobias"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["name", "town"],
+            "cells": [["a cafe name", "its town"]]
+          },
+          "note": "Tobias gets each cafe that buys cake once, in any order."
+        }
+      ]
+    },
+    "big-spenders": {
+      "steps": [
+        {
+          "active": ["orders", "products", "orders->q3", "products->q3"],
+          "value": {
+            "kind": "grid",
+            "label": "one delivered order line",
+            "colLabels": ["order", "product", "quantity", "price"],
+            "cells": [[2, "Lemon drizzle slice", 22, 2.75]]
+          },
+          "note": "Each line of a delivered order is worth its quantity times the product's current price."
+        },
+        {
+          "active": ["q3"],
+          "value": {
+            "kind": "grid",
+            "label": "the first step, named with WITH",
+            "colLabels": ["cafe_id", "total"],
+            "cells": [["a cafe id", "the sum of its lines"]]
+          },
+          "note": "The first step adds the lines up per cafe and gives that small table a name. Cafes with no delivered order are not in it."
+        },
+        {
+          "active": ["q3"],
+          "note": "The average spend is taken over the cafes that have at least one delivered order."
+        },
+        {
+          "active": ["q3"],
+          "note": "A cafe stays when its spend is above that average. The comparison uses the unrounded numbers."
+        },
+        {
+          "active": ["q3", "q3->odile", "odile"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["cafe", "spend"],
+            "cells": [["a cafe name", "its spend, rounded"]]
+          },
+          "note": "Odile gets the cafes that spend above average, highest spend first."
+        }
+      ]
+    }
+  }
+}

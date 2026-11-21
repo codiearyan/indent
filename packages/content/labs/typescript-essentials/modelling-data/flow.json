@@ -1,0 +1,155 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "desk", "label": "Booking desk", "kind": "story" },
+      { "id": "parse", "label": "parseLevel()", "kind": "function", "mine": true, "fn": "parseLevel" },
+      { "id": "price", "label": "levelPrice()", "kind": "function", "mine": true },
+      { "id": "create", "label": "createBooking()", "kind": "function", "mine": true, "fn": "createBooking" },
+      { "id": "workshop", "label": "Workshop", "kind": "story" },
+      { "id": "status", "label": "statusMessage()", "kind": "function", "mine": true, "fn": "statusMessage" },
+      { "id": "customer", "label": "Customer on the phone", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "desk", "to": "parse", "label": "typed level" },
+      { "from": "parse", "to": "price", "label": "ServiceLevel" },
+      { "from": "parse", "to": "create", "label": "ServiceLevel" },
+      { "from": "desk", "to": "create", "label": "id, bike, notes" },
+      { "from": "workshop", "to": "status", "label": "JobStatus" },
+      { "from": "status", "to": "customer", "label": "a message" }
+    ],
+    "note": "The shop's service levels, bookings and job states become exact types, so a typo like quik or a changed serial is caught before it ships."
+  },
+  "tasks": {
+    "levels": {
+      "trace": { "file": "src/levels.ts", "call": "parseLevel", "args": [" Basic "] },
+      "steps": [
+        {
+          "active": ["desk", "desk->parse"],
+          "value": {
+            "kind": "map",
+            "label": "what the desk typed",
+            "entries": [{ "key": "input", "value": "' Basic '" }]
+          },
+          "note": "Someone types ' Basic ' into the level box. Last week it was quik, and the price came out blank."
+        },
+        {
+          "active": ["parse"],
+          "value": { "kind": "array", "label": "ServiceLevel", "values": ["basic", "full", "overhaul"] },
+          "note": "ServiceLevel is exactly three string literals, so quik is not one of them."
+        },
+        {
+          "active": ["parse"],
+          "note": "parseLevel trims the text and ignores upper and lower case before it compares it with the three levels."
+        },
+        {
+          "active": ["parse", "parse->price"],
+          "note": "Text that is not a level gives null, and the return type ServiceLevel | null makes every caller deal with that."
+        },
+        {
+          "active": ["price"],
+          "value": {
+            "kind": "map",
+            "label": "what levelPrice gives",
+            "entries": [{ "key": "price", "value": "cents for that level" }]
+          },
+          "note": "levelPrice takes only a ServiceLevel, so levelPrice('quik') does not compile."
+        }
+      ]
+    },
+    "booking": {
+      "trace": {
+        "file": "src/booking.ts",
+        "call": "createBooking",
+        "args": ["SW-1051", { "serial": "KS-40528", "make": "Kestrel", "electric": true }, "overhaul"]
+      },
+      "steps": [
+        {
+          "active": ["desk", "desk->create"],
+          "value": {
+            "kind": "map",
+            "label": "the bike at drop-off",
+            "entries": [
+              { "key": "serial", "value": "KS-40528" },
+              { "key": "make", "value": "Kestrel" },
+              { "key": "electric", "value": "true" }
+            ]
+          },
+          "note": "An e-bike comes in for an overhaul as booking SW-1051, with no notes."
+        },
+        {
+          "active": ["create"],
+          "note": "Bike and Booking are interfaces. serial and id cannot be reassigned, so a serial can no longer change between drop-off and pickup."
+        },
+        {
+          "active": ["create", "parse->create"],
+          "note": "level is a ServiceLevel from levels.ts, not any string. electric and notes are optional."
+        },
+        {
+          "active": ["create"],
+          "note": "No notes were given, so the booking has no notes key at all."
+        },
+        {
+          "active": ["create"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "booking", "value": "a new Booking" }]
+          },
+          "note": "A new Booking comes back, with notes only when the desk wrote some."
+        }
+      ]
+    },
+    "status": {
+      "trace": {
+        "file": "src/status.ts",
+        "call": "statusMessage",
+        "args": [{ "kind": "waiting-for-parts", "part": "a brake cable", "days": 2 }]
+      },
+      "steps": [
+        {
+          "active": ["workshop", "workshop->status"],
+          "value": {
+            "kind": "map",
+            "label": "the job",
+            "entries": [
+              { "key": "kind", "value": "waiting-for-parts" },
+              { "key": "part", "value": "a brake cable" },
+              { "key": "days", "value": 2 }
+            ]
+          },
+          "note": "A customer calls about a bike that is waiting for a brake cable."
+        },
+        {
+          "active": ["status"],
+          "value": {
+            "kind": "array",
+            "label": "kind",
+            "values": ["waiting", "in-repair", "waiting-for-parts", "ready"]
+          },
+          "note": "JobStatus is a union of four object types, and kind tells them apart."
+        },
+        {
+          "active": ["status"],
+          "note": "A switch on kind picks the case for a job waiting for parts, which has a part and a number of days."
+        },
+        {
+          "active": ["status"],
+          "note": "One day reads day and any other number reads days."
+        },
+        {
+          "active": ["status"],
+          "note": "The default case assigns the status to a never variable and throws, so an unknown kind from old data fails loudly and a fifth kind is a type error."
+        },
+        {
+          "active": ["status", "status->customer", "customer"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "message", "value": "one sentence" }]
+          },
+          "note": "One sentence goes back that the desk can read out on the phone."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "orders", "label": "orders", "kind": "data" },
+      { "id": "products", "label": "products", "kind": "data" },
+      { "id": "q1", "label": "1-status-counts.sql", "kind": "file", "mine": true },
+      { "id": "q2", "label": "2-category-prices.sql", "kind": "file", "mine": true },
+      { "id": "q3", "label": "3-regular-cafes.sql", "kind": "file", "mine": true },
+      { "id": "odile", "label": "Odile", "kind": "story" },
+      { "id": "tobias", "label": "Tobias", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "orders", "to": "q1", "label": "rows" },
+      { "from": "products", "to": "q2", "label": "rows" },
+      { "from": "orders", "to": "q3", "label": "rows" },
+      { "from": "q1", "to": "odile", "label": "Monday numbers" },
+      { "from": "q2", "to": "tobias", "label": "a line per category" },
+      { "from": "q3", "to": "odile", "label": "regulars" }
+    ],
+    "note": "Three queries fold many rows into a few summary lines, so Odile and Tobias get numbers instead of lists."
+  },
+  "tasks": {
+    "status-counts": {
+      "steps": [
+        {
+          "active": ["orders", "orders->q1"],
+          "value": {
+            "kind": "grid",
+            "label": "a few rows of orders",
+            "colLabels": ["id", "cafe_id", "ordered_on", "status"],
+            "cells": [
+              [12, 1, "2026-09-24", "delivered"],
+              [13, 11, "2026-09-27", "cancelled"],
+              [19, 14, "2026-10-09", "pending"],
+              [20, 9, "2026-10-11", "delivered"]
+            ]
+          },
+          "note": "Every order comes in, each with one status."
+        },
+        {
+          "active": ["q1"],
+          "value": {
+            "kind": "map",
+            "label": "these four rows, by status",
+            "entries": [
+              { "key": "delivered", "value": "orders 12 and 20" },
+              { "key": "cancelled", "value": "order 13" },
+              { "key": "pending", "value": "order 19" }
+            ]
+          },
+          "note": "Orders that share a status belong on the same line of Odile's report. Here are only four of them; the real table has many more."
+        },
+        {
+          "active": ["q1"],
+          "note": "Each status ends up as one line with its number of orders."
+        },
+        {
+          "active": ["q1", "q1->odile", "odile"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["status", "orders"],
+            "cells": [["a status", "how many orders have it"]]
+          },
+          "note": "Odile gets one row per status, in any order."
+        }
+      ]
+    },
+    "category-prices": {
+      "steps": [
+        {
+          "active": ["products", "products->q2"],
+          "value": {
+            "kind": "grid",
+            "label": "a few rows of products",
+            "colLabels": ["name", "category", "price"],
+            "cells": [
+              ["White bloomer", "bread", 3.4],
+              ["Cardamom bun", "pastry", 2.6],
+              ["Almond twist", "pastry", 3.15],
+              ["Lemon drizzle slice", "cake", 2.75]
+            ]
+          },
+          "note": "Every product comes in with its category and price."
+        },
+        {
+          "active": ["q2"],
+          "note": "Bread, pastry and cake each get their own line in Tobias's review."
+        },
+        {
+          "active": ["q2"],
+          "value": {
+            "kind": "array",
+            "label": "worked out for each category",
+            "values": ["how many", "lowest price", "highest price", "average price"]
+          },
+          "note": "For each category, Tobias wants four numbers about its products."
+        },
+        {
+          "active": ["q2"],
+          "note": "An average rarely lands on whole cents, so it is rounded to 2 decimal places."
+        },
+        {
+          "active": ["q2", "q2->tobias", "tobias"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["category", "products", "cheapest", "dearest", "avg_price"],
+            "cells": [["a category", "a count", "a price", "a price", "a rounded price"]]
+          },
+          "note": "Tobias gets one line per category, sorted from A to Z."
+        }
+      ]
+    },
+    "regular-cafes": {
+      "steps": [
+        {
+          "active": ["orders", "orders->q3"],
+          "value": {
+            "kind": "grid",
+            "label": "a few rows of orders",
+            "colLabels": ["id", "cafe_id", "status"],
+            "cells": [
+              [26, 2, "pending"],
+              [28, 2, "delivered"],
+              [29, 8, "pending"],
+              [31, 14, "cancelled"]
+            ]
+          },
+          "note": "Every order comes in, delivered or not."
+        },
+        {
+          "active": ["q3"],
+          "note": "Only delivered orders count toward a regular. Cancelled and pending ones do not."
+        },
+        {
+          "active": ["q3"],
+          "note": "Each cafe's delivered orders are counted."
+        },
+        {
+          "active": ["q3"],
+          "note": "A cafe with at least 3 delivered orders is a regular. The others are left off Odile's list."
+        },
+        {
+          "active": ["q3", "q3->odile", "odile"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["cafe_id", "delivered"],
+            "cells": [["a cafe id", "its delivered orders"]]
+          },
+          "note": "Odile gets the regulars, most delivered first, and the smaller cafe_id first when two are tied."
+        }
+      ]
+    }
+  }
+}

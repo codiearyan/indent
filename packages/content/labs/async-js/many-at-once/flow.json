@@ -1,0 +1,135 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "routes", "label": "loadRoutes()", "kind": "function", "mine": true, "fn": "loadRoutes" },
+      { "id": "route", "label": "getRoute()", "kind": "function", "fn": "getRoute" },
+      { "id": "status", "label": "portStatus()", "kind": "function", "mine": true, "fn": "portStatus" },
+      { "id": "ping", "label": "pingPort()", "kind": "function" },
+      { "id": "timeout", "label": "withTimeout()", "kind": "function", "mine": true },
+      { "id": "forecast", "label": "Forecast service", "kind": "story" },
+      { "id": "clock", "label": "Timer", "kind": "data" },
+      { "id": "odile", "label": "Odile's status page", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "routes", "to": "route", "label": "every id" },
+      { "from": "status", "to": "ping", "label": "every port" },
+      { "from": "timeout", "to": "forecast", "label": "the work" },
+      { "from": "timeout", "to": "clock", "label": "ms" },
+      { "from": "routes", "to": "odile", "label": "routes" },
+      { "from": "status", "to": "odile", "label": "up and down" },
+      { "from": "timeout", "to": "odile", "label": "forecast or nothing" }
+    ],
+    "note": "Odile's status page starts many requests at once and waits for them together, keeps going past the radios that stay silent, and stops waiting for a forecast that hangs."
+  },
+  "tasks": {
+    "all": {
+      "trace": {
+        "file": "src/loadRoutes.js",
+        "call": "loadRoutes",
+        "args": [["gull-heron", "quay-gull"]]
+      },
+      "steps": [
+        {
+          "active": ["routes"],
+          "value": { "kind": "array", "label": "ids", "values": ["gull-heron", "quay-gull"] },
+          "note": "The status page asks for two routes, gull-heron first."
+        },
+        {
+          "active": ["routes", "routes->route", "route"],
+          "value": { "kind": "array", "label": "started before any wait", "values": ["gull-heron", "quay-gull"] },
+          "note": "A request starts for every id before anything is awaited, so both are in flight at the same time."
+        },
+        {
+          "active": ["route"],
+          "value": { "kind": "array", "label": "answers as they arrive", "values": ["quay-gull", "gull-heron"] },
+          "note": "The shorter id answers first. The order the answers arrive in does not decide the order of the result."
+        },
+        {
+          "active": ["routes", "routes->odile", "odile"],
+          "value": {
+            "kind": "array",
+            "label": "the shape of the result",
+            "values": ["{ id, minutes } for gull-heron", "{ id, minutes } for quay-gull"]
+          },
+          "note": "One route per id, in the order of the ids. If any route is closed, the whole result rejects with its error."
+        }
+      ]
+    },
+    "settled": {
+      "trace": {
+        "file": "src/portStatus.js",
+        "call": "portStatus",
+        "args": [["heron", "reef", "quay"]]
+      },
+      "steps": [
+        {
+          "active": ["status", "status->ping", "ping"],
+          "value": { "kind": "array", "label": "pinged at once", "values": ["heron", "reef", "quay"] },
+          "note": "Every harbour radio is pinged at the same moment."
+        },
+        {
+          "active": ["ping"],
+          "value": {
+            "kind": "grid",
+            "label": "how each ping ended",
+            "colLabels": ["port", "ping"],
+            "cells": [
+              ["heron", "answered"],
+              ["reef", "no answer"],
+              ["quay", "answered"]
+            ]
+          },
+          "note": "The reef radio stays silent and its ping rejects. Reef still gets its line on the page, and the other ports still count."
+        },
+        {
+          "active": ["status"],
+          "note": "portStatus() waits until it has heard from every radio, answered or silent."
+        },
+        {
+          "active": ["status", "status->odile", "odile"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of the result",
+            "entries": [
+              { "key": "up", "value": "ports that answered" },
+              { "key": "down", "value": "{ port, reason } for the rest" }
+            ]
+          },
+          "note": "Each port lands in one list, in the order it was given. The result never rejects, even when every radio is silent."
+        }
+      ]
+    },
+    "timeout": {
+      "steps": [
+        {
+          "active": ["timeout", "timeout->forecast", "forecast"],
+          "note": "withTimeout() is handed the forecast request, already on its way, and a number of milliseconds."
+        },
+        {
+          "active": ["timeout", "timeout->clock", "clock"],
+          "note": "It starts exactly one timer for that many milliseconds. The page now waits on whichever ends first, the forecast or the timer."
+        },
+        {
+          "active": ["forecast", "timeout", "timeout->odile", "odile"],
+          "note": "If the forecast settles first, the page gets its value or its error, and the timer is cleared so nothing is left waiting."
+        },
+        {
+          "active": ["clock", "timeout", "timeout->odile", "odile"],
+          "value": {
+            "kind": "map",
+            "label": "when the timer wins",
+            "entries": [
+              { "key": "name", "value": "TimeoutError" },
+              { "key": "message", "value": "mentions the ms" }
+            ]
+          },
+          "note": "If the timer fires first, the page gets a timeout error instead."
+        },
+        {
+          "active": ["forecast", "timeout"],
+          "note": "Giving up does not stop the forecast. If it fails later, that failure is not left unhandled."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "form", "label": "Booking form", "kind": "story" },
+      { "id": "inputs", "label": "Price, contact, greeting", "kind": "file", "mine": true },
+      { "id": "model", "label": "Booking model", "kind": "file", "mine": true },
+      { "id": "helpers", "label": "Generic helpers", "kind": "file", "mine": true },
+      { "id": "derived", "label": "Types from Booking", "kind": "file", "mine": true },
+      { "id": "export", "label": "Old app's export", "kind": "story" },
+      { "id": "supplier", "label": "Parts supplier", "kind": "story" },
+      { "id": "failures", "label": "Import, errors, quotes", "kind": "file", "mine": true },
+      { "id": "shop", "label": "Marit and the customers", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "form", "to": "inputs", "label": "typed input" },
+      { "from": "inputs", "to": "model", "label": "clean values" },
+      { "from": "model", "to": "helpers", "label": "jobs, notes" },
+      { "from": "model", "to": "derived", "label": "Booking" },
+      { "from": "export", "to": "failures", "label": "rows to check" },
+      { "from": "supplier", "to": "failures", "label": "prices or errors" },
+      { "from": "model", "to": "shop", "label": "job status" },
+      { "from": "failures", "to": "shop", "label": "plain messages" }
+    ],
+    "note": "You move Spokewell's booking app from plain JavaScript to TypeScript, one helper, model and failure at a time, so the compiler catches the cases the old code only hoped for."
+  }
+}

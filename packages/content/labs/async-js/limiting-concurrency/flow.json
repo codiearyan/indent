@@ -1,0 +1,130 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bookings", "label": "Tomorrow's bookings", "kind": "data" },
+      { "id": "batches", "label": "runInBatches()", "kind": "function", "mine": true },
+      { "id": "pool", "label": "mapLimit()", "kind": "function", "mine": true },
+      { "id": "settled", "label": "mapLimitSettled()", "kind": "function", "mine": true },
+      { "id": "send", "label": "sendReminder()", "kind": "function" },
+      { "id": "mail", "label": "Mail service", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bookings", "to": "batches", "label": "items, size" },
+      { "from": "bookings", "to": "pool", "label": "items, limit" },
+      { "from": "bookings", "to": "settled", "label": "items, limit" },
+      { "from": "settled", "to": "send", "label": "every item, failed or not" },
+      { "from": "batches", "to": "send", "label": "a batch at a time" },
+      { "from": "pool", "to": "send", "label": "as slots free up" },
+      { "from": "send", "to": "mail", "label": "at most 3 open" }
+    ],
+    "note": "Evening reminders go out through a mail service that refuses a fourth connection, so your code keeps every send under the limit and decides what one full mailbox does to the rest."
+  },
+  "tasks": {
+    "batches": {
+      "steps": [
+        {
+          "active": ["bookings", "bookings->batches", "batches"],
+          "value": {
+            "kind": "array",
+            "label": "items",
+            "values": ["B1", "B2", "B3", "B4", "B5", "B6", "B7"]
+          },
+          "note": "Seven reminders, in batches of three."
+        },
+        {
+          "active": ["batches", "batches->send", "send"],
+          "value": {
+            "kind": "grid",
+            "label": "the batches",
+            "rowLabels": ["first", "second", "third"],
+            "cells": [
+              ["B1", "B2", "B3"],
+              ["B4", "B5", "B6"],
+              ["B7", "", ""]
+            ]
+          },
+          "note": "The whole first batch starts at once. Each job is told its item and its position in the whole list."
+        },
+        {
+          "active": ["batches", "send"],
+          "note": "B2 finishes early, but nothing new starts. The second batch waits until every job in the first one is done."
+        },
+        {
+          "active": ["batches", "batches->send", "send", "send->mail", "mail"],
+          "note": "The last batch holds only B7. A batch is only as fast as its slowest reminder."
+        },
+        {
+          "active": ["batches"],
+          "note": "The results come back in the order of the list. If a job fails, the run rejects with that error and starts no further batch."
+        }
+      ]
+    },
+    "pool": {
+      "steps": [
+        {
+          "active": ["bookings", "bookings->pool", "pool"],
+          "value": { "kind": "array", "label": "items", "values": ["B1", "B2", "B3", "B4", "B5"] },
+          "note": "Five reminders, at most three sending at a time."
+        },
+        {
+          "active": ["pool", "pool->send", "send"],
+          "value": {
+            "kind": "grid",
+            "label": "in flight",
+            "colLabels": ["slot 1", "slot 2", "slot 3"],
+            "rowLabels": ["start", "B2 done", "B1 done"],
+            "cells": [
+              ["B1", "B2", "B3"],
+              ["B1", "B4", "B3"],
+              ["B5", "B4", "B3"]
+            ]
+          },
+          "note": "Reminders start in list order. The moment B2 is done, its place goes to B4, while B1 and B3 are still sending."
+        },
+        {
+          "active": ["send", "send->mail", "mail"],
+          "note": "Never more than three are open at once, so the mail service refuses nothing, and a slow reminder holds up only its own slot."
+        },
+        {
+          "active": ["pool"],
+          "value": {
+            "kind": "array",
+            "label": "the shape of the result",
+            "values": ["result for B1", "result for B2", "result for B3", "result for B4", "result for B5"]
+          },
+          "note": "The results come back in the order of the list, whoever finished first."
+        },
+        {
+          "active": ["pool"],
+          "note": "When a job fails, the pool rejects with that error, takes no new item, and a later failure of a job still running is not left unhandled."
+        }
+      ]
+    },
+    "settled": {
+      "steps": [
+        {
+          "active": ["bookings", "bookings->settled", "settled"],
+          "value": { "kind": "array", "label": "items", "values": ["B8", "B9", "B10", "B11"] },
+          "note": "Tonight's run includes B9, whose mailbox is full."
+        },
+        {
+          "active": ["settled", "settled->send", "send"],
+          "note": "Reminders start in list order, at most three at a time, just as with mapLimit."
+        },
+        {
+          "active": ["settled", "settled->send", "send", "send->mail", "mail"],
+          "note": "B9 fails, its place frees up like any other, and the next reminder starts. Nobody else loses their reminder."
+        },
+        {
+          "active": ["settled"],
+          "value": {
+            "kind": "array",
+            "label": "the shape of the result",
+            "values": ["{ ok: true, value }", "{ ok: false, error }", "{ ok: true, value }", "{ ok: true, value }"]
+          },
+          "note": "One entry per booking, in order. A failed one carries the error itself, and the whole result never rejects."
+        }
+      ]
+    }
+  }
+}

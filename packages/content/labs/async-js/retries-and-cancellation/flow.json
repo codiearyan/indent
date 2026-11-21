@@ -1,0 +1,113 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "odile", "label": "Odile's tablet", "kind": "story" },
+      { "id": "retry", "label": "retry()", "kind": "function", "mine": true },
+      { "id": "task", "label": "fetchManifest()", "kind": "function" },
+      { "id": "harbour", "label": "Harbour server", "kind": "story" },
+      { "id": "sleep", "label": "sleep()", "kind": "function", "mine": true, "fn": "sleep" },
+      { "id": "timer", "label": "Timer", "kind": "data" },
+      { "id": "signal", "label": "AbortSignal", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "odile", "to": "retry", "label": "a download" },
+      { "from": "retry", "to": "task", "label": "{ attempt, signal }" },
+      { "from": "task", "to": "harbour", "label": "a request" },
+      { "from": "retry", "to": "sleep", "label": "ms, { signal }" },
+      { "from": "sleep", "to": "timer", "label": "ms" },
+      { "from": "odile", "to": "signal", "label": "cancel" },
+      { "from": "signal", "to": "retry", "label": "abort" },
+      { "from": "signal", "to": "sleep", "label": "abort" }
+    ],
+    "note": "The tablet downloads a passenger list from a busy harbour server, tries again with growing waits when it is worth it, and stops everything the moment Odile cancels."
+  },
+  "tasks": {
+    "backoff": {
+      "steps": [
+        {
+          "active": ["odile", "odile->retry", "retry", "retry->task", "task"],
+          "note": "The tablet wants the passenger list for S1. retry() calls the task with attempt 1."
+        },
+        {
+          "active": ["task", "task->harbour", "harbour"],
+          "value": {
+            "kind": "map",
+            "label": "the error",
+            "entries": [
+              { "key": "message", "value": "Harbour server busy" },
+              { "key": "retryable", "value": "true" }
+            ]
+          },
+          "note": "The server is busy. The error is marked retryable, so it is worth another try."
+        },
+        {
+          "active": ["retry", "retry->sleep", "sleep"],
+          "value": {
+            "kind": "grid",
+            "label": "the wait before each new try",
+            "colLabels": ["after attempt", "wait"],
+            "cells": [
+              [1, "baseMs"],
+              [2, "baseMs x 2"],
+              [3, "baseMs x 4"]
+            ]
+          },
+          "note": "Before trying again it sleeps, and each wait is twice the one before, so the server is not hammered."
+        },
+        {
+          "active": ["retry", "retry->task", "task"],
+          "note": "When an attempt works, retry resolves with its value and waits no more."
+        },
+        {
+          "active": ["retry"],
+          "note": "An error that is not retryable, like a sailing that does not exist, rejects at once. After the last attempt the last error comes back, with no final wait."
+        }
+      ]
+    },
+    "sleep": {
+      "trace": { "file": "src/sleep.js", "call": "sleep", "args": [150] },
+      "steps": [
+        {
+          "active": ["sleep"],
+          "note": "retry asks sleep() to wait 150 ms. If the signal it was given has already aborted, it rejects at once and starts no timer."
+        },
+        {
+          "active": ["sleep", "sleep->timer", "timer"],
+          "note": "Otherwise it starts one timer and listens for the signal's abort event."
+        },
+        {
+          "active": ["signal", "signal->sleep", "sleep"],
+          "note": "If Odile cancels first, the timer is cleared so it never fires, and the sleep rejects with the signal's reason."
+        },
+        {
+          "active": ["timer", "sleep"],
+          "note": "If the timer fires first, the sleep resolves and removes its abort listener, because one signal outlives many sleeps."
+        }
+      ]
+    },
+    "cancel": {
+      "steps": [
+        {
+          "active": ["odile", "odile->signal", "signal"],
+          "note": "Odile starts the S2 download with a signal she can abort when the sailing is called off for weather."
+        },
+        {
+          "active": ["retry", "retry->task", "task", "retry->sleep", "sleep"],
+          "note": "retry passes the signal on to every attempt and every sleep, so both can stop early."
+        },
+        {
+          "active": ["signal", "signal->retry", "retry"],
+          "note": "Partway through, the sailing is called off and Odile cancels. From that moment no new attempt and no new wait may begin."
+        },
+        {
+          "active": ["task", "retry"],
+          "note": "An attempt that was already running may still fail with a retryable error after the abort. That is no reason to wait and try again."
+        },
+        {
+          "active": ["retry", "odile"],
+          "note": "Once the signal has aborted, nothing new starts, and the download rejects with the signal's reason. A signal that is already aborted never calls the task at all."
+        }
+      ]
+    }
+  }
+}

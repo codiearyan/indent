@@ -1,0 +1,138 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "odile", "label": "Odile", "kind": "story" },
+      { "id": "tobias", "label": "Tobias", "kind": "story" },
+      { "id": "q1", "label": "1-new-cafe.sql", "kind": "file", "mine": true },
+      { "id": "q2", "label": "2-price-review.sql", "kind": "file", "mine": true },
+      { "id": "q3", "label": "3-cancel-order.sql", "kind": "file", "mine": true },
+      { "id": "cafes", "label": "cafes", "kind": "data" },
+      { "id": "orders", "label": "orders", "kind": "data" },
+      { "id": "products", "label": "products", "kind": "data" },
+      { "id": "items", "label": "order_items", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "odile", "to": "q1", "label": "a sign-up" },
+      { "from": "tobias", "to": "q2", "label": "a price review" },
+      { "from": "odile", "to": "q3", "label": "a cancellation" },
+      { "from": "q1", "to": "cafes", "label": "insert" },
+      { "from": "q1", "to": "orders", "label": "insert" },
+      { "from": "q2", "to": "products", "label": "update, delete" },
+      { "from": "items", "to": "q2", "label": "what was ordered" },
+      { "from": "items", "to": "q3", "label": "the order's items" },
+      { "from": "q3", "to": "products", "label": "stock back" },
+      { "from": "q3", "to": "orders", "label": "status" }
+    ],
+    "note": "This time the queries write: each one changes only the rows it means to, and the tables must still agree with each other afterwards."
+  },
+  "tasks": {
+    "new-cafe": {
+      "steps": [
+        {
+          "active": ["odile", "odile->q1", "q1"],
+          "note": "Odile has a new cafe on the phone. Its details are in the task, and its first order was placed the same day."
+        },
+        {
+          "active": ["q1", "q1->cafes", "cafes"],
+          "value": {
+            "kind": "grid",
+            "label": "the last rows of cafes",
+            "colLabels": ["id", "name", "town"],
+            "cells": [
+              [13, "Driftwood Kitchen", "Saltmarsh"],
+              [14, "Pebble and Pine", "Saltmarsh"]
+            ]
+          },
+          "note": "The new cafe comes after the last one, and the database chooses its id."
+        },
+        {
+          "active": ["q1"],
+          "note": "The new id is not typed anywhere. The second insert looks it up by the cafe's name, so it is right however many cafes there are."
+        },
+        {
+          "active": ["q1", "q1->orders", "orders"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of the new order",
+            "colLabels": ["id", "cafe_id", "driver_id", "ordered_on", "status"],
+            "cells": [["picked by the database", "the new cafe's id", "NULL", "the sign-up day", "pending"]]
+          },
+          "note": "The order gets its own new id, points at the new cafe and has no driver yet."
+        },
+        {
+          "active": ["cafes", "orders"],
+          "note": "Afterwards each table has exactly one more row, and every other row is as it was."
+        }
+      ]
+    },
+    "price-review": {
+      "steps": [
+        {
+          "active": ["tobias", "tobias->q2", "products"],
+          "value": {
+            "kind": "grid",
+            "label": "a few rows of products",
+            "colLabels": ["id", "name", "category", "price", "stock"],
+            "cells": [
+              [1, "Country sourdough", "bread", 4.2, 18],
+              [3, "Light rye rolls", "bread", 2.1, 0],
+              [9, "Almond twist", "pastry", 3.15, 0],
+              [12, "Carrot cake", "cake", 18.5, 6]
+            ]
+          },
+          "note": "Tobias has two changes for the product list, and every product starts as it is today."
+        },
+        {
+          "active": ["q2", "q2->products"],
+          "note": "The update changes only bread. Each bread price goes up by 5% and is rounded to 2 decimals; pastries and cakes keep theirs."
+        },
+        {
+          "active": ["items", "items->q2", "q2"],
+          "note": "The lines in order_items show which products were ever ordered."
+        },
+        {
+          "active": ["q2", "q2->products"],
+          "note": "A product goes only when both are true: it has no stock and no order ever named it. Out of stock alone is not enough."
+        },
+        {
+          "active": ["products"],
+          "note": "Afterwards every old order still points at a product that exists."
+        }
+      ]
+    },
+    "cancel-order": {
+      "steps": [
+        {
+          "active": ["odile", "odile->q3", "q3"],
+          "note": "Odile needs order 27 cancelled. Both changes go inside one transaction, so either both happen or neither does."
+        },
+        {
+          "active": ["items", "items->q3"],
+          "value": {
+            "kind": "grid",
+            "label": "a few rows of order_items",
+            "colLabels": ["order_id", "product_id", "quantity"],
+            "cells": [
+              [26, 4, 12],
+              [27, "a product", "a quantity"],
+              [28, 11, 8]
+            ]
+          },
+          "note": "The items of order 27 are read from order_items, not typed in. Lines of other orders are left alone."
+        },
+        {
+          "active": ["q3", "q3->products", "products"],
+          "note": "Each product in the order gets its quantity added back to its stock. A product not in the order keeps its stock."
+        },
+        {
+          "active": ["q3", "q3->orders", "orders"],
+          "note": "Order 27's status becomes cancelled. Its lines stay in order_items, so the history is kept."
+        },
+        {
+          "active": ["q3"],
+          "note": "The transaction is committed. The total stock is now higher by exactly the number of items in the order."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "gauge", "label": "Tide gauge", "kind": "story" },
+      { "id": "tides", "label": "loadTides.js", "kind": "file", "mine": true },
+      { "id": "board", "label": "Departure board", "kind": "story" },
+      { "id": "services", "label": "services.js", "kind": "file" },
+      { "id": "dashboard", "label": "dashboard.js", "kind": "file", "mine": true },
+      { "id": "office", "label": "Ticket office", "kind": "story" },
+      { "id": "status", "label": "portStatus.js", "kind": "file", "mine": true },
+      { "id": "odile", "label": "Odile's status page", "kind": "story" },
+      { "id": "pool", "label": "mapLimit.js", "kind": "file", "mine": true },
+      { "id": "mail", "label": "Mail service", "kind": "story" },
+      { "id": "retry", "label": "retry.js", "kind": "file", "mine": true },
+      { "id": "harbour", "label": "Harbour server", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "gauge", "to": "tides", "label": "callbacks" },
+      { "from": "tides", "to": "board", "label": "promises" },
+      { "from": "services", "to": "dashboard", "label": "slow calls" },
+      { "from": "dashboard", "to": "office", "label": "screens" },
+      { "from": "services", "to": "status", "label": "many at once" },
+      { "from": "status", "to": "odile", "label": "up and down" },
+      { "from": "pool", "to": "mail", "label": "three at a time" },
+      { "from": "retry", "to": "harbour", "label": "backoff, cancel" }
+    ],
+    "note": "Every screen in the Tidewell ticket office waits on a slow service, and your code decides what waits, what runs at once, what tries again and what stops."
+  }
+}
