@@ -189,8 +189,9 @@ The packaged app reads content from `<userData>/content`: on start it copies the
 the roadmaps and the shipped repos there, and it downloads the other repos from the library the site
 publishes (`scripts/build-packs.mjs`, `main/library.ts`). It ships only the repos listed in the
 `extraResources` filter of `apps/desktop/electron-builder.yml`, plus an index of all of them that
-`build/pack-index.cjs` writes before packing, so the catalog is complete offline. `pnpm dev` reads `content/` directly; to
-try downloads, serve a `build-packs.mjs` output and start with `INDENT_PACKS_URL=<its address>`.
+`build/pack-index.mjs` writes before packing, so the catalog is complete offline. `pnpm dev` reads
+`content/` directly; to try downloads, serve a `build-packs.mjs` output and start with
+`INDENT_PACKS_URL=<its address>`.
 
 Read aloud plays a recording when one exists for the exact text of a lesson part, and falls back
 to the system voice when it does not. `node scripts/narrate.mjs [labId ...]` records the parts that

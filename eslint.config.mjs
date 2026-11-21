@@ -14,6 +14,7 @@ export default defineConfig(
       '**/.astro',
       'content/**',
       'scripts/**',
+      'apps/desktop/build/**',
       'apps/desktop/src/renderer/src/components/ui/**'
     ]
   },
