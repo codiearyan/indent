@@ -1,8 +1,8 @@
 import type { SuggestionMode } from '@shared/types'
 
-export type StepId = 'welcome' | 'how' | 'ai' | 'provider' | 'help' | 'ready'
+export type StepId = 'welcome' | 'how' | 'goal' | 'ai' | 'provider' | 'help' | 'ready'
 
-export const ALL_STEPS: StepId[] = ['welcome', 'how', 'ai', 'provider', 'help', 'ready']
+export const ALL_STEPS: StepId[] = ['welcome', 'how', 'goal', 'ai', 'provider', 'help', 'ready']
 
 const AI_ONLY: StepId[] = ['provider', 'help']
 

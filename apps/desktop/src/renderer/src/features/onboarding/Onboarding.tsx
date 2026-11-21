@@ -7,6 +7,7 @@ import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
 import { StepStrip } from './StepStrip'
 import { AiChoice } from './AiChoice'
+import { Goal } from './Goal'
 import { HelpLevel } from './HelpLevel'
 import { Ready } from './Ready'
 import { HowItWorks } from './HowItWorks'
@@ -18,6 +19,7 @@ import './onboarding.css'
 const STEPS: Record<StepId, (props: { staged: boolean }) => React.JSX.Element> = {
   welcome: Welcome,
   how: HowItWorks,
+  goal: Goal,
   ai: AiChoice,
   provider: Provider,
   help: HelpLevel,

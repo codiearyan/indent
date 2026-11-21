@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ChevronRight } from 'lucide-react'
 import { chapterKey, currentStreak, levelFor, localDate } from '@shared/rules'
-import type { LabSummary, PathDef, ProgressState } from '@shared/types'
+import type { LabSummary, ProgressState } from '@shared/types'
 import { BuildStrip } from '@/components/app/BuildStrip'
 import { LanguageIcon } from '@/components/app/LanguageIcon'
 import { Button } from '@/components/ui/button'
@@ -11,20 +11,15 @@ import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
+import { useSettings } from '@/stores/settings'
 import { parseDate, recentWeeks } from './activity'
 import { Heatmap } from './Heatmap'
 import { labProgress, type LabProgress } from './labStatus'
+import { goalLabIds, recommendedOrder } from './recommend'
 
 interface LabRow {
   lab: LabSummary
   progress: LabProgress
-}
-
-/** Labs in the order the paths teach them, then any lab no path mentions. */
-function teachingOrder(labs: LabSummary[], paths: PathDef[]): LabSummary[] {
-  const ids = [...new Set(paths.flatMap((path) => path.stages.flatMap((stage) => stage.labs)))]
-  const ordered = ids.flatMap((id) => labs.find((lab) => lab.id === id) ?? [])
-  return [...ordered, ...labs.filter((lab) => !ids.includes(lab.id))]
 }
 
 function daysAgo(iso: string): string {
@@ -39,6 +34,8 @@ export function DashboardPage(): React.JSX.Element {
   const labs = useCatalog((s) => s.labs)
   const paths = useCatalog((s) => s.paths)
   const progress = useProgress((s) => s.progress)
+  const goal = useSettings((s) => s.goal)
+  const experience = useSettings((s) => s.experience)
   const weeks = useMemo(() => recentWeeks(17), [])
 
   if (!labs || !paths || !progress) {
@@ -55,7 +52,8 @@ export function DashboardPage(): React.JSX.Element {
     )
   }
 
-  const rows: LabRow[] = teachingOrder(labs, paths).map((lab) => ({
+  const onRoadmap = new Set(goalLabIds(paths, goal))
+  const rows: LabRow[] = recommendedOrder(labs, paths, goal, experience).map((lab) => ({
     lab,
     progress: labProgress(lab, progress.chapters)
   }))
@@ -148,7 +146,7 @@ export function DashboardPage(): React.JSX.Element {
                   key={lab.id}
                   lab={lab}
                   to={`/labs/${lab.id}`}
-                  meta={`${p.chapterCount} issues, ${p.taskCount} tasks`}
+                  meta={`${p.chapterCount} issues, ${p.taskCount} tasks${onRoadmap.has(lab.id) ? ', on your roadmap' : ''}`}
                 />
               ))}
             </ul>

@@ -8,6 +8,7 @@ export type Appearance = Theme | 'system'
 export type EditorOption = 'wordWrap' | 'lineNumbers' | 'minimap'
 export type TextZone = 'lesson' | 'tasks' | 'editor' | 'terminal'
 export type PanelKey = 'files' | 'terminal' | 'chat' | 'zen' | 'browser'
+export type Experience = 'new' | 'some' | 'experienced'
 
 export const TEXT_SCALE_MIN = 0.8
 export const TEXT_SCALE_MAX = 1.6
@@ -33,6 +34,9 @@ export interface SettingsState {
   starAsked: boolean
   /** Anonymous usage stats; on unless turned off in Settings. Nothing is sent while false. */
   telemetry: boolean
+  /** Id of the roadmap picked as a goal in the setup or on Roadmaps; null when not sure yet. */
+  goal: string | null
+  experience: Experience | null
   /** Ids of DSA patterns whose animation was played to the end. */
   dsaWatched: string[]
   markDsaWatched(id: string): void
@@ -50,6 +54,8 @@ export interface SettingsState {
   setOnboarded(onboarded: boolean): void
   setStarAsked(asked: boolean): void
   setTelemetry(telemetry: boolean): void
+  setGoal(goal: string | null): void
+  setExperience(experience: Experience): void
   resetLayout(): void
 }
 
@@ -89,6 +95,8 @@ export const useSettings = create<SettingsState>()(
       onboarded: false,
       starAsked: false,
       telemetry: true,
+      goal: null,
+      experience: null,
       dsaWatched: [],
       markDsaWatched: (id) =>
         set((s) => (s.dsaWatched.includes(id) ? s : { dsaWatched: [...s.dsaWatched, id] })),
@@ -111,6 +119,8 @@ export const useSettings = create<SettingsState>()(
       setOnboarded: (onboarded) => set({ onboarded }),
       setStarAsked: (starAsked) => set({ starAsked }),
       setTelemetry: (telemetry) => set({ telemetry }),
+      setGoal: (goal) => set({ goal }),
+      setExperience: (experience) => set({ experience }),
       resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' })
     }),
     {

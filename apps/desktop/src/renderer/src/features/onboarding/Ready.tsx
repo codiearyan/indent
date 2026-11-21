@@ -1,5 +1,7 @@
+import { Button } from '@/components/ui/button'
 import { activeProvider, useAi } from '@/features/ai/aiStore'
 import { useSettings } from '@/stores/settings'
+import { useWorkspaceRoot } from '@/features/workspace/useWorkspaceRoot'
 import { StepLayout } from './StepLayout'
 import { helpLevelFor } from './steps'
 
@@ -14,6 +16,7 @@ export function Ready({ staged }: { staged: boolean }): React.JSX.Element {
   const provider = activeProvider(config)
   const on = config?.enabled ?? true
   const telemetry = useSettings((s) => s.telemetry)
+  const folder = useWorkspaceRoot()
 
   const ai: [string, string][] = on
     ? [
@@ -40,13 +43,31 @@ export function Ready({ staged }: { staged: boolean }): React.JSX.Element {
         {rows.map(([label, value], i) => (
           <div
             key={label}
-            className="motion-enter flex h-12 items-center justify-between gap-6 border-b border-rule px-5 last:border-b-0"
+            className="motion-enter flex h-12 items-center justify-between gap-6 border-b border-rule px-5"
             style={{ '--i': i } as React.CSSProperties}
           >
             <dt className="text-[13px] text-muted-foreground">{label}</dt>
             <dd className="min-w-0 truncate text-sm">{value}</dd>
           </div>
         ))}
+        <div
+          className="motion-enter flex h-12 items-center justify-between gap-6 px-5"
+          style={{ '--i': rows.length } as React.CSSProperties}
+        >
+          <dt className="shrink-0 text-[13px] text-muted-foreground">Your work is saved in</dt>
+          <dd className="flex min-w-0 items-center gap-2">
+            <span className="min-w-0 truncate font-mono text-xs">{folder.root}</span>
+            <Button
+              variant="ghost"
+              size="xs"
+              className="font-normal text-muted-foreground hover:text-foreground"
+              disabled={folder.moving}
+              onClick={() => void folder.change()}
+            >
+              {folder.moving ? 'Moving...' : 'Change'}
+            </Button>
+          </dd>
+        </div>
       </dl>
       <p className="mt-6 text-[13px] text-muted-foreground">
         Pick a repo on Home and open its first issue. The lesson, the tasks and the editor are all
