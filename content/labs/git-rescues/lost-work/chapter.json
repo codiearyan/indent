@@ -23,6 +23,10 @@
         "In the reflog, the checkout line that says it moved from harbour-alerts to main tells you which entry just below it is the branch's last commit.",
         "`git branch <name> <hash>` creates a branch at any commit. Use the hash of the newest commit Pavel made on that branch."
       ],
+      "docs": [
+        { "title": "git reflog", "url": "https://git-scm.com/docs/git-reflog" },
+        { "title": "git branch", "url": "https://git-scm.com/docs/git-branch" }
+      ],
       "points": 10
     },
     {
@@ -39,6 +43,11 @@
         "The reset itself is in the reflog. The entry just below it is where main stood before.",
         "You can name that moment without copying a hash: the reflog syntax `main@{n}`.",
         "While on main, a hard reset to the reflog entry from before the reset moves the branch and the files together. Then `git status` should be clean."
+      ],
+      "docs": [
+        { "title": "git reflog", "url": "https://git-scm.com/docs/git-reflog" },
+        { "title": "Reflog syntax in gitrevisions", "url": "https://git-scm.com/docs/gitrevisions#_specifying_revisions" },
+        { "title": "git reset", "url": "https://git-scm.com/docs/git-reset" }
       ],
       "points": 10
     }

@@ -23,6 +23,11 @@
         "You do not need a class on everything. `.event h3` reaches every event title, and `form button` reaches the submit button.",
         "Two elements need a class for a rule of their own: the library name and the \"Save a place\" links in the cards. The rest already have a tag, a class or an id to hang a rule on."
       ],
+      "docs": [
+        { "title": "CSS selectors", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Selectors" },
+        { "title": "Class selectors", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/Class_selectors" },
+        { "title": "Descendant combinator", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/Descendant_combinator" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "A custom property is declared like `--name: value;` and used like `color: var(--name);`.",
         "Search `styles.css` for `#` and `rgb` when you think you are done. The only matches left should be inside `:root`."
       ],
+      "docs": [
+        { "title": "Using CSS custom properties", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties" },
+        { "title": "var()", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/var" },
+        { "title": ":root", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/:root" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "When two rules set the same property, the more specific selector wins, whatever order they come in.",
         "An id in a selector outweighs any number of classes. Does the grey rule need its id?",
         "Two classes beat one class and an element. Try a selector for the paragraphs inside a card, and one for the date inside a card."
+      ],
+      "docs": [
+        { "title": "Specificity", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Specificity" },
+        { "title": "Introducing the CSS cascade", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Introduction" },
+        { "title": "ID selectors", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/ID_selectors" }
       ],
       "points": 10
     }

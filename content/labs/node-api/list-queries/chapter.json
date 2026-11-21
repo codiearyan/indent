@@ -23,6 +23,11 @@
         "`Number('')` is 0 and `parseInt('10abc')` is 10, so neither is strict enough on its own. A regular expression that only matches digits is.",
         "For sort, check `sort.startsWith('-')`, slice it off, then check what is left against the three field names."
       ],
+      "docs": [
+        { "title": "URLSearchParams.get()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/get" },
+        { "title": "RegExp.prototype.test()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/test" },
+        { "title": "String.prototype.startsWith()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "`available: false` is a filter. A check like `if (query.available)` skips it by accident.",
         "`filter` returns a new array, so sorting that one is safe. In the compare function, multiply the field comparison by -1 for desc, and use `|| compareCodes` for ties."
       ],
+      "docs": [
+        { "title": "Array.prototype.filter()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter" },
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" },
+        { "title": "Array.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,10 @@
         "You already took the pathname out of `req.url` in handleRequest. The same object has the query.",
         "`new URL(req.url, 'http://localhost').searchParams` is exactly what parseListQuery takes.",
         "Do not catch the HttpError from parseListQuery. createApp already turns it into a 400."
+      ],
+      "docs": [
+        { "title": "url.searchParams", "url": "https://nodejs.org/docs/latest/api/url.html#urlsearchparams" },
+        { "title": "URLSearchParams", "url": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams" }
       ],
       "points": 10
     }

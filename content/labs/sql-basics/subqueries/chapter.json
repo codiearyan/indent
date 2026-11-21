@@ -29,6 +29,11 @@
         "The subquery needs to know which category the outer row has. Give the outer table an alias so the inner query can refer to it.",
         "Inside the subquery, filter with WHERE category = p.category, where p is the alias of the outer products table."
       ],
+      "docs": [
+        { "title": "Subquery expressions", "url": "https://www.sqlite.org/lang_expr.html#subq" },
+        { "title": "Correlated subqueries", "url": "https://www.sqlite.org/lang_expr.html#cosub" },
+        { "title": "avg()", "url": "https://www.sqlite.org/lang_aggfunc.html#avg" }
+      ],
       "points": 10
     },
     {
@@ -47,6 +52,10 @@
         "EXISTS (subquery) is true when the subquery returns at least one row. What it selects does not matter, so SELECT 1 is common.",
         "Inside EXISTS, join orders, order_items and products, and add o.cafe_id = c.id to the conditions along with the status and category."
       ],
+      "docs": [
+        { "title": "EXISTS", "url": "https://www.sqlite.org/lang_expr.html#the_exists_operator" },
+        { "title": "Correlated subqueries", "url": "https://www.sqlite.org/lang_expr.html#cosub" }
+      ],
       "points": 10
     },
     {
@@ -64,6 +73,11 @@
         "Break it into two questions: what did each cafe spend, and what is the average of those numbers?",
         "A WITH block works like a named table for the rest of the query, and you can read it more than once, including inside a subquery.",
         "In the final query: FROM your named result, JOIN cafes, and WHERE total > (SELECT AVG(total) FROM your named result)."
+      ],
+      "docs": [
+        { "title": "WITH", "url": "https://www.sqlite.org/lang_with.html" },
+        { "title": "Subquery expressions", "url": "https://www.sqlite.org/lang_expr.html#subq" },
+        { "title": "sum()", "url": "https://www.sqlite.org/lang_aggfunc.html#sumunc" }
       ],
       "points": 10
     }

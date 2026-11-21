@@ -29,6 +29,11 @@
         "Running the saved callbacks after the loop is exactly what real timers do: they fire when the loop is long gone.",
         "You should get three entries, and all three go to Priya at +44 7700 900303."
       ],
+      "docs": [
+        { "title": "setTimeout()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout" },
+        { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures" },
+        { "title": "Callback function", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Callback_function" }
+      ],
       "points": 10
     },
     {
@@ -47,6 +52,11 @@
         "`let` and `const` inside a loop body make a fresh binding on every pass, so each callback can close over its own one.",
         "Changing the loop counter to `let` is not enough while `booking` is still a `var`. Declare the booking itself with `const`, or loop with `for...of`."
       ],
+      "docs": [
+        { "title": "Closures in loops", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures#creating_closures_in_loops_a_common_mistake" },
+        { "title": "let", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let" },
+        { "title": "var", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/var" }
+      ],
       "points": 10
     },
     {
@@ -64,6 +74,11 @@
         "Real timers make tests slow and flaky. A fake one gives you control over when the callbacks run.",
         "The wrong fix passes `send(...)` to `setTimer`, so `send` runs immediately and `setTimer` gets `undefined`.",
         "Check `sent` is empty right after scheduling, and only then run the callbacks and check the three texts."
+      ],
+      "docs": [
+        { "title": "setTimeout()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout" },
+        { "title": "Closures in loops", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures#creating_closures_in_loops_a_common_mistake" },
+        { "title": "Callback function", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Callback_function" }
       ],
       "points": 10
     }

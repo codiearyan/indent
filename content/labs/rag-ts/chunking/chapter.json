@@ -23,6 +23,11 @@
         "A chunk's length is the sum of its word lengths plus one space between each pair of words.",
         "Start a new chunk when the current length + 1 + the next word's length is more than size. A chunk always takes at least its first word, even when that word alone is too long."
       ],
+      "docs": [
+        { "title": "String.prototype.split()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split" },
+        { "title": "Character classes", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Character_classes" },
+        { "title": "String.prototype.trim()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,10 @@
         "Walking backwards from the chunk's end, count the carried length the same way you count a chunk: word lengths plus single spaces.",
         "The next start must stay greater than the current start. Stop walking back one word before you reach it, and stop the loop when end reaches the last word."
       ],
+      "docs": [
+        { "title": "Chunking in retrieval", "url": "https://developers.openai.com/api/docs/guides/retrieval#chunking" },
+        { "title": "Array.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +67,10 @@
         "The array method that maps and flattens in one step fits this well.",
         "The second argument of a map callback is the position, which is exactly the index you need.",
         "For each doc, map the strings chunkText gives you to objects, building the id from the doc's id, a # and the position."
+      ],
+      "docs": [
+        { "title": "Array.prototype.flatMap()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap" },
+        { "title": "Template literals", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals" }
       ],
       "points": 10
     }

@@ -23,6 +23,11 @@
         "There are four parts: the strip at the top, the menu inside it, the middle of the page, and the block at the bottom.",
         "The `div` with class `top` is the start of the page and the `div` with class `menu` sits inside it. The `div` with class `content` and the one with id `visit` are the other two. Each element's name is a plain English word for its part."
       ],
+      "docs": [
+        { "title": "Content sectioning elements", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements#content_sectioning" },
+        { "title": "<main>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/main" },
+        { "title": "<nav>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/nav" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,10 @@
         "A `<b>` only changes how text looks. A heading also tells a screen reader where a new part starts.",
         "There are three levels: the page title, then the three section titles, then the event titles, which live under Events."
       ],
+      "docs": [
+        { "title": "<h1> to <h6> heading elements", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements" },
+        { "title": "<b>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/b" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +67,11 @@
         "The cards are a set of things of the same kind. Which HTML structure says \"here are five things\"?",
         "A list item holds an article, which holds the image, the heading, the date, the text and the footer of the card.",
         "December 2026 dates look like `2026-12-05`. With a start time: `2026-12-05T10:00`, in 24-hour time."
+      ],
+      "docs": [
+        { "title": "<article>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/article" },
+        { "title": "<time>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/time" },
+        { "title": "<ul>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/ul" }
       ],
       "points": 10
     }

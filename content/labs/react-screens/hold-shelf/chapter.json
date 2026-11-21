@@ -30,6 +30,11 @@
         "The card cannot reach the state in `App`. Hand it a function as a prop, and let the button call that function.",
         "React only re-renders when you give it a new value. `setHeldIds([...heldIds, id])` builds a new array; `push` changes the old one and React sees nothing new."
       ],
+      "docs": [
+        { "title": "State: a component's memory", "url": "https://react.dev/learn/state-a-components-memory" },
+        { "title": "Passing event handlers as props", "url": "https://react.dev/learn/responding-to-events#passing-event-handlers-as-props" },
+        { "title": "Updating arrays in state", "url": "https://react.dev/learn/updating-arrays-in-state" }
+      ],
       "points": 10
     },
     {
@@ -48,6 +53,11 @@
         "`filter` returns a new array, which is exactly what removing needs.",
         "One function can decide with `ids.includes(id)` whether to add or remove, and the updater form `setHeldIds((ids) => ...)` always starts from the latest ids."
       ],
+      "docs": [
+        { "title": "Removing from an array", "url": "https://react.dev/learn/updating-arrays-in-state#removing-from-an-array" },
+        { "title": "Updating state based on the previous state", "url": "https://react.dev/reference/react/useState#updating-state-based-on-the-previous-state" },
+        { "title": "Sharing state between components", "url": "https://react.dev/learn/sharing-state-between-components" }
+      ],
       "points": 10
     },
     {
@@ -64,6 +74,10 @@
         "Anything you can work out from state during render does not need state of its own.",
         "A second state for the count would have to be kept in step by hand, and sooner or later it would drift.",
         "The length of the held array is the number you need."
+      ],
+      "docs": [
+        { "title": "Avoid redundant state", "url": "https://react.dev/learn/choosing-the-state-structure#avoid-redundant-state" },
+        { "title": "Choosing the state structure", "url": "https://react.dev/learn/choosing-the-state-structure" }
       ],
       "points": 10
     }

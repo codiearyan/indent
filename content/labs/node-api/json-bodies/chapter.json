@@ -23,6 +23,11 @@
         "Each chunk is a Buffer, and a Buffer's `length` is already in bytes. Count those, not characters.",
         "Push each chunk into an array and add its length to a total. Throw the HttpError when the total passes `limit`, and return `Buffer.concat(chunks).toString('utf8')` at the end."
       ],
+      "docs": [
+        { "title": "Readable stream data event", "url": "https://nodejs.org/docs/latest/api/stream.html#event-data" },
+        { "title": "Buffer.concat()", "url": "https://nodejs.org/docs/latest/api/buffer.html#static-method-bufferconcatlist-totallength" },
+        { "title": "413 Content Too Large", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/413" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "`JSON.parse('')` throws too, but its message is confusing. A clear message for an empty body helps the client.",
         "Wrap only `JSON.parse(text)` in try and catch, and throw `new HttpError(400, 'invalid_json', ...)` from the catch."
       ],
+      "docs": [
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "400 Bad Request", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "JSON gives you whatever the client sent. Check the type of each value, not just whether it is there.",
         "`typeof null` is `'object'` and so is `typeof []`. You need more than one test for a plain object.",
         "`'toString' in RATES` is true and `RATES.toString` exists. `Object.hasOwn(RATES, type)` only sees the keys you wrote. For hours, `Number.isInteger` rejects strings and fractions in one go."
+      ],
+      "docs": [
+        { "title": "typeof", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof" },
+        { "title": "Object.hasOwn()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn" },
+        { "title": "Number.isInteger()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger" }
       ],
       "points": 10
     }

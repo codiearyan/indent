@@ -29,6 +29,11 @@
         "Ten percent of 42.65 is 4.265, exactly half a cent. The team rule says half a cent rounds up.",
         "The right ticket receipt has a discount of 4.27, and the total is subtotal minus that rounded discount."
       ],
+      "docs": [
+        { "title": "Number encoding", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number#number_encoding" },
+        { "title": "Number.prototype.toFixed()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed" },
+        { "title": "Math.round()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round" }
+      ],
       "points": 10
     },
     {
@@ -47,6 +52,11 @@
         "A price like 18.15 becomes a safe whole number with `Math.round(price * 100)`. Sums and products of whole numbers are exact.",
         "Keep everything in cents until the very end, and only divide by 100 when you format. The total should be subtotal cents minus discount cents."
       ],
+      "docs": [
+        { "title": "Number encoding", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number#number_encoding" },
+        { "title": "Math.round()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round" },
+        { "title": "Number.prototype.toFixed()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed" }
+      ],
       "points": 10
     },
     {
@@ -64,6 +74,11 @@
         "Compare whole objects, not just the total. A receipt can have the right total and the wrong discount.",
         "`Math.round(4.265 * 100)` is not 427. Try it in `node -e` and see why rounding at the end does not save you.",
         "The ticket order catches the rounding fix on the discount line. The group order catches the original on the total line."
+      ],
+      "docs": [
+        { "title": "Number encoding", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number#number_encoding" },
+        { "title": "Math.round()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round" },
+        { "title": "Number.prototype.toFixed()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed" }
       ],
       "points": 10
     }

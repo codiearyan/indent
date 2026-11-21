@@ -23,6 +23,11 @@
         "A `for` loop over `attempt` with a `try` and `catch` inside reads well. The `return` inside the `try` ends the whole function.",
         "In the catch, rethrow when the error is not retryable or when `attempt` has reached `attempts`. Sleep after the catch, before the next turn."
       ],
+      "docs": [
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "throw", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw" },
+        { "title": "Exponentiation (**)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Exponentiation" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "Two things can happen first: the timer fires or the signal aborts. Whichever comes first should undo the other.",
         "Name the abort handler so you can pass the same function to `removeEventListener` inside the timer callback, and call `clearTimeout(timer)` inside the handler."
       ],
+      "docs": [
+        { "title": "AbortSignal", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal" },
+        { "title": "AbortSignal abort event", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/abort_event" },
+        { "title": "EventTarget.removeEventListener()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "Aborting cannot reach inside a promise that is already running. Your code has to look at the signal whenever it gets control back.",
         "`signal?.throwIfAborted()` throws `signal.reason` when the signal is aborted and does nothing otherwise, including when there is no signal.",
         "Check at the top of each turn of the loop (covers the start and after waking) and first thing in the catch (covers a failure that arrives after an abort)."
+      ],
+      "docs": [
+        { "title": "AbortSignal.throwIfAborted()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/throwIfAborted" },
+        { "title": "AbortSignal.reason", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/reason" },
+        { "title": "AbortController", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortController" }
       ],
       "points": 10
     }

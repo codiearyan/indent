@@ -23,6 +23,11 @@
         "`setAttribute` takes strings. `String(true)` is `'true'`.",
         "`item.classList.toggle('ticked', isTicked)` adds the class when the second argument is true and removes it when it is false."
       ],
+      "docs": [
+        { "title": "aria-pressed", "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-pressed" },
+        { "title": "Element.setAttribute()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute" },
+        { "title": "DOMTokenList.toggle()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "A click on a button bubbles up through its parents. A listener on the list hears clicks on everything inside it, now and later.",
         "In the listener, `event.target.closest('.tick')` gives you the button, or `null` when the click was somewhere else. From the button, `closest('.route')` gives you the item and its `dataset.id`."
       ],
+      "docs": [
+        { "title": "Element.closest()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Element/closest" },
+        { "title": "Event.target", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Event/target" },
+        { "title": "EventTarget.addEventListener()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "The count is a number made from the routes array. `filter` and `length` will do.",
         "Count routes that are ticked, not the size of the set. Later the set may hold ids of routes that are no longer on the board.",
         "The check compares the text exactly: a number, the word `of`, a number and the word `ticked`, with single spaces and nothing else."
+      ],
+      "docs": [
+        { "title": "Array.prototype.filter()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter" },
+        { "title": "Set.prototype.has()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set/has" },
+        { "title": "Template literals", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals" }
       ],
       "points": 10
     }

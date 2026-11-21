@@ -30,6 +30,11 @@
         "`text.matchAll(/\\bverdict\\b[\\s*:]*.../gi)` finds every label. Put the lowercased words in a `Set` to see how many different verdicts there are.",
         "A `Set` of size 1 is a verdict; any other size is unknown. For the reason, match `reason` the same way and capture `(.*)`, which stops at the end of the line."
       ],
+      "docs": [
+        { "title": "Regular expressions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions" },
+        { "title": "Word boundary assertion", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Word_boundary_assertion" },
+        { "title": "String.prototype.matchAll()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll" }
+      ],
       "points": 10
     },
     {
@@ -48,6 +53,11 @@
         "The follow-up is a conversation: the original messages, what the judge said, then your nudge. Spread the first array and add the two new messages.",
         "One try/catch around both requests is enough. In the catch, build the reason from `(err as Error).message`."
       ],
+      "docs": [
+        { "title": "LLM as a judge", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices#llm-as-a-judge-and-model-graders" },
+        { "title": "Manage conversation state", "url": "https://developers.openai.com/api/docs/guides/conversation-state#manually-manage-conversation-state" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" }
+      ],
       "points": 10
     },
     {
@@ -65,6 +75,11 @@
         "Spread the verdict into the result: `{ id, draft, ...verdict }`.",
         "A small `count(kind)` helper that filters the results keeps the three counts readable.",
         "The denominator is `pass + fail`, not the number of cases. Guard it for zero."
+      ],
+      "docs": [
+        { "title": "LLM as a judge", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices#llm-as-a-judge-and-model-graders" },
+        { "title": "Model graders", "url": "https://developers.openai.com/api/docs/guides/graders#model-graders" },
+        { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" }
       ],
       "points": 10
     }

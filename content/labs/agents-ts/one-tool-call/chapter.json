@@ -22,6 +22,11 @@
         "`parameters` is plain JSON schema: `type`, `properties` and `required`, all at the same level.",
         "Inside `properties`, `orderId` is itself a small schema: `{ type: 'string', description: '...' }`. Then put `'orderId'` in the `required` array."
       ],
+      "docs": [
+        { "title": "Defining functions", "url": "https://developers.openai.com/api/docs/guides/function-calling#defining-functions" },
+        { "title": "Best practices for defining functions", "url": "https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions" },
+        { "title": "Supported JSON schemas", "url": "https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas" }
+      ],
       "points": 10
     },
     {
@@ -38,6 +43,11 @@
         "When the model wants a tool, the message content is empty and a different field of the message is filled in.",
         "Each entry in `tool_calls` has an `id`, a `type` and a `function` with `name` and `arguments`. Check `type === 'function'` so TypeScript knows `function` is there.",
         "`arguments` is a string. `JSON.parse(call.function.arguments)` turns it into the object you return as `args`."
+      ],
+      "docs": [
+        { "title": "Handling function calls", "url": "https://developers.openai.com/api/docs/guides/function-calling#handling-function-calls" },
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" },
+        { "title": "Chat completions API reference", "url": "https://developers.openai.com/api/reference/resources/chat" }
       ],
       "points": 10
     },
@@ -56,6 +66,11 @@
         "The API is strict about order: a `tool` message must come right after the assistant message that asked for it.",
         "You can push `res.choices[0].message` as it is. It already carries `role: 'assistant'` and the `tool_calls`.",
         "The tool message looks like `{ role: 'tool', tool_call_id: <the call's id>, content: JSON.stringify(result) }`. Send the same `tools` again in the second request."
+      ],
+      "docs": [
+        { "title": "The tool calling flow", "url": "https://developers.openai.com/api/docs/guides/function-calling#the-tool-calling-flow" },
+        { "title": "Sending results back to the model", "url": "https://developers.openai.com/api/docs/guides/function-calling#incorporating-results-into-response" },
+        { "title": "JSON.stringify()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" }
       ],
       "points": 10
     }

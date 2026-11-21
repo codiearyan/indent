@@ -23,6 +23,11 @@
         "The second type parameter needs a constraint so it can only be a key of the first: `K extends keyof T`.",
         "If `item` is a `T` and `key` is a `K`, then `item[key]` is a `T[K]`. A list of those is the return type."
       ],
+      "docs": [
+        { "title": "keyof type operator", "url": "https://www.typescriptlang.org/docs/handbook/2/keyof-types.html" },
+        { "title": "Indexed access types", "url": "https://www.typescriptlang.org/docs/handbook/2/indexed-access-types.html" },
+        { "title": "Using type parameters in generic constraints", "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html#using-type-parameters-in-generic-constraints" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "`Pick` chooses the members and `Partial` makes them optional, so the order you nest them in matters for which members end up optional.",
         "`{ ...booking, ...change }` copies a key whose value is `undefined` and wipes the old value. Set each changed member with `??` instead."
       ],
+      "docs": [
+        { "title": "Utility types", "url": "https://www.typescriptlang.org/docs/handbook/utility-types.html" },
+        { "title": "Nullish coalescing operator (??)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing" },
+        { "title": "Spread syntax", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "A mapped type walks over a union of keys and builds one member per key: `{ [K in SomeKeys]: ... }`. Inside, `K` is one key at a time.",
         "`Object.keys` returns `string[]` because objects can have extra keys at runtime. Telling TypeScript they are `(keyof T)[]` with `as` is the usual move here, and it is not `any`.",
         "A rule can be missing, so read `rules[key]` into a variable and call it only when it is defined, passing `value[key]`."
+      ],
+      "docs": [
+        { "title": "Mapped types", "url": "https://www.typescriptlang.org/docs/handbook/2/mapped-types.html" },
+        { "title": "Indexed access types", "url": "https://www.typescriptlang.org/docs/handbook/2/indexed-access-types.html" },
+        { "title": "Object.keys()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys" }
       ],
       "points": 10
     }

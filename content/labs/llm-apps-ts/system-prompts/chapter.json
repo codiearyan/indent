@@ -23,6 +23,11 @@
         "The local model only switches to bare labels when the system message lists every label and uses the word \"only\".",
         "`LABELS.includes(...)` needs a small cast in TypeScript, because LABELS is a readonly tuple of exact strings."
       ],
+      "docs": [
+        { "title": "Message roles", "url": "https://developers.openai.com/api/docs/guides/prompt-engineering#message-roles-and-instruction-following" },
+        { "title": "String.prototype.trim()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim" },
+        { "title": "Array.prototype.includes()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,10 @@
         "Examples go in the conversation as if the model had already answered them: user, then assistant.",
         "Keep the examples in a constant array of pairs and use flatMap to turn each pair into two messages."
       ],
+      "docs": [
+        { "title": "Few-shot learning", "url": "https://developers.openai.com/api/docs/guides/prompt-engineering#few-shot-learning" },
+        { "title": "Message roles", "url": "https://developers.openai.com/api/docs/guides/prompt-engineering#message-roles-and-instruction-following" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +67,11 @@
         "Your code is the one that relies on the format, so it should be strict about it rather than forgiving.",
         "Anchor the pattern with `^` and `$`, and remember that `|` must be escaped to match a literal bar.",
         "The plant capture needs to allow letters and spaces, while label and urgency can list their allowed words."
+      ],
+      "docs": [
+        { "title": "Regular expressions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions" },
+        { "title": "String.prototype.split()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split" },
+        { "title": "throw", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw" }
       ],
       "points": 10
     }

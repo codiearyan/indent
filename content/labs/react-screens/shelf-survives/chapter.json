@@ -29,6 +29,11 @@
         "`localStorage.getItem` returns a string or `null`, and `JSON.parse` throws on text that is not JSON.",
         "Wrap the parse in `try` and `catch`, and check the result with `Array.isArray` before you trust it."
       ],
+      "docs": [
+        { "title": "Avoiding recreating the initial state", "url": "https://react.dev/reference/react/useState#avoiding-recreating-the-initial-state" },
+        { "title": "Window.localStorage", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" },
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" }
+      ],
       "points": 10
     },
     {
@@ -47,6 +52,11 @@
         "The dependency array tells React when to run the effect again: after any render where one of those values changed.",
         "If the shelf empties on refresh even though saving works, check that the first task reads the value before the first save can overwrite it."
       ],
+      "docs": [
+        { "title": "useEffect", "url": "https://react.dev/reference/react/useEffect" },
+        { "title": "Synchronizing with effects", "url": "https://react.dev/learn/synchronizing-with-effects" },
+        { "title": "Storage.setItem()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Storage/setItem" }
+      ],
       "points": 10
     },
     {
@@ -64,6 +74,11 @@
         "The page's keyboard is outside React, so listening to it is a job for an effect.",
         "Without a cleanup every opening adds one more listener, and they pile up for as long as the page is open.",
         "`removeEventListener` only removes the exact function that was added. Keep the listener in a variable inside the effect and use it in both calls."
+      ],
+      "docs": [
+        { "title": "Add cleanup if needed", "url": "https://react.dev/learn/synchronizing-with-effects#step-3-add-cleanup-if-needed" },
+        { "title": "removeEventListener()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener" },
+        { "title": "KeyboardEvent.key", "url": "https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key" }
       ],
       "points": 10
     }

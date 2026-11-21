@@ -32,6 +32,11 @@
         "Inside JSX, curly braces switch back to JavaScript: `<h3>{record.title}</h3>`.",
         "Leave the Sold mark out for now or copy it as it is; the third task is about it. Each value that was typed in becomes `{record.something}`."
       ],
+      "docs": [
+        { "title": "Your first component", "url": "https://react.dev/learn/your-first-component" },
+        { "title": "Passing props to a component", "url": "https://react.dev/learn/passing-props-to-a-component" },
+        { "title": "JavaScript in JSX with curly braces", "url": "https://react.dev/learn/javascript-in-jsx-with-curly-braces" }
+      ],
       "points": 10
     },
     {
@@ -50,6 +55,10 @@
         "The `key` goes on the outermost element returned from the `map` callback, here the `<li>`.",
         "The index from `map` changes when the order changes. Each record already carries something that never changes."
       ],
+      "docs": [
+        { "title": "Rendering lists", "url": "https://react.dev/learn/rendering-lists" },
+        { "title": "Keeping list items in order with key", "url": "https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key" }
+      ],
       "points": 10
     },
     {
@@ -66,6 +75,10 @@
         "JSX does not have an `if` inside it, but an expression can decide what to render.",
         "`{condition && <span>...</span>}` renders the span only when the condition is true.",
         "React renders nothing for `false`, `null` and `undefined`, so `record.sold && ...` is safe for a boolean."
+      ],
+      "docs": [
+        { "title": "Conditional rendering", "url": "https://react.dev/learn/conditional-rendering" },
+        { "title": "Logical AND operator (&&)", "url": "https://react.dev/learn/conditional-rendering#logical-and-operator-" }
       ],
       "points": 10
     }

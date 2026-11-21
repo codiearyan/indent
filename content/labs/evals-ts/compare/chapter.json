@@ -31,6 +31,11 @@
         "A `Map` from id to `passed` gives you the candidate outcome for any baseline id in one lookup. A missing entry means the runs do not match.",
         "Checking baseline ids against the candidate map finds one direction. Also look for candidate ids that are not in the baseline before you start sorting."
       ],
+      "docs": [
+        { "title": "How to read evals", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices#how-to-read-evals" },
+        { "title": "Map", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" },
+        { "title": "Set", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set" }
+      ],
       "points": 10
     },
     {
@@ -49,6 +54,11 @@
         "`broken.map(id => ...)` gives you the reasons; `ship` is whether that list is empty.",
         "Both model runs are independent, so `Promise.all` can run them side by side."
       ],
+      "docs": [
+        { "title": "Evaluation best practices", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices" },
+        { "title": "Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" },
+        { "title": "Template literals", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals" }
+      ],
       "points": 10
     },
     {
@@ -66,6 +76,10 @@
         "Tests that only use cases where the rate and the rule agree cannot tell the two rules apart.",
         "Make a candidate that fixes two cases and breaks one. Its rate goes up, and the rule must still say no.",
         "`expect(decision.ship).toBe(false)` plus `expect(decision.reasons.join(' ')).toContain(id)` covers the first two rules for that case."
+      ],
+      "docs": [
+        { "title": "Design your eval process", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices#design-your-eval-process" },
+        { "title": "Analyze eval results", "url": "https://developers.openai.com/api/docs/guides/evals#analyze-the-results" }
       ],
       "points": 10
     }

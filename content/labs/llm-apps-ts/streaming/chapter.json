@@ -23,6 +23,11 @@
         "The first chunk often has an empty content, and the last one may have no choices at all. Guard both before reading.",
         "`const choice = chunk.choices[0]; if (!choice) continue` handles the empty case, and `choice.delta?.content` the rest."
       ],
+      "docs": [
+        { "title": "Stream a chat completion", "url": "https://developers.openai.com/api/docs/guides/streaming-responses#stream-a-chat-completion" },
+        { "title": "for await...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of" },
+        { "title": "Chat completions API reference", "url": "https://developers.openai.com/api/reference/resources/chat" }
+      ],
       "points": 10
     },
     {
@@ -40,6 +45,11 @@
         "The call belongs inside the same `if` that adds a non-empty piece.",
         "One line is enough: `onPartial(text)` after `text += piece`."
       ],
+      "docs": [
+        { "title": "Read the streamed responses", "url": "https://developers.openai.com/api/docs/guides/streaming-responses#read-the-responses" },
+        { "title": "Callback function", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Callback_function" },
+        { "title": "for await...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of" }
+      ],
       "points": 10
     },
     {
@@ -56,6 +66,11 @@
         "With `stream: true`, the client does not give you a response with choices. It gives you something to iterate.",
         "You already wrote the hard part. This function only builds the request.",
         "Await the `create` call, then `return collectStream(stream, onPartial)`."
+      ],
+      "docs": [
+        { "title": "Stream a chat completion", "url": "https://developers.openai.com/api/docs/guides/streaming-responses#stream-a-chat-completion" },
+        { "title": "Streaming in the Node SDK", "url": "https://github.com/openai/openai-node#streaming-responses" },
+        { "title": "Chat completions API reference", "url": "https://developers.openai.com/api/reference/resources/chat" }
       ],
       "points": 10
     }

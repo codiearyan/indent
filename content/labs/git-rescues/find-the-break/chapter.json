@@ -23,6 +23,10 @@
         "`check.mjs` exits 1 when a case fails, so `git bisect run` can run it at each step for you.",
         "Start with main as bad and the fare calculator commit as good. The line ending in `is the first bad commit` has the hash to save."
       ],
+      "docs": [
+        { "title": "git bisect", "url": "https://git-scm.com/docs/git-bisect" },
+        { "title": "git bisect run", "url": "https://git-scm.com/docs/git-bisect#_bisect_run" }
+      ],
       "points": 10
     },
     {
@@ -40,6 +44,11 @@
         "The guilty commit was a rewrite, and only one small detail of it changed the behavior.",
         "Read the condition that decides whether the discount applies. Which group sizes does it include?",
         "Groups of exactly four should get the discount. Change that comparison on main, keep the bike code, then `git commit -am` with a clear message."
+      ],
+      "docs": [
+        { "title": "git bisect reset", "url": "https://git-scm.com/docs/git-bisect#_bisect_reset" },
+        { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" },
+        { "title": "git status", "url": "https://git-scm.com/docs/git-status" }
       ],
       "points": 10
     }

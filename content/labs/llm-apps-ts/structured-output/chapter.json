@@ -22,6 +22,11 @@
         "A regular expression with a lazy group between two fences finds the inside of the first one. `indexOf` and `lastIndexOf` find the braces.",
         "If you cannot find any JSON, parse an empty string anyway: it fails, and your catch turns it into the right message."
       ],
+      "docs": [
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" },
+        { "title": "String.prototype.lastIndexOf()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" }
+      ],
       "points": 10
     },
     {
@@ -38,6 +43,11 @@
         "`typeof null` is 'object', and so is an array. Rule both out explicitly.",
         "`Number.isInteger` is false for strings, fractions and NaN, which covers most quantity mistakes at once.",
         "These sentences are about to be sent back to the model in a repair message, so name the field and the rule, like \"quantity must be a whole number\"."
+      ],
+      "docs": [
+        { "title": "Narrowing", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html" },
+        { "title": "typeof", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof" },
+        { "title": "Number.isInteger()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger" }
       ],
       "points": 10
     },
@@ -56,6 +66,11 @@
         "The model cannot see your validator. The only way it learns what was wrong is the text of your repair message.",
         "Keep the messages in an array you can push to, so the repair request carries the whole conversation.",
         "Two attempts, not a loop: first try, one repair, then either return or throw with \"invalid order\" in the message."
+      ],
+      "docs": [
+        { "title": "Structured outputs vs JSON mode", "url": "https://developers.openai.com/api/docs/guides/structured-outputs#structured-outputs-vs-json-mode" },
+        { "title": "Manage conversation state", "url": "https://developers.openai.com/api/docs/guides/conversation-state#manually-manage-conversation-state" },
+        { "title": "Error.prototype.message", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/message" }
       ],
       "points": 10
     }

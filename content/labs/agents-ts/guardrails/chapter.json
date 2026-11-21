@@ -32,6 +32,11 @@
         "`parseArguments` from `registry.ts` gives you the parsed args for `confirm`, and tells you when not to ask at all.",
         "`confirm` can return a promise, and every promise is truthy. Put `await` in front of the call before you test the answer."
       ],
+      "docs": [
+        { "title": "Pause for human review", "url": "https://developers.openai.com/api/docs/guides/agents/guardrails-approvals#pause-for-human-review" },
+        { "title": "Human in the loop", "url": "https://developers.openai.com/api/docs/guides/safety-best-practices#human-in-the-loop-hitl" },
+        { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" }
+      ],
       "points": 10
     },
     {
@@ -50,6 +55,11 @@
         "Give `confirm` a default in the options destructuring, a function that returns `false`.",
         "`guardedCall` tells you `refused`. Use it to choose between a `refused` entry and a `tool_result` entry, and send `content` to the model either way."
       ],
+      "docs": [
+        { "title": "Start with traces", "url": "https://developers.openai.com/api/docs/guides/agent-evals#start-with-traces-when-you-are-still-debugging-behavior" },
+        { "title": "Handling function calls", "url": "https://developers.openai.com/api/docs/guides/function-calling#handling-function-calls" },
+        { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" }
+      ],
       "points": 10
     },
     {
@@ -67,6 +77,11 @@
         "A trace can look perfect while the tool still ran. That is why the test checks the money as well as the log.",
         "`trace.filter((entry) => entry.type === 'refused')` gives you the refusals to compare with `toEqual`. `expect.any(String)` matches an id you do not want to spell out.",
         "Take the id from the refused entry and assert that no `tool_result` entry has that id."
+      ],
+      "docs": [
+        { "title": "Adversarial testing", "url": "https://developers.openai.com/api/docs/guides/safety-best-practices#adversarial-testing" },
+        { "title": "Pause for human review", "url": "https://developers.openai.com/api/docs/guides/agents/guardrails-approvals#pause-for-human-review" },
+        { "title": "Array.prototype.find()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find" }
       ],
       "points": 10
     }

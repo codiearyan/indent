@@ -23,6 +23,11 @@
         "A `let` inside `createStampCard` is created fresh on every call, and the methods you return can still read and change it.",
         "In `stamp()`, add one first, then compare with `goal`. Only when they match do you reset and return true."
       ],
+      "docs": [
+        { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures" },
+        { "title": "let", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let" },
+        { "title": "Method definitions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "A plain object turns every key into a string. A `Map` keeps `1` and `'1'` apart.",
         "Decide with `cache.has(arg)`, not with whether `cache.get(arg)` is truthy. A saved 0 is still saved."
       ],
+      "docs": [
+        { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures" },
+        { "title": "Map", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" },
+        { "title": "Map.prototype.has()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/has" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "Two pieces of memory are needed here, not one. What would go wrong if you only kept the result?",
         "Rest parameters (`...args`) collect every argument, and spread (`fn(...args)`) passes them on unchanged.",
         "Use a boolean flag to decide whether to call `fn`. Checking `result === undefined` breaks when `fn` returns undefined."
+      ],
+      "docs": [
+        { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures" },
+        { "title": "Rest parameters", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters" },
+        { "title": "Spread syntax (...)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax" }
       ],
       "points": 10
     }

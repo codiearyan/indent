@@ -23,6 +23,11 @@
         "`'ø'.length` is 1, but it takes 2 bytes on the wire. Node has a helper on `Buffer` that measures a string in bytes.",
         "Call `res.writeHead(status, { ... })` with the two headers, using `Buffer.byteLength(text)` for the length, then `res.end(text)`."
       ],
+      "docs": [
+        { "title": "response.writeHead()", "url": "https://nodejs.org/docs/latest/api/http.html#responsewriteheadstatuscode-statusmessage-headers" },
+        { "title": "Buffer.byteLength()", "url": "https://nodejs.org/docs/latest/api/buffer.html#static-method-bufferbytelengthstring-encoding" },
+        { "title": "Content-Length", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Length" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "`new URL(req.url, 'http://localhost')` gives you a `pathname` without the query string.",
         "A table like `{ '/health': { GET: (req, res) => ... } }` makes the lookup two steps: the path, then the method."
       ],
+      "docs": [
+        { "title": "message.url", "url": "https://nodejs.org/docs/latest/api/http.html#messageurl" },
+        { "title": "message.method", "url": "https://nodejs.org/docs/latest/api/http.html#messagemethod" },
+        { "title": "url.pathname", "url": "https://nodejs.org/docs/latest/api/url.html#urlpathname" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "There are two different ways a lookup can miss here. Each one gets its own status.",
         "404 means the thing is not there. 405 means it is there but cannot be used that way.",
         "`Object.keys(route).join(', ')` lists the methods a route has. Set it with `res.setHeader('allow', ...)` before you call sendJson."
+      ],
+      "docs": [
+        { "title": "404 Not Found", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404" },
+        { "title": "405 Method Not Allowed", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/405" },
+        { "title": "Allow", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Allow" }
       ],
       "points": 10
     }

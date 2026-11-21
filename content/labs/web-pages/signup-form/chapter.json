@@ -23,6 +23,11 @@
         "There are two ways to tie a label to a field: put the field inside the label, or give the label a `for` that matches the field's `id`.",
         "For the radio buttons and the checkbox, wrapping is the shortest: one `label` around the input and the words after it."
       ],
+      "docs": [
+        { "title": "<label>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/label" },
+        { "title": "<input type=\"radio\">", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/radio" },
+        { "title": "<input type=\"checkbox\">", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/checkbox" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "One attribute with no value makes a field required. A number field takes two more for its limits.",
         "The types you need are `email`, `tel` and `number`. A radio group is required when any one of its buttons has the attribute."
       ],
+      "docs": [
+        { "title": "<input> types", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input#input_types" },
+        { "title": "HTML required attribute", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/required" },
+        { "title": "<input type=\"number\">", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/number" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "A styled `div` cannot be reached with Tab or pressed with Enter. The right element gets both for free.",
         "A fieldset draws a border and a legend sits in it. A rule in `styles.css` can take the border away if you do not want it.",
         "The question \"Which event?\" becomes the legend, and the styled `div` at the bottom becomes a button whose type is submit."
+      ],
+      "docs": [
+        { "title": "<form>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form" },
+        { "title": "<fieldset>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/fieldset" },
+        { "title": "<button>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/button" }
       ],
       "points": 10
     }

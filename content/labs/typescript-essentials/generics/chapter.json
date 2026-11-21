@@ -23,6 +23,11 @@
         "`readonly T[]` accepts both normal and read-only arrays, and `slice` on it still gives you a normal `T[]`.",
         "`items[items.length - 1]` has the type `T` in this compiler setup, but it can be missing. Your declared return type is where you say so."
       ],
+      "docs": [
+        { "title": "Generics", "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html" },
+        { "title": "Generic functions", "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#generic-functions" },
+        { "title": "The ReadonlyArray type", "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#the-readonlyarray-type" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,10 @@
         "`<T extends { updatedAt: number }>` keeps the caller's real item type in `T` and still lets you read `item.updatedAt` inside the function.",
         "Keep the best item so far in a variable of type `T | undefined` and replace it only when an item's time is strictly larger."
       ],
+      "docs": [
+        { "title": "Generic constraints", "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-constraints" },
+        { "title": "Constraints", "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#constraints" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +67,11 @@
         "Methods in an interface use the type parameter of the interface, so `Queue<number>` has `add(item: number)`.",
         "When a parameter has the type `readonly T[]`, TypeScript infers `T` from the array you pass. You do not need to write `createQueue<number>([1, 2])`.",
         "Spread `initial` into a new array inside `createQueue`, and let the returned methods close over that array. `shift()` already returns `T | undefined`."
+      ],
+      "docs": [
+        { "title": "Generic types", "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-types" },
+        { "title": "Generic object types", "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#generic-object-types" },
+        { "title": "Type inference in generic functions", "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#inference" }
       ],
       "points": 10
     }

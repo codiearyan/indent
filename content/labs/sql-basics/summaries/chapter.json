@@ -28,6 +28,10 @@
         "GROUP BY splits the rows into groups that share a value, and COUNT then counts each group.",
         "Select the column you group by next to COUNT(*), and give the count the name the task asks for with AS."
       ],
+      "docs": [
+        { "title": "Aggregate functions", "url": "https://www.sqlite.org/lang_aggfunc.html" },
+        { "title": "GROUP BY", "url": "https://www.sqlite.org/lang_select.html#resultset" }
+      ],
       "points": 10
     },
     {
@@ -45,6 +49,11 @@
         "You can wrap an aggregate in another function, for example ROUND(AVG(price), 2).",
         "Every column in the SELECT list is either the grouped column or an aggregate. Then add ORDER BY category at the end."
       ],
+      "docs": [
+        { "title": "Aggregate functions", "url": "https://www.sqlite.org/lang_aggfunc.html" },
+        { "title": "round()", "url": "https://www.sqlite.org/lang_corefunc.html#round" },
+        { "title": "GROUP BY", "url": "https://www.sqlite.org/lang_select.html#resultset" }
+      ],
       "points": 10
     },
     {
@@ -61,6 +70,10 @@
         "Two different filters are needed: one about single orders and one about whole groups.",
         "WHERE removes rows before they are grouped. HAVING removes groups after they are counted.",
         "Filter the status in WHERE, group by cafe_id, keep groups with HAVING COUNT(*) >= 3, then ORDER BY two columns."
+      ],
+      "docs": [
+        { "title": "WHERE, GROUP BY and HAVING", "url": "https://www.sqlite.org/lang_select.html#resultset" },
+        { "title": "count()", "url": "https://www.sqlite.org/lang_aggfunc.html#count" }
       ],
       "points": 10
     }

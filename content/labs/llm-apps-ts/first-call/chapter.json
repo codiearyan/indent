@@ -22,6 +22,10 @@
         "The order matters: instructions for the model first, then what the customer asked.",
         "Use the `SYSTEM_PROMPT` constant for the first message and the `question` argument for the second."
       ],
+      "docs": [
+        { "title": "Message roles", "url": "https://developers.openai.com/api/docs/guides/prompt-engineering#message-roles-and-instruction-following" },
+        { "title": "Chat completions API reference", "url": "https://developers.openai.com/api/reference/resources/chat" }
+      ],
       "points": 10
     },
     {
@@ -40,6 +44,11 @@
         "The response has a `choices` array. Each choice has a `message`.",
         "The text is at `res.choices[0].message.content`, which TypeScript says can be null, so fall back to ''."
       ],
+      "docs": [
+        { "title": "Chat completions API reference", "url": "https://developers.openai.com/api/reference/resources/chat" },
+        { "title": "OpenAI Node SDK usage", "url": "https://github.com/openai/openai-node#usage" },
+        { "title": "Nullish coalescing operator (??)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing" }
+      ],
       "points": 10
     },
     {
@@ -57,6 +66,11 @@
         "Everything you need is in one response object: the choice and the usage sit side by side.",
         "`usage` uses snake_case names like `prompt_tokens`, while `ReplyDetails` uses camelCase.",
         "TypeScript marks `usage` as optional, so read it with `res.usage?.` and a fallback of 0."
+      ],
+      "docs": [
+        { "title": "Chat completions API reference", "url": "https://developers.openai.com/api/reference/resources/chat" },
+        { "title": "Managing tokens", "url": "https://developers.openai.com/api/docs/guides/advanced-usage#managing-tokens" },
+        { "title": "Tokens", "url": "https://developers.openai.com/api/docs/concepts#tokens" }
       ],
       "points": 10
     }

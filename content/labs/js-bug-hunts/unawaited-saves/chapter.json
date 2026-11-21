@@ -29,6 +29,11 @@
         "`await new Promise((resolve) => setTimeout(resolve, 100))` pauses an async function for 100 ms.",
         "With the original code you should see 3 returned, 0 saved when it returned and 3 saved later."
       ],
+      "docs": [
+        { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" },
+        { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
+        { "title": "setTimeout()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout" }
+      ],
       "points": 10
     },
     {
@@ -47,6 +52,11 @@
         "Putting `await` in front of `forEach` does nothing: `forEach` returns `undefined`, and awaiting `undefined` finishes at once.",
         "Either await each save inside a `for...of` loop, or turn the bookings into an array of save promises with `map` and await `Promise.all` of it."
       ],
+      "docs": [
+        { "title": "Array.prototype.forEach()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach" },
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
+        { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" }
+      ],
       "points": 10
     },
     {
@@ -64,6 +74,11 @@
         "Read the store immediately after the `await`. Waiting longer in a test would hide the bug.",
         "`await expect(promise).rejects.toThrow('Could not save b102')` checks a rejection.",
         "Sort `store.saved()` before comparing if your fix may save in parallel, so the test does not depend on finishing order."
+      ],
+      "docs": [
+        { "title": "Array.prototype.forEach()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach" },
+        { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" },
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" }
       ],
       "points": 10
     }

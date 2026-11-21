@@ -23,6 +23,11 @@
         "You do not need a try and catch here. An error thrown inside an async function rejects the promise it returns.",
         "Two awaits, one after the other, then return an object that spreads the sailing and adds `sea`."
       ],
+      "docs": [
+        { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
+        { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" },
+        { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
+      ],
       "points": 10
     },
     {
@@ -41,6 +46,11 @@
         "Holding a started promise in a variable and awaiting it later is fast, but if it rejects before you reach the await, nobody is listening yet. `Promise.all` listens to every promise from the moment you give it to it.",
         "Put 'sailings, then crew' in a small async function of its own, then wait for it and the weather with one `Promise.all`."
       ],
+      "docs": [
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
+        { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
+        { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
+      ],
       "points": 10
     },
     {
@@ -58,6 +68,11 @@
         "Two different failures need two different answers: one is passed on to the caller, the other is turned into `emailed: false`.",
         "`finally` runs after `try` finishes, whether it returned or threw, and it does not swallow the error.",
         "A `try` only covers promises you `await` inside it. Calling `emailTicket` without `await` lets it fail later, outside your catch, and unlocks the seat too early."
+      ],
+      "docs": [
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" },
+        { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" }
       ],
       "points": 10
     }

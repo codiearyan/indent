@@ -28,6 +28,11 @@
         "Use `questions.entries()` or a counter so you know which send you are on when it throws.",
         "Put the `try`/`catch` inside the loop and `return { turns: i + 1, error: (err as Error).message }` from the catch."
       ],
+      "docs": [
+        { "title": "Managing the context window", "url": "https://developers.openai.com/api/docs/guides/conversation-state#managing-the-context-window" },
+        { "title": "API error codes", "url": "https://developers.openai.com/api/docs/guides/error-codes#api-errors" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" }
+      ],
       "points": 10
     },
     {
@@ -46,6 +51,11 @@
         "Split the history into the first message and the rest. Only the rest gets cut down.",
         "`rest.slice(-MAX_RECENT_MESSAGES)` keeps the newest messages. Rebuild the history from the system prompt plus that, before the request and after the reply."
       ],
+      "docs": [
+        { "title": "Managing the context window", "url": "https://developers.openai.com/api/docs/guides/conversation-state#managing-the-context-window" },
+        { "title": "Manage conversation state", "url": "https://developers.openai.com/api/docs/guides/conversation-state#manually-manage-conversation-state" },
+        { "title": "Array.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice" }
+      ],
       "points": 10
     },
     {
@@ -63,6 +73,11 @@
         "Use a fresh `ChatSession` in each test so they do not depend on each other.",
         "The local model only introduces itself as Kes when the first message it receives is the system prompt.",
         "Dropping the oldest messages also drops the system prompt. Assert on the last reply's opening words and on `history[0]`."
+      ],
+      "docs": [
+        { "title": "Managing the context window", "url": "https://developers.openai.com/api/docs/guides/conversation-state#managing-the-context-window" },
+        { "title": "Message roles", "url": "https://developers.openai.com/api/docs/guides/prompt-engineering#message-roles-and-instruction-following" },
+        { "title": "String.prototype.startsWith()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith" }
       ],
       "points": 10
     }
