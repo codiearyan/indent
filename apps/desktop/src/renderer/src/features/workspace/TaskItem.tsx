@@ -1,6 +1,16 @@
 import { useState } from 'react'
 import { Check, Circle, ListChecks, Loader2, Workflow, X } from 'lucide-react'
-import type { ChapterProgress, CheckDetail, FlowScene, FlowStep, TaskDef } from '@shared/types'
+import type {
+  ChapterProgress,
+  CheckDetail,
+  FlowScene,
+  TaskFlow,
+  TaskDef,
+  TraceResult
+} from '@shared/types'
+import { compareTrace } from '@shared/trace'
+import { traceView } from '@/features/flows/traceView'
+import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { useAi } from '@/features/ai/aiStore'
 import { checkAttachment, hintAttachment } from '@/features/ai/attachments'
@@ -22,7 +32,7 @@ interface Props {
   first: boolean
   /** The issue's scene and this task's steps, when the issue has a flow for it. */
   scene?: FlowScene
-  flow?: FlowStep[]
+  flow?: TaskFlow
 }
 
 export function TaskItem({
@@ -39,12 +49,58 @@ export function TaskItem({
   const check = useWorkspace((s) => s.check)
   const [flowOpen, setFlowOpen] = useState(false)
 
+  const files = useWorkspace((s) => s.files)
+  const [recording, setRecording] = useState<{
+    files: typeof files
+    trace: TraceResult
+  }>()
+  const [tracing, setTracing] = useState(false)
+  const [traceError, setTraceError] = useState('')
+  const [showTrace, setShowTrace] = useState(false)
+
   const taskProgress = progress?.tasks[task.id]
   const result = taskProgress?.lastResult
   const failed = result?.passed === false
   const isChecking = checking?.includes(task.id) ?? false
   const aiOn = useAi((s) => !!s.config?.enabled && !!s.config.provider)
   const nudge = useAi((s) => s.config?.nudge ?? false)
+
+  const view =
+    showTrace && recording && scene && flow
+      ? traceView(
+          compareTrace(scene, flow.steps, recording.trace),
+          recording.trace,
+          recording.files !== files &&
+            (recording.files.length !== files.length ||
+              recording.files.some(
+                ({ path, content }) =>
+                  !files.some((file) => file.path === path && file.content === content)
+              ))
+        )
+      : undefined
+
+  const runTrace = async (): Promise<void> => {
+    const { chapter, flush } = useWorkspace.getState()
+    if (!chapter || tracing) return
+    setTraceError('')
+    if (toolsInstalling) {
+      setTraceError('Getting the repo tools ready. Try again in a minute.')
+      return
+    }
+    setTracing(true)
+    setShowTrace(false)
+    try {
+      await flush()
+      const snapshot = useWorkspace.getState().files
+      const trace = await api.checks.trace(chapter.labId, chapter.id, task.id)
+      setRecording({ files: snapshot, trace })
+      setShowTrace(true)
+    } catch {
+      setTraceError('Could not run the trace. Try again.')
+    } finally {
+      setTracing(false)
+    }
+  }
 
   const askTutor = (): void => {
     if (!failed) {
@@ -118,7 +174,30 @@ export function TaskItem({
         </div>
         {flowOpen && scene && flow && (
           <div className="rounded-lg border border-border p-3">
-            <FlowPlayer scene={scene} steps={flow} />
+            {flow.trace && (result || taskProgress?.passed || taskProgress?.failedChecks) ? (
+              <div className="mb-3 space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={tracing}
+                    onClick={() => void runTrace()}
+                  >
+                    {tracing && <Loader2 aria-hidden="true" className="motion-safe:animate-spin" />}
+                    {tracing ? 'Tracing…' : 'Trace my code'}
+                  </Button>
+                  {view?.rows && (
+                    <Button variant="ghost" size="sm" onClick={() => setShowTrace(false)}>
+                      Back to the flow
+                    </Button>
+                  )}
+                </div>
+                <div aria-live="polite" className="text-xs text-muted-foreground">
+                  {traceError || view?.summary}
+                </div>
+              </div>
+            ) : null}
+            <FlowPlayer scene={scene} steps={flow.steps} rows={view?.rows} />
           </div>
         )}
         <TaskHelp

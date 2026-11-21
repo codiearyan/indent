@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { Check, Circle, X } from 'lucide-react'
 import { edgeId } from '@shared/flow'
 import type { FlowScene, FlowStep } from '@shared/types'
 import { cn } from '@/lib/utils'
@@ -6,18 +7,23 @@ import { Player } from '@/features/dsa/Player'
 import { usePlayer } from '@/features/dsa/usePlayer'
 import { FrameView } from '@/features/dsa/views/FrameView'
 import { FlowView } from './FlowView'
+import type { TraceRow } from './traceView'
 
 /** A task's flow, played step by step over the issue's scene. */
 export function FlowPlayer({
   scene,
-  steps
+  steps,
+  rows
 }: {
   scene: FlowScene
   steps: FlowStep[]
+  rows?: TraceRow[]
 }): React.JSX.Element {
   const player = usePlayer(steps)
   const index = Math.min(player.index, steps.length - 1)
   const step = steps[index]
+  const row = rows?.[index]
+  const Mark = row?.status === 'went elsewhere' ? X : row?.status === 'reached' ? Check : Circle
   const taskScene = useMemo(() => {
     // A task shows only the parts its steps touch, and only those are the learner's here.
     const touched = new Set(steps.flatMap((s) => s.active))
@@ -52,9 +58,32 @@ export function FlowPlayer({
           )}
         </div>
       )}
-      <p aria-live="polite" className="text-sm">
-        {step.note}
-      </p>
+      <div aria-live="polite" className="space-y-1 text-sm">
+        <p className="flex items-start gap-2">
+          {row && (
+            <>
+              <Mark
+                aria-hidden="true"
+                className={cn(
+                  'mt-0.5 size-4 shrink-0',
+                  row.status === 'went elsewhere'
+                    ? 'text-destructive'
+                    : row.status === 'reached'
+                      ? 'text-success'
+                      : 'text-muted-foreground'
+                )}
+              />
+              <span className="sr-only">{row.status}. </span>
+            </>
+          )}
+          <span className="min-w-0 break-words">{row?.note ?? step.note}</span>
+        </p>
+        {row?.returned !== undefined && (
+          <p className="break-words text-xs text-muted-foreground">
+            Your code returned <code>{row.returned}</code>
+          </p>
+        )}
+      </div>
       <Player player={player} embedded />
     </div>
   )
