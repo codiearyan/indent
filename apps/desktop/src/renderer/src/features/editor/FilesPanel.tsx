@@ -33,6 +33,7 @@ import { cn, errorMessage } from '@/lib/utils'
 import { useOpenTabs } from '@/stores/tabs'
 import { useWorkspace } from '@/stores/workspace'
 import { FileLabel, FileTypeIcon } from './FileTab'
+import { focusEditorSoon } from './editors'
 import { fileChange } from './fileChange'
 import {
   buildTree,
@@ -318,6 +319,19 @@ export function FilesPanel(): React.JSX.Element {
                         </DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => startNew('folder', node.path)}>
                           New folder
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
+                    {!isFolder && (
+                      <>
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            useWorkspace.getState().openToSide(node.path)
+                            focusEditorSoon()
+                          }}
+                        >
+                          Open to the side
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                       </>
