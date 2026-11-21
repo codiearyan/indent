@@ -176,6 +176,7 @@ packages/content/
   labs/<labId>/<chapterId>/
     chapter.json                     ChapterDef; `preview` names a page for the Browser panel
     flow.json                        Flow: the issue's scene and a short flow per task, optional
+    intro.json                       Intro: the issue's story in five frames, optional; see "Intros"
     lesson.md                        `##` headings split it into the parts the audio player reads
     starter/**                       copied into the workspace on first open and on reset
     solution/**                      solved files, same relative paths
@@ -224,6 +225,29 @@ the file is in `starter/` and each `fn` is a top-level `function` declaration th
 first place the path left the flow's, said in plain words without the expected value. Only
 top-level `function` declarations of ES modules (`.js`, `.mjs`, `.ts`, `.mts`) are traced, not
 `const f = () => {}`.
+
+### Intros
+
+An `intro.json` tells an issue's story before the learner reads anything: who asks, what goes
+wrong today, which part is theirs, and what right looks like. It plays at the top of the lesson, in
+place of the flow's scene, for about 11 seconds: once by itself while the issue has no passed task,
+then it rests on its last frame with Replay. An issue without one shows the flow's scene as before.
+
+It is data only (types in `shared/types.ts`): 3 or 4 `stations` in a row, one of them `mine`; a
+`ticket` with a label and its `wrong` and `right` endings; and 5 `captions`. A station has one
+body: `say` (a speech bubble), `text`, or `rows` with an optional `mark`. The learner's station has
+`tasks`, a `file`, and `gap`, the words in the hole where it lands. The motion is not in the file.
+`features/intro/` plays every intro the same way in five frames (the ask, the problem, your part,
+done, the whole trip): `camera.ts` says where the camera looks and where the ticket stands in each
+frame, `IntroPlayer.tsx` draws it, and `intro.css` holds the moves on the motion tokens.
+
+`shared/intro.ts` checks an intro, caps included: a station is 184px wide, so every text has a
+most number of characters (`INTRO_LIMITS`). `scripts/build-packs.mjs` fails on a bad one and the
+app leaves a bad one out. An intro may show how the story's example ends (an order's status from
+the starter data), never code, a hint, or a value a check compares against.
+
+To write intros for a repo, follow `.claude/skills/issue-intro/SKILL.md`: it says what to read in
+an issue, how to find its four beats, and how to check the result.
 
 ### Pages in the browser
 
@@ -392,6 +416,7 @@ The automated review of each pull request reads this section. Report these as hi
   one exception.
 - A grader message that gives the answer away, an issue whose starter passes a task, or one whose
   solution fails a task.
+- An intro that shows code, a hint or a value a check compares against.
 - Copy a person sees that uses the code's words (lab, chapter, path) instead of the app's (repo,
   issue, roadmap).
 - Points, hints or level numbers written anywhere but `src/shared/rules.ts`.

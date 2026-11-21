@@ -5,8 +5,17 @@ import { join } from 'path'
 import { pathToFileURL } from 'url'
 import { COVER_SCHEME } from '@shared/cover'
 import { checkFlow } from '@shared/flow'
+import { checkIntro } from '@shared/intro'
 import { PACKS_URL } from '@shared/packs'
-import type { Chapter, Flow, InstallResult, LabSummary, PackIndex, PathDef } from '@shared/types'
+import type {
+  Chapter,
+  Flow,
+  InstallResult,
+  Intro,
+  LabSummary,
+  PackIndex,
+  PathDef
+} from '@shared/types'
 import { EVENTS } from '@shared/types'
 import { emit, handle } from '../ipc'
 import {
@@ -123,6 +132,15 @@ async function readFlow(
   return flow ?? undefined
 }
 
+/** An intro.json that fails its checks is left out, like a flow. */
+async function readIntro(dir: string, name: string): Promise<Intro | undefined> {
+  const text = await readFile(join(dir, 'intro.json'), 'utf8').catch(() => undefined)
+  if (text === undefined) return undefined
+  const { intro, problems } = checkIntro(text, `${name}/intro.json`)
+  if (problems.length) console.warn(`Leaving out an intro:\n  ${problems.join('\n  ')}`)
+  return intro ?? undefined
+}
+
 async function listRepos(): Promise<LabSummary[]> {
   void refreshLibrary()
   const labs = await listAll(contentDir(), cachedIndex())
@@ -151,12 +169,14 @@ export async function loadChapter(labId: string, chapterId: string): Promise<Cha
   return getChapter(contentDir(), labId, safeId(chapterId))
 }
 
-/** The chapter with its flow, when the flow passes the checks in flow.ts. */
+/** The chapter with its flow and its intro, each only when it passes its checks. */
 export async function openChapter(labId: string, chapterId: string): Promise<Chapter> {
   const chapter = await loadChapter(labId, chapterId)
   const taskIds = chapter.tasks.map((task) => task.id)
-  const flow = await readFlow(chapterContentDir(labId, chapterId), `${labId}/${chapterId}`, taskIds)
-  return flow ? { ...chapter, flow } : chapter
+  const dir = chapterContentDir(labId, chapterId)
+  const name = `${labId}/${chapterId}`
+  const [flow, intro] = await Promise.all([readFlow(dir, name, taskIds), readIntro(dir, name)])
+  return { ...chapter, ...(flow && { flow }), ...(intro && { intro }) }
 }
 
 /** A recording exists only for the exact text it was made from, so the key is its file name. */

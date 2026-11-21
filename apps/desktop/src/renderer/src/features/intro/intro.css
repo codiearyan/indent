@@ -1,0 +1,79 @@
+/*
+ * An issue's intro. It plays by itself, so its moves are longer than a press or a state change;
+ * they are still counted in the motion tokens, and the player's timers count in the same steps.
+ */
+.intro-stage {
+  --intro-pan: calc(var(--motion-enter) * 3);
+  --intro-travel: calc(var(--motion-enter) * 5);
+}
+
+.intro-world {
+  transform-origin: 0 0;
+  transition: transform var(--intro-pan) var(--ease-in-out);
+}
+
+.intro-station {
+  transition:
+    opacity var(--motion-enter) var(--ease-out),
+    transform var(--motion-enter) var(--ease-out);
+}
+
+/* The learner's station drops into the hole; its tasks follow one by one. */
+.intro-mine[data-shown='false'] {
+  opacity: 0;
+  transform: translateY(-16px);
+}
+
+/* The hole shows once the camera has arrived. */
+.intro-gap[data-shown='false'] {
+  opacity: 0;
+}
+
+.intro-gap[data-shown='true'] {
+  transition-delay: calc(var(--intro-pan) / 2);
+}
+
+.intro-task {
+  transition: opacity var(--motion-enter) var(--ease-out);
+  transition-delay: calc(var(--motion-enter) + var(--row) * var(--motion-stage));
+}
+
+.intro-mine[data-shown='false'] .intro-task {
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+.intro-ticket {
+  transition: left var(--intro-pan) var(--ease-in-out);
+}
+
+.intro-ticket[data-frame='3'] {
+  transition-duration: var(--intro-travel);
+}
+
+/* The way back starts once the camera has pulled out. */
+.intro-ticket[data-frame='4'] {
+  transition-duration: var(--intro-travel);
+  transition-delay: var(--intro-pan);
+}
+
+.intro-stage[data-still='true'] :is(.intro-world, .intro-ticket, .intro-station, .intro-task) {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-world,
+  .intro-ticket {
+    transition: none;
+  }
+
+  .intro-station,
+  .intro-task {
+    transition: opacity var(--motion-state) var(--ease-out);
+    transition-delay: 0s;
+  }
+
+  .intro-mine[data-shown='false'] {
+    transform: none;
+  }
+}

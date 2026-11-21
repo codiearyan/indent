@@ -116,6 +116,8 @@ export interface Chapter extends ChapterDef {
   nextChapterId?: string
   /** flow.json; missing when the issue has none or it does not pass the checks in flow.ts. */
   flow?: Flow
+  /** intro.json; missing when the issue has none or it does not pass the checks in intro.ts. */
+  intro?: Intro
 }
 
 /** What a box in a flow stands for: a part of the story, a file, a function or a piece of data. */
@@ -188,6 +190,45 @@ export interface Flow {
   scene: FlowScene
   /** Keyed by task id. */
   tasks?: Record<string, TaskFlow>
+}
+
+/** A stop on an intro's road: who asks, what the story has, the learner's part, where the answer is. */
+export interface IntroStation {
+  title: string
+  /** One body per station: what someone says, a sentence, or the rows of a list. */
+  say?: string
+  text?: string
+  rows?: string[][]
+  /** The row of `rows` that lights up, counted from 0. */
+  mark?: number
+  note?: string
+  /** The learner's part, the one place an intro uses the brand colour. It has tasks and no body. */
+  mine?: boolean
+  file?: string
+  /** The words in the hole where the learner's station lands. */
+  gap?: string
+  /** What the learner builds, in a few words each. */
+  tasks?: string[]
+}
+
+/** What travels the road: a label that ends wrong today and right once the issue is done. */
+export interface IntroTicket {
+  label: string
+  wrong: string
+  /** Two words that name the wrong ending, such as "A guess". */
+  why: string
+  right: string
+}
+
+/**
+ * <issue>/intro.json: the issue's story in five frames, played at the top of the lesson. Data
+ * only; the motion is the app's. It may show how the story's example ends, never code.
+ */
+export interface Intro {
+  stations: IntroStation[]
+  ticket: IntroTicket
+  /** One per frame: the ask, the problem, your part, done, the whole trip. */
+  captions: string[]
 }
 
 /** One call of a learner's function, from kit/run-trace.mjs. Values are previews, cut to 160 characters. */
