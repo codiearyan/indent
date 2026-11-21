@@ -10,7 +10,10 @@ interface Props {
 
 const { title, description } = Astro.props
 const icon = await getImage({ src: logo, width: 64, height: 64, format: 'png' })
-const touchIcon = await getImage({ src: logo, width: 180, height: 180, format: 'png' })
+// Chat apps and iOS fill transparent corners with white, so these sit on the dark --background.
+const opaque = { src: logo, format: 'png', background: '#0a0a0b' } as const
+const touchIcon = await getImage({ ...opaque, width: 180, height: 180 })
+const shareImage = await getImage({ ...opaque, width: 512, height: 512 })
 ---
 
 <!doctype html>
@@ -24,6 +27,7 @@ const touchIcon = await getImage({ src: logo, width: 180, height: 180, format: '
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content={new URL(shareImage.src, Astro.site).href} />
     <link rel="icon" type="image/png" href={icon.src} />
     <link rel="apple-touch-icon" href={touchIcon.src} />
   </head>
