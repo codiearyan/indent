@@ -9,6 +9,8 @@ files:
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  # Only its index ships, in extraResources; the archives are what the site serves.
+  - '!out/packs/**'
 asarUnpack:
   - resources/**
   - node_modules/node-pty/**
@@ -51,6 +53,18 @@ linux:
 appImage:
   artifactName: Indent-linux-${arch}.${ext}
 npmRebuild: false
+beforePack: build/pack-index.mjs
 extraResources:
   - from: ../../content
     to: content
+    filter:
+      - kit/**
+      - runtime/**
+      - paths.json
+      - package.json
+      # The first repo of every roadmap; the rest download from the library on first start.
+      - labs/js-foundations/**
+      - labs/typescript-essentials/**
+      - labs/web-pages/**
+  - from: out/packs/index.json
+    to: content/index.json
