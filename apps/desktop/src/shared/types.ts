@@ -170,6 +170,14 @@ export interface RuntimeStatus {
 }
 
 /** Something the repos need on this computer, such as Node. */
+export interface LabModelStatus {
+  state: 'starting' | 'running' | 'failed'
+  /** Why it is not running, in plain words. */
+  reason?: string
+  /** It cannot start until Node.js is there. */
+  nodeMissing?: boolean
+}
+
 export interface ToolStatus {
   id: 'node' | 'git'
   label: string
@@ -364,6 +372,10 @@ export interface Api {
     status(): Promise<ToolStatus[]>
     /** Downloads Node into the app's own folder. Other programs do not see it. */
     installNode(): Promise<ToolStatus[]>
+    /** Whether the local model runs, and why not. */
+    labModel(): Promise<LabModelStatus>
+    /** Starts the local model again; resolves with its status a few seconds later at most. */
+    restartLabModel(): Promise<LabModelStatus>
   }
   github: {
     /** Stars the app's repository with the person's own GitHub CLI. False when that is not possible. */
@@ -397,7 +409,7 @@ export const INVOKE_METHODS = {
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],
-  tools: ['status', 'installNode'],
+  tools: ['status', 'installNode', 'labModel', 'restartLabModel'],
   github: ['star'],
   ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test', 'tip']
 } as const

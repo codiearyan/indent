@@ -9,7 +9,7 @@ import { labEnv } from '../labEnv'
 import { chapterContentDir, contentDir, workspaceDir, workspacesRoot } from '../paths'
 import { loadChapter } from './content'
 import { failedResults, gradeRun, nodeSupported, tail, type RunOutcome } from './grader'
-import { labModelReady, startLabModel } from './labModel'
+import { labModelProblem, labModelReady, startLabModel } from './labModel'
 import { recordCheck } from './progress'
 
 const CHECK_TIMEOUT_MS = 90_000
@@ -109,12 +109,14 @@ async function runCheck(
   if (unknown) throw new Error(`Unknown task: ${unknown}`)
 
   const status = await ensureRuntime()
+  if (status.ready) await labModelReady()
+  const error = status.ready
+    ? labModelProblem(labId)
+    : (status.error ?? 'The runtime dependencies are not installed.')
   let results: CheckResult[]
-  if (!status.ready) {
-    const error = status.error ?? 'The runtime dependencies are not installed.'
+  if (error) {
     results = failedResults(ids, error, 0, new Date().toISOString())
   } else {
-    await labModelReady()
     const sandboxRoot = join(workspacesRoot(), '.sandbox')
     await mkdir(sandboxRoot, { recursive: true })
     const args = [

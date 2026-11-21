@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Check, Loader2 } from 'lucide-react'
-import type { ToolStatus } from '@shared/types'
+import type { LabModelStatus, ToolStatus } from '@shared/types'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api'
@@ -12,18 +12,38 @@ export function ToolsSection(): React.JSX.Element {
   const [tools, setTools] = useState<ToolStatus[] | null>(null)
   const [downloading, setDownloading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [model, setModel] = useState<LabModelStatus | null>(null)
+  const [restarting, setRestarting] = useState(false)
 
   const show = (e: unknown): void => setError(errorMessage(e))
 
-  useEffect(() => {
-    void api.tools.status().then(setTools, show)
-  }, [])
+  // The model's status comes second: reading tools can restart it once Node is found.
+  const refresh = (): void => {
+    void api.tools
+      .status()
+      .then(setTools)
+      .then(() => api.tools.labModel())
+      .then(setModel, show)
+  }
+  useEffect(refresh, [])
+
+  const restart = async (): Promise<void> => {
+    setRestarting(true)
+    try {
+      setModel(await api.tools.restartLabModel())
+    } catch (e) {
+      show(e)
+    } finally {
+      setRestarting(false)
+    }
+  }
 
   const download = async (): Promise<void> => {
     setDownloading(true)
     setError(null)
     try {
       setTools(await api.tools.installNode())
+      setModel(await api.tools.labModel())
     } catch (e) {
       show(e)
     } finally {
@@ -35,12 +55,7 @@ export function ToolsSection(): React.JSX.Element {
     <Group
       title="What your repos need"
       action={
-        <Button
-          variant="ghost"
-          size="xs"
-          disabled={downloading}
-          onClick={() => void api.tools.status().then(setTools, show)}
-        >
+        <Button variant="ghost" size="xs" disabled={downloading} onClick={refresh}>
           Check again
         </Button>
       }
@@ -83,6 +98,38 @@ export function ToolsSection(): React.JSX.Element {
                 <Skeleton className="h-3 w-16" />
               </li>
             ))}
+        {model && (
+          <li className="flex min-h-14 items-center justify-between gap-6 px-4 py-2.5">
+            <div>
+              <div className="text-sm">Local model</div>
+              <p className="text-[13px] text-muted-foreground">
+                Answers code that calls an AI model, on this computer.
+                {model.state === 'failed' && ` It is not running: ${model.reason}`}
+              </p>
+            </div>
+            {model.state === 'running' ? (
+              <span className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                <Check className="size-4 text-success" strokeWidth={2} aria-hidden />
+                Running
+              </span>
+            ) : model.state === 'starting' || restarting ? (
+              <span className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden />
+                Starting
+              </span>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="press shrink-0 border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
+                disabled={model.nodeMissing}
+                onClick={() => void restart()}
+              >
+                Restart
+              </Button>
+            )}
+          </li>
+        )}
       </ul>
       {error && (
         <p role="alert" className="mt-3 text-[13px] text-destructive">
