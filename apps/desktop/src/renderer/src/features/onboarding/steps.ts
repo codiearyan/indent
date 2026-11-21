@@ -1,6 +1,6 @@
-export type StepId = 'welcome' | 'goal' | 'ai'
+export type StepId = 'welcome' | 'goal' | 'ai' | 'editor'
 
-export const STEPS: StepId[] = ['welcome', 'goal', 'ai']
+export const STEPS: StepId[] = ['welcome', 'goal', 'ai', 'editor']
 
 export function nextStep(step: StepId): StepId | null {
   return STEPS[STEPS.indexOf(step) + 1] ?? null

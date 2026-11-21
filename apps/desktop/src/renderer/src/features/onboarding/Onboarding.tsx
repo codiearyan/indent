@@ -8,6 +8,7 @@ import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
 import { StepStrip } from './StepStrip'
 import { Ai } from './Ai'
+import { Editor } from './Editor'
 import { Goal } from './Goal'
 import { Welcome } from './Welcome'
 import { nextStep, prevStep, STEPS, type StepId } from './steps'
@@ -16,7 +17,8 @@ import './onboarding.css'
 const VIEWS: Record<StepId, (props: { staged: boolean }) => React.JSX.Element> = {
   welcome: Welcome,
   goal: Goal,
-  ai: Ai
+  ai: Ai,
+  editor: Editor
 }
 
 /** Elements where Enter already means something; everywhere else in the setup it continues. */

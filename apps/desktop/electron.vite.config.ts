@@ -11,7 +11,12 @@ export default defineConfig({
   preload: { resolve: { alias: shared } },
   renderer: {
     resolve: {
-      alias: { ...shared, '@': resolve('src/renderer/src') }
+      alias: {
+        ...shared,
+        '@': resolve('src/renderer/src'),
+        // monaco-vim imports the editor by its old file paths, which this version no longer has.
+        'monaco-editor/esm/vs': 'monaco-editor'
+      }
     },
     plugins: [react(), tailwindcss()],
     define: { __APP_VERSION__: JSON.stringify(version) }

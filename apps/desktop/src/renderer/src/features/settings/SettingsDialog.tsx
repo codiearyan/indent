@@ -14,15 +14,8 @@ import {
 } from 'lucide-react'
 import SiGithub from '@icons-pack/react-simple-icons/icons/SiGithub'
 import { REPO_URL } from '@shared/repo'
-import {
-  CODE_THEMES,
-  codePalette,
-  type CodePalette,
-  type CodeThemeId
-} from '@indent/design/code-palette'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -40,6 +33,7 @@ import { GoalSection } from './GoalSection'
 import { useSettingsDialog, type SettingsSection } from './dialogStore'
 import { KeyboardSection } from './KeyboardSection'
 import { PracticeSection } from './PracticeSection'
+import { CodeThemeCards } from './CodeSample'
 import { ThemeCards } from './ThemeCards'
 import { ToolsSection } from './ToolsSection'
 import { Typography } from './Typography'
@@ -122,10 +116,6 @@ export function SettingsDialog(): React.JSX.Element {
 }
 
 function AppearanceSection(): React.JSX.Element {
-  const theme = useSettings((s) => s.theme)
-  const codeTheme = useSettings((s) => s.codeTheme)
-  const setCodeTheme = useSettings((s) => s.setCodeTheme)
-
   return (
     <>
       <Group title="App theme">
@@ -133,31 +123,7 @@ function AppearanceSection(): React.JSX.Element {
       </Group>
 
       <Group title="Code theme">
-        <RadioGroup
-          aria-label="Code theme"
-          value={codeTheme}
-          onValueChange={(value) => setCodeTheme(value as CodeThemeId)}
-          className="grid-cols-2"
-        >
-          {CODE_THEMES.map(({ id, label, hint }) => (
-            <label
-              key={id}
-              htmlFor={`code-theme-${id}`}
-              className="flex cursor-pointer flex-col gap-2.5 rounded-lg border border-border p-3 hover:border-input has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-ring/50 has-[[data-state=checked]]:border-foreground"
-            >
-              <span className="flex items-center gap-2">
-                <span className="flex-1 text-sm font-medium">{label}</span>
-                <RadioGroupItem
-                  id={`code-theme-${id}`}
-                  value={id}
-                  className="focus-visible:ring-0"
-                />
-              </span>
-              <CodeSample palette={codePalette(id, theme)} />
-              <span className="text-[13px] text-muted-foreground">{hint}</span>
-            </label>
-          ))}
-        </RadioGroup>
+        <CodeThemeCards hints />
       </Group>
 
       <Group title="Typography">
@@ -167,40 +133,10 @@ function AppearanceSection(): React.JSX.Element {
   )
 }
 
-/** Three lines that use every colour of a code theme. */
-function CodeSample({ palette: p }: { palette: CodePalette }): React.JSX.Element {
-  const part = (color: string, text: string): React.JSX.Element => (
-    <span style={{ color }}>{text}</span>
-  )
-  return (
-    <pre
-      aria-hidden
-      className="overflow-hidden rounded-md border border-rule bg-editor px-3 py-2 font-mono text-[11px] leading-5"
-      style={{ color: p.foreground }}
-    >
-      <span className="italic" style={{ color: p.comment }}>
-        {'// add up the paid orders\n'}
-      </span>
-      {part(p.keyword, 'const ')}
-      {part(p.variable, 'total')}
-      {' = '}
-      {part(p.function, 'Sum')}
-      {'.of('}
-      {part(p.variable, 'orders')}
-      {', '}
-      {part(p.number, '0')}
-      {')\n'}
-      {part(p.keyword, 'return ')}
-      {part(p.string, "'Total: '")}
-      {' + '}
-      {part(p.variable, 'total')}
-    </pre>
-  )
-}
-
 const EDITOR_OPTIONS: { option: EditorOption; label: string; hint: string }[] = [
   { option: 'lineNumbers', label: 'Line numbers', hint: 'Numbers in the left margin.' },
-  { option: 'minimap', label: 'Minimap', hint: 'A small overview of the file on the right.' }
+  { option: 'minimap', label: 'Minimap', hint: 'A small overview of the file on the right.' },
+  { option: 'vim', label: 'Vim mode', hint: 'Normal, Insert and Visual mode in the code editor.' }
 ]
 
 function EditorSection(): React.JSX.Element {
