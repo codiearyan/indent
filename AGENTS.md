@@ -163,8 +163,9 @@ reduced-motion block that turns movement into fades and shows each scene's last 
 packages/content/
   paths.json                         PathDef[]
   runtime/package.json               dependencies of learner code (vitest, typescript, openai, react, jsdom,
-                                     esbuild, @types/node);
-                                     installed once into <userData>/workspaces so every workspace resolves them
+                                     esbuild, @types/node), the "repo tools"; installed once into the work
+                                     folder so every workspace resolves them (see "Repo tools" below)
+  runtime/package-lock.json          their exact versions; its hash is the repo tools version
   kit/run-check.mjs                  grader CLI, see below
   kit/run-trace.mjs                  tracer CLI: runs a task's example and records the calls, see below
   kit/lab-model.mjs                  the lab model: a deterministic, offline, OpenAI-compatible server
@@ -244,7 +245,41 @@ declared, not where a box ended up. Options: `t.page(file, { dir, fetch, storage
 
 Node comes from the learner's PATH. When it is missing or older than 22.18, Settings (Tools) can
 download a copy into `<userData>/tools/node`; `labEnv()` puts that copy first on the PATH, so the
-checks, the terminal and the runtime install all use it. `services/tools.ts` owns this.
+checks, the terminal and the runtime install all use it. `services/tools.ts` owns this. A missing
+tool shows as a banner across the top of the issue (`features/workspace/ToolNotice`) with the action
+that gets it; a repo that needs more than Node lists it in `lab.json` (`"tools": ["node", "git"]`).
+
+### Repo tools
+
+The runtime's `node_modules` (the "repo tools" in the app) is built once per system in CI and
+downloaded by the app, not installed with npm on the learner's computer.
+
+- **Version.** The first 12 hex characters of the sha256 of `runtime/package-lock.json`, line ends
+  normalized. `toolsVersion()` in `main/repoTools.ts` and `scripts/tools-version.mjs` compute it the
+  same way; a test holds them together.
+- **Build.** `.github/workflows/tools.yml` runs when `packages/content/runtime/**` changes on `main`,
+  or by hand. On Windows x64, macOS arm64, macOS x64 and Linux x64 it runs `npm ci`, tries esbuild,
+  tsc and vitest, and packs `javascript-tools-<platform>-<arch>.tar.gz`. It publishes them with
+  `checksums.json` as the release `tools-js-<version>`: a prerelease, never latest, because the
+  updater and the site follow the latest release. A version that already has a release is skipped.
+- **Install.** `ensureRuntime()` in `main/services/checks.ts` runs ahead of the first Check. It asks
+  the learner's Node for its `<platform>-<arch>`, downloads the matching file (`downloadTools()`),
+  checks size and sha256, unpacks it with `unpack(archive, dest, { links: true })` from
+  `main/library.ts` (links allowed only when they stay inside the folder) and swaps it into
+  `<work folder>/node_modules` only once it is complete. A `.tools-version` marker beside it names the
+  version there; a different one means install again.
+- **Fallback.** No file for the system, no release for this version (a dev build, a lockfile not built
+  yet) or a failed download falls back to `npm ci` with the lockfile.
+- **Status.** `RuntimeStatus` carries `installing`, `progress`, a plain `error` per cause, `details`
+  for the full output, and `retry: false` when trying again cannot help. The notice above the tasks
+  (`features/workspace/RuntimeNotice`) and Settings (Tools) show it. A check never fails a task for a
+  missing tool: it returns no results and the notice says why.
+
+To change the tools: edit `runtime/package.json`, run `npm install` in `packages/content/runtime` so
+the lockfile follows, and merge. The workflow publishes the new version, the next app release expects
+it, and each learner downloads it once. A release before the workflow finishes costs one `npm ci`.
+Other languages will follow the same pattern (`<language>-tools-<platform>-<arch>.tar.gz` in a
+`tools-<language>-<version>` release) when their repos exist.
 
 Grader CLI, run by the main process with system Node and `labEnv()`:
 
@@ -313,6 +348,8 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
 - CI minutes are limited. CI runs on pull requests only and skips docs and lab content. Verify
   locally, push once per pull request, and batch small related fixes into one pull request instead
   of opening several.
+- The site deploys to Vercel from `main` only (`apps/site/vercel.json`, `git.deploymentEnabled`):
+  branches and pull requests get no preview, which keeps the Hobby plan under its daily limit.
 - Releases are built by `.github/workflows/release.yml`, never on pull requests. Run it by hand on
   `main`: it raises the version in `apps/desktop/package.json` (patch unless you pick minor or
   major), commits that to `main` as `chore: release <version>`, tags it, and builds. Do not edit
@@ -324,6 +361,9 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
   apps are signed with the Developer ID and notarized when the repository has the secrets
   `MAC_CERT_P12_BASE64`, `MAC_CERT_PASSWORD`, `APPLE_API_KEY_P8`, `APPLE_API_KEY_ID` and
   `APPLE_API_ISSUER`; without them they are signed ad-hoc and macOS asks to confirm the first open.
+  For a test build without a release, run it with `publish` off (and `only` set to one system if you
+  like): it builds the current version and keeps the installers as artifacts of the run, with nothing
+  committed or tagged. The repo tools have their own release, built by `tools.yml` (see "Repo tools").
 - Pull request text is a plain description of the change. No generated-by or tool attribution lines.
 - Every pull request description has a **Before** and an **After**: what the person saw or what
   happened before the change, and what happens now, in plain words. A refactor with no visible
