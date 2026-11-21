@@ -283,7 +283,9 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
   `Indent-linux-x86_64.AppImage` and attaches them to a GitHub release. The names carry no version
   on purpose: the site links to `releases/latest/download/<name>` and the app's updater
   (`main/services/updates.ts`) finds its file by name, so do not rename them. The macOS
-  apps are signed ad-hoc, not with a Developer ID, so macOS asks to confirm the first open.
+  apps are signed with the Developer ID and notarized when the repository has the secrets
+  `MAC_CERT_P12_BASE64`, `MAC_CERT_PASSWORD`, `APPLE_API_KEY_P8`, `APPLE_API_KEY_ID` and
+  `APPLE_API_ISSUER`; without them they are signed ad-hoc and macOS asks to confirm the first open.
 - Pull request text is a plain description of the change. No generated-by or tool attribution lines.
 - Commit and pull request titles are `type(scope): message` (`feat(editor): ...`, `fix(checks): ...`,
   `chore: ...`). Commits are authored by the repository owner, with no co-author or other trailers.
