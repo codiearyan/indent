@@ -14,6 +14,23 @@ export function hintsUnlocked(nonGreenChecks: number): number {
   return Math.min(MAX_HINTS, Math.max(0, nonGreenChecks - CHECKS_BEFORE_FIRST_HINT + 1))
 }
 
+export interface LockedHint {
+  /** The number of the hint, counted from 1. */
+  hint: number
+  /** Checks that are not all green still needed to unlock it. */
+  checksLeft: number
+}
+
+/** The next hint still locked for a task with `hintCount` hints, or null when all are open. */
+export function nextLockedHint(nonGreenChecks: number, hintCount = MAX_HINTS): LockedHint | null {
+  const unlocked = hintsUnlocked(nonGreenChecks)
+  if (unlocked >= Math.min(MAX_HINTS, hintCount)) return null
+  return {
+    hint: unlocked + 1,
+    checksLeft: CHECKS_BEFORE_FIRST_HINT + unlocked - Math.max(0, nonGreenChecks)
+  }
+}
+
 export interface LevelInfo {
   level: number
   /** Points earned inside the current level. */
