@@ -7,6 +7,7 @@ import { useAi } from '@/features/ai/aiStore'
 import { useChat } from '@/features/ai/chatStore'
 import { TOUR } from '@/features/tour/anchors'
 import { cn } from '@/lib/utils'
+import { useRuntime } from '@/stores/runtime'
 import { useWorkspace } from '@/stores/workspace'
 import { CheckDetails } from './CheckDetails'
 import { Markdown } from './Markdown'
@@ -22,6 +23,7 @@ interface Props {
 
 export function TaskItem({ task, number, progress, first }: Props): React.JSX.Element {
   const checking = useWorkspace((s) => s.checking)
+  const toolsInstalling = useRuntime((s) => !!s.status?.installing)
   const check = useWorkspace((s) => s.check)
   const [stepsOpen, setStepsOpen] = useState(false)
 
@@ -64,7 +66,7 @@ export function TaskItem({ task, number, progress, first }: Props): React.JSX.El
             data-tour={first ? TOUR.taskCheck : undefined}
           >
             {isChecking ? <Loader2 className="animate-spin" /> : <ListChecks />}
-            Check
+            {isChecking && toolsInstalling ? 'Getting ready...' : 'Check'}
           </Button>
           <Button
             variant="ghost"

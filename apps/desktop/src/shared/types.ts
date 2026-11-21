@@ -166,7 +166,11 @@ export interface RuntimeStatus {
   node: string | null
   /** Lab dependencies (vitest, typescript, openai) are installed. */
   ready: boolean
+  /** They are being installed now. */
+  installing?: boolean
   error?: string
+  /** The end of the npm output when the install failed. */
+  details?: string
 }
 
 /** Something the repos need on this computer, such as Node. */
@@ -354,6 +358,8 @@ export interface Api {
     runtimeStatus(): Promise<RuntimeStatus>
     /** Installs the lab dependencies if needed. */
     ensureRuntime(): Promise<RuntimeStatus>
+    /** The runtime started or finished installing, or failed to. */
+    onRuntime(listener: (status: RuntimeStatus) => void): Unsubscribe
   }
   progress: {
     get(): Promise<ProgressState>
@@ -427,5 +433,6 @@ export const EVENTS = {
   terminalExit: 'terminal:exit',
   aiChat: 'ai:chatEvent',
   contentInstall: 'content:installProgress',
-  contentChanged: 'content:changed'
+  contentChanged: 'content:changed',
+  runtime: 'checks:runtime'
 } as const

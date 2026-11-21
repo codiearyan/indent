@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api'
 import { errorMessage } from '@/lib/utils'
+import { retryRuntime, useRuntime } from '@/stores/runtime'
 import { Group, card } from './controls'
 
 /** What the repos need on this computer, and a download for the part the app can fetch itself. */
@@ -14,6 +15,7 @@ export function ToolsSection(): React.JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [model, setModel] = useState<LabModelStatus | null>(null)
   const [restarting, setRestarting] = useState(false)
+  const runtime = useRuntime((s) => s.status)
 
   const show = (e: unknown): void => setError(errorMessage(e))
 
@@ -98,6 +100,39 @@ export function ToolsSection(): React.JSX.Element {
                 <Skeleton className="h-3 w-16" />
               </li>
             ))}
+        {runtime && (
+          <li className="flex min-h-14 items-center justify-between gap-6 px-4 py-2.5">
+            <div>
+              <div className="text-sm">Repo tools</div>
+              <p className="text-[13px] text-muted-foreground">
+                What the checks and your code use, such as vitest and typescript. Installed once
+                into your work folder.
+                {!runtime.ready && !runtime.installing && runtime.error && ` ${runtime.error}`}
+              </p>
+            </div>
+            {runtime.ready ? (
+              <span className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                <Check className="size-4 text-success" strokeWidth={2} aria-hidden />
+                Ready
+              </span>
+            ) : runtime.installing ? (
+              <span className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden />
+                Installing
+              </span>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="press shrink-0 border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
+                disabled={!runtime.node}
+                onClick={retryRuntime}
+              >
+                {runtime.error ? 'Try again' : 'Install'}
+              </Button>
+            )}
+          </li>
+        )}
         {model && (
           <li className="flex min-h-14 items-center justify-between gap-6 px-4 py-2.5">
             <div>

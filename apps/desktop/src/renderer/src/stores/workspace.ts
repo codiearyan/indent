@@ -176,6 +176,9 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         const key = chapterKey(chapter.labId, chapter.id)
         const before = useProgress.getState().progress?.chapters[key]
         const { results, progress } = await api.checks.run(chapter.labId, chapter.id, taskIds)
+        useSettings.getState().setLeftTab('tasks')
+        // No results: the repo tools are not ready, and the notice above the tasks says why.
+        if (results.length === 0) return results
         useProgress.getState().set(progress)
         const after = progress.chapters[key]
         const ids = { repo: chapter.labId, issue: chapter.id }
@@ -186,7 +189,6 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
           track('hints_unlocked', { ...ids, hints })
         }
         if (after?.completedAt && !before?.completedAt) track('issue_completed', ids)
-        useSettings.getState().setLeftTab('tasks')
         // The main process skips this when AI is off or the task already has its tip.
         const tasks = progress.chapters[chapterKey(chapter.labId, chapter.id)]?.tasks ?? {}
         for (const result of results) {

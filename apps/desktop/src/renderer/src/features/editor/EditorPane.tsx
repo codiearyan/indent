@@ -18,6 +18,7 @@ import { useChapterProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
+import { useRuntime } from '@/stores/runtime'
 import { CodeEditor } from './CodeEditor'
 import { FileLabel } from './FileTab'
 import { fileChange, missingFiles } from './fileChange'
@@ -47,6 +48,7 @@ export function EditorPane(): React.JSX.Element {
   const activePath = useWorkspace((s) => s.activePath)
   const setActive = useWorkspace((s) => s.setActive)
   const checking = useWorkspace((s) => s.checking)
+  const toolsInstalling = useRuntime((s) => !!s.status?.installing)
   const panels = useSettings((s) => s.panels)
   const togglePanel = useSettings((s) => s.togglePanel)
 
@@ -54,7 +56,10 @@ export function EditorPane(): React.JSX.Element {
   const [prevChecking, setPrevChecking] = useState(checking)
   if (checking !== prevChecking) {
     setPrevChecking(checking)
-    if (prevChecking && !checking) setShowSummary(true)
+    // A check that waited on tools that never got ready has no results to sum up.
+    if (prevChecking && !checking && useRuntime.getState().status?.ready !== false) {
+      setShowSummary(true)
+    }
   }
   const chapterId = useWorkspace((s) => s.chapter?.id)
   const chapter = useWorkspace((s) => s.chapter)
@@ -141,7 +146,7 @@ export function EditorPane(): React.JSX.Element {
           onClick={checkAll}
         >
           {checking && <Loader2Icon className="animate-spin" />}
-          {checking ? 'Running...' : 'Run checks'}
+          {checking ? (toolsInstalling ? 'Getting ready...' : 'Running...') : 'Run checks'}
         </Button>
       </div>
 

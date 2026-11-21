@@ -12,6 +12,7 @@ import { handle } from '../ipc'
 import { labEnv } from '../labEnv'
 import { ownNodeBin, ownNodeDir, toolsDir } from '../paths'
 import { which } from './ai/cli'
+import { ensureRuntime } from './checks'
 import { labModelStatus, restartLabModel, startLabModelIfNodeWasMissing } from './labModel'
 import { nodeSupported } from './grader'
 import { pickNodeArchive } from './nodeArchive'
@@ -121,7 +122,12 @@ async function downloadNode(): Promise<ToolStatus[]> {
 let installing: Promise<ToolStatus[]> | undefined
 
 function installNode(): Promise<ToolStatus[]> {
-  return (installing ??= downloadNode().finally(() => (installing = undefined)))
+  return (installing ??= downloadNode()
+    .then((tools) => {
+      void ensureRuntime()
+      return tools
+    })
+    .finally(() => (installing = undefined)))
 }
 
 export function register(): void {
