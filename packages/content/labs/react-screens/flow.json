@@ -1,0 +1,33 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Stock records",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Counter screen",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Hold shelf",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "Sidewinder Records uses one counter screen to find stock and set records aside."
+  }
+}

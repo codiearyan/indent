@@ -1,0 +1,87 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Shared history",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Fare correction",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Team copies",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "The ferry team needs a fare correction it can share with everyone who already has the change."
+  },
+  "tasks": {
+    "revert": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Tickets use a fare change the team already received."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The correction restores the fare while keeping the shared history intact."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The team can see the bad change and its correction in the record."
+        }
+      ]
+    },
+    "share": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "The correction is ready locally."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The shared repo needs the new change."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "Other team members can pick up the corrected fare."
+        }
+      ]
+    }
+  }
+}

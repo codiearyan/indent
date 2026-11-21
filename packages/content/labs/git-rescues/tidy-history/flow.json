@@ -1,0 +1,113 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Working commits",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Review branch",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Change summary",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "The ferry team wants to share a clear record of a change after the work is complete."
+  },
+  "tasks": {
+    "backup": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A branch has several working commits."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Preserve the current work before preparing it for review."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "There is still a way to return to the original work."
+        }
+      ]
+    },
+    "squash": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "The editor has finished the proposed change."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Prepare its history against the current main branch."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "Reviewers can see the change together in one commit."
+        }
+      ]
+    },
+    "message": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "A reviewer needs to understand the change from history."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Describe the ferry work the commit contains."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The commit message gives the reviewer a clear starting point."
+        }
+      ]
+    }
+  }
+}

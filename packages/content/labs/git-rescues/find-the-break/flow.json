@@ -1,0 +1,87 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Fare reports",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Commit history",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Verified result",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "The ferry team needs to locate a regression and leave a working fare calculation."
+  },
+  "tasks": {
+    "find": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Staff see a fare calculation that used to work."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Compare the behaviour at different points in the repo’s history."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "Record the first commit that shows the problem."
+        }
+      ]
+    },
+    "fix": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "The change that introduced the problem is known."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The current fare code needs a correction."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The repo contains a new fix that can be checked against the fare calculation."
+        }
+      ]
+    }
+  }
+}
