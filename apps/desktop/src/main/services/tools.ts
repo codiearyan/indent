@@ -158,9 +158,9 @@ async function choose(bin: string | null): Promise<ToolStatus[]> {
     const option = (await nodeOptions()).options.find((candidate) => candidate.bin === bin)
     if (!option?.supported) throw new Error('Pick a Node.js 22.18 or newer from the list.')
   }
+  // The local model keeps the Node it started with: a restart would move it to a new port, which
+  // open terminals of AI repos would no longer reach.
   pickNode(bin)
-  // The local model was started with the Node from before.
-  void restartLabModel()
   return status()
 }
 

@@ -79,6 +79,19 @@ export function ToolsSection(): React.JSX.Element {
     }
   }
 
+  const downloadButton = (label: string): React.JSX.Element => (
+    <Button
+      variant="outline"
+      size="sm"
+      className="press shrink-0 border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
+      disabled={downloading}
+      onClick={() => void download()}
+    >
+      {downloading && <Loader2 className="animate-spin motion-reduce:animate-none" />}
+      {downloading ? 'Downloading' : `Download ${label}`}
+    </Button>
+  )
+
   return (
     <Group
       title="What your repos need"
@@ -104,8 +117,11 @@ export function ToolsSection(): React.JSX.Element {
                 </div>
                 {tool.id === 'node' && nodes && nodes.options.length > 1 ? (
                   <span className="flex shrink-0 items-center gap-2">
-                    {tool.ok && (
+                    {tool.ok ? (
                       <Check className="size-4 text-success" strokeWidth={2} aria-label="Ready" />
+                    ) : (
+                      // Every Node found can be too old: the download stays the way forward.
+                      tool.installable && downloadButton(tool.label)
                     )}
                     <Select
                       value={nodes.picked ?? 'auto'}
@@ -140,16 +156,7 @@ export function ToolsSection(): React.JSX.Element {
                     {tool.version}
                   </span>
                 ) : tool.installable ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="press shrink-0 border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
-                    disabled={downloading}
-                    onClick={() => void download()}
-                  >
-                    {downloading && <Loader2 className="animate-spin motion-reduce:animate-none" />}
-                    {downloading ? 'Downloading' : `Download ${tool.label}`}
-                  </Button>
+                  downloadButton(tool.label)
                 ) : (
                   <span className="shrink-0 text-xs text-muted-foreground">Not found</span>
                 )}

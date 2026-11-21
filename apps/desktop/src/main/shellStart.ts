@@ -2,9 +2,13 @@ import { mkdirSync, writeFileSync } from 'fs'
 import { basename, join } from 'path'
 import { dataFile } from './paths'
 
-/** Runs one of the learner's own zsh startup files, with ZDOTDIR pointing at their folder. */
+/**
+ * Runs one of the learner's own zsh startup files, with ZDOTDIR pointing at their folder. A file
+ * that moves ZDOTDIR (a .zshenv pointing at ~/.config/zsh) moves it for the next steps too.
+ */
 const zshStep = (file: string): string =>
-  `ZDOTDIR="$INDENT_USER_ZDOTDIR"\n[[ -f "$ZDOTDIR/${file}" ]] && source "$ZDOTDIR/${file}"\n`
+  `ZDOTDIR="$INDENT_USER_ZDOTDIR"\n[[ -f "$ZDOTDIR/${file}" ]] && source "$ZDOTDIR/${file}"\n` +
+  'INDENT_USER_ZDOTDIR="$ZDOTDIR"\n'
 
 const PREPEND = 'export PATH="$INDENT_NODE_DIR:$PATH"\n'
 
