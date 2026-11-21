@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { api } from '@/lib/api'
 import { codeChrome } from '@indent/design/code-palette'
+import { fontStack } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import { useSettings, type Theme } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
@@ -58,6 +59,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
   const open = useSettings((s) => s.panels.terminal)
   const theme = useSettings((s) => s.theme)
   const scale = useSettings((s) => s.textScale.terminal)
+  const typography = useSettings((s) => s.typography)
   const togglePanel = useSettings((s) => s.togglePanel)
   const setPanel = useSettings((s) => s.setPanel)
 
@@ -89,10 +91,11 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
   useEffect(() => {
     const container = containerRef.current
     if (!session || !chapter || !container) return
-    const { theme, textScale } = useSettings.getState()
+    const { theme, textScale, typography } = useSettings.getState()
     const term = new Terminal({
-      fontFamily: "'IBM Plex Mono', ui-monospace, monospace",
-      fontSize: 13 * textScale.terminal,
+      fontFamily: fontStack(typography.monoFont, 'mono'),
+      fontSize: typography.monoSize * textScale.terminal,
+      cursorStyle: typography.cursor,
       theme: xtermTheme(theme),
       cursorBlink: true
     })
@@ -174,9 +177,11 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
     const current = termRef.current
     if (!current) return
     current.term.options.theme = xtermTheme(theme)
-    current.term.options.fontSize = 13 * scale
+    current.term.options.fontFamily = fontStack(typography.monoFont, 'mono')
+    current.term.options.fontSize = typography.monoSize * scale
+    current.term.options.cursorStyle = typography.cursor
     if (containerRef.current?.clientHeight) current.fit.fit()
-  }, [theme, scale])
+  }, [theme, scale, typography])
 
   // Maximized: a fixed overlay over the editor column, tracking its size.
   const [overlay, setOverlay] = useState<React.CSSProperties | undefined>()

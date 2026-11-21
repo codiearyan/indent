@@ -12,20 +12,16 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { AiSettings, AiSwitch } from '@/features/ai/AiMenu'
 import { useAi } from '@/features/ai/aiStore'
 import { useWorkspaceRoot } from '@/features/workspace/useWorkspaceRoot'
 import { viewTransition } from '@/lib/viewTransition'
-import {
-  TEXT_SCALE_PRESETS,
-  useSettings,
-  type Appearance,
-  type EditorOption
-} from '@/stores/settings'
-import { Group, LayoutControls, Row, TextSizeControls, card, segment, segmented } from './controls'
+import { useSettings, type EditorOption } from '@/stores/settings'
+import { Group, LayoutControls, Row, card } from './controls'
 import { useSettingsDialog, type SettingsSection } from './dialogStore'
+import { ThemeCards } from './ThemeCards'
 import { ToolsSection } from './ToolsSection'
+import { Typography } from './Typography'
 
 const SECTIONS: {
   id: SettingsSection
@@ -99,42 +95,15 @@ export function SettingsDialog(): React.JSX.Element {
   )
 }
 
-const APPEARANCES: { value: Appearance; label: string }[] = [
-  { value: 'system', label: 'System' },
-  { value: 'dark', label: 'Dark' },
-  { value: 'light', label: 'Light' }
-]
-
 function AppearanceSection(): React.JSX.Element {
-  const appearance = useSettings((s) => s.appearance)
-  const setAppearance = useSettings((s) => s.setAppearance)
   const theme = useSettings((s) => s.theme)
   const codeTheme = useSettings((s) => s.codeTheme)
   const setCodeTheme = useSettings((s) => s.setCodeTheme)
-  const setAllTextScale = useSettings((s) => s.setAllTextScale)
 
   return (
     <>
-      <Group title="Theme">
-        <div className={card}>
-          <Row label="App theme" hint="System follows the setting of this computer.">
-            <ToggleGroup
-              type="single"
-              size="sm"
-              spacing={1}
-              aria-label="App theme"
-              className={`w-56 shrink-0 ${segmented}`}
-              value={appearance}
-              onValueChange={(value) => value && setAppearance(value as Appearance)}
-            >
-              {APPEARANCES.map(({ value, label }) => (
-                <ToggleGroupItem key={value} value={value} className={segment}>
-                  {label}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          </Row>
-        </div>
+      <Group title="App theme">
+        <ThemeCards />
       </Group>
 
       <Group title="Code theme">
@@ -165,17 +134,8 @@ function AppearanceSection(): React.JSX.Element {
         </RadioGroup>
       </Group>
 
-      <Group
-        title="Text size"
-        action={
-          <Button variant="ghost" size="xs" onClick={() => setAllTextScale(TEXT_SCALE_PRESETS.M)}>
-            Reset
-          </Button>
-        }
-      >
-        <div className="space-y-3 rounded-lg border border-border px-4 py-3.5">
-          <TextSizeControls />
-        </div>
+      <Group title="Typography">
+        <Typography />
       </Group>
     </>
   )
@@ -213,7 +173,6 @@ function CodeSample({ palette: p }: { palette: CodePalette }): React.JSX.Element
 }
 
 const EDITOR_OPTIONS: { option: EditorOption; label: string; hint: string }[] = [
-  { option: 'wordWrap', label: 'Word wrap', hint: 'Long lines continue on the next line.' },
   { option: 'lineNumbers', label: 'Line numbers', hint: 'Numbers in the left margin.' },
   { option: 'minimap', label: 'Minimap', hint: 'A small overview of the file on the right.' }
 ]

@@ -1,11 +1,17 @@
 import { useEffect, useRef } from 'react'
-import { useSettings } from '@/stores/settings'
+import { fontStack } from '@/lib/fonts'
+import { useSettings, type Typography } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { bindSuggestShortcut } from '@/features/ai/inlineSuggestions'
 import { TOUR } from '@/features/tour/anchors'
 import { languageFor, monaco, pathOf, themeName, uriFor } from './monaco'
 
-const fontSizeFor = (scale: number): number => Math.round(13 * scale)
+const fontOptions = (t: Typography, scale: number): monaco.editor.IEditorOptions => ({
+  fontFamily: fontStack(t.monoFont, 'mono'),
+  fontSize: Math.round(t.monoSize * scale),
+  lineHeight: t.lineHeight,
+  fontLigatures: t.ligatures
+})
 
 interface Props {
   editorRef: React.RefObject<monaco.editor.IStandaloneCodeEditor | null>
@@ -23,15 +29,14 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
   const codeTheme = useSettings((s) => s.codeTheme)
   const options = useSettings((s) => s.editor)
   const editorScale = useSettings((s) => s.textScale.editor)
+  const typography = useSettings((s) => s.typography)
 
   useEffect(() => {
-    const { theme, codeTheme, textScale } = useSettings.getState()
+    const { theme, codeTheme, textScale, typography } = useSettings.getState()
     const editor = monaco.editor.create(hostRef.current!, {
       model: null,
       theme: themeName(codeTheme, theme),
-      fontFamily: 'IBM Plex Mono',
-      fontSize: fontSizeFor(textScale.editor),
-      lineHeight: 1.6,
+      ...fontOptions(typography, textScale.editor),
       folding: true,
       scrollbar: { verticalScrollbarSize: 10, horizontalScrollbarSize: 10 },
       overviewRulerBorder: false,
@@ -121,8 +126,10 @@ export function CodeEditor({ editorRef, onEdit, onCheck }: Props): React.JSX.Ele
   }, [options, editorRef])
 
   useEffect(() => {
-    editorRef.current?.updateOptions({ fontSize: fontSizeFor(editorScale) })
-  }, [editorScale, editorRef])
+    editorRef.current?.updateOptions(fontOptions(typography, editorScale))
+    // Monaco caches glyph widths per font; a new font needs them measured again.
+    monaco.editor.remeasureFonts()
+  }, [typography, editorScale, editorRef])
 
   return <div ref={hostRef} data-tour={TOUR.editor} className="h-full min-w-0 flex-1" />
 }

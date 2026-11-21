@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { DEFAULT_CODE_THEME, type CodeThemeId } from '@indent/design/code-palette'
+import { fontStack } from '@/lib/fonts'
 import { mergeSettings } from './mergeSettings'
 
 export type Theme = 'dark' | 'light'
@@ -9,6 +10,30 @@ export type EditorOption = 'wordWrap' | 'lineNumbers' | 'minimap'
 export type TextZone = 'lesson' | 'tasks' | 'editor' | 'terminal'
 export type PanelKey = 'files' | 'terminal' | 'chat' | 'zen' | 'browser'
 export type Experience = 'new' | 'some' | 'experienced'
+export type CursorStyle = 'block' | 'bar' | 'underline'
+
+export interface Typography {
+  /** null is the bundled default (IBM Plex). */
+  uiFont: string | null
+  /** Pixels of lesson and task text; the lesson and tasks zones scale on top of it. */
+  uiSize: number
+  monoFont: string | null
+  /** Pixels of code in the editor and the terminal; their zones scale on top of it. */
+  monoSize: number
+  lineHeight: number
+  ligatures: boolean
+  cursor: CursorStyle
+}
+
+export const DEFAULT_TYPOGRAPHY: Typography = {
+  uiFont: null,
+  uiSize: 15,
+  monoFont: null,
+  monoSize: 13,
+  lineHeight: 1.6,
+  ligatures: false,
+  cursor: 'block'
+}
 
 export const TEXT_SCALE_MIN = 0.8
 export const TEXT_SCALE_MAX = 1.6
@@ -23,6 +48,7 @@ export interface SettingsState {
   editor: Record<EditorOption, boolean>
   /** 1 = 100%. Lesson and tasks scale through CSS; editor and terminal multiply their font size. */
   textScale: Record<TextZone, number>
+  typography: Typography
   /** Which optional panels are showing. `zen` hides everything but the editor. */
   panels: Record<PanelKey, boolean>
   lessonSide: 'left' | 'right'
@@ -46,6 +72,7 @@ export interface SettingsState {
   setEditorOption(option: EditorOption, on: boolean): void
   setTextScale(zone: TextZone, value: number): void
   setAllTextScale(value: number): void
+  setTypography(change: Partial<Typography>): void
   setPanel(key: PanelKey, open: boolean): void
   togglePanel(key: PanelKey): void
   setLessonSide(side: 'left' | 'right'): void
@@ -88,6 +115,7 @@ export const useSettings = create<SettingsState>()(
       codeTheme: DEFAULT_CODE_THEME,
       editor: defaultEditor,
       textScale: defaultScale,
+      typography: DEFAULT_TYPOGRAPHY,
       panels: defaultPanels,
       lessonSide: 'left',
       leftTab: 'insights',
@@ -111,6 +139,7 @@ export const useSettings = create<SettingsState>()(
       setTextScale: (zone, value) => set((s) => ({ textScale: { ...s.textScale, [zone]: value } })),
       setAllTextScale: (value) =>
         set({ textScale: { lesson: value, tasks: value, editor: value, terminal: value } }),
+      setTypography: (change) => set((s) => ({ typography: { ...s.typography, ...change } })),
       setPanel: (key, open) => set((s) => ({ panels: { ...s.panels, [key]: open } })),
       togglePanel: (key) => set((s) => ({ panels: { ...s.panels, [key]: !s.panels[key] } })),
       setLessonSide: (lessonSide) => set({ lessonSide }),
@@ -131,11 +160,18 @@ export const useSettings = create<SettingsState>()(
   )
 )
 
-function applyToDocument({ theme, textScale }: SettingsState): void {
+function applyToDocument({ theme, textScale, typography: t }: SettingsState): void {
   const root = document.documentElement
   root.classList.toggle('dark', theme === 'dark')
-  root.style.setProperty('--scale-lesson', String(textScale.lesson))
-  root.style.setProperty('--scale-tasks', String(textScale.tasks))
+  const base = t.uiSize / DEFAULT_TYPOGRAPHY.uiSize
+  root.style.setProperty('--scale-lesson', String(base * textScale.lesson))
+  root.style.setProperty('--scale-tasks', String(base * textScale.tasks))
+  const font = (name: string, value: string | null): void => {
+    if (value) root.style.setProperty(name, value)
+    else root.style.removeProperty(name)
+  }
+  font('--font-ui', t.uiFont && fontStack(t.uiFont, 'sans'))
+  font('--font-code', t.monoFont && fontStack(t.monoFont, 'mono'))
 }
 
 applyToDocument(useSettings.getState())
