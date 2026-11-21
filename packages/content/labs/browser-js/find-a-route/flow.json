@@ -1,0 +1,148 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "climber", "label": "Climber", "kind": "story" },
+      { "id": "search", "label": "Search box", "kind": "story" },
+      { "id": "grade", "label": "Grade select", "kind": "story" },
+      { "id": "main", "label": "main.js", "kind": "file", "mine": true },
+      { "id": "matches", "label": "matches()", "kind": "function", "mine": true, "fn": "matches" },
+      { "id": "board", "label": "Route board", "kind": "story" },
+      { "id": "nomatch", "label": "No match line", "kind": "story" },
+      { "id": "empty", "label": "Empty wall line", "kind": "story" },
+      { "id": "count", "label": "Header count", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "climber", "to": "search", "label": "types" },
+      { "from": "climber", "to": "grade", "label": "picks" },
+      { "from": "search", "to": "main", "label": "the text" },
+      { "from": "grade", "to": "main", "label": "a band" },
+      { "from": "main", "to": "matches", "label": "each route" },
+      { "from": "matches", "to": "board", "label": "routes that stay" },
+      { "from": "main", "to": "nomatch", "label": "shown or hidden" },
+      { "from": "main", "to": "empty", "label": "shown or hidden" },
+      { "from": "main", "to": "count", "label": "every route" }
+    ],
+    "note": "A climber narrows the board by name and by grade, and the board says so when nothing is left."
+  },
+  "tasks": {
+    "search-names": {
+      "trace": {
+        "file": "src/filter.js",
+        "call": "matches",
+        "args": [
+          { "id": "r104", "name": "The Long Reach", "grade": "V4", "colour": "Blue", "setter": "Hollis" },
+          " REACH ",
+          ""
+        ]
+      },
+      "steps": [
+        {
+          "active": ["climber", "climber->search", "search"],
+          "value": {
+            "kind": "map",
+            "label": "the search box",
+            "entries": [{ "key": "text", "value": " REACH " }]
+          },
+          "note": "A climber types reach into #search, with caps lock on and a stray space either side."
+        },
+        {
+          "active": ["search->main", "main"],
+          "note": "Every keystroke sends an input event, and main.js draws the board again each time."
+        },
+        {
+          "active": ["main->matches", "matches"],
+          "value": {
+            "kind": "map",
+            "label": "one call",
+            "entries": [
+              { "key": "route", "value": "The Long Reach" },
+              { "key": "query", "value": " REACH " },
+              { "key": "band", "value": "''" }
+            ]
+          },
+          "note": "For each route, matches decides whether it stays. A route stays when its name contains the text, ignoring upper and lower case and the spaces around it."
+        },
+        {
+          "active": ["matches->board", "board"],
+          "note": "Only the routes that pass stay on the board. An empty search keeps every route, in the original order."
+        },
+        {
+          "active": ["main->count", "count", "board"],
+          "note": "Ticks stay as they are while routes are searched out of view, and the header keeps counting every route."
+        }
+      ]
+    },
+    "grade-band": {
+      "trace": {
+        "file": "src/filter.js",
+        "call": "matches",
+        "args": [
+          { "id": "r106", "name": "Roof of the World", "grade": "V7", "colour": "Black", "setter": "Bram" },
+          "",
+          "hard"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["climber", "climber->grade", "grade"],
+          "value": {
+            "kind": "array",
+            "label": "values of #grade-filter",
+            "values": ["''", "easy", "mid", "hard"]
+          },
+          "note": "A climber picks Hard from #grade-filter. '' stands for any grade."
+        },
+        {
+          "active": ["grade->main", "main"],
+          "note": "When its value changes, main.js draws the board again."
+        },
+        {
+          "active": ["main->matches", "matches"],
+          "value": {
+            "kind": "map",
+            "label": "one call",
+            "entries": [
+              { "key": "route", "value": "Roof of the World" },
+              { "key": "grade", "value": "V7" },
+              { "key": "query", "value": "''" },
+              { "key": "band", "value": "hard" }
+            ]
+          },
+          "note": "matches now looks at the band too. A route stays only when it is in the chosen band, or when the band is ''."
+        },
+        {
+          "active": ["climber->search", "search", "search->main", "main->matches", "matches"],
+          "note": "The search and the grade apply together. With pinch typed and Medium picked, a route has to pass both."
+        },
+        {
+          "active": ["matches->board", "board"],
+          "note": "The board shows only the routes that passed both filters."
+        }
+      ]
+    },
+    "no-match": {
+      "steps": [
+        {
+          "active": ["climber", "climber->search", "search"],
+          "note": "A climber searches for crack, and no route on the walls has that in its name."
+        },
+        {
+          "active": ["search->main", "main", "main->matches", "matches", "matches->board", "board"],
+          "note": "The filters leave the board with nothing on it."
+        },
+        {
+          "active": ["main->nomatch", "nomatch", "empty"],
+          "note": "Routes exist but none match, so #no-match shows and #board-empty stays hidden."
+        },
+        {
+          "active": ["board", "main->nomatch", "nomatch"],
+          "note": "As soon as some routes match again, #no-match is hidden."
+        },
+        {
+          "active": ["main", "main->empty", "empty", "nomatch"],
+          "note": "On reset day there are no routes at all: #board-empty shows and #no-match stays hidden."
+        }
+      ]
+    }
+  }
+}

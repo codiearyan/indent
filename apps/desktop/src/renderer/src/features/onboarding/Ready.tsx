@@ -73,8 +73,7 @@ export function Ready({ staged }: { staged: boolean }): React.JSX.Element {
       <FolderNote folder={folder} className="mt-2 px-5" />
       <MoveFolderDialog folder={folder} />
       <p className="mt-6 text-[13px] text-muted-foreground">
-        Pick a repo on Home and open its first issue. The lesson, the tasks and the editor are all
-        in one place.
+        Next, a short tour takes you from Home into your first issue. Skip it any time.
       </p>
     </StepLayout>
   )

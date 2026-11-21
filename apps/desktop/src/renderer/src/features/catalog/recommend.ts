@@ -10,8 +10,8 @@ export function goalLabIds(paths: PathDef[], goal: string | null): string[] {
 
 /**
  * Repos in the order to suggest them: the goal's roadmap first, then every roadmap's order, then
- * repos no roadmap names. Outside the goal, new learners get easy repos first and experienced
- * ones get easy repos last.
+ * repos no roadmap names. Outside the goal, new learners, and anyone without a goal who is not
+ * experienced, get easy repos first; experienced ones get easy repos last.
  */
 export function recommendedOrder(
   labs: LabSummary[],
@@ -28,7 +28,9 @@ export function recommendedOrder(
   const inGoal = ordered.filter((lab) => goalSet.has(lab.id))
   const rest = ordered.filter((lab) => !goalSet.has(lab.id))
   const level = (lab: LabSummary): number => LEVEL_ORDER[lab.level ?? 'medium']
-  if (experience === 'new') rest.sort((a, b) => level(a) - level(b))
+  if (experience === 'new' || (inGoal.length === 0 && experience !== 'experienced')) {
+    rest.sort((a, b) => level(a) - level(b))
+  }
   if (experience === 'experienced') {
     rest.sort((a, b) => Number(a.level === 'easy') - Number(b.level === 'easy'))
   }

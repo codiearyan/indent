@@ -55,7 +55,10 @@ export function Onboarding(): React.JSX.Element {
       help: helpLevelFor(config?.suggestions ?? 'off')
     })
     window.location.hash = '#/'
-    viewTransition('onboarding-finish', () => useSettings.getState().setOnboarded(true))
+    viewTransition('onboarding-finish', () => {
+      useSettings.getState().setGuide('home')
+      useSettings.getState().setOnboarded(true)
+    })
   }, [])
 
   const go = (to: StepId | null): void => {

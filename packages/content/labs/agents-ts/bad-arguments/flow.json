@@ -1,0 +1,197 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "model",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "execute",
+        "label": "executeToolCall()",
+        "kind": "function",
+        "mine": true,
+        "fn": "executeToolCall"
+      },
+      {
+        "id": "parse",
+        "label": "parseArguments()",
+        "kind": "function",
+        "mine": true,
+        "fn": "parseArguments"
+      },
+      {
+        "id": "result",
+        "label": "Tool outcome",
+        "kind": "data"
+      },
+      {
+        "id": "agent",
+        "label": "agent.ts",
+        "kind": "function",
+        "mine": true,
+        "fn": "runAgent"
+      },
+      {
+        "id": "answer",
+        "label": "Pantry update",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "model",
+        "to": "execute",
+        "label": "tool request"
+      },
+      {
+        "from": "execute",
+        "to": "parse",
+        "label": "details"
+      },
+      {
+        "from": "parse",
+        "to": "result",
+        "label": "assessment"
+      },
+      {
+        "from": "execute",
+        "to": "result",
+        "label": "outcome"
+      },
+      {
+        "from": "result",
+        "to": "agent",
+        "label": "report"
+      },
+      {
+        "from": "agent",
+        "to": "answer",
+        "label": "update"
+      }
+    ],
+    "note": "Your code turns tool requests and their failures into reports Pip can use to answer the pantry."
+  },
+  "tasks": {
+    "parse-args": {
+      "trace": {
+        "file": "src/registry.ts",
+        "call": "parseArguments",
+        "args": [
+          {
+            "description": "Find an item in the produce aisle.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "produce": {
+                  "type": "string"
+                }
+              },
+              "required": ["produce"]
+            }
+          },
+          "{\"produce\":\"blood oranges\"}"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["model"],
+          "note": "Pip asks for the location of blood oranges in the produce aisle."
+        },
+        {
+          "active": ["execute->parse", "parse"],
+          "value": {
+            "kind": "map",
+            "label": "Produce lookup",
+            "entries": [
+              {
+                "key": "Produce",
+                "value": "blood oranges"
+              }
+            ]
+          },
+          "note": "The produce details arrive alongside the lookup’s accepted inputs."
+        },
+        {
+          "active": ["parse", "parse->result", "result"],
+          "note": "The lookup gets usable arguments when the details fit, or an explanation when they do not."
+        }
+      ]
+    },
+    "execute": {
+      "trace": {
+        "file": "src/registry.ts",
+        "call": "executeToolCall",
+        "args": [
+          {
+            "locate_crate": {
+              "description": "Find a delivery crate by its tag.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "crateTag": {
+                    "type": "string"
+                  }
+                },
+                "required": ["crateTag"]
+              }
+            }
+          },
+          "locate_crate",
+          "{\"aisle\":\"loading bay\"}"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["model", "model->execute", "execute"],
+          "note": "Pip asks for a delivery crate and gives the loading bay as a clue."
+        },
+        {
+          "active": ["execute", "execute->parse", "parse"],
+          "note": "The crate lookup needs a crate tag, which the request leaves out."
+        },
+        {
+          "active": ["execute", "execute->result", "result"],
+          "value": {
+            "kind": "map",
+            "label": "Tool outcome",
+            "entries": [
+              {
+                "key": "Error",
+                "value": "description of the problem"
+              }
+            ]
+          },
+          "note": "Pip gets an error report for this lookup."
+        }
+      ]
+    },
+    "recover": {
+      "trace": {
+        "file": "src/agent.ts",
+        "call": "runAgent",
+        "args": [
+          "Reserve 2 jars of orange marmalade for order PL-9352"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["agent", "model"],
+          "note": "A staff member asks whether oranges can be put aside for a delivery."
+        },
+        {
+          "active": ["model", "model->execute", "execute"],
+          "note": "A tool request hits a snag while Pip is working on the reservation."
+        },
+        {
+          "active": ["result", "result->agent", "agent"],
+          "note": "The pantry hands back a report about the snag, and Pip can make another attempt."
+        },
+        {
+          "active": ["agent", "agent->answer", "answer"],
+          "note": "The staff member gets a reservation update or an explanation that it could not go through."
+        }
+      ]
+    }
+  }
+}

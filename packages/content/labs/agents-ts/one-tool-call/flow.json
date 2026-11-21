@@ -1,0 +1,165 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "desk",
+        "label": "Delivery desk",
+        "kind": "story"
+      },
+      {
+        "id": "assistant",
+        "label": "describeOrderTool()",
+        "kind": "function",
+        "mine": true,
+        "fn": "describeOrderTool"
+      },
+      {
+        "id": "model",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "call",
+        "label": "requestToolCall()",
+        "kind": "function",
+        "mine": true,
+        "fn": "requestToolCall"
+      },
+      {
+        "id": "order",
+        "label": "Order lookup",
+        "kind": "data"
+      },
+      {
+        "id": "answer",
+        "label": "askAboutOrder()",
+        "kind": "function",
+        "mine": true,
+        "fn": "askAboutOrder"
+      }
+    ],
+    "edges": [
+      {
+        "from": "desk",
+        "to": "assistant",
+        "label": "question"
+      },
+      {
+        "from": "assistant",
+        "to": "model",
+        "label": "lookup offer"
+      },
+      {
+        "from": "model",
+        "to": "call",
+        "label": "lookup"
+      },
+      {
+        "from": "call",
+        "to": "order",
+        "label": "order ref"
+      },
+      {
+        "from": "order",
+        "to": "answer",
+        "label": "order facts"
+      }
+    ],
+    "note": "Your assistant connects a question at the delivery desk to the pantry’s order records."
+  },
+  "tasks": {
+    "describe-tool": {
+      "trace": {
+        "file": "src/assistant.ts",
+        "call": "describeOrderTool",
+        "args": []
+      },
+      "steps": [
+        {
+          "active": ["desk"],
+          "note": "The delivery desk wants Pip to answer questions about bike deliveries."
+        },
+        {
+          "active": ["assistant"],
+          "note": "The assistant prepares a description of the order lookup."
+        },
+        {
+          "active": ["assistant", "assistant->model", "model"],
+          "note": "The local model receives the lookup description with the information it needs to ask about an order."
+        }
+      ]
+    },
+    "read-call": {
+      "trace": {
+        "file": "src/assistant.ts",
+        "call": "requestToolCall",
+        "args": [
+          "Can you check the delivery status of order PL-9352?"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["call", "desk", "desk->assistant", "assistant"],
+          "note": "A staff member asks about order PL-2086."
+        },
+        {
+          "active": ["assistant", "assistant->model", "model"],
+          "note": "Pip takes the question to the local model with the order lookup available."
+        },
+        {
+          "active": ["model", "model->call", "call"],
+          "note": "The model asks the pantry to look up the order."
+        },
+        {
+          "active": ["call"],
+          "value": {
+            "kind": "map",
+            "label": "Lookup request",
+            "entries": [
+              {
+                "key": "Reference",
+                "value": "call reference"
+              },
+              {
+                "key": "Action",
+                "value": "lookup name"
+              },
+              {
+                "key": "Details",
+                "value": "order information"
+              }
+            ]
+          },
+          "note": "The assistant hands back a description of that request so the pantry can carry it out."
+        }
+      ]
+    },
+    "round-trip": {
+      "trace": {
+        "file": "src/assistant.ts",
+        "call": "askAboutOrder",
+        "args": [
+          "Can you check the delivery status of order PL-9352?"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["answer", "desk", "desk->assistant", "assistant", "assistant->model", "model"],
+          "note": "A customer at the pickup counter asks whether a delivery has already left."
+        },
+        {
+          "active": ["model", "model->call"],
+          "note": "The model needs the pantry’s record to answer."
+        },
+        {
+          "active": ["call->order", "order"],
+          "note": "The lookup brings back either order details or a report that the order is missing."
+        },
+        {
+          "active": ["order", "order->answer", "answer"],
+          "note": "Pip uses the lookup result to give the customer a short delivery update."
+        }
+      ]
+    }
+  }
+}

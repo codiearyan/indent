@@ -20,6 +20,7 @@ import { shortcutLabel } from '@/lib/shortcuts'
 import { cn, errorMessage } from '@/lib/utils'
 import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
+import { showTourAgain } from '@/features/tour/showTourAgain'
 import { activeProvider, useAi } from './aiStore'
 import { TestConnection } from './TestConnection'
 
@@ -75,6 +76,17 @@ export function AiMenu(): React.JSX.Element {
           }}
         >
           Run setup again
+        </Button>
+        <Button
+          variant="link"
+          size="sm"
+          className="h-auto self-start p-0 text-xs font-normal text-muted-foreground no-underline hover:text-foreground hover:no-underline"
+          onClick={() => {
+            setMenuOpen(false)
+            showTourAgain()
+          }}
+        >
+          Show the tour again
         </Button>
       </PopoverContent>
     </Popover>

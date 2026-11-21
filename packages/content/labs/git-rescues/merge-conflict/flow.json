@@ -1,0 +1,113 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Two contributions",
+        "kind": "data"
+      },
+      {
+        "id": "work",
+        "label": "Combined files",
+        "kind": "story",
+        "mine": true
+      },
+      {
+        "id": "result",
+        "label": "Merge result",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "work"
+      },
+      {
+        "from": "work",
+        "to": "result"
+      }
+    ],
+    "note": "Dispatch and fares both need their changes to survive the merge."
+  },
+  "tasks": {
+    "timetable": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Dispatch has a new sailing on each side of the merge."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "The timetable needs to make room for both contributions."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The merged timetable includes the sailings from both sides."
+        }
+      ]
+    },
+    "fares": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "Two contributions affect the adult fare."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Review how each contribution changes what passengers are charged."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The combined fare reflects both changes."
+        }
+      ]
+    },
+    "finish": {
+      "steps": [
+        {
+          "active": [
+            "input"
+          ],
+          "note": "The timetable and fares have been reconciled."
+        },
+        {
+          "active": [
+            "input",
+            "input->work",
+            "work"
+          ],
+          "note": "Review the combined files before finishing the merge."
+        },
+        {
+          "active": [
+            "work",
+            "work->result",
+            "result"
+          ],
+          "note": "The repo records the merge with both contributions in place."
+        }
+      ]
+    }
+  }
+}

@@ -5,6 +5,8 @@ export interface TourStep {
   anchor: TourAnchor
   title: string
   text: string
+  /** The label of the button that moves on, when it does more than show the next step. */
+  next?: string
   /** Makes the target visible before the step looks for it. */
   prepare?(): void
 }

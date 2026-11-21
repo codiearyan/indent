@@ -1,0 +1,163 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "cases", "label": "src/cases.ts", "kind": "data" },
+      { "id": "suite", "label": "runSuite()", "kind": "function", "mine": true, "fn": "runSuite" },
+      { "id": "triage", "label": "triageJson()", "kind": "function" },
+      { "id": "model", "label": "JSON triage model", "kind": "story" },
+      { "id": "build", "label": "buildGrader()", "kind": "function", "mine": true },
+      { "id": "graders", "label": "contains, matches, fieldEquals, near", "kind": "function", "mine": true },
+      { "id": "score", "label": "gradeOutput()", "kind": "function", "mine": true },
+      { "id": "report", "label": "Suite report", "kind": "data", "mine": true },
+      { "id": "dev", "label": "Dev, engineer", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "cases", "to": "suite", "label": "inputs and checks" },
+      { "from": "suite", "to": "triage", "label": "each input" },
+      { "from": "triage", "to": "model", "label": "request" },
+      { "from": "model", "to": "graders", "label": "JSON reply" },
+      { "from": "suite", "to": "build", "label": "each check spec" },
+      { "from": "build", "to": "graders", "label": "settings" },
+      { "from": "suite", "to": "score", "label": "each reply" },
+      { "from": "score", "to": "graders", "label": "the reply" },
+      { "from": "suite", "to": "report", "label": "scores and reasons" },
+      { "from": "report", "to": "dev", "label": "what to fix" }
+    ],
+    "note": "The JSON triage reply is scored one property at a time, so a case earns partial credit and every miss comes with a reason."
+  },
+  "tasks": {
+    "graders": {
+      "steps": [
+        {
+          "active": ["model", "model->graders"],
+          "value": {
+            "kind": "map",
+            "label": "a reply for a wilted orchid",
+            "entries": [
+              { "key": "category", "value": "plant-care" },
+              { "key": "urgency", "value": 3 },
+              { "key": "orderId", "value": "PB-63018" },
+              { "key": "summary", "value": "Customer writes about plant-care: ..." }
+            ]
+          },
+          "note": "The JSON triage model answers with one object: a category, an urgency from 1 to 5, the order id and a one line summary."
+        },
+        {
+          "active": ["graders"],
+          "note": "contains and matches read the reply as plain text. contains looks for a piece of text exactly as written, case included, and matches tests a pattern with its flags."
+        },
+        {
+          "active": ["graders"],
+          "note": "fieldEquals and near read one top-level field of the object. fieldEquals wants that exact value, and near wants a number within a tolerance of a target, edges included."
+        },
+        {
+          "active": ["graders"],
+          "value": {
+            "kind": "map",
+            "label": "what one grader gives back",
+            "entries": [
+              { "key": "pass", "value": "true or false" },
+              { "key": "reason", "value": "'' on a pass, a short sentence on a fail" }
+            ]
+          },
+          "note": "Every grader answers pass and a reason. A failing reason says what was looked for and, for a field, what was found."
+        },
+        {
+          "active": ["graders"],
+          "note": "A reply with words around the JSON fails the JSON graders with a reason that mentions JSON. The run goes on."
+        }
+      ]
+    },
+    "score": {
+      "steps": [
+        {
+          "active": ["suite->score", "score"],
+          "note": "gradeOutput gets one reply and the list of graders for its case."
+        },
+        {
+          "active": ["score", "score->graders", "graders"],
+          "note": "Every grader runs on the reply, so a case shows all of its problems at once."
+        },
+        {
+          "active": ["score"],
+          "note": "A grader that throws counts as a failure whose reason starts with grader error, and the other graders still run."
+        },
+        {
+          "active": ["score"],
+          "note": "An empty list of graders is an Error, because a case that checks nothing would always pass."
+        },
+        {
+          "active": ["score", "score->graders"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "score", "value": "share of graders that passed, 0 to 1" },
+              { "key": "passed", "value": "true only when every grader passed" },
+              { "key": "reasons", "value": "failing reasons, in grader order" }
+            ]
+          },
+          "note": "Dev gets a number that moves a little when a change helps a little, and a strict flag beside it."
+        }
+      ]
+    },
+    "suite": {
+      "trace": {
+        "file": "src/suite.ts",
+        "call": "runSuite",
+        "args": [
+          [
+            {
+              "id": "wrong-entrance",
+              "input": "The courier left my planter at the wrong entrance.",
+              "checks": [{ "kind": "contains", "text": "entrance" }]
+            }
+          ],
+          "evals-triage-json"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["cases", "cases->suite"],
+          "value": {
+            "kind": "array",
+            "label": "the checks of one case",
+            "values": ["field category", "field orderId", "near urgency", "contains PB-63018"]
+          },
+          "note": "Each case lists its checks as plain data: a kind and the settings for that kind."
+        },
+        {
+          "active": ["suite", "suite->build", "build", "build->graders", "graders"],
+          "note": "buildGrader turns a spec into the grader of its kind: contains uses text, regex uses pattern and flags, field uses field and equals, near uses field, value and tolerance."
+        },
+        {
+          "active": ["build"],
+          "note": "A kind it does not know, say a typo in the case file, throws an Error that names the kind."
+        },
+        {
+          "active": ["suite", "suite->triage", "triage", "triage->model", "model"],
+          "note": "Each input goes through triageJson with the model you were given. Some replies come back wrapped in a code fence."
+        },
+        {
+          "active": ["suite->score", "score"],
+          "note": "Each reply is graded with its own case's checks, and the result is kept under the case id, in case order."
+        },
+        {
+          "active": ["suite->report", "report", "report->dev", "dev"],
+          "value": {
+            "kind": "map",
+            "label": "the suite report",
+            "entries": [
+              { "key": "model", "value": "the model name" },
+              { "key": "total", "value": "number of cases" },
+              { "key": "passed", "value": "cases where every check passed" },
+              { "key": "meanScore", "value": "average case score" },
+              { "key": "results", "value": "{ id, score, passed, reasons } per case" }
+            ]
+          },
+          "note": "Dev reads one mean score, how many cases fully passed and every failing reason."
+        }
+      ]
+    }
+  }
+}

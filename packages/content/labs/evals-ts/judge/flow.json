@@ -1,0 +1,193 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "tickets", "label": "Tickets and rubric", "kind": "data" },
+      { "id": "evaluate", "label": "evaluateDrafts()", "kind": "function", "mine": true, "fn": "evaluateDrafts" },
+      { "id": "draft", "label": "draftReply()", "kind": "function" },
+      { "id": "writer", "label": "Draft model", "kind": "story" },
+      { "id": "judge", "label": "judgeDraft()", "kind": "function", "mine": true, "fn": "judgeDraft" },
+      { "id": "prompt", "label": "buildJudgeMessages()", "kind": "function" },
+      { "id": "judgeModel", "label": "Judge model", "kind": "story" },
+      { "id": "parse", "label": "parseVerdict()", "kind": "function", "mine": true, "fn": "parseVerdict" },
+      { "id": "report", "label": "Draft report", "kind": "data", "mine": true },
+      { "id": "ines", "label": "Ines, support lead", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "tickets", "to": "evaluate", "label": "cases and rules" },
+      { "from": "evaluate", "to": "draft", "label": "each ticket" },
+      { "from": "draft", "to": "writer", "label": "request" },
+      { "from": "evaluate", "to": "judge", "label": "ticket, draft, rubric" },
+      { "from": "judge", "to": "prompt", "label": "ticket, draft, rubric" },
+      { "from": "judge", "to": "judgeModel", "label": "messages" },
+      { "from": "judgeModel", "to": "parse", "label": "reply text" },
+      { "from": "judge", "to": "parse", "label": "reply text" },
+      { "from": "evaluate", "to": "report", "label": "verdicts" },
+      { "from": "report", "to": "ines", "label": "pass, fail, unknown" }
+    ],
+    "note": "A second model reads every reply draft against the team's rules, and its loose answers are parsed carefully, with unknown kept as its own result."
+  },
+  "tasks": {
+    "parse": {
+      "trace": {
+        "file": "src/verdict.ts",
+        "call": "parseVerdict",
+        "args": ["Thanks for sending this over.\nVerdict: fail\nReason: the draft is too long"]
+      },
+      "steps": [
+        {
+          "active": ["judgeModel"],
+          "note": "The judge model is asked for a verdict line and a reason line. It does not always answer that way: sometimes there is a sentence first, bold labels, or no verdict at all."
+        },
+        {
+          "active": ["judgeModel->parse", "parse"],
+          "value": {
+            "kind": "array",
+            "label": "a reply about a long draft",
+            "values": ["Thanks for sending this over.", "Verdict: fail", "Reason: the draft is too long"]
+          },
+          "note": "parseVerdict gets the whole reply as one piece of text."
+        },
+        {
+          "active": ["parse"],
+          "note": "A verdict label is the word verdict in any case, then spaces, * or :, then the whole word pass or fail. It counts wherever it sits in the text."
+        },
+        {
+          "active": ["parse"],
+          "note": "When every label in the reply agrees, that is the verdict. No label, or two that disagree, means unknown, and a loose pass or fail in a sentence is never read as one."
+        },
+        {
+          "active": ["parse", "judge->parse"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "verdict", "value": "pass, fail or unknown" },
+              { "key": "reason", "value": "the reason line, '' or could not judge ..." }
+            ]
+          },
+          "note": "For pass or fail the reason is the rest of the reason line, trimmed. An unknown verdict gets a sentence that starts with could not judge."
+        }
+      ]
+    },
+    "judge": {
+      "trace": {
+        "file": "src/judge.ts",
+        "call": "judgeDraft",
+        "args": [
+          "The courier left my planter at the wrong entrance.",
+          "I can ask the courier to confirm the delivery entrance.",
+          [
+            "Address the delivery concern."
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["evaluate->judge", "judge"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "ticket", "value": "the customer's email" },
+              { "key": "draft", "value": "the reply to grade" },
+              { "key": "rubric", "value": "the team's rules" }
+            ]
+          },
+          "note": "judgeDraft gets a ticket, its draft reply and the rubric."
+        },
+        {
+          "active": ["judge", "judge->prompt", "prompt", "judge->judgeModel", "judgeModel"],
+          "note": "The messages from buildJudgeMessages go to JUDGE_MODEL at temperature 0, through the client it was given."
+        },
+        {
+          "active": ["judgeModel->parse", "parse"],
+          "note": "The reply goes through parseVerdict. A pass or a fail is the answer."
+        },
+        {
+          "active": ["judge", "judge->judgeModel", "judgeModel"],
+          "note": "An unknown verdict earns one more request: the same messages, the judge's reply as an assistant message, then FOLLOW_UP as a user message. There is never a third."
+        },
+        {
+          "active": ["judge"],
+          "value": {
+            "kind": "map",
+            "label": "when the judge cannot be reached",
+            "entries": [
+              { "key": "verdict", "value": "unknown" },
+              { "key": "reason", "value": "could not judge, with the error message" }
+            ]
+          },
+          "note": "A request that throws ends in unknown too, and the run carries on with the next draft."
+        }
+      ]
+    },
+    "report": {
+      "trace": {
+        "file": "src/judge.ts",
+        "call": "evaluateDrafts",
+        "args": [
+          [
+            {
+              "id": "wrong-entrance",
+              "ticket": "The courier left my planter at the wrong entrance."
+            }
+          ],
+          [
+            "Address the delivery concern."
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["tickets", "tickets->evaluate", "evaluate"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "cases", "value": "{ id, ticket } per case" },
+              { "key": "rubric", "value": "a list of rules" }
+            ]
+          },
+          "note": "evaluateDrafts gets the support tickets and the rubric Ines wrote."
+        },
+        {
+          "active": ["evaluate", "evaluate->draft", "draft", "draft->writer", "writer"],
+          "note": "Each ticket gets a reply draft from draftReply."
+        },
+        {
+          "active": ["evaluate->judge", "judge"],
+          "note": "Each draft is judged with judgeDraft against the same rubric."
+        },
+        {
+          "active": ["evaluate"],
+          "value": {
+            "kind": "map",
+            "label": "one result",
+            "entries": [
+              { "key": "id", "value": "the case id" },
+              { "key": "draft", "value": "the reply text" },
+              { "key": "verdict", "value": "pass, fail or unknown" },
+              { "key": "reason", "value": "the judge's reason" }
+            ]
+          },
+          "note": "Each case keeps its draft, its verdict and the reason, in case order."
+        },
+        {
+          "active": ["evaluate->report", "report", "report->ines", "ines"],
+          "value": {
+            "kind": "map",
+            "label": "the draft report",
+            "entries": [
+              { "key": "results", "value": "one per case" },
+              { "key": "pass", "value": "count" },
+              { "key": "fail", "value": "count" },
+              { "key": "unknown", "value": "count" },
+              { "key": "passRate", "value": "a share of the judged cases" }
+            ]
+          },
+          "note": "Ines sees how many drafts were judged and how many nobody could check. Unknown is never counted as a pass or a fail."
+        }
+      ]
+    }
+  }
+}

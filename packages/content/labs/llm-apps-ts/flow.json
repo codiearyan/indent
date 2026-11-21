@@ -1,0 +1,24 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customer", "label": "Fernhollow customer", "kind": "story" },
+      { "id": "inbox", "label": "Shop inbox", "kind": "story" },
+      { "id": "care", "label": "Care and chat", "kind": "file", "mine": true },
+      { "id": "sort", "label": "Inbox and orders", "kind": "file", "mine": true },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "handle", "label": "Reply handling", "kind": "file", "mine": true },
+      { "id": "reply", "label": "Care reply", "kind": "data" },
+      { "id": "desk", "label": "Inbox tag or order", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "customer", "to": "care", "label": "questions" },
+      { "from": "inbox", "to": "sort", "label": "emails" },
+      { "from": "care", "to": "model", "label": "care request" },
+      { "from": "sort", "to": "model", "label": "shop request" },
+      { "from": "model", "to": "handle", "label": "model reply" },
+      { "from": "handle", "to": "reply", "label": "care text" },
+      { "from": "handle", "to": "desk", "label": "shop record" }
+    ],
+    "note": "You build Moss to answer Fernhollow’s plant care questions, sort Ravi’s inbox and turn order emails into records the shop can use."
+  }
+}

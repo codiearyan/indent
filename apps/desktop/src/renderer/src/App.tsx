@@ -15,6 +15,7 @@ import { AppShortcuts } from '@/features/shortcuts/AppShortcuts'
 import { ShortcutList } from '@/features/shortcuts/ShortcutList'
 import { SettingsDialog } from '@/features/settings/SettingsDialog'
 import { StarPrompt } from '@/features/star/StarPrompt'
+import { GuideTour } from '@/features/tour/GuideTour'
 import { WorkspacePage } from '@/features/workspace/WorkspacePage'
 import { useSettings } from '@/stores/settings'
 
@@ -33,6 +34,7 @@ export default function App(): React.JSX.Element {
             <AppShortcuts />
             {/* Inside the router: it watches routes to know when a repo is closed. */}
             <StarPrompt />
+            <GuideTour />
             <Routes>
               <Route element={<AppShell />}>
                 <Route index element={<DashboardPage />} />

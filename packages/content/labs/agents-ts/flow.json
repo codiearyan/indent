@@ -1,0 +1,55 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "pantry",
+        "label": "Pantry staff",
+        "kind": "story"
+      },
+      {
+        "id": "agent",
+        "label": "Pip’s agent",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "model",
+        "label": "Local model",
+        "kind": "story"
+      },
+      {
+        "id": "records",
+        "label": "Orders and shelves",
+        "kind": "data"
+      },
+      {
+        "id": "review",
+        "label": "Refund approval",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "pantry",
+        "to": "agent",
+        "label": "request"
+      },
+      {
+        "from": "agent",
+        "to": "model",
+        "label": "conversation"
+      },
+      {
+        "from": "agent",
+        "to": "records",
+        "label": "tool calls"
+      },
+      {
+        "from": "agent",
+        "to": "review",
+        "label": "approval"
+      }
+    ],
+    "note": "At Pebble Lane Pantry, your code lets Pip answer delivery and stock questions and lets staff decide whether a refund can go ahead."
+  }
+}
