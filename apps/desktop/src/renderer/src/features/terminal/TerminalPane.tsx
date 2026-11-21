@@ -22,6 +22,8 @@ import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
 
 const REFRESH_QUIET_MS = 500
+// The terminal drops input that arrives with Ctrl+C, so the command waits for the shell.
+const AFTER_INTERRUPT_MS = 150
 
 type Status = 'idle' | 'connected' | 'exited'
 
@@ -211,9 +213,11 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
     if (!suggested) return
     setPanel('terminal', true)
     const current = termRef.current
-    // Sent as typed input, so the shell runs it and the files refresh afterwards.
-    if (current?.id) current.term.input(`${suggested}\r`, false)
-    else connect(`${suggested}\r`)
+    if (!current?.id) return connect(`${suggested}\r`)
+    // Ctrl+C clears a half-typed line or stops the last run. Both go in as typed input, so the
+    // shell runs the command and the files refresh afterwards.
+    current.term.input('\x03', false)
+    setTimeout(() => current.term.input(`${suggested}\r`, false), AFTER_INTERRUPT_MS)
   })
 
   useEffect(
