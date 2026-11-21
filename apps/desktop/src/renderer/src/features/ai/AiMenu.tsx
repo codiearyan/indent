@@ -33,7 +33,11 @@ const suggestionModes = (): { value: SuggestionMode; label: string; hint: string
     label: 'When I ask',
     hint: `Press ${shortcutLabel('suggest')} for a suggestion. Tab accepts.`
   },
-  { value: 'auto', label: 'As I type', hint: 'Grey text after a pause in typing. Tab accepts.' }
+  {
+    value: 'auto',
+    label: 'As I type',
+    hint: `Grey text after a pause in typing. Until a task has a check, press ${shortcutLabel('suggest')}. Tab accepts.`
+  }
 ]
 
 export function AiMenu(): React.JSX.Element {

@@ -18,6 +18,7 @@ import type { ShortcutId } from '@/lib/shortcuts'
 import { useChapterProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
+import { SuggestionsControl } from '@/features/ai/SuggestionsControl'
 import { TOUR } from '@/features/tour/anchors'
 import { checkAll, runCommand } from '@/features/workspace/useWorkspaceShortcuts'
 import { useRuntime } from '@/stores/runtime'
@@ -99,6 +100,7 @@ export function EditorPane(): React.JSX.Element {
             )}
           </p>
         )}
+        <SuggestionsControl />
         <IconButton
           label="Focus mode"
           shortcut="toggleFocusMode"

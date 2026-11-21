@@ -4,6 +4,8 @@ import { cliInvocation } from './cli'
 import {
   cleanCompletion,
   cleanTip,
+  completionPrompt,
+  completionTask,
   maskKey,
   tipPrompt,
   transcript,
@@ -183,6 +185,45 @@ describe('completions', () => {
     expect(
       cleanCompletion(Array.from({ length: 20 }, (_, i) => `l${i}`).join('\n')).split('\n')
     ).toHaveLength(6)
+  })
+
+  it('puts the task and its failing checks above the file', () => {
+    const prompt = completionPrompt('src/a.js', 'let x = ', ';', {
+      title: 'Total one order',
+      description: 'Add up the items.\n',
+      failing: ['totals an order with a discount']
+    })
+    expect(prompt).toBe(
+      'Task: Total one order\n\nAdd up the items.\n\nFailing checks:\n- totals an order with a discount\n\nFile: src/a.js\n\nlet x = <cursor/>;'
+    )
+  })
+
+  it('leaves the task out when there is none', () => {
+    expect(completionPrompt('a.js', 'a', 'b')).toBe('File: a.js\n\na<cursor/>b')
+  })
+
+  it('keeps only a well formed task, cut to size', () => {
+    expect(completionTask(undefined)).toBeUndefined()
+    expect(completionTask('Total')).toBeUndefined()
+    expect(completionTask({ title: ' ', description: 'x', failing: [] })).toBeUndefined()
+    expect(completionTask({ title: 'T', description: 3 })).toBeUndefined()
+
+    const task = completionTask({
+      title: 't'.repeat(500),
+      description: 'd'.repeat(10_000),
+      failing: ['ok', 7, '', ...Array.from({ length: 20 }, () => 'n'.repeat(500))],
+      hints: ['SECRET HINT']
+    })!
+    expect(task.title).toHaveLength(200)
+    expect(task.description.length).toBeLessThan(3_100)
+    expect(task.failing[0]).toBe('ok')
+    expect(task.failing).toHaveLength(10)
+    expect(task.failing[1]).toHaveLength(200)
+    expect(JSON.stringify(task)).not.toContain('SECRET')
+  })
+
+  it('reads a missing list of failing checks as none', () => {
+    expect(completionTask({ title: 'T', description: 'D' })?.failing).toEqual([])
   })
 })
 

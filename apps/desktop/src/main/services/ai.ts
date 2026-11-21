@@ -29,6 +29,7 @@ import {
   cleanCompletion,
   cleanTip,
   completionPrompt,
+  completionTask,
   maskKey,
   tipPrompt,
   transcript,
@@ -285,7 +286,8 @@ async function complete(request: AiCompleteRequest): Promise<string> {
           content: completionPrompt(
             String(request.path).slice(0, 200),
             String(request.prefix).slice(-4000),
-            String(request.suffix).slice(0, 1000)
+            String(request.suffix).slice(0, 1000),
+            completionTask(request.task)
           )
         }
       ],

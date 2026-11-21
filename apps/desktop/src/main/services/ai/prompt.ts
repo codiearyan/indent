@@ -1,5 +1,6 @@
 import type {
   AiAttachment,
+  AiCompletionTask,
   AiMessage,
   ChapterDef,
   ChapterProgress,
@@ -217,10 +218,46 @@ export function withInstructions(system: string, prompt: string): string {
   return `<instructions>\n${system}\n</instructions>\n\n${prompt}`
 }
 
-export const COMPLETION_RULES = `You are an inline code completion engine in a learning app. Reply with only the code to insert at <cursor/>: no explanation, no markdown fences, no text that repeats what is already before or after the cursor. Insert at most a few lines, usually finishing the current line or statement. Never write a whole function body or a whole task answer in one go; the learner is practicing. If nothing useful fits, reply with nothing.`
+export const COMPLETION_RULES = `You are an inline code completion engine in a learning app. Reply with only the code to insert at <cursor/>: no explanation, no markdown fences, no text that repeats what is already before or after the cursor. Insert at most a few lines, usually finishing the current line or statement. Never write a whole function body or a whole task answer in one go; the learner is practicing. If nothing useful fits, reply with nothing.
 
-export function completionPrompt(path: string, prefix: string, suffix: string): string {
-  return `File: ${path}\n\n${prefix}<cursor/>${suffix}`
+When a task is given, it is the one the learner is working on. Suggest only the next small step toward it from where the cursor is, one or two lines, and leave the rest to the learner. Never write code that would make the task pass on its own: no whole function body, no complete loop or calculation the task asks for. If checks are failing, a step may move toward what they name, but never fix all of it at once.`
+
+const MAX_TASK_TITLE_CHARS = 200
+const MAX_TASK_CHARS = 3_000
+const MAX_FAILING = 10
+const MAX_CHECK_NAME_CHARS = 200
+
+/** The task from the renderer, checked and cut to size; anything malformed is left out. */
+export function completionTask(task: unknown): AiCompletionTask | undefined {
+  if (!task || typeof task !== 'object') return undefined
+  const { title, description, failing } = task as Partial<AiCompletionTask>
+  if (typeof title !== 'string' || !title.trim() || typeof description !== 'string') {
+    return undefined
+  }
+  return {
+    title: title.slice(0, MAX_TASK_TITLE_CHARS),
+    description: clip(description, MAX_TASK_CHARS),
+    failing: Array.isArray(failing)
+      ? failing
+          .filter((name): name is string => typeof name === 'string' && !!name.trim())
+          .slice(0, MAX_FAILING)
+          .map((name) => name.slice(0, MAX_CHECK_NAME_CHARS))
+      : []
+  }
+}
+
+export function completionPrompt(
+  path: string,
+  prefix: string,
+  suffix: string,
+  task?: AiCompletionTask
+): string {
+  const file = `File: ${path}\n\n${prefix}<cursor/>${suffix}`
+  if (!task) return file
+  const failing = task.failing.length
+    ? `\n\nFailing checks:\n${task.failing.map((name) => `- ${name}`).join('\n')}`
+    : ''
+  return `Task: ${task.title}\n\n${task.description.trim()}${failing}\n\n${file}`
 }
 
 const MAX_COMPLETION_LINES = 6
