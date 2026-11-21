@@ -203,6 +203,16 @@ export interface LabModelStatus {
   nodeMissing?: boolean
 }
 
+/** A Node.js found on the computer that the repos could run with. */
+export interface NodeOption {
+  bin: string
+  version: string
+  /** Where it comes from: "nvm", "Homebrew", "the app's copy", "on this computer". */
+  source: string
+  /** 22.18 or newer. */
+  supported: boolean
+}
+
 export interface ToolStatus {
   id: ToolId
   label: string
@@ -406,6 +416,10 @@ export interface Api {
     status(): Promise<ToolStatus[]>
     /** Downloads Node into the app's own folder. Other programs do not see it. */
     installNode(): Promise<ToolStatus[]>
+    /** Every Node found, and the one picked; null picked means automatic. */
+    nodeOptions(): Promise<{ options: NodeOption[]; picked: string | null }>
+    /** Picks a Node from nodeOptions, or null for automatic. */
+    pickNode(bin: string | null): Promise<ToolStatus[]>
     /** macOS only: opens Apple's installer for its developer tools, which include Git. */
     installGit(): Promise<void>
     /** Whether the local model runs, and why not. */
@@ -445,7 +459,15 @@ export const INVOKE_METHODS = {
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],
-  tools: ['status', 'installNode', 'installGit', 'labModel', 'restartLabModel'],
+  tools: [
+    'status',
+    'installNode',
+    'nodeOptions',
+    'pickNode',
+    'installGit',
+    'labModel',
+    'restartLabModel'
+  ],
   github: ['star'],
   ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test', 'tip']
 } as const

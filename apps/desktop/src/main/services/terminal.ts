@@ -5,7 +5,8 @@ import { dirname, join } from 'path'
 import { spawn, type IPty } from 'node-pty'
 import { EVENTS } from '@shared/types'
 import { emit, handle, listen } from '../ipc'
-import { labEnv } from '../labEnv'
+import { firstNodeDir, labEnv } from '../labEnv'
+import { shellLaunch } from '../shellStart'
 import { labModelProblem } from './labModel'
 import { workspaceDir } from '../paths'
 
@@ -44,10 +45,13 @@ export function register(): void {
   handle('terminal', {
     create: async ({ labId, chapterId, cols, rows }) => {
       const cwd = workspaceDir(labId, chapterId)
-      const env = { ...(await labEnv()), TERM: 'xterm-256color' }
       const windows = process.platform === 'win32'
       const shell = windows ? 'powershell.exe' : process.env.SHELL || '/bin/zsh'
-      const pty = spawn(shell, windows ? [] : ['-l'], {
+      const base = { ...(await labEnv()), TERM: 'xterm-256color' }
+      const { args, env } = windows
+        ? { args: [], env: base }
+        : shellLaunch(shell, firstNodeDir(), base)
+      const pty = spawn(shell, args, {
         name: 'xterm-256color',
         cwd,
         env,

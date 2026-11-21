@@ -1,8 +1,8 @@
 import { execFile } from 'child_process'
-import { existsSync } from 'fs'
-import { delimiter } from 'path'
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs'
+import { delimiter, dirname } from 'path'
 import { promisify } from 'util'
-import { ownNodeBin } from './paths'
+import { dataFile, ownNodeBin } from './paths'
 
 const run = promisify(execFile)
 
@@ -23,6 +23,33 @@ export function refreshShellPath(): void {
   shellPath = undefined
 }
 
+const pickFile = (): string => dataFile('node.json')
+
+/** The Node binary picked in Settings, or null for automatic or when it is gone. */
+export function pickedNode(): string | null {
+  try {
+    const bin = (JSON.parse(readFileSync(pickFile(), 'utf8')) as { bin?: unknown }).bin
+    return typeof bin === 'string' && existsSync(bin) ? bin : null
+  } catch {
+    return null
+  }
+}
+
+export function pickNode(bin: string | null): void {
+  if (bin) writeFileSync(pickFile(), JSON.stringify({ bin }))
+  else rmSync(pickFile(), { force: true })
+}
+
+/**
+ * The folder whose Node goes first on the PATH: the one picked in Settings, else the app's own
+ * copy, which is only downloaded when the computer's is missing or old. Null leaves the PATH alone.
+ */
+export function firstNodeDir(): string | null {
+  const picked = pickedNode()
+  if (picked) return dirname(picked)
+  return existsSync(ownNodeBin()) ? ownNodeBin() : null
+}
+
 /** Called once the lab model server is listening. */
 export function setLabModelUrl(url: string): void {
   labModelUrl = url
@@ -35,10 +62,8 @@ export async function shellEnv(): Promise<Record<string, string>> {
   for (const [key, value] of Object.entries(process.env)) {
     if (value !== undefined && !key.startsWith('ELECTRON_')) env[key] = value
   }
-  // The app's own Node goes first: it is only downloaded when the computer's is missing or old.
-  // shortcut: it keeps winning after the learner installs a newer Node; add a way to remove it then.
-  const own = ownNodeBin()
-  env.PATH = existsSync(own) ? `${own}${delimiter}${await shellPath}` : await shellPath
+  const first = firstNodeDir()
+  env.PATH = first ? `${first}${delimiter}${await shellPath}` : await shellPath
   return env
 }
 

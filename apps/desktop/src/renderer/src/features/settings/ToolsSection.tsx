@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Check, Loader2 } from 'lucide-react'
-import type { LabModelStatus, ToolStatus } from '@shared/types'
+import type { LabModelStatus, NodeOption, ToolStatus } from '@shared/types'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api'
 import { errorMessage } from '@/lib/utils'
@@ -25,11 +32,22 @@ export function ToolsSection(): React.JSX.Element {
   const [model, setModel] = useState<LabModelStatus | null>(null)
   const [restarting, setRestarting] = useState(false)
   const runtime = useRuntime((s) => s.status)
+  const [nodes, setNodes] = useState<{ options: NodeOption[]; picked: string | null } | null>(null)
+
+  const pickNode = (bin: string | null): void => {
+    setError(null)
+    void api.tools
+      .pickNode(bin)
+      .then(setTools)
+      .then(() => api.tools.nodeOptions())
+      .then(setNodes, show)
+  }
 
   const show = (e: unknown): void => setError(errorMessage(e))
 
   // The model's status comes second: reading tools can restart it once Node is found.
   const refresh = (): void => {
+    void api.tools.nodeOptions().then(setNodes, show)
     void refreshTools()
       .then(() => api.tools.labModel())
       .then(setModel, show)
@@ -61,6 +79,19 @@ export function ToolsSection(): React.JSX.Element {
     }
   }
 
+  const downloadButton = (label: string): React.JSX.Element => (
+    <Button
+      variant="outline"
+      size="sm"
+      className="press shrink-0 border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
+      disabled={downloading}
+      onClick={() => void download()}
+    >
+      {downloading && <Loader2 className="animate-spin motion-reduce:animate-none" />}
+      {downloading ? 'Downloading' : `Download ${label}`}
+    </Button>
+  )
+
   return (
     <Group
       title="What your repos need"
@@ -84,22 +115,48 @@ export function ToolsSection(): React.JSX.Element {
                     {tool.id !== 'node' && usedBy(tool) && ` Used by: ${usedBy(tool)}.`}
                   </p>
                 </div>
-                {tool.ok ? (
+                {tool.id === 'node' && nodes && nodes.options.length > 1 ? (
+                  <span className="flex shrink-0 items-center gap-2">
+                    {tool.ok ? (
+                      <Check className="size-4 text-success" strokeWidth={2} aria-label="Ready" />
+                    ) : (
+                      // Every Node found can be too old: the download stays the way forward.
+                      tool.installable && downloadButton(tool.label)
+                    )}
+                    <Select
+                      value={nodes.picked ?? 'auto'}
+                      onValueChange={(value) => pickNode(value === 'auto' ? null : value)}
+                    >
+                      <SelectTrigger size="sm" aria-label="Node.js version" className="w-60">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="auto">
+                          Automatic, {tool.version ?? 'none found'}
+                        </SelectItem>
+                        {nodes.options.map((option) => (
+                          <SelectItem
+                            key={option.bin}
+                            value={option.bin}
+                            disabled={!option.supported}
+                          >
+                            <span className="font-mono text-xs">{option.version}</span>
+                            <span className="text-muted-foreground">
+                              {option.source}
+                              {!option.supported && ', too old'}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </span>
+                ) : tool.ok ? (
                   <span className="flex shrink-0 items-center gap-2 font-mono text-xs text-muted-foreground">
                     <Check className="size-4 text-success" strokeWidth={2} aria-label="Ready" />
                     {tool.version}
                   </span>
                 ) : tool.installable ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="press shrink-0 border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
-                    disabled={downloading}
-                    onClick={() => void download()}
-                  >
-                    {downloading && <Loader2 className="animate-spin motion-reduce:animate-none" />}
-                    {downloading ? 'Downloading' : `Download ${tool.label}`}
-                  </Button>
+                  downloadButton(tool.label)
                 ) : (
                   <span className="shrink-0 text-xs text-muted-foreground">Not found</span>
                 )}

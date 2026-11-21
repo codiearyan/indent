@@ -1,4 +1,5 @@
 import { execFile } from 'child_process'
+import { app } from 'electron'
 import { createHash } from 'crypto'
 import { createWriteStream, existsSync } from 'fs'
 import { mkdir, rename, rm } from 'fs/promises'
@@ -7,15 +8,16 @@ import { Readable } from 'stream'
 import { pipeline } from 'stream/promises'
 import type { ReadableStream } from 'stream/web'
 import { promisify } from 'util'
-import type { ToolStatus } from '@shared/types'
+import type { NodeOption, ToolStatus } from '@shared/types'
 import { handle } from '../ipc'
-import { labEnv, refreshShellPath } from '../labEnv'
+import { labEnv, pickedNode, pickNode, refreshShellPath, shellEnv } from '../labEnv'
 import { ownNodeBin, ownNodeDir, toolsDir } from '../paths'
 import { which } from './ai/cli'
 import { ensureRuntime } from './checks'
 import { labModelStatus, restartLabModel, startLabModelIfNodeWasMissing } from './labModel'
 import { nodeSupported } from './grader'
 import { pickNodeArchive } from './nodeArchive'
+import { byVersion, findNodeBins, nodeSource } from './nodeOptions'
 
 const run = promisify(execFile)
 
@@ -47,7 +49,7 @@ function nodeNote(version: string | null, ok: boolean): string {
   const use = 'Runs your code and the checks.'
   if (!version) return `${use} Not found on this computer.`
   if (!ok) return `${use} Needs 22.18 or newer.`
-  return existsSync(ownNodeBin()) ? `${use} This copy belongs to the app.` : use
+  return !pickedNode() && existsSync(ownNodeBin()) ? `${use} This copy belongs to the app.` : use
 }
 
 function gitNote(version: string | null): string {
@@ -132,6 +134,36 @@ function installNode(): Promise<ToolStatus[]> {
     .finally(() => (installing = undefined)))
 }
 
+async function nodeOptions(): Promise<{ options: NodeOption[]; picked: string | null }> {
+  const env = await shellEnv()
+  const bins = findNodeBins(env.PATH ?? '', app.getPath('home'), ownNodeBin())
+  const found = await Promise.all(
+    bins.map(async (bin) => ({ bin, version: await versionOf(bin, env) }))
+  )
+  const options = found
+    .filter((option): option is { bin: string; version: string } => !!option.version)
+    .map(({ bin, version }) => ({
+      bin,
+      version,
+      source: nodeSource(bin, ownNodeBin()),
+      supported: nodeSupported(version)
+    }))
+    .sort((a, b) => byVersion(a.version, b.version))
+  return { options, picked: pickedNode() }
+}
+
+/** Only a binary this process found itself and that runs the repos can be picked. */
+async function choose(bin: string | null): Promise<ToolStatus[]> {
+  if (bin !== null) {
+    const option = (await nodeOptions()).options.find((candidate) => candidate.bin === bin)
+    if (!option?.supported) throw new Error('Pick a Node.js 22.18 or newer from the list.')
+  }
+  // The local model keeps the Node it started with: a restart would move it to a new port, which
+  // open terminals of AI repos would no longer reach.
+  pickNode(bin)
+  return status()
+}
+
 /** Opens Apple's installer window; the person finishes it there, then checks again. */
 async function installGit(): Promise<void> {
   if (process.platform !== 'darwin') throw new Error('Get Git from git-scm.com/downloads.')
@@ -154,6 +186,8 @@ export function register(): void {
   handle('tools', {
     status,
     installNode,
+    nodeOptions,
+    pickNode: choose,
     installGit,
     labModel: async () => labModelStatus(),
     restartLabModel
