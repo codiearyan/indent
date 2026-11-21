@@ -33,21 +33,31 @@ export async function emptyDir(dir: string): Promise<void> {
   await Promise.all(entries.map((name) => rm(join(dir, name), { recursive: true, force: true })))
 }
 
-async function listFiles(dir: string, prefix = ''): Promise<string[]> {
-  const files: string[] = []
+async function listEntries(
+  dir: string,
+  prefix = '',
+  found: { files: string[]; folders: string[] } = { files: [], folders: [] }
+): Promise<{ files: string[]; folders: string[] }> {
   for (const entry of await readdir(join(dir, prefix), { withFileTypes: true })) {
     if (entry.name.startsWith('.') || entry.name === 'node_modules') continue
     const path = prefix ? `${prefix}/${entry.name}` : entry.name
-    if (entry.isDirectory()) files.push(...(await listFiles(dir, path)))
-    else if (entry.isFile()) files.push(path)
+    if (entry.isDirectory()) {
+      found.folders.push(path)
+      await listEntries(dir, path, found)
+    } else if (entry.isFile()) found.files.push(path)
   }
-  return files
+  return found
+}
+
+/** Folders of the workspace, hidden ones and `node_modules` left out, as `readWorkspace` does. */
+export async function readFolders(dir: string): Promise<string[]> {
+  return (await listEntries(dir)).folders.sort()
 }
 
 /** Text files of the workspace, `first` (the chapter's tab order) leading, the rest alphabetical. */
 export async function readWorkspace(dir: string, first: string[]): Promise<WorkspaceFile[]> {
   const files: WorkspaceFile[] = []
-  for (const path of await listFiles(dir)) {
+  for (const path of (await listEntries(dir)).files) {
     const full = join(dir, ...path.split('/'))
     if ((await stat(full)).size > MAX_FILE_BYTES) continue
     const buffer = await readFile(full)

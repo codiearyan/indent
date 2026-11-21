@@ -8,6 +8,7 @@ import {
   copyStarter,
   emptyDir,
   isAppPath,
+  readFolders,
   readWorkspace,
   resolveInside
 } from './workspaceFiles'
@@ -96,7 +97,8 @@ async function snapshot(
   conflicts: string[] = [],
   updated: string[] = []
 ): Promise<WorkspaceSnapshot> {
-  return { dir, files: await readWorkspace(dir, first), starter, conflicts, updated, remembered }
+  const [files, folders] = await Promise.all([readWorkspace(dir, first), readFolders(dir)])
+  return { dir, files, folders, starter, conflicts, updated, remembered }
 }
 
 /**

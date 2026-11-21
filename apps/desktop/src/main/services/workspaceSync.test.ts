@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { describe, expect, it } from 'vitest'
+import { createFolder, removePath, renamePath } from './workspaceOps'
 import { openWorkspace, resetWorkspace, resolveConflict } from './workspaceSync'
 
 async function writeTree(dir: string, files: Record<string, string>): Promise<void> {
@@ -92,6 +93,31 @@ describe('openWorkspace', () => {
     expect(existsSync(join(dir, 'old'))).toBe(false)
     expect(await readdir(join(dir, 'keep'))).toEqual(['mine.ts'])
     expect(existsSync(dir)).toBe(true)
+  })
+
+  it('lists folders, empty ones too, and never the app folder', async () => {
+    const { starterDir, dir } = await setup({ 'src/lib/a.ts': 'a' })
+    await openWorkspace(starterDir, dir, [])
+    await createFolder(dir, 'empty')
+    expect((await openWorkspace(starterDir, dir, [])).folders).toEqual(['empty', 'src', 'src/lib'])
+  })
+
+  it('treats a starter file the learner deleted or renamed as their change', async () => {
+    const { starterDir, dir } = await setup({ 'a.ts': 'a', 'src/b.ts': 'b', 'c.ts': 'c' })
+    await openWorkspace(starterDir, dir, [])
+    await removePath(dir, 'a.ts')
+    await renamePath(dir, 'src', 'lib')
+    await updateStarter(starterDir, { 'a.ts': 'a', 'src/b.ts': 'b', 'c.ts': 'c 2' })
+
+    const snap = await openWorkspace(starterDir, dir, [])
+
+    expect(snap.files.map((f) => f.path)).toEqual(['c.ts', 'lib/b.ts'])
+    expect(await read(dir, 'c.ts')).toBe('c 2')
+    expect(snap.conflicts).toEqual([])
+    expect(await remembered(dir)).toEqual({ 'a.ts': 'a', 'src/b.ts': 'b', 'c.ts': 'c 2' })
+
+    const reset = await resetWorkspace(starterDir, dir, [])
+    expect(reset.files.map((f) => f.path)).toEqual(['a.ts', 'c.ts', 'lib/b.ts', 'src/b.ts'])
   })
 
   it('leaves a workspace from before the starter was kept as it is', async () => {
