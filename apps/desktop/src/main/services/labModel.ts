@@ -51,6 +51,11 @@ export function startLabModel(): void {
   void start()
 }
 
+/** Loads the repos' models again after a repo was installed or updated; it restarts on exit. */
+export function restartLabModel(): void {
+  child?.kill()
+}
+
 /** Resolves once the lab model is listening, or after `timeoutMs` so checks that do not need it still run. */
 export function labModelReady(timeoutMs = 15_000): Promise<void> {
   if (up) return Promise.resolve()
