@@ -1,14 +1,25 @@
 import { describe, expect, it } from 'vitest'
 import { CODE_THEMES, codePalette } from '@indent/design/code-palette'
 import { mergeSettings } from './mergeSettings'
-import type { SettingsState } from './settings'
+import type { SettingsState, Typography } from './settings'
+
+const typography: Typography = {
+  uiFont: null,
+  uiSize: 15,
+  monoFont: null,
+  monoSize: 13,
+  lineHeight: 1.6,
+  ligatures: false,
+  cursor: 'block'
+}
 
 const defaults = {
   appearance: 'dark',
   theme: 'dark',
   codeTheme: 'ember',
   editor: { wordWrap: false, lineNumbers: true, minimap: false },
-  panels: { files: false, terminal: false, chat: false, zen: false, browser: true }
+  panels: { files: false, terminal: false, chat: false, zen: false, browser: true },
+  typography
 } as SettingsState
 
 describe('mergeSettings', () => {
@@ -18,6 +29,12 @@ describe('mergeSettings', () => {
     expect(merged.theme).toBe('light')
     expect(merged.panels).toEqual({ ...defaults.panels, files: true })
     expect(merged.editor).toEqual(defaults.editor)
+    expect(merged.typography).toEqual(typography)
+  })
+
+  it('keeps the font options that were saved and defaults the rest', () => {
+    const merged = mergeSettings({ typography: { monoFont: 'Menlo' } }, defaults, 'dark')
+    expect(merged.typography).toEqual({ ...typography, monoFont: 'Menlo' })
   })
 
   it('resolves system to the theme of the computer', () => {

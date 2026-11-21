@@ -1,7 +1,9 @@
-import { PanelLeft, PanelRight } from 'lucide-react'
+import { PanelLeft, PanelRight, RotateCcw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   TEXT_SCALE_MAX,
   TEXT_SCALE_MIN,
@@ -141,26 +143,51 @@ export function Group({
 
 export const card = 'divide-y divide-rule rounded-lg border border-border'
 
+/** `onReset` shows a reset button next to the label; pass it only while the value differs. */
 export function Row({
   id,
   label,
   hint,
+  onReset,
   children
 }: {
   id?: string
   label: string
   hint?: string
+  onReset?: () => void
   children: React.ReactNode
 }): React.JSX.Element {
   return (
     <div className="flex min-h-14 items-center justify-between gap-6 px-4 py-2.5">
       <div>
-        <label htmlFor={id} className="text-sm">
-          {label}
-        </label>
+        <div className="flex h-6 items-center gap-1">
+          <label htmlFor={id} className="text-sm">
+            {label}
+          </label>
+          {onReset && <ResetButton onClick={onReset} />}
+        </div>
         {hint && <p className="text-[13px] text-muted-foreground">{hint}</p>}
       </div>
       {children}
     </div>
+  )
+}
+
+function ResetButton({ onClick }: { onClick: () => void }): React.JSX.Element {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          aria-label="Reset to default"
+          className="text-muted-foreground hover:text-foreground"
+          onClick={onClick}
+        >
+          <RotateCcw />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Reset to default</TooltipContent>
+    </Tooltip>
   )
 }

@@ -20,6 +20,7 @@ export function mergeSettings(
     theme: appearance === 'system' ? system : appearance,
     codeTheme: known ? persisted.codeTheme! : DEFAULT_CODE_THEME,
     panels: { ...current.panels, ...persisted.panels },
-    editor: { ...current.editor, ...persisted.editor }
+    editor: { ...current.editor, ...persisted.editor },
+    typography: { ...current.typography, ...persisted.typography }
   }
 }

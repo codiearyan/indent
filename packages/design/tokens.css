@@ -67,8 +67,9 @@
   --motion-stagger: 40ms;
 }
 
-/* 2. Semantic: light */
-:root {
+/* 2. Semantic: light. `.light` draws a light sample inside the dark app. */
+:root,
+.light {
   --radius: 8px;
 
   /* background is the frame; card is the sheet and everything that sits on it */
@@ -137,8 +138,9 @@
 
 /* 3. Tailwind mapping */
 @theme inline {
-  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  /* --font-ui and --font-code hold a font the person picked in the app's settings. */
+  --font-sans: var(--font-ui, 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(--font-code, 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
