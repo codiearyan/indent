@@ -22,10 +22,13 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+# Signed with a Developer ID and notarized when the release has the Apple secrets (release.yml);
+# electron-builder notarizes on its own once APPLE_API_KEY, _ID and _ISSUER are set.
 mac:
   target: dmg
+  hardenedRuntime: true
+  entitlements: build/entitlements.mac.plist
   entitlementsInherit: build/entitlements.mac.plist
-  notarize: false
 dmg:
   artifactName: Indent-mac-${arch}.${ext}
   title: Indent
