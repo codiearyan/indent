@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ChevronLeft, ChevronRight, CircleHelp, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AiMenu } from '@/features/ai/AiMenu'
+import { StreakStatus } from '@/features/progress/StreakStatus'
 import { useAiEnabled } from '@/features/ai/aiStore'
 import { cn } from '@/lib/utils'
 import { TOUR } from '@/features/tour/anchors'
@@ -73,6 +74,7 @@ export function TopBar(): React.JSX.Element {
         )}
       </nav>
       <div className="flex shrink-0 items-center gap-0.5">
+        <StreakStatus />
         {aiOn && (
           <Button
             variant="ghost"

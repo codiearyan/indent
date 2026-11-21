@@ -1,0 +1,55 @@
+.moment-card {
+  animation: moment-in var(--motion-enter) var(--ease-out) both;
+}
+.moment-card.moment-leaving {
+  animation: moment-out var(--motion-exit) var(--ease-out) both;
+}
+.moment-meter {
+  transition: width 520ms var(--ease-in-out);
+}
+.moment-roll > span {
+  display: block;
+  height: 1.75rem;
+}
+.moment-roll {
+  transition: transform var(--motion-state) var(--ease-out);
+}
+.moment-roll.moment-rolled {
+  transform: translateY(-50%);
+}
+.moment-row {
+  animation: moment-in var(--motion-enter) var(--ease-out) both;
+  animation-delay: calc(var(--motion-stage) * 6);
+}
+
+@keyframes moment-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+@keyframes moment-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes moment-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .moment-card,
+  .moment-row {
+    animation-name: moment-fade;
+  }
+  .moment-card.moment-leaving {
+    animation: moment-fade var(--motion-exit) linear reverse both;
+  }
+  .moment-meter,
+  .moment-roll {
+    transition: none;
+  }
+}

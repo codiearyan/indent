@@ -12,6 +12,7 @@ import { Tour } from '@/features/tour/Tour'
 import { ToolNotice } from './ToolNotice'
 import { TopBar } from './TopBar'
 import { LeftPanel } from './LeftPanel'
+import { MomentCard } from '@/features/progress/MomentCard'
 import { useCatalog } from '@/stores/catalog'
 import { RepoNotice } from './RepoNotice'
 import { useWorkspaceShortcuts } from './useWorkspaceShortcuts'
@@ -71,6 +72,7 @@ export function WorkspacePage(): React.JSX.Element {
   return (
     <div className="flex h-full flex-col bg-background">
       <TopBar />
+      <MomentCard />
       {labId && <ToolNotice labId={labId} />}
       <div className="mx-2 mb-2 min-h-0 flex-1 overflow-hidden rounded-2xl border border-border bg-card">
         {notice && labId && chapterId ? (
