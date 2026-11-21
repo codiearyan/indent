@@ -2,11 +2,11 @@
   "scene": {
     "nodes": [
       { "id": "cases", "label": "src/cases.ts", "kind": "data" },
-      { "id": "eval", "label": "runStabilityEval()", "kind": "function", "mine": true },
-      { "id": "repeat", "label": "runRepeated()", "kind": "function", "mine": true },
+      { "id": "eval", "label": "runStabilityEval()", "kind": "function", "mine": true, "fn": "runStabilityEval" },
+      { "id": "repeat", "label": "runRepeated()", "kind": "function", "mine": true, "fn": "runRepeated" },
       { "id": "triage", "label": "triage()", "kind": "function" },
       { "id": "model", "label": "Triage v3", "kind": "story" },
-      { "id": "flag", "label": "flagCase()", "kind": "function", "mine": true },
+      { "id": "flag", "label": "flagCase()", "kind": "function", "mine": true, "fn": "flagCase" },
       { "id": "report", "label": "Stability report", "kind": "data", "mine": true },
       { "id": "team", "label": "Ines and Dev", "kind": "story" }
     ],
@@ -24,6 +24,23 @@
   },
   "tasks": {
     "repeat": {
+      "trace": {
+        "file": "src/stability.ts",
+        "call": "runRepeated",
+        "args": [
+          {
+            "id": "wrong-entrance",
+            "input": "The courier left my planter at the wrong entrance.",
+            "expected": "delivery"
+          },
+          "evals-triage-v3",
+          [
+            23,
+            29,
+            31
+          ]
+        ]
+      },
       "steps": [
         {
           "active": ["cases"],
@@ -75,6 +92,28 @@
       ]
     },
     "flag": {
+      "trace": {
+        "file": "src/stability.ts",
+        "call": "flagCase",
+        "args": [
+          {
+            "id": "spare-lock",
+            "runs": [
+              {
+                "seed": 23,
+                "output": "delivery",
+                "passed": true
+              },
+              {
+                "seed": 29,
+                "output": "other",
+                "passed": false
+              }
+            ],
+            "passRate": 0.5
+          }
+        ]
+      },
       "steps": [
         {
           "active": ["repeat->flag", "flag"],
@@ -120,6 +159,21 @@
       ]
     },
     "report": {
+      "trace": {
+        "file": "src/stability.ts",
+        "call": "runStabilityEval",
+        "args": [
+          [
+            {
+              "id": "wrong-entrance",
+              "input": "The courier left my planter at the wrong entrance.",
+              "expected": "delivery"
+            }
+          ],
+          "evals-triage-v3",
+          3
+        ]
+      },
       "steps": [
         {
           "active": ["cases", "cases->eval", "eval"],

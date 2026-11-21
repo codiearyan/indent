@@ -7,7 +7,7 @@
       { "id": "baseline", "label": "Baseline run", "kind": "data" },
       { "id": "candidate", "label": "Candidate run", "kind": "data" },
       { "id": "compare", "label": "compareRuns()", "kind": "function", "mine": true, "fn": "compareRuns" },
-      { "id": "decide", "label": "decide()", "kind": "function", "mine": true },
+      { "id": "decide", "label": "decide()", "kind": "function", "mine": true, "fn": "decide" },
       { "id": "tests", "label": "decide.test.ts", "kind": "file", "mine": true },
       { "id": "team", "label": "Dev and Ines", "kind": "story" }
     ],
@@ -105,6 +105,25 @@
       ]
     },
     "decide": {
+      "trace": {
+        "file": "src/decide.ts",
+        "call": "decide",
+        "args": [
+          {
+            "baseline": "current",
+            "candidate": "trial",
+            "baselineRate": 0.5,
+            "candidateRate": 1,
+            "fixed": [
+              "missing-pannier"
+            ],
+            "broken": [],
+            "unchanged": [
+              "pickup-window"
+            ]
+          }
+        ]
+      },
       "steps": [
         {
           "active": ["compare->decide", "decide"],

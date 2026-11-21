@@ -2,10 +2,10 @@
   "scene": {
     "nodes": [
       { "id": "tickets", "label": "Tickets and rubric", "kind": "data" },
-      { "id": "evaluate", "label": "evaluateDrafts()", "kind": "function", "mine": true },
+      { "id": "evaluate", "label": "evaluateDrafts()", "kind": "function", "mine": true, "fn": "evaluateDrafts" },
       { "id": "draft", "label": "draftReply()", "kind": "function" },
       { "id": "writer", "label": "Draft model", "kind": "story" },
-      { "id": "judge", "label": "judgeDraft()", "kind": "function", "mine": true },
+      { "id": "judge", "label": "judgeDraft()", "kind": "function", "mine": true, "fn": "judgeDraft" },
       { "id": "prompt", "label": "buildJudgeMessages()", "kind": "function" },
       { "id": "judgeModel", "label": "Judge model", "kind": "story" },
       { "id": "parse", "label": "parseVerdict()", "kind": "function", "mine": true, "fn": "parseVerdict" },
@@ -56,7 +56,7 @@
           "note": "When every label in the reply agrees, that is the verdict. No label, or two that disagree, means unknown, and a loose pass or fail in a sentence is never read as one."
         },
         {
-          "active": ["parse", "judge->parse", "judge"],
+          "active": ["parse", "judge->parse"],
           "value": {
             "kind": "map",
             "label": "what comes back",
@@ -70,6 +70,17 @@
       ]
     },
     "judge": {
+      "trace": {
+        "file": "src/judge.ts",
+        "call": "judgeDraft",
+        "args": [
+          "The courier left my planter at the wrong entrance.",
+          "I can ask the courier to confirm the delivery entrance.",
+          [
+            "Address the delivery concern."
+          ]
+        ]
+      },
       "steps": [
         {
           "active": ["evaluate->judge", "judge"],
@@ -111,6 +122,21 @@
       ]
     },
     "report": {
+      "trace": {
+        "file": "src/judge.ts",
+        "call": "evaluateDrafts",
+        "args": [
+          [
+            {
+              "id": "wrong-entrance",
+              "ticket": "The courier left my planter at the wrong entrance."
+            }
+          ],
+          [
+            "Address the delivery concern."
+          ]
+        ]
+      },
       "steps": [
         {
           "active": ["tickets", "tickets->evaluate", "evaluate"],

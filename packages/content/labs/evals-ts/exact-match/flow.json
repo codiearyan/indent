@@ -3,10 +3,10 @@
     "nodes": [
       { "id": "tickets", "label": "data/tickets.jsonl", "kind": "data" },
       { "id": "load", "label": "loadCases()", "kind": "function", "mine": true, "fn": "loadCases" },
-      { "id": "run", "label": "runEval()", "kind": "function", "mine": true },
+      { "id": "run", "label": "runEval()", "kind": "function", "mine": true, "fn": "runEval" },
       { "id": "triage", "label": "triage()", "kind": "function" },
       { "id": "model", "label": "Triage model", "kind": "story" },
-      { "id": "match", "label": "isExactMatch()", "kind": "function", "mine": true },
+      { "id": "match", "label": "isExactMatch()", "kind": "function", "mine": true, "fn": "isExactMatch" },
       { "id": "normalize", "label": "normalizeLabel()", "kind": "function", "mine": true },
       { "id": "report", "label": "Eval report", "kind": "data", "mine": true },
       { "id": "ines", "label": "Ines, support lead", "kind": "story" }
@@ -55,7 +55,7 @@
           "note": "Two cases with the same id stop the load too, and the message holds that id."
         },
         {
-          "active": ["load", "load->run", "run"],
+          "active": ["load", "load->run"],
           "value": {
             "kind": "map",
             "label": "what comes back",
@@ -66,6 +66,14 @@
       ]
     },
     "normalize": {
+      "trace": {
+        "file": "src/evaluate.ts",
+        "call": "isExactMatch",
+        "args": [
+          "  ReTURN  ",
+          "return"
+        ]
+      },
       "steps": [
         {
           "active": ["model", "model->match", "match"],
@@ -103,6 +111,20 @@
       ]
     },
     "report": {
+      "trace": {
+        "file": "src/evaluate.ts",
+        "call": "runEval",
+        "args": [
+          [
+            {
+              "id": "wrong-entrance",
+              "input": "The courier left my planter at the wrong entrance.",
+              "expected": "delivery"
+            }
+          ],
+          "evals-triage-v1"
+        ]
+      },
       "steps": [
         {
           "active": ["load->run", "run"],

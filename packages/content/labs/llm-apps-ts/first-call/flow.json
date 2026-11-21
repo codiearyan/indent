@@ -2,10 +2,10 @@
   "scene": {
     "nodes": [
       { "id": "customer", "label": "Fernhollow customer", "kind": "story" },
-      { "id": "messages", "label": "buildMessages()", "kind": "function", "mine": true },
+      { "id": "messages", "label": "buildMessages()", "kind": "function", "mine": true, "fn": "buildMessages" },
       { "id": "request", "label": "Model messages", "kind": "data" },
-      { "id": "ask", "label": "ask()", "kind": "function", "mine": true },
-      { "id": "details", "label": "askWithDetails()", "kind": "function", "mine": true },
+      { "id": "ask", "label": "ask()", "kind": "function", "mine": true, "fn": "ask" },
+      { "id": "details", "label": "askWithDetails()", "kind": "function", "mine": true, "fn": "askWithDetails" },
       { "id": "model", "label": "Local model", "kind": "story" },
       { "id": "answer", "label": "Care reply", "kind": "data" },
       { "id": "report", "label": "Reply details", "kind": "data" }
@@ -23,6 +23,13 @@
   },
   "tasks": {
     "messages": {
+      "trace": {
+        "file": "src/ask.ts",
+        "call": "buildMessages",
+        "args": [
+          "Would a maranta suit a shelf beside my window?"
+        ]
+      },
       "steps": [
         {
           "active": ["customer"],
@@ -49,9 +56,16 @@
       ]
     },
     "ask": {
+      "trace": {
+        "file": "src/ask.ts",
+        "call": "ask",
+        "args": [
+          "Can a spider plant sit near my north-facing window?"
+        ]
+      },
       "steps": [
         {
-          "active": ["customer", "customer->messages", "messages"],
+          "active": ["ask", "customer", "customer->messages", "messages"],
           "value": {
             "kind": "array",
             "label": "Customer question",
@@ -79,9 +93,17 @@
       ]
     },
     "details": {
+      "trace": {
+        "file": "src/ask.ts",
+        "call": "askWithDetails",
+        "args": [
+          "Can a spider plant sit near my north-facing window?",
+          90
+        ]
+      },
       "steps": [
         {
-          "active": ["customer", "customer->messages", "messages"],
+          "active": ["details", "customer", "customer->messages", "messages"],
           "value": {
             "kind": "array",
             "label": "Trial question",

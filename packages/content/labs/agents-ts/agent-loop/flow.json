@@ -15,13 +15,15 @@
         "id": "loop",
         "label": "runAgent()",
         "kind": "function",
-        "mine": true
+        "mine": true,
+        "fn": "runAgent"
       },
       {
         "id": "tools",
         "label": "runToolCalls()",
         "kind": "function",
-        "mine": true
+        "mine": true,
+        "fn": "runToolCalls"
       },
       {
         "id": "records",
@@ -65,9 +67,25 @@
   },
   "tasks": {
     "run-tools": {
+      "trace": {
+        "file": "src/agent.ts",
+        "call": "runToolCalls",
+        "args": [
+          [
+            {
+              "id": "counter-lookup",
+              "type": "function",
+              "function": {
+                "name": "get_order",
+                "arguments": "{\"orderId\":\"PL-9352\"}"
+              }
+            }
+          ]
+        ]
+      },
       "steps": [
         {
-          "active": ["model", "model->loop", "loop", "loop->tools", "tools"],
+          "active": ["model", "model->loop", "loop->tools", "tools"],
           "note": "One reply asks the pantry to check a shelf and look up a delivery."
         },
         {
@@ -86,6 +104,13 @@
       ]
     },
     "loop": {
+      "trace": {
+        "file": "src/agent.ts",
+        "call": "runAgent",
+        "args": [
+          "Can you check the delivery status of order PL-9352?"
+        ]
+      },
       "steps": [
         {
           "active": ["desk", "desk->loop", "loop"],
@@ -120,6 +145,16 @@
       ]
     },
     "step-limit": {
+      "trace": {
+        "file": "src/agent.ts",
+        "call": "runAgent",
+        "args": [
+          "Can you check the delivery status of order PL-9352?",
+          {
+            "maxSteps": 2
+          }
+        ]
+      },
       "steps": [
         {
           "active": ["desk", "desk->loop", "loop"],

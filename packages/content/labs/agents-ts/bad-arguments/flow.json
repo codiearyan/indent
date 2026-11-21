@@ -28,8 +28,9 @@
       {
         "id": "agent",
         "label": "agent.ts",
-        "kind": "file",
-        "mine": true
+        "kind": "function",
+        "mine": true,
+        "fn": "runAgent"
       },
       {
         "id": "answer",
@@ -166,9 +167,16 @@
       ]
     },
     "recover": {
+      "trace": {
+        "file": "src/agent.ts",
+        "call": "runAgent",
+        "args": [
+          "Reserve 2 jars of orange marmalade for order PL-9352"
+        ]
+      },
       "steps": [
         {
-          "active": ["model"],
+          "active": ["agent", "model"],
           "note": "A staff member asks whether oranges can be put aside for a delivery."
         },
         {

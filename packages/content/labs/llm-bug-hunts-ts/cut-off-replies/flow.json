@@ -2,11 +2,11 @@
   "scene": {
     "nodes": [
       { "id": "complaint", "label": "Customer complaint", "kind": "data" },
-      { "id": "summarize", "label": "summarize.ts", "kind": "file", "mine": true },
+      { "id": "summarize", "label": "summarize.ts", "kind": "function", "mine": true, "fn": "summarizeComplaint" },
       { "id": "model", "label": "Local model", "kind": "story" },
       { "id": "reply", "label": "Model reply", "kind": "data" },
       { "id": "desk", "label": "Support desk", "kind": "story" },
-      { "id": "reproduce", "label": "reproduce.ts", "kind": "file", "mine": true },
+      { "id": "reproduce", "label": "reproduce.ts", "kind": "function", "mine": true, "fn": "reproduceCutoff" },
       { "id": "test", "label": "summarize.test.ts", "kind": "file", "mine": true },
       { "id": "evidence", "label": "Ticket evidence", "kind": "data" }
     ],
@@ -23,6 +23,11 @@
   },
   "tasks": {
     "reproduce": {
+      "trace": {
+        "file": "src/reproduce.ts",
+        "call": "reproduceCutoff",
+        "args": []
+      },
       "steps": [
         {
           "active": ["complaint"],
@@ -57,6 +62,13 @@
       ]
     },
     "fix": {
+      "trace": {
+        "file": "src/summarize.ts",
+        "call": "summarizeComplaint",
+        "args": [
+          "The shipping carton split and the poster inside got bent. Can the depot arrange a replacement?"
+        ]
+      },
       "steps": [
         {
           "active": ["complaint"],

@@ -3,11 +3,11 @@
     "nodes": [
       { "id": "inbox", "label": "Shop inbox", "kind": "story" },
       { "id": "tag-request", "label": "Tag request", "kind": "data" },
-      { "id": "label", "label": "labelMessage()", "kind": "function", "mine": true },
-      { "id": "examples", "label": "buildTriageMessages()", "kind": "function", "mine": true },
+      { "id": "label", "label": "labelMessage()", "kind": "function", "mine": true, "fn": "labelMessage" },
+      { "id": "examples", "label": "buildTriageMessages()", "kind": "function", "mine": true, "fn": "buildTriageMessages" },
       { "id": "request", "label": "Triage request", "kind": "data" },
       { "id": "model", "label": "Local model", "kind": "story" },
-      { "id": "triage", "label": "triage()", "kind": "function", "mine": true },
+      { "id": "triage", "label": "triage()", "kind": "function", "mine": true, "fn": "triage" },
       { "id": "ravi", "label": "Ravi’s inbox view", "kind": "story" }
     ],
     "edges": [
@@ -25,6 +25,13 @@
   },
   "tasks": {
     "label-only": {
+      "trace": {
+        "file": "src/inbox.ts",
+        "call": "labelMessage",
+        "args": [
+          "The leaves on my spider plant have tiny brown spots."
+        ]
+      },
       "steps": [
         {
           "active": ["inbox", "inbox->tag-request", "tag-request"],
@@ -51,6 +58,13 @@
       ]
     },
     "examples": {
+      "trace": {
+        "file": "src/inbox.ts",
+        "call": "buildTriageMessages",
+        "args": [
+          "My maranta has pale spots after I moved it."
+        ]
+      },
       "steps": [
         {
           "active": ["inbox"],
@@ -77,9 +91,16 @@
       ]
     },
     "triage": {
+      "trace": {
+        "file": "src/inbox.ts",
+        "call": "triage",
+        "args": [
+          "Can my spider plant grow in a shady hallway?"
+        ]
+      },
       "steps": [
         {
-          "active": ["inbox", "inbox->examples", "examples"],
+          "active": ["triage", "inbox", "inbox->examples", "examples"],
           "value": {
             "kind": "array",
             "label": "Inbox email",

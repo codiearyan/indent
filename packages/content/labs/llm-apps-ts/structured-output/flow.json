@@ -2,10 +2,10 @@
   "scene": {
     "nodes": [
       { "id": "email", "label": "Order email", "kind": "story" },
-      { "id": "extract", "label": "extractOrder()", "kind": "function", "mine": true },
+      { "id": "extract", "label": "extractOrder()", "kind": "function", "mine": true, "fn": "extractOrder" },
       { "id": "model", "label": "Local model", "kind": "story" },
-      { "id": "parse", "label": "parseJsonReply()", "kind": "function", "mine": true },
-      { "id": "validate", "label": "validateOrder()", "kind": "function", "mine": true },
+      { "id": "parse", "label": "parseJsonReply()", "kind": "function", "mine": true, "fn": "parseJsonReply" },
+      { "id": "validate", "label": "validateOrder()", "kind": "function", "mine": true, "fn": "validateOrder" },
       { "id": "problems", "label": "Order problems", "kind": "data" },
       { "id": "sheet", "label": "Ravi’s order sheet", "kind": "story" }
     ],
@@ -21,6 +21,13 @@
   },
   "tasks": {
     "parse": {
+      "trace": {
+        "file": "src/orders.ts",
+        "call": "parseJsonReply",
+        "args": [
+          "Order: {\"plant\":\"maranta\"}"
+        ]
+      },
       "steps": [
         {
           "active": ["model"],
@@ -47,9 +54,21 @@
       ]
     },
     "validate": {
+      "trace": {
+        "file": "src/orders.ts",
+        "call": "validateOrder",
+        "args": [
+          {
+            "plant": "maranta",
+            "quantity": 3,
+            "potSize": "medium",
+            "giftWrap": false
+          }
+        ]
+      },
       "steps": [
         {
-          "active": ["parse", "parse->validate", "validate"],
+          "active": ["parse->validate", "validate"],
           "value": {
             "kind": "array",
             "label": "Order details to check",
@@ -73,6 +92,13 @@
       ]
     },
     "extract": {
+      "trace": {
+        "file": "src/orders.ts",
+        "call": "extractOrder",
+        "args": [
+          "Could you set aside 4 spider plants in small pots?"
+        ]
+      },
       "steps": [
         {
           "active": ["email", "email->extract", "extract"],
