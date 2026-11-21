@@ -1,0 +1,19 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "cafes", "label": "Cafes", "kind": "story" },
+      { "id": "db", "label": "Bakehouse database", "kind": "data" },
+      { "id": "read", "label": "Your SELECT queries", "kind": "file", "mine": true },
+      { "id": "team", "label": "Odile and Tobias", "kind": "story" },
+      { "id": "change", "label": "Your changes", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "cafes", "to": "db", "label": "orders" },
+      { "from": "db", "to": "read", "label": "rows" },
+      { "from": "read", "to": "team", "label": "answers" },
+      { "from": "team", "to": "change", "label": "requests" },
+      { "from": "change", "to": "db", "label": "insert, update, delete" }
+    ],
+    "note": "First you answer the team's questions from the bakehouse's orders, then you change the stored data without breaking it."
+  }
+}

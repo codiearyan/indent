@@ -1,0 +1,186 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "orders", "label": "orders", "kind": "data" },
+      { "id": "cafes", "label": "cafes", "kind": "data" },
+      { "id": "drivers", "label": "drivers", "kind": "data" },
+      { "id": "products", "label": "products", "kind": "data" },
+      { "id": "items", "label": "order_items", "kind": "data" },
+      { "id": "q1", "label": "1-october-deliveries.sql", "kind": "file", "mine": true },
+      { "id": "q2", "label": "2-driver-load.sql", "kind": "file", "mine": true },
+      { "id": "q3", "label": "3-never-ordered.sql", "kind": "file", "mine": true },
+      { "id": "odile", "label": "Odile", "kind": "story" },
+      { "id": "tobias", "label": "Tobias", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "orders", "to": "q1", "label": "ids" },
+      { "from": "cafes", "to": "q1", "label": "names" },
+      { "from": "drivers", "to": "q1", "label": "names" },
+      { "from": "drivers", "to": "q2", "label": "every driver" },
+      { "from": "orders", "to": "q2", "label": "driver_id" },
+      { "from": "products", "to": "q3", "label": "every product" },
+      { "from": "items", "to": "q3", "label": "product_id" },
+      { "from": "q1", "to": "odile", "label": "a delivery log" },
+      { "from": "q2", "to": "odile", "label": "rotas" },
+      { "from": "q3", "to": "tobias", "label": "unwanted bakes" }
+    ],
+    "note": "Orders hold only ids, so each query joins them to the tables that hold the names, and chooses which rows must survive a missing match."
+  },
+  "tasks": {
+    "october-deliveries": {
+      "steps": [
+        {
+          "active": ["orders", "orders->q1"],
+          "value": {
+            "kind": "grid",
+            "label": "one row of orders",
+            "colLabels": ["id", "cafe_id", "driver_id", "ordered_on", "status"],
+            "cells": [[2, 1, 2, "2026-09-04", "delivered"]]
+          },
+          "note": "An order row says who by number only: cafe 1, driver 2."
+        },
+        {
+          "active": ["cafes", "cafes->q1", "q1"],
+          "value": {
+            "kind": "map",
+            "label": "cafes, matched on id",
+            "entries": [{ "key": "cafe 1", "value": "Copper Kettle" }]
+          },
+          "note": "The first join finds the cafe whose id matches the order's cafe_id and brings its name along."
+        },
+        {
+          "active": ["drivers", "drivers->q1", "q1"],
+          "value": {
+            "kind": "map",
+            "label": "drivers, matched on id",
+            "entries": [{ "key": "driver 2", "value": "Priya Lund" }]
+          },
+          "note": "The second join does the same for the driver. Both tables have a name column, so each needs its own name in the result."
+        },
+        {
+          "active": ["q1"],
+          "value": {
+            "kind": "grid",
+            "label": "rows the filter turns away",
+            "colLabels": ["id", "ordered_on", "status"],
+            "cells": [
+              [2, "2026-09-04", "delivered"],
+              [15, "2026-10-01", "cancelled"],
+              [19, "2026-10-09", "pending"]
+            ]
+          },
+          "note": "Only orders that were delivered and placed in October stay. A September order or an October order that never went out drops away."
+        },
+        {
+          "active": ["q1", "q1->odile", "odile"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["order_id", "cafe", "driver", "ordered_on"],
+            "cells": [["an order id", "a cafe name", "a driver name", "an October day"]]
+          },
+          "note": "Odile gets the log sorted by day, and by order id within a day."
+        }
+      ]
+    },
+    "driver-load": {
+      "steps": [
+        {
+          "active": ["drivers", "drivers->q2"],
+          "value": {
+            "kind": "grid",
+            "label": "a few rows of drivers",
+            "colLabels": ["id", "name", "van"],
+            "cells": [
+              [1, "Wes Abara", "Van 1"],
+              [3, "Callum Reyes", "Van 3"]
+            ]
+          },
+          "note": "Every driver must appear in the answer, so the drivers table is where the query starts."
+        },
+        {
+          "active": ["orders", "orders->q2", "q2"],
+          "value": {
+            "kind": "grid",
+            "label": "a few rows of orders",
+            "colLabels": ["id", "driver_id", "status"],
+            "cells": [
+              [3, 1, "delivered"],
+              [6, 3, "delivered"],
+              [13, "NULL", "cancelled"]
+            ]
+          },
+          "note": "Each driver is matched to the orders that carry their id. Orders with no driver yet match nobody."
+        },
+        {
+          "active": ["q2"],
+          "note": "A driver with no orders still keeps one row, with empty order columns. An inner join would drop that driver."
+        },
+        {
+          "active": ["q2"],
+          "note": "The rows are grouped by driver and the matched orders counted. Counting only real order ids makes an empty match count as 0."
+        },
+        {
+          "active": ["q2", "q2->odile", "odile"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["driver", "orders"],
+            "cells": [["a driver name", "a count, 0 or more"]]
+          },
+          "note": "Odile gets every driver, busiest first, then by name from A to Z."
+        }
+      ]
+    },
+    "never-ordered": {
+      "steps": [
+        {
+          "active": ["products", "products->q3"],
+          "value": {
+            "kind": "grid",
+            "label": "a few rows of products",
+            "colLabels": ["id", "name", "category"],
+            "cells": [
+              [1, "Country sourdough", "bread"],
+              [8, "Cardamom bun", "pastry"],
+              [13, "Chocolate stout cake", "cake"]
+            ]
+          },
+          "note": "Every product Tobias bakes comes in."
+        },
+        {
+          "active": ["items", "items->q3", "q3"],
+          "value": {
+            "kind": "grid",
+            "label": "a few rows of order_items",
+            "colLabels": ["order_id", "product_id", "quantity"],
+            "cells": [
+              [1, 8, 22],
+              [1, 13, 6],
+              [1, 1, 6]
+            ]
+          },
+          "note": "Each product is matched to the order lines that name it. These three products have been ordered."
+        },
+        {
+          "active": ["q3"],
+          "note": "A product nobody ordered still keeps a row, but its order_items columns come back empty."
+        },
+        {
+          "active": ["q3"],
+          "note": "Keeping only the rows where the match came back empty leaves the products that were never ordered."
+        },
+        {
+          "active": ["q3", "q3->tobias", "tobias"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["name", "category"],
+            "cells": [["a product", "its category"]]
+          },
+          "note": "Tobias gets the products baked for nobody, in any order."
+        }
+      ]
+    }
+  }
+}
