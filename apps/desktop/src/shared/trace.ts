@@ -95,7 +95,7 @@ export function compareTrace(
     for (const fn of fns) {
       const index = firstCall(fn)
       // Past the recorded calls nothing is known, so the step is neither reached nor missed.
-      if (index === -1 && trace.truncated) return { status: 'not-checked' }
+      if (index === -1 && trace.truncated) return { status: 'not-checked', fn }
       if (index === -1) missed = true
       const first = !seen.has(fn)
       seen.add(fn)

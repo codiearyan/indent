@@ -169,7 +169,7 @@ describe('compareTrace', () => {
   it('does not judge a step past the recorded calls', () => {
     const trace = run([call('revenueByDay', 0, { returned: '{}' })], { truncated: true })
     const result = compareTrace(scene, steps, trace)
-    expect(result.steps[2]).toEqual({ status: 'not-checked' })
+    expect(result.steps[2]).toEqual({ status: 'not-checked', fn: 'orderTotal' })
     expect(result.divergence).toBeUndefined()
   })
 

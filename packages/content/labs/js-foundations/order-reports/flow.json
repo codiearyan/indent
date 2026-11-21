@@ -24,11 +24,10 @@
         "call": "orderTotal",
         "args": [
           {
-            "id": "WC-1002",
-            "placedAt": "2026-11-02T17:40:00Z",
+            "id": "WC-1001",
+            "placedAt": "2026-11-02T08:15:00Z",
             "status": "paid",
-            "discountCents": 500,
-            "items": [{ "sku": "sage", "qty": 1, "priceCents": 1800 }]
+            "items": [{"sku": "cedar", "qty": 2, "priceCents": 1250}, {"sku": "smoked-fig", "qty": 1, "priceCents": 900}]
           }
         ]
       },
@@ -39,12 +38,12 @@
             "kind": "map",
             "label": "the example order",
             "entries": [
-              { "key": "id", "value": "WC-1002" },
+              { "key": "id", "value": "WC-1001" },
               { "key": "status", "value": "paid" },
-              { "key": "items", "value": "1 entry" }
+              { "key": "items", "value": "2 entries" }
             ]
           },
-          "note": "Theo hands orderTotal() one order, like WC-1002 from the top of reports.js."
+          "note": "Theo hands orderTotal() one order, like WC-1001 from orders.js."
         },
         {
           "active": ["total"],
@@ -52,21 +51,16 @@
             "kind": "map",
             "label": "an entry in items",
             "entries": [
-              { "key": "sku", "value": "sage" },
-              { "key": "qty", "value": 1 },
-              { "key": "priceCents", "value": 1800 }
+              { "key": "sku", "value": "cedar" },
+              { "key": "qty", "value": 2 },
+              { "key": "priceCents", "value": 1250 }
             ]
           },
           "note": "Every entry in items is worth its qty times its priceCents, and all the entries add up."
         },
         {
           "active": ["total"],
-          "value": {
-            "kind": "map",
-            "label": "only on some orders",
-            "entries": [{ "key": "discountCents", "value": 500 }]
-          },
-          "note": "This order carries a discount, so it comes off the sum. Many orders have no discountCents field at all."
+          "note": "This order has no discount. When an order carries discountCents, it comes off the sum."
         },
         {
           "active": ["total", "total->theo", "theo"],
@@ -80,6 +74,46 @@
       ]
     },
     "top": {
+      "trace": {
+        "file": "src/reports.js",
+        "call": "topCandles",
+        "args": [
+        [
+          {
+            "id": "WC-1001",
+            "placedAt": "2026-11-02T08:15:00Z",
+            "status": "paid",
+            "items": [{"sku": "cedar", "qty": 2, "priceCents": 1250}, {"sku": "smoked-fig", "qty": 1, "priceCents": 900}]
+          },
+          {
+            "id": "WC-1002",
+            "placedAt": "2026-11-02T17:40:00Z",
+            "status": "paid",
+            "discountCents": 500,
+            "items": [{"sku": "sage", "qty": 1, "priceCents": 1800}]
+          },
+          {
+            "id": "WC-1003",
+            "placedAt": "2026-11-03T09:05:00Z",
+            "status": "cancelled",
+            "items": [{"sku": "cedar", "qty": 5, "priceCents": 1250}]
+          },
+          {
+            "id": "WC-1004",
+            "placedAt": "2026-11-03T12:30:00Z",
+            "status": "paid",
+            "items": [{"sku": "smoked-fig", "qty": 3, "priceCents": 900}, {"sku": "lavender", "qty": 1, "priceCents": 1100}]
+          },
+          {
+            "id": "WC-1005",
+            "placedAt": "2026-11-04T19:55:00Z",
+            "status": "pending",
+            "items": [{"sku": "sage", "qty": 2, "priceCents": 1800}]
+          }
+        ],
+        2
+        ]
+      },
       "steps": [
         {
           "active": ["orders", "orders->top"],
@@ -136,6 +170,45 @@
       ]
     },
     "revenue": {
+      "trace": {
+        "file": "src/reports.js",
+        "call": "revenueByDay",
+        "args": [
+        [
+          {
+            "id": "WC-1001",
+            "placedAt": "2026-11-02T08:15:00Z",
+            "status": "paid",
+            "items": [{"sku": "cedar", "qty": 2, "priceCents": 1250}, {"sku": "smoked-fig", "qty": 1, "priceCents": 900}]
+          },
+          {
+            "id": "WC-1002",
+            "placedAt": "2026-11-02T17:40:00Z",
+            "status": "paid",
+            "discountCents": 500,
+            "items": [{"sku": "sage", "qty": 1, "priceCents": 1800}]
+          },
+          {
+            "id": "WC-1003",
+            "placedAt": "2026-11-03T09:05:00Z",
+            "status": "cancelled",
+            "items": [{"sku": "cedar", "qty": 5, "priceCents": 1250}]
+          },
+          {
+            "id": "WC-1004",
+            "placedAt": "2026-11-03T12:30:00Z",
+            "status": "paid",
+            "items": [{"sku": "smoked-fig", "qty": 3, "priceCents": 900}, {"sku": "lavender", "qty": 1, "priceCents": 1100}]
+          },
+          {
+            "id": "WC-1005",
+            "placedAt": "2026-11-04T19:55:00Z",
+            "status": "pending",
+            "items": [{"sku": "sage", "qty": 2, "priceCents": 1800}]
+          }
+        ]
+        ]
+      },
       "steps": [
         {
           "active": ["orders", "orders->revenue"],

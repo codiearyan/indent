@@ -46,14 +46,14 @@ export function TaskList({ chapter }: { chapter: Chapter }): React.JSX.Element {
       <ol className="divide-y divide-rule">
         {chapter.tasks.map((task, i) => (
           <TaskItem
-            key={`${chapter.id}/${task.id}`}
+            key={`${chapter.labId}/${chapter.id}/${task.id}`}
             task={task}
             hintKey={hintKey(chapter.labId, chapter.id, task.id)}
             number={i + 1}
             progress={progress}
             first={i === 0}
             scene={chapter.flow?.scene}
-            flow={chapter.flow?.tasks?.[task.id]?.steps}
+            flow={chapter.flow?.tasks?.[task.id]}
           />
         ))}
       </ol>
