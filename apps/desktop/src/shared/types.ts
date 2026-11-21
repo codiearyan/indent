@@ -240,6 +240,23 @@ export interface AiCompleteRequest {
 
 type Unsubscribe = () => void
 
+// ---------- Usage stats ----------
+
+/** Anonymous usage events. Not sent when usage stats are turned off in Settings. */
+export type TelemetryEvent =
+  | 'app_opened'
+  | 'onboarding_step'
+  | 'onboarding_finished'
+  | 'repo_started'
+  | 'check_run'
+  | 'hints_unlocked'
+  | 'issue_completed'
+  | 'tutor_asked'
+  | 'suggestion_requested'
+
+/** Ids, counts and choices only: never code, file names, messages or keys. */
+export type TelemetryProps = Record<string, string | number>
+
 /** window.api. Channels are `${namespace}:${method}`. */
 export interface Api {
   content: {
@@ -303,6 +320,9 @@ export interface Api {
     /** Sends one tiny fixed prompt through the chosen provider and model; resolves with the reply. */
     test(): Promise<string>
   }
+  telemetry: {
+    track(event: TelemetryEvent, props?: TelemetryProps): void
+  }
 }
 
 /** Methods the preload bridges with ipcRenderer.invoke, per namespace. */
@@ -320,7 +340,8 @@ export const INVOKE_METHODS = {
 /** Fire-and-forget renderer to main messages. */
 export const SEND_METHODS = {
   terminal: ['write', 'resize', 'kill'],
-  ai: ['cancel']
+  ai: ['cancel'],
+  telemetry: ['track']
 } as const
 
 /** Main to renderer events. */

@@ -20,6 +20,7 @@ for (const [namespace, methods] of Object.entries(INVOKE_METHODS)) {
   }
 }
 for (const [namespace, methods] of Object.entries(SEND_METHODS)) {
+  api[namespace] ??= {}
   for (const method of methods) {
     api[namespace][method] = (...args) => ipcRenderer.send(`${namespace}:${method}`, ...args)
   }
