@@ -1,0 +1,137 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "texts", "label": "Handbook texts", "kind": "data" },
+      { "id": "embed", "label": "embed()", "kind": "function", "mine": true },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "vectors", "label": "One vector per text", "kind": "data" },
+      { "id": "cosine", "label": "cosine()", "kind": "function", "mine": true },
+      { "id": "rank", "label": "rank()", "kind": "function", "mine": true },
+      { "id": "desk", "label": "Front desk question", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "texts", "to": "embed", "label": "texts" },
+      { "from": "embed", "to": "model", "label": "batches of texts" },
+      { "from": "model", "to": "embed", "label": "items with an index" },
+      { "from": "embed", "to": "vectors", "label": "number[][]" },
+      { "from": "vectors", "to": "cosine", "label": "two vectors" },
+      { "from": "desk", "to": "rank", "label": "query, texts" },
+      { "from": "rank", "to": "embed", "label": "query and texts" },
+      { "from": "rank", "to": "cosine", "label": "query vector, text vector" },
+      { "from": "rank", "to": "desk", "label": "texts with scores" }
+    ],
+    "note": "Each text becomes a list of numbers, and two texts that mean nearly the same thing get vectors that point nearly the same way."
+  },
+  "tasks": {
+    "batch": {
+      "steps": [
+        {
+          "active": ["texts", "texts->embed", "embed"],
+          "value": {
+            "kind": "array",
+            "label": "texts",
+            "values": ["spare paddle", "harbour map", "first aid kit", "whistle"]
+          },
+          "note": "A list of texts from the hut's kit list goes in."
+        },
+        {
+          "active": ["embed", "embed->model", "model"],
+          "note": "Several texts travel in each request to EMBED_MODEL, never more than MAX_BATCH at a time. An empty list sends nothing."
+        },
+        {
+          "active": ["model", "model->embed", "embed"],
+          "value": {
+            "kind": "map",
+            "label": "one item of res.data",
+            "entries": [
+              { "key": "index", "value": "which input it belongs to" },
+              { "key": "embedding", "value": "a list of numbers" }
+            ]
+          },
+          "note": "The items of a reply may not arrive in input order. Each one says by its index which text it is for."
+        },
+        {
+          "active": ["embed", "embed->vectors", "vectors"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "vectors", "value": "one per text, in the order of texts" }]
+          },
+          "note": "Back comes one vector for every text, in the same order as the list that went in."
+        }
+      ]
+    },
+    "cosine": {
+      "steps": [
+        {
+          "active": ["vectors", "vectors->cosine", "cosine"],
+          "value": {
+            "kind": "grid",
+            "label": "two small vectors",
+            "rowLabels": ["a", "b"],
+            "colLabels": ["1", "2", "3"],
+            "cells": [
+              [2, 0, 5],
+              [1, 3, 1]
+            ]
+          },
+          "note": "Two vectors of the same length go in. These have three numbers each; the local model's have many more."
+        },
+        {
+          "active": ["cosine"],
+          "note": "Vectors of different lengths cannot be compared, so that is an Error, not a number."
+        },
+        {
+          "active": ["cosine"],
+          "note": "The score is the dot product of a and b, divided by the length of a times the length of b, with no library."
+        },
+        {
+          "active": ["cosine"],
+          "note": "A vector of all zeros points nowhere, so its score with anything is 0."
+        },
+        {
+          "active": ["cosine"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "score", "value": "one number from -1 to 1" }]
+          },
+          "note": "Back comes one number: higher when the two vectors point the same way, lower when they point apart."
+        }
+      ]
+    },
+    "rank": {
+      "steps": [
+        {
+          "active": ["desk", "desk->rank", "rank"],
+          "value": {
+            "kind": "array",
+            "label": "texts to rank",
+            "values": ["Returning kit", "Tides", "Using the slipway"]
+          },
+          "note": "A guest asks where the paddles go after a trip, and three short notes are ranked against the question."
+        },
+        {
+          "active": ["rank", "rank->embed", "embed"],
+          "note": "The question and all the notes are embedded with a single call to embed."
+        },
+        {
+          "active": ["rank", "rank->cosine", "cosine"],
+          "note": "Each note's score is cosine of the question's vector and that note's vector."
+        },
+        {
+          "active": ["rank", "rank->desk", "desk"],
+          "value": {
+            "kind": "map",
+            "label": "one result",
+            "entries": [
+              { "key": "text", "value": "a note" },
+              { "key": "score", "value": "its cosine with the question" }
+            ]
+          },
+          "note": "Back comes one { text, score } per note, from the highest score to the lowest."
+        }
+      ]
+    }
+  }
+}

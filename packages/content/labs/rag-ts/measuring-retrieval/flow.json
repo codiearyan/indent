@@ -1,0 +1,162 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "labelled", "label": "labelled.ts", "kind": "data" },
+      { "id": "config", "label": "config.ts", "kind": "file", "mine": true },
+      { "id": "sweep", "label": "sweep.ts", "kind": "story" },
+      { "id": "evaluate", "label": "evaluate()", "kind": "function", "mine": true },
+      { "id": "store", "label": "Chunk, index, search", "kind": "file" },
+      { "id": "hitRate", "label": "hitRate()", "kind": "function", "mine": true },
+      { "id": "recall", "label": "recallAtK()", "kind": "function", "mine": true, "fn": "recallAtK" },
+      { "id": "scores", "label": "Hit rate and recall", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "config", "to": "sweep", "label": "settings" },
+      { "from": "sweep", "to": "evaluate", "label": "one group of settings" },
+      { "from": "labelled", "to": "evaluate", "label": "questions and articles" },
+      { "from": "evaluate", "to": "store", "label": "size, overlap, k" },
+      { "from": "store", "to": "evaluate", "label": "hits" },
+      { "from": "evaluate", "to": "hitRate", "label": "Retrieval[], k" },
+      { "from": "evaluate", "to": "recall", "label": "Retrieval[], k" },
+      { "from": "hitRate", "to": "scores", "label": "share of questions" },
+      { "from": "recall", "to": "scores", "label": "average share" },
+      { "from": "scores", "to": "sweep", "label": "a row of the table" }
+    ],
+    "note": "Questions from last summer's desk log, each labelled with the articles that answer it, turn a feeling about the box into two numbers."
+  },
+  "tasks": {
+    "metrics": {
+      "trace": {
+        "file": "src/metrics.ts",
+        "call": "recallAtK",
+        "args": [
+          [
+            { "expected": ["children"], "retrieved": ["safety", "children", "groups"] },
+            { "expected": ["parking", "booking"], "retrieved": ["parking", "damage", "booking"] },
+            { "expected": ["lost-property"], "retrieved": ["vouchers", "weather", "lost-property"] }
+          ],
+          2
+        ]
+      },
+      "steps": [
+        {
+          "active": ["evaluate->recall", "recall"],
+          "value": {
+            "kind": "grid",
+            "label": "results, one row per question",
+            "colLabels": ["expected", "retrieved in rank order"],
+            "cells": [
+              ["children", "safety, children, groups"],
+              ["parking, booking", "parking, damage, booking"],
+              ["lost-property", "vouchers, weather, lost-property"]
+            ]
+          },
+          "note": "Three desk questions go in, each with the articles that answer it and the articles its hits came from, plus k of 2."
+        },
+        {
+          "active": ["recall"],
+          "note": "Only the first k retrieved ids of each question count. Anything further down the list is ignored."
+        },
+        {
+          "active": ["recall"],
+          "note": "For each question, recall is the share of its expected articles found in those top k, counting each article once."
+        },
+        {
+          "active": ["recall", "recall->scores", "scores"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "recall", "value": "a number from 0 to 1" }]
+          },
+          "note": "The question scores are averaged into one number. No questions at all gives 0."
+        },
+        {
+          "active": ["evaluate->hitRate", "hitRate", "hitRate->scores"],
+          "note": "hitRate reads the same results: the share of questions with at least one expected article in their top k, and 0 for an empty list."
+        }
+      ]
+    },
+    "evaluate": {
+      "steps": [
+        {
+          "active": ["sweep", "sweep->evaluate", "evaluate"],
+          "value": {
+            "kind": "map",
+            "label": "settings",
+            "entries": [
+              { "key": "chunkSize", "value": "characters per chunk" },
+              { "key": "overlap", "value": "characters carried over" },
+              { "key": "k", "value": "hits per question" }
+            ]
+          },
+          "note": "One group of settings comes in. evaluate uses these, not the values in config.ts."
+        },
+        {
+          "active": ["evaluate", "evaluate->store", "store"],
+          "note": "The handbook is chunked with chunkSize and overlap, and the chunks are indexed."
+        },
+        {
+          "active": ["labelled", "labelled->evaluate", "evaluate", "store->evaluate"],
+          "note": "Each labelled question is searched with k and no minimum score."
+        },
+        {
+          "active": ["evaluate"],
+          "value": {
+            "kind": "map",
+            "label": "one Retrieval",
+            "entries": [
+              { "key": "expected", "value": "the label's article ids" },
+              { "key": "retrieved", "value": "the source of each hit, in rank order" }
+            ]
+          },
+          "note": "Each question becomes one Retrieval: what its label expects, and the article each hit came from."
+        },
+        {
+          "active": ["evaluate->hitRate", "hitRate", "evaluate->recall", "recall", "scores"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "hitRate", "value": "a number from 0 to 1" },
+              { "key": "recall", "value": "a number from 0 to 1" }
+            ]
+          },
+          "note": "Both metrics run on all the results at k, and the two numbers come back together."
+        }
+      ]
+    },
+    "tune": {
+      "steps": [
+        {
+          "active": ["config"],
+          "note": "config.ts holds the settings the answer box runs with, and one of them is hurting retrieval."
+        },
+        {
+          "active": ["config", "config->sweep", "sweep", "sweep->evaluate", "evaluate"],
+          "note": "node src/sweep.ts measures config.ts and a grid of other settings on the labelled questions."
+        },
+        {
+          "active": ["scores", "scores->sweep", "sweep"],
+          "note": "Each row of the table is one group of settings with its hit rate and recall."
+        },
+        {
+          "active": ["config"],
+          "value": {
+            "kind": "map",
+            "label": "team limits",
+            "entries": [
+              { "key": "TOP_K", "value": "1 to 3" },
+              { "key": "CHUNK_SIZE", "value": "1 to 500" },
+              { "key": "CHUNK_OVERLAP", "value": "0 to less than CHUNK_SIZE" }
+            ]
+          },
+          "note": "Any fix stays inside the team limits."
+        },
+        {
+          "active": ["config", "sweep"],
+          "note": "The goal is every labelled question finding all of its articles: hit rate and recall both at 100%."
+        }
+      ]
+    }
+  }
+}

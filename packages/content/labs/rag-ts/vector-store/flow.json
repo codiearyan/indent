@@ -1,0 +1,137 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "chunks", "label": "Handbook chunks", "kind": "data" },
+      { "id": "index", "label": "indexChunks()", "kind": "function", "mine": true },
+      { "id": "embed", "label": "embed()", "kind": "function" },
+      { "id": "entries", "label": "The index", "kind": "data" },
+      { "id": "search", "label": "search()", "kind": "function", "mine": true },
+      { "id": "cosine", "label": "cosine()", "kind": "function" },
+      { "id": "desk", "label": "Front desk question", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "chunks", "to": "index", "label": "Chunk[]" },
+      { "from": "index", "to": "embed", "label": "chunk texts" },
+      { "from": "index", "to": "entries", "label": "Entry[]" },
+      { "from": "desk", "to": "search", "label": "question, k" },
+      { "from": "search", "to": "embed", "label": "the question" },
+      { "from": "entries", "to": "search", "label": "chunks and vectors" },
+      { "from": "search", "to": "cosine", "label": "question vector, entry vector" },
+      { "from": "search", "to": "desk", "label": "Hit[]" }
+    ],
+    "note": "The handbook is embedded once into an index, and each question is then matched against it to find the closest chunks."
+  },
+  "tasks": {
+    "index": {
+      "steps": [
+        {
+          "active": ["chunks", "chunks->index", "index"],
+          "value": {
+            "kind": "array",
+            "label": "chunk ids",
+            "values": ["slipway#0", "slipway#1", "kit-room#0"]
+          },
+          "note": "A list of chunks goes in, each with its id, source, index and text."
+        },
+        {
+          "active": ["index", "index->embed", "embed"],
+          "note": "The text of every chunk goes to embed in one call, and embed already splits it into batches."
+        },
+        {
+          "active": ["index", "index->entries", "entries"],
+          "value": {
+            "kind": "map",
+            "label": "one entry",
+            "entries": [
+              { "key": "chunk", "value": "the chunk, unchanged" },
+              { "key": "vector", "value": "the embedding of chunk.text" }
+            ]
+          },
+          "note": "Each chunk is paired with its own vector, in the same order as the chunks."
+        },
+        {
+          "active": ["entries"],
+          "note": "No chunks gives an empty index."
+        }
+      ]
+    },
+    "search": {
+      "steps": [
+        {
+          "active": ["desk", "desk->search", "search"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "question", "value": "Where do helmets go after a trip?" },
+              { "key": "k", "value": 2 }
+            ]
+          },
+          "note": "A question from the desk comes in with k, how many chunks to bring back."
+        },
+        {
+          "active": ["search", "search->embed", "embed"],
+          "note": "Only the question is embedded, in one request. The chunks already have vectors in the index."
+        },
+        {
+          "active": ["entries", "entries->search", "search", "search->cosine", "cosine"],
+          "note": "Every entry is scored with cosine of the question's vector and the entry's vector."
+        },
+        {
+          "active": ["search"],
+          "note": "The best k are kept, highest score first. A k larger than the index keeps them all, a k of 0 keeps none, and the index itself stays as it was."
+        },
+        {
+          "active": ["search", "search->desk", "desk"],
+          "value": {
+            "kind": "map",
+            "label": "one hit",
+            "entries": [
+              { "key": "chunk", "value": "a chunk from the index" },
+              { "key": "score", "value": "its cosine with the question" }
+            ]
+          },
+          "note": "Back comes a list of at most k hits."
+        }
+      ]
+    },
+    "cutoff": {
+      "steps": [
+        {
+          "active": ["desk", "desk->search", "search"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "question", "value": "Do you hire bicycles?" },
+              { "key": "k", "value": 3 },
+              { "key": "minScore", "value": "the cut-off" }
+            ]
+          },
+          "note": "Some questions are about things the handbook never mentions, yet top k still brings back k chunks."
+        },
+        {
+          "active": ["search", "search->cosine", "cosine"],
+          "note": "Every entry is scored as before."
+        },
+        {
+          "active": ["search"],
+          "note": "Hits that score below minScore are dropped. A hit that scores exactly minScore stays."
+        },
+        {
+          "active": ["search"],
+          "note": "At most k of the hits that are left come back, highest first. With the default minScore of 0, nothing changes."
+        },
+        {
+          "active": ["search", "search->desk", "desk"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "hits", "value": "at most k, possibly none" }]
+          },
+          "note": "A question the handbook does not cover can now come back with no hits at all."
+        }
+      ]
+    }
+  }
+}
