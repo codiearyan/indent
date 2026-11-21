@@ -15,7 +15,12 @@ export const TOUR = {
   chat: 'chat',
   aiSuggestions: 'ai-suggestions',
   view: 'view',
-  help: 'help'
+  help: 'help',
+  upNext: 'up-next',
+  upNextStrip: 'up-next-strip',
+  repoIssues: 'repo-issues',
+  repoFigures: 'repo-figures',
+  repoStart: 'repo-start'
 } as const
 
 export type TourAnchor = (typeof TOUR)[keyof typeof TOUR]

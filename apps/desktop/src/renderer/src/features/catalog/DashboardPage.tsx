@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
+import { TOUR } from '@/features/tour/anchors'
 import { parseDate, recentWeeks } from './activity'
 import { Heatmap } from './Heatmap'
 import { labProgress, type LabProgress } from './labStatus'
@@ -190,7 +191,10 @@ function UpNext({
   }
 
   return (
-    <section className="col-span-8 flex flex-col rounded-lg border border-border p-6">
+    <section
+      className="col-span-8 flex flex-col rounded-lg border border-border p-6"
+      data-tour={TOUR.upNext}
+    >
       <p className="text-[13px] text-muted-foreground">{started ? 'Up next' : 'Start here'}</p>
       <div className="mt-2 flex items-start gap-6">
         <div className="min-w-0 flex-1">
@@ -206,7 +210,7 @@ function UpNext({
           </Link>
         </Button>
       </div>
-      <p className="mt-5 min-h-5 text-sm">
+      <p className="mt-5 mb-5 min-h-5 text-sm">
         {nextTask && (
           <>
             <span className="text-muted-foreground">Next task </span>
@@ -214,7 +218,7 @@ function UpNext({
           </>
         )}
       </p>
-      <div className="mt-auto pt-5">
+      <div className="mt-auto" data-tour={TOUR.upNextStrip}>
         <BuildStrip lab={lab} chapters={chapters} />
         <p className="mt-2 text-xs text-muted-foreground tabular-nums">
           {row.progress.pointsEarned > 0 || started
