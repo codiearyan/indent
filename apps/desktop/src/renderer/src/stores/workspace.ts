@@ -114,6 +114,9 @@ interface WorkspaceStore {
 
 const pendingSaves = new Map<string, ReturnType<typeof setTimeout>>()
 
+/** Counts launches of an IDE and leavings of an issue, so a launch knows when it was left behind. */
+let ideLaunch = 0
+
 export const useWorkspace = create<WorkspaceStore>()((set, get) => {
   const ids = (): [string, string] => {
     const chapter = get().chapter
@@ -347,12 +350,16 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       // What was typed here has to be on disk before the IDE reads the folder.
       await get().flush()
       const [labId, chapterId] = ids()
+      const launch = ++ideLaunch
       await api.ide.open(ide.id, labId, chapterId)
+      // The issues were left while the IDE was starting: the layout is for a page that is gone.
+      if (launch !== ideLaunch) return
       set({ companion: true, ideIssue: chapterKey(labId, chapterId) })
       await api.ide.setCompact(true)
     },
 
     leaveCompanion: async () => {
+      ideLaunch++
       if (!get().companion) return
       set({ companion: false, ideIssue: null })
       await api.ide.setCompact(false)

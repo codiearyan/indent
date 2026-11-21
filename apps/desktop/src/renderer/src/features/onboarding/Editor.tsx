@@ -55,7 +55,7 @@ export function Editor({ staged }: { staged: boolean }): React.JSX.Element {
         {ide && (
           <div className={cell}>
             <label htmlFor="setup-ide" className="text-sm">
-              Open issues in
+              Your IDE
             </label>
             <IdeSelect id="setup-ide" />
           </div>
