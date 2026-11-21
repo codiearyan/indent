@@ -1,44 +1,13 @@
 // The `t` object every grader/checks.mjs receives. See run-check.mjs.
 import { spawn, fork } from 'node:child_process'
-import { cp, copyFile, mkdir, mkdtemp, rm } from 'node:fs/promises'
+import { rm } from 'node:fs/promises'
 import { createRequire } from 'node:module'
-import { dirname, isAbsolute, join, relative } from 'node:path'
+import { dirname, isAbsolute, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { openPage } from './page.mjs'
+import { childEnv, clip, collect, DEFAULT_TIMEOUT, makeSandbox } from './sandbox.mjs'
 
-const DEFAULT_TIMEOUT = 15000
-const MAX_OUTPUT = 4000
 const callChild = fileURLToPath(new URL('./call-child.mjs', import.meta.url))
-
-const childEnv = (extra) => ({
-  ...process.env,
-  NO_COLOR: '1',
-  FORCE_COLOR: '0',
-  NODE_NO_WARNINGS: '1',
-  ...extra
-})
-
-const clip = (text) =>
-  text.length > MAX_OUTPUT ? `${text.slice(0, MAX_OUTPUT)}\n... (output cut)` : text
-
-function collect(child, timeoutMs) {
-  let stdout = ''
-  let stderr = ''
-  let timedOut = false
-  child.stdout.on('data', (d) => (stdout += d))
-  child.stderr.on('data', (d) => (stderr += d))
-  const timer = setTimeout(() => {
-    timedOut = true
-    child.kill('SIGKILL')
-  }, timeoutMs)
-  return new Promise((resolve, reject) => {
-    child.on('error', reject)
-    child.on('close', (code) => {
-      clearTimeout(timer)
-      resolve({ code, stdout: clip(stdout), stderr: clip(stderr), timedOut })
-    })
-  })
-}
 
 /** Resolves a dependency's bin the same way learner code does: walking up from `dir`. */
 function binFrom(dir, pkg, bin) {
@@ -58,21 +27,8 @@ export function createContext({ chapter, workspace, sandboxRoot }) {
 
     /** A fresh copy of the workspace; `overrides` maps a relative path to a source file. */
     async sandbox(overrides = {}) {
-      await mkdir(sandboxRoot, { recursive: true })
-      const dir = await mkdtemp(join(sandboxRoot, 'check-'))
+      const dir = await makeSandbox(workspace, sandboxRoot, overrides)
       sandboxes.push(dir)
-      await cp(workspace, dir, {
-        recursive: true,
-        // .indent holds the app's copy of the starter, never learner code.
-        filter: (src) => {
-          const parts = relative(workspace, src).split(/[\\/]/)
-          return !parts.includes('node_modules') && parts[0] !== '.indent'
-        }
-      })
-      for (const [rel, source] of Object.entries(overrides)) {
-        await mkdir(dirname(join(dir, rel)), { recursive: true })
-        await copyFile(source, join(dir, rel))
-      }
       return dir
     },
 

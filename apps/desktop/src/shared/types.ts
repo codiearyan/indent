@@ -127,6 +127,8 @@ export interface FlowNode {
   kind: FlowNodeKind
   /** The learner's part, the one place a flow uses the brand colour. */
   mine?: boolean
+  /** For a function node: the name of the learner's function it stands for, used by tracing. */
+  fn?: string
 }
 
 export interface FlowEdge {
@@ -163,6 +165,21 @@ export interface FlowStep {
   note: string
 }
 
+/** The story's example, run on the learner's code to record the path it takes. */
+export interface FlowTrace {
+  /** A learner file, relative to the workspace. */
+  file: string
+  /** An exported function of that file; the `fn` of a node in the scene. */
+  call: string
+  /** JSON values passed to the call. */
+  args: unknown[]
+}
+
+export interface TaskFlow {
+  steps: FlowStep[]
+  trace?: FlowTrace
+}
+
 /**
  * <issue>/flow.json, or labs/<labId>/flow.json with only a scene. Data only: it shows what goes
  * in and the shape of what comes out, never a task's answer.
@@ -170,7 +187,34 @@ export interface FlowStep {
 export interface Flow {
   scene: FlowScene
   /** Keyed by task id. */
-  tasks?: Record<string, { steps: FlowStep[] }>
+  tasks?: Record<string, TaskFlow>
+}
+
+/** One call of a learner's function, from kit/run-trace.mjs. Values are previews, cut to 160 characters. */
+export interface TraceCall {
+  fn: string
+  /** Relative to the workspace. */
+  file: string
+  /** 0 for the example's own call, 1 for what it calls, and so on. */
+  depth: number
+  args: string[]
+  /** Set when the call returned; an async call once its promise settled. */
+  returned?: string
+  /** The message, when the call threw. */
+  threw?: string
+}
+
+/** A task's example run on the learner's code, with the calls of their functions in order. */
+export interface TraceResult {
+  /** The example's call returned without throwing. */
+  ok: boolean
+  calls: TraceCall[]
+  error?: string
+  timedOut: boolean
+  /** More calls happened than were recorded. */
+  truncated: boolean
+  /** What the learner's code printed, cut like a check's output. */
+  stdout: string
 }
 
 /** content/paths.json */
@@ -506,6 +550,8 @@ export interface Api {
       chapterId: string,
       taskIds?: string[]
     ): Promise<{ results: CheckResult[]; progress: ProgressState }>
+    /** Runs the example in the task's flow on the learner's code and records their calls. */
+    trace(labId: string, chapterId: string, taskId: string): Promise<TraceResult>
     runtimeStatus(): Promise<RuntimeStatus>
     /** Installs the lab dependencies if needed. */
     ensureRuntime(): Promise<RuntimeStatus>
@@ -596,7 +642,7 @@ export const INVOKE_METHODS = {
     'pickRoot',
     'moveRoot'
   ],
-  checks: ['run', 'runtimeStatus', 'ensureRuntime'],
+  checks: ['run', 'trace', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],
   updates: ['status', 'check', 'download', 'cancel', 'install'],

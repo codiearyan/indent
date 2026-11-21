@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkFlow, edgeId } from './flow'
+import { checkFlow, edgeId, traceFileProblem } from './flow'
 
 const FILE = 'shop/orders/flow.json'
 
@@ -124,6 +124,82 @@ describe('checkFlow', () => {
     expect(check(valid, null)).toEqual([
       `${FILE}: a repo's flow.json holds only a scene, not tasks`
     ])
+  })
+})
+
+describe('checkFlow with tracing', () => {
+  const traced = (trace: unknown, nodes: object[] = scene.nodes): object => ({
+    scene: { ...scene, nodes },
+    tasks: { total: { ...valid.tasks.total, trace } }
+  })
+  const withFn = [scene.nodes[0], { ...scene.nodes[1], fn: 'orderTotal' }]
+  const example = { file: 'src/reports.js', call: 'orderTotal', args: [{ items: [] }] }
+
+  it('accepts a function node with fn and a task with a trace', () => {
+    const result = checkFlow(JSON.stringify(traced(example, withFn)), FILE, ['total'])
+    expect(result.problems).toEqual([])
+    expect(result.flow?.tasks?.total.trace).toEqual(example)
+  })
+
+  it('accepts a trace with no args', () => {
+    expect(check(traced({ ...example, args: [] }, withFn))).toEqual([])
+  })
+
+  it('finds a fn that is not a plain name or not on a function node', () => {
+    const nodes = [
+      { ...scene.nodes[0], fn: 'form' },
+      { ...scene.nodes[1], fn: 'order total' }
+    ]
+    expect(check({ scene: { ...scene, nodes } })).toEqual([
+      `${FILE}: node "form": only a function node has fn`,
+      `${FILE}: node "total": fn must be the plain name of a function, like orderTotal`
+    ])
+  })
+
+  it('finds the same fn on two nodes', () => {
+    const nodes = [...withFn, { id: 'again', label: 'again', kind: 'function', fn: 'orderTotal' }]
+    expect(check({ scene: { ...scene, nodes } })).toEqual([
+      `${FILE}: node "again": fn "orderTotal" is on two nodes`
+    ])
+  })
+
+  it('finds a call that no node names', () => {
+    expect(check(traced(example))).toEqual([
+      `${FILE}: the trace of task "total" calls "orderTotal", which is not the fn of a node in the scene`
+    ])
+  })
+
+  it('finds a trace without a file, a call or args', () => {
+    expect(check(traced({}, withFn))).toEqual([
+      `${FILE}: the trace of task "total" needs a file`,
+      `${FILE}: the trace of task "total" needs call, the plain name of an exported function`,
+      `${FILE}: the trace of task "total" needs args, a list (it can be empty)`
+    ])
+    expect(check(traced('src/reports.js', withFn))).toEqual([
+      `${FILE}: the trace of task "total" must be an object with a file, a call and args`
+    ])
+  })
+
+  it('finds a file outside the workspace', () => {
+    expect(check(traced({ ...example, file: '../grader/checks.mjs' }, withFn))).toEqual([
+      `${FILE}: the trace of task "total": file "../grader/checks.mjs" cannot go up a folder with ..`
+    ])
+  })
+})
+
+describe('traceFileProblem', () => {
+  it.each([
+    ['src/reports.js', null],
+    ['reports.ts', null],
+    ['/etc/passwd', 'must be a path inside the workspace, not absolute'],
+    ['C:/work/a.js', 'must be a path inside the workspace, not absolute'],
+    ['\\\\server\\a.js', 'must be a path inside the workspace, not absolute'],
+    ['src/../../a.js', 'cannot go up a folder with ..'],
+    ['src//a.js', 'must be a plain relative path'],
+    ['./a.js', 'must be a plain relative path'],
+    ['.indent/starter/a.js', 'cannot point into .indent']
+  ])('%s', (file, problem) => {
+    expect(traceFileProblem(file)).toBe(problem)
   })
 })
 

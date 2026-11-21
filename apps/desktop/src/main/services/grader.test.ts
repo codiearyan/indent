@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { gradeRun, nodeSupported, type RunOutcome } from './grader'
+import { gradeRun, nodeSupported, parseTrace, type RunOutcome } from './grader'
 
 const ok = (stdout: string): RunOutcome => ({ stdout, stderr: '', exitCode: 0, timedOut: false })
 const at = '2026-11-19T10:00:00.000Z'
@@ -61,5 +61,37 @@ describe('gradeRun', () => {
       expect.stringContaining('90 seconds'),
       expect.stringContaining('90 seconds')
     ])
+  })
+})
+
+describe('parseTrace', () => {
+  const trace = {
+    ok: false,
+    calls: [
+      { fn: 'orderTotal', file: 'src/reports.js', depth: 0, args: [], threw: 'Not implemented' }
+    ],
+    error: 'Error: Not implemented',
+    timedOut: false,
+    truncated: false,
+    stdout: ''
+  }
+
+  it('reads the last JSON line', () => {
+    expect(parseTrace(ok(`noise\n${JSON.stringify({ trace })}\n`), 30)).toEqual(trace)
+  })
+
+  it('says when the tracer was stopped, crashed or printed nothing', () => {
+    expect(parseTrace({ ...ok(''), timedOut: true, exitCode: null }, 30).error).toBe(
+      'The trace took longer than 30 seconds and was stopped.'
+    )
+    expect(parseTrace({ ...ok(''), exitCode: 1, stderr: 'Error: boom' }, 30)).toEqual({
+      ok: false,
+      calls: [],
+      error: 'The tracer stopped with an error.\nError: boom',
+      timedOut: false,
+      truncated: false,
+      stdout: ''
+    })
+    expect(parseTrace(ok('{"results":[]}'), 30).error).toBe('The tracer printed no result.')
   })
 })

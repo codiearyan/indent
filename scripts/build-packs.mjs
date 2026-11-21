@@ -11,12 +11,13 @@ import {
   rmSync,
   writeFileSync
 } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getChapter, listLabs, listPaths } from '../apps/desktop/src/main/services/packs.ts'
 import { checkFlow } from '../apps/desktop/src/shared/flow.ts'
 import { TOOL_IDS } from '../apps/desktop/src/shared/types.ts'
 import { packArchive, packVersion } from '../apps/desktop/src/main/packArchive.ts'
+import { functionNames, TRACED_EXTENSIONS } from '../packages/content/kit/declarations.mjs'
 
 const out = process.argv[2] && resolve(process.argv[2])
 if (!out) {
@@ -27,10 +28,54 @@ if (!out) {
 const content = fileURLToPath(new URL('../packages/content/', import.meta.url))
 const problems = []
 
+function starterFiles(dir) {
+  if (!existsSync(dir)) return []
+  return readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile() && TRACED_EXTENSIONS.includes(extname(entry.name)))
+    .map((entry) => join(entry.parentPath, entry.name))
+}
+
+/** What a trace needs from the starter: its file, and each fn declared as a top-level function. */
+function checkTraceNames(dir, name, flow) {
+  const starter = join(dir, 'starter')
+  const declared = new Set(
+    starterFiles(starter).flatMap((f) => functionNames(readFileSync(f, 'utf8')))
+  )
+  for (const node of flow.scene.nodes) {
+    if (node.fn && !declared.has(node.fn)) {
+      problems.push(
+        `${name}/flow.json: node "${node.id}": no starter file declares function ${node.fn}() at the top level`
+      )
+    }
+  }
+  for (const [taskId, task] of Object.entries(flow.tasks ?? {})) {
+    if (!task.trace) continue
+    const file = join(starter, task.trace.file)
+    const where = `${name}/flow.json: the trace of task "${taskId}"`
+    if (!TRACED_EXTENSIONS.includes(extname(file))) {
+      problems.push(
+        `${where} runs ${task.trace.file}; tracing runs ${TRACED_EXTENSIONS.join(', ')} files`
+      )
+    } else if (!existsSync(file)) {
+      problems.push(`${where} runs ${task.trace.file}, which is not in starter/`)
+    } else if (!functionNames(readFileSync(file, 'utf8')).includes(task.trace.call)) {
+      problems.push(
+        `${where} calls ${task.trace.call}(), which ${relative(starter, file)} does not declare`
+      )
+    }
+  }
+}
+
 function checkFlowFile(dir, name, taskIds) {
   const file = join(dir, 'flow.json')
   if (!existsSync(file)) return
-  problems.push(...checkFlow(readFileSync(file, 'utf8'), `${name}/flow.json`, taskIds).problems)
+  const { flow, problems: found } = checkFlow(
+    readFileSync(file, 'utf8'),
+    `${name}/flow.json`,
+    taskIds
+  )
+  problems.push(...found)
+  if (flow && taskIds) checkTraceNames(dir, name, flow)
 }
 
 const folders = readdirSync(join(content, 'labs'), { withFileTypes: true })

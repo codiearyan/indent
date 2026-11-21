@@ -17,6 +17,10 @@ const isText = (value: unknown): value is string => typeof value === 'string' &&
 
 const isCell = (value: unknown): boolean => typeof value === 'string' || typeof value === 'number'
 
+/** A plain JavaScript name, the only kind of `fn` and `trace.call` tracing can follow. */
+export const isIdentifier = (value: unknown): value is string =>
+  typeof value === 'string' && /^[A-Za-z_$][\w$]*$/.test(value)
+
 const quoted = (values: string[]): string => values.map((value) => `"${value}"`).join(', ')
 
 function valueProblems(value: unknown, where: string): string[] {
@@ -66,6 +70,7 @@ function flowProblems(data: unknown, taskIds: string[] | null): string[] {
   const nodes = Array.isArray(scene.nodes) ? scene.nodes : []
   if (nodes.length === 0) problems.push('the scene needs at least one node')
   const nodeIds = new Set<string>()
+  const fns = new Set<string>()
   nodes.forEach((node, i) => {
     const where = `node ${i + 1}`
     if (!isObject(node) || !isText(node.id)) {
@@ -82,6 +87,13 @@ function flowProblems(data: unknown, taskIds: string[] | null): string[] {
     }
     if (node.mine !== undefined && typeof node.mine !== 'boolean') {
       problems.push(`node "${id}": mine must be true or false`)
+    }
+    if (node.fn !== undefined) {
+      if (node.kind !== 'function') problems.push(`node "${id}": only a function node has fn`)
+      else if (!isIdentifier(node.fn)) {
+        problems.push(`node "${id}": fn must be the plain name of a function, like orderTotal`)
+      } else if (fns.has(node.fn)) problems.push(`node "${id}": fn "${node.fn}" is on two nodes`)
+      else fns.add(node.fn)
     }
   })
 
@@ -134,7 +146,37 @@ function flowProblems(data: unknown, taskIds: string[] | null): string[] {
       if (step.value !== undefined) problems.push(...valueProblems(step.value, where))
       if (!isText(step.note)) problems.push(`${where} needs a note`)
     })
+    if (isObject(flow) && flow.trace !== undefined) {
+      problems.push(...traceProblems(flow.trace, `the trace of task "${taskId}"`, fns))
+    }
   }
+  return problems
+}
+
+/** Why `file` cannot name a learner file of the workspace, or null when it can. */
+export function traceFileProblem(file: string): string | null {
+  if (/^([\\/]|[A-Za-z]:)/.test(file)) return 'must be a path inside the workspace, not absolute'
+  const parts = file.split(/[\\/]/)
+  if (parts.includes('..')) return 'cannot go up a folder with ..'
+  if (parts.some((part) => part === '' || part === '.')) return 'must be a plain relative path'
+  if (parts[0] === '.indent') return 'cannot point into .indent'
+  return null
+}
+
+function traceProblems(trace: unknown, where: string, fns: Set<string>): string[] {
+  if (!isObject(trace)) return [`${where} must be an object with a file, a call and args`]
+  const problems: string[] = []
+  if (!isText(trace.file)) problems.push(`${where} needs a file`)
+  else {
+    const problem = traceFileProblem(trace.file)
+    if (problem) problems.push(`${where}: file "${trace.file}" ${problem}`)
+  }
+  if (!isIdentifier(trace.call)) {
+    problems.push(`${where} needs call, the plain name of an exported function`)
+  } else if (!fns.has(trace.call)) {
+    problems.push(`${where} calls "${trace.call}", which is not the fn of a node in the scene`)
+  }
+  if (!Array.isArray(trace.args)) problems.push(`${where} needs args, a list (it can be empty)`)
   return problems
 }
 

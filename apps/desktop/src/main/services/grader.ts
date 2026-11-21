@@ -1,4 +1,4 @@
-import type { CheckDetail, CheckResult } from '../../shared/types'
+import type { CheckDetail, CheckResult, TraceResult } from '../../shared/types'
 
 const MIN_NODE = [22, 18] as const
 
@@ -70,4 +70,26 @@ export function gradeRun(
     const details: CheckDetail[] = Array.isArray(result.details) ? result.details : []
     return { taskId, passed: result.passed === true, details, durationMs, at }
   })
+}
+
+/** A trace that could not run; `error` says why in plain words. */
+export function failedTrace(error: string): TraceResult {
+  return { ok: false, calls: [], error, timedOut: false, truncated: false, stdout: '' }
+}
+
+/** Reads the last line run-trace.mjs printed, never throwing. */
+export function parseTrace(run: RunOutcome, timeoutSeconds: number): TraceResult {
+  if (run.timedOut) {
+    return failedTrace(`The trace took longer than ${timeoutSeconds} seconds and was stopped.`)
+  }
+  const line = run.exitCode === 0 ? run.stdout.trim().split('\n').pop() : undefined
+  try {
+    const trace = JSON.parse(line ?? '')?.trace
+    if (trace && typeof trace.ok === 'boolean' && Array.isArray(trace.calls)) return trace
+  } catch {
+    // Falls through to the error below.
+  }
+  const reason =
+    run.exitCode === 0 ? 'The tracer printed no result.' : 'The tracer stopped with an error.'
+  return failedTrace(run.stderr.trim() ? `${reason}\n${tail(run.stderr)}` : reason)
 }
