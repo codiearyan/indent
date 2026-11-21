@@ -1,135 +1,112 @@
 {
   "scene": {
     "nodes": [
-      {
-        "id": "input",
-        "label": "Inbox message",
-        "kind": "data"
-      },
-      {
-        "id": "request",
-        "label": "Prompt builder",
-        "kind": "function",
-        "mine": true
-      },
-      {
-        "id": "work",
-        "label": "Local model",
-        "kind": "story"
-      },
-      {
-        "id": "output",
-        "label": "Triage result",
-        "kind": "data"
-      }
+      { "id": "inbox", "label": "Shop inbox", "kind": "story" },
+      { "id": "tag-request", "label": "Tag request", "kind": "data" },
+      { "id": "label", "label": "labelMessage()", "kind": "function", "mine": true },
+      { "id": "examples", "label": "buildTriageMessages()", "kind": "function", "mine": true },
+      { "id": "request", "label": "Triage request", "kind": "data" },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "triage", "label": "triage()", "kind": "function", "mine": true },
+      { "id": "ravi", "label": "Ravi’s inbox view", "kind": "story" }
     ],
     "edges": [
-      {
-        "from": "input",
-        "to": "request"
-      },
-      {
-        "from": "request",
-        "to": "work"
-      },
-      {
-        "from": "work",
-        "to": "output"
-      }
+      { "from": "inbox", "to": "tag-request", "label": "email" },
+      { "from": "tag-request", "to": "model", "label": "request" },
+      { "from": "model", "to": "label", "label": "reply text" },
+      { "from": "inbox", "to": "examples", "label": "email" },
+      { "from": "examples", "to": "request", "label": "messages" },
+      { "from": "request", "to": "model", "label": "request" },
+      { "from": "model", "to": "triage", "label": "reply line" },
+      { "from": "triage", "to": "ravi", "label": "inbox entry" },
+      { "from": "label", "to": "ravi", "label": "tag" }
     ],
-    "note": "Ravi uses Moss to sort nursery messages before reading them."
+    "note": "Your inbox code turns Fernhollow’s incoming mail into tags and triage entries Ravi can use to decide what to open."
   },
   "tasks": {
     "label-only": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "An inbox message arrives."
+          "active": ["inbox", "inbox->tag-request", "tag-request"],
+          "value": {
+            "kind": "array",
+            "label": "Inbox email",
+            "values": ["Can I keep my fern under the lamp by the till?"]
+          },
+          "note": "During his morning inbox sweep, Ravi finds a customer asking about a plant display."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "Moss needs to know what kind of reply the inbox expects."
+          "active": ["tag-request", "tag-request->model", "model"],
+          "note": "Moss gets a request to sort that email."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "The model returns a label."
-        },
-        {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "The inbox can accept a recognised label."
+          "active": ["model", "model->label", "label", "label->ravi", "ravi"],
+          "value": {
+            "kind": "array",
+            "label": "Output shape",
+            "values": ["One inbox tag"]
+          },
+          "note": "Ravi gets a single tag he can use to group the email with related questions."
         }
       ]
     },
     "examples": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "A customer asks about a plant."
+          "active": ["inbox"],
+          "value": {
+            "kind": "array",
+            "label": "Inbox email",
+            "values": ["Can you hold my parcel until I get back on Saturday?"]
+          },
+          "note": "A customer asks when Fernhollow can send a parcel."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "The instructions describe the desired reply."
+          "active": ["inbox", "inbox->examples", "examples"],
+          "note": "The email goes to buildTriageMessages() when Ravi’s inbox asks for more than a tag."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "Examples show what a triage reply looks like."
-        },
-        {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "The model receives the new message with that context."
+          "active": ["examples", "examples->request", "request"],
+          "value": {
+            "kind": "array",
+            "label": "Output shape",
+            "values": ["List of model messages"]
+          },
+          "note": "The result is the request data Moss will use for the inbox entry."
         }
       ]
     },
     "triage": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "A message reaches the inbox."
+          "active": ["inbox", "inbox->examples", "examples"],
+          "value": {
+            "kind": "array",
+            "label": "Inbox email",
+            "values": ["Will my snake plant get enough sun on the landing?"]
+          },
+          "note": "Ravi opens a message from someone setting up a plant shelf."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "The app sends the triage conversation."
+          "active": ["examples", "examples->request", "request", "request->model", "model"],
+          "note": "The local model gets a request for a full inbox entry."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "The model replies with text."
+          "active": ["model", "model->triage", "triage"],
+          "note": "Moss sends back an inbox summary as one line of text."
         },
         {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "The inbox needs fields it can display."
+          "active": ["triage", "triage->ravi", "ravi"],
+          "value": {
+            "kind": "map",
+            "label": "Output shape",
+            "entries": [
+              { "key": "Label", "value": "Inbox tag" },
+              { "key": "Plant", "value": "Plant name or unknown" },
+              { "key": "Urgency", "value": "Priority" }
+            ]
+          },
+          "note": "Ravi’s view gets an entry it can display as separate bits of information."
         }
       ]
     }

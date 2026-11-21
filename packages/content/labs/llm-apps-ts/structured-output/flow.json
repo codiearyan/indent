@@ -1,136 +1,113 @@
 {
   "scene": {
     "nodes": [
-      {
-        "id": "input",
-        "label": "Model reply",
-        "kind": "data"
-      },
-      {
-        "id": "request",
-        "label": "Reply parser",
-        "kind": "function",
-        "mine": true
-      },
-      {
-        "id": "work",
-        "label": "Order validation",
-        "kind": "function",
-        "mine": true
-      },
-      {
-        "id": "output",
-        "label": "Order result",
-        "kind": "data"
-      }
+      { "id": "email", "label": "Order email", "kind": "story" },
+      { "id": "extract", "label": "extractOrder()", "kind": "function", "mine": true },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "parse", "label": "parseJsonReply()", "kind": "function", "mine": true },
+      { "id": "validate", "label": "validateOrder()", "kind": "function", "mine": true },
+      { "id": "problems", "label": "Order problems", "kind": "data" },
+      { "id": "sheet", "label": "Ravi’s order sheet", "kind": "story" }
     ],
     "edges": [
-      {
-        "from": "input",
-        "to": "request"
-      },
-      {
-        "from": "request",
-        "to": "work"
-      },
-      {
-        "from": "work",
-        "to": "output"
-      }
+      { "from": "email", "to": "extract", "label": "order email" },
+      { "from": "extract", "to": "model", "label": "order query" },
+      { "from": "model", "to": "parse", "label": "reply text" },
+      { "from": "parse", "to": "validate", "label": "value" },
+      { "from": "validate", "to": "problems", "label": "problems" },
+      { "from": "validate", "to": "sheet", "label": "order record" }
     ],
-    "note": "A nursery email becomes an order only when the reply can be read and the order makes sense."
+    "note": "Ravi wants purchase emails to become order records, and your code checks what Moss sends back before the shop can use it."
   },
   "tasks": {
     "parse": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "Moss replies to an order email."
+          "active": ["model"],
+          "value": {
+            "kind": "array",
+            "label": "Input shape",
+            "values": ["Model reply as text"]
+          },
+          "note": "Moss sends back text about a gift order for a bookshop."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "The reply can contain prose around the order."
+          "active": ["model", "model->parse", "parse"],
+          "note": "parseJsonReply() reads the order data from the reply."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "The order data needs to be readable."
-        },
-        {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "Unreadable data becomes a problem for the caller."
+          "active": ["parse", "parse->validate"],
+          "value": {
+            "kind": "array",
+            "label": "Output shape",
+            "values": ["Parsed value, ready to check"]
+          },
+          "note": "The next part of the app gets a value it can inspect for order details."
         }
       ]
     },
     "validate": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "An order arrives from the model."
+          "active": ["parse", "parse->validate", "validate"],
+          "value": {
+            "kind": "array",
+            "label": "Order details to check",
+            "values": ["Plant", "Quantity", "Pot size", "Gift wrap"]
+          },
+          "note": "A reply for a window display order has become a value the app can inspect."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "The app reads the order fields."
+          "active": ["validate"],
+          "note": "Ravi needs to know whether the order details are usable before anyone packs the plants."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "A field may have an unexpected value."
-        },
-        {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "The caller can see which part of the order needs attention."
+          "active": ["validate", "validate->problems", "problems"],
+          "value": {
+            "kind": "array",
+            "label": "Output shape",
+            "values": ["List of problems"]
+          },
+          "note": "The result is a list of order problems, empty when the order is usable."
         }
       ]
     },
     "extract": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "A customer email reaches Moss."
+          "active": ["email", "email->extract", "extract"],
+          "value": {
+            "kind": "array",
+            "label": "Order email",
+            "values": ["I’d like six medium orchids for the studio reception, gift wrapped please."]
+          },
+          "note": "A customer emails Fernhollow about stocking a new studio."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "The first reply may need work."
+          "active": ["extract", "extract->model", "model"],
+          "note": "Moss returns a reply about the studio’s requested order."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "The app can send the problems back to Moss."
+          "active": ["model", "model->parse", "parse", "parse->validate", "validate"],
+          "note": "The app assesses whether that reply can become an entry for the packing team."
         },
         {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "The caller gets an order or a clear failure."
+          "active": ["validate", "validate->sheet", "sheet"],
+          "value": {
+            "kind": "map",
+            "label": "Order shape",
+            "entries": [
+              { "key": "Plant", "value": "Name" },
+              { "key": "Quantity", "value": "Number" },
+              { "key": "Pot size", "value": "Size" },
+              { "key": "Gift wrap", "value": "Yes or no" }
+            ]
+          },
+          "note": "A usable result has the details Ravi needs on the order sheet."
+        },
+        {
+          "active": ["validate", "validate->problems", "problems"],
+          "note": "If the app cannot get a usable order, it reports a failure and Ravi has no record to pack from."
         }
       ]
     }

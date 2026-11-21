@@ -1,135 +1,114 @@
 {
   "scene": {
     "nodes": [
-      {
-        "id": "input",
-        "label": "New question",
-        "kind": "data"
-      },
-      {
-        "id": "request",
-        "label": "Conversation history",
-        "kind": "function",
-        "mine": true
-      },
-      {
-        "id": "work",
-        "label": "Local model",
-        "kind": "story"
-      },
-      {
-        "id": "output",
-        "label": "Updated history",
-        "kind": "data"
-      }
+      { "id": "customer", "label": "Fernhollow customer", "kind": "story" },
+      { "id": "send", "label": "Conversation.send()", "kind": "function", "mine": true },
+      { "id": "history", "label": "Conversation history", "kind": "data" },
+      { "id": "fit", "label": "fitToBudget()", "kind": "function", "mine": true },
+      { "id": "model", "label": "Local model", "kind": "story" },
+      { "id": "reply", "label": "Care reply", "kind": "data" },
+      { "id": "next-history", "label": "History for next turn", "kind": "data" }
     ],
     "edges": [
-      {
-        "from": "input",
-        "to": "request"
-      },
-      {
-        "from": "request",
-        "to": "work"
-      },
-      {
-        "from": "work",
-        "to": "output"
-      }
+      { "from": "customer", "to": "send", "label": "question" },
+      { "from": "history", "to": "send", "label": "past turns" },
+      { "from": "send", "to": "model", "label": "conversation" },
+      { "from": "history", "to": "fit", "label": "messages" },
+      { "from": "send", "to": "fit", "label": "current turn" },
+      { "from": "fit", "to": "model", "label": "within limit" },
+      { "from": "model", "to": "reply", "label": "answer" },
+      { "from": "reply", "to": "next-history", "label": "reply" }
     ],
-    "note": "Moss needs enough conversation to answer while staying inside the request budget."
+    "note": "Your conversation code lets customers follow up with Moss and keeps long chats within the local model’s token budget."
   },
   "tasks": {
     "history": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "A customer asks a follow-up."
+          "active": ["customer", "customer->send", "send"],
+          "value": {
+            "kind": "array",
+            "label": "First question",
+            "values": ["Can I move my fern to the bathroom shelf?"]
+          },
+          "note": "A customer mentions their fern at the start of a chat with Moss."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "Earlier turns give it context."
+          "active": ["history", "history->send", "send", "send->model", "model"],
+          "note": "The first question joins the chat, and Moss gets the request for this turn."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "Moss answers using the conversation it sees."
+          "active": ["model", "model->reply", "reply", "reply->next-history", "next-history"],
+          "note": "The care reply is available to the caller and becomes part of the chat record."
         },
         {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "The reply becomes part of the conversation."
+          "active": ["next-history", "customer", "customer->send", "send"],
+          "value": {
+            "kind": "array",
+            "label": "Follow-up",
+            "values": ["Does steam from the shower make a difference?"]
+          },
+          "note": "The customer asks a follow-up about the same spot."
         }
       ]
     },
     "fit": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "A new question joins a long conversation."
+          "active": ["history"],
+          "value": {
+            "kind": "array",
+            "label": "Example question",
+            "values": ["Could the cactus go on the landing instead?"]
+          },
+          "note": "A customer tries several spots for a cactus and asks Moss about the landing next."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "The app measures the messages against the budget."
+          "active": ["history", "history->fit", "fit"],
+          "value": {
+            "kind": "array",
+            "label": "Input shape",
+            "values": ["List of messages", "Token budget"]
+          },
+          "note": "fitToBudget() gets the conversation and the amount of room available."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "Moss can receive a smaller conversation."
+          "active": ["fit", "fit->model"],
+          "value": {
+            "kind": "array",
+            "label": "Output shape",
+            "values": ["List of messages within budget"]
+          },
+          "note": "When the conversation can fit, the caller gets a list within the budget."
         },
         {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "Some requests may be too large even after shortening."
+          "active": ["fit"],
+          "note": "If there’s too little room for a usable request, the caller gets an error."
         }
       ]
     },
     "budget": {
       "steps": [
         {
-          "active": [
-            "input"
-          ],
-          "note": "A customer sends another question."
+          "active": ["customer", "customer->send", "send"],
+          "value": {
+            "kind": "array",
+            "label": "Follow-up",
+            "values": ["Would the shelf near the back door suit it better?"]
+          },
+          "note": "After a long chat about a peace lily, the customer asks another question."
         },
         {
-          "active": [
-            "request",
-            "input->request"
-          ],
-          "note": "The app prepares a conversation within the budget."
+          "active": ["history", "history->fit", "send", "send->fit", "fit"],
+          "note": "The exchange so far is long enough that it needs a budget."
         },
         {
-          "active": [
-            "work",
-            "request->work"
-          ],
-          "note": "Moss replies to the messages it received."
+          "active": ["fit", "fit->model", "model"],
+          "note": "The request for this turn stays within the space available."
         },
         {
-          "active": [
-            "output",
-            "work->output"
-          ],
-          "note": "The next turn starts from the conversation used this time."
+          "active": ["model", "model->reply", "reply", "reply->next-history", "next-history"],
+          "note": "Moss’s answer comes back and the chat is ready for the next question."
         }
       ]
     }
