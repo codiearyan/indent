@@ -6,11 +6,15 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON ../../scripts/build-packs.mjs public/packs/v1 && astro build",
     "preview": "astro preview",
     "typecheck": "astro check"
   },
+  "engines": {
+    "node": ">=22.18"
+  },
   "dependencies": {
+    "@indent/content": "workspace:*",
     "@indent/design": "workspace:*",
     "@lucide/astro": "^1.75.0",
     "astro": "^7.4.13"

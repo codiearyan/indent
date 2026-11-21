@@ -9,3 +9,4 @@ out
 .astro
 *.tsbuildinfo
 .next
+apps/site/public/packs

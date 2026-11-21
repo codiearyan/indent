@@ -153,6 +153,9 @@ importers:
 
   apps/site:
     dependencies:
+      '@indent/content':
+        specifier: workspace:*
+        version: link:../../content
       '@indent/design':
         specifier: workspace:*
         version: link:../../packages/design
@@ -178,6 +181,8 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+
+  content: {}
 
   packages/design:
     dependencies:
