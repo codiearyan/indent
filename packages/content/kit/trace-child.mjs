@@ -5,6 +5,7 @@ import { realpathSync } from 'node:fs'
 import { register } from 'node:module'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { exitAfterOutput } from './exit.mjs'
 
 const [dir, file, exportName, argsJson] = process.argv.slice(2)
 const MAX_CALLS = 300
@@ -115,7 +116,7 @@ globalThis.__indentTrace = (fn, name, fileName) => {
 }
 
 function finish(message) {
-  process.send({ type: 'result', ...message }, () => process.exit(0))
+  process.send({ type: 'result', ...message }, exitAfterOutput)
 }
 
 try {

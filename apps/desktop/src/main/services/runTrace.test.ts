@@ -208,12 +208,16 @@ describe('run-trace.mjs', () => {
   }, 30_000)
 
   it("keeps the learner's own output apart from the result, and cuts it", async () => {
-    const result = await trace('noisy')
-    expect(result.ok).toBe(true)
-    expect(result.calls[0].returned).toBe('"done"')
-    expect(result.stdout.startsWith('line 0\nline 1\n')).toBe(true)
-    expect(result.stdout.endsWith('... (output cut)')).toBe(true)
-    expect(result.stdout.length).toBeLessThan(4100)
+    // Several times: on Linux a child that exits before its output is written loses the tail,
+    // but not on every run. One after another, because trace() expects an empty sandbox root.
+    for (let run = 0; run < 6; run++) {
+      const result = await trace('noisy')
+      expect(result.ok).toBe(true)
+      expect(result.calls[0].returned).toBe('"done"')
+      expect(result.stdout.startsWith('line 0\nline 1\n')).toBe(true)
+      expect(result.stdout.endsWith('... (output cut)')).toBe(true)
+      expect(result.stdout.length).toBeLessThan(4100)
+    }
   })
 
   it('traces a .ts file', async () => {

@@ -1,10 +1,11 @@
 // Child process for t.call(): imports a module, calls one export and sends the result back over IPC.
 import { pathToFileURL } from 'node:url'
+import { exitAfterOutput } from './exit.mjs'
 
 const [file, exportName, argsJson] = process.argv.slice(2)
 
 function reply(message) {
-  process.send(message, () => process.exit(0))
+  process.send(message, exitAfterOutput)
 }
 
 try {
