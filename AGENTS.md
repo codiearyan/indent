@@ -147,19 +147,21 @@ the chrome is neutral, and the one hue is a calm orange.
 
 ## First-run setup
 
-`features/onboarding/` is the setup shown instead of the app while `useSettings().onboarded` is false.
-It is not a route: finishing or skipping sets `onboarded` and the app takes over on Home; "Run
-setup again" in the AI menu clears it. It has three steps: welcome, goal and AI. `steps.ts` is the
-pure step machine (the steps, next, back, the progress cells) with its tests. Every choice writes
-the real setting at once (`ai.setConfig`, `ai.setKey`), so skipping keeps what was picked. What the
-setup does not ask (help in the editor, the tutor after a failed check) keeps its default and is
-changed in Settings. The AI step shows the provider found on this computer and the work folder;
-"Change" opens every provider (`Provider.tsx`) in a dialog. Step changes run through
-`lib/viewTransition.ts` with the type `onboarding-step`; `onboarding.css` holds the transition, the
-staged entrances and the scenes, all on the motion tokens, with a reduced-motion block that turns
-movement into fades and shows each scene's last frame. The welcome step holds the one picture of the
-setup (`welcome.webp`, in the style and inks of the covers) with a scene laid over its corner. The
-scenes in `scenes/` are built from app components and tokens, never images.
+`features/onboarding/` is the setup shown instead of the app while `useSettings().onboarded` is
+false. It is not a route: finishing or skipping sets `onboarded` and the app takes over on Home;
+"Run setup again" in the AI menu clears it. It has four steps: welcome, goal, AI and editor.
+`steps.ts` is the pure step machine (the steps, next, back, the progress cells) with its tests.
+Every choice writes the real setting at once (`ai.setConfig`, `ai.setKey`), so skipping keeps what
+was picked. What the setup does not ask (help in the editor, the tutor after a failed check) keeps
+its default and is changed in Settings. The AI step shows the provider found on this computer and
+the work folder; "Change" opens every provider (`Provider.tsx`) in a dialog. The editor step sets
+the code theme, the text size and Vim mode (`useSettings().editor.vim`, attached per editor by
+`features/editor/vim.ts`). Step changes run through `lib/viewTransition.ts` with the type
+`onboarding-step`; `onboarding.css` holds the transition, the staged entrances and the scenes, all
+on the motion tokens, with a reduced-motion block that turns movement into fades and shows each
+scene's last frame. The welcome step holds the one picture of the setup (`welcome.webp`, in the
+style and inks of the covers) with a scene laid over its corner. The scenes in `scenes/` are built
+from app components and tokens, never images.
 
 Finishing or skipping the setup starts the guide into the first issue (`useSettings().guide`,
 `features/tour/GuideTour`): a few steps on Home, a few on the repo page, then the workspace tour on

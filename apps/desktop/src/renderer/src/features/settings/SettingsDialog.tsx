@@ -14,12 +14,7 @@ import {
 } from 'lucide-react'
 import SiGithub from '@icons-pack/react-simple-icons/icons/SiGithub'
 import { REPO_URL } from '@shared/repo'
-import {
-  CODE_THEMES,
-  codePalette,
-  type CodePalette,
-  type CodeThemeId
-} from '@indent/design/code-palette'
+import { CODE_THEMES, codePalette, type CodeThemeId } from '@indent/design/code-palette'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -40,6 +35,7 @@ import { GoalSection } from './GoalSection'
 import { useSettingsDialog, type SettingsSection } from './dialogStore'
 import { KeyboardSection } from './KeyboardSection'
 import { PracticeSection } from './PracticeSection'
+import { CodeSample } from './CodeSample'
 import { ThemeCards } from './ThemeCards'
 import { ToolsSection } from './ToolsSection'
 import { Typography } from './Typography'
@@ -167,40 +163,10 @@ function AppearanceSection(): React.JSX.Element {
   )
 }
 
-/** Three lines that use every colour of a code theme. */
-function CodeSample({ palette: p }: { palette: CodePalette }): React.JSX.Element {
-  const part = (color: string, text: string): React.JSX.Element => (
-    <span style={{ color }}>{text}</span>
-  )
-  return (
-    <pre
-      aria-hidden
-      className="overflow-hidden rounded-md border border-rule bg-editor px-3 py-2 font-mono text-[11px] leading-5"
-      style={{ color: p.foreground }}
-    >
-      <span className="italic" style={{ color: p.comment }}>
-        {'// add up the paid orders\n'}
-      </span>
-      {part(p.keyword, 'const ')}
-      {part(p.variable, 'total')}
-      {' = '}
-      {part(p.function, 'Sum')}
-      {'.of('}
-      {part(p.variable, 'orders')}
-      {', '}
-      {part(p.number, '0')}
-      {')\n'}
-      {part(p.keyword, 'return ')}
-      {part(p.string, "'Total: '")}
-      {' + '}
-      {part(p.variable, 'total')}
-    </pre>
-  )
-}
-
 const EDITOR_OPTIONS: { option: EditorOption; label: string; hint: string }[] = [
   { option: 'lineNumbers', label: 'Line numbers', hint: 'Numbers in the left margin.' },
-  { option: 'minimap', label: 'Minimap', hint: 'A small overview of the file on the right.' }
+  { option: 'minimap', label: 'Minimap', hint: 'A small overview of the file on the right.' },
+  { option: 'vim', label: 'Vim mode', hint: 'Normal, Insert and Visual mode in the code editor.' }
 ]
 
 function EditorSection(): React.JSX.Element {

@@ -33,10 +33,9 @@ export const segment =
   'h-7 flex-1 rounded-sm font-normal text-muted-foreground data-[state=on]:font-medium data-[state=on]:text-foreground'
 export const segmented = 'rounded-md border border-input p-0.5'
 
-/** The size presets and one slider per kind of text. Shared by the View menu and Settings. */
-export function TextSizeControls(): React.JSX.Element {
+/** The size presets: one size for every kind of text. */
+export function TextSizePresets(): React.JSX.Element {
   const textScale = useSettings((s) => s.textScale)
-  const setTextScale = useSettings((s) => s.setTextScale)
   const setAllTextScale = useSettings((s) => s.setAllTextScale)
   const values = Object.values(textScale)
   const preset =
@@ -45,21 +44,31 @@ export function TextSizeControls(): React.JSX.Element {
     ) ?? ''
 
   return (
+    <ToggleGroup
+      type="single"
+      size="sm"
+      spacing={1}
+      className={`w-full ${segmented}`}
+      value={preset}
+      onValueChange={(key) => key && setAllTextScale(TEXT_SCALE_PRESETS[key as Preset])}
+    >
+      {(Object.keys(TEXT_SCALE_PRESETS) as Preset[]).map((key) => (
+        <ToggleGroupItem key={key} value={key} className={segment} aria-label={`Size ${key}`}>
+          {key}
+        </ToggleGroupItem>
+      ))}
+    </ToggleGroup>
+  )
+}
+
+/** The size presets and one slider per kind of text. Shared by the View menu and Settings. */
+export function TextSizeControls(): React.JSX.Element {
+  const textScale = useSettings((s) => s.textScale)
+  const setTextScale = useSettings((s) => s.setTextScale)
+
+  return (
     <>
-      <ToggleGroup
-        type="single"
-        size="sm"
-        spacing={1}
-        className={`w-full ${segmented}`}
-        value={preset}
-        onValueChange={(key) => key && setAllTextScale(TEXT_SCALE_PRESETS[key as Preset])}
-      >
-        {(Object.keys(TEXT_SCALE_PRESETS) as Preset[]).map((key) => (
-          <ToggleGroupItem key={key} value={key} className={segment} aria-label={`Size ${key}`}>
-            {key}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      <TextSizePresets />
       {ZONES.map(({ zone, label }) => (
         <div key={zone} className="grid grid-cols-[6rem_1fr_3rem] items-center gap-3 text-sm">
           <span>{label}</span>

@@ -8,7 +8,7 @@ import { mergeSettings } from './mergeSettings'
 
 export type Theme = 'dark' | 'light'
 export type Appearance = Theme | 'system'
-export type EditorOption = 'wordWrap' | 'lineNumbers' | 'minimap'
+export type EditorOption = 'wordWrap' | 'lineNumbers' | 'minimap' | 'vim'
 export type TextZone = 'lesson' | 'tasks' | 'editor' | 'terminal'
 export type PanelKey = 'files' | 'terminal' | 'chat' | 'zen' | 'browser'
 export type Experience = 'new' | 'some' | 'experienced'
@@ -113,7 +113,8 @@ const defaultPanels: Record<PanelKey, boolean> = {
 const defaultEditor: Record<EditorOption, boolean> = {
   wordWrap: false,
   lineNumbers: true,
-  minimap: false
+  minimap: false,
+  vim: false
 }
 
 const systemTheme = (): Theme =>

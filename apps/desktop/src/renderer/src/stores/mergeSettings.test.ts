@@ -17,7 +17,7 @@ const defaults = {
   appearance: 'dark',
   theme: 'dark',
   codeTheme: 'ember',
-  editor: { wordWrap: false, lineNumbers: true, minimap: false },
+  editor: { wordWrap: false, lineNumbers: true, minimap: false, vim: false },
   panels: { files: false, terminal: false, chat: false, zen: false, browser: true },
   typography,
   shortcuts: {},
@@ -26,6 +26,16 @@ const defaults = {
 } as SettingsState
 
 describe('mergeSettings', () => {
+  it('leaves Vim mode off for settings saved before it existed', () => {
+    const saved = { editor: { wordWrap: true, lineNumbers: true, minimap: false } }
+    expect(mergeSettings(saved, defaults, 'dark').editor).toEqual({
+      wordWrap: true,
+      lineNumbers: true,
+      minimap: false,
+      vim: false
+    })
+  })
+
   it('turns the one goal saved by an older version into the list of goals', () => {
     expect(mergeSettings({ goal: 'backend' }, defaults, 'dark').goals).toEqual(['backend'])
     expect(mergeSettings({ goal: null }, defaults, 'dark').goals).toEqual([])

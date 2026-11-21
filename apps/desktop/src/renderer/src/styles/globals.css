@@ -75,6 +75,14 @@ html.window-fullscreen {
   }
 
   /* Long-form markdown: lessons, task descriptions, AI replies */
+  /* The Vim mode line under an editor: the mode, the keys typed so far and the `:` command. */
+  .vim-status {
+    @apply h-6 shrink-0 border-t border-rule px-3 font-mono text-xs leading-6 text-muted-foreground;
+  }
+  .vim-status input {
+    @apply bg-transparent text-foreground outline-none;
+  }
+
   .prose-lab {
     @apply text-[0.9375rem] leading-7 text-foreground/85;
   }

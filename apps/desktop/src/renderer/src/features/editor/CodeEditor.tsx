@@ -27,6 +27,7 @@ interface Props {
 
 export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element {
   const hostRef = useRef<HTMLDivElement>(null)
+  const vimStatusRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const viewStates = useRef(new Map<string, monaco.editor.ICodeEditorViewState | null>())
   const files = useWorkspace((s) => s.files)
@@ -131,6 +132,23 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
     if (saved) editor.restoreViewState(saved)
   }, [activePath, files])
 
+  // Runs after the editor above is made, and again whenever that one is made anew.
+  const vim = options.vim
+  useEffect(() => {
+    const editor = editorRef.current
+    const status = vimStatusRef.current
+    if (!vim || !editor || !status) return
+    let detach: (() => void) | undefined
+    let gone = false
+    void import('./vim').then(({ attachVim }) => {
+      if (!gone) detach = attachVim(editor, status)
+    })
+    return () => {
+      gone = true
+      detach?.()
+    }
+  }, [vim, group, onCheck, onRun])
+
   useEffect(() => {
     monaco.editor.setTheme(themeName(codeTheme, theme))
   }, [codeTheme, theme])
@@ -150,10 +168,13 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
   }, [typography, editorScale])
 
   return (
-    <div
-      ref={hostRef}
-      data-tour={group === 0 ? TOUR.editor : undefined}
-      className="h-full min-w-0 flex-1"
-    />
+    <div className="flex h-full min-w-0 flex-1 flex-col">
+      <div
+        ref={hostRef}
+        data-tour={group === 0 ? TOUR.editor : undefined}
+        className="min-h-0 flex-1"
+      />
+      <div ref={vimStatusRef} hidden={!vim} className="vim-status" />
+    </div>
   )
 }
