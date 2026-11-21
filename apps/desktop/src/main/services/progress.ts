@@ -1,10 +1,11 @@
 import { copyFile, readFile, rename, stat, writeFile } from 'fs/promises'
 import { basename, join } from 'path'
 import { app, BrowserWindow, dialog } from 'electron'
-import { localDate } from '@shared/rules'
+import { chapterKey, localDate } from '@shared/rules'
 import type { CheckResult, ProgressImport, ProgressState, TaskDef } from '@shared/types'
 import { handle } from '../ipc'
 import { dataFile, safeId } from '../paths'
+import { milestoneCatalog } from './content'
 import * as rules from './progressLogic'
 
 let state: Promise<ProgressState> | undefined
@@ -15,6 +16,7 @@ async function load(): Promise<ProgressState> {
   try {
     const saved = JSON.parse(await readFile(file, 'utf8')) as ProgressState
     rules.dropOldToolErrors(saved)
+    await backfillMilestones(saved)
     return saved
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
@@ -27,9 +29,15 @@ async function load(): Promise<ProgressState> {
 
 const getState = (): Promise<ProgressState> => (state ??= load())
 
+/** Progress saved before milestones existed gets them with the dates they were reached. */
+async function backfillMilestones(s: ProgressState): Promise<void> {
+  rules.recordMilestones(s, await milestoneCatalog().catch(() => undefined))
+}
+
 /** Applies a change and saves atomically; saves are queued so renames never interleave. */
 async function update(change: (s: ProgressState) => void): Promise<ProgressState> {
   const s = await getState()
+  rules.settleFreezes(s, new Date())
   change(s)
   const file = dataFile('progress.json')
   const json = JSON.stringify(s)
@@ -43,13 +51,22 @@ async function update(change: (s: ProgressState) => void): Promise<ProgressState
   return s
 }
 
-export function recordCheck(
+export async function recordCheck(
   labId: string,
   chapterId: string,
   tasks: TaskDef[],
   results: CheckResult[]
 ): Promise<ProgressState> {
-  return update((s) => rules.recordCheck(s, labId, chapterId, tasks, results, new Date()))
+  const key = chapterKey(labId, chapterId)
+  const wasFinished = !!(await getState()).chapters[key]?.completedAt
+  const s = await update((s) => {
+    rules.recordCheck(s, labId, chapterId, tasks, results, new Date())
+    rules.recordMilestones(s)
+  })
+  // Only a newly finished issue can finish a repo or a roadmap.
+  if (wasFinished || !s.chapters[key]?.completedAt) return s
+  const catalog = await milestoneCatalog().catch(() => undefined)
+  return catalog ? update((s) => rules.recordMilestones(s, catalog)) : s
 }
 
 export const getProgress = (): Promise<ProgressState> => getState()
@@ -121,17 +138,19 @@ async function applyImport(): Promise<ProgressState> {
   await copyFile(file, `${file}.replaced-${Date.now()}`).catch((error: NodeJS.ErrnoException) => {
     if (error.code !== 'ENOENT') throw error
   })
+  await backfillMilestones(next)
   state = Promise.resolve(next)
   return update(() => {})
 }
 
 export function register(): void {
   handle('progress', {
-    get: getState,
+    get: () => update(() => {}),
     touch: (labId, chapterId) => update((s) => rules.touch(s, labId, chapterId, new Date())),
     exportFile,
     pickImport,
     applyImport,
+    setDailyGoal: (goal) => update((s) => rules.setDailyGoal(s, goal, new Date())),
     showHint: (labId, chapterId, taskId, hint) =>
       update((s) =>
         rules.showHint(s, safeId(labId), safeId(chapterId), safeId(taskId), hint, new Date())

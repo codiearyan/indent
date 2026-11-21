@@ -9,9 +9,13 @@ import type {
 import {
   chapterKey,
   checksRun,
+  DAILY_GOALS,
+  daysToFreeze,
   hintsUnlocked,
   isChapterComplete,
-  localDate
+  localDate,
+  milestoneDates,
+  type MilestoneCatalog
 } from '../../shared/rules'
 
 // Every rule mutates the given state in place; the service saves and returns it.
@@ -101,6 +105,7 @@ export function recordCheck(
   const day = (state.activity[localDate(now)] ??= { points: 0, checks: 0, tasksPassed: 0 })
   day.checks++
   chapter.checks = checksRun(chapter) + 1
+  if (state.dailyGoal) day.goal = state.dailyGoal
   // A run that could not execute (crash, timeout) says nothing about the code, so it unlocks no hint.
   if (!results.every((r) => r.passed) && !results.some((r) => r.error)) chapter.nonGreenChecks++
 
@@ -133,6 +138,8 @@ const isCount = (value: unknown): boolean =>
 const isText = (value: unknown): boolean => typeof value === 'string'
 const optional = (value: unknown, is: (value: unknown) => boolean): boolean =>
   value === undefined || is(value)
+const isLocalDate = (value: unknown): boolean =>
+  typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
 const everyValue = (value: unknown, is: (value: unknown) => boolean): boolean =>
   isRecord(value) && Object.values(value).every(is)
 
@@ -156,7 +163,12 @@ const isChapter = (chapter: unknown): boolean =>
   optional(chapter.checks, isCount)
 
 const isDay = (day: unknown): boolean =>
-  isRecord(day) && isCount(day.points) && isCount(day.checks) && isCount(day.tasksPassed)
+  isRecord(day) &&
+  isCount(day.points) &&
+  isCount(day.checks) &&
+  isCount(day.tasksPassed) &&
+  optional(day.goal, isCount) &&
+  optional(day.frozen, (frozen) => typeof frozen === 'boolean')
 
 const isResult = (result: unknown): boolean =>
   isRecord(result) &&
@@ -194,7 +206,9 @@ export function readProgressFile(text: string): ProgressState {
     optional(
       data.lastOpened,
       (opened) => isRecord(opened) && isText(opened.labId) && isText(opened.chapterId)
-    )
+    ) &&
+    optional(data.dailyGoal, (goal) => DAILY_GOALS.includes(goal as number)) &&
+    optional(data.milestones, (milestones) => everyValue(milestones, isLocalDate))
   if (!valid) throw notAFile
   const state = data as unknown as ProgressState
   for (const chapter of Object.values(state.chapters)) {
@@ -209,4 +223,28 @@ export function readProgressFile(text: string): ProgressState {
 export function summarize(state: ProgressState): ProgressSummary {
   const tasks = Object.values(state.chapters).flatMap((chapter) => Object.values(chapter.tasks))
   return { totalPoints: state.totalPoints, tasksPassed: tasks.filter((t) => t.passed).length }
+}
+
+export function setDailyGoal(state: ProgressState, goal: number, now: Date): void {
+  if (!DAILY_GOALS.includes(goal)) throw new Error(`Not a daily goal: ${goal}`)
+  state.dailyGoal = goal
+  const today = state.activity[localDate(now)]
+  if (today) today.goal = goal
+}
+
+/** Covers the days a streak missed with the freezes it holds; run before anything else changes. */
+export function settleFreezes(state: ProgressState, now: Date): void {
+  for (const date of daysToFreeze(state.activity, now)) {
+    state.activity[date] = {
+      ...(state.activity[date] ?? { points: 0, checks: 0, tasksPassed: 0 }),
+      frozen: true
+    }
+  }
+}
+
+/** Keeps the first date of every milestone reached; a recorded one never moves or goes away. */
+export function recordMilestones(state: ProgressState, catalog?: MilestoneCatalog): void {
+  for (const [id, date] of Object.entries(milestoneDates(state, catalog))) {
+    ;(state.milestones ??= {})[id as keyof typeof state.milestones] ??= date
+  }
 }

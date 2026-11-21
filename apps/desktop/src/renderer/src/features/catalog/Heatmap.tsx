@@ -18,8 +18,11 @@ function describe(date: string, activity: ProgressState['activity']): string {
     day: 'numeric',
     year: 'numeric'
   })
-  return `${when}: ${passed} ${passed === 1 ? 'task' : 'tasks'} passed, ${points} points`
+  const freeze = day?.frozen ? '. A streak freeze kept the streak' : ''
+  return `${when}: ${passed} ${passed === 1 ? 'task' : 'tasks'} passed, ${points} points${freeze}`
 }
+
+const FROZEN = 'bg-muted-foreground/45'
 
 /** Weeks as columns, Sunday to Saturday as rows. `fill` stretches the cells to the width. */
 export function Heatmap({
@@ -65,7 +68,7 @@ export function Heatmap({
                       className={cn(
                         'rounded-[3px]',
                         fill && 'aspect-square',
-                        STEPS[intensity(activity[date])]
+                        activity[date]?.frozen ? FROZEN : STEPS[intensity(activity[date])]
                       )}
                     />
                   </TooltipTrigger>
@@ -82,7 +85,7 @@ export function Heatmap({
   )
 }
 
-export function HeatmapLegend(): React.JSX.Element {
+export function HeatmapLegend({ freeze = false }: { freeze?: boolean }): React.JSX.Element {
   return (
     <div className="flex items-center gap-1 text-xs text-muted-foreground">
       <span className="mr-1">Less</span>
@@ -90,6 +93,12 @@ export function HeatmapLegend(): React.JSX.Element {
         <span key={step} className={cn('size-3 rounded-[3px]', step)} />
       ))}
       <span className="ml-1">More</span>
+      {freeze && (
+        <>
+          <span className={cn('ml-4 size-3 rounded-[3px]', FROZEN)} />
+          <span className="ml-1">Freeze used</span>
+        </>
+      )}
     </div>
   )
 }

@@ -393,7 +393,14 @@ export interface DayActivity {
   points: number
   checks: number
   tasksPassed: number
+  /** The daily goal in tasks while this day was played; missing means 1. */
+  goal?: number
+  /** A streak freeze covered this day. */
+  frozen?: boolean
 }
+
+export type MilestoneId =
+  'first-task' | 'first-issue' | 'first-repo' | 'streak-7' | 'streak-30' | 'streak-100' | 'roadmap'
 
 export interface ProgressState {
   /** Keyed by `${labId}/${chapterId}`. */
@@ -402,6 +409,10 @@ export interface ProgressState {
   activity: Record<string, DayActivity>
   totalPoints: number
   lastOpened?: { labId: string; chapterId: string }
+  /** Tasks a day that keep the streak; missing means 1. */
+  dailyGoal?: number
+  /** The local date (YYYY-MM-DD) each milestone was reached. */
+  milestones?: Partial<Record<MilestoneId, string>>
 }
 
 export interface ProgressSummary {
@@ -628,6 +639,8 @@ export interface Api {
     applyImport(): Promise<ProgressState>
     /** Records that hint `hint` (from 1) of a task was shown. */
     showHint(labId: string, chapterId: string, taskId: string, hint: number): Promise<ProgressState>
+    /** Sets how many tasks a day keep the streak: one of DAILY_GOALS. */
+    setDailyGoal(goal: number): Promise<ProgressState>
   }
   terminal: {
     create(opts: { labId: string; chapterId: string; cols: number; rows: number }): Promise<string>
@@ -717,7 +730,7 @@ export const INVOKE_METHODS = {
     'moveRoot'
   ],
   checks: ['run', 'trace', 'runtimeStatus', 'ensureRuntime'],
-  progress: ['get', 'touch', 'exportFile', 'pickImport', 'applyImport', 'showHint'],
+  progress: ['get', 'touch', 'exportFile', 'pickImport', 'applyImport', 'showHint', 'setDailyGoal'],
   terminal: ['create'],
   updates: ['status', 'check', 'download', 'cancel', 'install'],
   tools: [

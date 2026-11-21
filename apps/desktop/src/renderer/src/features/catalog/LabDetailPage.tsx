@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { getNewVersion } from '@/stores/updates'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FlowFigure } from '@/features/flows/FlowPlayer'
+import { RepoChart } from '@/features/progress/RepoChart'
 import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
@@ -124,6 +125,7 @@ export function LabDetailPage(): React.JSX.Element {
       <BuildStrip lab={lab} chapters={progress.chapters} className="h-2" />
 
       <RepoReview lab={lab} chapters={progress.chapters} />
+      <RepoChart lab={lab} chapters={progress.chapters} />
 
       {lab.scene && (
         <section className="rounded-lg border border-border p-5">

@@ -21,6 +21,7 @@ import { viewTransition } from '@/lib/viewTransition'
 import { Button } from '@/components/ui/button'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
+import { LevelGuide } from '@/features/progress/LevelGuide'
 import { useSettingsDialog } from '@/features/settings/dialogStore'
 import { UpdateCard } from '@/features/updates/UpdateCard'
 import { useUpdateNeedsAttention } from '@/stores/updates'
@@ -150,24 +151,33 @@ function LevelMeter(): React.JSX.Element {
   const totalPoints = useProgress((s) => s.progress?.totalPoints ?? 0)
   const { level, into, span } = levelFor(totalPoints)
   return (
-    <div className="px-2.5">
-      <div className="flex items-baseline justify-between text-[13px]">
-        <span className="font-medium">Level {level}</span>
-        <span className="text-muted-foreground tabular-nums">{totalPoints} points</span>
-      </div>
-      <div
-        role="img"
-        aria-label={`${span - into} points to level ${level + 1}`}
-        className="mt-2 h-1 overflow-hidden rounded-full bg-accent"
-      >
-        <div
-          className="h-full rounded-full bg-brand"
-          style={{ width: `${(into / span) * 100}%` }}
-        />
-      </div>
-      <p className="mt-1.5 text-xs text-muted-foreground tabular-nums">
-        {span - into} to level {level + 1}
-      </p>
+    // A flex box, so the button's hover area can reach past the text without moving what is below.
+    <div className="flex flex-col">
+      <LevelGuide>
+        <button
+          type="button"
+          className="-my-1.5 block w-full rounded-md px-2.5 py-1.5 text-left outline-none hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50"
+        >
+          <span className="flex items-baseline justify-between text-[13px]">
+            <span className="font-medium">Level {level}</span>
+            <span className="text-muted-foreground tabular-nums">{totalPoints} points</span>
+          </span>
+          <span
+            role="img"
+            aria-label={`${span - into} points to level ${level + 1}`}
+            className="mt-2 block h-1 overflow-hidden rounded-full bg-accent"
+          >
+            <span
+              className="block h-full rounded-full bg-brand"
+              style={{ width: `${(into / span) * 100}%` }}
+            />
+          </span>
+          <span className="mt-1.5 block text-xs text-muted-foreground tabular-nums">
+            {span - into} to level {level + 1}
+          </span>
+          <span className="sr-only">How levels work</span>
+        </button>
+      </LevelGuide>
     </div>
   )
 }

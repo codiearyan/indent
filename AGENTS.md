@@ -339,6 +339,9 @@ CSS transitions on stable keys. To add a pattern: write `patterns/<id>.ts` and i
 
 - Every task pays its points once, the first time it passes.
 - Each task has three hints. The first unlocks after 3 checks that are not all green, then one per check.
+- A day keeps the streak when it meets the daily goal (1, 2 or 3 tasks, set in Settings). Days carry
+  the goal they were played with, freezes earned along a streak cover missed days, and milestones are
+  kept with the date they were reached (`main/services/progressLogic.ts` records all three).
 - All of it is in `src/shared/rules.ts`; do not re-implement the numbers elsewhere.
 
 ## Code style

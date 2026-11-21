@@ -1,6 +1,6 @@
 // Relative imports keep this file loadable by vitest, which has no path aliases.
 import type { DayActivity, ProgressState } from '../../../../shared/types'
-import { localDate } from '../../../../shared/rules'
+import { localDate, walkStreak } from '../../../../shared/rules'
 
 type Activity = ProgressState['activity']
 
@@ -49,21 +49,9 @@ export function intensity(day: DayActivity | undefined): number {
   return 4
 }
 
+/** The longest run of days that met their goal; a frozen day bridges without counting. */
 export function longestStreak(activity: Activity): number {
-  const days = Object.keys(activity)
-    .filter((d) => activity[d].tasksPassed > 0)
-    .sort()
-  let best = 0
-  let run = 0
-  let prev: Date | undefined
-  for (const date of days) {
-    const day = parseDate(date)
-    if (prev) prev.setDate(prev.getDate() + 1)
-    run = prev && localDate(prev) === date ? run + 1 : 1
-    best = Math.max(best, run)
-    prev = day
-  }
-  return best
+  return walkStreak(activity).longest
 }
 
 export interface YearSummary {
