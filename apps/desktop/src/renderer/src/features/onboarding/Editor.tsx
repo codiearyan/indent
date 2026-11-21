@@ -1,7 +1,9 @@
 import { Switch } from '@/components/ui/switch'
 import { CodeThemeCards } from '@/features/settings/CodeSample'
+import { IdeSelect } from '@/features/settings/IdeRow'
 import { TextSizePresets } from '@/features/settings/controls'
 import { EditorSample, TerminalSample } from '@/features/settings/Typography'
+import { useIde } from '@/stores/ides'
 import { useSettings } from '@/stores/settings'
 import { StepLayout } from './StepLayout'
 
@@ -12,6 +14,7 @@ export function Editor({ staged }: { staged: boolean }): React.JSX.Element {
   const scale = useSettings((s) => s.textScale.editor)
   const vim = useSettings((s) => s.editor.vim)
   const setEditorOption = useSettings((s) => s.setEditorOption)
+  const ide = useIde()
   // The samples follow the text size, as the editor and the terminal do.
   const t = { ...typography, monoSize: Math.round(typography.monoSize * scale) }
 
@@ -49,6 +52,14 @@ export function Editor({ staged }: { staged: boolean }): React.JSX.Element {
             onCheckedChange={(on) => setEditorOption('vim', on)}
           />
         </div>
+        {ide && (
+          <div className={cell}>
+            <label htmlFor="setup-ide" className="text-sm">
+              Your IDE
+            </label>
+            <IdeSelect id="setup-ide" />
+          </div>
+        )}
       </div>
     </StepLayout>
   )

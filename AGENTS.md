@@ -367,6 +367,16 @@ and `embeddings` maps an embedding model name to a function from text to a vecto
 has a ready-made one). It also serves `POST /v1/embeddings`. Prefix model names with the lab's own
 name so labs never collide.
 
+## Working in an IDE
+
+An issue can be opened in an IDE found on this computer (`main/services/ide.ts`; `ideLogic.ts` has
+the IDEs and where each is looked for on every system). The button shows only when one is found,
+and `useSettings().ide` picks which. Once the IDE opened, the issue switches to the companion layout
+(`useWorkspace().companion`, `features/workspace/CompanionBar`): the editor and the terminal are
+away, the lesson, the tasks and the Tutor stay, and the window is narrow and docked to the right of
+its screen. Checks run on the files on disk, and the files are read again when the window gets
+focus and when the editor comes back.
+
 ## DSA patterns
 
 `features/dsa/` holds the animated algorithm patterns. A pattern is data and logic with no React:

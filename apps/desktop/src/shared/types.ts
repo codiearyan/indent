@@ -611,6 +611,12 @@ export type TelemetryEvent =
 export type TelemetryProps = Record<string, string | number>
 
 /** window.api. Channels are `${namespace}:${method}`. */
+/** An IDE found on this computer that an issue's folder can be opened in. */
+export interface IdeInfo {
+  id: string
+  label: string
+}
+
 export interface Api {
   content: {
     listLabs(): Promise<LabSummary[]>
@@ -624,6 +630,14 @@ export interface Api {
     onInstallProgress(listener: (labId: string, done: number) => void): Unsubscribe
     /** The list of repos or roadmaps changed: a newer index, an install or an update. */
     onChanged(listener: () => void): Unsubscribe
+  }
+  ide: {
+    /** The IDEs found on this computer, in the order they are offered. */
+    list(): Promise<IdeInfo[]>
+    /** Opens an issue's folder in one of them. Rejects with a plain reason when it does not open. */
+    open(ideId: string, labId: string, chapterId: string): Promise<void>
+    /** Makes the window narrow enough to sit beside an IDE, or gives it its size back. */
+    setCompact(compact: boolean): Promise<void>
   }
   workspace: {
     /** Creates the folder from the starter files on first open; otherwise reads it from disk. */
@@ -770,6 +784,7 @@ export const INVOKE_METHODS = {
     'pickRoot',
     'moveRoot'
   ],
+  ide: ['list', 'open', 'setCompact'],
   checks: ['run', 'trace', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch', 'exportFile', 'pickImport', 'applyImport', 'showHint', 'setDailyGoal'],
   terminal: ['create'],

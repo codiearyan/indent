@@ -12,6 +12,7 @@ import { useOpenWhenFinished } from '@/features/completion/useOpenWhenFinished'
 import { Tour } from '@/features/tour/Tour'
 import { ToolNotice } from './ToolNotice'
 import { TopBar } from './TopBar'
+import { CompanionBar } from './CompanionBar'
 import { LeftPanel } from './LeftPanel'
 import { MomentCard } from '@/features/progress/MomentCard'
 import { useCatalog } from '@/stores/catalog'
@@ -34,6 +35,7 @@ export function WorkspacePage(): React.JSX.Element {
   const terminalRef = usePanelRef()
   const aiOn = useAiEnabled()
   const chat = panels.chat && !panels.zen && aiOn
+  const companion = useWorkspace((s) => s.companion)
   const browser = useWorkspace((s) => Boolean(s.chapter?.preview)) && panels.browser
   const status = useWorkspace((s) => s.status)
   const downloading = useCatalog((s) => !!labId && s.downloads[labId]?.state === 'running')
@@ -46,6 +48,9 @@ export function WorkspacePage(): React.JSX.Element {
   useEffect(() => {
     if (labId && chapterId) void open(labId, chapterId)
   }, [labId, chapterId, open])
+
+  // Leaving the issues gives the window its size back.
+  useEffect(() => () => void useWorkspace.getState().leaveCompanion(), [])
 
   // Files may have changed on disk through the terminal.
   useEffect(() => {
@@ -77,9 +82,22 @@ export function WorkspacePage(): React.JSX.Element {
       <TopBar />
       <MomentCard />
       {labId && <ToolNotice labId={labId} />}
+      <CompanionBar />
       <div className="mx-2 mb-2 min-h-0 flex-1 overflow-hidden rounded-2xl border border-border bg-card">
         {notice && labId && chapterId ? (
           <RepoNotice labId={labId} chapterId={chapterId} />
+        ) : companion ? (
+          <Group orientation="vertical">
+            <Panel id="lesson" minSize="30%">
+              <LeftPanel />
+            </Panel>
+            {panels.chat && aiOn && <Separator className={`h-px ${separator}`} />}
+            {panels.chat && aiOn && (
+              <Panel id="chat" defaultSize="40%" minSize="25%">
+                <ChatPanel />
+              </Panel>
+            )}
+          </Group>
         ) : (
           <Group orientation="horizontal">
             {lessonSide === 'left' && lesson}
