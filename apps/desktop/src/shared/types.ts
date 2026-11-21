@@ -190,6 +190,33 @@ export interface Flow {
   tasks?: Record<string, TaskFlow>
 }
 
+/** One call of a learner's function, from kit/run-trace.mjs. Values are previews, cut to 160 characters. */
+export interface TraceCall {
+  fn: string
+  /** Relative to the workspace. */
+  file: string
+  /** 0 for the example's own call, 1 for what it calls, and so on. */
+  depth: number
+  args: string[]
+  /** Set when the call returned; an async call once its promise settled. */
+  returned?: string
+  /** The message, when the call threw. */
+  threw?: string
+}
+
+/** A task's example run on the learner's code, with the calls of their functions in order. */
+export interface TraceResult {
+  /** The example's call returned without throwing. */
+  ok: boolean
+  calls: TraceCall[]
+  error?: string
+  timedOut: boolean
+  /** More calls happened than were recorded. */
+  truncated: boolean
+  /** What the learner's code printed, cut like a check's output. */
+  stdout: string
+}
+
 /** content/paths.json */
 export interface PathDef {
   id: string
