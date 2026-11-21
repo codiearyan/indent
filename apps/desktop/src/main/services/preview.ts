@@ -6,7 +6,7 @@ import { pathToFileURL } from 'url'
 import { PREVIEW_MESSAGE, PREVIEW_SCHEME, previewTarget } from '@shared/preview'
 import { workspaceDir, workspacesRoot } from '../paths'
 import { ensureRuntime } from './checks'
-import { resolveInside } from './workspaceFiles'
+import { isAppPath, resolveInside } from './workspaceFiles'
 
 interface Esbuild {
   build(options: Record<string, unknown>): Promise<{ outputFiles: { text: string }[] }>
@@ -92,6 +92,7 @@ export function register(): void {
       const { labId, chapterId, path } = previewTarget(request.url)
       const dir = workspaceDir(labId, chapterId)
       const file = resolveInside(dir, path)
+      if (isAppPath(dir, file)) return new Response('Not found', { status: 404 })
       if (/\.(jsx|tsx|ts)$/.test(file)) return await bundle(dir, file)
       if (file.endsWith('.html')) {
         return respond(withBridge(await readFile(file, 'utf8')), 'text/html; charset=utf-8')

@@ -21,6 +21,7 @@ import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
 import { useRuntime } from '@/stores/runtime'
 import { CodeEditor } from './CodeEditor'
+import { ConflictDialog } from './ConflictDialog'
 import { FileLabel } from './FileTab'
 import { fileChange, missingFiles } from './fileChange'
 import type { monaco } from './monaco'
@@ -48,6 +49,8 @@ export function EditorPane(): React.JSX.Element {
   const setActive = useWorkspace((s) => s.setActive)
   const checking = useWorkspace((s) => s.checking)
   const toolsInstalling = useRuntime((s) => !!s.status?.installing)
+  const conflicts = useWorkspace((s) => s.conflicts)
+  const [conflictsOpen, setConflictsOpen] = useState(false)
   const panels = useSettings((s) => s.panels)
   const togglePanel = useSettings((s) => s.togglePanel)
 
@@ -99,15 +102,29 @@ export function EditorPane(): React.JSX.Element {
           {panels.files ? <PanelLeftCloseIcon /> : <PanelLeftIcon />}
         </IconButton>
         <div className="mx-1 h-5 w-px shrink-0 bg-border" />
-        <p className="min-w-0 flex-1 truncate px-1 text-[13px] text-muted-foreground">
-          {outdated ? (
-            'This issue has changed. Reset issue files, in the menu at the top right, to get its new files.'
-          ) : showSummary ? (
-            <CheckSummary />
-          ) : (
-            'Saved as you type. Run checks when you are ready.'
-          )}
-        </p>
+        {status === 'ready' && conflicts.length > 0 ? (
+          <div className="flex min-w-0 flex-1 items-center gap-2 px-1">
+            <p className="min-w-0 truncate text-[13px] text-muted-foreground">
+              This issue was updated.{' '}
+              {conflicts.length === 1
+                ? '1 file you changed has a new version.'
+                : `${conflicts.length} files you changed have a new version.`}
+            </p>
+            <Button size="xs" variant="outline" onClick={() => setConflictsOpen(true)}>
+              Choose versions
+            </Button>
+          </div>
+        ) : (
+          <p className="min-w-0 flex-1 truncate px-1 text-[13px] text-muted-foreground">
+            {outdated ? (
+              'This issue has changed. Reset issue files, in the menu at the top right, to get its new files.'
+            ) : showSummary ? (
+              <CheckSummary />
+            ) : (
+              'Saved as you type. Run checks when you are ready.'
+            )}
+          </p>
+        )}
         <IconButton label="Focus mode" onClick={() => togglePanel('zen')}>
           {panels.zen ? <Minimize2Icon /> : <Maximize2Icon />}
         </IconButton>
@@ -209,6 +226,7 @@ export function EditorPane(): React.JSX.Element {
           </div>
         )}
       </div>
+      <ConflictDialog open={conflictsOpen} onOpenChange={setConflictsOpen} />
     </div>
   )
 }

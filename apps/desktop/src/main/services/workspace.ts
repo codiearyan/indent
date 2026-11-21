@@ -1,5 +1,4 @@
 import { BrowserWindow, dialog } from 'electron'
-import { existsSync } from 'fs'
 import { mkdir, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 import type { FolderMove, WorkspaceSnapshot } from '@shared/types'
@@ -15,11 +14,12 @@ import { ensureRuntime } from './checks'
 import { loadChapter } from './content'
 import { moveContents, planMove } from './moveFolder'
 import { killAll } from './terminal'
-import { copyStarter, emptyDir, readWorkspace, resolveInside } from './workspaceFiles'
+import { isAppPath, resolveInside } from './workspaceFiles'
+import { openWorkspace, resetWorkspace, resolveConflict } from './workspaceSync'
 
 const queues = new Map<string, Promise<unknown>>()
 
-// Two opens of the same new workspace would both copy the starter files and collide.
+// Opens, resets and conflict choices all write starter files; two at once would collide.
 function oneAtATime<T>(key: string, job: () => Promise<T>): Promise<T> {
   const result = (queues.get(key) ?? Promise.resolve()).then(job, job)
   queues.set(
@@ -29,21 +29,15 @@ function oneAtATime<T>(key: string, job: () => Promise<T>): Promise<T> {
   return result
 }
 
-function open(labId: string, chapterId: string, reset = false): Promise<WorkspaceSnapshot> {
+type Job = (starterDir: string, dir: string, first: string[]) => Promise<WorkspaceSnapshot>
+
+function inWorkspace(labId: string, chapterId: string, job: Job): Promise<WorkspaceSnapshot> {
   // The repo tools install while the learner reads, not inside their first Check.
   void ensureRuntime()
   const dir = workspaceDir(labId, chapterId)
   return oneAtATime(dir, async () => {
     const chapter = await loadChapter(labId, chapterId)
-    const starterDir = join(chapterContentDir(labId, chapterId), 'starter')
-    if (reset) await emptyDir(dir)
-    if (reset || !existsSync(dir)) await copyStarter(starterDir, dir)
-    const starter = existsSync(starterDir) ? await readWorkspace(starterDir, []) : []
-    return {
-      dir,
-      files: await readWorkspace(dir, chapter.files),
-      starter: Object.fromEntries(starter.map((f) => [f.path, f.content]))
-    }
+    return job(join(chapterContentDir(labId, chapterId), 'starter'), dir, chapter.files)
   })
 }
 
@@ -53,7 +47,9 @@ async function write(
   path: string,
   content: string
 ): Promise<void> {
-  const file = resolveInside(workspaceDir(labId, chapterId), path)
+  const dir = workspaceDir(labId, chapterId)
+  const file = resolveInside(dir, path)
+  if (isAppPath(dir, file)) throw new Error(`Path outside workspace: ${path}`)
   await mkdir(dirname(file), { recursive: true })
   await writeFile(file, content)
 }
@@ -100,9 +96,13 @@ async function moveRoot(): Promise<string> {
 
 export function register(): void {
   handle('workspace', {
-    open: (labId, chapterId) => open(labId, chapterId),
+    open: (labId, chapterId) => inWorkspace(labId, chapterId, openWorkspace),
     writeFile: write,
-    reset: (labId, chapterId) => open(labId, chapterId, true),
+    reset: (labId, chapterId) => inWorkspace(labId, chapterId, resetWorkspace),
+    resolveConflict: (labId, chapterId, path, choice) =>
+      inWorkspace(labId, chapterId, (starterDir, dir, first) =>
+        resolveConflict(starterDir, dir, first, String(path), choice === 'new' ? 'new' : 'mine')
+      ),
     getRoot: async () => workspacesRoot(),
     pickRoot,
     moveRoot

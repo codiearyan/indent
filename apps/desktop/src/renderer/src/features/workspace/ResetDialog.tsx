@@ -16,6 +16,7 @@ export function ResetDialog(props: {
   onOpenChange(open: boolean): void
 }): React.JSX.Element {
   const reset = useWorkspace((s) => s.reset)
+  const remembered = useWorkspace((s) => s.remembered)
 
   const confirm = async (): Promise<void> => {
     try {
@@ -34,8 +35,10 @@ export function ResetDialog(props: {
         <AlertDialogHeader>
           <AlertDialogTitle>Reset this issue&apos;s files?</AlertDialogTitle>
           <AlertDialogDescription>
-            Your edits in this issue are replaced with the starter files. Passed tasks and points
-            stay as they are.
+            {remembered
+              ? 'Your changes to them are lost. Files you added are kept.'
+              : 'Your changes to them are lost, and so are files you added.'}{' '}
+            Passed tasks and points stay as they are.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -2,7 +2,7 @@
 import { spawn, fork } from 'node:child_process'
 import { cp, copyFile, mkdir, mkdtemp, rm } from 'node:fs/promises'
 import { createRequire } from 'node:module'
-import { dirname, isAbsolute, join } from 'node:path'
+import { dirname, isAbsolute, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { openPage } from './page.mjs'
 
@@ -63,7 +63,11 @@ export function createContext({ chapter, workspace, sandboxRoot }) {
       sandboxes.push(dir)
       await cp(workspace, dir, {
         recursive: true,
-        filter: (src) => !src.split(/[\\/]/).includes('node_modules')
+        // .indent holds the app's copy of the starter, never learner code.
+        filter: (src) => {
+          const parts = relative(workspace, src).split(/[\\/]/)
+          return !parts.includes('node_modules') && parts[0] !== '.indent'
+        }
       })
       for (const [rel, source] of Object.entries(overrides)) {
         await mkdir(dirname(join(dir, rel)), { recursive: true })

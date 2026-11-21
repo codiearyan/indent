@@ -1,6 +1,6 @@
 import { cp, mkdir, readdir, readFile, rm, stat } from 'fs/promises'
 import { existsSync } from 'fs'
-import { isAbsolute, join, relative, resolve } from 'path'
+import { isAbsolute, join, relative, resolve, sep } from 'path'
 import type { WorkspaceFile } from '../../shared/types'
 
 const MAX_FILE_BYTES = 1024 * 1024
@@ -12,6 +12,14 @@ export function resolveInside(dir: string, path: string): string {
   if (!rel || rel.startsWith('..') || isAbsolute(rel))
     throw new Error(`Path outside workspace: ${path}`)
   return full
+}
+
+/** The app's own folder in each workspace: the starter the learner was given. */
+export const APP_DIR = '.indent'
+
+/** The learner's editor and pages never reach the app's own folder. */
+export function isAppPath(dir: string, file: string): boolean {
+  return relative(dir, file).split(sep)[0] === APP_DIR
 }
 
 export async function copyStarter(starterDir: string, dir: string): Promise<void> {
