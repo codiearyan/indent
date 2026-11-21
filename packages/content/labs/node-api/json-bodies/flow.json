@@ -1,0 +1,146 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Booking page", "kind": "story" },
+      { "id": "route", "label": "POST /quotes", "kind": "file" },
+      { "id": "body", "label": "readBody()", "kind": "function", "mine": true },
+      { "id": "json", "label": "readJson()", "kind": "function", "mine": true },
+      { "id": "validate", "label": "validateQuote()", "kind": "function", "mine": true, "fn": "validateQuote" },
+      { "id": "price", "label": "priceQuote()", "kind": "function" },
+      { "id": "reply", "label": "Quote or error", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "page", "to": "route", "label": "a quote request" },
+      { "from": "route", "to": "json", "label": "req" },
+      { "from": "json", "to": "body", "label": "req, limit" },
+      { "from": "body", "to": "json", "label": "text" },
+      { "from": "json", "to": "validate", "label": "parsed value" },
+      { "from": "validate", "to": "price", "label": "{ type, hours }" },
+      { "from": "price", "to": "reply", "label": "price" },
+      { "from": "reply", "to": "page", "label": "answer" }
+    ],
+    "note": "Luka's page posts a quote request, and your three functions turn the raw body into a trusted { type, hours } before it is priced."
+  },
+  "tasks": {
+    "read-body": {
+      "steps": [
+        {
+          "active": ["page", "page->route", "route", "route->json", "json->body", "body"],
+          "value": {
+            "kind": "map",
+            "label": "what readBody() gets",
+            "entries": [
+              { "key": "req", "value": "the request" },
+              { "key": "limit", "value": "10000 unless given" }
+            ]
+          },
+          "note": "The booking page posts a body, and readBody() gets the request and a limit in bytes."
+        },
+        {
+          "active": ["body"],
+          "note": "A body of exactly the limit is fine. Once it is larger than the limit, readBody() rejects with an HttpError of status 413 and code payload_too_large."
+        },
+        {
+          "active": ["body", "body->json", "json"],
+          "value": {
+            "kind": "map",
+            "label": "what it resolves to",
+            "entries": [
+              { "key": "a body", "value": "the whole text in UTF-8" },
+              { "key": "no body", "value": "an empty string" }
+            ]
+          },
+          "note": "Otherwise it resolves to the whole body as one UTF-8 string, ready for readJson()."
+        }
+      ]
+    },
+    "read-json": {
+      "steps": [
+        {
+          "active": ["route", "route->json", "json", "json->body", "body"],
+          "note": "readJson() asks readBody() for the text with the same limit, so a body that is too large still gets its 413."
+        },
+        {
+          "active": ["body", "body->json", "json"],
+          "value": {
+            "kind": "map",
+            "label": "three bodies Luka might send",
+            "entries": [
+              { "key": "{\"type\":\"paddleboard\",\"hours\":4}", "value": "JSON" },
+              { "key": "(nothing)", "value": "empty" },
+              { "key": "{\"type\":", "value": "cut off" }
+            ]
+          },
+          "note": "The text comes back. Some of it will be JSON, and some will not."
+        },
+        {
+          "active": ["json"],
+          "note": "An empty body or text that is not valid JSON rejects with an HttpError of status 400 and code invalid_json."
+        },
+        {
+          "active": ["json", "json->validate", "validate"],
+          "note": "Good JSON resolves to the parsed value, which can be any JSON value. Checking its fields is the next task's job."
+        }
+      ]
+    },
+    "validate": {
+      "trace": {
+        "file": "src/quote.js",
+        "call": "validateQuote",
+        "args": [{ "type": "paddleboard", "hours": 4, "pickup": "north jetty" }]
+      },
+      "steps": [
+        {
+          "active": ["json", "json->validate", "validate"],
+          "value": {
+            "kind": "map",
+            "label": "the parsed body",
+            "entries": [
+              { "key": "type", "value": "paddleboard" },
+              { "key": "hours", "value": 4 },
+              { "key": "pickup", "value": "north jetty" }
+            ]
+          },
+          "note": "Luka's page sends a paddleboard for four hours, plus a pickup field the API does not know about."
+        },
+        {
+          "active": ["validate"],
+          "note": "The input has to be a plain object, not null and not an array, before its fields mean anything."
+        },
+        {
+          "active": ["validate"],
+          "value": {
+            "kind": "array",
+            "label": "the keys of RATES",
+            "values": ["single", "double", "paddleboard"]
+          },
+          "note": "type has to be one of the keys of RATES, and hours a whole number from 1 to 8, sent as a number."
+        },
+        {
+          "active": ["validate"],
+          "value": {
+            "kind": "map",
+            "label": "one entry in details",
+            "entries": [
+              { "key": "field", "value": "the field's name" },
+              { "key": "message", "value": "what is wrong" }
+            ]
+          },
+          "note": "When something is wrong it throws a 400 validation_failed, with details naming every problem at once, not just the first."
+        },
+        {
+          "active": ["validate", "validate->price", "price", "price->reply", "reply"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "type", "value": "a boat type" },
+              { "key": "hours", "value": "a whole number" }
+            ]
+          },
+          "note": "A good request comes back as { type, hours } with no other fields, and priceQuote() works out the price."
+        }
+      ]
+    }
+  }
+}

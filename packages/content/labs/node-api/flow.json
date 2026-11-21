@@ -1,0 +1,23 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Booking page", "kind": "story" },
+      { "id": "office", "label": "Back office", "kind": "story" },
+      { "id": "app", "label": "createApp()", "kind": "file" },
+      { "id": "routes", "label": "Routes", "kind": "file", "mine": true },
+      { "id": "checks", "label": "Bodies, queries and tokens", "kind": "file", "mine": true },
+      { "id": "store", "label": "Boat store", "kind": "file", "mine": true },
+      { "id": "json", "label": "JSON answer", "kind": "data", "mine": true }
+    ],
+    "edges": [
+      { "from": "page", "to": "app", "label": "requests" },
+      { "from": "office", "to": "app", "label": "changes" },
+      { "from": "app", "to": "checks", "label": "what was sent" },
+      { "from": "checks", "to": "routes", "label": "trusted input" },
+      { "from": "routes", "to": "store", "label": "reads and writes" },
+      { "from": "routes", "to": "json", "label": "status and body" },
+      { "from": "json", "to": "page", "label": "answers" }
+    ],
+    "note": "Requests from Luka's booking page and Bram's back office come into the API, pass through the parts you write and leave as JSON answers about Larchmere's boats."
+  }
+}
