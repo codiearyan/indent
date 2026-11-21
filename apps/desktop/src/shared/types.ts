@@ -201,6 +201,8 @@ export interface WorkspaceSnapshot {
   /** Absolute folder on disk; the terminal opens here. */
   dir: string
   files: WorkspaceFile[]
+  /** Every folder, `/` between names, so an empty one still shows in the files panel. */
+  folders: string[]
   /**
    * The starter files this workspace was given, by path, to tell which files the learner has
    * changed. A workspace from before these were kept gets the issue's current starter.
@@ -469,6 +471,14 @@ export interface Api {
       path: string,
       choice: ConflictChoice
     ): Promise<WorkspaceSnapshot>
+    /** Makes an empty file. Paths are relative to the workspace, `/` between folders. */
+    createFile(labId: string, chapterId: string, path: string): Promise<WorkspaceSnapshot>
+    /** Makes an empty folder. */
+    createFolder(labId: string, chapterId: string, path: string): Promise<WorkspaceSnapshot>
+    /** Renames or moves a file, or a folder with what is in it. */
+    rename(labId: string, chapterId: string, from: string, to: string): Promise<WorkspaceSnapshot>
+    /** Deletes a file, or a folder with everything in it. */
+    remove(labId: string, chapterId: string, path: string): Promise<WorkspaceSnapshot>
     /** The folder that holds every workspace. */
     getRoot(): Promise<string>
     /** Asks for a folder and says where the work would go; null when cancelled. */
@@ -560,7 +570,19 @@ export interface Api {
 /** Methods the preload bridges with ipcRenderer.invoke, per namespace. */
 export const INVOKE_METHODS = {
   content: ['listLabs', 'getChapter', 'listPaths', 'narration', 'install'],
-  workspace: ['open', 'writeFile', 'reset', 'resolveConflict', 'getRoot', 'pickRoot', 'moveRoot'],
+  workspace: [
+    'open',
+    'writeFile',
+    'reset',
+    'resolveConflict',
+    'createFile',
+    'createFolder',
+    'rename',
+    'remove',
+    'getRoot',
+    'pickRoot',
+    'moveRoot'
+  ],
   checks: ['run', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch'],
   terminal: ['create'],
