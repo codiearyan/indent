@@ -1,0 +1,133 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "load", "label": "loadTides()", "kind": "function", "mine": true, "fn": "loadTides" },
+      { "id": "read", "label": "readTideTable()", "kind": "function", "fn": "readTideTable" },
+      { "id": "next", "label": "nextHighTide()", "kind": "function", "mine": true, "fn": "nextHighTide" },
+      { "id": "report", "label": "sailingReport()", "kind": "function", "mine": true, "fn": "sailingReport" },
+      { "id": "sailing", "label": "getSailing()", "kind": "function", "fn": "getSailing" },
+      { "id": "sea", "label": "getSeaState()", "kind": "function", "fn": "getSeaState" },
+      { "id": "board", "label": "Departure board", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "load", "to": "read", "label": "port, callback" },
+      { "from": "next", "to": "load", "label": "port" },
+      { "from": "next", "to": "board", "label": "one line" },
+      { "from": "report", "to": "sailing", "label": "route" },
+      { "from": "report", "to": "sea", "label": "time" },
+      { "from": "report", "to": "board", "label": "a report" }
+    ],
+    "note": "The old tide reader answers through a callback, so you put a promise in front of it, then chain small steps and a second service onto that promise for Bram's departure board."
+  },
+  "tasks": {
+    "wrap": {
+      "trace": { "file": "src/loadTides.js", "call": "loadTides", "args": ["quay"] },
+      "steps": [
+        {
+          "active": ["load"],
+          "note": "The board asks loadTides() for the quay's tides. A promise goes back at once, still pending."
+        },
+        {
+          "active": ["load", "load->read", "read"],
+          "note": "Inside, readTideTable() is called once with the port and a callback. The gauge is slow, so nothing has come back yet."
+        },
+        {
+          "active": ["read"],
+          "value": {
+            "kind": "array",
+            "label": "callback arguments",
+            "values": ["error", "or", "null, table"]
+          },
+          "note": "Later the reader calls back. The first argument says whether it failed, the second holds the table when it worked."
+        },
+        {
+          "active": ["read", "load->read", "load"],
+          "note": "The callback settles the promise: an error rejects it with that same error, a table fulfils it. A reader that calls back straight away must work too."
+        }
+      ]
+    },
+    "chain": {
+      "trace": { "file": "src/nextHighTide.js", "call": "nextHighTide", "args": ["quay", "12:00"] },
+      "steps": [
+        {
+          "active": ["next"],
+          "value": {
+            "kind": "map",
+            "label": "the question",
+            "entries": [
+              { "key": "port", "value": "quay" },
+              { "key": "after", "value": "12:00" }
+            ]
+          },
+          "note": "The board wants the next high tide at the quay after midday."
+        },
+        {
+          "active": ["next", "next->load", "load"],
+          "value": {
+            "kind": "grid",
+            "label": "the quay's table",
+            "colLabels": ["time", "height"],
+            "cells": [
+              ["04:52", 3.6],
+              ["11:07", 0.9],
+              ["17:15", 3.4],
+              ["23:31", 1.1]
+            ]
+          },
+          "note": "nextHighTide() asks load() for the table and waits for it with then. The tides come in time order."
+        },
+        {
+          "active": ["next"],
+          "note": "One then looks for the first tide at or after the time that is 3 m or more. It may find nothing."
+        },
+        {
+          "active": ["next", "next->board", "board"],
+          "value": {
+            "kind": "array",
+            "label": "the shape of the line",
+            "values": ["HH:MM (h.h m)", "or", "No high tide after HH:MM"]
+          },
+          "note": "The next then turns it into one line for the board. If the load failed, the error travels down the chain untouched."
+        }
+      ]
+    },
+    "flatten": {
+      "trace": { "file": "src/sailingReport.js", "call": "sailingReport", "args": ["gull-heron"] },
+      "steps": [
+        {
+          "active": ["report", "report->sailing", "sailing"],
+          "note": "sailingReport() asks the timetable for the gull-heron sailing. Only that call starts."
+        },
+        {
+          "active": ["sailing", "report->sailing", "report"],
+          "value": {
+            "kind": "map",
+            "label": "the sailing",
+            "entries": [
+              { "key": "route", "value": "gull-heron" },
+              { "key": "time", "value": "HH:MM" }
+            ]
+          },
+          "note": "The sailing comes back with its time. The sea state needs that time, so it could not be asked for any sooner."
+        },
+        {
+          "active": ["report", "report->sea", "sea"],
+          "note": "Now the sea sensor is asked about that time. The then callback returns this promise, so the chain waits for it."
+        },
+        {
+          "active": ["report", "report->board", "board"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of the report",
+            "entries": [
+              { "key": "route", "value": "text" },
+              { "key": "time", "value": "HH:MM" },
+              { "key": "sea", "value": "text" }
+            ]
+          },
+          "note": "Both answers end up in one report. If either service fails, the report fails with that same error."
+        }
+      ]
+    }
+  }
+}

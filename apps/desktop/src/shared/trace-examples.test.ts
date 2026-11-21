@@ -30,6 +30,20 @@ const repos: { labId: string; expected: string[] }[] = [
       'unhappy-path/errors',
       'unhappy-path/quotes'
     ]
+  },
+  {
+    labId: 'async-js',
+    expected: [
+      'promises/wrap',
+      'promises/chain',
+      'promises/flatten',
+      'async-await/rewrite',
+      'async-await/parallel',
+      'async-await/finally',
+      'many-at-once/all',
+      'many-at-once/settled',
+      'retries-and-cancellation/sleep'
+    ]
   }
 ]
 
@@ -81,5 +95,6 @@ it.each(repos)(
     } finally {
       await rm(scratch, { recursive: true, force: true })
     }
-  }
+  },
+  30_000
 )

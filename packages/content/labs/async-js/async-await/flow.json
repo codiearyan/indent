@@ -1,0 +1,145 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "report", "label": "sailingReport()", "kind": "function", "mine": true, "fn": "sailingReport" },
+      { "id": "sailing", "label": "getSailing()", "kind": "function", "fn": "getSailing" },
+      { "id": "sea", "label": "getSeaState()", "kind": "function", "fn": "getSeaState" },
+      { "id": "dashboard", "label": "loadDashboard()", "kind": "function", "mine": true, "fn": "loadDashboard" },
+      { "id": "sailings", "label": "getSailings()", "kind": "function", "fn": "getSailings" },
+      { "id": "weather", "label": "getWeather()", "kind": "function", "fn": "getWeather" },
+      { "id": "crew", "label": "getCrew()", "kind": "function", "fn": "getCrew" },
+      { "id": "booking", "label": "saveBooking()", "kind": "function", "mine": true, "fn": "saveBooking" },
+      { "id": "store", "label": "storeBooking()", "kind": "function", "fn": "storeBooking" },
+      { "id": "email", "label": "emailTicket()", "kind": "function", "fn": "emailTicket" },
+      { "id": "unlock", "label": "unlockSeat()", "kind": "function", "fn": "unlockSeat" }
+    ],
+    "edges": [
+      { "from": "report", "to": "sailing", "label": "route" },
+      { "from": "report", "to": "sea", "label": "time" },
+      { "from": "dashboard", "to": "sailings", "label": "route" },
+      { "from": "dashboard", "to": "weather", "label": "route" },
+      { "from": "dashboard", "to": "crew", "label": "first sailing" },
+      { "from": "booking", "to": "store", "label": "booking" },
+      { "from": "booking", "to": "email", "label": "booking" },
+      { "from": "booking", "to": "unlock", "label": "seat" }
+    ],
+    "note": "Three async functions in the ticket office: one reads top to bottom with await, one waits only where it must, and one always unlocks the seat."
+  },
+  "tasks": {
+    "rewrite": {
+      "trace": { "file": "src/sailingReport.js", "call": "sailingReport", "args": ["gull-heron"] },
+      "steps": [
+        {
+          "active": ["report", "report->sailing", "sailing"],
+          "note": "The async sailingReport() asks for the gull-heron sailing and pauses at await. The rest of the office keeps running."
+        },
+        {
+          "active": ["report", "report->sea", "sea"],
+          "value": {
+            "kind": "map",
+            "label": "the sailing it waited for",
+            "entries": [
+              { "key": "route", "value": "gull-heron" },
+              { "key": "time", "value": "HH:MM" }
+            ]
+          },
+          "note": "With the sailing in a const, it asks for the sea state at that time and pauses again."
+        },
+        {
+          "active": ["report"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of the report",
+            "entries": [
+              { "key": "route", "value": "text" },
+              { "key": "time", "value": "HH:MM" },
+              { "key": "sea", "value": "text" }
+            ]
+          },
+          "note": "A return resolves the promise with the same report as before."
+        },
+        {
+          "active": ["report"],
+          "note": "An awaited rejection throws right there. With no catch it rejects the report, and a failed sailing never reaches the sea sensor."
+        }
+      ]
+    },
+    "parallel": {
+      "trace": { "file": "src/dashboard.js", "call": "loadDashboard", "args": ["quay-heron"] },
+      "steps": [
+        {
+          "active": ["dashboard", "dashboard->sailings", "sailings"],
+          "note": "The morning dashboard for quay-heron starts the sailings request."
+        },
+        {
+          "active": ["dashboard", "dashboard->weather", "weather"],
+          "note": "The weather does not need the sailings, so its request starts before anything is awaited. Both are in flight together."
+        },
+        {
+          "active": ["sailings", "dashboard->crew", "crew"],
+          "value": {
+            "kind": "array",
+            "label": "sailings for the route",
+            "values": ["first sailing", "second sailing"]
+          },
+          "note": "The crew does depend on the sailings. As soon as they arrive, the crew of the first one is asked for, whether the weather is back or not."
+        },
+        {
+          "active": ["dashboard"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of the dashboard",
+            "entries": [
+              { "key": "sailings", "value": "a list" },
+              { "key": "weather", "value": "text" },
+              { "key": "crew", "value": "a list of names" }
+            ]
+          },
+          "note": "Everything is waited for in a way that listens to every promise from the start, so an early weather failure is never left unheard."
+        }
+      ]
+    },
+    "finally": {
+      "trace": {
+        "file": "src/booking.js",
+        "call": "saveBooking",
+        "args": [{ "id": "B12", "name": "Lena", "email": "lena@example.com", "seat": "2C" }]
+      },
+      "steps": [
+        {
+          "active": ["booking", "booking->store", "store"],
+          "value": {
+            "kind": "map",
+            "label": "the booking",
+            "entries": [
+              { "key": "id", "value": "B12" },
+              { "key": "name", "value": "Lena" },
+              { "key": "seat", "value": "2C" }
+            ]
+          },
+          "note": "Lena books seat 2C. The booking is stored first. If that fails, the caller hears about it and no ticket is sent."
+        },
+        {
+          "active": ["booking", "booking->email", "email"],
+          "note": "Once it is stored, the ticket email is sent and awaited. A bounced email is a failure you have an answer for."
+        },
+        {
+          "active": ["booking", "booking->unlock", "unlock"],
+          "note": "Whatever happened, seat 2C is unlocked exactly once, after the other calls have settled."
+        },
+        {
+          "active": ["booking"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of the result",
+            "entries": [
+              { "key": "saved", "value": "true" },
+              { "key": "emailed", "value": "true or false" }
+            ]
+          },
+          "note": "The booking resolves with whether the email went out, and no rejection is left unhandled."
+        }
+      ]
+    }
+  }
+}
