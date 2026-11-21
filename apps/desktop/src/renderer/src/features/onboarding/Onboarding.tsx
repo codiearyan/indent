@@ -2,6 +2,7 @@ import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { APP_NAME, BrandMark } from '@/components/app/Brand'
 import { Button } from '@/components/ui/button'
 import { activeProvider, useAi } from '@/features/ai/aiStore'
+import { isShortcut } from '@/lib/shortcuts'
 import { track } from '@/lib/telemetry'
 import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
@@ -71,7 +72,7 @@ export function Onboarding(): React.JSX.Element {
   useEffect(() => {
     const onKey = (event: KeyboardEvent): void => {
       const target = event.target as HTMLElement
-      if (event.key !== 'Enter' || event.isComposing || event.repeat) return
+      if (!isShortcut(event, 'continueSetup') || event.isComposing || event.repeat) return
       // Radio items cancel Enter themselves (it must not pick an option), so they are let through.
       if (event.defaultPrevented && target.getAttribute('role') !== 'radio') return
       if (target !== document.body && !rootRef.current?.contains(target)) return

@@ -16,6 +16,7 @@ import { AiSettings, AiSwitch } from '@/features/ai/AiMenu'
 import { useAi } from '@/features/ai/aiStore'
 import { FolderNote, MoveFolderDialog } from '@/features/workspace/FolderMove'
 import { useWorkspaceRoot } from '@/features/workspace/useWorkspaceRoot'
+import { isShortcut } from '@/lib/shortcuts'
 import { viewTransition } from '@/lib/viewTransition'
 import { useSettings, type EditorOption } from '@/stores/settings'
 import { Group, LayoutControls, Row, card } from './controls'
@@ -43,7 +44,7 @@ export function SettingsDialog(): React.JSX.Element {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent): void => {
-      if (event.key !== ',' || !(event.metaKey || event.ctrlKey)) return
+      if (!isShortcut(event, 'openSettings')) return
       event.preventDefault()
       useSettingsDialog.getState().show()
     }

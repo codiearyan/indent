@@ -13,6 +13,7 @@ import { isChapterComplete } from '@shared/rules'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { isShortcut, shortcutLabel } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { useChapterProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
@@ -22,8 +23,6 @@ import { CodeEditor } from './CodeEditor'
 import { FileLabel } from './FileTab'
 import { fileChange, missingFiles } from './fileChange'
 import type { monaco } from './monaco'
-
-const RUN_SHORTCUT = window.platform === 'darwin' ? '⌘↵' : 'Ctrl+Enter'
 
 function run(): void {
   useWorkspace
@@ -73,7 +72,7 @@ export function EditorPane(): React.JSX.Element {
   useEffect(() => {
     if (!command) return
     const onKey = (event: KeyboardEvent): void => {
-      if (event.key !== 'Enter' || !(event.metaKey || event.ctrlKey) || event.shiftKey) return
+      if (!isShortcut(event, 'runCommand') || event.shiftKey) return
       const target = event.target as HTMLElement
       // Other text fields keep their own Enter; the code editor's input is a textarea too.
       if (target.closest('input, textarea') && !target.closest('.monaco-editor')) return
@@ -128,7 +127,8 @@ export function EditorPane(): React.JSX.Element {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              Runs <span className="font-mono">{command}</span> in the terminal ({RUN_SHORTCUT})
+              Runs <span className="font-mono">{command}</span> in the terminal (
+              {shortcutLabel('runCommand')})
             </TooltipContent>
           </Tooltip>
         )}

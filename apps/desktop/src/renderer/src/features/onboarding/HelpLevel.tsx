@@ -3,7 +3,7 @@ import { MessageCircle } from 'lucide-react'
 import { RadioGroup } from '@/components/ui/radio-group'
 import { Switch } from '@/components/ui/switch'
 import { useAi } from '@/features/ai/aiStore'
-import { SUGGEST_SHORTCUT } from '@/features/ai/inlineSuggestions'
+import { shortcutLabel } from '@/lib/shortcuts'
 import { ChoiceCard } from './ChoiceCard'
 import { StepLayout } from './StepLayout'
 import { Typed, MS_PER_CHAR } from './scenes/Typed'
@@ -18,7 +18,7 @@ const LEVELS: { value: Level; title: string; text: string }[] = [
   {
     value: 'manual',
     title: 'Suggestions when I ask',
-    text: `Press ${SUGGEST_SHORTCUT} in the editor for a grey suggestion. Tab accepts it.`
+    text: `Press ${shortcutLabel('suggest')} in the editor for a grey suggestion. Tab accepts it.`
   },
   {
     value: 'auto',
@@ -108,7 +108,7 @@ function Demo({ level }: { level: Level }): React.JSX.Element {
     )
   }
 
-  const key = level === 'manual' ? SUGGEST_SHORTCUT : 'Tab'
+  const key = level === 'manual' ? shortcutLabel('suggest') : 'Tab'
   const ghostAt = level === 'manual' ? TYPED_MS + 700 : TYPED_MS + 900
   const keyAt = level === 'manual' ? TYPED_MS + 400 : ghostAt + 900
 
