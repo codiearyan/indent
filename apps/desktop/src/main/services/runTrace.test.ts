@@ -208,9 +208,10 @@ describe('run-trace.mjs', () => {
   }, 30_000)
 
   it("keeps the learner's own output apart from the result, and cuts it", async () => {
-    // Several at once: on Linux a child that exits before its output is written loses the tail.
-    const results = await Promise.all(Array.from({ length: 6 }, () => trace('noisy')))
-    for (const result of results) {
+    // Several times: on Linux a child that exits before its output is written loses the tail,
+    // but not on every run. One after another, because trace() expects an empty sandbox root.
+    for (let run = 0; run < 6; run++) {
+      const result = await trace('noisy')
       expect(result.ok).toBe(true)
       expect(result.calls[0].returned).toBe('"done"')
       expect(result.stdout.startsWith('line 0\nline 1\n')).toBe(true)
