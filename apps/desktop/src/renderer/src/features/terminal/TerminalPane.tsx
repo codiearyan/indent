@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react'
 import { Terminal, type ITheme } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
@@ -141,6 +141,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
         current.id = id
         // The panel may have expanded while the shell was starting.
         api.terminal.resize(id, term.cols, term.rows)
+        if (pendingCommand.current?.includes('\r')) awaitingRefresh = true
         if (pendingCommand.current) api.terminal.write(id, pendingCommand.current)
         pendingCommand.current = null
         term.focus()
@@ -205,6 +206,23 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
   }
 
   const suggested = chapter?.terminal.suggestedCommand
+
+  const runSuggested = useEffectEvent(() => {
+    if (!suggested) return
+    setPanel('terminal', true)
+    const current = termRef.current
+    // Sent as typed input, so the shell runs it and the files refresh afterwards.
+    if (current?.id) current.term.input(`${suggested}\r`, false)
+    else connect(`${suggested}\r`)
+  })
+
+  useEffect(
+    () =>
+      useWorkspace.subscribe((state, previous) => {
+        if (state.runs !== previous.runs) runSuggested()
+      }),
+    []
+  )
   const suggestion = suggested && (
     <button
       type="button"

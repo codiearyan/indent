@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Loader2Icon,
@@ -6,6 +6,7 @@ import {
   Minimize2Icon,
   PanelLeftCloseIcon,
   PanelLeftIcon,
+  PlayIcon,
   WandSparklesIcon
 } from 'lucide-react'
 import { isChapterComplete } from '@shared/rules'
@@ -21,6 +22,15 @@ import { CodeEditor } from './CodeEditor'
 import { FileLabel } from './FileTab'
 import { fileChange, missingFiles } from './fileChange'
 import type { monaco } from './monaco'
+
+const RUN_SHORTCUT = window.platform === 'darwin' ? '⌘↵' : 'Ctrl+Enter'
+
+function run(): void {
+  useWorkspace
+    .getState()
+    .run()
+    .catch((error) => toast.error(error instanceof Error ? error.message : String(error)))
+}
 
 function checkAll(): void {
   useWorkspace
@@ -59,6 +69,22 @@ export function EditorPane(): React.JSX.Element {
   }
   const hideSummary = useCallback(() => setShowSummary(false), [])
   const outdated = status === 'ready' && missingFiles(chapter?.files ?? [], files).length > 0
+  const command = chapter?.terminal.suggestedCommand
+
+  useEffect(() => {
+    if (!command) return
+    const onKey = (event: KeyboardEvent): void => {
+      if (event.key !== 'Enter' || !(event.metaKey || event.ctrlKey) || event.shiftKey) return
+      const target = event.target as HTMLElement
+      // Other text fields keep their own Enter; the code editor's input is a textarea too.
+      if (target.closest('input, textarea') && !target.closest('.monaco-editor')) return
+      event.preventDefault()
+      event.stopPropagation()
+      run()
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [command])
 
   return (
     <div className="flex h-full flex-col bg-editor">
@@ -88,6 +114,25 @@ export function EditorPane(): React.JSX.Element {
         >
           <WandSparklesIcon />
         </IconButton>
+        {command && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="sm"
+                variant="outline"
+                className="ml-1"
+                disabled={status !== 'ready'}
+                onClick={run}
+              >
+                <PlayIcon />
+                Run
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              Runs <span className="font-mono">{command}</span> in the terminal ({RUN_SHORTCUT})
+            </TooltipContent>
+          </Tooltip>
+        )}
         <Button
           size="sm"
           variant={finished ? 'outline' : 'default'}
