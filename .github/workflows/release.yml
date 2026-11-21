@@ -2,41 +2,41 @@ name: Release
 
 # Builds the installers and publishes them as a GitHub release.
 #
-# It only runs when asked: when a version tag is pushed, or by hand from the Actions tab.
+# It only runs when asked: by hand from the Actions tab, or when a version tag is pushed.
 # Nothing here runs on pull requests, because a macOS runner costs ten times the minutes of
 # a Linux one. A full release is one macOS job (both chips), one Windows job and one Linux job.
 #
-#   git tag v0.2.0 && git push origin v0.2.0      a full release
-#   Actions, Release, Run workflow                 the same by hand, or one platform without publishing
-#
-# The tag must match the version in apps/desktop/package.json.
+#   Actions, Release, Run workflow     raises the version in apps/desktop/package.json (patch by
+#                                      default), commits it to main, tags it and publishes
+#   publish off                        builds the current version and keeps the installers as run
+#                                      artifacts; nothing is committed
+#   git tag v0.2.0 && git push ...     publishes a tag that matches apps/desktop/package.json
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
     inputs:
-      tag:
-        description: Version tag, such as v0.2.0. Created on this commit if it does not exist.
-        required: true
+      bump:
+        description: Which part of the version to raise
+        type: choice
+        options: [patch, minor, major]
+        default: patch
       only:
         description: Which installers to build
         type: choice
         options: [all, mac, windows, linux]
         default: all
       publish:
-        description: Publish the installers as a release. Off builds them and keeps them as run artifacts.
+        description: Raise the version and publish a release. Off builds the current version and keeps the installers as run artifacts.
         type: boolean
         default: true
 
 concurrency:
-  group: release-${{ inputs.tag || github.ref_name }}
+  group: release
   cancel-in-progress: false
 
 permissions:
   contents: write
-
-env:
-  TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
   # Seconds on a Linux runner, so a wrong tag never costs a macOS build.
@@ -45,15 +45,37 @@ jobs:
     timeout-minutes: 5
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
+      tag: ${{ steps.version.outputs.tag }}
+      sha: ${{ steps.version.outputs.sha }}
     steps:
       - uses: actions/checkout@v4
-      - name: Check the tag against the app version
+      - name: Settle the version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+          PUBLISH: ${{ github.event_name == 'push' || inputs.publish }}
         run: |
           version=$(node -p "require('./apps/desktop/package.json').version")
-          if [ "$TAG" != "v$version" ]; then
-            echo "::error::The tag is $TAG but apps/desktop/package.json says $version. Change the version first, or tag v$version."
-            exit 1
+          if [ "$GITHUB_EVENT_NAME" = push ]; then
+            if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+              echo "::error::The tag is $GITHUB_REF_NAME but apps/desktop/package.json says $version. Tag v$version, or run the workflow by hand."
+              exit 1
+            fi
+          elif [ "$PUBLISH" = true ]; then
+            if [ "$GITHUB_REF" != refs/heads/main ]; then
+              echo "::error::Releases are published from main. Run the workflow on main, or turn publish off."
+              exit 1
+            fi
+            version=$(cd apps/desktop && npm version "$BUMP" --no-git-tag-version | tr -d v)
+            # The repository owner's public GitHub address, so the commit is theirs like every other.
+            git config user.name 'Aryan Bhati'
+            git config user.email '123343302+codiearyan@users.noreply.github.com'
+            git commit -am "chore: release $version"
+            git tag "v$version"
+            git push --atomic origin HEAD:main "v$version"
           fi
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Pick the platforms
         id: plan
         env:
@@ -80,6 +102,8 @@ jobs:
       matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -106,7 +130,7 @@ jobs:
           retention-days: 3
 
   publish:
-    needs: build
+    needs: [prepare, build]
     if: github.event_name == 'push' || inputs.publish
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -120,10 +144,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          SHA: ${{ needs.prepare.outputs.sha }}
         run: |
           ls -l installers
           if gh release view "$TAG" > /dev/null 2>&1; then
             gh release upload "$TAG" installers/* --clobber
           else
-            gh release create "$TAG" installers/* --target "$GITHUB_SHA" --title "Indent ${TAG#v}" --generate-notes
+            gh release create "$TAG" installers/* --target "$SHA" --title "Indent ${TAG#v}" --generate-notes
           fi
