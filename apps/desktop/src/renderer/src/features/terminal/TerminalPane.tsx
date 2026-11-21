@@ -2,14 +2,7 @@ import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 're
 import { Terminal, type ITheme } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
-import {
-  ChevronDown,
-  ChevronUp,
-  Maximize2,
-  Minimize2,
-  RotateCw,
-  SquareTerminal
-} from 'lucide-react'
+import { ChevronDown, ChevronUp, Maximize2, Minimize2, RotateCw } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Chapter } from '@shared/types'
 import { Button } from '@/components/ui/button'
@@ -63,8 +56,10 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
   const togglePanel = useSettings((s) => s.togglePanel)
   const setPanel = useSettings((s) => s.setPanel)
 
-  const [status, setStatus] = useState<Status>('idle')
-  const [session, setSession] = useState(0)
+  // An open panel means the learner wants a shell, so it starts without a click.
+  const startNow = open && !!chapter
+  const [status, setStatus] = useState<Status>(startNow ? 'connected' : 'idle')
+  const [session, setSession] = useState(startNow ? 1 : 0)
   const [exitCode, setExitCode] = useState(0)
   const [maximized, setMaximized] = useState(false)
 
@@ -79,6 +74,17 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
     setStatus('connected')
     setSession((n) => n + 1)
   }
+
+  const startOnOpen = useEffectEvent(() => {
+    if (status === 'idle' && chapter) connect()
+  })
+  useEffect(
+    () =>
+      useSettings.subscribe((state, previous) => {
+        if (state.panels.terminal && !previous.panels.terminal) startOnOpen()
+      }),
+    []
+  )
 
   const typeCommand = (command: string): void => {
     const id = termRef.current?.id
@@ -284,24 +290,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
       </div>
 
       <div className="min-h-0 flex-1">
-        {status === 'idle' ? (
-          <div className="flex h-full flex-col items-center justify-center gap-3 overflow-auto p-6 text-center">
-            <SquareTerminal className="size-5 text-muted-foreground" strokeWidth={1.5} />
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
-              onClick={() => connect()}
-              disabled={!chapter}
-            >
-              Open terminal
-            </Button>
-            <p className="max-w-sm text-[13px] text-muted-foreground">
-              Checks do not need the terminal. Open it to run and explore.
-            </p>
-            {suggestion}
-          </div>
-        ) : (
+        {status === 'idle' ? null : (
           <div className="flex h-full flex-col">
             <div ref={containerRef} className="min-h-0 flex-1 overflow-hidden py-1 pl-3" />
             {status === 'exited' && (
