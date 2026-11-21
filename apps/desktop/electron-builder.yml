@@ -51,6 +51,18 @@ linux:
 appImage:
   artifactName: Indent-linux-${arch}.${ext}
 npmRebuild: false
+beforePack: build/pack-index.cjs
 extraResources:
   - from: ../../content
     to: content
+    filter:
+      - kit/**
+      - runtime/**
+      - paths.json
+      - package.json
+      # The first repo of every roadmap; the rest download from the library on first start.
+      - labs/js-foundations/**
+      - labs/typescript-essentials/**
+      - labs/web-pages/**
+  - from: out/packs/index.json
+    to: content/index.json
