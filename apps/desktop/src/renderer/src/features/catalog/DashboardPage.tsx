@@ -35,7 +35,7 @@ export function DashboardPage(): React.JSX.Element {
   const labs = useCatalog((s) => s.labs)
   const paths = useCatalog((s) => s.paths)
   const progress = useProgress((s) => s.progress)
-  const goal = useSettings((s) => s.goal)
+  const goals = useSettings((s) => s.goals)
   const experience = useSettings((s) => s.experience)
   const weeks = useMemo(() => recentWeeks(17), [])
 
@@ -53,8 +53,8 @@ export function DashboardPage(): React.JSX.Element {
     )
   }
 
-  const onRoadmap = new Set(goalLabIds(paths, goal))
-  const rows: LabRow[] = recommendedOrder(labs, paths, goal, experience).map((lab) => ({
+  const onRoadmap = new Set(goalLabIds(paths, goals))
+  const rows: LabRow[] = recommendedOrder(labs, paths, goals, experience).map((lab) => ({
     lab,
     progress: labProgress(lab, progress.chapters)
   }))
