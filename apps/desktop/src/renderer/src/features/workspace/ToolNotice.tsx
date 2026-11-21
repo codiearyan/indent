@@ -3,6 +3,7 @@ import { Wrench } from 'lucide-react'
 import type { ToolStatus } from '@shared/types'
 import { ToolInstallButton } from '@/components/app/ToolInstallButton'
 import { Button } from '@/components/ui/button'
+import { track } from '@/lib/telemetry'
 import { useCatalog } from '@/stores/catalog'
 import { missingTools, refreshTools, useTools, type ToolInstall } from '@/stores/tools'
 
@@ -23,6 +24,21 @@ function hint(tool: ToolStatus, install: ToolInstall | undefined): string {
     : 'The app can install it for you.'
 }
 
+const reported = new Set<string>()
+
+/** Usage stats hear about each missing tool once a session, not on every render. */
+function reportMissing(tool: ToolStatus, labId: string): void {
+  if (reported.has(tool.id)) return
+  reported.add(tool.id)
+  const major = tool.version?.match(/^v?(\d+)/)?.[1]
+  track('tool_missing', {
+    tool: tool.id,
+    repo: labId,
+    reason: tool.version ? 'too-old' : 'missing',
+    ...(major ? { major: Number(major) } : {})
+  })
+}
+
 /** A banner across the top of the issue for each tool this repo needs that the computer lacks. */
 export function ToolNotice({ labId }: { labId: string }): React.JSX.Element | null {
   const lab = useCatalog((s) => s.labs?.find((l) => l.id === labId))
@@ -33,6 +49,9 @@ export function ToolNotice({ labId }: { labId: string }): React.JSX.Element | nu
   useEffect(() => void useCatalog.getState().load(), [])
 
   const missing = lab ? missingTools(lab, tools) : []
+  useEffect(() => {
+    for (const tool of missing) reportMissing(tool, labId)
+  })
   if (missing.length === 0) return null
 
   const checkAgain = (): void => {

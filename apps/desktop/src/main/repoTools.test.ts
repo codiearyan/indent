@@ -15,7 +15,7 @@ import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { InstallError } from './library'
-import { downloadTools, installedTools, toolsArchive, toolsVersion } from './repoTools'
+import { downloadTools, installedTools, npmFailed, toolsArchive, toolsVersion } from './repoTools'
 
 const temp = (prefix: string): string => mkdtempSync(join(tmpdir(), prefix))
 const repoRoot = join(__dirname, '../../../..')
@@ -123,5 +123,26 @@ describe('downloadTools', () => {
     const root = temp('root-')
     expect(await reason(downloadTools(root, base, 'v4', 'os-cpu', () => {}))).toBe('broken')
     expect(existsSync(join(root, 'node_modules'))).toBe(false)
+  })
+})
+
+describe('npmFailed', () => {
+  const run = (
+    stderr: string,
+    exitCode: number | null = 1,
+    timedOut = false
+  ): ReturnType<typeof npmFailed> => npmFailed({ stdout: '', stderr, exitCode, timedOut })
+
+  it('names each way npm can fail, with details, and no retry when npm cannot start', () => {
+    expect(run('', null, true).failure).toBe('slow')
+    expect(run('npm error code ENOTFOUND registry.npmjs.org').failure).toBe('offline')
+    expect(run('npm error code ENOSPC').failure).toBe('no-space')
+    expect(run("'npm' is not recognized as an internal or external command")).toMatchObject({
+      failure: 'no-npm',
+      retry: false
+    })
+    expect(run('spawn npm ENOENT', null)).toMatchObject({ failure: 'no-npm', retry: false })
+    expect(run('npm error code E404')).toMatchObject({ failure: 'npm-failed', retry: true })
+    expect(run('', 1).details).toBe('npm exited with code 1.')
   })
 })
