@@ -7,14 +7,14 @@ const textHint = (hint) => (v) =>
     ? 'cedarOnShelf holds text, not a number. A name inside quotes is just text; a variable is used by writing its name without quotes.'
     : hint
 
-// Task 2 is judged with the lines that change cedarOnShelf later taken out, so Task 3 cannot
-// change what Task 2 made.
+// Task 2 is judged on the value cedarOnShelf was first made with, so Task 3 cannot change what
+// Task 2 made.
 function shelfCases(t) {
   return cases(t, {
     file: FILE,
     name: 'cedarOnShelf',
     task: 'Task 2',
-    drop: /^\s*cedarOnShelf\s*[-+*/]?=(?!=).*$/,
+    first: 'cedarOnShelf',
     typed: 'Check changed the delivery and cedarOnShelf stayed the same. Build it on the name cedarDelivered, not on a number you typed.',
     list: [
       {

@@ -6,11 +6,14 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 const READER = '__indentRead'
+const FIRST = '__indentFirst'
 
 const literal = (value) => (value === undefined ? 'undefined' : JSON.stringify(value))
 
-function reader(names) {
-  const reads = names.map((name) => `${JSON.stringify(name)}: read(() => ${name})`).join(',\n    ')
+function reader(names, from = {}) {
+  const reads = names
+    .map((name) => `${JSON.stringify(name)}: read(() => ${from[name] ?? name})`)
+    .join(',\n    ')
   return `
 ;export function ${READER}() {
   const read = (get) => {
@@ -40,11 +43,11 @@ export async function source(t, file) {
 }
 
 /**
- * Runs `file` with the given values swapped in and reads back `names`. `drop` removes the lines
- * it matches first, to read a variable before a later task changes it.
+ * Runs `file` with the given values swapped in and reads back `names`. `first` names a variable
+ * to read as it was first made, before a later task changes it.
  * Returns { ok, values, error, stdout, text } or { missingGiven } when a given line is gone.
  */
-export async function run(t, file, { given = {}, names = [], drop } = {}) {
+export async function run(t, file, { given = {}, names = [], first } = {}) {
   const dir = await t.sandbox()
   const path = join(dir, file)
   let text = await readFile(path, 'utf8')
@@ -53,8 +56,12 @@ export async function run(t, file, { given = {}, names = [], drop } = {}) {
     if (!line.test(text)) return { missingGiven: name }
     text = text.replace(line, (_, head) => head + literal(value))
   }
-  if (drop) text = text.replace(new RegExp(drop.source, 'gm'), '')
-  await writeFile(path, text + reader(names))
+  // The first value is kept in a variable of its own, so however the later lines are written
+  // they cannot change what is read. Without a value on the line that makes it, the last one is read.
+  const made = first && new RegExp(`\\b(let|const|var)(\\s+${first}\\s*=)(?!=)`)
+  const kept = made && made.test(text)
+  if (kept) text = text.replace(made, `let ${FIRST};$1$2 ${FIRST} =`)
+  await writeFile(path, text + reader(names, kept ? { [first]: FIRST } : {}))
   const r = await t.call(dir, file, READER)
   return { ok: r.ok, values: r.value ?? {}, error: r.error, stdout: r.stdout, text }
 }
@@ -152,11 +159,11 @@ const sameRead = (a, b) => a?.type === b?.type && a?.value === b?.value && a?.te
  * - `typed`: the value stayed the same in every case while the right one changed, and it has the
  *   right type (a wrong type is for the case's hint to explain).
  * - the case's own `hint`, a string or a function of the value read.
- * `drop` is passed on to run().
+ * `first` is passed on to run().
  */
-export async function cases(t, { file, name, task, list, after, mistakes = [], typed, drop }) {
+export async function cases(t, { file, name, task, list, after, mistakes = [], typed, first }) {
   const names = [name, ...(after?.names ?? [])]
-  const runs = await Promise.all(list.map((c) => run(t, file, { given: c.given, names, drop })))
+  const runs = await Promise.all(list.map((c) => run(t, file, { given: c.given, names, first })))
   for (const r of runs) {
     const problem = fileProblem(file, r)
     if (problem) return [problem]
