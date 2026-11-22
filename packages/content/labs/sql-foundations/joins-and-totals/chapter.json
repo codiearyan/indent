@@ -1,0 +1,105 @@
+{
+  "id": "joins-and-totals",
+  "title": "Totals across tables",
+  "files": [
+    "queries/1-november-calls.sql",
+    "queries/2-animals-per-owner.sql",
+    "queries/3-spent-per-animal.sql",
+    "queries/4-dog-counts.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-november-calls.sql"
+  },
+  "tasks": [
+    {
+      "id": "november-calls",
+      "title": "List this month's visits with a number to ring",
+      "file": "queries/1-november-calls.sql",
+      "description": "Winnie rings the owner of every animal that came in this month, to ask how it is getting on.\n\nIn `queries/1-november-calls.sql`, return four columns, in this order:\n\n- `visit_date`\n- `animal`: the name of the animal that came in\n- `last_name`: its owner's last name\n- `phone`: its owner's phone number\n\nOne row for each visit on or after 2026-11-01. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Follow one visit by hand in `seed.sql`: from the visit to its animal, and from the animal to its owner.",
+        "Join `visits` to `animals`, then join `owners` to that, each join with its own `ON`. Run it.",
+        "Keep this month's visits and choose the four columns."
+      ],
+      "hints": [
+        "The visit knows its animal, and the animal knows its owner. Read the lesson's part \"Three tables in one query\".",
+        "A second `JOIN` comes straight after the first, with its own `ON`. The owner is found through the animal, not through the visit.",
+        "The FROM part has the shape `FROM visits AS v JOIN animals AS a ON v.animal_id = a.id JOIN owners AS o ON a.owner_id = o.id`."
+      ],
+      "docs": [
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "Join syntax", "url": "https://www.sqlite.org/syntax/join-clause.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "animals-per-owner",
+      "title": "Count each owner's animals",
+      "file": "queries/2-animals-per-owner.sql",
+      "description": "For the yearly review, Rosamund wants every owner with how many animals they have, the owners with none included.\n\nIn `queries/2-animals-per-owner.sql`, return three columns, in this order:\n\n- `first_name`\n- `last_name`\n- `animals`: how many animals the owner has, `0` when none\n\nOne row per owner. Two owners can share a name and are still two rows. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, which has two owners with the same name.",
+      "nextSteps": [
+        "Join every owner to their animals, keeping the owners with none, and run it with `SELECT *`.",
+        "Group the rows so that each owner is one group, and count. Look at Nia Calloway's count.",
+        "Make sure two owners with the same name would still be two groups."
+      ],
+      "hints": [
+        "Read the lesson's part \"Counting across a join\". Which rows does Nia have after the join, and what does your count make of them?",
+        "`COUNT(*)` counts Nia's one row, partner or not. A count of a column from `animals` skips her empty cells. Group by something that is different for every owner, and list the name columns there too.",
+        "The query ends with the shape `... LEFT JOIN animals AS a ON a.owner_id = o.id GROUP BY o.id, o.first_name, o.last_name;`."
+      ],
+      "docs": [
+        { "title": "count()", "url": "https://www.sqlite.org/lang_aggfunc.html#count" },
+        { "title": "GROUP BY and HAVING", "url": "https://www.sqlite.org/lang_select.html#resultset" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "spent-per-animal",
+      "title": "Total each animal's visits",
+      "file": "queries/3-spent-per-animal.sql",
+      "description": "Ifan wants to see, for every animal that has come in, how many visits it has had and what they came to.\n\nIn `queries/3-spent-per-animal.sql`, return three columns, in this order:\n\n- `animal`: the animal's name\n- `visits`: how many visits it has had, each visit counted once however many treatments it had\n- `spent`: the prices of all the treatments of those visits added up, `0` when nothing was charged\n\nOne row for each animal that has had at least one visit, free visits included. Two animals can share a name and are still two rows. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, which has two animals with the same name.",
+      "nextSteps": [
+        "Join animals, visits and treatments and run it with `SELECT *`. Look at Pepper's rows: how many visits, how many rows?",
+        "Make sure a visit with no treatment still has its row.",
+        "Group by animal, count each visit once and add up the prices. Check Bramble and Olive by hand."
+      ],
+      "hints": [
+        "Read the lesson's part \"Counted twice\". After the join, a visit has one row for each of its treatments.",
+        "A visit with three treatments has three rows, so `COUNT(*)` gives 3 where `COUNT(DISTINCT ...)` of the visit's id gives 1. A visit with no treatment needs a join that keeps it, and a sum of nothing is `NULL`.",
+        "The query has the shape `SELECT a.name AS animal, COUNT(DISTINCT v.id) AS visits, COALESCE(SUM(t.price), 0) AS spent FROM animals AS a JOIN visits AS v ON ... LEFT JOIN treatments AS t ON ... GROUP BY a.id, a.name;`."
+      ],
+      "docs": [
+        { "title": "count() and DISTINCT", "url": "https://www.sqlite.org/lang_aggfunc.html#count" },
+        { "title": "coalesce()", "url": "https://www.sqlite.org/lang_corefunc.html#coalesce" }
+      ],
+      "videos": [
+        { "title": "Why a join repeats rows", "url": "https://www.youtube.com/watch?v=Y9hrlLIXKoU" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "dogs-per-owner",
+      "title": "Count each owner's dogs",
+      "file": "queries/4-dog-counts.sql",
+      "description": "The dog food supplier sends a sample for each dog, and asks how many dogs each owner has. Rosamund wants every owner on the list, with `0` for those with no dog.\n\nIn `queries/4-dog-counts.sql`, return three columns, in this order:\n\n- `first_name`\n- `last_name`\n- `dogs`: how many of the owner's animals are dogs, `0` when none\n\nOne row per owner, every owner included. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Start from your query of task 2 and run it.",
+        "Add the test for dogs, and run it again. Count the rows: is every owner still there?",
+        "If owners went missing, read the lesson's part \"WHERE or ON\" and move the test."
+      ],
+      "hints": [
+        "Leonie Okoro has rabbits and no dog. She must still have a row, with 0.",
+        "A test in `WHERE` runs after the `LEFT JOIN`, and throws away the owners who have no dog. A test in `ON` only decides which animals count as partners.",
+        "The FROM part has the shape `FROM owners AS o LEFT JOIN animals AS a ON a.owner_id = o.id AND a.species = 'dog'`."
+      ],
+      "docs": [
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "count()", "url": "https://www.sqlite.org/lang_aggfunc.html#count" }
+      ],
+      "points": 10
+    }
+  ]
+}

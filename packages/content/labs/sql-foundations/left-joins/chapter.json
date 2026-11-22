@@ -1,0 +1,83 @@
+{
+  "id": "left-joins",
+  "title": "Rows with no match",
+  "files": [
+    "queries/1-every-owner.sql",
+    "queries/2-never-visited.sql",
+    "queries/3-free-visits.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-every-owner.sql"
+  },
+  "tasks": [
+    {
+      "id": "every-owner",
+      "title": "List every owner with their animals",
+      "file": "queries/1-every-owner.sql",
+      "description": "Rosamund writes the Christmas cards from this list, so nobody may be missing from it, not even an owner whose animal has not come in yet.\n\nIn `queries/1-every-owner.sql`, return three columns, in this order:\n\n- `first_name`: the owner's first name\n- `last_name`: the owner's last name\n- `animal`: the name of one of their animals\n\nOne row for each owner and animal. An owner with no animals has one row, with `NULL` as the animal. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, which has another owner with no animals.",
+      "nextSteps": [
+        "Join `owners` and `animals` with a plain `JOIN` and run it. Look for Nia Calloway.",
+        "Change the join so that every owner is kept, partner or not.",
+        "Check which table comes first: the one that must keep every row."
+      ],
+      "hints": [
+        "If Nia Calloway is missing, read the lesson's part \"A plain JOIN drops rows\" again.",
+        "`LEFT JOIN` keeps every row of the table named before it. Here that has to be the table of owners.",
+        "The FROM part has the shape `FROM owners AS o LEFT JOIN animals AS a ON a.owner_id = o.id`."
+      ],
+      "docs": [
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "Join operators", "url": "https://www.sqlite.org/syntax/join-operator.html" }
+      ],
+      "videos": [
+        { "title": "Left joins", "url": "https://www.youtube.com/watch?v=giKwmtsz1U8" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "never-visited",
+      "title": "Find the animals that have never been seen",
+      "file": "queries/2-never-visited.sql",
+      "description": "Ifan wants to invite every animal that has never had a visit for a first check.\n\nIn `queries/2-never-visited.sql`, return two columns, in this order:\n\n- `animal`: the animal's name\n- `species`\n\nOne row for each animal that has no visit at all. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Join every animal to its visits, keeping the animals that have none, and run it with `SELECT *`.",
+        "Look at the rows of an animal that has never come in. What do the columns of `visits` hold there?",
+        "Keep only those rows, and choose the two columns."
+      ],
+      "hints": [
+        "Start from every animal with its visits, the animals without one included. Read the lesson's part \"Finding the rows with no partner\".",
+        "On the rows of an animal with no visit, every column of `visits` is `NULL`. Test a column that is never empty in a real visit, or a visit with no notes will look like no visit.",
+        "The query ends with the shape `... LEFT JOIN visits AS v ON v.animal_id = a.id WHERE v.id IS NULL;`."
+      ],
+      "docs": [
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "IS NULL and IS NOT NULL", "url": "https://www.sqlite.org/lang_expr.html#isisnot" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "free-visits",
+      "title": "Find the visits nothing was charged for",
+      "file": "queries/3-free-visits.sql",
+      "description": "Some checks are meant to be free, and Rosamund wants to see every visit that has nothing on its bill, to make sure none was forgotten.\n\nIn `queries/3-free-visits.sql`, return three columns from `visits`, in this order:\n\n- `visit_date`\n- `vet`\n- `reason`\n\nOne row for each visit that has no treatment at all. A visit with a treatment that cost £0 was charged, so it is not one of them. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Find a visit in `seed.sql` that has no row in `treatments`.",
+        "Join every visit to its treatments, keeping the visits that have none.",
+        "Keep only the visits with no partner. Make sure the weight check that cost £0 is not among them."
+      ],
+      "hints": [
+        "A visit with nothing charged has no row in `treatments` at all. Which kind of join keeps such a visit?",
+        "A treatment that cost £0 is still a row in `treatments`, so its visit has a partner. Test for a missing partner, not for a price.",
+        "The query ends with the shape `... FROM visits AS v LEFT JOIN treatments AS t ON t.visit_id = v.id WHERE t.id IS NULL;`."
+      ],
+      "docs": [
+        { "title": "Join operators", "url": "https://www.sqlite.org/syntax/join-operator.html" },
+        { "title": "IS NULL and IS NOT NULL", "url": "https://www.sqlite.org/lang_expr.html#isisnot" }
+      ],
+      "points": 10
+    }
+  ]
+}
