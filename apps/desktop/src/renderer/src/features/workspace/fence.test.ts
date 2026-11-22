@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fenceOf, openFenceStart } from './fence'
+import { fenceClosed, fenceOf } from './fence'
 
 const pre = (className: string[] | undefined, text: string): { children: unknown[] } => ({
   children: [{ type: 'element', properties: { className }, children: [{ value: text }] }]
@@ -27,25 +27,32 @@ describe('fenceOf', () => {
   })
 })
 
-describe('openFenceStart', () => {
-  it('is null when every fence is closed', () => {
-    expect(openFenceStart('Hi\n\n```ts\nconst a = 1\n```\n\nBye')).toBeNull()
-    expect(openFenceStart('No code at all')).toBeNull()
+describe('fenceClosed', () => {
+  it('sees a closed fence', () => {
+    expect(fenceClosed('```ts\nconst a = 1\n```')).toBe(true)
+    expect(fenceClosed('~~~~\ncode\n~~~~~')).toBe(true)
   })
 
-  it('finds a fence that is still open', () => {
-    const text = 'Look:\n\n```mermaid\nflowchart LR\n  A --> B'
-    expect(openFenceStart(text)).toBe(text.indexOf('```mermaid'))
+  it('sees one still open or cut off', () => {
+    expect(fenceClosed('```mermaid')).toBe(false)
+    expect(fenceClosed('```mermaid\nflowchart TD\n  A --> B')).toBe(false)
+    expect(fenceClosed('```mermaid\nflowchart TD\n')).toBe(false)
   })
 
-  it('needs the same mark, at least as long, to close', () => {
-    expect(openFenceStart('````md\n```\nstill inside\n')).toBe(0)
-    expect(openFenceStart('~~~\ncode\n```\n')).toBe(0)
-    expect(openFenceStart('````md\n```\n````\n')).toBeNull()
+  it('needs the same mark, at least as long, alone on its line', () => {
+    expect(fenceClosed('````md\n```')).toBe(false)
+    expect(fenceClosed('~~~\ncode\n```')).toBe(false)
+    expect(fenceClosed('```\na\n``` and more')).toBe(false)
   })
 
-  it('ignores inline backticks and a closing line with text after it', () => {
-    expect(openFenceStart('```js `nope`\nnot a fence')).toBeNull()
-    expect(openFenceStart('```\na\n``` and more\n')).toBe(0)
+  it('reads fences inside lists and blockquotes', () => {
+    expect(fenceClosed('```mermaid\n    flowchart TD\n    A --> B\n    ```')).toBe(true)
+    expect(fenceClosed('```mermaid\n    flowchart TD\n    A --> B')).toBe(false)
+    expect(fenceClosed('```mermaid\n> flowchart TD\n> ```')).toBe(true)
+    expect(fenceClosed('```mermaid\n> flowchart TD\n> A --> B')).toBe(false)
+  })
+
+  it('treats an indented block without a fence as complete', () => {
+    expect(fenceClosed('    const a = 1')).toBe(true)
   })
 })

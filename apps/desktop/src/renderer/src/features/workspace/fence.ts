@@ -18,26 +18,21 @@ export function fenceOf(pre: { children: unknown[] } | undefined): {
   return { code: textOf(code).replace(/\n$/, ''), language }
 }
 
-const FENCE = /^ {0,3}(`{3,}|~{3,})(.*)$/
+const FENCE = /^(`{3,}|~{3,})(.*)$/
+// List indentation and blockquote markers in front of a line inside a container.
+const CONTAINER = /^[ \t>]*/
 
 /**
- * Where a fenced block that is still open at the end of `markdown` starts, as a character offset,
- * or null when every fence is closed. A reply cut off or still streaming ends inside one.
+ * Whether a fenced block's own source, as the parser saw it, ends with its closing fence. A block
+ * still streaming, or cut off when a reply stopped, runs to the end of the reply instead.
  */
-export function openFenceStart(markdown: string): number | null {
-  let open: { mark: string; at: number } | null = null
-  let at = 0
-  for (const line of markdown.split('\n')) {
-    const match = FENCE.exec(line)
-    if (match) {
-      const [, mark, rest] = match
-      if (!open) {
-        if (!(mark[0] === '`' && rest.includes('`'))) open = { mark, at }
-      } else if (mark[0] === open.mark[0] && mark.length >= open.mark.length && !rest.trim()) {
-        open = null
-      }
-    }
-    at += line.length + 1
-  }
-  return open?.at ?? null
+export function fenceClosed(raw: string): boolean {
+  const lines = raw.split('\n').map((line) => line.replace(CONTAINER, ''))
+  const open = FENCE.exec(lines[0])
+  if (!open) return true
+  if (lines.length < 2) return false
+  const close = FENCE.exec(lines[lines.length - 1])
+  return (
+    !!close && close[1][0] === open[1][0] && close[1].length >= open[1].length && !close[2].trim()
+  )
 }
