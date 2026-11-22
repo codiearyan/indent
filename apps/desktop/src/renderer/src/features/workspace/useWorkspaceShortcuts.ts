@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { chapterKey } from '@shared/rules'
-import { useAiEnabled } from '@/features/ai/aiStore'
 import { focusEditorSoon, focusedEditor } from '@/features/editor/editors'
 import { useQuickOpen } from '@/features/editor/quickOpenStore'
 import { toggleTutor } from '@/features/ai/toggleTutor'
@@ -83,7 +82,6 @@ export function useWorkspaceShortcuts(): void {
   const navigate = useNavigate()
   const chapter = useWorkspace((s) => s.chapter)
   const ready = useWorkspace((s) => s.status === 'ready')
-  const aiOn = useAiEnabled()
   const togglePanel = useSettings((s) => s.togglePanel)
 
   const goTo = (chapterId?: string): false | (() => void) =>
@@ -119,7 +117,7 @@ export function useWorkspaceShortcuts(): void {
     toggleFocusMode: () => togglePanel('zen'),
     nextIssue: goTo(chapter?.nextChapterId),
     previousIssue: goTo(chapter?.prevChapterId),
-    openTutor: aiOn && toggleTutor,
+    openTutor: toggleTutor,
     ...Object.fromEntries(TAB_SHORTCUTS.map((id, i) => [id, ready && selectTab(i + 1)])),
     nextHint: ready && showNextHint
   })

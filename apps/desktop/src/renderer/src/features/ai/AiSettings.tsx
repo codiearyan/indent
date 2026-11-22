@@ -1,9 +1,21 @@
-import { useEffect, useState } from 'react'
-import { Sparkles } from 'lucide-react'
-import type { AiProviderInfo, SuggestionMode } from '@shared/types'
+import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
+import type { AiProviderId, AiProviderInfo, SuggestionMode } from '@shared/types'
+import { ProviderIcon } from '@/components/app/ProviderIcon'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -14,13 +26,9 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { TOUR } from '@/features/tour/anchors'
-import { IconButton } from '@/features/workspace/IconButton'
+import { useSettingsDialog } from '@/features/settings/dialogStore'
 import { shortcutLabel } from '@/lib/shortcuts'
 import { cn, errorMessage } from '@/lib/utils'
-import { viewTransition } from '@/lib/viewTransition'
-import { useSettings } from '@/stores/settings'
-import { showTourAgain } from '@/features/tour/showTourAgain'
 import { activeProvider, useAi } from './aiStore'
 import { InstallOpencode } from './InstallOpencode'
 import { CopyCommand } from './CopyCommand'
@@ -43,58 +51,6 @@ const suggestionModes = (): { value: SuggestionMode; label: string; hint: string
     hint: `Grey text after a pause in typing. Until a task has a check, press ${shortcutLabel('suggest')}. Tab accepts.`
   }
 ]
-
-export function AiMenu(): React.JSX.Element {
-  const { config, menuOpen, setMenuOpen, load } = useAi()
-  const active = activeProvider(config)
-
-  useEffect(() => {
-    if (menuOpen) void load()
-  }, [menuOpen, load])
-
-  return (
-    <Popover open={menuOpen} onOpenChange={setMenuOpen}>
-      <PopoverTrigger asChild>
-        <IconButton label="AI" data-tour={TOUR.aiSuggestions} className="relative">
-          <Sparkles />
-          {active && config?.enabled && (
-            <span className="absolute right-1.5 bottom-1.5 size-1.5 rounded-full bg-success" />
-          )}
-        </IconButton>
-      </PopoverTrigger>
-      <PopoverContent
-        align="end"
-        className="flex max-h-(--radix-popover-content-available-height) w-80 flex-col gap-4 overflow-y-auto rounded-lg"
-      >
-        <AiSwitch />
-        {config?.enabled !== false && <AiSettings />}
-        <Separator />
-        <Button
-          variant="link"
-          size="sm"
-          className="h-auto self-start p-0 text-xs font-normal text-muted-foreground no-underline hover:text-foreground hover:no-underline"
-          onClick={() => {
-            setMenuOpen(false)
-            viewTransition('onboarding-finish', () => useSettings.getState().setOnboarded(false))
-          }}
-        >
-          Run setup again
-        </Button>
-        <Button
-          variant="link"
-          size="sm"
-          className="h-auto self-start p-0 text-xs font-normal text-muted-foreground no-underline hover:text-foreground hover:no-underline"
-          onClick={() => {
-            setMenuOpen(false)
-            showTourAgain()
-          }}
-        >
-          Show the tour again
-        </Button>
-      </PopoverContent>
-    </Popover>
-  )
-}
 
 function SettingRow({
   id,
@@ -244,6 +200,85 @@ export function ModelSelect({ className }: { className?: string }): React.JSX.El
         )}
       </SelectContent>
     </Select>
+  )
+}
+
+/** The tutor's switch: the AI in use and its model, changed in one click without leaving the chat. */
+export function ProviderPicker(): React.JSX.Element {
+  const { config, update, load } = useAi()
+  const active = activeProvider(config)
+  const available = config?.providers.filter((p) => p.available) ?? []
+  const models =
+    active && config?.model && !active.models.includes(config.model)
+      ? [...active.models, config.model]
+      : (active?.models ?? [])
+
+  return (
+    // Opening looks for installed CLIs again, so one installed a minute ago shows up.
+    <DropdownMenu onOpenChange={(open) => open && void load()}>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="xs"
+          className="-ml-2 max-w-full min-w-0 justify-start gap-1.5 font-normal text-muted-foreground hover:text-foreground"
+        >
+          {active && <ProviderIcon id={active.id} className="size-3.5" />}
+          <span className="truncate">{active ? active.label : 'Pick an AI'}</span>
+          {active && config?.model && (
+            <span className="truncate font-mono text-muted-foreground">{config.model}</span>
+          )}
+          <ChevronDown />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="top" align="start" className="w-64">
+        {available.length > 0 && (
+          <DropdownMenuRadioGroup
+            value={config?.provider ?? ''}
+            onValueChange={(id) => void update({ provider: id as AiProviderId, model: null })}
+          >
+            {available.map((p) => (
+              <DropdownMenuRadioItem key={p.id} value={p.id}>
+                <ProviderIcon id={p.id} />
+                {p.label}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        )}
+        {active && (active.kind === 'cli' || models.length > 0) && (
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger inset>
+              Model
+              <span className="ml-auto truncate font-mono text-xs text-muted-foreground">
+                {config?.model ?? 'Default'}
+              </span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent className="max-h-80 overflow-y-auto">
+              <DropdownMenuRadioGroup
+                value={config?.model ?? CLI_DEFAULT}
+                onValueChange={(model) =>
+                  void update({ model: model === CLI_DEFAULT ? null : model })
+                }
+              >
+                {active.kind === 'cli' && (
+                  <DropdownMenuRadioItem value={CLI_DEFAULT}>
+                    Default of {active.label}
+                  </DropdownMenuRadioItem>
+                )}
+                {models.map((model) => (
+                  <DropdownMenuRadioItem key={model} value={model} className="font-mono text-xs">
+                    {model}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        )}
+        {available.length > 0 && <DropdownMenuSeparator />}
+        <DropdownMenuItem inset onSelect={() => useSettingsDialog.getState().show('ai')}>
+          AI settings
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

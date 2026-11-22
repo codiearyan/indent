@@ -11,6 +11,7 @@ import { playLinkedVideo } from '@/features/workspace/video'
 import { isShortcut } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { activeProvider, useAi } from './aiStore'
+import { AiSwitch, ProviderPicker } from './AiSettings'
 import { focusLine } from './attachments'
 import { toggleTutor } from './toggleTutor'
 import { InstallOpencode } from './InstallOpencode'
@@ -20,6 +21,7 @@ import { MESSAGE_BUDGET, useChat } from './chatStore'
 export function ChatPanel(): React.JSX.Element {
   const config = useAi((s) => s.config)
   const provider = activeProvider(config)
+  const off = config?.enabled === false
   const { messages, busy, error, remaining, focus, send, stop } = useChat()
   const [draft, setDraft] = useState('')
   const listRef = useRef<HTMLDivElement>(null)
@@ -78,7 +80,9 @@ export function ChatPanel(): React.JSX.Element {
           stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48
         }}
       >
-        {messages.length === 0 ? (
+        {off ? (
+          <AiSwitch />
+        ) : messages.length === 0 ? (
           <EmptyState hasProvider={!!provider} loading={!config} />
         ) : (
           <div className="flex flex-col gap-4">
@@ -110,7 +114,7 @@ export function ChatPanel(): React.JSX.Element {
             )}
           </div>
         )}
-        {error && (
+        {error && !off && (
           <div className="mt-4 flex flex-col items-start gap-1.5 text-[13px]">
             <p role="alert" className="text-destructive">
               {error}
@@ -127,56 +131,62 @@ export function ChatPanel(): React.JSX.Element {
         )}
       </div>
 
-      <div className="shrink-0 border-t border-border p-3">
-        <div className="flex items-end gap-2">
-          <Textarea
-            id="tutor-input"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (isShortcut(e, 'sendMessage') && !e.nativeEvent.isComposing) {
-                e.preventDefault()
-                submit()
-              }
-            }}
-            placeholder="Ask about this issue"
-            aria-label="Ask about this issue"
-            disabled={!provider || outOfMessages}
-            className="max-h-40 min-h-16 resize-none border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent dark:bg-transparent"
-          />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {busy ? (
-                <Button
-                  size="icon"
-                  variant="outline"
-                  aria-label="Stop"
-                  className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
-                  onClick={stop}
-                >
-                  <Square />
-                </Button>
-              ) : (
-                <Button
-                  size="icon"
-                  variant="outline"
-                  aria-label="Send"
-                  className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
-                  disabled={!canSend}
-                  onClick={submit}
-                >
-                  <SendHorizontal />
-                </Button>
-              )}
-            </TooltipTrigger>
-            <TooltipContent>{busy ? 'Stop' : 'Send'}</TooltipContent>
-          </Tooltip>
+      {!off && (
+        <div className="shrink-0 border-t border-border p-3">
+          <div className="flex items-end gap-2">
+            <Textarea
+              id="tutor-input"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (isShortcut(e, 'sendMessage') && !e.nativeEvent.isComposing) {
+                  e.preventDefault()
+                  submit()
+                }
+              }}
+              placeholder="Ask about this issue"
+              aria-label="Ask about this issue"
+              disabled={!provider || outOfMessages}
+              className="max-h-40 min-h-16 resize-none border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent dark:bg-transparent"
+            />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                {busy ? (
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    aria-label="Stop"
+                    className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
+                    onClick={stop}
+                  >
+                    <Square />
+                  </Button>
+                ) : (
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    aria-label="Send"
+                    className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
+                    disabled={!canSend}
+                    onClick={submit}
+                  >
+                    <SendHorizontal />
+                  </Button>
+                )}
+              </TooltipTrigger>
+              <TooltipContent>{busy ? 'Stop' : 'Send'}</TooltipContent>
+            </Tooltip>
+          </div>
+          <div className="mt-1.5 flex min-w-0 items-center gap-2">
+            <ProviderPicker />
+            {budgeted && (
+              <span className="ml-auto shrink-0 text-xs text-muted-foreground tabular-nums">
+                {remaining} of {MESSAGE_BUDGET} messages left
+              </span>
+            )}
+          </div>
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          {provider ? `Using ${provider.label}` : 'No AI provider yet'}
-          {budgeted && `, ${remaining} of ${MESSAGE_BUDGET} messages left this session`}
-        </p>
-      </div>
+      )}
     </aside>
   )
 }
@@ -204,7 +214,6 @@ function EmptyState({
   hasProvider: boolean
   loading: boolean
 }): React.JSX.Element | null {
-  const openMenu = useAi((s) => s.openMenu)
   const setupStep = useOpencodeSetup((s) => s.setup.step)
   if (loading) return null
   // A setup started here stays in view until OpenCode has answered.
@@ -217,7 +226,7 @@ function EmptyState({
           key, or install OpenCode here with its free models.
         </p>
         <InstallOpencode />
-        <Button variant="outline" size="sm" onClick={openMenu}>
+        <Button variant="outline" size="sm" onClick={() => useSettingsDialog.getState().show('ai')}>
           Set up AI
         </Button>
       </div>

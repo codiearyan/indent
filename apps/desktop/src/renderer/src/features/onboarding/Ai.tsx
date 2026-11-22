@@ -40,7 +40,7 @@ export function Ai({ staged }: { staged: boolean }): React.JSX.Element {
     <StepLayout
       staged={staged}
       title="Learn with AI, or without"
-      lead="You can change this any time from the AI menu."
+      lead="You can change this any time from the tutor."
     >
       <RadioGroup
         aria-label="AI help"

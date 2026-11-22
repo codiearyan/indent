@@ -7,7 +7,6 @@ import { EditorPane } from '@/features/editor/EditorPane'
 import { TerminalPane } from '@/features/terminal/TerminalPane'
 import { BrowserPane } from '@/features/browser/BrowserPane'
 import { ChatPanel } from '@/features/ai/ChatPanel'
-import { useAiEnabled } from '@/features/ai/aiStore'
 import { useOpenWhenFinished } from '@/features/completion/useOpenWhenFinished'
 import { Tour } from '@/features/tour/Tour'
 import { ToolNotice } from './ToolNotice'
@@ -36,8 +35,7 @@ export function WorkspacePage(): React.JSX.Element {
   const lessonSide = useSettings((s) => s.lessonSide)
   const setPanel = useSettings((s) => s.setPanel)
   const terminalRef = usePanelRef()
-  const aiOn = useAiEnabled()
-  const chat = panels.chat && !panels.zen && aiOn
+  const chat = panels.chat && !panels.zen
   const companion = useWorkspace((s) => s.companion)
   const browser = useWorkspace((s) => Boolean(s.chapter?.preview)) && panels.browser
   const status = useWorkspace((s) => s.status)
@@ -108,8 +106,8 @@ export function WorkspacePage(): React.JSX.Element {
                 <LeftPanel />
               </Pane>
             </Panel>
-            {panels.chat && aiOn && <Separator className={`h-px ${separator}`} />}
-            {panels.chat && aiOn && (
+            {panels.chat && <Separator className={`h-px ${separator}`} />}
+            {panels.chat && (
               <Panel id="chat" defaultSize="40%" minSize="25%">
                 <Pane id="tutor">
                   <ChatPanel />

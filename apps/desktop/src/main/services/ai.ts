@@ -77,7 +77,7 @@ const API_PROVIDERS: { id: ApiProviderId; label: string; models: string[]; fast:
 const CLI_FAST_MODEL: Partial<Record<CliProviderId, string>> = { 'claude-code': 'haiku' }
 
 const CHAT_TIMEOUT_MS = 120_000
-const AI_OFF = 'AI is off. Turn it on from the AI menu.'
+const AI_OFF = 'AI is off. Turn it on from the tutor or in Settings.'
 // A CLI starts a whole agent before it answers, so it gets longer than an HTTP call.
 const TEST_TIMEOUT_MS = { cli: 45_000, api: 20_000 }
 const COMPLETE_TIMEOUT_MS = { cli: 20_000, api: 8_000 }
@@ -190,7 +190,7 @@ interface Reply {
 
 async function streamReply(config: AiConfig, reply: Reply): Promise<void> {
   if (!config.provider)
-    throw new Error('No AI provider is set up yet. Open the AI menu to pick one.')
+    throw new Error('No AI provider is set up yet. Open AI settings to pick one.')
   const apiDef = API_PROVIDERS.find((p) => p.id === config.provider)
   if (apiDef) {
     const key = (await loadKeys())[apiDef.id] ?? ''
