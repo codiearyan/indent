@@ -772,6 +772,8 @@ export interface Api {
     onChatEvent(listener: (event: AiChatEvent) => void): Unsubscribe
     /** One inline suggestion for the cursor position; empty string when there is none. */
     complete(request: AiCompleteRequest): Promise<string>
+    /** Stops the suggestion being written; its complete() resolves with an empty string. */
+    cancelComplete(): void
     /** Sends one tiny fixed prompt through the chosen provider and model; resolves with the reply. */
     test(): Promise<string>
     /** Writes a tip for a task that keeps failing and saves it; resolves with the progress. */
@@ -829,7 +831,7 @@ export const INVOKE_METHODS = {
 /** Fire-and-forget renderer to main messages. */
 export const SEND_METHODS = {
   terminal: ['write', 'resize', 'kill'],
-  ai: ['cancel'],
+  ai: ['cancel', 'cancelComplete'],
   telemetry: ['track']
 } as const
 

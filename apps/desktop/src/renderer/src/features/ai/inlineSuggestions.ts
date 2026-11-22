@@ -6,6 +6,7 @@ import { api } from '@/lib/api'
 import { monacoShortcut, SHORTCUTS } from '@/lib/shortcuts'
 import { track } from '@/lib/telemetry'
 import { useProgress } from '@/stores/progress'
+import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { bindShortcuts } from '@/features/editor/shortcutBindings'
 import { useAi } from './aiStore'
@@ -23,6 +24,38 @@ function pause(ms: number, token: Monaco.CancellationToken): Promise<boolean> {
       resolve(false)
     })
   })
+}
+
+/** The suggestion being written, if any, and how to stop it; the editor shows it at the cursor. */
+export const usePendingSuggestion = create<{
+  pending: { model: Monaco.editor.ITextModel; position: Monaco.IPosition; stop(): void } | null
+}>(() => ({ pending: null }))
+
+/** Waits for a suggestion while the editor shows it is coming; empty when stopped or cancelled. */
+async function writeSuggestion(
+  request: AiCompleteRequest,
+  model: Monaco.editor.ITextModel,
+  position: Monaco.IPosition,
+  token: Monaco.CancellationToken
+): Promise<string> {
+  let stop = (): void => {}
+  const stopped = new Promise<string>((resolve) => {
+    stop = () => {
+      api.ai.cancelComplete()
+      resolve('')
+    }
+  })
+  const pending = { model, position, stop }
+  const subscription = token.onCancellationRequested(stop)
+  usePendingSuggestion.setState({ pending })
+  try {
+    return await Promise.race([api.ai.complete(request), stopped])
+  } finally {
+    subscription.dispose()
+    if (usePendingSuggestion.getState().pending === pending) {
+      usePendingSuggestion.setState({ pending: null })
+    }
+  }
 }
 
 /** The task under the cursor of the editor last typed in; the editor bar reads it. */
@@ -82,6 +115,20 @@ export function bindSuggestShortcut(
     onRequest.set(waitsForRequest(useAi.getState().config, task, progress))
   }
   sync()
+  // Esc stops a suggestion being written in this editor. In Vim mode Esc stays Vim's; leaving
+  // insert mode moves the cursor, which stops it anyway.
+  const pending = editor.createContextKey<boolean>('suggestionPending', false)
+  const syncPending = (): void => {
+    const shown = usePendingSuggestion.getState().pending
+    pending.set(!!shown && shown.model === editor.getModel() && !useSettings.getState().editor.vim)
+  }
+  editor.onDidDispose(usePendingSuggestion.subscribe(syncPending))
+  editor.onDidChangeModel(syncPending)
+  editor.addCommand(
+    monaco.KeyCode.Escape,
+    () => usePendingSuggestion.getState().pending?.stop(),
+    'suggestionPending && editorTextFocus'
+  )
   editor.onDidDispose(useAi.subscribe(sync))
   editor.onDidDispose(useProgress.subscribe(sync))
   editor.onDidChangeCursorPosition(sync)
@@ -121,7 +168,7 @@ export function registerInlineSuggestions(monaco: typeof Monaco): Monaco.IDispos
       if (explicit) track('suggestion_requested', { repo: chapter.labId, issue: chapter.id })
       const request = completionRequest(model, position)
       if (!request) return none
-      const insertText = await api.ai.complete(request)
+      const insertText = await writeSuggestion(request, model, position, token)
       if (!insertText || token.isCancellationRequested) return none
       return {
         items: [

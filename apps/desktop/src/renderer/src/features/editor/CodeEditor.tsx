@@ -4,6 +4,7 @@ import { monacoShortcut, SHORTCUTS } from '@/lib/shortcuts'
 import { useSettings, type Typography } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { bindSuggestShortcut } from '@/features/ai/inlineSuggestions'
+import { SuggestionPending } from '@/features/ai/SuggestionPending'
 import { SelectionAsk } from '@/features/ai/SelectionAsk'
 import { bindTutorActions } from '@/features/ai/tutorActions'
 import { TOUR } from '@/features/tour/anchors'
@@ -175,6 +176,7 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
       <div className="relative min-h-0 flex-1">
         <div ref={hostRef} data-tour={group === 0 ? TOUR.editor : undefined} className="h-full" />
         <SelectionAsk editor={editor} />
+        <SuggestionPending editor={editor} />
       </div>
       <div ref={vimStatusRef} hidden={!vim} className="vim-status" />
     </div>
