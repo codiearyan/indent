@@ -1,7 +1,7 @@
 import { safeStorage } from 'electron'
 import { randomUUID } from 'crypto'
 import { readFile, writeFile } from 'fs/promises'
-import { join } from 'path'
+import { dirname, join } from 'path'
 import type {
   AiChatEvent,
   AiChatRequest,
@@ -10,6 +10,7 @@ import type {
   AiProviderId,
   AiProviderInfo,
   ChapterDef,
+  LabMeta,
   ProgressState,
   WorkspaceFile
 } from '@shared/types'
@@ -23,6 +24,7 @@ import { resolveInside } from './workspaceFiles'
 import { CLI_BINS, cliModels, cliVersion, runCli, which } from './ai/cli'
 import { GEMINI_URL, OPENAI_URL, anthropicStream, openAiCompatibleStream } from './ai/http'
 import type { CliProviderId } from './ai/parsers'
+import { learnerContext } from './ai/learner'
 import {
   COMPLETION_RULES,
   TIP_RULES,
@@ -203,6 +205,15 @@ async function streamReply(config: AiConfig, reply: Reply): Promise<void> {
   })
 }
 
+/** The repo's lab.json; null when it cannot be read, so the chat still works without it. */
+async function loadLab(labId: string, chapterId: string): Promise<LabMeta | null> {
+  const file = join(dirname(chapterContentDir(labId, chapterId)), 'lab.json')
+  return readFile(file, 'utf8').then(
+    (text) => JSON.parse(text) as LabMeta,
+    () => null
+  )
+}
+
 async function loadChapter(labId: string, chapterId: string): Promise<[ChapterDef, string]> {
   const dir = chapterContentDir(labId, chapterId)
   const [chapter, lesson] = await Promise.all([
@@ -235,9 +246,10 @@ async function runChat(
 ): Promise<void> {
   const timeout = AbortSignal.timeout(CHAT_TIMEOUT_MS)
   try {
-    const [[chapter, lesson], progress] = await Promise.all([
+    const [[chapter, lesson], progress, lab] = await Promise.all([
       loadChapter(request.labId, request.chapterId),
-      getProgress()
+      getProgress(),
+      loadLab(request.labId, request.chapterId)
     ])
     const messages = trimHistory(request.messages)
     if (messages[messages.length - 1]?.role !== 'user') throw new Error('Ask a question first.')
@@ -247,7 +259,10 @@ async function runChat(
         lesson,
         activeFile: request.activeFile,
         lastCheck: request.lastCheck,
-        progress: progress.chapters[chapterKey(request.labId, request.chapterId)]
+        progress: progress.chapters[chapterKey(request.labId, request.chapterId)],
+        learner: lab
+          ? learnerContext(progress, request.labId, lab, chapter, request.learner)
+          : undefined
       }),
       messages,
       quick: false,

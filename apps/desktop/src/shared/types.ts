@@ -541,6 +541,13 @@ export interface AiChatRequest {
   /** The main process adds the lesson and tasks itself. */
   activeFile?: WorkspaceFile
   lastCheck?: CheckResult[]
+  /** What the learner said in setup; the main process adds their progress itself. */
+  learner?: LearnerPrefs
+}
+
+export interface LearnerPrefs {
+  experience?: 'new' | 'some' | 'experienced'
+  learnFirst?: 'reading' | 'videos'
 }
 
 export type AiChatEvent =
