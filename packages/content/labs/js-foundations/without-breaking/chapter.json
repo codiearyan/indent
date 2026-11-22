@@ -1,0 +1,129 @@
+{
+  "id": "without-breaking",
+  "title": "Changing without breaking",
+  "files": ["src/copies.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here: its last line shows whether the shelf survived the day.",
+    "suggestedCommand": "node src/copies.js"
+  },
+  "tasks": [
+    {
+      "id": "with",
+      "title": "Plan a new scent",
+      "file": "src/copies.js",
+      "description": "Under `// Task 1` in `src/copies.js`, make `withScent(scents, scent)` return a new list: every scent of `scents`, in order, with `scent` added at the end. `scents` itself stays as it was.\n\nCheck calls `withScent` with lists of its own, an empty one included, then makes sure the list it handed in has not changed and that what came back is a new list, not that same one.",
+      "nextSteps": [
+        "Read the lesson's part on making a copy.",
+        "Make a new list that holds every scent of `scents`.",
+        "Put the new scent at its end, and give the new list back.",
+        "Run the file: the last line should show the shelf without Pine."
+      ],
+      "hints": [
+        "`push` changes the list it is called on. Called on `scents`, it changes the shelf of whoever called `withScent`.",
+        "The spread form `...scents` inside square brackets lays out every scent of the old list in a new one, and you can write more items after it.",
+        "The body is one line: `return [...scents, scent]`."
+      ],
+      "docs": [
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        },
+        {
+          "title": "Shallow copy",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Primitive and reference values",
+          "url": "https://www.youtube.com/watch?v=FxUQazhlS9o"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "featured",
+      "title": "Pick the featured scents",
+      "file": "src/copies.js",
+      "description": "Under `// Task 2`, make `featured(scents, count)` return a new list of the first `count` scents of `scents`, in their order. When `scents` has fewer than `count`, all of them are featured. `scents` stays as it was.\n\nCheck calls `featured` with lists and counts of its own, a count of 0, a count larger than the list and an empty list included, then makes sure the list it handed in has not changed and that a new list came back.",
+      "nextSteps": [
+        "Look up `slice` in the lesson: where it starts and where it stops.",
+        "Start from the first position.",
+        "Use `count` to say where to stop.",
+        "Run the file and try a count larger than the shelf."
+      ],
+      "hints": [
+        "One list tool from the lesson cuts out a part of a list as a new list, without touching the old one.",
+        "`slice(start, end)` keeps the items from `start` up to, but not including, `end`. An `end` past the last item is no error: it just stops at the end, and it still makes a new list.",
+        "The body is one line: `return scents.slice(0, count)`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.slice()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice"
+        },
+        {
+          "title": "Shallow copy",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "without",
+      "title": "Leave the last one out",
+      "file": "src/copies.js",
+      "description": "Under `// Task 3`, make `withoutLast(scents)` return a new list of every scent of `scents` but the last one. An empty list gives an empty list. `scents` stays as it was.\n\nCheck calls `withoutLast` with lists of its own, one scent and none included, then makes sure the list it handed in has not changed and that a new list came back.",
+      "nextSteps": [
+        "Remember what `pop` does to the list it is called on.",
+        "Make the new list with a tool that leaves the old one alone.",
+        "Work out where to stop from the length of `scents`.",
+        "Run the file: the shelf in the last line should still end in Amber."
+      ],
+      "hints": [
+        "`pop` would take the last scent off the shelf of whoever called you. Use a tool that makes a new list instead.",
+        "`slice` stops just before its end position, so the end you want is the last position, worked out from the length. Or copy the list first and change only the copy.",
+        "The body is one line: `return scents.slice(0, scents.length - 1)`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.slice()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice"
+        },
+        {
+          "title": "Array.prototype.pop()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "labels",
+      "title": "Label without touching the shelf",
+      "file": "src/copies.js",
+      "description": "Under `// Task 4`, first write a function of your own, `labelFor(scent)`: it returns `'Wickhollow '` followed by the scent, like `'Wickhollow Sage'`. It only helps `labelsFor`, so it stays off the export line.\n\nThen fix Theo's `labelsFor(scents)`. Today it writes the labels over the list it is given. Make it return a new list with the label of each scent, in the same order, using `labelFor`, and leave `scents` as it was.\n\nCheck calls `labelFor` with scents of its own, then `labelsFor` with lists of its own, an empty one included. It makes sure the list handed in has not changed, that a new list came back, and that `labelsFor` uses `labelFor`.",
+      "nextSteps": [
+        "Run the file and read its last line: Theo's function changed the shelf.",
+        "Write `labelFor` above `labelsFor`, from its name to its closing brace.",
+        "In `labelsFor`, start an empty list and fill it, one label per scent.",
+        "Give the new list back and run the file again."
+      ],
+      "hints": [
+        "`scents[i] = ...` puts a value at a position of the list it was handed, which is the shelf itself. The labels need a list of their own.",
+        "Start with an empty list before the loop, `push` one label into it for each scent, and give it back after the loop.",
+        "`labelFor` is `return 'Wickhollow ' + scent`. In `labelsFor`: `const labels = []`, then `for (const scent of scents) { labels.push(labelFor(scent)) }`, then `return labels`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.push()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push"
+        },
+        {
+          "title": "for...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

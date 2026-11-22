@@ -1,0 +1,172 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "theo", "label": "Shop page", "kind": "story" },
+      { "id": "byname", "label": "byName()", "kind": "function", "mine": true, "fn": "byName" },
+      { "id": "cheapest", "label": "cheapestFirst()", "kind": "function", "mine": true, "fn": "cheapestFirst" },
+      { "id": "dearest", "label": "dearest()", "kind": "function", "mine": true, "fn": "dearest" },
+      { "id": "stock", "label": "Stock", "kind": "data" },
+      { "id": "pour", "label": "needsPouring()", "kind": "function", "mine": true, "fn": "needsPouring" },
+      { "id": "ready", "label": "readyForMarket()", "kind": "function", "mine": true, "fn": "readyForMarket" }
+    ],
+    "edges": [
+      { "from": "byname", "to": "theo", "label": "names in order" },
+      { "from": "cheapest", "to": "theo", "label": "prices in order" },
+      { "from": "dearest", "to": "theo", "label": "top prices" },
+      { "from": "stock", "to": "pour", "label": "counts" },
+      { "from": "stock", "to": "ready", "label": "counts" }
+    ],
+    "note": "Sorted copies go to the shop page while the shelf lists keep their order, and the stock answers yes or no questions."
+  },
+  "tasks": {
+    "byname": {
+      "trace": {
+        "file": "src/sorting.js",
+        "call": "byName",
+        "args": [["Sage", "Cedar", "Smoked fig", "Lavender", "Amber", "Bergamot"]]
+      },
+      "steps": [
+        {
+          "active": ["byname"],
+          "value": {
+            "kind": "array",
+            "label": "the shelf",
+            "values": ["Sage", "Cedar", "Smoked fig", "Lavender", "Amber", "Bergamot"]
+          },
+          "note": "Theo wants the scents on the page from A to Z."
+        },
+        {
+          "active": ["byname"],
+          "note": "byName() sorts a list of its own, so the shelf keeps its order."
+        },
+        {
+          "active": ["byname", "byname->theo", "theo"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "names", "value": "a new list, A to Z" }]
+          },
+          "note": "The page gets the names in order."
+        }
+      ]
+    },
+    "cheapest": {
+      "trace": {
+        "file": "src/sorting.js",
+        "call": "cheapestFirst",
+        "args": [[1800, 1250, 900, 1100, 4500, 2000]]
+      },
+      "steps": [
+        {
+          "active": ["cheapest"],
+          "value": {
+            "kind": "array",
+            "label": "the shelf's prices",
+            "values": [1800, 1250, 900, 1100, 4500, 2000]
+          },
+          "note": "Theo wants the prices cheapest first, and the last try put 900 at the end."
+        },
+        {
+          "active": ["cheapest"],
+          "note": "cheapestFirst() sorts the prices as numbers, on a list of its own."
+        },
+        {
+          "active": ["cheapest", "cheapest->theo", "theo"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "prices", "value": "a new list, lowest first" }]
+          },
+          "note": "The page shows the prices in the order a customer expects."
+        }
+      ]
+    },
+    "dearest": {
+      "trace": {
+        "file": "src/sorting.js",
+        "call": "dearest",
+        "args": [[1800, 1250, 900, 1100, 4500, 2000], 3]
+      },
+      "steps": [
+        {
+          "active": ["dearest"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "prices", "value": "the shelf's prices" },
+              { "key": "count", "value": 3 }
+            ]
+          },
+          "note": "Theo wants the three dearest candles for a gift section."
+        },
+        {
+          "active": ["dearest", "dearest->theo", "theo"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "top prices", "value": "a new list, at most count long" }]
+          },
+          "note": "dearest() hands the page the few highest prices, the highest first."
+        }
+      ]
+    },
+    "pour": {
+      "trace": {
+        "file": "src/sorting.js",
+        "call": "needsPouring",
+        "args": [[6, 2, 9, 4, 1, 7]]
+      },
+      "steps": [
+        {
+          "active": ["stock", "stock->pour", "pour"],
+          "value": {
+            "kind": "array",
+            "label": "today's stock",
+            "values": [6, 2, 9, 4, 1, 7]
+          },
+          "note": "On Friday Ines asks whether any scent is running low."
+        },
+        {
+          "active": ["pour"],
+          "note": "Your helper says whether one count is low, and needsPouring() asks it about the counts."
+        },
+        {
+          "active": ["pour"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "answer", "value": "true or false" }]
+          },
+          "note": "Ines gets a yes or a no, and pours a batch on a yes."
+        }
+      ]
+    },
+    "ready": {
+      "trace": {
+        "file": "src/sorting.js",
+        "call": "readyForMarket",
+        "args": [[6, 2, 9, 4, 1, 7]]
+      },
+      "steps": [
+        {
+          "active": ["stock", "stock->ready", "ready"],
+          "note": "Before Saturday, Ines asks whether there is enough of every scent."
+        },
+        {
+          "active": ["ready"],
+          "note": "readyForMarket() asks the same question about every count."
+        },
+        {
+          "active": ["ready"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "answer", "value": "true or false" }]
+          },
+          "note": "A yes means the van can be packed."
+        }
+      ]
+    }
+  }
+}

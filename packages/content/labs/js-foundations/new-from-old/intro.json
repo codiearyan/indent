@@ -1,0 +1,26 @@
+{
+  "stations": [
+    {
+      "title": "Ines",
+      "say": "What do I take to the market?",
+      "note": "Round prices, a cheap table, tags."
+    },
+    { "title": "The shelf", "rows": [["Cedar", "1250"], ["Sage", "1800"], ["Smoked fig", "900"]] },
+    {
+      "title": "Your code",
+      "file": "map-filter-find.js",
+      "mine": true,
+      "gap": "Every list by hand",
+      "tasks": ["Round every price", "Keep the cheap ones", "Find by first letter", "Tags that fit"]
+    },
+    { "title": "Market stall", "text": "Round prices, a cheap table, printed tags." }
+  ],
+  "ticket": { "label": "Market day", "wrong": "by hand", "why": "Too slow", "right": "lists ready" },
+  "captions": [
+    "Saturday is market day, and Ines needs new lists made from the shelf.",
+    "Each list means going down the shelf by hand and writing a new one.",
+    "You hand small functions to map, filter and find, in four tasks.",
+    "Now the round prices, the cheap table and the tags come from the shelf.",
+    "The shelf stays the same, and every market list is made from it."
+  ]
+}

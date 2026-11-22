@@ -1,0 +1,161 @@
+{
+  "id": "shelf-list",
+  "title": "A list for the shelf",
+  "files": ["src/arrays.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the shelf after each task.",
+    "suggestedCommand": "node src/arrays.js"
+  },
+  "tasks": [
+    {
+      "id": "last",
+      "title": "Read the end of the shelf",
+      "file": "src/arrays.js",
+      "description": "Under `// Task 1` in `src/arrays.js`, make `lastOnShelf(shelf)` return the last scent of `shelf`, however many scents it holds, and leave `shelf` as it was. An empty shelf gives `'Empty shelf'`.\n\nCheck calls `lastOnShelf` with shelves of its own, of different lengths, one scent and none included, then makes sure the shelf it handed in still has all its scents.",
+      "nextSteps": [
+        "Read the lesson's part on positions and length.",
+        "Handle the empty shelf first, by asking about its length.",
+        "Work out the last position from the length, so it fits a shelf of any size.",
+        "Run the file: the first line should name the last scent of today's shelf."
+      ],
+      "hints": [
+        "A shelf of four scents and a shelf of nine have their last scent at different positions. The one thing that tells you where is the length.",
+        "Positions count from 0, so the last position is one less than the length. Reading a position the list does not have gives undefined, which is what an empty shelf would give.",
+        "The function has the shape `if (shelf.length === 0) { return 'Empty shelf' }`, then `return shelf[...]` with the last position worked out from `shelf.length`."
+      ],
+      "docs": [
+        {
+          "title": "Array",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"
+        },
+        {
+          "title": "Array: length",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Arrays in a few minutes",
+          "url": "https://www.youtube.com/watch?v=oigfaZ5ApsM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "restock",
+      "title": "Restock a scent",
+      "file": "src/arrays.js",
+      "description": "Under `// Task 2`, make `restock(shelf, scent)` put `scent` at the end of `shelf`, unless the shelf has it already: a scent is never on the shelf twice. Either way it returns how many scents are on the shelf now.\n\nCheck calls `restock` with shelves of its own and looks at the number that comes back and at the shelf afterwards, with a scent that is new and one that is there already.",
+      "nextSteps": [
+        "Ask whether the shelf already has the scent.",
+        "When it does not, add the scent at the end of the shelf.",
+        "After that, give back how many scents the shelf holds.",
+        "Run the file and look at the line for Task 2."
+      ],
+      "hints": [
+        "Two list tools from the lesson do this job: one answers whether a list holds a value, the other adds at the end.",
+        "`includes` gives back true or false, which an `if` can ask. The `!` in front of a question turns true into false. The count comes from the shelf's length after adding.",
+        "The function has the shape `if (!shelf.includes(scent)) { shelf.push(scent) }`, then `return shelf.length`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.push()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push"
+        },
+        {
+          "title": "Array.prototype.includes()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sell",
+      "title": "Sell from the end",
+      "file": "src/arrays.js",
+      "description": "Under `// Task 3`, make `sellLast(shelf)` take the last scent off `shelf` and return `'Sold '` followed by its name, like `'Sold Amber'`. An empty shelf gives `'Nothing to sell'`.\n\nCheck calls `sellLast` with shelves of its own, an empty one included, and looks at the text that comes back and at the shelf afterwards: it must have lost its last scent and nothing else.",
+      "nextSteps": [
+        "Handle the empty shelf first.",
+        "Take the last scent off the shelf, and keep what comes off.",
+        "Give back the text with that scent's name in it.",
+        "Run the file: the line for Task 3 should name the scent Task 2 added."
+      ],
+      "hints": [
+        "Reading the last position only looks at a scent. The task takes it off the shelf too, and one list tool does both at once.",
+        "`pop()` takes the last item off a list and gives it back. Each call takes one more, so call it once and keep its answer in a `const`.",
+        "After the empty check, `const scent = shelf.pop()`, then return `'Sold '` joined to `scent`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.pop()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop"
+        },
+        {
+          "title": "Array: length",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "spot",
+      "title": "Find a scent's spot",
+      "file": "src/arrays.js",
+      "description": "Under `// Task 4`, make `shelfSpot(shelf, scent)` return `'Sage is in spot 2'` for a scent on the shelf, with the spot counted from 1 the way the shop counts, and `'No Pine on the shelf'` for one that is not there. When a scent is there twice, the spot of the first one counts.\n\nCheck calls `shelfSpot` with shelves of its own: a scent in the first spot, in the last, twice, and not there at all.",
+      "nextSteps": [
+        "Find the position of the scent with the list tool from the lesson.",
+        "Ask whether it was found, using the answer that means not found.",
+        "Turn the position into the shop's spot number, which starts at 1.",
+        "Run the file and try a scent that is not on today's shelf."
+      ],
+      "hints": [
+        "One list tool gives back where a value is, counting from 0, and a special number when it is not there at all.",
+        "`indexOf` gives -1 when the value is missing. Ask about -1 exactly: a scent in the first spot has position 0, and 0 counts as false in an `if`.",
+        "Keep `shelf.indexOf(scent)` in a `const`, return the not-there text when it is `-1`, and otherwise build the text with the position plus 1."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.indexOf()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf"
+        },
+        {
+          "title": "Template literals",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "takings",
+      "title": "Add up the day",
+      "file": "src/arrays.js",
+      "description": "Under `// Task 5`, first write a function of your own, `isRefund(cents)`: it returns `true` when `cents` is below 0, and `false` otherwise. It only helps `takings`, so it stays off the export line.\n\nThen make `takings(amounts)` return the sum of the sales in `amounts`, leaving the refunds out. Go through `amounts` with `for...of` and ask `isRefund` about each one. An empty day takes 0.\n\nCheck calls `isRefund` with amounts of its own, 0 included, then `takings` with days of its own, an empty day and a day of only refunds included. It also makes sure `takings` uses `isRefund` and `for...of`.",
+      "nextSteps": [
+        "Write `isRefund` from the word `function` to its closing brace, under the comment for Task 5.",
+        "In `takings`, start a sum at 0 before the loop.",
+        "Go through the amounts with `for...of` and add each one that is not a refund.",
+        "Give the sum back after the loop and run the file."
+      ],
+      "hints": [
+        "This is the `for...of` loop from the issue on loops, going over a list instead of a text, with a sum that grows each round.",
+        "A sum needs a starting value, or the first addition gives NaN. The return goes after the loop: inside it, the function would end in the first round.",
+        "`isRefund` is one line: `return cents < 0`. In `takings`, inside `for (const cents of amounts)`, add `cents` to the sum when `!isRefund(cents)`."
+      ],
+      "docs": [
+        {
+          "title": "for...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of"
+        },
+        {
+          "title": "Functions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions"
+        },
+        {
+          "title": "Addition assignment (+=)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Addition_assignment"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

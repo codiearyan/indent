@@ -1,8 +1,8 @@
 # Turning orders into answers
 
-## Welcome to Wickhollow Candles
+## The request from Theo
 
-Wickhollow Candles pours candles by hand and sells them online. Two people run it: Ines packs the parcels and Theo answers every email. Until now, Theo copied orders into a spreadsheet by hand every Sunday. That stopped working when the shop got its first mention in a newsletter.
+The shop sells online too, and Theo answers every email. Until now, he copied the orders into a spreadsheet by hand every Sunday. That stopped working when the shop got its first mention in a newsletter.
 
 > **Theo:** We have a file of last week's orders. I just want three answers: what each order came to, which candles sold best, and how much we made each day. Can you write that?
 
