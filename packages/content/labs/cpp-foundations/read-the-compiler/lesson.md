@@ -27,7 +27,7 @@ src/tea.cpp:9:20: error: use of undeclared identifier 'potsLeft'
       |                  ^
 ```
 
-Read it in pieces. `src/tea.cpp` is the file. `9` is the line and `20` the column, counted from the left. `error` is how serious it is. After that comes what the compiler found, in its own words. Below it, the compiler shows the line itself and puts a `^` under the spot it means.
+Read it in pieces. `src/tea.cpp` is the file. `9` is the line and `20` the column, counted from the left. `error` is how serious it is. After that comes what the compiler found, in its own words. Below it, the compiler shows the line itself and puts a `^` under the spot it means. Lines that say `note:` after an error add detail. Some point into the standard library's own files, with long paths and code you did not write: skip those and stay with the line in your file.
 
 The first part, file, line and `error`, looks the same on every C++ compiler. The words after it do not: GCC, the usual compiler on Linux, words the same problem differently, though it names `potsLeft` in quotes too. So do not learn the sentences by heart. Learn to find three things in them: the line, the kind of problem, and the name or symbol the message mentions in quotes.
 
@@ -41,7 +41,7 @@ Remember also that the line in the message is where the compiler _noticed_ the p
 
 - **Expected a semicolon.** The message says the compiler expected a `;`. The statement before it is not finished.
 - **A name it does not know.** The message says a name is not declared, and shows the name in quotes. Look for a typo, a capital letter, a missing `std::`, or a variable used above the line that makes it.
-- **A value that does not fit.** The message names two types and says one cannot be converted to the other, or cannot initialize it. Compare the type of the box with the kind of value you put in it.
+- **A value that does not fit.** The message names two types and says something like "no viable conversion" or "conversion from one to the other requested". Compare the type of the box with the kind of value you put in it.
 - **Not a member of std.** The name is right but the file never brought it in. Each part of the standard library lives in a header, and the `#include` line for that header goes at the top of the file. A name's reference page says which header it needs.
 
 That last one comes with a new friend. `std::setprecision(2)` sets how many digits to print, and with `std::fixed` before it, that means two digits after the point: `std::cout << std::fixed << std::setprecision(2) << 3.5` prints `3.50`. Both are explained properly in the next issue, where you price repairs.

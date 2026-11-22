@@ -49,7 +49,15 @@ export const checks = {
       file: FILE,
       task: 2,
       vars: { handsNeeded: 'int' },
-      source: keepsLine(/handsPerClock\s*\*\s*clocksOnBench|clocksOnBench\s*\*\s*handsPerClock/, 'works out the hands'),
+      source: (section) =>
+        keepsLine(/handsPerClock\s*\*\s*clocksOnBench|clocksOnBench\s*\*\s*handsPerClock/, 'works out the hands')(section) ??
+        (/^\s*(?:const\s+)?(?:int|auto|long|double)\s+(?!handsNeeded\b)\w+\s*[={;]/m.test(section.code) ||
+        !/<<\s*handsNeeded\s*<</.test(section.code)
+          ? fail(
+              'Prints handsNeeded',
+              'The line that prints the hands should print handsNeeded, the variable made on the line above it, by that exact name. A second variable with the misspelt name only hides the mistake.'
+            )
+          : null),
       typed:
         'Check changed the bench and the hands to fit stayed the same. Print the variable Kasimir made, not a number you typed.',
       cases: CASES.map((g) => {

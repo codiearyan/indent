@@ -85,7 +85,7 @@
         },
         {
           "active": ["file"],
-          "note": "The fix is at the top of the file, not on the line the message names."
+          "note": "The line itself stays as Kasimir wrote it."
         },
         {
           "active": ["compiler", "compiler->sheet", "sheet"],

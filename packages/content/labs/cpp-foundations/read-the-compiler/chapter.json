@@ -69,7 +69,7 @@
       "id": "crystal",
       "title": "Fix the crystal size",
       "file": "src/workbench.cpp",
-      "description": "Under `// Task 3`, the compiler refuses the line that makes `crystalSize`. Read its message and fix the mistake, so the program prints the width of the glass crystal from `crystalMm`, decimals included:\n\n```\nCrystal: 30.8 mm\n```\n\nKeep the name `crystalSize` and keep it made from `crystalMm`. Check builds your Task 3 lines with other widths, reads `crystalSize` and its type, and looks for the line.",
+      "description": "Under `// Task 3`, the compiler refuses the line that makes `crystalSize`. Read its message and fix the mistake, so the program prints the width of the glass crystal from `crystalMm`, decimals included:\n\n```\nCrystal: 30.8 mm\n```\n\nKeep the name `crystalSize`, keep it made from `crystalMm`, and keep the decimals. Check builds your Task 3 lines with other widths, reads `crystalSize` and its type, and looks for the line.",
       "nextSteps": [
         "Find the error whose line is under Task 3.",
         "Read which two types the message names.",

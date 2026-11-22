@@ -9,7 +9,7 @@
 //   a time limit, and compares what it printed and the values it wrote.
 // So one task is judged on its own, whatever state the others are in, with one build.
 import { spawn } from 'node:child_process'
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { access, mkdir, readdir, readFile, realpath, rm, writeFile } from 'node:fs/promises'
 import { constants } from 'node:fs'
 import { delimiter, join } from 'node:path'
 import { childEnv, clip } from '../../kit/sandbox.mjs'
@@ -99,10 +99,12 @@ function output(command, args, { cwd, input, timeoutMs, env } = {}) {
 }
 
 // On a Mac, /usr/bin/g++ and clang++ open an install prompt when Apple's developer tools are
-// missing, so they only count when xcode-select finds the tools.
+// missing, so they only count when xcode-select finds the tools. A link to one counts as one.
 async function appleToolsMissing(full) {
-  if (process.platform !== 'darwin' || !full.startsWith('/usr/bin/')) return false
-  const r = await output('xcode-select', ['-p'], { timeoutMs: 5000 })
+  if (process.platform !== 'darwin') return false
+  const real = await realpath(full).catch(() => full)
+  if (!full.startsWith('/usr/bin/') && !real.startsWith('/usr/bin/')) return false
+  const r = await output('/usr/bin/xcode-select', ['-p'], { timeoutMs: 5000 })
   return r.spawnError !== undefined || r.code !== 0
 }
 
@@ -275,6 +277,16 @@ export async function build(t, { file, task, vars = {}, cases = [{}] }) {
       ]
     }
   }
+  if (!/\bint\s+main\s*\(/.test(code.join('\n'))) {
+    return {
+      problem: [
+        fail(
+          `${file} keeps main`,
+          `Check cannot find main in ${file}. Every program starts at main, so keep the line int main() { as the starter wrote it.`
+        )
+      ]
+    }
+  }
   const kept = lines.map((line, i) => {
     if (i < first || (i >= start && i < end) || i >= closeLine) return line
     return ''
@@ -353,6 +365,10 @@ export async function build(t, { file, task, vars = {}, cases = [{}] }) {
   }
 
   const dir = await t.sandbox()
+  // A link copied from the workspace could lead a write of the program out of the copy.
+  for (const entry of await readdir(dir, { recursive: true, withFileTypes: true })) {
+    if (entry.isSymbolicLink()) await rm(join(entry.parentPath, entry.name))
+  }
   await writeFile(join(dir, file), kept.join('\n'))
   await mkdir(join(dir, '.check'), { recursive: true })
   const exe = join(dir, '.check', 'program')
@@ -374,7 +390,8 @@ export async function build(t, { file, task, vars = {}, cases = [{}] }) {
     const i = d.line - 1
     if (i === closeLine && d.column >= addedFrom && d.column < addedFrom + added.length) {
       const seg = segments.find((s) => d.column - addedFrom >= s.from && d.column - addedFrom < s.to)
-      return { place: 'added', seg }
+      // Outside a segment it is the learner's last line, reported at the next token (GCC).
+      if (seg) return { place: 'added', seg }
     }
     const j = i >= closeLine || kept[i]?.trim() === '' ? prevKept(i) : i
     return { place: j < first ? 'shared' : 'task', line: j + 1 }
@@ -455,7 +472,9 @@ export async function build(t, { file, task, vars = {}, cases = [{}] }) {
         ]
       }
     }
-    const linker = /undefined reference|Undefined symbols|ld returned|linker command failed/.test(made.stderr)
+    const all = made.stderr.split('\n')
+    const linkAt = all.findIndex((l) => /undefined reference|Undefined symbols|\bld\b|collect2|linker command/.test(l))
+    const linker = linkAt !== -1
     return {
       problem: [
         fail(
@@ -463,7 +482,11 @@ export async function build(t, { file, task, vars = {}, cases = [{}] }) {
           linker
             ? `The compiler read ${file}, but the linker could not finish the program. Build it in the terminal and read what the linker says is missing.`
             : `The compiler could not build ${file}. Build it in the terminal with ${COMMAND(file)} and read the first error.`,
-          clip(made.stderr.split('\n').filter((l) => !l.startsWith('/')).slice(0, 8).join('\n'))
+          clip(
+            linker
+              ? all.slice(linkAt, linkAt + 8).join('\n').replaceAll(`${dir}/`, '')
+              : all.filter((l) => !l.startsWith('/')).slice(0, 8).join('\n')
+          )
         )
       ]
     }
@@ -485,7 +508,12 @@ export async function build(t, { file, task, vars = {}, cases = [{}] }) {
   const runs = await Promise.all(
     cases.map(async (c) => {
       const input = givens.map((g) => stdinValue(c.given[g.name], g.type)).join('\n') + '\n'
-      const r = await output(exe, [], { cwd: dir, input, timeoutMs: RUN_SECONDS * 1000 })
+      const r = await output(exe, [], {
+        cwd: dir,
+        input,
+        timeoutMs: RUN_SECONDS * 1000,
+        env: { HOME: dir, TMPDIR: dir }
+      })
       return { given: c.given ?? {}, ...r }
     })
   )

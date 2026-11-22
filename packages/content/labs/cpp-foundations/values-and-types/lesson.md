@@ -63,12 +63,12 @@ You can make a variable without a value: `int cupsLeft;`. C++ does not fill it i
 
 The compiler checks every value against the type of its box. Three errors you will meet here:
 
-- **A value that does not fit.** `char row = "C";` gives text to a box for one character. The message says the value cannot be converted or used to initialize a `char`. Single quotes hold one character, double quotes hold text.
+- **A value that does not fit.** `char row = "C";` gives text to a box for one character. The message says something like an invalid conversion, or that a `char` cannot be initialized with it. Single quotes hold one character, double quotes hold text.
 - **A name it does not know.** `std::cout << cupPoured;` is a typo. The message says `cupPoured` is not declared. Check the spelling and the capitals, and that the variable is made above the line that uses it.
-- **Text in single quotes.** `'earl grey'` is not text. The compiler warns about a multi-character constant and treats it as a number, so it prints digits.
+- **Text in single quotes.** `'earl grey'` is not text. The compiler warns about a multi-character constant, or one too long for its type, and treats it as a number, so it prints digits.
 
 As in the first issue, the start of each message is the same everywhere: the file, the line, and `error` or `warning`. The words after it differ between compilers, and the name they mention is your best clue.
 
 ## Your work in this issue
 
-Open `src/ticket.cpp`. Today's slip is at the top of `main`: the ticket number, the customer, the item, the quote, the price of a key and the promised days. Check puts other tickets in those variables, so build every task on the names, not on the values. Build and run with `g++ -std=c++17 -Wall src/ticket.cpp -o ticket && ./ticket`, read what it prints and any warning above it, and work through the four tasks in order.
+Open `src/ticket.cpp`. Today's slip is at the top of `main`: the ticket number, the customer, the item, the quote, the price of a key and the promised days. Check puts other tickets in those variables, so build every task on the names, not on the values. Build and run with `g++ -std=c++17 -Wall src/ticket.cpp -o ticket && ./ticket`, read what it prints and any warning above it, and work through the four tasks in order. The first build warns that some variables are unused: nothing uses them yet, and those warnings go away as your tasks use them.

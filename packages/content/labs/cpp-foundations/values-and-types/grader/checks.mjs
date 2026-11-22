@@ -53,7 +53,11 @@ export const checks = {
         hint: ({ stdout }) =>
           stdout.split('\n').some((l) => loose(l) === loose(ticketLine(g)))
             ? 'Close. The pieces are all there, but a space or a capital letter is off. << puts nothing between the pieces, so the spaces go inside the quoted text.'
-            : 'The ticket line is not there yet. Print Ticket, the ticket number, a colon, the item, for and the customer, in that order, with the words between them as text in double quotes.'
+            : stdout
+                  .split('\n')
+                  .some((l) => /2187|carriage clock|Edwina Sallow|\b(?:ticketNumber|item|customer)\b/.test(l))
+              ? 'The ticket line does not follow the ticket Check gave. Send ticketNumber, item and customer by their names, with no quotes around them: in quotes, a name is only its letters.'
+              : 'The ticket line is not there yet. Print Ticket, the ticket number, a colon, the item, for and the customer, in that order, with the words between them as text in double quotes.'
       }))
     })
   },
