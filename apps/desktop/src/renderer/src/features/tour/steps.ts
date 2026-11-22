@@ -74,12 +74,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     anchor: TOUR.chat,
     title: 'Tutor',
-    text: 'A chat that knows the lesson, your tasks, the open file and your latest check.'
-  },
-  {
-    anchor: TOUR.aiSuggestions,
-    title: 'AI help',
-    text: 'Turn AI on or off, pick the AI that helps you, and choose when grey suggestions appear.'
+    text: 'A chat that knows the lesson, your tasks, the open file and your latest check. Switch the AI under the message box.'
   },
   {
     anchor: TOUR.view,

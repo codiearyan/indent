@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ModelSelect } from '@/features/ai/AiMenu'
+import { ModelSelect } from '@/features/ai/AiSettings'
 import { InstallOpencode } from '@/features/ai/InstallOpencode'
 import { useOpencodeSetup } from '@/features/ai/opencodeInstall'
 import { activeProvider, useAi } from '@/features/ai/aiStore'
@@ -95,7 +95,7 @@ export function ProviderPicker(): React.JSX.Element {
         ) : (
           !loading && (
             <p className="text-[13px] text-muted-foreground">
-              No provider yet. You can continue and pick one later from the AI menu.
+              No provider yet. You can continue and pick one later from the tutor.
             </p>
           )
         )}

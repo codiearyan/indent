@@ -4,18 +4,13 @@ import { api } from '@/lib/api'
 
 interface AiStore {
   config: AiConfig | null
-  /** The AI menu popover; other components open it with `openMenu()`. */
-  menuOpen: boolean
   load(): Promise<void>
   update(patch: AiSettingsPatch): Promise<void>
   setKey(provider: AiProviderId, key: string | null): Promise<void>
-  setMenuOpen(open: boolean): void
-  openMenu(): void
 }
 
 export const useAi = create<AiStore>()((set) => ({
   config: null,
-  menuOpen: false,
   load: async () => set({ config: await api.ai.getConfig() }),
   // Shown at once: the reply can wait seconds behind the search for installed CLIs.
   update: async (patch) => {
@@ -27,9 +22,7 @@ export const useAi = create<AiStore>()((set) => ({
       throw error
     }
   },
-  setKey: async (provider, key) => set({ config: await api.ai.setKey(provider, key) }),
-  setMenuOpen: (menuOpen) => set({ menuOpen }),
-  openMenu: () => set({ menuOpen: true })
+  setKey: async (provider, key) => set({ config: await api.ai.setKey(provider, key) })
 }))
 
 /** True until the config says otherwise, so the tutor does not flicker in while it loads. */

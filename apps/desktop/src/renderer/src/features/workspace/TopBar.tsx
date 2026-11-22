@@ -1,9 +1,9 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ChevronLeft, ChevronRight, CircleHelp, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { AiMenu } from '@/features/ai/AiMenu'
+import { ProviderIcon } from '@/components/app/ProviderIcon'
 import { StreakStatus } from '@/features/progress/StreakStatus'
-import { useAiEnabled } from '@/features/ai/aiStore'
+import { activeProvider, useAi } from '@/features/ai/aiStore'
 import { toggleTutor } from '@/features/ai/toggleTutor'
 import { cn } from '@/lib/utils'
 import { TOUR } from '@/features/tour/anchors'
@@ -21,7 +21,7 @@ export function TopBar(): React.JSX.Element {
   const navigate = useNavigate()
   const chapter = useWorkspace((s) => s.chapter)
   const chatOpen = useSettings((s) => s.panels.chat)
-  const aiOn = useAiEnabled()
+  const provider = useAi((s) => (s.config?.enabled ? activeProvider(s.config) : undefined))
   const ready = useWorkspace((s) => s.status === 'ready')
   const setTourOpen = useWorkspace((s) => s.setTourOpen)
   const companion = useWorkspace((s) => s.companion)
@@ -88,24 +88,21 @@ export function TopBar(): React.JSX.Element {
       <div className="flex shrink-0 items-center gap-0.5">
         {!companion && <StreakStatus />}
         {ide && ready && !companion && <OpenInIdeButton ide={ide} variant="ghost" />}
-        {aiOn && (
-          <Button
-            variant="ghost"
-            size="sm"
-            aria-pressed={chatOpen}
-            onClick={toggleTutor}
-            data-tour={TOUR.chat}
-            data-shortcut="openTutor"
-            className={cn(
-              'font-normal text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]',
-              chatOpen && 'bg-accent text-foreground'
-            )}
-          >
-            <MessageCircle />
-            Tutor
-          </Button>
-        )}
-        <AiMenu />
+        <Button
+          variant="ghost"
+          size="sm"
+          aria-pressed={chatOpen}
+          onClick={toggleTutor}
+          data-tour={TOUR.chat}
+          data-shortcut="openTutor"
+          className={cn(
+            'font-normal text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]',
+            chatOpen && 'bg-accent text-foreground'
+          )}
+        >
+          {provider ? <ProviderIcon id={provider.id} /> : <MessageCircle />}
+          Tutor
+        </Button>
         <ViewPopover />
         <IconButton
           label="Take the tour"

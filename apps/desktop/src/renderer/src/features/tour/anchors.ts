@@ -13,7 +13,6 @@ export const TOUR = {
   checkAll: 'check-all',
   terminal: 'terminal',
   chat: 'chat',
-  aiSuggestions: 'ai-suggestions',
   view: 'view',
   help: 'help',
   upNext: 'up-next',

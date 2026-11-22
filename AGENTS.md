@@ -153,7 +153,7 @@ the chrome is neutral, and the one hue is a calm orange.
 
 `features/onboarding/` is the setup shown instead of the app while `useSettings().onboarded` is
 false. It is not a route: finishing or skipping sets `onboarded` and the app takes over on Home;
-"Run setup again" in the AI menu clears it. It has four steps: welcome, goal, AI and editor.
+"Run setup again" in Settings (AI) clears it. It has four steps: welcome, goal, AI and editor.
 `steps.ts` is the pure step machine (the steps, next, back, the progress cells) with its tests.
 Every choice writes the real setting at once (`ai.setConfig`, `ai.setKey`), so skipping keeps what
 was picked. What the setup does not ask (help in the editor, the tutor after a failed check) keeps
