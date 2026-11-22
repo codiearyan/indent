@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { AiAttachment, AiChatEvent, AiMessage, CheckResult } from '@shared/types'
+import type { AiAttachment, AiChatEvent, AiMessage, CheckResult, LearnerPrefs } from '@shared/types'
 import { chapterKey } from '@shared/rules'
 import { api } from '@/lib/api'
 import { track } from '@/lib/telemetry'
@@ -45,6 +45,11 @@ let turn = 0
 function currentKey(): string | null {
   const chapter = useWorkspace.getState().chapter
   return chapter ? chapterKey(chapter.labId, chapter.id) : null
+}
+
+function learnerPrefs(): LearnerPrefs {
+  const { experience, learnFirst } = useSettings.getState()
+  return { experience: experience ?? undefined, learnFirst }
 }
 
 function isBudgeted(): boolean {
@@ -140,7 +145,8 @@ export const useChat = create<ChatStore>()((set, get) => {
           chapterId: chapter.id,
           messages: history,
           activeFile: files.find((f) => f.path === activePath),
-          lastCheck
+          lastCheck,
+          learner: learnerPrefs()
         })
         // Stopped while the request was starting.
         if (!get().busy || thisTurn !== turn) return api.ai.cancel(id)

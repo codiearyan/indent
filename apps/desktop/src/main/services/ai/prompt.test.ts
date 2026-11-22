@@ -106,6 +106,38 @@ describe('tutorSystemPrompt', () => {
     }
   })
 
+  it('describes the learner and how to pitch to them', () => {
+    const prompt = tutorSystemPrompt({
+      chapter,
+      lesson: '',
+      learner: {
+        level: 3,
+        pointsToNextLevel: 40,
+        totalPoints: 560,
+        streak: 4,
+        longestStreak: 9,
+        freezes: 1,
+        today: { tasksPassed: 1, goal: 2 },
+        repo: { title: 'The shop', issueNumber: 2, issueCount: 5, issuesFinished: 1 },
+        issue: { tasksPassed: 1, taskCount: 3, hintsOpened: 2 },
+        issuesFinished: 6,
+        experience: 'new',
+        learnFirst: 'videos'
+      }
+    })
+    expect(prompt).toContain('# The learner')
+    expect(prompt).toContain('- Experience: new to coding')
+    expect(prompt).toContain('- Prefers videos first')
+    expect(prompt).toContain('- Level 3, 40 points to level 4 (560 points in all)')
+    expect(prompt).toContain(
+      '- Streak: 4 days (longest 9), 1 freeze held; 1 of 2 tasks passed today'
+    )
+    expect(prompt).toContain('- In the repo "The shop": issue 2 of 5, 1 issue finished')
+    expect(prompt).toContain('- This issue: 1 of 3 tasks passed, 2 hints opened')
+    expect(prompt).toContain('Pitch every answer to it')
+    expect(tutorSystemPrompt({ chapter, lesson: '' })).not.toContain('# The learner')
+  })
+
   it('says when no check ran yet', () => {
     expect(tutorSystemPrompt({ chapter, lesson: '' })).toContain('has not run a check yet')
   })

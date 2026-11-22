@@ -9,6 +9,7 @@ import type {
   TaskProgress,
   WorkspaceFile
 } from '@shared/types'
+import type { LearnerContext } from './learner'
 
 const MAX_FILE_CHARS = 20_000
 const MAX_OUTPUT_CHARS = 1_500
@@ -27,6 +28,8 @@ How you help:
 - When a check failed, name the one link from that task's docs that covers the problem and say what to read it for. Use only the links listed with the task; never make one up.
 - When a short video would help more than reading, or the learner asks for one, link one of that task's videos with its exact title and link from the list. It opens in the Resources tab beside the task. Use only the videos listed with the task; never make one up.
 - Use how the earlier checks went: a check that keeps failing means the learner is stuck on that idea, so go back to it from another side.
+- The learner section says who you are talking to. Pitch every answer to it: for someone new to coding, use plain words, explain a term the first time it comes up and take small steps; for an experienced developer, be brief and skip the basics. When they prefer videos and a task lists one, point to it before a doc.
+- You may mention their progress in one short sentence when it helps them keep going: the last task of this issue, the day's goal one task away, a streak worth keeping. At most once in a conversation, never as pressure and never instead of help. Use only the numbers given; never make one up.
 - Ask one guiding question when it helps the learner find the next step themselves.
 - Small examples are welcome, but they must show the idea on different names and data, never the task's own answer.
 - When how pieces connect or the order things happen is the point, draw a small diagram in a \`\`\`mermaid block: a top-down flowchart (\`flowchart TD\`, since the tutor panel is narrow) or a \`sequenceDiagram\`, at most eight nodes, short labels in plain words, no styles, links or click handlers. Use one only when it says more than a sentence would, and never draw the task's solution.
@@ -49,6 +52,33 @@ export interface TutorContext {
   activeFile?: WorkspaceFile
   lastCheck?: CheckResult[]
   progress?: ChapterProgress
+  learner?: LearnerContext
+}
+
+const EXPERIENCE_WORDS: Record<NonNullable<LearnerContext['experience']>, string> = {
+  new: 'new to coding',
+  some: 'has written some code before',
+  experienced: 'an experienced developer'
+}
+
+const count = (n: number, word: string): string => `${n} ${n === 1 ? word : `${word}s`}`
+
+export function describeLearner(l: LearnerContext): string {
+  const today =
+    l.today.tasksPassed >= l.today.goal
+      ? `today's goal of ${count(l.today.goal, 'task')} is met (${l.today.tasksPassed} passed today)`
+      : `${l.today.tasksPassed} of ${count(l.today.goal, 'task')} passed today toward the daily goal`
+  return [
+    `- Experience: ${l.experience ? EXPERIENCE_WORDS[l.experience] : 'not given'}`,
+    l.learnFirst ? `- Prefers ${l.learnFirst} first when they want to learn more` : '',
+    `- Level ${l.level}, ${l.pointsToNextLevel} points to level ${l.level + 1} (${l.totalPoints} points in all)`,
+    `- Streak: ${count(l.streak, 'day')} (longest ${l.longestStreak}), ${count(l.freezes, 'freeze')} held; ${today}`,
+    `- In the repo "${l.repo.title}": issue ${l.repo.issueNumber} of ${l.repo.issueCount}, ${count(l.repo.issuesFinished, 'issue')} finished`,
+    `- This issue: ${l.issue.tasksPassed} of ${count(l.issue.taskCount, 'task')} passed, ${count(l.issue.hintsOpened, 'hint')} opened`,
+    `- Issues finished in the app: ${l.issuesFinished}`
+  ]
+    .filter(Boolean)
+    .join('\n')
 }
 
 function clip(text: string, max: number): string {
@@ -126,10 +156,12 @@ export function tutorSystemPrompt({
   lesson,
   activeFile,
   lastCheck,
-  progress
+  progress,
+  learner
 }: TutorContext): string {
   const parts = [
     TUTOR_RULES,
+    ...(learner ? [`# The learner\n\n${describeLearner(learner)}`] : []),
     `# Issue: ${chapter.title}\n\n## Lesson\n\n${lesson.trim()}`,
     `## Tasks\n\n${describeTasks(chapter)}`
   ]
