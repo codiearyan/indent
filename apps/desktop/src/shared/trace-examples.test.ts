@@ -263,6 +263,10 @@ const repos: { labId: string; expected: string[] }[] = [
     ]
   },
   {
+    labId: 'build-a-router',
+    expected: ['parts-that-vary/match', 'query-and-body/query']
+  },
+  {
     labId: 'security-bug-hunts',
     expected: [
       'search-leak/reproduce',

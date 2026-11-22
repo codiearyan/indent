@@ -1,0 +1,82 @@
+{
+  "id": "parts-that-vary",
+  "title": "Paths with parts that vary",
+  "files": ["src/router.js", "src/try.js"],
+  "terminal": {
+    "description": "A shell in your workspace where requests about single orders go to the old server and to your router.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "match",
+      "title": "Match a path to a pattern",
+      "file": "src/router.js",
+      "description": "Implement `matchPath(pattern, path)` in `src/router.js`. A pattern is a path where a part that starts with `:` varies, such as `/orders/:id`.\n\n- when the path fits, it returns an object with one property per part that varies, named without the colon and holding the part as written in the path: `matchPath('/orders/:id', '/orders/1873')` is `{ id: '1873' }`\n- a pattern with no parts that vary gives `{}` for its own path\n- the path fits only when it has the same number of parts as the pattern, every fixed part is exactly the same, capitals included, and every part that varies is one whole part that is not empty\n- otherwise it returns `null`\n\nThe check calls `matchPath` with patterns and paths of its own, some that fit and some that nearly do.",
+      "nextSteps": [
+        "Split the pattern and the path on `/` and look at what you get for `/orders/` and for `/orders/1873/proof`.",
+        "Return `null` when the number of parts differs.",
+        "Walk both lists side by side: a part with a colon takes a value, any other part has to be the same.",
+        "Return the values once every part has been looked at."
+      ],
+      "hints": [
+        "A pattern and a path are both lists of parts once you split them on the slash. Matching is comparing two lists, one place at a time.",
+        "`'/orders/'.split('/')` is `['', 'orders', '']`. The last part is there, and it is empty, so a part that varies must refuse it.",
+        "In the loop: `if (wanted[i].startsWith(':')) values[wanted[i].slice(1)] = parts[i]`, and otherwise `if (wanted[i] !== parts[i]) return null`. Add the empty part check."
+      ],
+      "docs": [
+        { "title": "String.prototype.split()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split" },
+        { "title": "String.prototype.startsWith()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith" },
+        { "title": "Property accessors", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "params",
+      "title": "Hand the values to the handler",
+      "file": "src/router.js",
+      "description": "Make `handle` find routes with `matchPath`, and give the handler the values.\n\n- a route fits a request when `matchPath(route's path, req.url)` is not `null`\n- before the handler runs, `req.params` is the object of values, each one decoded from its `%`-codes (`cotton%20white` becomes `cotton white`); a route with no parts that vary gets `{}`\n- a value whose `%`-codes cannot be decoded is answered `400` with `{ error }`, and no handler runs\n- 404 and 405 work as before: 404 when no route fits the path, 405 with `allow` when routes fit but none has the request's method\n\nThe check adds patterns of its own, sends requests and notes what each handler finds on `req.params`.",
+      "nextSteps": [
+        "Run `node src/try.js`: today, `/orders/1873` gets a 404.",
+        "In `handle`, use `matchPath` for every route instead of comparing paths as text.",
+        "Decode each value of the route that runs, put them on `req.params`, then call the handler.",
+        "Look at `/orders/18%7` in the output and decide where a broken value is caught."
+      ],
+      "hints": [
+        "The path stays as it came in while you match. A `%2F` inside a value is a slash that belongs to the value, so decode only after matching, one value at a time.",
+        "`decodeURIComponent` turns `%20` into a space, and throws a `URIError` when the `%`-codes are broken. That throw has to become a 400, not a crash.",
+        "`try { req.params = Object.fromEntries(Object.entries(values).map(([k, v]) => [k, decodeURIComponent(v)])) } catch { return sendJson(res, 400, { error: ... }) }`"
+      ],
+      "docs": [
+        { "title": "decodeURIComponent()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent" },
+        { "title": "Percent-encoding", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding" },
+        { "title": "400 Bad Request", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400" }
+      ],
+      "videos": [
+        { "title": "URL encoding in a few minutes", "url": "https://www.youtube.com/watch?v=ru0iCHsmsLc" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "wins",
+      "title": "Choose when two routes match",
+      "file": "src/router.js",
+      "description": "When more than one route of the request's method fits its path, make `handle` call exactly one of them.\n\n- the route with the most fixed parts wins: for `/orders/today`, `/orders/today` beats `/orders/:id`, whichever was added first\n- with the same number of fixed parts, the route added first wins\n- only routes with the request's method take part: a route of another method never wins, however many fixed parts it has\n\nThe check adds routes that overlap, in different orders, and notes which handler runs for each request.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at `/orders/today`: which handler answered?",
+        "Keep every route of the request's method that fits, not only the first.",
+        "Count the fixed parts of each and keep the one with the most.",
+        "On a tie, keep the one you met first."
+      ],
+      "hints": [
+        "`/orders/today` names one thing; `/orders/:id` names any order. When both fit, the one that says more about this path is the better answer.",
+        "A fixed part is a part without a colon. Counting them gives every route a number to compare.",
+        "Loop over the fitting routes with `if (fixed(route) > fixed(best)) best = route`. A strict `>` keeps the earlier route on a tie."
+      ],
+      "docs": [
+        { "title": "Array.prototype.filter()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter" },
+        { "title": "Array.prototype.reduce()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce" }
+      ],
+      "points": 10
+    }
+  ]
+}

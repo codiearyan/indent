@@ -1,0 +1,78 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "sefton", "label": "Sefton", "kind": "story" },
+      { "id": "add", "label": "addRoute()", "kind": "function", "mine": true, "fn": "addRoute" },
+      { "id": "table", "label": "Route table", "kind": "data" },
+      { "id": "page", "label": "Order page", "kind": "story" },
+      { "id": "handle", "label": "handle()", "kind": "function", "mine": true, "fn": "handle" },
+      { "id": "handler", "label": "A handler", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "sefton", "to": "add", "label": "method, path, fn" },
+      { "from": "add", "to": "table", "label": "kept" },
+      { "from": "page", "to": "handle", "label": "request" },
+      { "from": "table", "to": "handle", "label": "routes" },
+      { "from": "handle", "to": "handler", "label": "the one route" },
+      { "from": "handle", "to": "page", "label": "a plain no" }
+    ],
+    "note": "The order server becomes a table you can read: each route is a method, a path and a handler, and anything else gets a plain no."
+  },
+  "tasks": {
+    "table": {
+      "steps": [
+        {
+          "active": ["sefton", "sefton->add", "add"],
+          "note": "Sefton adds a route for reading today's orders: the method GET, the path /orders/today, and his handler."
+        },
+        {
+          "active": ["add", "add->table", "table"],
+          "value": { "kind": "array", "label": "route table", "values": ["{ method, path, handler }", "{ method, path, handler }", "..."] },
+          "note": "addRoute checks the path and the handler, then keeps the route in this router's own table."
+        },
+        {
+          "active": ["page", "page->handle", "handle", "table->handle"],
+          "note": "The order page asks for today's orders. handle looks for the route with the same method and exactly the same path."
+        },
+        {
+          "active": ["handle", "handle->handler", "handler"],
+          "note": "It calls that route's handler with the request and the response, and no other handler."
+        }
+      ]
+    },
+    "missing": {
+      "steps": [
+        {
+          "active": ["page", "page->handle", "handle"],
+          "note": "A request comes in for a path that is close to one in the table, but not the same."
+        },
+        {
+          "active": ["table", "table->handle", "handle"],
+          "note": "handle finds no route with this path at all, under any method. Starting the same way does not count."
+        },
+        {
+          "active": ["handle", "handle->page", "page"],
+          "value": { "kind": "map", "label": "the answer", "entries": [{ "key": "status", "value": "nothing here" }, { "key": "error", "value": "names the method and path" }] },
+          "note": "The order page gets a plain no that says which request it was, and no handler runs."
+        }
+      ]
+    },
+    "methods": {
+      "steps": [
+        {
+          "active": ["page", "page->handle", "handle"],
+          "note": "Someone sends a DELETE to the price list, which only has routes for other methods."
+        },
+        {
+          "active": ["table", "table->handle", "handle"],
+          "note": "handle finds routes with this path, but none with this method, so the price list handler must not run."
+        },
+        {
+          "active": ["handle", "handle->page", "page"],
+          "value": { "kind": "map", "label": "the answer", "entries": [{ "key": "status", "value": "not this method" }, { "key": "allow", "value": "the path's methods" }, { "key": "error", "value": "names the method and path" }] },
+          "note": "The answer says this method is not taken here, and lists the methods that are."
+        }
+      ]
+    }
+  }
+}

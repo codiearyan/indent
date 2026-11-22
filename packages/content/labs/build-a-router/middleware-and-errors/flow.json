@@ -1,0 +1,84 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Order page", "kind": "story" },
+      { "id": "handle", "label": "handle()", "kind": "function", "mine": true, "fn": "handle" },
+      { "id": "mw", "label": "Middleware", "kind": "data" },
+      { "id": "handler", "label": "A handler", "kind": "story" },
+      { "id": "errors", "label": "Error handler", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "page", "to": "handle", "label": "request" },
+      { "from": "handle", "to": "mw", "label": "in order" },
+      { "from": "mw", "to": "handler", "label": "next()" },
+      { "from": "mw", "to": "errors", "label": "an error" },
+      { "from": "handle", "to": "page", "label": "an error, named" }
+    ],
+    "note": "Every request now passes Hesper's middleware on its way to the handler, and every error goes to one place."
+  },
+  "tasks": {
+    "use": {
+      "steps": [
+        {
+          "active": ["page", "page->handle", "handle"],
+          "note": "A member of staff changes the status of an order. The route is found and the body read."
+        },
+        {
+          "active": ["handle", "handle->mw", "mw"],
+          "value": { "kind": "array", "label": "the chain", "values": ["note the request", "staff check", "the handler"] },
+          "note": "handle runs the middleware in the order it was added. Each one decides whether the next runs."
+        },
+        {
+          "active": ["mw", "mw->handler", "handler"],
+          "note": "The staff check finds the key and calls next(), so the handler changes the order."
+        },
+        {
+          "active": ["handle"],
+          "note": "handle finishes only once the whole chain has. Without the key, the staff check would have answered and nothing after it would run."
+        }
+      ]
+    },
+    "errors": {
+      "steps": [
+        {
+          "active": ["page", "page->handle", "handle", "handle->mw", "mw"],
+          "note": "A customer asks for an order number that does not exist."
+        },
+        {
+          "active": ["mw", "mw->handler", "handler"],
+          "note": "The handler throws an error that says there is no such order."
+        },
+        {
+          "active": ["mw", "mw->errors", "errors"],
+          "note": "Everything left is skipped, and the error goes to the one error handler, which answers."
+        },
+        {
+          "active": ["errors", "page"],
+          "value": { "kind": "map", "label": "with no error handler", "entries": [{ "key": "status", "value": "something went wrong" }, { "key": "error", "value": "in plain words, no message" }] },
+          "note": "If there were no error handler, the router would answer that something went wrong, and nothing more."
+        }
+      ]
+    },
+    "stuck": {
+      "steps": [
+        {
+          "active": ["page", "page->handle", "handle", "handle->mw", "mw"],
+          "note": "A customer asks for the proof of an order, a route Sefton has not finished."
+        },
+        {
+          "active": ["mw", "mw->handler", "handler"],
+          "note": "The proof handler returns without answering."
+        },
+        {
+          "active": ["handle"],
+          "note": "handle sees the step finish with no answer and no next(), so it knows who stopped."
+        },
+        {
+          "active": ["handle", "handle->page", "page"],
+          "value": { "kind": "map", "label": "the answer", "entries": [{ "key": "status", "value": "something went wrong" }, { "key": "error", "value": "names the step" }] },
+          "note": "Instead of spinning all afternoon, the page gets an answer that names the route that stopped."
+        }
+      ]
+    }
+  }
+}

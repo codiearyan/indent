@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Order page", "say": "Where is the proof of 1873?", "note": "The page waits for an answer." },
+    { "title": "Proof handler", "text": "Sefton's draft returns without answering.", "note": "Nobody can say where it stopped." },
+    {
+      "title": "Your router",
+      "file": "router.js",
+      "mine": true,
+      "gap": "Nothing between steps",
+      "tasks": ["Run middleware", "One place for errors", "Name what stopped"]
+    },
+    { "title": "Hesper", "say": "So that was the proof route.", "note": "Fixed before lunch." }
+  ],
+  "ticket": { "label": "1873 proof", "wrong": "spins all day", "why": "No answer", "right": "named" },
+  "captions": [
+    "At Ashgrove Press, a customer asks the order page for the proof of order 1873.",
+    "Sefton's proof handler never answers, so the page spins and nobody knows why.",
+    "You add middleware, one place for errors and a check on every step, in three tasks.",
+    "Now the page gets an answer at once, and it names the route that stopped.",
+    "Staff checks, errors and stuck steps all go through the router, in one place."
+  ]
+}

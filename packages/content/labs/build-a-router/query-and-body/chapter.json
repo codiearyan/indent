@@ -1,0 +1,82 @@
+{
+  "id": "query-and-body",
+  "title": "The query string and the body",
+  "files": ["src/router.js", "src/try.js"],
+  "terminal": {
+    "description": "A shell in your workspace where requests with queries and JSON bodies go to your router.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "query",
+      "title": "Read the query string",
+      "file": "src/router.js",
+      "description": "Implement `parseQuery(search)` in `src/router.js`, and use it in `handle`.\n\n`parseQuery` turns the text after the `?` into an object: `'status=waiting&item=card'` gives `{ status: 'waiting', item: 'card' }`.\n\n- pairs are separated by `&`, and empty pairs are skipped\n- a key and its value are split at the first `=`; a key with no `=` has the value `''`\n- `+` is a space and `%`-codes are decoded; a part whose `%`-codes are broken is kept as written\n- a key that comes more than once gives an array of all its values, in order\n- every key is a key of its own, even `constructor`, `toString` or `__proto__`\n- an empty string gives an object with no keys\n\nIn `handle`, routes are matched on the path before the `?`, and the handler gets `req.query`, from `parseQuery`, even when there is no `?`.\n\nThe check calls `parseQuery` with queries of its own, and sends requests with queries through `handle`.",
+      "nextSteps": [
+        "Run `node src/try.js`: `/orders?status=waiting` gets a 404 today.",
+        "Write `parseQuery` for one pair first, then for many, then for a key that comes twice.",
+        "Try `parseQuery('constructor=staff')` in a script and look at what you get.",
+        "In `handle`, split `req.url` at its first `?`, match on the part before, and set `req.query`."
+      ],
+      "hints": [
+        "A query is text with two separators: `&` between pairs, `=` inside a pair. Values can hold an `=` of their own, so only the first one splits.",
+        "An object made with `{}` already answers to `constructor` and `toString`, from its prototype. `Object.create(null)` makes one with no prototype, so every key there is one you put in.",
+        "`const at = pair.indexOf('=')` gives the key `pair.slice(0, at)` and the value `pair.slice(at + 1)`. When the key is already there, turn its value into an array, or push onto the array it already is."
+      ],
+      "docs": [
+        { "title": "Object.create()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create" },
+        { "title": "URLSearchParams", "url": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams" },
+        { "title": "Object.hasOwn()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "body",
+      "title": "Read a JSON body",
+      "file": "src/router.js",
+      "description": "Make `handle` read a JSON body once, before the handler runs, and give the handler `req.body`.\n\n- a body is JSON when the `content-type` header, before any `;`, is `application/json`, in any case: `Application/JSON; charset=utf-8` is JSON too\n- the request is a stream of chunks of bytes: read them all, join the bytes, and turn them into text once\n- `req.body` is the parsed value, whatever it is; an empty body leaves `req.body` undefined\n- broken JSON is answered `400` with `{ error }`, and no handler runs\n- other bodies are not read, and `req.body` stays undefined\n- a request answered 404 or 405 does not have its body read\n\nThe check sends bodies of its own in chunks, a character split between two of them included, and notes what the handler finds on `req.body` and how many chunks were read.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at the two `POST /orders` lines.",
+        "Find the route first, then decide whether the body is JSON.",
+        "Collect every chunk with `for await`, join them, then parse.",
+        "Catch what `JSON.parse` throws and answer 400."
+      ],
+      "hints": [
+        "A body arrives in pieces, and a piece can end in the middle of a character. Bytes are only safe to turn into text once they are all together.",
+        "`for await (const chunk of req)` gives you each chunk as a `Buffer`. `Buffer.concat(chunks).toString('utf8')` makes the whole text at once.",
+        "`try { req.body = JSON.parse(text) } catch { return sendJson(res, 400, { error: ... }) }`, and only when `text` is not empty."
+      ],
+      "docs": [
+        { "title": "for await...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of" },
+        { "title": "Buffer.concat()", "url": "https://nodejs.org/api/buffer.html#static-method-bufferconcatlist-totallength" },
+        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" }
+      ],
+      "videos": [
+        { "title": "Characters, bytes and UTF-8", "url": "https://www.youtube.com/watch?v=MijmeoH9LT4" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "limit",
+      "title": "Refuse a body that is too large",
+      "file": "src/router.js",
+      "description": "Give every router a body limit, and make `handle` refuse bodies above it.\n\n- `createRouter({ bodyLimit })` keeps the most bytes a body may have; `createRouter()` allows `100000`\n- a body of exactly the limit is fine; one byte more is answered `413` with `{ error }`, and no handler runs\n- the limit counts bytes, not characters\n- a `content-length` header above the limit is answered 413 before anything is read\n- the header is only a claim: bytes are counted as they arrive too, and the 413 goes out as soon as the count passes the limit, without waiting for the rest\n\nThe check makes routers with limits of its own and sends bodies around them, one from a client that never stops sending.",
+      "nextSteps": [
+        "Give `createRouter` an options object and keep `bodyLimit` on the router.",
+        "Look at the `content-length` header before you read anything.",
+        "Count the bytes of each chunk as it arrives, and stop as soon as you are over."
+      ],
+      "hints": [
+        "Waiting for the whole body before measuring it means holding all of it, however big, and a client can keep sending for ever.",
+        "A chunk is a `Buffer`, so `chunk.length` is its size in bytes. A string's `length` counts characters, and `é` is one character but two bytes.",
+        "Inside the loop: `size += chunk.length; if (size > limit) return sendJson(res, 413, { error: ... })`. Leaving a `for await` early stops reading."
+      ],
+      "docs": [
+        { "title": "413 Content Too Large", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/413" },
+        { "title": "Content-Length header", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Length" },
+        { "title": "Default parameters", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters" }
+      ],
+      "points": 10
+    }
+  ]
+}

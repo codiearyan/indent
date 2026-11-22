@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "Saturday, the old server goes.", "note": "She wants a real address." },
+    { "title": "Old server", "text": "One function, an if for every address.", "note": "Still the one that answers." },
+    {
+      "title": "Your code",
+      "file": "app.js",
+      "mine": true,
+      "gap": "Not on your router yet",
+      "tasks": ["Groups under a prefix", "Serve real requests", "Move every route"]
+    },
+    { "title": "Order page", "rows": [["/orders/today", "today"], ["DELETE /prices", "plain no"], ["/staff/queue", "staff only"]], "mark": 1 }
+  ],
+  "ticket": { "label": "Saturday", "wrong": "old chain", "why": "Too risky", "right": "your router" },
+  "captions": [
+    "At Ashgrove Press, Hesper wants the order server moved over by Saturday.",
+    "Today every request still goes through Sefton's chain of ifs, which nobody dares touch.",
+    "You add groups, a real server and every route of the shop, in three tasks.",
+    "Now the order page talks to your router on a real address, staff pages behind their key.",
+    "From a table of routes to the shop's whole server, and every line of it explained."
+  ]
+}
