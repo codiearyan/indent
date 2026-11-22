@@ -1,0 +1,127 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Front desk", "kind": "story" },
+      { "id": "route", "label": "POST /sign-in", "kind": "function", "mine": true },
+      {
+        "id": "check",
+        "label": "checkSignIn()",
+        "kind": "function",
+        "mine": true,
+        "fn": "checkSignIn"
+      },
+      { "id": "store", "label": "Staff store", "kind": "data" },
+      { "id": "standin", "label": "Stand-in hash", "kind": "data" },
+      { "id": "log", "label": "Log", "kind": "data" },
+      { "id": "reply", "label": "JSON answer", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "page", "to": "route", "label": "email, password" },
+      { "from": "route", "to": "check", "label": "email, password" },
+      { "from": "check", "to": "store", "label": "find by email" },
+      { "from": "check", "to": "standin", "label": "no such email" },
+      { "from": "route", "to": "log", "label": "what happened" },
+      { "from": "route", "to": "reply", "label": "status, body" },
+      { "from": "reply", "to": "page", "label": "answer" }
+    ],
+    "note": "A sign-in from the front desk is checked against the staff store, refused the same way whatever was wrong, and logged without its secrets."
+  },
+  "tasks": {
+    "check": {
+      "steps": [
+        {
+          "active": ["route", "route->check", "check"],
+          "value": {
+            "kind": "map",
+            "label": "a sign-in",
+            "entries": [
+              { "key": "email", "value": "sunniva@kilnworth.example" },
+              { "key": "password", "value": "what she typed" }
+            ]
+          },
+          "note": "Sunniva's email and password reach checkSignIn()."
+        },
+        {
+          "active": ["check", "check->store", "store"],
+          "note": "The staff store finds her by email, whatever its case, and the typed password is checked against her hash."
+        },
+        {
+          "active": ["check", "check->standin", "standin"],
+          "note": "For an email nobody has, the same slow check runs against a stand-in hash, so the no takes as long as any other."
+        },
+        {
+          "active": ["check"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of what comes back",
+            "entries": [
+              { "key": "her password", "value": "the member, without the hash" },
+              { "key": "anything else", "value": "null" }
+            ]
+          },
+          "note": "A wrong password and an unknown email come back exactly alike."
+        }
+      ]
+    },
+    "route": {
+      "steps": [
+        {
+          "active": ["page", "page->route", "route"],
+          "value": {
+            "kind": "map",
+            "label": "POST /sign-in",
+            "entries": [
+              { "key": "email", "value": "text" },
+              { "key": "password", "value": "text" }
+            ]
+          },
+          "note": "The front desk posts an email and a password."
+        },
+        {
+          "active": ["route"],
+          "note": "A body without both, or with something that is not text, is a broken request and answers 400 before any password is checked."
+        },
+        {
+          "active": ["route", "route->check", "check"],
+          "note": "Otherwise checkSignIn() decides."
+        },
+        {
+          "active": ["route", "route->reply", "reply", "reply->page", "page"],
+          "value": {
+            "kind": "map",
+            "label": "what goes back",
+            "entries": [
+              { "key": "signed in", "value": "200 with the member" },
+              { "key": "anything else", "value": "401, one answer for all" }
+            ]
+          },
+          "note": "The desk learns whether she is in, and a stranger learns nothing about which part was wrong."
+        }
+      ]
+    },
+    "log": {
+      "steps": [
+        {
+          "active": ["page", "page->route", "route"],
+          "note": "Three attempts arrive: Kofi gets it right, Sunniva mistypes, and someone tries an email nobody has."
+        },
+        {
+          "active": ["route", "route->log", "log"],
+          "value": {
+            "kind": "map",
+            "label": "a log line",
+            "entries": [
+              { "key": "says", "value": "the email and how it ended" },
+              { "key": "never says", "value": "a password or a hash" }
+            ]
+          },
+          "note": "Each attempt leaves one line the studio can read later."
+        },
+        {
+          "active": ["log"],
+          "note": "Broken bodies and refusals leave the secrets out too. Every way out of the route counts."
+        }
+      ]
+    }
+  }
+}

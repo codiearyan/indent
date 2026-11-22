@@ -1,0 +1,112 @@
+{
+  "id": "guarding-routes",
+  "title": "Who may do what",
+  "files": [
+    "src/middleware/signedIn.js",
+    "src/middleware/allow.js",
+    "src/routes/staff.js",
+    "src/app.js",
+    "src/routes/workshops.js",
+    "src/middleware/readSession.js",
+    "try.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js signs Kofi and Dilys in, then sends changes with the old key, as Kofi and as Dilys, and asks for the staff list.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "signed-in",
+      "title": "Ask for a sign-in instead of the key",
+      "file": "src/middleware/signedIn.js",
+      "description": "Implement `signedIn(req, res, next)` in `src/middleware/signedIn.js`:\n\n- `GET` and `HEAD` requests go on for everyone\n- any other request goes on only when `req.staff` is set\n- otherwise answer `401` with `{ \"error\": { \"code\": \"not_signed_in\", \"message\": \"...\" } }`, and the route never runs\n\nIn `createApp`, put `signedIn` in front of the workshops router in place of `staffOnly(staffKey)`, and stop using the staff key: a request with only the key no longer changes anything. The check starts your app with staff, sessions and an old key of its own, and sends reads and changes with no session, with the key, with a made-up session and with a real one.",
+      "nextSteps": [
+        "Run `node try.js` and see what the old key still does.",
+        "Let reads through.",
+        "Let a change through only when someone is signed in.",
+        "Swap the guard in `createApp`, then run `node try.js` again."
+      ],
+      "hints": [
+        "`readSession` already ran for every request, so the guard only has to look at what it left behind.",
+        "`req.staff` is set only for a request with a real session. `req.method` tells a read from a change.",
+        "`if (req.method === 'GET' || req.method === 'HEAD' || req.staff) return next()`, then `res.status(401).json(...)`. Mount it as `app.use('/workshops', signedIn, workshopsRouter(store))` and take `staffKey` out of `createApp`."
+      ],
+      "docs": [
+        {
+          "title": "Writing middleware",
+          "url": "https://expressjs.com/en/5x/guide/writing-middleware"
+        },
+        {
+          "title": "401 Unauthorized",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"
+        },
+        {
+          "title": "Safe HTTP methods",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Safe/HTTP"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "allow",
+      "title": "Let only the owner remove workshops",
+      "file": "src/middleware/allow.js",
+      "description": "Implement `allow(...roles)` in `src/middleware/allow.js`. It returns a middleware that:\n\n- answers `401` with the code `not_signed_in` when `req.staff` is not set\n- answers `403` with `{ \"error\": { \"code\": \"forbidden\", \"message\": \"...\" } }` when the role of `req.staff` is not one of `roles`\n- otherwise calls `next()`\n\nThen put `allow('owner')` in front of the `DELETE` route in `src/routes/workshops.js`, so only the owner removes a workshop. Every signed-in member can still create and change them. The check runs `allow()` with one role and with several, then removes workshops as the owner, a teacher and the front desk.",
+      "nextSteps": [
+        "Return a middleware from `allow`.",
+        "Answer 401 when nobody is signed in.",
+        "Answer 403 when the role is not listed, and go on otherwise.",
+        "Guard the `DELETE` route, then run `node try.js`."
+      ],
+      "hints": [
+        "`allow()` makes a middleware the way `express.json()` does: it takes settings and returns a function of `(req, res, next)`.",
+        "The rest parameter `...roles` gathers every argument into an array, and `roles.includes(x)` says whether `x` is one of them. A route takes more than one handler: `router.delete(path, guard, handler)`.",
+        "`return (req, res, next) => { ... }` with a 401 when `!req.staff`, a 403 when `!roles.includes(req.staff.role)`, and `next()` otherwise. Then `router.delete('/:id', allow('owner'), (req, res) => { ... })`."
+      ],
+      "docs": [
+        {
+          "title": "Rest parameters",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters"
+        },
+        {
+          "title": "403 Forbidden",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403"
+        },
+        {
+          "title": "Route handlers",
+          "url": "https://expressjs.com/en/5x/guide/routing#route-handlers"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "staff-list",
+      "title": "Show the owner who has an account",
+      "file": "src/routes/staff.js",
+      "description": "Implement `staffRouter(staff)` in `src/routes/staff.js`. It returns a router with `GET /` that answers `200` with every member of the staff store as `{ id, name, email, role }`, in the store's order, and never a password hash.\n\nMount it in `createApp` at `/staff`, behind `allow('owner')`: only the owner sees the list, a signed-in member with another role gets `403`, and someone not signed in gets `401`. Reading workshops stays open to everyone. The check reads `/staff` as the owner, a teacher, the front desk and nobody, and looks for hashes in every answer.",
+      "nextSteps": [
+        "Make a router with `GET /` and return it.",
+        "Answer with every member, without the hash.",
+        "Mount it at `/staff` behind its guard.",
+        "Run `node try.js` and compare Kofi's answer with Dilys's."
+      ],
+      "hints": [
+        "This read is the exception: unlike the workshops, it is not open to everyone, so `signedIn` cannot guard it.",
+        "`staff.list()` gives every member with the hash. `publicStaff()` from `src/staff.js` leaves the hash out of one member.",
+        "`router.get('/', (req, res) => res.json(staff.list().map(publicStaff)))`, and `app.use('/staff', allow('owner'), staffRouter(staff))` in `createApp`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.map()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+        },
+        { "title": "app.use()", "url": "https://expressjs.com/en/5x/api/application#appuse" },
+        {
+          "title": "Authorization",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

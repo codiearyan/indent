@@ -1,0 +1,124 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "team", "label": "The team", "kind": "story" },
+      { "id": "add", "label": "addStaff()", "kind": "function", "mine": true, "fn": "addStaff" },
+      {
+        "id": "hash",
+        "label": "hashPassword()",
+        "kind": "function",
+        "mine": true,
+        "fn": "hashPassword"
+      },
+      { "id": "store", "label": "Staff store", "kind": "data" },
+      { "id": "typed", "label": "A sign-in", "kind": "story" },
+      {
+        "id": "verify",
+        "label": "verifyPassword()",
+        "kind": "function",
+        "mine": true,
+        "fn": "verifyPassword"
+      },
+      { "id": "answer", "label": "Yes or no", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "team", "to": "add", "label": "a person" },
+      { "from": "add", "to": "hash", "label": "password" },
+      { "from": "add", "to": "store", "label": "member with hash" },
+      { "from": "typed", "to": "verify", "label": "typed password" },
+      { "from": "store", "to": "verify", "label": "salt:hash" },
+      { "from": "verify", "to": "answer", "label": "true or false" }
+    ],
+    "note": "Staff are saved with a salted hash in place of their password, and a typed password is checked against that hash, never against the password itself."
+  },
+  "tasks": {
+    "hash": {
+      "steps": [
+        {
+          "active": ["hash"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "password", "value": "centre-the-clay" }]
+          },
+          "note": "Kofi's first password goes into hashPassword()."
+        },
+        {
+          "active": ["hash"],
+          "note": "Sixteen new random bytes become the salt. Hash the same password again and the salt is different."
+        },
+        {
+          "active": ["hash"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of what comes out",
+            "entries": [
+              { "key": "salt", "value": "32 hex characters" },
+              { "key": "hash", "value": "128 hex characters" }
+            ]
+          },
+          "note": "scrypt mixes the password and the salt into 64 bytes. Both come back as hex, joined by a colon, and the password is gone."
+        }
+      ],
+      "trace": { "file": "src/passwords.js", "call": "hashPassword", "args": ["centre-the-clay"] }
+    },
+    "verify": {
+      "steps": [
+        {
+          "active": ["typed", "typed->verify", "verify"],
+          "note": "Someone types Kofi's email and a password. It might be his, or a guess."
+        },
+        {
+          "active": ["store", "store->verify", "verify"],
+          "note": "The stored value gives back its salt, the only way to hash the typed password the same way again."
+        },
+        {
+          "active": ["verify"],
+          "note": "The typed password is hashed with that salt, and the two hashes are compared byte by byte, always to the end."
+        },
+        {
+          "active": ["verify", "verify->answer", "answer"],
+          "note": "Same hash, same password. A stored value that is broken is simply a no."
+        }
+      ]
+    },
+    "add-staff": {
+      "steps": [
+        {
+          "active": ["team", "team->add", "add"],
+          "value": {
+            "kind": "map",
+            "label": "a person",
+            "entries": [
+              { "key": "name", "value": "Kofi" },
+              { "key": "role", "value": "teacher" },
+              { "key": "password", "value": "centre-the-clay" }
+            ]
+          },
+          "note": "Kofi joins the staff list with the password he picked."
+        },
+        {
+          "active": ["add", "add->hash", "hash"],
+          "note": "The password goes to hashPassword() and nowhere else."
+        },
+        {
+          "active": ["add", "add->store", "store"],
+          "value": {
+            "kind": "map",
+            "label": "what the store keeps",
+            "entries": [
+              { "key": "name", "value": "Kofi" },
+              { "key": "role", "value": "teacher" },
+              { "key": "passwordHash", "value": "salt:hash" }
+            ]
+          },
+          "note": "The store keeps his name, email, role and the hash. No password."
+        },
+        {
+          "active": ["add"],
+          "note": "addStaff() hands back the new member with the id the store gave, and without the hash."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "id": "signing-in",
+  "title": "Signing in",
+  "files": [
+    "src/signIn.js",
+    "src/routes/signIn.js",
+    "src/app.js",
+    "src/team.js",
+    "src/passwords.js",
+    "src/staff.js",
+    "src/staffStore.js",
+    "try.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js starts your API on a free port, tries a few sign-ins and prints what came back, with your log lines among them.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "check",
+      "title": "Check a sign-in the same way every time",
+      "file": "src/signIn.js",
+      "description": "Implement `checkSignIn(staff, email, password)` in `src/signIn.js`. `staff` is a staff store.\n\n- find the member with the store's `findByEmail()`, which ignores case\n- when the password is theirs, return them as `{ id, name, email, role }`, without the hash\n- otherwise return `null`: a wrong password and an email nobody has give the same answer\n- both of those take as long: an unknown email still checks the password against a hash\n\nThe check signs in against staff of its own, with right and wrong passwords and an unknown email, and counts how much hashing each attempt does.",
+      "nextSteps": [
+        "Find the member by email.",
+        "Check the password against their hash with `verifyPassword`.",
+        "Make an unknown email check a password too.",
+        "Return the member without the hash, or `null`."
+      ],
+      "hints": [
+        "Two answers must be the same: what comes back, and how long it takes. The lesson part on the same amount of work says why.",
+        "When nobody has the email, there is no hash to check against. Make one stand-in hash once, when the module loads, and check the typed password against that instead.",
+        "`const STAND_IN = hashPassword('...')` at the top, then `verifyPassword(password, member ? member.passwordHash : STAND_IN)`. Return `publicStaff(member)` only when there is a member and the check passed."
+      ],
+      "docs": [
+        {
+          "title": "Authentication: error messages",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#authentication-and-error-messages"
+        },
+        {
+          "title": "Conditional (ternary) operator",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "route",
+      "title": "Add the sign-in route",
+      "file": "src/routes/signIn.js",
+      "description": "Implement `signInRouter(staff)` in `src/routes/signIn.js`. It returns a router with `POST /sign-in`, whose body is `{ email, password }`:\n\n- when either is missing, not text, or empty, answer `400` with `{ \"error\": { \"code\": \"bad_sign_in\", \"message\": \"...\" } }`\n- when `checkSignIn` finds the member, answer `200` with `{ \"staff\": { id, name, email, role } }`\n- otherwise answer `401` with `{ \"error\": { \"code\": \"wrong_sign_in\", \"message\": \"...\" } }`, exactly the same answer for a wrong password and for an email nobody has\n\nThen mount it in `createApp` with `app.use(signInRouter(staff))`, before the 404 catch-all. The check sends sign-ins of every kind to an app with staff of its own.",
+      "nextSteps": [
+        "Make a router with a `POST /sign-in` route and return it.",
+        "Refuse a body without an email and a password.",
+        "Answer from what `checkSignIn` returns.",
+        "Mount the router in `createApp`, then run `node try.js`."
+      ],
+      "hints": [
+        "The route has three ways out: the body is not usable, the sign-in works, or it does not. Check them in that order.",
+        "`req.body` is `undefined` when a request has no JSON body, so read it with a fallback. `typeof value === 'string'` tells text from everything else.",
+        "`const { email, password } = req.body ?? {}`, then a 400 when either is not a string that is not empty, then `const member = checkSignIn(staff, email, password)` and a 401 or `res.json({ staff: member })`."
+      ],
+      "docs": [
+        { "title": "express.Router", "url": "https://expressjs.com/en/5x/api/router" },
+        { "title": "req.body", "url": "https://expressjs.com/en/5x/api/request#reqbody" },
+        {
+          "title": "401 Unauthorized",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "log",
+      "title": "Log each attempt without its secrets",
+      "file": "src/routes/signIn.js",
+      "description": "Make `POST /sign-in` log every attempt with `console.log`, so the studio can see who tried to sign in:\n\n- one line per attempt with the email that was sent and how it ended\n- no password and no password hash ever reaches the log, on any path and in any stream, or an answer\n\nThe check signs in right, wrong and with an unknown email, sends a body with no email and a body that is not JSON, and reads everything the app printed and every answer it sent.",
+      "nextSteps": [
+        "Run `node try.js` and read what your route logs today.",
+        "List the secrets that pass through the route.",
+        "Write one line for a sign-in that worked and one for a refusal.",
+        "Run `node try.js` again and read every line."
+      ],
+      "hints": [
+        "Two secrets pass through this route: the password that was typed, and the hash in the staff store. Neither may leave it.",
+        "Logging a whole object, `req.body` or a member from the store, copies everything inside it, the secret included. Build each line from the one fact you mean to log.",
+        "A line such as `` `signed in ${email}` `` after a good sign-in and `` `sign-in refused for ${email}` `` before the 401. Nothing else from the body."
+      ],
+      "docs": [
+        {
+          "title": "Logging",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
+        },
+        {
+          "title": "Template literals",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals"
+        }
+      ],
+      "videos": [
+        {
+          "title": "How leaked password hashes get cracked",
+          "url": "https://www.youtube.com/watch?v=7U-RbOKanYs"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

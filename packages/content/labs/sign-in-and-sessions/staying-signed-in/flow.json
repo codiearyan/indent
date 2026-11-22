@@ -1,0 +1,110 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "browser", "label": "Ivo's page", "kind": "story" },
+      { "id": "signin", "label": "POST /sign-in", "kind": "function", "mine": true },
+      { "id": "token", "label": "newToken()", "kind": "function", "mine": true, "fn": "newToken" },
+      { "id": "sessions", "label": "Session store", "kind": "data" },
+      { "id": "cookie", "label": "Session cookie", "kind": "data" },
+      { "id": "read", "label": "readSession()", "kind": "function", "mine": true },
+      { "id": "routes", "label": "Routes", "kind": "file" }
+    ],
+    "edges": [
+      { "from": "browser", "to": "signin", "label": "email, password" },
+      { "from": "signin", "to": "token", "label": "new token" },
+      { "from": "signin", "to": "sessions", "label": "token, staffId" },
+      { "from": "signin", "to": "cookie", "label": "Set-Cookie" },
+      { "from": "cookie", "to": "read", "label": "next request" },
+      { "from": "read", "to": "sessions", "label": "look up" },
+      { "from": "read", "to": "routes", "label": "req.staff" }
+    ],
+    "note": "A sign-in now leaves a session on the server and its token in a cookie, and every later request is read for it, so the routes know who is asking."
+  },
+  "tasks": {
+    "token": {
+      "steps": [
+        {
+          "active": ["signin", "signin->token", "token"],
+          "note": "Kofi signs in, and the route asks for a new token."
+        },
+        {
+          "active": ["token"],
+          "value": {
+            "kind": "map",
+            "label": "what a token is made of",
+            "entries": [
+              { "key": "comes from", "value": "secure random bytes" },
+              { "key": "how many", "value": "32 or more" }
+            ]
+          },
+          "note": "The bytes come from the system's secure source, never from Math.random, the clock or a counter."
+        },
+        {
+          "active": ["token"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of what comes out",
+            "entries": [{ "key": "written as", "value": "base64url or hex text" }]
+          },
+          "note": "Written as text a cookie can carry with nothing to escape. Every call gives a new one."
+        }
+      ],
+      "trace": { "file": "src/tokens.js", "call": "newToken", "args": [] }
+    },
+    "cookie": {
+      "steps": [
+        {
+          "active": ["browser", "browser->signin", "signin"],
+          "note": "Kofi's sign-in works."
+        },
+        {
+          "active": ["signin", "signin->sessions", "sessions"],
+          "value": {
+            "kind": "map",
+            "label": "what the server keeps",
+            "entries": [
+              { "key": "under", "value": "the new token" },
+              { "key": "staffId", "value": "Kofi's id" }
+            ]
+          },
+          "note": "The server writes down which member the token belongs to."
+        },
+        {
+          "active": ["signin", "signin->cookie", "cookie"],
+          "value": {
+            "kind": "map",
+            "label": "the cookie",
+            "entries": [
+              { "key": "name", "value": "session" },
+              { "key": "scripts can read it", "value": "no" },
+              { "key": "SameSite", "value": "Lax" },
+              { "key": "Path", "value": "/" }
+            ]
+          },
+          "note": "The token goes back in a cookie the page's scripts cannot read. The body stays the member, with no token in it."
+        }
+      ]
+    },
+    "read": {
+      "steps": [
+        {
+          "active": ["cookie", "cookie->read", "read"],
+          "value": {
+            "kind": "map",
+            "label": "the next request",
+            "entries": [{ "key": "Cookie", "value": "theme=dark; session=..." }]
+          },
+          "note": "Kofi's next request carries all of the site's cookies in one header."
+        },
+        {
+          "active": ["read", "read->sessions", "sessions"],
+          "note": "readSession() finds the cookie named exactly session and looks its token up, then the member it belongs to."
+        },
+        {
+          "active": ["read", "read->routes", "routes"],
+          "note": "When both are found, req.staff says who is asking. Otherwise it stays unset, and the request goes on either way."
+        }
+      ]
+    }
+  }
+}

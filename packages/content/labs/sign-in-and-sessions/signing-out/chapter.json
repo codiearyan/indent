@@ -1,0 +1,106 @@
+{
+  "id": "signing-out",
+  "title": "Ending a session",
+  "files": [
+    "src/routes/signIn.js",
+    "src/middleware/readSession.js",
+    "src/app.js",
+    "src/sessionStore.js",
+    "try.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js runs your API on a clock it can move, signs Kofi out, and asks GET /me seven and eight hours after a sign-in.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "sign-out",
+      "title": "Sign out",
+      "file": "src/routes/signIn.js",
+      "description": "Add `POST /sign-out` to the router in `src/routes/signIn.js`:\n\n- remove the session of the request's session cookie from the store\n- tell the browser to drop the session cookie: the same name and path, an empty value and a date in the past\n- answer `204` with no body, also when the request had no session or one the store does not know\n- end only that session: the same person signed in on another computer stays signed in\n\n`sessionToken(req)` from `src/middleware/readSession.js` gives the value of the session cookie. The check signs out with sessions of its own, then sends `GET /me` with the old cookie and with others.",
+      "nextSteps": [
+        "Add the route to the sign-in router.",
+        "Find the token and forget its session.",
+        "Tell the browser to drop the cookie.",
+        "Answer 204, then run `node try.js`."
+      ],
+      "hints": [
+        "Signing out has two halves, like signing in: the server forgets the session, and the browser forgets the cookie. Only the first one is safety; the second is tidiness.",
+        "`sessions.remove(token)` forgets the server's half. `res.clearCookie(name, options)` sends the header that makes a browser drop a cookie.",
+        "`const token = sessionToken(req)`, then `if (token) sessions.remove(token)`, then `res.clearCookie('session', { httpOnly: true, sameSite: 'lax' })` and `res.status(204).end()`."
+      ],
+      "docs": [
+        {
+          "title": "res.clearCookie()",
+          "url": "https://expressjs.com/en/5x/api/response#resclearcookie"
+        },
+        {
+          "title": "204 No Content",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/204"
+        },
+        {
+          "title": "Session management",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "expires",
+      "title": "Give each session an end",
+      "file": "src/routes/signIn.js",
+      "description": "Give every new session an end, eight hours after it starts. In `POST /sign-in`:\n\n- save `expiresAt` with the session: the time `now()` gives plus `SESSION_MS`, in milliseconds\n- make the session cookie last as long: a `Max-Age` of eight hours\n- keep the cookie HttpOnly, SameSite `Lax` and on the path `/`\n\nRead the time only with `now()`, the clock `createApp` is given, never `Date.now()` itself. The check signs in with clocks of its own, then reads the session store and the `Set-Cookie` header.",
+      "nextSteps": [
+        "Find where the session is saved and the cookie set.",
+        "Work out when the session ends, from `now()`.",
+        "Save that time with the session.",
+        "Give the cookie the same lifetime, then run `node try.js`."
+      ],
+      "hints": [
+        "The server's record of the session and the browser's cookie each need to know when it ends.",
+        "`now()` gives milliseconds, like `Date.now()`. The `maxAge` option of `res.cookie()` is in milliseconds too, and Express writes the header's `Max-Age` in seconds for you.",
+        "`sessions.save(token, { staffId: member.id, expiresAt: now() + SESSION_MS })`, and `maxAge: SESSION_MS` among the cookie options."
+      ],
+      "docs": [
+        {
+          "title": "Date.now()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/now"
+        },
+        { "title": "res.cookie()", "url": "https://expressjs.com/en/5x/api/response#rescookie" },
+        {
+          "title": "Set-Cookie: Max-Age",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie#max-agenumber"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "expired",
+      "title": "Refuse a session that has ended",
+      "file": "src/middleware/readSession.js",
+      "description": "Make `readSession(staff, sessions, now)` in `src/middleware/readSession.js` refuse a session that has ended:\n\n- a session has ended once `now()` is at or past its `expiresAt`\n- an ended session is removed from the store, and `req.staff` stays unset\n- a session that has not ended works as before, and the request always goes on\n\nThe check saves sessions that end at times of its own, moves the clock, and sends `GET /me`, a change and a read.",
+      "nextSteps": [
+        "Find where readSession looks up the session.",
+        "Compare its end with the time.",
+        "Forget a session that has ended.",
+        "Run `node try.js` and read the answer eight hours later."
+      ],
+      "hints": [
+        "The cookie's `Max-Age` asks the browser to drop it, but a copied cookie can be sent for ever. Only the server can really end a session.",
+        "Compare `session.expiresAt` with `now()` right after the session is looked up. At exactly `expiresAt` it has ended.",
+        "Make `session` a `let`, then `if (session && session.expiresAt <= now()) { sessions.remove(token); session = undefined }` before the member is looked up."
+      ],
+      "docs": [
+        {
+          "title": "Session expiration",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#session-expiration"
+        },
+        {
+          "title": "Less than or equal (<=)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
