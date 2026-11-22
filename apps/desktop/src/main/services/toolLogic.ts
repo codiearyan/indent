@@ -34,7 +34,7 @@ export function cppVersion(output: string): string | null {
 
 export function pythonSupported(version: string): boolean {
   const [major, minor] = version.split('.').map((part) => parseInt(part))
-  return major > 3 || (major === 3 && minor >= 10)
+  return major > 3 || (major === 3 && minor >= 9)
 }
 
 /** Java 8 and older call themselves 1.x. */
@@ -84,8 +84,8 @@ const WINGET: Record<SystemTool, string | null> = {
   cpp: null
 }
 
-// Apple's developer tools hold Git and a C++ compiler. Their Python is 3.9, too old for the repos.
-const APPLE_DEV_TOOLS: SystemTool[] = ['git', 'cpp']
+// Apple's developer tools hold Git, Python 3.9 and a C++ compiler; a Java kit is its own download.
+const APPLE_DEV_TOOLS: SystemTool[] = ['git', 'python', 'cpp']
 
 /**
  * The command that installs a tool here: Apple's installer, winget (Windows asks for permission),

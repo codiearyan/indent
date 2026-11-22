@@ -37,10 +37,10 @@ describe('tool versions', () => {
     expect(cppVersion('g++.exe (Rev2, Built by MSYS2 project) 14.2.0\n')).toBe('g++ 14.2.0')
   })
 
-  it('wants Python 3.10 and Java 17 or newer', () => {
-    expect(pythonSupported('3.10.0')).toBe(true)
+  it('wants Python 3.9 and Java 17 or newer', () => {
+    expect(pythonSupported('3.9.6')).toBe(true)
     expect(pythonSupported('3.12.1')).toBe(true)
-    expect(pythonSupported('3.9.6')).toBe(false)
+    expect(pythonSupported('3.8.10')).toBe(false)
     expect(javaSupported('17.0.10')).toBe(true)
     expect(javaSupported('21.0.2')).toBe(true)
     expect(javaSupported('11.0.22')).toBe(false)
@@ -64,11 +64,11 @@ describe('installerFor', () => {
     ...['--accept-package-agreements', '--accept-source-agreements']
   ]
 
-  it("uses Apple's developer tools for Git and C++ only", () => {
+  it("uses Apple's developer tools for Git, Python and C++, not Java", () => {
     const xcode = { cmd: 'xcode-select', args: ['--install'] }
     expect(installerFor('git', 'darwin', new Set())).toEqual(xcode)
     expect(installerFor('cpp', 'darwin', new Set())).toEqual(xcode)
-    expect(installerFor('python', 'darwin', new Set())).toBeNull()
+    expect(installerFor('python', 'darwin', new Set())).toEqual(xcode)
     expect(installerFor('java', 'darwin', new Set())).toBeNull()
   })
 

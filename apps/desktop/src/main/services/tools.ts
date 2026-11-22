@@ -186,7 +186,7 @@ async function status(): Promise<ToolStatus[]> {
   const javaUse = 'Builds and runs the Java repos.'
   const others = await Promise.all([
     system('git', git, !!git, toolNote('Keeps the history of a project.', git, !!git)),
-    system('python', py, pyOk, toolNote('Runs the Python repos.', py, pyOk, '3.10')),
+    system('python', py, pyOk, toolNote('Runs the Python repos.', py, pyOk, '3.9')),
     system(
       'java',
       javac,
