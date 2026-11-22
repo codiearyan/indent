@@ -11,6 +11,7 @@ export type Appearance = Theme | 'system'
 export type EditorOption = 'wordWrap' | 'lineNumbers' | 'minimap' | 'vim'
 export type TextZone = 'lesson' | 'tasks' | 'editor' | 'terminal'
 export type PanelKey = 'files' | 'terminal' | 'chat' | 'zen' | 'browser'
+export type LeftTab = 'insights' | 'tasks' | 'resources'
 export type Experience = 'new' | 'some' | 'experienced'
 export type CursorStyle = 'block' | 'bar' | 'underline'
 
@@ -54,7 +55,9 @@ export interface SettingsState {
   /** Which optional panels are showing. `zen` hides everything but the editor. */
   panels: Record<PanelKey, boolean>
   lessonSide: 'left' | 'right'
-  leftTab: 'insights' | 'tasks'
+  leftTab: LeftTab
+  /** Chapter keys whose Resources tab the learner uncovered. */
+  resourcesShown: string[]
   tourSeen: boolean
   /** The first-run setup was finished or skipped. */
   onboarded: boolean
@@ -91,7 +94,8 @@ export interface SettingsState {
   setPanel(key: PanelKey, open: boolean): void
   togglePanel(key: PanelKey): void
   setLessonSide(side: 'left' | 'right'): void
-  setLeftTab(tab: 'insights' | 'tasks'): void
+  setLeftTab(tab: LeftTab): void
+  showResources(key: string): void
   setTourSeen(seen: boolean): void
   setOnboarded(onboarded: boolean): void
   setStarAsked(asked: boolean): void
@@ -138,6 +142,7 @@ export const useSettings = create<SettingsState>()(
       panels: defaultPanels,
       lessonSide: 'left',
       leftTab: 'insights',
+      resourcesShown: [],
       tourSeen: false,
       onboarded: false,
       starAsked: false,
@@ -170,6 +175,10 @@ export const useSettings = create<SettingsState>()(
       togglePanel: (key) => set((s) => ({ panels: { ...s.panels, [key]: !s.panels[key] } })),
       setLessonSide: (lessonSide) => set({ lessonSide }),
       setLeftTab: (leftTab) => set({ leftTab }),
+      showResources: (key) =>
+        set((s) =>
+          s.resourcesShown.includes(key) ? s : { resourcesShown: [...s.resourcesShown, key] }
+        ),
       setTourSeen: (tourSeen) => set({ tourSeen }),
       setOnboarded: (onboarded) => set({ onboarded }),
       setStarAsked: (starAsked) => set({ starAsked }),
