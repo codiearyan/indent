@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Check, Circle, ListChecks, Loader2, Workflow, X } from 'lucide-react'
 import type {
   ChapterProgress,
@@ -12,6 +13,7 @@ import type {
 import { compareTrace } from '@shared/trace'
 import { traceView } from '@/features/flows/traceView'
 import { api } from '@/lib/api'
+import { errorMessage } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAi } from '@/features/ai/aiStore'
 import { checkAttachment, hintAttachment } from '@/features/ai/attachments'
@@ -152,7 +154,7 @@ export function TaskItem({
             size="sm"
             className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
             disabled={checking !== null || toolsBroken}
-            onClick={() => void check([task.id])}
+            onClick={() => void check([task.id]).catch((error) => toast.error(errorMessage(error)))}
           >
             {isChecking ? <Loader2 className="animate-spin" /> : <ListChecks />}
             {isChecking && toolsInstalling ? 'Getting ready...' : 'Check'}

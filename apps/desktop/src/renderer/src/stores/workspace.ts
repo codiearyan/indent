@@ -121,10 +121,13 @@ interface WorkspaceStore {
   openPageWindow(): Promise<void>
 }
 
-const pendingSaves = new Map<string, ReturnType<typeof setTimeout>>()
+const pendingSaves = new Map<string, ReturnType<typeof setTimeout> | undefined>()
 
 /** Counts launches of an IDE and leavings of an issue, so a launch knows when it was left behind. */
 let ideLaunch = 0
+
+/** Counts opens, so one that was left for another issue does not land on its page. */
+let opens = 0
 
 export const useWorkspace = create<WorkspaceStore>()((set, get) => {
   const ids = (): [string, string] => {
@@ -133,14 +136,25 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     return [chapter.labId, chapter.id]
   }
 
-  const save = (path: string): Promise<void> => {
+  const save = async (path: string): Promise<void> => {
     clearTimeout(pendingSaves.get(path))
     pendingSaves.delete(path)
     const file = get().files.find((f) => f.path === path)
-    if (!file) return Promise.resolve()
-    return api.workspace
-      .writeFile(...ids(), path, file.content)
-      .then(() => set((s) => ({ revision: s.revision + 1 })))
+    if (!file) return
+    const chapter = get().chapter
+    try {
+      await api.workspace.writeFile(...ids(), path, file.content)
+    } catch (error) {
+      // Still pending, so a refresh cannot replace text that never reached the disk. Only while
+      // this issue is open: in the next one the same path is another file.
+      if (get().chapter === chapter && !pendingSaves.has(path)) pendingSaves.set(path, undefined)
+      toast.error(`Could not save ${path}`, {
+        id: 'save-failed',
+        description: errorMessage(error)
+      })
+      throw error
+    }
+    set((s) => ({ revision: s.revision + 1 }))
   }
 
   const setLayout = (layout: EditorLayout): void => {
@@ -201,7 +215,15 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     pageWindow: false,
 
     open: async (labId, chapterId, { here = false } = {}) => {
-      await get().flush()
+      const opening = ++opens
+      // A save that failed was already reported; it must not hold the next issue back.
+      await get()
+        .flush()
+        .catch(() => {})
+      // Before the timers: by now they may belong to the issue a newer open is showing.
+      if (opening !== opens) return
+      for (const timer of pendingSaves.values()) clearTimeout(timer)
+      pendingSaves.clear()
       api.preview.close()
       set({
         browserExpanded: false,
@@ -221,13 +243,16 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       const catalog = useCatalog.getState()
       if (catalog.labs?.find((lab) => lab.id === labId)?.availability) {
         if (!(await catalog.download(labId))) {
+          if (opening !== opens) return
           const failed = useCatalog.getState().downloads[labId]
           set({ status: 'error', error: failed?.state === 'failed' ? failed.message : null })
           return
         }
+        if (opening !== opens) return
       }
       try {
         const elsewhere = here ? null : await api.workspace.findElsewhere(labId, chapterId)
+        if (opening !== opens) return
         if (elsewhere) {
           set({ status: 'elsewhere', elsewhere })
           return
@@ -237,12 +262,13 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
           api.workspace.open(labId, chapterId),
           api.progress.touch(labId, chapterId)
         ])
+        if (opening !== opens) return
         useProgress.getState().set(progress)
         if (repoJustStarted(progress, labId, chapterId)) track('repo_started', { repo: labId })
         set({ chapter, status: 'ready' })
         applySnapshot(snapshot, true)
       } catch (error) {
-        set({ status: 'error', error: errorMessage(error) })
+        if (opening === opens) set({ status: 'error', error: errorMessage(error) })
       }
     },
 
@@ -251,7 +277,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     openToSide: (path, from) => setLayout(openToSide(get().layout, path, from)),
 
     closeFile: (path, group) => {
-      if (pendingSaves.has(path)) void save(path)
+      if (pendingSaves.has(path)) void save(path).catch(() => {})
       setLayout(closeInGroup(get().layout, path, group))
     },
 
@@ -268,7 +294,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       clearTimeout(pendingSaves.get(path))
       pendingSaves.set(
         path,
-        setTimeout(() => void save(path), SAVE_DELAY_MS)
+        setTimeout(() => void save(path).catch(() => {}), SAVE_DELAY_MS)
       )
     },
 
@@ -277,9 +303,11 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     },
 
     refresh: async () => {
-      if (!get().chapter || pendingSaves.size > 0) return
-      const snapshot = await api.workspace.open(...ids())
-      if (pendingSaves.size === 0) applySnapshot(snapshot)
+      const chapter = get().chapter
+      if (!chapter || pendingSaves.size > 0) return
+      const snapshot = await api.workspace.open(chapter.labId, chapter.id)
+      // The learner may have opened another issue while the files were read.
+      if (get().chapter === chapter && pendingSaves.size === 0) applySnapshot(snapshot)
     },
 
     reset: async () => {
