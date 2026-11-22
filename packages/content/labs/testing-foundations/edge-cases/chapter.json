@@ -1,0 +1,117 @@
+{
+  "id": "edge-cases",
+  "title": "Testing the edges",
+  "files": ["src/delivery.test.js", "src/delivery.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here and read what they say.",
+    "suggestedCommand": "npx vitest run src/delivery.test.js"
+  },
+  "tasks": [
+    {
+      "id": "line",
+      "title": "Test both sides of the free delivery line",
+      "file": "src/delivery.test.js",
+      "description": "Orders of `FREE_DELIVERY_FROM` pounds or more get free delivery; anything less pays `DELIVERY_CHARGE`. In the `deliveryCharge` block, test both sides of that line: an order of exactly the free delivery amount, and an order just under it.\n\nCheck runs your tests on the working code and on versions that move the line a little either way. A test in this block must pass on the first and fail on each of the others.",
+      "nextSteps": [
+        "Find the free delivery amount in `delivery.js`.",
+        "Write a test for an order of exactly that amount.",
+        "Write a test for an order as close below it as you can.",
+        "Run the tests."
+      ],
+      "hints": [
+        "A test of a 100 pound order and a 10 pound order passes even when the line is in the wrong place.",
+        "The mistake that slips in most often is `>` where the rule says \"or more\". Only an order of exactly the amount shows it.",
+        "One test for `deliveryCharge(40)` and one for `deliveryCharge(39.99)`, each with the charge the rule says."
+      ],
+      "docs": [
+        {
+          "title": "Greater than or equal (>=)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal"
+        },
+        { "title": "test", "url": "https://vitest.dev/api/test" }
+      ],
+      "videos": [
+        {
+          "title": "Boundary values and partitions",
+          "url": "https://www.youtube.com/watch?v=Vnp3nVPaKTg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "empty",
+      "title": "Test a Friday with no boxes",
+      "file": "src/delivery.test.js",
+      "description": "Some Fridays in winter have no deliveries at all. In the `totalWeight` block, test that the total weight of an empty list of boxes is 0.\n\nCheck runs your tests on the working code and on versions that crash or give nothing back for an empty list. A test in this block must pass on the first and fail on the others.",
+      "nextSteps": [
+        "Read `totalWeight` to see what it does with a list of boxes.",
+        "Ask what the right answer is when the list is empty.",
+        "Write a test that calls `totalWeight` with an empty list.",
+        "Run the tests."
+      ],
+      "hints": [
+        "An empty list is a list with nothing in it: `[]`.",
+        "Check the number that comes back, not only that nothing crashed.",
+        "Write `expect(totalWeight([])).toBe(0)`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.reduce()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce"
+        },
+        { "title": "toBe", "url": "https://vitest.dev/api/expect#tobe" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ends",
+      "title": "Test the heaviest box at either end",
+      "file": "src/delivery.test.js",
+      "description": "The heaviest box goes into the van first. In the `heaviestBox` block, write tests with a few boxes where the heaviest one is first in the list, and where it is last. Each box is `{ customer, kilos }`, and `heaviestBox` gives back the heaviest box itself.\n\nCheck runs your tests on the working code and on versions that skip the first box or the last box. A test in this block must pass on the first and fail on each of the others.",
+      "nextSteps": [
+        "Make three boxes with different weights.",
+        "Test a list with the heaviest box first.",
+        "Test a list with the heaviest box last.",
+        "Run the tests."
+      ],
+      "hints": [
+        "With the heaviest box in the middle, a loop that skips an end still finds it.",
+        "Loops most often go wrong at the first or the last item. Put the answer exactly there.",
+        "Two tests: `heaviestBox([heavy, light, middle])` and `heaviestBox([light, middle, heavy])`, each compared with `heavy` using `toEqual`."
+      ],
+      "docs": [
+        { "title": "toEqual", "url": "https://vitest.dev/api/expect#toequal" },
+        {
+          "title": "for...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "trips",
+      "title": "Test the van trips at the edges",
+      "file": "src/delivery.test.js",
+      "description": "The van takes `BOXES_PER_TRIP` boxes per trip. In the `tripsNeeded` block, test the three edges Wendell cares about: no boxes at all, exactly one full van, and one box more than a full van.\n\nCheck runs your tests on the working code and on versions that book an extra trip for a full van, leave the last boxes behind, or always book a trip. A test in this block must pass on the first and fail on each of the others.",
+      "nextSteps": [
+        "Find how many boxes fit in the van.",
+        "Work out on paper how many trips 0 boxes, a full van, and one box more need.",
+        "Write one test for each.",
+        "Run the tests."
+      ],
+      "hints": [
+        "A test of 30 boxes passes for most of the wrong versions. The edges are where they differ.",
+        "Think of no boxes, the exact number that fills the van, and one more than that.",
+        "Three tests: `tripsNeeded(0)`, `tripsNeeded(12)` and `tripsNeeded(13)`, with the trips you worked out."
+      ],
+      "docs": [
+        {
+          "title": "Math.ceil()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/ceil"
+        },
+        { "title": "test", "url": "https://vitest.dev/api/test" }
+      ],
+      "points": 10
+    }
+  ]
+}

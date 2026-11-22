@@ -1,0 +1,103 @@
+{
+  "id": "one-behaviour-each",
+  "title": "One rule in each test",
+  "files": ["src/weekly.test.js", "src/weekly.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here and read their names.",
+    "suggestedCommand": "npx vitest run src/weekly.test.js"
+  },
+  "tasks": [
+    {
+      "id": "pause",
+      "title": "Test a paused week",
+      "file": "src/weekly.test.js",
+      "description": "Customers can pause their box while they are away. Make a `describe('weeklyBox', ...)` block in `src/weekly.test.js`, and inside it write a test that a subscriber gets no box (`null`) in a week they paused.\n\nThe test's name must say what it checks and contain the word pause or paused, such as `'gives no box in a paused week'`.\n\nCheck looks for that test inside the `weeklyBox` block, runs it on the working code, where it must pass, and on a version that ignores paused weeks, where it must fail.",
+      "nextSteps": [
+        "Read the comment at the top of `weekly.js` to see what a subscription looks like.",
+        "Add a `describe('weeklyBox', () => { })` block below Lorcan's test.",
+        "Inside it, make a subscriber with one paused week and test that week.",
+        "Run the tests and read the names in the output."
+      ],
+      "hints": [
+        "A subscription is a plain object. Make one in your test with the fields from the comment in `weekly.js`.",
+        "Keep the subscriber simple: a weekly box, one paused week, no size changes. Then only the pause can decide the answer.",
+        "Inside `describe('weeklyBox', () => { ... })`, write `test('gives no box in a paused week', () => { ... })` with `expect(weeklyBox(sub, week)).toBe(null)` for a week in its `pausedWeeks`."
+      ],
+      "docs": [
+        { "title": "describe", "url": "https://vitest.dev/api/describe" },
+        { "title": "test", "url": "https://vitest.dev/api/test" },
+        { "title": "toBeNull", "url": "https://vitest.dev/api/expect#tobenull" }
+      ],
+      "videos": [
+        { "title": "Grouping tests with describe", "url": "https://www.youtube.com/watch?v=Mo0aGoCqSek" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fortnight",
+      "title": "Test a fortnightly box",
+      "file": "src/weekly.test.js",
+      "description": "A fortnightly subscriber gets a box in even weeks only. In the `weeklyBox` block, write a test that a fortnightly subscriber gets no box in an odd week.\n\nThe test's name must contain the word fortnight or fortnightly.\n\nCheck runs it on the working code, where it must pass, and on versions that send a box every week or skip the wrong weeks, where it must fail.",
+      "nextSteps": [
+        "Make a subscriber with `every: 'fortnight'`, no paused weeks and no size changes.",
+        "Pick an odd week number.",
+        "Write a test in the `weeklyBox` block with a name that says what it checks.",
+        "Run the tests."
+      ],
+      "hints": [
+        "Leave pauses and size changes out of this subscriber, so the test checks one rule only.",
+        "An odd week is a week number that does not divide by two, like 31.",
+        "Write `test('gives a fortnightly subscriber no box in an odd week', () => { ... })` and expect `null` for week 31."
+      ],
+      "docs": [
+        { "title": "test", "url": "https://vitest.dev/api/test" },
+        { "title": "toBeNull", "url": "https://vitest.dev/api/expect#tobenull" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "change",
+      "title": "Test a size change for one week",
+      "file": "src/weekly.test.js",
+      "description": "A subscriber can change their box size for a single week, say a large box for a family visit. In the `weeklyBox` block, write a test that the week with the change gets the changed size, and the week after gets the usual size again. Compare the whole box that comes back.\n\nThe test's name must contain the word change or changed.\n\nCheck runs it on the working code, where it must pass, and on versions that ignore the change or keep it for every week, where it must fail.",
+      "nextSteps": [
+        "Make a weekly subscriber with one entry in `sizeChanges`.",
+        "Check the box for that week.",
+        "Check the box for the week after.",
+        "Run the tests."
+      ],
+      "hints": [
+        "`sizeChanges` maps a week number to a size, like `{ 50: 'large' }`.",
+        "A version that keeps the new size for good only shows up if you also look at a week without a change.",
+        "Write `test('uses the size change for that one week', () => { ... })` with two expects: `toEqual` the large box for the changed week, and the usual box for the next."
+      ],
+      "docs": [
+        { "title": "toEqual", "url": "https://vitest.dev/api/expect#toequal" },
+        { "title": "test", "url": "https://vitest.dev/api/test" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "one-rule",
+      "title": "Give each rule its own test",
+      "file": "src/weekly.test.js",
+      "description": "Lorcan's test `'weeklyBox works'` checks all three rules at once. When it fails, its name cannot tell Effie which rule broke.\n\nMake every test in the file check one rule. When a rule breaks, only tests whose names are about that rule may fail. Replace Lorcan's test with focused tests, or remove it if your tests already cover what it checked.\n\nCheck breaks each rule in turn, pausing, fortnightly boxes and size changes, and looks at which of your tests fail. Every test that fails must have that rule in its name, and at least one must fail.",
+      "nextSteps": [
+        "Run the tests and read every name in the output.",
+        "Ask of each test: if pausing broke, would it fail? And if fortnightly boxes broke?",
+        "Find the tests that would fail for more than one rule.",
+        "Split them, or remove what your focused tests already check."
+      ],
+      "hints": [
+        "Lorcan's test uses a fortnightly subscriber with a pause and a size change, so any of the three rules can make it fail.",
+        "A test about one rule should use a subscriber where only that rule matters: no pauses in the fortnight test, and so on.",
+        "Remove `'weeklyBox works'` once your three tests from the tasks above cover it, and check that each of them uses a subscriber with only its own rule switched on."
+      ],
+      "docs": [
+        { "title": "describe", "url": "https://vitest.dev/api/describe" },
+        { "title": "test", "url": "https://vitest.dev/api/test" }
+      ],
+      "points": 10
+    }
+  ]
+}

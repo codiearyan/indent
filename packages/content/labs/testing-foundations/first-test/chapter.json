@@ -1,0 +1,106 @@
+{
+  "id": "first-test",
+  "title": "Your first test",
+  "files": ["src/prices.test.js", "src/prices.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here and read what they say.",
+    "suggestedCommand": "npx vitest run src/prices.test.js"
+  },
+  "tasks": [
+    {
+      "id": "small-box",
+      "title": "Test the price of a small box",
+      "file": "src/prices.test.js",
+      "description": "In the `boxPrice` block of `src/prices.test.js`, replace the `test.todo` line with your first test: a small box costs the price on the price list in `src/prices.js`.\n\nGive the test a name that says what it checks, call `boxPrice('small')` inside `expect`, and compare it with the price using `toBe`.\n\nCheck runs your tests on the farm's working code, where they must pass, then on versions of `prices.js` with a mistake slipped in, where a test in this block must fail. One of those versions has last week's mistake: a small box charged as a large one.",
+      "nextSteps": [
+        "Open `src/prices.js` and find the price of a small box.",
+        "In the `boxPrice` block, replace the `test.todo` line with `test('...', () => { })`.",
+        "Inside the braces, write one `expect` line that checks `boxPrice('small')`.",
+        "Run `npx vitest run src/prices.test.js` and look for a tick next to your test."
+      ],
+      "hints": [
+        "The price you need is in `BOX_PRICES` at the top of `prices.js`. The lesson's part on your first test shows every piece of a test.",
+        "A test is `test(name, function)`. Inside the function, `expect(what the code gives).toBe(what it should be)`.",
+        "The shape is `test('a small box costs ...', () => { expect(boxPrice('small')).toBe(...) })`, with the price from the list in both places."
+      ],
+      "docs": [
+        { "title": "Writing your first test", "url": "https://vitest.dev/guide/#writing-tests" },
+        { "title": "test", "url": "https://vitest.dev/api/test" },
+        { "title": "expect and toBe", "url": "https://vitest.dev/api/expect#tobe" }
+      ],
+      "videos": [
+        { "title": "Writing your first test", "url": "https://www.youtube.com/watch?v=9Op6lK4wnRE" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "eggs",
+      "title": "Test a box with eggs",
+      "file": "src/prices.test.js",
+      "description": "In the `withEggs` block, replace the `test.todo` line with a test for `withEggs('medium', 2)`: a medium box with two dozen eggs.\n\nWork out what it should cost by hand from the prices in `src/prices.js`, and write that number in your test. Do not get the expected value by calling the function again.\n\nCheck runs your tests on the working code and on versions where the eggs or the box are priced wrong. A test in this block must pass on the first and fail on each of the others.",
+      "nextSteps": [
+        "Read `withEggs` in `prices.js` to see how the price is built.",
+        "Work out the price of a medium box plus two dozen eggs on paper.",
+        "Write a test in the `withEggs` block that compares `withEggs('medium', 2)` with your number.",
+        "Run the tests and check your new test passes."
+      ],
+      "hints": [
+        "The price is the box price plus the eggs. Both prices are near the top of `prices.js`.",
+        "A test that compares the function with itself always passes, even when the code is wrong. The expected value has to come from you, not from the code.",
+        "Add the medium box price to two times the price of a dozen eggs, then write `expect(withEggs('medium', 2)).toBe(...)` with that sum."
+      ],
+      "docs": [
+        { "title": "expect and toBe", "url": "https://vitest.dev/api/expect#tobe" },
+        { "title": "test", "url": "https://vitest.dev/api/test" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "delivery",
+      "title": "Fix a test that is out of date",
+      "file": "src/prices.test.js",
+      "description": "The test in the `deliveryCharge` block fails. Run the tests and read its failure: which line, what it expected and what it received.\n\nTown delivery went up in March, and `prices.js` already has the new price, so here the code is right and the test is out of date. Fix the test, not the code.\n\nCheck runs your tests on the working code and on versions that still charge the old town price or charge the village price instead. A test in this block must pass on the first and fail on each of the others, so do not delete the test or its `expect`.",
+      "nextSteps": [
+        "Run `npx vitest run src/prices.test.js` and find the failure for `deliveryCharge`.",
+        "Read the Expected and Received lines under it.",
+        "Compare them with the delivery prices in `prices.js`.",
+        "Change the number in the test and run the tests again."
+      ],
+      "hints": [
+        "The failure points at the line of the test with a small arrow and a line number.",
+        "Expected is what the test wrote down. Received is what the code gave. The price list in `prices.js` says which one is right.",
+        "Change the expected number in the `deliveryCharge` test to the town price from the list."
+      ],
+      "docs": [
+        { "title": "expect and toBe", "url": "https://vitest.dev/api/expect#tobe" },
+        { "title": "Running tests from the command line", "url": "https://vitest.dev/guide/cli" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "member",
+      "title": "Fix the code a test caught",
+      "file": "src/prices.js",
+      "description": "The test in the `memberPrice` block fails too. Members of the box club pay 2 less for every box, and Lorcan's test says exactly that. This time the test is right and the code is wrong.\n\nRead the failure, find the mistake in `memberPrice` in `src/prices.js`, and fix it. Leave the other functions as they are.\n\nCheck calls `memberPrice` for every box size and compares it with the club's price, and checks that the other prices did not change.",
+      "nextSteps": [
+        "Run the tests and read the failure for `memberPrice`.",
+        "Compare what it received with what a member should pay.",
+        "Open `memberPrice` in `prices.js` and find the line that uses `MEMBER_DISCOUNT`.",
+        "Fix that line and run the tests until all of them pass."
+      ],
+      "hints": [
+        "Received is more than a member should pay, and more than the box costs without the club.",
+        "Is the discount taken off the price, or added to it?",
+        "The line should take `MEMBER_DISCOUNT` away from `boxPrice(size)`."
+      ],
+      "docs": [
+        { "title": "expect and toBe", "url": "https://vitest.dev/api/expect#tobe" },
+        {
+          "title": "Subtraction (-)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Subtraction"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
