@@ -140,6 +140,8 @@ async function previewPage(
 
 const MAX_LINES = 200
 const windows = new Map<string, BrowserWindow>()
+/** Counts closeAll() calls, so an open still reading from disk knows its issue was left. */
+let closes = 0
 
 const send = (event: PreviewWindowEvent): void => emit(EVENTS.previewWindow, event)
 
@@ -149,7 +151,9 @@ const openOutside = (url: string): void => {
 
 /** The page is the learner's code: the window gets no preload, no window.api and no Node. */
 async function openWindow(labId: string, chapterId: string): Promise<void> {
+  const started = closes
   const { page, title } = await previewPage(labId, chapterId)
+  if (started !== closes) return
   const key = `${labId}/${chapterId}`
   const open = windows.get(key)
   if (open) {
@@ -169,6 +173,8 @@ async function openWindow(labId: string, chapterId: string): Promise<void> {
     webPreferences: { sandbox: true, contextIsolation: true, nodeIntegration: false }
   })
   markPageWindow(window)
+  // A page's beforeunload handler must not keep its window open after the learner left the issue.
+  window.webContents.on('will-prevent-unload', (event) => event.preventDefault())
   windows.set(key, window)
 
   const ownPage = (url: string): boolean => {
@@ -295,7 +301,9 @@ function stopServer(): void {
 
 /** One issue is served at a time, each on its own port with its own token. */
 async function openInBrowser(labId: string, chapterId: string): Promise<void> {
+  const started = closes
   const { page } = await previewPage(labId, chapterId)
+  if (started !== closes) return
   if (serving?.labId !== labId || serving.chapterId !== chapterId) {
     stopServer()
     const server = startServer(labId, chapterId)
@@ -305,6 +313,7 @@ async function openInBrowser(labId: string, chapterId: string): Promise<void> {
     })
   }
   const { port, token } = await serving.server
+  if (started !== closes) return
   const path = page.split('/').map(encodeURIComponent).join('/')
   await shell.openExternal(`http://127.0.0.1:${port}/${path}?token=${token}`)
 }
@@ -321,6 +330,7 @@ function reload(labId: string, chapterId: string): void {
 
 /** The learner left the issue, reset it, or the app is closing. */
 export function closeAll(): void {
+  closes++
   for (const window of windows.values()) window.close()
   stopServer()
 }
