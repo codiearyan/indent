@@ -89,11 +89,16 @@ export const checks = {
       throwCase(
         'Fails when the function returns',
         ['returns'],
-        (v) => v.threw && v.isError && v.message?.includes('Expected the function to throw'),
+        (v) => v.threw && v.isError && v.message?.includes('Expected the function to throw') && v.calls === 1,
         'expect(fn).toThrow(), where fn returns 4500',
-        'A function that returns has not thrown, so toThrow should throw the Error from the task. If you do throw there, check whether your own catch swallows it.'
+        (v) =>
+          v?.threw && v.calls !== 1
+            ? 'toThrow should call the function once, and only once.'
+            : 'A function that returns has not thrown, so toThrow should throw the Error from the task. If you do throw there, check whether your own catch swallows it.',
+        (v) => `${said(v)}, called the function ${v.calls} times`
       ),
       throwCase('Any thrown value counts', ['text'], (v) => !v.threw, "expect(fn).toThrow(), where fn throws the string 'no paper left'", 'A function that throws a string has still thrown.'),
+      throwCase('A thrown undefined counts', ['nothing'], (v) => !v.threw, 'expect(fn).toThrow(), where fn runs `throw undefined`', 'The function threw, even though the value is undefined. Decide by whether your catch ran, not by what it caught.'),
       throwCase('Passes when the message has the text', ['unknownItem', 'Unknown item'], (v) => !v.threw, "expect(fn).toThrow('Unknown item'), where fn throws Error('Unknown item: mug')", "The error's message contains the text, so toThrow should return quietly."),
       throwCase(
         'Fails when the message is different',

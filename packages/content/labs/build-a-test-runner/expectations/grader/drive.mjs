@@ -64,6 +64,9 @@ const BEHAVIOURS = {
   text: () => {
     throw 'no paper left'
   },
+  nothing: () => {
+    throw undefined
+  },
   returns: () => 4500
 }
 

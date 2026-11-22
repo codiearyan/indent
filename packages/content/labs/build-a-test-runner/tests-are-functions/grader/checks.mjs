@@ -18,7 +18,7 @@ export const checks = {
         run: 'collectCase',
         args: ['order'],
         pass: (v) => v.isArray && JSON.stringify(v.names) === '["ships on time","counts the paper"]' && v.sameFns,
-        show: (v) => `tests holds the names ${JSON.stringify(v.names)}${v.isArray && !v.sameFns ? ', but not the same functions that were passed in' : ''}`,
+        show: (v) => `tests holds the names ${JSON.stringify(v.names)}${v.isArray && !v.keptFns ? ', but not the same functions that were passed in' : ''}`,
         setup: "test('ships on time', a), then test('counts the paper', b)",
         hint: 'Each call should add one { name, fn } to the end of the exported tests array, keeping the very function it was given.'
       },
@@ -100,6 +100,15 @@ export const checks = {
         show: showRun,
         setup: "one test that throws the string 'out of card stock', not an Error",
         hint: 'JavaScript can throw any value, not only an Error. Whatever the function throws, the test failed.'
+      },
+      {
+        name: 'A thrown null is a failure too',
+        run: 'runCase',
+        args: [[['checks the ink', 'null']]],
+        pass: all(['checks the ink', false]),
+        show: showRun,
+        setup: 'one test that runs `throw null`',
+        hint: 'The function threw, so the test failed, even though null is falsy. Decide pass or fail by whether it threw, not by what it threw.'
       },
       {
         name: 'Returning false is not a failure',

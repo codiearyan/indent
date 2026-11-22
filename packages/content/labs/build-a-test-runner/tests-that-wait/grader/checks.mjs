@@ -63,7 +63,12 @@ export const checks = {
         pass: (v) => ok(v) && same(verdicts(v), [true, false]) && v.results[1].sameError === true,
         show: showResults,
         setup: "two plain tests: one returns, one throws Error('Price is 0')",
-        hint: (v) => (v?.hung ? NEVER : 'Plain functions that return or throw should still pass or fail as before.')
+        hint: (v) =>
+          v?.hung
+            ? NEVER
+            : ok(v) && same(v.results.map((r) => r.name), ['rounds to pence', 'adds the setup'])
+              ? 'Each test got the right result, but the results are not in the order the tests were added. Finish one test and keep its result before you start the next.'
+              : 'Plain functions that return or throw should still pass or fail as before.'
       }
     ])
     const program = await runScripts(t, 'main()', [
@@ -84,7 +89,7 @@ export const checks = {
       {
         name: 'The next test waits for the one before',
         run: 'waitCase',
-        args: [[['first', 'waitPass'], ['second', 'syncPass']]],
+        args: [[['first', 'waitPass'], ['second', 'syncPass']], 4000, true],
         pass: (v) => same(v.events, ['first start', 'first end', 'second start', 'second end']) && ok(v),
         show: showOrder,
         setup: "two tests: 'first' waits 30 ms, 'second' does not wait",
@@ -93,7 +98,7 @@ export const checks = {
       {
         name: 'A test that fails late still finishes first',
         run: 'waitCase',
-        args: [[['first', 'waitFail'], ['second', 'syncPass']]],
+        args: [[['first', 'waitFail'], ['second', 'syncPass']], 4000, true],
         pass: (v) => same(v.events, ['first start', 'first end', 'second start', 'second end']) && same(verdicts(v), [false, true]),
         show: (v) => `${showOrder(v)}\n${showResults(v)}`,
         setup: "two tests: 'first' waits 30 ms and then fails, 'second' passes",
@@ -102,7 +107,7 @@ export const checks = {
       {
         name: 'Three tests, one at a time',
         run: 'waitCase',
-        args: [[['first', 'slow'], ['second', 'waitPass'], ['third', 'syncPass']]],
+        args: [[['first', 'slow'], ['second', 'waitPass'], ['third', 'syncPass']], 4000, true],
         pass: (v) =>
           same(v.events, ['first start', 'first end', 'second start', 'second end', 'third start', 'third end']) &&
           same(verdicts(v), [true, true, true]),
@@ -165,11 +170,22 @@ export const checks = {
         args: ['quickLongLimit'],
         pass: (v) => v.code === 0 && v.ms < 3000,
         show: (v) => `exit code ${v.code}, the program ended after ${v.ms} ms${v.timedOut ? ' (stopped by the check)' : ''}`,
-        setup: "a test file with one quick test and { timeout: 6000 }, ending in await main()",
+        setup: 'a test file with one quick test and { timeout: 6000 }, ending in await main()',
         hint: (v) =>
           v && v.code !== 0
             ? `The program ended with exit code ${v.code}, though its one test passes. If main() does not wait for run() yet, finish task 1 first.`
             : 'The test passed at once, but the program stayed open until its time limit ran out. A timer that is still waiting keeps Node running. Stop it once the test is over.'
+      },
+      {
+        name: 'A quick failure does not keep the program open either',
+        args: ['quickFailLongLimit'],
+        pass: (v) => v.code === 1 && v.ms < 3000,
+        show: (v) => `exit code ${v.code}, the program ended after ${v.ms} ms${v.timedOut ? ' (stopped by the check)' : ''}`,
+        setup: "a test file with one test that fails at once and { timeout: 6000 }, ending in await main()",
+        hint: (v) =>
+          v && v.code !== 1
+            ? `The program ended with exit code ${v.code}, though its one test fails. If main() does not wait for run() yet, finish task 1 first.`
+            : 'The test failed at once, but the program stayed open until its time limit ran out. Stop the timer whichever way the test ended, not only when it passed.'
       }
     ])
     return [...cases, ...program]

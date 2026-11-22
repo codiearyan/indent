@@ -25,6 +25,7 @@ export function collectCase(mode) {
       isArray: Array.isArray(runner.tests),
       names: names(),
       sameFns: kept[0]?.fn === first && kept[1]?.fn === second,
+      keptFns: kept.some((t) => t?.fn === first) && kept.some((t) => t?.fn === second),
       calls
     }
   }

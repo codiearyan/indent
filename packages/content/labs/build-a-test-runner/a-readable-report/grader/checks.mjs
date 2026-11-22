@@ -141,7 +141,10 @@ export const checks = {
         pass: (v) => v.code === 1,
         show: showRun,
         setup: 'a test file with two failing tests, ending in main()',
-        hint: 'The exit code says whether anything failed, not how many: 1 for any failure.'
+        hint: (v) =>
+          v && v.code === 0
+            ? 'With failed tests the exit code should be 1, so a script knows to stop. Look at process.exitCode.'
+            : 'The exit code says whether anything failed, not how many: 1 for any failure.'
       },
       {
         name: 'No tests is a failure too',

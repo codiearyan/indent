@@ -105,6 +105,13 @@ const LAYOUTS = {
       test.only('chosen', () => log('chosen'))
     })
     test('also skipped', () => log('also skipped'))
+  },
+  onlyWithHook({ test, describe, beforeEach }, log) {
+    describe('job book', () => {
+      beforeEach(() => log('hook'))
+      test('skipped', () => log('skipped'))
+      test.only('chosen', () => log('chosen'))
+    })
   }
 }
 

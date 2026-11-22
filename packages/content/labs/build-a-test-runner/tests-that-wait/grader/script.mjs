@@ -10,7 +10,16 @@ const PLANS = {
       throw new Error('No paper for posters')
     }),
   // One quick test with a long time limit: the program should end as soon as it passes.
-  quickLongLimit: () => runner.test('counts the paper', async () => {}, { timeout: 6000 })
+  quickLongLimit: () => runner.test('counts the paper', async () => {}, { timeout: 6000 }),
+  // The same, for a test that fails at once.
+  quickFailLongLimit: () =>
+    runner.test(
+      'checks the ink',
+      async () => {
+        throw new Error('Ink is low')
+      },
+      { timeout: 6000 }
+    )
 }
 
 PLANS[process.argv[2]]()

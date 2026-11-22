@@ -40,7 +40,10 @@ export const checks = {
         (v) => same(names(v), ['paper > in stock', 'job book']),
         showNames,
         "describe('paper') with 'in stock' inside, then the test 'job book' outside any group",
-        'Once the group function has returned, the group is over. Tests added later should keep their own names.'
+        (v) =>
+          v && !v.hung && names(v)[1] === 'job book'
+            ? "The test after the group is right. Look at the name of the test inside it: the group's name, then ' > ', then its own name."
+            : 'Once the group function has returned, the group is over. Tests added later should keep their own names.'
       ),
       layout(
         'The group function runs straight away',
@@ -93,7 +96,7 @@ export const checks = {
         (v) => same(v.events, ['hook', 'written first']),
         showEvents,
         "describe('job book') with the test 'written first', and beforeEach(hook) after it",
-        'A hook applies to every test in its group, wherever in the group it was written. Decide which hooks apply when the test runs, not when it is added.'
+        'A hook applies to every test in its group, wherever in the group it was written. A copy of the hooks made when a test is added misses the ones written after it.'
       ),
       layout(
         'An async hook is waited for',
@@ -156,10 +159,18 @@ export const checks = {
       layout(
         'test.only works inside a group',
         'onlyInGroup',
-        (v) => same(v.events, ['chosen']),
-        showEvents,
+        (v) => same(v.events, ['chosen']) && same(names(v), ['cards > chosen']),
+        (v) => `${showEvents(v)}\n${showNames(v)}`,
         "describe('cards') with test('skipped') and test.only('chosen'), then test('also skipped') outside",
-        'A chosen test inside a group is still chosen, and nothing else runs.'
+        "A chosen test inside a group is still chosen, its name carries the group's name like any test, and nothing else runs. If plain tests in a group lack its name too, finish task 1 first."
+      ),
+      layout(
+        'A chosen test gets its setup',
+        'onlyWithHook',
+        (v) => same(v.events, ['hook', 'chosen']),
+        showEvents,
+        "describe('job book') with beforeEach(hook), test('skipped') and test.only('chosen')",
+        'test.only adds a test just like test(), so the beforeEach hooks of its group run before it too. If hooks do not run before plain tests either, finish task 2 first.'
       ),
       {
         name: 'test.only checks its arguments like test()',

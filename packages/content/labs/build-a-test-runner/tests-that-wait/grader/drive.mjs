@@ -69,7 +69,7 @@ export async function waitCase(entries, guardMs = 4000, needsTask1 = false) {
   const returned = runner.run()
   const isPromise = typeof returned?.then === 'function'
   if (needsTask1 && !isPromise) {
-    earlier('This task needs task 1 first: run() does not return a promise yet, so it cannot wait for a time limit.')
+    earlier('This task needs task 1 first: run() does not return a promise yet, so it does not wait for any test.')
   }
   const outcome = await within(guardMs, returned)
   const ms = Date.now() - started
