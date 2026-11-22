@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Bridget", "say": "Can the laptop check our prices?", "note": "Small boxes went out as large." },
+    { "title": "Price file", "text": "Changed often, and nobody checks it." },
+    {
+      "title": "Your tests",
+      "file": "prices.test.js",
+      "mine": true,
+      "gap": "Nothing checks the prices",
+      "tasks": ["Test a small box", "Test a box with eggs", "Fix an old test", "Fix the member price"]
+    },
+    { "title": "Friday boxes", "text": "Priced before they leave the farm." }
+  ],
+  "ticket": { "label": "Small box", "wrong": "overcharged", "why": "Wrong price", "right": "priced right" },
+  "captions": [
+    "Thistlecombe Farm packs veg boxes. Bridget wants the laptop to check the prices.",
+    "Today the price file changes often and nothing checks it, so mistakes reach customers.",
+    "You write the farm's first tests, and read two old ones that fail.",
+    "Now a wrong price shows up as a failing test before Friday's boxes go out.",
+    "Same prices, same file. The laptop checks them, and Bridget hears first."
+  ]
+}

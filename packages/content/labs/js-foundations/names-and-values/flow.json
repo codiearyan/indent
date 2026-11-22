@@ -1,0 +1,109 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "theo", "label": "Theo", "kind": "story" },
+      { "id": "file", "label": "restock.js", "kind": "file", "mine": true },
+      { "id": "node", "label": "Node", "kind": "story" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" },
+      { "id": "ines", "label": "Ines", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "theo", "to": "file", "label": "his tidying" },
+      { "from": "file", "to": "node", "label": "lines" },
+      { "from": "node", "to": "terminal", "label": "error or sheet" },
+      { "from": "terminal", "to": "ines", "label": "restock sheet" }
+    ],
+    "note": "Theo's tidying left names and values Node cannot use, so the sheet stops partway until you fix each one and it reaches Ines."
+  },
+  "tasks": {
+    "jars": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "Under Task 1, one line makes the count of wax jars and the next one prints it."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "Node runs the lines in order and meets a name nothing has made."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "The error names the name it does not know, and the mark sits under it."
+        },
+        {
+          "active": ["terminal", "terminal->ines", "ines"],
+          "note": "Fixed, the sheet tells Ines how many jars of wax are left."
+        }
+      ]
+    },
+    "shelf": {
+      "steps": [
+        {
+          "active": ["file"],
+          "value": {
+            "kind": "map",
+            "label": "the cedar count",
+            "entries": [
+              { "key": "starts with", "value": "the candles delivered" },
+              { "key": "then loses", "value": "the candles sold" }
+            ]
+          },
+          "note": "Under Task 2, the cedar count starts with the delivery and should then lose the sold candles."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "Node stops on the line that changes the count, because of how the count was made."
+        },
+        {
+          "active": ["terminal", "terminal->ines", "ines"],
+          "note": "Once the count can change, the sheet shows what is really left on the shelf."
+        }
+      ]
+    },
+    "label": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "Under Task 3, the label starts as the customer's name and should then turn into capitals."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "Node reads the whole file first, finds one name made twice, and runs nothing at all."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "That is why this error shows first, even though Task 3 sits lower in the file."
+        },
+        {
+          "active": ["terminal", "terminal->ines", "ines"],
+          "note": "Fixed, the label comes out in capitals, ready for the parcel."
+        }
+      ]
+    },
+    "code": {
+      "steps": [
+        {
+          "active": ["file"],
+          "value": {
+            "kind": "array",
+            "label": "the city code",
+            "values": ["trimmed", "first three letters", "capitals"]
+          },
+          "note": "Under Task 4, the courier's city code is made in three jobs on one line."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "One job on that line never runs, so the next one is asked of something that is not text."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "The error names what is not a function. Each dot in that name is a place to look."
+        },
+        {
+          "active": ["terminal", "terminal->ines", "ines"],
+          "note": "Fixed, the sheet prints the code the courier wants."
+        }
+      ]
+    }
+  }
+}

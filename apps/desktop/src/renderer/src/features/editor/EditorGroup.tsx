@@ -14,6 +14,7 @@ import { TAB_SHORTCUTS } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
+import { usePane } from '@/features/workspace/activePane'
 import { CodeEditor } from './CodeEditor'
 import { focusEditorSoon } from './editors'
 import { FileLabel } from './FileTab'
@@ -42,6 +43,8 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
   const paths = tabs?.paths ?? []
   const activePath = tabs?.active ?? null
 
+  const pane = usePane(group === 0 ? 'editor-0' : 'editor-1')
+
   const toSide = (path: string): void => {
     useWorkspace.getState().openToSide(path, group)
     focusEditorSoon()
@@ -49,7 +52,8 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
 
   return (
     <div
-      className="relative flex h-full min-w-0 flex-col"
+      {...pane}
+      className="pane flex h-full min-w-0 flex-col"
       onPointerDownCapture={() => focusGroup(group)}
     >
       <div className="flex h-9 shrink-0">

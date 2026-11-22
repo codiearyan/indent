@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Bridget",
+      "say": "Why did this order pay?",
+      "note": "It was big enough to go free."
+    },
+    {
+      "title": "Lorcan's tests",
+      "text": "Only ordinary orders, so they all pass."
+    },
+    {
+      "title": "Your tests",
+      "file": "delivery.test.js",
+      "mine": true,
+      "gap": "Nobody tests the awkward cases",
+      "tasks": [
+        "Test the free line",
+        "Test an empty Friday",
+        "Test first and last",
+        "Test the van trips"
+      ]
+    },
+    {
+      "title": "Friday van",
+      "text": "Charged right and loaded right, every week."
+    }
+  ],
+  "ticket": {
+    "label": "Her order",
+    "wrong": "charged",
+    "why": "On the line",
+    "right": "delivered free"
+  },
+  "captions": [
+    "A customer spent just enough for free delivery, and the farm charged her anyway.",
+    "Lorcan's tests only use ordinary orders, so they pass while the line is wrong.",
+    "You test right on the edges: the line, an empty Friday, first and last, a full van.",
+    "Now a mistake at any edge fails a test before the van leaves.",
+    "Same rules, same van. The awkward cases are covered too."
+  ]
+}

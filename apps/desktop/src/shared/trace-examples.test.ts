@@ -13,7 +13,24 @@ const openai = fileURLToPath(new URL('../../node_modules/openai', import.meta.ur
 const repos: { labId: string; expected: string[] }[] = [
   {
     labId: 'js-foundations',
-    expected: ['order-reports/total', 'order-reports/top', 'order-reports/revenue']
+    expected: [
+      'reusable-rules/label',
+      'reusable-rules/shipping',
+      'reusable-rules/price',
+      'reusable-rules/total',
+      'doing-it-again/batch',
+      'doing-it-again/weeks',
+      'doing-it-again/engraving',
+      'doing-it-again/digit',
+      'where-names-live/label',
+      'where-names-live/sale',
+      'where-names-live/zone',
+      'where-names-live/note',
+      'passing-functions/rule',
+      'order-reports/total',
+      'order-reports/top',
+      'order-reports/revenue'
+    ]
   },
   {
     labId: 'typescript-essentials',

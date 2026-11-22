@@ -1,0 +1,96 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridget", "label": "Bridget", "kind": "story" },
+      { "id": "tests", "label": "prices.test.js", "kind": "file", "mine": true },
+      { "id": "vitest", "label": "Vitest", "kind": "story" },
+      { "id": "prices", "label": "prices.js", "kind": "file" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bridget", "to": "tests", "label": "price rules" },
+      { "from": "tests", "to": "vitest", "label": "tests" },
+      { "from": "vitest", "to": "prices", "label": "runs" },
+      { "from": "vitest", "to": "terminal", "label": "ticks, crosses" }
+    ],
+    "note": "You write down the farm's price rules as tests, Vitest runs them against prices.js, and the terminal says which ones hold."
+  },
+  "tasks": {
+    "small-box": {
+      "steps": [
+        {
+          "active": ["bridget", "bridget->tests"],
+          "note": "Bridget's rule: a small box costs the price on the list, never the large price."
+        },
+        {
+          "active": ["tests"],
+          "note": "In the boxPrice block you write one test with a name and one expect."
+        },
+        {
+          "active": ["tests", "tests->vitest", "vitest", "vitest->prices", "prices"],
+          "note": "Vitest runs boxPrice for a small box and compares its answer with yours."
+        },
+        {
+          "active": ["vitest", "vitest->terminal", "terminal"],
+          "note": "A tick in the terminal means the price and your test agree."
+        }
+      ]
+    },
+    "eggs": {
+      "steps": [
+        {
+          "active": ["bridget", "bridget->tests"],
+          "value": {
+            "kind": "map",
+            "label": "the order",
+            "entries": [
+              { "key": "size", "value": "medium" },
+              { "key": "dozens", "value": "2" }
+            ]
+          },
+          "note": "A medium box with two dozen eggs. You work out its price on paper first."
+        },
+        {
+          "active": ["tests"],
+          "note": "Your test compares withEggs with the number you worked out, not with the code's own answer."
+        },
+        {
+          "active": ["tests", "tests->vitest", "vitest", "vitest->prices", "prices"],
+          "note": "If the eggs or the box were priced wrong, the two numbers would differ and the test would fail."
+        }
+      ]
+    },
+    "delivery": {
+      "steps": [
+        {
+          "active": ["vitest", "vitest->terminal", "terminal"],
+          "note": "Lorcan's delivery test fails. The terminal shows what it expected and what it received."
+        },
+        {
+          "active": ["prices"],
+          "note": "The price list in prices.js says town delivery went up in March, so the code is right."
+        },
+        {
+          "active": ["tests"],
+          "note": "The test is out of date. You change what it expects and keep the check."
+        }
+      ]
+    },
+    "member": {
+      "steps": [
+        {
+          "active": ["vitest", "vitest->terminal", "terminal"],
+          "note": "Lorcan's member price test fails too, with what it expected and what it received."
+        },
+        {
+          "active": ["bridget", "bridget->tests", "tests"],
+          "note": "This test matches the club's rule: members pay less for every box."
+        },
+        {
+          "active": ["prices"],
+          "note": "So the mistake is in memberPrice. You fix the code, and the test turns green."
+        }
+      ]
+    }
+  }
+}

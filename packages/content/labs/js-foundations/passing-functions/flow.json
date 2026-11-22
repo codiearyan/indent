@@ -1,0 +1,136 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ines", "label": "Ines", "kind": "story" },
+      { "id": "rules", "label": "Price rules", "kind": "data" },
+      { "id": "wrap", "label": "addWrapping", "kind": "function", "mine": true },
+      { "id": "pick", "label": "ruleFor()", "kind": "function", "mine": true, "fn": "ruleFor" },
+      { "id": "apply", "label": "applyRule()", "kind": "function", "mine": true, "fn": "applyRule" },
+      { "id": "count", "label": "countWhere()", "kind": "function", "mine": true, "fn": "countWhere" },
+      { "id": "tag", "label": "Price tag", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ines", "to": "wrap", "label": "price" },
+      { "from": "ines", "to": "pick", "label": "day" },
+      { "from": "rules", "to": "pick", "label": "two rules" },
+      { "from": "pick", "to": "apply", "label": "a rule" },
+      { "from": "ines", "to": "count", "label": "text, test" },
+      { "from": "wrap", "to": "tag", "label": "plus wrapping" },
+      { "from": "apply", "to": "tag", "label": "price" }
+    ],
+    "note": "Price rules become values that Ines can pick and plug in, so a new rule needs no new pricing function."
+  },
+  "tasks": {
+    "wrap": {
+      "steps": [
+        {
+          "active": ["ines", "ines->wrap"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "cents", "value": 1200 }]
+          },
+          "note": "Ines adds gift wrapping to a price."
+        },
+        {
+          "active": ["wrap"],
+          "note": "The same rule as before, written the short way and kept in a const."
+        },
+        {
+          "active": ["wrap", "wrap->tag", "tag"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "price", "value": "whole cents" }]
+          },
+          "note": "The wrapped price goes on the tag, the same as before the rewrite."
+        }
+      ]
+    },
+    "rule": {
+      "trace": { "file": "src/callbacks.js", "call": "ruleFor", "args": ["Sunday"] },
+      "steps": [
+        {
+          "active": ["ines", "ines->pick"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "day", "value": "Sunday" }]
+          },
+          "note": "Ines asks which rule holds today."
+        },
+        {
+          "active": ["rules", "rules->pick", "pick"],
+          "note": "ruleFor() picks one of the two rules by the day, without running it."
+        },
+        {
+          "active": ["pick"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "rule", "value": "a function" }]
+          },
+          "note": "What comes back is a rule, ready to be used on any price."
+        }
+      ]
+    },
+    "apply": {
+      "steps": [
+        {
+          "active": ["pick", "pick->apply", "apply"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "priceCents", "value": 2000 },
+              { "key": "rule", "value": "a function" }
+            ]
+          },
+          "note": "applyRule() gets a price and a rule, any rule."
+        },
+        {
+          "active": ["apply"],
+          "note": "It calls the rule with the price, without knowing which rule it is."
+        },
+        {
+          "active": ["apply", "apply->tag", "tag"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "price", "value": "whatever the rule gives" }]
+          },
+          "note": "The rule's answer goes on the price tag."
+        }
+      ]
+    },
+    "count": {
+      "steps": [
+        {
+          "active": ["ines", "ines->count"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "text", "value": "Wickhollow" },
+              { "key": "test", "value": "a function" }
+            ]
+          },
+          "note": "Ines hands over a text and a question to ask about each character."
+        },
+        {
+          "active": ["count"],
+          "note": "countWhere() goes through the text and asks the test about every character in turn."
+        },
+        {
+          "active": ["count"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "count", "value": "a whole number" }]
+          },
+          "note": "It counts how many characters the test said yes to."
+        }
+      ]
+    }
+  }
+}
