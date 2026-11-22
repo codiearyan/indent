@@ -98,10 +98,15 @@ export async function restartLabModel(): Promise<LabModelStatus> {
   return status
 }
 
+/** Only the repos with a `model.mjs` talk to the local model. */
+export function labUsesModel(labId: string): boolean {
+  return existsSync(join(contentDir(), 'labs', labId, 'model.mjs'))
+}
+
 /** What to tell a learner whose repo uses the local model while it is down, or null. */
 export function labModelProblem(labId: string): string | null {
   if (status.state !== 'failed') return null
-  if (!existsSync(join(contentDir(), 'labs', labId, 'model.mjs'))) return null
+  if (!labUsesModel(labId)) return null
   return status.nodeMissing
     ? 'The local model needs Node.js, which was not found. Get it in Settings, Tools.'
     : "The local model isn't running. Restart it in Settings, Tools."
@@ -127,7 +132,13 @@ export async function reloadLabModel(): Promise<void> {
 export function labModelReady(timeoutMs = 15_000): Promise<void> {
   if (up || status.nodeMissing) return Promise.resolve()
   return new Promise((resolve) => {
-    waiters.push(resolve)
-    setTimeout(resolve, timeoutMs)
+    const done = (): void => {
+      clearTimeout(timer)
+      const at = waiters.indexOf(done)
+      if (at !== -1) waiters.splice(at, 1)
+      resolve()
+    }
+    const timer = setTimeout(done, timeoutMs)
+    waiters.push(done)
   })
 }

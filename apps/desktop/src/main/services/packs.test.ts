@@ -92,4 +92,20 @@ describe('packs', () => {
   it('reads paths', async () => {
     expect((await listPaths(root))[0].id).toBe('p')
   })
+
+  it('keeps the order of lab.json when one chapter is slower to read than the next', async () => {
+    // c1 is far larger than c2 and c3, so it is the last to finish when read together.
+    await put(
+      'labs/alpha/c1/chapter.json',
+      chapter('c1', [
+        task('t1', 10),
+        task('t2', 20),
+        ...Array.from({ length: 400 }, (_, i) => task(`x${i}`, 0))
+      ])
+    )
+    const [alpha] = await listLabs(root)
+    expect(alpha.chapters.map((c) => c.id)).toEqual(['c1', 'c2', 'c3'])
+    expect(alpha.chapters.map((c) => c.number)).toEqual([1, 2, 3])
+    await put('labs/alpha/c1/chapter.json', chapter('c1', [task('t1', 10), task('t2', 20)]))
+  })
 })
