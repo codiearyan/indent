@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   activeOf,
   closeInGroup,
+  dropFile,
   initialLayout,
   openInGroup,
   openToSide,
@@ -34,6 +35,33 @@ describe('openToSide', () => {
     const two = layout([tabs(['a']), tabs(['b'])], 1)
     expect(openToSide(two, 'c')).toEqual(layout([tabs(['a', 'c'], 'c'), tabs(['b'])], 0))
     expect(openToSide(two, 'a', 0)).toEqual(layout([tabs(['a']), tabs(['b', 'a'], 'a')], 1))
+  })
+})
+
+describe('dropFile', () => {
+  it('splits with the file on the right when dropped beside the only group', () => {
+    expect(dropFile(layout([tabs(['a'])]), 'b', 'side')).toEqual(
+      layout([tabs(['a']), tabs(['b'])], 1)
+    )
+  })
+
+  it('moves a dragged tab to the other group', () => {
+    const two = layout([tabs(['a', 'b'], 'b'), tabs(['c'])])
+    expect(dropFile(two, 'b', 1, 0)).toEqual(layout([tabs(['a'], 'a'), tabs(['c', 'b'], 'b')], 1))
+  })
+
+  it('closes the group a moved tab leaves empty', () => {
+    expect(dropFile(layout([tabs(['a'])]), 'a', 'side', 0)).toEqual(layout([tabs(['a'])], 0))
+  })
+
+  it('only opens a tab dropped back on its own group', () => {
+    const two = layout([tabs(['a', 'b'], 'a'), tabs(['c'])], 1)
+    expect(dropFile(two, 'b', 0, 0)).toEqual(layout([tabs(['a', 'b'], 'b'), tabs(['c'])], 0))
+  })
+
+  it('opens a file from the files panel in the group it is dropped on', () => {
+    const two = layout([tabs(['a']), tabs(['c'])])
+    expect(dropFile(two, 'd', 1)).toEqual(layout([tabs(['a']), tabs(['c', 'd'], 'd')], 1))
   })
 })
 

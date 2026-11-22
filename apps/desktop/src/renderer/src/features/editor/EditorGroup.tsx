@@ -17,6 +17,8 @@ import { CodeEditor } from './CodeEditor'
 import { focusEditorSoon } from './editors'
 import { FileLabel } from './FileTab'
 import { fileChange } from './fileChange'
+import { endFileDrag, startFileDrag, useFileDrag, type FileDrag } from './fileDrag'
+import type { DropTarget } from './layout'
 
 interface Props {
   group: number
@@ -34,6 +36,7 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
   const openFile = useWorkspace((s) => s.openFile)
   const closeFile = useWorkspace((s) => s.closeFile)
   const focusGroup = useWorkspace((s) => s.focusGroup)
+  const drag = useFileDrag((s) => s.drag)
   const [menuFor, setMenuFor] = useState<string | null>(null)
   const paths = tabs?.paths ?? []
   const activePath = tabs?.active ?? null
@@ -44,7 +47,10 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
   }
 
   return (
-    <div className="flex h-full min-w-0 flex-col" onPointerDownCapture={() => focusGroup(group)}>
+    <div
+      className="relative flex h-full min-w-0 flex-col"
+      onPointerDownCapture={() => focusGroup(group)}
+    >
       <div className="flex h-9 shrink-0">
         <div
           role="tablist"
@@ -60,6 +66,9 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
             return (
               <div
                 key={path}
+                draggable
+                onDragStart={(event) => startFileDrag(event, { path, from: group })}
+                onDragEnd={endFileDrag}
                 onMouseDown={(event) => event.button === 1 && event.preventDefault()}
                 onAuxClick={(event) => event.button === 1 && closeFile(path, group)}
                 onContextMenu={(event) => {
@@ -157,6 +166,53 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
           </p>
         )}
       </div>
+      {drag && <DropZone group={group} split={split} drag={drag} />}
+    </div>
+  )
+}
+
+/** Covers the group while a file is dragged, the editor included, and outlines where it lands. */
+function DropZone({
+  group,
+  split,
+  drag
+}: {
+  group: number
+  split: boolean
+  drag: FileDrag
+}): React.JSX.Element {
+  const [over, setOver] = useState<DropTarget | null>(null)
+
+  const targetAt = (event: React.DragEvent<HTMLDivElement>): DropTarget => {
+    if (split) return group
+    const box = event.currentTarget.getBoundingClientRect()
+    return event.clientX - box.left > box.width / 2 ? 'side' : group
+  }
+
+  return (
+    <div
+      className="absolute inset-0 z-20"
+      onDragOver={(event) => {
+        event.preventDefault()
+        event.dataTransfer.dropEffect = 'move'
+        setOver(targetAt(event))
+      }}
+      onDragLeave={() => setOver(null)}
+      onDrop={(event) => {
+        event.preventDefault()
+        endFileDrag()
+        useWorkspace.getState().dropFile(drag.path, targetAt(event), drag.from)
+        focusEditorSoon()
+      }}
+    >
+      {over !== null && (
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-y-1 rounded-md bg-accent/60 ring-1 ring-border',
+            over === 'side' ? 'right-1 left-1/2' : 'inset-x-1'
+          )}
+        />
+      )}
     </div>
   )
 }

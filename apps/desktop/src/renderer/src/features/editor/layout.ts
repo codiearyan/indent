@@ -55,6 +55,21 @@ export function openToSide(
   return openInGroup(layout, path, from === 0 ? 1 : 0)
 }
 
+/** Where a dragged file lands: a group, or a new group on the right of the only one. */
+export type DropTarget = number | 'side'
+
+/** A file dropped on the editor. A tab dragged from another group (`from`) leaves that group. */
+export function dropFile(
+  layout: EditorLayout,
+  path: string,
+  target: DropTarget,
+  from?: number
+): EditorLayout {
+  const to = target === 'side' ? layout.groups.length : target
+  const opened = target === 'side' ? openToSide(layout, path) : openInGroup(layout, path, to)
+  return from === undefined || from === to ? opened : closeInGroup(opened, path, from)
+}
+
 export function closeInGroup(
   layout: EditorLayout,
   path: string,

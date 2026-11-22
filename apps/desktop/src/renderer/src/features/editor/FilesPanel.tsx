@@ -32,6 +32,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { cn, errorMessage } from '@/lib/utils'
 import { useOpenTabs } from '@/stores/tabs'
 import { useWorkspace } from '@/stores/workspace'
+import { endFileDrag, startFileDrag } from './fileDrag'
 import { FileLabel, FileTypeIcon } from './FileTab'
 import { focusEditorSoon } from './editors'
 import { fileChange } from './fileChange'
@@ -250,6 +251,9 @@ export function FilesPanel(): React.JSX.Element {
                 aria-selected={active}
                 tabIndex={row === current ? 0 : -1}
                 data-path={node.path}
+                draggable={!isFolder}
+                onDragStart={(event) => startFileDrag(event, { path: node.path })}
+                onDragEnd={endFileDrag}
                 onFocus={() => setFocused(node.path)}
                 onClick={() => activate(row)}
                 onContextMenu={(event) => {

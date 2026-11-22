@@ -23,6 +23,7 @@ import {
   activeOf,
   clampSplit,
   closeInGroup,
+  dropFile,
   focusGroup,
   initialLayout,
   NO_LAYOUT,
@@ -31,6 +32,7 @@ import {
   pruneLayout,
   renameInLayout,
   storedTabs,
+  type DropTarget,
   type EditorLayout
 } from '@/features/editor/layout'
 
@@ -84,6 +86,8 @@ interface WorkspaceStore {
   /** Closes a file's tab in a group, the focused one by default. The file stays on disk. */
   closeFile(path: string, group?: number): void
   focusGroup(group: number): void
+  /** Opens a dragged file where it was dropped; a tab from another group moves there. */
+  dropFile(path: string, target: DropTarget, from?: number): void
   /** Sets the width of the first group, in percent. */
   setSplit(split: number): void
   /** Updates the buffer and saves to disk after a short pause. */
@@ -241,6 +245,8 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     focusGroup: (group) => {
       if (group !== get().layout.focused) setLayout(focusGroup(get().layout, group))
     },
+
+    dropFile: (path, target, from) => setLayout(dropFile(get().layout, path, target, from)),
 
     setSplit: (split) => setLayout({ ...get().layout, split: clampSplit(split) }),
 
