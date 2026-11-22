@@ -55,7 +55,12 @@ function inWorkspace(labId: string, chapterId: string, job: Job): Promise<Worksp
   const dir = workspaceDir(labId, chapterId)
   return oneAtATime(dir, async () => {
     const chapter = await loadChapter(labId, chapterId)
-    return job(join(chapterContentDir(labId, chapterId), 'starter'), dir, chapter.files)
+    const snapshot = await job(
+      join(chapterContentDir(labId, chapterId), 'starter'),
+      dir,
+      chapter.files
+    )
+    return chapter.movesFiles ? { ...snapshot, missing: [] } : snapshot
   })
 }
 
