@@ -161,6 +161,23 @@ html.window-fullscreen {
   .press {
     transition: transform var(--motion-press) var(--ease-out);
   }
+  /* The pane that takes typing: a thin neutral line just inside its edge. */
+  .pane {
+    position: relative;
+  }
+  .pane::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    border: 1px solid color-mix(in oklab, var(--foreground) 40%, transparent);
+    opacity: 0;
+    transition: opacity var(--motion-state) var(--ease-out);
+  }
+  .pane[data-active='true']::after {
+    opacity: 1;
+  }
   .press:active:not(:disabled, [aria-disabled='true']) {
     transform: scale(0.98);
   }

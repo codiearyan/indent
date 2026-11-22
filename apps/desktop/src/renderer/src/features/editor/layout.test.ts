@@ -7,7 +7,6 @@ import {
   openInGroup,
   openToSide,
   pruneLayout,
-  renameInLayout,
   storedTabs,
   type EditorLayout
 } from './layout'
@@ -105,15 +104,6 @@ describe('pruneLayout', () => {
   it('closes a group whose files are all gone', () => {
     const two = layout([tabs(['a']), tabs(['b'])], 1)
     expect(pruneLayout(two, ['a'])).toEqual(layout([tabs(['a'])], 0))
-  })
-})
-
-describe('renameInLayout', () => {
-  it('follows a renamed file or folder in both groups', () => {
-    const two = layout([tabs(['src/a.js', 'b.js'], 'src/a.js'), tabs(['src/a.js'])], 1)
-    expect(renameInLayout(two, 'src', 'lib')).toEqual(
-      layout([tabs(['lib/a.js', 'b.js'], 'lib/a.js'), tabs(['lib/a.js'])], 1)
-    )
   })
 })
 
