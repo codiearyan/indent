@@ -15,7 +15,10 @@ export const checks = {
           name: 'GET /health is sent as JSON',
           req: { path: '/health' },
           ok: (res) => res.status === 200 && isJson(res),
-          hint: 'The content-type of the answer should say the body is JSON. Look at how the lesson sends an object back.'
+          hint: (res) =>
+            res.status !== 200
+              ? `GET /health got ${res.status} instead of 200, so something else answered it before your route. Look at the order of what you add to the app.`
+              : 'The content-type of the answer should say the body is JSON. Look at how the lesson sends an object back.'
         }
       ],
       { workshops: seed }
@@ -30,7 +33,10 @@ export const checks = {
           name: 'GET /workshops answers 200 with every workshop',
           req: { path: '/workshops' },
           ok: (res) => res.status === 200 && isJson(res) && same(res.json, seed),
-          hint: 'GET /workshops should answer 200 with what the store lists, unchanged. Use the store createApp is given, not the list in workshops.js.'
+          hint: (res) =>
+            res.status === 200 && !Array.isArray(res.json)
+              ? 'GET /workshops should answer with the list itself, an array of workshops, not an object that holds it.'
+              : 'GET /workshops should answer 200 with what the store lists, unchanged. Use the store createApp is given, not the list in workshops.js.'
         },
         {
           name: 'A query string reaches the same route',

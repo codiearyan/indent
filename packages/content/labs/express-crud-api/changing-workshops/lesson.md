@@ -9,11 +9,11 @@ The API can list workshops, read one and create new ones. What it cannot do yet 
 - remove a resource with DELETE and answer 204 with no body
 - reuse one validator for a whole body and for part of one
 
-## The request from Nadia
+## The request from Dilys
 
-Nadia writes on a Monday morning, with three changes for the week.
+Dilys writes on a Monday morning, with three changes for the week.
 
-> **Nadia:** The mugs class is now mugs and jugs, and the price goes up, so Sunniva will send the whole workshop again from her form. The family morning is popular: can we take fourteen instead of twelve without retyping everything else? And glazing basics is cancelled until the new glazes arrive. Take it off the page.
+> **Dilys:** The mugs class is now mugs and jugs, and the price goes up, so Sunniva will send the whole workshop again from her form. The family morning is popular: can we take fourteen instead of twelve without retyping everything else? And glazing basics is cancelled until the new glazes arrive. Take it off the page.
 
 That is a replace, a partial change and a removal: `PUT`, `PATCH` and `DELETE` on `/workshops/:id`.
 
@@ -45,7 +45,7 @@ The default `= {}` keeps every old call, like `check(body)`, working as before. 
 
 ## DELETE answers with nothing
 
-A DELETE removes the thing at the address. When it works there is nothing left to describe, so the answer is **204 No Content**: a status and no body at all. `res.json()` always writes a body, so end the response without one instead:
+A DELETE removes the thing at the address. When it works there is nothing left to describe, so the answer is **204 No Content**: a status and no body at all. Express quietly drops anything you hand `res.json()` with a 204, so a body there would only mislead whoever reads the code. Say what you mean and end the response without one:
 
 ```js
 res.status(204).end()

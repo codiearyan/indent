@@ -11,7 +11,7 @@
       "id": "header",
       "title": "Mark the top of the page",
       "file": "index.html",
-      "description": "The studio name and the Jump to links are the top of the page.\n\n- wrap them in a `header`, outside the main content\n- inside the header, put the Jump to links in a `nav`\n\nThe check finds the main heading and looks for the header around it, then for a nav in that header that holds the three Jump to links.",
+      "description": "The studio name and the Jump to links are the top of the page. The studio picture between them is main content, so it goes below the header.\n\n- wrap them in a `header`, outside the main content\n- inside the header, put the Jump to links in a `nav`\n\nThe check finds the main heading and looks for the header around it, then for a nav in that header that holds the three Jump to links, makes sure the studio picture is not in it, and reads the file to see each tag close in order.",
       "nextSteps": [
         "Read \"Landmarks\" in the lesson.",
         "Open a header before the main heading and close it after the Jump to line.",
@@ -37,7 +37,7 @@
       "id": "main",
       "title": "Mark the main content",
       "file": "index.html",
-      "description": "Everything between the header and the small print is the main content: the studio picture, the welcome, the divider and the three parts.\n\nWrap it all in one `main`. The header and the small print stay outside it.\n\nThe check counts the main elements, looks for the welcome and the three section headings inside it, and makes sure the header and the small print are not.",
+      "description": "Everything between the header and the small print is the main content: the studio picture, the welcome, the divider and the three parts.\n\nWrap it all in one `main`. The header and the small print stay outside it.\n\nThe check counts the main elements, looks for the studio picture, the welcome and the three section headings inside it, and makes sure the header and the small print are not. It also reads the file to see main close in order.",
       "nextSteps": [
         "Find where the header ends and where the small print starts.",
         "Open a main right after the header.",
@@ -59,7 +59,7 @@
       "id": "sections",
       "title": "Give each part a section",
       "file": "index.html",
-      "description": "Inside main, Classes, The shop and Visit us are three parts, each with its own heading.\n\nWrap each part in a `section` that starts with its heading and runs to just before the next heading. Keep the ids on the headings.\n\nThe check finds each heading, looks for the section around it, makes sure the heading leads it and that it holds the rest of its part, and that the sections are inside main.",
+      "description": "Inside main, Classes, The shop and Visit us are three parts, each with its own heading.\n\nWrap each part in a `section` that starts with its heading and runs to just before the next heading. Keep the ids on the headings.\n\nThe check finds each heading, looks for the section around it, makes sure the heading leads it and that it holds the rest of its part, and that the sections are inside main. It also reads the file to see each section close in order.",
       "nextSteps": [
         "Read \"Sections\" in the lesson.",
         "Open a section right before the Classes heading.",
@@ -81,7 +81,7 @@
       "id": "footer",
       "title": "Mark the end of the page",
       "file": "index.html",
-      "description": "The small print at the bottom, `Kilnworth Pottery, 14 Saddler Street, Ostley. Words and drawings by Dilys.`, is the end of the page.\n\nWrap it in a `footer`, after main and outside it. Keep its words as they are.\n\nThe check finds the small print and looks for the footer around it, outside main.",
+      "description": "The small print at the bottom, `Kilnworth Pottery, 14 Saddler Street, Ostley. Words and drawings by Dilys.`, is the end of the page.\n\nWrap it in a `footer`, after main and outside it. Keep its words as they are.\n\nThe check finds the small print and looks for the footer around it, outside main, and reads the file to see the footer close.",
       "nextSteps": [
         "Find the small print at the end of the body.",
         "Make sure it sits after the closing main tag.",

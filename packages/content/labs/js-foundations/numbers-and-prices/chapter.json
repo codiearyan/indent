@@ -97,7 +97,7 @@
       "id": "boxes",
       "title": "Count the boxes",
       "file": "src/prices.js",
-      "description": "Under `// Task 4`, make a `const` called `boxes`: how many boxes Ines needs for the order, when one box holds `candlesPerBox` candles. A box that is only partly full still counts as a whole box. Print it.\n\nCheck tries orders that fill the boxes exactly and orders with candles left over.",
+      "description": "Under `// Task 4`, make a `const` called `boxes`: how many boxes Ines needs for the order, when one box holds `candlesPerBox` candles. A box that is only partly full still counts as a whole box. Print it.\n\nCheck tries orders that fill the boxes exactly, orders with candles left over, and other box sizes.",
       "nextSteps": [
         "Divide the candles by the box size and look at the result.",
         "Ask what to do when it is not a whole number.",
