@@ -22,7 +22,8 @@
     {
       "title": "Sending and receiving data",
       "chapters": [
-        "json"
+        "json",
+        "sending-data"
       ]
     }
   ]
