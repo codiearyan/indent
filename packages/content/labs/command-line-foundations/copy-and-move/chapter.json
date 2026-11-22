@@ -1,0 +1,116 @@
+{
+  "id": "copy-and-move",
+  "title": "Copying and moving",
+  "files": ["today.txt"],
+  "terminal": {
+    "description": "A shell that starts in the shop's top folder. Copy and move what the jobs ask for, then list both places to see the result.",
+    "suggestedCommand": "ls"
+  },
+  "movesFiles": true,
+  "tasks": [
+    {
+      "id": "move",
+      "title": "File the loose invoice",
+      "file": "today.txt",
+      "description": "`invoice-0303.csv` is loose in the top folder. Move it into `invoices/march`, keeping its name.\n\nCheck looks for `invoices/march/invoice-0303.csv` with the invoice's contents, and checks that it is no longer in the top folder.",
+      "nextSteps": [
+        "List the top folder and `invoices/march` to see where things are now.",
+        "Move the invoice with the command from the lesson, naming the folder as the place it goes.",
+        "List both places again: the invoice should be in one of them only."
+      ],
+      "hints": [
+        "Copying would leave the invoice in the top folder as well. The lesson has a command that takes it away from where it was.",
+        "`mv` takes what to move first and where it goes last. A folder as the last name keeps the file's name.",
+        "From the top folder, run `mv invoice-0303.csv invoices/march`."
+      ],
+      "docs": [
+        {
+          "title": "mv: move or rename files",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/mv-invocation.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Copy, move and remove in the terminal",
+          "url": "https://www.youtube.com/watch?v=uDvJ5KhqT5A"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rename",
+      "title": "Give the fox poster a proper name",
+      "file": "today.txt",
+      "description": "The fox poster in `artwork` is called `fox-poster-FINAL-v2-REAL.svg`. Rename it to `fox-poster.svg`, in the same folder.\n\nCheck looks for `artwork/fox-poster.svg` with the poster's contents, and checks that no file is left under the old name.",
+      "nextSteps": [
+        "Run `ls artwork` to see the long name. Tab can type it for you.",
+        "Rename it with the same command you use to move.",
+        "Run `ls artwork` again to see only the new name."
+      ],
+      "hints": [
+        "Renaming is moving a file to a new name in the same folder.",
+        "`mv` with the old name first and the new name last renames. Both are paths, so both start with `artwork/` from the top folder.",
+        "Run `mv artwork/fox-poster-FINAL-v2-REAL.svg artwork/fox-poster.svg`."
+      ],
+      "docs": [
+        {
+          "title": "mv: move or rename files",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/mv-invocation.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "copy",
+      "title": "Keep a copy of the old prices",
+      "file": "today.txt",
+      "description": "Hesper is about to change `prices.csv`. First make a copy of it called `prices-2025.csv` in the top folder. `prices.csv` stays where it is, unchanged.\n\nCheck compares both files with the price list the issue started with.",
+      "nextSteps": [
+        "Make the copy with the command from the lesson, giving the new name as the second name.",
+        "Run `ls` and find both names in the top folder.",
+        "If `prices.csv` went missing, you moved it instead: put it back first."
+      ],
+      "hints": [
+        "A copy leaves the original where it was. The lesson's command for that is two letters.",
+        "`cp` takes the file to copy first, then the name of the copy.",
+        "Run `cp prices.csv prices-2025.csv`."
+      ],
+      "docs": [
+        {
+          "title": "cp: copy files and directories",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "backup",
+      "title": "Back up the orders folder",
+      "file": "today.txt",
+      "description": "Idris wants a backup of the whole `orders` folder before sorting it: a folder called `orders-backup` in the top folder, holding a copy of everything in `orders`, the month folders and their orders included.\n\nCheck compares every file in `orders`, as the issue started, with the one at the same place in `orders-backup`, and checks that `orders` is still there as it was.",
+      "nextSteps": [
+        "Look at what `orders` holds, with its subfolders: `ls orders` and `ls orders/2026`.",
+        "Copy the whole folder in one command, to the new name `orders-backup`.",
+        "List `orders-backup` and `orders-backup/2026` to see the copy."
+      ],
+      "hints": [
+        "`cp` on its own refuses a folder. The lesson names the option that copies a folder with everything inside it.",
+        "`cp -r` copies a folder and all it holds. Name the copy as the second name, while `orders-backup` does not exist yet.",
+        "Run `cp -r orders orders-backup` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "cp: copy files and directories",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Copy, move and remove in the terminal",
+          "url": "https://www.youtube.com/watch?v=uDvJ5KhqT5A"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

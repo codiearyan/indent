@@ -1,0 +1,5 @@
+Today's jobs, from Hesper
+
+1. Every drawing in downloads (the .svg files) goes in artwork.
+2. Every invoice in downloads goes in invoices/march.
+3. In orders, a folder called pellow with every Pellow Bakery order in it.

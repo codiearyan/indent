@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Where do the receipts go?", "note": "And this year's orders." },
+    { "title": "Top folder", "text": "Orders, artwork and invoices. Nothing else.", "note": "No place for new things." },
+    {
+      "title": "Your commands",
+      "file": "today.txt",
+      "mine": true,
+      "gap": "Nowhere to put things",
+      "tasks": ["Receipts folder", "Month folders", "Poster ideas folder", "Empty print queue"]
+    },
+    { "title": "Top folder", "text": "A place for every kind of file.", "note": "Ready for what comes next." }
+  ],
+  "ticket": { "label": "Receipts", "wrong": "homeless", "why": "No folder", "right": "have a home" },
+  "captions": [
+    "At Ashgrove, Idris wants places for receipts, orders by month, ideas and a print queue.",
+    "Today the top folder has nowhere to put any of it.",
+    "You make the folders and one empty file, in four tasks.",
+    "Receipts have a home, the months are ready, and the print queue waits.",
+    "Nothing moved yet, but every file now has somewhere to go."
+  ]
+}

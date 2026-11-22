@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "Let's get rid of the clutter.", "note": "But keep the old logo." },
+    { "title": "Shop folder", "text": "A duplicate, printer leftovers, an old site.", "note": "The logo is inside the old site." },
+    {
+      "title": "Your commands",
+      "file": "today.txt",
+      "mine": true,
+      "gap": "Clutter everywhere",
+      "tasks": ["The duplicate poster", "The temporary files", "Rescue the logo", "The old site"]
+    },
+    { "title": "artwork", "rows": [["fox-poster.svg"], ["logo.svg", "rescued"]], "mark": 1 }
+  ],
+  "ticket": { "label": "The logo", "wrong": "at risk", "why": "Not moved", "right": "safe" },
+  "captions": [
+    "At Ashgrove, Hesper wants the last clutter gone, except the old logo.",
+    "A duplicate, printer leftovers and an old site remain, and the logo sits inside it.",
+    "You clear the clutter and keep the logo, in four tasks.",
+    "The clutter is gone for good, and the logo is safe in artwork.",
+    "The shop laptop is sorted, and nothing that mattered was lost."
+  ]
+}

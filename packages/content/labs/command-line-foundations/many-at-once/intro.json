@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "My drawings are lost in downloads.", "note": "Invoices got mixed in too." },
+    { "title": "downloads", "text": "Drawings, invoices and lists, all mixed up.", "note": "One file at a time takes ages." },
+    {
+      "title": "Your patterns",
+      "file": "today.txt",
+      "mine": true,
+      "gap": "One file at a time",
+      "tasks": ["All the drawings", "All the invoices", "Pellow Bakery orders"]
+    },
+    { "title": "artwork", "rows": [["badger-poster.svg"], ["kite-card.svg"], ["stag-flyer.svg"]] }
+  ],
+  "ticket": { "label": "New drawings", "wrong": "buried", "why": "Mixed up", "right": "in artwork" },
+  "captions": [
+    "At Ashgrove, Hesper's new drawings were saved into downloads, along with everything else.",
+    "Sorting the folder one file at a time would be slow and easy to get wrong.",
+    "You write patterns that pick out each group and move it in one go, in three tasks.",
+    "The drawings are in artwork, the invoices are filed, and Pellow Bakery has a folder.",
+    "A few characters name a whole group. downloads holds only what is left."
+  ]
+}

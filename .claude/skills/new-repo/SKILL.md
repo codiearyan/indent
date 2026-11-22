@@ -38,7 +38,8 @@ commands.
    - `tools`: only when it needs more than Node, e.g. `["node", "git"]`.
    - `format`: only when the repo needs something an older app does not have. `2` for a repo that
      imports `express`, which joined the repo tools with format 2. Older apps then list the repo
-     as needing a newer version instead of failing its checks.
+     as needing a newer version instead of failing its checks. `3` for a repo with an issue
+     that sets `movesFiles`.
    - `parts`: one or two titled groups that list the issue ids in order.
 4. **Plan the issues.** Five is usual, two is the least. Each is one request from someone at the
    company, and each starts where the last one ended, so the fifth issue's code has grown from the
