@@ -16,7 +16,7 @@
     "At Marrowfield allotments, Rhiannon is asked what a plot of 125 square metres costs.",
     "She works it out on the back of an envelope, every time someone asks.",
     "You write two small scripts that read what she types, in four tasks.",
-    "Now node fee.js 125 prints the fee, and a size that makes no sense gets a plain error.",
+    "Now the laptop prints the fee for a size she types, and a bad size gets a plain error.",
     "Same question at the gate, no envelope. The laptop answers in one line."
   ]
 }

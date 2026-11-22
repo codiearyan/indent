@@ -1,5 +1,5 @@
 import { isDeepStrictEqual } from 'node:util'
-import { box, broken, errorLine, fail, hasStack, lines, pass, read, report, reports, run } from '../../grading.mjs'
+import { box, broken, errorLine, fail, hasStack, hide, lines, pass, read, report, reports, run } from '../../grading.mjs'
 
 // Runs readPlots from the learner's plots.js on a file and prints what it gives back as JSON.
 const DRIVER = `import { join } from 'node:path'
@@ -11,7 +11,9 @@ console.log(JSON.stringify(result === undefined ? '(nothing)' : result))
 // Stands in for plots.js, so free-plots.js is judged on its own. It answers only for the
 // plots.txt beside the scripts, and its list differs from that file's.
 const stub = (plots) => `import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 export async function readPlots(file) {
+  if (file instanceof URL) file = fileURLToPath(file)
   if (typeof file !== 'string' || resolve(file) !== resolve(import.meta.dirname, 'plots.txt')) {
     throw new Error('readPlots was given ' + file + ', not the plots.txt beside the scripts')
   }
@@ -28,7 +30,7 @@ const STUB_PLOTS = [
   { plot: 'K3', holder: null }
 ]
 // What plots.txt holds while the stub answers: a script that reads it itself prints other plots.
-const DECOY = 'Q1,\nQ2,Elsbeth Kettering\n'
+const DECOY = 'Q1,\nQ2,Elsbeth Pennock\n'
 
 const show = (v) => JSON.stringify(v)
 
@@ -39,7 +41,7 @@ async function stubbed(t, plots = STUB_PLOTS) {
 /** The detail for a free-plots.js run that went wrong in a way the stub can tell, or null. */
 function stubTrouble(name, r) {
   if (/readPlots was given/.test(r.stderr)) {
-    const given = /Error: readPlots was given (.*), not the plots/.exec(r.stderr)?.[1] ?? ''
+    const given = hide(/Error: readPlots was given (.*), not the plots/.exec(r.stderr)?.[1] ?? '')
     return fail(
       name,
       r.from === '.'
@@ -92,6 +94,8 @@ export const checks = {
       let message
       if (hasStack(r.stderr)) {
         message = `readPlots threw an error: ${errorLine(r.stderr) ?? 'see the output'}.`
+      } else if (lines(r.stdout).length > 1) {
+        message = 'plots.js printed something of its own when it was imported and called. Leave the printing to the scripts that import it: readPlots only gives back the list.'
       } else if (isDeepStrictEqual(got, expected)) {
         message = null
       } else if (got === '(nothing)') {
@@ -104,6 +108,8 @@ export const checks = {
         message = 'A free plot has holder set to empty text. The task asks for null there, so a free plot is easy to tell apart.'
       } else if (got.some((p) => typeof p?.holder === 'string' && p.holder.endsWith('\r')) || got.some((p) => p?.holder === '\r')) {
         message = 'A holder ends with an invisible \\r. This list was saved on Windows; split it so both line endings work.'
+      } else if (got.some((p) => !expected.some((e) => e.plot === p?.plot))) {
+        message = 'readPlots gave back plots that are not in the list it was given. Read the file at the path that comes in as file, not one of your own choosing.'
       } else if (got.length > expected.length) {
         message = 'readPlots gave back more plots than the list has: a blank line became a plot. Leave blank lines out.'
       } else if (got.some((p) => !p || !('plot' in p) || !('holder' in p))) {
@@ -138,11 +144,14 @@ export const checks = {
       }
       const out = lines(r.stdout)
       let message
-      if (hasStack(r.stderr)) message = `free-plots.js stopped with an error: ${errorLine(r.stderr) ?? 'see the output'}.`
+      const awaited = /await\s+(\w+\.)?\w+\(|\.then\(/.test((await read(dir, 'free-plots.js')) ?? '')
+      if (hasStack(r.stderr) && !awaited && /is not a function|of undefined/.test(errorLine(r.stderr) ?? '')) {
+        message = `free-plots.js stopped with an error: ${errorLine(r.stderr)}. readPlots is async: without await, the script gets a promise instead of the list.`
+      } else if (hasStack(r.stderr)) message = `free-plots.js stopped with an error: ${errorLine(r.stderr) ?? 'see the output'}.`
       else if (out.join('\n') === 'J2\nK1\nK3' && r.code === 0) message = null
       else if (out.some((l) => /\{|holder/.test(l))) message = 'Print each free plot by its name alone, like A3, one per line.'
       else if (out.includes('J1')) message = 'A plot with a holder is in the list. Only the plots whose holder is null are free.'
-      else if (out.join('\n') === 'No free plots.' && !/await\s+readPlots|\.then\(/.test((await read(dir, 'free-plots.js')) ?? '')) {
+      else if (out.join('\n') === 'No free plots.' && !awaited) {
         message = 'The script said no plot is free, although readPlots gave it free plots. readPlots is async: without await, the script gets a promise instead of the list.'
       } else if (out.join('\n') === 'No free plots.') message = 'The script said no plot is free, although readPlots gave it free plots. A free plot is one whose holder is null.'
       else message = 'Print the name of each free plot, one per line, in the order readPlots gives them.'
@@ -177,7 +186,7 @@ export const checks = {
       else if (/ENOENT/.test(r.stderr)) message = 'Run from another folder, version.js could not find package.json. Build its path from the script\'s own folder.'
       else if (hasStack(r.stderr)) message = `version.js stopped with an error: ${errorLine(r.stderr) ?? 'see the output'}.`
       else if (/0\.1\.0/.test(r.stdout)) message = 'version.js printed the version from the starter, not from package.json as it is now. Read the file when the script runs.'
-      else if (/undefined/.test(r.stdout)) message = 'A part of the line is undefined. The name and the version are the name and version properties of the object in package.json.'
+      else if (/undefined/.test(r.stdout)) message = 'A part of the line is undefined. The text of package.json has to become an object before it has a name and a version, and each is spelled as it is in the file.'
       else if (/^\{|"name"/.test(r.stdout.trim())) message = 'version.js printed the file\'s text. Turn the text into an object first, then print its name and version.'
       else message = 'Print one line: the name, one space, and the version, as in the task.'
       results.push(message ? fail(name, message, report(r)) : pass(name, report(r)))
@@ -228,6 +237,7 @@ export const checks = {
         return `With ${what}, the script carried on and printed plots as if all was well. parseArgs refuses what it was not told about: let it read the options, and print its message.`
       }
       if (hasStack(r.stderr)) return `With ${what}, Node stopped with the error and its stack trace. Catch what parseArgs throws and print its message as one plain line.`
+      if (/Unknown option|argument missing/.test(r.stdout)) return `With ${what}, the message went to standard output. A message about a mistake belongs on standard error.`
       if (r.stdout.trim() !== '') return `With ${what}, something went to standard output. The script should list nothing then, only print one line on standard error.`
       if (r.stderr.trim() === '') return `With ${what}, the script printed nothing. Print one line on standard error that says what is wrong.`
       if (r.code !== 1) return `With ${what}, the line is right, but the script ended with exit code ${r.code}. It ends with 1.`

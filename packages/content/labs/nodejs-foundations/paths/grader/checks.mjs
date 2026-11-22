@@ -88,7 +88,9 @@ export const checks = {
       let message
       if (/ENOENT/.test(r.stderr)) {
         const path = /'([^']+)'/.exec(errorLine(r.stderr) ?? '')?.[1] ?? ''
-        message = /^(\/|[A-Za-z]:)/.test(path)
+        message = relative(path, join(t.workspace, r.from, 'water', 'readings.txt')) === ''
+          ? `water-total.js built the path from the folder the command was typed in, ${where(r)}, so it looked for ${path}. That is the folder process.cwd() gives. Build it from the script's own folder instead.`
+          : /^(\/|[A-Za-z]:)/.test(path)
           ? `water-total.js could not find ${path}. Check the folder names in the path against where readings.txt really is.`
           : `water-total.js looked for ${path} in ${where(r)}, the folder the command was typed in, and it is not there. A path like that is relative to where the command was typed. Build the path from the script's own folder instead.`
       } else if (hasStack(r.stderr)) {

@@ -17,7 +17,7 @@
       "id": "add",
       "title": "Add a name to the waiting list",
       "file": "add-to-list.js",
-      "description": "Write `add-to-list.js` so that `node add-to-list.js Wendeline Achterberg` adds `Wendeline Achterberg` as a new line at the end of `waiting-list.txt`. It may print a line that says so. The names already on the list stay, in order. A name can be typed as several words; they are all part of it.\n\nThe list is the one beside the script, whatever folder the command is typed in. With no name, the script prints one line on standard error, ends with exit code 1, and leaves the list as it was.\n\nCheck puts a list of its own beside the script, adds two names, one of them from another folder, reads the list after, and runs the script with no name.",
+      "description": "Write `add-to-list.js` so that `node add-to-list.js Wendeline Achterberg` adds `Wendeline Achterberg` as a new line at the end of `waiting-list.txt`, ending with a line break so the next name goes on a line of its own. It may print a line that says so. The names already on the list stay, in order. A name can be typed as several words; they are all part of it.\n\nThe list is the one beside the script, whatever folder the command is typed in. With no name, the script prints one line on standard error, ends with exit code 1, and leaves the list as it was.\n\nCheck puts a list of its own beside the script, adds two names, one of them from another folder, reads the list after, and runs the script with no name.",
       "nextSteps": [
         "Join every word typed after the script's name into one name.",
         "Build the path to `waiting-list.txt` from the script's own folder.",
@@ -45,7 +45,7 @@
       "id": "next",
       "title": "Offer the plot to the next in line",
       "file": "next-on-list.js",
-      "description": "When a plot comes free, it goes to whoever is at the top of the waiting list. Write `next-on-list.js` so that `node next-on-list.js` prints:\n\n```\nOffer the plot to Thaddeus Fairbairn.\n```\n\nwith the first name on the list, and writes the list back without that name. The others stay, in order, one per line. When nobody is on the list, it prints `Nobody is waiting.`, changes nothing, and ends with exit code 0.\n\nCheck runs `next-on-list.js` twice on a list of its own, once from another folder, reads the list after each run, and runs it on an empty list.",
+      "description": "When a plot comes free, it goes to whoever is at the top of the waiting list. Write `next-on-list.js` so that `node next-on-list.js` prints:\n\n```\nOffer the plot to Thaddeus Fairbairn.\n```\n\nwith the first name on the list, and writes the list back without that name. The others stay, in order, one per line, each ending with a line break. When nobody is on the list, it prints `Nobody is waiting.`, changes nothing, and ends with exit code 0.\n\nCheck runs `next-on-list.js` twice on a list of its own, once from another folder, reads the list after each run, and runs it on an empty list.",
       "nextSteps": [
         "Read `waiting-list.txt` beside the script and split it into names.",
         "Take the first name off, and keep the rest.",

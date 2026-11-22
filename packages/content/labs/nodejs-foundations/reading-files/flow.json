@@ -27,7 +27,7 @@
       "steps": [
         {
           "active": ["rhiannon", "rhiannon->show", "show"],
-          "note": "Rhiannon types node show.js and the name of a file, like plots.txt."
+          "note": "Rhiannon runs show.js with the name of a file after it, like plots.txt."
         },
         {
           "active": ["plots", "plots->readfile", "readfile"],

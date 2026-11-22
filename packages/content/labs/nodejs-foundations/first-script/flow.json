@@ -26,7 +26,7 @@
       "steps": [
         {
           "active": ["rhiannon", "rhiannon->terminal", "terminal"],
-          "note": "Rhiannon types node welcome.js and a new member's name, like Maud."
+          "note": "Rhiannon runs welcome.js with a new member's name after it, like Maud."
         },
         {
           "active": ["terminal->argv", "argv"],

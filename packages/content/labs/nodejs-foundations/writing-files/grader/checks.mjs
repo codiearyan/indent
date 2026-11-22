@@ -15,6 +15,22 @@ import {
   slashStrings
 } from '../../grading.mjs'
 
+// Loaded before list-reports.js: most systems list a folder in name order, so a script that never
+// sorts would pass by luck. Reversed, it cannot.
+const REVERSED = `import fs from 'node:fs'
+import { syncBuiltinESMExports } from 'node:module'
+const back = (names) => (Array.isArray(names) ? [...names].reverse() : names)
+const { readdir, readdirSync } = fs
+const promised = fs.promises.readdir
+fs.promises.readdir = async (...args) => back(await promised(...args))
+fs.readdirSync = (...args) => back(readdirSync(...args))
+fs.readdir = (...args) => {
+  const done = args.pop()
+  readdir(...args, (error, names) => done(error, back(names)))
+}
+syncBuiltinESMExports()
+`
+
 const LIST = 'Cassius Pembury\nMorwenna Brand\nRennick Roe\n'
 const names = (text) => (text ?? '').split(/\r?\n/).filter((l) => l.trim() !== '')
 const show = (label, text) => `${label}:\n${text === null ? '  (no such file)' : text === '' ? '  (empty)' : text.replace(/\n$/, '').split('\n').map((l) => `  ${l}`).join('\n')}`
@@ -35,12 +51,12 @@ function fileError(r, script) {
 export const checks = {
   async add(t) {
     const dir = await box(t, { 'waiting-list.txt': LIST })
-    const first = await run(dir, 'add-to-list.js', ['Elsbeth', 'Kettering'])
-    const second = await run(dir, 'add-to-list.js', ['Lorcan Achterberg'], { from: 'gate-shed' })
+    const first = await run(dir, 'add-to-list.js', ['Elsbeth', 'Pennock'])
+    const second = await run(dir, 'add-to-list.js', ['Ludovic Achterberg'], { from: 'gate-shed' })
     const early = (await broken('add-to-list.js adds names', first, dir, 'add-to-list.js')) ?? (await broken('add-to-list.js adds names', second, dir, 'add-to-list.js'))
     if (early) return [early]
     const after = await read(dir, 'waiting-list.txt')
-    const wanted = [...names(LIST), 'Elsbeth Kettering', 'Lorcan Achterberg']
+    const wanted = [...names(LIST), 'Elsbeth Pennock', 'Ludovic Achterberg']
     const output = `${reports(first, second)}\n\n${show('waiting-list.txt before', LIST)}\n${show('waiting-list.txt after', after)}`
     const name = 'Two names are added to the end of the waiting list, from any folder'
     const got = names(after)
@@ -48,16 +64,21 @@ export const checks = {
     if (message) {
       // already said
     } else if (got.join('\n') === wanted.join('\n')) {
-      message = null
+      const raw = after.split(/\r?\n/)
+      message = raw.slice(0, -1).includes('')
+        ? 'A blank line ended up in the list. The line break goes after each name, not before it.'
+        : raw.at(-1) !== ''
+          ? 'The last name has no line break after it, so the next name added would land on its line. End each name with a line break.'
+          : null
     } else if (!got.includes('Cassius Pembury')) {
       message = 'The names that were on the list before are gone: the file was replaced instead of added to. Write in a way that keeps what is there.'
-    } else if (got.some((l) => /Kettering.*Achterberg|Roe.*Elsbeth/.test(l))) {
+    } else if (got.some((l) => /Pennock.*Achterberg|Roe.*Elsbeth/.test(l))) {
       message = 'Two names ended up on one line. Each name goes on a line of its own, so end each one with a line break.'
-    } else if (got.includes('Elsbeth') || got.includes('Kettering')) {
-      message = 'Only part of the name was added. A name typed as two words, Elsbeth Kettering, reaches the script as two arguments; add all of them, with a space between.'
-    } else if (!got.includes('Lorcan Achterberg') && (await read(dir, 'gate-shed/waiting-list.txt')) !== null) {
+    } else if (got.includes('Elsbeth') || got.includes('Pennock')) {
+      message = 'Only part of the name was added. A name typed as two words, Elsbeth Pennock, reaches the script as two arguments; add all of them, with a space between.'
+    } else if (!got.includes('Ludovic Achterberg') && (await read(dir, 'gate-shed/waiting-list.txt')) !== null) {
       message = 'Run from another folder, the name went into a new waiting-list.txt in that folder. Build the path from the script\'s own folder, as in the last issue.'
-    } else if (got.includes('Lorcan Achterberg') && !got.includes('Elsbeth Kettering')) {
+    } else if (got.includes('Ludovic Achterberg') && !got.includes('Elsbeth Pennock')) {
       message = 'The first name is missing from the list. Each run should add its name.'
     } else {
       message = 'The list should be the names it had, in order, then each new name on a line of its own.'
@@ -105,6 +126,8 @@ export const checks = {
       message = 'After the first run, the list should be the other names, in the order they were in.'
     } else if (mid.includes('Morwenna BrandRennick')) {
       message = 'The names left ran together on one line. Each name goes on a line of its own.'
+    } else if (!/\n$/.test(mid)) {
+      message = 'The last name left has no line break after it, so a name add-to-list.js adds next would land on its line. End every name with a line break.'
     } else if (lines(second.stdout)[0] !== 'Offer the plot to Morwenna Brand.' || names(end).join('\n') !== 'Rennick Roe') {
       message = (await read(dir, 'gate-shed/waiting-list.txt')) !== null || /ENOENT/.test(second.stderr)
         ? 'Run from another folder, the script did not use the waiting list beside it. Build the path from the script\'s own folder.'
@@ -133,8 +156,8 @@ export const checks = {
   },
 
   async report(t) {
-    const plots = 'K1,Cassius Pembury\nK2,\nK3,Morwenna Brand\nK4,\nK5,\nK6,Rennick Roe\nK7,Elsbeth Kettering\n'
-    const list = 'Lorcan Achterberg\nSeverine Ottoway\n'
+    const plots = 'K1,Cassius Pembury\nK2,\nK3,Morwenna Brand\nK4,\nK5,\nK6,Rennick Roe\nK7,Elsbeth Pennock\n'
+    const list = 'Ludovic Achterberg\nSeverine Ottoway\n'
     const old = 'Plots: 1\nFree: 1\nWaiting: 0\n'
     const expected = 'Plots: 7\nFree: 3\nWaiting: 2'
     const results = []
@@ -211,11 +234,11 @@ export const checks = {
       'reports/2030-12.txt': 'Plots: 7\n',
       'reports/notes.md': 'Ask about the hose.\n'
     }
-    const many = await box(t, files)
+    const many = await box(t, { reports: null, ...files, '.check/reversed.mjs': REVERSED })
     const missing = await box(t, { reports: null })
     const empty = await box(t, { reports: null, 'reports/notes.md': 'Ask about the hose.\n' })
     const [r1, r2, r3] = await Promise.all([
-      run(many, 'list-reports.js', [], { from: 'gate-shed' }),
+      run(many, 'list-reports.js', [], { from: 'gate-shed', preload: '.check/reversed.mjs' }),
       run(missing, 'list-reports.js'),
       run(empty, 'list-reports.js')
     ])

@@ -29,7 +29,7 @@
         },
         {
           "active": ["cwd->where", "where"],
-          "note": "He runs node ../where.js, so the script sits one folder above him."
+          "note": "He runs where.js from there, and the script sits one folder above him."
         },
         {
           "active": ["where"],
