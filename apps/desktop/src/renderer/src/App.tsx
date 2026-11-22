@@ -1,3 +1,4 @@
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
@@ -17,12 +18,38 @@ import { ShortcutList } from '@/features/shortcuts/ShortcutList'
 import { SettingsDialog } from '@/features/settings/SettingsDialog'
 import { StarPrompt } from '@/features/star/StarPrompt'
 import { GuideTour } from '@/features/tour/GuideTour'
-import { WorkspacePage } from '@/features/workspace/WorkspacePage'
 import { useSettings } from '@/stores/settings'
+
+type WorkspacePage = (typeof import('@/features/workspace/WorkspacePage'))['WorkspacePage']
+
+let workspacePage: WorkspacePage | undefined
+
+// The editor and the terminal are most of the app's code and Home needs none of it.
+const loadWorkspace = (): Promise<WorkspacePage> =>
+  import('@/features/workspace/WorkspacePage').then((m) => (workspacePage = m.WorkspacePage))
+
+const LazyWorkspace = lazy(() => loadWorkspace().then((page) => ({ default: page })))
+
+function Workspace(): React.JSX.Element {
+  // Drawn directly once it is fetched: a lazy component shows its fallback first, and React keeps
+  // a fallback on screen for 300 ms. Decided once, so the page is not mounted a second time.
+  const [Loaded] = useState(() => workspacePage)
+  if (Loaded) return <Loaded />
+  return (
+    <Suspense fallback={<div className="h-full bg-background" />}>
+      <LazyWorkspace />
+    </Suspense>
+  )
+}
 
 export default function App(): React.JSX.Element {
   // Not a route: until the setup is finished or skipped it replaces the app, then it is gone.
   const onboarded = useSettings((s) => s.onboarded)
+  // Fetched once the first screen is up and the window is idle, so opening an issue does not wait.
+  useEffect(() => {
+    const id = requestIdleCallback(() => void loadWorkspace())
+    return () => cancelIdleCallback(id)
+  }, [])
   return (
     <TooltipProvider delayDuration={300}>
       {!onboarded ? (
@@ -48,7 +75,7 @@ export default function App(): React.JSX.Element {
                 <Route path="dsa/:patternId" element={<PatternPage />} />
                 <Route path="year" element={<YearBoardPage />} />
               </Route>
-              <Route path="learn/:labId/:chapterId" element={<WorkspacePage />} />
+              <Route path="learn/:labId/:chapterId" element={<Workspace />} />
             </Routes>
           </HashRouter>
         </>
