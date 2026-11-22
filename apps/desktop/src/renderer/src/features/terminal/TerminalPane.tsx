@@ -19,6 +19,7 @@ import { TOUR } from '@/features/tour/anchors'
 import { useAi } from '@/features/ai/aiStore'
 import { AskBar } from '@/features/ai/AskBar'
 import { askAboutOutput } from '@/features/ai/tutorActions'
+import { usePane } from '@/features/workspace/activePane'
 
 const REFRESH_QUIET_MS = 500
 // The terminal drops input that arrives with Ctrl+C, so the command waits for the shell.
@@ -69,6 +70,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
   const [maximized, setMaximized] = useState(false)
 
   const rootRef = useRef<HTMLDivElement>(null)
+  const pane = usePane('terminal')
   const containerRef = useRef<HTMLDivElement>(null)
   const termRef = useRef<{ term: Terminal; fit: FitAddon; id: string | null } | null>(null)
   /** Text selected in the terminal, and where the mouse let go, for the ask bar. */
@@ -291,9 +293,10 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
 
   return (
     <div
+      {...pane}
       ref={rootRef}
       style={overlay}
-      className={cn('flex h-full flex-col bg-editor', maximized && 'border-t border-border')}
+      className={cn('pane flex h-full flex-col bg-editor', maximized && 'border-t border-border')}
     >
       {/* The whole bar opens and closes the terminal. The arrow is the button the keyboard uses. */}
       <div

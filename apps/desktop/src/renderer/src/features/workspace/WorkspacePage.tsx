@@ -177,7 +177,7 @@ export function WorkspacePage(): React.JSX.Element {
   )
 }
 
-/** Focus here takes the active mark off the editor; only the editor draws the mark. */
+/** Focus here takes the active mark off the editor; only the editors and the terminal draw it. */
 function Pane({ id, children }: { id: PaneId; children: React.ReactNode }): React.JSX.Element {
   return (
     <div data-pane={id} className="h-full">
