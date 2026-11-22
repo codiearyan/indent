@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Bryn", "say": "Why does this parcel weigh nonsense?", "note": "A code came out in halves." },
+    { "title": "Picking desk", "text": "Keeps every list as a plain array." },
+    {
+      "title": "Your types",
+      "file": "picking.ts",
+      "mine": true,
+      "gap": "Lists that hold anything",
+      "tasks": ["Weigh a parcel", "Type the empty list", "Split a code in two", "Write order lines"]
+    },
+    { "title": "Parcel", "rows": [["HA-250", "Hearth Assam"], ["MK-50", "Morning Keemun"]], "mark": 0 }
+  ],
+  "ticket": { "label": "HA-250", "wrong": "weight as text", "why": "Mixed list", "right": "weighed" },
+  "captions": [
+    "Bryn packs parcels at Oakhollow, and one parcel's weight adds up to nonsense.",
+    "The desk keeps every list as a plain array, so a product code's halves get mixed up.",
+    "You give each list its type, and the product code a type for each place.",
+    "Now code HA-250 splits into a blend and a weight, and the parcel adds up.",
+    "Every list at the picking desk now says what it holds."
+  ]
+}

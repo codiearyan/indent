@@ -1,0 +1,135 @@
+{
+  "id": "arrays-and-tuples",
+  "title": "Lists and pairs",
+  "files": ["src/picking.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/picking.ts` runs the picking desk, and `npm run types` checks its types.",
+    "suggestedCommand": "npm run types"
+  },
+  "tasks": [
+    {
+      "id": "parcel",
+      "title": "Weigh a parcel",
+      "file": "src/picking.ts",
+      "description": "Under `// Task 1` in `src/picking.ts`, give `parcelGrams` the type of its parameter, a list of numbers, and the type of its result, a number. Then replace the line in its body so it gives back the sum of every weight in the list, and `0` for an empty list.\n\nCheck reads your function for the result type, and compiles calls of its own: a list of numbers, an empty list and a list made elsewhere must compile, while one number on its own, weights as text or a result used as text must be refused. It calls `parcelGrams` with parcels of its own.",
+      "nextSteps": [
+        "Run `npm run types` and read the error for the parameter of `parcelGrams`.",
+        "Write the type of a list of numbers after the parameter, and the result type after the brackets.",
+        "Add up the weights in the body, starting from 0.",
+        "Run both commands: the parcel should weigh 425 g."
+      ],
+      "hints": [
+        "The type of a list is the type of one item followed by an empty pair of square brackets.",
+        "A list of numbers is `number[]`. To add them up, keep a total in a `let` that starts at 0 and add each weight to it in a `for...of` loop.",
+        "`export function parcelGrams(tinGrams: number[]): number {`, then `let total = 0`, a loop that does `total += grams`, and `return total`."
+      ],
+      "docs": [
+        {
+          "title": "Arrays",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#arrays"
+        },
+        {
+          "title": "for...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Types for arrays and objects",
+          "url": "https://www.youtube.com/watch?v=157NopQ-chU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "picklist",
+      "title": "Type the empty picking list",
+      "file": "src/picking.ts",
+      "description": "Under `// Task 2`, the compiler refuses the lines that add order ids to `pickList`. Read what it says, and write the type `pickList` needs after its name, so it starts empty and holds order ids. Leave the lines that add to it as they are.\n\nCheck reads your line for the type. It compiles code of its own that reads the list as order ids and adds one more, which must compile, and code that adds a number or reads it as a list of numbers, which must be refused. It reads the list after your lines.",
+      "nextSteps": [
+        "Run `npm run types` and read the errors for the two lines that add to the list.",
+        "Point at `pickList` in the editor: what type did the compiler give an empty list?",
+        "Write the type of a list of order ids after its name.",
+        "Run both commands again."
+      ],
+      "hints": [
+        "`never` is the type with no values at all. An empty list with no type written is a list of `never`, so nothing may go in.",
+        "The compiler cannot see what will be added later, so an empty list needs its type written. Order ids are text.",
+        "`export const pickList: string[] = []`."
+      ],
+      "docs": [
+        {
+          "title": "Arrays",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#arrays"
+        },
+        {
+          "title": "Array.prototype.push()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "code",
+      "title": "Split a product code in two",
+      "file": "src/picking.ts",
+      "description": "Under `// Task 3`, the compiler refuses the lines that use what `splitCode` gives back. Read why, then write the result type of `splitCode` so it says exactly what comes back: the blend code as text first, the grams as a number second, and nothing more. Leave its body as it is.\n\nCheck reads your function for the result type. It compiles code of its own that uses the first part as text and the second as a number, which must compile, and code that reads a third part or uses a part as the wrong type, which must be refused. It calls `splitCode` with codes of its own.",
+      "nextSteps": [
+        "Run `npm run types` and read the two errors under Task 3.",
+        "Point at `splitCode`: what result type did the compiler work out?",
+        "Write a result type that names the type of the first place and of the second.",
+        "Run both commands again."
+      ],
+      "hints": [
+        "`string | number` reads \"a string or a number\". The compiler worked out a list whose items could each be either, so it cannot know the first is text.",
+        "A tuple is a list with a fixed length and a type for each place, written in square brackets in order.",
+        "`export function splitCode(code: string): [string, number] {`."
+      ],
+      "docs": [
+        {
+          "title": "Tuple types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#tuple-types"
+        },
+        {
+          "title": "Destructuring",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Tuples",
+          "url": "https://www.youtube.com/watch?v=5q0VtzJjvNc"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "lines",
+      "title": "Write the order lines whole",
+      "file": "src/picking.ts",
+      "description": "Under `// Task 4`, write a function called `orderLines`, with `export` in front, from the word `function` to its closing brace. It takes the lines of an order: a list where each line is a pair of a blend (text) and a number of tins, like `['Hearth Assam', 2]`. It gives back a list of text with one entry per line, like `'Hearth Assam x2'`, in the same order. Write every type, then take away the `//` in front of the line that prints it.\n\nCheck reads your function for its result type. It compiles calls of its own: pairs, an empty order and pairs made elsewhere must compile, while a pair in the wrong order, a blend on its own, a line of three parts or a result used as one text must be refused. It calls `orderLines` with orders of its own.",
+      "nextSteps": [
+        "Work out the type of one line, then the type of a list of them.",
+        "Write the first line of the function with that parameter type and a result type.",
+        "Turn each line into its text, then take away the `//` in front of the line under it.",
+        "Run both commands."
+      ],
+      "hints": [
+        "One line is a tuple of a blend and a number. A list of something is that type followed by `[]`, and that works for a tuple too.",
+        "`.map` gives back a new list with one item per item, and inside it the compiler already knows each line is a pair, so you can take it apart with `[blend, tins]`.",
+        "`export function orderLines(lines: [string, number][]): string[] {` and a `return` of `lines.map(...)` that builds `` `${blend} x${tins}` ``."
+      ],
+      "docs": [
+        {
+          "title": "Tuple types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#tuple-types"
+        },
+        {
+          "title": "Array.prototype.map()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

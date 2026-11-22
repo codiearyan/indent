@@ -1,0 +1,237 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "shelves",
+        "label": "Shelves",
+        "kind": "story"
+      },
+      {
+        "id": "parcel",
+        "label": "parcelGrams()",
+        "kind": "function",
+        "mine": true,
+        "fn": "parcelGrams"
+      },
+      {
+        "id": "picklist",
+        "label": "Picking list",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "code",
+        "label": "splitCode()",
+        "kind": "function",
+        "mine": true,
+        "fn": "splitCode"
+      },
+      {
+        "id": "lines",
+        "label": "orderLines()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "bryn",
+        "label": "Bryn",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "shelves",
+        "to": "code",
+        "label": "product code"
+      },
+      {
+        "from": "shelves",
+        "to": "parcel",
+        "label": "tin weights"
+      },
+      {
+        "from": "picklist",
+        "to": "bryn",
+        "label": "order ids"
+      },
+      {
+        "from": "lines",
+        "to": "bryn",
+        "label": "lines to pack"
+      },
+      {
+        "from": "parcel",
+        "to": "bryn",
+        "label": "parcel weight"
+      }
+    ],
+    "note": "Every list at the picking desk says what it holds, and a product code becomes a pair with a type for each place."
+  },
+  "tasks": {
+    "parcel": {
+      "trace": {
+        "file": "src/picking.ts",
+        "call": "parcelGrams",
+        "args": [
+          [
+            125,
+            250,
+            50
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": [
+            "shelves",
+            "shelves->parcel"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "tin weights",
+            "values": [
+              125,
+              250,
+              50
+            ]
+          },
+          "note": "Bryn puts three tins in a parcel, and each tin has a weight in grams."
+        },
+        {
+          "active": [
+            "parcel"
+          ],
+          "note": "The parameter is a list of numbers, so a weight written as text cannot get in."
+        },
+        {
+          "active": [
+            "parcel",
+            "parcel->bryn",
+            "bryn"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              {
+                "key": "weight",
+                "value": "number"
+              }
+            ]
+          },
+          "note": "The weights add up to one number for the parcel's label."
+        }
+      ]
+    },
+    "picklist": {
+      "steps": [
+        {
+          "active": [
+            "picklist"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "at the start",
+            "values": []
+          },
+          "note": "The picking list starts the morning empty, with nothing for the compiler to work a type out from."
+        },
+        {
+          "active": [
+            "picklist"
+          ],
+          "note": "With no type written, the compiler lets nothing into it, and says so when an order id is added."
+        },
+        {
+          "active": [
+            "picklist",
+            "picklist->bryn",
+            "bryn"
+          ],
+          "note": "Once the list says it holds order ids, the orders go in and Bryn knows what to pick."
+        }
+      ]
+    },
+    "code": {
+      "trace": {
+        "file": "src/picking.ts",
+        "call": "splitCode",
+        "args": [
+          "HA-250"
+        ]
+      },
+      "steps": [
+        {
+          "active": [
+            "shelves",
+            "shelves->code",
+            "code"
+          ],
+          "note": "Each tin on the shelf has a product code, a blend code and its grams joined by a dash."
+        },
+        {
+          "active": [
+            "code"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "what comes back",
+            "values": [
+              "blend code",
+              "grams"
+            ]
+          },
+          "note": "The code comes back in two places, and the compiler should know the first is text and the second a number."
+        },
+        {
+          "active": [
+            "code"
+          ],
+          "note": "As a pair with a type for each place, the grams can be added up and the code can be read as text."
+        }
+      ]
+    },
+    "lines": {
+      "steps": [
+        {
+          "active": [
+            "lines"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the lines of an order",
+            "rowLabels": [
+              "line 1",
+              "line 2"
+            ],
+            "cells": [
+              [
+                "Hearth Assam",
+                2
+              ],
+              [
+                "Morning Keemun",
+                1
+              ]
+            ]
+          },
+          "note": "An order is a list of lines, and each line is a blend and a number of tins."
+        },
+        {
+          "active": [
+            "lines"
+          ],
+          "note": "Each pair turns into one line of text, in the same order."
+        },
+        {
+          "active": [
+            "lines",
+            "lines->bryn",
+            "bryn"
+          ],
+          "note": "Bryn gets a list of text to pack from, and the compiler refuses a line with its parts swapped."
+        }
+      ]
+    }
+  }
+}

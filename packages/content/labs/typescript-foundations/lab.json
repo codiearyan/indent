@@ -14,7 +14,8 @@
       "chapters": [
         "read-the-compiler",
         "types-for-values",
-        "types-for-functions"
+        "types-for-functions",
+        "arrays-and-tuples"
       ]
     }
   ]
