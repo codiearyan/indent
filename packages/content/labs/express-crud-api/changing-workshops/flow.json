@@ -24,7 +24,7 @@
       { "from": "remove", "to": "store", "label": "remove" },
       { "from": "store", "to": "reply", "label": "result" }
     ],
-    "note": "Nadia's changes for the week reach the store through three new routes, each of which checks the id first and the body second."
+    "note": "Dilys's changes for the week reach the store through three new routes, each of which checks the id first and the body second."
   },
   "tasks": {
     "put": {

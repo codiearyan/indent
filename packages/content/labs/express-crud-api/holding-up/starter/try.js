@@ -2,7 +2,7 @@
 // Starts the API on a free port, sends a few requests, prints what came back, then stops.
 import { createApp } from './src/app.js'
 
-const staff = { 'x-staff-key': process.env.STAFF_KEY ?? 'copperleaf-staff' }
+const staff = { 'x-staff-key': process.env.STAFF_KEY ?? 'kilnworth-staff' }
 
 const requests = [
   { path: '/workshops' },

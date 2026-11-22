@@ -5,5 +5,5 @@ import { createApp } from './src/app.js'
 const app = createApp()
 
 const server = app.listen(Number(process.env.PORT ?? 3000), () => {
-  console.log(`Copperleaf API listening on http://localhost:${server.address().port}`)
+  console.log(`Kilnworth API listening on http://localhost:${server.address().port}`)
 })

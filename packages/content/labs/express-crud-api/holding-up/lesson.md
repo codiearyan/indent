@@ -2,22 +2,22 @@
 
 ## What you will be able to do
 
-The workshops API now does everything Copperleaf asked for: list, read, create, replace, change and remove. It does it all from one long `createApp`, it lets anyone change anything, and when something breaks it shows its insides. In this last issue you make it hold up. By the end you will be able to:
+The workshops API now does everything Kilnworth asked for: list, read, create, replace, change and remove. It does it all from one long `createApp`, it lets anyone change anything, and when something breaks it shows its insides. In this last issue you make it hold up. By the end you will be able to:
 
 - split routes into a router module and mount it on a path
 - write a middleware of your own that decides whether a request goes on
 - write one error handler so no route ever leaks a stack trace
 - explain the order in which Express runs all of these
 
-## The request from Ivo and Nadia
+## The request from Ivo and Dilys
 
 Two notes arrive on the same day. First Ivo:
 
 > **Ivo:** I sent a half-written body by mistake and got back a whole page of HTML with file paths from your server in it. My page can't read that, and I don't think strangers should see it either.
 
-Then Nadia:
+Then Dilys:
 
-> **Nadia:** Ivo mentioned that anyone who finds the address could delete a workshop. Only the studio's computers should be able to change things. Reading is fine for everyone.
+> **Dilys:** Ivo mentioned that anyone who finds the address could delete a workshop. Only the studio's computers should be able to change things. Reading is fine for everyone.
 
 That is a staff key for every change, and one place that turns any error into a calm JSON answer. First, though, `createApp` needs to be easier to work in.
 

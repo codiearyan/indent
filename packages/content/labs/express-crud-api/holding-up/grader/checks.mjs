@@ -15,7 +15,7 @@ const [planters, raku, coil] = seed
 const bowls = { title: 'Throwing bowls', day: 'tue', seats: 6, priceCents: 4400 }
 const staffKey = 'check-key-7'
 const staff = { 'x-staff-key': staffKey }
-const secret = 'workshop file locked at /srv/copperleaf/workshops.db'
+const secret = 'workshop file locked at /srv/kilnworth/workshops.db'
 const htmlPage = (res) => /text\/html/i.test(res.headers?.['content-type'] ?? '')
 const neverRan = (hint) => (res) => {
   if (!htmlPage(res)) return hint
