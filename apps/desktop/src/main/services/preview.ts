@@ -16,7 +16,8 @@ interface BuildFailure {
   errors?: { text: string; location?: { file: string; line: number } | null }[]
 }
 
-// Runs inside the previewed page: passes console output and uncaught errors to the Browser panel.
+// Runs inside the previewed page: passes console output, uncaught errors and the page's title to
+// the Browser panel.
 const BRIDGE = `<script>(() => {
   const format = (value) => {
     if (value instanceof Error) return value.stack || value.message
@@ -34,6 +35,8 @@ const BRIDGE = `<script>(() => {
     send('error', [address ? 'Could not load ' + address : event.error ?? event.message])
   }, true)
   addEventListener('unhandledrejection', (event) => send('error', [event.reason]))
+  addEventListener('DOMContentLoaded', () =>
+    parent.postMessage({ source: '${PREVIEW_MESSAGE}', title: document.title }, '*'))
 })()</script>`
 
 function withBridge(html: string): string {
