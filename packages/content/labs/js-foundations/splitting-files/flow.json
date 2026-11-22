@@ -1,0 +1,109 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "catalogue", "label": "catalogue.js", "kind": "file", "mine": true },
+      { "id": "settings", "label": "settings.js", "kind": "file" },
+      { "id": "stock", "label": "stock.js", "kind": "file", "mine": true },
+      { "id": "page", "label": "page.js", "kind": "file", "mine": true },
+      { "id": "shop", "label": "shop.js", "kind": "file", "mine": true },
+      { "id": "site", "label": "Shop page", "kind": "story" },
+      { "id": "ines", "label": "Ines", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "catalogue", "to": "shop", "label": "candles" },
+      { "from": "settings", "to": "stock", "label": "low number" },
+      { "from": "settings", "to": "page", "label": "shop name" },
+      { "from": "stock", "to": "page", "label": "in stock?" },
+      { "from": "stock", "to": "shop", "label": "pour list" },
+      { "from": "page", "to": "shop", "label": "page lines" },
+      { "from": "shop", "to": "site", "label": "page" },
+      { "from": "shop", "to": "ines", "label": "pour next" }
+    ],
+    "note": "One long file becomes a file for each part of the site, and each file imports what it uses from the others."
+  },
+  "tasks": {
+    "catalogue": {
+      "steps": [
+        {
+          "active": ["shop"],
+          "note": "Today the list of candles sits at the top of shop.js, among the rules and the page."
+        },
+        {
+          "active": ["catalogue"],
+          "value": {
+            "kind": "map",
+            "label": "one candle in the list",
+            "entries": [
+              { "key": "sku", "value": "text" },
+              { "key": "name", "value": "text" },
+              { "key": "priceCents", "value": "a number" },
+              { "key": "stock", "value": "a number" }
+            ]
+          },
+          "note": "The list moves to catalogue.js, a file that holds only the candles."
+        },
+        {
+          "active": ["catalogue", "catalogue->shop", "shop", "shop->site", "site"],
+          "note": "shop.js imports the list from there and prints the same page as before."
+        }
+      ]
+    },
+    "stock": {
+      "steps": [
+        {
+          "active": ["shop"],
+          "note": "The rules about stock are in shop.js too, between the candles and the page."
+        },
+        {
+          "active": ["stock"],
+          "note": "They move to stock.js. The small helper that only one of them uses moves along and stays inside."
+        },
+        {
+          "active": ["catalogue->shop", "stock", "stock->shop", "shop", "shop->ines", "ines"],
+          "note": "shop.js now imports from two files, and Ines gets the same list of candles to pour next."
+        }
+      ]
+    },
+    "settings": {
+      "steps": [
+        {
+          "active": ["settings"],
+          "value": {
+            "kind": "map",
+            "label": "the settings",
+            "entries": [
+              { "key": "shopName", "value": "text" },
+              { "key": "currency", "value": "text" },
+              { "key": "lowAt", "value": "a number" }
+            ]
+          },
+          "note": "settings.js came with the site. It shares one object, as its default export."
+        },
+        {
+          "active": ["settings", "settings->stock", "stock"],
+          "note": "stock.js imports the settings and reads from them when a candle counts as low."
+        },
+        {
+          "active": ["stock", "stock->shop", "shop", "shop->ines", "ines"],
+          "note": "When the number in the settings changes, the pour list follows, and no code has to change."
+        }
+      ]
+    },
+    "page": {
+      "steps": [
+        {
+          "active": ["shop"],
+          "note": "The page is the last part left in shop.js."
+        },
+        {
+          "active": ["stock", "stock->page", "settings", "settings->page", "page"],
+          "note": "page.js imports from two files: whether a candle is in stock, and the shop's name."
+        },
+        {
+          "active": ["page", "page->shop", "shop", "shop->site", "site"],
+          "note": "shop.js only imports and prints now, and the site shows the same page."
+        }
+      ]
+    }
+  }
+}

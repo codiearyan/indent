@@ -1,0 +1,129 @@
+{
+  "id": "splitting-files",
+  "title": "Splitting a file that grew",
+  "files": ["src/shop.js", "src/catalogue.js", "src/stock.js", "src/settings.js", "src/page.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the shop's site here after every move: it should print the same page and the same list every time.",
+    "suggestedCommand": "node src/shop.js"
+  },
+  "tasks": [
+    {
+      "id": "catalogue",
+      "title": "Give the candles a file of their own",
+      "file": "src/catalogue.js",
+      "description": "Move the `catalogue` list from `src/shop.js` into `src/catalogue.js` and export it there with the name `catalogue`. In `shop.js`, import it in place of the list, so `node src/shop.js` prints the same page as before.\n\nCheck imports `catalogue.js` and compares the list with the one `shop.js` had. Then it puts other candles in a `catalogue.js` of its own and runs `shop.js`, to make sure the page comes from there.",
+      "nextSteps": [
+        "Read the lesson's part on data in its own file.",
+        "Cut the list from `shop.js` and paste it into `catalogue.js`, with `export` in front of `const`.",
+        "At the top of `shop.js`, import `catalogue` from `catalogue.js`.",
+        "Run `node src/shop.js`: the page should look exactly as it did."
+      ],
+      "hints": [
+        "A list can be exported like a function: an export line that names it, or `export` in front of the line that makes it.",
+        "`shop.js` still uses the name `catalogue` in its last lines. Once the list has moved, that name has to come from somewhere: an import line at the top.",
+        "`catalogue.js` holds `export const catalogue = [ ... ]`, and `shop.js` starts with `import { catalogue } from './catalogue.js'`."
+      ],
+      "docs": [
+        {
+          "title": "export",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export"
+        },
+        {
+          "title": "JavaScript modules",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stock",
+      "title": "Move the stock rules",
+      "file": "src/stock.js",
+      "description": "Move `isLow`, `inStock` and `lowStock` from `src/shop.js` into `src/stock.js`. Export `inStock` and `lowStock`; `isLow` only helps `lowStock`, so it is not exported. In `shop.js`, import what it still uses from `stock.js`. `shop.js` then imports from two files.\n\nCheck calls `inStock` and `lowStock` from `stock.js` with candles of its own, makes sure `shop.js` keeps no copy of them, and runs `shop.js` beside a `stock.js` of its own to make sure it uses that file.",
+      "nextSteps": [
+        "Read the lesson's parts on moving by what code is about and on one file importing from two.",
+        "Cut the three functions from `shop.js` and paste them into `stock.js`.",
+        "Export the two that other files need.",
+        "Run `node src/shop.js` and read the error it gives, if any: it names what `shop.js` is missing."
+      ],
+      "hints": [
+        "After the move, run `shop.js`. A `ReferenceError` names a function that `shop.js` still uses but no longer has.",
+        "`shop.js` uses `lowStock` in its last line, and `productLine`, which is still in `shop.js` until Task 4, uses `inStock`. Both come from `stock.js` now.",
+        "`stock.js` has `export function inStock` and `export function lowStock`, with `isLow` above them without export. `shop.js` adds `import { inStock, lowStock } from './stock.js'`."
+      ],
+      "docs": [
+        {
+          "title": "import",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import"
+        },
+        {
+          "title": "JavaScript modules",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "settings",
+      "title": "Read the low stock number from the settings",
+      "file": "src/stock.js",
+      "description": "`src/settings.js` came with the site, and it shares the shop's settings as its default export. In `src/stock.js`, import the settings from it, and make `isLow` use their `lowAt` in place of the `3` typed in. Leave `settings.js` as it is.\n\nCheck puts settings of its own in place of `settings.js`, with other numbers for `lowAt`, and calls `lowStock` from your `stock.js`. It also makes sure `settings.js` is unchanged.",
+      "nextSteps": [
+        "Read the lesson's part on the default export, then read `settings.js`.",
+        "At the top of `stock.js`, import the settings, with a name of your choosing.",
+        "In `isLow`, use the `lowAt` of that object where the 3 is.",
+        "Run `node src/shop.js`: with `lowAt` at 3, the pour list is the same as before."
+      ],
+      "hints": [
+        "`settings.js` has no names in curly braces to import. It shares one object, as its default export.",
+        "A default import has no curly braces, and the name after `import` is yours to choose. That name then holds the whole settings object.",
+        "`stock.js` starts with `import settings from './settings.js'`, and `isLow` compares with `settings.lowAt`."
+      ],
+      "docs": [
+        {
+          "title": "import: default import",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#default_import"
+        },
+        {
+          "title": "export",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Modules in 100 seconds",
+          "url": "https://www.youtube.com/watch?v=qgRUr-YUk1Q"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "page",
+      "title": "Move the page into a file of its own",
+      "file": "src/page.js",
+      "description": "Move `productLine` and `pageLines` from `src/shop.js` into `src/page.js`. `page.js` imports `inStock` from `stock.js` and the settings from `settings.js`, and `pageLines` starts the page with the settings' `shopName` in place of the name typed in. Export `pageLines`; `productLine` only helps it. In `shop.js`, import `pageLines`. After this task, `shop.js` keeps no function of its own: only its imports and the two lines that print.\n\nCheck calls `pageLines` from your `page.js` with settings and candles of its own, makes sure it uses `inStock` from `stock.js`, and runs `shop.js` beside a `page.js` of its own.",
+      "nextSteps": [
+        "Cut the two functions from `shop.js` and paste them into `page.js`.",
+        "Give `page.js` its two imports: one from `stock.js`, one from `settings.js`.",
+        "Start the page with `shopName`, export `pageLines`, and import it in `shop.js`.",
+        "Remove from `shop.js` any import it no longer uses, and run it."
+      ],
+      "hints": [
+        "Each file imports what it uses itself. `productLine` uses `inStock`, so `page.js` needs it from `stock.js`, whatever `shop.js` imports.",
+        "The settings come in the same way as in Task 3. Their `shopName` takes the place of the text at the start of the list `pageLines` gives.",
+        "`page.js` starts with `import { inStock } from './stock.js'` and `import settings from './settings.js'`; `pageLines` returns `[settings.shopName, ...candles.map(productLine)]`."
+      ],
+      "docs": [
+        {
+          "title": "import",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import"
+        },
+        {
+          "title": "JavaScript modules",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

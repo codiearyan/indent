@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "Ines packed an empty box.", "note": "Someone ordered zero figs." },
+    { "title": "Order page", "text": "Takes any order, even zero candles." },
+    {
+      "title": "Your code",
+      "file": "orders.js",
+      "mine": true,
+      "gap": "Nothing ever says no",
+      "tasks": ["Refuse a bad quantity", "Refuse an unknown sku", "Let wrong lines pass", "Answer the customer"]
+    },
+    { "title": "Customer", "say": "It told me what was wrong." }
+  ],
+  "ticket": { "label": "0 figs", "wrong": "packed empty", "why": "No check", "right": "refused, with why" },
+  "captions": [
+    "The site is in tidy files now. Next, Theo found an empty parcel: zero figs.",
+    "The order page takes any quantity and any sku, and breaks only much later.",
+    "You throw errors that say what was wrong, and catch them only where it helps.",
+    "The order for zero figs is refused, and the customer reads the reason.",
+    "Wrong orders get a clear no, and a bug in the code still stops the site."
+  ]
+}

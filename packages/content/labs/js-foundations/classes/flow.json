@@ -1,0 +1,125 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ines", "label": "Ines", "kind": "story" },
+      { "id": "card", "label": "makeCard()", "kind": "function", "mine": true, "fn": "makeCard" },
+      { "id": "candle", "label": "Candle", "kind": "function", "mine": true },
+      { "id": "limited", "label": "LimitedCandle", "kind": "function", "mine": true },
+      { "id": "pay", "label": "sellOnPayment()", "kind": "function", "mine": true, "fn": "sellOnPayment" },
+      { "id": "till", "label": "Till", "kind": "story" },
+      { "id": "shelf", "label": "Shelf label", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ines", "to": "card", "label": "name, stock" },
+      { "from": "ines", "to": "candle", "label": "name, price" },
+      { "from": "candle", "to": "limited", "label": "built on" },
+      { "from": "candle", "to": "shelf", "label": "label" },
+      { "from": "limited", "to": "shelf", "label": "label" },
+      { "from": "pay", "to": "till", "label": "handler" },
+      { "from": "till", "to": "candle", "label": "sell" }
+    ],
+    "note": "Each candle becomes an object that carries its own methods, made from a class, and the till sells from it without losing which candle it is."
+  },
+  "tasks": {
+    "card": {
+      "trace": { "file": "src/candles.js", "call": "makeCard", "args": ["Fig", 5] },
+      "steps": [
+        {
+          "active": ["ines", "ines->card", "card"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "name", "value": "Fig" },
+              { "key": "stock", "value": 5 }
+            ]
+          },
+          "note": "Ines writes a card for the fig candles: five on the shelf."
+        },
+        {
+          "active": ["card"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "name", "value": "text" },
+              { "key": "stock", "value": "a number" },
+              { "key": "sell", "value": "a method" }
+            ]
+          },
+          "note": "makeCard() gives back a card that carries its own sell method."
+        },
+        {
+          "active": ["card"],
+          "note": "When two figs are sold, the card's sell changes its own stock, through this."
+        }
+      ]
+    },
+    "candle": {
+      "steps": [
+        {
+          "active": ["ines", "ines->candle", "candle"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "name", "value": "Sage" },
+              { "key": "priceCents", "value": 1700 }
+            ]
+          },
+          "note": "Every candle the shop pours is made the same way, with new."
+        },
+        {
+          "active": ["candle"],
+          "note": "The constructor gives each new candle its name, its price and a stock of its own."
+        },
+        {
+          "active": ["candle", "candle->shelf", "shelf"],
+          "value": {
+            "kind": "map",
+            "label": "its label",
+            "entries": [{ "key": "label", "value": "the name and what is left, or sold out" }]
+          },
+          "note": "restock, sell and label work on the candle they are called on."
+        }
+      ]
+    },
+    "limited": {
+      "steps": [
+        {
+          "active": ["ines", "limited"],
+          "note": "Winter brings a limited edition: a candle with one thing more, how many will ever be poured."
+        },
+        {
+          "active": ["candle", "candle->limited", "limited"],
+          "note": "LimitedCandle is built on Candle: Candle makes the candle, and LimitedCandle adds the edition."
+        },
+        {
+          "active": ["limited", "limited->shelf", "shelf"],
+          "value": {
+            "kind": "map",
+            "label": "its label",
+            "entries": [{ "key": "label", "value": "the label Candle gives, then the edition" }]
+          },
+          "note": "Its label starts with the label of Candle and adds the edition."
+        }
+      ]
+    },
+    "payment": {
+      "steps": [
+        {
+          "active": ["till"],
+          "note": "The till knows when a customer has paid, but not which candle to sell from."
+        },
+        {
+          "active": ["pay", "pay->till", "till"],
+          "note": "sellOnPayment() hands the till a small function that calls sell on the candle."
+        },
+        {
+          "active": ["till", "till->candle", "candle"],
+          "note": "Once the payment comes in, the till calls it, and the candle's stock goes down."
+        }
+      ]
+    }
+  }
+}

@@ -56,6 +56,10 @@
     {
       "title": "Helpers that remember",
       "chapters": ["loyalty-cards"]
+    },
+    {
+      "title": "Growing the codebase",
+      "chapters": ["export-and-import", "splitting-files", "throwing-errors", "classes"]
     }
   ]
 }

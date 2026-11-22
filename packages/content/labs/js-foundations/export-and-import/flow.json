@@ -1,0 +1,132 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ines", "label": "Ines", "kind": "story" },
+      { "id": "money", "label": "money.js", "kind": "file", "mine": true },
+      { "id": "shelf", "label": "shelfLabel()", "kind": "function", "mine": true, "fn": "shelfLabel" },
+      { "id": "sale", "label": "saleLabel()", "kind": "function", "mine": true, "fn": "saleLabel" },
+      { "id": "order", "label": "orderLine()", "kind": "function", "mine": true },
+      { "id": "stall", "label": "Market stall", "kind": "story" },
+      { "id": "theo", "label": "Theo's emails", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ines", "to": "shelf", "label": "candle" },
+      { "from": "ines", "to": "sale", "label": "candle, percent" },
+      { "from": "money", "to": "shelf", "label": "formatPrice" },
+      { "from": "money", "to": "sale", "label": "salePrice" },
+      { "from": "money", "to": "order", "label": "formatPrice" },
+      { "from": "shelf", "to": "stall", "label": "label" },
+      { "from": "sale", "to": "stall", "label": "sale label" },
+      { "from": "order", "to": "theo", "label": "email line" }
+    ],
+    "note": "The price code lives in one file, money.js, and the labels and the emails import it from there instead of keeping copies."
+  },
+  "tasks": {
+    "share": {
+      "steps": [
+        {
+          "active": ["money"],
+          "note": "money.js holds the price code, but it shares nothing yet, so no other file can use it."
+        },
+        {
+          "active": ["money", "money->shelf", "money->order"],
+          "note": "Its export line names the functions other files need. Those can now be imported."
+        },
+        {
+          "active": ["money"],
+          "note": "twoDigits only helps from inside money.js, so it is left off the export line and stays there."
+        }
+      ]
+    },
+    "import": {
+      "trace": {
+        "file": "src/labels.js",
+        "call": "shelfLabel",
+        "args": [{ "name": "Amber", "grams": 200, "priceCents": 1850 }]
+      },
+      "steps": [
+        {
+          "active": ["ines", "ines->shelf", "shelf"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "name", "value": "Amber" },
+              { "key": "grams", "value": 200 },
+              { "key": "priceCents", "value": 1850 }
+            ]
+          },
+          "note": "Ines needs the amber candle's label for the stall."
+        },
+        {
+          "active": ["money", "money->shelf", "shelf"],
+          "note": "shelfLabel() imports formatPrice from money.js, the same price code the emails use."
+        },
+        {
+          "active": ["shelf", "shelf->stall", "stall"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "label", "value": "the name, the grams and the price" }]
+          },
+          "note": "The label goes on the stall, with the price written the shop's one way."
+        }
+      ]
+    },
+    "sale": {
+      "trace": {
+        "file": "src/labels.js",
+        "call": "saleLabel",
+        "args": [{ "name": "Fig", "grams": 350, "priceCents": 2400 }, 20]
+      },
+      "steps": [
+        {
+          "active": ["ines", "ines->sale", "sale"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "candle", "value": "the Fig candle" },
+              { "key": "percent", "value": 20 }
+            ]
+          },
+          "note": "Saturday is a sale, and fig candles have a percent off."
+        },
+        {
+          "active": ["money", "money->sale", "sale"],
+          "note": "saleLabel() works the sale price out and writes it with two functions it imports from money.js."
+        },
+        {
+          "active": ["sale", "sale->stall", "stall"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "label", "value": "name, grams, sale price, how much is off" }]
+          },
+          "note": "The sale label goes up beside the fig candles."
+        }
+      ]
+    },
+    "email": {
+      "steps": [
+        {
+          "active": ["theo"],
+          "note": "Theo types the price into every order email by hand."
+        },
+        {
+          "active": ["money", "money->order", "order"],
+          "note": "orderLine() lives in a file of its own and imports formatPrice from money.js."
+        },
+        {
+          "active": ["order", "order->theo", "theo"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "line", "value": "how many, the name, what they cost together" }]
+          },
+          "note": "The email gets its line, with the same price the label shows."
+        }
+      ]
+    }
+  }
+}

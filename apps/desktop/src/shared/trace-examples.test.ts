@@ -69,7 +69,14 @@ const repos: { labId: string; expected: string[] }[] = [
       'maps-and-sets/customers',
       'saving-the-catalogue/save',
       'saving-the-catalogue/load',
-      'saving-the-catalogue/settings'
+      'saving-the-catalogue/settings',
+      'export-and-import/import',
+      'export-and-import/sale',
+      'throwing-errors/quantity',
+      'throwing-errors/candle',
+      'throwing-errors/cart',
+      'throwing-errors/order',
+      'classes/card'
     ]
   },
   {

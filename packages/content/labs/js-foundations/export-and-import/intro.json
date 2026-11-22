@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Why does the label say 18.5?", "note": "A customer saw two prices." },
+    { "title": "Price code", "text": "Labels and emails each keep a copy of it." },
+    {
+      "title": "Your code",
+      "file": "money.js",
+      "mine": true,
+      "gap": "No price code to share",
+      "tasks": ["Share the price code", "Use it on the labels", "A sale label", "An email line"]
+    },
+    { "title": "Customer", "text": "One price, on the label and in the email." }
+  ],
+  "ticket": { "label": "Amber price", "wrong": "two prices", "why": "Copies", "right": "one price" },
+  "captions": [
+    "Helpers remember now. Next, a customer saw the amber candle at two prices.",
+    "The labels keep an old copy of the price code, and that copy drops a zero.",
+    "You share the price code from one file and import it everywhere else.",
+    "The label, the sale label and the email write the amber price the same way.",
+    "One file holds the price code now, and every other file uses it from there."
+  ]
+}

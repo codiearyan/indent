@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Can the label say limited?", "note": "Twenty winter candles, ever." },
+    { "title": "Till", "text": "Stops with undefined after every payment." },
+    {
+      "title": "Your code",
+      "file": "candles.js",
+      "mine": true,
+      "gap": "No candle that sells itself",
+      "tasks": ["A card that sells", "A Candle class", "A limited edition", "Sell on payment"]
+    },
+    { "title": "Theo", "say": "Paid, and the stock went down." }
+  ],
+  "ticket": { "label": "Snow", "wrong": "till error", "why": "Lost this", "right": "sold, limited" },
+  "captions": [
+    "Errors make sense now. Next, Ines pours a winter edition of only twenty.",
+    "The till stops with an error about undefined every time a customer pays.",
+    "You give candles their own methods, write a class for them, and build one on it.",
+    "The snow candle sells when the payment comes in, and its label says limited.",
+    "Each candle carries what it can do, and the till sells from it without a crash."
+  ]
+}

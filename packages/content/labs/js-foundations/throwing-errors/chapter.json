@@ -1,0 +1,129 @@
+{
+  "id": "throwing-errors",
+  "title": "Errors of your own",
+  "files": ["src/orders.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the orders file here to see three carts go through, two of them with a mistake.",
+    "suggestedCommand": "node src/orders.js"
+  },
+  "tasks": [
+    {
+      "id": "quantity",
+      "title": "Refuse a quantity that makes no sense",
+      "file": "src/orders.js",
+      "description": "Under `// Task 1` in `src/orders.js`, make `lineTotal(candle, qty)` give what `qty` of the candle cost together, in cents. When `qty` is less than `1`, or not a whole number, it throws a `RangeError` whose message names the `qty` it was given.\n\nCheck calls `lineTotal` with good quantities and with wrong ones of its own, and looks at what it throws: an `Error`, of the kind `RangeError`, with the quantity in its message.",
+      "nextSteps": [
+        "Read the lesson's parts on throw and on picking the kind of error.",
+        "First ask whether `qty` is wrong, and throw when it is.",
+        "After that, return the price of one candle times `qty`.",
+        "Try `lineTotal(catalogue[0], 0)` at the bottom of the file and read what Node prints."
+      ],
+      "hints": [
+        "Check the quantity before working anything out. Once an error is thrown, nothing after it in the function runs.",
+        "A quantity is not whole when rounding it down changes it: `Math.floor(qty)` is not `qty`. Put the qty in the message with a template literal.",
+        "The function starts with ``if (qty < 1 || Math.floor(qty) !== qty) { throw new RangeError(`The quantity must be 1 or more, not ${qty}`) }``, then `return candle.priceCents * qty`."
+      ],
+      "docs": [
+        {
+          "title": "throw",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw"
+        },
+        {
+          "title": "RangeError",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "candle",
+      "title": "Refuse a candle the shop does not have",
+      "file": "src/orders.js",
+      "description": "Under `// Task 2`, make `findCandle(candles, sku)` give the candle of `candles` whose `sku` is `sku`. When there is none, it throws a `RangeError` whose message names the `sku` it was given.\n\nCheck calls `findCandle` with a list of its own, with skus that are in it and skus that are not, and an empty list, and looks at what it gives back or throws.",
+      "nextSteps": [
+        "Find the candle with the list method that gives back the first match.",
+        "Ask whether anything was found.",
+        "Throw when nothing was, and return the candle when something was.",
+        "Run the file: the last cart should now come back with a reason."
+      ],
+      "hints": [
+        "`find` gives back `undefined` when nothing matches. Returning that would let the order go on with no candle.",
+        "Ask about `undefined` after the `find`, and throw there, where the problem is found, with the sku in the message.",
+        "The body is `const candle = candles.find((c) => c.sku === sku)`, then ``if (candle === undefined) { throw new RangeError(`No candle with the sku ${sku}`) }``, then `return candle`."
+      ],
+      "docs": [
+        {
+          "title": "Error",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
+        },
+        {
+          "title": "Array.prototype.find()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cart",
+      "title": "Let a wrong line pass up",
+      "file": "src/orders.js",
+      "description": "Under `// Task 3`, make `cartTotal(candles, cart)` give what the whole cart costs, in cents: for each line, `findCandle` finds the candle and `lineTotal` works out the line, and the lines are added up. An empty cart costs `0`. When a line is wrong, the error that `findCandle` or `lineTotal` throws passes up out of `cartTotal` as it is: `cartTotal` does not catch it.\n\nCheck calls `cartTotal` with carts of its own, putting stand-ins in place of your `findCandle` and `lineTotal`, so this task does not depend on the two before it. A cart with a wrong line must end in the same error the stand-in threw.",
+      "nextSteps": [
+        "Read the lesson's part on where to catch.",
+        "Start a total at 0 and go through the lines with `for...of`.",
+        "For each line, find the candle, work out the line, and add it.",
+        "Return the total. There is no `try` in this function."
+      ],
+      "hints": [
+        "An error that nobody catches inside a function leaves it at once and goes on to whoever called it. That is exactly what this task wants.",
+        "Each line is `{ sku, qty }`. Hand `findCandle` the candles and the line's sku, then hand `lineTotal` what came back and the line's qty.",
+        "Inside `for (const line of cart)`, the line is `total = total + lineTotal(findCandle(candles, line.sku), line.qty)`."
+      ],
+      "docs": [
+        {
+          "title": "try...catch",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
+        },
+        {
+          "title": "for...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "order",
+      "title": "Answer the customer, and only the customer",
+      "file": "src/orders.js",
+      "description": "Under `// Task 4`, make `placeOrder(candles, cart)` call `cartTotal` with the candles and the cart. For a good cart it gives `{ ok: true, totalCents }` with the total. When `cartTotal` throws a `RangeError`, it gives `{ ok: false, reason }`, where `reason` is the error's message. Any other error is a mistake in the code, which the customer cannot fix: `placeOrder` lets it pass, as it is.\n\nCheck puts a stand-in in place of your `cartTotal` that gives a total, throws a `RangeError`, throws a `TypeError` or throws a plain `Error`, and looks at what `placeOrder` does with each.",
+      "nextSteps": [
+        "Read the lesson's part on telling one kind of error from another.",
+        "Call `cartTotal` inside `try`, and return the good answer from there.",
+        "In `catch`, ask whether the error is a `RangeError` and answer the customer when it is.",
+        "Throw every other error again, and run the file."
+      ],
+      "hints": [
+        "This is the one place with something to do about a mistake in the order: tell the customer what was wrong. A mistake in the code is not theirs to fix.",
+        "`error instanceof RangeError` asks whether the error is of that kind. For any other error, `throw error` sends the same error on, as if `placeOrder` had not caught it.",
+        "The shape is `try { return { ok: true, totalCents: cartTotal(candles, cart) } } catch (error) { if (error instanceof RangeError) { return { ok: false, reason: error.message } } throw error }`."
+      ],
+      "docs": [
+        {
+          "title": "try...catch",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
+        },
+        {
+          "title": "instanceof",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Throwing and catching errors",
+          "url": "https://www.youtube.com/watch?v=NwoAZF66_Go"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
