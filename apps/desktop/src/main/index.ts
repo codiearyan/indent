@@ -18,6 +18,7 @@ import * as telemetry from './services/telemetry'
 import * as updates from './services/updates'
 import * as reminders from './services/reminders'
 import { appWindows } from './ipc'
+import { perf } from './perf'
 import { seedContent } from './library'
 import { bundledContentDir, contentDir, usesLibrary } from './paths'
 import { PACKS_URL } from '@shared/packs'
@@ -50,7 +51,10 @@ function createWindow(route?: string): void {
     }
   })
 
-  mainWindow.on('ready-to-show', () => mainWindow.show())
+  mainWindow.on('ready-to-show', () => {
+    mainWindow.show()
+    perf('window shown', process.uptime() * 1000)
+  })
   // A page's window belongs to an issue open in this window.
   mainWindow.on('closed', preview.closeAll)
 
