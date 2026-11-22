@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "Why did the hours stay grey?",
+      "note": "She tried a few rules herself."
+    },
+    {
+      "title": "styles.css",
+      "text": "Her rules are there, but older ones win.",
+      "note": "Three changes do not show"
+    },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "Rules that clash",
+      "tasks": ["Brown h2 headings", "Hours in clay", "Set the font once", "Name the colours"]
+    },
+    {
+      "title": "Visit us",
+      "rows": [["14 Saddler Street"], ["Opening hours"], ["Email or call"]],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "Open hours",
+    "wrong": "still grey",
+    "why": "Rule loses",
+    "right": "in clay"
+  },
+  "captions": [
+    "Dilys changed the stylesheet herself, and wants to know why three changes did not show.",
+    "Her rules are in the file, but other rules beat them, so the hours stay grey.",
+    "You work out why each rule wins or loses, set the font once and name the colours.",
+    "The opening hours turn clay, and the rest of Visit us stays grey.",
+    "Same look Dilys wanted. Now every rule wins for a reason you can see."
+  ]
+}

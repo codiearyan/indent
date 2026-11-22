@@ -1,0 +1,23 @@
+body {
+  background-color: #f7f1e8;
+  color: #3b2f2a;
+  font-family: Georgia, serif;
+  font-size: 18px;
+}
+
+h1,
+h2 {
+  color: #a4492a;
+}
+
+.note {
+  background-color: #efdcc3;
+}
+
+#mug-of-the-month {
+  text-align: center;
+}
+
+nav a {
+  font-weight: bold;
+}

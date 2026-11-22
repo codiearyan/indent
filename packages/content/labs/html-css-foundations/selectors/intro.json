@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "Can the opening hours stand out?",
+      "note": "People miss them."
+    },
+    {
+      "title": "Home page",
+      "text": "Only a body rule, so it all looks alike.",
+      "note": "Nothing stands out"
+    },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "No way to pick one part",
+      "tasks": ["Group the headings", "A class for notes", "An id for the mug", "Links in the nav"]
+    },
+    {
+      "title": "Visit us",
+      "rows": [["14 Saddler Street"], ["Opening hours"], ["Email or call"]],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "Open hours",
+    "wrong": "missed",
+    "why": "All alike",
+    "right": "seen first"
+  },
+  "captions": [
+    "Dilys wants the opening hours, and a few other parts, to stand out.",
+    "Every rule so far is for the whole body, so everything looks the same.",
+    "You pick parts with grouped names, a class, an id and links inside the nav.",
+    "The opening hours sit on sand, and visitors see them first.",
+    "Same stylesheet, new rules. Now each part of the page can have its own look."
+  ]
+}
