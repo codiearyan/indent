@@ -7,6 +7,7 @@
   "tags": ["C++"],
   "kind": "foundations",
   "tools": ["node", "cpp"],
+  "format": 4,
   "parts": [
     {
       "title": "Off the paper slips",
