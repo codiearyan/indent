@@ -3,6 +3,7 @@ import type { ChapterDef } from '@shared/types'
 import { cliInvocation } from './cli'
 import {
   cleanCompletion,
+  COMPLETION_RULES,
   cleanTip,
   completionPrompt,
   completionTask,
@@ -250,6 +251,21 @@ describe('completions', () => {
     expect(
       cleanCompletion(Array.from({ length: 20 }, (_, i) => `l${i}`).join('\n')).split('\n')
     ).toHaveLength(6)
+  })
+
+  it('drops indentation the cursor already stands after', () => {
+    const reply = '  // Wait for the sailing first\n  const sailing = await get()'
+    expect(cleanCompletion(reply, 'function f() {\n  ')).toBe(
+      '// Wait for the sailing first\n  const sailing = await get()'
+    )
+    expect(cleanCompletion(reply, 'function f() {\n')).toBe(reply)
+    expect(cleanCompletion('  x', 'const a =  ')).toBe('  x')
+  })
+
+  it('asks every suggestion to explain itself in a comment, where a comment fits', () => {
+    expect(COMPLETION_RULES).toContain('explains itself in one short code comment')
+    expect(COMPLETION_RULES).toContain('like JSON')
+    expect(COMPLETION_RULES).not.toContain('no explanation')
   })
 
   it('puts the task and its failing checks above the file', () => {

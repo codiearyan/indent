@@ -266,7 +266,9 @@ export function withInstructions(system: string, prompt: string): string {
   return `<instructions>\n${system}\n</instructions>\n\n${prompt}`
 }
 
-export const COMPLETION_RULES = `You are an inline code completion engine in a learning app. Reply with only the code to insert at <cursor/>: no explanation, no markdown fences or backticks around it, no text that repeats what is already before or after the cursor. Insert at most a few lines, usually finishing the current line or statement. Never write a whole function body or a whole task answer in one go; the learner is practicing. If nothing useful fits, reply with nothing.
+export const COMPLETION_RULES = `You are an inline code completion engine in a learning app. Reply with only the text to insert at <cursor/>: no markdown fences or backticks around it, no text that repeats what is already before or after the cursor. Insert at most a few lines, usually finishing the current line or statement.
+
+The learner is here to learn, so every suggestion explains itself in one short code comment, in the file's own comment syntax: plain words, at most about twelve, saying why this step works or what it is for, never repeating the code in words. When the cursor is on an empty line, start with the comment on its own line, at the indentation of the code under it, then the code. When the code finishes a line already started, put the comment at the end of that line instead. Where a comment would break the code (inside a string, or in a file with no comments, like JSON), leave it out. Never write a whole function body or a whole task answer in one go; the learner is practicing. If nothing useful fits, reply with nothing.
 
 When a task is given, it is the one the learner is working on. Suggest only the next small step toward it from where the cursor is, one or two lines, and leave the rest to the learner. Never write code that would make the task pass on its own: no whole function body, no complete loop or calculation the task asks for. If checks are failing, a step may move toward what they name, but never fix all of it at once.`
 
@@ -310,8 +312,11 @@ export function completionPrompt(
 
 const MAX_COMPLETION_LINES = 6
 
-/** Strips fences and chatter models add anyway, and keeps the suggestion short. */
-export function cleanCompletion(raw: string): string {
+/**
+ * Strips fences and chatter models add anyway, and keeps the suggestion short. `prefix` is the
+ * text before the cursor: when its line is only indentation, a reply that repeats it is cut.
+ */
+export function cleanCompletion(raw: string, prefix = ''): string {
   let text = raw.replace(/^\s*```[\w-]*\n?/, '').replace(/\n?```\s*$/, '')
   // A one-line reply wrapped like inline code. Inside a fence the backticks are code, and so is
   // a template literal with ${}; both are left alone.
@@ -319,6 +324,8 @@ export function cleanCompletion(raw: string): string {
   const inline = /^\s*`([^`\n]+)`\s*$/.exec(text)
   if (inline && !fenced && !inline[1].includes('${')) text = inline[1]
   if (!text.trim()) return ''
+  const indent = prefix.slice(prefix.lastIndexOf('\n') + 1)
+  if (indent && !indent.trim() && text.startsWith(indent)) text = text.slice(indent.length)
   text = text.split('\n').slice(0, MAX_COMPLETION_LINES).join('\n')
   return text.replace(/\s+$/, '')
 }

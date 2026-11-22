@@ -315,7 +315,7 @@ async function complete(request: AiCompleteRequest): Promise<string> {
         text += delta
       }
     })
-    return cancel.signal.aborted ? '' : cleanCompletion(text)
+    return cancel.signal.aborted ? '' : cleanCompletion(text, String(request.prefix))
   } catch {
     return ''
   } finally {
@@ -472,6 +472,7 @@ export function register(): void {
   })
 
   listen('ai', {
-    cancel: (requestId) => chats.get(requestId)?.abort()
+    cancel: (requestId) => chats.get(requestId)?.abort(),
+    cancelComplete: () => completion?.abort()
   })
 }
