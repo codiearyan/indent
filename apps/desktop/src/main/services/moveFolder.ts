@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, rename, rm, rmdir } from 'fs/promises'
+import { cp, lstat, mkdir, readdir, rename, rm, rmdir, stat } from 'fs/promises'
 import { isAbsolute, join, relative, resolve } from 'path'
 
 const IGNORED = new Set(['.DS_Store', 'Thumbs.db', 'desktop.ini'])
@@ -51,7 +51,12 @@ export async function planMove(
  * any entry fails, everything already moved goes back and the copies are deleted, so the work
  * stays whole in `from`.
  */
-export async function moveEntries(from: string, to: string, names: string[]): Promise<void> {
+export async function moveEntries(
+  from: string,
+  to: string,
+  names: string[],
+  onCopied: (bytes: number) => void = () => {}
+): Promise<void> {
   await mkdir(to, { recursive: true })
   const renamed: string[] = []
   const copied: string[] = []
@@ -67,7 +72,13 @@ export async function moveEntries(from: string, to: string, names: string[]): Pr
         await cp(join(from, name), join(to, name), {
           recursive: true,
           verbatimSymlinks: true,
-          errorOnExist: true
+          errorOnExist: true,
+          // Called before each entry is copied: the one place a copy tells how far it is.
+          filter: async (source) => {
+            const info = await lstat(source)
+            if (info.isFile()) onCopied(info.size)
+            return true
+          }
         })
         copied.push(name)
         copying = null
@@ -128,29 +139,68 @@ export async function reposIn(root: string): Promise<{ labId: string; issues: nu
   return repos.filter((repo) => repo.issues > 0)
 }
 
+/** Bytes of the files under `path`, links not followed. */
+export async function sizeOf(path: string): Promise<number> {
+  const info = await lstat(path).catch(() => null)
+  if (!info) return 0
+  if (!info.isDirectory()) return info.isFile() ? info.size : 0
+  const sizes = await Promise.all((await readdir(path)).map((name) => sizeOf(join(path, name))))
+  return sizes.reduce((sum, size) => sum + size, 0)
+}
+
+export interface RepoMoveProgress {
+  /** The repo moving now; null while measuring and while the repo tools move. */
+  labId: string | null
+  /** Repos already moved. */
+  done: number
+  measuring: boolean
+  /** Bytes copied so far and in all; both 0 on the same drive, where a move is a quick rename. */
+  bytes: number
+  totalBytes: number
+}
+
 /**
  * Moves the repo tools and then the repos `labIds` from `from` to `to`, each repo whole or not at
  * all. Stops at the first repo that fails: the repos before it are in `to`, it and the rest stay
- * in `from`. A failure to move the tools moves nothing.
+ * in `from`. A failure to move the tools moves nothing. Onto another drive the files are copied,
+ * so their size is measured first to report progress in bytes.
  */
 export async function moveRepos(
   from: string,
   to: string,
   labIds: string[],
-  onRepo: (labId: string | null, done: number) => void = () => {}
+  onProgress: (progress: RepoMoveProgress) => void = () => {}
 ): Promise<{ moved: string[]; failed: { labId: string; error: unknown } | null }> {
-  onRepo(null, 0)
+  await mkdir(to, { recursive: true })
   const present = await entriesOf(from)
-  await moveEntries(
-    from,
-    to,
-    RUNTIME_ENTRIES.filter((name) => present.includes(name))
-  )
+  const tools = RUNTIME_ENTRIES.filter((name) => present.includes(name))
+  const copying = (await stat(from)).dev !== (await stat(to)).dev
+  const progress: RepoMoveProgress = {
+    labId: null,
+    done: 0,
+    measuring: copying,
+    bytes: 0,
+    totalBytes: 0
+  }
+  onProgress({ ...progress })
+  if (copying) {
+    const sizes = await Promise.all([...tools, ...labIds].map((name) => sizeOf(join(from, name))))
+    progress.totalBytes = sizes.reduce((sum, size) => sum + size, 0)
+    progress.measuring = false
+    onProgress({ ...progress })
+  }
+  const onCopied = (bytes: number): void => {
+    progress.bytes = Math.min(progress.bytes + bytes, progress.totalBytes)
+    onProgress({ ...progress })
+  }
+  await moveEntries(from, to, tools, onCopied)
   const moved: string[] = []
   for (const labId of labIds) {
-    onRepo(labId, moved.length)
+    progress.labId = labId
+    progress.done = moved.length
+    onProgress({ ...progress })
     try {
-      await moveEntries(from, to, [labId])
+      await moveEntries(from, to, [labId], onCopied)
       moved.push(labId)
     } catch (error) {
       return { moved, failed: { labId, error } }

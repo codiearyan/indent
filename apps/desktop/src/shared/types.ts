@@ -302,10 +302,16 @@ export interface RepoInFolder {
 }
 
 export interface FolderMoveProgress {
+  /** The repo moving now; null while measuring and while the repo tools move first. */
+  labId: string | null
+  /** Repos already moved, of `total`. */
   done: number
   total: number
-  /** The repo moving now; null while the repo tools move first. */
-  labId: string | null
+  /** Adding up the size of the work before copying it to another drive. */
+  measuring: boolean
+  /** Bytes copied so far and in all; both 0 on the same drive, where a move is a quick rename. */
+  bytes: number
+  totalBytes: number
 }
 
 export interface FolderMoveResult {

@@ -149,10 +149,16 @@ async function moveRoot(labIds: string[]): Promise<FolderMoveResult> {
     // Shells running inside the old folder would keep it busy and lose their place.
     if (chosen.length) killAll()
     const total = chosen.length
+    let sent = { at: 0, labId: '' as string | null, measuring: true }
     const { moved, failed } = chosen.length
-      ? await moveRepos(current, next, chosen, (labId, done) =>
-          emit(EVENTS.folderMove, { labId, done, total } satisfies FolderMoveProgress)
-        ).catch((error: unknown) => {
+      ? await moveRepos(current, next, chosen, (progress) => {
+          // A copy reports every file; the window needs a few updates a second, and every change of step.
+          const now = Date.now()
+          const step = progress.labId !== sent.labId || progress.measuring !== sent.measuring
+          if (!step && now - sent.at < 120) return
+          sent = { at: now, labId: progress.labId, measuring: progress.measuring }
+          emit(EVENTS.folderMove, { ...progress, total } satisfies FolderMoveProgress)
+        }).catch((error: unknown) => {
           throw new Error(plainError(error))
         })
       : { moved: [], failed: null }

@@ -9,8 +9,8 @@ import { useWorkspace } from '@/stores/workspace'
 export interface WorkspaceRoot {
   root: string | null
   moving: boolean
-  /** Which repo is moving, once the move has started. */
-  progress: FolderMoveProgress | null
+  /** How far the move is, once it has started; `elapsedMs` counts from the first copied byte. */
+  progress: (FolderMoveProgress & { elapsedMs: number }) | null
   /** Why the last pick or move failed, shown next to the folder until the next try. */
   error: string | null
   /** A picked folder waiting for the person to confirm. */
@@ -31,7 +31,7 @@ export const repoTitle = (labId: string): string =>
 export function useWorkspaceRoot(): WorkspaceRoot {
   const [root, setRoot] = useState<string | null>(null)
   const [moving, setMoving] = useState(false)
-  const [progress, setProgress] = useState<FolderMoveProgress | null>(null)
+  const [progress, setProgress] = useState<WorkspaceRoot['progress']>(null)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState<FolderMove | null>(null)
   const [selected, setSelected] = useState<string[]>([])
@@ -40,7 +40,14 @@ export function useWorkspaceRoot(): WorkspaceRoot {
     void api.workspace.getRoot().then(setRoot)
   }, [])
 
-  useEffect(() => (moving ? api.workspace.onMoveProgress(setProgress) : undefined), [moving])
+  useEffect(() => {
+    if (!moving) return
+    let started: number | null = null
+    return api.workspace.onMoveProgress((next) => {
+      if (started === null && next.totalBytes > 0 && !next.measuring) started = Date.now()
+      setProgress({ ...next, elapsedMs: started === null ? 0 : Date.now() - started })
+    })
+  }, [moving])
 
   const change = async (): Promise<void> => {
     setError(null)

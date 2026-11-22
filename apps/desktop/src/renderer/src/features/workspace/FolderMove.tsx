@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
+import { formatBytes, timeLeft } from './moveProgress'
 import { repoTitle, type WorkspaceRoot } from './useWorkspaceRoot'
 
 /** What a new folder must be, or why the last pick failed. Sits under the folder's path. */
@@ -103,18 +104,7 @@ export function MoveFolderDialog({ folder }: { folder: WorkspaceRoot }): React.J
           </section>
         )}
         {moving && progress ? (
-          <div role="status" className="space-y-2">
-            <p className="text-[13px] text-muted-foreground tabular-nums">
-              {progress.labId
-                ? `Moving ${repoTitle(progress.labId)}, ${progress.done + 1} of ${progress.total}`
-                : 'Moving the repo tools'}
-            </p>
-            <Progress
-              aria-label="Moving your work"
-              value={progress.labId ? (progress.done / progress.total) * 100 : 0}
-              className={cn('h-1.5', !progress.labId && 'motion-safe:animate-pulse')}
-            />
-          </div>
+          <MoveStatus progress={progress} />
         ) : (
           repos.length > 0 && (
             <p className="text-[13px] text-muted-foreground">
@@ -151,5 +141,42 @@ export function MoveFolderDialog({ folder }: { folder: WorkspaceRoot }): React.J
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  )
+}
+
+function MoveStatus({
+  progress
+}: {
+  progress: NonNullable<WorkspaceRoot['progress']>
+}): React.JSX.Element {
+  const { labId, done, total, measuring, bytes, totalBytes, elapsedMs } = progress
+  const copying = totalBytes > 0
+  const step = measuring
+    ? 'Measuring your work'
+    : labId
+      ? `Moving ${repoTitle(labId)}, ${done + 1} of ${total}`
+      : 'Moving the repo tools'
+  const value = measuring ? 0 : copying ? (bytes / totalBytes) * 100 : (done / total) * 100
+  return (
+    <div role="status" className="space-y-2">
+      <div className="flex items-baseline justify-between gap-4 text-[13px]">
+        <p className="min-w-0 truncate">{step}</p>
+        {copying && (
+          <p className="shrink-0 text-muted-foreground tabular-nums">
+            {formatBytes(bytes)} of {formatBytes(totalBytes)}
+          </p>
+        )}
+      </div>
+      <Progress
+        aria-label="Moving your work"
+        value={value}
+        className={cn('h-1.5', measuring && 'motion-safe:animate-pulse')}
+      />
+      {copying && (
+        <p className="text-[13px] text-muted-foreground tabular-nums">
+          {timeLeft(bytes, totalBytes, elapsedMs) ?? 'Working out the time left'}
+        </p>
+      )}
+    </div>
   )
 }

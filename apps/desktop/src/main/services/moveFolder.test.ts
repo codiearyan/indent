@@ -12,7 +12,8 @@ import {
   moveContents,
   moveRepos,
   planMove,
-  reposIn
+  reposIn,
+  sizeOf
 } from './moveFolder'
 
 async function tempDir(): Promise<string> {
@@ -159,9 +160,10 @@ describe('moveRepos', () => {
     const to = join(base, 'new')
     const seen: (string | null)[] = []
 
-    const result = await moveRepos(from, to, ['a-lab', 'c-lab'], (labId) => seen.push(labId))
+    const result = await moveRepos(from, to, ['a-lab', 'c-lab'], (p) => seen.push(p.labId))
 
     expect(result).toEqual({ moved: ['a-lab', 'c-lab'], failed: null })
+    // The same drive: renames, nothing to measure.
     expect(seen).toEqual([null, 'a-lab', 'c-lab'])
     expect(await readFile(join(to, 'a-lab', 'two', 'index.js'), 'utf8')).toBe('a-lab two')
     expect(existsSync(join(to, 'node_modules', 'vitest'))).toBe(true)
@@ -217,5 +219,15 @@ describe('clearIfNoWork', () => {
     await writeFile(join(root, 'package.json'), '{}')
     expect(await clearIfNoWork(root)).toBe(true)
     expect(existsSync(root)).toBe(false)
+  })
+})
+
+describe('sizeOf', () => {
+  it('adds up the files under a folder', async () => {
+    const root = await workFolder(await tempDir())
+    // Four index.js files of 9 bytes ('a-lab one' and so on) and package.json of 2.
+    expect(await sizeOf(join(root, 'a-lab'))).toBe(18)
+    expect(await sizeOf(root)).toBe(38)
+    expect(await sizeOf(join(root, 'missing'))).toBe(0)
   })
 })
