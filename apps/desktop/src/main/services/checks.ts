@@ -213,7 +213,7 @@ async function runCheck(
   const starterDir = join(chapterContentDir(labId, chapterId), 'starter')
   const missing = chapter.movesFiles
     ? []
-    : await findMissing(starterDir, workspaceDir(labId, chapterId))
+    : await findMissing(starterDir, workspaceDir(labId, chapterId), chapter.files)
   if (missing.length > 0) {
     return { results: [], progress: await getProgress() }
   }

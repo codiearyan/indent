@@ -35,6 +35,7 @@ api.checks.onRuntime = subscribe(EVENTS.runtime)
 api.workspace.onMoveProgress = subscribe(EVENTS.folderMove)
 api.tools.onInstallProgress = subscribe(EVENTS.toolInstall)
 api.updates.onStatus = subscribe(EVENTS.update)
+api.preview.onWindow = subscribe(EVENTS.previewWindow)
 
 contextBridge.exposeInMainWorld('platform', process.platform)
 contextBridge.exposeInMainWorld('api', api)

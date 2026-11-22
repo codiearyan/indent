@@ -31,3 +31,8 @@ export function previewTarget(url: string): { labId: string; chapterId: string; 
     path: decodeURIComponent(pathname).replace(/^\/+/, '') || 'index.html'
   }
 }
+
+/** The page's own window, shown to the Browser panel of its issue. */
+export type PreviewWindowEvent = { labId: string; chapterId: string } & (
+  { type: 'console'; lines: PreviewMessage[] } | { type: 'closed' }
+)

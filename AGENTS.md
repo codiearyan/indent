@@ -291,6 +291,17 @@ file is bundled on request with the runtime's esbuild, so a React issue loads
 uncaught errors of the page show in the panel's console. The page is the learner's code: it runs in
 a sandboxed frame on its own origin and never sees `window.api`.
 
+The panel has three ways to give the page more room, all served by the same `serve()` in
+`preview.ts` so they never behave differently. Expand lays the panel over the sheet without moving
+the frame, so the page keeps running. Open in a window opens one sandboxed window per issue on the
+same `indent-preview:` address: no preload, links to other sites go to the system browser, its
+console reaches the panel's, and the panel shows a short line instead of running the page twice.
+Open in browser serves the issue on `http://127.0.0.1:<random port>` with a fresh token per issue
+(`previewLogic.ts` holds the checks: exact Host, GET and HEAD only, the token from the address or
+a SameSite cookie); the page reloads after a save through an `EventSource`. Leaving the issue,
+resetting it or closing the app closes the window and stops the server. `ipc.ts` keeps page windows
+out of `emit()` and `appWindows()`.
+
 Checks open the same page without a browser. `const page = await t.page()` (`kit/page.mjs`) loads
 it into a headless DOM, runs its scripts and returns `document`, `$`, `$$`, `text`, `click`, `type`,
 `press`, `submit`, `settle`, `errors`, `logs`, `reloads` and `style(target, { width })`. `style`

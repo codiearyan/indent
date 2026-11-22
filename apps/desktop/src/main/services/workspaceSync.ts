@@ -48,9 +48,9 @@ async function remember(dir: string, starter: Files): Promise<void> {
   await writeFile(rememberedFile(dir), JSON.stringify(starter, null, 2))
 }
 
-async function readStarter(starterDir: string): Promise<Files> {
+async function readStarter(starterDir: string, first: string[]): Promise<Files> {
   if (!existsSync(starterDir)) return {}
-  const files = await readWorkspace(starterDir, [])
+  const files = await readWorkspace(starterDir, first)
   return Object.fromEntries(files.map((f) => [f.path, f.content]))
 }
 
@@ -108,8 +108,12 @@ async function snapshot(
 }
 
 /** Starter files that are gone from the workspace, deleted or renamed by the learner. */
-export async function findMissing(starterDir: string, dir: string): Promise<string[]> {
-  return missingFiles(dir, (await readRemembered(dir)) ?? (await readStarter(starterDir)))
+export async function findMissing(
+  starterDir: string,
+  dir: string,
+  first: string[]
+): Promise<string[]> {
+  return missingFiles(dir, (await readRemembered(dir)) ?? (await readStarter(starterDir, first)))
 }
 
 /**
@@ -121,7 +125,7 @@ export async function openWorkspace(
   dir: string,
   first: string[]
 ): Promise<WorkspaceSnapshot> {
-  const next = await readStarter(starterDir)
+  const next = await readStarter(starterDir, first)
   if (!existsSync(dir)) {
     await copyStarter(starterDir, dir)
     await remember(dir, next)
@@ -148,7 +152,7 @@ export async function resetWorkspace(
   first: string[]
 ): Promise<WorkspaceSnapshot> {
   const old = await readRemembered(dir)
-  const next = await readStarter(starterDir)
+  const next = await readStarter(starterDir, first)
   if (!old) await emptyDir(dir)
   else {
     for (const path of Object.keys(old)) {
@@ -166,7 +170,7 @@ export async function restoreMissing(
   dir: string,
   first: string[]
 ): Promise<WorkspaceSnapshot> {
-  for (const path of missingFiles(dir, await readStarter(starterDir))) {
+  for (const path of missingFiles(dir, await readStarter(starterDir, first))) {
     await takeFromStarter(starterDir, dir, path)
   }
   return openWorkspace(starterDir, dir, first)
@@ -185,7 +189,7 @@ export async function resolveConflict(
 ): Promise<WorkspaceSnapshot> {
   if (!isSafePath(dir, path)) throw new Error(`Not a file of this issue: ${path}`)
   const old = await readRemembered(dir)
-  const next = await readStarter(starterDir)
+  const next = await readStarter(starterDir, first)
   const mine = await readMine(dir, [path])
   const pick = (files: Files | null): Files =>
     files && Object.hasOwn(files, path) ? { [path]: files[path] } : {}

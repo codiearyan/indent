@@ -42,6 +42,7 @@ export const SHORTCUTS = {
   toggleTerminal: { label: 'Show or hide the terminal', keys: 'Mod+J', scope: 'workspace' },
   toggleFiles: { label: 'Show or hide the file list', keys: 'Mod+B', scope: 'workspace' },
   toggleFocusMode: { label: 'Focus mode', keys: '', scope: 'workspace' },
+  expandBrowser: { label: 'Expand or collapse the page', keys: '', scope: 'workspace' },
   nextIssue: { label: 'Next issue', keys: '', scope: 'workspace' },
   previousIssue: { label: 'Previous issue', keys: '', scope: 'workspace' },
   openTutor: { label: 'Show or hide the tutor', keys: 'Mod+Shift+T', scope: 'workspace' },
