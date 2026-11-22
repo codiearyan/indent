@@ -10,7 +10,7 @@ export type Theme = 'dark' | 'light'
 export type Appearance = Theme | 'system'
 export type EditorOption = 'wordWrap' | 'lineNumbers' | 'minimap' | 'vim'
 export type TextZone = 'lesson' | 'tasks' | 'editor' | 'terminal'
-export type PanelKey = 'files' | 'terminal' | 'chat' | 'zen' | 'browser'
+export type PanelKey = 'files' | 'terminal' | 'chat' | 'zen' | 'browser' | 'focusTasks'
 export type LeftTab = 'insights' | 'tasks' | 'resources'
 export type LearnFirst = 'reading' | 'videos'
 export type Experience = 'new' | 'some' | 'experienced'
@@ -53,7 +53,10 @@ export interface SettingsState {
   /** 1 = 100%. Lesson and tasks scale through CSS; editor and terminal multiply their font size. */
   textScale: Record<TextZone, number>
   typography: Typography
-  /** Which optional panels are showing. `zen` hides everything but the editor. */
+  /**
+   * Which optional panels are showing. `zen` hides everything but the editor; `focusTasks` is the
+   * task card it shows open rather than collapsed to a pill.
+   */
   panels: Record<PanelKey, boolean>
   lessonSide: 'left' | 'right'
   leftTab: LeftTab
@@ -121,7 +124,8 @@ const defaultPanels: Record<PanelKey, boolean> = {
   terminal: false,
   chat: false,
   zen: false,
-  browser: true
+  browser: true,
+  focusTasks: true
 }
 
 const defaultEditor: Record<EditorOption, boolean> = {

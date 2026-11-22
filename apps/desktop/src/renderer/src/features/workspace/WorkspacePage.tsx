@@ -19,6 +19,7 @@ import { useCatalog } from '@/stores/catalog'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { RepoNotice } from './RepoNotice'
+import { FocusTasks } from './FocusTasks'
 import { useWorkspaceShortcuts } from './useWorkspaceShortcuts'
 import { useActivePaneTracking, type PaneId } from './activePane'
 
@@ -41,6 +42,7 @@ export function WorkspacePage(): React.JSX.Element {
   const browser = useWorkspace((s) => Boolean(s.chapter?.preview)) && panels.browser
   const browserExpanded = useWorkspace((s) => s.browserExpanded) && browser
   const status = useWorkspace((s) => s.status)
+  const chapter = useWorkspace((s) => s.chapter)
   const downloading = useCatalog((s) => !!labId && s.downloads[labId]?.state === 'running')
   // The sheet shows the repo's download, work left in an earlier folder, or why the issue could
   // not open.
@@ -180,6 +182,15 @@ export function WorkspacePage(): React.JSX.Element {
               </Panel>
             )}
           </Group>
+        )}
+        {panels.zen && !companion && !notice && chapter && status === 'ready' && (
+          // In the lesson's corner, just above the terminal's header so its toggle stays free.
+          <div
+            className={cn('absolute z-10', lessonSide === 'left' ? 'left-3' : 'right-3')}
+            style={{ bottom: TERMINAL_HEADER_PX + 12 }}
+          >
+            <FocusTasks chapter={chapter} />
+          </div>
         )}
       </div>
       <Tour />
