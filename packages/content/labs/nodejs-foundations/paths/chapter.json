@@ -1,7 +1,12 @@
 {
   "id": "paths",
   "title": "Where a script runs from",
-  "files": ["where.js", "water-total.js", "file-info.js", "water/readings.txt"],
+  "files": [
+    "where.js",
+    "water-total.js",
+    "file-info.js",
+    "water/readings.txt"
+  ],
   "terminal": {
     "description": "A terminal in your workspace. `node where.js` runs your script from here; `cd water` and then `node ../where.js` runs the same script from the water folder, and `cd ..` comes back.",
     "suggestedCommand": "node where.js"
@@ -24,9 +29,18 @@
         "`console.log(`Run from: ${process.cwd()}`)` and `console.log(`Script in: ${import.meta.dirname}`)`."
       ],
       "docs": [
-        { "title": "process.cwd()", "url": "https://nodejs.org/api/process.html#processcwd" },
-        { "title": "import.meta.dirname", "url": "https://nodejs.org/api/esm.html#importmetadirname" },
-        { "title": "No __filename or __dirname", "url": "https://nodejs.org/api/esm.html#no-__filename-or-__dirname" }
+        {
+          "title": "process.cwd()",
+          "url": "https://nodejs.org/api/process.html#processcwd"
+        },
+        {
+          "title": "import.meta.dirname",
+          "url": "https://nodejs.org/api/esm.html#importmetadirname"
+        },
+        {
+          "title": "No __filename or __dirname",
+          "url": "https://nodejs.org/api/esm.html#no-__filename-or-__dirname"
+        }
       ],
       "points": 10
     },
@@ -47,9 +61,24 @@
         "`const text = await readFile(join(import.meta.dirname, 'water', 'readings.txt'), 'utf8')`, then sum `Number(line.split(',')[2])` over the lines."
       ],
       "docs": [
-        { "title": "path.join()", "url": "https://nodejs.org/api/path.html#pathjoinpaths" },
-        { "title": "import.meta.dirname", "url": "https://nodejs.org/api/esm.html#importmetadirname" },
-        { "title": "Windows and POSIX paths", "url": "https://nodejs.org/api/path.html#windows-vs-posix" }
+        {
+          "title": "path.join()",
+          "url": "https://nodejs.org/api/path.html#pathjoinpaths"
+        },
+        {
+          "title": "import.meta.dirname",
+          "url": "https://nodejs.org/api/esm.html#importmetadirname"
+        },
+        {
+          "title": "Windows and POSIX paths",
+          "url": "https://nodejs.org/api/path.html#windows-vs-posix"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Working with paths in the path module",
+          "url": "https://www.youtube.com/watch?v=Jmdasmnlm8U"
+        }
       ],
       "points": 10
     },
@@ -70,9 +99,18 @@
         "`console.log(`Full path: ${resolve(typed)}`)`, then `basename(typed)` and `extname(typed) || 'none'`."
       ],
       "docs": [
-        { "title": "path.resolve()", "url": "https://nodejs.org/api/path.html#pathresolvepaths" },
-        { "title": "path.basename()", "url": "https://nodejs.org/api/path.html#pathbasenamepath-suffix" },
-        { "title": "path.extname()", "url": "https://nodejs.org/api/path.html#pathextnamepath" }
+        {
+          "title": "path.resolve()",
+          "url": "https://nodejs.org/api/path.html#pathresolvepaths"
+        },
+        {
+          "title": "path.basename()",
+          "url": "https://nodejs.org/api/path.html#pathbasenamepath-suffix"
+        },
+        {
+          "title": "path.extname()",
+          "url": "https://nodejs.org/api/path.html#pathextnamepath"
+        }
       ],
       "points": 10
     }

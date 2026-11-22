@@ -1,7 +1,12 @@
 {
   "id": "reading-files",
   "title": "Reading a file",
-  "files": ["show.js", "count-plots.js", "holder.js", "plots.txt"],
+  "files": [
+    "show.js",
+    "count-plots.js",
+    "holder.js",
+    "plots.txt"
+  ],
   "terminal": {
     "description": "A terminal in your workspace. `node show.js plots.txt` runs your script on the plot list, and `node try.js show.js nope.txt` shows the streams and the exit code for a file that is not there.",
     "suggestedCommand": "node show.js plots.txt"
@@ -24,8 +29,20 @@
         "`const text = await readFile(process.argv[2], 'utf8')`, then print `text`."
       ],
       "docs": [
-        { "title": "fsPromises.readFile()", "url": "https://nodejs.org/api/fs.html#fspromisesreadfilepath-options" },
-        { "title": "Modules: node: imports", "url": "https://nodejs.org/api/esm.html#node-imports" }
+        {
+          "title": "fsPromises.readFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesreadfilepath-options"
+        },
+        {
+          "title": "Modules: node: imports",
+          "url": "https://nodejs.org/api/esm.html#node-imports"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading and writing files with fs",
+          "url": "https://www.youtube.com/watch?v=U57kU311-nE"
+        }
       ],
       "points": 10
     },
@@ -46,7 +63,10 @@
         "In the `catch`: `if (error.code !== 'ENOENT') throw error`, then `console.error(...)` with the file name and `process.exitCode = 1`."
       ],
       "docs": [
-        { "title": "Common system errors", "url": "https://nodejs.org/api/errors.html#common-system-errors" },
+        {
+          "title": "Common system errors",
+          "url": "https://nodejs.org/api/errors.html#common-system-errors"
+        },
         {
           "title": "try...catch",
           "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
@@ -75,7 +95,10 @@
           "title": "String.prototype.split()",
           "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split"
         },
-        { "title": "fsPromises.readFile()", "url": "https://nodejs.org/api/fs.html#fspromisesreadfilepath-options" }
+        {
+          "title": "fsPromises.readFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesreadfilepath-options"
+        }
       ],
       "points": 10
     },
@@ -100,7 +123,10 @@
           "title": "Array.prototype.find()",
           "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find"
         },
-        { "title": "process.argv", "url": "https://nodejs.org/api/process.html#processargv" }
+        {
+          "title": "process.argv",
+          "url": "https://nodejs.org/api/process.html#processargv"
+        }
       ],
       "points": 10
     }

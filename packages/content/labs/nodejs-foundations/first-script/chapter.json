@@ -36,6 +36,12 @@
           "url": "https://nodejs.org/api/console.html#consolelogdata-args"
         }
       ],
+      "videos": [
+        {
+          "title": "What Node is, in a few steps",
+          "url": "https://www.youtube.com/watch?v=ENrzD9HAZK4"
+        }
+      ],
       "points": 10
     },
     {
@@ -126,6 +132,12 @@
         {
           "title": "Number.isNaN()",
           "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Command line arguments with process.argv",
+          "url": "https://www.youtube.com/watch?v=UUhqbcBs0-g"
         }
       ],
       "points": 10

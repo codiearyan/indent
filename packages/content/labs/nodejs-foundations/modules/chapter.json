@@ -1,7 +1,12 @@
 {
   "id": "modules",
   "title": "Modules and package.json",
-  "files": ["plots.js", "free-plots.js", "version.js", "package.json"],
+  "files": [
+    "plots.js",
+    "free-plots.js",
+    "version.js",
+    "package.json"
+  ],
   "terminal": {
     "description": "A terminal in your workspace. `node free-plots.js` lists the free plots once `plots.js` does the reading, and `node free-plots.js --row B` lists the free plots of row B.",
     "suggestedCommand": "node free-plots.js"
@@ -11,7 +16,7 @@
       "id": "module",
       "title": "Read the plot list in one module",
       "file": "plots.js",
-      "description": "Write `plots.js` as a module that exports one async function, `readPlots(file)`. It reads the plot list at the path `file` and gives back an array with one object per plot, in the order of the file:\n\n```js\n[\n  { plot: 'A1', holder: 'Maud Pask' },\n  { plot: 'A3', holder: null }\n]\n```\n\nA free plot has `holder: null`. Blank lines are not plots, and a list saved on Windows reads the same. `plots.js` prints nothing itself: the scripts that import it decide what to print.\n\nCheck imports `readPlots` from your `plots.js` in a script of its own, calls it on two lists of its own, and compares what it gives back.",
+      "description": "Write `plots.js` as a module that exports one async function, `readPlots(file)`. It reads the plot list at the path `file` and gives back an array with one object per plot, in the order of the file:\n\n```js\n[\n  { plot: 'A1', holder: 'Maud Pask' },\n  { plot: 'A3', holder: null }\n]\n```\n\nA free plot has `holder: null`. Blank lines are not plots, and a list saved on Windows reads the same. Leave the printing to the scripts that import `plots.js`: they decide what to say.\n\nCheck imports `readPlots` from your `plots.js` in a script of its own, calls it on two lists of its own, and compares what it gives back.",
       "nextSteps": [
         "Import `readFile` at the top of `plots.js`.",
         "Write `readPlots(file)` and put `export` in front of it.",
@@ -28,8 +33,20 @@
           "title": "export",
           "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export"
         },
-        { "title": "Modules: ECMAScript modules", "url": "https://nodejs.org/api/esm.html" },
-        { "title": "fsPromises.readFile()", "url": "https://nodejs.org/api/fs.html#fspromisesreadfilepath-options" }
+        {
+          "title": "Modules: ECMAScript modules",
+          "url": "https://nodejs.org/api/esm.html"
+        },
+        {
+          "title": "fsPromises.readFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesreadfilepath-options"
+        }
+      ],
+      "videos": [
+        {
+          "title": "CommonJS and ES modules in Node",
+          "url": "https://www.youtube.com/watch?v=4N00XnEcNWE"
+        }
       ],
       "points": 10
     },
@@ -50,7 +67,10 @@
         "`const free = plots.filter((p) => p.holder === null)`, then print `free.map((p) => p.plot).join('\\n')`."
       ],
       "docs": [
-        { "title": "Mandatory file extensions", "url": "https://nodejs.org/api/esm.html#mandatory-file-extensions" },
+        {
+          "title": "Mandatory file extensions",
+          "url": "https://nodejs.org/api/esm.html#mandatory-file-extensions"
+        },
         {
           "title": "import",
           "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import"
@@ -75,9 +95,18 @@
         "`const pkg = JSON.parse(await readFile(join(import.meta.dirname, 'package.json'), 'utf8'))`, then print `${pkg.name} ${pkg.version}`."
       ],
       "docs": [
-        { "title": "package.json: the type field", "url": "https://nodejs.org/api/packages.html#type" },
-        { "title": "package.json fields", "url": "https://docs.npmjs.com/cli/configuring-npm/package-json" },
-        { "title": "JSON modules", "url": "https://nodejs.org/api/esm.html#json-modules" }
+        {
+          "title": "package.json: the type field",
+          "url": "https://nodejs.org/api/packages.html#type"
+        },
+        {
+          "title": "package.json fields",
+          "url": "https://docs.npmjs.com/cli/configuring-npm/package-json"
+        },
+        {
+          "title": "JSON modules",
+          "url": "https://nodejs.org/api/esm.html#json-modules"
+        }
       ],
       "points": 10
     },
@@ -98,8 +127,14 @@
         "Wrap the `parseArgs` call in `try`; in the `catch`, `console.error(error.message)` and `process.exitCode = 1`. Then filter with `p.plot.startsWith(row)`."
       ],
       "docs": [
-        { "title": "util.parseArgs()", "url": "https://nodejs.org/api/util.html#utilparseargsconfig" },
-        { "title": "ERR_PARSE_ARGS_UNKNOWN_OPTION", "url": "https://nodejs.org/api/errors.html#err_parse_args_unknown_option" }
+        {
+          "title": "util.parseArgs()",
+          "url": "https://nodejs.org/api/util.html#utilparseargsconfig"
+        },
+        {
+          "title": "ERR_PARSE_ARGS_UNKNOWN_OPTION",
+          "url": "https://nodejs.org/api/errors.html#err_parse_args_unknown_option"
+        }
       ],
       "points": 10
     }

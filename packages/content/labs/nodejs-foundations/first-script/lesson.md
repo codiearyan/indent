@@ -53,7 +53,7 @@ if (crop === undefined) {
 }
 ```
 
-Each shell shows the exit code its own way, so this repo gives you a small helper. `node try.js sow.js` runs `sow.js` for you and shows what went to standard output, what went to standard error, and the exit code. You do not need to read how it works yet.
+Each shell shows the exit code its own way, so this repo gives you a small helper. `node try.js sow.js` runs `sow.js` for you and shows what went to standard output, what went to standard error, and the exit code.
 
 ## Your work in this issue
 
