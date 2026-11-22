@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs'
-import { delimiter, dirname } from 'path'
-import { dataFile, ownNodeBin } from './paths'
+import { delimiter, dirname, join } from 'path'
+import { dataFile, ownNodeBin, python3ShimDir } from './paths'
 import { freshWindowsPath, regPath } from './windowsPath'
 import { run } from './run'
 
@@ -79,8 +79,9 @@ export async function shellEnv(): Promise<Record<string, string>> {
   for (const [key, value] of Object.entries(process.env)) {
     if (value !== undefined && !key.startsWith('ELECTRON_')) env[key] = value
   }
-  const first = firstNodeDir()
-  env.PATH = first ? `${first}${delimiter}${await shellPath}` : await shellPath
+  // The shim goes before the Store's `python3`, which only opens the Store.
+  const shim = existsSync(join(python3ShimDir(), 'python3.cmd')) ? python3ShimDir() : null
+  env.PATH = [firstNodeDir(), shim, await shellPath].filter(Boolean).join(delimiter)
   return env
 }
 

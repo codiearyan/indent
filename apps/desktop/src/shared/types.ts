@@ -5,8 +5,8 @@ import type { PreviewWindowEvent } from './preview'
 // ---------- Content ----------
 
 /** A development tool a repo can need on the learner's computer. */
-export type ToolId = 'node' | 'git'
-export const TOOL_IDS: ToolId[] = ['node', 'git']
+export type ToolId = 'node' | 'git' | 'python' | 'java' | 'cpp'
+export const TOOL_IDS: ToolId[] = ['node', 'git', 'python', 'java', 'cpp']
 
 /** content/labs/<labId>/lab.json */
 /**

@@ -119,6 +119,11 @@ export function ownNodeBin(): string {
   return process.platform === 'win32' ? ownNodeDir() : join(ownNodeDir(), 'bin')
 }
 
+/** On Windows, the folder of the `python3` the app adds when Python has only `python`. */
+export function python3ShimDir(): string {
+  return join(toolsDir(), 'python3')
+}
+
 /** The app's own copy of OpenCode, for learners with no AI set up; found only by the app. */
 export function ownOpencodeDir(): string {
   return join(toolsDir(), 'opencode')

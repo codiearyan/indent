@@ -1,8 +1,8 @@
 import { app } from 'electron'
 import { createHash } from 'crypto'
 import { createWriteStream, existsSync } from 'fs'
-import { mkdir, rename, rm } from 'fs/promises'
-import { join } from 'path'
+import { mkdir, rename, rm, writeFile } from 'fs/promises'
+import { delimiter, join } from 'path'
 import { Readable } from 'stream'
 import { pipeline } from 'stream/promises'
 import type { ReadableStream } from 'stream/web'
@@ -10,13 +10,27 @@ import type { NodeOption, ToolId, ToolInstallResult, ToolStatus } from '@shared/
 import { EVENTS } from '@shared/types'
 import { emit, handle } from '../ipc'
 import { labEnv, pickedNode, pickNode, refreshShellPath, shellEnv } from '../labEnv'
-import { ownNodeBin, ownNodeDir, toolsDir } from '../paths'
+import { ownNodeBin, ownNodeDir, python3ShimDir, toolsDir } from '../paths'
 import { which } from './ai/cli'
 import { ensureRuntime } from './checks'
 import { labModelStatus, restartLabModel, startLabModelIfNodeWasMissing } from './labModel'
 import { nodeSupported } from './grader'
 import { pickNodeArchive } from './nodeArchive'
 import { byVersion, findNodeBins, nodeSource } from './nodeOptions'
+import {
+  cppVersion,
+  installerFor,
+  javacVersion,
+  javaSupported,
+  javaVersion,
+  LINUX_MANAGERS,
+  PYTHON3_SHIM,
+  pythonSupported,
+  pythonVersion,
+  wantsPython3Shim,
+  type Installer,
+  type SystemTool
+} from './toolLogic'
 import { run } from '../run'
 
 // The long-term support line that is downloaded. Any release of it runs the repos.
@@ -31,16 +45,80 @@ async function versionOf(bin: string, env: Record<string, string>): Promise<stri
   }
 }
 
-async function gitVersion(env: Record<string, string>): Promise<string | null> {
-  if (process.platform === 'darwin' && (await which('git', env.PATH ?? '')) === '/usr/bin/git') {
-    // Without Apple's developer tools this git is a stub that opens an install prompt when run.
-    try {
-      await run('xcode-select', ['-p'], { timeout: 5000 })
-    } catch {
-      return null
-    }
+type Env = Record<string, string>
+
+const XCODE: [string, string[]] = ['xcode-select', ['-p']]
+const JAVA_HOME: [string, string[]] = ['/usr/libexec/java_home', []]
+
+/** On a Mac, /usr/bin/git, python3, g++, clang++ and javac open an install prompt when the tool
+ * behind them is missing. `probe` says without a prompt whether it is there. */
+async function stubbed(bin: string, env: Env, probe: [string, string[]]): Promise<boolean> {
+  if (process.platform !== 'darwin' || (await which(bin, env.PATH ?? '')) !== `/usr/bin/${bin}`) {
+    return false
   }
+  try {
+    await run(probe[0], probe[1], { timeout: 5000 })
+    return false
+  } catch {
+    return true
+  }
+}
+
+/** Both output streams of a tool, or null when it is missing, a stub or fails. */
+async function outputOf(
+  bin: string,
+  args: string[],
+  env: Env,
+  probe: [string, string[]] = XCODE
+): Promise<string | null> {
+  if (await stubbed(bin, env, probe)) return null
+  try {
+    const { stdout, stderr } = await run(bin, args, { env, timeout: 10_000 })
+    return `${stdout}\n${stderr}`
+  } catch {
+    return null
+  }
+}
+
+async function gitVersion(env: Env): Promise<string | null> {
+  if (await stubbed('git', env, XCODE)) return null
   return (await versionOf('git', env))?.replace(/^git version /, '') ?? null
+}
+
+/** Python 3 as `python3`, else as `python`; `python3` alone is null when only `python` has it. */
+async function pythonVersions(
+  env: Env
+): Promise<{ python3: string | null; python: string | null }> {
+  // The app's own `python3` is left out, or it would always find itself.
+  const path = (env.PATH ?? '').split(delimiter).filter((dir) => dir !== python3ShimDir())
+  const bare = { ...env, PATH: path.join(delimiter) }
+  const read = async (bin: string): Promise<string | null> =>
+    pythonVersion((await outputOf(bin, ['--version'], bare)) ?? '')
+  const python3 = await read('python3')
+  return { python3, python: python3 ? null : await read('python') }
+}
+
+/** Writes or removes the app's own `python3` on Windows; elsewhere there is none. */
+async function placePython3Shim(python3: string | null, python: string | null): Promise<void> {
+  if (process.platform !== 'win32') return
+  if (wantsPython3Shim(process.platform, python3, python)) {
+    await mkdir(python3ShimDir(), { recursive: true })
+    await writeFile(join(python3ShimDir(), 'python3.cmd'), PYTHON3_SHIM)
+  } else {
+    await rm(python3ShimDir(), { recursive: true, force: true })
+  }
+}
+
+async function javaFound(env: Env): Promise<{ javac: string | null; java: string | null }> {
+  const javac = javacVersion((await outputOf('javac', ['-version'], env, JAVA_HOME)) ?? '')
+  if (javac) return { javac, java: null }
+  return { javac, java: javaVersion((await outputOf('java', ['-version'], env, JAVA_HOME)) ?? '') }
+}
+
+async function cppFound(env: Env): Promise<string | null> {
+  const output =
+    (await outputOf('g++', ['--version'], env)) ?? (await outputOf('clang++', ['--version'], env))
+  return output && cppVersion(output)
 }
 
 function nodeNote(version: string | null, ok: boolean): string {
@@ -50,49 +128,75 @@ function nodeNote(version: string | null, ok: boolean): string {
   return !pickedNode() && existsSync(ownNodeBin()) ? `${use} This copy belongs to the app.` : use
 }
 
-function gitNote(version: string | null): string {
-  const use = 'Keeps the history of a project.'
-  return version ? use : `${use} Not found on this computer.`
+function toolNote(use: string, version: string | null, ok: boolean, min = ''): string {
+  if (!version) return `${use} Not found on this computer.`
+  return ok ? use : `${use} Needs ${min} or newer; this computer has ${version}.`
 }
 
-const GIT_PAGE = 'https://git-scm.com/downloads'
+const LABELS: Record<SystemTool, string> = {
+  git: 'Git',
+  python: 'Python',
+  java: 'Java',
+  cpp: 'C++'
+}
 
-// Tried in order on Linux, each with the arguments that install without asking again.
-const LINUX_MANAGERS: [string, string[]][] = [
-  ['apt-get', ['install', '-y']],
-  ['dnf', ['install', '-y']],
-  ['pacman', ['-S', '--noconfirm']],
-  ['zypper', ['--non-interactive', 'install']]
-]
+const PAGES: Record<SystemTool, string> = {
+  git: 'https://git-scm.com/downloads',
+  python: 'https://www.python.org/downloads/',
+  java: 'https://adoptium.net/',
+  cpp: 'https://isocpp.org/get-started'
+}
 
-/**
- * The command that installs Git here: Apple's installer, winget (Windows asks for permission), or
- * the package manager through pkexec (which asks for the password). Null leaves the download page.
- */
-async function gitInstaller(path: string): Promise<{ cmd: string; args: string[] } | null> {
-  if (process.platform === 'darwin') return { cmd: 'xcode-select', args: ['--install'] }
-  if (process.platform === 'win32') {
-    if (!(await which('winget', path))) return null
-    const args = ['install', '--id', 'Git.Git', '-e', '--source', 'winget']
-    return {
-      cmd: 'winget',
-      args: [...args, '--accept-package-agreements', '--accept-source-agreements']
-    }
-  }
-  if (!(await which('pkexec', path))) return null
-  for (const [manager, args] of LINUX_MANAGERS) {
-    if (await which(manager, path)) return { cmd: 'pkexec', args: [manager, ...args, 'git'] }
-  }
-  return null
+async function installer(id: SystemTool, path: string): Promise<Installer | null> {
+  const bins = ['winget', 'pkexec', ...LINUX_MANAGERS.map(([name]) => name)]
+  const found = await Promise.all(bins.map(async (bin) => ((await which(bin, path)) ? bin : '')))
+  return installerFor(id, process.platform, new Set(found))
 }
 
 async function status(): Promise<ToolStatus[]> {
   // A tool installed while the app is open is on the shell's PATH, not the one read at start.
   refreshShellPath()
   const env = await labEnv()
-  const [node, git] = await Promise.all([versionOf('node', env), gitVersion(env)])
+  const [node, git, { python3, python }, { javac, java }, cpp] = await Promise.all([
+    versionOf('node', env),
+    gitVersion(env),
+    pythonVersions(env),
+    javaFound(env),
+    cppFound(env)
+  ])
+  await placePython3Shim(python3, python)
   const nodeOk = !!node && nodeSupported(node)
-  const gitInstallable = !git && !!(await gitInstaller(env.PATH ?? ''))
+  const py = python3 ?? python
+  const system = async (
+    id: SystemTool,
+    version: string | null,
+    ok: boolean,
+    note: string
+  ): Promise<ToolStatus> => ({
+    id,
+    label: LABELS[id],
+    version,
+    ok,
+    note,
+    installable: !ok && !!(await installer(id, env.PATH ?? '')),
+    url: PAGES[id]
+  })
+  const pyOk = !!py && pythonSupported(py)
+  const javaOk = !!javac && javaSupported(javac)
+  const javaUse = 'Builds and runs the Java repos.'
+  const others = await Promise.all([
+    system('git', git, !!git, toolNote('Keeps the history of a project.', git, !!git)),
+    system('python', py, pyOk, toolNote('Runs the Python repos.', py, pyOk, '3.10')),
+    system(
+      'java',
+      javac,
+      javaOk,
+      java
+        ? `${javaUse} Java ${java} is here, but not javac, the compiler that comes with a JDK.`
+        : toolNote(javaUse, javac, javaOk, '17')
+    ),
+    system('cpp', cpp, !!cpp, toolNote('Builds the C++ repos.', cpp, !!cpp))
+  ])
   // Awaited, so the local model's status read after this one already shows the restart.
   if (nodeOk) await startLabModelIfNodeWasMissing()
   return [
@@ -104,15 +208,7 @@ async function status(): Promise<ToolStatus[]> {
       note: nodeNote(node, nodeOk),
       installable: true
     },
-    {
-      id: 'git',
-      label: 'Git',
-      version: git,
-      ok: !!git,
-      note: gitNote(git),
-      installable: gitInstallable,
-      url: GIT_PAGE
-    }
+    ...others
   ]
 }
 
@@ -209,13 +305,13 @@ async function choose(bin: string | null): Promise<ToolStatus[]> {
   return status()
 }
 
-async function installGit(): Promise<ToolInstallResult> {
+async function installSystemTool(id: SystemTool): Promise<ToolInstallResult> {
   const env = await labEnv()
-  const installer = await gitInstaller(env.PATH ?? '')
-  if (!installer) return { tools: await status(), url: GIT_PAGE }
+  const command = await installer(id, env.PATH ?? '')
+  if (!command) return { tools: await status(), url: PAGES[id] }
   if (process.platform === 'darwin') {
     try {
-      await run(installer.cmd, installer.args, { timeout: 10_000 })
+      await run(command.cmd, command.args, { timeout: 10_000 })
     } catch (error) {
       // It also exits non-zero when the tools are already there, which is fine.
       if (!/already installed/i.test(String((error as { stderr?: string }).stderr))) {
@@ -226,15 +322,16 @@ async function installGit(): Promise<ToolInstallResult> {
     return { tools: await status(), waiting: true }
   }
   try {
-    await run(installer.cmd, installer.args, { env, timeout: 15 * 60_000 })
+    await run(command.cmd, command.args, { env, timeout: 15 * 60_000 })
   } catch (error) {
     // pkexec exits 126 when the password prompt is closed.
     const cancelled = (error as { code?: unknown }).code === 126
-    throw new Error(cancelled ? 'The install was cancelled.' : 'Git did not install. Try again.', {
-      cause: error
-    })
+    const message = cancelled
+      ? 'The install was cancelled.'
+      : `${LABELS[id]} did not install. Try again.`
+    throw new Error(message, { cause: error })
   }
-  // status() reads the PATH again (from the registry on Windows), so the new Git is found.
+  // status() reads the PATH again (from the registry on Windows), so the new tool is found.
   return { tools: await status() }
 }
 
@@ -244,7 +341,9 @@ const installs = new Map<ToolId, Promise<ToolInstallResult>>()
 function install(id: ToolId): Promise<ToolInstallResult> {
   const running = installs.get(id)
   if (running) return running
-  const job = (id === 'node' ? installNode() : installGit()).finally(() => installs.delete(id))
+  const job = (id === 'node' ? installNode() : installSystemTool(id)).finally(() =>
+    installs.delete(id)
+  )
   installs.set(id, job)
   return job
 }

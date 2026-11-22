@@ -18,6 +18,8 @@ function hint(tool: ToolStatus, install: ToolInstall | undefined): string {
       ? `This computer has ${tool.version}; the repos need 22.18 or newer. The app can get one for itself.`
       : 'It runs your code and the checks. The app can get it for you.'
   }
+  // Too old: the note says which version is here and which one the repos need.
+  if (tool.version) return tool.note
   if (!tool.installable) return 'Install it, then check again.'
   return window.platform === 'darwin'
     ? "On a Mac it comes with Apple's developer tools."
