@@ -12,7 +12,7 @@ import {
   workspacesRoot
 } from '../paths'
 import { ensureRuntime } from './checks'
-import { loadChapter } from './content'
+import { enterRepo, loadChapter } from './content'
 import { moveContents, planMove } from './moveFolder'
 import { killAll } from './terminal'
 import { isAppPath, resolveInside } from './workspaceFiles'
@@ -112,7 +112,10 @@ async function moveRoot(): Promise<string> {
 
 export function register(): void {
   handle('workspace', {
-    open: (labId, chapterId) => inWorkspace(labId, chapterId, openWorkspace),
+    open: (labId, chapterId) => {
+      enterRepo(labId)
+      return inWorkspace(labId, chapterId, openWorkspace)
+    },
     writeFile: write,
     reset: (labId, chapterId) => inWorkspace(labId, chapterId, resetWorkspace),
     restoreMissing: (labId, chapterId) => inWorkspace(labId, chapterId, restoreMissing),

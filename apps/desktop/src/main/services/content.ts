@@ -133,6 +133,11 @@ async function refreshLibrary(): Promise<void> {
   await updateStale()
 }
 
+/** Only the workspace counts: Home and other views read issues without opening them. */
+export function enterRepo(labId: string): void {
+  openLabId = safeId(labId)
+}
+
 /** The learner left the issues, so the repo skipped while it was open can update now. */
 function leave(): void {
   openLabId = undefined
@@ -189,7 +194,6 @@ export async function milestoneCatalog(): Promise<MilestoneCatalog> {
 /** Downloads the repo first when only the library has it. */
 export async function loadChapter(labId: string, chapterId: string): Promise<Chapter> {
   safeId(labId)
-  openLabId = labId
   await installs.get(labId)?.catch(() => {})
   if (usesLibrary() && !existsSync(join(contentDir(), 'labs', labId, 'lab.json'))) {
     await installRepo(labId)
