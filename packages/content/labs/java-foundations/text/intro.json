@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Two adults, three children?",
+      "note": "A family at the ticket hut."
+    },
+    {
+      "title": "Ticket printer",
+      "text": "Glues the numbers as text, checks nothing."
+    },
+    {
+      "title": "Your program",
+      "file": "Tickets.java",
+      "mine": true,
+      "gap": "Text glued and unchecked",
+      "tasks": ["Print the party", "Make the code", "Check the boat", "Fit the printer"]
+    },
+    {
+      "title": "The ticket",
+      "text": "The right party, code and boat on one line."
+    }
+  ],
+  "ticket": {
+    "label": "Family ticket",
+    "wrong": "23 people",
+    "why": "Glued text",
+    "right": "right"
+  },
+  "captions": [
+    "The ticket printer at the hut. Bridie sells a ticket to two adults and three children.",
+    "Today the printer glues the two counts together and checks nothing on the ticket.",
+    "You join, cut, measure and compare the ticket's text, in four small tasks.",
+    "Now the ticket shows the right party and code, and says whether it is for today's boat.",
+    "Text has its own rules. The tickets come out right."
+  ]
+}

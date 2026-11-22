@@ -1,0 +1,133 @@
+{
+  "id": "numbers",
+  "title": "Numbers and their traps",
+  "files": ["Fares.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the fares here, and print a variable to see what it holds.",
+    "suggestedCommand": "java Fares.java"
+  },
+  "tasks": [
+    {
+      "id": "return-fare",
+      "title": "Price the return ticket",
+      "file": "Fares.java",
+      "description": "Under `// Task 1` in `Fares.java`, make an `int` called `returnFarePence`: two single fares, less 40 pence for buying both at once. The single fare is in `singleFarePence`, in pence.\n\nCheck runs your Task 1 lines with other fares in place of the one at the top and reads `returnFarePence`.",
+      "nextSteps": [
+        "Read the numbers at the top of `main`: the fares are in whole pence.",
+        "Under `// Task 1`, make `returnFarePence` with the type for whole numbers.",
+        "On the right of `=`, write the sum with the name `singleFarePence`.",
+        "Print it and run `java Fares.java` to see the price."
+      ],
+      "hints": [
+        "Two single fares is the fare times two. Then the 40 pence come off.",
+        "Java multiplies before it adds or subtracts, as in maths. Brackets change that, so only use them where you mean them.",
+        "The line has the shape `int returnFarePence = singleFarePence * ... - ...;`."
+      ],
+      "docs": [
+        {
+          "title": "Arithmetic operators",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html"
+        },
+        {
+          "title": "Operators and their order",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "trips",
+      "title": "Count the full trips",
+      "file": "Fares.java",
+      "description": "Under `// Task 2`, `queue` people wait on the quay and the boat takes `seats` people a trip. Make an `int` called `fullTrips`: how many full boatloads the queue fills. Then make an `int` called `leftOver`: how many people are still on the quay after those full trips.\n\nCheck runs your Task 2 lines with queues and boats of its own, including a queue smaller than the boat and one that fills it exactly, and reads both.",
+      "nextSteps": [
+        "Work out one example on paper: 100 people, 48 seats a trip.",
+        "Read the part of the lesson about dividing two ints.",
+        "Make `fullTrips` with the division that drops the rest.",
+        "Make `leftOver` with the operator that gives the rest."
+      ],
+      "hints": [
+        "Dividing one `int` by another gives an `int`: the whole number of times, with the rest dropped. Here that is exactly what you want.",
+        "The rest of a division has its own operator in Java, `%`. `7 % 3` is 1.",
+        "The two lines have the shapes `int fullTrips = queue / ...;` and `int leftOver = queue % ...;`."
+      ],
+      "docs": [
+        {
+          "title": "Arithmetic operators, % included",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html"
+        },
+        {
+          "title": "Integer division and remainder in the Java language",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-15.html#jls-15.17.2"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "average",
+      "title": "Work out the average crossing",
+      "file": "Fares.java",
+      "description": "Under `// Task 3`, make a `double` called `averagePerCrossing`: `passengersToday` divided by `crossingsToday`, keeping the part after the point.\n\nCheck runs your Task 3 lines with numbers of its own, some whose average has a part after the point, and reads `averagePerCrossing`.",
+      "nextSteps": [
+        "Write the division into a `double` and print it.",
+        "Run it: with 57 passengers over 12 crossings, does the answer look right?",
+        "Read the part of the lesson about why a `double` on the left is not enough.",
+        "Make one of the two numbers a `double` before the division."
+      ],
+      "hints": [
+        "Both numbers are `int`s, so Java divides them as whole numbers first and only then stores the answer in the `double`.",
+        "A cast, `(double)` in front of a value, turns it into a `double`. Once one side of the division is a `double`, Java divides with decimals.",
+        "The line has the shape `double averagePerCrossing = (double) passengersToday / ...;`."
+      ],
+      "docs": [
+        {
+          "title": "Primitive data types",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html"
+        },
+        {
+          "title": "Casting conversions in the Java language",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-5.html#jls-5.5"
+        },
+        {
+          "title": "Using operators",
+          "url": "https://dev.java/learn/language-basics/using-operators/"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Dividing ints and doubles",
+          "url": "https://www.youtube.com/watch?v=crGd6jKoII8"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ticket",
+      "title": "Number the ticket",
+      "file": "Fares.java",
+      "description": "Under `// Task 4`, make a `long` called `ticketNumber`: the date code times 100000, plus the ticket of the day. Ticket 57 on `20261123` is `2026112300057`. The two are in `dateCode` and `ticketOfDay`.\n\nCheck runs your Task 4 lines with dates and tickets of its own and reads `ticketNumber`.",
+      "nextSteps": [
+        "Make `ticketNumber` as a `long` with the sum, and print it.",
+        "Compare what it prints with the example in the task.",
+        "Read the part of the lesson about how big an `int` can get.",
+        "Make the multiplication happen in `long`, not only the result."
+      ],
+      "hints": [
+        "A thirteen digit number does not fit in an `int`, which is why the task asks for a `long`.",
+        "Storing the result in a `long` is not enough: `dateCode * 100000` is worked out first, as two `int`s, and it overflows before it reaches the `long`.",
+        "Make one side of the multiplication a `long`: write `100000L`, with an L, or put `(long)` in front of `dateCode`."
+      ],
+      "docs": [
+        {
+          "title": "Primitive data types: int and long",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html"
+        },
+        {
+          "title": "Integer overflow in the Java language",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-4.html#jls-4.2.2"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "clipboard", "label": "Next crossing", "kind": "data" },
+      { "id": "ossian", "label": "Ossian", "kind": "story" },
+      { "id": "file", "label": "Departures.java", "kind": "file", "mine": true },
+      { "id": "board", "label": "Departures board", "kind": "story" },
+      { "id": "fares", "label": "Fare to charge", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "ossian", "to": "clipboard", "label": "weather" },
+      { "from": "clipboard", "to": "file", "label": "values" },
+      { "from": "file", "to": "board", "label": "status" },
+      { "from": "file", "to": "fares", "label": "pence" }
+    ],
+    "note": "Departures.java turns the next crossing's values into true or false answers, and decides what the board says and what each passenger pays."
+  },
+  "tasks": {
+    "full": {
+      "steps": [
+        {
+          "active": ["clipboard"],
+          "note": "The clipboard has the passengers booked and the seats on the boat."
+        },
+        {
+          "active": ["clipboard", "clipboard->file", "file"],
+          "note": "Comparing the two gives true or false, and equal counts as full."
+        },
+        {
+          "active": ["file"],
+          "value": { "kind": "array", "label": "full", "values": ["true or false"] },
+          "note": "The answer is kept for the board to use."
+        }
+      ]
+    },
+    "can-sail": {
+      "steps": [
+        {
+          "active": ["ossian", "ossian->clipboard", "clipboard"],
+          "note": "Ossian notes the wind and whether there is fog."
+        },
+        {
+          "active": ["clipboard", "clipboard->file", "file"],
+          "note": "The boat sails only when the wind is below his limit and there is no fog, both at once."
+        },
+        {
+          "active": ["file"],
+          "value": { "kind": "array", "label": "canSail", "values": ["true or false"] },
+          "note": "One true or false answer says whether the crossing can go."
+        }
+      ]
+    },
+    "status": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "The board has three words, and the two answers from before decide which."
+        },
+        {
+          "active": ["file"],
+          "note": "A crossing that cannot sail is cancelled however full it is, so that check comes first."
+        },
+        {
+          "active": ["file", "file->board", "board"],
+          "note": "The board shows exactly one word for the crossing."
+        }
+      ]
+    },
+    "fare": {
+      "steps": [
+        {
+          "active": ["clipboard"],
+          "note": "Each passenger has an age, and the single fare is on the clipboard."
+        },
+        {
+          "active": ["clipboard", "clipboard->file", "file"],
+          "note": "The youngest go free, children pay half, everyone else the single fare. The youngest are checked first."
+        },
+        {
+          "active": ["file", "file->fares", "fares"],
+          "note": "Bridie charges the fare in whole pence."
+        }
+      ]
+    }
+  }
+}
