@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "Can the shop look like our window?",
+      "note": "This week's firing came out well."
+    },
+    {
+      "title": "The shop",
+      "text": "Six pot cards stand in one long column.",
+      "note": "A list on paper"
+    },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "Cards in one long line",
+      "tasks": ["Two class columns", "Space between cards", "As many as fit", "Fill the row"]
+    },
+    {
+      "title": "The shop",
+      "rows": [["Small mug", "Tall mug"], ["Cereal bowl", "Serving bowl"], ["Side plate", "Dinner plate"]],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "Bowls",
+    "wrong": "far down a list",
+    "why": "No columns",
+    "right": "on the shelf"
+  },
+  "captions": [
+    "Dilys wants the shop to look like the shelves in the studio window.",
+    "The pots stand in one long column, so the bowls are far down the page.",
+    "You make the classes and the shelf grids, with columns, a gap, repeat() and minmax().",
+    "The bowls stand on the shelf in a row with other pots, the way they do in the window.",
+    "Same pots, same words. Now the shop has rows, and it fits any screen."
+  ]
+}

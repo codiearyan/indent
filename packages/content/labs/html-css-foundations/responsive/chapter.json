@@ -1,0 +1,124 @@
+{
+  "id": "responsive",
+  "title": "A page that works on a phone",
+  "files": ["styles.css", "index.html", "classes.html"],
+  "terminal": {
+    "description": "The home page runs in the Browser panel and reloads every time you save. Drag the panel narrower to see it the way a phone would."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "viewport",
+      "title": "Tell phones the page fits their screen",
+      "file": "index.html",
+      "description": "On Kofi's phone the page is a tiny copy of the big one, because the phone lays it out for a wide screen.\n\nIn the `head` of both `index.html` and `classes.html`, add the viewport line from the lesson: `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />`.\n\nThe check opens both pages and reads the viewport line in each head: its name, the width and the zoom it opens at.",
+      "nextSteps": [
+        "Read \"The viewport line\" in the lesson.",
+        "Open index.html and find the meta line already in its head.",
+        "Add the viewport line under it, then do the same in classes.html.",
+        "Save both files and press Check."
+      ],
+      "hints": [
+        "The line goes in the head, with the other meta line, in each page.",
+        "It is a `meta` with the name `viewport`, and its content has two parts separated by a comma.",
+        "Add `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />` under the charset line of both pages."
+      ],
+      "docs": [
+        { "title": "The viewport meta", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/viewport" },
+        { "title": "Responsive design", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Responsive_Design" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "images",
+      "title": "Let the pictures shrink with the page",
+      "file": "styles.css",
+      "description": "The studio picture is wider than a phone, so it runs off the edge.\n\nIn `styles.css`, give every picture a `max-width` of the full width of its box, and let its `height` follow its width so it keeps its shape. The width and height in the HTML can stay as they are.\n\nThe check reads the max-width and the height of every picture on the home page.",
+      "nextSteps": [
+        "Read \"Pictures that shrink\" in the lesson.",
+        "Add a new rule to styles.css that picks every picture.",
+        "Set the largest width as a percentage of the box, then let the height follow.",
+        "Save, drag the Browser panel narrower, and press Check."
+      ],
+      "hints": [
+        "A largest width lets a picture be narrower than its own size, never wider than its box.",
+        "`max-width` in percent follows the box. The height in the HTML stays unless CSS lets it follow the width.",
+        "Write `img { max-width: 100%; height: auto; }`."
+      ],
+      "docs": [
+        { "title": "max-width", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/max-width" },
+        { "title": "height", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/height" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rem",
+      "title": "Set the body's text size in rem",
+      "file": "styles.css",
+      "description": "The body's text is 18px, which ignores readers who set larger text on their phone.\n\nChange the `font-size` of the body to the same size, 18px, written in `rem`.\n\nThe check reads the text size of the body: its unit, and whether it is the same size as now.",
+      "nextSteps": [
+        "Read \"Relative units\" in the lesson.",
+        "Find the font-size in the body rule.",
+        "Work out how many rem make 18px when 1rem is 16px.",
+        "Save and press Check."
+      ],
+      "hints": [
+        "Only the value of the body's font-size changes.",
+        "1rem is 16px, so a size in px divided by 16 is the same size in rem.",
+        "Write `font-size: 1.125rem;` in the body rule."
+      ],
+      "docs": [
+        { "title": "font-size", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/font-size" },
+        { "title": "CSS lengths", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/length" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "width",
+      "title": "Let main shrink on a narrow screen",
+      "file": "styles.css",
+      "description": "Kofi's rule makes `main` 960px wide on every screen, so on a phone the page runs off the edge.\n\nIn the rule for `main`, replace the fixed width with an upper limit: no wider than the same 960px, written in `rem`, and as narrow as the screen when it is smaller. `margin: 0 auto` can stay as it is.\n\nThe check reads the width and the max-width of main.",
+      "nextSteps": [
+        "Read \"Relative units\" in the lesson, the part about widths.",
+        "Find the rule for main.",
+        "Change the property to the one for a largest width, and the value to rem.",
+        "Save, drag the Browser panel narrower, and press Check."
+      ],
+      "hints": [
+        "A fixed width stays the same on every screen. A largest width only stops a box growing past it.",
+        "The property is `max-width`. 960 divided by 16 gives the size in rem.",
+        "Replace `width: 960px;` with `max-width: 60rem;`."
+      ],
+      "docs": [
+        { "title": "max-width", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/max-width" },
+        { "title": "CSS lengths", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/length" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "phone",
+      "title": "Stack the two classes on a phone",
+      "file": "styles.css",
+      "description": "On a phone the two class cards are squeezed side by side. Kofi's notes say: at 600px wide or narrower, one card above the other.\n\nAdd a media query to `styles.css`, after the rule that gives the classes their two columns, that at 600px wide or narrower gives the list of classes one column. On wider screens it keeps its two columns.\n\nThe check reads the columns of the list of classes at several screen widths, some narrower than 600px and some wider.",
+      "nextSteps": [
+        "Read \"Media queries\" in the lesson.",
+        "Go to the end of styles.css, after the rule that gives the classes two columns.",
+        "Write a media query for screens that wide or narrower, with a rule for the classes inside it.",
+        "Save, drag the Browser panel narrower and wider, and press Check."
+      ],
+      "hints": [
+        "A media query wraps a normal rule. Inside it, the classes get a different set of columns.",
+        "`max-width` in the condition means that wide or narrower. It goes in round brackets, with its unit.",
+        "Write `@media (max-width: 600px) { .classes { grid-template-columns: 1fr; } }`."
+      ],
+      "docs": [
+        { "title": "Using media queries", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Using_media_queries" },
+        { "title": "@media", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media" }
+      ],
+      "videos": [
+        { "title": "Media queries in five minutes", "url": "https://www.youtube.com/watch?v=2KL-z9A56SQ" }
+      ],
+      "points": 10
+    }
+  ]
+}

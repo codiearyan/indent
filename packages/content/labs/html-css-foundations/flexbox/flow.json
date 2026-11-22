@@ -1,0 +1,94 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kofi", "label": "Kofi", "kind": "story" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "header", "label": "Header", "kind": "data" },
+      { "id": "links", "label": "List of links", "kind": "data" },
+      { "id": "visitor", "label": "Visitor", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kofi", "to": "css", "label": "his notes" },
+      { "from": "css", "to": "header", "label": "layout" },
+      { "from": "header", "to": "links", "label": "holds" },
+      { "from": "links", "to": "visitor", "label": "a row to tap" }
+    ],
+    "note": "Flexbox lines up the children of one box. You lay out the header and its list of links, so visitors find the classes at a glance."
+  },
+  "tasks": {
+    "row": {
+      "steps": [
+        {
+          "active": ["links"],
+          "value": { "kind": "array", "label": "the links", "values": ["Classes", "The shop", "Visit us", "Book a class"] },
+          "note": "Each link sits on its own line, down the left of the header."
+        },
+        {
+          "active": ["css", "css->header", "header", "header->links", "links"],
+          "note": "The list becomes a flex container, and its own children, the links, become the items."
+        },
+        {
+          "active": ["links", "links->visitor", "visitor"],
+          "note": "The links sit side by side, from left to right."
+        }
+      ]
+    },
+    "gap": {
+      "steps": [
+        {
+          "active": ["links"],
+          "note": "In a row, the links touch each other."
+        },
+        {
+          "active": ["kofi", "kofi->css", "css"],
+          "note": "Kofi wants the same space between every link, and between rows once they wrap."
+        },
+        {
+          "active": ["css", "css->header", "header", "header->links", "links"],
+          "note": "The space is set once, on the list, and lands only between the links."
+        }
+      ]
+    },
+    "header": {
+      "steps": [
+        {
+          "active": ["header"],
+          "value": { "kind": "array", "label": "inside the header", "values": ["the studio's name", "the nav"] },
+          "note": "The header holds two things: the studio's name and the nav with its links."
+        },
+        {
+          "active": ["css", "css->header", "header"],
+          "value": {
+            "kind": "map",
+            "label": "in a column",
+            "entries": [
+              { "key": "along", "value": "top to bottom" },
+              { "key": "across", "value": "side to side" }
+            ]
+          },
+          "note": "The header becomes a flex container that runs top to bottom. Side to side is now across."
+        },
+        {
+          "active": ["header", "header->links", "links", "links->visitor", "visitor"],
+          "note": "The name sits on top, the links under it, both in the middle like the sign over the door."
+        }
+      ]
+    },
+    "wrap": {
+      "steps": [
+        {
+          "active": ["visitor"],
+          "note": "On a phone the window is narrow, and the four links do not fit on one line."
+        },
+        {
+          "active": ["css", "css->header", "header", "header->links", "links"],
+          "note": "The list lets a link that has no room move onto a new line."
+        },
+        {
+          "active": ["links", "links->visitor", "visitor"],
+          "note": "Each line of links sits in the middle, on a wide screen and a narrow one."
+        }
+      ]
+    }
+  }
+}

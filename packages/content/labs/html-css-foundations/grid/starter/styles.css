@@ -1,0 +1,97 @@
+/*
+  Task 1: put the two classes side by side.
+  Task 2: space the cards apart.
+  Task 3: lay out the shelf with repeat().
+  Task 4: let the shelf's columns share the room that is left.
+
+  Dilys's notes:
+  The two classes are cards now, and so is everything on the shelves this week.
+  The rule for .card at the bottom gives each one its frame.
+  Classes: two columns, the same width, side by side.
+  24px between all the cards, across and down.
+  Shelf: cards at least 200px wide, as many in a row as fit.
+  And no empty strip at the end of a row, please.
+*/
+
+:root {
+  --clay: #a4492a;
+  --cream: #f7f1e8;
+  --ink: #3b2f2a;
+  --sand: #efdcc3;
+  --stone: #7a6c64;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--ink);
+  font-family: Palatino, serif;
+  font-size: 18px;
+}
+
+h1,
+h2 {
+  color: var(--clay);
+}
+
+h2 {
+  color: var(--ink);
+}
+
+.note {
+  background-color: var(--sand);
+  color: var(--clay);
+  padding: 12px;
+  border-left: 4px solid var(--clay);
+}
+
+section {
+  margin-bottom: 48px;
+}
+
+#mug-of-the-month {
+  text-align: center;
+}
+
+nav a {
+  font-weight: bold;
+}
+
+#contact p {
+  color: var(--stone);
+}
+
+#contact .note {
+  color: var(--clay);
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.links {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+
+.classes,
+.shelf {
+  list-style: none;
+  padding-left: 0;
+}
+
+.card {
+  padding: 16px;
+  border: 2px solid var(--sand);
+}
