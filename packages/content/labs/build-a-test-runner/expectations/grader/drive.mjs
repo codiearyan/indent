@@ -22,6 +22,7 @@ const PAIRS = {
   extraKey: () => [{ setup: 1500, total: 4500 }, { setup: 1500 }],
   missingKey: () => [{ setup: 1500 }, { setup: 1500, total: 4500 }],
   arrayVsObject: () => [[], {}],
+  emptyPlaces: () => [[], new Array(3)],
   nullVsObject: () => [null, {}],
   nanInArray: () => [[NaN], [NaN]],
   nanVsNull: () => [[NaN], [null]],

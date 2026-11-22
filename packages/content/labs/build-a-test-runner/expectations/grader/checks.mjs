@@ -74,6 +74,7 @@ export const checks = {
       breaksEqual('A missing key fails', 'missingKey', 'expect({ setup: 1500 }).toEqual({ setup: 1500, total: 4500 })', 'The expected object has a key that the value lacks. Look at both sets of keys.'),
       breaksEqual('Different keys fail even when both are undefined', 'undefinedKeys', 'expect({ a: undefined }).toEqual({ b: undefined })', 'Both objects have one key, but not the same key. Reading a key that is not there also gives undefined.'),
       breaksEqual('Order matters in an array', 'order', 'expect([1, 2]).toEqual([2, 1])', 'An array is equal only when the same values sit at the same places.'),
+      breaksEqual('Arrays of different lengths fail', 'emptyPlaces', 'expect([]).toEqual(new Array(3))', 'The two arrays are not the same length. Empty places in an array do not show up among its keys.'),
       breaksEqual('An array is not an object', 'arrayVsObject', 'expect([]).toEqual({})', 'An array never equals an object that is not an array.'),
       breaksEqual('null is not an object', 'nullVsObject', 'expect(null).toEqual({})', 'typeof null is "object", but null is not an object with keys.'),
       breaksEqual('NaN is not null', 'nanVsNull', 'expect([NaN]).toEqual([null])', 'NaN and null are different values. Turning both sides into text can hide that.'),
