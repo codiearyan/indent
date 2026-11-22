@@ -1,0 +1,135 @@
+{
+  "id": "text-and-f-strings",
+  "title": "Text and f-strings",
+  "files": ["radio_log.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to write tonight's log entry.",
+    "suggestedCommand": "python3 radio_log.py"
+  },
+  "tasks": [
+    {
+      "id": "where",
+      "title": "Write down where",
+      "file": "radio_log.py",
+      "description": "Under `# Task 1` in `radio_log.py`, make a variable called `location`: the hill, a comma, a space, the word `grid`, a space and the grid reference, like this:\n\n```\nScarth Fell, grid NY 4127 0836\n```\n\nPrint it to see it. Check runs your file with other hills and grid references in place of the ones at the top and reads `location` after the lines under `# Task 1`.",
+      "nextSteps": [
+        "Read tonight's callout near the top of the file.",
+        "Join `hill`, the text in the middle and `grid_ref` with `+`.",
+        "Check the spaces: `+` adds none of its own.",
+        "Print it and compare it with the task."
+      ],
+      "hints": [
+        "Three pieces of text go together: the hill, the words in the middle, and the grid reference.",
+        "`+` joins text exactly as it is, so the comma and both spaces have to be inside the quotes of the middle piece.",
+        "The line has the shape `location = hill + \"...\" + grid_ref`, with the comma, the word grid and their spaces in the quotes."
+      ],
+      "docs": [
+        {
+          "title": "Text in the Python tutorial",
+          "url": "https://docs.python.org/3/tutorial/introduction.html#text"
+        },
+        {
+          "title": "Text sequence type, str",
+          "url": "https://docs.python.org/3/builtins/stdtypes.html#textseq"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sign",
+      "title": "Tidy the call sign",
+      "file": "radio_log.py",
+      "description": "Under `# Task 2`, make a variable called `clean_call_sign`: the call sign in `call_sign` without the spaces at its start and end, in capital letters, like this:\n\n```\nBRAVO TWO\n```\n\nPrint it to see it. Check tries call signs with spaces around them, without any, and with a capital already in them.",
+      "nextSteps": [
+        "Run the file once with `print(call_sign)` to see the spaces.",
+        "Find the method in the lesson that removes them.",
+        "Find the one that turns text into capitals.",
+        "Use both, one after the other, and print the result."
+      ],
+      "hints": [
+        "Two things change: the spaces at the ends go, and the letters become capitals.",
+        "Methods are written after the text with a dot and round brackets. You can write a second one straight after the first.",
+        "The line has the shape `clean_call_sign = call_sign.strip()....()`, with the capitals method where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "str.strip()",
+          "url": "https://docs.python.org/3/builtins/stdtypes.html#str.strip"
+        },
+        {
+          "title": "str.upper()",
+          "url": "https://docs.python.org/3/builtins/stdtypes.html#str.upper"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Working with text in Python",
+          "url": "https://www.youtube.com/watch?v=k9TUPpGqYTo"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "crew",
+      "title": "Write the crew line",
+      "file": "radio_log.py",
+      "description": "Under `# Task 3`, make a variable called `crew_line`: the text `Crew out:`, a space, then the number in `crew_out`, like this:\n\n```\nCrew out: 6\n```\n\nPrint it to see it. `crew_line` must be text. Check tries other crews, including nobody at all.",
+      "nextSteps": [
+        "Try joining the text and `crew_out` with `+` and read the error.",
+        "Read the part of the lesson about text and numbers.",
+        "Turn the number into text before you join it.",
+        "Print it and run the file."
+      ],
+      "hints": [
+        "`crew_out` is a whole number, and `+` cannot join text to a number.",
+        "Python has a way to turn a number into text. The lesson shows it next to the TypeError.",
+        "The line has the shape `crew_line = \"Crew out: \" + str(...)`, with the crew's name where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "str()",
+          "url": "https://docs.python.org/3/builtins/functions.html#func-str"
+        },
+        {
+          "title": "TypeError",
+          "url": "https://docs.python.org/3/builtins/exceptions.html#TypeError"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "entry",
+      "title": "Write the log entry",
+      "file": "radio_log.py",
+      "description": "Under `# Task 4`, make a variable called `log_entry` with an f-string: the clean call sign, the word `to`, the location, the word `with`, the number in `crew_out` and the word `crew`, with one space between each, like this:\n\n```\nBRAVO TWO to Scarth Fell, grid NY 4127 0836 with 6 crew\n```\n\nPrint it to see it. Check starts Task 4 from `clean_call_sign` and `location` as Tasks 1 and 2 should make them, with other callouts, and reads your file to see that `log_entry` is made with an f-string.",
+      "nextSteps": [
+        "Read the part of the lesson on f-strings.",
+        "Write the entry as one text in quotes, with an `f` in front.",
+        "Put each variable's name in curly braces where its value goes.",
+        "Print it and compare it with the task word by word."
+      ],
+      "hints": [
+        "An f-string lets you write the whole line as you want it to read, with the names where their values go.",
+        "Put an `f` right before the opening quote, and each name inside `{` and `}`. A number needs no turning into text there.",
+        "The line has the shape `log_entry = f\"{clean_call_sign} to ... crew\"`, with the location and the crew in braces in the middle."
+      ],
+      "docs": [
+        {
+          "title": "Formatted string literals",
+          "url": "https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals"
+        },
+        {
+          "title": "f-strings",
+          "url": "https://docs.python.org/3/reference/lexical_analysis.html#f-strings"
+        }
+      ],
+      "videos": [
+        {
+          "title": "f-strings, how to use them",
+          "url": "https://www.youtube.com/watch?v=nghuHvKLhJA"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

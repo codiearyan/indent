@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ambrose", "say": "Can the laptop do my bill?", "note": "He prices every repair." },
+    { "title": "Pencil and slip", "text": "Sums by hand, and once a negative guarantee." },
+    {
+      "title": "Your code",
+      "file": "prices.cpp",
+      "mine": true,
+      "gap": "No sums, no bill",
+      "tasks": ["Price the labour", "Bag the screws", "Average and beats", "Print the parts"]
+    },
+    { "title": "Repair bill", "rows": [["Labour", "by the hour"], ["Guarantee", "in beats"], ["Parts", "two decimals"]] }
+  ],
+  "ticket": { "label": "The bill", "wrong": "negative", "why": "Too big", "right": "printed" },
+  "captions": [
+    "Ambrose prices every repair on the back of a slip, and wants the laptop to do it.",
+    "Last week the laptop printed a guarantee of a negative number of beats.",
+    "You write the sums, with the right type for each number, in five tasks.",
+    "Now the labour, the bags, the average, the beats and the parts all come out right.",
+    "Same figures as the slip. The laptop does the sums and none of them goes wrong."
+  ]
+}

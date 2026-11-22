@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dougie", "say": "How many ropes are in the store?", "note": "The whiteboard got wiped." },
+    { "title": "Kit store", "rows": [["In the store", "9"], ["Out on the callout", "4"]] },
+    {
+      "title": "Your code",
+      "file": "kit_store.py",
+      "mine": true,
+      "gap": "Nothing keeps the count",
+      "tasks": ["Name the team", "Count the ropes", "Take ropes out", "Rename x and y"]
+    },
+    { "title": "Base laptop", "text": "Prints the ropes left after each callout." }
+  ],
+  "ticket": { "label": "Rope count", "wrong": "wiped", "why": "Not kept", "right": "kept" },
+  "captions": [
+    "Second evening at the base. Dougie wants to know how many ropes are in the kit store.",
+    "Today the count lives on a whiteboard, and tonight it was wiped.",
+    "You write variables that keep the count and change it, in four small tasks.",
+    "Now the laptop prints the ropes in the store, before and after the callout.",
+    "Named values, kept and changed. Dougie's count survives the night."
+  ]
+}

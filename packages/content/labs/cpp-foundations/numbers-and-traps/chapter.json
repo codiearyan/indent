@@ -1,0 +1,161 @@
+{
+  "id": "numbers-and-traps",
+  "title": "Numbers and their traps",
+  "files": [
+    "src/prices.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the repair bill here, run it, and read what it prints.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/prices.cpp -o prices && ./prices"
+  },
+  "tasks": [
+    {
+      "id": "labour",
+      "title": "Price the labour",
+      "file": "src/prices.cpp",
+      "description": "Under `// Task 1` in `src/prices.cpp`, make a `double` called `labour`: the hourly rate times the hours worked. Print it:\n\n```\nLabour: 115.5\n```\n\nCheck runs your program with other rates and hours, reads `labour` and its type, and looks for the line.",
+      "nextSteps": [
+        "Find `hourlyRate` and `hoursWorked` at the top of `main`, and note their types.",
+        "Make `labour` as a `double`, worked out from those two names.",
+        "Print `Labour: ` and then `labour`.",
+        "Build, run, and check the number against the slip: 38.5 for each of 3 hours."
+      ],
+      "hints": [
+        "The labour is one number times another. Which operator multiplies in C++?",
+        "When a `double` and an `int` meet in a sum, the `int` is turned into a `double` first, so the result keeps its decimals.",
+        "The line has the shape `double labour = hourlyRate * ...;`."
+      ],
+      "docs": [
+        {
+          "title": "Arithmetic operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_arithmetic"
+        },
+        {
+          "title": "Floating-point types",
+          "url": "https://en.cppreference.com/w/cpp/language/types#Floating-point_types"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "bags",
+      "title": "Bag the screws",
+      "file": "src/prices.cpp",
+      "description": "Kasimir puts `screwsPerBag` screws in each bag. Under `// Task 2`, make an `int` called `fullBags`, the number of full bags the box of `screwsInBox` screws makes, and an `int` called `leftOver`, the screws left over. Print them:\n\n```\nFull bags: 3, left over: 2\n```\n\nCheck runs your program with other boxes and bags, a box that comes out even and a box too small for one bag among them, and reads both variables and the line.",
+      "nextSteps": [
+        "Work out today's numbers by hand: 14 screws, 4 to a bag.",
+        "Make `fullBags` by dividing the screws by the screws per bag.",
+        "Make `leftOver` with the operator that gives what is left after a division.",
+        "Print both on one line, build and run."
+      ],
+      "hints": [
+        "Dividing one `int` by another gives an `int`: the whole part, with nothing after the point. That is exactly a count of full bags.",
+        "The `%` operator gives the remainder of a whole-number division: what is left once the full bags are packed.",
+        "The two lines have the shapes `int fullBags = screwsInBox / ...;` and `int leftOver = screwsInBox % ...;`."
+      ],
+      "docs": [
+        {
+          "title": "Arithmetic operators: division and remainder",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_arithmetic#Multiplicative_operators"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Integer division and the remainder",
+          "url": "https://www.youtube.com/watch?v=dWSJqvFE7Cg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "average",
+      "title": "Find the average job",
+      "file": "src/prices.cpp",
+      "description": "Under `// Task 3`, make a `double` called `averageMinutes`: `minutesTotal` divided by `jobsDone`, decimals included. Print it:\n\n```\nAverage: 62.5 minutes\n```\n\nCheck runs your program with other minutes and jobs, some that divide evenly and some that do not, and reads `averageMinutes` and the line.",
+      "nextSteps": [
+        "Make `averageMinutes` the obvious way, build, run, and compare with 62.5.",
+        "Notice which types `minutesTotal` and `jobsDone` have.",
+        "Turn one of them into a `double` before the division happens.",
+        "Build and run: the half minute should be back."
+      ],
+      "hints": [
+        "Putting the result into a `double` does not help if the division was already done in whole numbers.",
+        "The type of a division is decided by the numbers being divided. One `double` among them is enough to keep the decimals.",
+        "`static_cast<double>(minutesTotal)` is `minutesTotal` as a `double`. Divide that by `jobsDone`."
+      ],
+      "docs": [
+        {
+          "title": "static_cast",
+          "url": "https://en.cppreference.com/w/cpp/language/static_cast"
+        },
+        {
+          "title": "Usual arithmetic conversions",
+          "url": "https://en.cppreference.com/w/cpp/language/usual_arithmetic_conversions"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Integer division and type casting",
+          "url": "https://www.youtube.com/watch?v=lZ7zXItSO10"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "beats",
+      "title": "Count the beats of the guarantee",
+      "file": "src/prices.cpp",
+      "description": "A watch beats `beatsPerSecond` times a second, and the workshop's guarantee lasts `guaranteeYears` years of 365 days. Under `// Task 4`, make a `long long` called `guaranteeBeats`: how many times the watch beats in that time. Print it:\n\n```\nBeats: 2522880000\n```\n\nCheck runs your program with other watches and guarantees, short ones and long ones, and reads `guaranteeBeats` and the line.",
+      "nextSteps": [
+        "Work out the seconds in a day, then in a year of 365 days.",
+        "Make `guaranteeBeats` as a `long long`: beats a second, times seconds a year, times years.",
+        "Build and run with today's slip and compare with the task's number.",
+        "If it comes out wrong or below zero, read the part of the lesson on how big an `int` can get."
+      ],
+      "hints": [
+        "A minute has 60 seconds, an hour 60 minutes, a day 24 hours, a year 365 days.",
+        "An `int` holds numbers up to a little over two billion. A multiplication of `int`s is worked out in `int`, even when the result goes into a `long long`, so it can run past the top first.",
+        "Make the first number of the multiplication a `long long`: `static_cast<long long>(beatsPerSecond) * 60 * ...`."
+      ],
+      "docs": [
+        {
+          "title": "Integer types",
+          "url": "https://en.cppreference.com/w/cpp/language/types#Integral_types"
+        },
+        {
+          "title": "Arithmetic operators: overflows",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_arithmetic#Overflows"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "parts",
+      "title": "Print the parts price",
+      "file": "src/prices.cpp",
+      "description": "Under `// Task 5`, print `partsCost` with exactly two digits after the point:\n\n```\nParts: 12.40\n```\n\nThe tools for it are in a header this file does not include yet. Check runs your program with other prices, a whole number among them, and looks for the line.",
+      "nextSteps": [
+        "Print `Parts: ` and `partsCost` plainly, build, run, and see what is wrong with it.",
+        "Read the part of the lesson on printing prices.",
+        "Add the `#include` line it needs at the top of the file.",
+        "Send `std::fixed` and `std::setprecision(2)` before the price, build and run."
+      ],
+      "hints": [
+        "`std::cout` prints a `double` with as few digits as it can, so 12.40 comes out as 12.4.",
+        "`std::setprecision` lives in the header `<iomanip>`. On its own it counts every digit of the number; after `std::fixed`, it counts the digits after the point.",
+        "Add `#include <iomanip>` at the top, then send `std::fixed << std::setprecision(2)` to `std::cout` before `partsCost`."
+      ],
+      "docs": [
+        {
+          "title": "std::setprecision",
+          "url": "https://en.cppreference.com/w/cpp/io/manip/setprecision"
+        },
+        {
+          "title": "std::fixed",
+          "url": "https://en.cppreference.com/w/cpp/io/manip/fixed"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

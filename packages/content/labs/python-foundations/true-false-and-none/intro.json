@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Are we ready to go?", "note": "Three questions, shouted." },
+    { "title": "The base", "rows": [["Crew ready", "5"], ["Radio channel", "6"], ["Stretcher", "packed"]] },
+    {
+      "title": "Your code",
+      "file": "ready_to_go.py",
+      "mine": true,
+      "gap": "Nobody hears the answers",
+      "tasks": ["Enough crew?", "On the channel?", "Ready to go?", "Name known?"]
+    },
+    { "title": "Team vehicle", "say": "Everything checked. We go." }
+  ],
+  "ticket": { "label": "Checklist", "wrong": "half heard", "why": "Shouted", "right": "answered" },
+  "captions": [
+    "Sunday morning, pager going. Ailsa needs to know whether the team is ready to go.",
+    "Today Ailsa shouts the checklist across the base, and last month an answer got lost.",
+    "You write the comparisons that answer each question True or False.",
+    "Now the laptop says plainly whether the team can leave.",
+    "Comparisons, and, or, not, and None for what is not known yet."
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ambrose", "label": "Ambrose", "kind": "story" },
+      { "id": "figures", "label": "Today's figures", "kind": "data" },
+      { "id": "file", "label": "prices.cpp", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "bill", "label": "Repair bill", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ambrose", "to": "figures", "label": "slips" },
+      { "from": "figures", "to": "file", "label": "numbers" },
+      { "from": "file", "to": "compiler", "label": "sums" },
+      { "from": "compiler", "to": "bill", "label": "printed lines" }
+    ],
+    "note": "You turn Ambrose's figures into sums that keep the right type, and the laptop prints his bill."
+  },
+  "tasks": {
+    "labour": {
+      "steps": [
+        {
+          "active": ["ambrose", "ambrose->figures", "figures"],
+          "value": {
+            "kind": "map",
+            "label": "the labour",
+            "entries": [
+              { "key": "hourlyRate", "value": "double" },
+              { "key": "hoursWorked", "value": "int" }
+            ]
+          },
+          "note": "Ambrose charges an hourly rate, and the slip says how many hours the job took."
+        },
+        {
+          "active": ["figures->file", "file"],
+          "note": "The labour is the rate times the hours, kept as a number with decimals."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->bill", "bill"],
+          "note": "The bill prints the labour for this job."
+        }
+      ]
+    },
+    "bags": {
+      "steps": [
+        {
+          "active": ["figures"],
+          "note": "A box of screws, and the number Kasimir puts in each bag."
+        },
+        {
+          "active": ["figures->file", "file"],
+          "value": {
+            "kind": "map",
+            "label": "the box, bagged",
+            "entries": [
+              { "key": "fullBags", "value": "whole bags" },
+              { "key": "leftOver", "value": "screws" }
+            ]
+          },
+          "note": "A whole-number division counts the full bags, and the remainder is what is left."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->bill", "bill"],
+          "note": "The bill prints both on one line."
+        }
+      ]
+    },
+    "average": {
+      "steps": [
+        {
+          "active": ["figures"],
+          "note": "The minutes of all jobs this week, and how many jobs there were."
+        },
+        {
+          "active": ["figures->file", "file"],
+          "note": "Two whole numbers divided give a whole number, and the half minutes must not be lost."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->bill", "bill"],
+          "note": "The average prints with its decimals, half minutes included."
+        }
+      ]
+    },
+    "beats": {
+      "steps": [
+        {
+          "active": ["ambrose", "ambrose->figures", "figures"],
+          "note": "A watch beats a few times a second, and the guarantee lasts some years."
+        },
+        {
+          "active": ["figures->file", "file"],
+          "value": {
+            "kind": "array",
+            "label": "the sum, in order",
+            "values": ["beats a second", "seconds a year", "years"]
+          },
+          "note": "The beats grow past what an int can hold, so the type of each step of the sum matters."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->bill", "bill"],
+          "note": "The receipt prints the beats of the guarantee, a positive number."
+        }
+      ]
+    },
+    "parts": {
+      "steps": [
+        {
+          "active": ["figures"],
+          "note": "The parts for the job have a price with decimals."
+        },
+        {
+          "active": ["file"],
+          "note": "The file brings in the header for printing tools, and asks for two digits after the point."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->bill", "bill"],
+          "note": "The bill prints the parts price the way money is written."
+        }
+      ]
+    }
+  }
+}
