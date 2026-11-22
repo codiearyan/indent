@@ -25,7 +25,6 @@ import { useAi } from '@/features/ai/aiStore'
 import { SuggestionsControl } from '@/features/ai/SuggestionsControl'
 import { askWhyTaskFailed } from '@/features/ai/tutorActions'
 import { TOUR } from '@/features/tour/anchors'
-import { usePane } from '@/features/workspace/activePane'
 import { checkAll, runCommand } from '@/features/workspace/useWorkspaceShortcuts'
 import { useRuntime } from '@/stores/runtime'
 import { foldKey, toggleCommentFolds, useCommentFolds } from './commentFolds'
@@ -71,7 +70,6 @@ export function EditorPane(): React.JSX.Element {
   const hideSummary = useCallback(() => setShowSummary(false), [])
   useModels(files, hideSummary)
   const command = chapter?.terminal.suggestedCommand
-  const filesPane = usePane('files')
   const focusedGroup = useWorkspace((s) => s.layout.focused)
   const activePath = useWorkspace((s) => s.layout.groups[s.layout.focused]?.active ?? null)
   const commentsFolded = useCommentFolds(
@@ -176,8 +174,8 @@ export function EditorPane(): React.JSX.Element {
       <div className="flex min-h-0 flex-1 border-t border-border">
         {panels.files && status === 'ready' && (
           <div
-            {...filesPane}
-            className="pane flex w-[200px] shrink-0 flex-col border-r border-border"
+            data-pane="files"
+            className="flex w-[200px] shrink-0 flex-col border-r border-border"
           >
             <FilesPanel />
           </div>

@@ -9,7 +9,7 @@ export type { PaneId }
 
 export const useActivePane = create<ActivePane>()(() => ({ pane: null, held: null }))
 
-/** The props that make an element a pane: marked while it is the active one. */
+/** The props of an editor group, the one pane that draws the active mark. */
 export function usePane(id: PaneId): { 'data-pane': PaneId; 'data-active': boolean } {
   const active = useActivePane((s) => s.pane === id)
   return { 'data-pane': id, 'data-active': active }

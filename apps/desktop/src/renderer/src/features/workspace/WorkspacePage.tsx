@@ -20,7 +20,7 @@ import { useCatalog } from '@/stores/catalog'
 import { api } from '@/lib/api'
 import { RepoNotice } from './RepoNotice'
 import { useWorkspaceShortcuts } from './useWorkspaceShortcuts'
-import { useActivePaneTracking, usePane, type PaneId } from './activePane'
+import { useActivePaneTracking, type PaneId } from './activePane'
 
 /** Height of the terminal's header bar, which stays visible while the terminal is collapsed. */
 export const TERMINAL_HEADER_PX = 41
@@ -177,9 +177,10 @@ export function WorkspacePage(): React.JSX.Element {
   )
 }
 
+/** Focus here takes the active mark off the editor; only the editor draws the mark. */
 function Pane({ id, children }: { id: PaneId; children: React.ReactNode }): React.JSX.Element {
   return (
-    <div {...usePane(id)} className="pane h-full">
+    <div data-pane={id} className="h-full">
       {children}
     </div>
   )
