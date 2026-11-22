@@ -28,7 +28,7 @@
     "The dog food supplier asks Rosamund how many dogs each owner has, to send samples.",
     "The owners are in one table and the dogs in another, so the list is counted by hand.",
     "You join, count and total across tables, in four tasks.",
-    "Now every owner has a count of dogs, a 0 included, and the samples go out.",
+    "Now every owner is on the list with a count of dogs, and the samples go out.",
     "Same records, counted across tables, with nobody counted twice or left out."
   ]
 }
