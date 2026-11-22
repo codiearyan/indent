@@ -156,6 +156,20 @@ export const checks = {
         password: 'oxide',
         stored: 'not-a-hash',
         want: false
+      },
+      {
+        name: 'A stored value with something added after the hash answers false',
+        password: 'lemon-slip-42',
+        stored: `${kofi}:extra`,
+        want: false,
+        hint: 'The stored value has a third part after the hash, so it is not a salt and a hash. It was accepted because only its first two parts were looked at. Look at the whole value before trusting any of it.'
+      },
+      {
+        name: 'A stored value whose hash ends in other characters answers false',
+        password: 'lemon-slip-42',
+        stored: `${kofi}zz`,
+        want: false,
+        hint: 'The hash in this stored value ends in characters that are not hex, so it is a broken record. It was accepted because turning hex into bytes stops quietly at the first character it cannot read. Look at the whole value before trusting any of it.'
       }
     ]
     const r = await t.call(await sandbox(t), '.grader/harness.mjs', 'verifies', [
@@ -178,6 +192,7 @@ export const checks = {
           'The right password was refused. The typed password has to be hashed exactly the way the stored one was, with its salt and its length, before the two can match.'
       } else {
         message =
+          c.hint ??
           'This should be refused, and it was accepted. Look at what your function compares, and whether it can answer true without the two hashes matching.'
       }
       return {

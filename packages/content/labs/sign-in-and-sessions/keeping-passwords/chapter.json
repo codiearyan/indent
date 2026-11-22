@@ -60,7 +60,7 @@
       "id": "verify",
       "title": "Check a password against its hash",
       "file": "src/passwords.js",
-      "description": "Implement `verifyPassword(password, stored)` in `src/passwords.js`. `stored` is a value `hashPassword` made. It returns `true` when `password` is the one it was made from, and `false` otherwise:\n\n- it compares the two hashes in constant time\n- a stored value that is not a salt and a hash, or whose hash has another length, gives `false` and never throws\n\nThe check makes stored values of its own and tries the right password, near misses, plain text and broken values. It also watches how the hashes are compared.",
+      "description": "Implement `verifyPassword(password, stored)` in `src/passwords.js`. `stored` is a value `hashPassword` made. It returns `true` when `password` is the one it was made from, and `false` otherwise:\n\n- it compares the two hashes in constant time\n- a stored value that is not exactly a salt and a hash, both in hex, or whose hash has another length, gives `false` and never throws\n\nThe check makes stored values of its own and tries the right password, near misses, plain text and broken values. It also watches how the hashes are compared.",
       "nextSteps": [
         "Split the stored value into its salt and its hash.",
         "Hash the typed password the same way `hashPassword` did.",

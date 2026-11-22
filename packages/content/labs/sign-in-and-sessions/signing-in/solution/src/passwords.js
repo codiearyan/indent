@@ -18,8 +18,10 @@ export function hashPassword(password) {
 }
 
 export function verifyPassword(password, stored) {
-  const [salt, hash] = String(stored).split(':')
-  if (!salt || !hash) return false
+  // A whole stored value is two runs of hex and nothing else; anything more is a broken record.
+  const match = /^([0-9a-f]+):([0-9a-f]+)$/.exec(String(stored))
+  if (!match) return false
+  const [, salt, hash] = match
   const expected = Buffer.from(hash, 'hex')
   const actual = scryptSync(password, salt, HASH_BYTES)
   return expected.length === actual.length && timingSafeEqual(expected, actual)

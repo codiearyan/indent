@@ -15,7 +15,7 @@
       "file": "signIn.js",
       "mine": true,
       "gap": "No way to end a session",
-      "tasks": ["Sign out", "Eight-hour sessions", "Refuse ended sessions"]
+      "tasks": ["Sign out", "Sessions that end", "Refuse ended sessions"]
     },
     {
       "title": "Studio laptop",
@@ -32,8 +32,8 @@
   "captions": [
     "Kofi found the studio laptop still signed in as him the morning after an evening class.",
     "Today a session never ends, and there is no way to sign out of one.",
-    "You add a real sign-out, an eight-hour end for each session, and a check for it.",
+    "You add a real sign-out, an end for each session, and a check for it.",
     "Now Kofi signs out and his token is worthless, even where someone copied it.",
-    "Every session ends: when its owner signs out, or eight hours after it began."
+    "Every session ends: when its owner signs out, or when its time is up."
   ]
 }

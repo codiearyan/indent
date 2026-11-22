@@ -96,12 +96,7 @@
           "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals"
         }
       ],
-      "videos": [
-        {
-          "title": "How leaked password hashes get cracked",
-          "url": "https://www.youtube.com/watch?v=7U-RbOKanYs"
-        }
-      ],
+      "videos": [],
       "points": 10
     }
   ]
