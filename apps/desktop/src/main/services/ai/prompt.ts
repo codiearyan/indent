@@ -312,9 +312,11 @@ const MAX_COMPLETION_LINES = 6
 /** Strips fences and chatter models add anyway, and keeps the suggestion short. */
 export function cleanCompletion(raw: string): string {
   let text = raw.replace(/^\s*```[\w-]*\n?/, '').replace(/\n?```\s*$/, '')
-  // A one-line reply wrapped like inline code; a template literal with ${} is left alone.
+  // A one-line reply wrapped like inline code. Inside a fence the backticks are code, and so is
+  // a template literal with ${}; both are left alone.
+  const fenced = text !== raw
   const inline = /^\s*`([^`\n]+)`\s*$/.exec(text)
-  if (inline && !inline[1].includes('${')) text = inline[1]
+  if (inline && !fenced && !inline[1].includes('${')) text = inline[1]
   if (!text.trim()) return ''
   text = text.split('\n').slice(0, MAX_COMPLETION_LINES).join('\n')
   return text.replace(/\s+$/, '')
