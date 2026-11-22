@@ -302,6 +302,8 @@ export interface WorkspaceSnapshot {
    * False for a workspace from before that was kept: Reset empties it.
    */
   remembered: boolean
+  /** Starter files that are gone from the workspace. Checks wait until they are back. */
+  missing: string[]
 }
 
 /** For a conflicted file: keep the learner's version, or replace it with the new one. */
@@ -645,6 +647,8 @@ export interface Api {
     writeFile(labId: string, chapterId: string, path: string, content: string): Promise<void>
     /** Restores the starter files. Files the learner added and progress are kept. */
     reset(labId: string, chapterId: string): Promise<WorkspaceSnapshot>
+    /** Copies back the starter files listed in `missing` and touches nothing else. */
+    restoreMissing(labId: string, chapterId: string): Promise<WorkspaceSnapshot>
     /** Settles one file listed in `conflicts`. */
     resolveConflict(
       labId: string,
@@ -775,6 +779,7 @@ export const INVOKE_METHODS = {
     'open',
     'writeFile',
     'reset',
+    'restoreMissing',
     'resolveConflict',
     'createFile',
     'createFolder',

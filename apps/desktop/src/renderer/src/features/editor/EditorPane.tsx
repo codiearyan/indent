@@ -26,7 +26,6 @@ import { ConflictDialog } from './ConflictDialog'
 import { EditorGroup } from './EditorGroup'
 import { focusedEditor } from './editors'
 import { FilesPanel } from './FilesPanel'
-import { missingFiles } from './fileChange'
 import { useModels } from './models'
 import { QuickOpen } from './QuickOpen'
 
@@ -64,7 +63,6 @@ export function EditorPane(): React.JSX.Element {
   }
   const hideSummary = useCallback(() => setShowSummary(false), [])
   useModels(files, hideSummary)
-  const outdated = status === 'ready' && missingFiles(chapter?.files ?? [], files).length > 0
   const command = chapter?.terminal.suggestedCommand
 
   return (
@@ -92,13 +90,7 @@ export function EditorPane(): React.JSX.Element {
           </div>
         ) : (
           <p className="min-w-0 flex-1 truncate px-1 text-[13px] text-muted-foreground">
-            {outdated ? (
-              'This issue has changed. Reset issue files, in the menu at the top right, to get its new files.'
-            ) : showSummary ? (
-              <CheckSummary />
-            ) : (
-              'Saved as you type. Run checks when you are ready.'
-            )}
+            {showSummary ? <CheckSummary /> : 'Saved as you type. Run checks when you are ready.'}
           </p>
         )}
         <SuggestionsControl />

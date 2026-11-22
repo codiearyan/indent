@@ -85,6 +85,11 @@ async function removeFile(dir: string, path: string): Promise<void> {
   }
 }
 
+const missingFiles = (dir: string, starter: Files): string[] =>
+  Object.keys(starter)
+    .filter((path) => !existsSync(resolveInside(dir, path)))
+    .sort()
+
 const sameFiles = (a: Files, b: Files): boolean =>
   Object.keys(a).length === Object.keys(b).length &&
   Object.keys(a).every((path) => Object.hasOwn(b, path) && a[path] === b[path])
@@ -98,7 +103,13 @@ async function snapshot(
   updated: string[] = []
 ): Promise<WorkspaceSnapshot> {
   const [files, folders] = await Promise.all([readWorkspace(dir, first), readFolders(dir)])
-  return { dir, files, folders, starter, conflicts, updated, remembered }
+  const missing = missingFiles(dir, starter)
+  return { dir, files, folders, starter, conflicts, updated, remembered, missing }
+}
+
+/** Starter files that are gone from the workspace, deleted or renamed by the learner. */
+export async function findMissing(starterDir: string, dir: string): Promise<string[]> {
+  return missingFiles(dir, (await readRemembered(dir)) ?? (await readStarter(starterDir)))
 }
 
 /**
@@ -147,6 +158,18 @@ export async function resetWorkspace(
   await copyStarter(starterDir, dir)
   await remember(dir, next)
   return snapshot(dir, first, next)
+}
+
+/** Copies back only the starter files that are gone. Edited and added files stay as they are. */
+export async function restoreMissing(
+  starterDir: string,
+  dir: string,
+  first: string[]
+): Promise<WorkspaceSnapshot> {
+  for (const path of missingFiles(dir, await readStarter(starterDir))) {
+    await takeFromStarter(starterDir, dir, path)
+  }
+  return openWorkspace(starterDir, dir, first)
 }
 
 /**

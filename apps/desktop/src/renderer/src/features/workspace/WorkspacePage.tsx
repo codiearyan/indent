@@ -11,6 +11,7 @@ import { useAiEnabled } from '@/features/ai/aiStore'
 import { useOpenWhenFinished } from '@/features/completion/useOpenWhenFinished'
 import { Tour } from '@/features/tour/Tour'
 import { ToolNotice } from './ToolNotice'
+import { MissingFilesNotice } from './MissingFilesNotice'
 import { TopBar } from './TopBar'
 import { CompanionBar } from './CompanionBar'
 import { LeftPanel } from './LeftPanel'
@@ -82,6 +83,7 @@ export function WorkspacePage(): React.JSX.Element {
       <TopBar />
       <MomentCard />
       {labId && <ToolNotice labId={labId} />}
+      <MissingFilesNotice />
       <CompanionBar />
       <div className="mx-2 mb-2 min-h-0 flex-1 overflow-hidden rounded-2xl border border-border bg-card">
         {notice && labId && chapterId ? (

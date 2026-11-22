@@ -4,7 +4,13 @@ import { tmpdir } from 'os'
 import { join } from 'path'
 import { describe, expect, it } from 'vitest'
 import { createFolder, removePath, renamePath } from './workspaceOps'
-import { openWorkspace, resetWorkspace, resolveConflict } from './workspaceSync'
+import {
+  findMissing,
+  openWorkspace,
+  resetWorkspace,
+  resolveConflict,
+  restoreMissing
+} from './workspaceSync'
 
 async function writeTree(dir: string, files: Record<string, string>): Promise<void> {
   for (const [path, content] of Object.entries(files)) {
@@ -197,5 +203,25 @@ describe('resetWorkspace', () => {
     const snap = await resetWorkspace(starterDir, dir, [])
     expect(snap.files).toEqual([{ path: 'a.ts', content: 'a' }])
     expect(await remembered(dir)).toEqual({ 'a.ts': 'a' })
+  })
+})
+
+describe('restoreMissing', () => {
+  it('finds starter files that are gone and brings back only those', async () => {
+    const { starterDir, dir } = await setup({ 'src/data.ts': 'data', 'src/tools.ts': 'tools' })
+    await openWorkspace(starterDir, dir, [])
+    await renamePath(dir, 'src/data.ts', 'src/old.ts')
+    await writeTree(dir, { 'src/tools.ts': 'my tools', 'notes.md': 'mine' })
+
+    expect((await openWorkspace(starterDir, dir, [])).missing).toEqual(['src/data.ts'])
+    expect(await findMissing(starterDir, dir)).toEqual(['src/data.ts'])
+
+    const snap = await restoreMissing(starterDir, dir, [])
+
+    expect(snap.missing).toEqual([])
+    expect(await read(dir, 'src/data.ts')).toBe('data')
+    expect(await read(dir, 'src/tools.ts')).toBe('my tools')
+    expect(await read(dir, 'src/old.ts')).toBe('data')
+    expect(await read(dir, 'notes.md')).toBe('mine')
   })
 })
