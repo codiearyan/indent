@@ -28,6 +28,10 @@ const faqs = [
     a: 'In folders on your computer. Each issue has its own workspace with the starter files, which you edit like any project. Your progress is stored locally too. The hidden tests are never copied into your workspace.'
   },
   {
+    q: 'Can I lose my progress? What if I get a new laptop?',
+    a: 'Your progress is never lost. It is saved on your computer, outside the app, so updating or reinstalling Indent keeps it. For a new laptop, open Settings, then Your data, and export a backup: one file with your progress, your code and your settings. Install Indent on the new laptop and import that file. API keys stay behind.'
+  },
+  {
     q: 'Will the hints or the tutor just give me the answer?',
     a: 'No. Check messages say what to look at in plain words and never give the answer. Hints open one at a time as you keep trying, and the tutor explains rather than writes the code for you.'
   },
@@ -43,7 +47,7 @@ const faqs = [
     <div class="lg:col-span-5">
       <div class="flex items-center gap-3">
         <p class="font-mono text-[13px] text-muted-foreground">/faq</p>
-        <BuildStrip groups={[8]} filled={8} />
+        <BuildStrip groups={[9]} filled={9} />
       </div>
       <h2 id="faq-title" class="headline mt-6 text-[38px] sm:text-[48px] lg:text-[60px]">
         <span class="text-muted-foreground">Questions,</span>{' '}

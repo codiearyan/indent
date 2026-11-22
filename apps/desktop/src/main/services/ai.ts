@@ -1,6 +1,6 @@
 import { safeStorage } from 'electron'
 import { randomUUID } from 'crypto'
-import { readFile, writeFile } from 'fs/promises'
+import { copyFile, readFile, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 import type {
   AiChatEvent,
@@ -413,6 +413,27 @@ async function tip(labId: string, chapterId: string, taskId: string): Promise<Pr
   } finally {
     tips.delete(key)
   }
+}
+
+export const savedAiChoice = (): Promise<AiSettings> => loadSettings()
+
+/** Takes the AI choice from a backup. A provider this version does not know is left unpicked. */
+export async function restoreAiChoice(saved: unknown): Promise<void> {
+  const next = readSettings(saved)
+  if (![...CLI_PROVIDERS, ...API_PROVIDERS].some((p) => p.id === next.provider)) {
+    next.provider = null
+    next.model = null
+  }
+  if (next.model?.startsWith('-')) next.model = null
+  // Kept aside like the progress, so the choice made on this computer can be recovered.
+  await copyFile(settingsFile(), `${settingsFile()}.replaced-${Date.now()}`).catch(
+    (error: NodeJS.ErrnoException) => {
+      if (error.code !== 'ENOENT') throw error
+    }
+  )
+  settings = next
+  await saveSettings()
+  if (!next.enabled) stopEverything()
 }
 
 export function register(): void {

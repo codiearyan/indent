@@ -7,6 +7,7 @@ import * as content from './services/content'
 import * as workspace from './services/workspace'
 import * as checks from './services/checks'
 import * as progress from './services/progress'
+import * as backup from './services/backup'
 import * as terminal from './services/terminal'
 import * as ai from './services/ai'
 import * as preview from './services/preview'
@@ -141,6 +142,7 @@ app.whenReady().then(() => {
     workspace,
     checks,
     progress,
+    backup,
     terminal,
     ai,
     preview,

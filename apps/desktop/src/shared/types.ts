@@ -474,12 +474,21 @@ export interface ProgressSummary {
   tasksPassed: number
 }
 
-/** A picked progress file next to the progress on this computer, shown before it is replaced. */
+/** A picked backup next to the progress on this computer, shown before it is replaced. */
 export interface ProgressImport {
   /** Name of the picked file, without its folder. */
   file: string
   current: ProgressSummary
   incoming: ProgressSummary
+  /** Issues whose code the file holds; 0 for a progress-only file. */
+  issues: number
+  hasSettings: boolean
+}
+
+export interface BackupRestored {
+  progress: ProgressState
+  /** The renderer's settings from the backup, still to be checked; null when it had none. */
+  app: Record<string, unknown> | null
 }
 
 // ---------- AI ----------
@@ -710,16 +719,21 @@ export interface Api {
     get(): Promise<ProgressState>
     /** Records the chapter as opened, creating its progress entry. */
     touch(labId: string, chapterId: string): Promise<ProgressState>
-    /** Asks where to save and writes the progress there. The file's path, or null when cancelled. */
-    exportFile(): Promise<string | null>
-    /** Asks for a progress file and reads it. Null when cancelled; throws when it is not one. */
-    pickImport(): Promise<ProgressImport | null>
-    /** Makes the last picked file the progress. The replaced progress is kept aside on disk. */
-    applyImport(): Promise<ProgressState>
     /** Records that hint `hint` (from 1) of a task was shown. */
     showHint(labId: string, chapterId: string, taskId: string, hint: number): Promise<ProgressState>
     /** Sets how many tasks a day keep the streak: one of DAILY_GOALS. */
     setDailyGoal(goal: number): Promise<ProgressState>
+  }
+  backup: {
+    /**
+     * Asks where to save and writes one file with the progress, the code of every issue and the
+     * settings (`app` are the renderer's own). The file's path, or null when cancelled.
+     */
+    exportFile(app: Record<string, unknown>): Promise<string | null>
+    /** Asks for a backup or an older progress file and reads it. Null when cancelled. */
+    pickImport(): Promise<ProgressImport | null>
+    /** Restores the last picked file. What it replaces is kept aside on disk, never deleted. */
+    applyImport(): Promise<BackupRestored>
   }
   terminal: {
     create(opts: { labId: string; chapterId: string; cols: number; rows: number }): Promise<string>
@@ -813,7 +827,8 @@ export const INVOKE_METHODS = {
   ],
   ide: ['list', 'open', 'setCompact'],
   checks: ['run', 'trace', 'runtimeStatus', 'ensureRuntime'],
-  progress: ['get', 'touch', 'exportFile', 'pickImport', 'applyImport', 'showHint', 'setDailyGoal'],
+  progress: ['get', 'touch', 'showHint', 'setDailyGoal'],
+  backup: ['exportFile', 'pickImport', 'applyImport'],
   terminal: ['create'],
   updates: ['status', 'check', 'download', 'cancel', 'install'],
   tools: [
