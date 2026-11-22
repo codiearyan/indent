@@ -1,0 +1,123 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "desk", "label": "Front desk form", "kind": "story" },
+      { "id": "put", "label": "PUT /workshops/:id", "kind": "file", "mine": true },
+      { "id": "patch", "label": "PATCH /workshops/:id", "kind": "file", "mine": true },
+      { "id": "remove", "label": "DELETE /workshops/:id", "kind": "file", "mine": true },
+      {
+        "id": "validate",
+        "label": "validateWorkshop()",
+        "kind": "function",
+        "mine": true,
+        "fn": "validateWorkshop"
+      },
+      { "id": "store", "label": "Workshop store", "kind": "file" },
+      { "id": "reply", "label": "JSON answer", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "desk", "to": "put", "label": "whole workshop" },
+      { "from": "desk", "to": "patch", "label": "a few fields" },
+      { "from": "desk", "to": "remove", "label": "an id" },
+      { "from": "patch", "to": "validate", "label": "body, partial" },
+      { "from": "put", "to": "store", "label": "update" },
+      { "from": "remove", "to": "store", "label": "remove" },
+      { "from": "store", "to": "reply", "label": "result" }
+    ],
+    "note": "Nadia's changes for the week reach the store through three new routes, each of which checks the id first and the body second."
+  },
+  "tasks": {
+    "put": {
+      "steps": [
+        {
+          "active": ["desk", "desk->put", "put"],
+          "value": {
+            "kind": "map",
+            "label": "PUT /workshops/2",
+            "entries": [
+              { "key": "title", "value": "Hand-built mugs and jugs" },
+              { "key": "day", "value": "wed" },
+              { "key": "seats", "value": 10 },
+              { "key": "priceCents", "value": 4200 }
+            ]
+          },
+          "note": "Sunniva sends the mugs class again, whole, with its new name and price."
+        },
+        {
+          "active": ["put", "put->store", "store"],
+          "note": "The route asks the store whether workshop 2 exists. An id it does not have answers 404, and nothing is created."
+        },
+        {
+          "active": ["put"],
+          "note": "The body is checked like a POST: every field must be there and follow its rule, or the answer is 400 with the fields."
+        },
+        {
+          "active": ["put", "put->store", "store", "store->reply", "reply"],
+          "note": "Only the four fields are saved, under the id from the path, and the whole workshop goes back with a 200."
+        }
+      ]
+    },
+    "patch": {
+      "steps": [
+        {
+          "active": ["desk", "desk->patch", "patch"],
+          "value": {
+            "kind": "map",
+            "label": "PATCH /workshops/5",
+            "entries": [{ "key": "seats", "value": 14 }]
+          },
+          "note": "The family morning gets more seats. Only the field that changes is sent."
+        },
+        {
+          "active": ["patch", "patch->validate", "validate"],
+          "note": "validateWorkshop() in partial mode tests only the fields that were sent. The missing ones are simply not changing."
+        },
+        {
+          "active": ["patch", "store"],
+          "note": "An unknown id answers 404 and a field that breaks its rule answers 400. Otherwise the sent fields are merged into the workshop."
+        },
+        {
+          "active": ["store", "store->reply", "reply"],
+          "value": {
+            "kind": "map",
+            "label": "what goes back",
+            "entries": [
+              { "key": "status", "value": 200 },
+              { "key": "body", "value": "the whole workshop after the change" }
+            ]
+          },
+          "note": "The answer is the whole workshop, so the page never has to guess the other fields."
+        }
+      ],
+      "trace": {
+        "file": "src/validate.js",
+        "call": "validateWorkshop",
+        "args": [{ "seats": 14 }, { "partial": true }]
+      }
+    },
+    "delete": {
+      "steps": [
+        {
+          "active": ["desk", "desk->remove", "remove"],
+          "note": "Glazing basics is cancelled, so the desk asks to remove workshop 3."
+        },
+        {
+          "active": ["remove", "remove->store", "store"],
+          "note": "The store removes it and says whether there was anything to remove."
+        },
+        {
+          "active": ["store", "store->reply", "reply"],
+          "value": {
+            "kind": "map",
+            "label": "two ways it can end",
+            "entries": [
+              { "key": "removed", "value": "204 and no body" },
+              { "key": "not there", "value": "404 and an error object" }
+            ]
+          },
+          "note": "A removal answers with a status and nothing else. Removing it a second time finds nothing, and says so."
+        }
+      ]
+    }
+  }
+}

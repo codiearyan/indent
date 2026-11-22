@@ -1,0 +1,113 @@
+{
+  "id": "holding-up",
+  "title": "Routers, middleware and errors",
+  "files": [
+    "src/app.js",
+    "src/routes/workshops.js",
+    "src/middleware/staffOnly.js",
+    "src/middleware/errors.js",
+    "src/validate.js",
+    "src/store.js",
+    "try.js",
+    "server.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js starts your API on a free port and sends it a few requests, some with the staff key.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "router",
+      "title": "Move the routes into a router",
+      "file": "src/routes/workshops.js",
+      "description": "Implement `workshopsRouter(store)` in `src/routes/workshops.js`. It returns an Express router with all six workshop routes from `src/app.js`: list (with its filters), read one, create, replace, change and remove. Every answer stays exactly as it is now.\n\n- the router's paths are written from where it is mounted: the list is at `/`, one workshop at `/:id`\n- in `createApp`, remove those routes and mount the router at `/workshops`; `GET /health` and the catch-all 404 stay in `app.js`\n- the `location` of a new workshop still names its real path, such as `/workshops/6`\n\nThe check mounts your router at a different path in an app of its own and sends it every kind of request, then checks that `createApp` still answers at `/workshops`.",
+      "nextSteps": [
+        "Make a router in `workshopsRouter` and return it.",
+        "Move each workshop route onto it, and shorten its path.",
+        "Move the helpers the routes need with them.",
+        "Mount the router in `createApp`, then run `node try.js`."
+      ],
+      "hints": [
+        "A router is a small app with routes and middleware of its own. It has the same `get`, `post`, `put`, `patch` and `delete` methods.",
+        "`express.Router()` makes one, and `app.use('/workshops', router)` mounts it. Inside, the router only sees the part of the path after `/workshops`. `req.baseUrl` holds the part before.",
+        "`router.get('/:id', ...)` instead of `app.get('/workshops/:id', ...)`, and `res.location(`${req.baseUrl}/${workshop.id}`)` for the new workshop."
+      ],
+      "docs": [
+        {
+          "title": "express.Router",
+          "url": "https://expressjs.com/en/5x/guide/routing#expressrouter"
+        },
+        { "title": "Router", "url": "https://expressjs.com/en/5x/api/router" },
+        { "title": "req.baseUrl", "url": "https://expressjs.com/en/5x/api/request#reqbaseurl" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "staff-only",
+      "title": "Let only staff make changes",
+      "file": "src/middleware/staffOnly.js",
+      "description": "Implement `staffOnly(key)` in `src/middleware/staffOnly.js`. It returns a middleware:\n\n- `GET` and `HEAD` requests go on to the next handler\n- any other request goes on only when its `x-staff-key` header equals `key`\n- otherwise it answers `401` with `{ \"error\": { \"code\": \"unauthorized\", \"message\": \"...\" } }` and the route never runs\n\nThen use it in `createApp`: put `staffOnly(staffKey)` in front of the workshops router, with the `staffKey` that `createApp` is given.\n\nThe check starts your app with a key of its own and sends reads and changes with no key, a wrong key and the right one.",
+      "nextSteps": [
+        "Return a function with the three middleware arguments from `staffOnly`.",
+        "Let reads through first.",
+        "Compare the header with the key, and either go on or answer 401.",
+        "Mount it in front of the router, then run `node try.js`."
+      ],
+      "hints": [
+        "A middleware ends in one of two ways: it answers, or it calls `next()` so the next handler runs. Never both.",
+        "`req.get('x-staff-key')` reads a header, whatever case the client wrote it in. `app.use(path, first, second)` runs both handlers in order on that path.",
+        "`return (req, res, next) => { ... }` with `return next()` for reads and for the right key, and `res.status(401).json(...)` for the rest. Mount it as `app.use('/workshops', staffOnly(staffKey), workshopsRouter(store))`."
+      ],
+      "docs": [
+        {
+          "title": "Writing middleware",
+          "url": "https://expressjs.com/en/5x/guide/writing-middleware"
+        },
+        { "title": "req.get()", "url": "https://expressjs.com/en/5x/api/request#reqget" },
+        {
+          "title": "401 Unauthorized",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Express middleware explained",
+          "url": "https://www.youtube.com/watch?v=lY6icfhap2o"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "errors",
+      "title": "Answer every error as JSON",
+      "file": "src/middleware/errors.js",
+      "description": "Implement `handleErrors(err, req, res, next)` in `src/middleware/errors.js`, the app's one error handler:\n\n- a body that is not valid JSON answers `400` with `{ \"error\": { \"code\": \"invalid_json\", \"message\": \"...\" } }`\n- any other error is logged with `console.error` and answers `500` with `{ \"error\": { \"code\": \"internal\", \"message\": \"...\" } }`; the message says nothing about the error itself: no stack, no error message, no file paths\n- if the response has already started, pass the error on with `next(err)`\n\nRegister it in `createApp` after everything else. The check makes the store fail with an error of its own, posts broken JSON, and checks that ordinary requests and the 404 still work.",
+      "nextSteps": [
+        "Run `node try.js` and read what broken JSON gets today.",
+        "Tell a JSON error from everything else.",
+        "Log the error for yourself and send a plain sentence to the client.",
+        "Register the handler last in `createApp`, then run `node try.js` again."
+      ],
+      "hints": [
+        "Express knows a function is an error handler because it takes four arguments. It only runs once something has failed.",
+        "The error `express.json()` passes on for a broken body has a `type` of `'entity.parse.failed'` and a `status` of 400.",
+        "`if (res.headersSent) return next(err)`, then `if (err.type === 'entity.parse.failed') return res.status(400).json(...)`, then `console.error(err)` and `res.status(500).json(...)`. Add it with `app.use(handleErrors)` after the catch-all."
+      ],
+      "docs": [
+        {
+          "title": "Express error handling",
+          "url": "https://expressjs.com/en/5x/guide/error-handling"
+        },
+        {
+          "title": "Writing error handlers",
+          "url": "https://expressjs.com/en/5x/guide/error-handling#writing-error-handlers"
+        },
+        {
+          "title": "500 Internal Server Error",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

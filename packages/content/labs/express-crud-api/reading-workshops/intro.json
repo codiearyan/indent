@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Ivo",
+      "say": "Thursday, for under forty?",
+      "note": "A question from the sign-up page."
+    },
+    {
+      "title": "The API",
+      "text": "Answers only with the whole list.",
+      "note": "From the last issue."
+    },
+    {
+      "title": "Your code",
+      "file": "app.js",
+      "mine": true,
+      "gap": "No way to ask for less",
+      "tasks": ["Read one by id", "Filter by day", "Filter by price"]
+    },
+    {
+      "title": "Workshops",
+      "rows": [
+        ["Glazing basics", "thu"],
+        ["Second steps", "thu"],
+        ["Family morning", "sat"]
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Thursday",
+    "wrong": "all five",
+    "why": "Too much",
+    "right": "a short list"
+  },
+  "captions": [
+    "Ivo's sign-up page wants one workshop at a time, and Thursdays for under forty.",
+    "Today the API can only send every workshop, so the page has to sort it out.",
+    "You read an id from the path and two filters from the query string.",
+    "Now the page asks for Thursday under forty and gets just what fits.",
+    "One workshop by id, a shorter list by query, and a clear no for the rest."
+  ]
+}

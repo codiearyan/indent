@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Ivo",
+      "say": "Can I get this week's workshops?",
+      "note": "For the new sign-up page."
+    },
+    {
+      "title": "The studio",
+      "text": "Workshops on a paper sheet by the door.",
+      "note": "No API yet."
+    },
+    {
+      "title": "Your code",
+      "file": "app.js",
+      "mine": true,
+      "gap": "No app answers yet",
+      "tasks": ["Create the app", "List the workshops", "A JSON 404"]
+    },
+    {
+      "title": "Workshops",
+      "rows": [
+        ["Wheel throwing", "tue"],
+        ["Hand-built mugs", "wed"],
+        ["Glazing basics", "thu"]
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Workshops",
+    "wrong": "no answer",
+    "why": "No app",
+    "right": "a JSON list"
+  },
+  "captions": [
+    "At Copperleaf Pottery, Ivo needs this week's workshops for his sign-up page.",
+    "The workshops are only on paper, and nothing answers his request.",
+    "You create the Express app, its routes and a JSON 404, in three tasks.",
+    "Now the page asks for the workshops and gets every one of them as JSON.",
+    "Same request, a real answer. And a clear no for anything else."
+  ]
+}

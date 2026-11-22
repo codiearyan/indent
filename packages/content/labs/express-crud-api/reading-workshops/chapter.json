@@ -1,0 +1,100 @@
+{
+  "id": "reading-workshops",
+  "title": "Read one, read many",
+  "files": ["src/app.js", "src/store.js", "src/workshops.js", "try.js", "server.js"],
+  "terminal": {
+    "description": "A shell in your workspace where try.js starts your API on a free port and sends it a few requests.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "one",
+      "title": "Read one workshop by id",
+      "file": "src/app.js",
+      "description": "Add a route to `createApp` in `src/app.js`:\n\n- `GET /workshops/:id` answers `200` with the workshop whose id is `:id`, as `store.get(id)` returns it\n- an id the store does not have, or one that is not a number at all (`/workshops/glazing`), answers `404` with `{ \"error\": { \"code\": \"not_found\", \"message\": \"...\" } }`\n\nIds in the store are numbers. The check sends ids of workshops it gave the store, ids it did not, and one that is not a number.",
+      "nextSteps": [
+        "Add a route whose path has a parameter for the id.",
+        "Read the id from the request and turn it into a number.",
+        "Ask the store for that workshop.",
+        "Answer 404 when there is none, then run `node try.js`."
+      ],
+      "hints": [
+        "A part of a path that starts with `:` is a route parameter. Express puts what the client sent there in `req.params`.",
+        "Everything in `req.params` is text, and the store's ids are numbers. `'3' === 3` is false.",
+        "`store.get(Number(req.params.id))` gives a workshop or `undefined`. Return a `res.status(404).json(...)` when it is `undefined`."
+      ],
+      "docs": [
+        {
+          "title": "Express route parameters",
+          "url": "https://expressjs.com/en/5x/guide/routing#route-parameters"
+        },
+        { "title": "req.params", "url": "https://expressjs.com/en/5x/api/request#reqparams" },
+        {
+          "title": "404 Not Found",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Express routes, parameters and routers",
+          "url": "https://www.youtube.com/watch?v=SccSCuHhOw0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "day",
+      "title": "Filter the list by day",
+      "file": "src/app.js",
+      "description": "Make `GET /workshops` take an optional filter in the query string:\n\n- `GET /workshops?day=thu` answers only the workshops whose `day` is `thu`, in the store's order\n- a day with no workshops answers `200` with an empty list\n- without `day`, the list is whole, as before\n\nThe check asks for days that have workshops, a day that has none, and no day at all.",
+      "nextSteps": [
+        "Read the query string from the request in the list route.",
+        "Keep the whole list when there is no `day`.",
+        "Otherwise keep only the workshops on that day.",
+        "Run `node try.js` and look at the `?day=thu` answer."
+      ],
+      "hints": [
+        "Express has already split the query string into an object for you. Look at `req.query`.",
+        "A filter that was not sent is `undefined` in `req.query`. Only filter when it is there.",
+        "`store.list().filter((w) => day === undefined || w.day === day)`."
+      ],
+      "docs": [
+        { "title": "req.query", "url": "https://expressjs.com/en/5x/api/request#reqquery" },
+        {
+          "title": "Array.prototype.filter()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "price",
+      "title": "Filter it by price",
+      "file": "src/app.js",
+      "description": "Add a second optional filter to `GET /workshops`:\n\n- `?maxPriceCents=4000` keeps only the workshops whose `priceCents` is at most that number\n- with `day` and `maxPriceCents` both given, keep the workshops that match both\n- a `maxPriceCents` that is not a number answers `400` with `{ \"error\": { \"code\": \"bad_query\", \"message\": \"...\" } }`\n\nThe check sends prices on and around the edge, both filters together, and a price that is not a number.",
+      "nextSteps": [
+        "Read `maxPriceCents` next to `day`.",
+        "Turn it into a number, and decide what to do when that fails.",
+        "Keep only what costs that much or less, after the day filter.",
+        "Run `node try.js` and look at the last two answers."
+      ],
+      "hints": [
+        "Query values are always text, like route parameters. Comparing a price with `'4000'` happens to work, but `'cheap'` becomes `NaN`, and every comparison with `NaN` is false.",
+        "`Number('cheap')` is `NaN`, and `Number.isNaN` tells you so. That is the moment to answer 400 and stop.",
+        "Convert once, return `res.status(400).json(...)` when `Number.isNaN(max)`, then chain a second `.filter` that keeps `w.priceCents <= max`."
+      ],
+      "docs": [
+        { "title": "req.query", "url": "https://expressjs.com/en/5x/api/request#reqquery" },
+        {
+          "title": "Number.isNaN()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN"
+        },
+        {
+          "title": "400 Bad Request",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

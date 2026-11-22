@@ -1,0 +1,132 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "desk", "label": "Front desk form", "kind": "story" },
+      { "id": "json", "label": "express.json()", "kind": "file", "mine": true },
+      { "id": "route", "label": "POST /workshops", "kind": "file", "mine": true },
+      {
+        "id": "validate",
+        "label": "validateWorkshop()",
+        "kind": "function",
+        "mine": true,
+        "fn": "validateWorkshop"
+      },
+      { "id": "store", "label": "Workshop store", "kind": "file" },
+      { "id": "reply", "label": "201 or 400", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "desk", "to": "json", "label": "JSON body" },
+      { "from": "json", "to": "route", "label": "req.body" },
+      { "from": "route", "to": "validate", "label": "body" },
+      { "from": "route", "to": "store", "label": "four fields" },
+      { "from": "route", "to": "reply", "label": "status, body" },
+      { "from": "reply", "to": "desk", "label": "answer" }
+    ],
+    "note": "Sunniva's form at the front desk posts new workshops, and the API reads, checks and trims each body before the store ever sees it."
+  },
+  "tasks": {
+    "create": {
+      "steps": [
+        {
+          "active": ["desk", "desk->json", "json"],
+          "value": {
+            "kind": "map",
+            "label": "what the form sends",
+            "entries": [
+              { "key": "title", "value": "Throwing bowls" },
+              { "key": "day", "value": "fri" },
+              { "key": "seats", "value": 6 },
+              { "key": "priceCents", "value": 4500 }
+            ]
+          },
+          "note": "Sunniva adds a Friday workshop. The form sends it as JSON in the body of a POST."
+        },
+        {
+          "active": ["json", "json->route", "route"],
+          "note": "express.json() reads the body before any route runs, so the POST route finds it in req.body."
+        },
+        {
+          "active": ["route", "route->store", "store"],
+          "note": "The route keeps only the four workshop fields and saves them. The store picks the id."
+        },
+        {
+          "active": ["route", "route->reply", "reply", "reply->desk"],
+          "value": {
+            "kind": "map",
+            "label": "what goes back",
+            "entries": [
+              { "key": "status", "value": 201 },
+              { "key": "location", "value": "where the new workshop lives" },
+              { "key": "body", "value": "the saved workshop, with its id" }
+            ]
+          },
+          "note": "The desk learns the new workshop's id and where to find it."
+        }
+      ]
+    },
+    "validate": {
+      "steps": [
+        {
+          "active": ["route", "route->validate", "validate"],
+          "value": {
+            "kind": "map",
+            "label": "the body from last month",
+            "entries": [
+              { "key": "title", "value": "Raku evening" },
+              { "key": "day", "value": "fri" },
+              { "key": "seats", "value": 40 },
+              { "key": "priceCents", "value": 6500 }
+            ]
+          },
+          "note": "validateWorkshop() gets the raku evening that was typed with far too many seats."
+        },
+        {
+          "active": ["validate"],
+          "note": "It first makes sure the body is an object at all. Nothing, null, a list or a string gets every field name back."
+        },
+        {
+          "active": ["validate"],
+          "note": "Then it tests each field against its rule: a real title, a short day name, a sensible number of seats, a whole price."
+        },
+        {
+          "active": ["validate", "route"],
+          "value": {
+            "kind": "array",
+            "label": "what it returns",
+            "values": ["names of the wrong fields, in order"]
+          },
+          "note": "It hands back the names of the fields that broke a rule. An empty list means the workshop is fine."
+        }
+      ],
+      "trace": {
+        "file": "src/validate.js",
+        "call": "validateWorkshop",
+        "args": [{ "title": "Raku evening", "day": "fri", "seats": 40, "priceCents": 6500 }]
+      }
+    },
+    "reject": {
+      "steps": [
+        {
+          "active": ["desk", "desk->json", "json", "json->route", "route"],
+          "note": "A form with a mistake posts a workshop, or a request arrives with no body at all."
+        },
+        {
+          "active": ["route", "route->validate", "validate"],
+          "note": "The route asks validateWorkshop() about the body before it does anything else."
+        },
+        {
+          "active": ["route", "route->reply", "reply", "reply->desk"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of the refusal",
+            "entries": [
+              { "key": "error.code", "value": "validation_failed" },
+              { "key": "error.fields", "value": "the fields to fix" }
+            ]
+          },
+          "note": "When there are problems it answers 400 with the fields to fix, and the store is never touched."
+        }
+      ]
+    }
+  }
+}

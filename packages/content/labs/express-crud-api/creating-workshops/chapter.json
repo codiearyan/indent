@@ -1,0 +1,103 @@
+{
+  "id": "creating-workshops",
+  "title": "Create from a request body",
+  "files": [
+    "src/app.js",
+    "src/validate.js",
+    "src/store.js",
+    "src/workshops.js",
+    "try.js",
+    "server.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js starts your API on a free port and sends it a few requests.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "create",
+      "title": "Create a workshop",
+      "file": "src/app.js",
+      "description": "Add `POST /workshops` to `createApp` in `src/app.js`. It reads a JSON body like `{ \"title\": \"Throwing bowls\", \"day\": \"fri\", \"seats\": 6, \"priceCents\": 4500 }` and:\n\n- saves the workshop with `store.create(...)`, which picks the id\n- saves **only** `title`, `day`, `seats` and `priceCents`; an `id` or any other field in the body is left out (`FIELDS` in `src/validate.js` lists the four)\n- answers `201` with the saved workshop and a `location` header that points at it, such as `/workshops/6`\n\nValidation comes in the next two tasks. The check posts workshops, reads them back and posts one with fields that must not be saved.",
+      "nextSteps": [
+        "Run `node try.js` and look at the first answer: Express has no route for it yet.",
+        "Turn on JSON body parsing for the app, before the routes.",
+        "Add the POST route, keep only the four fields and save them.",
+        "Answer 201 with the location header, then run `node try.js` again."
+      ],
+      "hints": [
+        "Express does not read request bodies by itself. `req.body` stays `undefined` until a middleware fills it.",
+        "`app.use(express.json())` reads JSON bodies into `req.body`. To keep only some fields, build a new object from `FIELDS`.",
+        "`const workshop = store.create(picked)`, then `res.status(201).location(`/workshops/${workshop.id}`).json(workshop)`."
+      ],
+      "docs": [
+        { "title": "express.json()", "url": "https://expressjs.com/en/5x/api/express#expressjson" },
+        { "title": "req.body", "url": "https://expressjs.com/en/5x/api/request#reqbody" },
+        { "title": "res.location()", "url": "https://expressjs.com/en/5x/api/response#reslocation" }
+      ],
+      "videos": [
+        {
+          "title": "A REST API in Express, from GET to DELETE",
+          "url": "https://www.youtube.com/watch?v=pKd0Rpw7O48"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "validate",
+      "title": "Check what was sent",
+      "file": "src/validate.js",
+      "description": "Implement `validateWorkshop(body)` in `src/validate.js`. It returns the names of the fields that are missing or wrong, in the order `title`, `day`, `seats`, `priceCents`, and `[]` when the workshop is fine:\n\n- `title`: text that is not empty once spaces are trimmed, at most 80 characters\n- `day`: one of `DAYS`\n- `seats`: a whole number from 1 to 20\n- `priceCents`: a whole number, 0 or more\n\nA body that is not an object at all (`undefined`, `null`, an array, a string) gets all four names. Other fields do not matter here.\n\nThe check calls your function with good workshops, values on both sides of each limit, and bodies that are not workshops.",
+      "nextSteps": [
+        "First handle a body that is not a plain object.",
+        "Write one small test per field.",
+        "Return the fields whose test fails, in the order of `FIELDS`.",
+        "Press Check: it calls the function directly."
+      ],
+      "hints": [
+        "`typeof` is not enough on its own: it says `\"object\"` for `null` and for arrays too.",
+        "`Number.isInteger` is false for `2.5`, for `'6'` and for `NaN`, which covers most of what a number rule needs.",
+        "`if (typeof body !== 'object' || body === null || Array.isArray(body)) return [...FIELDS]`, then keep one test per field in an object `rules` and return `FIELDS.filter((field) => !rules[field](body[field]))`."
+      ],
+      "docs": [
+        {
+          "title": "Number.isInteger()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger"
+        },
+        {
+          "title": "Array.isArray()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "reject",
+      "title": "Refuse a bad workshop",
+      "file": "src/app.js",
+      "description": "Use `validateWorkshop` in `POST /workshops`. When it finds problems:\n\n- answer `400` with `{ \"error\": { \"code\": \"validation_failed\", \"message\": \"...\", \"fields\": [...] } }`, where `fields` is the list `validateWorkshop` returned\n- save nothing\n\nA POST with no JSON body at all leaves `req.body` as `undefined`, and must get the same 400, not a crash. Good workshops are still created as before.\n\nThe check posts workshops with wrong fields, no body and a list, then checks that nothing was saved.",
+      "nextSteps": [
+        "Call `validateWorkshop` with the body at the start of the route.",
+        "When the list is not empty, answer 400 and stop.",
+        "Make sure the store only sees bodies that passed.",
+        "Run `node try.js` and look at the last two answers."
+      ],
+      "hints": [
+        "The body is the one part of a request you cannot trust. Check it before anything else uses it.",
+        "The route has two endings now. Return the 400 so the code after it does not run.",
+        "`const problems = validateWorkshop(req.body)`, then `if (problems.length > 0) return res.status(400).json({ error: { code: 'validation_failed', message, fields: problems } })`."
+      ],
+      "docs": [
+        {
+          "title": "400 Bad Request",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400"
+        },
+        {
+          "title": "201 Created",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/201"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

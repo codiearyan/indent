@@ -1,0 +1,113 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Sign-up page", "kind": "story" },
+      { "id": "one", "label": "GET /workshops/:id", "kind": "file", "mine": true },
+      { "id": "list", "label": "GET /workshops", "kind": "file", "mine": true },
+      { "id": "store", "label": "Workshop store", "kind": "file" },
+      { "id": "reply", "label": "JSON answer", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "page", "to": "one", "label": "an id" },
+      { "from": "page", "to": "list", "label": "filters" },
+      { "from": "one", "to": "store", "label": "get(id)" },
+      { "from": "list", "to": "store", "label": "list()" },
+      { "from": "one", "to": "reply", "label": "workshop or 404" },
+      { "from": "list", "to": "reply", "label": "list or 400" },
+      { "from": "reply", "to": "page", "label": "answer" }
+    ],
+    "note": "Ivo's page can now ask for one workshop by its id, or for a list narrowed by day and price, and every answer says clearly when there is nothing to give."
+  },
+  "tasks": {
+    "one": {
+      "steps": [
+        {
+          "active": ["page", "page->one", "one"],
+          "value": {
+            "kind": "map",
+            "label": "what the route gets",
+            "entries": [
+              { "key": "path", "value": "/workshops/3" },
+              { "key": "req.params.id", "value": "text, not a number" }
+            ]
+          },
+          "note": "The page for Glazing basics asks for workshop 3. The id arrives in the path, as text."
+        },
+        {
+          "active": ["one", "one->store", "store"],
+          "note": "The route turns the id into a number and asks the store for that one workshop."
+        },
+        {
+          "active": ["one", "one->reply", "reply", "reply->page"],
+          "value": {
+            "kind": "map",
+            "label": "two ways it can end",
+            "entries": [
+              { "key": "found", "value": "200 and the workshop" },
+              { "key": "not found", "value": "404 and an error object" }
+            ]
+          },
+          "note": "An id the store has, or one it has never heard of, such as /workshops/glazing, each get a clear answer."
+        }
+      ]
+    },
+    "day": {
+      "steps": [
+        {
+          "active": ["page", "page->list", "list"],
+          "value": {
+            "kind": "map",
+            "label": "req.query",
+            "entries": [{ "key": "day", "value": "thu" }]
+          },
+          "note": "Someone wants a workshop on a Thursday, so the page sends the day in the query string."
+        },
+        {
+          "active": ["list", "list->store", "store"],
+          "note": "The route takes every workshop from the store and keeps only those on that day."
+        },
+        {
+          "active": ["list", "list->reply", "reply", "reply->page"],
+          "value": {
+            "kind": "map",
+            "label": "what goes back",
+            "entries": [
+              { "key": "a day with workshops", "value": "those workshops" },
+              { "key": "a day with none", "value": "an empty list" },
+              { "key": "no day", "value": "every workshop" }
+            ]
+          },
+          "note": "The answer is always 200 and a list, even when no workshop runs that day."
+        }
+      ]
+    },
+    "price": {
+      "steps": [
+        {
+          "active": ["page", "page->list", "list"],
+          "value": {
+            "kind": "map",
+            "label": "req.query",
+            "entries": [
+              { "key": "day", "value": "thu" },
+              { "key": "maxPriceCents", "value": "4000" }
+            ]
+          },
+          "note": "Now the page also sends a top price. Like the day, it arrives as text."
+        },
+        {
+          "active": ["list"],
+          "note": "The route turns the price into a number. When that fails, as with maxPriceCents=lots, it answers 400 with the code bad_query and stops."
+        },
+        {
+          "active": ["list", "list->store", "store"],
+          "note": "Otherwise it keeps the workshops that match the day and cost that much or less."
+        },
+        {
+          "active": ["list", "list->reply", "reply", "reply->page"],
+          "note": "The page gets the shorter list, or an error it can show next to the price box."
+        }
+      ]
+    }
+  }
+}
