@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Can it print the hut's notice?",
+      "note": "Today it is sticky tape on wood."
+    },
+    {
+      "title": "Ticket hut",
+      "text": "Prints a good morning and an old offer."
+    },
+    {
+      "title": "Your program",
+      "file": "Notice.java",
+      "mine": true,
+      "gap": "Nothing prints the notice",
+      "tasks": ["Print the welcome", "Print the times", "Hours on one line", "Switch off the old"]
+    },
+    {
+      "title": "The notice",
+      "text": "Printed and ready for the hut window."
+    }
+  ],
+  "ticket": {
+    "label": "The notice",
+    "wrong": "taped up",
+    "why": "Not printed",
+    "right": "printed"
+  },
+  "captions": [
+    "Lanternquay Ferries. Bridie wants the notice on the ticket hut printed by a program.",
+    "Today the program prints a good morning and an offer that stopped, and no notice.",
+    "You write the statements that print it, in four small tasks.",
+    "Now the welcome, the times and the hours print, and the old offer is switched off.",
+    "One file, run with java. The computer talks, and Bridie has her notice."
+  ]
+}

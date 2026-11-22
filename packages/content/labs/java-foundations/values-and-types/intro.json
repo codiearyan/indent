@@ -1,0 +1,40 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Can it keep the seats count?",
+      "note": "The clipboard is crossed out by noon."
+    },
+    {
+      "title": "Clipboard",
+      "rows": [
+        ["Seats", "48"],
+        ["Boarded", "15"]
+      ]
+    },
+    {
+      "title": "Your program",
+      "file": "Clipboard.java",
+      "mine": true,
+      "gap": "Nothing keeps the count",
+      "tasks": ["Name the crossing", "Count and board", "Write the fare", "Rename a and b"]
+    },
+    {
+      "title": "Seats left",
+      "text": "Counted by the program, all morning."
+    }
+  ],
+  "ticket": {
+    "label": "Seats left",
+    "wrong": "crossed out",
+    "why": "Unreadable",
+    "right": "counted"
+  },
+  "captions": [
+    "Morning at the ticket hut. Bridie wants the program to keep the seats count.",
+    "Today the count is crossed out on the clipboard each time people board.",
+    "You keep the numbers and text in typed variables, in five small tasks.",
+    "Now the program counts the seats left after boarding and prints the fare.",
+    "Values with types and good names. The clipboard's numbers live in the program."
+  ]
+}
