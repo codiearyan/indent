@@ -11,6 +11,10 @@
     {
       "title": "Keeping a history",
       "chapters": ["first-commit", "three-places", "commit-messages", "reading-history", "undo-before-commit"]
+    },
+    {
+      "title": "Branching out",
+      "chapters": ["ignoring-files", "branches", "merging", "first-conflict"]
     }
   ]
 }

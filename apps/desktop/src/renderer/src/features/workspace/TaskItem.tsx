@@ -6,7 +6,8 @@ import type {
   FlowScene,
   TaskFlow,
   TaskDef,
-  TraceResult
+  TraceResult,
+  WorkspaceFile
 } from '@shared/types'
 import { compareTrace } from '@shared/trace'
 import { traceView } from '@/features/flows/traceView'
@@ -49,9 +50,8 @@ export function TaskItem({
   const check = useWorkspace((s) => s.check)
   const [flowOpen, setFlowOpen] = useState(false)
 
-  const files = useWorkspace((s) => s.files)
   const [recording, setRecording] = useState<{
-    files: typeof files
+    files: WorkspaceFile[]
     trace: TraceResult
   }>()
   const [tracing, setTracing] = useState(false)
@@ -65,18 +65,22 @@ export function TaskItem({
   const aiOn = useAi((s) => !!s.config?.enabled && !!s.config.provider)
   const nudge = useAi((s) => s.config?.nudge ?? false)
 
+  // A boolean, not the files: typing re-renders this task only when the answer changes.
+  const edited = useWorkspace(
+    (s) =>
+      showTrace &&
+      !!recording &&
+      recording.files !== s.files &&
+      (recording.files.length !== s.files.length ||
+        recording.files.some(
+          ({ path, content }) =>
+            !s.files.some((file) => file.path === path && file.content === content)
+        ))
+  )
+
   const view =
     showTrace && recording && scene && flow
-      ? traceView(
-          compareTrace(scene, flow.steps, recording.trace),
-          recording.trace,
-          recording.files !== files &&
-            (recording.files.length !== files.length ||
-              recording.files.some(
-                ({ path, content }) =>
-                  !files.some((file) => file.path === path && file.content === content)
-              ))
-        )
+      ? traceView(compareTrace(scene, flow.steps, recording.trace), recording.trace, edited)
       : undefined
 
   const runTrace = async (): Promise<void> => {
@@ -210,7 +214,7 @@ export function TaskItem({
   )
 }
 
-function StatusIcon(props: {
+export function StatusIcon(props: {
   checking: boolean
   failed: boolean
   passed: boolean

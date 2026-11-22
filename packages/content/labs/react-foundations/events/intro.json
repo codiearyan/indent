@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Elspeth", "say": "Can the kiosk ring my bell?", "note": "She answers the door all day." },
+    { "title": "Welcome kiosk", "text": "Buttons and a question that look right.", "note": "Pressing does nothing." },
+    {
+      "title": "Your handlers",
+      "file": "Kiosk.jsx",
+      "mine": true,
+      "gap": "Nothing runs on a press",
+      "tasks": ["Ring the bell", "Print each ticket", "Send the answer", "Write TicketButton"]
+    },
+    { "title": "Front desk", "rows": [["Bell"], ["Ticket printer"], ["Tally of answers"]], "mark": 0 }
+  ],
+  "ticket": { "label": "Ring for help", "wrong": "no bell", "why": "Not wired", "right": "bell rings" },
+  "captions": [
+    "At the front door, Elspeth wants the kiosk to ring her bell when a visitor needs help.",
+    "The kiosk has buttons, but pressing them does nothing at the desk.",
+    "You give each button and the question a function to run, in four tasks.",
+    "A press on Ring for help rings the bell at the desk, once per press.",
+    "Same kiosk, now it answers. Tickets print and the tally counts every answer."
+  ]
+}

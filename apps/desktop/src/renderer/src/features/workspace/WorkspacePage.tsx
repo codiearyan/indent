@@ -17,7 +17,9 @@ import { LeftPanel } from './LeftPanel'
 import { MomentCard } from '@/features/progress/MomentCard'
 import { useCatalog } from '@/stores/catalog'
 import { api } from '@/lib/api'
+import { cn } from '@/lib/utils'
 import { RepoNotice } from './RepoNotice'
+import { FocusTasks } from './FocusTasks'
 import { useWorkspaceShortcuts } from './useWorkspaceShortcuts'
 import { useActivePaneTracking, type PaneId } from './activePane'
 
@@ -38,7 +40,9 @@ export function WorkspacePage(): React.JSX.Element {
   const chat = panels.chat && !panels.zen
   const companion = useWorkspace((s) => s.companion)
   const browser = useWorkspace((s) => Boolean(s.chapter?.preview)) && panels.browser
+  const browserExpanded = useWorkspace((s) => s.browserExpanded) && browser
   const status = useWorkspace((s) => s.status)
+  const chapter = useWorkspace((s) => s.chapter)
   const downloading = useCatalog((s) => !!labId && s.downloads[labId]?.state === 'running')
   // The sheet shows the repo's download, work left in an earlier folder, or why the issue could
   // not open.
@@ -53,14 +57,20 @@ export function WorkspacePage(): React.JSX.Element {
     if (labId && chapterId) void open(labId, chapterId)
   }, [labId, chapterId, open])
 
-  // Leaving the issues gives the window its size back and lets the repo update.
+  // Leaving the issues gives the window its size back, closes the page's window and lets the repo
+  // update.
   useEffect(
     () => () => {
       void useWorkspace.getState().leaveCompanion()
+      api.preview.close()
       api.content.leave()
     },
     []
   )
+
+  useEffect(() => {
+    if (!browser) useWorkspace.getState().setBrowserExpanded(false)
+  }, [browser])
 
   // Files may have changed on disk through the terminal.
   useEffect(() => {
@@ -124,7 +134,21 @@ export function WorkspacePage(): React.JSX.Element {
                 <Panel id="code" minSize="30%">
                   <Group orientation="vertical">
                     <Panel id="editor" minSize="20%">
-                      <EditorPane />
+                      {/* The task card sits in the editor's bottom corner on the lesson's side, so it
+                          stays above the terminal at any height. */}
+                      <div className="relative h-full">
+                        <EditorPane />
+                        {panels.zen && chapter && status === 'ready' && (
+                          <div
+                            className={cn(
+                              'absolute bottom-3 z-10 flex max-h-[calc(100%-1.5rem)] flex-col',
+                              lessonSide === 'left' ? 'left-3' : 'right-3'
+                            )}
+                          >
+                            <FocusTasks chapter={chapter} />
+                          </div>
+                        )}
+                      </div>
                     </Panel>
                     <Separator className={`h-px ${separator}`} />
                     <Panel
@@ -150,7 +174,11 @@ export function WorkspacePage(): React.JSX.Element {
                 {browser && <Separator className={`w-px ${separator}`} />}
                 {browser && (
                   <Panel id="browser" defaultSize="45%" minSize="20%">
-                    <Pane id="browser">
+                    {/* Expanded, the pane covers the sheet but stays in place, so the page keeps running. */}
+                    <Pane
+                      id="browser"
+                      className={browserExpanded ? 'absolute inset-0 z-10 bg-card' : undefined}
+                    >
                       <BrowserPane />
                     </Pane>
                   </Panel>
@@ -176,9 +204,17 @@ export function WorkspacePage(): React.JSX.Element {
 }
 
 /** Focus here takes the active mark off the editor; only the editors and the terminal draw it. */
-function Pane({ id, children }: { id: PaneId; children: React.ReactNode }): React.JSX.Element {
+function Pane({
+  id,
+  className,
+  children
+}: {
+  id: PaneId
+  className?: string
+  children: React.ReactNode
+}): React.JSX.Element {
   return (
-    <div data-pane={id} className="h-full">
+    <div data-pane={id} className={cn('h-full', className)}>
       {children}
     </div>
   )

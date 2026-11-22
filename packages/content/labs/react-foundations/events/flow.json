@@ -1,0 +1,51 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "visitor", "label": "Visitor", "kind": "story" },
+      { "id": "kiosk", "label": "Kiosk", "kind": "function", "mine": true },
+      { "id": "button", "label": "TicketButton", "kind": "function", "mine": true },
+      { "id": "desk", "label": "desk.js", "kind": "file" },
+      { "id": "elspeth", "label": "Elspeth's desk", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "visitor", "to": "kiosk", "label": "click, pick" },
+      { "from": "kiosk", "to": "button", "label": "kind, onChoose" },
+      { "from": "kiosk", "to": "desk", "label": "calls" },
+      { "from": "button", "to": "desk", "label": "onChoose(kind)" },
+      { "from": "desk", "to": "elspeth", "label": "bell, ticket, tally" }
+    ],
+    "note": "The kiosk stops being a picture: each press or pick calls the desk, and only when it happens."
+  },
+  "tasks": {
+    "ring": {
+      "steps": [
+        { "active": ["kiosk"], "note": "The kiosk is drawn, and nothing rings yet." },
+        { "active": ["visitor", "visitor->kiosk", "kiosk"], "note": "A visitor presses Ring for help." },
+        { "active": ["kiosk", "kiosk->desk", "desk"], "note": "React calls the function the button was given." },
+        { "active": ["desk", "desk->elspeth", "elspeth"], "note": "The bell rings at the desk, once for each press." }
+      ]
+    },
+    "tickets": {
+      "steps": [
+        { "active": ["kiosk"], "value": { "kind": "array", "label": "Tickets", "values": ["kind", "kind", "kind"] }, "note": "The kiosk draws one button for each ticket the desk sells." },
+        { "active": ["visitor", "visitor->kiosk", "kiosk"], "note": "A visitor presses the button of one ticket." },
+        { "active": ["kiosk", "kiosk->desk", "desk", "desk->elspeth", "elspeth"], "note": "The printer prints that ticket, and no other." }
+      ]
+    },
+    "heard": {
+      "steps": [
+        { "active": ["visitor", "visitor->kiosk", "kiosk"], "note": "A visitor picks how they heard about the museum." },
+        { "active": ["kiosk"], "value": { "kind": "map", "label": "The event", "entries": [{ "key": "target", "value": "the select" }] }, "note": "The event says which element changed, and what the visitor picked is found there." },
+        { "active": ["kiosk", "kiosk->desk", "desk", "desk->elspeth", "elspeth"], "note": "Elspeth's tally gets one more for that answer." }
+      ]
+    },
+    "ticket-button": {
+      "steps": [
+        { "active": ["kiosk", "kiosk->button", "button"], "note": "The kiosk draws one button per ticket and hands each its kind and what to do." },
+        { "active": ["visitor", "visitor->kiosk", "button"], "note": "A visitor presses one of the buttons." },
+        { "active": ["button", "button->desk", "desk"], "note": "The button calls what it was given, with its own kind." },
+        { "active": ["desk", "desk->elspeth", "elspeth"], "note": "The ticket prints, and the button never knew about the printer." }
+      ]
+    }
+  }
+}

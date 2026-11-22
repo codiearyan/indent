@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Winnie",
+      "say": "Can the owners go by surname?",
+      "note": "Like the paper cards."
+    },
+    {
+      "title": "owners",
+      "text": "Rows come back in the order they were typed.",
+      "note": "Never by surname."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "file": "1-phone-book.sql",
+      "gap": "No order of your own",
+      "tasks": [
+        "Phone book by surname",
+        "Heaviest dogs first",
+        "Visits by vet",
+        "Three oldest animals"
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Phone book",
+    "wrong": "any order",
+    "why": "No sort",
+    "right": "A to Z"
+  },
+  "captions": [
+    "Winnie wants the owners in surname order, the way the paper cards are.",
+    "The rows come back in whatever order they were typed, so she scrolls to find a name.",
+    "You sort the rows by one column or two, and keep only the first few, in four tasks.",
+    "Now the phone book runs from A to Z, and Winnie finds a name at a glance.",
+    "Same records, now in the order each question needs."
+  ]
+}

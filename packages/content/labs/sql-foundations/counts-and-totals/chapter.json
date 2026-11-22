@@ -1,0 +1,110 @@
+{
+  "id": "counts-and-totals",
+  "title": "Counts and totals",
+  "files": [
+    "queries/1-owner-counts.sql",
+    "queries/2-takings.sql",
+    "queries/3-dog-weights.sql",
+    "queries/4-big-charges.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-owner-counts.sql"
+  },
+  "tasks": [
+    {
+      "id": "owner-counts",
+      "title": "Count the owners",
+      "file": "queries/1-owner-counts.sql",
+      "description": "Rosamund is filling in the practice's yearly form and needs three numbers about the owners.\n\nIn `queries/1-owner-counts.sql`, return one row from `owners` with three columns, in this order:\n\n- `owners`: how many owners there are\n- `with_email`: how many of them gave an email\n- `towns`: how many different towns they live in\n\nCheck compares the columns and the row on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write a query that counts every owner, name the column, and run it.",
+        "Add a second count that only counts the owners who have an email.",
+        "Add a third count that counts each town once, however many owners live there.",
+        "Compare the three numbers with what you see in `seed.sql`."
+      ],
+      "hints": [
+        "Each of the three columns is a `COUNT`. What goes inside the brackets decides what is counted.",
+        "`COUNT(*)` counts rows. `COUNT(column)` skips the rows where that column is `NULL`. One more word inside the brackets counts each value once.",
+        "The columns have the shapes `COUNT(*) AS owners`, `COUNT(column) AS with_email` and `COUNT(DISTINCT column) AS towns`."
+      ],
+      "docs": [
+        { "title": "count()", "url": "https://www.sqlite.org/lang_aggfunc.html#count" },
+        { "title": "Aggregate functions", "url": "https://www.sqlite.org/lang_aggfunc.html" }
+      ],
+      "videos": [
+        {
+          "title": "COUNT, SUM, AVG, MIN and MAX",
+          "url": "https://www.youtube.com/watch?v=jcoJuc5e3RE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "takings",
+      "title": "Sum up the treatments",
+      "file": "queries/2-takings.sql",
+      "description": "Rosamund wants to know what the treatments brought in.\n\nIn `queries/2-takings.sql`, return one row from `treatments` with four columns, in this order:\n\n- `total`: the prices added up\n- `average`: the average price, rounded to 2 decimal places\n- `cheapest`: the lowest price\n- `dearest`: the highest price\n\nEvery treatment counts, the free ones too. Check compares the columns and the row on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write the four columns one at a time, running the file after each.",
+        "Look at the average: how many decimal places does it have?",
+        "Round it to 2 decimal places and run it again."
+      ],
+      "hints": [
+        "Each column is one aggregate over `price`. The lesson's part \"Adding up\" lists them.",
+        "`ROUND` takes the number and how many decimal places to keep. It goes around the average, not inside it.",
+        "The second column has the shape `ROUND(AVG(price), 2) AS average`."
+      ],
+      "docs": [
+        { "title": "sum() and total()", "url": "https://www.sqlite.org/lang_aggfunc.html#sumunc" },
+        { "title": "avg()", "url": "https://www.sqlite.org/lang_aggfunc.html#avg" },
+        { "title": "round()", "url": "https://www.sqlite.org/lang_corefunc.html#round" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "dog-weights",
+      "title": "Find the average weight of the dogs",
+      "file": "queries/3-dog-weights.sql",
+      "description": "Ifan orders worming tablets by the average weight of the dogs he sees.\n\nIn `queries/3-dog-weights.sql`, return one row from `animals` with two columns, in this order:\n\n- `dogs`: how many dogs there are, weighed or not\n- `average_kg`: the average weight of the dogs that have been weighed, rounded to 2 decimal places\n\nA dog nobody has weighed has no weight; it does not weigh 0. Check compares the columns and the row on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Keep only the dogs with a condition, and count them.",
+        "Add the average weight, rounded to 2 decimal places, and run it.",
+        "Work the average out by hand from `seed.sql` for the weighed dogs and compare."
+      ],
+      "hints": [
+        "One dog has no weight. Ask yourself what each of your two columns does with it.",
+        "`AVG` already skips empty cells, and `COUNT(*)` counts every row. Turning `NULL` into 0 would pull the average down.",
+        "The query has the shape `SELECT COUNT(*) AS dogs, ROUND(AVG(weight_kg), 2) AS average_kg FROM animals WHERE ...;`."
+      ],
+      "docs": [
+        { "title": "avg()", "url": "https://www.sqlite.org/lang_aggfunc.html#avg" },
+        { "title": "NULL handling in SQLite", "url": "https://www.sqlite.org/nulls.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "big-charges",
+      "title": "Total the charges over £250",
+      "file": "queries/4-big-charges.sql",
+      "description": "The insurer asks how many single charges came to more than £250, and what they added up to. Rosamund thinks there were none, and the form wants a number in both boxes.\n\nIn `queries/4-big-charges.sql`, return one row from `treatments` with two columns, in this order:\n\n- `charges`: how many treatments cost more than £250\n- `total`: their prices added up, and `0` when there are none\n\nCheck compares the columns and the row on the data you can see and on hidden data, which has charges over £250 and one of exactly £250.",
+      "nextSteps": [
+        "Write the condition for a price over £250 and count the rows.",
+        "Add the total of their prices, and run it. Look hard at what the total shows.",
+        "Make the total show 0 when nothing matches."
+      ],
+      "hints": [
+        "Run it: with no rows to add up, one of your two columns is not a number. The lesson's part \"When nothing matches\" says why.",
+        "`COALESCE`, from the issue about missing values, gives back its second value when the first is `NULL`.",
+        "The second column has the shape `COALESCE(SUM(price), 0) AS total`."
+      ],
+      "docs": [
+        { "title": "sum() and total()", "url": "https://www.sqlite.org/lang_aggfunc.html#sumunc" },
+        { "title": "coalesce()", "url": "https://www.sqlite.org/lang_corefunc.html#coalesce" }
+      ],
+      "points": 10
+    }
+  ]
+}

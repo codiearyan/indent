@@ -86,8 +86,9 @@ function part(lines, task) {
 }
 
 /**
- * The code above the first task, to compare with the starter's. Spaces, semicolons and trailing
- * commas are left out, so a file an editor formatted still counts as unchanged.
+ * The code above the first task, to compare with the starter's. Spaces, semicolons, trailing
+ * commas and the `|` before the first member of a union are left out, so a file an editor
+ * formatted still counts as unchanged.
  */
 function sharedCode(lines) {
   const starts = [...parts(lines).values()]
@@ -95,6 +96,7 @@ function sharedCode(lines) {
   return codeOnly(lines.slice(0, first).join('\n'))
     .replace(/\s+|;/g, '')
     .replace(/,(?=[}\])])/g, '')
+    .replace(/=[|&]/g, '=')
 }
 
 /** The last line of the declaration that starts on line `at`, by counting brackets. */
@@ -152,6 +154,15 @@ function silencers(section, whole) {
   return { found, comments, fileOff }
 }
 
+/** The lines of the section with a `!` after a value: `count!` or `line.samples!.length`. */
+function nonNullAssertions(section) {
+  return codeOnly(section.text)
+    .split('\n')
+    .flatMap((line, i) =>
+      /[\w$)\]]!(?!=)/.test(line) ? [`line ${section.start + i + 1}: ${section.lines[i].trim()}`] : []
+    )
+}
+
 function explainOwn(errors, lines) {
   return errors
     .map(
@@ -194,6 +205,12 @@ const pass = (name, output) => ({ name, passed: true, output })
  * - results: functions whose result type must be written out; annotated: variables whose type must
  * - cases: { name, call, args } or { name, read } or { name, prints }, each with expected, setup, hint
  * - messages: { uses, misuse } in place of the general ones
+ * - declared: { name: 'interface' | 'type' } for a type the task asks to be written in that form
+ * - named: [where, type] pairs: the parameters of function `where`, the annotation of `const where`
+ *   or the declaration of type `where` must use `type` by its name
+ * - grow: { type, member, name, message }: with `member` added to the union `type` of the shared
+ *   lines, the compiler must refuse a line of the task
+ * - nonNull: true refuses `!` after a value, for a task about checking a value before using it
  */
 export async function judge(t, spec) {
   const { file, task } = spec
@@ -282,6 +299,14 @@ export async function judge(t, spec) {
       : t.call(at, '.grader/read.mjs', 'read', [file, c.read])
   }
 
+  const grownText = spec.grow ? grow(main.text.split('\n'), p.first, spec.grow) : null
+  const grownRun = grownText
+    ? t.sandbox().then(async (at) => {
+        await writeFile(join(at, file), grownText)
+        return t.typecheck(at, [file])
+      })
+    : null
+
   const hidden = ['.grader/uses.ts', '.grader/misuse.ts'].filter((f) => extra[f])
   const cases = spec.cases ?? []
   const [compiled, runs, usesText, misuseText] = await Promise.all([
@@ -327,6 +352,16 @@ export async function judge(t, spec) {
         `${label} uses real types`,
         `The word any, or a value followed by as and a type, tells the compiler to stop checking that value. It hides mistakes instead of catching them, so Check does not accept it here. Write a real type and let the compiler check it.`,
         off.found.join('\n')
+      )
+    )
+  }
+  const asserted = spec.nonNull ? nonNullAssertions(section) : []
+  if (asserted.length) {
+    details.push(
+      fail(
+        `${label} checks before it uses a value`,
+        `A ! after a value tells the compiler the value is not null or undefined, without checking it. It hides the case this task is about, so Check does not accept it here. Check the value in a way the compiler follows, as the lesson shows.`,
+        asserted.join('\n')
       )
     )
   }
@@ -388,6 +423,36 @@ export async function judge(t, spec) {
     )
   }
 
+  for (const [name, kind] of Object.entries(spec.declared ?? {})) {
+    const found = typeDeclaration(sectionCode, name)
+    details.push(
+      found?.keyword === kind
+        ? pass(`${name} is written as ${kind === 'interface' ? 'an interface' : 'a type alias'}`)
+        : fail(
+            `${name} is written as ${kind === 'interface' ? 'an interface' : 'a type alias'}`,
+            found
+              ? `${label} asks for ${name} written with the word ${kind} in front of its name: that form is what this task is about.`
+              : `Check cannot find a type called ${name} under // ${label}. Write it there, with the name the task gives and export in front of it.`
+          )
+    )
+  }
+  for (const [where, type] of spec.named ?? []) {
+    const text = namedIn(sectionCode, where)
+    const isType = typeDeclaration(sectionCode, where) !== null
+    details.push(
+      text !== null && new RegExp(`(?:^|[^\\w$.])${type}\\b`).test(text)
+        ? pass(`${where} uses ${type} by its name`)
+        : fail(
+            `${where} uses ${type} by its name`,
+            text === null
+              ? `Check cannot find ${where} under // ${label}. It should be there, with the name the task gives.`
+              : isType
+                ? `${label} asks for ${where} to use ${type} by its name, not to write its properties out again, so a change to ${type} reaches ${where} too.`
+                : `${label} asks for ${where} to be typed with the name ${type}, so the type is written once and every use follows it.`
+          )
+    )
+  }
+
   const usesErrors = errors.filter((e) => e.path === '.grader/uses.ts')
   const misuseErrors = errors.filter((e) => e.path === '.grader/misuse.ts')
   const absent = missingExport([...usesErrors, ...misuseErrors])
@@ -414,6 +479,21 @@ export async function judge(t, spec) {
             spec.messages?.misuse ??
               `Check's own code uses ${label} the wrong way, and the compiler lets it through. A type is wider than the task asks, or missing. The output says which use.`,
             explainHidden(misuseErrors, misuseText.split('\n'))
+          )
+    )
+  }
+
+  if (grownRun && !crashed && !absent && shared.length === 0 && mine.length === 0) {
+    const g = await grownRun
+    const caught = parseErrors(g.output).some(
+      (e) => e.path === file && e.line - 1 >= p.start && e.line - 1 < p.end
+    )
+    details.push(
+      caught
+        ? pass(spec.grow.name)
+        : fail(
+            spec.grow.name,
+            g.passed ? spec.grow.message : 'The compiler could not run. Try Check again.'
           )
     )
   }
@@ -483,6 +563,68 @@ function behaviour(cases, runs, file, label) {
       output: `${c.setup}\nGave: ${show(v)}`
     }
   })
+}
+
+/** The last line of the type declared on line `at`: brackets closed and no `|` or `&` to follow. */
+function typeEnd(lines, at) {
+  let depth = 0
+  for (let i = at; i < lines.length; i++) {
+    const line = codeOnly(lines[i])
+    for (const ch of line) {
+      if ('([{'.includes(ch)) depth++
+      if (')]}'.includes(ch)) depth--
+    }
+    if (depth > 0 || /[=|&]\s*$/.test(line)) continue
+    const next = lines.slice(i + 1).find((l) => l.trim() !== '')
+    if (next === undefined || !/^\s*[|&]/.test(next)) return i
+  }
+  return lines.length - 1
+}
+
+/** The keyword (type or interface) and the text of the declaration of type `name`, or null. */
+function typeDeclaration(code, name) {
+  const lines = code.split('\n')
+  const re = new RegExp(`(?:^|[^\\w$.])(type|interface)\\s+${name}\\b`)
+  const at = lines.findIndex((l) => re.test(l))
+  if (at === -1) return null
+  return {
+    keyword: re.exec(lines[at])[1],
+    text: lines.slice(at, typeEnd(lines, at) + 1).join('\n')
+  }
+}
+
+/** Where `where` says which types it uses: its declaration, its parameters or its annotation. */
+function namedIn(code, where) {
+  const decl = typeDeclaration(code, where)
+  if (decl) {
+    const name = new RegExp(`\\b${where}\\b`).exec(decl.text)
+    return decl.text.slice(name.index + where.length)
+  }
+  const fn = new RegExp(`\\bfunction\\s+${where}\\s*(?=[<(])`).exec(code)
+  if (fn) {
+    const open = code.indexOf('(', fn.index + fn[0].length)
+    let depth = 0
+    for (let i = open; i < code.length; i++) {
+      if (code[i] === '(') depth++
+      if (code[i] === ')' && --depth === 0) return code.slice(open + 1, i)
+    }
+    return null
+  }
+  const v = new RegExp(`\\b(?:const|let)\\s+${where}\\s*(:[^=]*)?=`).exec(code)
+  return v ? (v[1] ?? '') : null
+}
+
+/** The lines with `member` added to the union `type` declared above the first task, or null. */
+function grow(lines, first, { type, member }) {
+  const re = new RegExp(`^(\\s*(?:export\\s+)?type\\s+${type}\\b[^=]*=)(.*)$`)
+  const at = lines.findIndex((l, i) => i < first && re.test(l))
+  if (at === -1) return null
+  const [, head, rest] = re.exec(lines[at])
+  const code = (l) => codeOnly(l).trim()
+  const next = code(rest) ? rest : (lines.slice(at + 1).find((l) => code(l) !== '') ?? '')
+  const kept = [...lines]
+  kept[at] = `${head} ${member}${/^\s*\|/.test(next) ? '' : ' |'}${rest}`
+  return kept.join('\n')
 }
 
 /** A value written the way code writes it: { id: 'OK-1', tins: 2 }. */

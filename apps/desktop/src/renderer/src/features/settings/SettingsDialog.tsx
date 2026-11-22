@@ -13,7 +13,7 @@ import {
   type LucideIcon
 } from 'lucide-react'
 import SiGithub from '@icons-pack/react-simple-icons/icons/SiGithub'
-import { REPO_URL } from '@shared/repo'
+import { REPO_URL, SPONSOR_URL } from '@shared/repo'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
@@ -275,6 +275,14 @@ function AboutSection(): React.JSX.Element {
           className="text-[13px] text-muted-foreground hover:text-foreground"
         >
           All releases
+        </a>
+        <a
+          href={SPONSOR_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="text-[13px] text-muted-foreground hover:text-foreground"
+        >
+          Sponsor
         </a>
       </div>
       {import.meta.env.DEV && <StarPromptDevTools />}

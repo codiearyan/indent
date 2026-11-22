@@ -160,18 +160,40 @@ export async function reference(t) {
 
 export const isAncestor = (git, a, b) => Boolean(a && b) && git('merge-base', '--is-ancestor', a, b).ok
 
+/** A commit setup made, found by its exact subject on any branch, or null. */
+export function setupCommit(git, subject) {
+  const found = git('log', '--all', '--format=%H', '--fixed-strings', `--grep=${subject}`).out
+    .split('\n')
+    .filter(Boolean)
+    .find((hash) => subjectOf(git, hash) === subject)
+  return found ?? null
+}
+
 /**
  * The setup's last commit (found by its subject) and the commits made on top of it, newest
  * first. Null when HEAD's history no longer holds that commit.
  */
 export function sinceSetup(git, subject) {
   const head = commitOf(git, 'HEAD')
-  const tip = git('log', '--all', '--format=%H', '--fixed-strings', `--grep=${subject}`).out
-    .split('\n')
-    .filter(Boolean)
-    .find((hash) => subjectOf(git, hash) === subject)
+  const tip = setupCommit(git, subject)
   if (!head || !tip || !isAncestor(git, tip, head)) return null
   return { tip, mine: commits(git, 'HEAD', tip) }
 }
 
 export const LOST_HISTORY = `The history of shop no longer holds the commits setup made. ${START_OVER}`
+
+export const tipOf = (git, branch) => commitOf(git, `refs/heads/${branch}`)
+
+/** The branch HEAD is on, or '' when HEAD is detached. */
+export const currentBranch = (git) => git('symbolic-ref', '--quiet', '--short', 'HEAD').out.trim()
+
+export const branchNames = (git) =>
+  git('for-each-ref', '--format=%(refname:short)', 'refs/heads').out.split('\n').filter(Boolean)
+
+/** The commit a merge left half done is bringing in, or null when no merge is open. */
+export const mergeHead = (git) => commitOf(git, 'MERGE_HEAD')
+
+export const hasMarkers = (text) => /^(<{7}|\|{7}|={7}|>{7})( |\r?$)/m.test(text ?? '')
+
+export const DETACHED =
+  'git status says HEAD detached: you are looking at one commit and are on no branch. The lesson on branches says how to get back onto one.'

@@ -1,0 +1,59 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilma", "label": "Wilma", "kind": "story" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "main", "label": "main", "kind": "data" },
+      { "id": "sale", "label": "Sale branch", "kind": "data" },
+      { "id": "folder", "label": "Working folder", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "wilma", "to": "you", "label": "two requests" },
+      { "from": "you", "to": "sale", "label": "sale commit" },
+      { "from": "you", "to": "main", "label": "new time" },
+      { "from": "main", "to": "sale", "label": "starts from" },
+      { "from": "sale", "to": "folder", "label": "its files" },
+      { "from": "main", "to": "folder", "label": "its files" }
+    ],
+    "note": "The summer sale waits on a branch of its own while main goes on."
+  },
+  "tasks": {
+    "branch": {
+      "steps": [
+        { "active": ["main"], "note": "main points at the last commit, the site as it is today." },
+        {
+          "active": ["main", "main->sale", "sale"],
+          "note": "A second name starts at that same commit. Nothing is copied."
+        },
+        { "active": ["you", "sale"], "note": "You switch to the new branch, so your next commits go onto it." }
+      ]
+    },
+    "sale": {
+      "steps": [
+        { "active": ["wilma", "wilma->you", "you"], "note": "Wilma wants the sale ready now, but not on the site." },
+        {
+          "active": ["you", "you->sale", "sale"],
+          "note": "The sale is committed on its branch, and only that branch moves."
+        },
+        { "active": ["main"], "note": "main stays where it was, without the sale." }
+      ]
+    },
+    "back": {
+      "steps": [
+        {
+          "active": ["main", "main->folder", "folder"],
+          "note": "Switching back puts main's files in the working folder."
+        },
+        { "active": ["folder"], "note": "The sale line is gone from the home page in the editor." },
+        { "active": ["sale"], "note": "It is still safe in its commit on the sale branch." }
+      ]
+    },
+    "evening": {
+      "steps": [
+        { "active": ["wilma", "wilma->you", "you"], "note": "The reading group's new time cannot wait for July." },
+        { "active": ["you", "you->main", "main"], "note": "It is committed on main, the branch you are on." },
+        { "active": ["main", "sale"], "note": "The two branches now go different ways." }
+      ]
+    }
+  }
+}

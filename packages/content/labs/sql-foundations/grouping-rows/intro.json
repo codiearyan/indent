@@ -1,0 +1,34 @@
+{
+  "stations": [
+    {
+      "title": "Ifan",
+      "say": "Which breeds do we see most?",
+      "note": "Species by species."
+    },
+    {
+      "title": "animals",
+      "text": "Every count so far covers the whole table.",
+      "note": "One number, not one per breed."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "file": "2-breed-counts.sql",
+      "gap": "One number for everything",
+      "tasks": ["Count per species", "Count per breed", "Rank the kinds", "The big bills"]
+    }
+  ],
+  "ticket": {
+    "label": "Breed list",
+    "wrong": "one total",
+    "why": "No groups",
+    "right": "per breed"
+  },
+  "captions": [
+    "Ifan wants to know which breeds the practice sees, species by species.",
+    "A count squeezes the whole table into one number, so every breed is lumped together.",
+    "You split the rows into groups, pick and sort the groups by their totals, in four tasks.",
+    "Now each species and breed gets its own count, and Ifan sees which breeds come in.",
+    "Same records, now with a figure for every group."
+  ]
+}

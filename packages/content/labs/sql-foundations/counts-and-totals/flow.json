@@ -1,0 +1,162 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "owners",
+        "label": "owners",
+        "kind": "data"
+      },
+      {
+        "id": "treatments",
+        "label": "treatments",
+        "kind": "data"
+      },
+      {
+        "id": "animals",
+        "label": "animals",
+        "kind": "data"
+      },
+      {
+        "id": "q1",
+        "label": "1-owner-counts.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q2",
+        "label": "2-takings.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q3",
+        "label": "3-dog-weights.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q4",
+        "label": "4-big-charges.sql",
+        "kind": "file",
+        "mine": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "owners",
+        "to": "q1",
+        "label": "rows"
+      },
+      {
+        "from": "treatments",
+        "to": "q2",
+        "label": "rows"
+      },
+      {
+        "from": "animals",
+        "to": "q3",
+        "label": "rows"
+      },
+      {
+        "from": "treatments",
+        "to": "q4",
+        "label": "rows"
+      }
+    ],
+    "note": "Four queries turn whole tables into single rows of figures for the year's forms."
+  },
+  "tasks": {
+    "owner-counts": {
+      "steps": [
+        {
+          "active": ["owners", "owners->q1"],
+          "note": "Every owner comes in. Some never gave an email, and many share a town."
+        },
+        {
+          "active": ["q1"],
+          "note": "Three counts run over the same rows: every row, the filled-in emails, and each town once."
+        },
+        {
+          "active": ["q1"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["owners", "with_email", "towns"],
+            "cells": [["a count", "a count", "a count"]]
+          },
+          "note": "Rosamund gets one row with three numbers for the form."
+        }
+      ]
+    },
+    "takings": {
+      "steps": [
+        {
+          "active": ["treatments", "treatments->q2"],
+          "note": "Every treatment comes in, with its price. Some cost nothing."
+        },
+        {
+          "active": ["q2"],
+          "note": "The prices are added up, averaged, and the lowest and highest are found."
+        },
+        {
+          "active": ["q2"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["total", "average", "cheapest", "dearest"],
+            "cells": [["a sum", "an average, rounded", "a price", "a price"]]
+          },
+          "note": "The average is rounded, and Rosamund gets one row of figures."
+        }
+      ]
+    },
+    "dog-weights": {
+      "steps": [
+        {
+          "active": ["animals", "animals->q3"],
+          "note": "Every animal comes in. Only the dogs stay, and one has no weight recorded."
+        },
+        {
+          "active": ["q3"],
+          "note": "The count takes every dog. The average takes only the dogs with a weight, and does not treat the gap as zero."
+        },
+        {
+          "active": ["q3"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["dogs", "average_kg"],
+            "cells": [["a count", "an average, rounded"]]
+          },
+          "note": "Ifan gets one row to order tablets by."
+        }
+      ]
+    },
+    "big-charges": {
+      "steps": [
+        {
+          "active": ["treatments", "treatments->q4"],
+          "note": "Every treatment comes in, and only the charges over the insurer's limit stay."
+        },
+        {
+          "active": ["q4"],
+          "note": "The rows that are left are counted and added up, even when there are none."
+        },
+        {
+          "active": ["q4"],
+          "note": "With nothing to add up, a total has no value, so the empty box is filled with a number."
+        },
+        {
+          "active": ["q4"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["charges", "total"],
+            "cells": [["a count", "a total"]]
+          },
+          "note": "The insurer's form gets a number in both boxes."
+        }
+      ]
+    }
+  }
+}

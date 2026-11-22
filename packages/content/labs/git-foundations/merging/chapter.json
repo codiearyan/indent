@@ -1,0 +1,81 @@
+{
+  "id": "merging",
+  "title": "Bringing the branches in",
+  "files": ["NOTES.md", "shop/index.html", "shop/events.html", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the shop's folder, then go into shop and work there with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "sale",
+      "title": "Merge summer-sale into main",
+      "file": "shop/index.html",
+      "description": "Run `node setup.mjs` in the top folder, then work inside `shop`. It is July, and the summer sale can go on the site. `main` has not moved since `summer-sale` started from it.\n\nMerge `summer-sale` into `main`. Because `main` has nothing new of its own, Git only has to move `main` forward to the last commit of the sale: no merge commit.\n\nThe check expects both commits of the sale on `main`'s own line of history, with no merge commit for them.",
+      "nextSteps": [
+        "Run `git log --oneline --graph --all` and find where each branch points.",
+        "Make sure `git status` says `On branch main`.",
+        "Merge `summer-sale` and read what Git prints: it says `Fast-forward`.",
+        "Look at the graph again: `main` and `summer-sale` point at the same commit."
+      ],
+      "hints": [
+        "A merge brings another branch into the branch you are on, so be on main.",
+        "`git merge` takes the name of the branch to bring in.",
+        "On main, run `git merge summer-sale`."
+      ],
+      "docs": [
+        { "title": "git merge", "url": "https://git-scm.com/docs/git-merge" },
+        { "title": "Basic merging", "url": "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging" }
+      ],
+      "videos": [{ "title": "Fast-forward and three-way merges", "url": "https://www.youtube.com/watch?v=3aKOwUdciHU" }],
+      "points": 10
+    },
+    {
+      "id": "group",
+      "title": "Merge reading-group into main, with a merge commit",
+      "file": "shop/events.html",
+      "description": "Now merge `reading-group`, with Wilma's July book, into `main`. `main` has moved on since that branch started, so Git joins the two lines with a merge commit. Git writes its message for you, and you can keep it as it is.\n\nThe check looks on `main`'s own line for a merge commit that brings in the reading group book, and expects no merge left half done.",
+      "nextSteps": [
+        "Run `git log --oneline --graph --all`: `reading-group` started from an older commit than `main`'s last one.",
+        "Merge `reading-group` on `main`, keeping Git's message without an editor.",
+        "If an editor opens anyway, close it as the lesson says, keeping the message.",
+        "Run `git log --oneline --graph -n 5`: two lines meet in the merge commit."
+      ],
+      "hints": [
+        "Git makes a merge commit when both branches have commits the other does not. Like any commit, it needs a message.",
+        "One option of git merge keeps the message Git writes and opens no editor.",
+        "On main, run `git merge --no-edit reading-group`."
+      ],
+      "docs": [
+        {
+          "title": "git merge --no-edit",
+          "url": "https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---no-edit"
+        },
+        { "title": "Basic merging", "url": "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "tidy",
+      "title": "Delete the branches that are merged",
+      "file": "shop/index.html",
+      "description": "Read the graph with `git log --oneline --graph --all`. Every commit of `summer-sale` and of `reading-group` is now in `main`, so those two branches can go. `window-display` holds a commit `main` does not have, and Wilma has not decided about it: keep it.\n\nDelete the two merged branches. The check expects `summer-sale` and `reading-group` to be gone with all their commits in `main`, and `window-display` to be still there.",
+      "nextSteps": [
+        "Run `git log --oneline --graph --all` and see which branch names sit on commits that are in `main`.",
+        "Delete those branches with the safe way the lesson shows.",
+        "If Git refuses, read why: it means the branch has commits `main` does not have.",
+        "Run `git branch`: `main` and `window-display` are left."
+      ],
+      "hints": [
+        "Deleting a branch deletes only the name. The commits stay, as long as another branch holds them.",
+        "`git branch` lists, makes and deletes branches. The lower-case option deletes only a branch that is merged.",
+        "Run `git branch -d summer-sale reading-group`."
+      ],
+      "docs": [
+        { "title": "git branch", "url": "https://git-scm.com/docs/git-branch" },
+        { "title": "git log --graph", "url": "https://git-scm.com/docs/git-log#Documentation/git-log.txt---graph" }
+      ],
+      "points": 10
+    }
+  ]
+}

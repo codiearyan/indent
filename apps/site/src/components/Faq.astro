@@ -9,11 +9,11 @@ const faqs = [
   },
   {
     q: 'Does it work without internet?',
-    a: 'Yes, once it is set up. The first Check installs the test tools into the app’s data folder, once. After that every repo runs offline, including the ones about language models, which talk to the local model inside the app. Only the tutor needs whatever network its CLI or API key needs.'
+    a: 'Mostly. A few starter repos come with the installer; every other repo downloads once, the first time you open it. The first Check also downloads the test tools into your work folder, once. After that a repo runs offline, including the ones about language models, which talk to the local model inside the app. Only the tutor needs whatever network its CLI or API key needs.'
   },
   {
     q: 'Do I need an API key?',
-    a: 'No. The LLM, retrieval, agents and evals repos run against the local model, an offline stand-in for a model API that answers the same way every time. A key is one of two ways to power the optional tutor; the other is a coding CLI you already have installed.'
+    a: 'No. The LLM, retrieval, agents and evals repos run against the local model, an offline stand-in for a model API that answers the same way every time. A key is one of two ways to power the optional tutor; the other is a coding CLI you already have installed. Both have a free way in: the free models of OpenCode, or a free Gemini key.'
   },
   {
     q: 'Which platforms does it run on?',
@@ -22,6 +22,10 @@ const faqs = [
   {
     q: 'Which languages can I learn?',
     a: 'HTML and CSS, JavaScript in the browser and React, each with the page live beside your code. JavaScript and TypeScript, including async code and a JSON API with plain Node. SQL on built-in SQLite. Git, in the real terminal. The AI repos (LLM apps, retrieval, agents, evals) are written in TypeScript.'
+  },
+  {
+    q: 'What kinds of repos are there?',
+    a: 'Foundations teach a language from the start, one topic at a time. Projects build one real thing over a few issues. Bug hunts hand you code someone else wrote and a bug report, like a live interview: reproduce the bug, fix its cause and write the test that catches it.'
   },
   {
     q: 'Where is my work stored?',
@@ -47,7 +51,7 @@ const faqs = [
     <div class="lg:col-span-5">
       <div class="flex items-center gap-3">
         <p class="font-mono text-[13px] text-muted-foreground">/faq</p>
-        <BuildStrip groups={[9]} filled={9} />
+        <BuildStrip groups={[faqs.length]} filled={faqs.length} />
       </div>
       <h2 id="faq-title" class="headline mt-6 text-[38px] sm:text-[48px] lg:text-[60px]">
         <span class="text-muted-foreground">Questions,</span>{' '}

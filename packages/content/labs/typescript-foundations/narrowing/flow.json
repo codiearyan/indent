@@ -1,0 +1,140 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bryn", "label": "Bryn", "kind": "story" },
+      { "id": "types", "label": "Shared types", "kind": "data" },
+      { "id": "refs", "label": "refLabel()", "kind": "function", "mine": true, "fn": "refLabel" },
+      {
+        "id": "count",
+        "label": "lineCount()",
+        "kind": "function",
+        "mine": true,
+        "fn": "lineCount"
+      },
+      {
+        "id": "shelf",
+        "label": "shelfLine()",
+        "kind": "function",
+        "mine": true,
+        "fn": "shelfLine"
+      },
+      { "id": "delivery", "label": "deliveryLine()", "kind": "function", "mine": true },
+      { "id": "table", "label": "Packing table", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "types", "to": "refs", "label": "Ref" },
+      { "from": "types", "to": "count", "label": "order line" },
+      { "from": "types", "to": "delivery", "label": "Delivery" },
+      { "from": "bryn", "to": "shelf", "label": "a count" },
+      { "from": "refs", "to": "table", "label": "label" },
+      { "from": "count", "to": "table", "label": "how many" },
+      { "from": "delivery", "to": "table", "label": "where it goes" }
+    ],
+    "note": "Each function finds out which kind of value it holds before using it, so the compiler knows the kind in every branch."
+  },
+  "tasks": {
+    "refs": {
+      "trace": { "file": "src/packing.ts", "call": "refLabel", "args": [977] },
+      "steps": [
+        {
+          "active": ["types", "types->refs"],
+          "value": {
+            "kind": "map",
+            "label": "a ref",
+            "entries": [{ "key": "ref", "value": "number, or text" }]
+          },
+          "note": "Order 977 is an old one, so its ref is a number."
+        },
+        {
+          "active": ["refs"],
+          "note": "The function asks which type the ref holds. In the branch for a number, the compiler knows it is a number."
+        },
+        {
+          "active": ["refs", "refs->table", "table"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "label", "value": "text" }]
+          },
+          "note": "Old and new refs both reach the packing table as one tidy label."
+        }
+      ]
+    },
+    "count": {
+      "trace": {
+        "file": "src/packing.ts",
+        "call": "lineCount",
+        "args": [{ "samples": ["Ember Oolong", "Frost Sencha", "Morning Keemun", "Hearth Assam"] }]
+      },
+      "steps": [
+        {
+          "active": ["types", "types->count"],
+          "value": {
+            "kind": "map",
+            "label": "an order line",
+            "entries": [
+              { "key": "tin line", "value": "blend, tins" },
+              { "key": "sampler", "value": "samples" }
+            ]
+          },
+          "note": "This line is a sampler box with four blends in it."
+        },
+        {
+          "active": ["count"],
+          "note": "The function finds out which shape the line has. In the branch for a sampler, the compiler lets it read the samples."
+        },
+        {
+          "active": ["count", "count->table", "table"],
+          "note": "Bryn gets the number of things to pack for the line."
+        }
+      ]
+    },
+    "shelf": {
+      "trace": { "file": "src/packing.ts", "call": "shelfLine", "args": [null] },
+      "steps": [
+        {
+          "active": ["bryn", "bryn->shelf"],
+          "value": {
+            "kind": "map",
+            "label": "a shelf",
+            "entries": [{ "key": "count", "value": "number, or null before counting" }]
+          },
+          "note": "Bryn has not counted this shelf yet, so its count is null."
+        },
+        {
+          "active": ["shelf"],
+          "note": "The function tells a shelf nobody counted from a count. Only where the count is a number does the compiler let it compare."
+        },
+        {
+          "active": ["shelf"],
+          "note": "A shelf nobody counted and an empty one get different lines, because 0 is a real count."
+        }
+      ]
+    },
+    "delivery": {
+      "steps": [
+        {
+          "active": ["types", "types->delivery"],
+          "value": {
+            "kind": "map",
+            "label": "a delivery",
+            "entries": [
+              { "key": "post", "value": "address" },
+              { "key": "locker", "value": "locker" },
+              { "key": "collect", "value": "nothing more" }
+            ]
+          },
+          "note": "Order OK-1042 goes by post, to an address."
+        },
+        {
+          "active": ["delivery"],
+          "note": "The function branches on the kind. In each branch, the compiler knows which properties the delivery has."
+        },
+        {
+          "active": ["delivery", "delivery->table", "table"],
+          "note": "The packing table gets where the parcel goes. If a new kind is added, the compiler points at this function until it handles it."
+        }
+      ]
+    }
+  }
+}

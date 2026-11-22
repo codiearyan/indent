@@ -1,0 +1,64 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilma", "label": "Wilma", "kind": "story" },
+      { "id": "folder", "label": "Shop's folder", "kind": "data" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "rules", "label": ".gitignore", "kind": "file", "mine": true },
+      { "id": "history", "label": "History", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "wilma", "to": "you", "label": "too much noise" },
+      { "from": "folder", "to": "you", "label": "untracked files" },
+      { "from": "you", "to": "rules", "label": "patterns" },
+      { "from": "you", "to": "history", "label": "forget a file" },
+      { "from": "rules", "to": "history", "label": "one commit" }
+    ],
+    "note": "Git learns which files of the shop's folder to leave alone, and the rules go into the history."
+  },
+  "tasks": {
+    "stock": {
+      "steps": [
+        { "active": ["folder"], "note": "Every evening the till leaves its stock export in the folder, untracked." },
+        {
+          "active": ["folder", "folder->you", "you"],
+          "note": "git status lists it each time, among the website's files."
+        },
+        {
+          "active": ["you", "you->rules", "rules"],
+          "note": "A line in .gitignore names the file, and git status stops listing it."
+        }
+      ]
+    },
+    "drafts": {
+      "steps": [
+        { "active": ["folder"], "note": "Femi's drafts folder holds pages that are not ready, and more arrive." },
+        {
+          "active": ["you", "you->rules", "rules"],
+          "note": "One line in .gitignore takes the whole folder, whatever is in it."
+        },
+        { "active": ["folder"], "note": "Nothing in the drafts folder shows up in git status any more." }
+      ]
+    },
+    "upload": {
+      "steps": [
+        { "active": ["history"], "note": "The upload log went into a commit once, so Git tracks it." },
+        { "active": ["rules"], "note": "A line in .gitignore matches it, and git status still lists it as modified." },
+        {
+          "active": ["you", "you->history", "history"],
+          "note": "Git is told to forget the file, which stays in the folder for the upload tool."
+        }
+      ]
+    },
+    "commit": {
+      "steps": [
+        { "active": ["rules"], "note": "The rules are ready in the folder, but only this folder knows them." },
+        {
+          "active": ["rules", "rules->history", "history"],
+          "note": "One commit saves the rules and the end of the upload log."
+        },
+        { "active": ["wilma", "wilma->you", "you"], "note": "git status is quiet: only the website is left." }
+      ]
+    }
+  }
+}

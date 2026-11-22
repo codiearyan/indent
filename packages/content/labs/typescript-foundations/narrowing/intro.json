@@ -1,0 +1,46 @@
+{
+  "stations": [
+    {
+      "title": "Bryn",
+      "say": "Why is shelf B empty? Nobody counted",
+      "note": "It has no count yet."
+    },
+    {
+      "title": "Packing code",
+      "text": "Uses a value before it knows its kind."
+    },
+    {
+      "title": "Your code",
+      "file": "packing.ts",
+      "mine": true,
+      "gap": "Never checks the kind first",
+      "tasks": [
+        "Tidy either ref",
+        "Tins or a sampler",
+        "Not counted or none",
+        "Every delivery kind"
+      ]
+    },
+    {
+      "title": "Packing table",
+      "rows": [
+        ["Shelf B", "no count yet"],
+        ["OK-1042", "by post"]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Shelf B",
+    "wrong": "shown empty",
+    "why": "Unchecked",
+    "right": "still to count"
+  },
+  "captions": [
+    "Bryn asks why the packing code says a shelf at Oakhollow is empty.",
+    "Nobody has counted shelf B yet, and the code used its count anyway.",
+    "You make each function check which kind of value it holds before using it.",
+    "Now shelf B waits for its count, and only a shelf with no tins shows as empty.",
+    "Every function knows the kind of its value, and a new kind of delivery is caught."
+  ]
+}

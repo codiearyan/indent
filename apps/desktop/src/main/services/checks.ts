@@ -17,10 +17,11 @@ import {
   parseTrace,
   type RunOutcome
 } from './grader'
-import { labModelProblem, labModelReady, startLabModel } from './labModel'
+import { labModelProblem, labModelReady, labUsesModel, startLabModel } from './labModel'
 import { getProgress, recordCheck } from './progress'
 import { findMissing } from './workspaceSync'
 import { InstallError } from '../library'
+import { perf } from '../perf'
 import {
   downloadTools,
   installedTools,
@@ -180,7 +181,7 @@ async function trace(labId: string, chapterId: string, taskId: string): Promise<
 
   const status = await ensureRuntime()
   if (!status.ready) return failedTrace(status.error ?? 'The repo tools are not ready yet.')
-  await labModelReady()
+  if (labUsesModel(labId)) await labModelReady()
   const error = labModelProblem(labId)
   if (error) return failedTrace(error)
   const args = [
@@ -203,6 +204,7 @@ async function runCheck(
   chapterId: string,
   taskIds?: string[]
 ): Promise<{ results: CheckResult[]; progress: ProgressState }> {
+  const began = Date.now()
   const chapter = await loadChapter(labId, chapterId)
   const known = chapter.tasks.map((task) => task.id)
   const ids = taskIds ?? known
@@ -213,14 +215,14 @@ async function runCheck(
   const starterDir = join(chapterContentDir(labId, chapterId), 'starter')
   const missing = chapter.movesFiles
     ? []
-    : await findMissing(starterDir, workspaceDir(labId, chapterId))
+    : await findMissing(starterDir, workspaceDir(labId, chapterId), chapter.files)
   if (missing.length > 0) {
     return { results: [], progress: await getProgress() }
   }
   const status = await ensureRuntime()
   // The notice above the tasks says what is wrong; the tasks are not failed for it.
   if (!status.ready) return { results: [], progress: await getProgress() }
-  await labModelReady()
+  if (labUsesModel(labId)) await labModelReady()
   const error = labModelProblem(labId)
   let results: CheckResult[]
   if (error) {
@@ -234,11 +236,13 @@ async function runCheck(
       ...ids.flatMap((id) => ['--task', id])
     ]
     const started = Date.now()
+    perf('check, before the grader', started - began)
     const run = await runProcess('node', args, {
       env: await labEnv(),
       timeout: CHECK_TIMEOUT_MS,
       killSignal: 'SIGKILL'
     })
+    perf('check, in the grader', Date.now() - started)
     results = gradeRun(ids, run, Date.now() - started, new Date().toISOString())
   }
   return { results, progress: await recordCheck(labId, chapterId, chapter.tasks, results) }

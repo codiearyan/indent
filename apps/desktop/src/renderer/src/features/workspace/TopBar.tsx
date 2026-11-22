@@ -1,5 +1,12 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, ChevronLeft, ChevronRight, CircleHelp, MessageCircle } from 'lucide-react'
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  CircleHelp,
+  Focus,
+  MessageCircle
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProviderIcon } from '@/components/app/ProviderIcon'
 import { StreakStatus } from '@/features/progress/StreakStatus'
@@ -21,6 +28,8 @@ export function TopBar(): React.JSX.Element {
   const navigate = useNavigate()
   const chapter = useWorkspace((s) => s.chapter)
   const chatOpen = useSettings((s) => s.panels.chat)
+  const zen = useSettings((s) => s.panels.zen)
+  const togglePanel = useSettings((s) => s.togglePanel)
   const provider = useAi((s) => (s.config?.enabled ? activeProvider(s.config) : undefined))
   const ready = useWorkspace((s) => s.status === 'ready')
   const setTourOpen = useWorkspace((s) => s.setTourOpen)
@@ -88,6 +97,22 @@ export function TopBar(): React.JSX.Element {
       <div className="flex shrink-0 items-center gap-0.5">
         {!companion && <StreakStatus />}
         {ide && ready && !companion && <OpenInIdeButton ide={ide} variant="ghost" />}
+        {ready && !companion && (
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-pressed={zen}
+            onClick={() => togglePanel('zen')}
+            data-shortcut="toggleFocusMode"
+            className={cn(
+              'font-normal text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]',
+              zen && 'bg-accent text-foreground'
+            )}
+          >
+            <Focus />
+            Focus
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="sm"

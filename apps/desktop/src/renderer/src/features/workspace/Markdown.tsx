@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, memo, useContext, useMemo } from 'react'
 import ReactMarkdown, { type Components, type ExtraProps } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
@@ -62,8 +62,10 @@ function Link({ href, children }: React.ComponentProps<'a'>): React.JSX.Element 
 }
 
 const components: Components = { pre: Pre, a: Link }
+const plugins = [remarkGfm]
 
-export function Markdown({
+// Memoized: a thread or a task list renders many of these, and most did not change.
+export const Markdown = memo(function Markdown({
   children,
   compact,
   streaming = false,
@@ -83,10 +85,10 @@ export function Markdown({
   return (
     <div className={cn('prose-lab', compact && 'prose-compact')}>
       <MarkdownContext.Provider value={context}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+        <ReactMarkdown remarkPlugins={plugins} components={components}>
           {children}
         </ReactMarkdown>
       </MarkdownContext.Provider>
     </div>
   )
-}
+})

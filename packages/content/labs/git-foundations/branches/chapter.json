@@ -1,0 +1,113 @@
+{
+  "id": "branches",
+  "title": "A branch for the summer sale",
+  "files": ["NOTES.md", "shop/index.html", "shop/events.html", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the shop's folder, then go into shop and work there with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "branch",
+      "title": "Make the branch summer-sale and switch to it",
+      "file": "shop/index.html",
+      "description": "Run `node setup.mjs` in the top folder, then work inside `shop`. The repository has one branch, `main`, with the site as it is today.\n\nMake a new branch called `summer-sale`, starting from the last commit of `main`, and switch to it, so the next commits go onto it.\n\nThe check expects a branch with exactly that name that holds every commit of `main` from the setup, and you to be on it (or to have committed on it).",
+      "nextSteps": [
+        "Run `git status`: its first line says `On branch main`.",
+        "Run `git branch` to list the branches. There is one.",
+        "Make `summer-sale` and switch to it, in one command or two.",
+        "Run `git status` again: the first line names the new branch."
+      ],
+      "hints": [
+        "Making a branch and moving onto it are two separate things. A new branch starts from the commit you are on.",
+        "`git switch` moves you to a branch. One of its options makes the branch first.",
+        "Run `git switch -c summer-sale`."
+      ],
+      "docs": [
+        { "title": "git switch", "url": "https://git-scm.com/docs/git-switch" },
+        { "title": "git branch", "url": "https://git-scm.com/docs/git-branch" },
+        {
+          "title": "Branches in a nutshell",
+          "url": "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell"
+        }
+      ],
+      "videos": [{ "title": "What a Git branch is", "url": "https://www.youtube.com/watch?v=e2IbNHi4uCI" }],
+      "points": 10
+    },
+    {
+      "id": "sale",
+      "title": "Commit the sale on summer-sale",
+      "file": "shop/index.html",
+      "description": "On `summer-sale`, open `shop/index.html` and add this line just under the paragraph about Bramley Row, inside the page:\n\n```\n<p>Summer sale: every book half price, 1 to 31 July.</p>\n```\n\nSave it and commit it on `summer-sale`. Change no other file.\n\nThe check looks for a commit that is on `summer-sale` but not on `main` and whose home page announces the summer sale, and expects the other pages on `summer-sale` to be as they are on `main`.",
+      "nextSteps": [
+        "Make sure `git status` says `On branch summer-sale`.",
+        "Add the line to `shop/index.html` in the editor and save.",
+        "Stage the file and commit it with a message that says what changed.",
+        "Run `git log --oneline -n 3`: your commit is at the top, on `summer-sale`."
+      ],
+      "hints": [
+        "A commit goes onto the branch you are on. Check the first line of git status before you commit.",
+        "Committing on a branch is the same two steps as always: stage, then commit.",
+        "Run `git add index.html`, then `git commit -m \"Announce the summer sale on the home page\"`."
+      ],
+      "docs": [
+        {
+          "title": "Basic branching",
+          "url": "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging"
+        },
+        { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "back",
+      "title": "Switch back to main and see the sale go",
+      "file": "shop/index.html",
+      "description": "Switch back to `main`. Keep `shop/index.html` open in the editor: the sale line disappears, because `main` does not have that commit. It is still safe on `summer-sale`.\n\nThe check expects you to be on `main`, the sale to be committed on `summer-sale`, and `index.html` in the working folder to have no sale line.",
+      "nextSteps": [
+        "Run `git status` first: there must be nothing left to commit.",
+        "Switch to `main`.",
+        "Look at `shop/index.html` in the editor: the sale line is gone.",
+        "Run `git log --oneline --graph --all -n 4` to see both branches."
+      ],
+      "hints": [
+        "Switching branches puts the files of that branch's last commit in the working folder.",
+        "The command that moved you onto summer-sale also moves you back, without its option.",
+        "Run `git switch main`."
+      ],
+      "docs": [
+        { "title": "git switch", "url": "https://git-scm.com/docs/git-switch" },
+        {
+          "title": "Switching branches",
+          "url": "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "evening",
+      "title": "Move the reading group to 19:00, on main",
+      "file": "shop/events.html",
+      "description": "The reading group cannot wait for July. Wilma wants it to meet at 19:00 instead of 18:30, on the site now. On `main`, open `shop/events.html`, change the time on the line about the first Thursday of the month, save, and commit it on `main`.\n\nThe check looks for a commit on `main` whose reading group meets at 19:00 and no longer at 18:30, expects every other line of that page to be as it was, and the sale to stay off `main`.",
+      "nextSteps": [
+        "Make sure `git status` says `On branch main`.",
+        "Change only the time on the reading group line, and save.",
+        "Stage and commit it.",
+        "Run `git log --oneline --graph --all -n 4`: the two branches now go different ways."
+      ],
+      "hints": [
+        "This commit belongs on main, so check the first line of git status before you commit.",
+        "The sale is not in the files on main, so this commit cannot take it along.",
+        "Run `git add events.html`, then `git commit -m \"Move the reading group to 19:00\"`."
+      ],
+      "docs": [
+        { "title": "git log --graph", "url": "https://git-scm.com/docs/git-log#Documentation/git-log.txt---graph" },
+        {
+          "title": "Basic branching",
+          "url": "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "stations": [
+    { "title": "Imogen", "say": "Why is the label code broken now?", "note": "Nobody touched it." },
+    { "title": "Order code", "text": "Writes an order line out in every function." },
+    {
+      "title": "Your types",
+      "file": "orders.ts",
+      "mine": true,
+      "gap": "Each copy drifts apart",
+      "tasks": [
+        "Name an order line",
+        "A customer interface",
+        "An address inside",
+        "Batch tins on tins"
+      ]
+    },
+    {
+      "title": "Packing table",
+      "rows": [
+        ["Hearth Assam x3", "line"],
+        ["OK-1042", "parcel"]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": { "label": "Order line", "wrong": "two shapes", "why": "Copies", "right": "one shape" },
+  "captions": [
+    "Imogen asks why a function at Oakhollow broke when nobody changed it.",
+    "The order line was written out twice, and only one copy got the grams per tin.",
+    "You give each shape a name, and every function uses the name.",
+    "Now the order line is written once, and both functions see the same shape.",
+    "The shop's shapes have names, so a change reaches every place that uses them."
+  ]
+}

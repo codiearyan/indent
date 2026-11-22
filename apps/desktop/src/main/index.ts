@@ -17,6 +17,8 @@ import * as github from './services/github'
 import * as telemetry from './services/telemetry'
 import * as updates from './services/updates'
 import * as reminders from './services/reminders'
+import { appWindows } from './ipc'
+import { perf } from './perf'
 import { seedContent } from './library'
 import { bundledContentDir, contentDir, usesLibrary } from './paths'
 import { PACKS_URL } from '@shared/packs'
@@ -49,7 +51,12 @@ function createWindow(route?: string): void {
     }
   })
 
-  mainWindow.on('ready-to-show', () => mainWindow.show())
+  mainWindow.on('ready-to-show', () => {
+    mainWindow.show()
+    perf('window shown', process.uptime() * 1000)
+  })
+  // A page's window belongs to an issue open in this window.
+  mainWindow.on('closed', preview.closeAll)
 
   // Full screen hides the traffic lights, so the page gives the room it kept for them back.
   const syncFullScreen = (): void => {
@@ -79,7 +86,7 @@ function createWindow(route?: string): void {
 
 /** Brings the window back, or opens a new one, on `route` when given. */
 function showWindow(route?: string): void {
-  const window = BrowserWindow.getAllWindows()[0]
+  const window = appWindows()[0]
   if (!window) return createWindow(route)
   if (window.isMinimized()) window.restore()
   window.show()
@@ -160,7 +167,7 @@ app.whenReady().then(() => {
   if (!reminders.startsHidden()) createWindow()
 
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (appWindows().length === 0) createWindow()
   })
 })
 

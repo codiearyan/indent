@@ -1,5 +1,6 @@
 ---
-import type { Repo } from '../lib/content'
+import type { Kind, Repo } from '../lib/content'
+import { MAX_HINTS } from '../../../desktop/src/shared/rules'
 import BuildStrip from './BuildStrip.astro'
 import SectionHead from './SectionHead.astro'
 
@@ -26,11 +27,28 @@ const languageName: Record<string, string> = {
   html: 'HTML and CSS',
   react: 'React'
 }
+// The same three kinds, titles and notes as the Repos page of the app.
+const sections: { kind: Kind; title: string; note: string }[] = [
+  {
+    kind: 'foundations',
+    title: 'Foundations',
+    note: 'Learn a language from the start, one topic at a time.'
+  },
+  { kind: 'project', title: 'Projects', note: 'Build one real thing over a few issues.' },
+  {
+    kind: 'bug-hunt',
+    title: 'Bug hunts',
+    note: 'Reproduce a bug, fix its cause and write the test that catches it.'
+  }
+]
+const groups = sections
+  .map((section) => ({ ...section, repos: repos.filter((repo) => repo.kind === section.kind) }))
+  .filter((group) => group.repos.length > 0)
 const figures = [
   { label: 'Repos', value: repos.length },
   { label: 'Issues', value: issues },
   { label: 'Tasks', value: tasks },
-  { label: 'Hints per task', value: 3 }
+  { label: 'Hints per task', value: MAX_HINTS }
 ]
 ---
 
@@ -46,8 +64,8 @@ const figures = [
     >
       <p>
         A repo is a story told through its issues. An issue is a short lesson and a few tasks, and
-        every task is checked by hidden tests. Pick the one that matches what you want to get good
-        at.
+        every task is checked by hidden tests. Start with the foundations of a language, build a
+        project, or hunt down the bugs an interview would ask about.
       </p>
     </SectionHead>
 
@@ -73,37 +91,50 @@ const figures = [
       }
     </dl>
 
-    <ul
-      class="mt-6 grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-2 lg:grid-cols-3"
-    >
-      {
-        repos.map((repo) => (
-          <li class="group flex flex-col bg-background p-6 sm:p-7">
-            <div class="flex items-center justify-between gap-3">
-              <span
-                class="inline-flex h-6 min-w-8 items-center justify-center rounded-sm border border-border px-1.5 font-mono text-[11px] text-muted-foreground"
-                title={languageName[repo.language] ?? repo.language}
-              >
-                {languageCode[repo.language] ?? repo.language}
-              </span>
-              <span class="text-[13px] text-muted-foreground">{repo.category}</span>
-            </div>
-            <h3 class="mt-6 text-[19px] leading-snug font-medium tracking-[-0.01em]">
-              {repo.title}
-            </h3>
-            <p class="mt-2.5 mb-8 text-[15px] leading-[1.6] text-muted-foreground">
-              {repo.problem}
+    {
+      groups.map((group) => (
+        <div class="mt-16">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+            <h3 class="text-[22px] font-medium tracking-[-0.015em]">{group.title}</h3>
+            <p class="font-mono text-[12px] text-muted-foreground tabular-nums">
+              {group.repos.length} repos
             </p>
-            <div class="mt-auto flex flex-col gap-3">
-              <BuildStrip groups={repo.issues.map((issue) => issue.tasks)} hoverFill />
-              <span class="font-mono text-[12px] text-muted-foreground tabular-nums">
-                {repo.issues.length} issues, {repo.tasks} tasks
-              </span>
-            </div>
-          </li>
-        ))
-      }
-    </ul>
+          </div>
+          <p class="mt-2 text-[16px] leading-[1.6] text-muted-foreground">{group.note}</p>
+          <ul
+            class="mt-5 grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-2 lg:grid-cols-3"
+          >
+            {
+              group.repos.map((repo) => (
+                <li class="group flex flex-col bg-background p-6 sm:p-7">
+                  <div class="flex items-center justify-between gap-3">
+                    <span
+                      class="inline-flex h-6 min-w-8 items-center justify-center rounded-sm border border-border px-1.5 font-mono text-[11px] text-muted-foreground"
+                      title={languageName[repo.language] ?? repo.language}
+                    >
+                      {languageCode[repo.language] ?? repo.language}
+                    </span>
+                    <span class="text-[13px] text-muted-foreground">{repo.category}</span>
+                  </div>
+                  <h4 class="mt-6 text-[19px] leading-snug font-medium tracking-[-0.01em]">
+                    {repo.title}
+                  </h4>
+                  <p class="mt-2.5 mb-8 text-[15px] leading-[1.6] text-muted-foreground">
+                    {repo.problem}
+                  </p>
+                  <div class="mt-auto flex flex-col gap-3">
+                    <BuildStrip groups={repo.issues.map((issue) => issue.tasks)} hoverFill />
+                    <span class="font-mono text-[12px] text-muted-foreground tabular-nums">
+                      {repo.issues.length} issues, {repo.tasks} tasks
+                    </span>
+                  </div>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      ))
+    }
     <p class="mt-6 text-[14px] text-muted-foreground">
       Each strip is one repo: a group per issue, a cell per task. In the app the cells fill as your
       tasks pass.

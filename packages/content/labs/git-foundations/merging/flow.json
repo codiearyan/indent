@@ -1,0 +1,48 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilma", "label": "Wilma", "kind": "story" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "sale", "label": "Sale branch", "kind": "data" },
+      { "id": "group", "label": "July book branch", "kind": "data" },
+      { "id": "window", "label": "Window branch", "kind": "data" },
+      { "id": "main", "label": "main", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "wilma", "to": "you", "label": "it is July" },
+      { "from": "you", "to": "main", "label": "merges" },
+      { "from": "sale", "to": "main", "label": "moves forward" },
+      { "from": "group", "to": "main", "label": "merge commit" }
+    ],
+    "note": "Two branches come back into main, and one waits for Wilma."
+  },
+  "tasks": {
+    "sale": {
+      "steps": [
+        { "active": ["sale", "main"], "note": "main has nothing new since the sale branch started from it." },
+        {
+          "active": ["you", "you->main", "sale", "sale->main", "main"],
+          "note": "main simply moves forward to the sale's last commit."
+        },
+        { "active": ["main"], "note": "No new commit: the history is still one line." }
+      ]
+    },
+    "group": {
+      "steps": [
+        { "active": ["group", "main"], "note": "main and the July book branch each have commits the other lacks." },
+        {
+          "active": ["you", "you->main", "group", "group->main", "main"],
+          "note": "A merge commit with two parents joins the two lines."
+        },
+        { "active": ["main"], "note": "It carries the message Git wrote for it." }
+      ]
+    },
+    "tidy": {
+      "steps": [
+        { "active": ["main"], "note": "Every commit of the two merged branches is in main now." },
+        { "active": ["sale", "group"], "note": "Their names can go; their commits stay, held by main." },
+        { "active": ["window"], "note": "The window branch has a commit main lacks, so it stays for Wilma to decide." }
+      ]
+    }
+  }
+}
