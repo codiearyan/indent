@@ -24,6 +24,7 @@
     "@anthropic-ai/sdk": "^1.10.0",
     "@electron-toolkit/utils": "^4.0.0",
     "electron-updater": "6.8.12",
+    "mermaid": "12.3.0",
     "monaco-vim": "0.4.4",
     "node-pty": "^1.1.0"
   },

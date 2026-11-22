@@ -17,3 +17,22 @@ export function fenceOf(pre: { children: unknown[] } | undefined): {
   const language = first.startsWith('language-') ? first.slice('language-'.length) : undefined
   return { code: textOf(code).replace(/\n$/, ''), language }
 }
+
+const FENCE = /^(`{3,}|~{3,})(.*)$/
+// List indentation and blockquote markers in front of a line inside a container.
+const CONTAINER = /^[ \t>]*/
+
+/**
+ * Whether a fenced block's own source, as the parser saw it, ends with its closing fence. A block
+ * still streaming, or cut off when a reply stopped, runs to the end of the reply instead.
+ */
+export function fenceClosed(raw: string): boolean {
+  const lines = raw.split('\n').map((line) => line.replace(CONTAINER, ''))
+  const open = FENCE.exec(lines[0])
+  if (!open) return true
+  if (lines.length < 2) return false
+  const close = FENCE.exec(lines[lines.length - 1])
+  return (
+    !!close && close[1][0] === open[1][0] && close[1].length >= open[1].length && !close[2].trim()
+  )
+}
