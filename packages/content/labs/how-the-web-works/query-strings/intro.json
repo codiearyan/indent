@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Ffion",
+      "say": "Find me Mabli & the Moths?",
+      "note": "A listener asked for them."
+    },
+    {
+      "title": "Typed address",
+      "text": "The search is glued together as plain text."
+    },
+    {
+      "title": "Your code",
+      "file": "search.js",
+      "mine": true,
+      "gap": "The & splits the name",
+      "tasks": ["Read a value", "Build the search", "Send the search", "Ask for page two"]
+    },
+    {
+      "title": "Cupboard server",
+      "text": "Reads each value after the question mark."
+    }
+  ],
+  "ticket": {
+    "label": "Ffion's search",
+    "wrong": "empty",
+    "why": "Split at &",
+    "right": "found"
+  },
+  "captions": [
+    "Ffion looks up a listener's song request: anything by Mabli & the Moths.",
+    "The search is plain glued text, so the server reads the artist as just Mabli.",
+    "You read and build the question mark part so every value survives, in four tasks.",
+    "The artist arrives exactly as typed, and the server finds the songs.",
+    "Names and values, encoded on the way: the server reads what Ffion typed."
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "id": "requests",
+  "title": "A request has a method, a path and headers",
+  "files": ["src/requests.js", "run.js", "server/station.js"],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "line",
+      "title": "Write the first line of a request",
+      "file": "src/requests.js",
+      "description": "Under `// Task 1` in `src/requests.js`, make `requestLine(method, address)` give back the first line of the request that asks for `address` with `method`, as text: the method in capital letters, a space, the path with its question mark part, a space, and `HTTP/1.1`. For example `'GET /shows?day=saturday HTTP/1.1'`.\n\nCheck calls `requestLine` with methods and addresses of its own, some in small letters, some with a question mark part and one with no path at all.",
+      "nextSteps": [
+        "Run `node run.js` and look at the first line under any request: that is the shape to build.",
+        "Make a `URL` from the address and find the property that holds the question mark part.",
+        "Put the method in capitals, the path and its question mark part, and the version together.",
+        "Run `node run.js` again and compare both Task 1 lines with the addresses they came from."
+      ],
+      "hints": [
+        "The host is not on the first line of a request. It travels in a header of its own, so the line only needs what comes after the host.",
+        "A `URL` has `pathname` for the path and `search` for the question mark part, `?` included, or `''` when there is none. Text has a method that turns it into capitals.",
+        "Build it with a template literal: `${method.toUpperCase()} ${url.pathname}${url.search} HTTP/1.1`."
+      ],
+      "docs": [
+        {
+          "title": "HTTP messages",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages"
+        },
+        {
+          "title": "URL: search property",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URL/search"
+        },
+        {
+          "title": "String.prototype.toUpperCase()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase"
+        }
+      ],
+      "videos": [
+        {
+          "title": "How HTTP requests work",
+          "url": "https://www.youtube.com/watch?v=CFzgKfnmG-Q"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "remove",
+      "title": "Remove a song request",
+      "file": "src/requests.js",
+      "description": "Under `// Task 2`, make `removeRequest(base, id)` ask the server at `base` to remove song request number `id`. The request goes to the path `/requests/<id>`, with the method that removes. It gives back the text of the answer's body, whatever the server says.\n\nCheck starts a server of its own and looks at both sides: the method and path of the request its server received, and the text `removeRequest` gave back.",
+      "nextSteps": [
+        "Build the address of the song request from `base` and `id`.",
+        "Find in the lesson the method that removes, and how to hand a method to `fetch`.",
+        "Wait for the answer and give back its body text.",
+        "Run `node run.js`: the cupboard server answers, but it does not remove the request yet."
+      ],
+      "hints": [
+        "Given only an address, `fetch` sends a GET, which asks to read. To do anything else, it needs to be told the method.",
+        "`fetch` takes a second value: an object of options. One of them is `method`.",
+        "`await fetch(address, { method: 'DELETE' })`, where `address` is built from `base` and `` `/requests/${id}` ``."
+      ],
+      "docs": [
+        {
+          "title": "HTTP request methods",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods"
+        },
+        {
+          "title": "DELETE",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/DELETE"
+        },
+        {
+          "title": "fetch() options",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/RequestInit"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "studio",
+      "title": "Say who is asking",
+      "file": "src/requests.js",
+      "description": "Under `// Task 3`, make `removeAsStudio(base, id, key)` send the same request as `removeRequest`, with one header more: `authorization`, whose value is the word `Bearer`, a space and `key`. It gives back the text of the answer's body.\n\nCheck starts a server of its own, calls `removeAsStudio` with a key of its own, and looks at the method, path and `authorization` header its server received, and at the text that came back.",
+      "nextSteps": [
+        "Start from what you wrote for Task 2.",
+        "Add `headers` to the options you hand `fetch`.",
+        "Build the value of the header from the word, a space and `key`.",
+        "Run `node run.js`: with the studio key the request comes off the list, with a wrong key it stays."
+      ],
+      "hints": [
+        "A header is a name and a value. The server finds it by its name, spelt exactly, so `authorisation` with an s is a different header that it never looks at.",
+        "The options of `fetch` can have `headers`: an object whose property names are header names and whose values are text.",
+        "Hand `fetch` the options `{ method: 'DELETE', headers: { authorization: `Bearer ${key}` } }`, with the value written as a template literal."
+      ],
+      "docs": [
+        {
+          "title": "Authorization header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Authorization"
+        },
+        {
+          "title": "HTTP headers",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "accept",
+      "title": "Ask for a kind of answer",
+      "file": "src/requests.js",
+      "description": "Under `// Task 4`, make `fetchAs(base, path, type)` ask the server at `base` for the page at `path` with a GET request whose `accept` header is `type`, like `'text/html'`. It gives back the text of the answer's body.\n\nCheck starts a server of its own, calls `fetchAs` with paths and types of its own, and looks at the `accept` header its server received and at the text that came back.",
+      "nextSteps": [
+        "Build the address from `base` and `path`.",
+        "Hand `fetch` a header called `accept` with `type` as its value.",
+        "Wait for the answer and give back its body text.",
+        "Run `node run.js`: the same page comes back as HTML for one call and as plain text for the other."
+      ],
+      "hints": [
+        "Without your header, `fetch` still sends `accept: */*`, which means any kind will do. Your header takes its place.",
+        "This is the same shape as Task 3: `headers` in the options of `fetch`, with a different name and value. A GET needs no method in the options.",
+        "`await fetch(new URL(path, base), { headers: { accept: type } })`, then give back the body text."
+      ],
+      "docs": [
+        {
+          "title": "Accept header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Accept"
+        },
+        {
+          "title": "MIME types",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/MIME_types"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

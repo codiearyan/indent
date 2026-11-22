@@ -1,0 +1,129 @@
+{
+  "id": "query-strings",
+  "title": "The question mark part",
+  "files": ["src/search.js", "run.js", "server/station.js"],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "read",
+      "title": "Read a value from the question mark part",
+      "file": "src/search.js",
+      "description": "Under `// Task 1` in `src/search.js`, make `queryValue(address, name)` give back the value called `name` in the question mark part of `address`, decoded the way the server reads it: `'Mabli & the Moths'`, not `'Mabli+%26+the+Moths'`. When there is no value with that name, it gives back `null`.\n\nCheck calls `queryValue` with an address of its own whose values have encoded characters in them, and with a name that is not there.",
+      "nextSteps": [
+        "Make a `URL` from the address and print its `searchParams`.",
+        "Ask `searchParams` for the value by its name.",
+        "Try a name that is not in the address and look at what comes back.",
+        "Run `node run.js` and compare the two Task 1 lines with the address they read."
+      ],
+      "hints": [
+        "Cutting the text at `?`, `&` and `=` yourself leaves the codes like `%26` and `+` in the values. `URL` decodes them for you.",
+        "A `URL` has a `searchParams` property that holds the names and values of the question mark part, already decoded. Its `get` method gives back `null` for a name that is not there.",
+        "One line: `return new URL(address).searchParams.get(name)`."
+      ],
+      "docs": [
+        {
+          "title": "URL: searchParams property",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams"
+        },
+        {
+          "title": "URLSearchParams: get() method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/get"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "build",
+      "title": "Build a search address",
+      "file": "src/search.js",
+      "description": "Under `// Task 2`, make `searchAddress(base, artist, title)` give back, as text, the address of `/songs/search` on the server at `base`, with `artist` and `title` in the question mark part. Both must reach the server exactly as they were typed, with any `&`, `#`, `+`, `%` or space in them. When `title` is not given, the address has no `title` at all.\n\nCheck calls `searchAddress` with artists and titles of its own, reads the address back the way a server does, and compares each value with what was typed.",
+      "nextSteps": [
+        "Make a `URL` for the search page from `base`, as in the last issue.",
+        "Put the artist into its `searchParams` and print the address.",
+        "Put the title in only when it was given.",
+        "Run `node run.js` and read how `&` and `+` look in the address."
+      ],
+      "hints": [
+        "Building the question mark part with a template literal puts an `&` or a `#` from a value straight into the address, where it means something else.",
+        "`searchParams` has a `set` method that adds a name and value and encodes the value for you. A parameter that was not given is `undefined`.",
+        "Make `const url = new URL('/songs/search', base)`, call `url.searchParams.set('artist', artist)`, do the same for title inside `if (title !== undefined)`, and return `url.href`."
+      ],
+      "docs": [
+        {
+          "title": "URLSearchParams: set() method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/set"
+        },
+        {
+          "title": "Percent-encoding",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Percent-encoding in two minutes",
+          "url": "https://www.youtube.com/watch?v=WxelUOG-Bj4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "search",
+      "title": "Search the cupboard server",
+      "file": "src/search.js",
+      "description": "Under `// Task 3`, make `searchSongs(base, artist, title)` send a request for that search to the server at `base`, wait for the answer, and give back the text of its body. `title` may be left out here too, and then the request has no title.\n\nCheck starts a server of its own, calls `searchSongs`, and looks at both sides: the artist and title its server read from the request, and the text `searchSongs` gave back.",
+      "nextSteps": [
+        "Get the address of the search from the function you wrote in Task 2.",
+        "Send a request there with `fetch` and wait for the answer.",
+        "Read the body as text, wait for it, and give it back.",
+        "Run `node run.js` and read the first line of each answer: it says what the server looked for."
+      ],
+      "hints": [
+        "This is Task 2 and the last task of the previous issue put together.",
+        "A function can call another function of the same file. Hand `searchAddress` the three values `searchSongs` was given, even when the title is `undefined`.",
+        "`const response = await fetch(searchAddress(base, artist, title))`, then give back the body text, waited for with `await`."
+      ],
+      "docs": [
+        {
+          "title": "Using the Fetch API",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch"
+        },
+        {
+          "title": "URLSearchParams",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "Ask for the next page",
+      "file": "src/search.js",
+      "description": "The server shows two songs at a time. Under `// Task 4`, make `nextPage(address)` give back, as text, the same address with `page` one higher. An address with no `page` is on page 1, so its next page is 2. Every other value stays as it was, and `page` appears only once.\n\nCheck calls `nextPage` with addresses of its own, with and without a page, and reads every value of the address it gives back.",
+      "nextSteps": [
+        "Read the page out of the address and print what kind of value it is.",
+        "Decide what the page is when the address has none.",
+        "Work out the next page as a number, and put it back in place of the old one.",
+        "Run `node run.js`: the server should answer with the next two songs."
+      ],
+      "hints": [
+        "Every value in the question mark part is text, even when it looks like a number, and `'9' + 1` is `'91'`.",
+        "`Number()` turns text into a number. `get` gives `null` for a name that is not there, and `set` replaces a value that is already there instead of adding a second one.",
+        "Read it with `Number(url.searchParams.get('page') ?? '1')`, then `url.searchParams.set('page', String(page + 1))` and return `url.href`."
+      ],
+      "docs": [
+        {
+          "title": "URLSearchParams: set() method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/set"
+        },
+        {
+          "title": "Number() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/Number"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

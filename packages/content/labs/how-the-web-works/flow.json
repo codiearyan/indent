@@ -1,0 +1,19 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "people", "label": "Odette, Ffion, Gethin", "kind": "story" },
+      { "id": "studio", "label": "Studio screens", "kind": "story" },
+      { "id": "scripts", "label": "Your scripts", "kind": "file", "mine": true },
+      { "id": "server", "label": "Cupboard server", "kind": "story" },
+      { "id": "listings", "label": "Listings and requests", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "people", "to": "studio", "label": "what they need" },
+      { "from": "studio", "to": "scripts", "label": "asks" },
+      { "from": "scripts", "to": "server", "label": "requests" },
+      { "from": "server", "to": "listings", "label": "reads" },
+      { "from": "scripts", "to": "studio", "label": "answers" }
+    ],
+    "note": "Your scripts are the part of the station that talks to the cupboard server: they build each address, send each request and read each answer."
+  }
+}
