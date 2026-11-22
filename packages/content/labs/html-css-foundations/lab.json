@@ -34,6 +34,14 @@
         "cascade",
         "box-model"
       ]
+    },
+    {
+      "title": "Layout for every screen",
+      "chapters": [
+        "flexbox",
+        "grid",
+        "responsive"
+      ]
     }
   ]
 }

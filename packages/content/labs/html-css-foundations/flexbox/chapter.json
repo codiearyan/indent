@@ -1,0 +1,102 @@
+{
+  "id": "flexbox",
+  "title": "A row of links",
+  "files": ["styles.css", "index.html"],
+  "terminal": {
+    "description": "The home page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "row",
+      "title": "Put the links in a row",
+      "file": "styles.css",
+      "description": "Kofi turned the jump links into a list, the `ul` with the class `links` in the header. Each link now sits on its own line.\n\nMake that list a flex container, so its links sit side by side from left to right. The rule for `.links` at the bottom of `styles.css` is a good place for it.\n\nThe check reads the `display` of the list of links, and its direction.",
+      "nextSteps": [
+        "Read \"Containers and items\" in the lesson.",
+        "Find the rule for .links at the bottom of styles.css.",
+        "Decide which element is the container: the list, or each link inside it.",
+        "Save, look at the header in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "Flexbox is switched on with one declaration on the parent of the items you want in a row.",
+        "The items are the `li` elements, so their parent, the `ul` with the class `links`, is the container.",
+        "Add `display: flex;` to the `.links` rule."
+      ],
+      "docs": [
+        { "title": "Flexbox", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Flexbox" },
+        { "title": "display", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/display" }
+      ],
+      "videos": [
+        { "title": "Flexbox in 15 minutes", "url": "https://www.youtube.com/watch?v=fYq5PXgSsbE" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "gap",
+      "title": "Space the links apart",
+      "file": "styles.css",
+      "description": "The links touch each other. Kofi's notes ask for 24px between them, and the same between rows once they wrap.\n\nGive the list of links 24px of `gap`, in both directions.\n\nThe check reads the gap of the list of links along the row and between rows.",
+      "nextSteps": [
+        "Read \"Direction and gap\" in the lesson.",
+        "Go back to the rule for .links.",
+        "Add the space once, on the container, in px.",
+        "Save, look at the links, and press Check."
+      ],
+      "hints": [
+        "Space between flex items is set on the container, not on each item.",
+        "`gap` with one value sets the space along the row and between rows.",
+        "Add `gap: 24px;` to the `.links` rule."
+      ],
+      "docs": [
+        { "title": "gap", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/gap" },
+        { "title": "Flexbox", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Flexbox" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "header",
+      "title": "Stack the name and the links in the middle",
+      "file": "styles.css",
+      "description": "Kofi wants the studio's name on top and the links under it, both in the middle of the header, like the sign over the door.\n\nMake the `header` a flex container whose items run from top to bottom, and line them up in the middle from side to side.\n\nThe check reads the display, the direction and the alignment across of the header.",
+      "nextSteps": [
+        "Read \"Direction and gap\" and \"Lining items up\" in the lesson.",
+        "Add a new rule to styles.css that picks the header.",
+        "Make it a flex container and choose its direction.",
+        "Work out which way is across in that direction, centre the items that way, save, and press Check."
+      ],
+      "hints": [
+        "The header's items are the h1 and the nav. The rule goes on the header itself.",
+        "`flex-direction: column` runs the items top to bottom. In a column, side to side is across, so the property for across does the centring.",
+        "Write `header { display: flex; flex-direction: column; align-items: center; }`."
+      ],
+      "docs": [
+        { "title": "flex-direction", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/flex-direction" },
+        { "title": "align-items", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/align-items" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "wrap",
+      "title": "Let the links wrap, each line in the middle",
+      "file": "styles.css",
+      "description": "On Kofi's phone the window is narrow, and four links do not fit on one line. Drag the Browser panel narrower to see it.\n\nLet the list of links wrap onto a new line when the next link has no room, and put each line of links in the middle along the row.\n\nThe check reads the wrapping of the list of links and how it lines up its links along the row.",
+      "nextSteps": [
+        "Read \"Wrapping\" and \"Lining items up\" in the lesson.",
+        "Go back to the rule for .links.",
+        "Let the items wrap, then line them up along the row.",
+        "Save, drag the Browser panel narrower, and press Check."
+      ],
+      "hints": [
+        "Both properties go on the flex container, the list of links.",
+        "`flex-wrap` lets items move onto a new line. In a row, along is left to right, which is the job of `justify-content`.",
+        "Add `flex-wrap: wrap;` and `justify-content: center;` to the `.links` rule."
+      ],
+      "docs": [
+        { "title": "flex-wrap", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/flex-wrap" },
+        { "title": "justify-content", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content" }
+      ],
+      "points": 10
+    }
+  ]
+}

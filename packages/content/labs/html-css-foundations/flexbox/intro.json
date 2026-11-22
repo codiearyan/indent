@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Kofi",
+      "say": "Where are the classes? Nobody looks.",
+      "note": "The links hide in a list."
+    },
+    {
+      "title": "Header",
+      "text": "The links stack down the left, one per line.",
+      "note": "A shopping list"
+    },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "Boxes in a pile",
+      "tasks": ["Links in a row", "Space between", "Name over the links", "Wrap and centre"]
+    },
+    {
+      "title": "Header",
+      "rows": [["Kilnworth Pottery"], ["Classes", "The shop"], ["Visit us", "Book a class"]],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "Classes",
+    "wrong": "lost in a list",
+    "why": "No layout",
+    "right": "in the row"
+  },
+  "captions": [
+    "Kofi says people cannot find the classes, though the link is at the very top.",
+    "The links stack down the left of the header, like a shopping list.",
+    "You make the header and its links flex containers, with a gap, wrapping and centring.",
+    "The Classes link sits in a row under the name, in the middle of the header.",
+    "Same links, same page. Now they sit side by side, on a wide screen and a phone."
+  ]
+}
