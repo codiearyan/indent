@@ -115,6 +115,11 @@ export interface ChapterDef {
   terminal: { description: string; suggestedCommand?: string }
   /** A page of the workspace to show in the Browser panel, e.g. "index.html". */
   preview?: string
+  /**
+   * The learner moves, renames and removes files in this issue, so a starter file that is gone is
+   * their work: no notice asks for it back, and checks run without it.
+   */
+  movesFiles?: boolean
   tasks: TaskDef[]
 }
 

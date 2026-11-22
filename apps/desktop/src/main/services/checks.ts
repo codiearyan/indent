@@ -211,7 +211,10 @@ async function runCheck(
 
   // The banner across the issue names the missing files; checks would only fail on their imports.
   const starterDir = join(chapterContentDir(labId, chapterId), 'starter')
-  if ((await findMissing(starterDir, workspaceDir(labId, chapterId))).length > 0) {
+  const missing = chapter.movesFiles
+    ? []
+    : await findMissing(starterDir, workspaceDir(labId, chapterId))
+  if (missing.length > 0) {
     return { results: [], progress: await getProgress() }
   }
   const status = await ensureRuntime()
