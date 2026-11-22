@@ -541,6 +541,10 @@ export interface AiProviderInfo {
   /** Version or path for a CLI, masked key for an API provider, or why it is unavailable. */
   detail?: string
   models: string[]
+  /** The app's own copy of OpenCode, used because none is installed on the computer. */
+  managed?: boolean
+  /** Where the app's own copy is, so a terminal can run it to sign in. */
+  bin?: string
 }
 
 export type SuggestionMode = 'off' | 'manual' | 'auto'
@@ -829,6 +833,15 @@ export interface Api {
     test(): Promise<string>
     /** Writes a tip for a task that keeps failing and saves it; resolves with the progress. */
     tip(labId: string, chapterId: string, taskId: string): Promise<ProgressState>
+    /**
+     * Downloads the app's own OpenCode, checks it and picks it with a free model. The download
+     * reports through onInstallProgress.
+     */
+    installOpencode(): Promise<AiConfig>
+    cancelOpencodeInstall(): void
+    onInstallProgress(listener: (done: number) => void): Unsubscribe
+    /** Deletes the app's own OpenCode; a provider it was is no longer picked. */
+    removeOpencode(): Promise<AiConfig>
   }
   telemetry: {
     track(event: TelemetryEvent, props?: TelemetryProps): void
@@ -874,7 +887,17 @@ export const INVOKE_METHODS = {
     'restartLabModel'
   ],
   github: ['star', 'starred'],
-  ai: ['getConfig', 'setConfig', 'setKey', 'chat', 'complete', 'test', 'tip'],
+  ai: [
+    'getConfig',
+    'setConfig',
+    'setKey',
+    'chat',
+    'complete',
+    'test',
+    'tip',
+    'installOpencode',
+    'removeOpencode'
+  ],
   reminders: ['get', 'set', 'test', 'saveCalendar']
 } as const
 
@@ -882,7 +905,7 @@ export const INVOKE_METHODS = {
 export const SEND_METHODS = {
   content: ['leave'],
   terminal: ['write', 'resize', 'kill'],
-  ai: ['cancel', 'cancelComplete'],
+  ai: ['cancel', 'cancelComplete', 'cancelOpencodeInstall'],
   telemetry: ['track']
 } as const
 
@@ -891,6 +914,7 @@ export const EVENTS = {
   terminalData: 'terminal:data',
   terminalExit: 'terminal:exit',
   aiChat: 'ai:chatEvent',
+  aiInstall: 'ai:installProgress',
   contentInstall: 'content:installProgress',
   contentChanged: 'content:changed',
   runtime: 'checks:runtime',
