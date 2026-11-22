@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, rename, rm } from 'fs/promises'
+import { cp, mkdir, readdir, rename, rm, rmdir } from 'fs/promises'
 import { isAbsolute, join, relative, resolve } from 'path'
 
 const IGNORED = new Set(['.DS_Store', 'Thumbs.db', 'desktop.ini'])
@@ -46,23 +46,18 @@ export async function planMove(
 }
 
 /**
- * Moves everything in `from` into `to`, then removes `from`. Entries named in `skip` are deleted
- * instead of moved. Another drive cannot take a rename, so those entries are copied and their
- * originals removed only once every entry has arrived. If any entry fails, everything already
- * moved goes back and the copies are deleted, so the work stays whole in `from`.
+ * Moves the entries `names` of `from` into `to`, all or none. Another drive cannot take a rename,
+ * so those entries are copied and their originals removed only once every entry has arrived. If
+ * any entry fails, everything already moved goes back and the copies are deleted, so the work
+ * stays whole in `from`.
  */
-export async function moveContents(from: string, to: string, skip: string[] = []): Promise<void> {
+export async function moveEntries(from: string, to: string, names: string[]): Promise<void> {
   await mkdir(to, { recursive: true })
-  const entries = await readdir(from).catch((error: NodeJS.ErrnoException) => {
-    if (error.code === 'ENOENT') return []
-    throw error
-  })
   const renamed: string[] = []
   const copied: string[] = []
   let copying: string | null = null
   try {
-    for (const name of entries) {
-      if (skip.includes(name) || IGNORED.has(name)) continue
+    for (const name of names) {
       try {
         await rename(join(from, name), join(to, name))
         renamed.push(name)
@@ -86,5 +81,105 @@ export async function moveContents(from: string, to: string, skip: string[] = []
     throw error
   }
   for (const name of copied) await rm(join(from, name), { recursive: true, force: true })
+}
+
+/** The entries of a folder, without system files; none when the folder is missing. */
+export async function entriesOf(dir: string): Promise<string[]> {
+  const entries = await readdir(dir).catch((error: NodeJS.ErrnoException) => {
+    if (error.code === 'ENOENT') return []
+    throw error
+  })
+  return entries.filter((name) => !IGNORED.has(name))
+}
+
+/** Moves everything in `from` into `to`, then removes `from`. Entries in `skip` are deleted. */
+export async function moveContents(from: string, to: string, skip: string[] = []): Promise<void> {
+  const names = (await entriesOf(from)).filter((name) => !skip.includes(name))
+  await moveEntries(from, to, names)
   await rm(from, { recursive: true, force: true })
+}
+
+/** The repo tools at the top of the work folder. They move with the first repo that moves. */
+export const RUNTIME_ENTRIES = [
+  'node_modules',
+  'package.json',
+  'package-lock.json',
+  '.tools-version'
+]
+
+async function folders(dir: string): Promise<string[]> {
+  const entries = await readdir(dir, { withFileTypes: true }).catch(
+    (error: NodeJS.ErrnoException) => {
+      if (error.code === 'ENOENT') return []
+      throw error
+    }
+  )
+  return entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name)
+}
+
+/** Each repo with work in `root` and how many issue workspaces it holds. */
+export async function reposIn(root: string): Promise<{ labId: string; issues: number }[]> {
+  const labs = (await folders(root)).filter(
+    (name) => !name.startsWith('.') && name !== 'node_modules'
+  )
+  const repos = await Promise.all(
+    labs.map(async (labId) => ({ labId, issues: (await folders(join(root, labId))).length }))
+  )
+  return repos.filter((repo) => repo.issues > 0)
+}
+
+/**
+ * Moves the repo tools and then the repos `labIds` from `from` to `to`, each repo whole or not at
+ * all. Stops at the first repo that fails: the repos before it are in `to`, it and the rest stay
+ * in `from`. A failure to move the tools moves nothing.
+ */
+export async function moveRepos(
+  from: string,
+  to: string,
+  labIds: string[],
+  onRepo: (labId: string | null, done: number) => void = () => {}
+): Promise<{ moved: string[]; failed: { labId: string; error: unknown } | null }> {
+  onRepo(null, 0)
+  const present = await entriesOf(from)
+  await moveEntries(
+    from,
+    to,
+    RUNTIME_ENTRIES.filter((name) => present.includes(name))
+  )
+  const moved: string[] = []
+  for (const labId of labIds) {
+    onRepo(labId, moved.length)
+    try {
+      await moveEntries(from, to, [labId])
+      moved.push(labId)
+    } catch (error) {
+      return { moved, failed: { labId, error } }
+    }
+  }
+  return { moved, failed: null }
+}
+
+/**
+ * Moves the issue workspaces of a repo from an earlier folder into the current one. An issue that
+ * already has a workspace here keeps it, and its earlier copy stays where it is.
+ */
+export async function bringRepoBack(
+  earlier: string,
+  current: string,
+  labId: string
+): Promise<void> {
+  const here = await folders(join(current, labId))
+  const issues = (await folders(join(earlier, labId))).filter((name) => !here.includes(name))
+  await moveEntries(join(earlier, labId), join(current, labId), issues)
+  await rmdir(join(earlier, labId)).catch(() => {})
+}
+
+/** Removes the repo tools of a folder with no repos left, and the folder once it is empty. */
+export async function clearIfNoWork(dir: string): Promise<boolean> {
+  if ((await reposIn(dir)).length) return false
+  for (const name of [...RUNTIME_ENTRIES, '.sandbox']) {
+    await rm(join(dir, name), { recursive: true, force: true })
+  }
+  await rmdir(dir).catch(() => {})
+  return true
 }

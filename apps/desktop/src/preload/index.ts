@@ -31,6 +31,7 @@ api.ai.onChatEvent = subscribe(EVENTS.aiChat)
 api.content.onInstallProgress = subscribe(EVENTS.contentInstall)
 api.content.onChanged = subscribe(EVENTS.contentChanged)
 api.checks.onRuntime = subscribe(EVENTS.runtime)
+api.workspace.onMoveProgress = subscribe(EVENTS.folderMove)
 api.tools.onInstallProgress = subscribe(EVENTS.toolInstall)
 api.updates.onStatus = subscribe(EVENTS.update)
 

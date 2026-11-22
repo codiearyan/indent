@@ -41,8 +41,10 @@ export function WorkspacePage(): React.JSX.Element {
   const browser = useWorkspace((s) => Boolean(s.chapter?.preview)) && panels.browser
   const status = useWorkspace((s) => s.status)
   const downloading = useCatalog((s) => !!labId && s.downloads[labId]?.state === 'running')
-  // The sheet shows the repo's download, or why the issue could not open.
-  const notice = status === 'error' || (status === 'loading' && downloading)
+  // The sheet shows the repo's download, work left in an earlier folder, or why the issue could
+  // not open.
+  const notice =
+    status === 'error' || status === 'elsewhere' || (status === 'loading' && downloading)
   useWorkspaceShortcuts()
   // Here and not in the tasks list, which focus mode hides.
   useOpenWhenFinished(labId)

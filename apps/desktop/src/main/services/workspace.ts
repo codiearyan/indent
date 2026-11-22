@@ -1,19 +1,36 @@
 import { BrowserWindow, dialog } from 'electron'
 import { existsSync } from 'fs'
-import { mkdir, writeFile } from 'fs/promises'
+import { mkdir, stat, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
-import type { FolderMove, WorkspaceSnapshot } from '@shared/types'
-import { handle } from '../ipc'
+import {
+  EVENTS,
+  type FolderMove,
+  type FolderMoveProgress,
+  type FolderMoveResult,
+  type RepoInFolder,
+  type WorkspaceSnapshot
+} from '@shared/types'
+import { emit, handle } from '../ipc'
 import {
   chapterContentDir,
   contentDir,
+  earlierRoots,
+  isSafeId,
+  safeId,
   setWorkspacesRoot,
   workspaceDir,
   workspacesRoot
 } from '../paths'
 import { ensureRuntime } from './checks'
 import { enterRepo, loadChapter } from './content'
-import { moveContents, planMove } from './moveFolder'
+import {
+  bringRepoBack,
+  clearIfNoWork,
+  moveContents,
+  moveRepos,
+  planMove,
+  reposIn
+} from './moveFolder'
 import { killAll } from './terminal'
 import { isAppPath, resolveInside } from './workspaceFiles'
 import { createFile, createFolder, removePath, renamePath } from './workspaceOps'
@@ -70,16 +87,36 @@ async function write(
   await writeFile(file, content)
 }
 
-/** The destination of the last pick; moveRoot moves only there, never to a renderer's path. */
-let picked: string | null = null
+/** The last pick; moveRoot moves only there and only these repos, never a renderer's choice. */
+let picked: { to: string; repos: string[] } | null = null
+let moving = false
+
+const exists = (path: string): Promise<boolean> =>
+  stat(path).then(
+    () => true,
+    () => false
+  )
+
+async function repos(root: string): Promise<RepoInFolder[]> {
+  return (await reposIn(root)).filter((repo) => isSafeId(repo.labId))
+}
+
+function plainError(error: unknown): string {
+  const code = (error as NodeJS.ErrnoException).code
+  if (code === 'EACCES' || code === 'EPERM') return 'Indent is not allowed to write there.'
+  if (code === 'ENOSPC') return 'The drive is full.'
+  if (code === 'EBUSY') return 'A file in it is in use by another program.'
+  return error instanceof Error ? error.message : String(error)
+}
 
 /** Asks for a folder and says where the work would go. Null when the person cancels. */
 async function pickRoot(): Promise<FolderMove | null> {
+  if (moving) throw new Error('Your work is still moving.')
   picked = null
   const current = workspacesRoot()
   const options: Electron.OpenDialogOptions = {
     title: 'Choose a folder for your work',
-    message: 'Your work moves to the folder you pick. It must be empty.',
+    message: 'Pick an empty folder, or make a new one.',
     buttonLabel: 'Use this folder',
     defaultPath: dirname(current),
     properties: ['openDirectory', 'createDirectory']
@@ -90,24 +127,74 @@ async function pickRoot(): Promise<FolderMove | null> {
     : dialog.showOpenDialog(options))
   if (result.canceled || !result.filePaths[0]) return null
   const plan = await planMove(current, result.filePaths[0], contentDir())
-  picked = plan.to
-  return { from: current, ...plan }
+  const inFolder = await repos(current)
+  picked = { to: plan.to, repos: inFolder.map((repo) => repo.labId) }
+  return { from: current, ...plan, repos: inFolder }
 }
 
-/** Moves all work to the folder the last pick approved, checked again in case it changed. */
-async function moveRoot(): Promise<string> {
+/** Switches to the folder the last pick approved, checked again, and moves the chosen repos. */
+async function moveRoot(labIds: string[]): Promise<FolderMoveResult> {
+  if (moving) throw new Error('Your work is still moving.')
   if (!picked) throw new Error('Pick a folder first.')
-  const current = workspacesRoot()
-  const next = picked
+  const { to: next, repos: offered } = picked
   picked = null
-  const plan = await planMove(current, next, contentDir())
-  if (plan.inside || plan.to !== next) throw new Error('Pick an empty folder, or make a new one.')
-  if (next === current) return current
-  // Shells running inside the old folder would keep it busy and lose their place.
-  killAll()
-  await moveContents(current, next, ['.sandbox'])
-  setWorkspacesRoot(next)
-  return next
+  const chosen = offered.filter((labId) => (Array.isArray(labIds) ? labIds : []).includes(labId))
+  moving = true
+  try {
+    const current = workspacesRoot()
+    const plan = await planMove(current, next, contentDir())
+    if (plan.inside || plan.to !== next) throw new Error('Pick an empty folder, or make a new one.')
+    if (next === current) return { root: current, moved: [], failed: null }
+    await mkdir(next, { recursive: true })
+    // Shells running inside the old folder would keep it busy and lose their place.
+    if (chosen.length) killAll()
+    const total = chosen.length
+    const { moved, failed } = chosen.length
+      ? await moveRepos(current, next, chosen, (labId, done) =>
+          emit(EVENTS.folderMove, { labId, done, total } satisfies FolderMoveProgress)
+        ).catch((error: unknown) => {
+          throw new Error(plainError(error))
+        })
+      : { moved: [], failed: null }
+    if ((await repos(current)).length) {
+      setWorkspacesRoot(next, [current, ...earlierRoots()])
+    } else {
+      // Nothing of the learner's is left, so the rest comes along as it always did.
+      await moveContents(current, next, ['.sandbox'])
+      setWorkspacesRoot(next)
+    }
+    return {
+      root: next,
+      moved,
+      failed: failed && { labId: failed.labId, error: plainError(failed.error) }
+    }
+  } finally {
+    moving = false
+  }
+}
+
+async function findElsewhere(labId: string, chapterId: string): Promise<string | null> {
+  if (await exists(workspaceDir(labId, chapterId))) return null
+  for (const dir of earlierRoots()) {
+    if (await exists(join(dir, safeId(labId), safeId(chapterId)))) return dir
+  }
+  return null
+}
+
+function bringBack(labId: string, chapterId: string): Promise<void> {
+  return oneAtATime(workspaceDir(labId, chapterId), async () => {
+    const earlier = await findElsewhere(labId, chapterId)
+    if (!earlier) return
+    await bringRepoBack(earlier, workspacesRoot(), safeId(labId)).catch((error: unknown) => {
+      throw new Error(plainError(error))
+    })
+    if (await clearIfNoWork(earlier)) {
+      setWorkspacesRoot(
+        workspacesRoot(),
+        earlierRoots().filter((dir) => dir !== earlier)
+      )
+    }
+  })
 }
 
 export function register(): void {
@@ -133,6 +220,8 @@ export function register(): void {
       change(labId, chapterId, (dir) => removePath(dir, String(path))),
     getRoot: async () => workspacesRoot(),
     pickRoot,
-    moveRoot
+    moveRoot,
+    findElsewhere,
+    bringBack
   })
 }

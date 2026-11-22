@@ -291,6 +291,28 @@ export interface FolderMove {
   to: string
   /** The picked folder had files, so `to` is a new folder inside it. */
   inside: boolean
+  /** Repos with work in the current folder, the ones that can move. */
+  repos: RepoInFolder[]
+}
+
+export interface RepoInFolder {
+  labId: string
+  /** Issues of the repo with a workspace in the folder. */
+  issues: number
+}
+
+export interface FolderMoveProgress {
+  done: number
+  total: number
+  /** The repo moving now; null while the repo tools move first. */
+  labId: string | null
+}
+
+export interface FolderMoveResult {
+  root: string
+  moved: string[]
+  /** The repo that could not move, and why; it and the repos after it stay in the old folder. */
+  failed: { labId: string; error: string } | null
 }
 
 export interface WorkspaceSnapshot {
@@ -697,8 +719,16 @@ export interface Api {
     getRoot(): Promise<string>
     /** Asks for a folder and says where the work would go; null when cancelled. */
     pickRoot(): Promise<FolderMove | null>
-    /** Moves all work to the folder the last pickRoot approved. Returns the new root. */
-    moveRoot(): Promise<string>
+    /**
+     * Makes the folder the last pickRoot approved the work folder and moves the repos `labIds`
+     * there, one at a time. The others stay in the old folder, which is remembered.
+     */
+    moveRoot(labIds: string[]): Promise<FolderMoveResult>
+    onMoveProgress(listener: (progress: FolderMoveProgress) => void): Unsubscribe
+    /** The earlier work folder that holds this issue's work, when the current one does not. */
+    findElsewhere(labId: string, chapterId: string): Promise<string | null>
+    /** Moves the repo's work from the earlier folder that holds this issue into the current one. */
+    bringBack(labId: string, chapterId: string): Promise<void>
   }
   checks: {
     /** Runs the hidden tests for the given tasks (all when omitted) and records progress. */
@@ -823,7 +853,9 @@ export const INVOKE_METHODS = {
     'remove',
     'getRoot',
     'pickRoot',
-    'moveRoot'
+    'moveRoot',
+    'findElsewhere',
+    'bringBack'
   ],
   ide: ['list', 'open', 'setCompact'],
   checks: ['run', 'trace', 'runtimeStatus', 'ensureRuntime'],
@@ -861,6 +893,7 @@ export const EVENTS = {
   contentInstall: 'content:installProgress',
   contentChanged: 'content:changed',
   runtime: 'checks:runtime',
+  folderMove: 'workspace:moveProgress',
   toolInstall: 'tools:installProgress',
   update: 'updates:status'
 } as const

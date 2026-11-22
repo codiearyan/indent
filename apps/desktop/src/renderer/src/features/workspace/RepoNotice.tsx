@@ -1,10 +1,17 @@
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { api } from '@/lib/api'
+import { errorMessage } from '@/lib/utils'
 import { getNewVersion } from '@/stores/updates'
 import { Progress } from '@/components/ui/progress'
 import { useCatalog } from '@/stores/catalog'
 import { useWorkspace } from '@/stores/workspace'
 
-/** Fills the sheet while a repo downloads, and says what went wrong when an issue cannot open. */
+/**
+ * Fills the sheet while a repo downloads, when the issue's work is in an earlier folder, and says
+ * what went wrong when an issue cannot open.
+ */
 export function RepoNotice({
   labId,
   chapterId
@@ -13,9 +20,12 @@ export function RepoNotice({
   chapterId: string
 }): React.JSX.Element {
   const error = useWorkspace((s) => s.error)
+  const elsewhere = useWorkspace((s) => (s.status === 'elsewhere' ? s.elsewhere : null))
   const open = useWorkspace((s) => s.open)
   const download = useCatalog((s) => s.downloads[labId])
   const title = useCatalog((s) => s.labs?.find((lab) => lab.id === labId)?.title)
+
+  if (elsewhere) return <Elsewhere labId={labId} chapterId={chapterId} dir={elsewhere} />
 
   if (download?.state === 'running') {
     const percent = Math.round(download.done * 100)
@@ -43,6 +53,56 @@ export function RepoNotice({
       ) : (
         <Button onClick={() => void open(labId, chapterId)}>Try again</Button>
       )}
+    </Frame>
+  )
+}
+
+/** The work stayed in the old folder when the folder changed; never open a fresh copy over it unasked. */
+function Elsewhere({
+  labId,
+  chapterId,
+  dir
+}: {
+  labId: string
+  chapterId: string
+  dir: string
+}): React.JSX.Element {
+  const open = useWorkspace((s) => s.open)
+  const [busy, setBusy] = useState(false)
+
+  const bringBack = async (): Promise<void> => {
+    setBusy(true)
+    try {
+      await api.workspace.bringBack(labId, chapterId)
+      await open(labId, chapterId)
+    } catch (failure) {
+      toast.error(errorMessage(failure))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <Frame>
+      <div className="space-y-1">
+        <p className="text-sm font-semibold">Your work on this repo is in another folder</p>
+        <p className="text-[13px] text-muted-foreground">
+          It stayed in <span className="font-mono text-xs break-all">{dir}</span> when you changed
+          the folder for your work. Bring it here to carry on where you left off.
+        </p>
+      </div>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          disabled={busy}
+          onClick={() => void open(labId, chapterId, { here: true })}
+        >
+          Start fresh here
+        </Button>
+        <Button disabled={busy} onClick={() => void bringBack()}>
+          {busy ? 'Bringing it here...' : 'Bring it here'}
+        </Button>
+      </div>
     </Frame>
   )
 }
