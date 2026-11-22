@@ -77,6 +77,12 @@
           "url": "https://expressjs.com/en/5x/guide/routing#route-handlers"
         }
       ],
+      "videos": [
+        {
+          "title": "Who you are and what you may do",
+          "url": "https://www.youtube.com/watch?v=9rn7Onx8uCk"
+        }
+      ],
       "points": 10
     },
     {

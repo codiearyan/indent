@@ -50,7 +50,7 @@
       "id": "cookie",
       "title": "Start a session at sign-in",
       "file": "src/routes/signIn.js",
-      "description": "When a sign-in works, make `POST /sign-in` in `src/routes/signIn.js` start a session:\n\n- make a token with `newToken()` and save `{ staffId }` under it with `sessions.save(token, ...)`\n- send it in a cookie named `session`, HttpOnly so the page's scripts cannot read it, with SameSite `Lax` and the path `/`\n- the body stays `{ staff }`, and the token never reaches the body or the log\n- a refused sign-in sends no cookie and saves nothing\n\nThe check signs in to an app with staff and a session store of its own, reads the `Set-Cookie` header and looks in the store.",
+      "description": "When a sign-in works, make `POST /sign-in` in `src/routes/signIn.js` start a session:\n\n- make a token with `newToken()` and save `{ staffId }` under it with `sessions.save(token, ...)`\n- send it in a cookie named `session`, HttpOnly so the page's scripts cannot read it, with SameSite `Lax` (or the stricter `Strict`) and the path `/`\n- the body stays `{ staff }`, and the token never reaches the body or the log\n- a refused sign-in sends no cookie and saves nothing\n\nThe check signs in to an app with staff and a session store of its own, reads the `Set-Cookie` header and looks in the store.",
       "nextSteps": [
         "Find the place in the route where the sign-in has worked.",
         "Make a token and save the session.",

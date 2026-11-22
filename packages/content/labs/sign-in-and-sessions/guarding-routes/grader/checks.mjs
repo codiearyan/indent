@@ -209,22 +209,16 @@ export const checks = {
       withSessions([
         {
           name: 'The owner can remove a workshop',
-          requests: [
-            { method: 'DELETE', path: '/workshops/11', headers: as('dilys') },
-            { path: '/workshops/11' }
-          ],
-          ok: (r) => r.responses[0].status === 204 && r.res.status === 404,
+          requests: [{ method: 'DELETE', path: '/workshops/11', headers: as('dilys') }],
+          ok: (r) => r.res.status === 204 && !r.workshops.some((w) => w.id === 11),
           hint: 'Dilys owns the studio, and her DELETE should still remove the workshop with 204.'
         },
         {
           name: 'A teacher cannot remove a workshop',
-          requests: [
-            { method: 'DELETE', path: '/workshops/11', headers: as('kofi') },
-            { path: '/workshops/11' }
-          ],
-          ok: (r) => forbidden(r.responses[0]) && r.res.status === 200,
+          requests: [{ method: 'DELETE', path: '/workshops/11', headers: as('kofi') }],
+          ok: (r) => forbidden(r.res) && r.workshops.some((w) => w.id === 11),
           hint: (r) =>
-            r.responses[0].status === 204
+            r.res.status === 204
               ? 'Kofi is a teacher, and his DELETE removed the workshop. Look at what guards the DELETE route in src/routes/workshops.js.'
               : 'Kofi is signed in but is not the owner: his DELETE should answer 403 forbidden and leave the workshop where it is.'
         },

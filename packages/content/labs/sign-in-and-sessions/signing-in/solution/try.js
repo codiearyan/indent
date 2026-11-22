@@ -22,6 +22,9 @@ const requests = [
   { path: '/workshops/5' }
 ]
 
+// This line is the demo's, not the API's log, and it still leaves the password out.
+const hidePassword = (key, value) => (key === 'password' ? '(not printed)' : value)
+
 let app
 try {
   app = createApp()
@@ -40,7 +43,7 @@ const server = app.listen(0, '127.0.0.1', async () => {
     }
     try {
       const res = await fetch(base + path, init)
-      console.log(`${method} ${path} ${json ? JSON.stringify(json) : ''}`)
+      console.log(`${method} ${path} ${json ? JSON.stringify(json, hidePassword) : ''}`)
       console.log(`  -> ${res.status} ${(await res.text()).slice(0, 200)}\n`)
     } catch (err) {
       console.log(`${method} ${path} -> failed: ${err.cause?.message ?? err.message}\n`)

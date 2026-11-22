@@ -136,7 +136,7 @@ export const checks = {
         ok: (r) => /^(lax|strict)$/i.test(String(session(r)?.attrs.samesite)),
         hint: (r) =>
           signedInFirst(r) ??
-          'The cookie should have SameSite set to Lax, so another site cannot make a browser send it along with a change.'
+          'The cookie should have SameSite set to Lax (or Strict), so another site cannot make a browser send it along with a change.'
       },
       {
         name: 'It is sent for every path of the API',

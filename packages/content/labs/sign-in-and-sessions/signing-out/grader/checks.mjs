@@ -207,7 +207,7 @@ export const checks = {
           /^(lax|strict)$/i.test(String(cookie(r)?.attrs.samesite)) &&
           cookie(r)?.attrs.path === '/',
         hint: (r) =>
-          signedIn(r) ?? 'The cookie should still be HttpOnly, with SameSite Lax and the path /.'
+          signedIn(r) ?? 'The cookie should still be HttpOnly, with SameSite Lax (or Strict) and the path /.'
       }
     ]
     const { details } = await checkCases(t, cases, options, ['src/middleware/readSession.js'])
@@ -241,6 +241,20 @@ export const checks = {
           r.res.status === 200
             ? 'At the moment of expiresAt this session still counted. A session has ended from the moment the clock reaches expiresAt, not only after it.'
             : 'An ended session should leave req.staff unset, so GET /me answers 401.'
+      },
+      {
+        name: 'Using a session does not move its end',
+        sessions: ending,
+        requests: [me(s, { advance: 59 * 60 * 1000 }), me(s, { advance: 60 * 1000 })],
+        ok: (r) => signedInAs(sunniva, 2)(r.responses[0]) && notSignedIn(r.res),
+        hint: (r) => {
+          if (r.res.status !== 200)
+            return 'One minute before its end the session should sign the request in, and at its end it should not.'
+          const end = r.sessions.find((x) => x.token === s)?.session?.expiresAt
+          return end === clock + HOUR
+            ? 'At the moment of expiresAt this session still counted. A session has ended from the moment the clock reaches expiresAt, not only after it.'
+            : 'Used one minute before its end, this session still counted at its end, because its expiresAt moved. A session whose end moves each time it is used never ends. Its end is set once, at sign-in.'
+        }
       },
       {
         name: 'A session past its end no longer counts',

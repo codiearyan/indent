@@ -64,6 +64,8 @@ The cookie's lifetime is a request, not a rule. Anyone who copied the token can 
 
 A session has ended from the moment the clock reaches `expiresAt`, not one millisecond later. When a request brings an ended session, treat it as no session at all: `req.staff` stays unset, the request goes on, and reads keep working. Remove the ended session from the store while you are there, or the store fills up with sessions nobody can use.
 
+The end is set once, at sign-in. Moving it each time the session is used would let a busy session last for ever, which is what Kofi asked to avoid.
+
 ## Your work in this issue
 
 Everything happens in two files you already know. Add `POST /sign-out` to `src/routes/signIn.js`, then give each new session its end in the same file's `POST /sign-in`. Last, make `readSession` in `src/middleware/readSession.js` refuse a session that has ended. `createApp` already passes `now` to both.

@@ -49,7 +49,7 @@
       "id": "expires",
       "title": "Give each session an end",
       "file": "src/routes/signIn.js",
-      "description": "Give every new session an end, eight hours after it starts. In `POST /sign-in`:\n\n- save `expiresAt` with the session: the time `now()` gives plus `SESSION_MS`, in milliseconds\n- make the session cookie last as long: a `Max-Age` of eight hours\n- keep the cookie HttpOnly, SameSite `Lax` and on the path `/`\n\nRead the time only with `now()`, the clock `createApp` is given, never `Date.now()` itself. The check signs in with clocks of its own, then reads the session store and the `Set-Cookie` header.",
+      "description": "Give every new session an end, eight hours after it starts. In `POST /sign-in`:\n\n- save `expiresAt` with the session: the time `now()` gives plus `SESSION_MS`, in milliseconds\n- make the session cookie last as long: a `Max-Age` of eight hours\n- keep the cookie HttpOnly, SameSite `Lax` (or `Strict`) and on the path `/`\n\nRead the time only with `now()`, the clock `createApp` is given, never `Date.now()` itself. The check signs in with clocks of its own, then reads the session store and the `Set-Cookie` header.",
       "nextSteps": [
         "Find where the session is saved and the cookie set.",
         "Work out when the session ends, from `now()`.",
@@ -78,7 +78,7 @@
       "id": "expired",
       "title": "Refuse a session that has ended",
       "file": "src/middleware/readSession.js",
-      "description": "Make `readSession(staff, sessions, now)` in `src/middleware/readSession.js` refuse a session that has ended:\n\n- a session has ended once `now()` is at or past its `expiresAt`\n- an ended session is removed from the store, and `req.staff` stays unset\n- a session that has not ended works as before, and the request always goes on\n\nThe check saves sessions that end at times of its own, moves the clock, and sends `GET /me`, a change and a read.",
+      "description": "Make `readSession(staff, sessions, now)` in `src/middleware/readSession.js` refuse a session that has ended:\n\n- a session has ended once `now()` is at or past its `expiresAt`\n- an ended session is removed from the store, and `req.staff` stays unset\n- a session that has not ended works as before, and using it never moves its end\n- the request always goes on\n\nThe check saves sessions that end at times of its own, moves the clock, and sends `GET /me`, a change and a read.",
       "nextSteps": [
         "Find where readSession looks up the session.",
         "Compare its end with the time.",
@@ -98,6 +98,12 @@
         {
           "title": "Less than or equal (<=)",
           "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Idle and absolute session timeouts",
+          "url": "https://www.youtube.com/watch?v=8pLJu9iIu6s"
         }
       ],
       "points": 10
