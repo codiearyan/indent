@@ -1,0 +1,124 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "app",
+        "label": "App.jsx",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "api",
+        "label": "Studio API",
+        "kind": "story"
+      },
+      {
+        "id": "status",
+        "label": "Status",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "screen",
+        "label": "What the visitor sees",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "app",
+        "to": "api",
+        "label": "GET request"
+      },
+      {
+        "from": "api",
+        "to": "status",
+        "label": "answer or failure"
+      },
+      {
+        "from": "status",
+        "to": "screen",
+        "label": "loading, list or alert"
+      }
+    ],
+    "note": "One status value says where the request is, and the screen draws the loading line, the list or an alert from it."
+  },
+  "tasks": {
+    "show-loading": {
+      "steps": [
+        {
+          "active": ["app", "app->api", "api"],
+          "note": "The screen asks for the week on a slow connection."
+        },
+        {
+          "active": ["status", "status->screen", "screen"],
+          "value": {
+            "kind": "map",
+            "label": "status",
+            "entries": [
+              {
+                "key": "while waiting",
+                "value": "loading"
+              }
+            ]
+          },
+          "note": "While the answer travels, the status says loading and the visitor reads a loading line."
+        },
+        {
+          "active": ["api", "api->status", "status", "status->screen", "screen"],
+          "note": "When the week arrives, the status moves on and the list takes the line's place."
+        }
+      ]
+    },
+    "show-failure": {
+      "steps": [
+        {
+          "active": ["app", "app->api", "api"],
+          "note": "The studio's server is restarting, or the internet is down."
+        },
+        {
+          "active": ["api", "api->status", "status"],
+          "value": {
+            "kind": "map",
+            "label": "three failures",
+            "entries": [
+              {
+                "key": "503",
+                "value": "the API's own message"
+              },
+              {
+                "key": "no answer",
+                "value": "fetch rejects"
+              },
+              {
+                "key": "502 page",
+                "value": "not JSON"
+              }
+            ]
+          },
+          "note": "A 503 with a message, no answer at all, or a web page instead of JSON: each one is a failure."
+        },
+        {
+          "active": ["status", "status->screen", "screen"],
+          "note": "The visitor reads one plain sentence in an alert, and no list."
+        }
+      ]
+    },
+    "try-again": {
+      "steps": [
+        {
+          "active": ["screen"],
+          "note": "The alert has a Try again button, and the visitor presses it."
+        },
+        {
+          "active": ["status", "app", "app->api", "api"],
+          "note": "The status goes back to loading and the screen asks the API once more, without a reload."
+        },
+        {
+          "active": ["api", "api->status", "status", "status->screen", "screen"],
+          "note": "This time the week arrives, and the list replaces the loading line."
+        }
+      ]
+    }
+  }
+}

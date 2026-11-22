@@ -1,0 +1,111 @@
+{
+  "id": "a-form-that-saves",
+  "title": "A form that saves",
+  "files": [
+    "src/BookingForm.jsx",
+    "src/api.js",
+    "src/App.jsx",
+    "server/settings.js",
+    "server/standIn.js"
+  ],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. Change server/settings.js to make the stand-in API slow or failing. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "send-booking",
+      "title": "Send the booking",
+      "file": "src/BookingForm.jsx",
+      "description": "When the form is sent, `BookingForm` sends the booking to the API without reloading the page:\n\n- `POST /api/bookings`, with the header `Content-Type: application/json`\n- the body as JSON: `{ \"workshopId\": 3, \"name\": \"Tamsin Ferreira\" }`, where `workshopId` is the id of the picked workshop as a number\n\nThe API answers `201` with `{ booking, workshop }`. Then the form shows a line with `role=\"status\"` that names the person and the workshop, for example `Booked: a place for Tamsin Ferreira at Glazing basics.`\n\n`request()` in `src/api.js` sends a request and reads the answer for you. The check fills in the form, presses the button, and reads the request and the screen.",
+      "nextSteps": [
+        "Stop the browser from sending the form its own way, which reloads the page.",
+        "Read `request()` in `src/api.js`: it takes the same options as `fetch`.",
+        "Send the method, the header and the body. Remember what type a select's value is.",
+        "Keep the server's answer, or a sentence made from it, in state and show it."
+      ],
+      "hints": [
+        "Without your code, a browser sends a form by loading a new page. The submit event can be told not to.",
+        "`fetch` sends a body as text, so an object has to become JSON text first, and the header tells the server what that text is.",
+        "`event.preventDefault()`, then `await request('/api/bookings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ workshopId: Number(workshopId), name }) })`."
+      ],
+      "docs": [
+        {
+          "title": "Preventing default behavior",
+          "url": "https://react.dev/learn/responding-to-events#preventing-default-behavior"
+        },
+        {
+          "title": "Making a POST request",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#setting_a_body"
+        },
+        {
+          "title": "JSON.stringify()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Sending JSON with fetch",
+          "url": "https://www.youtube.com/watch?v=-HNgSamMbPY"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "no-double",
+      "title": "Never send one booking twice",
+      "file": "src/BookingForm.jsx",
+      "description": "On a slow connection, people press the button again because nothing seems to happen, and book two places.\n\nWhile a booking is on its way, the Book a place button is disabled, so a second press sends nothing. Once the answer is in, whatever it says, the button works again.\n\nThe check holds the answer back, presses the button twice, counts the bookings, then answers and looks at the button, after a booking that worked and after one the server refused.",
+      "nextSteps": [
+        "Set `delayMs` in `server/settings.js` to 3000 and press the button twice.",
+        "Add a state that says a booking is on its way, and turn it on before you send.",
+        "Use it to disable the button, and maybe to change its words.",
+        "Turn it off again after the answer, whether it worked or not."
+      ],
+      "hints": [
+        "The button has to be off from the moment the booking leaves, not from when the answer comes back.",
+        "Set the state before the `await`. A `finally` block runs after both a success and a failure, which makes it a good place to turn it off again.",
+        "`setSending(true)` first, `finally { setSending(false) }` after the `try`, and `<button type=\"submit\" disabled={sending}>`."
+      ],
+      "docs": [
+        {
+          "title": "Reacting to input with state",
+          "url": "https://react.dev/learn/reacting-to-input-with-state"
+        },
+        {
+          "title": "try...catch...finally",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "show-refusal",
+      "title": "Show what the server refused",
+      "file": "src/BookingForm.jsx",
+      "description": "The server can refuse a booking: the workshop filled up while the form was open (`409`), or the name is missing (`400`). Its answer has `{ \"error\": { \"message\": \"...\" } }`, and `request()` turns that into an Error with the server's message.\n\nWhen a booking is refused or gets no answer, the form shows the reason in an element with `role=\"alert\"`. It keeps the name that was typed, so people can press again, and it does not say the place is booked. A later booking that works clears the old reason.\n\nThe check makes the server refuse, reads the form, books again, and then tries a booking that gets no answer.",
+      "nextSteps": [
+        "In the Browser panel, book Glazing basics twice: it has one place left, so the server refuses the second booking.",
+        "Catch the failure of `request()` and keep its message in state.",
+        "Show the message in an alert, and clear it when a new booking starts.",
+        "Clear the name only after a booking that worked."
+      ],
+      "hints": [
+        "A refusal is not a reason to throw away what was typed. Only a booking that worked is done with it.",
+        "`await` inside `try` lets a `catch` block receive the Error that `request()` throws. Its `message` is already a sentence for people.",
+        "`catch (failure) { setRefused(failure.message) }`, `setRefused('')` at the start of every booking, and `{refused && <p className=\"booking-refused\" role=\"alert\">{refused}</p>}`."
+      ],
+      "docs": [
+        {
+          "title": "ARIA alert role",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/alert_role"
+        },
+        {
+          "title": "HTTP 409 Conflict",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

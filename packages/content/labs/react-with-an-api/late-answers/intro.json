@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Kofi",
+      "say": "Just Thursday, please.",
+      "note": "People ask what is on."
+    },
+    {
+      "title": "Studio API",
+      "text": "Answers each day, in any order.",
+      "note": "Tuesday's list can come late."
+    },
+    {
+      "title": "Your code",
+      "file": "App.jsx",
+      "mine": true,
+      "gap": "Days do nothing; late wins",
+      "tasks": ["Ask for the day", "Last choice wins", "Cancel the unwanted"]
+    },
+    {
+      "title": "Workshop cards",
+      "rows": [
+        ["Glazing basics", "Thu"],
+        ["Wheel throwing", "Thu"]
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Thursday",
+    "wrong": "Tuesday's list",
+    "why": "Late answer",
+    "right": "Thursday's list"
+  },
+  "captions": [
+    "Kofi wants the day buttons to work, so people can see just Thursday.",
+    "Tap Tuesday, then Thursday, and Tuesday's late answer takes over the screen.",
+    "You ask for the chosen day, let the last choice win, and cancel the rest.",
+    "Now Thursday shows Thursday, however late Tuesday's answer comes.",
+    "Every tap gets its own list, and an answer nobody wants never reaches the screen."
+  ]
+}

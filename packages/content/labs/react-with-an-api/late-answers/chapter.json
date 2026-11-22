@@ -1,0 +1,110 @@
+{
+  "id": "late-answers",
+  "title": "Answers that arrive late",
+  "files": ["src/App.jsx", "src/api.js", "src/DayPicker.jsx", "src/main.jsx", "server/settings.js"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. Set randomDelay to true in server/settings.js to make answers arrive in any order. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "ask-for-the-day",
+      "title": "Show the chosen day's workshops",
+      "file": "src/App.jsx",
+      "description": "The day picker above the list sets `day` to `'all'` or a short day name such as `'thu'`. When the day changes, the screen asks the API for that day's workshops, `GET /api/workshops?day=thu`, and shows the answer. `'all'` asks for `/api/workshops` with no day, as before.\n\nWhile the chosen day's list is on its way, the loading line shows and no cards from before: they belong to another day. Choosing the day that is already chosen changes nothing on the screen.\n\nThe check chooses Thursday, holds its answer back, reads the screen, answers, then chooses All, and chooses All once more.",
+      "nextSteps": [
+        "Give `getWorkshops` in `src/api.js` the day, and build the address from it.",
+        "Pass `day` to it from the effect in `App`.",
+        "Tell the effect it depends on the day as well as on the attempt.",
+        "Show the loading line when a day is chosen."
+      ],
+      "hints": [
+        "An effect runs again when one of the values in its array changes. The list now depends on two things.",
+        "`?day=thu` at the end of the address is how the API is told the day. `'all'` keeps the address without it.",
+        "`getWorkshops(day)` with `day === 'all' ? '/api/workshops' : `/api/workshops?day=${day}``, the effect's array `[day, attempt]`, and `setStatus('loading')` in `chooseDay`."
+      ],
+      "docs": [
+        {
+          "title": "Specifying reactive dependencies",
+          "url": "https://react.dev/reference/react/useEffect#specifying-reactive-dependencies"
+        },
+        {
+          "title": "URLSearchParams",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "newest-wins",
+      "title": "Let the day chosen last win",
+      "file": "src/App.jsx",
+      "description": "Someone taps Tuesday and then Thursday. Both requests are on their way, and nothing promises they come back in that order.\n\nWhatever order the answers arrive in, the screen only ever shows the list of the day chosen last. An answer for a day that is no longer chosen is never shown, not even for a moment.\n\nThe check chooses Tuesday and then Thursday, and answers them in both orders.",
+      "nextSteps": [
+        "Set `randomDelay: true` in `server/settings.js` and tap between days quickly.",
+        "Find where an answer is put on the screen, and ask: is this answer still wanted?",
+        "Use the effect's cleanup: it runs before the effect runs for the next day."
+      ],
+      "hints": [
+        "Each run of the effect starts one request. When the day changes, React cleans up the old run before it starts the new one.",
+        "A variable made inside the effect belongs to that run alone. The cleanup can mark it, and the answer can look at it before it touches state.",
+        "`let wanted = true`, `if (wanted) setWorkshops(list)` in the `then`, and `return () => { wanted = false }` at the end of the effect."
+      ],
+      "docs": [
+        {
+          "title": "Fetching data, and race conditions",
+          "url": "https://react.dev/learn/synchronizing-with-effects#fetching-data"
+        },
+        {
+          "title": "Your first effect: cleanup",
+          "url": "https://react.dev/learn/synchronizing-with-effects#step-3-add-cleanup-if-needed"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Race conditions in effects",
+          "url": "https://www.youtube.com/watch?v=fXD9Ct03Q6k"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cancel-unwanted",
+      "title": "Cancel what nobody waits for",
+      "file": "src/App.jsx",
+      "description": "Ignoring an old answer still lets it travel all the way. Cancel it instead:\n\n- When the day changes, the request for the old day, if still on its way, is cancelled.\n- When the screen goes away, its request still on its way is cancelled.\n- A cancelled request is never shown as a failure: cancelling makes `fetch` reject too, with an error named `AbortError`.\n\nThe check looks at the signal each request was sent with, closes the screen while a request is on its way, and reads the screen for alerts.",
+      "nextSteps": [
+        "Watch the console: in development StrictMode starts the first request, cleans up, and starts it again.",
+        "Make an `AbortController` in the effect, and hand its `signal` to `fetch` through `getWorkshops` and `request`.",
+        "Call `abort()` in the cleanup.",
+        "Look at what `request()` in `src/api.js` does when `fetch` rejects, and what `App` does with that."
+      ],
+      "hints": [
+        "The cleanup runs both when the day changes and when the screen goes away, so one place covers both.",
+        "`fetch(path, { signal })` rejects with an error named `AbortError` once `controller.abort()` is called. Right now `request()` turns every rejection into \"could not be reached\".",
+        "In `request()`: `catch (error) { if (error.name === 'AbortError') throw error; ... }`. In the effect: `if (failure.name === 'AbortError') return` at the top of the `catch`, and `return () => controller.abort()`."
+      ],
+      "docs": [
+        {
+          "title": "AbortController",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortController"
+        },
+        {
+          "title": "How to handle the effect firing twice in development",
+          "url": "https://react.dev/learn/synchronizing-with-effects#how-to-handle-the-effect-firing-twice-in-development"
+        },
+        {
+          "title": "StrictMode",
+          "url": "https://react.dev/reference/react/StrictMode"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Cleaning up an effect",
+          "url": "https://www.youtube.com/watch?v=aKOQtGLT-Yk"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

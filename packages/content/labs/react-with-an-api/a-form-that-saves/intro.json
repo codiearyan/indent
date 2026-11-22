@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "One press, one place, please.",
+      "note": "A man paid twice last month."
+    },
+    {
+      "title": "Booking form",
+      "text": "Pressing Book a place reloads the page.",
+      "note": "Nothing reaches the API."
+    },
+    {
+      "title": "Your code",
+      "file": "BookingForm.jsx",
+      "mine": true,
+      "gap": "Sends nothing, or twice",
+      "tasks": ["Send the booking", "One press, one booking", "Show the refusal"]
+    },
+    {
+      "title": "Studio API",
+      "text": "Books the place, or says why not.",
+      "note": "It has the last word."
+    }
+  ],
+  "ticket": {
+    "label": "A booking",
+    "wrong": "page reloads",
+    "why": "Never sent",
+    "right": "booked once"
+  },
+  "captions": [
+    "Dilys wants people to book a place from the screen, once per press.",
+    "Pressing the button only reloads the page, and nothing reaches the API.",
+    "You send the booking as JSON, turn the button off meanwhile, and show refusals.",
+    "Now one press books one place, and a full class says why it did not work.",
+    "The booking reaches the API exactly once, and the screen says how it went."
+  ]
+}

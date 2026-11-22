@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Sunniva",
+      "say": "People think we stopped running!",
+      "note": "The page was just blank."
+    },
+    {
+      "title": "Studio API",
+      "text": "Slow today, and restarting now and then.",
+      "note": "Sometimes no answer at all."
+    },
+    {
+      "title": "Your code",
+      "file": "App.jsx",
+      "mine": true,
+      "gap": "A blank screen, no reason",
+      "tasks": ["Say it is loading", "Say what went wrong", "A Try again button"]
+    },
+    {
+      "title": "Visitor",
+      "say": "Ah, restarting. I'll try again.",
+      "note": "No phone call needed."
+    }
+  ],
+  "ticket": {
+    "label": "A 503",
+    "wrong": "blank page",
+    "why": "Says nothing",
+    "right": "a plain reason"
+  },
+  "captions": [
+    "Sunniva keeps getting calls: people think the studio stopped running workshops.",
+    "The server was restarting, and the screen stayed blank without a word.",
+    "You add a loading line, an alert that says what went wrong, and Try again.",
+    "Now a restart shows the server's own reason, with a button to ask again.",
+    "Slow, broken or offline, the visitor always knows what is going on."
+  ]
+}

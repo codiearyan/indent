@@ -1,0 +1,105 @@
+{
+  "id": "in-step-with-the-server",
+  "title": "Keeping the screen in step",
+  "files": [
+    "src/App.jsx",
+    "src/BookingForm.jsx",
+    "src/api.js",
+    "server/settings.js",
+    "server/standIn.js"
+  ],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. Set busy to true in server/settings.js to have the front desk book places while you work. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "places-from-server",
+      "title": "Show the places left after a booking",
+      "file": "src/App.jsx",
+      "description": "After a booking works, the booked workshop's card shows the places left that the server reports, without a reload. The other cards stay as they are, in the same order.\n\n`BookingForm` calls `onBooked(answer)` with the server's answer, `{ booking, workshop }`, where `workshop` is the workshop as the server has it now. Write `handleBooked` in `App`.\n\nThe number comes from the server, either way you get it: from that answer, or by asking for the list again. Taking one off the old number yourself is not right, because the front desk books places too. The check books a place while the front desk books another one, and reads the card.",
+      "nextSteps": [
+        "Set `busy: true` in `server/settings.js` and book a few places at one workshop: with the front desk booking too, its card should sometimes drop by more than one.",
+        "Look at what the booking's answer holds.",
+        "Either put that workshop into the list in place of the old one, or ask for the list again.",
+        "Make the change through state, never by changing the old list."
+      ],
+      "hints": [
+        "The screen's list is a copy of what the server said some time ago. After a booking, the server's copy is the true one.",
+        "The answer's `workshop` has the same `id` as one card. A new list made with `map` can put it in that place and keep every other workshop as it is.",
+        "`setWorkshops((list) => list.map((item) => (item.id === workshop.id ? workshop : item)))`"
+      ],
+      "docs": [
+        {
+          "title": "Updating arrays in state",
+          "url": "https://react.dev/learn/updating-arrays-in-state#replacing-items-in-an-array"
+        },
+        {
+          "title": "Updating state based on the previous state",
+          "url": "https://react.dev/reference/react/useState#updating-state-based-on-the-previous-state"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Updating an array of objects in state",
+          "url": "https://www.youtube.com/watch?v=Y62mbztjmus"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "catch-up-after-refusal",
+      "title": "Catch up after a refusal",
+      "file": "src/App.jsx",
+      "description": "When the server refuses a booking because the workshop filled up, the screen is out of date: its card still offers a place.\n\nAfter a refused booking, ask the API for the list again, so the card shows what the server has now. The form keeps showing the server's reason.\n\n`BookingForm` does not tell `App` about a refusal yet: give it a way to. The check makes the server refuse, watches for a new request for the list, and reads the card.",
+      "nextSteps": [
+        "Book Glazing basics twice in the Browser panel and look at its card after the refusal.",
+        "Give `BookingForm` a second prop, called when a booking is refused.",
+        "In `App`, make that prop ask for the list again. Try again already knows how to start a request."
+      ],
+      "hints": [
+        "The refusal's answer only says no. To know how many places are left now, the screen has to ask.",
+        "The effect that loads the list runs again when its array changes. Something other than Try again can change it too.",
+        "`function refresh() { setAttempt((count) => count + 1) }`, passed to the form as `onRefused={refresh}` and called in its `catch`."
+      ],
+      "docs": [
+        {
+          "title": "Passing event handlers as props",
+          "url": "https://react.dev/learn/responding-to-events#passing-event-handlers-as-props"
+        },
+        {
+          "title": "Specifying reactive dependencies",
+          "url": "https://react.dev/reference/react/useEffect#specifying-reactive-dependencies"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "keep-list-while-refreshing",
+      "title": "Keep the cards while the list refreshes",
+      "file": "src/App.jsx",
+      "description": "Asking for the list again should not wipe the screen. While a new list is on its way, the cards that are already there stay on the screen, and when it arrives, it takes their place.\n\nThe loading line from the second issue is for when there is nothing to show yet. Pressing Try again after a failure still shows it.\n\nThe check holds the new list back after a refusal, and after a booking if your screen asks then too, reads the screen, and then lets it through.",
+      "nextSteps": [
+        "Set `delayMs` to 3000 and watch the list after a refused booking.",
+        "Look at what decides whether the cards are drawn: is it the status, or whether you have a list?",
+        "Ask for the list again without going back to the first loading screen."
+      ],
+      "hints": [
+        "\"We have nothing yet\" and \"we have a list, and a newer one is coming\" are two different moments, and the screen should look different in each.",
+        "The status only has to go back to `'loading'` when there is nothing to show. A refresh can leave it as it is.",
+        "Let `refresh` change only the attempt, and keep `setStatus('loading')` in `tryAgain`."
+      ],
+      "docs": [
+        {
+          "title": "Choosing the state structure",
+          "url": "https://react.dev/learn/choosing-the-state-structure"
+        },
+        {
+          "title": "Conditional rendering",
+          "url": "https://react.dev/learn/conditional-rendering"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

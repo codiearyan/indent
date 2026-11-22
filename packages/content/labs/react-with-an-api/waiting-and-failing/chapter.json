@@ -1,0 +1,104 @@
+{
+  "id": "waiting-and-failing",
+  "title": "While it loads, and when it fails",
+  "files": ["src/App.jsx", "server/settings.js", "server/standIn.js", "src/WorkshopCard.jsx"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. Change server/settings.js to make the stand-in API slow or failing. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "show-loading",
+      "title": "Say the workshops are loading",
+      "file": "src/App.jsx",
+      "description": "While the request is on its way, the screen shows a line with `role=\"status\"` that says the workshops are loading, for example `<p className=\"status-line\" role=\"status\">Loading this week's workshops...</p>`. No list is shown yet.\n\nOnce the workshops arrive, the loading line goes away and the list takes its place.\n\nThe check holds the answer back, reads the screen, then answers and reads it again.",
+      "nextSteps": [
+        "Set `delayMs` in `server/settings.js` to 3000 and save, so you can see the gap.",
+        "Add a state that says where the request is: on its way, arrived, or failed.",
+        "Draw the loading line, the list or the empty line from that one value."
+      ],
+      "hints": [
+        "The screen has to know something it cannot see in the list itself: whether the request is still on its way. That is state.",
+        "One status value with a few possible words (`'loading'`, `'ready'`, `'failed'`) cannot contradict itself. Two true or false flags can.",
+        "`const [status, setStatus] = useState('loading')`, set it to `'ready'` next to `setWorkshops`, and render `{status === 'loading' && <p className=\"status-line\" role=\"status\">...</p>}`."
+      ],
+      "docs": [
+        {
+          "title": "Avoid contradictions in state",
+          "url": "https://react.dev/learn/choosing-the-state-structure#avoid-contradictions-in-state"
+        },
+        {
+          "title": "ARIA status role",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/status_role"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "show-failure",
+      "title": "Say what went wrong",
+      "file": "src/App.jsx",
+      "description": "When the request fails, the screen shows an element with `role=\"alert\"` that says what went wrong, and no list and no loading line. A failure is any of these:\n\n- The server answers with an error status. Its body is `{ \"error\": { \"code\": \"...\", \"message\": \"...\" } }`: show that `message`.\n- No answer comes at all and `fetch` rejects. Say in your own words that the studio could not be reached, not the browser's words.\n- The server answers with an error status, but the body is not the API's JSON (a web page, say). Show a plain sentence of your own.\n\nThe page must not stop with an error in any of these. The check plays each failure and reads the alert.",
+      "nextSteps": [
+        "Set `failure: 'always'` in `server/settings.js` and save. Try both values of `failAs`.",
+        "Look at what `fetch` does with a 503 answer: does it reject?",
+        "Check `response.ok`, and turn every kind of failure into an Error with a sentence a visitor can read.",
+        "Show that sentence in the alert when the status says the request failed."
+      ],
+      "hints": [
+        "`fetch` only rejects when no answer came. An answer with status 503 is still an answer, so it lands in your `then`, not your `catch`.",
+        "Read the body of an error answer to find the server's message, but be ready for a body that is not JSON: `response.json()` rejects then. Fall back to a sentence of your own.",
+        "In an `async` function: wrap `await fetch(...)` in `try`/`catch` and throw your own sentence; then `if (!response.ok) { const body = await response.json().catch(() => null); throw new Error(body?.error?.message ?? 'Your sentence') }`."
+      ],
+      "docs": [
+        {
+          "title": "Response.ok",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/ok"
+        },
+        {
+          "title": "Checking that the fetch was successful",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#checking_response_status"
+        },
+        {
+          "title": "ARIA alert role",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/alert_role"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Using fetch, errors included",
+          "url": "https://www.youtube.com/watch?v=cN2TMpliiao"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "try-again",
+      "title": "Let people try again",
+      "file": "src/App.jsx",
+      "description": "The alert gets a `<button>` that says `Try again`. Pressing it asks the API for the workshops again, once, without reloading the page.\n\nWhile it asks again, the loading line comes back in place of the alert. When the answer arrives, the list shows as usual.\n\nThe check makes the first request fail, presses Try again, holds the second answer back, reads the screen, and then lets it through.",
+      "nextSteps": [
+        "Set `failure: 'first'` in `server/settings.js`: the first request fails and the next one works.",
+        "Add the button inside the alert.",
+        "Find a way to make the request run again: an effect runs again when a value in its array changes.",
+        "Put the status back to loading when the button is pressed."
+      ],
+      "hints": [
+        "Reloading the page would work, but it throws away everything else on the screen. Ask for the workshops again instead.",
+        "A number in state that the button adds one to is a simple way to say \"run this again\": put it in the effect's array.",
+        "`function tryAgain() { setStatus('loading'); setAttempt((count) => count + 1) }`, and the effect ends with `}, [attempt])`."
+      ],
+      "docs": [
+        {
+          "title": "Specifying reactive dependencies",
+          "url": "https://react.dev/reference/react/useEffect#specifying-reactive-dependencies"
+        },
+        {
+          "title": "Responding to events",
+          "url": "https://react.dev/learn/responding-to-events"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

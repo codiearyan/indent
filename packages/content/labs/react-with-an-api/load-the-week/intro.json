@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Ivo",
+      "say": "Can it show this week's workshops?",
+      "note": "The API already has them."
+    },
+    {
+      "title": "Studio API",
+      "text": "Answers GET /api/workshops with the week.",
+      "note": "Nobody asks it yet."
+    },
+    {
+      "title": "Your code",
+      "file": "App.jsx",
+      "mine": true,
+      "gap": "Nothing asks the API",
+      "tasks": ["Ask once", "Show the cards", "Empty only when known"]
+    },
+    {
+      "title": "Sign-up screen",
+      "rows": [
+        ["Wheel throwing", "Tue"],
+        ["Hand-built mugs", "Wed"],
+        ["Family clay morning", "Sat"]
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "5 workshops",
+    "wrong": "no workshops",
+    "why": "Never asked",
+    "right": "on screen"
+  },
+  "captions": [
+    "Ivo wants the sign-up screen to show this week's workshops from the studio's API.",
+    "Nothing asks the API yet, so the screen says there are no workshops at all.",
+    "You ask once when the screen opens, draw a card each, and wait before saying empty.",
+    "Now the week's five workshops arrive and each gets its own card.",
+    "Same five workshops, on screen, and never a false empty week while they travel."
+  ]
+}
