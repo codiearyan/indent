@@ -1,0 +1,117 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhiannon", "label": "Rhiannon", "kind": "story" },
+      { "id": "plots", "label": "plots.txt", "kind": "file" },
+      { "id": "readfile", "label": "readFile()", "kind": "function" },
+      { "id": "show", "label": "show.js", "kind": "file", "mine": true },
+      { "id": "count", "label": "count-plots.js", "kind": "file", "mine": true },
+      { "id": "holder", "label": "holder.js", "kind": "file", "mine": true },
+      { "id": "out", "label": "What she reads", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "rhiannon", "to": "show", "label": "file name" },
+      { "from": "rhiannon", "to": "holder", "label": "list, plot" },
+      { "from": "plots", "to": "readfile", "label": "bytes" },
+      { "from": "readfile", "to": "show", "label": "text" },
+      { "from": "readfile", "to": "count", "label": "text" },
+      { "from": "readfile", "to": "holder", "label": "text" },
+      { "from": "show", "to": "out", "label": "the file" },
+      { "from": "count", "to": "out", "label": "counts" },
+      { "from": "holder", "to": "out", "label": "holder" }
+    ],
+    "note": "Your three scripts read the society's plot list through readFile and turn its text into the answers Rhiannon is asked for on the phone."
+  },
+  "tasks": {
+    "show": {
+      "steps": [
+        {
+          "active": ["rhiannon", "rhiannon->show", "show"],
+          "note": "Rhiannon runs show.js with the name of a file after it, like plots.txt."
+        },
+        {
+          "active": ["plots", "plots->readfile", "readfile"],
+          "note": "show.js asks readFile for that file, waits for the read to finish, and asks for the text in UTF-8."
+        },
+        {
+          "active": ["readfile->show", "show"],
+          "note": "The text comes back as one string, line breaks and all."
+        },
+        {
+          "active": ["show->out", "out"],
+          "note": "The text goes to standard output, as it is in the file."
+        }
+      ]
+    },
+    "missing": {
+      "steps": [
+        {
+          "active": ["rhiannon", "rhiannon->show", "show"],
+          "note": "Rhiannon types a file name with a typo in it."
+        },
+        {
+          "active": ["readfile"],
+          "note": "readFile finds no file by that name and fails with the code ENOENT."
+        },
+        {
+          "active": ["readfile->show", "show"],
+          "note": "show.js catches that one kind of error. Any other error still stops the script."
+        },
+        {
+          "active": ["show->out", "out"],
+          "note": "One plain line that names the file goes to standard error, and the script ends with exit code 1."
+        }
+      ]
+    },
+    "count": {
+      "steps": [
+        {
+          "active": ["plots", "plots->readfile", "readfile"],
+          "value": { "kind": "array", "label": "the first lines of plots.txt", "values": ["A1,Maud Pask", "A2,Lionel Barnes", "A3,"] },
+          "note": "count-plots.js reads the whole plot list as text."
+        },
+        {
+          "active": ["readfile->count", "count"],
+          "note": "The text is split into lines. A list saved on Windows ends each line with \\r\\n, not only \\n."
+        },
+        {
+          "active": ["count"],
+          "value": {
+            "kind": "map",
+            "label": "one line",
+            "entries": [
+              { "key": "plot", "value": "before the comma" },
+              { "key": "holder", "value": "after it, empty when free" }
+            ]
+          },
+          "note": "Blank lines are left out, and each line is split at its comma."
+        },
+        {
+          "active": ["count->out", "out"],
+          "note": "One line goes out: how many plots, and how many have nobody on them."
+        }
+      ]
+    },
+    "holder": {
+      "steps": [
+        {
+          "active": ["rhiannon", "rhiannon->holder", "holder"],
+          "value": { "kind": "array", "label": "what she types after holder.js", "values": ["plots.txt", "B3"] },
+          "note": "Rhiannon names the list first and the plot second."
+        },
+        {
+          "active": ["plots", "readfile", "readfile->holder"],
+          "note": "holder.js reads the list and splits it into lines."
+        },
+        {
+          "active": ["holder"],
+          "note": "It looks for the line whose plot matches, and takes what comes after the comma."
+        },
+        {
+          "active": ["holder->out", "out"],
+          "note": "The holder, or the word free, goes to standard output. A plot that is not in the list gets a line on standard error."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhiannon", "label": "Rhiannon", "kind": "story" },
+      { "id": "add", "label": "add-to-list.js", "kind": "file", "mine": true },
+      { "id": "list", "label": "waiting-list.txt", "kind": "file" },
+      { "id": "next", "label": "next-on-list.js", "kind": "file", "mine": true },
+      { "id": "report", "label": "monthly-report.js", "kind": "file", "mine": true },
+      { "id": "reports", "label": "reports folder", "kind": "data" },
+      { "id": "lister", "label": "list-reports.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "rhiannon", "to": "add", "label": "a name" },
+      { "from": "add", "to": "list", "label": "appends" },
+      { "from": "list", "to": "next", "label": "names" },
+      { "from": "next", "to": "rhiannon", "label": "who to offer" },
+      { "from": "list", "to": "report", "label": "names" },
+      { "from": "report", "to": "reports", "label": "writes" },
+      { "from": "reports", "to": "lister", "label": "file names" },
+      { "from": "lister", "to": "rhiannon", "label": "months" }
+    ],
+    "note": "Your scripts keep the waiting list in a file and write a report each month into a folder of its own, so Rhiannon's paper scraps can go."
+  },
+  "tasks": {
+    "add": {
+      "steps": [
+        {
+          "active": ["rhiannon", "rhiannon->add", "add"],
+          "value": { "kind": "array", "label": "the words after add-to-list.js", "values": ["Wendeline", "Achterberg"] },
+          "note": "At the gate, Rhiannon types a new name after add-to-list.js, as two words."
+        },
+        {
+          "active": ["add"],
+          "note": "The words are joined back into one name."
+        },
+        {
+          "active": ["add->list", "list"],
+          "note": "The name goes on a new line at the end of the waiting list, and every name already there stays."
+        }
+      ]
+    },
+    "next": {
+      "steps": [
+        {
+          "active": ["list", "list->next", "next"],
+          "value": { "kind": "array", "label": "the waiting list", "values": ["Thaddeus Fairbairn", "Ysolde Bastable", "Peregrine Ottoway"] },
+          "note": "A plot comes free, and next-on-list.js reads the whole waiting list."
+        },
+        {
+          "active": ["next"],
+          "note": "The first name comes off: that person has waited longest."
+        },
+        {
+          "active": ["next", "list"],
+          "note": "The rest are written back in place of the old list, in the same order."
+        },
+        {
+          "active": ["next->rhiannon", "rhiannon"],
+          "note": "Rhiannon is told who to offer the plot to, or that nobody is waiting."
+        }
+      ]
+    },
+    "report": {
+      "steps": [
+        {
+          "active": ["rhiannon", "report"],
+          "note": "Rhiannon types the month after monthly-report.js."
+        },
+        {
+          "active": ["list", "list->report", "report"],
+          "value": {
+            "kind": "map",
+            "label": "what the report counts",
+            "entries": [
+              { "key": "Plots", "value": "lines of plots.txt" },
+              { "key": "Free", "value": "plots with no holder" },
+              { "key": "Waiting", "value": "names on the list" }
+            ]
+          },
+          "note": "The script counts the plots, the free ones and the names waiting, from the files as they are now."
+        },
+        {
+          "active": ["report", "report->reports", "reports"],
+          "note": "It makes the reports folder when it is not there yet, and writes the month's report into it."
+        }
+      ]
+    },
+    "list": {
+      "steps": [
+        {
+          "active": ["reports", "reports->lister", "lister"],
+          "note": "list-reports.js reads the names in the reports folder."
+        },
+        {
+          "active": ["lister"],
+          "note": "Only .txt files are reports. Each name loses its .txt, and the months are sorted."
+        },
+        {
+          "active": ["lister->rhiannon", "rhiannon"],
+          "note": "Rhiannon gets one month per line, oldest first, or a line that says there are none yet."
+        }
+      ]
+    }
+  }
+}

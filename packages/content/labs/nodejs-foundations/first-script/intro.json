@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhiannon", "say": "What does a 125 metre plot cost?", "note": "Asked at the gate every week." },
+    { "title": "The envelope", "text": "She works out each fee by hand." },
+    {
+      "title": "Your scripts",
+      "file": "fee.js",
+      "mine": true,
+      "gap": "Nothing reads what she types",
+      "tasks": ["Welcome by name", "Refuse a missing name", "Price a plot", "Price many, refuse bad"]
+    },
+    { "title": "Terminal", "text": "One line with the fee, and exit code 0." }
+  ],
+  "ticket": { "label": "Fee for 125", "wrong": "by hand", "why": "Slow", "right": "printed" },
+  "captions": [
+    "At Marrowfield allotments, Rhiannon is asked what a plot of 125 square metres costs.",
+    "She works it out on the back of an envelope, every time someone asks.",
+    "You write two small scripts that read what she types, in four tasks.",
+    "Now the laptop prints the fee for a size she types, and a bad size gets a plain error.",
+    "Same question at the gate, no envelope. The laptop answers in one line."
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "id": "reading-files",
+  "title": "Reading a file",
+  "files": [
+    "show.js",
+    "count-plots.js",
+    "holder.js",
+    "plots.txt"
+  ],
+  "terminal": {
+    "description": "A terminal in your workspace. `node show.js plots.txt` runs your script on the plot list, and `node try.js show.js nope.txt` shows the streams and the exit code for a file that is not there.",
+    "suggestedCommand": "node show.js plots.txt"
+  },
+  "tasks": [
+    {
+      "id": "show",
+      "title": "Print a file's text",
+      "file": "show.js",
+      "description": "Write `show.js` so that `node show.js plots.txt` prints the text of `plots.txt`, exactly as it is in the file. The file is whichever one was named after the script's name, so `node show.js notes.txt` prints `notes.txt`.\n\nCheck makes files of its own in a copy of your workspace, runs `show.js` with their names, and compares what it prints with their text.",
+      "nextSteps": [
+        "Import `readFile` from Node's file system module, the promise version.",
+        "Read the file named in `process.argv`, with its encoding.",
+        "Wait for the read to finish, then print the text.",
+        "Run `node show.js plots.txt` and compare with the file in the editor."
+      ],
+      "hints": [
+        "The lesson's first import brings `readFile` in from `node:fs/promises`.",
+        "`readFile` gives back a promise, so it needs `await`. Without an encoding it gives raw bytes, a Buffer; with `'utf8'` it gives text.",
+        "`const text = await readFile(process.argv[2], 'utf8')`, then print `text`."
+      ],
+      "docs": [
+        {
+          "title": "fsPromises.readFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesreadfilepath-options"
+        },
+        {
+          "title": "Modules: node: imports",
+          "url": "https://nodejs.org/api/esm.html#node-imports"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading and writing files with fs",
+          "url": "https://www.youtube.com/watch?v=U57kU311-nE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "missing",
+      "title": "Say plainly when a file is not there",
+      "file": "show.js",
+      "description": "When the file named does not exist, `show.js` prints one plain line to standard error that names the file, prints nothing on standard output, and ends with exit code 1. A stack trace is not a plain line. A file that is there is printed as before.\n\nCheck runs `show.js` with the name of a file that is not in the workspace and with one that is, and looks at both streams and the exit code.",
+      "nextSteps": [
+        "Run `node try.js show.js nope.txt` and read the error Node prints.",
+        "Find the error's code in it: it says what kind of failure this is.",
+        "Put the read in a `try` block and catch that error.",
+        "Print one line naming the file to standard error and set the exit code."
+      ],
+      "hints": [
+        "The error has `code: 'ENOENT'`, Node's short name for no such file or directory.",
+        "Wrap the read in `try { ... } catch (error) { ... }`. In the `catch`, `error.code` is `'ENOENT'` when the file is missing.",
+        "In the `catch`: `if (error.code !== 'ENOENT') throw error`, then `console.error(...)` with the file name and `process.exitCode = 1`."
+      ],
+      "docs": [
+        {
+          "title": "Common system errors",
+          "url": "https://nodejs.org/api/errors.html#common-system-errors"
+        },
+        {
+          "title": "try...catch",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "count",
+      "title": "Count the plots and the free ones",
+      "file": "count-plots.js",
+      "description": "Each line of a plot list is a plot, its holder after a comma: `A1,Maud Pask`. A free plot has nothing after its comma: `A3,`. Write `count-plots.js` so that `node count-plots.js plots.txt` prints one line:\n\n```\n12 plots, 3 free\n```\n\nBlank lines are not plots. The list may have been saved on Windows, so its lines may end with `\\r\\n` instead of `\\n`; both must count the same.\n\nCheck runs `count-plots.js` on two lists of its own: one with lines that end with `\\n`, and one saved on Windows with blank lines in it.",
+      "nextSteps": [
+        "Read the file named after the script, as text.",
+        "Split the text into lines, so both kinds of line ending work.",
+        "Leave out the blank lines, then split each line at its comma.",
+        "Count all the plots and the ones with no holder, and print the line."
+      ],
+      "hints": [
+        "Splitting on `'\\n'` alone leaves an invisible `'\\r'` at the end of every line of a Windows file.",
+        "`text.split(/\\r?\\n/)` splits on both endings. `line.trim() === ''` is true for a blank line.",
+        "`const plots = text.split(/\\r?\\n/).filter((l) => l.trim() !== '')`, then count the ones whose part after the comma is empty."
+      ],
+      "docs": [
+        {
+          "title": "String.prototype.split()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split"
+        },
+        {
+          "title": "fsPromises.readFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesreadfilepath-options"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "holder",
+      "title": "Find who holds a plot",
+      "file": "holder.js",
+      "description": "Write `holder.js` so that `node holder.js plots.txt B3` prints who holds plot B3:\n\n```\nB3: Petronella Gale\n```\n\nFor a free plot it prints the word `free` in place of a name, like `A3: free`. For a plot that is not in the list, it prints one line on standard error that names the plot and ends with exit code 1. The list is named first, the plot second.\n\nCheck runs `holder.js` on a list of its own, saved on Windows, with a held plot, a free plot and one that is not there.",
+      "nextSteps": [
+        "Read both arguments: the file first, then the plot.",
+        "Read the file and split it into lines as in Task 3.",
+        "Find the line whose plot matches, and take the holder from it.",
+        "Handle a free plot and a plot that is not there."
+      ],
+      "hints": [
+        "Both arguments are in `process.argv`, one after the other, after the script's path.",
+        "`lines.find((line) => line.split(',')[0] === plot)` gives the line, or `undefined` when no plot matches.",
+        "When the holder is `''`, print `free`; when the line is `undefined`, use `console.error(...)` and `process.exitCode = 1`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.find()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find"
+        },
+        {
+          "title": "process.argv",
+          "url": "https://nodejs.org/api/process.html#processargv"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

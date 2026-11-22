@@ -1,0 +1,118 @@
+{
+  "id": "paths",
+  "title": "Where a script runs from",
+  "files": [
+    "where.js",
+    "water-total.js",
+    "file-info.js",
+    "water/readings.txt"
+  ],
+  "terminal": {
+    "description": "A terminal in your workspace. `node where.js` runs your script from here; `cd water` and then `node ../where.js` runs the same script from the water folder, and `cd ..` comes back.",
+    "suggestedCommand": "node where.js"
+  },
+  "tasks": [
+    {
+      "id": "where",
+      "title": "Show both folders",
+      "file": "where.js",
+      "description": "Write `where.js` so that it prints two lines:\n\n```\nRun from: <the folder the command was typed in>\nScript in: <the folder that holds where.js>\n```\n\nEach is a full path. From the top folder of the workspace they are the same; from the `water` folder, with `node ../where.js`, they differ.\n\nCheck runs `where.js` from the top folder and from `water`, and compares each line with the real folder.",
+      "nextSteps": [
+        "Print the folder the command was typed in: `process` knows it.",
+        "Print the folder of the script: a module knows its own.",
+        "Run `node where.js` from the top folder.",
+        "Run `cd water`, then `node ../where.js`, and see the first line change."
+      ],
+      "hints": [
+        "The folder the command was typed in is the working directory. A module's own place is on `import.meta`.",
+        "`process.cwd()` gives the working directory. `import.meta.dirname` gives the folder that holds the module.",
+        "`console.log(`Run from: ${process.cwd()}`)` and `console.log(`Script in: ${import.meta.dirname}`)`."
+      ],
+      "docs": [
+        {
+          "title": "process.cwd()",
+          "url": "https://nodejs.org/api/process.html#processcwd"
+        },
+        {
+          "title": "import.meta.dirname",
+          "url": "https://nodejs.org/api/esm.html#importmetadirname"
+        },
+        {
+          "title": "No __filename or __dirname",
+          "url": "https://nodejs.org/api/esm.html#no-__filename-or-__dirname"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "total",
+      "title": "Add up the water from any folder",
+      "file": "water-total.js",
+      "description": "Each line of `water/readings.txt` is a date, a trough and the litres used: `2026-06-01,north,420`. Write `water-total.js` so that it prints the litres of all the lines added up:\n\n```\nTotal: 2622 litres\n```\n\nIt reads `water/readings.txt` beside the script, whatever folder the command is typed in, so `node ../water-total.js` from the `water` folder works too. Build the path with `join` from `node:path`, never by putting text and slashes together.\n\nCheck writes readings of its own into `water/readings.txt`, runs `water-total.js` from three folders, and reads how the path is built.",
+      "nextSteps": [
+        "Build the path to the readings from the script's own folder.",
+        "Read the file and split it into lines, leaving out blank ones.",
+        "Add up the third part of every line as a number.",
+        "Run it from the top folder and from `water`: the total is the same."
+      ],
+      "hints": [
+        "`'water/readings.txt'` on its own is looked for in the folder the command was typed in. From `water` that is `water/water/readings.txt`.",
+        "`join(import.meta.dirname, 'water', 'readings.txt')` is the readings file beside the script, with the right separator for the system.",
+        "`const text = await readFile(join(import.meta.dirname, 'water', 'readings.txt'), 'utf8')`, then sum `Number(line.split(',')[2])` over the lines."
+      ],
+      "docs": [
+        {
+          "title": "path.join()",
+          "url": "https://nodejs.org/api/path.html#pathjoinpaths"
+        },
+        {
+          "title": "import.meta.dirname",
+          "url": "https://nodejs.org/api/esm.html#importmetadirname"
+        },
+        {
+          "title": "Windows and POSIX paths",
+          "url": "https://nodejs.org/api/path.html#windows-vs-posix"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Working with paths in the path module",
+          "url": "https://www.youtube.com/watch?v=Jmdasmnlm8U"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "info",
+      "title": "Describe a path that was typed",
+      "file": "file-info.js",
+      "description": "Write `file-info.js` so that `node file-info.js water/readings.txt` prints three lines about the path typed after the script's name:\n\n```\nFull path: <the full path, from the folder the command was typed in>\nName: readings.txt\nExtension: .txt\n```\n\nA name with no dot has no extension: then the last line is `Extension: none`. The file does not have to exist. With no path at all, the script prints one line on standard error and ends with exit code 1. Take the parts with `node:path`, never by splitting at slashes.\n\nCheck runs `file-info.js` from three folders with paths of its own, written the way the system writes them, and with none.",
+      "nextSteps": [
+        "Read the path typed after the script's name.",
+        "Turn it into a full path from the folder the command was typed in.",
+        "Take its name and its extension with functions of `node:path`.",
+        "Try it from the `water` folder with a path that starts with `..`."
+      ],
+      "hints": [
+        "A path a person types is relative to where they typed it, not to the script. `node:path` has a function that turns it into a full path from there.",
+        "`resolve(typed)` starts from `process.cwd()`. `basename()` gives the last part of a path and `extname()` the end of it from the last dot.",
+        "`console.log(`Full path: ${resolve(typed)}`)`, then `basename(typed)` and `extname(typed) || 'none'`."
+      ],
+      "docs": [
+        {
+          "title": "path.resolve()",
+          "url": "https://nodejs.org/api/path.html#pathresolvepaths"
+        },
+        {
+          "title": "path.basename()",
+          "url": "https://nodejs.org/api/path.html#pathbasenamepath-suffix"
+        },
+        {
+          "title": "path.extname()",
+          "url": "https://nodejs.org/api/path.html#pathextnamepath"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

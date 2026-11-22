@@ -1,0 +1,25 @@
+{
+  "stations": [
+    { "title": "Rhiannon", "say": "Who has waited longest for a plot?", "note": "Names are on scraps of paper." },
+    { "title": "The waiting list", "text": "Names on whatever paper was to hand." },
+    {
+      "title": "Your scripts",
+      "file": "next-on-list.js",
+      "mine": true,
+      "gap": "Nothing writes the list down",
+      "tasks": ["Add a name", "Offer the next plot", "Write the report", "List the reports"]
+    },
+    {
+      "title": "waiting-list.txt",
+      "rows": [["Thaddeus Fairbairn"], ["Ysolde Bastable"], ["Peregrine Ottoway"]]
+    }
+  ],
+  "ticket": { "label": "Free plot", "wrong": "who next?", "why": "Lost paper", "right": "offered" },
+  "captions": [
+    "At Marrowfield a plot comes free, and Rhiannon must find who has waited longest.",
+    "The names are on scraps of paper from the gate, in no order she can trust.",
+    "You write the scripts that keep the list and the reports, in four tasks.",
+    "Now the list lives in a file, and the plot goes to the name at the top.",
+    "Same free plot, no scraps. Rhiannon knows who to ring."
+  ]
+}
