@@ -1,0 +1,97 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ambrose", "label": "Ambrose", "kind": "story" },
+      { "id": "file", "label": "welcome.cpp", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "program", "label": "welcome", "kind": "file" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ambrose", "to": "file", "label": "window card" },
+      { "from": "file", "to": "compiler", "label": "your text" },
+      { "from": "compiler", "to": "program", "label": "builds" },
+      { "from": "program", "to": "terminal", "label": "printed lines" }
+    ],
+    "note": "You write the lines of welcome.cpp, the compiler builds them into a program, and running it prints the window card."
+  },
+  "tasks": {
+    "name": {
+      "steps": [
+        {
+          "active": ["ambrose", "ambrose->file"],
+          "note": "Ambrose wants the workshop's welcome on the window card, exactly as the task spells it."
+        },
+        {
+          "active": ["file"],
+          "note": "Under Task 1 you add one statement inside main that prints it."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler", "compiler->program", "program"],
+          "note": "The compiler reads the file and builds the program, or says which line it cannot read."
+        },
+        {
+          "active": ["program", "program->terminal", "terminal"],
+          "note": "Running the program prints the welcome on a line of its own."
+        }
+      ]
+    },
+    "hours": {
+      "steps": [
+        {
+          "active": ["ambrose", "ambrose->file"],
+          "value": {
+            "kind": "array",
+            "label": "the opening hours",
+            "values": ["first line", "second line"]
+          },
+          "note": "The hours are two lines, and they go on the card in the order the task gives."
+        },
+        {
+          "active": ["file"],
+          "note": "Each line gets its own print, and each one ends its line."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler", "compiler->program", "program"],
+          "note": "The program runs its statements from the top of main to the bottom."
+        },
+        {
+          "active": ["program", "program->terminal", "terminal"],
+          "note": "The terminal shows the two lines, one under the other, not run together."
+        }
+      ]
+    },
+    "notice": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "A line under Task 3 still prints the free cleaning offer the workshop stopped."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "The compiler skips every comment, so a line turned into one is not built."
+        },
+        {
+          "active": ["program", "program->terminal", "terminal"],
+          "note": "The offer no longer prints, and the line stays in the file in case it comes back."
+        }
+      ]
+    },
+    "comment": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "A comment is a note for the next person who opens the file, like Kasimir."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "The compiler skips comments, so your note changes nothing in the program."
+        },
+        {
+          "active": ["program", "program->terminal", "terminal"],
+          "note": "The program prints the same lines as before your note."
+        }
+      ]
+    }
+  }
+}

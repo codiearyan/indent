@@ -1,0 +1,54 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dougie", "label": "Dougie", "kind": "story" },
+      { "id": "kit", "label": "Tonight's kit", "kind": "data" },
+      { "id": "file", "label": "batteries.py", "kind": "file", "mine": true },
+      { "id": "rhona", "label": "Rhona", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dougie", "to": "kit", "label": "torches, packs" },
+      { "from": "kit", "to": "file", "label": "numbers" },
+      { "from": "file", "to": "rhona", "label": "walk time" }
+    ],
+    "note": "Tonight's kit and route sit at the top of batteries.py, and your sums turn them into batteries, packs and a walking time."
+  },
+  "tasks": {
+    "batteries": {
+      "steps": [
+        {
+          "active": ["dougie", "dougie->kit", "kit"],
+          "value": { "kind": "map", "label": "tonight's kit", "entries": [{ "key": "head_torches", "value": "a whole number" }, { "key": "batteries_per_torch", "value": "a whole number" }] },
+          "note": "Dougie has a number of head torches, and each takes the same number of batteries."
+        },
+        { "active": ["kit", "kit->file", "file"], "note": "Under Task 1 one sum gives the batteries for every torch." },
+        { "active": ["file"], "note": "The result is a whole number of batteries, kept in its own variable." }
+      ]
+    },
+    "packs": {
+      "steps": [
+        { "active": ["kit", "kit->file", "file"], "note": "Batteries come in packs of the same size." },
+        { "active": ["file"], "note": "Under Task 2 a division counts only the packs that are completely full." },
+        { "active": ["file"], "note": "The answer is a whole number of packs, never a part of one." }
+      ]
+    },
+    "loose": {
+      "steps": [
+        { "active": ["file"], "note": "Some batteries may be left once the full packs are filled." },
+        { "active": ["file"], "note": "Under Task 3 one operator gives what is left over after dividing." },
+        { "active": ["dougie"], "note": "Dougie takes the full packs and the loose batteries, and opens no pack too many." }
+      ]
+    },
+    "walk": {
+      "steps": [
+        {
+          "active": ["kit", "kit->file", "file"],
+          "value": { "kind": "map", "label": "the route", "entries": [{ "key": "walk_in_km", "value": "a decimal number" }, { "key": "walking_speed_kmh", "value": "a whole number" }] },
+          "note": "The walk in has a distance and the team walks at a steady speed."
+        },
+        { "active": ["file"], "note": "Under Task 4 the distance divided by the speed gives the hours, rounded to one place." },
+        { "active": ["file", "file->rhona", "rhona"], "note": "Rhona gets a walking time to plan with, instead of a guess." }
+      ]
+    }
+  }
+}

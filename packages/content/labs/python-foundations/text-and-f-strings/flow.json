@@ -1,0 +1,54 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "radio", "label": "Radio", "kind": "story" },
+      { "id": "callout", "label": "Tonight's callout", "kind": "data" },
+      { "id": "file", "label": "radio_log.py", "kind": "file", "mine": true },
+      { "id": "log", "label": "Callout log", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "radio", "to": "callout", "label": "what Ailsa hears" },
+      { "from": "callout", "to": "file", "label": "text and a number" },
+      { "from": "file", "to": "log", "label": "log entry" }
+    ],
+    "note": "What Ailsa hears on the radio sits at the top of radio_log.py, and your code turns it into one tidy line for the callout log."
+  },
+  "tasks": {
+    "where": {
+      "steps": [
+        {
+          "active": ["radio", "radio->callout", "callout"],
+          "value": { "kind": "map", "label": "where", "entries": [{ "key": "hill", "value": "text" }, { "key": "grid_ref", "value": "text" }] },
+          "note": "The radio gives the hill and the grid reference as two pieces of text."
+        },
+        { "active": ["callout", "callout->file", "file"], "note": "Under Task 1 they are joined into one location, with the words and spaces between them." },
+        { "active": ["file"], "note": "The location is kept in its own variable for the log entry later." }
+      ]
+    },
+    "sign": {
+      "steps": [
+        { "active": ["callout"], "note": "The call sign came off the radio form with stray spaces and in small letters." },
+        { "active": ["callout", "callout->file", "file"], "note": "Under Task 2 two methods tidy it: one removes the spaces at the ends, one makes capitals." },
+        { "active": ["file"], "note": "Every call sign in the log now looks the same." }
+      ]
+    },
+    "crew": {
+      "steps": [
+        {
+          "active": ["callout", "callout->file", "file"],
+          "value": { "kind": "map", "label": "the crew", "entries": [{ "key": "crew_out", "value": "a whole number" }] },
+          "note": "How many went out arrives as a number, not as text."
+        },
+        { "active": ["file"], "note": "Under Task 3 the number becomes text before it joins the words in front of it." },
+        { "active": ["file"], "note": "The crew line is text, ready to print or to join to more text." }
+      ]
+    },
+    "entry": {
+      "steps": [
+        { "active": ["file"], "note": "The tidy call sign, the location and the crew are all ready." },
+        { "active": ["file"], "note": "Under Task 4 one f-string writes the whole entry, with each value in its place." },
+        { "active": ["file", "file->log", "log"], "note": "Ailsa's log gets the same kind of line for every callout." }
+      ]
+    }
+  }
+}

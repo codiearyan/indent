@@ -1,0 +1,20 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dorrit", "label": "Dorrit at the counter", "kind": "story" },
+      { "id": "slips", "label": "Paper slips", "kind": "data" },
+      { "id": "code", "label": "Your C++ programs", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "kasimir", "label": "Kasimir at the bench", "kind": "story" },
+      { "id": "ambrose", "label": "Ambrose's prices", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dorrit", "to": "slips", "label": "tickets" },
+      { "from": "slips", "to": "code", "label": "what they hold" },
+      { "from": "code", "to": "compiler", "label": "builds" },
+      { "from": "compiler", "to": "kasimir", "label": "printed tickets" },
+      { "from": "compiler", "to": "ambrose", "label": "printed bills" }
+    ],
+    "note": "You move the workshop's paper slips into C++ programs that the compiler builds and the workshop runs."
+  }
+}

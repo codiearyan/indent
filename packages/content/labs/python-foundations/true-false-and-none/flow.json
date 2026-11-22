@@ -1,0 +1,50 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" },
+      { "id": "state", "label": "The team tonight", "kind": "data" },
+      { "id": "file", "label": "ready_to_go.py", "kind": "file", "mine": true },
+      { "id": "vehicle", "label": "Team vehicle", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ailsa", "to": "state", "label": "the checklist" },
+      { "from": "state", "to": "file", "label": "values" },
+      { "from": "file", "to": "vehicle", "label": "go or wait" }
+    ],
+    "note": "The team's state sits at the top of ready_to_go.py, and your comparisons turn it into plain answers: True, False, or not known yet."
+  },
+  "tasks": {
+    "crew": {
+      "steps": [
+        {
+          "active": ["ailsa", "ailsa->state", "state"],
+          "value": { "kind": "map", "label": "the crew", "entries": [{ "key": "crew_ready", "value": "a whole number" }, { "key": "crew_needed", "value": "a whole number" }] },
+          "note": "Ailsa's first question: are enough people here to go?"
+        },
+        { "active": ["state", "state->file", "file"], "note": "Under Task 1 one comparison answers it, and exactly enough counts as enough." },
+        { "active": ["file"], "note": "The answer is True or False, kept in its own variable." }
+      ]
+    },
+    "channel": {
+      "steps": [
+        { "active": ["state"], "note": "The radio is set to a channel, and the team uses one channel." },
+        { "active": ["state", "state->file", "file"], "note": "Under Task 2 a comparison asks whether the two are the same." },
+        { "active": ["file"], "note": "A radio one channel off is not on the team channel." }
+      ]
+    },
+    "ready": {
+      "steps": [
+        { "active": ["file"], "note": "Three answers are ready: crew, channel and stretcher." },
+        { "active": ["file"], "note": "Under Task 3 they are joined so that one missing keeps the team waiting." },
+        { "active": ["file", "file->vehicle", "vehicle"], "note": "The vehicle leaves only when every answer is True." }
+      ]
+    },
+    "name": {
+      "steps": [
+        { "active": ["state"], "note": "The casualty's name is None until someone gives it to the team." },
+        { "active": ["state", "state->file", "file"], "note": "Under Task 4 the code asks whether the name is still None." },
+        { "active": ["file", "file->vehicle", "vehicle"], "note": "The team knows whether it has a name to call out on the hill." }
+      ]
+    }
+  }
+}
