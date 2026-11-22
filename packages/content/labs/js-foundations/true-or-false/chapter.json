@@ -1,0 +1,133 @@
+{
+  "id": "true-or-false",
+  "title": "True or false",
+  "files": ["src/booleans.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the shop's rules applied to today's order.",
+    "suggestedCommand": "node src/booleans.js"
+  },
+  "tasks": [
+    {
+      "id": "big",
+      "title": "Spot a big order",
+      "file": "src/booleans.js",
+      "description": "Under `// Task 1` in `src/booleans.js`, make a `const` called `bigOrder`: `true` when `totalCents` is `freeShippingFromCents` or more, `false` otherwise. Print it.\n\nCheck runs your file with other orders, including one exactly on the line, and expects `true` or `false` itself.",
+      "nextSteps": [
+        "Read the order and the rules near the top of the file.",
+        "Pick the comparison that means \"or more\".",
+        "Make `bigOrder` from that comparison of the two names.",
+        "Print it and run `node src/booleans.js`."
+      ],
+      "hints": [
+        "A comparison is already true or false. You can store it in a variable as it is.",
+        "There are two comparisons for \"bigger\": one leaves out the equal case and one includes it. The task includes it.",
+        "The line has the shape `const bigOrder = totalCents ... freeShippingFromCents`, with \"bigger than or equal to\" in place of the dots."
+      ],
+      "docs": [
+        {
+          "title": "Greater than or equal (>=)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal"
+        },
+        {
+          "title": "Boolean",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "free",
+      "title": "Decide on free shipping",
+      "file": "src/booleans.js",
+      "description": "Under `// Task 2`, make a `const` called `freeShipping`. Shipping is free for a big order, or for any order whose `deliveryZone` is `'local'`. `freeShipping` is `true` when either is the case. Print it.\n\nCheck tries small and big orders in each delivery zone.",
+      "nextSteps": [
+        "Make sure Task 1 passes: `bigOrder` is the first rule.",
+        "Write the second rule: is the zone the local one?",
+        "Join the two rules with the operator for \"or\".",
+        "Print it and try changing `deliveryZone` at the top to see it change."
+      ],
+      "hints": [
+        "There are two rules, and one of them being true is enough.",
+        "To ask whether two values are the same, use `===`. The zone is text, so the value you compare it with needs quotes.",
+        "The line has the shape `const freeShipping = bigOrder || deliveryZone === '...'`, with the local zone's name in the quotes."
+      ],
+      "docs": [
+        {
+          "title": "Logical OR (||)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_OR"
+        },
+        {
+          "title": "Strict equality (===)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "today",
+      "title": "Can it ship today?",
+      "file": "src/booleans.js",
+      "description": "Under `// Task 3`, make a `const` called `canShipToday`: `true` when there are at least as many candles in stock (`candlesInStock`) as the order needs (`quantity`), and the shop is not closed (`shopClosed`). Print it.\n\nCheck tries orders with enough stock, too little stock, a closed shop, and both problems at once.",
+      "nextSteps": [
+        "Write the stock rule as one comparison.",
+        "Write the shop rule: you need the opposite of `shopClosed`.",
+        "Join the two with the operator for \"and\".",
+        "Print it and run the file."
+      ],
+      "hints": [
+        "Both rules must hold at the same time for the order to ship.",
+        "`!` turns true into false and false into true. \"At least as many\" includes the equal case.",
+        "The line has the shape `const canShipToday = candlesInStock >= quantity && ...`, with the opposite of `shopClosed` in place of the dots."
+      ],
+      "docs": [
+        {
+          "title": "Logical AND (&&)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND"
+        },
+        {
+          "title": "Logical NOT (!)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_NOT"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "note",
+      "title": "Is there a gift note?",
+      "file": "src/booleans.js",
+      "description": "Under `// Task 4`, make a `const` called `hasGiftNote`: `true` when `giftNote` has any text in it, `false` when it is empty text. It must be `true` or `false` itself, not the note. Print it.\n\nCheck tries an empty note, a long note and a note of one letter.",
+      "nextSteps": [
+        "Read the lesson's part on truthy and falsy values.",
+        "Decide which kind empty text is.",
+        "Turn `giftNote` into a real `true` or `false`.",
+        "Print it, then put a note in `giftNote` at the top and run it again."
+      ],
+      "hints": [
+        "Every value is either truthy or falsy. Empty text is one of the few falsy ones.",
+        "The lesson shows a way to turn any value into the `true` or `false` it counts as.",
+        "`Boolean(...)` with `giftNote` in the brackets gives exactly the true or false you need."
+      ],
+      "docs": [
+        {
+          "title": "Truthy",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Truthy"
+        },
+        {
+          "title": "Falsy",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Falsy"
+        },
+        {
+          "title": "Boolean",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Truthy and falsy values",
+          "url": "https://www.youtube.com/watch?v=Xp60QbXRAPI"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

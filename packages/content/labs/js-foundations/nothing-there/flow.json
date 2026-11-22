@@ -1,0 +1,116 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "form", "label": "Order form", "kind": "data" },
+      { "id": "quantity", "label": "quantity", "kind": "data", "mine": true },
+      { "id": "note", "label": "note", "kind": "data", "mine": true },
+      { "id": "extra", "label": "extraIsNumber", "kind": "data", "mine": true },
+      { "id": "safe", "label": "safeQuantity", "kind": "data", "mine": true },
+      { "id": "theo", "label": "Theo", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "form", "to": "quantity", "label": "quantity text" },
+      { "from": "form", "to": "note", "label": "gift note" },
+      { "from": "form", "to": "extra", "label": "extras text" },
+      { "from": "quantity", "to": "safe", "label": "quantity" },
+      { "from": "safe", "to": "theo", "label": "candles" },
+      { "from": "note", "to": "theo", "label": "note" },
+      { "from": "extra", "to": "theo", "label": "number?" }
+    ],
+    "note": "The order form sends text and empty boxes, and your variables turn them into numbers and sensible defaults."
+  },
+  "tasks": {
+    "quantity": {
+      "steps": [
+        {
+          "active": ["form"],
+          "value": {
+            "kind": "map",
+            "label": "from the form",
+            "entries": [{ "key": "quantityText", "value": "3, as text" }]
+          },
+          "note": "The quantity arrives as text, so adding one to it joins instead of adding."
+        },
+        {
+          "active": ["form", "form->quantity", "quantity"],
+          "note": "quantity is the same value turned into a real number."
+        },
+        {
+          "active": ["quantity"],
+          "value": {
+            "kind": "map",
+            "label": "what comes out",
+            "entries": [{ "key": "quantity", "value": "a number" }]
+          },
+          "note": "Spaces around the digits make no difference."
+        }
+      ]
+    },
+    "note": {
+      "steps": [
+        {
+          "active": ["form", "form->note"],
+          "value": {
+            "kind": "map",
+            "label": "from the form",
+            "entries": [{ "key": "giftNote", "value": "null" }]
+          },
+          "note": "The customer left the note box empty, so it arrives as null."
+        },
+        {
+          "active": ["note"],
+          "note": "When nothing is there at all, a default text steps in."
+        },
+        {
+          "active": ["note", "note->theo", "theo"],
+          "note": "A note that is empty text was still sent, so it is kept as it is."
+        }
+      ]
+    },
+    "extra": {
+      "steps": [
+        {
+          "active": ["form", "form->extra"],
+          "value": {
+            "kind": "map",
+            "label": "from the form",
+            "entries": [{ "key": "extraCandlesText", "value": "two" }]
+          },
+          "note": "Someone typed a word in the extras box instead of digits."
+        },
+        {
+          "active": ["extra"],
+          "note": "Turned into a number, a word gives NaN rather than a real number."
+        },
+        {
+          "active": ["extra", "extra->theo", "theo"],
+          "note": "Theo gets a plain true or false: is it a real number?"
+        }
+      ]
+    },
+    "fallback": {
+      "steps": [
+        {
+          "active": ["quantity", "quantity->safe", "safe"],
+          "note": "safeQuantity starts from the quantity of Task 1."
+        },
+        {
+          "active": ["safe"],
+          "value": {
+            "kind": "map",
+            "label": "when quantity is",
+            "entries": [
+              { "key": "a real number", "value": "kept" },
+              { "key": "NaN or 0", "value": "one candle" }
+            ]
+          },
+          "note": "When the quantity is NaN or 0, Theo counts the order as one candle."
+        },
+        {
+          "active": ["safe", "safe->theo", "theo"],
+          "note": "Every order ends with a real number of candles."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Can the laptop print our note?", "note": "A note goes in every parcel." },
+    { "title": "Shop laptop", "text": "Prints a good morning and an old offer." },
+    {
+      "title": "Your code",
+      "file": "first-line.js",
+      "mine": true,
+      "gap": "Nothing prints the note",
+      "tasks": ["Print the welcome", "Print the note", "Switch off the offer", "Leave Theo a note"]
+    },
+    { "title": "Parcel note", "text": "Printed and ready for the box." }
+  ],
+  "ticket": { "label": "The note", "wrong": "missing", "why": "Not printed", "right": "printed" },
+  "captions": [
+    "First day at Wickhollow Candles. Ines wants the laptop to print the parcel note.",
+    "Today the laptop prints a good morning and an old offer, but no note.",
+    "You write the lines that print it, in four small tasks.",
+    "Now the welcome and the note print, and the old offer is switched off.",
+    "One file, run with node. The laptop talks, and Ines has her note."
+  ]
+}

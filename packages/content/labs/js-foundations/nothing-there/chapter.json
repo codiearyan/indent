@@ -1,0 +1,137 @@
+{
+  "id": "nothing-there",
+  "title": "Nothing there",
+  "files": ["src/missing.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to read today's order form.",
+    "suggestedCommand": "node src/missing.js"
+  },
+  "tasks": [
+    {
+      "id": "quantity",
+      "title": "Turn the quantity into a number",
+      "file": "src/missing.js",
+      "description": "Under `// Task 1` in `src/missing.js`, make a `const` called `quantity`: `quantityText` turned into a number. Print it.\n\nCheck runs your file with other quantities, one with spaces around the digits, and expects a number, not text that looks like one.",
+      "nextSteps": [
+        "Run the file and read the second line: text plus one is not what Theo wants.",
+        "Find how the lesson turns text into a number.",
+        "Make `quantity` from `quantityText` that way.",
+        "Print it, and print `typeof quantity` too if you want to be sure."
+      ],
+      "hints": [
+        "`'3'` with quotes is text. It looks like a number, but `+` joins it instead of adding.",
+        "JavaScript has a built-in that takes a value in its brackets and gives back the number it stands for.",
+        "The line has the shape `const quantity = Number(...)`, with `quantityText` in the brackets."
+      ],
+      "docs": [
+        {
+          "title": "Number() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/Number"
+        },
+        {
+          "title": "Basic math in JavaScript",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Math"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "note",
+      "title": "Give the note a default",
+      "file": "src/missing.js",
+      "description": "Under `// Task 2`, make a `const` called `note`: `giftNote` when there is one, and the text `No note` when `giftNote` is `null` or `undefined`. A note that is empty text stays as it is. Print it.\n\nCheck tries `null`, `undefined`, a real note and an empty note.",
+      "nextSteps": [
+        "Read the lesson's part on defaults.",
+        "Decide which of the two default operators fits: one replaces every falsy value, one only `null` and `undefined`.",
+        "Make `note` from `giftNote` and the default text.",
+        "Print it, then try a note at the top and run it again."
+      ],
+      "hints": [
+        "You need a value that steps in only when nothing is there at all.",
+        "`||` would also replace empty text, because empty text is falsy. The task says empty text stays.",
+        "The line has the shape `const note = giftNote ?? '...'`, with the default text from the task in the quotes."
+      ],
+      "docs": [
+        {
+          "title": "Nullish coalescing operator (??)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing"
+        },
+        {
+          "title": "null",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/null"
+        },
+        {
+          "title": "undefined",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Defaults with ?? in two minutes",
+          "url": "https://www.youtube.com/watch?v=TOBlbEe224Q"
+        },
+        {
+          "title": "null and undefined",
+          "url": "https://www.youtube.com/watch?v=spgTd91FAjo"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "extra",
+      "title": "Spot text that is not a number",
+      "file": "src/missing.js",
+      "description": "Under `// Task 3`, make a `const` called `extraIsNumber`: `true` when `extraCandlesText` turns into a real number, `false` when it turns into `NaN`. Print it.\n\nCheck tries a word, digits, digits with a word after them, and more digits. It expects `true` or `false` itself.",
+      "nextSteps": [
+        "Turn `extraCandlesText` into a number and print it to see what you get.",
+        "Find how the lesson asks whether a value is `NaN`.",
+        "Turn that answer around: you want true for a real number.",
+        "Print `extraIsNumber` and try other text at the top."
+      ],
+      "hints": [
+        "First turn the text into a number. Bad text gives `NaN`.",
+        "`NaN === NaN` is false, so you cannot compare with it. `Number.isNaN(...)` asks the question for you.",
+        "`Number.isNaN(Number(extraCandlesText))` is true for bad text. Put `!` in front to flip it."
+      ],
+      "docs": [
+        {
+          "title": "NaN",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN"
+        },
+        {
+          "title": "Number.isNaN()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fallback",
+      "title": "Fall back to one candle",
+      "file": "src/missing.js",
+      "description": "Under `// Task 4`, make a `const` called `safeQuantity`: `quantity` when it is a real number other than `0`, and `1` when it is `NaN` or `0`. Print it.\n\nCheck runs your file with a good quantity, a word, `'0'` and an empty box (`null`) in `quantityText`.",
+      "nextSteps": [
+        "Make sure Task 1 passes: this task builds on `quantity`.",
+        "List what should become 1: `NaN` and `0`. Both are falsy.",
+        "Pick the default operator that replaces every falsy value.",
+        "Print it and try `'three'` at the top."
+      ],
+      "hints": [
+        "Both values that should become 1 are falsy, and every good quantity is truthy.",
+        "This time you want the default operator that steps in for every falsy value, not only for `null` and `undefined`.",
+        "The line has the shape `const safeQuantity = quantity || ...`, with the fallback number in place of the dots."
+      ],
+      "docs": [
+        {
+          "title": "Logical OR (||)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_OR"
+        },
+        {
+          "title": "Falsy",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Falsy"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

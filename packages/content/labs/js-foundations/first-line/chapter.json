@@ -1,0 +1,121 @@
+{
+  "id": "first-line",
+  "title": "Your first line",
+  "files": ["src/first-line.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here and read what it prints.",
+    "suggestedCommand": "node src/first-line.js"
+  },
+  "tasks": [
+    {
+      "id": "welcome",
+      "title": "Print the welcome",
+      "file": "src/first-line.js",
+      "description": "Under `// Task 1` in `src/first-line.js`, print this line:\n\n```\nWelcome to Wickhollow Candles\n```\n\nCheck runs your file with `node src/first-line.js` and looks for a line that matches this one exactly, capital letters and spaces included.",
+      "nextSteps": [
+        "Run `node src/first-line.js` once and read what it prints today.",
+        "Look at the first `console.log` line in the file: it is your model.",
+        "Write a new line under `// Task 1` that prints the welcome.",
+        "Run the file again and compare the output with the task."
+      ],
+      "hints": [
+        "The file already prints one line. Read how that line is written.",
+        "Text has to sit inside quotes, and the quotes sit inside the round brackets of `console.log`.",
+        "The line has the shape `console.log('...')`, with the welcome where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "console.log()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/console/log_static"
+        },
+        {
+          "title": "Run Node.js scripts from the command line",
+          "url": "https://nodejs.org/en/learn/command-line/run-nodejs-scripts-from-the-command-line"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Running a JavaScript file with Node",
+          "url": "https://www.youtube.com/watch?v=4AK4x4t-mHE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "note",
+      "title": "Print the parcel note",
+      "file": "src/first-line.js",
+      "description": "Under `// Task 2`, print the two lines of the note that goes in every parcel, in this order:\n\n```\nThank you for your order\nPoured by hand in Wickhollow\n```\n\nCheck runs your file and looks for both lines, the second right after the first.",
+      "nextSteps": [
+        "Find `// Task 2` and read the two lines in the comment.",
+        "Print the first line with its own `console.log`.",
+        "Print the second line on the line below it.",
+        "Run the file and read the output from top to bottom."
+      ],
+      "hints": [
+        "One `console.log` prints one line. How many lines does the note have?",
+        "Node runs your lines from the top of the file to the bottom, so the order you write them in is the order they print in.",
+        "Two `console.log` lines, one under the other, each with one line of the note in quotes."
+      ],
+      "docs": [
+        {
+          "title": "console.log()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/console/log_static"
+        },
+        {
+          "title": "Strings, the basics",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Strings"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "offer",
+      "title": "Switch off the old offer",
+      "file": "src/first-line.js",
+      "description": "Under `// Task 3` there is a line that prints an offer the shop no longer runs. Turn it into a comment, so it stays in the file but no longer runs.\n\nCheck runs your file to see that the offer is not printed, then reads the file to see that the line is still there as a comment.",
+      "nextSteps": [
+        "Run the file and find the offer in the output.",
+        "Find the line under `// Task 3` that prints it.",
+        "Turn that one line into a comment. Do not delete it.",
+        "Run the file again: the offer should be gone from the output."
+      ],
+      "hints": [
+        "The lesson shows a way to keep a line in the file while Node skips it.",
+        "Every comment in this file starts the same way. Look at the start of the lines that do not print anything.",
+        "Put `//` at the very start of the offer's line."
+      ],
+      "docs": [
+        {
+          "title": "Comments in JavaScript",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "comment",
+      "title": "Leave a note for Theo",
+      "file": "src/first-line.js",
+      "description": "Write a comment of your own anywhere in `src/first-line.js`: a line that starts with `//`, followed by a few words for Theo, for example what the file prints.\n\nCheck reads your file and looks for a comment that was not there when you started. The file must still run.",
+      "nextSteps": [
+        "Pick a place for your note, for example under `// Task 4`.",
+        "Start a new line with `//`.",
+        "Write a few words after it.",
+        "Run the file: your note should not change what it prints."
+      ],
+      "hints": [
+        "A comment is for people. Node skips it, so you can write anything in it.",
+        "A comment starts with two slashes. Everything after them on that line is skipped.",
+        "A line like `// Theo, ...` with a short sentence after it is all it takes."
+      ],
+      "docs": [
+        {
+          "title": "Comments in JavaScript",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "order", "label": "Today's order", "kind": "data" },
+      { "id": "big", "label": "bigOrder", "kind": "data", "mine": true },
+      { "id": "free", "label": "freeShipping", "kind": "data", "mine": true },
+      { "id": "today", "label": "canShipToday", "kind": "data", "mine": true },
+      { "id": "note", "label": "hasGiftNote", "kind": "data", "mine": true },
+      { "id": "theo", "label": "Theo", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "order", "to": "big", "label": "total" },
+      { "from": "big", "to": "free", "label": "big or not" },
+      { "from": "order", "to": "free", "label": "zone" },
+      { "from": "order", "to": "today", "label": "stock, closed" },
+      { "from": "order", "to": "note", "label": "gift note" },
+      { "from": "free", "to": "theo", "label": "free?" },
+      { "from": "today", "to": "theo", "label": "today?" },
+      { "from": "note", "to": "theo", "label": "card?" }
+    ],
+    "note": "Each of Theo's rules becomes a true or false about today's order."
+  },
+  "tasks": {
+    "big": {
+      "steps": [
+        {
+          "active": ["order"],
+          "value": {
+            "kind": "map",
+            "label": "today's order",
+            "entries": [
+              { "key": "totalCents", "value": 5400 },
+              { "key": "freeShippingFromCents", "value": 5000 }
+            ]
+          },
+          "note": "Today's order, and the amount from which shipping is free."
+        },
+        {
+          "active": ["order", "order->big", "big"],
+          "note": "bigOrder compares the total with that amount. An order exactly on it counts as big."
+        },
+        {
+          "active": ["big"],
+          "value": {
+            "kind": "map",
+            "label": "what comes out",
+            "entries": [{ "key": "bigOrder", "value": "true or false" }]
+          },
+          "note": "The answer is a yes or a no, kept as true or false."
+        }
+      ]
+    },
+    "free": {
+      "steps": [
+        {
+          "active": ["big", "big->free"],
+          "note": "The first rule is the answer from Task 1: is it a big order?"
+        },
+        {
+          "active": ["order", "order->free", "free"],
+          "value": {
+            "kind": "map",
+            "label": "today's order",
+            "entries": [{ "key": "deliveryZone", "value": "local" }]
+          },
+          "note": "The second rule asks whether the order stays in the local zone."
+        },
+        {
+          "active": ["free", "free->theo", "theo"],
+          "note": "Either rule is enough for free shipping."
+        }
+      ]
+    },
+    "today": {
+      "steps": [
+        {
+          "active": ["order", "order->today"],
+          "value": {
+            "kind": "map",
+            "label": "today's order",
+            "entries": [
+              { "key": "candlesInStock", "value": 7 },
+              { "key": "quantity", "value": 3 },
+              { "key": "shopClosed", "value": "false" }
+            ]
+          },
+          "note": "Shipping today needs two things: enough candles in stock and an open shop."
+        },
+        {
+          "active": ["today"],
+          "note": "Exactly as many candles as the order needs is enough."
+        },
+        {
+          "active": ["today", "today->theo", "theo"],
+          "note": "Both must hold, or the order waits until tomorrow."
+        }
+      ]
+    },
+    "note": {
+      "steps": [
+        {
+          "active": ["order", "order->note"],
+          "value": {
+            "kind": "map",
+            "label": "today's order",
+            "entries": [{ "key": "giftNote", "value": "empty text" }]
+          },
+          "note": "Today's gift note is empty text: the customer wrote nothing."
+        },
+        {
+          "active": ["note"],
+          "note": "Empty text counts as false, and any text at all counts as true."
+        },
+        {
+          "active": ["note", "note->theo", "theo"],
+          "note": "Theo gets a plain true or false: add a card or not."
+        }
+      ]
+    }
+  }
+}

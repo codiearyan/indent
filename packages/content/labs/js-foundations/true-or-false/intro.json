@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "Does this order ship free today?", "note": "He checks the rules by eye." },
+    { "title": "Today's order", "rows": [["Total", "54.00"], ["Zone", "local"], ["Shop", "open"]] },
+    {
+      "title": "Your code",
+      "file": "booleans.js",
+      "mine": true,
+      "gap": "Rules checked by eye",
+      "tasks": ["Spot a big order", "Free shipping or not", "Ships today or not", "Spot a gift note"]
+    },
+    { "title": "Packing table", "text": "A yes or a no for every rule." }
+  ],
+  "ticket": { "label": "Today's order", "wrong": "a guess", "why": "By eye", "right": "decided" },
+  "captions": [
+    "Labels are tidy. Now Theo wants his shop rules answered for every order.",
+    "He checks free shipping, stock and gift notes by eye, and misses some.",
+    "You turn each rule into true or false, in four small tasks.",
+    "Now every rule gives a plain yes or no for today's order.",
+    "Comparisons with and, or and not: the rules work the same way every time."
+  ]
+}

@@ -1,12 +1,24 @@
 {
   "id": "js-foundations",
   "title": "JavaScript foundations",
-  "description": "Wickhollow Candles is a two-person online shop that pours candles by hand, and you just became its developer. Turn a messy pile of orders into answers the owners can use, then build the small helpers behind their loyalty cards. Along the way you learn array methods and closures by writing real functions.",
+  "description": "Wickhollow Candles is a two-person shop that pours candles by hand, and you just became its developer without ever having written a line of code. You start on your first day by making the shop laptop print, count, price and decide, then turn a pile of orders into answers and build helpers that remember. Each issue teaches one part of the language, from your first line to array methods and closures, in one file you run yourself.",
   "category": "JavaScript and TypeScript",
   "language": "javascript",
   "tags": ["JavaScript"],
   "kind": "foundations",
   "parts": [
-    { "title": "A week at Wickhollow Candles", "chapters": ["order-reports", "loyalty-cards"] }
+    {
+      "title": "First day at the shop",
+      "chapters": [
+        "first-line",
+        "values-and-variables",
+        "numbers-and-prices",
+        "text-and-labels",
+        "true-or-false",
+        "nothing-there"
+      ]
+    },
+    { "title": "The shelf", "chapters": ["order-reports"] },
+    { "title": "Helpers that remember", "chapters": ["loyalty-cards"] }
   ]
 }
