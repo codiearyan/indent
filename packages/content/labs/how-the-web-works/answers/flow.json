@@ -1,0 +1,95 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "odette", "label": "Odette", "kind": "story" },
+      { "id": "screen", "label": "Listings screen", "kind": "story" },
+      { "id": "status", "label": "statusLine()", "kind": "function", "mine": true },
+      { "id": "header", "label": "contentType()", "kind": "function", "mine": true },
+      { "id": "whole", "label": "readAnswer()", "kind": "function", "mine": true },
+      { "id": "server", "label": "Cupboard server", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "odette", "to": "screen", "label": "wrong text" },
+      { "from": "screen", "to": "whole", "label": "address" },
+      { "from": "status", "to": "server", "label": "request" },
+      { "from": "header", "to": "server", "label": "request" },
+      { "from": "whole", "to": "server", "label": "one request" },
+      { "from": "whole", "to": "screen", "label": "the whole answer" }
+    ],
+    "note": "The listings screen reads the status and headers of every answer, not only its body, so it can tell a show from a server saying something went wrong."
+  },
+  "tasks": {
+    "status": {
+      "steps": [
+        {
+          "active": ["status", "status->server"],
+          "note": "statusLine() asks for a page and waits for the answer."
+        },
+        {
+          "active": ["server"],
+          "note": "The server answers with a status line first: a number for programs and a reason for people."
+        },
+        {
+          "active": ["status"],
+          "value": {
+            "kind": "array",
+            "label": "what comes back, in order",
+            "values": ["number", "reason as written"]
+          },
+          "note": "The number and the reason come back as one text, the reason exactly as the server wrote it."
+        }
+      ]
+    },
+    "header": {
+      "steps": [
+        {
+          "active": ["header", "header->server"],
+          "note": "contentType() asks for a page and waits for the answer."
+        },
+        {
+          "active": ["server"],
+          "note": "Under its status line the answer has headers. One of them may say what kind of body follows."
+        },
+        {
+          "active": ["header"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "content-type", "value": "text, or null" }]
+          },
+          "note": "The header is found by its name and its value comes back, or null when the answer has none."
+        }
+      ]
+    },
+    "whole": {
+      "steps": [
+        {
+          "active": ["screen", "screen->whole", "whole"],
+          "note": "The screen hands readAnswer() the address of a show."
+        },
+        {
+          "active": ["whole", "whole->server", "server"],
+          "note": "readAnswer() sends one request. The answer may go well, or say the show is not there, or that the server broke."
+        },
+        {
+          "active": ["whole"],
+          "note": "Everything is read from that one answer, and the body only once."
+        },
+        {
+          "active": ["whole", "whole->screen", "screen"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "ok", "value": "true or false" },
+              { "key": "status", "value": "a number" },
+              { "key": "type", "value": "text, or null" },
+              { "key": "body", "value": "text" }
+            ]
+          },
+          "note": "The screen gets the whole answer, so it can look at ok before it puts the body up."
+        }
+      ]
+    }
+  }
+}

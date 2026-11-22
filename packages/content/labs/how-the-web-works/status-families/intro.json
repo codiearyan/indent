@@ -1,0 +1,26 @@
+{
+  "stations": [
+    {
+      "title": "Gethin",
+      "say": "Why is it silent after three?",
+      "note": "The server restarts then."
+    },
+    { "title": "Playlist script", "text": "Asks once, and gives up on any bad status." },
+    {
+      "title": "Your code",
+      "file": "statuses.js",
+      "mine": true,
+      "gap": "Every status looks the same",
+      "tasks": ["Name the family", "Show, null or error", "Ask again, not forever"]
+    },
+    { "title": "Cupboard server", "text": "Answers 503 for a few seconds, then 200." }
+  ],
+  "ticket": { "label": "Tonight", "wrong": "silence", "why": "Gave up", "right": "music on air" },
+  "captions": [
+    "Gethin wants to know why the station goes silent after the nightly restart.",
+    "The playlist script gets one 503 and gives up, the same as for a missing show.",
+    "You sort statuses into families and decide what each one means, in three tasks.",
+    "The script asks again after the 503, gets the playlist, and the music plays.",
+    "The family of a status says what to do. Ask again only when the server is in trouble."
+  ]
+}

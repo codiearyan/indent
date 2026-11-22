@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Gethin",
+      "say": "Take request 43 off the list?",
+      "note": "Ffion played it last night."
+    },
+    { "title": "The cupboard", "text": "Today Gethin edits a file by hand." },
+    {
+      "title": "Your code",
+      "file": "requests.js",
+      "mine": true,
+      "gap": "Every request only reads",
+      "tasks": ["Write a request line", "Ask to remove", "Send the studio key", "Ask for a kind"]
+    },
+    {
+      "title": "Song requests",
+      "rows": [
+        ["41", "Seven Bridges"],
+        ["42", "Tin Whistle Morning"],
+        ["43", "Weather for Ducks"]
+      ],
+      "mark": 2
+    }
+  ],
+  "ticket": {
+    "label": "Request 43",
+    "wrong": "still listed",
+    "why": "Only reads",
+    "right": "off the list"
+  },
+  "captions": [
+    "Ffion played request 43 last night, and Gethin wants it off the list.",
+    "Every request the station sends only reads, so Gethin edits a file in the cupboard.",
+    "You write requests with a method and headers that say who is asking.",
+    "The studio asks to remove request 43 with its key, and it comes off the list.",
+    "A method says what to do, headers say who asks. No more cupboard edits."
+  ]
+}

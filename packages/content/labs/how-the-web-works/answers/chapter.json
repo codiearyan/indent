@@ -1,0 +1,101 @@
+{
+  "id": "answers",
+  "title": "An answer has a status, headers and a body",
+  "files": ["src/answers.js", "run.js", "server/station.js"],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "status",
+      "title": "Read the status line",
+      "file": "src/answers.js",
+      "description": "Under `// Task 1` in `src/answers.js`, make `statusLine(address)` ask for the page at `address` and give back the status of the answer as text: its number, a space, and the reason the server wrote beside it, like `'404 Not Found'`.\n\nCheck starts a server of its own that writes reasons of its own beside its statuses, and compares the text `statusLine` gives back with what its server sent.",
+      "nextSteps": [
+        "Send the request and wait for the answer.",
+        "Print the answer's `status` and `statusText` to see what each holds.",
+        "Put the two together with a space between them.",
+        "Run `node run.js` and compare the two Task 1 lines with the answers printed above them."
+      ],
+      "hints": [
+        "The first line of an answer is the version, the status number and a reason. The answer object you get from `fetch` has the number and the reason as two properties.",
+        "`response.status` is the number and `response.statusText` the reason, exactly as the server wrote it. Do not work the reason out from the number: a server may write its own.",
+        "`return `${response.status} ${response.statusText}``, after `const response = await fetch(address)`."
+      ],
+      "docs": [
+        {
+          "title": "Response: status property",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/status"
+        },
+        {
+          "title": "Response: statusText property",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/statusText"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "header",
+      "title": "Read a header",
+      "file": "src/answers.js",
+      "description": "Under `// Task 2`, make `contentType(address)` ask for the page at `address` and give back the whole value of the answer's `content-type` header, like `'text/plain; charset=utf-8'`, or `null` when the answer has none.\n\nCheck starts a server of its own that answers with content types of its own, and once with no content-type at all.",
+      "nextSteps": [
+        "Send the request and wait for the answer.",
+        "Find in the lesson how a header of an answer is read.",
+        "Read the header by its name and give back its value.",
+        "Run `node run.js`: `/ping` answers with no content-type at all."
+      ],
+      "hints": [
+        "An answer's `headers` is not a plain object, so reading a property of it by name gives `undefined`.",
+        "`headers` has a `get` method that finds a header by its name, whatever the capital letters, and gives `null` when the answer has no such header.",
+        "`return response.headers.get('content-type')`, after waiting for the answer."
+      ],
+      "docs": [
+        {
+          "title": "Headers: get() method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Headers/get"
+        },
+        {
+          "title": "Content-Type header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "whole",
+      "title": "Read the whole answer once",
+      "file": "src/answers.js",
+      "description": "Under `// Task 3`, make `readAnswer(address)` send **one** request for the page at `address` and give back an object with four properties, all read from that one answer:\n\n- `ok`: `true` when the status is from 200 to 299, otherwise `false`\n- `status`: the status, a number\n- `type`: the `content-type` header, or `null` when there is none\n- `body`: the text of the body, also when the answer did not go well\n\nCheck starts a server of its own that answers with statuses from the 200s, the 400s and the 500s, and looks at how many requests its server received and at each of the four properties.",
+      "nextSteps": [
+        "Send one request and keep the answer in a `const`.",
+        "Read the status, the header and the body from that same answer.",
+        "Find the property of the answer that already says whether the status is from 200 to 299.",
+        "Run `node run.js`: the test card answers 500 and `/ping` answers 204 with no body."
+      ],
+      "hints": [
+        "Calling your functions from Tasks 1 and 2 here would send a request each. One answer holds everything you need.",
+        "`response.ok` is `true` for every status from 200 to 299, not only 200. The body still needs `await`, also inside an object.",
+        "Return `{ ok: response.ok, status: response.status, type: response.headers.get('content-type'), body: await response.text() }`."
+      ],
+      "docs": [
+        {
+          "title": "Response: ok property",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/ok"
+        },
+        {
+          "title": "Response",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response"
+        }
+      ],
+      "videos": [
+        {
+          "title": "The Fetch API in six minutes",
+          "url": "https://www.youtube.com/watch?v=cuEtnrL9-H0"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

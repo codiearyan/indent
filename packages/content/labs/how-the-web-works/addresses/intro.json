@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Odette", "say": "Why is the listings box blank?", "note": "Since Tuesday." },
+    { "title": "Listings screen", "text": "Asks for an address nobody checked." },
+    {
+      "title": "Your code",
+      "file": "address.js",
+      "mine": true,
+      "gap": "The address is just text",
+      "tasks": ["Take it apart", "Put it together", "Ask and read"]
+    },
+    { "title": "Cupboard server", "text": "Answers any page it is asked for by name." }
+  ],
+  "ticket": { "label": "Listings", "wrong": "blank", "why": "Bad address", "right": "on screen" },
+  "captions": [
+    "At Heronsgate Community Radio, Odette wants the studio's listings screen back.",
+    "The screen asks for an address nobody understands, and gets nothing to show.",
+    "You take addresses apart, put them together, and send a real request.",
+    "The cupboard server answers, and the listings appear on the screen.",
+    "An address is parts, not just text. Now the screen asks for the right one."
+  ]
+}

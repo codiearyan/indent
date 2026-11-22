@@ -1,0 +1,115 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "gethin", "label": "Gethin", "kind": "story" },
+      {
+        "id": "family",
+        "label": "statusFamily()",
+        "kind": "function",
+        "mine": true,
+        "fn": "statusFamily"
+      },
+      { "id": "show", "label": "showText()", "kind": "function", "mine": true },
+      { "id": "retry", "label": "fetchWithRetry()", "kind": "function", "mine": true },
+      { "id": "server", "label": "Cupboard server", "kind": "story" },
+      { "id": "playlist", "label": "Overnight playlist", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "gethin", "to": "family", "label": "a status" },
+      { "from": "show", "to": "family", "label": "status" },
+      { "from": "show", "to": "server", "label": "request" },
+      { "from": "retry", "to": "server", "label": "requests" },
+      { "from": "retry", "to": "playlist", "label": "last answer" }
+    ],
+    "note": "Each answer is judged by the family of its status, so the playlist waits out a restart and a show that is gone is not mistaken for a broken server."
+  },
+  "tasks": {
+    "family": {
+      "trace": { "file": "src/statuses.js", "call": "statusFamily", "args": [503] },
+      "steps": [
+        {
+          "active": ["gethin", "gethin->family", "family"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "status", "value": 503 }]
+          },
+          "note": "statusFamily() gets a status number, like the 503 the server answers during its restart."
+        },
+        {
+          "active": ["family"],
+          "note": "The first digit picks the family. Numbers outside 100 to 599 have none."
+        },
+        {
+          "active": ["family"],
+          "value": {
+            "kind": "array",
+            "label": "the names it can give back",
+            "values": [
+              "information",
+              "success",
+              "redirect",
+              "client error",
+              "server error",
+              "unknown"
+            ]
+          },
+          "note": "The name of one family comes back as text."
+        }
+      ]
+    },
+    "show": {
+      "steps": [
+        {
+          "active": ["show", "show->server", "server"],
+          "note": "showText() asks the server for one show and waits for the answer."
+        },
+        {
+          "active": ["show", "show->family", "family"],
+          "note": "The family of the status decides what happens next."
+        },
+        {
+          "active": ["show"],
+          "value": {
+            "kind": "map",
+            "label": "what happens, by family",
+            "entries": [
+              { "key": "success", "value": "the body" },
+              { "key": "client error", "value": "null" },
+              { "key": "server error", "value": "an error is thrown" }
+            ]
+          },
+          "note": "A show that is there comes back, a show that is not gives null, and a broken server is reported with its status."
+        }
+      ]
+    },
+    "retry": {
+      "steps": [
+        {
+          "active": ["retry", "retry->server", "server"],
+          "note": "fetchWithRetry() asks for tonight's playlist while the server is restarting."
+        },
+        {
+          "active": ["server", "retry"],
+          "note": "A server error means it may work in a moment, so it asks again, up to the number of tries it was given."
+        },
+        {
+          "active": ["retry"],
+          "note": "Any other family is final at once. A client error is never asked again."
+        },
+        {
+          "active": ["retry", "retry->playlist", "playlist"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "status", "value": "a number" },
+              { "key": "body", "value": "text" }
+            ]
+          },
+          "note": "The last answer goes to the overnight playlist, which plays music instead of silence."
+        }
+      ]
+    }
+  }
+}
