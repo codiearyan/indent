@@ -1,0 +1,262 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "animals",
+        "label": "animals",
+        "kind": "data"
+      },
+      {
+        "id": "owners",
+        "label": "owners",
+        "kind": "data"
+      },
+      {
+        "id": "q1",
+        "label": "1-names-and-species.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q2",
+        "label": "2-phone-list.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q3",
+        "label": "3-full-names.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q4",
+        "label": "4-weight-in-grams.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "desk",
+        "label": "Front desk",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "animals",
+        "to": "q1",
+        "label": "rows"
+      },
+      {
+        "from": "owners",
+        "to": "q2",
+        "label": "rows"
+      },
+      {
+        "from": "owners",
+        "to": "q3",
+        "label": "rows"
+      },
+      {
+        "from": "animals",
+        "to": "q4",
+        "label": "rows"
+      },
+      {
+        "from": "q1",
+        "to": "desk",
+        "label": "short list"
+      },
+      {
+        "from": "q2",
+        "to": "desk",
+        "label": "phone list"
+      },
+      {
+        "from": "q3",
+        "to": "desk",
+        "label": "full names"
+      },
+      {
+        "from": "q4",
+        "to": "desk",
+        "label": "grams"
+      }
+    ],
+    "note": "Four queries keep only the columns a question needs, give them clear names and work out new ones."
+  },
+  "tasks": {
+    "names-and-species": {
+      "steps": [
+        {
+          "active": [
+            "animals",
+            "animals->q1"
+          ],
+          "note": "Every animal comes in with all seven of its columns."
+        },
+        {
+          "active": [
+            "q1"
+          ],
+          "note": "Only two columns are kept, in the order Winnie reads them."
+        },
+        {
+          "active": [
+            "q1",
+            "q1->desk",
+            "desk"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "name",
+              "species"
+            ],
+            "cells": [
+              [
+                "a name",
+                "a species"
+              ]
+            ]
+          },
+          "note": "One row per animal, two columns wide."
+        }
+      ]
+    },
+    "phone-list": {
+      "steps": [
+        {
+          "active": [
+            "owners",
+            "owners->q2"
+          ],
+          "note": "Every owner comes in, emails and towns included."
+        },
+        {
+          "active": [
+            "q2"
+          ],
+          "note": "Three columns stay, and one of them goes out under the name on the paper cards."
+        },
+        {
+          "active": [
+            "q2",
+            "q2->desk",
+            "desk"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "first_name",
+              "surname",
+              "phone"
+            ],
+            "cells": [
+              [
+                "a first name",
+                "a last name",
+                "a phone number"
+              ]
+            ]
+          },
+          "note": "The table keeps its own column names; only this list uses the new one."
+        }
+      ]
+    },
+    "full-names": {
+      "steps": [
+        {
+          "active": [
+            "owners",
+            "owners->q3"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "what each owner row has",
+            "colLabels": [
+              "first_name",
+              "last_name"
+            ],
+            "cells": [
+              [
+                "a first name",
+                "a last name"
+              ]
+            ]
+          },
+          "note": "The names are stored in two columns."
+        },
+        {
+          "active": [
+            "q3"
+          ],
+          "note": "The two pieces are joined into one, with a space between them, for every row."
+        },
+        {
+          "active": [
+            "q3",
+            "q3->desk",
+            "desk"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "owner",
+              "town"
+            ],
+            "cells": [
+              [
+                "one full name",
+                "a town"
+              ]
+            ]
+          },
+          "note": "Each owner's name arrives in one piece, ready for the reminder letters."
+        }
+      ]
+    },
+    "weight-in-grams": {
+      "steps": [
+        {
+          "active": [
+            "animals",
+            "animals->q4"
+          ],
+          "note": "Every animal comes in with its weight in kilograms, or NULL if nobody has weighed it."
+        },
+        {
+          "active": [
+            "q4"
+          ],
+          "note": "Each row's weight is worked out in grams, the unit the small animals room uses."
+        },
+        {
+          "active": [
+            "q4",
+            "q4->desk",
+            "desk"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "name",
+              "weight_g"
+            ],
+            "cells": [
+              [
+                "a name",
+                "grams or NULL"
+              ]
+            ]
+          },
+          "note": "The worked-out column gets a name of its own. An animal with no weight still has none."
+        }
+      ]
+    }
+  }
+}

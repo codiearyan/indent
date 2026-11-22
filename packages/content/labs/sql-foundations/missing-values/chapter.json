@@ -1,0 +1,114 @@
+{
+  "id": "missing-values",
+  "title": "Missing values",
+  "files": [
+    "queries/1-no-email.sql",
+    "queries/2-visit-notes.sql",
+    "queries/3-not-labradors.sql",
+    "queries/4-contact-list.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-no-email.sql"
+  },
+  "tasks": [
+    {
+      "id": "no-email",
+      "title": "Find the owners with no email",
+      "file": "queries/1-no-email.sql",
+      "description": "Winnie will phone every owner the practice has no email for.\n\nIn `queries/1-no-email.sql`, return three columns from `owners`, in this order:\n\n- `first_name`\n- `last_name`\n- `phone`\n\nOnly owners whose `email` is missing (`NULL`). Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Run a query with the three columns and `email`, and find the owners with `NULL`.",
+        "Write a condition that keeps only those owners.",
+        "Take `email` out of the columns again and run the file."
+      ],
+      "hints": [
+        "If your query runs and returns no rows, read the lesson's part \"What NULL is\" again.",
+        "A missing value is never equal to anything, not even to `NULL`. It has a test of its own.",
+        "The condition is `WHERE email IS NULL`."
+      ],
+      "docs": [
+        { "title": "IS and IS NOT", "url": "https://www.sqlite.org/lang_expr.html#isisnot" },
+        { "title": "NULL handling in SQLite", "url": "https://www.sqlite.org/nulls.html" }
+      ],
+      "videos": [
+        {
+          "title": "The IS NULL condition",
+          "url": "https://www.youtube.com/watch?v=DUGppOtEX-s"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "visit-notes",
+      "title": "List the visits with notes",
+      "file": "queries/2-visit-notes.sql",
+      "description": "Ifan wants to read back through the visits he and Mabel wrote notes on.\n\nIn `queries/2-visit-notes.sql`, return three columns from `visits`, in this order:\n\n- `visit_date`\n- `vet`\n- `notes`\n\nOnly visits whose `notes` are not missing. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Run a query with the three columns and look at the `notes`.",
+        "Keep only the rows where a note was written.",
+        "Run it: no `NULL` should be left in the notes column."
+      ],
+      "hints": [
+        "This is the opposite of task 1.",
+        "`IS NULL` has an opposite that keeps only the rows where a value was recorded.",
+        "The condition is `WHERE notes IS NOT NULL`."
+      ],
+      "docs": [
+        { "title": "IS and IS NOT", "url": "https://www.sqlite.org/lang_expr.html#isisnot" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "not-labradors",
+      "title": "Find the dogs that are not Labradors",
+      "file": "queries/3-not-labradors.sql",
+      "description": "Ifan wants every dog that is not a Labrador, and he was clear that a dog whose breed nobody knows counts too.\n\nIn `queries/3-not-labradors.sql`, return two columns from `animals`, in this order:\n\n- `name`\n- `breed`\n\nOnly dogs, and of those only the ones whose `breed` is not `Labrador`, including dogs whose `breed` is missing. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Run a query that keeps the dogs and look at their breeds, `NULL` included.",
+        "Leave out the Labradors and run it again. Count the dogs with no breed: are they still there?",
+        "Bring the dogs with no breed back in.",
+        "Make sure no cat or rabbit came in with them."
+      ],
+      "hints": [
+        "Count the dogs with no breed in your result. The lesson's part \"Conditions skip empty cells quietly\" says where they went.",
+        "Keep a dog when its breed is something else, or when its breed is missing. That is an `OR`, next to an `AND` about the species.",
+        "The condition has the shape `WHERE species = 'dog' AND (breed <> '...' OR breed IS NULL)`."
+      ],
+      "docs": [
+        { "title": "NULL handling in SQLite", "url": "https://www.sqlite.org/nulls.html" },
+        { "title": "IS and IS NOT", "url": "https://www.sqlite.org/lang_expr.html#isisnot" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "contact-list",
+      "title": "Make one contact list",
+      "file": "queries/4-contact-list.sql",
+      "description": "Winnie wants one way to reach every owner on a single list.\n\nIn `queries/4-contact-list.sql`, return three columns from `owners`, in this order:\n\n- `first_name`\n- `last_name`\n- `contact`: the owner's `email`, or their `phone` when the email is missing\n\nEvery owner, in any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Run a query with the names, `email` and `phone`, and see which owners have no email.",
+        "Replace the two columns with one that falls back from the email to the phone.",
+        "Name it, and run the file: no `NULL` should be left in it."
+      ],
+      "hints": [
+        "Every owner stays in the list, so this needs no `WHERE`. The work happens in a column.",
+        "`COALESCE` gives back the first of its values that is not `NULL`. The order you list them in matters.",
+        "The column has the shape `COALESCE(first_choice, fallback) AS contact`."
+      ],
+      "docs": [
+        { "title": "coalesce()", "url": "https://www.sqlite.org/lang_corefunc.html#coalesce" },
+        { "title": "ifnull()", "url": "https://www.sqlite.org/lang_corefunc.html#ifnull" }
+      ],
+      "videos": [
+        {
+          "title": "Functions for missing values",
+          "url": "https://www.youtube.com/watch?v=X_cPXHV2NQ4"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

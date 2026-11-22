@@ -1,0 +1,38 @@
+{
+  "stations": [
+    {
+      "title": "Rosamund",
+      "say": "I need the month's visits.",
+      "note": "Friday afternoon, the accounts."
+    },
+    {
+      "title": "visits",
+      "text": "Every visit with its date, written as text.",
+      "note": "Months and years all mixed."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "gap": "Long chains of ORs",
+      "tasks": [
+        "Vaccines and tests",
+        "Every terrier",
+        "The month's visits",
+        "Other species"
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Month report",
+    "wrong": "by hand",
+    "why": "Clumsy rules",
+    "right": "ready"
+  },
+  "captions": [
+    "Rosamund does the accounts on Fridays and needs the month's visits for her report.",
+    "Writing a long chain of conditions for every day of a month is slow and easy to get wrong.",
+    "You test lists, patterns and ranges with IN, LIKE and BETWEEN, in four tasks.",
+    "Now one short condition picks out the month's visits, first and last day included.",
+    "Same records, shorter questions. The report is ready before the kettle boils."
+  ]
+}

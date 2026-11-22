@@ -1,0 +1,109 @@
+{
+  "id": "choosing-columns",
+  "title": "Choosing columns",
+  "files": [
+    "queries/1-names-and-species.sql",
+    "queries/2-phone-list.sql",
+    "queries/3-full-names.sql",
+    "queries/4-weight-in-grams.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-names-and-species.sql"
+  },
+  "tasks": [
+    {
+      "id": "names-and-species",
+      "title": "List names and species",
+      "file": "queries/1-names-and-species.sql",
+      "description": "Winnie wants a short list of the animals: what each one is called and what it is.\n\nIn `queries/1-names-and-species.sql`, return two columns from `animals`, in this order:\n\n- `name`\n- `species`\n\nEvery animal, in any order of rows. Check compares the column names and their order, and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Look up the two columns in the `animals` table in `schema.sql`.",
+        "List them after `SELECT`, in the order the task gives.",
+        "Run the file and read the first line of the output: the column names.",
+        "Make sure there are exactly two columns."
+      ],
+      "hints": [
+        "The lesson's part \"Naming the columns you want\" shows a query that picks two columns.",
+        "Columns come back in the order you list them, and a comma goes between each two.",
+        "The query has the shape `SELECT first_column, second_column FROM table_name;`."
+      ],
+      "docs": [
+        { "title": "SELECT: the result columns", "url": "https://www.sqlite.org/lang_select.html#resultset" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "phone-list",
+      "title": "Make the phone list",
+      "file": "queries/2-phone-list.sql",
+      "description": "Winnie phones owners every day, and the practice's paper cards say \"surname\", not \"last name\".\n\nIn `queries/2-phone-list.sql`, return three columns from `owners`, in this order:\n\n- `first_name`\n- `surname`: the `last_name` column under a new name\n- `phone`\n\nEvery owner, in any order of rows. Check compares the column names and their order, and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write the three columns from `owners` that hold these facts.",
+        "Give the middle one its new name.",
+        "Run the file and check that the header line reads exactly as the task lists it."
+      ],
+      "hints": [
+        "The table does not change. Only the result calls the column something else.",
+        "`AS` after a column gives it a new name in the result.",
+        "The middle column is written `last_name AS surname`."
+      ],
+      "docs": [
+        { "title": "SELECT: the result columns", "url": "https://www.sqlite.org/lang_select.html#resultset" }
+      ],
+      "videos": [
+        {
+          "title": "Giving columns new names with AS",
+          "url": "https://www.youtube.com/watch?v=ngPeJ06f4-A"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "full-names",
+      "title": "Put full names together",
+      "file": "queries/3-full-names.sql",
+      "description": "For the reminder letters, Winnie wants each owner's name in one piece.\n\nIn `queries/3-full-names.sql`, return two columns from `owners`, in this order:\n\n- `owner`: the first name, one space, then the last name, as one piece of text\n- `town`\n\nEvery owner, in any order of rows. Check compares the column names and their order, and the rows, letter for letter, on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write the query with just `first_name` and `town` first, and run it.",
+        "Join the last name on to the first name.",
+        "Add the space between them, then name the column.",
+        "Run it and read a name: is there exactly one space in it?"
+      ],
+      "hints": [
+        "Joining text is done with an operator from the lesson's part \"Working out a column\".",
+        "SQLite joins pieces of text exactly as they are and adds no space of its own. A space you add is text, so it goes in single quotes.",
+        "The column has the shape `a || ' ' || b AS owner`, with the two name columns in place of `a` and `b`."
+      ],
+      "docs": [
+        { "title": "SQL operators, including ||", "url": "https://www.sqlite.org/lang_expr.html#operators_and_parse_affecting_attributes" },
+        { "title": "Double quotes in SQLite", "url": "https://www.sqlite.org/quirks.html#double_quoted_string_literals_are_accepted" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "weight-in-grams",
+      "title": "Show weights in grams",
+      "file": "queries/4-weight-in-grams.sql",
+      "description": "The scales in the small animals room show grams, so Ifan wants the weights that way.\n\nIn `queries/4-weight-in-grams.sql`, return two columns from `animals`, in this order:\n\n- `name`\n- `weight_g`: the animal's `weight_kg` worked out in grams (1 kilogram is 1000 grams)\n\nEvery animal, in any order of rows. An animal with no weight shows `NULL`. Check compares the column names and their order, and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write the query with `name` and `weight_kg` and run it.",
+        "Turn the weight in kilograms into grams in the query itself.",
+        "Give the worked-out column its name.",
+        "Check Biscuit's row: his weight in grams should be his kilograms times a thousand."
+      ],
+      "hints": [
+        "A column in the result can be worked out from a stored column with arithmetic.",
+        "Grams are kilograms times 1000, and `*` means times. A worked-out column needs a name, or it is called by its formula.",
+        "The column has the shape `weight_kg * number AS weight_g`."
+      ],
+      "docs": [
+        { "title": "SQL expressions", "url": "https://www.sqlite.org/lang_expr.html" },
+        { "title": "SELECT: the result columns", "url": "https://www.sqlite.org/lang_select.html#resultset" }
+      ],
+      "points": 10
+    }
+  ]
+}

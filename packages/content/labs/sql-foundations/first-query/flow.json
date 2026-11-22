@@ -1,0 +1,231 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "animals",
+        "label": "animals",
+        "kind": "data"
+      },
+      {
+        "id": "owners",
+        "label": "owners",
+        "kind": "data"
+      },
+      {
+        "id": "visits",
+        "label": "visits",
+        "kind": "data"
+      },
+      {
+        "id": "q1",
+        "label": "1-every-animal.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q2",
+        "label": "2-every-owner.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q3",
+        "label": "3-fix-the-query.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "winnie",
+        "label": "Winnie",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "animals",
+        "to": "q1",
+        "label": "rows"
+      },
+      {
+        "from": "owners",
+        "to": "q2",
+        "label": "rows"
+      },
+      {
+        "from": "visits",
+        "to": "q3",
+        "label": "rows"
+      },
+      {
+        "from": "q1",
+        "to": "winnie",
+        "label": "every animal"
+      },
+      {
+        "from": "q2",
+        "to": "winnie",
+        "label": "every owner"
+      },
+      {
+        "from": "q3",
+        "to": "winnie",
+        "label": "every visit"
+      }
+    ],
+    "note": "Three queries read three tables whole and put the practice's records on Winnie's screen."
+  },
+  "tasks": {
+    "every-animal": {
+      "steps": [
+        {
+          "active": [
+            "animals"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "one row of animals",
+            "colLabels": [
+              "id",
+              "owner_id",
+              "name",
+              "species",
+              "breed",
+              "born",
+              "weight_kg"
+            ],
+            "cells": [
+              [
+                "an id",
+                "an owner's id",
+                "a name",
+                "a species",
+                "a breed or NULL",
+                "a date or NULL",
+                "a weight or NULL"
+              ]
+            ]
+          },
+          "note": "The animals table holds one row per animal and one column per fact about it."
+        },
+        {
+          "active": [
+            "animals",
+            "animals->q1",
+            "q1"
+          ],
+          "note": "Your query asks for every column and names the table to read."
+        },
+        {
+          "active": [
+            "q1",
+            "q1->winnie",
+            "winnie"
+          ],
+          "note": "Every row comes back, with the column names on top, so Winnie can look up any animal by name."
+        }
+      ]
+    },
+    "every-owner": {
+      "steps": [
+        {
+          "active": [
+            "owners"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "one row of owners",
+            "colLabels": [
+              "id",
+              "first_name",
+              "last_name",
+              "phone",
+              "email",
+              "town"
+            ],
+            "cells": [
+              [
+                "an id",
+                "a first name",
+                "a last name",
+                "a phone number",
+                "an email or NULL",
+                "a town"
+              ]
+            ]
+          },
+          "note": "The owners table holds the people behind the animals."
+        },
+        {
+          "active": [
+            "owners",
+            "owners->q2",
+            "q2"
+          ],
+          "note": "The same kind of query as before, pointed at another table."
+        },
+        {
+          "active": [
+            "q2",
+            "q2->winnie",
+            "winnie"
+          ],
+          "note": "Winnie sees every owner. Where nobody recorded an email, the cell shows NULL."
+        }
+      ]
+    },
+    "fix-the-query": {
+      "steps": [
+        {
+          "active": [
+            "q3"
+          ],
+          "note": "Ifan's query does not run. SQLite stops at the first word it cannot read and says where."
+        },
+        {
+          "active": [
+            "q3"
+          ],
+          "note": "Each fix lets SQLite get a little further, until the next error or until rows come back."
+        },
+        {
+          "active": [
+            "visits",
+            "visits->q3",
+            "q3"
+          ],
+          "note": "Once every word is right and the table name matches the schema, the query reads the visits table."
+        },
+        {
+          "active": [
+            "q3",
+            "q3->winnie",
+            "winnie"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "id",
+              "animal_id",
+              "visit_date",
+              "vet",
+              "reason",
+              "notes"
+            ],
+            "cells": [
+              [
+                "an id",
+                "an animal's id",
+                "a date",
+                "a vet",
+                "a reason",
+                "notes or NULL"
+              ]
+            ]
+          },
+          "note": "Winnie gets every visit, every column."
+        }
+      ]
+    }
+  }
+}

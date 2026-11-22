@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Winnie",
+      "say": "Who have we no email for?",
+      "note": "The reminders go by email now."
+    },
+    {
+      "title": "owners",
+      "text": "Some cells were never filled in.",
+      "note": "They show NULL."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "file": "1-no-email.sql",
+      "gap": "Empty cells go missing",
+      "tasks": [
+        "Owners with no email",
+        "Visits with notes",
+        "Dogs, not Labradors",
+        "One contact list"
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Reminders",
+    "wrong": "rows lost",
+    "why": "Empty cells",
+    "right": "everyone"
+  },
+  "captions": [
+    "Winnie needs every owner the practice has no email for, so she can phone them.",
+    "Comparing with an empty cell is never true, so those owners quietly drop out.",
+    "You find, keep and fill the empty cells, in four tasks.",
+    "Now every owner without an email is on Winnie's list, and nobody is lost.",
+    "Same records, gaps and all. Every reminder reaches someone."
+  ]
+}
