@@ -1,0 +1,102 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "effie", "label": "Effie", "kind": "story" },
+      { "id": "subscriber", "label": "Subscriber", "kind": "data" },
+      { "id": "tests", "label": "weekly.test.js", "kind": "file", "mine": true },
+      { "id": "code", "label": "weeklyBox()", "kind": "function" },
+      { "id": "terminal", "label": "Test names", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "subscriber", "to": "tests", "label": "one rule on" },
+      { "from": "tests", "to": "code", "label": "subscriber, week" },
+      { "from": "code", "to": "terminal", "label": "pass or fail" },
+      { "from": "terminal", "to": "effie", "label": "which rule" }
+    ],
+    "note": "Each test switches on one rule of a subscription, so when a rule breaks the failing test's name tells Effie which one."
+  },
+  "tasks": {
+    "pause": {
+      "steps": [
+        {
+          "active": ["subscriber", "subscriber->tests"],
+          "value": {
+            "kind": "map",
+            "label": "a subscriber",
+            "entries": [
+              { "key": "every", "value": "week" },
+              { "key": "pausedWeeks", "value": "one week" },
+              { "key": "sizeChanges", "value": "none" }
+            ]
+          },
+          "note": "A weekly subscriber with one paused week and nothing else switched on."
+        },
+        {
+          "active": ["tests", "tests->code", "code"],
+          "note": "The test asks weeklyBox for that paused week."
+        },
+        {
+          "active": ["code", "code->terminal", "terminal", "terminal->effie", "effie"],
+          "note": "If pauses ever break, a test named for pauses fails, and Effie knows where to look."
+        }
+      ]
+    },
+    "fortnight": {
+      "steps": [
+        {
+          "active": ["subscriber", "subscriber->tests"],
+          "value": {
+            "kind": "map",
+            "label": "a subscriber",
+            "entries": [
+              { "key": "every", "value": "fortnight" },
+              { "key": "pausedWeeks", "value": "none" },
+              { "key": "sizeChanges", "value": "none" }
+            ]
+          },
+          "note": "A fortnightly subscriber with no pauses and no size changes."
+        },
+        {
+          "active": ["tests", "tests->code", "code"],
+          "note": "The test asks for an odd week, when a fortnightly box should not come."
+        },
+        {
+          "active": ["code", "code->terminal", "terminal"],
+          "note": "Its name says fortnightly, so its failure would name the rule."
+        }
+      ]
+    },
+    "change": {
+      "steps": [
+        {
+          "active": ["subscriber", "subscriber->tests"],
+          "note": "A weekly subscriber who wants a different size for one week only."
+        },
+        {
+          "active": ["tests", "tests->code", "code"],
+          "note": "The test asks for the week with the change, and for the week after it."
+        },
+        {
+          "active": ["code", "code->terminal", "terminal"],
+          "note": "The changed week gets the new size and the next week the usual one."
+        }
+      ]
+    },
+    "one-rule": {
+      "steps": [
+        {
+          "active": ["tests"],
+          "note": "Lorcan's test switches on every rule at once and checks them all."
+        },
+        {
+          "active": ["code", "code->terminal", "terminal"],
+          "note": "When any one rule breaks, it fails, and its name does not say which rule."
+        },
+        {
+          "active": ["terminal", "terminal->effie", "effie"],
+          "note": "With one rule per test, only the tests for the broken rule fail, and their names tell Effie."
+        }
+      ]
+    }
+  }
+}

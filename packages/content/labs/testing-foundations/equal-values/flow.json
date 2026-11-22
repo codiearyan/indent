@@ -1,0 +1,104 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wendell", "label": "Wendell", "kind": "story" },
+      { "id": "tests", "label": "boxes.test.js", "kind": "file", "mine": true },
+      { "id": "boxes", "label": "boxes.js", "kind": "file" },
+      { "id": "answer", "label": "Lists and slips", "kind": "data" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "wendell", "to": "tests", "label": "what goes in" },
+      { "from": "tests", "to": "boxes", "label": "calls" },
+      { "from": "boxes", "to": "answer", "label": "gives back" },
+      { "from": "answer", "to": "terminal", "label": "compared" }
+    ],
+    "note": "Your tests call boxes.js and compare the whole list or slip it gives back, not just its length or one field."
+  },
+  "tasks": {
+    "contents": {
+      "steps": [
+        {
+          "active": ["wendell", "wendell->tests"],
+          "note": "Wendell packs a medium box from its list, heaviest first, so every item and its place matter."
+        },
+        {
+          "active": ["tests", "tests->boxes", "boxes", "boxes->answer", "answer"],
+          "value": { "kind": "array", "label": "a medium box", "values": ["item", "item", "item", "item", "item", "item"] },
+          "note": "Your test asks boxContents for a medium box and gets a brand new list back."
+        },
+        {
+          "active": ["answer", "answer->terminal", "terminal"],
+          "note": "The test compares what is inside that list, item by item, with the list you expect."
+        }
+      ]
+    },
+    "slip": {
+      "steps": [
+        {
+          "active": ["wendell", "wendell->tests"],
+          "value": {
+            "kind": "map",
+            "label": "Cora's order",
+            "entries": [
+              { "key": "customer", "value": "Cora Pellow" },
+              { "key": "size", "value": "medium" },
+              { "key": "dozens", "value": "2" }
+            ]
+          },
+          "note": "Cora Pellow's order goes into packingSlip."
+        },
+        {
+          "active": ["boxes", "boxes->answer", "answer"],
+          "value": {
+            "kind": "map",
+            "label": "the slip",
+            "entries": [
+              { "key": "customer", "value": "text" },
+              { "key": "size", "value": "text" },
+              { "key": "items", "value": "a list" },
+              { "key": "eggs", "value": "a number" }
+            ]
+          },
+          "note": "A slip comes back with four fields, and one of them is a whole list."
+        },
+        {
+          "active": ["answer", "answer->terminal", "terminal"],
+          "note": "One check compares every field, so missing eggs or the wrong items cannot slip through."
+        }
+      ]
+    },
+    "weighed": {
+      "steps": [
+        {
+          "active": ["tests", "tests->boxes", "boxes"],
+          "note": "A customer at the farm gate buys 0.7 kilos of apples."
+        },
+        {
+          "active": ["boxes", "boxes->answer", "answer"],
+          "note": "The price comes back as a decimal, a hair above or below the exact pennies."
+        },
+        {
+          "active": ["answer", "answer->terminal", "terminal"],
+          "note": "Your test compares it to the penny and lets the tiny binary error go."
+        }
+      ]
+    },
+    "swap": {
+      "steps": [
+        {
+          "active": ["wendell", "wendell->tests"],
+          "note": "A customer swaps kale for chard, and Wendell still packs other boxes from the same list."
+        },
+        {
+          "active": ["tests", "tests->boxes", "boxes", "boxes->answer", "answer"],
+          "note": "swapItem gives back a list with the swap made."
+        },
+        {
+          "active": ["answer", "answer->terminal", "terminal"],
+          "note": "Your test checks the new list, and also that the list it started with is unchanged."
+        }
+      ]
+    }
+  }
+}
