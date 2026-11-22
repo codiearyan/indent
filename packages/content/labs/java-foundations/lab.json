@@ -7,6 +7,7 @@
   "tags": ["Java"],
   "kind": "foundations",
   "tools": ["node", "java"],
+  "format": 4,
   "parts": [
     {
       "title": "The clipboard at the ticket hut",
