@@ -105,6 +105,9 @@ export const checks = {
     if (!window) {
       return fail(`window-display is gone, and Femi's commit with it. Wilma has not decided about it yet, so it had to stay. ${START_OVER}`)
     }
+    if (isAncestor(git, window, main)) {
+      return fail(`window-display is merged into main, so its change is on the site. Wilma has not decided about it yet, so it had to stay on its own branch. ${START_OVER}`)
+    }
     const lost = [['summer-sale', sale], ['reading-group', group]].filter(([, tip]) => !isAncestor(git, tip, main))
     const left = ['summer-sale', 'reading-group'].filter((branch) => tipOf(git, branch))
     if (lost.length) {
