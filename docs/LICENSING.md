@@ -17,9 +17,6 @@ Commercial use needs a separate license: write to codiearyan07@gmail.com.
   `packages/content/labs/`: the Zero-Clause BSD license below. What you build from it is yours,
   for any use, with nothing to credit.
 
-Versions published before this change were released under the GNU General Public License,
-version 3, and stay available under it.
-
 ## Who uses it free and who pays
 
 Free:
