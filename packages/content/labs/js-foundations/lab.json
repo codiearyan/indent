@@ -38,8 +38,7 @@
         "shelf-list",
         "without-breaking",
         "new-from-old",
-        "sort-and-search",
-        "order-reports"
+        "sort-and-search"
       ]
     },
     {
@@ -50,7 +49,8 @@
         "taking-cards-apart",
         "copies-and-originals",
         "maps-and-sets",
-        "saving-the-catalogue"
+        "saving-the-catalogue",
+        "order-reports"
       ]
     },
     {
