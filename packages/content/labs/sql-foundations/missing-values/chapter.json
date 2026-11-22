@@ -102,12 +102,7 @@
         { "title": "coalesce()", "url": "https://www.sqlite.org/lang_corefunc.html#coalesce" },
         { "title": "ifnull()", "url": "https://www.sqlite.org/lang_corefunc.html#ifnull" }
       ],
-      "videos": [
-        {
-          "title": "Functions for missing values",
-          "url": "https://www.youtube.com/watch?v=X_cPXHV2NQ4"
-        }
-      ],
+      "videos": [],
       "points": 10
     }
   ]
