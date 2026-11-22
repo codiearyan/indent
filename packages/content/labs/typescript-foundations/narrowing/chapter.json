@@ -11,7 +11,7 @@
       "id": "refs",
       "title": "Tidy a ref of either kind",
       "file": "src/packing.ts",
-      "description": "Under `// Task 1` in `src/packing.ts`, `refLabel` takes a `Ref`: a number or text. For a number, it should give `'OK-'` and the number with zeros in front to make four digits: `977` gives `'OK-0977'`. For text, it should give the text without spaces at either end, in capitals: `' ok-1042 '` gives `'OK-1042'`. Rafe tells them apart by asking for a length, and the compiler refuses that. Check which kind `ref` is in a way the compiler understands, and leave the first line of the function as it is.\n\nCheck refuses `as` in your lines, and reads `refLabel` for its result type. It compiles calls of its own: refs of both kinds must compile, while true or false, or a label used as a number, must be refused. It calls `refLabel` with numbers and text of its own.",
+      "description": "Under `// Task 1` in `src/packing.ts`, `refLabel` takes a `Ref`: a number or text. For a number, it should give `'OK-'` and the number with zeros in front to make four digits: `977` gives `'OK-0977'`. For text, it should give the text without spaces at either end, in capitals: `' ok-1042 '` gives `'OK-1042'`. Rafe tells them apart by asking for a length, and the compiler refuses that. Check which kind `ref` is in a way the compiler understands, and leave the first line of the function as it is.\n\nCheck refuses `as` and a `!` after a value in your lines, and reads `refLabel` for its result type. It compiles calls of its own: refs of both kinds must compile, while true or false, or a label used as a number, must be refused. It calls `refLabel` with numbers and text of its own.",
       "nextSteps": [
         "Run `npm run types` and read the two errors for the body: which member of `Ref` is in the way?",
         "Replace Rafe's check with one that asks which type `ref` holds.",
@@ -45,7 +45,7 @@
       "id": "count",
       "title": "Count tins or a sampler",
       "file": "src/packing.ts",
-      "description": "Under `// Task 2`, `lineCount` takes a `TinLine` or a `SamplerLine`, from the top of the file. It should give the number of things Bryn packs: the `tins` of a tin line, and the number of blends in the `samples` of a sampler. The compiler refuses Rafe's body. Check which shape the line has before reading from it, and leave the first line of the function as it is.\n\nCheck refuses `as` in your lines, and reads `lineCount` for its result type. It compiles calls of its own: a tin line and a sampler must compile, while a tin line without its tins, an empty object or a count used as text must be refused. It calls `lineCount` with lines of its own, an empty sampler among them.",
+      "description": "Under `// Task 2`, `lineCount` takes a `TinLine` or a `SamplerLine`, from the top of the file. It should give the number of things Bryn packs: the `tins` of a tin line, and the number of blends in the `samples` of a sampler. The compiler refuses Rafe's body. Check which shape the line has before reading from it, and leave the first line of the function as it is.\n\nCheck refuses `as` and a `!` after a value in your lines, and reads `lineCount` for its result type. It compiles calls of its own: a tin line and a sampler must compile, while a tin line without its tins, an empty object or a count used as text must be refused. It calls `lineCount` with lines of its own, an empty sampler among them.",
       "nextSteps": [
         "Run `npm run types` and read the errors for the body.",
         "Ask whether the line has a property only one of the two shapes has.",
@@ -73,7 +73,7 @@
       "id": "shelf",
       "title": "Tell not counted from sold out",
       "file": "src/packing.ts",
-      "description": "Under `// Task 3`, `shelfLine` takes the tins on a shelf: a number once Bryn has counted them, or `null` before. It should give `'Not counted'` for `null`, `'Sold out'` for `0`, and `'12 tins'` for `12`. The compiler refuses Rafe's body, and it gives `'Sold out'` for a shelf nobody counted. Make it give each of the three, and leave the first line of the function as it is.\n\nCheck refuses `as` in your lines, and reads `shelfLine` for its result type. It compiles calls of its own: a count and `null` must compile, while a count as text or `undefined` must be refused. It calls `shelfLine` with `null`, `0` and counts of its own.",
+      "description": "Under `// Task 3`, `shelfLine` takes the tins on a shelf: a number once Bryn has counted them, or `null` before. It should give `'Not counted'` for `null`, `'Sold out'` for `0`, and `'12 tins'` for `12`. The compiler refuses Rafe's body, and it gives `'Sold out'` for a shelf nobody counted. Make it give each of the three, and leave the first line of the function as it is.\n\nCheck refuses `as` and a `!` after a value in your lines, and reads `shelfLine` for its result type. It compiles calls of its own: a count and `null` must compile, while a count as text or `undefined` must be refused. It calls `shelfLine` with `null`, `0` and counts of its own.",
       "nextSteps": [
         "Run `npm run types` and read the error for the comparison.",
         "Decide what `null` should give, and check for it before the comparison.",
@@ -105,7 +105,7 @@
       "id": "delivery",
       "title": "Write the delivery line whole",
       "file": "src/packing.ts",
-      "description": "Under `// Task 4`, write a function called `deliveryLine`, with `export` in front, from the word `function` to its closing brace. It takes a `Delivery`, from the top of the file, and gives back text:\n\n- post: `'Post to '` and the address\n- locker: `'Locker '` and the locker number\n- collect: `'Collect at the shop'`\n\nWrite its result type. Write it so that if a fourth kind is ever added to `Delivery`, the compiler refuses `deliveryLine` until it handles the new kind: the lesson shows two ways. Then take away the `//` in front of the lines at the end, to see it run.\n\nCheck refuses `as` in your lines, and reads `deliveryLine` for its result type. It compiles calls of its own: a delivery of each kind must compile, while a kind the shop does not have, a post delivery without its address or a line used as a number must be refused. Then it adds a fourth kind to `Delivery`, and your function must no longer compile. It calls `deliveryLine` with a delivery of each kind.",
+      "description": "Under `// Task 4`, write a function called `deliveryLine`, with `export` in front, from the word `function` to its closing brace. It takes a `Delivery`, from the top of the file, and gives back text:\n\n- post: `'Post to '` and the address\n- locker: `'Locker '` and the locker number\n- collect: `'Collect at the shop'`\n\nWrite its result type. Write it so that if a fourth kind is ever added to `Delivery`, the compiler refuses `deliveryLine` until it handles the new kind: the lesson shows two ways. Then take away the `//` in front of the lines at the end, to see it run.\n\nCheck refuses `as` and a `!` after a value in your lines, and reads `deliveryLine` for its result type. It compiles calls of its own: a delivery of each kind must compile, while a kind the shop does not have, a post delivery without its address or a line used as a number must be refused. Then it adds a fourth kind to `Delivery`, and your function must no longer compile. It calls `deliveryLine` with a delivery of each kind.",
       "nextSteps": [
         "Write the first line: the name, a parameter of type `Delivery`, and the result type.",
         "Branch on `kind`, and give back each kind's line from what that kind has.",
@@ -114,7 +114,7 @@
       ],
       "hints": [
         "Inside a branch for one kind, the compiler knows the delivery is that shape, so it lets you read the property only that shape has.",
-        "A `default` that gives back a line, or a last `return` after the branches, also catches a kind added later, without a word. With a `case` for every kind and no `default`, the result type does the checking.",
+        "A `default` or a last `return` that gives back a line also catches a kind added later, without a word. With a `case` for every kind and no `default`, the result type does the checking.",
         "`export function deliveryLine(delivery: Delivery): string {`, then `switch (delivery.kind) {` with `case 'post': return ...` for each of the three kinds, and no `default`."
       ],
       "docs": [

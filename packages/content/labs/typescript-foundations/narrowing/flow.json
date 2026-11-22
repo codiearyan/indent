@@ -81,7 +81,7 @@
         },
         {
           "active": ["count"],
-          "note": "The function asks whether the line has samples, without reading them. Inside that branch, it is a sampler."
+          "note": "The function finds out which shape the line has. In the branch for a sampler, the compiler lets it read the samples."
         },
         {
           "active": ["count", "count->table", "table"],
@@ -103,7 +103,7 @@
         },
         {
           "active": ["shelf"],
-          "note": "The function asks for null first, and only then compares the count as a number."
+          "note": "The function tells a shelf nobody counted from a count. Only where the count is a number does the compiler let it compare."
         },
         {
           "active": ["shelf"],

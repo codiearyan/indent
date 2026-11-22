@@ -15,7 +15,7 @@
       "nextSteps": [
         "Write a union of the two types after the parameter of `refLine`, and its result type after the round brackets.",
         "Write the type of `todaysRefs` after its name: a list of that union.",
-        "If the compiler says a list is not assignable to `number[]`, read the lesson's part on brackets.",
+        "If the compiler refuses an entry of the list, or says the list is not assignable, read the lesson's part on brackets.",
         "Run both commands again."
       ],
       "hints": [

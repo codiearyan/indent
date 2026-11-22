@@ -12,6 +12,7 @@ export const checks = {
       file: FILE,
       task: 1,
       results: ['refLabel'],
+      nonNull: true,
       uses: 'grader/types/refs.uses.ts',
       misuse: 'grader/types/refs.misuse.ts',
       messages: {
@@ -33,6 +34,7 @@ export const checks = {
       file: FILE,
       task: 2,
       results: ['lineCount'],
+      nonNull: true,
       uses: 'grader/types/count.uses.ts',
       misuse: 'grader/types/count.misuse.ts',
       messages: {
@@ -53,6 +55,7 @@ export const checks = {
       file: FILE,
       task: 3,
       results: ['shelfLine'],
+      nonNull: true,
       uses: 'grader/types/shelf.uses.ts',
       misuse: 'grader/types/shelf.misuse.ts',
       messages: {
@@ -94,6 +97,7 @@ export const checks = {
       file: FILE,
       task: 4,
       results: ['deliveryLine'],
+      nonNull: true,
       uses: 'grader/types/delivery.uses.ts',
       misuse: 'grader/types/delivery.misuse.ts',
       grow: {

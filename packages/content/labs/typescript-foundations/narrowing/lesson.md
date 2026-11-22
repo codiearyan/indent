@@ -37,7 +37,7 @@ error TS2339: Property 'length' does not exist on type 'string | number'.
   Property 'length' does not exist on type 'number'.
 ```
 
-Watch one trap: `typeof null` is `'object'`, so `typeof` cannot tell an object from `null`.
+Watch two traps. `typeof null` is `'object'`, so `typeof` cannot tell an object from `null`. And a list is an object too: `typeof` never gives `'array'`, and a comparison with a word it never gives is refused, `This comparison appears to be unintentional because the types ... have no overlap`.
 
 ## Narrowing with in
 
@@ -68,6 +68,8 @@ error TS18047: 'count' is possibly 'null'.
 ```
 
 A **truthiness check**, `if (note)` or `if (!note)`, narrows away `null` and `undefined` as well. It also treats `0`, `''` and `false` as missing, because they are falsy in JavaScript. For an optional note, where an empty note is no note, that is what you want. For a count, where `0` is a real answer, it is a bug: the compiler is happy, and the code gives the "not counted" line for an empty shelf. Ask for exactly the value you mean.
+
+You may have seen a `!` after a value, as in `count! > 0`. It tells the compiler the value is not `null` or `undefined` without checking, so the error goes and the bug stays. Like `as`, Check does not accept it in this issue.
 
 ## A switch over kinds
 
@@ -105,4 +107,4 @@ error TS2322: Type '{ kind: "loaf"; }' is not assignable to type 'never'.
 
 ## Your work in this issue
 
-Open `src/packing.ts`. The types at the top are shared by every task; leave them as they are. Tidy a ref of either kind, count tins or a sampler, tell a shelf nobody counted from an empty one, and write the delivery line whole. Run `npm run types` and `node src/packing.ts` after each change. Check uses your functions with values of its own, and does not accept `as` in place of a check.
+Open `src/packing.ts`. The types at the top are shared by every task; leave them as they are. Tidy a ref of either kind, count tins or a sampler, tell a shelf nobody counted from an empty one, and write the delivery line whole. Run `npm run types` and `node src/packing.ts` after each change. Check uses your functions with values of its own, and does not accept `as` or `!` in place of a check.

@@ -46,6 +46,8 @@ const trays: string | number[] = [4, 'B']
 src/trays.ts:7:7 - error TS2322: Type '(string | number)[]' is not assignable to type 'string | number[]'.
 ```
 
+Written the other way round, `number | string[]`, the same mistake gets a shorter message that points at one entry of the list: `Type 'number' is not assignable to type 'string'`. The compiler took the list part of the union, `string[]`, and found a number in it.
+
 ## Exact words as types
 
 A word in quotes can be a type: the type that allows exactly that text and nothing else. A union of them is a list of allowed words:
@@ -81,6 +83,8 @@ type BakeOrder =
 
 const order: BakeOrder = { kind: 'cake' }
 ```
+
+A long union is often written one member to a line, with a `|` in front of each, the first one included. The compiler reads it the same way.
 
 A value fits when it fits one shape whole: its kind, and what that kind needs. The cake above has no message:
 

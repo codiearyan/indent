@@ -31,7 +31,8 @@ console.log('Label:', lineLabel({ blend: 'Hearth Assam', tins: 3, gramsPerTin: 1
 // Task 2: A customer, as an interface
 // Write an interface called Customer, with export in front: a name (text), an email (text) and a
 // phone number (text) that a customer may leave out. Then use it as the type of the parameter of
-// contactLine and of firstCustomer, and write the result type of contactLine. Like this:
+// contactLine and as the type of firstCustomer, and write the result type of contactLine.
+// Like this:
 // Contact: Ottoline Marsh, ottoline@example.com
 // Contact: Wren Ashby, wren@example.com, 01632 960184
 export interface Customer {

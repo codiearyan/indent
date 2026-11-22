@@ -5,5 +5,5 @@ const paid: Status = 'paid'
 const packed: Status = 'packed'
 const sent: Status = 'sent'
 // What comes back is one of the three words too, not any text
-const next: 'paid' | 'packed' | 'sent' = nextStatus(paid)
-const again: Status = nextStatus(nextStatus(packed))
+const next: 'paid' | 'packed' | 'sent' = nextStatus('paid')
+const again: Status = nextStatus(nextStatus('packed'))

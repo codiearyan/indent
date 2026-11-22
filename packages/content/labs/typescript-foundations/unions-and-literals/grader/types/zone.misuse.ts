@@ -5,5 +5,5 @@ zoneFee('Local')
 // @ts-expect-error: a zone the courier does not know is refused
 const moon: Zone = 'moon'
 const typed: string = 'local'
-// @ts-expect-error: any text at all is too wide to be a Zone
+// @ts-expect-error: typed is any text, a string, and that is too wide to be a Zone
 zoneFee(typed)

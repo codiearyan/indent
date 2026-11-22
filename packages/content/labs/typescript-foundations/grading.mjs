@@ -154,6 +154,15 @@ function silencers(section, whole) {
   return { found, comments, fileOff }
 }
 
+/** The lines of the section with a `!` after a value: `count!` or `line.samples!.length`. */
+function nonNullAssertions(section) {
+  return codeOnly(section.text)
+    .split('\n')
+    .flatMap((line, i) =>
+      /[\w$)\]]!(?!=)/.test(line) ? [`line ${section.start + i + 1}: ${section.lines[i].trim()}`] : []
+    )
+}
+
 function explainOwn(errors, lines) {
   return errors
     .map(
@@ -201,6 +210,7 @@ const pass = (name, output) => ({ name, passed: true, output })
  *   or the declaration of type `where` must use `type` by its name
  * - grow: { type, member, name, message }: with `member` added to the union `type` of the shared
  *   lines, the compiler must refuse a line of the task
+ * - nonNull: true refuses `!` after a value, for a task about checking a value before using it
  */
 export async function judge(t, spec) {
   const { file, task } = spec
@@ -342,6 +352,16 @@ export async function judge(t, spec) {
         `${label} uses real types`,
         `The word any, or a value followed by as and a type, tells the compiler to stop checking that value. It hides mistakes instead of catching them, so Check does not accept it here. Write a real type and let the compiler check it.`,
         off.found.join('\n')
+      )
+    )
+  }
+  const asserted = spec.nonNull ? nonNullAssertions(section) : []
+  if (asserted.length) {
+    details.push(
+      fail(
+        `${label} checks before it uses a value`,
+        `A ! after a value tells the compiler the value is not null or undefined, without checking it. It hides the case this task is about, so Check does not accept it here. Check the value in a way the compiler follows, as the lesson shows.`,
+        asserted.join('\n')
       )
     )
   }
@@ -600,7 +620,8 @@ function grow(lines, first, { type, member }) {
   const at = lines.findIndex((l, i) => i < first && re.test(l))
   if (at === -1) return null
   const [, head, rest] = re.exec(lines[at])
-  const next = rest.trim() ? rest : (lines.slice(at + 1).find((l) => l.trim() !== '') ?? '')
+  const code = (l) => codeOnly(l).trim()
+  const next = code(rest) ? rest : (lines.slice(at + 1).find((l) => code(l) !== '') ?? '')
   const kept = [...lines]
   kept[at] = `${head} ${member}${/^\s*\|/.test(next) ? '' : ' |'}${rest}`
   return kept.join('\n')
