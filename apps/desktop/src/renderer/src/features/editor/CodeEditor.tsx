@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { fontStack } from '@/lib/fonts'
 import { monacoShortcut, SHORTCUTS } from '@/lib/shortcuts'
 import { useSettings, type Typography } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { bindSuggestShortcut } from '@/features/ai/inlineSuggestions'
+import { SelectionAsk } from '@/features/ai/SelectionAsk'
 import { bindTutorActions } from '@/features/ai/tutorActions'
 import { TOUR } from '@/features/tour/anchors'
 import { registerEditor } from './editors'
@@ -29,6 +30,7 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
   const hostRef = useRef<HTMLDivElement>(null)
   const vimStatusRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null)
   const viewStates = useRef(new Map<string, monaco.editor.ICodeEditorViewState | null>())
   const files = useWorkspace((s) => s.files)
   const activePath = useWorkspace((s) => s.layout.groups[group]?.active ?? null)
@@ -57,6 +59,7 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
       renderLineHighlight: 'line'
     })
     editorRef.current = editor
+    setEditor(editor)
     const unregister = registerEditor(group, editor)
     editor.onDidFocusEditorWidget(() => useWorkspace.getState().focusGroup(group))
     bindShortcuts(editor, () => [
@@ -169,11 +172,10 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
 
   return (
     <div className="flex h-full min-w-0 flex-1 flex-col">
-      <div
-        ref={hostRef}
-        data-tour={group === 0 ? TOUR.editor : undefined}
-        className="min-h-0 flex-1"
-      />
+      <div className="relative min-h-0 flex-1">
+        <div ref={hostRef} data-tour={group === 0 ? TOUR.editor : undefined} className="h-full" />
+        <SelectionAsk editor={editor} />
+      </div>
       <div ref={vimStatusRef} hidden={!vim} className="vim-status" />
     </div>
   )

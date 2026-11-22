@@ -8,7 +8,8 @@ import {
   hintAttachment,
   MAX_CODE_CHARS,
   MAX_OUTPUT_CHARS,
-  taskForFile
+  taskForFile,
+  terminalAttachment
 } from './attachments'
 
 const task = (id: string, file: string): TaskDef => ({
@@ -96,5 +97,19 @@ describe('taskForFile', () => {
     expect(taskForFile(tasks, progress as never, 'two.js', true)?.number).toBe(3)
     expect(taskForFile(tasks, progress as never, 'other.js', true)?.number).toBe(1)
     expect(taskForFile(tasks, {}, 'two.js', true)).toBeNull()
+  })
+})
+
+describe('terminalAttachment', () => {
+  it('labels the lines and trims the end', () => {
+    expect(terminalAttachment('$ node demo.js\nError: boom\n\n')).toEqual({
+      kind: 'terminal',
+      label: 'Terminal, 2 lines',
+      text: '$ node demo.js\nError: boom'
+    })
+    expect(terminalAttachment('one line').label).toBe('Terminal, 1 line')
+    expect(terminalAttachment('x'.repeat(MAX_CODE_CHARS + 50)).text.length).toBeLessThan(
+      MAX_CODE_CHARS + 10
+    )
   })
 })

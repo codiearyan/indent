@@ -16,6 +16,9 @@ import { cn } from '@/lib/utils'
 import { useSettings, type Theme } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
+import { useAi } from '@/features/ai/aiStore'
+import { AskBar } from '@/features/ai/AskBar'
+import { askAboutOutput } from '@/features/ai/tutorActions'
 
 const REFRESH_QUIET_MS = 500
 // The terminal drops input that arrives with Ctrl+C, so the command waits for the shell.
@@ -68,6 +71,9 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
   const rootRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const termRef = useRef<{ term: Terminal; fit: FitAddon; id: string | null } | null>(null)
+  /** Text selected in the terminal, and where the mouse let go, for the ask bar. */
+  const [picked, setPicked] = useState<{ text: string; left: number; top: number } | null>(null)
+  const tutorOn = useAi((s) => !!s.config?.enabled && !!s.config.provider)
   const pendingCommand = useRef<string | null>(null)
 
   const connect = (command?: string): void => {
@@ -169,8 +175,39 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
         setStatus('idle')
       })
 
+    // The bar shows where the pointer let go of a selection; a click elsewhere clears it.
+    let pointer = { left: 0, top: 0 }
+    let downY = 0
+    const onPointerDown = (event: PointerEvent): void => {
+      downY = event.clientY - container.getBoundingClientRect().top
+    }
+    const onPointerUp = (event: PointerEvent): void => {
+      const box = container.getBoundingClientRect()
+      const x = event.clientX - box.left
+      // Above the first selected line, or below the last one near the top; never past the edge.
+      const first = Math.min(downY, event.clientY - box.top)
+      const last = Math.max(downY, event.clientY - box.top)
+      pointer = {
+        left: Math.max(4, Math.min(x, box.width - 340)),
+        top: Math.max(4, Math.min(first < 56 ? last + 16 : first - 48, box.height - 44))
+      }
+      setTimeout(() => {
+        const text = term.hasSelection() ? term.getSelection() : ''
+        setPicked(text.trim() ? { text, ...pointer } : null)
+      })
+    }
+    container.addEventListener('pointerdown', onPointerDown)
+    container.addEventListener('pointerup', onPointerUp)
+    const selection = term.onSelectionChange(() => {
+      if (!term.hasSelection()) setPicked(null)
+    })
+
     return () => {
       disposed = true
+      container.removeEventListener('pointerdown', onPointerDown)
+      container.removeEventListener('pointerup', onPointerUp)
+      selection.dispose()
+      setPicked(null)
       clearTimeout(refreshTimer)
       offData()
       offExit()
@@ -306,7 +343,27 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
           <div className="flex h-full flex-col">
             {/* The fit add-on sizes the terminal from its parent, padding included, so the padding sits outside it. */}
             <div className="min-h-0 flex-1 py-1 pl-3">
-              <div ref={containerRef} className="h-full overflow-hidden" />
+              <div className="relative h-full">
+                <div ref={containerRef} className="h-full overflow-hidden" />
+                {tutorOn && picked && (
+                  <AskBar
+                    left={picked.left}
+                    top={picked.top}
+                    actions={[
+                      {
+                        label: 'Explain this output',
+                        run: () => askAboutOutput(picked.text, 'What does this output mean?')
+                      }
+                    ]}
+                    onAsk={(question) => askAboutOutput(picked.text, question)}
+                    onClose={() => {
+                      setPicked(null)
+                      termRef.current?.term.clearSelection()
+                      termRef.current?.term.focus()
+                    }}
+                  />
+                )}
+              </div>
             </div>
             {status === 'exited' && (
               <div className="flex shrink-0 items-center gap-3 border-t border-border px-3 py-2 text-xs text-muted-foreground">

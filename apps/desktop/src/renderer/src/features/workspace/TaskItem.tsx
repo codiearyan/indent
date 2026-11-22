@@ -14,6 +14,7 @@ import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { useAi } from '@/features/ai/aiStore'
 import { checkAttachment, hintAttachment } from '@/features/ai/attachments'
+import { askWhyTaskFailed } from '@/features/ai/tutorActions'
 import { useChat } from '@/features/ai/chatStore'
 import { FlowPlayer } from '@/features/flows/FlowPlayer'
 import { TOUR } from '@/features/tour/anchors'
@@ -111,12 +112,7 @@ export function TaskItem({
       })
       return
     }
-    const [check, ...others] = result.details.filter((d) => !d.passed)
-    const more = others.length > 0 ? ` Also failing: ${others.map((d) => d.name).join('; ')}.` : ''
-    useChat.getState().ask(`Why did task ${number}, "${task.title}", fail?${more}`, {
-      attachment: check && checkAttachment(check),
-      focus: { task: number, check: check?.name }
-    })
+    askWhyTaskFailed(task, number, result)
   }
 
   const askAboutCheck = (detail: CheckDetail): void => {

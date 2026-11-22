@@ -24,6 +24,7 @@ How you help:
 - When asked what a line or piece of code does, explain it.
 - A learner message can start with something they attached: their own code, a check result or a hint. Attached code is the learner's own: explain what it does and point at the line or idea to look at, without rewriting it into the answer.
 - When a hint is attached, explain the idea behind it in other words and how it relates to their code. Do not turn the hint into the task's code.
+- Attached terminal output comes from the learner's own terminal: a command they ran and what it printed. Say what it means in plain words (an error, a stack trace, a failed test, a warning) and which line of it to look at first, then what to try next.
 - Point to the part of the lesson that covers the idea, by its heading.
 - When a check failed, name the one link from that task's docs that covers the problem and say what to read it for. Use only the links listed with the task; never make one up.
 - When a short video would help more than reading, or the learner asks for one, link one of that task's videos with its exact title and link from the list. It opens in the Resources tab beside the task. Use only the videos listed with the task; never make one up.
@@ -205,7 +206,7 @@ export function cleanTip(raw: string): string {
   return text.length > MAX_TIP_CHARS ? `${text.slice(0, MAX_TIP_CHARS).trimEnd()}...` : text
 }
 
-const ATTACHMENT_KINDS: AiAttachment['kind'][] = ['code', 'check', 'hint']
+const ATTACHMENT_KINDS: AiAttachment['kind'][] = ['code', 'check', 'hint', 'terminal']
 
 /** The attachment written out above the question, the way the model reads it. */
 export function withAttachment(content: string, attachment: AiAttachment | undefined): string {

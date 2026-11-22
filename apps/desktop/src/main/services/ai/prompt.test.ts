@@ -204,6 +204,19 @@ describe('attachments', () => {
     })
   })
 
+  it('writes terminal output out for the model, without a language', () => {
+    expect(
+      withAttachment('What does this mean?', {
+        kind: 'terminal',
+        label: 'Terminal, 2 lines',
+        text: '$ node demo.js\nTypeError: x is not a function',
+        language: 'js'
+      })
+    ).toBe(
+      'Attached terminal (Terminal, 2 lines):\n\n```\n$ node demo.js\nTypeError: x is not a function\n```\n\nWhat does this mean?'
+    )
+  })
+
   it('uses a longer fence when the text holds backticks', () => {
     const text = withAttachment('Why?', { kind: 'check', label: 'Check: md', text: 'a ``` b' })
     expect(text).toContain('````\na ``` b\n````')
