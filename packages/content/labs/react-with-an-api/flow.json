@@ -1,0 +1,55 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "visitor",
+        "label": "Visitor",
+        "kind": "story"
+      },
+      {
+        "id": "screen",
+        "label": "Sign-up screen",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "api",
+        "label": "Studio API",
+        "kind": "story"
+      },
+      {
+        "id": "desk",
+        "label": "Front desk",
+        "kind": "story"
+      },
+      {
+        "id": "week",
+        "label": "This week's workshops",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "visitor",
+        "to": "screen",
+        "label": "picks, books"
+      },
+      {
+        "from": "screen",
+        "to": "api",
+        "label": "requests"
+      },
+      {
+        "from": "desk",
+        "to": "api",
+        "label": "phone bookings"
+      },
+      {
+        "from": "api",
+        "to": "week",
+        "label": "reads, writes"
+      }
+    ],
+    "note": "You build the React screen where visitors see this week's workshops and book a place, talking to the studio's API while the front desk books places too."
+  }
+}

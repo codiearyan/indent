@@ -1,0 +1,153 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "open",
+        "label": "Screen opens",
+        "kind": "story"
+      },
+      {
+        "id": "app",
+        "label": "App.jsx",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "api",
+        "label": "Studio API",
+        "kind": "story"
+      },
+      {
+        "id": "list",
+        "label": "Workshop list",
+        "kind": "data"
+      },
+      {
+        "id": "cards",
+        "label": "WorkshopCard",
+        "kind": "file"
+      }
+    ],
+    "edges": [
+      {
+        "from": "open",
+        "to": "app",
+        "label": "first render"
+      },
+      {
+        "from": "app",
+        "to": "api",
+        "label": "GET request"
+      },
+      {
+        "from": "api",
+        "to": "list",
+        "label": "JSON answer"
+      },
+      {
+        "from": "list",
+        "to": "cards",
+        "label": "one card each"
+      }
+    ],
+    "note": "The screen asks the studio's API for this week's workshops once, when it opens, and draws what comes back."
+  },
+  "tasks": {
+    "ask-once": {
+      "steps": [
+        {
+          "active": ["open", "open->app", "app"],
+          "note": "A visitor opens the sign-up screen, and React draws it for the first time."
+        },
+        {
+          "active": ["app", "app->api", "api"],
+          "note": "Right after that first render, the screen asks the API for this week's workshops. Drawing it again later asks nothing."
+        },
+        {
+          "active": ["api", "api->list", "list"],
+          "value": {
+            "kind": "map",
+            "label": "the answer",
+            "entries": [
+              {
+                "key": "type",
+                "value": "array of workshops"
+              }
+            ]
+          },
+          "note": "The answer arrives a moment later and goes into state."
+        }
+      ]
+    },
+    "show-workshops": {
+      "steps": [
+        {
+          "active": ["api", "api->list", "list"],
+          "value": {
+            "kind": "map",
+            "label": "one workshop",
+            "entries": [
+              {
+                "key": "title",
+                "value": "text"
+              },
+              {
+                "key": "day",
+                "value": "short day name"
+              },
+              {
+                "key": "priceCents",
+                "value": "number"
+              },
+              {
+                "key": "placesLeft",
+                "value": "number"
+              }
+            ]
+          },
+          "note": "The week's workshops are in state now, so React draws the screen again."
+        },
+        {
+          "active": ["list", "list->cards", "cards"],
+          "note": "Each workshop of the answer gets one card, in the order the API sent them, with its id as the key."
+        }
+      ]
+    },
+    "empty-week": {
+      "steps": [
+        {
+          "active": ["open", "open->app", "app"],
+          "value": {
+            "kind": "map",
+            "label": "before the answer",
+            "entries": [
+              {
+                "key": "workshops",
+                "value": "not here yet"
+              }
+            ]
+          },
+          "note": "Before any answer, the screen does not know whether the week has workshops."
+        },
+        {
+          "active": ["app", "app->api", "api", "api->list", "list"],
+          "value": {
+            "kind": "map",
+            "label": "an empty week",
+            "entries": [
+              {
+                "key": "workshops",
+                "value": "[]"
+              }
+            ]
+          },
+          "note": "Some weeks the API answers with an empty list."
+        },
+        {
+          "active": ["list"],
+          "note": "Only an answer that arrived and is empty means there are no workshops this week."
+        }
+      ]
+    }
+  }
+}

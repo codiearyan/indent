@@ -1,0 +1,99 @@
+{
+  "id": "load-the-week",
+  "title": "Loading the workshops",
+  "files": ["src/App.jsx", "src/WorkshopCard.jsx", "server/standIn.js", "server/settings.js"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. The stand-in API writes one line per request to the panel's console. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "ask-once",
+      "title": "Ask for this week's workshops once",
+      "file": "src/App.jsx",
+      "description": "When the screen opens, `App` asks the studio's API for this week's workshops with `fetch('/api/workshops')`, and keeps the list that comes back in state.\n\nIt asks once, when the screen first appears. Drawing the screen again, for example after the answer arrives, must not send another request.\n\nThe check opens the screen on an API of its own, waits, and counts the requests that reach `/api/workshops`.",
+      "nextSteps": [
+        "Find where `workshops` is made in `App`, and turn it into state.",
+        "Decide where the request belongs: not in the body of the component, which runs on every render.",
+        "Send the request, read the answer as JSON, and put the list into state.",
+        "Open the Browser panel's console: the stand-in writes one line for each request it gets."
+      ],
+      "hints": [
+        "The body of a component runs every time React draws it. A request sent from there is sent again on every render.",
+        "Talking to a server is a side effect, so it goes in `useEffect`. The array after the effect says when it runs again; an empty array means only after the first render.",
+        "`useEffect(() => { fetch('/api/workshops').then((response) => response.json()).then(setWorkshops) }, [])`"
+      ],
+      "docs": [
+        {
+          "title": "Synchronizing with effects",
+          "url": "https://react.dev/learn/synchronizing-with-effects"
+        },
+        {
+          "title": "Using the Fetch API",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch"
+        }
+      ],
+      "videos": [
+        {
+          "title": "useEffect in 13 minutes",
+          "url": "https://www.youtube.com/watch?v=0ZJgIjIuY7U"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "show-workshops",
+      "title": "Show the workshops that came back",
+      "file": "src/App.jsx",
+      "description": "Draw one `WorkshopCard` for each workshop in the answer, in the order the API sent them, inside a `<ul>`. The class `workshops` on it gives the list its layout from `styles.css`. Give each card the workshop's `id` as its `key`.\n\n`WorkshopCard` is written for you: it shows the title, the day, the price and the places left.\n\nThe check answers with workshops your code has never seen and reads the cards on the screen.",
+      "nextSteps": [
+        "Look at what `response.json()` gives you: a promise, not the list itself.",
+        "Once the list is in state, map over it in the JSX.",
+        "Pass each workshop to `WorkshopCard` as the `workshop` prop, with a `key`."
+      ],
+      "hints": [
+        "The screen draws again only when state changes. The answer arrives after the first render, so it has to end up in state.",
+        "`response.json()` reads the body and returns a promise of the parsed value. Wait for that promise before you put the value into state.",
+        "`<ul className=\"workshops\">{workshops.map((workshop) => <WorkshopCard key={workshop.id} workshop={workshop} />)}</ul>`"
+      ],
+      "docs": [
+        {
+          "title": "Rendering lists",
+          "url": "https://react.dev/learn/rendering-lists"
+        },
+        {
+          "title": "Response.json()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/json"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "empty-week",
+      "title": "Tell an empty week from one not loaded yet",
+      "file": "src/App.jsx",
+      "description": "Some weeks the studio runs no workshops, and the API answers with an empty list `[]`. Then the screen says `No workshops this week.`\n\nBut before the answer arrives, the screen does not know yet. It must not say there are no workshops while the request is still on its way. For now it can show nothing there; the next issue adds a loading line.\n\nThe check holds the answer back, reads the screen, then answers with an empty list and reads it again.",
+      "nextSteps": [
+        "Set `server/settings.js` to a long `delayMs`, save, and watch what the screen says while it waits.",
+        "Look at the value the workshops start from. Can it tell \"not here yet\" from \"here, and empty\"?",
+        "Show the empty line only when an answer has arrived and it has no workshops."
+      ],
+      "hints": [
+        "An empty array means \"we know there are none\". Before the answer, you do not know anything yet.",
+        "Start the state from a value that is not a list, such as `null`, and draw the list or the empty line only once it is a list.",
+        "`useState(null)`, then `{workshops !== null && workshops.length === 0 && <p className=\"empty-line\">No workshops this week.</p>}`"
+      ],
+      "docs": [
+        {
+          "title": "Conditional rendering",
+          "url": "https://react.dev/learn/conditional-rendering"
+        },
+        {
+          "title": "useState",
+          "url": "https://react.dev/reference/react/useState"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

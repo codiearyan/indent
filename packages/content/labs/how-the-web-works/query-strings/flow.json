@@ -1,0 +1,250 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "ffion",
+        "label": "Ffion",
+        "kind": "story"
+      },
+      {
+        "id": "search",
+        "label": "searchSongs()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "build",
+        "label": "searchAddress()",
+        "kind": "function",
+        "mine": true,
+        "fn": "searchAddress"
+      },
+      {
+        "id": "read",
+        "label": "queryValue()",
+        "kind": "function",
+        "mine": true,
+        "fn": "queryValue"
+      },
+      {
+        "id": "next",
+        "label": "nextPage()",
+        "kind": "function",
+        "mine": true,
+        "fn": "nextPage"
+      },
+      {
+        "id": "server",
+        "label": "Cupboard server",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "ffion",
+        "to": "search",
+        "label": "artist, title"
+      },
+      {
+        "from": "search",
+        "to": "build",
+        "label": "artist, title"
+      },
+      {
+        "from": "build",
+        "to": "read",
+        "label": "address"
+      },
+      {
+        "from": "search",
+        "to": "server",
+        "label": "request"
+      },
+      {
+        "from": "ffion",
+        "to": "next",
+        "label": "more songs"
+      },
+      {
+        "from": "next",
+        "to": "server",
+        "label": "next page"
+      }
+    ],
+    "note": "Ffion's searches carry the artist and title in the question mark part, encoded so the server reads exactly what she typed."
+  },
+  "tasks": {
+    "read": {
+      "trace": {
+        "file": "src/search.js",
+        "call": "queryValue",
+        "args": [
+          "http://localhost:5133/songs/search?artist=Mabli+%26+the+Moths&title=bridges",
+          "artist"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["read"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              {
+                "key": "address",
+                "value": "/songs/search?artist=Mabli+%26+the+Moths&title=bridges"
+              },
+              {
+                "key": "name",
+                "value": "artist"
+              }
+            ]
+          },
+          "note": "queryValue() gets an address with a question mark part, and the name of one value in it."
+        },
+        {
+          "active": ["read"],
+          "note": "searchParams splits the pairs at each & and decodes the codes, the way the server does."
+        },
+        {
+          "active": ["read"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              {
+                "key": "artist",
+                "value": "text, decoded"
+              }
+            ]
+          },
+          "note": "The value comes back as the server reads it, or null when there is no value with that name."
+        }
+      ]
+    },
+    "build": {
+      "trace": {
+        "file": "src/search.js",
+        "call": "searchAddress",
+        "args": ["http://localhost:5133", "Mabli & the Moths", "night"]
+      },
+      "steps": [
+        {
+          "active": ["search", "search->build", "build"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              {
+                "key": "artist",
+                "value": "Mabli & the Moths"
+              },
+              {
+                "key": "title",
+                "value": "night"
+              }
+            ]
+          },
+          "note": "searchAddress() gets the artist and the title as Ffion typed them, & and all."
+        },
+        {
+          "active": ["build"],
+          "note": "searchParams sets each value and encodes it, so an & or a + cannot break the address."
+        },
+        {
+          "active": ["build"],
+          "note": "A title that was not given is left out, instead of being sent as the word undefined."
+        },
+        {
+          "active": ["build"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              {
+                "key": "address",
+                "value": "text"
+              }
+            ]
+          },
+          "note": "The whole address comes back as text, and reading it back gives what was typed."
+        }
+      ]
+    },
+    "search": {
+      "steps": [
+        {
+          "active": ["ffion", "ffion->search", "search"],
+          "note": "Ffion asks for the songs of one artist, maybe with part of a title."
+        },
+        {
+          "active": ["search", "search->build", "build"],
+          "note": "searchSongs() gets the search address from searchAddress()."
+        },
+        {
+          "active": ["search", "search->server", "server"],
+          "note": "It sends the request and waits. The server decodes the question mark part and looks for the songs."
+        },
+        {
+          "active": ["search"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              {
+                "key": "body",
+                "value": "text"
+              }
+            ]
+          },
+          "note": "The text of the answer comes back to Ffion, starting with what the server looked for."
+        }
+      ]
+    },
+    "next": {
+      "trace": {
+        "file": "src/search.js",
+        "call": "nextPage",
+        "args": ["http://localhost:5133/songs/search?artist=Mabli+%26+the+Moths"]
+      },
+      "steps": [
+        {
+          "active": ["ffion", "ffion->next", "next"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              {
+                "key": "address",
+                "value": "/songs/search?artist=Mabli+%26+the+Moths"
+              }
+            ]
+          },
+          "note": "The server shows two songs at a time, and Ffion wants the next two."
+        },
+        {
+          "active": ["next"],
+          "note": "nextPage() reads the page, which is text, or page 1 when the address has none, and counts one on as a number."
+        },
+        {
+          "active": ["next", "next->server"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              {
+                "key": "artist",
+                "value": "as it was"
+              },
+              {
+                "key": "page",
+                "value": "one higher"
+              }
+            ]
+          },
+          "note": "The same address comes back with only the page changed, ready for the server."
+        }
+      ]
+    }
+  }
+}

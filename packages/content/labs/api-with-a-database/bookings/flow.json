@@ -1,0 +1,159 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "page",
+        "label": "Sign-up page",
+        "kind": "story"
+      },
+      {
+        "id": "route",
+        "label": "Bookings route",
+        "kind": "file"
+      },
+      {
+        "id": "book",
+        "label": "book()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "tables",
+        "label": "createTables()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "reads",
+        "label": "list() and get()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "db",
+        "label": "kilnworth.db",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "tables",
+        "to": "db",
+        "label": "bookings table"
+      },
+      {
+        "from": "page",
+        "to": "route",
+        "label": "workshop, name"
+      },
+      {
+        "from": "route",
+        "to": "book",
+        "label": "workshopId, name"
+      },
+      {
+        "from": "book",
+        "to": "db",
+        "label": "INSERT"
+      },
+      {
+        "from": "reads",
+        "to": "db",
+        "label": "join, count"
+      },
+      {
+        "from": "reads",
+        "to": "page",
+        "label": "places left"
+      }
+    ],
+    "note": "Bookings get a table of their own that points at the workshops, and the database counts what each workshop has left."
+  },
+  "tasks": {
+    "table": {
+      "steps": [
+        {
+          "active": ["tables", "tables->db", "db"],
+          "value": {
+            "kind": "array",
+            "label": "columns",
+            "values": ["id", "workshopId", "name"]
+          },
+          "note": "Beside the workshops table, createTables makes a bookings table."
+        },
+        {
+          "active": ["db"],
+          "note": "workshopId has to be the id of a real workshop. The database refuses anything else."
+        },
+        {
+          "active": ["tables"],
+          "note": "Run again on every start, it leaves both tables and their rows as they are."
+        }
+      ]
+    },
+    "book": {
+      "steps": [
+        {
+          "active": ["page", "page->route", "route", "route->book", "book"],
+          "value": {
+            "kind": "map",
+            "label": "the booking",
+            "entries": [
+              {
+                "key": "workshopId",
+                "value": 5
+              },
+              {
+                "key": "name",
+                "value": "Bronagh Kell"
+              }
+            ]
+          },
+          "note": "Someone books the family morning on Ivo's page."
+        },
+        {
+          "active": ["book"],
+          "note": "book first makes sure the workshop is there."
+        },
+        {
+          "active": ["book", "book->db", "db"],
+          "note": "The booking goes in, its values apart from the SQL, and comes back with its id."
+        },
+        {
+          "active": ["book", "route"],
+          "note": "A workshop that is not there adds nothing and becomes a 404."
+        }
+      ]
+    },
+    "places": {
+      "steps": [
+        {
+          "active": ["reads", "reads->db", "db"],
+          "note": "The query puts each workshop beside its bookings."
+        },
+        {
+          "active": ["db"],
+          "note": "Bookings are counted per workshop, and a workshop nobody has booked counts none."
+        },
+        {
+          "active": ["reads", "reads->page", "page"],
+          "value": {
+            "kind": "map",
+            "label": "the family morning",
+            "entries": [
+              {
+                "key": "seats",
+                "value": 12
+              },
+              {
+                "key": "placesLeft",
+                "value": "seats minus bookings"
+              }
+            ]
+          },
+          "note": "Each workshop comes back with its places left, worked out in the same query."
+        }
+      ]
+    }
+  }
+}

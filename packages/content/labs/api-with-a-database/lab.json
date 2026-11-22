@@ -1,0 +1,17 @@
+{
+  "id": "api-with-a-database",
+  "title": "Back an Express API with SQLite",
+  "description": "Kilnworth Pottery's workshop API keeps everything in memory, so every restart throws away the week's changes, and places are still booked on a paper sheet. Move the API you built onto SQLite, which is built into Node, one issue at a time: a database file and a table, reads and writes as queries, bookings in a second table with the places left counted by the database, and group bookings that go in all at once or not at all. You learn to use a real database from code, with every value passed as a value and never written into the SQL.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": ["Node.js", "SQL"],
+  "kind": "project",
+  "format": 2,
+  "parts": [
+    {
+      "title": "From memory to a file",
+      "chapters": ["database-file", "reading-with-queries", "writing-rows"]
+    },
+    { "title": "Bookings", "chapters": ["bookings", "all-or-nothing"] }
+  ]
+}

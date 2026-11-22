@@ -1,0 +1,155 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "page",
+        "label": "Sign-up page",
+        "kind": "story"
+      },
+      {
+        "id": "routes",
+        "label": "Workshop routes",
+        "kind": "file"
+      },
+      {
+        "id": "list",
+        "label": "list()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "get",
+        "label": "get()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "table",
+        "label": "Workshops table",
+        "kind": "data"
+      },
+      {
+        "id": "reply",
+        "label": "JSON answer",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "page",
+        "to": "routes",
+        "label": "GET"
+      },
+      {
+        "from": "routes",
+        "to": "list",
+        "label": "filters"
+      },
+      {
+        "from": "routes",
+        "to": "get",
+        "label": "id"
+      },
+      {
+        "from": "list",
+        "to": "table",
+        "label": "query, values"
+      },
+      {
+        "from": "get",
+        "to": "table",
+        "label": "query, id"
+      },
+      {
+        "from": "routes",
+        "to": "reply",
+        "label": "rows"
+      },
+      {
+        "from": "reply",
+        "to": "page",
+        "label": "answer"
+      }
+    ],
+    "note": "The routes stay as they were, and the store now answers every read with a query on the workshops table."
+  },
+  "tasks": {
+    "list": {
+      "steps": [
+        {
+          "active": ["page", "page->routes", "routes", "routes->list", "list"],
+          "note": "Ivo's page asks for GET /workshops, as it always has."
+        },
+        {
+          "active": ["list", "list->table", "table"],
+          "value": {
+            "kind": "array",
+            "label": "each row",
+            "values": ["id", "title", "day", "seats", "priceCents"]
+          },
+          "note": "The store asks the workshops table for every row, in an order the query names."
+        },
+        {
+          "active": ["routes", "routes->reply", "reply", "reply->page"],
+          "note": "The rows go back as JSON, the same shape the page already knows."
+        }
+      ]
+    },
+    "one": {
+      "steps": [
+        {
+          "active": ["page", "page->routes", "routes", "routes->get", "get"],
+          "value": {
+            "kind": "map",
+            "label": "the request",
+            "entries": [
+              {
+                "key": "path",
+                "value": "/workshops/4"
+              }
+            ]
+          },
+          "note": "The page opens one workshop by the id in its path."
+        },
+        {
+          "active": ["get", "get->table", "table"],
+          "note": "The id travels to the database apart from the SQL, in the place of a ?."
+        },
+        {
+          "active": ["get", "routes", "routes->reply", "reply"],
+          "note": "One row comes back, or nothing at all, and nothing becomes a 404."
+        }
+      ]
+    },
+    "filter": {
+      "steps": [
+        {
+          "active": ["page", "page->routes", "routes", "routes->list", "list"],
+          "value": {
+            "kind": "map",
+            "label": "the filters",
+            "entries": [
+              {
+                "key": "day",
+                "value": "thu"
+              },
+              {
+                "key": "maxPriceCents",
+                "value": 4000
+              }
+            ]
+          },
+          "note": "Ivo asks for the Thursday workshops up to a top price."
+        },
+        {
+          "active": ["list", "list->table"],
+          "note": "Only the filters that were asked for become conditions, and each value travels apart from the SQL."
+        },
+        {
+          "active": ["table", "routes->reply", "reply"],
+          "note": "The database picks the matching rows and sends back only those."
+        }
+      ]
+    }
+  }
+}

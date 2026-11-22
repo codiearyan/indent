@@ -166,6 +166,18 @@ const repos: { labId: string; expected: string[] }[] = [
     expected: ['cut-off-replies/reproduce', 'cut-off-replies/fix', 'untrusted-json/fix']
   },
   {
+    labId: 'how-the-web-works',
+    expected: [
+      'addresses/parts',
+      'addresses/join',
+      'query-strings/read',
+      'query-strings/build',
+      'query-strings/next',
+      'requests/line',
+      'status-families/family'
+    ]
+  },
+  {
     labId: 'security-bug-hunts',
     expected: [
       'search-leak/reproduce',

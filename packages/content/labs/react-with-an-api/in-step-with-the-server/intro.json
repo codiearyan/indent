@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Ivo",
+      "say": "It still says one place left!",
+      "note": "After he booked the last one."
+    },
+    {
+      "title": "Studio API",
+      "text": "Knows the real places left.",
+      "note": "The front desk books by phone."
+    },
+    {
+      "title": "Your code",
+      "file": "App.jsx",
+      "mine": true,
+      "gap": "Cards keep old numbers",
+      "tasks": ["Places from the server", "Catch up after a no", "Keep cards meanwhile"]
+    },
+    {
+      "title": "Workshop cards",
+      "rows": [
+        ["Glazing basics", "Full"],
+        ["Hand-built mugs", "6 left"]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Glazing basics",
+    "wrong": "1 left",
+    "why": "Out of date",
+    "right": "full"
+  },
+  "captions": [
+    "Ivo booked the last place at Glazing basics to test the screen.",
+    "The card still offers one place, because the screen never heard back.",
+    "You take places from the server, catch up after a refusal, and keep the cards meanwhile.",
+    "Now the card turns full the moment the server says so.",
+    "Bookings here or at the front desk, the cards say what the server says."
+  ]
+}

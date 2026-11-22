@@ -1,0 +1,33 @@
+// The families of statuses. Run node run.js to try your functions against the cupboard server.
+//
+// Task 1: Name the family of a status
+// Task 2: Read a show, or say why not
+// Task 3: Ask again when the server is in trouble
+//
+// Each function throws 'Not implemented' until you write it. Keep the word export in front of
+// each one: it lets run.js and Check use them.
+
+// Task 1: Name the family of a status
+// statusFamily(status) gets a status number and gives back the name of its family as text:
+// 'information' for 100 to 199, 'success' for 200 to 299, 'redirect' for 300 to 399,
+// 'client error' for 400 to 499, 'server error' for 500 to 599, and 'unknown' for anything else.
+export function statusFamily(status) {
+  throw new Error('Not implemented')
+}
+
+// Task 2: Read a show, or say why not
+// showText(base, slug) asks the server at base for the page /shows/<slug>. When the answer is in
+// the success family, it gives back the text of its body. When it is in the client error family,
+// it gives back null. When it is in the server error family, it throws an Error whose message has
+// the status number in it.
+export async function showText(base, slug) {
+  throw new Error('Not implemented')
+}
+
+// Task 3: Ask again when the server is in trouble
+// fetchWithRetry(address, tries) asks for the page at address. While the answer is in the server
+// error family, it asks again, sending at most tries requests in all. Any other answer is final at
+// once. It gives back { status, body } of the last answer it got.
+export async function fetchWithRetry(address, tries) {
+  throw new Error('Not implemented')
+}

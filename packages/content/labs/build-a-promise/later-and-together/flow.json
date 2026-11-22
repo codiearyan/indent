@@ -1,0 +1,78 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "list", "label": "price-list.js", "kind": "file" },
+      { "id": "then", "label": "then()", "kind": "function", "mine": true },
+      { "id": "queue", "label": "Microtask queue", "kind": "data" },
+      { "id": "all", "label": "Docket.all()", "kind": "function", "mine": true },
+      { "id": "race", "label": "Docket.race()", "kind": "function", "mine": true },
+      { "id": "screen", "label": "Idris's screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "list", "to": "then", "label": "callbacks" },
+      { "from": "then", "to": "queue", "label": "later" },
+      { "from": "queue", "to": "screen", "label": "in order" },
+      { "from": "list", "to": "all", "label": "three counts" },
+      { "from": "list", "to": "race", "label": "queue or time limit" },
+      { "from": "all", "to": "screen", "label": "every count" },
+      { "from": "race", "to": "screen", "label": "first answer" }
+    ],
+    "note": "Callbacks always run after the current code, in one order, and the price list can ask for many things at once."
+  },
+  "tasks": {
+    "always-later": {
+      "steps": [
+        {
+          "active": ["list", "list->then", "then"],
+          "note": "The invite count comes from memory, so its docket is already kept when then() is called."
+        },
+        {
+          "active": ["then", "then->queue", "queue"],
+          "note": "then() does not run the callback now. It queues it to run once the code that is running has finished."
+        },
+        {
+          "active": ["list"],
+          "note": "The line under then() runs first, every night, whether the count was in memory or not."
+        },
+        {
+          "active": ["queue", "queue->screen", "screen"],
+          "note": "Then the queued callbacks run, before any timer, in the order their then() calls were made."
+        }
+      ]
+    },
+    "all": {
+      "steps": [
+        {
+          "active": ["list", "list->all", "all"],
+          "value": { "kind": "array", "label": "dockets", "values": ["card", "invite", "poster"] },
+          "note": "The price list asks for three counts at once and hands all three dockets to Docket.all()."
+        },
+        {
+          "active": ["all"],
+          "note": "The answers come back in any order. Each one goes to the place of its own docket, and Docket.all() counts them."
+        },
+        {
+          "active": ["all", "all->screen", "screen"],
+          "value": { "kind": "array", "label": "values, in the order of the list", "values": ["card count", "invite count", "poster count"] },
+          "note": "When the last one arrives, the counts go out in the order they were asked for. One failure would end it at once."
+        }
+      ]
+    },
+    "race": {
+      "steps": [
+        {
+          "active": ["list", "list->race", "race"],
+          "note": "The price list races the press queue against a docket that fails after half a second."
+        },
+        {
+          "active": ["race"],
+          "note": "Whichever settles first settles the race. The other changes nothing."
+        },
+        {
+          "active": ["race", "race->screen", "screen"],
+          "note": "Idris gets the first free day, or a sentence saying the queue did not answer in time."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "form",
+        "label": "BookingForm.jsx",
+        "kind": "file"
+      },
+      {
+        "id": "api",
+        "label": "Studio API",
+        "kind": "story"
+      },
+      {
+        "id": "desk",
+        "label": "Front desk",
+        "kind": "story"
+      },
+      {
+        "id": "app",
+        "label": "App.jsx",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "cards",
+        "label": "Workshop cards",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "form",
+        "to": "api",
+        "label": "booking"
+      },
+      {
+        "from": "desk",
+        "to": "api",
+        "label": "phone bookings"
+      },
+      {
+        "from": "api",
+        "to": "app",
+        "label": "what is true now"
+      },
+      {
+        "from": "app",
+        "to": "cards",
+        "label": "places left"
+      }
+    ],
+    "note": "After a booking or a refusal, the cards show what the server has now, not a number the screen worked out."
+  },
+  "tasks": {
+    "places-from-server": {
+      "steps": [
+        {
+          "active": ["form", "form->api", "api"],
+          "note": "A visitor books a place, while the front desk takes a phone booking for the same workshop."
+        },
+        {
+          "active": ["api", "api->app", "app"],
+          "value": {
+            "kind": "map",
+            "label": "the answer",
+            "entries": [
+              {
+                "key": "booking",
+                "value": "the new booking"
+              },
+              {
+                "key": "workshop",
+                "value": "as the server has it"
+              }
+            ]
+          },
+          "note": "The answer to the booking carries the workshop as the server has it now."
+        },
+        {
+          "active": ["app", "app->cards", "cards"],
+          "note": "The booked card shows the server's places left; every other card stays as it was."
+        }
+      ]
+    },
+    "catch-up-after-refusal": {
+      "steps": [
+        {
+          "active": ["form", "form->api", "api"],
+          "note": "The server refuses a booking: the workshop is full."
+        },
+        {
+          "active": ["form", "app", "api"],
+          "note": "The form tells App, and App asks for the list again."
+        },
+        {
+          "active": ["api", "api->app", "app", "app->cards", "cards"],
+          "note": "The new list arrives, and the card says the workshop is full."
+        }
+      ]
+    },
+    "keep-list-while-refreshing": {
+      "steps": [
+        {
+          "active": ["app", "api"],
+          "note": "The screen asks for a fresh list, and the answer takes a while."
+        },
+        {
+          "active": ["cards"],
+          "note": "Meanwhile the cards from before stay on the screen. The loading line is only for when there is nothing to show."
+        },
+        {
+          "active": ["api", "api->app", "app", "app->cards", "cards"],
+          "note": "The fresh list replaces the old cards when it arrives."
+        }
+      ]
+    }
+  }
+}

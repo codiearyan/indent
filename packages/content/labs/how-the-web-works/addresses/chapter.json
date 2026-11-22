@@ -1,0 +1,105 @@
+{
+  "id": "addresses",
+  "title": "What an address is made of",
+  "files": ["src/address.js", "run.js", "server/station.js"],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "parts",
+      "title": "Take an address apart",
+      "file": "src/address.js",
+      "description": "Under `// Task 1` in `src/address.js`, make `addressParts(address)` take a whole address as text and give back an object with four properties:\n\n- `scheme`: the word at the start, without its colon, like `'https'`\n- `host`: the name of the computer only, like `'listen.heronsgate.example'`\n- `port`: a number. When the address writes no port, it is the port its scheme uses when none is written\n- `path`: the part after the host, starting with its slash, like `'/shows/dawn-chorus'`\n\nCheck calls `addressParts` with addresses of its own, with and without a port, and compares each of the four parts.",
+      "nextSteps": [
+        "Make a `URL` from the address, as the lesson shows, and print it to see its properties.",
+        "Pick out the scheme, the host and the path, and look at what each one holds exactly.",
+        "Turn the port into a number, and decide what it is when the address writes none.",
+        "Run `node run.js` and compare both Task 1 lines with the addresses they read."
+      ],
+      "hints": [
+        "`new URL(address)` takes the address apart for you. Print it with `console.log` and look at `protocol`, `hostname`, `host`, `port` and `pathname`.",
+        "Some properties hold a little more or less than the task asks for: `protocol` keeps the colon, `host` keeps the port, and `port` is text that is empty when the address writes no port.",
+        "Start with `const url = new URL(address)`. The scheme is `url.protocol` without its last character, and when `url.port` is `''` the port is `443` for https and `80` for http; otherwise it is `Number(url.port)`."
+      ],
+      "docs": [
+        {
+          "title": "URL",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URL"
+        },
+        {
+          "title": "What is a URL?",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Web_mechanics/What_is_a_URL"
+        }
+      ],
+      "videos": [
+        {
+          "title": "The parts of a URL",
+          "url": "https://www.youtube.com/watch?v=-LPe4tYckkg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "join",
+      "title": "Put an address together",
+      "file": "src/address.js",
+      "description": "Under `// Task 2`, make `pageAddress(base, path)` give back the whole address of one page as text. `base` is the address of a server, like `'http://localhost:5133'`, and it may or may not end with a slash. `path` starts with a slash, like `'/shows'`. The address must have exactly one slash between the host and the path.\n\nCheck calls `pageAddress` with bases of its own, some ending in a slash and some not.",
+      "nextSteps": [
+        "Try joining the two texts with `+` and run `node run.js`.",
+        "Now call it yourself with a base that ends in a slash and look at the slashes.",
+        "Let `URL` put the two together instead, as the lesson shows.",
+        "Give back the address as text, not the `URL` object."
+      ],
+      "hints": [
+        "Joining two texts with `+` keeps every character of both, so a slash at the end of one and a slash at the start of the other become two.",
+        "`new URL` can take a second value: the address to start from. Then the first value can be a path, and URL works out where the slashes go.",
+        "`new URL(path, base)` gives a URL object, and its `href` property is the whole address as text."
+      ],
+      "docs": [
+        {
+          "title": "URL() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URL/URL"
+        },
+        {
+          "title": "URL: href property",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URL/href"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fetch",
+      "title": "Ask for a page and read it",
+      "file": "src/address.js",
+      "description": "Under `// Task 3`, make `fetchText(address)` send a request for the page at `address` with `fetch`, wait for the answer, and give back the text of the answer's body.\n\nCheck starts a server of its own with pages of its own, calls `fetchText` with their addresses, and looks at both sides: the request its server received, and the text `fetchText` gave back.",
+      "nextSteps": [
+        "Send the request with `fetch(address)` and wait for the answer with `await`.",
+        "Print the answer to see what you got: it is not the text yet.",
+        "Read the body as text, wait for that too, and give it back.",
+        "Run `node run.js`: the request and the answer for Task 3 are printed under it."
+      ],
+      "hints": [
+        "`fetch` gives back a promise of the answer, not the answer. `await` waits for it, and only works inside a function marked `async`, which this one already is.",
+        "The answer is an object with the status, the headers and a way to read the body. Reading the body takes a moment too, so it also gives a promise.",
+        "Two lines: `const response = await fetch(address)`, then `return await response.text()`."
+      ],
+      "docs": [
+        {
+          "title": "Using the Fetch API",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch"
+        },
+        {
+          "title": "Response: text() method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/text"
+        },
+        {
+          "title": "await",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

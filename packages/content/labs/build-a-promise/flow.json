@@ -1,0 +1,18 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "hesper", "label": "Hesper", "kind": "story" },
+      { "id": "store", "label": "Store room and press queue", "kind": "story" },
+      { "id": "docket", "label": "Your docket", "kind": "file", "mine": true },
+      { "id": "list", "label": "Idris's price list", "kind": "story" },
+      { "id": "sefton", "label": "Sefton's quotes", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "hesper", "to": "docket", "label": "every line explained" },
+      { "from": "store", "to": "docket", "label": "answers, later" },
+      { "from": "docket", "to": "list", "label": "when it arrives" },
+      { "from": "docket", "to": "sefton", "label": "step by step" }
+    ],
+    "note": "At Ashgrove Press, every answer the shop has to wait for comes on a docket you write yourself, so each line of the waiting code can be explained."
+  }
+}

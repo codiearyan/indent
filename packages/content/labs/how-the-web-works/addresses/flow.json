@@ -1,0 +1,132 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "odette", "label": "Odette", "kind": "story" },
+      { "id": "screen", "label": "Listings screen", "kind": "story" },
+      {
+        "id": "parts",
+        "label": "addressParts()",
+        "kind": "function",
+        "mine": true,
+        "fn": "addressParts"
+      },
+      {
+        "id": "join",
+        "label": "pageAddress()",
+        "kind": "function",
+        "mine": true,
+        "fn": "pageAddress"
+      },
+      { "id": "fetch", "label": "fetchText()", "kind": "function", "mine": true },
+      { "id": "server", "label": "Cupboard server", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "odette", "to": "screen", "label": "blank box" },
+      { "from": "screen", "to": "parts", "label": "an address" },
+      { "from": "screen", "to": "join", "label": "base, path" },
+      { "from": "join", "to": "fetch", "label": "address" },
+      { "from": "fetch", "to": "server", "label": "request" },
+      { "from": "fetch", "to": "screen", "label": "text" }
+    ],
+    "note": "The listings screen gets a whole, correct address, sends a real request to the cupboard server, and shows the text that comes back."
+  },
+  "tasks": {
+    "parts": {
+      "trace": {
+        "file": "src/address.js",
+        "call": "addressParts",
+        "args": ["https://listen.heronsgate.example/shows/dawn-chorus"]
+      },
+      "steps": [
+        {
+          "active": ["screen", "screen->parts"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "address", "value": "https://listen.heronsgate.example/shows/dawn-chorus" }
+            ]
+          },
+          "note": "The screen hands addressParts() a whole address as one line of text."
+        },
+        {
+          "active": ["parts"],
+          "note": "URL takes the address apart by the rules, so nothing has to be cut by hand."
+        },
+        {
+          "active": ["parts"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "scheme", "value": "a word, no colon" },
+              { "key": "host", "value": "a name" },
+              { "key": "port", "value": "a number" },
+              { "key": "path", "value": "from the slash" }
+            ]
+          },
+          "note": "Four parts come back. The port is a number even when the address writes none."
+        }
+      ]
+    },
+    "join": {
+      "trace": {
+        "file": "src/address.js",
+        "call": "pageAddress",
+        "args": ["http://localhost:5133", "/shows"]
+      },
+      "steps": [
+        {
+          "active": ["screen", "screen->join"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "base", "value": "http://localhost:5133" },
+              { "key": "path", "value": "/shows" }
+            ]
+          },
+          "note": "The screen knows where the cupboard server is and which page it wants."
+        },
+        {
+          "active": ["join"],
+          "note": "pageAddress() puts the two together, with one slash between the host and the path, whether the base ends in a slash or not."
+        },
+        {
+          "active": ["join", "join->fetch"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "address", "value": "text" }]
+          },
+          "note": "The whole address comes back as text, ready to send a request to."
+        }
+      ]
+    },
+    "fetch": {
+      "steps": [
+        {
+          "active": ["fetch", "fetch->server"],
+          "note": "fetchText() sends a GET request for the page to the cupboard server."
+        },
+        {
+          "active": ["server"],
+          "note": "The server finds the page and sends back an answer with a body of text."
+        },
+        {
+          "active": ["fetch"],
+          "note": "fetchText() waits for the answer, then waits again while the body is read as text."
+        },
+        {
+          "active": ["fetch", "fetch->screen", "screen"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "body", "value": "text" }]
+          },
+          "note": "The text of the body goes to the listings screen, and the blank box is filled."
+        }
+      ]
+    }
+  }
+}

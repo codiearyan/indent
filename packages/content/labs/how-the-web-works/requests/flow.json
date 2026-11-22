@@ -1,0 +1,155 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "gethin", "label": "Gethin", "kind": "story" },
+      {
+        "id": "line",
+        "label": "requestLine()",
+        "kind": "function",
+        "mine": true,
+        "fn": "requestLine"
+      },
+      { "id": "remove", "label": "removeRequest()", "kind": "function", "mine": true },
+      { "id": "studio", "label": "removeAsStudio()", "kind": "function", "mine": true },
+      { "id": "accept", "label": "fetchAs()", "kind": "function", "mine": true },
+      { "id": "server", "label": "Cupboard server", "kind": "story" },
+      { "id": "requests", "label": "Song requests", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "gethin", "to": "line", "label": "method, address" },
+      { "from": "gethin", "to": "studio", "label": "id, key" },
+      { "from": "remove", "to": "server", "label": "removal" },
+      { "from": "studio", "to": "server", "label": "removal + key" },
+      { "from": "accept", "to": "server", "label": "GET + accept" },
+      { "from": "server", "to": "requests", "label": "removes" }
+    ],
+    "note": "Requests now say what to do with their method and say more with headers, so the studio can take a played song off the list."
+  },
+  "tasks": {
+    "line": {
+      "trace": {
+        "file": "src/requests.js",
+        "call": "requestLine",
+        "args": ["delete", "http://localhost:5133/requests/41"]
+      },
+      "steps": [
+        {
+          "active": ["gethin", "gethin->line", "line"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "method", "value": "delete" },
+              { "key": "address", "value": "http://localhost:5133/requests/41" }
+            ]
+          },
+          "note": "requestLine() gets a method, maybe in small letters, and a whole address."
+        },
+        {
+          "active": ["line"],
+          "note": "The scheme and host stay out of the line: the host travels in a header of its own."
+        },
+        {
+          "active": ["line"],
+          "value": {
+            "kind": "array",
+            "label": "what comes back, in order",
+            "values": ["METHOD", "path and question mark part", "version"]
+          },
+          "note": "The first line of the request comes back: three parts with one space between each."
+        }
+      ]
+    },
+    "remove": {
+      "steps": [
+        {
+          "active": ["remove"],
+          "note": "removeRequest() builds the address of one song request from its number."
+        },
+        {
+          "active": ["remove", "remove->server", "server"],
+          "note": "It sends a request with the method that removes, instead of the GET that fetch sends by itself."
+        },
+        {
+          "active": ["server"],
+          "note": "The cupboard server knows who may remove requests, and nothing in this request says who is asking."
+        },
+        {
+          "active": ["remove"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "body", "value": "text" }]
+          },
+          "note": "The text of the answer comes back, whatever the server decided."
+        }
+      ]
+    },
+    "studio": {
+      "steps": [
+        {
+          "active": ["gethin", "gethin->studio", "studio"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "id", "value": "a number" },
+              { "key": "key", "value": "text" }
+            ]
+          },
+          "note": "Gethin hands over the number of a played song request and the studio key."
+        },
+        {
+          "active": ["studio", "studio->server", "server"],
+          "note": "The same removal goes out with one header more, whose name the server looks for exactly."
+        },
+        {
+          "active": ["server", "server->requests", "requests"],
+          "note": "With the right key the server takes the request off the list. A wrong key changes nothing."
+        },
+        {
+          "active": ["studio"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "body", "value": "text" }]
+          },
+          "note": "The text of the answer says what happened."
+        }
+      ]
+    },
+    "accept": {
+      "steps": [
+        {
+          "active": ["accept"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "path", "value": "/shows?day=saturday" },
+              { "key": "type", "value": "text/html" }
+            ]
+          },
+          "note": "fetchAs() gets a page and the kind of answer that is wanted."
+        },
+        {
+          "active": ["accept", "accept->server"],
+          "note": "It sends a GET whose accept header names that kind, in place of the any kind that fetch sends by itself."
+        },
+        {
+          "active": ["server"],
+          "note": "The server reads the header and writes the same listings in the kind that was asked for."
+        },
+        {
+          "active": ["accept"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "body", "value": "text" }]
+          },
+          "note": "The body comes back as text, HTML for the station's page or plain for the studio screen."
+        }
+      ]
+    }
+  }
+}

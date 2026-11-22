@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Kofi",
+      "say": "A family is one booking to me.",
+      "note": "After a busy Saturday."
+    },
+    {
+      "title": "The API",
+      "text": "Books one name at a time, even when full.",
+      "note": "Families end up split."
+    },
+    {
+      "title": "Your code",
+      "file": "store.js",
+      "mine": true,
+      "gap": "It never says no",
+      "tasks": ["Refuse when full", "Book a group whole", "Undo a half group"]
+    },
+    {
+      "title": "Thursday wheel",
+      "rows": [
+        ["Seats", "6"],
+        ["Booked", "3"],
+        ["Places left", "3"]
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Four names",
+    "wrong": "half booked",
+    "why": "Split up",
+    "right": "all or none"
+  },
+  "captions": [
+    "Kofi saw a family of four split up when only two places were left.",
+    "The API books one name at a time and never says that a workshop is full.",
+    "You refuse a full workshop, decide about a whole group and undo a half-done one.",
+    "Four names for three places are refused together, and nobody is booked alone.",
+    "A booking goes in whole or not at all, even when the database fails halfway."
+  ]
+}

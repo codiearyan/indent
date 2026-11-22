@@ -1,0 +1,133 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "days",
+        "label": "Day buttons",
+        "kind": "story"
+      },
+      {
+        "id": "app",
+        "label": "App.jsx",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "api",
+        "label": "Studio API",
+        "kind": "story"
+      },
+      {
+        "id": "answers",
+        "label": "Answers",
+        "kind": "data"
+      },
+      {
+        "id": "cards",
+        "label": "Workshop cards",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "days",
+        "to": "app",
+        "label": "chosen day"
+      },
+      {
+        "from": "app",
+        "to": "api",
+        "label": "GET ?day="
+      },
+      {
+        "from": "api",
+        "to": "answers",
+        "label": "in any order"
+      },
+      {
+        "from": "answers",
+        "to": "cards",
+        "label": "newest only"
+      }
+    ],
+    "note": "Each chosen day asks the API for its own list, and only the answer for the day chosen last ever reaches the cards."
+  },
+  "tasks": {
+    "ask-for-the-day": {
+      "steps": [
+        {
+          "active": ["days", "days->app", "app"],
+          "note": "A visitor taps Thursday."
+        },
+        {
+          "active": ["app", "app->api", "api"],
+          "value": {
+            "kind": "map",
+            "label": "the request",
+            "entries": [
+              {
+                "key": "address",
+                "value": "/api/workshops?day=thu"
+              },
+              {
+                "key": "All",
+                "value": "no day"
+              }
+            ]
+          },
+          "note": "The screen asks the API for that day's workshops, and shows the loading line meanwhile."
+        },
+        {
+          "active": ["api", "api->answers", "answers", "answers->cards", "cards"],
+          "note": "Thursday's list arrives and becomes the cards."
+        }
+      ]
+    },
+    "newest-wins": {
+      "steps": [
+        {
+          "active": ["days", "days->app", "app", "app->api", "api"],
+          "note": "A visitor taps Tuesday, then Thursday. Two requests are on their way."
+        },
+        {
+          "active": ["api", "api->answers", "answers"],
+          "value": {
+            "kind": "map",
+            "label": "two answers",
+            "entries": [
+              {
+                "key": "Tuesday",
+                "value": "asked first"
+              },
+              {
+                "key": "Thursday",
+                "value": "asked last"
+              }
+            ]
+          },
+          "note": "The answers come back in any order: Tuesday's may be the later one."
+        },
+        {
+          "active": ["answers", "answers->cards", "cards"],
+          "note": "Only Thursday's answer may reach the cards. Tuesday's is dropped whenever it comes."
+        }
+      ]
+    },
+    "cancel-unwanted": {
+      "steps": [
+        {
+          "active": ["days", "days->app", "app"],
+          "note": "Thursday is chosen while Tuesday's request is still on its way."
+        },
+        {
+          "active": ["app", "app->api", "api"],
+          "note": "The old request is cancelled, and so is any request still travelling when the screen closes."
+        },
+        {
+          "active": ["answers", "cards"],
+          "note": "A cancel is not a failure: no alert appears, and the cards show Thursday."
+        }
+      ]
+    }
+  }
+}

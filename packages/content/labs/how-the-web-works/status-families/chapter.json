@@ -1,0 +1,105 @@
+{
+  "id": "status-families",
+  "title": "The families of statuses",
+  "files": ["src/statuses.js", "run.js", "server/station.js"],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "family",
+      "title": "Name the family of a status",
+      "file": "src/statuses.js",
+      "description": "Under `// Task 1` in `src/statuses.js`, make `statusFamily(status)` take a status number and give back the name of its family as text: `'information'` for 100 to 199, `'success'` for 200 to 299, `'redirect'` for 300 to 399, `'client error'` for 400 to 499, `'server error'` for 500 to 599, and `'unknown'` for anything else.\n\nCheck calls `statusFamily` with statuses of its own, at the edges of the families and outside them.",
+      "nextSteps": [
+        "Start with the numbers that are in no family at all.",
+        "Work out the family from the first digit of the status, as the lesson shows.",
+        "Give back the name with the exact words of the task.",
+        "Run `node run.js` and read the five Task 1 lines."
+      ],
+      "hints": [
+        "The first digit of a status names its family. 100 to 599 are the statuses that have one.",
+        "`Math.floor(status / 100)` gives the first digit of a three digit number. You can compare it with `===`, or use it to pick from a list of the five names.",
+        "Return `'unknown'` when `status < 100 || status > 599`. Otherwise keep the names in a list, in order, and return the one at `Math.floor(status / 100) - 1`."
+      ],
+      "docs": [
+        {
+          "title": "HTTP response status codes",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status"
+        },
+        {
+          "title": "Math.floor()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/floor"
+        }
+      ],
+      "videos": [
+        {
+          "title": "HTTP status codes in five minutes",
+          "url": "https://www.youtube.com/watch?v=qmpUfWN7hh4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "show",
+      "title": "Read a show, or say why not",
+      "file": "src/statuses.js",
+      "description": "Under `// Task 2`, make `showText(base, slug)` ask the server at `base` for the page `/shows/<slug>` and decide by the family of the answer's status:\n\n- success: give back the text of the body\n- client error: give back `null`, because the show is not there for this request\n- server error: throw an `Error` whose message has the status number in it\n\nCheck starts a server of its own that answers with statuses from each family, and looks at the request its server received and at what `showText` gave back or threw.",
+      "nextSteps": [
+        "Send the request and wait for the answer.",
+        "Work out the family of its status; your function from Task 1 can do that.",
+        "Give back the body, or `null`, or throw, as the task lists.",
+        "Run `node run.js`: one show is there, one is not, and the test card breaks the server."
+      ],
+      "hints": [
+        "`fetch` does not fail on a 404 or a 500, so the decision is yours, made from `response.status`.",
+        "Read the body only in the success family. `throw new Error(message)` stops the function at once and hands the error to whoever called it.",
+        "After `const family = statusFamily(response.status)`, return the body when it is `'success'`, return `null` when it is `'client error'`, and when it is `'server error'`, `throw new Error(`The server answered ${response.status}`)`."
+      ],
+      "docs": [
+        {
+          "title": "throw",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw"
+        },
+        {
+          "title": "Client error responses",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#client_error_responses"
+        },
+        {
+          "title": "Server error responses",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#server_error_responses"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "retry",
+      "title": "Ask again when the server is in trouble",
+      "file": "src/statuses.js",
+      "description": "Under `// Task 3`, make `fetchWithRetry(address, tries)` ask for the page at `address`. While the answer is in the server error family, it asks again, sending at most `tries` requests in all. An answer from any other family is final at once. It gives back `{ status, body }` of the last answer it got.\n\nCheck starts a server of its own that answers 500s, 502s and 503s before it recovers, or never recovers, or answers 404, and counts the requests its server received.",
+      "nextSteps": [
+        "Send the first request and keep the answer in a `let`.",
+        "Write a loop that asks again while the answer is a server error.",
+        "Count the requests, and stop the loop when the count reaches `tries`.",
+        "Return the status and the body of the last answer, then run `node run.js`."
+      ],
+      "hints": [
+        "A loop that asks again needs two reasons to stop: an answer that is not a server error, and running out of tries.",
+        "A `while` loop with both conditions joined by `&&` stops as soon as either one is false. Count the requests in a variable that starts at 1 after the first one.",
+        "`while (statusFamily(response.status) === 'server error' && sent < tries) { response = await fetch(address); sent += 1 }`, then return `{ status: response.status, body: await response.text() }`."
+      ],
+      "docs": [
+        {
+          "title": "while",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/while"
+        },
+        {
+          "title": "503 Service Unavailable",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/503"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

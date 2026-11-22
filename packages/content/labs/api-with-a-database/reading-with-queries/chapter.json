@@ -1,0 +1,105 @@
+{
+  "id": "reading-with-queries",
+  "title": "Read workshops with queries",
+  "files": [
+    "src/store.js",
+    "src/routes/workshops.js",
+    "src/app.js",
+    "src/db.js",
+    "try.js",
+    "server.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js starts the API on data/kilnworth.db and sends it a few reads.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "list",
+      "title": "List the workshops from the table",
+      "file": "src/store.js",
+      "description": "Implement `list()` in `createStore(db)` in `src/store.js`, for now without filters. It returns every row of the `workshops` table as `{ id, title, day, seats, priceCents }`, in id order, and the query itself says that order.\n\nThe check fills a database of its own, sends `GET /workshops` and reads the SQL your store hands the database.",
+      "nextSteps": [
+        "Write the `SELECT` with the five columns.",
+        "Say the order the rows come back in.",
+        "Run it with the method that gives back every row, and return what it gives.",
+        "Run `node try.js`."
+      ],
+      "hints": [
+        "The route already sends whatever `list` returns, so `list` only has to give back the rows.",
+        "`ORDER BY id` puts the rows in id order. `.all()` gives back an array with one object per row, and `.get()` only the first row.",
+        "`return db.prepare('SELECT id, title, day, seats, priceCents FROM workshops ORDER BY id').all()`."
+      ],
+      "docs": [
+        { "title": "SQLite SELECT", "url": "https://sqlite.org/lang_select.html" },
+        { "title": "SQLite ORDER BY", "url": "https://sqlite.org/lang_select.html#orderby" },
+        {
+          "title": "node:sqlite statement.all()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/sqlite.html#statementallnamedparameters-anonymousparameters"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "one",
+      "title": "Read one workshop by its id",
+      "file": "src/store.js",
+      "description": "Implement `get(id)` in `src/store.js`. It returns the workshop whose `id` is `id`, as `{ id, title, day, seats, priceCents }`, or `undefined` when there is no such row. The id reaches the database in the place of a `?`, never inside the SQL text.\n\nThe check sends `GET /workshops/:id` for ids that are in its table, one that is not and one that is not a number, and reads the SQL your store hands the database.",
+      "nextSteps": [
+        "Write a `SELECT` with a `WHERE` on the id.",
+        "Leave a `?` where the id goes.",
+        "Run it with the method that gives back one row, handing it the id.",
+        "Run `node try.js` and look at the 404."
+      ],
+      "hints": [
+        "The route answers 404 when `get` returns nothing, so a missing row has to come back as `undefined`, not as an empty list.",
+        "`.get(value)` fills the `?` with the value and gives back the first matching row, or `undefined`.",
+        "`return db.prepare('SELECT id, title, day, seats, priceCents FROM workshops WHERE id = ?').get(id)`."
+      ],
+      "docs": [
+        {
+          "title": "node:sqlite statement.get()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/sqlite.html#statementgetnamedparameters-anonymousparameters"
+        },
+        { "title": "SQLite WHERE", "url": "https://sqlite.org/lang_select.html#whereclause" },
+        { "title": "SQLite parameters", "url": "https://sqlite.org/lang_expr.html#varparam" }
+      ],
+      "videos": [
+        {
+          "title": "How text can change a SQL query",
+          "url": "https://www.youtube.com/watch?v=ciNHn38EyRc"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "filter",
+      "title": "Filter in the query",
+      "file": "src/store.js",
+      "description": "Make `list({ day, maxPriceCents })` in `src/store.js` use its filters. The route hands them over; one that was not asked for is `undefined`.\n\n- `day` keeps the rows whose `day` is that day\n- `maxPriceCents` keeps the rows whose `priceCents` is that much or less, and `0` is a real filter\n- with both, a row has to match both; with neither, every row comes back\n\nThe database does the filtering: the query gives back only the rows in the answer. Each value reaches the database in the place of a `?`.\n\nThe check sends filtered lists, including a day that looks like SQL, counts the rows your query gives back and reads the SQL your store hands the database.",
+      "nextSteps": [
+        "Start a list of conditions and a list of values.",
+        "Add a condition and its value for each filter that was given.",
+        "Put the conditions into the query only when there are any.",
+        "Hand the values to `.all()` and run `node try.js`."
+      ],
+      "hints": [
+        "Only the pieces of SQL you write yourself may be joined into the query. What the visitor sent goes in the list of values.",
+        "Test each filter with `!== undefined`, so `0` counts. `conditions.join(' AND ')` joins the conditions, and `.all(...values)` hands the values over in order.",
+        "`if (day !== undefined) { conditions.push('day = ?'); values.push(day) }`, the same for `priceCents <= ?`, then `WHERE ${conditions.join(' AND ')}` before `ORDER BY id` when there are conditions."
+      ],
+      "docs": [
+        { "title": "SQLite WHERE", "url": "https://sqlite.org/lang_select.html#whereclause" },
+        {
+          "title": "SQLite expressions and AND",
+          "url": "https://sqlite.org/lang_expr.html#binaryops"
+        },
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

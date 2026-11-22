@@ -1,0 +1,76 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "list", "label": "price-list.js", "kind": "file" },
+      { "id": "store", "label": "store.js", "kind": "file" },
+      { "id": "docket", "label": "new Docket()", "kind": "function", "mine": true },
+      { "id": "paper", "label": "paper.json", "kind": "data" },
+      { "id": "state", "label": "State and value", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "list", "to": "store", "label": "which paper" },
+      { "from": "store", "to": "docket", "label": "executor" },
+      { "from": "docket", "to": "paper", "label": "starts the read" },
+      { "from": "paper", "to": "state", "label": "resolve" },
+      { "from": "docket", "to": "list", "label": "the docket" }
+    ],
+    "note": "The paper count now comes back at once as a docket, which is kept or failed when the file has been read."
+  },
+  "tasks": {
+    "settle": {
+      "steps": [
+        {
+          "active": ["list", "list->store", "store", "store->docket", "docket"],
+          "note": "The price list asks the store room for card, and the store makes a docket with an executor that knows how to read the file."
+        },
+        {
+          "active": ["docket", "docket->paper", "paper"],
+          "note": "The constructor runs the executor at once, handing it resolve and reject, and the file starts to be read."
+        },
+        {
+          "active": ["docket", "docket->list", "list"],
+          "value": { "kind": "map", "label": "the docket now", "entries": [{ "key": "state", "value": "pending" }, { "key": "value", "value": "nothing yet" }] },
+          "note": "The price list gets the docket straight away, still pending, and carries on."
+        },
+        {
+          "active": ["paper", "paper->state", "state"],
+          "value": { "kind": "map", "label": "a moment later", "entries": [{ "key": "state", "value": "fulfilled" }, { "key": "value", "value": "the count" }] },
+          "note": "When the file has been read, resolve keeps the docket with the count."
+        }
+      ]
+    },
+    "once": {
+      "steps": [
+        {
+          "active": ["docket"],
+          "note": "The posters are counted by hand, and their executor calls resolve twice."
+        },
+        {
+          "active": ["docket", "state"],
+          "note": "The first call settles the docket."
+        },
+        {
+          "active": ["state"],
+          "note": "Every later call to resolve or reject is ignored, quietly, so the docket keeps its first answer."
+        }
+      ]
+    },
+    "throwing-executor": {
+      "steps": [
+        {
+          "active": ["docket"],
+          "note": "The smudged count's executor throws before it can settle anything."
+        },
+        {
+          "active": ["docket", "state"],
+          "value": { "kind": "map", "label": "the docket", "entries": [{ "key": "state", "value": "rejected" }, { "key": "value", "value": "what was thrown" }] },
+          "note": "The constructor catches the throw and fails the docket with exactly what was thrown."
+        },
+        {
+          "active": ["docket", "docket->list", "list"],
+          "note": "The price list still gets a docket, and nothing crashes."
+        }
+      ]
+    }
+  }
+}

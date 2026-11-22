@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Ivo",
+      "say": "Same list, same filters, please.",
+      "note": "From the sign-up page."
+    },
+    {
+      "title": "The API",
+      "text": "Still reads every workshop from memory.",
+      "note": "The file sits beside it, unread."
+    },
+    {
+      "title": "Your code",
+      "file": "store.js",
+      "mine": true,
+      "gap": "Nothing asks the file",
+      "tasks": ["List from the table", "Read one by its id", "Filter in the query"]
+    },
+    {
+      "title": "kilnworth.db",
+      "rows": [
+        ["Glazing basics", "thu"],
+        ["Second steps", "thu"],
+        ["Family morning", "sat"]
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Thursdays",
+    "wrong": "from memory",
+    "why": "Not the file",
+    "right": "from the file"
+  },
+  "captions": [
+    "On the sign-up page, Ivo asks for the Thursday workshops, the way he always has.",
+    "The answer still comes from memory, while the studio's database file sits unread.",
+    "You write the list, one workshop by its id and the filters as queries on the file.",
+    "The Thursday workshops come back from kilnworth.db, picked by the database.",
+    "Every read comes from the file now, with the visitor's values kept out of the SQL."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Same lines, a different order. Why?", "note": "Since counts are kept in memory." },
+    { "title": "Invite count", "text": "Already kept, so its callback runs at once.", "note": "Card's runs later." },
+    {
+      "title": "Your docket",
+      "file": "docket.js",
+      "mine": true,
+      "gap": "The order depends on luck",
+      "tasks": ["Callbacks run later", "Docket.all()", "Docket.race()"]
+    },
+    { "title": "Idris's screen", "text": "Every count in the same order, every night." }
+  ],
+  "ticket": { "label": "Invite count", "wrong": "jumps ahead", "why": "Ran at once", "right": "in order" },
+  "captions": [
+    "Idris keeps the paper count in memory now, and the price list prints in a new order.",
+    "A docket already kept runs its callback at once, so the invite line jumps ahead.",
+    "You make callbacks always run later, then write all and race, in three tasks.",
+    "Now the invite count prints in its place, like the card count before it.",
+    "One order every night, many answers at once, and await is no longer a mystery."
+  ]
+}

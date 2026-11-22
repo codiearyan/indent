@@ -1,0 +1,31 @@
+{
+  "stations": [
+    {
+      "title": "Odette",
+      "say": "Why is an error up as a show?",
+      "note": "In big letters, on air."
+    },
+    { "title": "Listings screen", "text": "Reads the body and nothing else." },
+    {
+      "title": "Your code",
+      "file": "answers.js",
+      "mine": true,
+      "gap": "The status is never read",
+      "tasks": ["Read the status", "Read a header", "Read it all, once"]
+    },
+    { "title": "Cupboard server", "text": "Says how it went before the body starts." }
+  ],
+  "ticket": {
+    "label": "midnight-quiz",
+    "wrong": "as a show",
+    "why": "Body only",
+    "right": "not on"
+  },
+  "captions": [
+    "Odette sees a sentence about a missing show up on the listings screen.",
+    "The screen reads only the body, so a not found answer looks like a show.",
+    "You read the status line, a header, and the whole answer at once.",
+    "Now the screen sees that midnight-quiz is not on, and says so.",
+    "Every answer says how it went first. Now the screen reads that part too."
+  ]
+}
