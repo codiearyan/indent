@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CHECKS_BEFORE_FIRST_HINT } from '@shared/rules'
-import type { ChapterProgress, LabSummary, Level, PathDef } from '@shared/types'
+import type { ChapterProgress, Kind, LabSummary, PathDef } from '@shared/types'
 import {
   HOME_STEPS,
   REPO_STEPS,
@@ -15,7 +15,7 @@ import {
   suggestedRepo
 } from './guide'
 
-function lab(id: string, level: Level = 'easy', extra: Partial<LabSummary> = {}): LabSummary {
+function lab(id: string, kind: Kind = 'foundations', extra: Partial<LabSummary> = {}): LabSummary {
   return {
     id,
     title: id,
@@ -23,7 +23,7 @@ function lab(id: string, level: Level = 'easy', extra: Partial<LabSummary> = {})
     category: '',
     language: 'javascript',
     tags: [],
-    level,
+    kind,
     parts: [{ title: 'One', chapters: ['a', 'b'] }],
     chapters: [
       { id: 'a', number: 1, title: 'A', part: 'One', taskCount: 2, points: 20 },
@@ -49,7 +49,7 @@ const paths: PathDef[] = [
     stages: [{ title: 'One', labs: ['node', 'sql'] }]
   }
 ]
-const labs = [lab('react', 'medium'), lab('node', 'medium'), lab('basics'), lab('sql')]
+const labs = [lab('react', 'project'), lab('node', 'project'), lab('basics'), lab('sql')]
 const fresh = { chapters: {}, lastOpened: undefined }
 
 describe('routeOf', () => {
@@ -105,7 +105,7 @@ describe('suggestedRepo', () => {
     expect(suggestedRepo(labs, paths, ['backend'], 'new', fresh)?.id).toBe('node')
   })
 
-  it('suggests the first easy repo when no goal was picked', () => {
+  it('suggests the first foundations repo when no goal was picked', () => {
     expect(suggestedRepo(labs, paths, [], null, fresh)?.id).toBe('sql')
     expect(suggestedRepo(labs, paths, [], 'some', fresh)?.id).toBe('sql')
   })
@@ -147,7 +147,7 @@ describe('copy', () => {
   })
 
   it('says a repo that is not here yet downloads when it starts', () => {
-    const [, , start] = repoSteps(lab('x', 'easy', { availability: 'download' }), {})
+    const [, , start] = repoSteps(lab('x', 'foundations', { availability: 'download' }), {})
     expect(start.title).toBe('Start repo')
     expect(start.next).toBe('Start repo')
     expect(start.text).toMatch(/^Downloads the repo/)
@@ -163,7 +163,7 @@ describe('copy', () => {
     const all = [
       ...homeSteps({ goal: true, started: false }),
       ...homeSteps({ goal: false, started: true }),
-      ...repoSteps(lab('x', 'easy', { availability: 'download' }), {})
+      ...repoSteps(lab('x', 'foundations', { availability: 'download' }), {})
     ]
     for (const step of all) {
       expect(`${step.title} ${step.text}`).not.toMatch(/\b(lab|chapter|path)s?\b|—/i)

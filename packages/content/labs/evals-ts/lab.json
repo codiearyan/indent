@@ -5,7 +5,7 @@
   "category": "AI engineering",
   "language": "typescript",
   "tags": ["TypeScript", "AI"],
-  "level": "hard",
+  "kind": "project",
   "parts": [
     { "title": "Scoring one version", "chapters": ["exact-match", "graders", "judge"] },
     { "title": "Deciding between versions", "chapters": ["compare", "flaky"] }

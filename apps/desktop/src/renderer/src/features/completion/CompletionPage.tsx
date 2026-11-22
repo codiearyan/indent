@@ -320,7 +320,6 @@ function NextList({
               <span className="block truncate text-[13px] text-muted-foreground">
                 {[
                   started ? 'Started' : `${other.chapters.length} issues`,
-                  other.level && `${other.level[0].toUpperCase()}${other.level.slice(1)}`,
                   onRoadmap && 'on your roadmap'
                 ]
                   .filter(Boolean)

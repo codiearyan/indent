@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ChapterProgress, DayActivity, LabSummary } from '../../../../shared/types'
-import { NO_FILTERS, matchesFilters } from './labFilters'
+import { NO_FILTERS, kindOf, matchesFilters } from './labFilters'
 import { labProgress } from './labStatus'
 import { intensity, longestStreak, recentWeeks, yearSummary, yearWeeks } from './activity'
 
@@ -11,7 +11,7 @@ const lab: LabSummary = {
   category: 'AI engineering',
   language: 'typescript',
   tags: [],
-  level: 'medium',
+  kind: 'project',
   parts: [{ title: 'One', chapters: ['a', 'b'] }],
   chapters: [
     { id: 'a', number: 1, title: 'A', part: 'One', taskCount: 2, points: 20 },
@@ -110,6 +110,14 @@ describe('streaks and year summary', () => {
   })
 })
 
+describe('kindOf', () => {
+  it('counts a repo with no kind, or one this app does not know, as a project', () => {
+    expect(kindOf({ ...lab, kind: 'bug-hunt' })).toBe('bug-hunt')
+    expect(kindOf({ ...lab, kind: undefined })).toBe('project')
+    expect(kindOf({ ...lab, kind: 'workshop' as never })).toBe('project')
+  })
+})
+
 describe('matchesFilters', () => {
   it('keeps everything when nothing is picked', () => {
     expect(matchesFilters(lab, 'not-started', NO_FILTERS)).toBe(true)
@@ -121,15 +129,6 @@ describe('matchesFilters', () => {
     expect(matchesFilters(lab, 'not-started', { ...picked, languages: ['sql'] })).toBe(false)
     expect(matchesFilters(lab, 'not-started', { ...picked, languages: ['typescript'] })).toBe(true)
     expect(matchesFilters(lab, 'not-started', { ...picked, status: 'completed' })).toBe(false)
-  })
-
-  it('keeps the levels that are picked, and drops a repo with no level', () => {
-    expect(matchesFilters(lab, 'not-started', { ...NO_FILTERS, levels: ['easy', 'medium'] })).toBe(
-      true
-    )
-    expect(matchesFilters(lab, 'not-started', { ...NO_FILTERS, levels: ['hard'] })).toBe(false)
-    const unrated = { ...lab, level: undefined }
-    expect(matchesFilters(unrated, 'not-started', { ...NO_FILTERS, levels: ['easy'] })).toBe(false)
   })
 
   it('searches the title, shelf and tags without minding case', () => {

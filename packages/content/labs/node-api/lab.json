@@ -5,7 +5,7 @@
   "category": "JavaScript and TypeScript",
   "language": "javascript",
   "tags": ["Node.js", "Project"],
-  "level": "hard",
+  "kind": "project",
   "parts": [
     { "title": "Answering requests", "chapters": ["first-routes", "json-bodies"] },
     { "title": "The fleet behind an API", "chapters": ["boat-crud", "list-queries", "auth-and-errors"] }

@@ -1,7 +1,5 @@
-import type { LabSummary, Level, PathDef } from '@shared/types'
+import type { LabSummary, PathDef } from '@shared/types'
 import type { Experience } from '@/stores/settings'
-
-const LEVEL_ORDER: Record<Level, number> = { easy: 0, medium: 1, hard: 2 }
 
 /** The repos of the roadmaps picked as goals, in the order the goals were picked. */
 export function goalLabIds(paths: PathDef[], goals: string[]): string[] {
@@ -13,7 +11,7 @@ export function goalLabIds(paths: PathDef[], goals: string[]): string[] {
 /**
  * Repos in the order to suggest them: the roadmaps picked as goals first, then every roadmap's
  * order, then repos no roadmap names. Outside the goals, new learners, and anyone without a goal
- * who is not experienced, get easy repos first; experienced ones get easy repos last.
+ * who is not experienced, get foundations first; experienced ones get foundations last.
  */
 export function recommendedOrder(
   labs: LabSummary[],
@@ -29,12 +27,12 @@ export function recommendedOrder(
   const goalSet = new Set(fromGoal)
   const inGoal = ordered.filter((lab) => goalSet.has(lab.id))
   const rest = ordered.filter((lab) => !goalSet.has(lab.id))
-  const level = (lab: LabSummary): number => LEVEL_ORDER[lab.level ?? 'medium']
+  const foundations = (lab: LabSummary): number => Number(lab.kind === 'foundations')
   if (experience === 'new' || (inGoal.length === 0 && experience !== 'experienced')) {
-    rest.sort((a, b) => level(a) - level(b))
+    rest.sort((a, b) => foundations(b) - foundations(a))
   }
   if (experience === 'experienced') {
-    rest.sort((a, b) => Number(a.level === 'easy') - Number(b.level === 'easy'))
+    rest.sort((a, b) => foundations(a) - foundations(b))
   }
   return [...inGoal, ...rest]
 }

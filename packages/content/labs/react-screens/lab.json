@@ -5,7 +5,7 @@
   "category": "Web and frontend",
   "language": "react",
   "tags": ["React"],
-  "level": "medium",
+  "kind": "project",
   "parts": [
     {
       "title": "A screen made of parts",
