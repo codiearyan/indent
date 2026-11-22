@@ -9,7 +9,7 @@
       "gap": "Nowhere to put things",
       "tasks": ["Receipts folder", "Month folders", "Poster ideas folder", "Empty print queue"]
     },
-    { "title": "Top folder", "rows": [["receipts", "folder"], ["orders/2026", "3 months"], ["print-queue.txt", "empty"]] }
+    { "title": "Top folder", "text": "A place for every kind of file.", "note": "Ready for what comes next." }
   ],
   "ticket": { "label": "Receipts", "wrong": "homeless", "why": "No folder", "right": "have a home" },
   "captions": [

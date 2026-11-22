@@ -8,6 +8,7 @@
     "Shell"
   ],
   "kind": "foundations",
+  "format": 3,
   "parts": [
     {
       "title": "Sorting the shop laptop",

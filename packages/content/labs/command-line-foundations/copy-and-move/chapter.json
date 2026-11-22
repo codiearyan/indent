@@ -6,6 +6,7 @@
     "description": "A shell that starts in the shop's top folder. Copy and move what the jobs ask for, then list both places to see the result.",
     "suggestedCommand": "ls"
   },
+  "movesFiles": true,
   "tasks": [
     {
       "id": "move",

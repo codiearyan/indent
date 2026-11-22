@@ -6,6 +6,7 @@
     "description": "A shell that starts in the shop's top folder. List what you are about to remove before you remove it.",
     "suggestedCommand": "ls artwork downloads old-site"
   },
+  "movesFiles": true,
   "tasks": [
     {
       "id": "duplicate",

@@ -6,6 +6,7 @@
     "description": "A shell that starts in the shop's top folder. Try each pattern with ls before you move anything with it.",
     "suggestedCommand": "ls downloads"
   },
+  "movesFiles": true,
   "tasks": [
     {
       "id": "drawings",
