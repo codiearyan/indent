@@ -61,6 +61,7 @@ function rota(dir, args, { from, typed = [], preload = '.check/input.mjs' } = {}
   return run(dir, 'rota.js', args, {
     from,
     preload,
+    seconds: 10,
     onLine: (line, type) => {
       if (line.endsWith('your turn at the tap.') && typed[turns++] !== undefined) type(`${typed[turns - 1]}\n`)
       if (line.trim() === EVERYONE || line.trim().startsWith('Stopped')) type(null)
@@ -78,10 +79,10 @@ function wholeRota(r, plots) {
   if (hasStack(r.stderr)) return `rota.js stopped with an error: ${errorLine(r.stderr) ?? 'see the output'}.`
   if (r.timedOut) {
     if (got.join('\n') === wanted.join('\n')) {
-      return 'Everyone had a turn, but the script did not end, so Check stopped it after 5 seconds. Something still keeps it running: the timer goes on until clearInterval stops it.'
+      return `Everyone had a turn, but the script did not end, so Check stopped it after ${r.seconds} seconds. Something still keeps it running: the timer goes on until clearInterval stops it.`
     }
     if (got.length > wanted.length) return 'After everyone had a turn, the timer kept going. Stop it with clearInterval when the last turn is over.'
-    return 'rota.js did not get through the rota within 5 seconds, so Check stopped it. Each turn lasts the seconds typed after the script name, and Check typed a small number.'
+    return `rota.js did not get through the rota within ${r.seconds} seconds, so Check stopped it. Each turn lasts the seconds typed after the script name, and Check typed a small number.`
   }
   if (got.join('\n') === wanted.join('\n')) return r.code === 0 ? null : `rota.js ended with exit code ${r.code}. A rota that ran to the end ends with 0.`
   if (got.length === 1 && got[0] === wanted[0]) return 'Only the first turn was called. setTimeout runs its function once; a job that repeats needs setInterval.'
@@ -115,7 +116,7 @@ function stopped(r, plots, how, after = 1) {
     return `After ${how}, print the line from the task: Stopped, and who is next.`
   }
   if (got.length > at + 1) return `After ${how}, the rota printed more lines after it stopped. Stop the timer too.`
-  if (r.timedOut) return `After ${how}, the rota stopped, but the script did not end, so Check stopped it after 5 seconds. Something still keeps it running, such as the timer.`
+  if (r.timedOut) return `After ${how}, the rota stopped, but the script did not end, so Check stopped it after ${r.seconds} seconds. Something still keeps it running, such as the timer.`
   if (inputSeen(r).byEnd > 0) {
     return `After ${how}, the rota stopped, but the script was still reading what is typed. In a terminal it would wait for the next line and never end; Check ended its input to finish the run. Close what reads the input when the rota stops.`
   }

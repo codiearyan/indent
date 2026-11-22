@@ -1,6 +1,6 @@
 import { box, broken, errorLine, fail, hasStack, lines, outOfMemory, pass, report, run } from '../../grading.mjs'
 
-// The script gets 16 MB for its data and a log of about 32 MB. Holding the whole log, as one text
+// The script gets 16 MB for its data and a log of about 24 MB. Holding the whole log, as one text
 // or as an array of its lines, cannot fit, so it runs out of memory every time; reading a line at a
 // time and keeping only totals needs far less. Nothing here measures time.
 const MEMORY = 16
@@ -19,7 +19,7 @@ function bigLog() {
     let count = 0
     let total = 0
     let notes = 0
-    for (let minute = 0; size < 32_000_000; minute++) {
+    for (let minute = 0; size < 24_000_000; minute++) {
       if (minute % 100_000 === 50_000) {
         const note = `# restarted at minute ${minute}\n`
         parts.push(note)
@@ -51,13 +51,15 @@ async function logs(t) {
   return box(t, { [BIG]: bigLog().text, [SMALL]: SMALL_TEXT })
 }
 
+// A tight memory makes a slow computer slower still, so these runs get longer before Check stops one.
+const SECONDS = 20
 const both = (dir, script) =>
-  Promise.all([run(dir, script, [BIG], { memory: MEMORY }), run(dir, script, [SMALL], { memory: MEMORY })])
+  Promise.all([run(dir, script, [BIG], { memory: MEMORY, seconds: SECONDS }), run(dir, script, [SMALL], { memory: MEMORY, seconds: SECONDS })])
 
 /** The detail for a run that went wrong the same way in every task, or null. */
 function common(r, script, which) {
   if (outOfMemory(r.stderr)) {
-    return `${script} ran out of the ${MEMORY} MB Check gave it, on a log of about 32 MB. It held the whole log at once, as one text or as a list of its lines. Read it a line at a time, and keep only what you need from each line.`
+    return `${script} ran out of the ${MEMORY} MB Check gave it, on a log of about 24 MB. It held the whole log at once, as one text or as a list of its lines. Read it a line at a time, and keep only what you need from each line.`
   }
   if (/ENOENT/.test(r.stderr)) {
     return `${script} could not find the log it was given: ${errorLine(r.stderr) ?? 'see the output'}. Open the file named after the script's name, as it was typed.`

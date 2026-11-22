@@ -130,11 +130,12 @@ const quote = (arg) => (arg === '' || /\s/.test(arg) ? `"${arg}"` : arg)
  * Runs `node <script> <args>` the way a person types it in the folder `from` (relative to dir).
  * `preload`, a module in dir, runs first and is left out of the command shown.
  * `env` sets settings in its environment (undefined removes one) and `memory` caps its data in MB;
- * either shows the command the way try.js takes it. With `onLine(line, type)`, standard input
+ * either shows the command the way try.js takes it. `seconds` overrides how long it may run.
+ * With `onLine(line, type)`, standard input
  * stays open, like a terminal where nobody types, type(text) types into it and type(null) ends it.
- * Returns { code, stdout, stderr, timedOut, flooded, command, from, guarded, memory }.
+ * Returns { code, stdout, stderr, timedOut, flooded, command, from, guarded, memory, seconds }.
  */
-export async function run(dir, script, args = [], { from = '.', preload, env, memory, onLine } = {}) {
+export async function run(dir, script, args = [], { from = '.', preload, env, memory, onLine, seconds = SECONDS } = {}) {
   const cwd = at(dir, from)
   await mkdir(cwd, { recursive: true })
   const file = relative(cwd, at(dir, script))
@@ -142,11 +143,11 @@ export async function run(dir, script, args = [], { from = '.', preload, env, me
   const before = preload ? ['--import', pathToFileURL(at(dir, preload)).href] : []
   const limit = memory ? [`--max-old-space-size=${memory}`] : []
   const child = spawnNode([...flags, ...limit, ...before, file, ...args], cwd, { env, input: Boolean(onLine) })
-  const r = await collect(child, SECONDS * 1000, onLine && talk(child, onLine))
+  const r = await collect(child, seconds * 1000, onLine && talk(child, onLine))
   const settings = Object.entries(env ?? {}).filter(([, v]) => v !== undefined).map(([k, v]) => quote(`${k}=${v}`))
   const helper = env || memory ? ['try.js', ...settings, ...(memory ? [`--memory=${memory}`] : [])] : []
   const command = ['node', ...helper, file, ...args.map(quote)].join(' ')
-  return { ...r, command, from, guarded: flags.length > 0, memory }
+  return { ...r, command, from, guarded: flags.length > 0, memory, seconds }
 }
 
 /** True when Node stopped because the script's data outgrew the memory it was given. */
@@ -162,7 +163,7 @@ export function report(r) {
   const end = r.flooded
     ? 'stopped by Check: it printed without stopping'
     : r.timedOut
-      ? `stopped by Check after ${SECONDS} seconds`
+      ? `stopped by Check after ${r.seconds ?? SECONDS} seconds`
       : oom
         ? `stopped by Node: it ran out of the ${r.memory} MB it was given`
         : `exit code: ${r.code}`
@@ -216,7 +217,7 @@ export async function broken(name, r, dir, script) {
   if (r.timedOut) {
     return fail(
       name,
-      `${script} did not end within ${SECONDS} seconds, so Check stopped it. A script ends by itself once its last line has run and nothing is left to wait for. Look for a loop that never stops, a timer that keeps going, or a wait for typing.`,
+      `${script} did not end within ${r.seconds ?? SECONDS} seconds, so Check stopped it. A script ends by itself once its last line has run and nothing is left to wait for. Look for a loop that never stops, a timer that keeps going, or a wait for typing.`,
       report(r)
     )
   }
