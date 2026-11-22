@@ -1,0 +1,83 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "list", "label": "today.txt", "kind": "file" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "top", "label": "Top folder", "kind": "data" },
+      { "id": "inside", "label": "orders and artwork", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "list", "to": "you", "label": "the jobs" },
+      { "from": "you", "to": "top", "label": "new names" },
+      { "from": "top", "to": "inside", "label": "a path" }
+    ],
+    "note": "You make the folders and the file the studio needs before anything is sorted into them."
+  },
+  "tasks": {
+    "receipts": {
+      "steps": [
+        {
+          "active": ["list", "list->you"],
+          "note": "Idris needs a place for the card machine slips."
+        },
+        {
+          "active": ["you", "you->top", "top"],
+          "note": "A new, empty folder appears in the top folder, beside orders and artwork."
+        },
+        {
+          "active": ["top"],
+          "note": "A listing of the top folder shows its name, spelled exactly as asked."
+        }
+      ]
+    },
+    "months": {
+      "steps": [
+        {
+          "active": ["list", "list->you"],
+          "value": { "kind": "array", "label": "months to sort by", "values": ["jan", "feb", "mar"] },
+          "note": "Idris will sort this year's orders into one folder per month."
+        },
+        {
+          "active": ["you", "you->top", "top", "top->inside", "inside"],
+          "note": "The year folder goes inside orders, and the months go inside the year."
+        },
+        {
+          "active": ["inside"],
+          "note": "A listing of the year folder shows all three months side by side."
+        }
+      ]
+    },
+    "ideas": {
+      "steps": [
+        {
+          "active": ["list", "list->you"],
+          "note": "Maeve wants a folder for rough drawings, and its name has a space."
+        },
+        {
+          "active": ["you", "you->top", "top", "top->inside", "inside"],
+          "note": "The shell has to read the two words as one name, or it makes two folders."
+        },
+        {
+          "active": ["inside"],
+          "note": "artwork lists one new folder, not two."
+        }
+      ]
+    },
+    "queue": {
+      "steps": [
+        {
+          "active": ["list", "list->you"],
+          "note": "Maeve keeps a list of what to print next, and wants an empty file to start it."
+        },
+        {
+          "active": ["you", "you->top", "top"],
+          "note": "An empty file appears in the top folder, ready to open in the editor."
+        },
+        {
+          "active": ["top"],
+          "note": "The long listing shows it with a size of nothing at all."
+        }
+      ]
+    }
+  }
+}

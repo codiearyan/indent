@@ -1,0 +1,130 @@
+{
+  "id": "removing",
+  "title": "Removing for good",
+  "files": ["today.txt"],
+  "terminal": {
+    "description": "A shell that starts in the studio's top folder. List what you are about to remove before you remove it.",
+    "suggestedCommand": "ls artwork downloads old-site"
+  },
+  "tasks": [
+    {
+      "id": "duplicate",
+      "title": "Remove the duplicate fox poster",
+      "file": "today.txt",
+      "description": "`artwork` holds the fox poster twice: `fox-poster.svg` and an exact copy called `fox-poster copy.svg`. Remove the copy. `fox-poster.svg` stays.\n\nCheck looks for `fox-poster.svg` unchanged in `artwork` and no `fox-poster copy.svg` beside it.",
+      "nextSteps": [
+        "Run `ls artwork` and find both posters.",
+        "Look at the copy's name: it has a space in it.",
+        "Remove only the copy, keeping its name together.",
+        "Run `ls artwork` again: `fox-poster.svg` is still there."
+      ],
+      "hints": [
+        "The copy's name has a space, so it needs the same care as a folder name with a space.",
+        "`rm` with the name in quotes, or with a backslash before the space, removes exactly that file. A pattern like `fox-poster*` would catch the original too.",
+        "Run `rm \"artwork/fox-poster copy.svg\"` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "rm: remove files or directories",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/rm-invocation.html"
+        },
+        {
+          "title": "Quoting in the shell",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Quoting.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Copy, move and remove in the terminal",
+          "url": "https://www.youtube.com/watch?v=uDvJ5KhqT5A"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "temp",
+      "title": "Clear the temporary files",
+      "file": "today.txt",
+      "description": "Sol's handover note says the print driver fills `downloads` with `.tmp` files that are safe to delete. Remove every `.tmp` file in `downloads`. Every other file there stays.\n\nCheck looks for any `.tmp` file left in `downloads`, and fails if another file in `downloads` is gone.",
+      "nextSteps": [
+        "Run `ls downloads` and see which files end in `.tmp`.",
+        "Write a pattern for them and check it with `ls` first.",
+        "Remove them with the same pattern.",
+        "List `downloads` again: only the other files remain."
+      ],
+      "hints": [
+        "A pattern from the last issue picks out files by their ending.",
+        "`ls downloads/*.tmp` should list only the temporary files. Hand the same pattern to `rm`.",
+        "Run `rm downloads/*.tmp` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "rm: remove files or directories",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/rm-invocation.html"
+        },
+        {
+          "title": "Filename expansion",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Filename-Expansion.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rescue",
+      "title": "Rescue the logo",
+      "file": "today.txt",
+      "description": "The old web site in `old-site` is going, but Sol says to keep the logo. Get `old-site/logo.svg` into `artwork`, keeping the name `logo.svg`. Do this before the next task, because what `rm` removes does not come back.\n\nCheck looks for `artwork/logo.svg` with the logo's contents.",
+      "nextSteps": [
+        "Run `ls old-site` and find the logo.",
+        "Move it into `artwork` with a command from an earlier issue.",
+        "Run `ls artwork` and find `logo.svg`."
+      ],
+      "hints": [
+        "Nothing new here: you moved files into folders two issues ago.",
+        "`mv` takes the logo's path first and `artwork` last.",
+        "Run `mv old-site/logo.svg artwork` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "mv: move or rename files",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/mv-invocation.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "old-site",
+      "title": "Remove the old site",
+      "file": "today.txt",
+      "description": "Once the logo is safe, remove the folder `old-site` with everything still in it, the `images` folder included.\n\nCheck looks for `old-site` in the top folder and passes when it is gone.",
+      "nextSteps": [
+        "Check the previous task is done: the logo is in `artwork`.",
+        "Run `ls old-site` to see what is about to go.",
+        "Remove the whole folder in one command.",
+        "Run `ls` in the top folder: `old-site` is no longer there."
+      ],
+      "hints": [
+        "`rmdir` refuses a folder that still holds files, and plain `rm` refuses any folder.",
+        "`rm -r` removes a folder with everything inside it. Type the folder's name carefully.",
+        "Run `rm -r old-site` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "rm: remove files or directories",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/rm-invocation.html"
+        },
+        {
+          "title": "rmdir: remove empty directories",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/rmdir-invocation.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Copy, move and remove in the terminal",
+          "url": "https://www.youtube.com/watch?v=uDvJ5KhqT5A"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

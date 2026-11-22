@@ -1,0 +1,24 @@
+{
+  "id": "command-line-foundations",
+  "title": "Command line foundations",
+  "description": "Ashgrove Print Studio is a two-person screen-print studio on Tanner Row, and years of posters, orders and invoices sit in one laptop folder that nobody can find anything in. You have never typed a command, and you start there: look around, move between folders, then make, copy, move and remove files until the folder is sorted. Each issue teaches one part of the command line in a real shell, one small step at a time.",
+  "category": "DevOps and tools",
+  "language": "shell",
+  "tags": [
+    "Shell"
+  ],
+  "kind": "foundations",
+  "parts": [
+    {
+      "title": "Sorting the studio laptop",
+      "chapters": [
+        "where-you-are",
+        "paths",
+        "new-folders",
+        "copy-and-move",
+        "many-at-once",
+        "removing"
+      ]
+    }
+  ]
+}

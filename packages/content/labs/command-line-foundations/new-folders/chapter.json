@@ -1,0 +1,121 @@
+{
+  "id": "new-folders",
+  "title": "Making folders and files",
+  "files": ["today.txt"],
+  "terminal": {
+    "description": "A shell that starts in the studio's top folder. Make what the jobs ask for, then list it to see it is there.",
+    "suggestedCommand": "ls"
+  },
+  "tasks": [
+    {
+      "id": "receipts",
+      "title": "Make a folder for receipts",
+      "file": "today.txt",
+      "description": "Idris wants a folder called `receipts` in the top folder, for the card machine slips.\n\nCheck looks in the top folder for a folder with exactly that name.",
+      "nextSteps": [
+        "Make sure you are in the top folder: `pwd`, or `ls` should show `today.txt`.",
+        "Make the folder with the command from the lesson.",
+        "Run `ls` and find `receipts` in the list."
+      ],
+      "hints": [
+        "The lesson's command for a new folder is short for make directory.",
+        "`mkdir` takes the name of the folder to make, after a space.",
+        "Run `mkdir receipts` in the top folder."
+      ],
+      "docs": [
+        {
+          "title": "mkdir: make directories",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/mkdir-invocation.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Making and removing folders and files",
+          "url": "https://www.youtube.com/watch?v=jnv0wge-OFo"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "months",
+      "title": "Make month folders for the orders",
+      "file": "today.txt",
+      "description": "Idris will sort this year's orders by month. Inside `orders`, make a folder `2026`, and inside `2026` make three folders: `jan`, `feb` and `mar`.\n\nCheck looks for `orders/2026/jan`, `orders/2026/feb` and `orders/2026/mar`, all folders.",
+      "nextSteps": [
+        "Look at what `orders` holds today with `ls orders`.",
+        "Make `2026` inside `orders`.",
+        "Make the three month folders inside `orders/2026`, in one command or three.",
+        "List `orders/2026` to see all three."
+      ],
+      "hints": [
+        "You can make a folder inside another by giving its path, or by moving into the parent first.",
+        "`mkdir` takes several names at once, and `-p` also makes any missing folders on the way.",
+        "From the top folder, `mkdir -p` with the three paths `orders/2026/jan`, `orders/2026/feb` and `orders/2026/mar` makes them all."
+      ],
+      "docs": [
+        {
+          "title": "mkdir: make directories",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/mkdir-invocation.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ideas",
+      "title": "Make a folder for poster ideas",
+      "file": "today.txt",
+      "description": "Maeve wants a folder for rough drawings inside `artwork`, called `poster ideas`, with the space.\n\nCheck looks for `artwork/poster ideas`. It also fails while a stray empty `poster` or `ideas` folder is left in `artwork` or the top folder, from a name the shell split at the space.",
+      "nextSteps": [
+        "Remember from the last issue what the shell does with a space.",
+        "Make the folder inside `artwork`, keeping the space inside the name.",
+        "Run `ls artwork` and check there is one new name, not two.",
+        "If a split made two folders, remove them before you try again."
+      ],
+      "hints": [
+        "A space separates the parts of a command, so a name with a space needs the same care as with `cd`.",
+        "Quotes or a backslash keep the space inside the name. An empty folder made by mistake goes away with `rmdir`.",
+        "Run `mkdir \"artwork/poster ideas\"` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "Quoting in the shell",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Quoting.html"
+        },
+        {
+          "title": "rmdir: remove empty directories",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/rmdir-invocation.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "queue",
+      "title": "Make an empty print queue file",
+      "file": "today.txt",
+      "description": "Maeve keeps a list of what to print next. Make an empty file called `print-queue.txt` in the top folder. It gets filled in later.\n\nCheck looks for a file with exactly that name in the top folder and checks that it is empty.",
+      "nextSteps": [
+        "Go back to the top folder if you moved.",
+        "Make the empty file with the command from the lesson.",
+        "Run `ls -l print-queue.txt` and look at its size."
+      ],
+      "hints": [
+        "`mkdir` makes folders. The lesson names another command for an empty file.",
+        "`touch` makes an empty file when the name does not exist yet.",
+        "Run `touch print-queue.txt` in the top folder."
+      ],
+      "docs": [
+        {
+          "title": "touch: change file timestamps",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/touch-invocation.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Making and removing folders and files",
+          "url": "https://www.youtube.com/watch?v=jnv0wge-OFo"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

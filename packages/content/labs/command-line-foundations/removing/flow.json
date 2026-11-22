@@ -1,0 +1,82 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "maeve", "label": "Maeve", "kind": "story" },
+      { "id": "look", "label": "Look first", "kind": "story", "mine": true },
+      { "id": "remove", "label": "Your removals", "kind": "story", "mine": true },
+      { "id": "clutter", "label": "Clutter", "kind": "data" },
+      { "id": "keep", "label": "What stays", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "maeve", "to": "look", "label": "what can go" },
+      { "from": "look", "to": "remove", "label": "the exact list" },
+      { "from": "remove", "to": "clutter", "label": "gone for good" },
+      { "from": "look", "to": "keep", "label": "left alone" }
+    ],
+    "note": "You list exactly what will go, rescue what must stay, and remove the rest for good."
+  },
+  "tasks": {
+    "duplicate": {
+      "steps": [
+        {
+          "active": ["maeve", "maeve->look", "look"],
+          "note": "artwork holds the fox poster twice, and the copy's name has a space in it."
+        },
+        {
+          "active": ["look", "look->remove", "remove"],
+          "note": "The name has to reach the removal as one name, or it means two other files."
+        },
+        {
+          "active": ["remove", "remove->clutter", "clutter", "look->keep", "keep"],
+          "note": "The copy is gone, and the original poster is still in artwork."
+        }
+      ]
+    },
+    "temp": {
+      "steps": [
+        {
+          "active": ["maeve", "maeve->look", "look"],
+          "value": { "kind": "array", "label": "downloads holds", "values": ["printer leftovers", "price ideas", "stock count"] },
+          "note": "downloads mixes the printer's leftovers with files Maeve still needs."
+        },
+        {
+          "active": ["look", "look->remove", "remove"],
+          "note": "A pattern listed first shows only the leftovers, all sharing one ending."
+        },
+        {
+          "active": ["remove", "remove->clutter", "clutter", "look->keep", "keep"],
+          "note": "The leftovers are gone, and every other file in downloads stays."
+        }
+      ]
+    },
+    "rescue": {
+      "steps": [
+        {
+          "active": ["maeve", "maeve->look", "look"],
+          "note": "The old web site is going, but the logo inside it has to stay."
+        },
+        {
+          "active": ["look", "look->keep", "keep"],
+          "note": "The logo moves out to artwork before anything is removed."
+        }
+      ]
+    },
+    "old-site": {
+      "steps": [
+        {
+          "active": ["look"],
+          "value": { "kind": "array", "label": "old-site holds", "values": ["page", "styles", "images folder"] },
+          "note": "A listing shows what is left in the old site, now that the logo is safe."
+        },
+        {
+          "active": ["look", "look->remove", "remove"],
+          "note": "A folder that still holds files and folders needs a removal that goes all the way down."
+        },
+        {
+          "active": ["remove", "remove->clutter", "clutter"],
+          "note": "The whole old site is gone from the top folder, for good."
+        }
+      ]
+    }
+  }
+}

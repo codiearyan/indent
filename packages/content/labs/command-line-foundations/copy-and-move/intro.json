@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Can we tidy before Maeve edits?", "note": "Back up before anything changes." },
+    { "title": "Top folder", "text": "A loose invoice, a muddled poster name.", "note": "No copy of prices or orders." },
+    {
+      "title": "Your commands",
+      "file": "today.txt",
+      "mine": true,
+      "gap": "Files sit in the wrong place",
+      "tasks": ["File the invoice", "Rename the poster", "Copy the prices", "Back up orders"]
+    },
+    { "title": "invoices/march", "rows": [["invoice-0301.csv"], ["invoice-0302.csv"], ["invoice-0303.csv"]], "mark": 2 }
+  ],
+  "ticket": { "label": "Invoice 0303", "wrong": "loose", "why": "Not filed", "right": "filed" },
+  "captions": [
+    "At Ashgrove, Idris wants things filed and backed up before Maeve changes prices.",
+    "Today an invoice lies loose, the fox poster has a muddled name, and nothing is backed up.",
+    "You copy and move files into place, in four tasks.",
+    "The invoice is filed with March, the poster is renamed, and both backups exist.",
+    "Copies keep the old, moves tidy the new. The folder is safer and neater."
+  ]
+}

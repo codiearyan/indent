@@ -1,0 +1,85 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "list", "label": "today.txt", "kind": "file" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "from", "label": "Where it is", "kind": "data" },
+      { "id": "to", "label": "Where it goes", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "list", "to": "you", "label": "the jobs" },
+      { "from": "you", "to": "from", "label": "pick up" },
+      { "from": "from", "to": "to", "label": "copy or move" }
+    ],
+    "note": "You copy what must stay where it is and move what belongs somewhere else."
+  },
+  "tasks": {
+    "move": {
+      "steps": [
+        {
+          "active": ["list", "list->you"],
+          "note": "An invoice is lying loose in the top folder."
+        },
+        {
+          "active": ["you", "you->from", "from"],
+          "note": "It is picked up from the top folder, name and all."
+        },
+        {
+          "active": ["from", "from->to", "to"],
+          "value": { "kind": "map", "label": "after the move", "entries": [{ "key": "top folder", "value": "gone" }, { "key": "invoices/march", "value": "there" }] },
+          "note": "It lands in the March invoices and is no longer in the top folder."
+        }
+      ]
+    },
+    "rename": {
+      "steps": [
+        {
+          "active": ["list", "list->you"],
+          "note": "The fox poster in artwork has a long, muddled name."
+        },
+        {
+          "active": ["you", "you->from", "from"],
+          "note": "The poster stays in artwork; only its name changes."
+        },
+        {
+          "active": ["from", "from->to", "to"],
+          "note": "Afterwards artwork lists the poster under its new name and nothing under the old one."
+        }
+      ]
+    },
+    "copy": {
+      "steps": [
+        {
+          "active": ["list", "list->you"],
+          "note": "Maeve is about to change the price list, and Idris wants it kept as it is today."
+        },
+        {
+          "active": ["you", "you->from", "from"],
+          "note": "The price list stays exactly where it is."
+        },
+        {
+          "active": ["from", "from->to", "to"],
+          "value": { "kind": "map", "label": "after the copy", "entries": [{ "key": "prices.csv", "value": "unchanged" }, { "key": "prices-2025.csv", "value": "same contents" }] },
+          "note": "A second file with the same contents sits beside it under the new name."
+        }
+      ]
+    },
+    "backup": {
+      "steps": [
+        {
+          "active": ["list", "list->you"],
+          "note": "Idris wants a backup of every order before sorting starts."
+        },
+        {
+          "active": ["you", "you->from", "from"],
+          "value": { "kind": "array", "label": "orders holds", "values": ["three loose orders", "2026", "jan, feb, mar"] },
+          "note": "The orders folder holds loose orders and the month folders, each with orders inside."
+        },
+        {
+          "active": ["from", "from->to", "to"],
+          "note": "The backup is a new folder that holds the same files in the same folders."
+        }
+      ]
+    }
+  }
+}

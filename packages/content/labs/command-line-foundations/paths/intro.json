@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "How do I get around in here?", "note": "And into client proofs." },
+    { "title": "Top folder", "text": "You can look from here, but not move yet.", "note": "client proofs makes the shell complain." },
+    {
+      "title": "Your commands",
+      "file": "notes.txt",
+      "mine": true,
+      "gap": "Stuck in one folder",
+      "tasks": ["Go deep into archive", "From orders to March", "Into client proofs"]
+    },
+    { "title": "client proofs", "rows": [["pellow-bakery.svg"], ["thornby-books.svg"]] }
+  ],
+  "ticket": { "label": "client proofs", "wrong": "shut", "why": "A split name", "right": "open" },
+  "captions": [
+    "Back at Ashgrove, Idris needs to get around the folders, and into client proofs.",
+    "Today the shell stays in one folder, and the space in client proofs trips it up.",
+    "You move around with paths and get into client proofs, in three tasks.",
+    "The shell goes deep, climbs back out, and opens client proofs.",
+    "One map, many paths. Idris can now reach any folder from anywhere."
+  ]
+}

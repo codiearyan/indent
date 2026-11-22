@@ -1,0 +1,86 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "idris", "label": "Idris", "kind": "story" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "folder", "label": "Studio folder", "kind": "data" },
+      { "id": "screen", "label": "Terminal", "kind": "story" },
+      { "id": "notes", "label": "notes.txt", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "idris", "to": "you", "label": "questions" },
+      { "from": "you", "to": "folder", "label": "look" },
+      { "from": "folder", "to": "screen", "label": "what is there" },
+      { "from": "screen", "to": "notes", "label": "answers" }
+    ],
+    "note": "You look around the studio folder from the terminal and write what you find in notes.txt."
+  },
+  "tasks": {
+    "here": {
+      "steps": [
+        {
+          "active": ["idris", "idris->you"],
+          "note": "Idris wants to know where on the laptop the studio folder is."
+        },
+        {
+          "active": ["you", "you->folder", "folder"],
+          "note": "The shell is always inside one folder. When the terminal opens, it is the studio folder."
+        },
+        {
+          "active": ["folder", "folder->screen", "screen"],
+          "note": "The terminal prints that folder's full path on one line, from the top of the computer down."
+        },
+        {
+          "active": ["screen", "screen->notes", "notes"],
+          "note": "That whole line goes after here: in the notes."
+        }
+      ]
+    },
+    "biggest": {
+      "steps": [
+        {
+          "active": ["idris", "idris->you"],
+          "note": "One drawing keeps filling the memory stick, and Idris wants to know which."
+        },
+        {
+          "active": ["you", "you->folder", "folder"],
+          "value": {
+            "kind": "grid",
+            "label": "the long listing of artwork",
+            "colLabels": ["size", "name"],
+            "cells": [["bytes", "file name"]]
+          },
+          "note": "A long listing of artwork shows one line per file, with its size in bytes."
+        },
+        {
+          "active": ["folder", "folder->screen", "screen"],
+          "note": "You compare the size column from top to bottom and find the largest number."
+        },
+        {
+          "active": ["screen", "screen->notes", "notes"],
+          "note": "That file's name, exactly as listed, goes after biggest: in the notes."
+        }
+      ]
+    },
+    "hidden": {
+      "steps": [
+        {
+          "active": ["idris", "idris->you"],
+          "note": "Sol left a handover note in desk, but Idris cannot see it."
+        },
+        {
+          "active": ["you", "you->folder", "folder"],
+          "note": "A plain listing of desk leaves out every name that starts with a dot."
+        },
+        {
+          "active": ["folder", "folder->screen", "screen"],
+          "note": "Asking for all names shows the hidden ones too, beside the two that every folder has."
+        },
+        {
+          "active": ["screen", "screen->notes", "notes"],
+          "note": "The hidden note's full name, dot included, goes after hidden: in the notes."
+        }
+      ]
+    }
+  }
+}

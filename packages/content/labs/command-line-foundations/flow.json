@@ -1,0 +1,16 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "people", "label": "Maeve and Idris", "kind": "story" },
+      { "id": "laptop", "label": "Studio laptop", "kind": "data" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "sorted", "label": "Sorted folders", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "people", "to": "you", "label": "requests" },
+      { "from": "laptop", "to": "you", "label": "messy files" },
+      { "from": "you", "to": "sorted", "label": "sorted" }
+    ],
+    "note": "You sort the studio laptop's files from the terminal, one command at a time."
+  }
+}

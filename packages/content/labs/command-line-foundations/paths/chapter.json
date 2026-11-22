@@ -1,0 +1,107 @@
+{
+  "id": "paths",
+  "title": "Moving around with paths",
+  "files": ["notes.txt"],
+  "terminal": {
+    "description": "A shell that starts in the studio's top folder. Move with cd, and run pwd whenever you are not sure where you are.",
+    "suggestedCommand": "ls"
+  },
+  "tasks": [
+    {
+      "id": "inside",
+      "title": "Go deep and say where you are",
+      "file": "notes.txt",
+      "description": "Maeve wants the notes from last autumn's market stall, which are somewhere in `archive`. Move the shell into `archive/2025/autumn`, run `pwd` there, and write the line it prints after `inside:` in `notes.txt`.\n\nCheck compares your line with the full path of `archive/2025/autumn` in this workspace.",
+      "nextSteps": [
+        "Run `ls archive` to see which folders it holds, then go one level deeper.",
+        "Move into `archive/2025/autumn`, in one step or in three.",
+        "Run `pwd` there and copy the line it prints.",
+        "Paste it after `inside:`."
+      ],
+      "hints": [
+        "The lesson's command for changing the working folder is two letters long.",
+        "`cd` takes a path, and a path can name several folders joined by `/`.",
+        "Run `cd archive/2025/autumn`, then `pwd`, and copy that line after `inside:`."
+      ],
+      "docs": [
+        {
+          "title": "cd and pwd in the shell",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html"
+        },
+        {
+          "title": "Pathname resolution",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap04.html#tag_04_16"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Absolute and relative paths",
+          "url": "https://www.youtube.com/watch?v=DB5vmJ2a64I"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "back",
+      "title": "Point from orders to the March invoices",
+      "file": "notes.txt",
+      "description": "Idris works with the shell inside `orders` and wants to list the March invoices without leaving it. Write a relative path that leads from `orders` to `invoices/march` after `back:` in `notes.txt`. It must not start with `/` or `~`.\n\nTry it first: go into `orders` and run `ls` with your path. When it lists the March invoices, write it down.\n\nCheck follows your path from `orders` and sees where it ends.",
+      "nextSteps": [
+        "Go into `orders` with `cd orders`.",
+        "Work out where `invoices` sits compared with `orders`.",
+        "Build a path that first climbs out of `orders`, then goes down to `march`.",
+        "Test it with `ls` from inside `orders`, then write it after `back:`."
+      ],
+      "hints": [
+        "From inside `orders`, the name `invoices` alone finds nothing: `invoices` is not inside `orders`.",
+        "`..` is the folder above. Both `orders` and `invoices` sit in the same folder above you.",
+        "The path starts with `../`, then names `invoices`, then `march`, joined with `/`."
+      ],
+      "docs": [
+        {
+          "title": "Pathname resolution",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap04.html#tag_04_16"
+        },
+        {
+          "title": "cd and pwd in the shell",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Absolute and relative paths",
+          "url": "https://www.youtube.com/watch?v=DB5vmJ2a64I"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "proofs",
+      "title": "Write the cd that reaches client proofs",
+      "file": "notes.txt",
+      "description": "The proofs for clients sit in a folder whose name has a space in it: `client proofs`. From the top folder, move into it with `cd`. When it works, write the whole command you typed after `proofs:` in `notes.txt`, starting with `cd`.\n\nCheck runs your command from the top folder and sees where it ends.",
+      "nextSteps": [
+        "Go back to the top folder, the one the terminal started in.",
+        "Try `cd` with the folder's name and read what the shell says.",
+        "Change the command so the shell reads the name as one name.",
+        "When `pwd` shows you are in `client proofs`, write the command after `proofs:`."
+      ],
+      "hints": [
+        "A space separates the parts of a command. The lesson shows two ways to keep a space inside one name.",
+        "Put the whole name in quotes, or put a backslash in front of the space. Tab can also write the name for you.",
+        "The command is `cd` followed by `\"client proofs\"`, with the quotes."
+      ],
+      "docs": [
+        {
+          "title": "Quoting in the shell",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Quoting.html"
+        },
+        {
+          "title": "The escape character",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Escape-Character.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

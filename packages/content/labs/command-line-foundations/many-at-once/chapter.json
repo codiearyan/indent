@@ -1,0 +1,107 @@
+{
+  "id": "many-at-once",
+  "title": "Many files at once",
+  "files": ["today.txt"],
+  "terminal": {
+    "description": "A shell that starts in the studio's top folder. Try each pattern with ls before you move anything with it.",
+    "suggestedCommand": "ls downloads"
+  },
+  "tasks": [
+    {
+      "id": "drawings",
+      "title": "Move every drawing into artwork",
+      "file": "today.txt",
+      "description": "Maeve's new drawings were saved into `downloads`, between invoices and lists. Move every `.svg` file in `downloads` into `artwork`, and nothing else.\n\nCheck looks for each drawing from `downloads` in `artwork`, checks that none is left in `downloads`, and fails if a file that is not a drawing ended up in `artwork`.",
+      "nextSteps": [
+        "Run `ls downloads` and pick out the drawings by their ending.",
+        "Write a pattern that matches only those names, and try it with `ls`.",
+        "When `ls` lists exactly the drawings, use the same pattern with `mv`.",
+        "List both folders to see the result."
+      ],
+      "hints": [
+        "Every drawing's name ends the same way. The lesson's `*` stands for any run of characters.",
+        "`ls downloads/*.svg` should list only the drawings. Then hand the same pattern to `mv`, with `artwork` last.",
+        "Run `mv downloads/*.svg artwork` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "Filename expansion",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Filename-Expansion.html"
+        },
+        {
+          "title": "Pattern matching",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Wildcards in the shell",
+          "url": "https://www.youtube.com/watch?v=MIGcHAlYpxU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "invoices",
+      "title": "File the March invoices",
+      "file": "today.txt",
+      "description": "Three March invoices are in `downloads` too, among other `.csv` files that are not invoices. Move every file in `downloads` whose name starts with `invoice-` into `invoices/march`, and nothing else.\n\nCheck looks for each invoice from `downloads` in `invoices/march`, checks that none is left in `downloads`, and fails if a file that is not an invoice ended up in `invoices/march`.",
+      "nextSteps": [
+        "Run `ls downloads/*.csv` and see why the ending alone is not enough here.",
+        "Write a pattern built on how the invoices' names start.",
+        "Try it with `ls`, then use it with `mv`.",
+        "List `invoices/march` to see six invoices."
+      ],
+      "hints": [
+        "A pattern can fix the start of a name as well as its end.",
+        "Put the fixed part first and `*` after it. Test it with `ls` until only invoices show.",
+        "Run `mv downloads/invoice-* invoices/march` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "Filename expansion",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Filename-Expansion.html"
+        },
+        {
+          "title": "Pattern matching",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pellow",
+      "title": "Gather the Pellow Bakery orders",
+      "file": "today.txt",
+      "description": "Idris wants every order from Pellow Bakery together. Make a folder `pellow` inside `orders`, then move every file directly in `orders` whose name ends in `-pellow.txt` into it. Orders from other customers stay where they are, and the `2026` folder is left alone.\n\nCheck looks for each Pellow Bakery order in `orders/pellow`, checks that none is left loose in `orders`, and fails if another customer's order ended up in `orders/pellow`.",
+      "nextSteps": [
+        "Run `ls orders` and find what the Pellow Bakery orders have in common.",
+        "Make the `pellow` folder inside `orders`.",
+        "Try a pattern with `ls` that lists only the Pellow Bakery orders.",
+        "Move them with the same pattern, then list `orders` and `orders/pellow`."
+      ],
+      "hints": [
+        "Their names differ at the start and agree at the end.",
+        "A `*` can come first: it matches the order numbers, and the fixed part after it picks the customer.",
+        "Run `mkdir orders/pellow`, then `mv orders/*-pellow.txt orders/pellow`."
+      ],
+      "docs": [
+        {
+          "title": "Pattern matching",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html"
+        },
+        {
+          "title": "mv: move or rename files",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/mv-invocation.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Wildcards in the shell",
+          "url": "https://www.youtube.com/watch?v=MIGcHAlYpxU"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
