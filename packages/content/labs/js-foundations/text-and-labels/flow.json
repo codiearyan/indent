@@ -1,0 +1,107 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "checkout", "label": "Typed at checkout", "kind": "data" },
+      { "id": "name", "label": "cleanName", "kind": "data", "mine": true },
+      { "id": "city", "label": "cityCode", "kind": "data", "mine": true },
+      { "id": "line", "label": "labelLine", "kind": "data", "mine": true },
+      { "id": "length", "label": "labelLength", "kind": "data", "mine": true },
+      { "id": "printer", "label": "Label printer", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "checkout", "to": "name", "label": "name" },
+      { "from": "checkout", "to": "city", "label": "city" },
+      { "from": "name", "to": "line", "label": "tidy name" },
+      { "from": "city", "to": "line", "label": "code" },
+      { "from": "line", "to": "length", "label": "the line" },
+      { "from": "line", "to": "printer", "label": "label" }
+    ],
+    "note": "What the customer typed is tidied and put together into one label line that fits the printer."
+  },
+  "tasks": {
+    "name": {
+      "steps": [
+        {
+          "active": ["checkout"],
+          "value": {
+            "kind": "map",
+            "label": "typed at checkout",
+            "entries": [{ "key": "customerName", "value": "  Maya Ortiz " }]
+          },
+          "note": "The name comes in as Maya typed it, with stray spaces at the ends."
+        },
+        {
+          "active": ["checkout", "checkout->name", "name"],
+          "note": "cleanName is the same name with the spaces at both ends gone."
+        },
+        {
+          "active": ["name"],
+          "note": "The space between the two words stays where it is."
+        }
+      ]
+    },
+    "city": {
+      "steps": [
+        {
+          "active": ["checkout", "checkout->city"],
+          "value": {
+            "kind": "map",
+            "label": "typed at checkout",
+            "entries": [{ "key": "city", "value": "Lisbon" }]
+          },
+          "note": "The city comes in as typed, in any mix of capital and small letters."
+        },
+        {
+          "active": ["city"],
+          "note": "The code is cut from the start of the city: its first three letters."
+        },
+        {
+          "active": ["city"],
+          "value": {
+            "kind": "map",
+            "label": "what comes out",
+            "entries": [{ "key": "cityCode", "value": "three capitals" }]
+          },
+          "note": "Then it is turned into capitals, whatever the customer typed."
+        }
+      ]
+    },
+    "line": {
+      "steps": [
+        {
+          "active": ["name", "city", "name->line", "city->line", "line"],
+          "note": "The label needs the order number, the tidy name and the city code."
+        },
+        {
+          "active": ["line"],
+          "note": "The words and the comma are the same on every label. Only the number, the name and the code change."
+        },
+        {
+          "active": ["line", "line->printer", "printer"],
+          "note": "The finished line goes to the printer."
+        }
+      ]
+    },
+    "length": {
+      "steps": [
+        {
+          "active": ["line", "line->length"],
+          "note": "The printer fits only so many characters on a line."
+        },
+        {
+          "active": ["length"],
+          "note": "Every character counts: letters, digits, spaces and the comma."
+        },
+        {
+          "active": ["length"],
+          "value": {
+            "kind": "map",
+            "label": "what comes out",
+            "entries": [{ "key": "labelLength", "value": "a number" }]
+          },
+          "note": "One number comes out, so Ines can tell whether the label fits."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "id": "first-app",
+  "title": "A first Express app",
+  "files": ["src/app.js", "src/store.js", "src/workshops.js", "try.js", "server.js"],
+  "terminal": {
+    "description": "A shell in your workspace where try.js starts your API on a free port and sends it a few requests.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "health",
+      "title": "Create the app and its health check",
+      "file": "src/app.js",
+      "description": "Implement `createApp({ store })` in `src/app.js`. It builds a new Express app, adds one route and returns the app **without** calling `listen()`:\n\n- `GET /health` answers `200` with `{ \"status\": \"ok\" }` as JSON\n\nLeave the `store` for the next task. `server.js` and `try.js` call `listen()` on the app you return.\n\nThe check calls your `createApp`, starts the app on a free port and sends it real requests.",
+      "nextSteps": [
+        "Make a new app with the `express` function you already import.",
+        "Add a route for `GET /health`.",
+        "Return the app at the end of `createApp`.",
+        "Run `node try.js` and look at the first answer."
+      ],
+      "hints": [
+        "An Express app is made by calling `express()`. Nothing listens until someone calls `listen()` on it.",
+        "`app.get(path, handler)` adds a route. The handler gets `req` and `res`, and `res.json(value)` sends a value as JSON with a 200.",
+        "`app.get('/health', (req, res) => { res.json(...) })`, then `return app`."
+      ],
+      "docs": [
+        {
+          "title": "Express hello world",
+          "url": "https://expressjs.com/en/5x/starter/hello-world"
+        },
+        { "title": "app.get()", "url": "https://expressjs.com/en/5x/api/application#appget" },
+        { "title": "res.json()", "url": "https://expressjs.com/en/5x/api/response#resjson" }
+      ],
+      "videos": [
+        {
+          "title": "A REST API with Express in 100 seconds",
+          "url": "https://www.youtube.com/watch?v=-MTSQjw5DrM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "list",
+      "title": "List the workshops",
+      "file": "src/app.js",
+      "description": "Add a second route to `createApp`:\n\n- `GET /workshops` answers `200` with every workshop from `store.list()`, unchanged\n\nUse the `store` that `createApp` is given, not the `workshops` array directly. The check passes a store with workshops of its own, so it can tell the difference. A query string, as in `GET /workshops?day=thu`, must still reach this route.\n\nThe check starts your app on a free port and sends it real requests.",
+      "nextSteps": [
+        "Look at what `createStore` in `src/store.js` returns.",
+        "Add a route for `GET /workshops` next to the health check.",
+        "Answer with what the store lists.",
+        "Run `node try.js` and look at the second answer."
+      ],
+      "hints": [
+        "The store is already written. Its `list()` gives back an array of workshops.",
+        "Express matches routes on the path only, so the query string takes no work from you.",
+        "`app.get('/workshops', (req, res) => res.json(store.list()))`."
+      ],
+      "docs": [
+        {
+          "title": "Express basic routing",
+          "url": "https://expressjs.com/en/5x/starter/basic-routing"
+        },
+        {
+          "title": "Express route paths",
+          "url": "https://expressjs.com/en/5x/guide/routing#route-paths"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "not-found",
+      "title": "Answer JSON for every other path",
+      "file": "src/app.js",
+      "description": "Right now a path with no route gets the HTML page Express sends by itself. The sign-up page reads JSON, so make every other request answer:\n\n- status `404`\n- body `{ \"error\": { \"code\": \"not_found\", \"message\": \"...\" } }`, where the message is a short sentence for a developer\n\nThat includes a known path with a method it has no route for, such as `POST /health`. The routes you already wrote must keep working.\n\nThe check sends requests to paths and methods your app does not serve, then one to a route it does.",
+      "nextSteps": [
+        "Run `node try.js` and look at what `/kilns` gets today.",
+        "Add a middleware with no path that answers every request that reaches it.",
+        "Set the status before you send the JSON.",
+        "Think about where it has to go among your routes, then run `node try.js` again."
+      ],
+      "hints": [
+        "Express tries routes and middleware in the order you add them. A request that nothing answered falls off the end.",
+        "`app.use(handler)` with no path runs for every request that gets that far. Put it after all your routes.",
+        "`app.use((req, res) => res.status(404).json({ error: { code: 'not_found', message: ... } }))`, added last."
+      ],
+      "docs": [
+        {
+          "title": "How do I handle 404 responses?",
+          "url": "https://expressjs.com/en/5x/starter/faq#how-do-i-handle-404-responses"
+        },
+        { "title": "res.status()", "url": "https://expressjs.com/en/5x/api/response#resstatus" },
+        {
+          "title": "404 Not Found",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

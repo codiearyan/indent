@@ -1,21 +1,21 @@
 {
   "scene": {
     "nodes": [
-      { "id": "checkout", "label": "Checkout", "kind": "story" },
+      { "id": "owners", "label": "Ines and Theo", "kind": "story" },
+      { "id": "basics", "label": "First-day files", "kind": "file", "mine": true },
       { "id": "orders", "label": "orders.js", "kind": "file" },
       { "id": "reports", "label": "reports.js", "kind": "file", "mine": true },
       { "id": "theo", "label": "Theo's answers", "kind": "story" },
-      { "id": "customers", "label": "Customers", "kind": "story" },
       { "id": "helpers", "label": "helpers.js", "kind": "file", "mine": true },
       { "id": "site", "label": "Shop site", "kind": "story" }
     ],
     "edges": [
-      { "from": "checkout", "to": "orders", "label": "exports" },
+      { "from": "owners", "to": "basics", "label": "small asks" },
       { "from": "orders", "to": "reports", "label": "orders" },
       { "from": "reports", "to": "theo", "label": "answers" },
-      { "from": "customers", "to": "helpers", "label": "clicks" },
+      { "from": "owners", "to": "helpers", "label": "loyalty cards" },
       { "from": "helpers", "to": "site", "label": "remembers" }
     ],
-    "note": "First you turn the shop's orders into answers for Theo, then you write the helpers that let the site remember things for its customers."
+    "note": "On your first day you write small files that print, count, price and decide for Ines and Theo, then you turn the shop's orders into answers and write helpers that let the site remember."
   }
 }

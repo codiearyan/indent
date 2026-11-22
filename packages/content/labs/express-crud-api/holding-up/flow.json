@@ -1,0 +1,116 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Page and desk", "kind": "story" },
+      { "id": "json", "label": "express.json()", "kind": "file" },
+      { "id": "staff", "label": "staffOnly()", "kind": "function", "mine": true },
+      { "id": "router", "label": "workshopsRouter()", "kind": "function", "mine": true },
+      { "id": "errors", "label": "handleErrors()", "kind": "function", "mine": true },
+      { "id": "reply", "label": "JSON answer", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "page", "to": "json", "label": "request" },
+      { "from": "json", "to": "staff", "label": "req.body" },
+      { "from": "staff", "to": "router", "label": "next()" },
+      { "from": "json", "to": "errors", "label": "bad JSON" },
+      { "from": "router", "to": "errors", "label": "thrown error" },
+      { "from": "router", "to": "reply", "label": "status, body" },
+      { "from": "errors", "to": "reply", "label": "400 or 500" },
+      { "from": "reply", "to": "page", "label": "answer" }
+    ],
+    "note": "Every request now passes a staff check before the workshops router, and anything that fails on the way ends in one error handler that answers in JSON."
+  },
+  "tasks": {
+    "router": {
+      "steps": [
+        {
+          "active": [
+            "page",
+            "page->json",
+            "json",
+            "json->staff",
+            "staff",
+            "staff->router",
+            "router"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "the same request, two views",
+            "entries": [
+              { "key": "the app sees", "value": "/workshops/5" },
+              { "key": "the router sees", "value": "/5" }
+            ]
+          },
+          "note": "createApp() mounts the router at /workshops. Inside, the router only sees the rest of the path."
+        },
+        {
+          "active": ["router"],
+          "note": "All six workshop routes live in the router now, each with the same answers as before, and app.js keeps only the health check and the 404."
+        },
+        {
+          "active": ["router", "router->reply", "reply", "reply->page"],
+          "note": "A new workshop's location still names its full path, because the router can read where it was mounted."
+        }
+      ]
+    },
+    "staff-only": {
+      "steps": [
+        {
+          "active": ["page", "page->json", "json", "json->staff", "staff"],
+          "value": {
+            "kind": "map",
+            "label": "three requests",
+            "entries": [
+              { "key": "GET /workshops", "value": "no key" },
+              { "key": "DELETE /workshops/1", "value": "no key" },
+              { "key": "PATCH /workshops/5", "value": "the staff key" }
+            ]
+          },
+          "note": "Ivo's page reads, a stranger tries to delete, and the front desk changes the family morning."
+        },
+        {
+          "active": ["staff", "staff->router", "router"],
+          "note": "Reads always go on. A change goes on only when its x-staff-key header matches the key createApp() was given."
+        },
+        {
+          "active": ["staff", "reply", "reply->page"],
+          "note": "Any other change is stopped right there with a 401, and the route never runs."
+        }
+      ]
+    },
+    "errors": {
+      "steps": [
+        {
+          "active": ["page", "page->json", "json", "json->errors", "errors"],
+          "value": {
+            "kind": "map",
+            "label": "a body cut short",
+            "entries": [{ "key": "body", "value": "{\"title\": \"Throwing bowls\"," }]
+          },
+          "note": "Ivo sends half a body. express.json() cannot read it and passes an error straight to the error handler."
+        },
+        {
+          "active": ["errors", "errors->reply", "reply"],
+          "note": "The error handler sees it is the client's mistake and answers 400 with the code invalid_json."
+        },
+        {
+          "active": ["router", "router->errors", "errors"],
+          "note": "When a route throws, say the store cannot be read, Express skips ahead to the same handler. It logs the whole error for you."
+        },
+        {
+          "active": ["errors", "errors->reply", "reply", "reply->page"],
+          "value": {
+            "kind": "map",
+            "label": "what the client sees",
+            "entries": [
+              { "key": "status", "value": 500 },
+              { "key": "error.code", "value": "internal" },
+              { "key": "error.message", "value": "a plain sentence, no details" }
+            ]
+          },
+          "note": "The page gets a calm JSON answer, with no stack trace and no file paths."
+        }
+      ]
+    }
+  }
+}

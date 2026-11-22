@@ -3,7 +3,7 @@
   "private": true,
   "description": "A local-first desktop app for hands-on coding labs",
   "author": "Aryan Bhati",
-  "license": "GPL-3.0-only",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "scripts": {
     "dev": "pnpm --filter @indent/desktop dev",
     "dev:site": "pnpm --filter @indent/site dev",

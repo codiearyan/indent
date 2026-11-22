@@ -1,0 +1,25 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "Why did 3 plus one come out 31?", "note": "The form sends text." },
+    {
+      "title": "Order form",
+      "rows": [["Quantity", "3, as text"], ["Gift note", "empty"], ["Extras", "two"]]
+    },
+    {
+      "title": "Your code",
+      "file": "missing.js",
+      "mine": true,
+      "gap": "Text and blanks read as they are",
+      "tasks": ["Make it a number", "Default for the note", "Spot bad numbers", "Fall back to one"]
+    },
+    { "title": "Evening orders", "text": "Real numbers and sensible defaults." }
+  ],
+  "ticket": { "label": "3 plus one", "wrong": "31", "why": "Text joined", "right": "added up" },
+  "captions": [
+    "Rules give yes or no. Now Theo wants the evening's order form read properly.",
+    "The form sends text and empty boxes, so 3 plus one comes out as 31.",
+    "You turn text into numbers and fill the gaps, in four small tasks.",
+    "Now the quantity adds up, empty notes get a default and bad numbers are caught.",
+    "Null, undefined and NaN in hand. Your first day at the shop is done."
+  ]
+}

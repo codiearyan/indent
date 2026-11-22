@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Can the labels look tidy?", "note": "The courier wants a city code." },
+    { "title": "Typed at checkout", "text": "Names with stray spaces, and no city code." },
+    {
+      "title": "Your code",
+      "file": "labels.js",
+      "mine": true,
+      "gap": "Nobody tidies the text",
+      "tasks": ["Tidy the name", "Make the city code", "Write the label line", "Measure the label"]
+    },
+    { "title": "Label printer", "text": "Prints one tidy line for the courier." }
+  ],
+  "ticket": { "label": "Maya's label", "wrong": "messy", "why": "As typed", "right": "tidy" },
+  "captions": [
+    "The order is priced. Now Ines wants tidy shipping labels for the courier.",
+    "Names come from the checkout as customers typed them, stray spaces and all.",
+    "You tidy the text and write the label, in four small tasks.",
+    "Now Maya's label is one tidy line with a city code, and it fits the printer.",
+    "Strings and their methods: every label comes out the same way."
+  ]
+}

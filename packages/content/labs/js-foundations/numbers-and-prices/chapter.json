@@ -1,0 +1,125 @@
+{
+  "id": "numbers-and-prices",
+  "title": "Numbers and prices",
+  "files": ["src/prices.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to price today's first order.",
+    "suggestedCommand": "node src/prices.js"
+  },
+  "tasks": [
+    {
+      "id": "subtotal",
+      "title": "Price the candles",
+      "file": "src/prices.js",
+      "description": "Under `// Task 1` in `src/prices.js`, make a `const` called `subtotalCents`: the price of one candle (`candlePriceCents`) times the number of candles (`quantity`). Print it.\n\nCheck runs your file with other orders in place of the numbers at the top, so build on the names, not on the numbers.",
+      "nextSteps": [
+        "Read the order near the top of the file.",
+        "Under `// Task 1`, make `subtotalCents` with `const`.",
+        "On the right of `=`, combine the two names with the right operator.",
+        "Print it and run `node src/prices.js`."
+      ],
+      "hints": [
+        "Three candles at the same price cost that price three times over.",
+        "JavaScript writes \"times\" as `*`. Both values you need already have names at the top of the file.",
+        "The line has the shape `const subtotalCents = ... * ...`, with the price and the quantity names in place of the dots."
+      ],
+      "docs": [
+        {
+          "title": "Arithmetic operators",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_operators"
+        },
+        {
+          "title": "Basic math in JavaScript",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Math"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "discount",
+      "title": "Take off the discount",
+      "file": "src/prices.js",
+      "description": "Under `// Task 2`, make a `const` called `discountCents`: `discountPercent` percent of `subtotalCents`, rounded to the nearest whole cent. Exactly half a cent rounds up. Print it.\n\nCheck tries orders where the discount comes out even and orders where it has to be rounded.",
+      "nextSteps": [
+        "Make sure Task 1 passes: the discount is a part of the subtotal.",
+        "Work out the percentage: a percent is that many hundredths.",
+        "Round the result to a whole number of cents.",
+        "Print it and run the file."
+      ],
+      "hints": [
+        "Read the part of the lesson on percentages, then think about an order where the result is not a whole number of cents.",
+        "`Math` has three ways to make a whole number: one always goes down, one always goes up, and one goes to the nearest.",
+        "Wrap the whole percentage sum in `Math.round(...)`: `subtotalCents * discountPercent / 100` inside the brackets."
+      ],
+      "docs": [
+        {
+          "title": "Math.round()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round"
+        },
+        {
+          "title": "Basic math in JavaScript",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Math"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Why decimals are not exact",
+          "url": "https://www.youtube.com/watch?v=PZRI1IfStY0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "total",
+      "title": "Find the total",
+      "file": "src/prices.js",
+      "description": "Under `// Task 3`, make a `const` called `totalCents`: the subtotal, minus the discount, plus shipping (`shippingCents`). Print it.\n\nCheck runs your file with other orders, including one with free shipping and one with no discount.",
+      "nextSteps": [
+        "Make sure Tasks 1 and 2 pass first.",
+        "Under `// Task 3`, make `totalCents` from the three names.",
+        "Check each sign: what comes off, and what goes on.",
+        "Print it and compare it with the till by hand."
+      ],
+      "hints": [
+        "The customer pays for the candles, gets the discount back, and pays for the parcel to travel.",
+        "Two of the three values come from your own variables, and one from the order at the top.",
+        "Start from `subtotalCents`, take away `discountCents`, then add `shippingCents`."
+      ],
+      "docs": [
+        {
+          "title": "Arithmetic operators",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_operators"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "boxes",
+      "title": "Count the boxes",
+      "file": "src/prices.js",
+      "description": "Under `// Task 4`, make a `const` called `boxes`: how many boxes Ines needs for the order, when one box holds `candlesPerBox` candles. A box that is only partly full still counts as a whole box. Print it.\n\nCheck tries orders that fill the boxes exactly and orders with candles left over.",
+      "nextSteps": [
+        "Divide the candles by the box size and look at the result.",
+        "Ask what to do when it is not a whole number.",
+        "Pick the `Math` helper that makes that choice.",
+        "Print it and try it for 8 and for 9 candles in your head."
+      ],
+      "hints": [
+        "Nine candles in boxes of four make two full boxes and one candle left over. That candle still needs a box.",
+        "Dividing gives 2.25 for nine candles. You want the next whole number, never a smaller one.",
+        "`Math.ceil(...)` around `quantity / candlesPerBox` always goes up to the next whole number."
+      ],
+      "docs": [
+        {
+          "title": "Math.ceil()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/ceil"
+        },
+        {
+          "title": "Basic math in JavaScript",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Math"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
