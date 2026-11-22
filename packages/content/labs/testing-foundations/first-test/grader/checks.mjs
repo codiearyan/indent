@@ -35,7 +35,7 @@ export const checks = {
     {
       label: 'has the wrong price for a small box',
       change: ['small: 14', 'small: 15'],
-      hint: 'Compare the small box price with the exact number on the price list in prices.js.'
+      hint: "Call boxPrice('small') in your test and compare it with the exact number on the price list in prices.js."
     }
   ]),
 
@@ -49,6 +49,11 @@ export const checks = {
       label: 'always starts from the small box price',
       change: ['return boxPrice(size) + dozens', "return boxPrice('small') + dozens"],
       hint: 'Use a medium box, as the task says, so the size makes a difference.'
+    },
+    {
+      label: 'has the wrong price for a medium box',
+      change: ['medium: 19', 'medium: 20'],
+      hint: 'Work the expected price out by hand from the price list, and write that number in your test instead of getting it from the code.'
     }
   ]),
 

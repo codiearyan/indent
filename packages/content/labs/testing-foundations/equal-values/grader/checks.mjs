@@ -40,6 +40,11 @@ export const checks = {
       label: "leaves the customer's name off the slip",
       change: ['customer: order.customer,', 'customer: undefined,'],
       hint: 'Compare the whole slip, every field, not just one of them.'
+    },
+    {
+      label: 'leaves the box size off the slip',
+      change: ['size: order.size,', 'size: undefined,'],
+      hint: 'Compare the whole slip, every field, the size included.'
     }
   ]),
 

@@ -30,6 +30,8 @@ test('the gate stall opens on Friday and Saturday', () => {
 ```
 AssertionError: expected [ 'Friday', 'Saturday' ] to be [ 'Friday', 'Saturday' ] // Object.is equality
 
+If it should pass with deep equality, replace "toBe" with "toStrictEqual"
+
 Expected: [ 'Friday', 'Saturday' ]
 Received: serializes to the same string
 ```

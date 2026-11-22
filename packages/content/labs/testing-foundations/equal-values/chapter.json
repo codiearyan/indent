@@ -40,7 +40,7 @@
       "id": "slip",
       "title": "Test a whole packing slip",
       "file": "src/boxes.test.js",
-      "description": "Every box goes out with a packing slip. In the `packingSlip` block, write a test for Cora Pellow's order:\n\n```js\n{ customer: 'Cora Pellow', size: 'medium', dozens: 2 }\n```\n\nCompare the whole slip that `packingSlip` gives back, every field, in one check. Read `packingSlip` in `src/boxes.js` to see which fields a slip has.\n\nCheck runs your tests on the working code and on versions that drop the eggs, list the wrong items, or leave the name off. A test in this block must pass on the first and fail on each of the others.",
+      "description": "Every box goes out with a packing slip. In the `packingSlip` block, write a test for Cora Pellow's order:\n\n```js\n{ customer: 'Cora Pellow', size: 'medium', dozens: 2 }\n```\n\nCompare the whole slip that `packingSlip` gives back, every field; one check on the whole object does it. Read `packingSlip` in `src/boxes.js` to see which fields a slip has.\n\nCheck runs your tests on the working code and on versions that drop the eggs, list the wrong items, or leave the name or the size off. A test in this block must pass on the first and fail on each of the others.",
       "nextSteps": [
         "Read `packingSlip` and list the four fields of a slip.",
         "Work out by hand what each field should be for Cora's order.",

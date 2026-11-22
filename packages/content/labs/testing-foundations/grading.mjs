@@ -99,12 +99,14 @@ const fullName = (test) => [...test.group, test.name].join(' > ')
 /** Why a test failed on the working code, said in plain words. */
 export function whyItFails(test, { thrown } = {}) {
   const first = shortFailure(test.failure).split('\n')[0]
-  const numbers = first.match(/^AssertionError: expected (-?[\d.e+-]+) to be (-?[\d.e+-]+)/)
+  const numbers = first.match(
+    /^AssertionError: expected (-?[\d.e+-]+) to (?:be|deeply equal) (-?[\d.e+-]+)/
+  )
   if (numbers && Math.abs(Number(numbers[1]) - Number(numbers[2])) < 1e-9) {
     return `"${test.name}" compares two decimals that differ only far after the point. The lesson's part on decimals says which matcher allows for that.`
   }
   if (/serializes to the same string|no visual difference/.test(test.failure ?? '')) {
-    return `"${test.name}" compares two lists or objects that look the same but are not the very same one. The lesson's part on lists and objects says which matcher compares what is inside.`
+    return `"${test.name}" compares two lists or objects that look the same but are not the very same one. Use the matcher from the issue "Equal values, equal objects" that compares what is inside.`
   }
   if (/expected any number of assertion/.test(first)) {
     return `"${test.name}" has no expect in it, so it checks nothing. Add an expect that compares what the code gives with what it should give.`
@@ -113,10 +115,10 @@ export function whyItFails(test, { thrown } = {}) {
     return `"${test.name}" got undefined back from the code. That usually means the function was given something it does not know: check the spelling of what you pass in, capital letters count.`
   }
   if (/to throw error including .* but got/.test(first)) {
-    return `"${test.name}" looks for text that the error's message does not contain. Compare your text with the message in the output, letter by letter.`
+    return `"${test.name}" looks for text that the error's message does not contain. Compare your text with the message in the output, letter by letter. If that message is about another rule, your example breaks that rule too.`
   }
   if (/expected error to be instance of/.test(first)) {
-    return `"${test.name}" expects a different kind of error from the one the code throws. Read the rule in the code to see which kind it throws.`
+    return `"${test.name}" expects a different kind of error from the one the code threw. Run the tests in the terminal to see the error it threw: if it is about another rule, your example breaks that rule too.`
   }
   if (/to throw an error, but it didn't|expected \[Function\] to throw an error$/.test(first)) {
     return `"${test.name}" expects an error, but the code accepts what your test gave it. Check that your example really breaks the rule.`
@@ -125,7 +127,7 @@ export function whyItFails(test, { thrown } = {}) {
     return `"${test.name}" expects no error, but what your test gave the code breaks one of its rules. Read the error in the output.`
   }
   if (/^AssertionError/.test(first)) {
-    return `"${test.name}" fails on the farm's working code, so it expects something the code does not do. Work the expected value out again from the rules in the task, and read the output to see what the code gave.`
+    return `"${test.name}" fails on the farm's working code, so it expects something the code does not do. Work the expected value out again from the rules in the task, and run the tests in the terminal: the Expected and Received lines show where the two differ.`
   }
   if (/is not defined|is not a function/.test(first)) {
     return `"${test.name}" stops at a name that does not exist. Check the spelling of the function and that it is imported at the top of the file.`
@@ -140,11 +142,15 @@ function list(tests) {
   return tests.length ? tests.map((x) => `  ${fullName(x)}`).join('\n') : '  (no tests)'
 }
 
+const NONE =
+  'None of them fail on any wrong version. A test that never calls the function, compares it with its own answer, or uses an example where this rule makes no difference can never fail.'
+
 /**
  * Judges one task. `pick` says which tests are this task's, `where` says it in words for the
  * messages, and each wrong version has a `label` (what it gets wrong) and a `hint` (where to look).
+ * `none` is said once when no wrong version is caught at all.
  */
-export async function judge(t, { test, target, pick, where, missing, wrong, thrown }) {
+export async function judge(t, { test, target, pick, where, missing, wrong, thrown, none = NONE }) {
   const code = await workingCode(t, target)
   const versions = wrong.map((w) => wrongVersion(code, w.change))
   const [good, ...runs] = await Promise.all(
@@ -177,20 +183,18 @@ export async function judge(t, { test, target, pick, where, missing, wrong, thro
         : `Passed:\n${list(mine)}`
     }
   ]
-  const passing = mine.filter((x) => x.status === 'passed')
-  if (!passing.length) return details
+  // Wrong versions are judged once every test of the task passes on the working code.
+  if (broken.length) return details
 
   const caughtBy = runs.map((run) => {
     const after = new Map(run.tests.map((x) => [fullName(x), x.status]))
-    return mine.filter((x) => x.status === 'passed' && after.get(fullName(x)) !== 'passed')
+    return mine.filter((x) => after.get(fullName(x)) !== 'passed')
   })
   // Said once, on the first miss, when no wrong version is caught at all.
   let note = caughtBy.every((c) => c.length === 0)
   wrong.forEach((w, i) => {
     const caught = caughtBy[i]
-    const extra = note
-      ? ' None of them fail on any wrong version. A test that does not call the function, or compares it with its own answer, can never fail.'
-      : ''
+    const extra = note ? ` ${none}` : ''
     note = false
     details.push({
       name: `Fails on a version that ${w.label}`,
@@ -200,7 +204,7 @@ export async function judge(t, { test, target, pick, where, missing, wrong, thro
         : `Your tests ${where} still pass on a version that ${w.label}. ${w.hint}${extra}`,
       output: caught.length
         ? `Failed there, as it should:\n${list(caught)}`
-        : `On that version these still passed:\n${list(passing)}`
+        : `On that version these still passed:\n${list(mine)}`
     })
   })
   return details

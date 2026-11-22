@@ -54,6 +54,14 @@ const rules = {
         label: 'keeps the changed size for every week',
         change: [CHANGE, 'Object.values(subscription.sizeChanges)[0] ?? subscription.size'],
         hint: 'Also check a week without a change: it should get the usual size.'
+      },
+      {
+        label: "leaves the customer's name off the box in a week with a change",
+        change: [
+          'return { customer: subscription.customer, size }',
+          'return week in subscription.sizeChanges ? { size } : { customer: subscription.customer, size }'
+        ],
+        hint: 'Compare the whole box that comes back, not just its size.'
       }
     ]
   }
@@ -68,8 +76,9 @@ const ruleTask = (key) => (t) => {
     target,
     pick: (x) => inGroup(x) && rule.name.test(x.name),
     where: `about ${rule.about} in the weeklyBox block`,
-    missing: `Check finds no test about ${rule.about} in describe('weeklyBox') yet. It looks for a test inside that block whose name says ${rule.words}.`,
-    wrong: rule.wrong
+    missing: `Check finds no test about ${rule.about} in describe('weeklyBox') yet. It looks for a test inside that block whose name says ${rule.words}; tests outside it do not count.`,
+    wrong: rule.wrong,
+    none: 'None of them fail on any wrong version. If the subscriber in your test has another rule switched on too, that rule can decide the answer by itself: start from a plain subscriber and change only what this rule needs.'
   })
 }
 
@@ -106,7 +115,7 @@ export const checks = {
           : caught.length === 0
             ? `No passing test fails yet when the rule for ${rule.about} breaks. Finish the task "${rule.task}" first.`
             : unnamed
-              ? `When the rule for ${rule.about} breaks, "${unnamed.name}" fails too, and its name does not say it is about ${rule.about}. Give each rule a test of its own that says which rule it checks, and take that rule's checks out of tests about something else.`
+              ? `When the rule for ${rule.about} breaks, "${unnamed.name}" fails, and its name does not say it is about ${rule.about}. Give each rule a test of its own that says which rule it checks, and take that rule's checks out of tests about something else.`
               : `"${mixed.name}" fails when ${others.map((o) => `the rule for ${o} breaks`).join(' and also when ')}, so it checks more than one rule. Split it into one test per rule.`,
         output: caught.length
           ? `On a version that ${rule.wrong[0].label}, these failed:\n${caught.map((x) => `  ${name(x)}`).join('\n')}`

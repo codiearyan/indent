@@ -59,7 +59,7 @@
       "id": "change",
       "title": "Test a size change for one week",
       "file": "src/weekly.test.js",
-      "description": "A subscriber can change their box size for a single week, say a large box for a family visit. In the `weeklyBox` block, write a test that the week with the change gets the changed size, and the week after gets the usual size again. Compare the whole box that comes back.\n\nThe test's name must contain the word change or changed.\n\nCheck runs it on the working code, where it must pass, and on versions that ignore the change or keep it for every week, where it must fail.",
+      "description": "A subscriber can change their box size for a single week, say a large box for a family visit. In the `weeklyBox` block, write a test that the week with the change gets the changed size, and the week after gets the usual size again. Compare the whole box that comes back.\n\nThe test's name must contain the word change or changed.\n\nCheck runs it on the working code, where it must pass, and on versions that ignore the change, keep it for every week, or leave the name off the changed box, where it must fail.",
       "nextSteps": [
         "Make a weekly subscriber with one entry in `sizeChanges`.",
         "Check the box for that week.",

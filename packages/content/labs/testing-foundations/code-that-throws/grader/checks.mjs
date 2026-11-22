@@ -7,13 +7,18 @@ const target = 'src/orders.js'
 const thrown =
   'stops with the error from placeOrder itself, before expect could see it. The lesson shows how to hand the call to expect so it can catch the error.'
 
-const task = (title, wrong) => (t) =>
+const none =
+  'None of them fail on any wrong version. If the order in your test breaks another rule too, that rule throws first, whatever this one does: start from a good order and change only what this rule is about.'
+
+const task = (title, wrong, options = {}) => (t) =>
   judge(t, {
     test,
     target,
     ...block(title),
     wrong,
-    thrown: (name) => `"${name}" ${thrown}`
+    thrown: (name) => `"${name}" ${thrown}`,
+    none,
+    ...options
   })
 
 const SIZE = 'if (!SIZES.includes(size)) {'
@@ -69,7 +74,11 @@ export const checks = {
     {
       label: 'drops the eggs from the order',
       change: ['return { customer, size, dozens, village }', 'return { customer, size, dozens: 0, village }'],
-      hint: 'Check what comes back, not only that nothing was thrown.'
+      hint: 'Compare everything that comes back with the order you sent, not only that nothing was thrown.'
     }
-  ])
+  ], {
+    thrown: (name) =>
+      `"${name}" stops with an error from placeOrder, so the order in it breaks one of the rules. Read the error in the output, and make an order that keeps every rule.`,
+    none: undefined
+  })
 }

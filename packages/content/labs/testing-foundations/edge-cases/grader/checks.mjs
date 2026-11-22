@@ -16,9 +16,9 @@ export const checks = {
       hint: 'Test an order of exactly the amount where delivery becomes free.'
     },
     {
-      label: 'makes delivery free a little below the line',
-      change: [FREE, 'orderTotal >= FREE_DELIVERY_FROM - 5'],
-      hint: 'Test an order just under the line too, as close to it as you can.'
+      label: 'makes delivery free for anything over 39 pounds, pennies included',
+      change: [FREE, 'orderTotal > FREE_DELIVERY_FROM - 1'],
+      hint: 'Test an order just under the line too. Prices have pennies, so go as close as money allows.'
     }
   ]),
 
@@ -51,7 +51,7 @@ export const checks = {
   trips: task('tripsNeeded', [
     {
       label: 'books an extra trip when the van is exactly full',
-      change: [TRIPS, 'Math.floor(boxCount / BOXES_PER_TRIP) + 1'],
+      change: [TRIPS, 'boxCount === 0 ? 0 : Math.floor(boxCount / BOXES_PER_TRIP) + 1'],
       hint: 'Test exactly one full van of boxes.'
     },
     {
