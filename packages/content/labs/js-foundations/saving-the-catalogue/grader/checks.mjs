@@ -1,16 +1,5 @@
 import { code } from '../../grading.mjs'
-import {
-  calls,
-  earlier,
-  lit,
-  loaded,
-  partOf,
-  probe,
-  readSource,
-  same,
-  shape,
-  show
-} from '../../catalogue-grading.mjs'
+import { calls, earlier, exportsName, keepHome, lit, loaded, partOf, probe, readSource, same, shape, show } from '../../catalogue-grading.mjs'
 
 const FILE = 'src/saving.js'
 
@@ -78,6 +67,11 @@ export const checks = {
         { name: 'Loads an empty list', text: '[]', expected: [] },
         { name: 'A file cut off part way', text: '[{"sku":"PIN-350","na', expected: [] },
         { name: 'Text that is not JSON at all', text: 'catalogue goes here', expected: [] },
+        {
+          name: 'A list someone changed by hand',
+          text: '[{"sku":"PIN-350","name":"Pine",}]',
+          expected: []
+        },
         { name: 'An empty file', text: '', expected: [] }
       ].map((c) => ({
         name: c.name,
@@ -89,6 +83,9 @@ export const checks = {
             : 'This text is not JSON, so loadCatalogue gives back an empty list instead of stopping.',
         explain: (r) => {
           if (r.threw && /SyntaxError/.test(r.threw)) return stopsOnBroken('loadCatalogue')
+          if (typeof r.value === 'string' && !c.expected.length && c.text !== '[]') {
+            return 'For broken text loadCatalogue gave back text, in quotes. The task asks for an empty list, a list and not text.'
+          }
           if (typeof r.value === 'string')
             return 'loadCatalogue gave back text. Turn the JSON text back into a list.'
           if (
@@ -268,11 +265,11 @@ export const checks = {
       })
     })
     const { values } = await probe(t, FILE, [
-      `(() => { try { loadSettings('{"perPage":99,"currency":"USD"}'); loadSettings('oops') } catch {} return defaultSettings })()`
+      `(() => { try { loadSettings('{"perPage":99,"currency":"USD"}'); const back = loadSettings('oops'); if (back && typeof back === 'object') back.perPage = -1 } catch {} return defaultSettings })()`
     ])
     const defaults = values?.[0]
     const oneRight = one.every((d) => d.passed)
-    const exported = /^export\s*\{[^}]*\breadJson\b/m.test(text)
+    const exported = exportsName(text, 'readJson')
     return [
       ...one,
       ...(oneRight
@@ -285,7 +282,7 @@ export const checks = {
         defaults && !defaults.threw && same(defaults.value, DEFAULTS),
         defaults?.threw
           ? 'Check cannot find defaultSettings any more. Keep that line as it was, with the same name.'
-          : 'defaultSettings changed after loadSettings ran. Writing the saved settings into it changes the defaults for every later load. Make a new object.'
+          : 'defaultSettings changed after loadSettings ran, or when the settings it gave back were changed. loadSettings makes a new object every time, broken text included, so that nothing reaches the defaults.'
       ),
       shape(
         'loadSettings uses readJson',
@@ -295,7 +292,7 @@ export const checks = {
       shape(
         'readJson stays off the export line',
         !exported,
-        'readJson only helps loadSettings, so it stays off the export line at the bottom. Put that line back as it was.'
+        keepHome('readJson', 'loadSettings')
       )
     ]
   }

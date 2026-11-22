@@ -1,15 +1,5 @@
 import { code } from '../../grading.mjs'
-import {
-  assignsInIf,
-  calls,
-  earlier,
-  explainObject,
-  loaded,
-  partOf,
-  probe,
-  readSource,
-  shape
-} from '../../catalogue-grading.mjs'
+import { assignsInIf, calls, earlier, explainObject, exportsName, keepHome, loaded, partOf, probe, readSource, shape } from '../../catalogue-grading.mjs'
 
 const FILE = 'src/object-loops.js'
 
@@ -44,7 +34,9 @@ export const checks = {
                   ? 'totalStock stops on an empty shelf: reduce with no starting value has nothing to start from when the list is empty. Give it a starting value.'
                   : typeof r.value === 'string'
                     ? 'totalStock gave back text. Adding a scent, which is text, joins text instead of adding numbers. Add up the counts, the values of the object.'
-                    : r.value === Object.keys(shelf).length && expected !== r.value
+                    : Number.isNaN(r.value)
+                      ? 'totalStock gave NaN, which is what adding undefined to a number gives. Check that the total starts at 0 and that you add the counts themselves.'
+                      : r.value === Object.keys(shelf).length && expected !== r.value
                       ? 'totalStock gave the number of scents, not the number of candles. Add up the counts themselves.'
                       : undefined
           }
@@ -235,7 +227,7 @@ export const checks = {
     })
     const oneRight = one.every((d) => d.passed)
     const body = partOf(text, 'stockValue')
-    const exported = /^export\s*\{[^}]*\bcandleValue\b/m.test(text)
+    const exported = exportsName(text, 'candleValue')
     return [
       ...one,
       ...(oneRight
@@ -251,7 +243,7 @@ export const checks = {
       shape(
         'candleValue stays off the export line',
         !exported,
-        'candleValue only helps stockValue, so it stays off the export line at the bottom. Put that line back as it was.'
+        keepHome('candleValue', 'stockValue')
       )
     ]
   }

@@ -1,7 +1,9 @@
 {
   "id": "going-through-cards",
   "title": "Going through the cards",
-  "files": ["src/object-loops.js"],
+  "files": [
+    "src/object-loops.js"
+  ],
   "terminal": {
     "description": "A shell in your workspace. Run your file here to see the shelf count and the catalogue worked out.",
     "suggestedCommand": "node src/object-loops.js"
@@ -20,7 +22,7 @@
       ],
       "hints": [
         "for...of goes through a list, not an object. Ask `Object` for a list first.",
-        "`Object.values(shelf)` is a list of the counts alone. From there it is the adding loop you know, or `reduce` with a starting value.",
+        "`Object.values(shelf)` is a list of the counts alone. From there it is the adding loop you know: a total that starts at 0 and grows with every count.",
         "The function has the shape `let total = 0`, then `for (const count of Object.values(shelf)) { total = total + count }`, then `return total`."
       ],
       "docs": [
@@ -110,13 +112,13 @@
       ],
       "hints": [
         "Two small jobs: one card, then the whole list. The first function does one card, the second calls it for each.",
-        "Adding up a list into one number is the job of a loop with a total, or of `reduce` with a starting value of 0.",
-        "`candleValue` is `return candle.priceCents * candle.stock`, and `stockValue` can be `return candles.reduce((total, candle) => total + candleValue(candle), 0)`."
+        "Adding up a list into one number is the job of a loop with a total that starts at 0. Inside the loop, add what `candleValue` gives for the card.",
+        "`candleValue` is `return candle.priceCents * candle.stock`. `stockValue` starts with `let total = 0`, then `for (const candle of candles) { total = total + candleValue(candle) }`, then `return total`."
       ],
       "docs": [
         {
-          "title": "Array.prototype.reduce()",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce"
+          "title": "for...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of"
         },
         {
           "title": "Functions",

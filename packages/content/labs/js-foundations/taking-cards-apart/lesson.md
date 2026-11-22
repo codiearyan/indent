@@ -66,7 +66,7 @@ for (const [room, guestName] of Object.entries({ 12: 'Rafa', 14: 'Noor' })) {
 
 ## Copying with a change
 
-You met three dots in the arrays part: `[...arrivals]` copies a list. Inside the curly braces of a new object, they copy every property of another object:
+You met three dots in the part on lists: `[...arrivals]` copies a list. Inside the curly braces of a new object, they copy every property of another object:
 
 ```js
 const copy = { ...guest }

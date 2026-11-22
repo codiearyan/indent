@@ -1,14 +1,5 @@
 import { code } from '../../grading.mjs'
-import {
-  calls,
-  earlier,
-  explainObject,
-  assignsInIf,
-  loaded,
-  partOf,
-  readSource,
-  shape
-} from '../../catalogue-grading.mjs'
+import { assignsInIf, calls, earlier, explainObject, exportsName, keepHome, loaded, partOf, readSource, shape } from '../../catalogue-grading.mjs'
 
 const FILE = 'src/objects.js'
 
@@ -117,7 +108,7 @@ export const checks = {
       }))
     })
     const body = partOf(text, 'cardLine')
-    const exported = /^export\s*\{[^}]*\bhasLine\b/m.test(text)
+    const exported = exportsName(text, 'hasLine')
     return [
       ...has,
       ...(hasRight
@@ -133,7 +124,7 @@ export const checks = {
       shape(
         'hasLine stays off the export line',
         !exported,
-        'hasLine only helps cardLine, so it stays off the export line at the bottom. Put that line back as it was.'
+        keepHome('hasLine', 'cardLine')
       )
     ]
   },

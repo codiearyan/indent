@@ -1,15 +1,5 @@
 import { code } from '../../grading.mjs'
-import {
-  calls,
-  earlier,
-  explainObject,
-  lit,
-  loaded,
-  partOf,
-  probe,
-  readSource,
-  shape
-} from '../../catalogue-grading.mjs'
+import { calls, earlier, explainObject, exportsName, keepHome, lit, loaded, partOf, probe, readSource, shape } from '../../catalogue-grading.mjs'
 
 const FILE = 'src/references.js'
 
@@ -118,7 +108,7 @@ export const checks = {
         explain: (r) => {
           if (typeof r.value !== 'boolean') return 'sameDetails should give back true or false.'
           if (name === 'Two cards with the same details' && r.value === false) {
-            return 'sameDetails says false for two cards with the same details. === asks whether two names point at one object, not whether two objects hold the same things. Compare them key by key.'
+            return 'sameDetails says false for two cards with the same details. On two objects, === and == both ask whether two names point at one object, not whether two objects hold the same things. Compare them key by key.'
           }
           if (name === 'The same details in another order' && r.value === false) {
             return 'sameDetails says false when the keys come in another order. Two objects with the same keys and values are the same details, whatever the order.'
@@ -239,7 +229,7 @@ export const checks = {
       }))
     })
     const oneRight = one.every((d) => d.passed)
-    const exported = /^export\s*\{[^}]*\bonSaleCopy\b/m.test(text)
+    const exported = exportsName(text, 'onSaleCopy')
     const changedCards = all.some((d) => /changed the list of cards/.test(d.message ?? ''))
     return [
       ...one,
@@ -264,7 +254,7 @@ export const checks = {
       shape(
         'onSaleCopy stays off the export line',
         !exported,
-        'onSaleCopy only helps markAllOnSale, so it stays off the export line at the bottom. Put that line back as it was.'
+        keepHome('onSaleCopy', 'markAllOnSale')
       )
     ]
   }

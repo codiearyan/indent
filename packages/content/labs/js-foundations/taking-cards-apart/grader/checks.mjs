@@ -1,13 +1,5 @@
 import { code } from '../../grading.mjs'
-import {
-  calls,
-  earlier,
-  explainObject,
-  loaded,
-  partOf,
-  readSource,
-  shape
-} from '../../catalogue-grading.mjs'
+import { calls, earlier, explainObject, exportsName, keepHome, loaded, partOf, readSource, shape } from '../../catalogue-grading.mjs'
 
 const FILE = 'src/destructuring.js'
 
@@ -216,7 +208,7 @@ export const checks = {
       }))
     })
     const oneRight = one.every((d) => d.passed)
-    const exported = /^export\s*\{[^}]*\bpublicCard\b/m.test(text)
+    const exported = exportsName(text, 'publicCard')
     return [
       ...one,
       ...(oneRight
@@ -232,7 +224,7 @@ export const checks = {
       shape(
         'publicCard stays off the export line',
         !exported,
-        'publicCard only helps publicCatalogue, so it stays off the export line at the bottom. Put that line back as it was.'
+        keepHome('publicCard', 'publicCatalogue')
       )
     ]
   }

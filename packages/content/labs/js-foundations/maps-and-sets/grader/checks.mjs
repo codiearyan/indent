@@ -1,5 +1,5 @@
 import { code } from '../../grading.mjs'
-import { calls, earlier, loaded, partOf, readSource, shape } from '../../catalogue-grading.mjs'
+import { calls, earlier, exportsName, keepHome, loaded, partOf, readSource, shape } from '../../catalogue-grading.mjs'
 
 const FILE = 'src/maps-and-sets.js'
 
@@ -10,6 +10,15 @@ const count = (list) => {
 }
 
 const key = (email) => email.trim().toLowerCase()
+
+/** Whether the function makes a Set, itself or in a function of the file it calls. */
+function makesSet(text, name, seen = new Set([name])) {
+  const body = partOf(text, name)
+  if (/\bnew\s+Set\b/.test(body)) return true
+  return [...body.matchAll(/\b([A-Za-z_]\w*)\s*\(/g)].some(
+    ([, called]) => !seen.has(called) && seen.add(called) && makesSet(text, called, seen)
+  )
+}
 
 export const checks = {
   count(t) {
@@ -158,8 +167,8 @@ export const checks = {
       ...details,
       shape(
         'Uses a Set',
-        /\bnew\s+Set\b/.test(partOf(code(await readSource(t, FILE)), 'uniqueScents')),
-        'The task asks uniqueScents to leave the repeats out with a Set. Make one inside uniqueScents.'
+        makesSet(code(await readSource(t, FILE)), 'uniqueScents'),
+        'The task asks uniqueScents to leave the repeats out with a Set. Make one in uniqueScents, or in a function it calls.'
       )
     ]
   },
@@ -243,7 +252,7 @@ export const checks = {
       })
     })
     const oneRight = one.every((d) => d.passed)
-    const exported = /^export\s*\{[^}]*\bemailKey\b/m.test(text)
+    const exported = exportsName(text, 'emailKey')
     return [
       ...one,
       ...(oneRight
@@ -259,7 +268,7 @@ export const checks = {
       shape(
         'emailKey stays off the export line',
         !exported,
-        'emailKey only helps newCustomers, so it stays off the export line at the bottom. Put that line back as it was.'
+        keepHome('emailKey', 'newCustomers')
       )
     ]
   }

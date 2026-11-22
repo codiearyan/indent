@@ -42,7 +42,7 @@ Object.values(garden) // [6, 0, 3]
 Object.entries(garden) // [['tomatoes', 6], ['beans', 0], ['kale', 3]]
 ```
 
-`Object.keys` gives the names, `Object.values` the values, and `Object.entries` both, as pairs. They come in the order the properties were added. They are ordinary lists, so everything from the arrays part works on them: `length`, `for...of`, `map`, `filter`, `reduce`. The object itself is not changed.
+`Object.keys` gives the names, `Object.values` the values, and `Object.entries` both, as pairs. They come in the order the properties were added (keys that are whole numbers, like `12`, are the one exception: they come first, smallest first). They are ordinary lists, so everything from the part on lists works on them: `length`, `for...of`, `map`, `filter`, `find`. The object itself is not changed.
 
 Use the one that holds what you need. To count how many kinds of plant there are, `Object.keys(garden).length` is enough. To add up the plants, you only need the values:
 
@@ -88,7 +88,11 @@ The harvest above is a list of objects. That shape is everywhere: orders, custom
 
 ```js
 const heavy = harvest.filter((row) => row.kilos > 2)
-const kilos = harvest.reduce((total, row) => total + row.kilos, 0)
+
+let kilos = 0
+for (const row of harvest) {
+  kilos = kilos + row.kilos
+}
 ```
 
 A small function for one item keeps the bigger one short. If `rowWorth(row)` works out one row, a total is that function called for every row and added up.

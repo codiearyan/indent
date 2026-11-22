@@ -69,7 +69,11 @@ function candleValue(candle) {
 }
 
 function stockValue(candles) {
-  return candles.reduce((total, candle) => total + candleValue(candle), 0)
+  let total = 0
+  for (const candle of candles) {
+    total = total + candleValue(candle)
+  }
+  return total
 }
 
 console.log(stockValue(catalogue))

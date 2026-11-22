@@ -5,10 +5,25 @@
 // expression reports whether the function changed what it was given, and whether it handed back
 // the very object it was given.
 import { inspect, isDeepStrictEqual } from 'node:util'
-import { evaluate } from './rules-grading.mjs'
+import { evaluate, partOf as topLevel } from './rules-grading.mjs'
 
 export { readSource } from './rules-grading.mjs'
-export { partOf, shape } from './rules-grading.mjs'
+export { shape } from './rules-grading.mjs'
+
+const exportWord = /^export\s+(?=function\b|const\b|let\b)/gm
+
+/** rules-grading's partOf, which also finds a function written with export in front of it. */
+export const partOf = (source, name) => topLevel(source.replace(exportWord, ''), name)
+
+/** Whether `name` is exported, on the export line or with export in front of it. */
+export const exportsName = (source, name) =>
+  new RegExp(`^export\\s*\\{[^}]*\\b${name}\\b|^export\\s+(?:function|const|let)\\s+${name}\\b`, 'm').test(
+    source
+  )
+
+/** The message for a helper that is exported, though only one of the learner's functions uses it. */
+export const keepHome = (helper, user) =>
+  `${helper} only helps ${user}, so it is not exported: keep it off the export line at the bottom, with no export in front of its own line.`
 
 const DESCRIBE = `(function d(v, seen) {
   seen = seen || new Set()
@@ -220,7 +235,7 @@ function why(fn, c, r, { right, changed, stuck, answersOthers }) {
     return `${fn} gave the right answer, but it changed the ${c.keeps} it was given on the way. The task asks for the ${c.keeps} to stay as it was.`
   }
   if (r.value === undefined && !c.changes) {
-    if (r.printed.length) {
+    if (r.printed.length && !answersOthers) {
       return `${fn} prints its answer but gives nothing back. A function hands its answer back with return.`
     }
     const own = answersOthers && c.explain?.(r)

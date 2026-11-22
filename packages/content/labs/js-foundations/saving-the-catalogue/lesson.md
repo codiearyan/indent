@@ -61,7 +61,7 @@ JSON.stringify(new Set(['sea'])) // '{}'
 
 A property holding `undefined` or a function is left out. A Map or a Set becomes `{}`, because its contents are not properties. A date becomes text and comes back as text, not a date. `NaN` becomes `null`.
 
-To save a Map, turn it into something JSON keeps first. Spread from the last issue turns a Map into a list of pairs, and `new Map()` turns such a list back into a Map:
+To save a Map, turn it into something JSON keeps first. Spread, which turned a Set into a list in the last issue, turns a Map into a list of its entries, each a pair of key and value, and `new Map()` turns such a list back into a Map:
 
 ```js
 const pairs = [...new Map([['B', 4]])] // [['B', 4]]
@@ -73,7 +73,8 @@ new Map(pairs) // Map(1) { 'B' => 4 }
 `JSON.parse` on text that is not JSON throws an error, and an error stops the whole program:
 
 ```js
-JSON.parse('{"title":"Salt') // SyntaxError: Unterminated string in JSON at position 14
+JSON.parse('{"title":"Salt')
+// SyntaxError: Unterminated string in JSON at position 14 (line 1 column 15)
 ```
 
 A file cut off halfway, an empty file, a stray letter: all of them stop the program, unless you catch the error. Code inside `try { }` runs as usual, but when anything in it throws, Node jumps to the `catch { }` part instead of stopping:
