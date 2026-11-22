@@ -1,0 +1,101 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "form", "label": "Order form", "kind": "story" },
+      { "id": "tests", "label": "orders.test.js", "kind": "file", "mine": true },
+      { "id": "place", "label": "placeOrder()", "kind": "function" },
+      { "id": "error", "label": "Error", "kind": "data" },
+      { "id": "list", "label": "Packing list", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "form", "to": "tests", "label": "orders" },
+      { "from": "tests", "to": "place", "label": "an order" },
+      { "from": "place", "to": "error", "label": "bad order" },
+      { "from": "place", "to": "list", "label": "good order" }
+    ],
+    "note": "placeOrder turns a bad order away with an error and lets a good one through, and your tests check both paths."
+  },
+  "tasks": {
+    "size": {
+      "steps": [
+        {
+          "active": ["form", "form->tests", "tests"],
+          "value": {
+            "kind": "map",
+            "label": "an order",
+            "entries": [
+              { "key": "size", "value": "one the farm does not sell" },
+              { "key": "dozens", "value": "fine" },
+              { "key": "village", "value": "fine" }
+            ]
+          },
+          "note": "An order that is good in every way except its size."
+        },
+        {
+          "active": ["tests", "tests->place", "place"],
+          "note": "Your test hands expect a function that places the order, so expect can catch what it throws."
+        },
+        {
+          "active": ["place", "place->error", "error"],
+          "note": "placeOrder throws, and the order never reaches the packing list."
+        }
+      ]
+    },
+    "eggs": {
+      "steps": [
+        {
+          "active": ["form", "form->tests", "tests"],
+          "note": "An order with a negative number of dozens."
+        },
+        {
+          "active": ["tests", "tests->place", "place", "place->error", "error"],
+          "value": {
+            "kind": "map",
+            "label": "the error",
+            "entries": [
+              { "key": "kind", "value": "a number out of range" },
+              { "key": "message", "value": "text" }
+            ]
+          },
+          "note": "placeOrder throws, and the kind of error matters: the form shows a different message for it."
+        },
+        {
+          "active": ["error"],
+          "note": "Your test checks the kind of error, not just that there was one."
+        }
+      ]
+    },
+    "village": {
+      "steps": [
+        {
+          "active": ["form", "form->tests", "tests"],
+          "note": "An order from a village the van does not go to."
+        },
+        {
+          "active": ["tests", "tests->place", "place", "place->error", "error"],
+          "note": "placeOrder throws an error with a message for Effie."
+        },
+        {
+          "active": ["error"],
+          "note": "Your test checks that the message names the village, so Effie knows where the customer lives."
+        }
+      ]
+    },
+    "good": {
+      "steps": [
+        {
+          "active": ["form", "form->tests", "tests"],
+          "note": "A good order with eggs, for a village the van goes to."
+        },
+        {
+          "active": ["tests", "tests->place", "place"],
+          "note": "Your test calls placeOrder directly. If it threw, the test would fail by itself."
+        },
+        {
+          "active": ["place", "place->list", "list"],
+          "note": "The order comes back exactly as it was asked, ready for Wendell's list."
+        }
+      ]
+    }
+  }
+}

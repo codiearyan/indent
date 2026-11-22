@@ -18,7 +18,6 @@ import { useProgress } from './progress'
 import { noticeMoment } from '@/features/progress/momentStore'
 import { useSettings } from './settings'
 import { useOpenTabs } from './tabs'
-import { movedPath } from '@/features/editor/fileTree'
 import {
   activeOf,
   clampSplit,
@@ -30,7 +29,6 @@ import {
   openInGroup,
   openToSide,
   pruneLayout,
-  renameInLayout,
   storedTabs,
   type DropTarget,
   type EditorLayout
@@ -103,13 +101,6 @@ interface WorkspaceStore {
   reset(): Promise<void>
   /** Copies back the starter files in `missing`, leaving every other file alone. */
   restoreMissing(): Promise<void>
-  /** Makes an empty file and opens it. */
-  createFile(path: string): Promise<void>
-  createFolder(path: string): Promise<void>
-  /** Renames a file or folder; its open tabs and expanded folders follow. */
-  renamePath(from: string, to: string): Promise<void>
-  /** Deletes a file, or a folder with everything in it, and closes their tabs. */
-  removePath(path: string): Promise<void>
   /** Keeps the learner's version of a conflicted file, or takes the new one. */
   resolveConflict(path: string, choice: ConflictChoice): Promise<void>
   /** Runs the hidden tests for some tasks, or all. */
@@ -288,32 +279,6 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     },
 
     restoreMissing: () => change(() => api.workspace.restoreMissing(...ids())),
-
-    createFile: async (path) => {
-      await change(() => api.workspace.createFile(...ids(), path))
-      get().openFile(path)
-    },
-
-    createFolder: (path) => change(() => api.workspace.createFolder(...ids(), path)),
-
-    renamePath: async (from, to) => {
-      await change(async () => {
-        const snapshot = await api.workspace.rename(...ids(), from, to)
-        const layout = renameInLayout(get().layout, from, to)
-        set({ layout, activePath: activeOf(layout) })
-        return snapshot
-      })
-      const key = chapterKey(...ids())
-      const tabs = useOpenTabs.getState()
-      const expanded = tabs.expandedByChapter[key]
-      if (expanded)
-        tabs.rememberExpanded(
-          key,
-          expanded.map((p) => movedPath(p, from, to))
-        )
-    },
-
-    removePath: (path) => change(() => api.workspace.remove(...ids(), path)),
 
     resolveConflict: async (path, choice) => {
       await get().flush()

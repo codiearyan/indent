@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Wendell",
+      "say": "Is the salad really in the box?",
+      "note": "He packs from the code's lists."
+    },
+    {
+      "title": "Packing code",
+      "text": "Gives back lists. Nobody checks inside."
+    },
+    {
+      "title": "Your tests",
+      "file": "boxes.test.js",
+      "mine": true,
+      "gap": "Only the outside is checked",
+      "tasks": [
+        "Test a medium box",
+        "Test a whole slip",
+        "Test a weighed price",
+        "Test a swap"
+      ]
+    },
+    {
+      "title": "Friday van",
+      "text": "Every box packed from its list, slip on top."
+    }
+  ],
+  "ticket": {
+    "label": "Medium box",
+    "wrong": "no salad",
+    "why": "Unchecked",
+    "right": "all there"
+  },
+  "captions": [
+    "Wendell packs every box from the farm's code and wants to know the lists are right.",
+    "Today the code gives back a list and a slip, and nobody looks inside them.",
+    "You write tests that compare whole lists, whole slips and prices to the penny.",
+    "Now a box missing its salad fails a test before Wendell packs it.",
+    "Same lists, same van. Every box leaves the farm with what was on the slip."
+  ]
+}

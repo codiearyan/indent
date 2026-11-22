@@ -1,0 +1,18 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "people", "label": "Bridget, Wendell, Effie", "kind": "story" },
+      { "id": "code", "label": "The farm's code", "kind": "file" },
+      { "id": "tests", "label": "Your tests", "kind": "file", "mine": true },
+      { "id": "vitest", "label": "Vitest", "kind": "story" },
+      { "id": "boxes", "label": "Friday boxes", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "people", "to": "tests", "label": "the rules" },
+      { "from": "tests", "to": "vitest", "label": "tests" },
+      { "from": "vitest", "to": "code", "label": "runs" },
+      { "from": "code", "to": "boxes", "label": "prices, lists" }
+    ],
+    "note": "You turn the farm's rules into tests that run against its code, so a mistake fails a test before Friday's boxes go out."
+  }
+}
