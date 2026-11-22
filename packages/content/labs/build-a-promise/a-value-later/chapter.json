@@ -16,7 +16,7 @@
         "Run `node src/price-list.js` and read the error.",
         "Make two small functions inside the constructor, one that keeps the docket and one that fails it.",
         "Hand both to the executor.",
-        "Run the script again: card should be pending at first and fulfilled a moment later."
+        "Run the script again: card should be pending at first. The script still stops at the smudged count; that is task 3."
       ],
       "hints": [
         "The constructor does not know the value. The executor will find it, now or later, and needs a way to hand it back.",

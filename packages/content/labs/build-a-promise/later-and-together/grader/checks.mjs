@@ -75,9 +75,9 @@ export const checks = {
         name: 'In the order then() was called',
         run: 'laterCase',
         args: ['order'],
-        pass: logIs('callback 1', 'callback 2', 'callback 3', 'callback 4'),
+        pass: logIs('callback 1', 'callback 2', 'callback 3', 'callback 4', 'callback 5'),
         show: showLog,
-        setup: 'callback 1 on a kept docket, callback 2 on a pending one, resolve it, then callbacks 3 and 4 on each',
+        setup: 'callback 1 on a kept docket, callbacks 2 and 3 on a pending one, resolve it, then callbacks 4 and 5 on each',
         hint: 'Every callback ran, but not in the order then() was called. Jobs put off with queueMicrotask run first in, first out, so queue each one when its turn comes: at then() for a settled docket, at resolve() for one that was waiting.'
       },
       {

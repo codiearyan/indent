@@ -168,14 +168,14 @@ export const checks = {
       {
         name: 'A callback that is not a function is skipped',
         run: 'missingCase',
-        args: ['reject', 'text', 'fn'],
-        pass: only('onRejected(Error: No paper listed for napkin)', 'late onRejected(Error: No paper listed for napkin)'),
+        args: ['reject', 'fn', 'text'],
+        pass: only(),
         show: showCalls,
-        setup: "then('not a function', onRejected) on a docket that then fails, and again after it failed",
+        setup: "then(onFulfilled, 'not a function') on a docket that then fails, and again after it failed",
         hint: (v) =>
           v?.threw?.length || v?.escaped?.length
-            ? 'A string is not a callback. Your code threw. Check that a callback is a function before you keep or call it.'
-            : 'onRejected should run once for each then(), even when the other argument is not a function.'
+            ? 'A string is not a callback. Your code threw. Check that a callback is a function before you call it, not only that it is there.'
+            : 'The docket failed, so onFulfilled must not run.'
       }
     ])
   }

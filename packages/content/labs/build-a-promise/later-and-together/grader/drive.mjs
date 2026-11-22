@@ -63,9 +63,10 @@ export async function laterCase(mode) {
     const b = open()
     a.then(note('callback 1'))
     b.docket.then(note('callback 2'))
+    b.docket.then(note('callback 3'))
     b.resolve('invite')
-    a.then(note('callback 3'))
-    b.docket.then(note('callback 4'))
+    a.then(note('callback 4'))
+    b.docket.then(note('callback 5'))
   }
   if (mode === 'executor') {
     log.push('new Docket called')

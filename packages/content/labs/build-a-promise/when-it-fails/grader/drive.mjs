@@ -71,7 +71,7 @@ export async function catchCase(outcome, returns, via = 'catch') {
   const calls = []
   const inner = open()
   const handler = (reason) => {
-    calls.push({ value: shown(reason), same: reason === missing })
+    calls.push({ value: shown(reason), same: reason === (outcome === 'fulfil' ? 75 : missing) })
     if (returns === 'docket') return inner.docket
     return fallback
   }

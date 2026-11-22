@@ -1,9 +1,12 @@
 import { runCases } from '../../checks-helpers.mjs'
 
-const showEnd = (v) =>
+const endWith = (note) => (v) =>
   v.constructorThrew
     ? `new Docket threw ${v.error}`
-    : `state: ${v.end.state}\nvalue: ${v.end.value}${v.end.state !== 'pending' && !v.end.same ? ' (not the value that was given)' : ''}${v.threw?.length ? `\na later call threw ${v.threw[0]}` : ''}`
+    : `state: ${v.end.state}\nvalue: ${v.end.value}${v.end.state !== 'pending' && !v.end.same ? ` (not ${note})` : ''}${v.threw?.length ? `\na later call threw ${v.threw[0]}` : ''}`
+const showEnd = endWith('the value that was given')
+const showFirst = endWith('the first value it was given')
+const showThrown = endWith('what was thrown')
 
 const settledAs = (state) => (v) => v.functions !== false && v.end?.state === state && v.end.same
 
@@ -84,7 +87,7 @@ export const checks = {
         run: 'onceCase',
         args: ['resolve', 'resolve'],
         pass: stays,
-        show: showEnd,
+        show: showFirst,
         setup: "resolve({ kraft: 300, laid: 85 }), then resolve('other')",
         hint
       },
@@ -93,7 +96,7 @@ export const checks = {
         run: 'onceCase',
         args: ['resolve', 'reject'],
         pass: stays,
-        show: showEnd,
+        show: showFirst,
         setup: "resolve({ kraft: 300, laid: 85 }), then reject(new Error('Second answer'))",
         hint
       },
@@ -102,7 +105,7 @@ export const checks = {
         run: 'onceCase',
         args: ['reject', 'resolve'],
         pass: stays,
-        show: showEnd,
+        show: showFirst,
         setup: "reject(new Error('No paper listed for napkin')), then resolve('other')",
         hint
       },
@@ -111,7 +114,7 @@ export const checks = {
         run: 'onceCase',
         args: ['reject', 'reject+resolve+reject'],
         pass: stays,
-        show: showEnd,
+        show: showFirst,
         setup: "reject(new Error('No paper listed for napkin')), then reject, resolve and reject again",
         hint
       },
@@ -120,7 +123,7 @@ export const checks = {
         run: 'onceCase',
         args: ['resolve', 'resolve-undefined'],
         pass: stays,
-        show: showEnd,
+        show: showFirst,
         setup: "resolve(undefined), then resolve('other')",
         hint: (v) =>
           v?.threw?.length
@@ -140,7 +143,7 @@ export const checks = {
         run: 'throwCase',
         args: ['error'],
         pass: rejectedWithThrown,
-        show: showEnd,
+        show: showThrown,
         setup: "new Docket(() => { throw new Error('Ink on the count sheet') })",
         hint: or('The docket should be rejected, and its value should be the very Error that was thrown.')
       },
@@ -149,7 +152,7 @@ export const checks = {
         run: 'throwCase',
         args: ['string'],
         pass: rejectedWithThrown,
-        show: showEnd,
+        show: showThrown,
         setup: "new Docket(() => { throw 'out of ink' })",
         hint: or('Anything can be thrown, not only an Error. Keep what was thrown as it is.')
       },
@@ -158,16 +161,21 @@ export const checks = {
         run: 'throwCase',
         args: ['undefined'],
         pass: rejectedWithThrown,
-        show: showEnd,
+        show: showThrown,
         setup: 'new Docket(() => { throw undefined })',
-        hint: or('The executor threw, so the docket failed, even though what it threw is undefined. Decide by whether it threw, not by what it threw.')
+        hint: (v) =>
+          v?.constructorThrew
+            ? THREW
+            : v?.end?.state === 'rejected'
+              ? 'The docket failed, but its value is not what was thrown. Keep what was thrown as it is, even undefined.'
+              : 'The executor threw, so the docket failed, even though what it threw is undefined. Decide by whether it threw, not by what it threw.'
       },
       {
         name: 'A throw after resolve changes nothing',
         run: 'throwCase',
         args: ['afterResolve'],
         pass: (v) => !v.constructorThrew && v.end.state === 'fulfilled' && v.end.same,
-        show: showEnd,
+        show: showFirst,
         setup: "new Docket((resolve) => { resolve({ kraft: 300, laid: 85 }); throw new Error('Smudge after the count') })",
         hint: or('The docket was already kept when the executor threw. A settled docket never changes, so the throw has to go through the same rule as every other late call.')
       },
@@ -176,7 +184,7 @@ export const checks = {
         run: 'throwCase',
         args: ['afterReject'],
         pass: (v) => !v.constructorThrew && v.end.state === 'rejected' && v.end.same,
-        show: showEnd,
+        show: showFirst,
         setup: "new Docket((resolve, reject) => { reject(new Error('No paper listed for napkin')); throw new Error('Smudge after the count') })",
         hint: or('The docket had already failed with its first reason. A later throw must not replace it.')
       }

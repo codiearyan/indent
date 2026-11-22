@@ -43,16 +43,18 @@ export const checks = {
         name: 'Kept once the callback has run',
         run: 'newDocketCase',
         args: ['one'],
-        pass: (v) => v.isDocket && !v.same && v.before === 'pending' && v.after === 'fulfilled' && v.calls === 1,
+        pass: (v) => v.isDocket && !v.same && v.before === 'pending' && v.during === 'pending' && v.after === 'fulfilled' && v.calls === 1,
         show: (v) =>
           v.isDocket && !v.same
-            ? `docket from then() before: ${v.before}\nafter resolve: ${v.after}\ncallback ran ${v.calls} time(s)`
+            ? `docket from then() before: ${v.before}\nwhile the callback ran: ${v.during ?? 'the callback did not run'}\nafter resolve: ${v.after}\ncallback ran ${v.calls} time(s)`
             : shape(v),
         setup: "then(onFulfilled) on a pending docket, then resolve({ item: 'kraft', sheets: 300 })",
         hint: (v) =>
           v?.before && v.before !== 'pending'
             ? 'The docket from then() settled before the first docket did. It should wait until the callback has run.'
-            : 'The new docket stays pending until the callback has run, and then it is kept. Something has to call its resolve at that moment.'
+            : v?.during && v.during !== 'pending'
+              ? 'The docket from then() was already kept while the callback was still running. Keep it once the callback has finished.'
+              : 'The new docket stays pending until the callback has run, and then it is kept. Something has to call its resolve at that moment.'
       }
     ])
   },

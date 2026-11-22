@@ -45,7 +45,7 @@ Two cases look like exceptions and are not. A callback that returns nothing retu
 
 ## A step that waits
 
-Some steps cannot answer at once. In Sefton's chain, the second step needs the press queue, which is another file to read, so `firstFreeDay()` returns a docket. If the next docket were kept with that docket as its value, the step after would get a docket instead of a day, and the waiting would just be passed down the line. Run the price list after the first two tasks and you will see exactly that: the press line prints a docket.
+Some steps cannot answer at once. In Sefton's chain, the second step needs the press queue, which is another file to read, so `firstFreeDay()` returns a docket. If the next docket were kept with that docket as its value, the step after would get a docket instead of a day, and the waiting would just be passed down the line. Run the price list after the first two tasks and you will see exactly that: the press line prints `[object Object]`, which is a docket where a day should be.
 
 So when a callback returns a `Docket`, the docket from `then()` waits for it, and settles the same way: kept with its value, or failed with its reason. You already have a way to wait for a docket and act when it settles. `instanceof` tells you whether a value is a `Docket`.
 

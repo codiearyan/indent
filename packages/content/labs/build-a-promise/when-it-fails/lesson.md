@@ -14,7 +14,7 @@ Idris runs the price list every night, and has had two bad nights in a row.
 
 > **Idris:** On Monday the stock sheet had no line for napkins, and the price list stopped at two in the morning with a wall of red text. On Tuesday someone asked for 100 posters when we had 60 sheets, the quote threw, and the whole script died with it, card prices and all. I want every quote to end one of two ways: a price, or a sentence saying why not. And I want to write the "why not" once, at the end, not after every step.
 
-Run `node src/price-list.js` and you will see Tuesday: the poster's throw takes the script down.
+Run `node src/price-list.js` and it stops at once, on `catch()`, which you write in task 2. Tuesday's crash, the poster's throw, is task 1; the check shows it before the script can.
 
 ## A throw belongs to its step
 

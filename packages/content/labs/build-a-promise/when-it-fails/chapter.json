@@ -13,7 +13,7 @@
       "file": "src/docket.js",
       "description": "When `onFulfilled` or `onRejected` throws, the docket from `then()` fails with exactly what was thrown.\n\n- the throw goes no further: `resolve`, `reject` and `then()` never throw because a callback did\n- one callback that throws does not stop the other callbacks waiting on the same docket\n- this holds on a docket that settles later and on one already settled\n\nThe check gives dockets of its own callbacks that throw, settles them, and reads the docket from `then()` and anything that escaped.",
       "nextSteps": [
-        "Run `node src/price-list.js` and read the error: the poster's throw crashes the script.",
+        "Run `node src/price-list.js`: it stops on `catch()`, which is task 2. Press Check to see where a throw in a callback goes today.",
         "Find the one place where a callback is called.",
         "Catch what it throws there, and fail the docket from `then()` with it.",
         "Run the script again: it now stops at `catch()`, which is the next task."
@@ -26,6 +26,9 @@
       "docs": [
         { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
         { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" }
+      ],
+      "videos": [
+        { "title": "What happens to a throw inside a promise", "url": "https://www.youtube.com/watch?v=LzlGL3k3p04" }
       ],
       "points": 10
     },
@@ -55,7 +58,7 @@
       "id": "skip-ahead",
       "title": "A failure skips ahead",
       "file": "src/docket.js",
-      "description": "Make a failure travel down a chain to the first callback that takes it.\n\n- when `onRejected` is missing or not a function, the docket from `then()` fails with the same reason, unchanged\n- no `onFulfilled` runs on the way\n- this holds for a docket that failed, one that fails later, and a throw in an earlier callback\n\nThe check builds chains of `then()` calls with only `onFulfilled`, ending in `then(undefined, handler)`, and records what ran and how a docket in the middle ended. The last case builds on task 1; the check says so when it is not done.",
+      "description": "Make a failure travel down a chain to the first callback that takes it.\n\n- when `onRejected` is missing or not a function, the docket from `then()` fails with the same reason, unchanged\n- no `onFulfilled` runs on the way\n- this holds for a docket that failed, one that fails later, and a throw in an earlier callback\n\nThe check builds chains of `then()` calls with only `onFulfilled`, ending in `then(undefined, handler)`, and records what ran and how a docket in the middle ended. This task builds on task 1; the check says so when it is not done.",
       "nextSteps": [
         "Look at the napkin quote: its count fails, and two `then()` calls stand between it and `catch()`.",
         "Find what `then()` does today when the docket failed and there is no `onRejected`.",

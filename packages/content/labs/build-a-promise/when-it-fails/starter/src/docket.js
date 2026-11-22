@@ -39,7 +39,7 @@ export class Docket {
     return new Docket((resolve, reject) => {
       const handle = () => {
         if (this.state === 'rejected') {
-          // Task 3 changes what happens to a failure.
+          // Tasks 2 and 3 change what happens to a failure.
           if (typeof onRejected === 'function') onRejected(this.value)
           return
         }

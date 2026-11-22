@@ -57,7 +57,7 @@
       "file": "src/docket.js",
       "description": "When `onFulfilled` returns a `Docket`, the docket from `then()` waits for it, then settles the same way: kept with its value, or failed with its reason.\n\n- it is never kept with the returned docket itself as its value\n- the next step in the chain gets the value, not a docket\n- a returned docket that has already settled works too\n\nThis task builds on tasks 1 and 2. The check returns dockets of its own from callbacks, settles them later or before, and reads the docket from `then()`.",
       "nextSteps": [
-        "Look at the press line in the price list: it prints a docket, not a day.",
+        "Look at the press line in the price list: `[object Object]` there is a docket, not a day.",
         "After calling `onFulfilled`, look at what it returned.",
         "When it is a `Docket`, wait for it before you settle the new docket.",
         "Run the script: the press line should name a day."

@@ -42,9 +42,16 @@ export async function newDocketCase(mode) {
   await needsIssue2()
   const { docket, resolve } = open()
   let calls = 0
-  const first = attempt(() => docket.then(() => (calls += 1)))
+  let during
+  let next
+  const first = attempt(() =>
+    docket.then(() => {
+      calls += 1
+      during = next?.state
+    })
+  )
   if (first.threw) return { threw: first.error }
-  const next = first.value
+  next = first.value
   const facts = { isDocket: isDocket(next), same: next === docket, got: shown(next) }
   if (mode === 'two') {
     const second = attempt(() => docket.then(() => {}))
@@ -55,7 +62,7 @@ export async function newDocketCase(mode) {
   const before = next.state
   resolve(kraft)
   await tick(30)
-  return { ...facts, before, after: next.state, calls }
+  return { ...facts, before, during, after: next.state, calls }
 }
 
 // Each step of `steps` is what a callback returns: ['value', x], ['undefined'] or ['skip'] for a

@@ -52,7 +52,7 @@ One case is easy to miss. An executor can call `resolve` and then throw on its n
 
 ## Your work in this issue
 
-All three tasks are in `src/docket.js`, in the constructor: settle the docket, settle it only once, then catch a throwing executor. Try your work with:
+All three tasks are in `src/docket.js`, in the constructor: settle the docket, settle it only once, then catch a throwing executor. The check refuses the file if it uses the built-in `Promise`, `async` or `await`, in this issue and every one after: the point is to build it yourself. Try your work with:
 
 ```sh
 node src/price-list.js
