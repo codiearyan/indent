@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Imran", "say": "Can the list be read in one place?", "note": "He fixed one copy last month." },
+    { "title": "The scripts", "text": "Each one reads plots.txt its own way." },
+    {
+      "title": "Your module",
+      "file": "plots.js",
+      "mine": true,
+      "gap": "No shared way to read",
+      "tasks": ["Read in one module", "List free plots", "Print the version", "Pick a row"]
+    },
+    { "title": "Every script", "text": "One fix reaches all of them." }
+  ],
+  "ticket": { "label": "Windows fix", "wrong": "in one copy", "why": "Copied code", "right": "everywhere" },
+  "captions": [
+    "At Marrowfield, Imran asks for the plot list to be read in one place.",
+    "Each script reads plots.txt its own way, so his fix for Windows files reached only one.",
+    "You write one module that reads the list, and scripts that use it, in four tasks.",
+    "Now every script imports readPlots, so one fix reaches all of them.",
+    "Same plot list, one way to read it. Imran knows which version he has, too."
+  ]
+}

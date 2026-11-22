@@ -1,0 +1,101 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "plotsTxt", "label": "plots.txt", "kind": "file" },
+      { "id": "readplots", "label": "readPlots()", "kind": "function", "mine": true },
+      { "id": "util", "label": "node:util", "kind": "file" },
+      { "id": "free", "label": "free-plots.js", "kind": "file", "mine": true },
+      { "id": "pkg", "label": "package.json", "kind": "file" },
+      { "id": "version", "label": "version.js", "kind": "file", "mine": true },
+      { "id": "imran", "label": "Imran", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "plotsTxt", "to": "readplots", "label": "text" },
+      { "from": "readplots", "to": "free", "label": "plot objects" },
+      { "from": "util", "to": "free", "label": "options" },
+      { "from": "free", "to": "imran", "label": "free plots" },
+      { "from": "pkg", "to": "version", "label": "name, version" },
+      { "from": "version", "to": "imran", "label": "version" }
+    ],
+    "note": "The plot list is read in one module that every script imports, Node's own modules help with options, and package.json says what the tools are."
+  },
+  "tasks": {
+    "module": {
+      "steps": [
+        {
+          "active": ["plotsTxt", "plotsTxt->readplots", "readplots"],
+          "note": "readPlots in plots.js reads a plot list at the path it is given."
+        },
+        {
+          "active": ["readplots"],
+          "value": {
+            "kind": "map",
+            "label": "one plot",
+            "entries": [
+              { "key": "plot", "value": "before the comma" },
+              { "key": "holder", "value": "after it, or null" }
+            ]
+          },
+          "note": "Each line that is not blank becomes one object, with null for a plot nobody holds."
+        },
+        {
+          "active": ["readplots", "readplots->free"],
+          "note": "Any script can import it, so the list is read the same way everywhere."
+        }
+      ]
+    },
+    "free": {
+      "steps": [
+        {
+          "active": ["readplots", "readplots->free", "free"],
+          "note": "free-plots.js imports readPlots and asks it for the plots.txt beside the script."
+        },
+        {
+          "active": ["free"],
+          "note": "It keeps the plots whose holder is null."
+        },
+        {
+          "active": ["free->imran", "imran"],
+          "note": "Imran sees one free plot per line, like A3, or a line that says none are free."
+        }
+      ]
+    },
+    "version": {
+      "steps": [
+        {
+          "active": ["pkg"],
+          "note": "package.json says what the tools are called and which version they are."
+        },
+        {
+          "active": ["pkg->version", "version"],
+          "note": "version.js reads it from its own folder and turns the text into an object."
+        },
+        {
+          "active": ["version->imran", "imran"],
+          "note": "Imran gets one line: the name and the version."
+        }
+      ]
+    },
+    "row": {
+      "steps": [
+        {
+          "active": ["imran", "util", "util->free"],
+          "value": { "kind": "array", "label": "what Imran types after free-plots.js", "values": ["--row", "B"] },
+          "note": "Imran types --row B after free-plots.js."
+        },
+        {
+          "active": ["util", "free"],
+          "note": "parseArgs from node:util reads the option, and refuses one it was not told about."
+        },
+        {
+          "active": ["free"],
+          "note": "Only the free plots whose name starts with B are kept."
+        },
+        {
+          "active": ["free->imran", "imran"],
+          "note": "Imran sees the free plots of row B, or one plain line on standard error for an option that makes no sense."
+        }
+      ]
+    }
+  }
+}

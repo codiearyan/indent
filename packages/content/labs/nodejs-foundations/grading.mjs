@@ -119,7 +119,7 @@ export async function unwritten(dir, script) {
  */
 export async function broken(name, r, dir, script) {
   if (await unwritten(dir, script)) {
-    return fail(name, `${script} holds only the comment from the starter so far. Write the script under it.`, report(r))
+    return fail(name, `${script} holds only the comment from the starter so far. Write your code under it.`, report(r))
   }
   if (r.timedOut) {
     return fail(
@@ -136,6 +136,14 @@ export async function broken(name, r, dir, script) {
     )
   }
   const error = errorLine(r.stderr) ?? ''
+  const missingExport = /does not provide an export named '([^']+)'/.exec(error)
+  if (missingExport) {
+    return fail(
+      name,
+      `A file imports ${missingExport[1]} from a module that has no export by that name, so nothing ran. Compare the name in the import with the name after export in that module, letter by letter. A default export is not a named one.`,
+      report(r)
+    )
+  }
   if (/SyntaxError/.test(error)) {
     return fail(
       name,
@@ -143,10 +151,24 @@ export async function broken(name, r, dir, script) {
       report(r)
     )
   }
+  if (/ERR_MODULE_NOT_FOUND/.test(error) && /Cannot find module/.test(error)) {
+    return fail(
+      name,
+      `A file of your own that ${script} imports cannot be found, so nothing ran. Its name starts with ./ and ends with .js, as the file is called on disk.`,
+      report(r)
+    )
+  }
   if (/ERR_MODULE_NOT_FOUND|ERR_UNKNOWN_BUILTIN_MODULE/.test(error)) {
     return fail(
       name,
-      `Node cannot find a module that ${script} imports, so nothing in it ran. Compare the name after from with the one in the lesson, letter by letter, prefix included.`,
+      `Node cannot find a module that ${script} imports, so nothing in it ran. Compare the name after from with the one in the lesson, letter by letter, node: prefix included.`,
+      report(r)
+    )
+  }
+  if (/ERR_IMPORT_ATTRIBUTE_MISSING/.test(error)) {
+    return fail(
+      name,
+      `${script} imports a JSON file without saying that it is JSON, so nothing ran. The lesson shows the words that go after the import.`,
       report(r)
     )
   }

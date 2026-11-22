@@ -15,7 +15,8 @@
         "first-script",
         "reading-files",
         "paths",
-        "writing-files"
+        "writing-files",
+        "modules"
       ]
     }
   ]

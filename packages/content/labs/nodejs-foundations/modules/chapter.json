@@ -1,0 +1,107 @@
+{
+  "id": "modules",
+  "title": "Modules and package.json",
+  "files": ["plots.js", "free-plots.js", "version.js", "package.json"],
+  "terminal": {
+    "description": "A terminal in your workspace. `node free-plots.js` lists the free plots once `plots.js` does the reading, and `node free-plots.js --row B` lists the free plots of row B.",
+    "suggestedCommand": "node free-plots.js"
+  },
+  "tasks": [
+    {
+      "id": "module",
+      "title": "Read the plot list in one module",
+      "file": "plots.js",
+      "description": "Write `plots.js` as a module that exports one async function, `readPlots(file)`. It reads the plot list at the path `file` and gives back an array with one object per plot, in the order of the file:\n\n```js\n[\n  { plot: 'A1', holder: 'Maud Pask' },\n  { plot: 'A3', holder: null }\n]\n```\n\nA free plot has `holder: null`. Blank lines are not plots, and a list saved on Windows reads the same. `plots.js` prints nothing itself: the scripts that import it decide what to print.\n\nCheck imports `readPlots` from your `plots.js` in a script of its own, calls it on two lists of its own, and compares what it gives back.",
+      "nextSteps": [
+        "Import `readFile` at the top of `plots.js`.",
+        "Write `readPlots(file)` and put `export` in front of it.",
+        "Split the text into lines as before, and turn each into an object.",
+        "Give back the array, with `null` for a plot that has no holder."
+      ],
+      "hints": [
+        "A module shares a function by exporting it. A function that uses `await` has `async` in front of it.",
+        "`export async function readPlots(file) { ... }`. Inside, read the file, split it with `/\\r?\\n/`, leave out blank lines and `map` each line to an object.",
+        "`.map((line) => { const [plot, holder] = line.split(','); return { plot, holder: holder === '' ? null : holder } })`."
+      ],
+      "docs": [
+        {
+          "title": "export",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export"
+        },
+        { "title": "Modules: ECMAScript modules", "url": "https://nodejs.org/api/esm.html" },
+        { "title": "fsPromises.readFile()", "url": "https://nodejs.org/api/fs.html#fspromisesreadfilepath-options" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "free",
+      "title": "List the free plots with readPlots",
+      "file": "free-plots.js",
+      "description": "Write `free-plots.js` so that `node free-plots.js` prints the name of every free plot in `plots.txt` beside the script, one per line, in the order of the list:\n\n```\nA3\nB2\nC3\n```\n\nIt reads the list by importing `readPlots` from `plots.js`, not by reading the file itself. When no plot is free, it prints `No free plots.`\n\nCheck puts a stand-in `plots.js` of its own beside your script, so this task is judged on its own, and runs `free-plots.js` from two folders and with no free plot. The stand-in answers only for the `plots.txt` beside the scripts.",
+      "nextSteps": [
+        "Import `readPlots` from your own module, by its path.",
+        "Call it with the path to `plots.txt` beside the script, and wait for it.",
+        "Keep the plots whose holder is `null`.",
+        "Print their names, or the line for when none are free."
+      ],
+      "hints": [
+        "A file of your own is imported by a path that starts with `./` and ends with its `.js`.",
+        "`import { readPlots } from './plots.js'`, then `await readPlots(join(import.meta.dirname, 'plots.txt'))`.",
+        "`const free = plots.filter((p) => p.holder === null)`, then print `free.map((p) => p.plot).join('\\n')`."
+      ],
+      "docs": [
+        { "title": "Mandatory file extensions", "url": "https://nodejs.org/api/esm.html#mandatory-file-extensions" },
+        {
+          "title": "import",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "version",
+      "title": "Print the version of the tools",
+      "file": "version.js",
+      "description": "`package.json` describes the society's tools: their name, their version, and how Node should read their files. Write `version.js` so that `node version.js` prints the name and the version from `package.json` beside the script, with one space between:\n\n```\nmarrowfield-tools 0.1.0\n```\n\nIt works from any folder, and it reads the file as it is when the script runs.\n\nCheck puts a `package.json` of its own beside the script, with another name and version, and runs `version.js` from two folders.",
+      "nextSteps": [
+        "Open `package.json` and find the two values you need.",
+        "Read it from the script's own folder.",
+        "Turn its text into an object.",
+        "Print the name, a space and the version."
+      ],
+      "hints": [
+        "`package.json` is a JSON text file. The lesson shows two ways to get its contents as an object.",
+        "`JSON.parse(text)` turns the file's text into an object with `name` and `version` properties.",
+        "`const pkg = JSON.parse(await readFile(join(import.meta.dirname, 'package.json'), 'utf8'))`, then print `${pkg.name} ${pkg.version}`."
+      ],
+      "docs": [
+        { "title": "package.json: the type field", "url": "https://nodejs.org/api/packages.html#type" },
+        { "title": "package.json fields", "url": "https://docs.npmjs.com/cli/configuring-npm/package-json" },
+        { "title": "JSON modules", "url": "https://nodejs.org/api/esm.html#json-modules" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "row",
+      "title": "Show the free plots of one row",
+      "file": "free-plots.js",
+      "description": "Plots are named by row and number, so B2 is in row B. Add an option to `free-plots.js`: `node free-plots.js --row B` prints only the free plots whose name starts with `B`, one per line, or `No free plots.` when that row has none. With no option it lists every free plot, as in Task 2.\n\nAn option the script does not know, like `--colour red`, or `--row` with nothing after it, gets one plain line on standard error and exit code 1, and no plots. Read the options with `parseArgs` from `node:util`.\n\nCheck runs `free-plots.js` with the stand-in `plots.js` from Task 2 and options of its own, good and bad.",
+      "nextSteps": [
+        "Import `parseArgs` from Node's `node:util` module.",
+        "Describe the one option the script takes, `row`, which takes a value.",
+        "Catch the error `parseArgs` throws for an option it does not know.",
+        "Keep only the free plots whose name starts with the row, when one was given."
+      ],
+      "hints": [
+        "`parseArgs` reads `process.argv` for you. It throws for an option you did not describe, and for an option that is missing its value.",
+        "`parseArgs({ options: { row: { type: 'string' } } }).values.row` is the letter, or `undefined` with no `--row`.",
+        "Wrap the `parseArgs` call in `try`; in the `catch`, `console.error(error.message)` and `process.exitCode = 1`. Then filter with `p.plot.startsWith(row)`."
+      ],
+      "docs": [
+        { "title": "util.parseArgs()", "url": "https://nodejs.org/api/util.html#utilparseargsconfig" },
+        { "title": "ERR_PARSE_ARGS_UNKNOWN_OPTION", "url": "https://nodejs.org/api/errors.html#err_parse_args_unknown_option" }
+      ],
+      "points": 10
+    }
+  ]
+}

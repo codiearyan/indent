@@ -1,0 +1,22 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhiannon", "label": "Rhiannon, secretary", "kind": "story" },
+      { "id": "imran", "label": "Imran, water", "kind": "story" },
+      { "id": "laptop", "label": "Shed laptop", "kind": "story" },
+      { "id": "scripts", "label": "Your scripts", "kind": "file", "mine": true },
+      { "id": "lists", "label": "Plot and waiting lists", "kind": "data" },
+      { "id": "water", "label": "Water readings", "kind": "data" },
+      { "id": "reports", "label": "Monthly reports", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "rhiannon", "to": "laptop", "label": "types" },
+      { "from": "imran", "to": "laptop", "label": "types" },
+      { "from": "laptop", "to": "scripts", "label": "arguments" },
+      { "from": "lists", "to": "scripts", "label": "reads, changes" },
+      { "from": "water", "to": "scripts", "label": "readings" },
+      { "from": "scripts", "to": "reports", "label": "writes" }
+    ],
+    "note": "Rhiannon and Imran type at the shed laptop, and the Node scripts you write read and change the society's files and answer in plain lines."
+  }
+}
