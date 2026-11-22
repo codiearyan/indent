@@ -29,8 +29,18 @@ export function listen<N extends keyof typeof SEND_METHODS>(
   }
 }
 
+const pageWindows = new WeakSet<BrowserWindow>()
+
+/** A window that shows a learner's page: it has no window.api and is not the app. */
+export function markPageWindow(window: BrowserWindow): void {
+  pageWindows.add(window)
+}
+
+/** The windows that run the app itself, never a page window. */
+export function appWindows(): BrowserWindow[] {
+  return BrowserWindow.getAllWindows().filter((w) => !w.isDestroyed() && !pageWindows.has(w))
+}
+
 export function emit(channel: string, ...args: unknown[]): void {
-  for (const window of BrowserWindow.getAllWindows()) {
-    if (!window.isDestroyed()) window.webContents.send(channel, ...args)
-  }
+  for (const window of appWindows()) window.webContents.send(channel, ...args)
 }
