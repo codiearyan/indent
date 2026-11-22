@@ -24,8 +24,6 @@
     "@anthropic-ai/sdk": "^1.10.0",
     "@electron-toolkit/utils": "^4.0.0",
     "electron-updater": "6.8.12",
-    "mermaid": "12.3.0",
-    "monaco-vim": "0.4.4",
     "node-pty": "^1.1.0"
   },
   "devDependencies": {
@@ -48,7 +46,9 @@
     "electron-builder": "^26.15.3",
     "electron-vite": "^6.0.0",
     "lucide-react": "^1.76.0",
+    "mermaid": "12.3.0",
     "monaco-editor": "^0.57.0",
+    "monaco-vim": "0.4.4",
     "openai": "7.62.0",
     "radix-ui": "^1.8.1",
     "react": "^19.3.0",
