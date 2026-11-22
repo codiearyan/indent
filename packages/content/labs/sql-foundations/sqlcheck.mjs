@@ -79,6 +79,9 @@ function hints(mine, missing, unexpected, values) {
   const wrongCase = values ? plain.find((lit) => !values.includes(lit) && values.some((v) => same(v, lit))) : undefined
   const unknown = values ? plain.find((lit) => !values.some((v) => same(v, lit))) : undefined
   const where = /\bwhere\b/.test(code)
+  const aggregate = /\b(count|sum|avg|min|max|total)\s*\(/.test(code)
+  const grouped = /\bgroup\s+by\b/.test(code)
+  const wanted = mine.rows.length - unexpected.length + missing.length
   if (where && conditionLits.some((lit) => lit.trim().toUpperCase() === 'NULL')) {
     found.push(`'NULL' in quotes is text made of four letters, not a missing value.`)
   } else if (where && conditionLits.includes('')) {
@@ -108,7 +111,7 @@ function hints(mine, missing, unexpected, values) {
       break
     }
   }
-  if (/\bdistinct\b/.test(code)) {
+  if (!aggregate && /\bdistinct\b/.test(code)) {
     found.push('DISTINCT removes rows that repeat, and this task keeps every row, repeats included.')
   }
   if (/\b([\w.]+)\s*(<>|!=)\s*''[^()]*?\bor\s+\1\s*(<>|!=)/.test(code)) {
@@ -137,7 +140,66 @@ function hints(mine, missing, unexpected, values) {
       'Every row left out has an empty cell (NULL) in it. A comparison with an empty cell is never true, so such a row drops out of a condition without a word.'
     )
   }
+  if (aggregate && !grouped && mine.rows.length === 1 && wanted > 1) {
+    found.push('Without GROUP BY, a count or a total squeezes every row of the table into one.')
+  }
+  if (grouped && (mine.rows.length !== wanted || whereAt !== -1)) {
+    found.push(
+      'Look at the columns after GROUP BY, which decide what counts as one group, and at each condition: WHERE picks single rows before they are grouped, HAVING picks whole groups after.'
+    )
+  }
+  if (aggregate && unexpected.some((r) => r.includes(null)) && missing.some((r) => r.includes(0))) {
+    found.push('When no rows match, COUNT gives 0, but SUM, AVG, MIN and MAX give NULL.')
+  }
   return found
+}
+
+/** Likely causes of rows in the wrong order, for a task that asks for one. */
+function orderHints(mine, wantRows, missing, unexpected) {
+  const found = []
+  const code = mine.code.toLowerCase()
+  const clause = code.split(/\border\s+by\b/)[1]
+  const limit = /\blimit\b/.test(code)
+  if (clause === undefined) {
+    found.push(
+      limit
+        ? 'Your query has no ORDER BY, so the rows come back in no particular order and LIMIT keeps whichever come first.'
+        : 'Your query has no ORDER BY, so the rows come back in no particular order.'
+    )
+  } else if (clause.split(',').some((part) => /^\s*''\s*(asc|desc)?\s*(limit\b.*)?$/.test(part))) {
+    found.push('In ORDER BY, a name in single quotes is text, the same for every row, so it sorts nothing.')
+  }
+  const nullFirst = (rows) => rows.length > 0 && rows[0].includes(null)
+  const nullsLetIn = limit && unexpected.some((r) => r.includes(null)) && !missing.some((r) => r.includes(null))
+  const nullsMoved = !missing.length && nullFirst(mine.rows) !== nullFirst(wantRows)
+  if (nullsLetIn || nullsMoved) {
+    found.push(
+      'SQLite counts an empty cell (NULL) as smaller than any value, so it comes first when the smallest come first, and last when the largest do.'
+    )
+  }
+  if (limit && clause !== undefined && missing.length && missing.length === unexpected.length) {
+    found.push('With LIMIT, the order decides which rows make the cut: look at what you sort by, its direction, and how rows with the same value are ordered.')
+  }
+  return found
+}
+
+/** What is wrong with the order of rows that are otherwise right, or null when it is right too. */
+function outOfOrder(want, mine, hidden) {
+  const same = (a, b) => a.every((r, i) => key(r) === key(b[i]))
+  if (same(mine.rows, want.rows)) return null
+  const look = 'Look at the columns you sort by, the order you list them in, and the direction of each.'
+  let message
+  if (!/\border\s+by\b/i.test(mine.code)) {
+    message = 'The right rows, in a different order.'
+  } else if (same([...mine.rows].reverse(), want.rows)) {
+    message = 'The right rows, in the opposite order. Look at the direction of your sort.'
+  } else if (hidden) {
+    message = `The right rows, in a different order. ${look}`
+  } else {
+    const i = mine.rows.findIndex((r, j) => key(r) !== key(want.rows[j]))
+    message = `The right rows, in a different order. Row ${i + 1} should be ${describe(want.columns, want.rows[i])}, and yours is ${describe(want.columns, mine.rows[i])}. ${look}`
+  }
+  return [message, ...orderHints(mine, want.rows, [], [])].join(' ')
 }
 
 /** True when a column in the SELECT list is two bare names in a row, which a missing comma causes. */
@@ -147,7 +209,7 @@ function twoNames(code) {
 }
 
 /** Compares a result with the expected one; returns null when they match, or what differs in plain words. */
-function compare(want, mine, values) {
+function compare(want, mine, values, ordered = false) {
   const hidden = values === null
   if (!mine.columns) return problem(mine, 'The file').message
   if (!/\bfrom\b/i.test(mine.code)) {
@@ -191,7 +253,7 @@ function compare(want, mine, values) {
     if (n > 0) counts.set(key(r), n - 1)
     return n > 0
   })
-  if (!missing.length && !unexpected.length) return null
+  if (!missing.length && !unexpected.length) return ordered ? outOfOrder(want, mine, hidden) : null
 
   const { columns } = want
   const n = mine.rows.length
@@ -200,13 +262,18 @@ function compare(want, mine, values) {
   if (n > m) {
     message = `Your result has ${plural(n, 'row')}; it should have ${m}. Some rows get through that the task leaves out${hidden ? ': look at your condition.' : `. For example, this row should not be there: ${describe(columns, unexpected[0])}.`}`
   } else if (n < m) {
-    message = `Your result has ${plural(n, 'row')}; it should have ${m}. Some rows that belong are left out: look at your condition.`
+    const squeezed = n === 1 && /\b(count|sum|avg|min|max|total)\s*\(/i.test(mine.code) && !/\bgroup\s+by\b/i.test(mine.code)
+    message = `Your result has ${plural(n, 'row')}; it should have ${m}. Some rows that belong are left out${squeezed ? '.' : ': look at your condition.'}`
   } else if (hidden) {
-    message = 'Your result has the right number of rows, but some of them are not the ones the task asks for: look at your condition, and at how each column is worked out.'
+    message = ordered
+      ? 'Your result has the right number of rows, but some of them are not the ones the task asks for.'
+      : 'Your result has the right number of rows, but some of them are not the ones the task asks for: look at your condition, and at how each column is worked out.'
   } else {
     const bad = unexpected[0]
     const twin = missing.find((r) => r.filter((v, i) => key([v]) !== key([bad[i]])).length === 1)
-    if (twin) {
+    if (ordered) {
+      message = `This row should not be in the result: ${describe(columns, bad)}. Another row belongs in its place.`
+    } else if (twin) {
       const col = columns.findIndex((_, i) => key([twin[i]]) !== key([bad[i]]))
       const wrong = unexpected.length === 1 ? 'One row has' : `${unexpected.length} rows have`
       message = `${wrong} the wrong ${columns[col]}. One of yours is ${show(bad[col])}. Look at how that column is worked out.`
@@ -214,7 +281,8 @@ function compare(want, mine, values) {
       message = `This row should not be in the result: ${describe(columns, bad)}. Another row belongs in its place: look at your condition.`
     }
   }
-  return [message, ...hints(mine, missing, unexpected, values)].join(' ')
+  const extra = ordered ? orderHints(mine, want.rows, missing, unexpected) : []
+  return [message, ...hints(mine, missing, unexpected, values), ...extra].join(' ')
 }
 
 const HIDDEN = 'On a second set of data that Check keeps hidden, with other owners and animals: '
@@ -231,8 +299,11 @@ async function runSql(t, seed, files) {
   return r.value
 }
 
-/** A reading task: the one query in the file must return the solution's rows, on both sets of data. */
-export async function checkQuery(t, file) {
+/**
+ * A reading task: the one query in the file must return the solution's rows, on both sets of data.
+ * With `ordered`, the rows must also come in the solution's order.
+ */
+export async function checkQuery(t, file, { ordered = false } = {}) {
   const files = [join(t.workspace, file), t.chapterPath(`solution/${file}`)]
   const [shown, hidden] = await Promise.all(
     [t.chapterPath('starter/seed.sql'), HIDDEN_SEED].map((seed) => runSql(t, seed, files))
@@ -249,8 +320,8 @@ export async function checkQuery(t, file) {
   const stop = problem(mine, file)
   if (stop) return [stop]
   const [hiddenMine, hiddenWant] = hidden.results
-  const seen = compare(want, mine, shown.values)
-  const unseen = compare(hiddenWant, hiddenMine, null)
+  const seen = compare(want, mine, shown.values, ordered)
+  const unseen = compare(hiddenWant, hiddenMine, null, ordered)
   return [
     { name: 'The query runs', passed: true },
     detail('Returns the right rows from the data you can see', seen, formatTable(mine)),

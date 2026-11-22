@@ -1,6 +1,8 @@
 -- Hidden data for the checks: other owners, animals, visits and treatments in the same tables.
 -- It holds the edges the shipped data does not: values right on a limit, a town, a species and
 -- a kind of treatment the shipped data never has, and more empty cells.
+-- The rows added last are for sorting and totals: a tie on a birthday, a charge right on a limit,
+-- a bill right on a limit.
 
 INSERT INTO owners (id, first_name, last_name, phone, email, town) VALUES
   (201, 'Freya', 'Nkemelu', '01632 960201', NULL, 'Hollybank'),
@@ -34,7 +36,8 @@ INSERT INTO animals (id, owner_id, name, species, breed, born, weight_kg) VALUES
   (317, 210, 'Bun', 'rabbit', NULL, '2022-02-02', NULL),
   (318, 210, 'Ginger', 'dog', 'Irish setter', '2022-06-15', 14.0),
   (319, 204, 'Clementine', 'goat', 'Pygmy goat', '2021-03-30', 28.0),
-  (320, 206, 'Murphy', 'dog', 'Collie cross', '2020-11-11', 25.4);
+  (320, 206, 'Murphy', 'dog', 'Collie cross', '2020-11-11', 25.4),
+  (321, 209, 'Tansy', 'cat', NULL, '2017-07-07', NULL);
 
 INSERT INTO visits (id, animal_id, visit_date, vet, reason, notes) VALUES
   (401, 301, '2026-10-01', 'Ifan Pryce', 'Booster vaccine', NULL),
@@ -46,7 +49,10 @@ INSERT INTO visits (id, animal_id, visit_date, vet, reason, notes) VALUES
   (407, 313, '2026-03-10', 'Ifan Pryce', 'Booster vaccine', NULL),
   (408, 316, '2026-06-01', 'Mabel Tranter', 'Lump check', 'A harmless fatty lump.'),
   (409, 306, '2026-10-09', 'Ifan Pryce', 'First vaccine', NULL),
-  (410, 314, '2024-10-15', 'Mabel Tranter', 'Bite wound', 'Antibiotics for a week.');
+  (410, 314, '2024-10-15', 'Mabel Tranter', 'Bite wound', 'Antibiotics for a week.'),
+  (411, 303, '2026-11-12', 'Mabel Tranter', 'Broken leg', 'Leg pinned. Crate rest for six weeks.'),
+  (412, 312, '2026-11-19', 'Ifan Pryce', 'Dental check', 'Two teeth out.'),
+  (413, 318, '2026-11-21', 'Ifan Pryce', 'Limping', NULL);
 
 INSERT INTO treatments (id, visit_id, name, kind, price) VALUES
   (501, 401, 'Booster vaccine', 'vaccine', 54.0),
@@ -62,4 +68,10 @@ INSERT INTO treatments (id, visit_id, name, kind, price) VALUES
   (511, 409, 'First vaccine', 'vaccine', 60.0),
   (512, 409, 'Microchip', 'procedure', 25.0),
   (513, 410, 'Antibiotics', 'medicine', 22.3),
-  (514, 410, 'Ultrasound scan', 'scan', 120.0);
+  (514, 410, 'Ultrasound scan', 'scan', 120.0),
+  (515, 411, 'Leg surgery', 'procedure', 380.0),
+  (516, 411, 'X-ray', 'test', 95.0),
+  (517, 411, 'Bone plate', 'procedure', 290.0),
+  (518, 412, 'Dental under anaesthetic', 'procedure', 250.0),
+  (519, 413, 'Consultation', 'consultation', 48.0),
+  (520, 413, 'Anti-inflammatory', 'medicine', 52.0);

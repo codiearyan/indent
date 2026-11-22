@@ -1,0 +1,126 @@
+{
+  "id": "sorting-and-limits",
+  "title": "Sorting and limits",
+  "files": [
+    "queries/1-phone-book.sql",
+    "queries/2-heaviest-dogs.sql",
+    "queries/3-visits-by-vet.sql",
+    "queries/4-oldest-three.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-phone-book.sql"
+  },
+  "tasks": [
+    {
+      "id": "phone-book",
+      "title": "Sort the phone book by surname",
+      "file": "queries/1-phone-book.sql",
+      "description": "Winnie wants the owners in the same order as the paper cards: by surname, A to Z.\n\nIn `queries/1-phone-book.sql`, return three columns from `owners`, in this order:\n\n- `last_name`\n- `first_name`\n- `phone`\n\nEvery owner, sorted by `last_name` from A to Z. Check compares the columns, the rows and their order on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write the query with the three columns and run it. Look at the order the rows come back in.",
+        "Add the part that sorts the rows, after `FROM`.",
+        "Run it again and read down the surnames: A at the top, Z at the bottom."
+      ],
+      "hints": [
+        "Without a sort, rows come back in whatever order SQLite finds them. The lesson's part \"Putting rows in order\" shows how to ask for one.",
+        "`ORDER BY` goes at the end of the query and takes the column to sort by. A to Z is the order it uses when you say nothing else.",
+        "The last line has the shape `ORDER BY column;`, with the column name written without quotes."
+      ],
+      "docs": [
+        {
+          "title": "The ORDER BY clause",
+          "url": "https://www.sqlite.org/lang_select.html#orderby"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "heaviest-dogs",
+      "title": "List the dogs, heaviest first",
+      "file": "queries/2-heaviest-dogs.sql",
+      "description": "Ifan doses worming tablets by weight and works down from the biggest dog.\n\nIn `queries/2-heaviest-dogs.sql`, return two columns from `animals`, in this order:\n\n- `name`\n- `weight_kg`\n\nOnly dogs, sorted by `weight_kg` from the heaviest to the lightest. A dog nobody has weighed yet goes at the very end. Check compares the columns, the rows and their order on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write a query that returns the two columns for the dogs only, and run it.",
+        "Sort it by weight and run it. Which end is the heaviest dog at?",
+        "Turn the sort around so the heaviest dog is first.",
+        "Find the dog with no weight. Is it where the task wants it?"
+      ],
+      "hints": [
+        "This query needs the `WHERE` from earlier issues and a sort, in that order.",
+        "A sort runs from the smallest to the largest unless you say otherwise. One word after the column turns it around.",
+        "The end of the query has the shape `WHERE species = '...' ORDER BY column DESC;`. Run it and check where the dog with no weight lands."
+      ],
+      "docs": [
+        {
+          "title": "The ORDER BY clause",
+          "url": "https://www.sqlite.org/lang_select.html#orderby"
+        },
+        {
+          "title": "Where NULL goes in a sort",
+          "url": "https://www.sqlite.org/lang_select.html#nullslast"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "visits-by-vet",
+      "title": "Sort the visits by vet, newest first",
+      "file": "queries/3-visits-by-vet.sql",
+      "description": "Rosamund is reviewing each vet's recent work and wants every visit, one vet at a time.\n\nIn `queries/3-visits-by-vet.sql`, return three columns from `visits`, in this order:\n\n- `vet`\n- `visit_date`\n- `reason`\n\nEvery visit, sorted by `vet` from A to Z, and within each vet by `visit_date` with the newest visit first. Check compares the columns, the rows and their order on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write the query with the three columns and sort it by vet. Run it and look at the dates inside each vet.",
+        "Add a second column to the sort, so the dates inside each vet are in order.",
+        "Check the direction of each column: vets A to Z, dates newest first."
+      ],
+      "hints": [
+        "A sort can take more than one column. The second one only decides the order of rows that tie on the first.",
+        "Each column in the sort has its own direction. `DESC` after one column does not change the other.",
+        "The last line has the shape `ORDER BY first_column, second_column DESC;`."
+      ],
+      "docs": [
+        {
+          "title": "The ORDER BY clause",
+          "url": "https://www.sqlite.org/lang_select.html#orderby"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "oldest-three",
+      "title": "Find the three oldest animals",
+      "file": "queries/4-oldest-three.sql",
+      "description": "Winnie writes to the owners of the oldest animals about a senior health check, three letters at a time.\n\nIn `queries/4-oldest-three.sql`, return three columns from `animals`, in this order:\n\n- `name`\n- `species`\n- `born`\n\nThe three animals born earliest, oldest first. Leave out animals whose birthday nobody knows. When two animals were born on the same day, the one whose `name` comes first from A to Z goes first. Check compares the columns, the rows and their order on the data you can see and on hidden data, which has its own tie.",
+      "nextSteps": [
+        "Sort every animal by `born` and run it without a limit. Look at the top of the list.",
+        "Deal with the animals whose birthday is missing, so they are not at the top.",
+        "Find the two animals born on the same day, and make the sort say which comes first.",
+        "Keep only the first three rows."
+      ],
+      "hints": [
+        "Run the sort without a limit first and read the top rows. The lesson's part \"Where empty cells go\" explains what you see.",
+        "Leave out the missing birthdays with a condition you know, or move them to the end of the sort. Then add a second column to the sort for the tie.",
+        "The query ends with the shape `ORDER BY born, name LIMIT 3;`, and the missing birthdays are dealt with before that."
+      ],
+      "docs": [
+        {
+          "title": "LIMIT and OFFSET",
+          "url": "https://www.sqlite.org/lang_select.html#limitoffset"
+        },
+        {
+          "title": "Where NULL goes in a sort",
+          "url": "https://www.sqlite.org/lang_select.html#nullslast"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Sorting with ORDER BY and keeping the first rows with LIMIT",
+          "url": "https://www.youtube.com/watch?v=wyWnJ7QYME4"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "animals",
+        "label": "animals",
+        "kind": "data"
+      },
+      {
+        "id": "treatments",
+        "label": "treatments",
+        "kind": "data"
+      },
+      {
+        "id": "q1",
+        "label": "1-species-counts.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q2",
+        "label": "2-breed-counts.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q3",
+        "label": "3-takings-per-kind.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q4",
+        "label": "4-big-bills.sql",
+        "kind": "file",
+        "mine": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "animals",
+        "to": "q1",
+        "label": "rows"
+      },
+      {
+        "from": "animals",
+        "to": "q2",
+        "label": "rows"
+      },
+      {
+        "from": "treatments",
+        "to": "q3",
+        "label": "rows"
+      },
+      {
+        "from": "treatments",
+        "to": "q4",
+        "label": "rows"
+      }
+    ],
+    "note": "Four queries split the records into groups and give a figure for each group."
+  },
+  "tasks": {
+    "species-counts": {
+      "steps": [
+        {
+          "active": ["animals", "animals->q1"],
+          "note": "Every animal comes in."
+        },
+        {
+          "active": ["q1"],
+          "note": "Animals of the same species land in the same group, and each group is counted."
+        },
+        {
+          "active": ["q1"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["species", "animals"],
+            "cells": [["a species", "a count"]]
+          },
+          "note": "Winnie gets one row per species for the leaflet order."
+        }
+      ]
+    },
+    "breed-counts": {
+      "steps": [
+        {
+          "active": ["animals", "animals->q2"],
+          "note": "Every animal comes in. Some have a breed nobody knows."
+        },
+        {
+          "active": ["q2"],
+          "note": "Animals go in the same group only when both the species and the breed match."
+        },
+        {
+          "active": ["q2"],
+          "note": "The unknown breeds of each species make a group of their own."
+        },
+        {
+          "active": ["q2"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["species", "breed", "animals"],
+            "cells": [["a species", "a breed or NULL", "a count"]]
+          },
+          "note": "Ifan gets one row for each species and breed."
+        }
+      ]
+    },
+    "takings-per-kind": {
+      "steps": [
+        {
+          "active": ["treatments", "treatments->q3"],
+          "note": "Every treatment comes in, with its kind and price."
+        },
+        {
+          "active": ["q3"],
+          "note": "Treatments of the same kind are grouped, counted and added up."
+        },
+        {
+          "active": ["q3"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["kind", "treatments", "takings"],
+            "cells": [["a kind", "a count", "a total"]]
+          },
+          "note": "The groups are sorted by what they brought in, biggest first."
+        }
+      ]
+    },
+    "big-bills": {
+      "steps": [
+        {
+          "active": ["treatments", "treatments->q4"],
+          "note": "Every treatment comes in, each one a line on some visit's bill."
+        },
+        {
+          "active": ["q4"],
+          "note": "The treatments of each visit are grouped and added up into a bill."
+        },
+        {
+          "active": ["q4"],
+          "note": "Only now, with each bill worked out, are the big ones kept. A single treatment's price is not the test."
+        },
+        {
+          "active": ["q4"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["visit_id", "treatments", "bill"],
+            "cells": [["a visit id", "a count", "a total"]]
+          },
+          "note": "Rosamund gets the visits to offer a payment plan to."
+        }
+      ]
+    }
+  }
+}
