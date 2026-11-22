@@ -3,6 +3,7 @@ import {
   errorCode,
   glaze,
   openDay,
+  readsAtMost,
   saggar,
   same,
   tiles,
@@ -75,6 +76,12 @@ export const checks = {
             hint: oneHint
           },
           {
+            name: 'The database finds the row',
+            req: { path: `/workshops/${tiles.id}` },
+            ok: (res) => res.status === 200 && readsAtMost(res, 1),
+            hint: 'The query gave back every workshop, and the one was picked out in JavaScript. Compare the id in the query, so the database sends only that row.'
+          },
+          {
             name: 'An id with no row answers 404',
             req: { path: '/workshops/4900' },
             ok: (res) => res.status === 404 && errorCode(res) === 'not_found',
@@ -88,7 +95,10 @@ export const checks = {
             name: 'An id that is not a number answers 404',
             req: { path: '/workshops/pots' },
             ok: (res) => res.status === 404 && errorCode(res) === 'not_found',
-            hint: 'No row has an id like that. It should get the same 404, not an error from the database.'
+            hint: (res) =>
+              res.status === 200
+                ? 'An id that is not a number answered 200. No row has an id like that, so get(id) should return undefined and the route answers 404.'
+                : 'No row has an id like that, so it should get the same 404 as any other missing id.'
           }
         ]
       }

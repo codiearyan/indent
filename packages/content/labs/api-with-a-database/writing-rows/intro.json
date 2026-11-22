@@ -36,7 +36,7 @@
   "captions": [
     "At the front desk, Sunniva adds a Friday class and wants it to stay this time.",
     "The API reads the file now, but adding, changing and removing still fail.",
-    "You write the insert, the update and the delete, and read what each one changed.",
+    "You write the insert, the update and the delete, and say when a workshop is gone.",
     "Throwing bowls is saved with its own id and is still there after a restart.",
     "Changes outlive the server, and a change to a workshop that is gone answers 404."
   ]

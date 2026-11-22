@@ -1,7 +1,7 @@
 // Copied into a check sandbox as .grader/harness.mjs. Every case gets a database of its own, in
 // memory or in a file inside the sandbox, filled by the check, so nothing is ever written to the
 // workspace. Every server listens on port 0 and is always closed.
-import { existsSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
@@ -316,7 +316,11 @@ export async function open(rel) {
   try {
     db = openDatabase(file)
   } catch (err) {
-    return { ...report, error: describe(err) }
+    return {
+      ...report,
+      error: describe(err),
+      folderAtFile: existsSync(file) && statSync(file).isDirectory()
+    }
   }
   if (!(db instanceof DatabaseSync)) {
     return { ...report, notDb: db === undefined ? 'undefined' : String(db) }

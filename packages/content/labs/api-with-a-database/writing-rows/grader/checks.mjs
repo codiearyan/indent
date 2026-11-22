@@ -67,7 +67,10 @@ export const checks = {
               res.status === 200 &&
               same(newRows(after, before).map(withoutId), [night, jugs]) &&
               same(res.json, after.workshops),
-            hint: 'After the server restarted on the same file, the list should hold both new workshops. Each should be a row in the workshops table, not something kept in memory.'
+            hint: (res, after) =>
+              newRows(after, before).length === 0
+                ? 'After the restart the workshops table had no new row, because the POST requests above added none. Get those working first: each should add a row to the table.'
+                : 'After the server restarted on the same file, the list should hold both new workshops. Each should be a row in the workshops table, not something kept in memory.'
           }
         ]
       }

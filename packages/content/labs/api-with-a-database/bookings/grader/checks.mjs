@@ -5,10 +5,12 @@ import {
   errorCode,
   glaze,
   openDay,
+  readsAtMost,
   saggar,
   same,
   sandbox,
   showSql,
+  sqlType,
   tiles,
   workshops
 } from '../../shared/checks-lib.mjs'
@@ -42,7 +44,7 @@ function judgeTables(report) {
   const output = describeColumns(cols)
   const missing = Object.keys(TYPES).filter((name) => !byName[name])
   const wrongType = Object.keys(TYPES).filter(
-    (name) => byName[name] && byName[name].type.toUpperCase() !== TYPES[name]
+    (name) => byName[name] && sqlType(byName[name].type) !== TYPES[name]
   )
   const key = report.bookingKeys.find((k) => k.from === 'workshopId')
   const results = [
@@ -162,7 +164,7 @@ const placesHint = (res) => {
 const listHint = (size) => (res) => {
   const list = Array.isArray(res.json) ? res.json : []
   const empty = list.find((w) => w.id === tiles.id)
-  if (size > 1 && list.length === 1) {
+  if (size > 1 && list.length === 1 && !same(list[0], left[list[0].id])) {
     return 'The whole list came back as one row. Counting turns all the rows into one unless the query says what to count them per.'
   }
   if (list.length > 0 && list.length < size) {
@@ -197,6 +199,19 @@ export const checks = {
             hint: bookingHint
           },
           {
+            name: 'The database finds the workshop',
+            req: {
+              method: 'POST',
+              path: '/bookings',
+              json: { workshopId: saggar.id, name: 'Iris Fenn' }
+            },
+            ok: (res) => res.status === 201 && readsAtMost(res, 1),
+            hint: (res) =>
+              res.status === 201
+                ? 'book read every workshop to find out whether one is there. Ask the database for that one workshop by its id, so it sends only that row.'
+                : bookingHint(res, { bookings: [] })
+          },
+          {
             name: 'A name with an apostrophe is stored as it is',
             req: {
               method: 'POST',
@@ -215,16 +230,17 @@ export const checks = {
             hint: "With no workshop 4900, book should return { problem: 'not_found' } so the route answers 404."
           },
           {
-            name: 'Only the two real bookings were added',
+            name: 'Only the real bookings were added',
             req: { path: '/health' },
+            output: (after) => `The bookings table at the end:\n${show(after.bookings)}`,
             ok: (res, after) =>
-              after.bookings.length === 4 &&
+              after.bookings.length === 5 &&
               same(after.bookings.slice(0, 2), earlier) &&
               after.bookings.every((b) => b.workshopId !== 4900),
             hint: (res, after) =>
               after.bookings.some((b) => b.workshopId === 4900)
                 ? 'A booking for a workshop that does not exist was stored. Check the workshop is there before you add the booking.'
-                : 'The bookings table should hold the two bookings that were there before and the two new ones, nothing else.'
+                : 'The bookings table should hold the two bookings that were there before and the three new ones, nothing else.'
           }
         ]
       }
@@ -262,7 +278,10 @@ export const checks = {
             req: { path: '/workshops/4900' },
             ok: (res) => res.status === 404,
             values: [4900],
-            hint: 'An id with no workshop should still answer 404.'
+            hint: (res) =>
+              res.status === 200 && res.json?.id === null
+                ? 'An id with no workshop came back as a row of empty values. Counting gives one row even when nothing matched, unless the query says what to count per.'
+                : 'An id with no workshop should still answer 404.'
           },
           {
             name: 'The list gives every workshop its places left',

@@ -71,7 +71,7 @@
       "id": "atomic",
       "title": "Undo a group that fails halfway",
       "file": "src/store.js",
-      "description": "Make `bookGroup` all or nothing even when the database fails in the middle of a group:\n\n- when any booking of the group fails, no booking of that group stays in the table\n- the error goes on, so the error handler logs it and answers 500\n- afterwards the next booking works and is saved as usual\n\nThe check makes the database fail on the second booking of a group, then books one more place.",
+      "description": "Make `bookGroup` all or nothing even when the database fails in the middle of a group:\n\n- when any booking of the group fails, no booking of that group stays in the table\n- the error goes on, so the error handler logs it and answers 500\n- afterwards the next booking works and is saved as usual\n- a group that is refused, as too big or for a workshop that is not there, leaves no transaction open either\n\nThe check makes the database fail on the second booking of a group, then books one more place. It also refuses a group and books one more place after it.",
       "nextSteps": [
         "Start a transaction before the first booking of the group.",
         "Keep the changes once every booking has gone in.",

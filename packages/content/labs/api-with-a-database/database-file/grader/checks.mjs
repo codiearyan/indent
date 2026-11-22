@@ -5,6 +5,7 @@ import {
   sandbox,
   same,
   showSql,
+  sqlType,
   written
 } from '../../shared/checks-lib.mjs'
 
@@ -43,7 +44,7 @@ function judgeTables(report) {
   const output = describeColumns(cols)
   const missing = Object.keys(TYPES).filter((name) => !byName[name])
   const wrongType = FIELDS.filter(
-    (name) => byName[name] && byName[name].type.toUpperCase() !== TYPES[name]
+    (name) => byName[name] && sqlType(byName[name].type) !== TYPES[name]
   )
   const nullable = FIELDS.filter((name) => byName[name] && !byName[name].notnull)
   return [
@@ -125,7 +126,7 @@ function judgeSeed(report) {
       message: third.error
         ? 'The call after a removal threw. Read the error.'
         : 'The check removed one workshop and called seedWorkshops again, as a restart would, and the table changed. A table that has any rows at all is left as it is.',
-      output: `${third.error ? `threw ${third.error}\n` : ''}The check removed the workshop with id ${third.removed}. The table then held:\n${show(third.rows)}`
+      output: `${third.error ? `threw ${third.error}\n` : ''}The check removed the workshop with id ${third.removed} and called seedWorkshops again. After that call the table held:\n${show(third.rows)}`
     },
     {
       name: 'The values travel apart from the SQL',
@@ -177,15 +178,18 @@ export const checks = {
     const report = r.value
     if (report.error) {
       const noFolder = /unable to open database file/i.test(report.error)
+      const folderAtFile = report.folderAtFile
       return [
         {
           name: 'openDatabase opens a file in a folder that is not there yet',
           passed: false,
           message: /Not implemented/.test(report.error)
             ? `openDatabase still throws 'Not implemented'. Replace that line with your code.`
-            : noFolder
-              ? 'SQLite could not open the file. It makes a file that is missing, but not a folder that is missing, so make the folder of the path openDatabase is given before you open it. Making a folder that is already there should not fail either.'
-              : 'openDatabase threw. Read the error.',
+            : folderAtFile
+              ? 'A folder was made with the name of the file itself, so SQLite cannot open it as a file. Make the folder the file goes in, not the file path.'
+              : noFolder
+                ? 'SQLite could not open the file. It makes a file that is missing, but not a folder that is missing, so make the folder of the path openDatabase is given before you open it. Making a folder that is already there should not fail either.'
+                : 'openDatabase threw. Read the error.',
           output: `openDatabase('${rel}')\nthrew ${report.error}`
         }
       ]

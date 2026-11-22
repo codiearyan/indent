@@ -3,6 +3,7 @@ import {
   errorCode,
   glaze,
   openDay,
+  readsAtMost,
   same,
   saggar,
   tiles
@@ -33,6 +34,19 @@ const insertsOf = (res) =>
     (r) => r.method === 'run' && /insert/i.test(r.sql) && /bookings/i.test(r.sql)
   )
 
+const show = (value) => JSON.stringify(value, null, 2)
+const refused = (res) =>
+  res.status === 409 &&
+  errorCode(res) === 'full' &&
+  insertsOf(res).length === 0 &&
+  readsAtMost(res, 1)
+const refusedHint = (res, fallback) =>
+  res.status === 409 && insertsOf(res).length > 0
+    ? 'The booking was refused, but only after it had been added and taken out again. Look at the places left before anything is added.'
+    : res.status === 409 && !readsAtMost(res, 1)
+      ? 'The bookings were read into JavaScript to count them. The database already works out the places left: use its count.'
+      : fallback
+
 const marsh = 'Ottilie Marsh'
 const halloran = 'Wynn Halloran'
 const trio = ['Ama Quist', 'Benno Sarre', 'Cleo Dunmore']
@@ -56,18 +70,25 @@ export const checks = {
           {
             name: 'A booking when no place is left answers 409',
             req: post(saggar.id, halloran),
-            ok: (res) => res.status === 409 && errorCode(res) === 'full',
+            ok: refused,
             hint: (res) =>
               res.status === 201
                 ? 'Every place is taken now, but the booking went through. Look at the places left before you add a booking, and how you compare them.'
-                : "With no place left, book should return { problem: 'full' } so the route answers 409."
+                : refusedHint(
+                    res,
+                    "With no place left, book should return { problem: 'full' } so the route answers 409."
+                  )
           },
           {
             name: 'A workshop that is full to the last seat answers 409',
             req: post(openDay.id, halloran),
-            ok: (res) => res.status === 409 && errorCode(res) === 'full',
+            ok: refused,
             values: [openDay.id],
-            hint: 'Twelve seats and twelve bookings leave no place, so this booking should be refused.'
+            hint: (res) =>
+              refusedHint(
+                res,
+                'Twelve seats and twelve bookings leave no place, so this booking should be refused.'
+              )
           },
           {
             name: 'A workshop with places left still takes bookings',
@@ -85,6 +106,8 @@ export const checks = {
           {
             name: 'A refused booking adds nothing',
             req: { path: '/health' },
+            output: (after) =>
+              `Bookings at the end: ${countFor(after, saggar)} for a workshop of ${saggar.seats} seats, ${countFor(after, openDay)} for one of ${openDay.seats}, ${countFor(after, glaze)} for one of ${glaze.seats}.`,
             ok: (res, after) =>
               countFor(after, saggar) === 5 &&
               countFor(after, openDay) === 12 &&
@@ -181,6 +204,7 @@ export const checks = {
           {
             name: 'No booking of that group stays',
             req: { path: '/health' },
+            output: (after) => `The bookings table at the end:\n${show(after.bookings)}`,
             ok: (res, after) =>
               wholeGroup(after) || !after.bookings.some((b) => trio.includes(b.name)),
             hint: (res, after) =>
@@ -201,7 +225,29 @@ export const checks = {
                 : 'After a failed group, a plain booking should still go through and be saved.'
           }
         ]
-      }
+      },
+      ...[
+        ['too big', group(saggar.id, ['Dara Venn', 'Edda Vale', 'Fitz Ober']), 409],
+        ['for a workshop that is not there', group(4900, trio), 404]
+      ].map(([what, req, status]) => ({
+        workshops: [saggar],
+        bookings: guests(saggar, 3, 100),
+        requests: [
+          { req },
+          {
+            name: `A group ${what} leaves no transaction open`,
+            req: post(saggar.id, marsh),
+            ok: (res, after) =>
+              res.status === 201 &&
+              !after.open &&
+              after.bookings.some((b) => isBooking(b, saggar.id, marsh)),
+            hint: (res, after) =>
+              after.open
+                ? `A group ${what} was refused with ${status}, but its transaction was still open, so this booking after it was never saved. Every way out of bookGroup ends the transaction, a refusal too.`
+                : 'After a refused group, a plain booking should still go through and be saved.'
+          }
+        ]
+      }))
     ])
   }
 }

@@ -16,6 +16,14 @@ export const tiles = { id: 4823, title: 'Pressed tiles', day: 'mon', seats: 9, p
 export const openDay = { id: 4829, title: 'Open studio hour', day: 'sat', seats: 12, priceCents: 0 }
 export const workshops = [glaze, saggar, tiles, openDay]
 
+// The type SQLite reads a column as: any type with INT in it holds whole numbers, as INTEGER does.
+export const sqlType = (type) =>
+  /INT/i.test(type) ? 'INTEGER' : /CHAR|CLOB|TEXT/i.test(type) ? 'TEXT' : type.toUpperCase()
+
+/** True when no statement of this request gave back more than `n` rows. */
+export const readsAtMost = (res, n) =>
+  (res.runs ?? []).every((run) => run.count === undefined || run.count <= n)
+
 export const sandbox = (t) => t.sandbox({ '.grader/harness.mjs': harness })
 
 const clip = (text, max = 600) => (text.length > max ? `${text.slice(0, max)} ...` : text)
@@ -71,8 +79,9 @@ export function broken(name, error) {
 /**
  * Runs `cases` with the harness, one fresh database each, and judges every request that has an
  * `ok`. A case is { workshops, bookings, requests, file?, failSecond? }; a request is
- * { req, name, ok(res, after), hint, values?, may500? }. `values` must never be written into the
- * SQL that request hands the database. `more(results)` adds results of its own.
+ * { req, name, ok(res, after), hint, values?, may500?, output? }. `values` must never be written
+ * into the SQL that request hands the database. `output(after)` replaces the request in the output,
+ * for a result about the tables rather than about the request. `more(results)` adds results of its own.
  */
 export async function checkApp(t, cases, more = () => []) {
   const dir = await sandbox(t)
@@ -97,7 +106,7 @@ export async function checkApp(t, cases, more = () => []) {
 }
 
 function judge(x, res, after) {
-  const output = [show(x.req, res)]
+  const output = [x.output ? x.output(after) : show(x.req, res)]
   let passed = false
   let message
   try {
@@ -119,7 +128,7 @@ function judge(x, res, after) {
           ? 'The database refused the row because the workshop it points at is not there, and that error reached the error handler as a 500. Find out whether the workshop exists before you add the row.'
           : 'Your code threw an error while it handled this request, so the error handler answered 500. Read what it logged below, then run node try.js.'
     } else message = hint
-    if (res?.sql) output.push(showSql(res.sql))
+    if (res?.sql && !x.output) output.push(showSql(res.sql))
   }
   return {
     name: x.name,

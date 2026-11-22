@@ -64,6 +64,13 @@
         { "title": "SQLite coalesce()", "url": "https://sqlite.org/lang_corefunc.html#coalesce" },
         { "title": "SQLite changes()", "url": "https://sqlite.org/lang_corefunc.html#changes" }
       ],
+      "videos": [
+        {
+          "title": "Update, delete and insert in SQL",
+          "url": "https://www.youtube.com/watch?v=mcXSvjumhbo",
+          "start": 110
+        }
+      ],
       "points": 10
     },
     {
