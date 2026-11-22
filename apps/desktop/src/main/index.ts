@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, session, shell, BrowserWindow } from 'electron'
 import { copyFileSync, existsSync, mkdirSync, renameSync } from 'fs'
 import { dirname, join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -18,6 +18,8 @@ import * as updates from './services/updates'
 import * as reminders from './services/reminders'
 import { seedContent } from './library'
 import { bundledContentDir, contentDir, usesLibrary } from './paths'
+import { PACKS_URL } from '@shared/packs'
+import { VIDEO_ORIGIN } from '@shared/video'
 
 // Privileged schemes have to be registered before the app is ready.
 preview.registerScheme()
@@ -86,6 +88,21 @@ function showWindow(route?: string): void {
   }
 }
 
+/**
+ * The packaged page loads from file://, which sends no referrer, and the YouTube player refuses to
+ * play without one. Its requests carry the site's address instead.
+ */
+function allowVideoPlayer(): void {
+  const referer = `${new URL(PACKS_URL).origin}/`
+  session.defaultSession.webRequest.onBeforeSendHeaders(
+    { urls: [`${VIDEO_ORIGIN}/*`] },
+    ({ requestHeaders }, callback) => {
+      requestHeaders['Referer'] ??= referer
+      callback({ requestHeaders })
+    }
+  )
+}
+
 /** Carries a learner's progress and files over from the data folder of the app's earlier name. */
 function adoptEarlierData(): void {
   const current = app.getPath('userData')
@@ -136,6 +153,7 @@ app.whenReady().then(() => {
     service.register()
   }
   reminders.register(showWindow)
+  allowVideoPlayer()
 
   if (!reminders.startsHidden()) createWindow()
 

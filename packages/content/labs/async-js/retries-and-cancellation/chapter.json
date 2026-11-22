@@ -51,6 +51,9 @@
         { "title": "AbortSignal abort event", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/abort_event" },
         { "title": "EventTarget.removeEventListener()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener" }
       ],
+      "videos": [
+        { "title": "Cancel a request with AbortController", "url": "https://www.youtube.com/watch?v=VdAlFWBUGV4" }
+      ],
       "points": 10
     },
     {
@@ -73,6 +76,9 @@
         { "title": "AbortSignal.throwIfAborted()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/throwIfAborted" },
         { "title": "AbortSignal.reason", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/reason" },
         { "title": "AbortController", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortController" }
+      ],
+      "videos": [
+        { "title": "Cancel a request with AbortController", "url": "https://www.youtube.com/watch?v=VdAlFWBUGV4" }
       ],
       "points": 10
     }

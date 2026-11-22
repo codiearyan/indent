@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url'
 import { getChapter, listLabs, listPaths } from '../apps/desktop/src/main/services/packs.ts'
 import { checkFlow, tasksWithoutFlow } from '../apps/desktop/src/shared/flow.ts'
 import { checkIntro } from '../apps/desktop/src/shared/intro.ts'
+import { videoProblems } from '../apps/desktop/src/shared/video.ts'
 import { TOOL_IDS } from '../apps/desktop/src/shared/types.ts'
 import { packArchive, packVersion } from '../apps/desktop/src/main/packArchive.ts'
 import { functionNames, TRACED_EXTENSIONS } from '../packages/content/kit/declarations.mjs'
@@ -116,12 +117,16 @@ for (const lab of labs) {
     const loaded = await getChapter(content, lab.id, chapter.id).catch((error) => {
       problems.push(`${lab.id}/${chapter.id}: ${error.message}`)
     })
-    if (loaded)
+    if (loaded) {
       checkFlowFile(
         dir,
         `${lab.id}/${chapter.id}`,
         loaded.tasks.map((task) => task.id)
       )
+      for (const task of loaded.tasks) {
+        problems.push(...videoProblems(task.videos, `${lab.id}/${chapter.id}/${task.id}`))
+      }
+    }
     checkIntroFile(dir, `${lab.id}/${chapter.id}`)
     if (!existsSync(join(dir, 'grader', 'checks.mjs'))) {
       problems.push(`${lab.id}/${chapter.id}: grader/checks.mjs is missing`)
