@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react'
 import { X } from 'lucide-react'
 import type { VideoLink } from '@shared/types'
 import { embedUrl } from '@shared/video'
+import { useSettings } from '@/stores/settings'
 import { IconButton } from './IconButton'
 import { stopVideo } from './video'
 
@@ -17,11 +18,12 @@ function subscribe(onChange: () => void): () => void {
 const useOnline = (): boolean => useSyncExternalStore(subscribe, () => navigator.onLine)
 
 /**
- * The YouTube player, framed from its own origin. The sandbox keeps it off the app's origin, so
- * it never reaches `window.api`; its own controls and branding stay as YouTube's terms ask.
+ * The embedded video player, framed from its own origin. The sandbox keeps it off the app's
+ * origin, so it never reaches `window.api`; its own controls and branding stay, as its terms ask.
  */
 export function VideoPlayer({ video }: { video: VideoLink }): React.JSX.Element | null {
   const online = useOnline()
+  const markVideoWatched = useSettings((s) => s.markVideoWatched)
   const src = embedUrl(video)
   if (!src) return null
 
@@ -43,6 +45,7 @@ export function VideoPlayer({ video }: { video: VideoLink }): React.JSX.Element 
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           referrerPolicy="strict-origin-when-cross-origin"
           allowFullScreen
+          onLoad={() => markVideoWatched(video.url)}
         />
       ) : (
         <p className="border-t border-rule px-4 py-3 text-sm text-muted-foreground">

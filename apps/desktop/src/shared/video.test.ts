@@ -67,7 +67,7 @@ describe('videoProblems', () => {
       )
     ).toEqual([
       't: video 1 has no title',
-      't: video 2 is not a YouTube video or playlist link',
+      't: video 2 is not a youtube.com or youtu.be video or playlist link',
       't: video 3 ends before it starts',
       't: video 4 start must be whole seconds',
       't: video 5 is a playlist, so it has no start'

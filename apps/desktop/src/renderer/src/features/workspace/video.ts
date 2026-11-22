@@ -20,7 +20,6 @@ export function playVideo(chapter: Chapter, video: VideoLink): void {
   settings.setPanel('zen', false)
   settings.setLeftTab('resources')
   settings.showResources(key)
-  settings.markVideoWatched(video.url)
   useVideo.setState({ playing: { key, video } })
 }
 
@@ -28,6 +27,6 @@ export function stopVideo(): void {
   useVideo.setState({ playing: null })
 }
 
-/** A task's videos the app can play; a link that is not YouTube's is left out. */
+/** A task's videos the app can play; a link the player can't open is left out. */
 export const taskVideos = (task: TaskDef): VideoLink[] =>
   (task.videos ?? []).filter((video) => videoSource(video.url))

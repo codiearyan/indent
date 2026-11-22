@@ -89,7 +89,7 @@ function showWindow(route?: string): void {
 }
 
 /**
- * The packaged page loads from file://, which sends no referrer, and the YouTube player refuses to
+ * The packaged page loads from file://, which sends no referrer, and the video player refuses to
  * play without one. Its requests carry the site's address instead.
  */
 function allowVideoPlayer(): void {

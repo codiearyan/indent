@@ -86,7 +86,7 @@ export interface TaskDef {
   hints: string[]
   /** Official reference pages that explain what the task tests; shown after repeated fails. */
   docs?: DocLink[]
-  /** YouTube videos or playlists picked by the author; listed in Resources and after repeated fails. */
+  /** Videos or playlists picked by the author; listed in Resources and after repeated fails. */
   videos?: VideoLink[]
   points: number
 }

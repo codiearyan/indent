@@ -9,7 +9,7 @@ const HOSTS = ['youtube.com', 'www.youtube.com', 'm.youtube.com']
 const VIDEO_ID = /^[\w-]{11}$/
 const LIST_ID = /^[\w-]{10,64}$/
 
-/** The YouTube video or playlist a link points at, or null when it is neither. */
+/** The video or playlist a link points at, or null when it is neither. */
 export function videoSource(url: string): VideoSource | null {
   let parsed: URL
   try {
@@ -31,7 +31,7 @@ export function videoSource(url: string): VideoSource | null {
   return null
 }
 
-/** The player address for a video link, or null when the link is not a YouTube one. */
+/** The player address for a video link, or null when the player can't open the link. */
 export function embedUrl(video: VideoLink): string | null {
   const source = videoSource(video.url)
   if (!source) return null
@@ -65,7 +65,7 @@ export function videoProblems(videos: unknown, where: string): string[] {
     if (typeof video?.title !== 'string' || !video.title.trim()) problems.push(`${at} has no title`)
     const source = typeof video?.url === 'string' ? videoSource(video.url) : null
     if (!source) {
-      problems.push(`${at} is not a YouTube video or playlist link`)
+      problems.push(`${at} is not a youtube.com or youtu.be video or playlist link`)
       return
     }
     for (const key of ['start', 'end'] as const) {
