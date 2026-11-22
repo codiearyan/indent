@@ -6,10 +6,10 @@
 // compiler says about each line and fix the line. Leave the types as they are: they say what the
 // code was meant to do.
 //
-// Task 1: The tins on the shelf
-// Task 2: The grams in an order
-// Task 3: The label on the tin
-// Task 4: The shipping for an order
+// 1. The tins on the shelf
+// 2. The grams in an order
+// 3. The label on the tin
+// 4. The shipping for an order
 
 export const order = { id: 'OK-1042', blend: 'Hearth Assam', tins: 3, gramsPerTin: 125, zone: 'local' }
 

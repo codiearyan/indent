@@ -5,10 +5,10 @@
 // task below gives one function the types of what it takes and what it gives back, so the
 // compiler checks every call.
 //
-// Task 1: The price of a tin
-// Task 2: A label with a usual size
-// Task 3: The packing line
-// Task 4: Shipping, written whole
+// 1. The price of a tin
+// 2. A label with a usual size
+// 3. The packing line
+// 4. Shipping, written whole
 
 // Task 1: The price of a tin
 // Give tinPrice the types of its two parameters and of its result. Like this: Price: 1000

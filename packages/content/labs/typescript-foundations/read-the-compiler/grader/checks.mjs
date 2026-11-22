@@ -11,6 +11,9 @@ export const checks = {
       given: { delivered: 30 },
       uses: 'grader/types/shelf.uses.ts',
       misuse: 'grader/types/shelf.misuse.ts',
+      messages: {
+        uses: 'Check uses tinsOnShelf as a number, and the compiler refuses it. Leave the type number on tinsOnShelf, as the starter had it, and change the value instead.'
+      },
       annotated: ['tinsOnShelf'],
       cases: [
         {

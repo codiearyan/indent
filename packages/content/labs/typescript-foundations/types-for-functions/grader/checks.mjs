@@ -59,8 +59,8 @@ export const checks = {
         ),
         call(
           'packedLine',
-          ['OK-0090', 1],
-          'Packed 1 tins for OK-0090',
+          ['OK-0090', 2],
+          'Packed 2 tins for OK-0090',
           'packedLine should give back a line in the same shape for any order.'
         )
       ]

@@ -5,10 +5,10 @@
 // the weights in a parcel, the orders to pick, the lines of an order. Each task below gives one
 // list its type.
 //
-// Task 1: The weight of a parcel
-// Task 2: The picking list
-// Task 3: A product code in two parts
-// Task 4: The lines of an order, written whole
+// 1. The weight of a parcel
+// 2. The picking list
+// 3. A product code in two parts
+// 4. The lines of an order, written whole
 
 // Task 1: The weight of a parcel
 // parcelGrams takes the grams of each tin in a parcel, a list of numbers, and gives back their sum.

@@ -5,10 +5,10 @@
 // any object and read whatever properties they hoped were there. Each task below writes the
 // shape of an object as a type, so the compiler knows which properties it has.
 //
-// Task 1: The grams in an order line
-// Task 2: A gift note that may be missing
-// Task 3: An order id that stays put
-// Task 4: A parcel, written whole
+// 1. The grams in an order line
+// 2. A gift note that may be missing
+// 3. An order id that stays put
+// 4. A parcel, written whole
 
 // Task 1: The grams in an order line
 // An order line has tins (a number) and gramsPerTin (a number). Give the parameter of lineGrams

@@ -105,7 +105,7 @@
       "id": "shipping",
       "title": "Write the shipping function whole",
       "file": "src/pricing.ts",
-      "description": "Under `// Task 4`, write a function called `shippingFor`, with `export` in front, from the word `function` to its closing brace. It takes the grams in an order (a number) and whether it goes express (true or false), and gives back the shipping in pence (a number), with every type written:\n\n- up to and including 500 g: `295`\n- up to and including 2000 g: `450`\n- anything heavier: `900`\n- express adds `350` to any of these\n\nThen take away the `//` in front of the line that prints it. Check reads your function for its result type, compiles calls of its own (a call without express, or with text, must be refused), and calls it with orders on both sides of each edge.",
+      "description": "Under `// Task 4`, write a function called `shippingFor`, with `export` in front, from the word `function` to its closing brace. It takes the grams in an order (a number) and whether it goes express (true or false), and gives back the shipping in pence (a number), with every type written:\n\n- up to and including 500 g: `295`\n- up to and including 2000 g: `450`\n- anything heavier: `900`\n- express adds `350` to any of these\n\nThen take away the `//` in front of the line that prints it, to see it run. Check reads your function for its result type, compiles calls of its own (a call without express, or with text, must be refused), and calls it with orders on both sides of each edge.",
       "nextSteps": [
         "Write the first line: `export function`, the name, two typed parameters and the result type.",
         "Work out the price from the grams, then add the express part.",

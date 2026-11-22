@@ -53,14 +53,24 @@ export const codeOnly = (source) =>
     (m) => m.replace(/[^\n]/g, ' ')
   )
 
-function parts(lines) {
+// Loose on purpose: `//task 2` and `/* Task 2 */` still mark Task 2.
+const TASK_MARK = /^\s*(?:\/\/+|\/\*+)\s*task\s*(\d+)\b/i
+
+/** Where each `// Task N` comment is, and the numbers that appear more than once. */
+function marks(lines) {
   const starts = new Map()
+  const twice = new Set()
   lines.forEach((line, i) => {
-    const m = /^\s*\/\/\s*Task (\d+)\b/.exec(line)
-    if (m) starts.set(Number(m[1]), i)
+    const m = TASK_MARK.exec(line)
+    if (!m) return
+    const n = Number(m[1])
+    if (starts.has(n)) twice.add(n)
+    starts.set(n, i)
   })
-  return starts
+  return { starts, twice }
 }
+
+const parts = (lines) => marks(lines).starts
 
 /** The lines of Task `task`, from its `// Task N` comment to the next task's, or null. */
 function part(lines, task) {
@@ -75,11 +85,29 @@ function part(lines, task) {
   }
 }
 
-/** The code above the first task, without comments or spaces, to compare with the starter's. */
+/**
+ * The code above the first task, to compare with the starter's. Spaces, semicolons and trailing
+ * commas are left out, so a file an editor formatted still counts as unchanged.
+ */
 function sharedCode(lines) {
   const starts = [...parts(lines).values()]
   const first = starts.length ? Math.min(...starts) : lines.length
-  return codeOnly(lines.slice(0, first).join('\n')).replace(/\s+/g, '')
+  return codeOnly(lines.slice(0, first).join('\n'))
+    .replace(/\s+|;/g, '')
+    .replace(/,(?=[}\])])/g, '')
+}
+
+/** The last line of the declaration that starts on line `at`, by counting brackets. */
+function declarationEnd(lines, at) {
+  let depth = 0
+  for (let i = at; i < lines.length; i++) {
+    for (const ch of codeOnly(lines[i])) {
+      if ('([{'.includes(ch)) depth++
+      if (')]}'.includes(ch)) depth--
+    }
+    if (depth <= 0) return i
+  }
+  return at
 }
 
 const literal = (v) => (typeof v === 'string' ? `'${v}'` : JSON.stringify(v))
@@ -112,14 +140,11 @@ function afterParams(code, name) {
 
 function silencers(section, whole) {
   const code = codeOnly(section.text)
-  const found = []
-  code.split('\n').forEach((line, i) => {
-    const n = section.start + i + 1
-    const shown = section.lines[i].trim()
-    if (/\bany\b/.test(line)) found.push(`line ${n}: ${shown}`)
-    else if (/(?:^|[^\w$.])as\s+(?!const\b)[A-Za-z_$({[]/.test(line))
-      found.push(`line ${n}: ${shown}`)
-  })
+  const at = new Set()
+  for (const m of code.matchAll(/\bany\b|(?:^|[^\w$.])as\s+(?!const\b)[A-Za-z_$({[]/gm)) {
+    at.add(code.slice(0, m.index + m[0].search(/any|as/)).split('\n').length - 1)
+  }
+  const found = [...at].map((i) => `line ${section.start + i + 1}: ${section.lines[i].trim()}`)
   const comments = [...section.lines.entries()]
     .filter(([, line]) => /@ts-(ignore|expect-error|nocheck)/.test(line))
     .map(([i, line]) => `line ${section.start + i + 1}: ${line.trim()}`)
@@ -175,6 +200,22 @@ export async function judge(t, spec) {
   const label = `Task ${task}`
   const whole = await readFile(join(t.workspace, file), 'utf8')
   const lines = whole.split('\n')
+  const starter = await readFile(t.chapterPath(`starter/${file}`), 'utf8').catch(() => null)
+  if (starter !== null) {
+    const { starts, twice } = marks(lines)
+    const lost = [...parts(starter.split('\n')).keys()].filter((n) => !starts.has(n))
+    if (lost.length || twice.size) {
+      const n = lost[0] ?? [...twice][0]
+      return [
+        fail(
+          `${file} keeps its tasks`,
+          lost.length
+            ? `Check cannot find the // Task ${n} comment in ${file}. Check uses those comments to tell the tasks apart, so put it back on a line of its own above the lines of Task ${n}.`
+            : `The // Task ${n} comment is in ${file} more than once. Check uses those comments to tell the tasks apart, so keep the one above the lines of Task ${n} and remove the other.`
+        )
+      ]
+    }
+  }
   const p = part(lines, task)
   if (!p) {
     return [
@@ -191,7 +232,9 @@ export async function judge(t, spec) {
       const re = new RegExp(`^(\\s*(?:export\\s+)?(?:const|let)\\s+${name}\\b[^=]*=\\s*).*$`)
       const at = kept.findIndex((line) => re.test(line))
       if (at === -1) return { missing: name }
+      const end = declarationEnd(kept, at)
       kept[at] = kept[at].replace(re, (_, head) => head + literal(value))
+      for (let i = at + 1; i <= end; i++) kept[i] = ''
     }
     return { text: kept.join('\n') }
   }
@@ -251,7 +294,6 @@ export async function judge(t, spec) {
   const crashed = !compiled.passed && errors.length === 0
   const details = []
 
-  const starter = await readFile(t.chapterPath(`starter/${file}`), 'utf8').catch(() => null)
   if (starter !== null && sharedCode(starter.split('\n')) !== sharedCode(lines)) {
     details.push(
       fail(
@@ -338,7 +380,9 @@ export async function judge(t, spec) {
         : fail(
             `${name} has its result type written`,
             rest === null
-              ? `Check cannot find a function called ${name} under // ${label}. It should be there, with the name the task gives and export in front of it.`
+              ? new RegExp(`\\b(?:const|let|var)\\s+${name}\\b`).test(sectionCode)
+                ? `${label} asks for ${name} written with the word function, as export function ${name}(...), so Check can find its result type. Write it that way instead of as a value.`
+                : `Check cannot find a function called ${name} under // ${label}. It should be there, with the name the task gives and export in front of it.`
               : `${label} asks you to write the result type of ${name} yourself, after the round brackets of its parameters. Without it, the compiler guesses the result from the body, so a mistake in the body changes the type instead of being caught.`
           )
     )
@@ -356,7 +400,7 @@ export async function judge(t, spec) {
             absent
               ? `Check cannot find ${absent} exported from ${file}. It should be under // ${label}, with the name the task gives and export in front of it.`
               : (spec.messages?.uses ??
-                  `Check's own code uses ${label} the right way, and the compiler refuses it. A type is narrower than the task asks, or a name is different. The output says which use.`),
+                  `Check's own code uses ${label} the right way, and the compiler refuses it. A type you wrote is narrower than the task asks or a different one (type names are lowercase), or a name is different. The output says which use.`),
             explainHidden(usesErrors, usesText.split('\n'))
           )
     )

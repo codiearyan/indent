@@ -5,10 +5,10 @@
 // as it came, so tins were glued together instead of added up. Each task below gives a few
 // values their types and makes them out of the form's text the right way.
 //
-// Task 1: The types of a tin
-// Task 2: Grams from the form
-// Task 3: A gift or not
-// Task 4: The shelf after a delivery
+// 1. The types of a tin
+// 2. Grams from the form
+// 3. A gift or not
+// 4. The shelf after a delivery
 
 // What the order form sent, exactly as it arrived.
 export const formTins: string = '3'
