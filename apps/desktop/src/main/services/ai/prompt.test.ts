@@ -97,6 +97,15 @@ describe('tutorSystemPrompt', () => {
     )
   })
 
+  it('teaches code tags, diagrams and the four teaching cards', () => {
+    const prompt = tutorSystemPrompt({ chapter, lesson: '' })
+    expect(prompt).toContain('tagged with their language')
+    expect(prompt).toContain('```mermaid')
+    for (const type of ['steps', 'examples', 'quiz', 'compare']) {
+      expect(prompt).toContain(`"type":"${type}"`)
+    }
+  })
+
   it('says when no check ran yet', () => {
     expect(tutorSystemPrompt({ chapter, lesson: '' })).toContain('has not run a check yet')
   })
