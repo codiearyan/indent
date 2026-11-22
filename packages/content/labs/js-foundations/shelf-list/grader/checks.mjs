@@ -1,6 +1,6 @@
 import { code } from '../../grading.mjs'
 import { calls, partOf, readSource, shape } from '../../rules-grading.mjs'
-import { helper, listAfter } from '../../shelf-grading.mjs'
+import { helper, keeps, listAfter } from '../../shelf-grading.mjs'
 
 const FILE = 'src/arrays.js'
 
@@ -32,10 +32,13 @@ export const checks = {
               : undefined
       }))
     })
+    if (!loaded(details)) return details
     const body = code(await readSource(t, FILE))
     const pastEnd = /\[\s*shelf\.length\s*\]/.test(body)
-    return details.map((d, i) => {
-      if (d.passed || !/gave back undefined for this case, though it answers others/.test(d.message ?? '')) return d
+    const read = details.map((d, i) => {
+      const lost = /gave back undefined for this case, though it answers others/.test(d.message ?? '')
+      const pastEndOnly = pastEnd && /gives nothing back yet/.test(d.message ?? '')
+      if (d.passed || !(lost || pastEndOnly)) return d
       const empty = i === details.length - 1
       return {
         ...d,
@@ -46,6 +49,18 @@ export const checks = {
             : 'lastOnShelf read a position this shelf does not have, so it found undefined. A fixed position only fits a shelf of one length; work the last position out from the length.'
       }
     })
+    const kept = await listAfter(t, {
+      file: FILE,
+      fn: 'lastOnShelf',
+      list: keeps('lastOnShelf', [
+        { list: ['Pine', 'Amber', 'Rose'], call: 'lastOnShelf(list)' },
+        { list: ['Tonka'], call: 'lastOnShelf(list)' }
+      ]).map((c) => ({
+        ...c,
+        hint: 'lastOnShelf took a scent off the shelf it was given. It only reads the last scent: the shelf stays as it was, so read the last position instead of taking it off.'
+      }))
+    })
+    return [...read, ...kept]
   },
 
   async restock(t) {
@@ -146,7 +161,7 @@ export const checks = {
           !Array.isArray(a)
             ? undefined
             : a.length === shelf.length && shelf.length
-              ? 'The sold scent is still on the shelf. Reading the last position only looks at it; sellLast has to take it off too.'
+              ? 'The sold scent is still on the shelf. sellLast has to take it off the shelf, not only name it.'
               : a.length < shelf.length - 1
                 ? 'sellLast took more than one scent off the shelf. Each time a scent is taken off, the shelf loses one, so count how many times your function does it.'
                 : a.length === shelf.length - 1 && a.at(-1) !== shelf.at(-2)
@@ -188,6 +203,8 @@ export const checks = {
                 ? 'shelfSpot gave the position counting from 0. The shop counts its spots from 1.'
                 : at === 0 && v.value === `No ${scent} on the shelf`
                   ? `shelfSpot says ${scent} is not there, but it is the first scent of the shelf. Its position is 0: look at how your function decides whether the scent was found.`
+                  : at !== -1 && v.value === `${scent} is in spot ${at}1`
+                    ? 'The spot came out as two numbers side by side. After text, + joins like words, so the position and the 1 were joined instead of added. Work out the spot number first, in round brackets or in a const.'
                   : at !== -1 && /spot 0$/.test(v.value)
                     ? `shelfSpot gave spot 0 for a scent that is on the shelf. Look at what the position is when the scent is found and when it is not.`
                     : at === -1 && /spot/.test(v.value)
@@ -239,6 +256,7 @@ export const checks = {
         [[3000, -3000, 0, 650], 3650]
       ].map(([amounts, expected]) => {
         const all = amounts.reduce((a, b) => a + b, 0)
+        const refunds = amounts.filter((c) => c < 0).reduce((a, b) => a + b, 0)
         return {
           name: `Adds up ${list(amounts)}`,
           expr: `takings(${list(amounts)})`,
@@ -247,7 +265,11 @@ export const checks = {
             ? 'takings should add up every amount that is not a refund, and give back the sum after going through the whole list.'
             : 'isRefund is not right yet, and takings asks it about each amount. Fix isRefund first, then check again.',
           explain: (v) =>
-            amounts.length && v.value === all && all !== expected
+            amounts.length && amounts.every((c) => c < 0) && v.value === all
+              ? 'This day has only refunds, so it took no sales: takings should give back 0 for it.'
+              : amounts.some((c) => c > 0) && v.value === refunds && refunds !== expected
+                ? 'takings added up only the refunds. Look at the question in your if: an amount counts when isRefund says it is not a refund.'
+              : amounts.length && v.value === all && all !== expected
               ? 'takings added the refunds in too. Ask isRefund about each amount and leave the refunds out.'
               : amounts.length && v.value === amounts[0] && amounts[0] !== expected
                 ? 'takings gave back the first amount only. A return inside the loop ends the function in its first round; give the sum back after the loop.'
@@ -262,6 +284,13 @@ export const checks = {
       if (nan && /gave back undefined/.test(d.message ?? '')) {
         d.message =
           'takings gave back undefined here and NaN for other days. The sum has no starting value: give it one before the loop.'
+      }
+    }
+    const bare = /\bisRefund\b(?!\s*\()/.test(partOf(text, 'takings'))
+    for (const d of sums) {
+      if (bare && !d.passed) {
+        d.message =
+          'takings names isRefund without round brackets. That is the function itself, not its answer about an amount: the brackets, with the amount inside, make it run.'
       }
     }
     const loops = /\bfor\s*\(\s*(?:const|let)\s+\w+\s+of\b/.test(partOf(text, 'takings'))

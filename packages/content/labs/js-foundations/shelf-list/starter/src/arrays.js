@@ -13,8 +13,8 @@
 const todaysShelf = ['Cedar', 'Sage', 'Smoked fig', 'Lavender']
 
 // Task 1: Read the end of the shelf
-// lastOnShelf(shelf) returns the last scent of shelf, however many scents it holds. An empty shelf
-// gives 'Empty shelf'.
+// lastOnShelf(shelf) returns the last scent of shelf, however many scents it holds, and leaves
+// shelf as it was. An empty shelf gives 'Empty shelf'.
 function lastOnShelf(shelf) {}
 
 console.log(lastOnShelf(todaysShelf))

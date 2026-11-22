@@ -72,7 +72,11 @@ export const checks = {
               : 'featured should give back the first count scents, from the start of the list, in their order.',
           explain: (v) =>
             notAList('featured')(v) ??
-            (v.value.length === count - 1 && count > 0
+            (count > 0 && list(v.value) === list(scents.slice(1, count))
+              ? 'featured starts at the second scent. Positions count from 0, so the first scent is at position 0.'
+              : count > scents.length && v.value.length === count
+                ? 'featured gave back count items, though this list has fewer scents, so some of them are undefined. slice stops at the end of the list by itself.'
+              : v.value.length === count - 1 && count > 0
               ? 'featured gave back one scent fewer than count. Look at where it stops: with slice, the item at the end position is left out.'
               : v.value.length === count + 1
                 ? 'featured gave back one scent more than count.'
@@ -159,7 +163,11 @@ export const checks = {
         hint: helperRight
           ? 'labelsFor should give back one label for each scent, in the same order.'
           : 'labelFor is not right yet, and labelsFor uses it for every scent. Fix labelFor first, then check again.',
-        explain: notAList('labelsFor')
+        explain: (v) =>
+          notAList('labelsFor')(v) ??
+          (v.value.length === 1 && scents.length > 1
+            ? 'labelsFor gave back only the first label. A return inside the loop ends the function in its first round; give the list back after the loop.'
+            : undefined)
       })),
       keep: [
         { list: ['Moss', 'Rose', 'Pine'], call: 'labelsFor(list)' },

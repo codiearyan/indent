@@ -100,3 +100,23 @@ export function usesMethod(text, fn, method) {
     `The task asks ${fn} to use the list method ${method}. Your answer may be right another way, but this issue is about ${method}, so use it in ${fn}.`
   )
 }
+
+/** True when `fn` hands on an arrow function with braces after => and no return inside them. */
+export const bracesWithoutReturn = (text, fn) =>
+  /=>\s*\{(?![^}]*\breturn\b)/.test(partOf(text, fn))
+
+/**
+ * When `user` writes `name()` with empty brackets where `tool` wanted the function, the call
+ * stops with "is not a function". Says so in place of the general message.
+ */
+export function handedAnswer(details, text, { user, name, tool }) {
+  if (!new RegExp(`\\b${name}\\s*\\(\\s*\\)`).test(partOf(text, user))) return details
+  return details.map((d) =>
+    !d.passed && /is not a function/.test(d.output ?? '')
+      ? {
+          ...d,
+          message: `${user} writes ${name}() with round brackets, so ${name} runs right there with nothing handed in, and ${tool} gets its answer instead of the function. Hand ${tool} the function itself, by its name, and ${tool} calls it.`
+        }
+      : d
+  )
+}

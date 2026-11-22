@@ -73,7 +73,7 @@
       "id": "find",
       "title": "Find a scent by its letter",
       "file": "src/map-filter-find.js",
-      "description": "Under `// Task 3`, make `firstStartingWith(scents, letter)` return the first scent of `scents` whose first letter is `letter`, or `'None'` when no scent starts with it. Use `find`.\n\nCheck calls `firstStartingWith` with lists and letters of its own: two scents with the same letter, a letter no scent has, and an empty list.",
+      "description": "Under `// Task 3`, make `firstStartingWith(scents, letter)` return the first scent of `scents` whose first letter is `letter`, or `'None'` when no scent starts with it. Use `find`.\n\nCheck calls `firstStartingWith` with lists and letters of its own: two scents with the same letter, a scent with the letter later in its name, a letter no scent has, and an empty list.",
       "nextSteps": [
         "Read the lesson's part on `find`.",
         "Write the question about one scent: is its first character `letter`?",

@@ -11,7 +11,7 @@
       "id": "last",
       "title": "Read the end of the shelf",
       "file": "src/arrays.js",
-      "description": "Under `// Task 1` in `src/arrays.js`, make `lastOnShelf(shelf)` return the last scent of `shelf`, however many scents it holds. An empty shelf gives `'Empty shelf'`.\n\nCheck calls `lastOnShelf` with shelves of its own, of different lengths, one scent and none included.",
+      "description": "Under `// Task 1` in `src/arrays.js`, make `lastOnShelf(shelf)` return the last scent of `shelf`, however many scents it holds, and leave `shelf` as it was. An empty shelf gives `'Empty shelf'`.\n\nCheck calls `lastOnShelf` with shelves of its own, of different lengths, one scent and none included, then makes sure the shelf it handed in still has all its scents.",
       "nextSteps": [
         "Read the lesson's part on positions and length.",
         "Handle the empty shelf first, by asking about its length.",
@@ -137,7 +137,7 @@
         "Give the sum back after the loop and run the file."
       ],
       "hints": [
-        "This is the counting loop from the issue on loops, going over a list instead of a text, with a sum in place of a count.",
+        "This is the `for...of` loop from the issue on loops, going over a list instead of a text, with a sum that grows each round.",
         "A sum needs a starting value, or the first addition gives NaN. The return goes after the loop: inside it, the function would end in the first round.",
         "`isRefund` is one line: `return cents < 0`. In `takings`, inside `for (const cents of amounts)`, add `cents` to the sum when `!isRefund(cents)`."
       ],

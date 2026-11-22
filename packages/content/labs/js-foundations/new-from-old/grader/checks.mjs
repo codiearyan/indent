@@ -1,6 +1,13 @@
 import { code } from '../../grading.mjs'
-import { calls, readSource } from '../../rules-grading.mjs'
-import { helper, keeps, listAfter, usesMethod } from '../../shelf-grading.mjs'
+import { calls, partOf, readSource } from '../../rules-grading.mjs'
+import {
+  bracesWithoutReturn,
+  handedAnswer,
+  helper,
+  keeps,
+  listAfter,
+  usesMethod
+} from '../../shelf-grading.mjs'
 
 const FILE = 'src/map-filter-find.js'
 
@@ -43,7 +50,7 @@ export const checks = {
     })
     if (!loaded(one)) return one
     const helperRight = one.every((d) => d.passed)
-    const many = await calls(t, {
+    const priced = await calls(t, {
       file: FILE,
       fn: 'marketPrices',
       list: [[1430, 990, 2000], [350], []].map((given) => ({
@@ -60,7 +67,8 @@ export const checks = {
             : undefined)
       }))
     })
-    if (!loaded(many)) return many
+    if (!loaded(priced)) return priced
+    const many = handedAnswer(priced, text, { user: 'marketPrices', name: 'roundUp', tool: 'map' })
     const kept = await listAfter(t, {
       file: FILE,
       fn: 'marketPrices',
@@ -95,11 +103,15 @@ export const checks = {
             const got = v.value
             const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
             const dear = given.filter((c) => c >= limit)
-            if (dear.length && same(got, dear)) {
+            const above = given.filter((c) => c > limit)
+            if (bracesWithoutReturn(text, 'cheapTable') && got.length === 0 && expected.length) {
+              return 'cheapTable gave back an empty list, though some prices here are below the limit. The function you give filter has braces after => and no return, so it gives back undefined, which keeps nothing.'
+            }
+            if ((dear.length || expected.length) && (same(got, dear) || same(got, above))) {
               return 'cheapTable kept the dear prices and left out the cheap ones. Turn the question round.'
             }
             if (got.length === 0 && expected.length) {
-              return 'cheapTable gave back an empty list, though some prices here are below the limit. Look at what the function you give filter gives back: true keeps a price, and with braces after => that needs return.'
+              return 'cheapTable kept no prices, though some here are below the limit. Look at what the function you give filter gives back: true keeps a price.'
             }
             if (same(got, given.filter((c) => c <= limit))) {
               return `A price of exactly ${limit} is not below the limit, so it stays off the cheap table. Which comparison leaves the equal case out?`
@@ -130,6 +142,7 @@ export const checks = {
       [['Moss', 'Tonka', 'Thyme', 'Rose'], 'T', 'Tonka'],
       [['Birch', 'Clove', 'Honey'], 'H', 'Honey'],
       [['Pine', 'Fig', 'Plum'], 'P', 'Pine'],
+      [['Earl Grey', 'Ginger'], 'G', 'Ginger'],
       [['Moss', 'Rose'], 'B', 'None'],
       [[], 'C', 'None']
     ]
@@ -152,6 +165,8 @@ export const checks = {
             ? 'firstStartingWith gave back a list. The task asks for one scent: filter keeps every match in a list, find gives back the first match itself.'
             : typeof v.value === 'boolean'
               ? 'firstStartingWith gave back true or false. The task asks for the scent itself.'
+              : typeof v.value === 'string' && v.value.includes(letter) && v.value[0] !== letter
+                ? `firstStartingWith gave back ${v.value}, which has ${letter} in it but does not start with it. Ask about the first character only.`
               : expected !== 'None' && v.value !== expected && scents.filter((s) => s[0] === letter).at(-1) === v.value
                 ? 'firstStartingWith gave back the last match. The task asks for the first one.'
                 : undefined
@@ -198,7 +213,9 @@ export const checks = {
             booleans(v)
               ? 'tagsFor gave back true and false values. Keep the scents themselves, then change each one.'
               : (notAList('tagsFor')(v) ??
-                (v.value.length && JSON.stringify(v.value) === JSON.stringify(fit) && fit.length
+                (v.value.length && v.value.every((x) => x === null)
+                  ? 'tagsFor gave back a list of empty values. The function you give map must give back the scent in capital letters: a method runs only with its round brackets, and with braces after => it needs return.'
+                  : v.value.length && JSON.stringify(v.value) === JSON.stringify(fit) && fit.length
                   ? 'tagsFor kept the right scents, but they are not in capital letters yet. Change each kept scent too.'
                   : v.value.length === scents.length && scents.length > fit.length
                     ? v.value.every((s) => s === String(s).toUpperCase())

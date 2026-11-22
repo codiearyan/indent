@@ -1,6 +1,14 @@
 import { code } from '../../grading.mjs'
 import { calls, partOf, readSource } from '../../rules-grading.mjs'
-import { helper, keeps, listAfter, newList, usesMethod } from '../../shelf-grading.mjs'
+import {
+  bracesWithoutReturn,
+  handedAnswer,
+  helper,
+  keeps,
+  listAfter,
+  newList,
+  usesMethod
+} from '../../shelf-grading.mjs'
 
 const FILE = 'src/sorting.js'
 
@@ -20,13 +28,21 @@ const notAList = (fn) => (v) =>
 async function sorted(t, { fn, cases, keep, fresh }) {
   const text = code(await readSource(t, FILE))
   const yesNoCompare = /=>\s*\(?\s*\w+\s*[<>]=?\s*\w+\s*\)?\s*\)/.test(partOf(text, fn))
+  const noReturn = bracesWithoutReturn(text, fn)
   const values = (await calls(t, { file: FILE, fn, list: cases })).map((d) =>
-    !d.passed && yesNoCompare && !/stops|nothing back|not a list/.test(d.message ?? '')
-      ? {
-          ...d,
-          message: `The compare function in ${fn} gives back true or false. sort needs a number from it: below 0 when the first should come first, above 0 when the second should.`
-        }
-      : d
+    d.passed || /stops|nothing back|not a list/.test(d.message ?? '')
+      ? d
+      : noReturn
+        ? {
+            ...d,
+            message: `The compare function in ${fn} has braces after => and no return, so it gives back undefined and sort leaves the order as it was. With braces, the number needs return.`
+          }
+        : yesNoCompare
+          ? {
+              ...d,
+              message: `The compare function in ${fn} gives back true or false. sort needs a number from it: below 0 when the first should come first, above 0 when the second should.`
+            }
+          : d
   )
   if (!loaded(values)) return values
   const kept = await listAfter(t, { file: FILE, fn, list: keeps(fn, keep) })
@@ -183,7 +199,7 @@ export const checks = {
     })
     if (!loaded(one)) return one
     const helperRight = one.every((d) => d.passed)
-    const many = await calls(t, {
+    const asked = await calls(t, {
       file: FILE,
       fn: 'needsPouring',
       list: [
@@ -211,6 +227,7 @@ export const checks = {
             : undefined)
       }))
     })
+    const many = handedAnswer(asked, text, { user: 'needsPouring', name: 'isLow', tool: 'some' })
     return [
       ...one,
       ...many,
@@ -249,6 +266,18 @@ export const checks = {
       }))
     })
     if (!loaded(details)) return details
-    return [...details, usesMethod(text, 'readyForMarket', 'every')]
+    const noReturn = bracesWithoutReturn(text, 'readyForMarket')
+    return [
+      ...details.map((d) =>
+        !d.passed && noReturn && !/stops|nothing back/.test(d.message ?? '')
+          ? {
+              ...d,
+              message:
+                'The function you give every has braces after => and no return, so it gives back undefined for each count, which every takes as no. With braces, the answer needs return.'
+            }
+          : d
+      ),
+      usesMethod(text, 'readyForMarket', 'every')
+    ]
   }
 }
