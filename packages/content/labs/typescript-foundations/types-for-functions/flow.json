@@ -1,0 +1,126 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "imogen", "label": "Imogen", "kind": "story" },
+      { "id": "price", "label": "tinPrice()", "kind": "function", "mine": true, "fn": "tinPrice" },
+      { "id": "label", "label": "tinLabel()", "kind": "function", "mine": true, "fn": "tinLabel" },
+      { "id": "packed", "label": "packedLine()", "kind": "function", "mine": true, "fn": "packedLine" },
+      { "id": "shipping", "label": "shippingFor()", "kind": "function", "mine": true },
+      { "id": "table", "label": "Packing table", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "imogen", "to": "price", "label": "grams, price" },
+      { "from": "imogen", "to": "label", "label": "blend, grams?" },
+      { "from": "imogen", "to": "shipping", "label": "grams, express" },
+      { "from": "imogen", "to": "packed", "label": "order, tins" },
+      { "from": "label", "to": "table", "label": "label" },
+      { "from": "packed", "to": "table", "label": "line" }
+    ],
+    "note": "Each pricing function says what it takes and what it gives back, so the compiler checks every call Imogen makes before a price or a label goes out."
+  },
+  "tasks": {
+    "price": {
+      "trace": { "file": "src/pricing.ts", "call": "tinPrice", "args": [125, 800] },
+      "steps": [
+        {
+          "active": ["imogen", "imogen->price"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "grams", "value": "number" },
+              { "key": "pencePer100g", "value": "number" }
+            ]
+          },
+          "note": "Imogen asks the price of a 125 g tin of a blend sold by the 100 g."
+        },
+        {
+          "active": ["price"],
+          "note": "With both parameters typed, the compiler refuses a call that passes a weight as text."
+        },
+        {
+          "active": ["price", "imogen->price", "imogen"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "price", "value": "number" }]
+          },
+          "note": "The written result type promises a number of pence, and the body is checked against it."
+        }
+      ]
+    },
+    "label": {
+      "trace": { "file": "src/pricing.ts", "call": "tinLabel", "args": ["Morning Keemun"] },
+      "steps": [
+        {
+          "active": ["imogen", "imogen->label"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "blend", "value": "text" }]
+          },
+          "note": "Imogen asks for a label for Morning Keemun and leaves the size out."
+        },
+        {
+          "active": ["label"],
+          "note": "The grams are a parameter a call may leave out, so the compiler allows the call, and the usual size takes their place."
+        },
+        {
+          "active": ["label", "label->table", "table"],
+          "note": "The label for a tin of the usual size reaches the packing table."
+        }
+      ]
+    },
+    "packed": {
+      "trace": { "file": "src/pricing.ts", "call": "packedLine", "args": ["OK-1042", 3] },
+      "steps": [
+        {
+          "active": ["imogen", "imogen->packed", "packed"],
+          "note": "The packing slip asks for the line that says what was packed for order OK-1042."
+        },
+        {
+          "active": ["packed"],
+          "note": "A function that only prints gives back nothing, and the compiler calls that void."
+        },
+        {
+          "active": ["packed", "packed->table", "table"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "line", "value": "text" }]
+          },
+          "note": "Once it gives the line back, the slip can print it."
+        }
+      ]
+    },
+    "shipping": {
+      "steps": [
+        {
+          "active": ["imogen", "imogen->shipping"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "grams", "value": "number" },
+              { "key": "express", "value": "true or false" }
+            ]
+          },
+          "note": "Imogen asks what a 750 g order costs to send express."
+        },
+        {
+          "active": ["shipping"],
+          "note": "The weight picks one of three prices, and express adds to it."
+        },
+        {
+          "active": ["shipping", "imogen->shipping", "imogen"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "shipping", "value": "number of pence" }]
+          },
+          "note": "The shipping comes back as a number, and every type on the way is one you wrote."
+        }
+      ]
+    }
+  }
+}

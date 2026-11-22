@@ -13,7 +13,8 @@
       "title": "The first types",
       "chapters": [
         "read-the-compiler",
-        "types-for-values"
+        "types-for-values",
+        "types-for-functions"
       ]
     }
   ]

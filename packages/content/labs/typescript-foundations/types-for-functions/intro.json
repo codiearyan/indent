@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Imogen", "say": "Why do forty labels say undefined?", "note": "She left the size out." },
+    { "title": "Price list", "text": "Takes anything and gives back anything." },
+    {
+      "title": "Your types",
+      "file": "pricing.ts",
+      "mine": true,
+      "gap": "Calls are never checked",
+      "tasks": ["Type the tin price", "A usual label size", "Give back the line", "Write shipping"]
+    },
+    { "title": "Packing table", "rows": [["Morning Keemun", "label"], ["Order OK-1042", "slip"]], "mark": 0 }
+  ],
+  "ticket": { "label": "Labels", "wrong": "undefined g", "why": "No types", "right": "usual size" },
+  "captions": [
+    "Imogen printed forty labels at Oakhollow, and every one says undefined g.",
+    "Rafe's price list takes anything, so a call with a missing size goes through.",
+    "You give each function the types of what it takes and gives back.",
+    "Now a label without a size gets the usual one, and a bad call is refused.",
+    "Every call to the price list is checked before a label is printed."
+  ]
+}

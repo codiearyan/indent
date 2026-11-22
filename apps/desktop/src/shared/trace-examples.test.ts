@@ -51,6 +51,10 @@ const repos: { labId: string; expected: string[] }[] = [
     ]
   },
   {
+    labId: 'typescript-foundations',
+    expected: ['types-for-functions/price', 'types-for-functions/label', 'types-for-functions/packed']
+  },
+  {
     labId: 'async-js',
     expected: [
       'promises/wrap',

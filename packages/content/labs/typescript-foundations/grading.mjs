@@ -142,7 +142,10 @@ function explainHidden(errors, lines) {
 }
 
 const missingExport = (errors) =>
-  errors.map((e) => /has no exported member(?: named)? '([\w$]+)'/.exec(e.text)?.[1]).find(Boolean)
+  errors
+    .map((e) => /has no exported member(?: named)? '([\w$]+)'|declares '([\w$]+)' locally/.exec(e.text))
+    .map((m) => m && (m[1] ?? m[2]))
+    .find(Boolean)
 
 const fail = (name, message, output) => ({ name, passed: false, message, output })
 const pass = (name, output) => ({ name, passed: true, output })
@@ -319,7 +322,7 @@ export async function judge(t, spec) {
         : fail(
             `${name} has its result type written`,
             rest === null
-              ? `Check cannot find a function called ${name} under // ${label}. Keep the name the task gives, with export in front of it.`
+              ? `Check cannot find a function called ${name} under // ${label}. It should be there, with the name the task gives and export in front of it.`
               : `${label} asks you to write the result type of ${name} yourself, after the round brackets of its parameters. Without it, the compiler guesses the result from the body, so a mistake in the body changes the type instead of being caught.`
           )
     )
@@ -335,7 +338,7 @@ export async function judge(t, spec) {
         : fail(
             'Right uses compile',
             absent
-              ? `Check's code cannot find ${absent} in ${file}. Keep the name the task gives, with export in front of it.`
+              ? `Check cannot find ${absent} exported from ${file}. It should be under // ${label}, with the name the task gives and export in front of it.`
               : (spec.messages?.uses ??
                   `Check's own code uses ${label} the right way, and the compiler refuses it. A type is narrower than the task asks, or a name is different. The output says which use.`),
             explainHidden(usesErrors, usesText.split('\n'))
@@ -380,6 +383,16 @@ function behaviour(cases, runs, file, label) {
       )
     ]
   }
+  const gone = cases.find((c, i) => !c.prints && runs[i].value?.type === 'missing')
+  if (gone) {
+    const name = gone.call ?? gone.read
+    return [
+      fail(
+        `${file} has ${name}`,
+        `Check cannot find ${name} exported from ${file}. It should be under // ${label}, with the name the task gives and export in front of it.`
+      )
+    ]
+  }
   return cases.map((c, i) => {
     const r = runs[i]
     if (c.prints) {
@@ -395,10 +408,6 @@ function behaviour(cases, runs, file, label) {
     }
     const v = r.value
     const passed = same(v, c.expected)
-    const message =
-      v?.type === 'missing'
-        ? `Check cannot find ${c.call ?? c.read} in ${file}. Keep the name the task gives, with export in front of it.`
-        : c.hint
-    return { name: c.name, passed, message: passed ? undefined : message, output: `${c.setup}\nGave: ${show(v)}` }
+    return { name: c.name, passed, message: passed ? undefined : c.hint, output: `${c.setup}\nGave: ${show(v)}` }
   })
 }
