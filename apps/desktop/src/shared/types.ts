@@ -276,7 +276,8 @@ export interface PathDef {
   title: string
   tagline: string
   description: string
-  stages: { title: string; labs: string[] }[]
+  /** `soon` holds the titles of repos that are planned for the stage and not written yet. */
+  stages: { title: string; labs: string[]; soon?: string[] }[]
 }
 
 // ---------- Workspace ----------

@@ -1,5 +1,84 @@
 [
   {
+    "id": "full-stack-web",
+    "title": "Full-stack web developer",
+    "tagline": "From your first page to an app with a server and a database",
+    "description": "Go one technology at a time: learn it from the start in its foundations repo, then prove it in the projects and bug hunts that follow. Each stage builds on the one before, so start at the top or skip what you already know.",
+    "stages": [
+      {
+        "title": "HTML and CSS",
+        "labs": [
+          "web-pages"
+        ],
+        "soon": [
+          "HTML and CSS foundations"
+        ]
+      },
+      {
+        "title": "JavaScript",
+        "labs": [
+          "js-foundations",
+          "browser-js",
+          "async-js",
+          "js-bug-hunts"
+        ]
+      },
+      {
+        "title": "Git",
+        "labs": [
+          "git-rescues"
+        ],
+        "soon": [
+          "Git foundations"
+        ]
+      },
+      {
+        "title": "TypeScript",
+        "labs": [
+          "typescript-essentials"
+        ],
+        "soon": [
+          "TypeScript foundations"
+        ]
+      },
+      {
+        "title": "React",
+        "labs": [
+          "react-screens"
+        ],
+        "soon": [
+          "React foundations"
+        ]
+      },
+      {
+        "title": "Node.js",
+        "labs": [
+          "node-api"
+        ],
+        "soon": [
+          "Node.js foundations",
+          "A CRUD API with Express"
+        ]
+      },
+      {
+        "title": "SQL",
+        "labs": [
+          "sql-basics"
+        ],
+        "soon": [
+          "SQL foundations"
+        ]
+      },
+      {
+        "title": "Next.js",
+        "labs": [],
+        "soon": [
+          "Next.js foundations"
+        ]
+      }
+    ]
+  },
+  {
     "id": "ai-engineer-typescript",
     "title": "AI engineer with TypeScript",
     "tagline": "Call models, ground them in your data, give them tools, and measure the result",

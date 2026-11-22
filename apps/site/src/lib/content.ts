@@ -32,7 +32,7 @@ export interface Roadmap {
   title: string
   tagline: string
   description: string
-  stages: { title: string; labs: string[] }[]
+  stages: { title: string; labs: string[]; soon?: string[] }[]
 }
 
 export interface Task {
