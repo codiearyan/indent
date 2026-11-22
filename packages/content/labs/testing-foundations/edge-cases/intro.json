@@ -2,8 +2,8 @@
   "stations": [
     {
       "title": "Bridget",
-      "say": "Why did a 40 pound order pay?",
-      "note": "Forty or more is free."
+      "say": "Why did this order pay?",
+      "note": "It was big enough to go free."
     },
     {
       "title": "Lorcan's tests",
@@ -33,7 +33,7 @@
     "right": "delivered free"
   },
   "captions": [
-    "A customer spent exactly forty pounds, and the farm charged her for delivery.",
+    "A customer spent just enough for free delivery, and the farm charged her anyway.",
     "Lorcan's tests only use ordinary orders, so they pass while the line is wrong.",
     "You test right on the edges: the line, an empty Friday, first and last, a full van.",
     "Now a mistake at any edge fails a test before the van leaves.",

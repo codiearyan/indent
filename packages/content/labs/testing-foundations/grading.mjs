@@ -186,9 +186,22 @@ export async function judge(t, { test, target, pick, where, missing, wrong, thro
   // Wrong versions are judged once every test of the task passes on the working code.
   if (broken.length) return details
 
+  // A wrong version that could not be run proves nothing, so it never counts as caught.
+  const stopped = runs.find((run) => run.problem)
+  if (stopped) {
+    return [
+      ...details,
+      {
+        name: 'Your tests run on the wrong versions',
+        passed: false,
+        message: `Check could not finish running ${test} on a wrong version of the code. Run the tests in the terminal and make sure they end, then check again.`,
+        output: shortFailure(stopped.output)
+      }
+    ]
+  }
   const caughtBy = runs.map((run) => {
     const after = new Map(run.tests.map((x) => [fullName(x), x.status]))
-    return mine.filter((x) => after.get(fullName(x)) !== 'passed')
+    return mine.filter((x) => after.get(fullName(x)) === 'failed')
   })
   // Said once, on the first miss, when no wrong version is caught at all.
   let note = caughtBy.every((c) => c.length === 0)
