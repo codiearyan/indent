@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Kofi",
+      "say": "Which class do they want?",
+      "note": "Bookings come in with no class."
+    },
+    {
+      "title": "Booking form",
+      "text": "Name, email and places, and nothing else.",
+      "note": "Can be sent empty"
+    },
+    {
+      "title": "Your HTML",
+      "file": "classes.html",
+      "mine": true,
+      "gap": "No way to pick an answer",
+      "tasks": ["A class menu", "Radio buttons", "Checkbox and notes", "Required answers"]
+    },
+    {
+      "title": "Booking",
+      "rows": [["Wheel throwing"], ["First time"], ["News: yes"]],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "A booking",
+    "wrong": "no class",
+    "why": "Half a form",
+    "right": "all he needs"
+  },
+  "captions": [
+    "Kofi gets bookings, but he cannot tell which class they are for.",
+    "The form only asks for a name, an email and places, and it can be sent empty.",
+    "You add a menu, radio buttons, a checkbox, a notes box and required answers.",
+    "A booking arrives with the class, the experience and every answer Kofi needs.",
+    "The classes page now shows the timetable and takes a full booking."
+  ]
+}

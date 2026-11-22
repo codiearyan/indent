@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Kofi",
+      "say": "When is the Saturday class?",
+      "note": "People ring to ask every day."
+    },
+    {
+      "title": "Classes page",
+      "text": "The timetable is three lines with commas.",
+      "note": "Hard to read on a phone"
+    },
+    {
+      "title": "Your HTML",
+      "file": "classes.html",
+      "mine": true,
+      "gap": "Data with no rows or columns",
+      "tasks": ["Rows and cells", "Column headers", "Row headers", "A caption"]
+    },
+    {
+      "title": "Timetable",
+      "rows": [["Wheel throwing"], ["Handbuilding"]],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "Saturday",
+    "wrong": "a phone call",
+    "why": "Lost in text",
+    "right": "easy to read"
+  },
+  "captions": [
+    "Kofi keeps getting calls from people who want to know when the Saturday class is.",
+    "The timetable is on the page, but as lines of commas that nobody reads.",
+    "You build a table with rows, cells, headers for both directions and a caption.",
+    "Visitors read across the handbuilding row and find the day, the time and the price.",
+    "Same words from Kofi. Now his timetable is a real table."
+  ]
+}

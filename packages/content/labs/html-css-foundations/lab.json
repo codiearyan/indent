@@ -17,6 +17,23 @@
         "lists",
         "page-structure"
       ]
+    },
+    {
+      "title": "Tables and forms",
+      "chapters": [
+        "tables",
+        "booking-form",
+        "form-choices"
+      ]
+    },
+    {
+      "title": "First styles",
+      "chapters": [
+        "first-stylesheet",
+        "selectors",
+        "cascade",
+        "box-model"
+      ]
     }
   ]
 }

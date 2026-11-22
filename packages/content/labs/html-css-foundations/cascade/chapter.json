@@ -1,0 +1,105 @@
+{
+  "id": "cascade",
+  "title": "Which rule wins",
+  "files": ["styles.css", "index.html"],
+  "terminal": {
+    "description": "The home page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "source-order",
+      "title": "Make the h2 headings dark brown",
+      "file": "styles.css",
+      "description": "Dilys added a rule at the top of `styles.css` to make the h2 headings dark brown, so only the main heading is clay. The headings stayed clay.\n\nMake every h2 heading dark brown while the main heading stays clay, without `!important`.\n\nThe check reads the colour of the main heading and of each h2 heading, and makes sure no rule for the headings uses `!important`.",
+      "nextSteps": [
+        "Read \"When two rules disagree\" in the lesson.",
+        "Find every rule in styles.css that sets the colour of an h2.",
+        "Work out which one the browser uses, and why.",
+        "Move or change one rule so Dilys's wins, save and press Check."
+      ],
+      "hints": [
+        "Both rules pick the h2 headings with the same kind of selector, so neither is stronger.",
+        "When two rules are equally strong, the one later in the file wins.",
+        "Move Dilys's `h2` rule below the rule for `h1, h2`, or take h2 out of that rule."
+      ],
+      "docs": [
+        { "title": "Cascade, specificity and inheritance", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Handling_conflicts" },
+        { "title": "Introducing the CSS cascade", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Introduction" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "specificity",
+      "title": "Make the opening hours clay",
+      "file": "styles.css",
+      "description": "Dilys gave the Visit us section the id `contact` and greyed its lines with a rule for `#contact p`. Then she gave the notes clay letters in the `.note` rule. The muddy clothes line turned clay, but the opening hours stayed grey.\n\nMake the opening hours clay. The other lines of Visit us stay grey, and the muddy clothes line stays clay. Do not use `!important`.\n\nThe check reads the colour of the opening hours, the muddy clothes line, the address, the email and phone line and a paragraph outside Visit us, and looks for `!important` in the rules for the notes.",
+      "nextSteps": [
+        "Read \"How strong a selector is\" in the lesson.",
+        "Compare the selector that makes the hours grey with the one that makes them clay.",
+        "Work out which is stronger, and why moving the rule would not help.",
+        "Write a rule for the hours with a selector strong enough to win, save and press Check."
+      ],
+      "hints": [
+        "Here the file order does not decide. One selector has an id in it.",
+        "An id outweighs any number of classes. A rule for the notes inside Visit us needs the id too.",
+        "Add a rule `#contact .note { color: ...; }` with the clay code, after the `#contact p` rule or anywhere."
+      ],
+      "docs": [
+        { "title": "Specificity", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Specificity" },
+        { "title": "Cascade, specificity and inheritance", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Handling_conflicts" }
+      ],
+      "videos": [
+        { "title": "Specificity explained", "url": "https://www.youtube.com/watch?v=c0kfcP_nD9E" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "inheritance",
+      "title": "Set the new font once",
+      "file": "styles.css",
+      "description": "Dilys wants Palatino now, falling back to any serif. She wrote it into a rule for `h1, h2, p, li`, so the body still says Georgia and some text, like the caption of the mug, did not change.\n\nSet `font-family` to Palatino with `serif` after it on the `body`, and remove every other font list, so all text takes the font from the body.\n\nThe check reads the font of every heading, paragraph, list item, caption and link on the home page, counts the font lists in `styles.css`, and reads the one on the body.",
+      "nextSteps": [
+        "Read \"Passed down from the element around it\" in the lesson.",
+        "Find every font-family in styles.css.",
+        "Change the one on the body to Dilys's new font.",
+        "Delete the rule she copied it into, save, and press Check."
+      ],
+      "hints": [
+        "Some properties pass from an element to everything inside it. The font is one of them.",
+        "Everything on the page is inside the body, so a font on the body reaches all of it. The copies are not needed.",
+        "Set `font-family: Palatino, serif;` in the body rule and delete the `h1, h2, p, li` rule."
+      ],
+      "docs": [
+        { "title": "Inheritance", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Inheritance" },
+        { "title": "font-family", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/font-family" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "custom-properties",
+      "title": "Give the studio's colours names",
+      "file": "styles.css",
+      "description": "The same five colour codes are copied from rule to rule. Dilys's notes give them names: clay, cream, ink, sand and stone.\n\nOn `:root`, set five custom properties, `--clay`, `--cream`, `--ink`, `--sand` and `--stone`, each to the code it names now. Then write every colour in the rules with `var()` and its name, so each code appears only once.\n\nThe check reads the five names on `:root`, looks for colours still written out in the rules, and makes sure the page looks the same: the background, the writing, the main heading, the notes and the address.",
+      "nextSteps": [
+        "Read \"Names for values\" in the lesson.",
+        "At the top of styles.css, write a rule for :root with the five custom properties.",
+        "Replace each code in the rules below with var() and its name.",
+        "Save, check the page looks the same, and press Check."
+      ],
+      "hints": [
+        "A custom property is a name you make up, starting with two dashes, that holds a value.",
+        "Set them in a `:root` rule; use one with `var(--name)` wherever the code was.",
+        "`:root { --clay: #a4492a; ... }`, then for example `color: var(--clay);`."
+      ],
+      "docs": [
+        { "title": "Using CSS custom properties", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties" },
+        { "title": "var()", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/var" }
+      ],
+      "videos": [
+        { "title": "Custom properties in 100 seconds", "url": "https://www.youtube.com/watch?v=NtRmIp4eMjs" }
+      ],
+      "points": 10
+    }
+  ]
+}

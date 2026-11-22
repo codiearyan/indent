@@ -1,0 +1,86 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dilys", "label": "Dilys", "kind": "story" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "html", "label": "index.html", "kind": "file", "mine": true },
+      { "id": "parts", "label": "Parts of the page", "kind": "data" },
+      { "id": "visitor", "label": "Visitor", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dilys", "to": "css", "label": "what stands out" },
+      { "from": "html", "to": "parts", "label": "class, id" },
+      { "from": "css", "to": "parts", "label": "selectors" },
+      { "from": "parts", "to": "visitor", "label": "what to see" }
+    ],
+    "note": "Selectors let one stylesheet pick out the headings, the notes, the mug of the month and the Jump to links, so each part can look different."
+  },
+  "tasks": {
+    "headings": {
+      "steps": [
+        {
+          "active": ["dilys", "dilys->css", "css"],
+          "note": "Dilys wants every heading in the orange of fired clay."
+        },
+        {
+          "active": ["css", "css->parts", "parts"],
+          "value": { "kind": "array", "label": "picked by one rule", "values": ["the main heading", "Classes", "The shop", "Visit us"] },
+          "note": "One rule lists both kinds of heading in its selector and gives them the clay colour."
+        },
+        {
+          "active": ["parts", "parts->visitor", "visitor"],
+          "note": "Each heading stands out from the brown writing around it."
+        }
+      ]
+    },
+    "note": {
+      "steps": [
+        {
+          "active": ["dilys", "dilys->css", "css"],
+          "note": "Two lines keep getting missed: the muddy clothes and the opening hours."
+        },
+        {
+          "active": ["html", "html->parts", "parts"],
+          "note": "In the HTML, both paragraphs get the same class."
+        },
+        {
+          "active": ["css", "css->parts", "parts"],
+          "note": "A rule for that class puts them on sand, and leaves every other paragraph alone."
+        }
+      ]
+    },
+    "mug": {
+      "steps": [
+        {
+          "active": ["html", "html->parts", "parts"],
+          "note": "The mug of the month is one figure on the page, so it gets an id."
+        },
+        {
+          "active": ["css", "css->parts", "parts"],
+          "note": "A rule picks that id and lines up its picture and caption in the middle."
+        },
+        {
+          "active": ["parts", "parts->visitor", "visitor"],
+          "note": "Visitors see the mug centred in The shop."
+        }
+      ]
+    },
+    "nav-links": {
+      "steps": [
+        {
+          "active": ["parts"],
+          "value": { "kind": "array", "label": "links on the page", "values": ["Jump to links", "classes page", "email", "phone"] },
+          "note": "The page has links in several places. Only the ones in the nav should be bold."
+        },
+        {
+          "active": ["css", "css->parts", "parts"],
+          "note": "A rule picks links by where they sit: inside the nav. The HTML stays as it is."
+        },
+        {
+          "active": ["parts", "parts->visitor", "visitor"],
+          "note": "The three Jump to links are the first thing a visitor sees."
+        }
+      ]
+    }
+  }
+}

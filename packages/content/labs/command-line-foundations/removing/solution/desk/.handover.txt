@@ -1,0 +1,6 @@
+Handover from Sol
+
+- The card machine slips are in the shoebox under the counter, not on the laptop.
+- The old web site is in a folder called old-site. Keep the logo, the rest can go.
+- The print driver fills downloads with .tmp files. They are safe to delete.
+- The spare key to the drying room is with Idris.
