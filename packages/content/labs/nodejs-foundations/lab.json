@@ -18,6 +18,12 @@
         "writing-files",
         "modules"
       ]
+    },
+    {
+      "title": "Settings, big files and long jobs",
+      "chapters": [
+        "environment"
+      ]
     }
   ]
 }

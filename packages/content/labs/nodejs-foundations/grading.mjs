@@ -53,8 +53,11 @@ export async function box(t, files = {}) {
   return dir
 }
 
-/** Like the kit's collect, but a script that prints without end is stopped, not held in memory. */
-function collect(child, timeoutMs) {
+/**
+ * Like the kit's collect, but a script that prints without end is stopped, not held in memory.
+ * `onOutput`, when given, sees each piece of standard output as it comes.
+ */
+function collect(child, timeoutMs, onOutput) {
   let stdout = ''
   let stderr = ''
   let timedOut = false
@@ -66,7 +69,10 @@ function collect(child, timeoutMs) {
     }
     return (kept + chunk).slice(0, MAX_READ)
   }
-  child.stdout.on('data', (d) => (stdout = take(stdout, d)))
+  child.stdout.on('data', (d) => {
+    stdout = take(stdout, d)
+    onOutput?.(d)
+  })
   child.stderr.on('data', (d) => (stderr = take(stderr, d)))
   const timer = setTimeout(() => {
     timedOut = true
@@ -81,8 +87,22 @@ function collect(child, timeoutMs) {
   })
 }
 
-const spawnNode = (args, cwd) =>
-  spawn(process.execPath, args, { cwd, env: childEnv(), stdio: ['ignore', 'pipe', 'pipe'] })
+const spawnNode = (args, cwd, { env, input = false } = {}) =>
+  spawn(process.execPath, args, { cwd, env: childEnv(env), stdio: [input ? 'pipe' : 'ignore', 'pipe', 'pipe'] })
+
+// Calls onLine(line, type) for each whole line of standard output; type(text) writes to standard input.
+function talk(child, onLine) {
+  child.stdin.on('error', () => {})
+  const type = (text) => {
+    if (child.stdin.writable) child.stdin.write(text)
+  }
+  let rest = ''
+  return (chunk) => {
+    const parts = (rest + chunk).split('\n')
+    rest = parts.pop()
+    for (const line of parts) onLine(line.replace(/\r$/, ''), type)
+  }
+}
 
 const guardFlags = (dir) => ['--permission', '--allow-fs-read=*', `--allow-fs-write=${dir}`]
 
@@ -106,17 +126,28 @@ const quote = (arg) => (arg === '' || /\s/.test(arg) ? `"${arg}"` : arg)
 /**
  * Runs `node <script> <args>` the way a person types it in the folder `from` (relative to dir).
  * `preload`, a module in dir, runs first and is left out of the command shown.
- * Returns { code, stdout, stderr, timedOut, flooded, command, from, guarded }.
+ * `env` sets settings in its environment (undefined removes one) and `memory` caps its data in MB;
+ * either shows the command the way try.js takes it. With `onLine(line, type)`, standard input
+ * stays open, like a terminal where nobody types, and type(text) types into it.
+ * Returns { code, stdout, stderr, timedOut, flooded, command, from, guarded, memory }.
  */
-export async function run(dir, script, args = [], { from = '.', preload } = {}) {
+export async function run(dir, script, args = [], { from = '.', preload, env, memory, onLine } = {}) {
   const cwd = at(dir, from)
   await mkdir(cwd, { recursive: true })
   const file = relative(cwd, at(dir, script))
   const flags = (await guarded(dir)) ? guardFlags(dir) : []
   const before = preload ? ['--import', pathToFileURL(at(dir, preload)).href] : []
-  const r = await collect(spawnNode([...flags, ...before, file, ...args], cwd), SECONDS * 1000)
-  return { ...r, command: ['node', file, ...args.map(quote)].join(' '), from, guarded: flags.length > 0 }
+  const limit = memory ? [`--max-old-space-size=${memory}`] : []
+  const child = spawnNode([...flags, ...limit, ...before, file, ...args], cwd, { env, input: Boolean(onLine) })
+  const r = await collect(child, SECONDS * 1000, onLine && talk(child, onLine))
+  const settings = Object.entries(env ?? {}).filter(([, v]) => v !== undefined).map(([k, v]) => quote(`${k}=${v}`))
+  const helper = env || memory ? ['try.js', ...settings, ...(memory ? [`--memory=${memory}`] : [])] : []
+  const command = ['node', ...helper, file, ...args.map(quote)].join(' ')
+  return { ...r, command, from, guarded: flags.length > 0, memory }
 }
+
+/** True when Node stopped because the script's data outgrew the memory it was given. */
+export const outOfMemory = (stderr) => /JavaScript heap out of memory/.test(stderr)
 
 const block = (text) =>
   text === '' ? '  (nothing)' : text.replace(/\n$/, '').split('\n').map((l) => `  ${l}`).join('\n')
@@ -124,16 +155,20 @@ const block = (text) =>
 /** What a run did, for a check's output. */
 export function report(r) {
   const where = r.from === '.' ? 'In the top folder' : `In the folder ${r.from}`
+  const oom = r.memory && outOfMemory(r.stderr)
   const end = r.flooded
     ? 'stopped by Check: it printed without stopping'
     : r.timedOut
       ? `stopped by Check after ${SECONDS} seconds`
-      : `exit code: ${r.code}`
+      : oom
+        ? `stopped by Node: it ran out of the ${r.memory} MB it was given`
+        : `exit code: ${r.code}`
+  const stderr = oom ? r.stderr.split('\n').filter((l) => l.startsWith('FATAL ERROR')).join('\n') : r.stderr
   const unguarded = r.guarded
     ? []
     : ['(Node on this computer refused the guard that keeps a script writing only inside its copy of the workspace, so Check ran this script without it.)']
   return hide(
-    [`${where}: ${r.command}`, 'standard output:', block(r.stdout), 'standard error:', block(r.stderr), end, ...unguarded].join('\n')
+    [`${where}: ${r.command}`, 'standard output:', block(r.stdout), 'standard error:', block(stderr), end, ...unguarded].join('\n')
   )
 }
 
