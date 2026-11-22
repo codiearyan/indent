@@ -50,6 +50,12 @@ function listWith(page, words) {
 function notKept(near, words, what) {
   const texts = items(near).map(ownText)
   const missing = words.filter((word) => !texts.some((text) => text.includes(word)))
+  if (missing.length === 0) {
+    return {
+      message: `Kofi's words are all there, but some ${what} share one list item. Give each its own item.`,
+      output: describe(near)
+    }
+  }
   return {
     message: `The list is there, but some ${what} no longer have Kofi's words. Keep his words for each item.`,
     output: `${describe(near)}\nNot found: ${missing.join(', ')}`
