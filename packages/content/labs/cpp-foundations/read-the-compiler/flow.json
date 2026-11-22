@@ -1,0 +1,97 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kasimir", "label": "Kasimir", "kind": "story" },
+      { "id": "file", "label": "workbench.cpp", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "messages", "label": "Error messages", "kind": "data" },
+      { "id": "sheet", "label": "Bench sheet", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kasimir", "to": "file", "label": "his lines" },
+      { "from": "file", "to": "compiler", "label": "builds" },
+      { "from": "compiler", "to": "messages", "label": "refuses" },
+      { "from": "compiler", "to": "sheet", "label": "prints" }
+    ],
+    "note": "You read what the compiler says about Kasimir's lines and fix each mistake, until his bench sheet builds and prints."
+  },
+  "tasks": {
+    "springs": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->file", "file"],
+          "note": "Kasimir's line adds the springs in stock to the springs just delivered."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler", "compiler->messages", "messages"],
+          "value": {
+            "kind": "array",
+            "label": "an error message",
+            "values": ["file", "line", "error", "what it expected"]
+          },
+          "note": "The compiler stops and names the line where it expected something more."
+        },
+        {
+          "active": ["compiler", "compiler->sheet", "sheet"],
+          "note": "With the statement finished, the bench sheet prints the springs on the shelf."
+        }
+      ]
+    },
+    "hands": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->file", "file"],
+          "note": "Kasimir works out the hands for today's clocks and prints them."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->messages", "messages"],
+          "note": "The compiler meets a name nobody made, and says which one."
+        },
+        {
+          "active": ["file"],
+          "note": "The name in the print and the name of the variable have to match, letter for letter."
+        },
+        {
+          "active": ["compiler", "compiler->sheet", "sheet"],
+          "note": "The bench sheet prints the hands Kasimir worked out."
+        }
+      ]
+    },
+    "crystal": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->file", "file"],
+          "note": "Kasimir puts the width of the glass crystal into a variable to print it."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->messages", "messages"],
+          "note": "The compiler names two types: the value does not fit the box it goes into."
+        },
+        {
+          "active": ["compiler", "compiler->sheet", "sheet"],
+          "note": "In a box of the right type, the width prints with its decimals."
+        }
+      ]
+    },
+    "oil": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->file", "file"],
+          "note": "Kasimir prints the oil one service takes, with two decimals."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->messages", "messages"],
+          "note": "The compiler does not know one name on the line, because the file never brought it in."
+        },
+        {
+          "active": ["file"],
+          "note": "The fix is at the top of the file, not on the line the message names."
+        },
+        {
+          "active": ["compiler", "compiler->sheet", "sheet"],
+          "note": "The bench sheet prints the oil with two decimals."
+        }
+      ]
+    }
+  }
+}

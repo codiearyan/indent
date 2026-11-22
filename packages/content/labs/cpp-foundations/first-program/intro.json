@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ambrose", "say": "Can the laptop print our card?", "note": "The card hangs in the window." },
+    { "title": "Workshop laptop", "text": "Prints a good morning and an old offer." },
+    {
+      "title": "Your code",
+      "file": "welcome.cpp",
+      "mine": true,
+      "gap": "Nothing prints the card",
+      "tasks": ["Print the name", "Print the hours", "Switch off the offer", "Leave Kasimir a note"]
+    },
+    { "title": "Window card", "text": "Printed and ready for the window." }
+  ],
+  "ticket": { "label": "The card", "wrong": "missing", "why": "Not printed", "right": "printed" },
+  "captions": [
+    "First day at Tolliver Clockworks. Ambrose wants the laptop to print the window card.",
+    "Today the laptop prints a good morning and an offer they stopped, but no card.",
+    "You write the lines that print it, build them with the compiler, in four tasks.",
+    "Now the welcome and the hours print, and the old offer is switched off.",
+    "One file, built and run in the terminal. The laptop talks, and the card is in the window."
+  ]
+}
