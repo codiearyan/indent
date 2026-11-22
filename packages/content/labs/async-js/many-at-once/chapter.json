@@ -28,6 +28,9 @@
         { "title": "Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" },
         { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
       ],
+      "videos": [
+        { "title": "Promise.all, race, allSettled and any", "url": "https://www.youtube.com/watch?v=vQtgi8uElmk" }
+      ],
       "points": 10
     },
     {
@@ -51,6 +54,9 @@
         { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
         { "title": "Error.prototype.message", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/message" }
       ],
+      "videos": [
+        { "title": "Promise.all, race, allSettled and any", "url": "https://www.youtube.com/watch?v=vQtgi8uElmk" }
+      ],
       "points": 10
     },
     {
@@ -73,6 +79,9 @@
         { "title": "Promise.race()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race" },
         { "title": "setTimeout()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout" },
         { "title": "Promise.prototype.finally()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally" }
+      ],
+      "videos": [
+        { "title": "Promise.all, race, allSettled and any", "url": "https://www.youtube.com/watch?v=vQtgi8uElmk" }
       ],
       "points": 10
     }

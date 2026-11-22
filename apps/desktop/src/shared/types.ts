@@ -86,12 +86,23 @@ export interface TaskDef {
   hints: string[]
   /** Official reference pages that explain what the task tests; shown after repeated fails. */
   docs?: DocLink[]
+  /** Videos or playlists picked by the author; listed in Resources and after repeated fails. */
+  videos?: VideoLink[]
   points: number
 }
 
 export interface DocLink {
   title: string
   url: string
+}
+
+export interface VideoLink {
+  title: string
+  /** A youtube.com or youtu.be link to one video or a playlist. */
+  url: string
+  /** Seconds into a video where it starts and stops; not for playlists. */
+  start?: number
+  end?: number
 }
 
 /** content/labs/<labId>/<chapterId>/chapter.json */

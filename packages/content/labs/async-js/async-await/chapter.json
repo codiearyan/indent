@@ -28,6 +28,9 @@
         { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" },
         { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
       ],
+      "videos": [
+        { "title": "async and await", "url": "https://www.youtube.com/watch?v=V_Kr9OSfDeU" }
+      ],
       "points": 10
     },
     {
@@ -51,6 +54,9 @@
         { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
         { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
       ],
+      "videos": [
+        { "title": "async and await in depth", "url": "https://www.youtube.com/watch?v=vn3tm0quoqE" }
+      ],
       "points": 10
     },
     {
@@ -73,6 +79,9 @@
         { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
         { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" },
         { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" }
+      ],
+      "videos": [
+        { "title": "async and await", "url": "https://www.youtube.com/watch?v=V_Kr9OSfDeU" }
       ],
       "points": 10
     }

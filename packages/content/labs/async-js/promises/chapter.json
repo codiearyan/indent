@@ -27,6 +27,10 @@
         { "title": "Promise() constructor", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise" },
         { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
       ],
+      "videos": [
+        { "title": "Promises in 100 seconds", "url": "https://www.youtube.com/watch?v=RvYYCGs45L4" },
+        { "title": "Asynchronous JavaScript, a short series", "url": "https://www.youtube.com/playlist?list=PL4cUxeGkcC9jx2TTZk3IGWKSbtugYdrlu" }
+      ],
       "points": 10
     },
     {
@@ -50,6 +54,9 @@
         { "title": "Array.prototype.find()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find" },
         { "title": "Number.prototype.toFixed()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed" }
       ],
+      "videos": [
+        { "title": "Promises in 10 minutes", "url": "https://www.youtube.com/watch?v=DHvZLI7Db8E" }
+      ],
       "points": 10
     },
     {
@@ -72,6 +79,10 @@
         { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" },
         { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" },
         { "title": "Promise", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" }
+      ],
+      "videos": [
+        { "title": "How a promise runs, step by step", "url": "https://www.youtube.com/watch?v=Xs1EMmBLpn4" },
+        { "title": "What the event loop is", "url": "https://www.youtube.com/watch?v=8aGhZQkoFbQ" }
       ],
       "points": 10
     }

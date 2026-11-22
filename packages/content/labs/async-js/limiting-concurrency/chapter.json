@@ -28,6 +28,9 @@
         { "title": "Array.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice" },
         { "title": "for", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for" }
       ],
+      "videos": [
+        { "title": "Promise.all, race, allSettled and any", "url": "https://www.youtube.com/watch?v=vQtgi8uElmk" }
+      ],
       "points": 10
     },
     {
@@ -51,6 +54,9 @@
         { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
         { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
       ],
+      "videos": [
+        { "title": "What the event loop is", "url": "https://www.youtube.com/watch?v=8aGhZQkoFbQ" }
+      ],
       "points": 10
     },
     {
@@ -73,6 +79,9 @@
         { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
         { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
         { "title": "Promise.allSettled()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled" }
+      ],
+      "videos": [
+        { "title": "Promise.all, race, allSettled and any", "url": "https://www.youtube.com/watch?v=vQtgi8uElmk" }
       ],
       "points": 10
     }

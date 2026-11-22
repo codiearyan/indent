@@ -58,6 +58,8 @@ export interface SettingsState {
   leftTab: LeftTab
   /** Chapter keys whose Resources tab the learner uncovered. */
   resourcesShown: string[]
+  /** Links of the videos the learner played. */
+  videosWatched: string[]
   tourSeen: boolean
   /** The first-run setup was finished or skipped. */
   onboarded: boolean
@@ -96,6 +98,7 @@ export interface SettingsState {
   setLessonSide(side: 'left' | 'right'): void
   setLeftTab(tab: LeftTab): void
   showResources(key: string): void
+  markVideoWatched(url: string): void
   setTourSeen(seen: boolean): void
   setOnboarded(onboarded: boolean): void
   setStarAsked(asked: boolean): void
@@ -143,6 +146,7 @@ export const useSettings = create<SettingsState>()(
       lessonSide: 'left',
       leftTab: 'insights',
       resourcesShown: [],
+      videosWatched: [],
       tourSeen: false,
       onboarded: false,
       starAsked: false,
@@ -178,6 +182,10 @@ export const useSettings = create<SettingsState>()(
       showResources: (key) =>
         set((s) =>
           s.resourcesShown.includes(key) ? s : { resourcesShown: [...s.resourcesShown, key] }
+        ),
+      markVideoWatched: (url) =>
+        set((s) =>
+          s.videosWatched.includes(url) ? s : { videosWatched: [...s.videosWatched, url] }
         ),
       setTourSeen: (tourSeen) => set({ tourSeen }),
       setOnboarded: (onboarded) => set({ onboarded }),
