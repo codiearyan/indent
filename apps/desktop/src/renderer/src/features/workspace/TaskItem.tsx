@@ -17,7 +17,6 @@ import { checkAttachment, hintAttachment } from '@/features/ai/attachments'
 import { askWhyTaskFailed } from '@/features/ai/tutorActions'
 import { useChat } from '@/features/ai/chatStore'
 import { FlowPlayer } from '@/features/flows/FlowPlayer'
-import { TOUR } from '@/features/tour/anchors'
 import { useRuntime } from '@/stores/runtime'
 import { useWorkspace } from '@/stores/workspace'
 import { CheckDetails } from './CheckDetails'
@@ -30,7 +29,6 @@ interface Props {
   hintKey: string
   number: number
   progress: ChapterProgress | undefined
-  first: boolean
   /** The issue's scene and this task's steps, when the issue has a flow for it. */
   scene?: FlowScene
   flow?: TaskFlow
@@ -41,7 +39,6 @@ export function TaskItem({
   hintKey,
   number,
   progress,
-  first,
   scene,
   flow
 }: Props): React.JSX.Element {
@@ -152,7 +149,6 @@ export function TaskItem({
             className="border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent"
             disabled={checking !== null || toolsBroken}
             onClick={() => void check([task.id])}
-            data-tour={first ? TOUR.taskCheck : undefined}
           >
             {isChecking ? <Loader2 className="animate-spin" /> : <ListChecks />}
             {isChecking && toolsInstalling ? 'Getting ready...' : 'Check'}
@@ -203,7 +199,6 @@ export function TaskItem({
           task={task}
           progress={taskProgress}
           nonGreenChecks={progress?.nonGreenChecks ?? 0}
-          first={first}
           aiOn={aiOn}
           onExplain={aiOn ? explainHint : undefined}
           onAskTutor={aiOn ? askTutor : undefined}

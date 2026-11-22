@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { Pause, Play, SkipBack, SkipForward } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { TOUR } from '@/features/tour/anchors'
 import { useShortcuts } from '@/lib/useShortcuts'
 import { IconButton } from './IconButton'
 import { lessonParts } from '@shared/narration'
@@ -27,10 +26,7 @@ export function AudioCard({
   const playing = status === 'playing'
 
   return (
-    <div
-      data-tour={TOUR.audio}
-      className="flex h-12 items-center gap-3 rounded-lg border border-border pr-1.5 pl-2"
-    >
+    <div className="flex h-12 items-center gap-3 rounded-lg border border-border pr-1.5 pl-2">
       <Button
         variant="outline"
         size="icon-sm"
