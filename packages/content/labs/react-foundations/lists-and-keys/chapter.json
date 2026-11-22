@@ -1,0 +1,115 @@
+{
+  "id": "lists-and-keys",
+  "title": "Lists and keys",
+  "files": ["src/ShopList.jsx", "src/shop.js", "src/App.jsx", "src/money.js", "src/main.jsx"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "every-item",
+      "title": "One list item for each item",
+      "file": "src/ShopList.jsx",
+      "description": "Make `ShopList` draw its list from the `items` prop instead of the typed list. Inside the `<ul>` with the class `shop-list`, draw one `<li>` for each item, holding:\n\n- a `<span>` with the class `name` and the item's `name`\n- a `<span>` with the class `price` and its `pricePence` written with `formatPence`\n\nAn empty `items` gives an empty list. The check draws your list with many items, one item and none, and compares what each list shows with what it passed.",
+      "nextSteps": [
+        "Read \"An array of elements is a list\" in the lesson.",
+        "Keep the `ul` and delete the typed list items inside it.",
+        "In curly braces, map each item to an `li` with its two spans.",
+        "If the list comes out empty, look at the brackets of your callback."
+      ],
+      "hints": [
+        "A typed list item is the right markup. What changes is that there is one for every item in `items`.",
+        "JSX draws an array of elements, and `map` turns an array of items into an array of elements.",
+        "Inside the `ul`: `{items.map((item) => (<li>...</li>))}`, with `{item.name}` and `{formatPence(item.pricePence)}` in the spans."
+      ],
+      "docs": [
+        { "title": "Rendering lists", "url": "https://react.dev/learn/rendering-lists" },
+        {
+          "title": "Array.prototype.map()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+        }
+      ],
+      "videos": [{ "title": "Drawing lists with map", "url": "https://www.youtube.com/watch?v=tHjxSVaj_wY" }],
+      "points": 10
+    },
+    {
+      "id": "keys",
+      "title": "A key that belongs to the item",
+      "file": "src/ShopList.jsx",
+      "description": "Give each `<li>` a `key` that belongs to the item itself and is different for every item, so React can tell the items apart when the list changes.\n\nThe check looks for React's warnings about keys in the console, then takes the first item out of the list and checks that every other item stays in its own list item.",
+      "nextSteps": [
+        "Read \"Keys tell React which item is which\" in the lesson.",
+        "Open the console in the Browser panel and find React's warning.",
+        "Look in `shop.js` for a field that names each item and never changes.",
+        "Put the key on the element your callback returns."
+      ],
+      "hints": [
+        "React only needs one thing from you here, and it says which in the console.",
+        "The key goes on the outermost element returned for each item. The index from `map` is a place in the list, so it moves when the list changes.",
+        "Every item in `shop.js` has an `id`: `<li key={item.id}>`."
+      ],
+      "docs": [
+        {
+          "title": "Keeping list items in order with key",
+          "url": "https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key"
+        },
+        { "title": "Why does React need keys?", "url": "https://react.dev/learn/rendering-lists#why-does-react-need-keys" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "in-stock",
+      "title": "Leave out what is sold out",
+      "file": "src/ShopList.jsx",
+      "description": "An item with a `stock` of `0` is sold out and stays off the screen. Every item with stock left is still drawn. When everything is sold out, the list is empty.\n\nThe check draws your list with a mix of items in and out of stock, and with everything sold out.",
+      "nextSteps": [
+        "Read \"Leave out, then draw\" in the lesson.",
+        "Above the `return`, make a new array with only the items that have stock.",
+        "Map that array instead of `items`.",
+        "Look at the screen: the network map should be gone."
+      ],
+      "hints": [
+        "Deciding which items to draw is plain JavaScript, done before the JSX.",
+        "Arrays have a method that keeps the values a callback says yes to.",
+        "`const inStock = items.filter((item) => item.stock > 0)`, then map `inStock`."
+      ],
+      "docs": [
+        {
+          "title": "Filtering arrays of items",
+          "url": "https://react.dev/learn/rendering-lists#filtering-arrays-of-items"
+        },
+        {
+          "title": "Array.prototype.filter()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cheapest-first",
+      "title": "Cheapest first",
+      "file": "src/ShopList.jsx",
+      "description": "Draw the items in order of `pricePence`, cheapest first, whatever order `shop.js` has them in. `ShopList` must not change the `items` array it is given: props are read-only.\n\nThe check passes an array that cannot be changed and reads the prices in the order they appear.",
+      "nextSteps": [
+        "Read \"Props are read-only\" in the lesson.",
+        "Find out which array methods change the array they are called on.",
+        "Sort a new array by price, with the smallest first.",
+        "Check the screen: the prices should go up from top to bottom."
+      ],
+      "hints": [
+        "`sort` reorders the array you call it on. Here that array belongs to App.",
+        "Sort an array you made yourself: one that `filter` returned, a copy, or the new array `toSorted` gives back. The compare function gets two items and returns a negative number when the first goes first.",
+        "`.toSorted((a, b) => a.pricePence - b.pricePence)` on the items you draw."
+      ],
+      "docs": [
+        { "title": "Keeping components pure", "url": "https://react.dev/learn/keeping-components-pure" },
+        {
+          "title": "Array.prototype.toSorted()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilf", "label": "Wilf", "kind": "story" },
+      { "id": "today", "label": "today.js", "kind": "data" },
+      { "id": "money", "label": "formatPence()", "kind": "function" },
+      { "id": "board", "label": "RideBoard", "kind": "function", "mine": true },
+      { "id": "screen", "label": "Ride board", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "wilf", "to": "today", "label": "the day's plan" },
+      { "from": "today", "to": "board", "label": "values" },
+      { "from": "money", "to": "board", "label": "prices as text" },
+      { "from": "board", "to": "screen", "label": "markup" }
+    ],
+    "note": "The ride board stops being typed in by hand and shows whatever Wilf writes in today.js."
+  },
+  "tasks": {
+    "todays-tram": {
+      "steps": [
+        { "active": ["wilf", "wilf->today", "today"], "note": "Wilf writes the date and the tram that runs today." },
+        {
+          "active": ["today", "today->board", "board"],
+          "value": { "kind": "map", "label": "What the board reads", "entries": [{ "key": "date", "value": "text" }, { "key": "tram.number", "value": "number" }, { "key": "tram.name", "value": "text" }] },
+          "note": "The board reads those values from the file instead of having them typed in."
+        },
+        { "active": ["board", "board->screen", "screen"], "note": "Visitors see today's date and today's tram." }
+      ]
+    },
+    "ride-times": {
+      "steps": [
+        { "active": ["today"], "note": "The plan has the first ride, the last ride and how many rides run an hour." },
+        { "active": ["today", "today->board", "board"], "note": "The board shows both times and works out how far apart the rides are." },
+        { "active": ["board", "board->screen", "screen"], "note": "On a busy day with more rides, the board says so by itself." }
+      ]
+    },
+    "fares": {
+      "steps": [
+        { "active": ["today"], "note": "The plan has the adult fare, in pence." },
+        { "active": ["money", "money->board", "board"], "note": "The board turns each fare into money text, the child fare being half." },
+        { "active": ["board", "board->screen", "screen"], "note": "Families read both fares on the board." }
+      ]
+    },
+    "tram-photo": {
+      "steps": [
+        { "active": ["today"], "note": "Each tram in the plan has a photo and a name." },
+        { "active": ["today", "today->board", "board"], "note": "The board hands those values to its image." },
+        { "active": ["board", "board->screen", "screen"], "note": "The picture on the board is the tram that is really out today." }
+      ]
+    },
+    "livery": {
+      "steps": [
+        { "active": ["today"], "note": "Each tram has its own colour, its livery." },
+        { "active": ["today", "today->board", "board"], "note": "The board paints its strip with that colour." },
+        { "active": ["board", "board->screen", "screen"], "note": "The strip matches the tram waiting at the stop." }
+      ]
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilf", "label": "Wilf", "kind": "story" },
+      { "id": "rides", "label": "rides.js", "kind": "data" },
+      { "id": "list", "label": "RideList", "kind": "function", "mine": true },
+      { "id": "row", "label": "RideRow", "kind": "function", "mine": true },
+      { "id": "notice", "label": "Notice", "kind": "function", "mine": true },
+      { "id": "stop", "label": "Rides screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "wilf", "to": "rides", "label": "rota, notice" },
+      { "from": "rides", "to": "list", "label": "rides" },
+      { "from": "list", "to": "row", "label": "one ride" },
+      { "from": "rides", "to": "notice", "label": "notice" },
+      { "from": "row", "to": "stop", "label": "what applies" },
+      { "from": "notice", "to": "stop", "label": "or nothing" }
+    ],
+    "note": "The rides screen decides for each ride what to say, and leaves out what does not apply."
+  },
+  "tasks": {
+    "full": {
+      "steps": [
+        { "active": ["rides"], "value": { "kind": "map", "label": "A ride", "entries": [{ "key": "time", "value": "text" }, { "key": "seatsLeft", "value": "number" }] }, "note": "Each ride in the rota says how many seats are left." },
+        { "active": ["list", "list->row", "row"], "note": "The row picks its words from that number, and its colour with them." },
+        { "active": ["row", "row->stop", "stop"], "note": "A family at the stop can tell at a glance which rides are full." }
+      ]
+    },
+    "step-free": {
+      "steps": [
+        { "active": ["rides"], "note": "Some trams have a step-free door, some do not." },
+        { "active": ["list", "list->row", "row"], "note": "The row adds the mark only for the trams that have one." },
+        { "active": ["row", "row->stop", "stop"], "note": "Nobody plans a trip around a door that is not there." }
+      ]
+    },
+    "wheelchair": {
+      "steps": [
+        { "active": ["rides"], "note": "Each ride has a number of wheelchair spaces, sometimes none." },
+        { "active": ["list", "list->row", "row"], "note": "The row shows the spaces when there are some, and nothing otherwise." },
+        { "active": ["row", "row->stop", "stop"], "note": "No row has a number left on it that means nothing." }
+      ]
+    },
+    "no-rides": {
+      "steps": [
+        { "active": ["rides"], "note": "Late in the day, the last ride has gone and the list is empty." },
+        { "active": ["rides", "rides->list", "list"], "note": "The list notices before drawing anything." },
+        { "active": ["list", "list->row", "row", "row->stop", "stop"], "note": "The screen says plainly that the rides are over." }
+      ]
+    },
+    "notice": {
+      "steps": [
+        { "active": ["wilf", "wilf->rides", "rides"], "note": "Some days Wilf writes a notice; most days he leaves it empty." },
+        { "active": ["rides", "rides->notice", "notice"], "note": "The notice is handed whatever he wrote." },
+        { "active": ["notice", "notice->stop", "stop"], "note": "It shows his words, or on a quiet day nothing at all." }
+      ]
+    }
+  }
+}

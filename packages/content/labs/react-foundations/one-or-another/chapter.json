@@ -1,0 +1,153 @@
+{
+  "id": "one-or-another",
+  "title": "Showing one thing or another",
+  "files": ["src/Rides.jsx", "src/App.jsx", "src/rides.js", "src/main.jsx"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "full",
+      "title": "Full when no seats are left",
+      "file": "src/Rides.jsx",
+      "description": "In `RideRow`, the span with the class `seats` reads `Full` when `ride.seatsLeft` is `0`, and otherwise the number and ` seats left`, like `14 seats left`.\n\nA full ride's span also has the class `full` beside `seats`, which paints it red. Any other ride's span has only `seats`.\n\nThe check draws rides of its own, full and not full, and reads the span's words and classes.",
+      "nextSteps": [
+        "Read \"One or the other\" in the lesson.",
+        "Decide which words the span shows, depending on `ride.seatsLeft`.",
+        "Decide its class the same way.",
+        "Look at the ten thirty on the screen."
+      ],
+      "hints": [
+        "There are two outcomes for the words and two for the class, and the same question decides both.",
+        "The conditional operator, `a ? b : c`, is an expression, so it works inside the braces of the text and of `className`.",
+        "Something like `{ride.seatsLeft === 0 ? 'Full' : ...}` for the words and `className={ride.seatsLeft === 0 ? 'seats full' : 'seats'}`."
+      ],
+      "docs": [
+        {
+          "title": "Conditional (ternary) operator",
+          "url": "https://react.dev/learn/conditional-rendering#conditional-ternary-operator--"
+        },
+        {
+          "title": "Conditional operator",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Conditional rendering with && and the ternary",
+          "url": "https://www.youtube.com/watch?v=fAUkKh-WfLM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "step-free",
+      "title": "Step-free only where it is true",
+      "file": "src/Rides.jsx",
+      "description": "Show the span with the class `step-free` only for a ride whose `stepFree` is `true`. For any other ride the span is not there at all: not empty, not hidden, left out.\n\nThe check draws a step-free ride and one that is not, and looks for the element and for the words.",
+      "nextSteps": [
+        "Read \"Something or nothing\" in the lesson.",
+        "Find the step-free span in `RideRow`.",
+        "Make the whole span depend on `ride.stepFree`.",
+        "Check that the Foundry Belle's rows no longer say Step-free."
+      ],
+      "hints": [
+        "This time one of the two outcomes is nothing at all.",
+        "React draws nothing for `false`, and `&&` gives back its left side when that side is false.",
+        "`{ride.stepFree && <span className=\"step-free\">Step-free</span>}`"
+      ],
+      "docs": [
+        {
+          "title": "Logical AND operator (&&)",
+          "url": "https://react.dev/learn/conditional-rendering#logical-and-operator-"
+        },
+        {
+          "title": "Conditionally including JSX",
+          "url": "https://react.dev/learn/conditional-rendering#conditionally-including-jsx"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "wheelchair",
+      "title": "Wheelchair spaces only when there are some",
+      "file": "src/Rides.jsx",
+      "description": "Show the span with the class `wheelchair`, reading for example `2 wheelchair spaces`, only when `ride.wheelchairSpaces` is more than `0`. With no spaces, the row shows nothing for it: no span, and no stray `0` either.\n\nThe check draws rides with and without spaces, and looks at everything in the row.",
+      "nextSteps": [
+        "Read \"The 0 that shows up\" in the lesson.",
+        "Make the wheelchair span depend on the number of spaces.",
+        "Look at the ten thirty: is there a 0 left on its row?",
+        "Make the condition a real true or false."
+      ],
+      "hints": [
+        "The number of spaces is a number, not true or false.",
+        "`&&` gives back its left side when that side is falsy, and React draws the number 0.",
+        "Compare first: `{ride.wheelchairSpaces > 0 && (...)}`."
+      ],
+      "docs": [
+        {
+          "title": "Logical AND operator (&&)",
+          "url": "https://react.dev/learn/conditional-rendering#logical-and-operator-"
+        },
+        {
+          "title": "Logical AND (&&)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "no-rides",
+      "title": "Say when there are no more rides",
+      "file": "src/Rides.jsx",
+      "description": "When `rides` is empty, `RideList` shows a `<p>` with the class `empty` that reads `No more rides today`, in place of the list: no `<ul>`, empty or not. With rides, it draws the list as before, without the message.\n\nThe check draws `RideList` with no rides and with two.",
+      "nextSteps": [
+        "Read \"Return early\" in the lesson.",
+        "At the top of `RideList`, ask whether there are any rides.",
+        "Return the message when there are none.",
+        "Try it: empty the array in `rides.js` for a moment and look at the screen."
+      ],
+      "hints": [
+        "A component is a function, and a function can return from more than one place.",
+        "Check the length of `rides` before the list is built, where an `if` is allowed.",
+        "`if (rides.length === 0) { return <p className=\"empty\">No more rides today</p> }`"
+      ],
+      "docs": [
+        {
+          "title": "Conditionally returning JSX",
+          "url": "https://react.dev/learn/conditional-rendering#conditionally-returning-jsx"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "notice",
+      "title": "A notice that is only there when there is one",
+      "file": "src/Rides.jsx",
+      "description": "Below `RideList`, write a component called `Notice` and export it by name. It takes one prop, `text`:\n\n- with a text, it returns a `<p>` with the class `notice` holding the text\n- with an empty text or none, it draws nothing at all\n\nThen use `Notice` in `src/App.jsx`, between the heading and the rides section, with the `notice` from `rides.js` as its text.\n\nThe check draws `Notice` with a text, with an empty text and with none, then changes `rides.js` and looks at the screen.",
+      "nextSteps": [
+        "Read the end of \"Return early\" in the lesson.",
+        "Write `Notice` below `RideList`, with its `text` prop.",
+        "Return nothing at all when there is no text.",
+        "Import `notice` and `Notice` in `App.jsx`, and use them above the rides."
+      ],
+      "hints": [
+        "An empty paragraph is still on the page. When there is nothing to say, the component should put nothing there.",
+        "A component can return a value React draws as nothing. Both an empty string and a missing prop are falsy.",
+        "`if (!text) return null`, then return the paragraph. In App: `<Notice text={notice} />`."
+      ],
+      "docs": [
+        {
+          "title": "Conditionally returning nothing with null",
+          "url": "https://react.dev/learn/conditional-rendering#conditionally-returning-nothing-with-null"
+        },
+        {
+          "title": "Importing and exporting components",
+          "url": "https://react.dev/learn/importing-and-exporting-components"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

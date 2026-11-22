@@ -1,0 +1,154 @@
+{
+  "id": "values-in-jsx",
+  "title": "Values in curly braces",
+  "files": ["src/RideBoard.jsx", "src/today.js", "src/money.js", "src/App.jsx", "src/main.jsx"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "todays-tram",
+      "title": "Show the date and today's tram",
+      "file": "src/RideBoard.jsx",
+      "description": "In `RideBoard`, take the date and the tram from `today` instead of typing them in:\n\n- the `<h2>` shows `today.date`\n- the paragraph with the class `tram` reads `No. ` and the tram's number, a comma, then the tram's name, like `No. 14, The Foundry Belle`\n\nThe check gives the board two days of its own and reads both lines.",
+      "nextSteps": [
+        "Read \"Curly braces open a window to JavaScript\" in the lesson.",
+        "Open `src/today.js` and find the date, the tram's number and its name.",
+        "Replace the typed date in the `h2` with the value from `today`.",
+        "Do the same for the number and the name in the tram line."
+      ],
+      "hints": [
+        "Everything on the board was typed in by hand. Each piece of it is somewhere in `today`.",
+        "Curly braces in JSX hold a JavaScript expression, and text can sit around them on the same line. The tram is an object inside `today`, so its fields are one dot further in.",
+        "The heading is `<h2>{today.date}</h2>`, and the tram line mixes text with `{today.tram.number}` and `{today.tram.name}`."
+      ],
+      "docs": [
+        {
+          "title": "JavaScript in JSX with curly braces",
+          "url": "https://react.dev/learn/javascript-in-jsx-with-curly-braces"
+        },
+        {
+          "title": "Where to use curly braces",
+          "url": "https://react.dev/learn/javascript-in-jsx-with-curly-braces#where-to-use-curly-braces"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Dynamic values in JSX",
+          "url": "https://www.youtube.com/watch?v=pnhO8UaCgxg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ride-times",
+      "title": "Show the ride times",
+      "file": "src/RideBoard.jsx",
+      "description": "Two more lines come from `today`:\n\n- the paragraph with the class `times` reads `First ride ` and `today.firstRide`, then `, last ride ` and `today.lastRide`\n- the paragraph with the class `every` reads `A tram every 30 minutes` when there are two rides an hour. Work the minutes out from `today.ridesPerHour`: an hour divided by the rides in it.\n\nThe check gives the board days with other times and other numbers of rides an hour.",
+      "nextSteps": [
+        "Find the two ride times in `today` and put them in the `times` line.",
+        "Work out on paper how many minutes apart three rides an hour are.",
+        "Write that sum inside the braces in the `every` line, using `today.ridesPerHour`.",
+        "If the board shows NaN, look at the spelling of the field."
+      ],
+      "hints": [
+        "The times go in the same way as the date. The minutes are the new part: they are not in `today`, so they have to be worked out.",
+        "The braces take any expression that gives a value, a sum included. An hour has 60 minutes.",
+        "The every line is `A tram every {60 / today.ridesPerHour} minutes`."
+      ],
+      "docs": [
+        {
+          "title": "JavaScript in JSX with curly braces",
+          "url": "https://react.dev/learn/javascript-in-jsx-with-curly-braces"
+        },
+        {
+          "title": "Expressions and operators",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_operators"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fares",
+      "title": "Show the fares",
+      "file": "src/RideBoard.jsx",
+      "description": "The paragraph with the class `fare` reads `Adult `, the adult fare, `, child `, then the child fare, like `Adult £3.50, child £1.75`.\n\n- the adult fare is `today.farePence`\n- a child pays half of it\n- both are written with `formatPence` from `src/money.js`, which turns pence into text like `£3.50`\n\nThe check gives the board other fares and reads the line.",
+      "nextSteps": [
+        "Read \"Anything that gives a value\" in the lesson.",
+        "Read `formatPence` in `src/money.js`: what it takes and what it gives back.",
+        "Call it for the adult fare inside the braces.",
+        "Call it again for the child fare, with half of the pence."
+      ],
+      "hints": [
+        "`formatPence` is a function. Inside the braces it has to be called, like anywhere else in JavaScript.",
+        "Work out the child fare in pence first, then hand that number to `formatPence`. Halving the text it gives back does not work.",
+        "The line has the shape `Adult {formatPence(...)}, child {formatPence(... / 2)}`."
+      ],
+      "docs": [
+        {
+          "title": "JavaScript in JSX with curly braces",
+          "url": "https://react.dev/learn/javascript-in-jsx-with-curly-braces"
+        },
+        {
+          "title": "Functions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "tram-photo",
+      "title": "Show the photo of today's tram",
+      "file": "src/RideBoard.jsx",
+      "description": "The `<img>` on the board still shows yesterday's tram. Give it values from `today`:\n\n- its `src` is the tram's `photo`\n- its `alt` is the tram's `name`\n\nThe check gives the board other trams and reads both attributes of the image.",
+      "nextSteps": [
+        "Read \"Attributes take values too\" in the lesson.",
+        "Find the photo and the name of the tram in `today`.",
+        "Give `src` and `alt` their values from `today`.",
+        "Save: the picture of tram 14 should appear on the board."
+      ],
+      "hints": [
+        "An attribute in quotes is text that never changes.",
+        "An attribute can take a value from JavaScript the same way text can, with one difference in what goes around it.",
+        "Replace the quotes with curly braces: `src={today.tram.photo}`, and the same for `alt`."
+      ],
+      "docs": [
+        {
+          "title": "Passing strings with quotes",
+          "url": "https://react.dev/learn/javascript-in-jsx-with-curly-braces#passing-strings-with-quotes"
+        },
+        { "title": "<img>", "url": "https://react.dev/reference/react-dom/components/img" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "livery",
+      "title": "Paint the livery strip",
+      "file": "src/RideBoard.jsx",
+      "description": "Every tram is painted in its own colour, its livery, and the board has a strip for it: the `div` with the class `livery`. Set the strip's background to `today.tram.livery` with the `style` attribute.\n\nThe check gives the board trams of other colours and reads the background of the strip. A warning from React about a style name fails the task.",
+      "nextSteps": [
+        "Read \"Styles are objects\" in the lesson.",
+        "Find the livery colour in `today`.",
+        "Give the strip a `style` whose background is that colour.",
+        "Look at the console in the Browser panel: it should show no warning."
+      ],
+      "hints": [
+        "In JSX, `style` does not take a line of CSS.",
+        "It takes an object, and an object inside curly braces gives two pairs of braces. The CSS property is a key of that object.",
+        "`style={{ background: today.tram.livery }}` on the strip. `backgroundColor` works too."
+      ],
+      "docs": [
+        {
+          "title": "Using double curlies: CSS and other objects in JSX",
+          "url": "https://react.dev/learn/javascript-in-jsx-with-curly-braces#using-double-curlies-css-and-other-objects-in-jsx"
+        },
+        {
+          "title": "Applying CSS styles",
+          "url": "https://react.dev/reference/react-dom/components/common#applying-css-styles"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

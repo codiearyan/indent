@@ -1,0 +1,117 @@
+{
+  "id": "props",
+  "title": "Props",
+  "files": ["src/TramCard.jsx", "src/App.jsx", "src/trams.js", "src/main.jsx"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "tram-card",
+      "title": "Write the TramCard component",
+      "file": "src/TramCard.jsx",
+      "description": "In `src/TramCard.jsx`, write a component called `TramCard` and export it by name. It takes three props, `number`, `name` and `built`, and returns:\n\n- an `<article>` with the class `tram-card`\n- inside it, an `<h3>` with the tram's name\n- a `<p>` with the class `number` that reads `No. ` and the number, like `No. 14`\n- a `<p>` with the class `built` that reads `Built in ` and the year, like `Built in 1911`\n\nEverything on the card comes from its props. The check draws `TramCard` on its own with trams of its own.",
+      "nextSteps": [
+        "Read \"Props are the arguments of a component\" in the lesson.",
+        "Copy the markup of one card from `App.jsx` into the return of `TramCard`.",
+        "Name the three props in the parameter list.",
+        "Replace each typed value with the prop it comes from."
+      ],
+      "hints": [
+        "A card written by hand in `App.jsx` is the right markup. What changes is where its words come from.",
+        "React hands a component all its props as one object in the first parameter. Destructuring in the parameter list gives each prop its own name.",
+        "The function starts `export function TramCard({ number, name, built })`, and the card uses `{name}`, `{number}` and `{built}`."
+      ],
+      "docs": [
+        { "title": "Passing props to a component", "url": "https://react.dev/learn/passing-props-to-a-component" },
+        {
+          "title": "Destructuring",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring"
+        }
+      ],
+      "videos": [{ "title": "Props in React", "url": "https://www.youtube.com/watch?v=PHaECbrKgs0" }],
+      "points": 10
+    },
+    {
+      "id": "three-cards",
+      "title": "One card for each tram",
+      "file": "src/App.jsx",
+      "description": "In `src/App.jsx`, replace the three hand-written cards with three `TramCard` tags, one for each tram in `trams`, in the same order. Pass each one the tram's `number`, `name` and `built`. Keep the `div` with the class `trams` around them.\n\nThe check changes `trams.js` to trams of its own and reads the cards on the screen. It also asks React which component drew each card, so a card written by hand does not count.",
+      "nextSteps": [
+        "Read \"Passing props\" in the lesson.",
+        "Delete the first hand-written card and put a `TramCard` in its place.",
+        "Pass it the first tram's three values from `trams`.",
+        "Do the same for the other two, and compare the screen with `trams.js`."
+      ],
+      "hints": [
+        "`trams` is an array. Its first tram is `trams[0]`.",
+        "A prop in quotes is text. A value from JavaScript goes in curly braces on the tag, and the prop names have to be the ones `TramCard` reads.",
+        "One card is `<TramCard number={trams[0].number} name={trams[0].name} built={trams[0].built} />`. Spreading `{...trams[0]}` passes the same three props."
+      ],
+      "docs": [
+        {
+          "title": "Pass props to the child component",
+          "url": "https://react.dev/learn/passing-props-to-a-component#step-1-pass-props-to-the-child-component"
+        },
+        {
+          "title": "Forwarding props with the spread syntax",
+          "url": "https://react.dev/learn/passing-props-to-a-component#forwarding-props-with-the-jsx-spread-syntax"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "extra-children",
+      "title": "Show what is between the tags",
+      "file": "src/TramCard.jsx",
+      "description": "Some trams need a line of their own. At the bottom of the card, `TramCard` has a `<div>` with the class `extra`, and inside it shows whatever is put between its opening and closing tags.\n\nThen, in `App`, write the second card with an opening and a closing tag and the words `Out on the track today` between them.\n\nThe check puts an element of its own between the tags of a `TramCard`, then reads the second card on the screen.",
+      "nextSteps": [
+        "Read \"What goes between the tags\" in the lesson.",
+        "Add the `extra` box at the bottom of the card.",
+        "Show what was put between the tags inside it.",
+        "Give the second card in `App` a closing tag and the words."
+      ],
+      "hints": [
+        "What sits between a component's tags is passed to it like any other prop.",
+        "That prop always has the same name, and the component decides where it appears.",
+        "Add `children` to the props you take, and put `<div className=\"extra\">{children}</div>` at the bottom of the card."
+      ],
+      "docs": [
+        {
+          "title": "Passing JSX as children",
+          "url": "https://react.dev/learn/passing-props-to-a-component#passing-jsx-as-children"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "status",
+      "title": "A status that falls back to On show",
+      "file": "src/TramCard.jsx",
+      "description": "Sometimes a tram is away for repair. `TramCard` takes one more prop, `status`, and shows it in a `<p>` with the class `status`. When no `status` is passed, the line reads `On show`.\n\n`App` passes no status today, so every card in the shed should say On show.\n\nThe check draws the card once with a status of its own and once with none.",
+      "nextSteps": [
+        "Read \"A value to fall back on\" in the lesson.",
+        "Take `status` as a prop and show it in a paragraph with the class `status`.",
+        "Look at the screen: the line is empty, because App passes no status.",
+        "Give `status` a default where you name it."
+      ],
+      "hints": [
+        "A prop that nobody passes is `undefined`, and React shows nothing for it.",
+        "Destructuring can give a name a value to use when it is missing.",
+        "In the parameter list, write `status = 'On show'`."
+      ],
+      "docs": [
+        {
+          "title": "Specifying a default value for a prop",
+          "url": "https://react.dev/learn/passing-props-to-a-component#specifying-a-default-value-for-a-prop"
+        },
+        {
+          "title": "Default parameters",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

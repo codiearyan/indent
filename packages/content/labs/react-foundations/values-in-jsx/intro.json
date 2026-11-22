@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilf", "say": "Can the board read my plan?", "note": "He keeps the trams running." },
+    { "title": "today.js", "text": "Today the Foundry Belle runs.", "note": "Wilf writes it every morning." },
+    {
+      "title": "Your board",
+      "file": "RideBoard.jsx",
+      "mine": true,
+      "gap": "Typed in by hand",
+      "tasks": ["Date and tram", "Times and fares", "Tram photo", "Livery strip"]
+    },
+    { "title": "Visitors", "say": "Which tram is out today?" }
+  ],
+  "ticket": { "label": "The tram", "wrong": "yesterday's", "why": "Typed in", "right": "Foundry Belle" },
+  "captions": [
+    "In the depot, Wilf wants the ride board to show the plan he writes each morning.",
+    "His plan says the Foundry Belle, but the board still shows yesterday's tram.",
+    "You swap every typed value on the board for one read from today.js, in five tasks.",
+    "The board shows today's tram, its times, its fares, its photo and its colour.",
+    "Same board, but now it follows Wilf's plan. Nobody retypes it in the morning."
+  ]
+}
