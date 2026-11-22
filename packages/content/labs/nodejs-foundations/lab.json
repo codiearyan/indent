@@ -1,0 +1,20 @@
+{
+  "id": "nodejs-foundations",
+  "title": "Node.js foundations",
+  "description": "Marrowfield Allotment Society is run by volunteers, and its plot list, waiting list and water readings live in text files that the secretary edits by hand. You know JavaScript but have only ever run a file with node, and you start there: small scripts that take arguments, read and write the society's files, and say plainly when something is wrong. Each issue teaches one part of Node, from process and exit codes to files, paths and modules, in scripts you run in a real terminal.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": [
+    "Node.js"
+  ],
+  "kind": "foundations",
+  "parts": [
+    {
+      "title": "The society's files",
+      "chapters": [
+        "first-script",
+        "reading-files"
+      ]
+    }
+  ]
+}

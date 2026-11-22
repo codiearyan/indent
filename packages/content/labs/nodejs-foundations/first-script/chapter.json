@@ -1,0 +1,134 @@
+{
+  "id": "first-script",
+  "title": "What Node gives a script",
+  "files": [
+    "welcome.js",
+    "fee.js"
+  ],
+  "terminal": {
+    "description": "A terminal in your workspace. `node welcome.js Maud` runs your script with one argument, and `node try.js welcome.js Maud` shows what it sent to each stream and the exit code it ended with.",
+    "suggestedCommand": "node try.js welcome.js Maud"
+  },
+  "tasks": [
+    {
+      "id": "name",
+      "title": "Welcome a new member by name",
+      "file": "welcome.js",
+      "description": "Write `welcome.js` so that `node welcome.js Maud` prints one line:\n\n```\nWelcome to Marrowfield, Maud.\n```\n\nThe name is whatever was typed after the script's name, so `node welcome.js Ade` welcomes Ade.\n\nCheck runs `welcome.js` with names of its own and compares the one line it prints.",
+      "nextSteps": [
+        "Print `process.argv` once and run `node welcome.js Maud` to see what it holds.",
+        "Find the place in that list where `Maud` sits, counting from 0.",
+        "Print the welcome with the value from that place, in the words of the task.",
+        "Try it with another name and see the welcome follow."
+      ],
+      "hints": [
+        "Everything typed on the command line reaches the script in `process.argv`, a plain array of strings.",
+        "The first two entries are the path of the node program and the path of your script. What you type after the script's name comes after them.",
+        "Read `process.argv[2]` into a name and print it with `console.log(`Welcome to Marrowfield, ${name}.`)`."
+      ],
+      "docs": [
+        {
+          "title": "process.argv",
+          "url": "https://nodejs.org/api/process.html#processargv"
+        },
+        {
+          "title": "console.log()",
+          "url": "https://nodejs.org/api/console.html#consolelogdata-args"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "missing",
+      "title": "Refuse a missing name",
+      "file": "welcome.js",
+      "description": "When `welcome.js` is run with no name, it should not welcome anyone. It prints one plain line to **standard error** that says what to type, prints nothing on standard output, and ends with **exit code 1**. With a name, it works as before and ends with exit code 0.\n\nCheck runs `welcome.js` with no name and with a name, and looks at each stream and at the exit code. A stack trace is not a plain line.",
+      "nextSteps": [
+        "Run `node try.js welcome.js` and see what happens today with no name.",
+        "Check whether a name was typed before printing the welcome.",
+        "When there is none, write the line to standard error and set the exit code.",
+        "Run `node try.js welcome.js` again: one line on standard error and exit code 1."
+      ],
+      "hints": [
+        "When nothing is typed after the script's name, the place in `process.argv` you read holds `undefined`.",
+        "`console.error()` writes to standard error. `process.exitCode = 1` makes the script end with 1 once it has finished.",
+        "`if (name === undefined) { console.error('Type a name after the script'); process.exitCode = 1 } else { ... the welcome ... }`."
+      ],
+      "docs": [
+        {
+          "title": "console.error()",
+          "url": "https://nodejs.org/api/console.html#consoleerrordata-args"
+        },
+        {
+          "title": "process.exitCode",
+          "url": "https://nodejs.org/api/process.html#processexitcode-1"
+        },
+        {
+          "title": "Exit codes",
+          "url": "https://nodejs.org/api/process.html#exit-codes"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fee",
+      "title": "Price a plot",
+      "file": "fee.js",
+      "description": "Write `fee.js` so that `node fee.js 125` prints the yearly fee of a plot of 125 square metres:\n\n```\nA 125 square metre plot costs 65.00 a year.\n```\n\nThe fee is 0.40 for every square metre plus 15.00 for water, written with two decimals. The size is what was typed after the script's name, as it was typed.\n\nCheck runs `fee.js` with sizes of its own, one at a time, and compares the line it prints.",
+      "nextSteps": [
+        "Read the size from `process.argv` the way `welcome.js` reads the name.",
+        "Turn it into a number before you do sums with it.",
+        "Work out the fee and write it with two decimals.",
+        "Run `node fee.js 125` and compare with the task's example."
+      ],
+      "hints": [
+        "Every entry of `process.argv` is a string, even when it looks like a number.",
+        "`Number('125')` gives the number 125. A number's `toFixed(2)` gives it as text with two decimals.",
+        "`const fee = Number(size) * 0.4 + 15`, then print the line with `fee.toFixed(2)` in it."
+      ],
+      "docs": [
+        {
+          "title": "process.argv",
+          "url": "https://nodejs.org/api/process.html#processargv"
+        },
+        {
+          "title": "Number.prototype.toFixed()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "many",
+      "title": "Price several plots and refuse bad sizes",
+      "file": "fee.js",
+      "description": "Rhiannon often prices a few plots at once: `node fee.js 125 250` prints the Task 3 line for each size, in the order they were typed.\n\nA size that is not a number above 0, like `lots` or `-5`, gets no fee. It gets one line on standard error that names it instead, and the sizes after it are still priced. With no size at all, the script prints one line on standard error that says what to type. When any size was refused, or none was typed, the script ends with exit code 1; otherwise with 0.\n\nCheck runs `fee.js` with lists of sizes of its own, good and bad mixed, with `0`, and with none.",
+      "nextSteps": [
+        "Take every argument after the script's name, not only the first.",
+        "Go through them one by one and price the good ones.",
+        "For a bad one, write a line to standard error and remember to end with 1.",
+        "Run `node try.js fee.js 40 lots 100` and read both streams and the exit code."
+      ],
+      "hints": [
+        "`process.argv.slice(2)` is everything typed after the script's name, as an array.",
+        "`Number('lots')` is `NaN`. `process.exit()` would stop the script at the bad size; `process.exitCode` lets it carry on and end with that code.",
+        "In a `for (const size of sizes)` loop: when `Number(size) > 0`, print the fee; otherwise `console.error(...)` and `process.exitCode = 1`."
+      ],
+      "docs": [
+        {
+          "title": "process.exitCode",
+          "url": "https://nodejs.org/api/process.html#processexitcode-1"
+        },
+        {
+          "title": "process.exit()",
+          "url": "https://nodejs.org/api/process.html#processexitcode"
+        },
+        {
+          "title": "Number.isNaN()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

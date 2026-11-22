@@ -1,0 +1,110 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhiannon", "label": "Rhiannon", "kind": "story" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" },
+      { "id": "argv", "label": "process.argv", "kind": "data" },
+      { "id": "welcome", "label": "welcome.js", "kind": "file", "mine": true },
+      { "id": "fee", "label": "fee.js", "kind": "file", "mine": true },
+      { "id": "out", "label": "Standard output", "kind": "data" },
+      { "id": "err", "label": "Standard error", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "rhiannon", "to": "terminal", "label": "types" },
+      { "from": "terminal", "to": "argv", "label": "the words" },
+      { "from": "argv", "to": "welcome", "label": "a name" },
+      { "from": "argv", "to": "fee", "label": "sizes" },
+      { "from": "welcome", "to": "out", "label": "welcome" },
+      { "from": "welcome", "to": "err", "label": "no name" },
+      { "from": "fee", "to": "out", "label": "fees" },
+      { "from": "fee", "to": "err", "label": "refusals" }
+    ],
+    "note": "What Rhiannon types reaches your two scripts through process.argv, and their answers come back on standard output or standard error, with an exit code."
+  },
+  "tasks": {
+    "name": {
+      "steps": [
+        {
+          "active": ["rhiannon", "rhiannon->terminal", "terminal"],
+          "note": "Rhiannon types node welcome.js and a new member's name, like Maud."
+        },
+        {
+          "active": ["terminal->argv", "argv"],
+          "value": { "kind": "array", "label": "process.argv", "values": ["path of node", "path of welcome.js", "the name"] },
+          "note": "Node puts every word of that line into process.argv, with two paths first."
+        },
+        {
+          "active": ["argv->welcome", "welcome"],
+          "note": "welcome.js takes the name from its place in the list."
+        },
+        {
+          "active": ["welcome->out", "out"],
+          "note": "One welcome line goes to standard output, with the name in it."
+        }
+      ]
+    },
+    "missing": {
+      "steps": [
+        {
+          "active": ["rhiannon", "rhiannon->terminal", "terminal"],
+          "note": "This time Rhiannon presses Enter before she types a name."
+        },
+        {
+          "active": ["argv", "argv->welcome", "welcome"],
+          "value": { "kind": "array", "label": "process.argv", "values": ["path of node", "path of welcome.js"] },
+          "note": "process.argv holds only the two paths, so the place of the name is empty."
+        },
+        {
+          "active": ["welcome->err", "err"],
+          "note": "welcome.js writes one plain line to standard error that says what to type."
+        },
+        {
+          "active": ["err"],
+          "note": "The script ends with exit code 1, so whatever ran it knows it did not do its job."
+        }
+      ]
+    },
+    "fee": {
+      "steps": [
+        {
+          "active": ["rhiannon", "rhiannon->terminal", "terminal", "terminal->argv"],
+          "note": "Someone at the gate asks about a plot of 125 square metres, and Rhiannon types the size."
+        },
+        {
+          "active": ["argv", "argv->fee", "fee"],
+          "value": { "kind": "map", "label": "what fee.js gets", "entries": [{ "key": "size", "value": "text, like '125'" }] },
+          "note": "The size arrives in process.argv as text, not as a number."
+        },
+        {
+          "active": ["fee"],
+          "note": "fee.js turns it into a number: 0.40 for each square metre, plus 15.00 for water."
+        },
+        {
+          "active": ["fee->out", "out"],
+          "note": "One line with the fee, written with two decimals, goes to standard output."
+        }
+      ]
+    },
+    "many": {
+      "steps": [
+        {
+          "active": ["terminal", "terminal->argv", "argv"],
+          "value": { "kind": "array", "label": "the sizes typed", "values": ["125", "lots", "87.5"] },
+          "note": "Rhiannon types three sizes at once, and one of them is not a size."
+        },
+        {
+          "active": ["argv->fee", "fee"],
+          "note": "fee.js goes through every size in the order they were typed."
+        },
+        {
+          "active": ["fee->out", "out"],
+          "note": "Each good size gets its fee line on standard output."
+        },
+        {
+          "active": ["fee->err", "err"],
+          "note": "The bad one gets a line on standard error that names it, and the script ends with exit code 1."
+        }
+      ]
+    }
+  }
+}

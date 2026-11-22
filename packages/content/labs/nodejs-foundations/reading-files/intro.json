@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhiannon", "say": "Who has plot B3?", "note": "People ring her to ask." },
+    { "title": "The plot list", "text": "A line per plot, read with a finger." },
+    {
+      "title": "Your scripts",
+      "file": "holder.js",
+      "mine": true,
+      "gap": "Nothing reads the file",
+      "tasks": ["Print a file", "Say when it is missing", "Count plots and free", "Find who holds a plot"]
+    },
+    { "title": "Terminal", "text": "One line: the plot and its holder." }
+  ],
+  "ticket": { "label": "Plot B3", "wrong": "lost place", "why": "By finger", "right": "found" },
+  "captions": [
+    "At Marrowfield, someone rings Rhiannon to ask who has plot B3.",
+    "The answer is in plots.txt, and she scrolls through it with a finger and loses her place.",
+    "You write three scripts that read the society's files, in four tasks.",
+    "Now node holder.js plots.txt B3 prints the holder, and a typo gets a plain line.",
+    "Same phone call, no scrolling. The list answers for itself."
+  ]
+}
