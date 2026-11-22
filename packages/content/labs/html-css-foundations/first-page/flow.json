@@ -24,11 +24,11 @@
         },
         {
           "active": ["html", "html->browser", "browser"],
-          "note": "The browser opens the file and looks at the first line to learn what kind of page it is."
+          "note": "The browser opens the file and looks at the top of the file to learn what kind of page it is."
         },
         {
           "active": ["html"],
-          "note": "Start the file with the doctype, and wrap the rest in one root element that says the page is in English."
+          "note": "Put the doctype above everything else, and wrap the rest in one root element that says the page is in English."
         },
         {
           "active": ["browser"],

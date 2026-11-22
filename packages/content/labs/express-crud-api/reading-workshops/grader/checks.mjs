@@ -79,7 +79,10 @@ export const checks = {
           name: '?maxPriceCents= keeps what costs at most that much',
           req: { path: '/workshops?maxPriceCents=4100' },
           ok: (res) => res.status === 200 && same(ids(res), [11, 15]),
-          hint: 'GET /workshops?maxPriceCents=4100 should keep every workshop whose price is that amount or less. Query values arrive as text.'
+          hint: (res) =>
+            same(ids(res), [15])
+              ? 'GET /workshops?maxPriceCents=4100 left out the workshop that costs exactly 4100. "At most" includes the amount itself; look at the comparison.'
+              : 'GET /workshops?maxPriceCents=4100 should keep every workshop whose price is that amount or less. Query values arrive as text.'
         },
         {
           name: 'Both filters together',

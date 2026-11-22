@@ -1,3 +1,6 @@
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+
 const SECTIONS = [
   { title: 'Classes', holds: 'a[href="classes.html"], a[href="./classes.html"]', what: 'the link to the classes page' },
   { title: 'The shop', holds: 'figure', what: 'the mug of the month' },
@@ -21,6 +24,50 @@ const chain = (el) => {
   return parents.length ? `inside ${parents.join(' in ')}` : 'straight in the body'
 }
 const heading = (page, title) => page.$$('h2').find((h) => clean(h.textContent) === title)
+const studioPicture = (page) => page.$('img[src$="studio.svg"]')
+
+// The browser quietly repairs tags closed in the wrong order or never closed, so the file is read.
+async function landmarkProblems(t) {
+  const text = (await readFile(join(t.workspace, 'index.html'), 'utf8')).replace(/<!--[\s\S]*?-->/g, '')
+  const stack = []
+  const problems = []
+  for (const [, slash, raw] of text.matchAll(/<(\/?)(header|nav|main|section|footer)(?=[\s>/])[^>]*>/gi)) {
+    const name = raw.toLowerCase()
+    const top = stack.at(-1)
+    if (!slash) stack.push(name)
+    else if (top === name) stack.pop()
+    else if (stack.includes(name)) {
+      problems.push({
+        names: [name, top],
+        message: `The ${top} opened inside the ${name} is still open when the ${name} closes. Close the ${top} first.`,
+        output: `</${name}> comes before </${top}>`
+      })
+      stack.splice(stack.lastIndexOf(name))
+    } else
+      problems.push({
+        names: [name],
+        message: `There is a closing ${name} tag with no opening one before it.`,
+        output: `</${name}> without <${name}>`
+      })
+  }
+  for (const name of stack)
+    problems.push({
+      names: [name],
+      message: `A ${name} is opened but never closed. Close it where its part ends.`,
+      output: `<${name}> without </${name}>`
+    })
+  return problems
+}
+
+async function closedInOrder(t, names) {
+  const problem = (await landmarkProblems(t)).find((p) => p.names.some((n) => names.includes(n)))
+  return detail(
+    `Every ${names.join(' and ')} tag closes, in order`,
+    !problem,
+    problem?.message,
+    problem?.output ?? 'All closed in order'
+  )
+}
 
 export const checks = {
   async header(t) {
@@ -29,6 +76,7 @@ export const checks = {
     const header = h1?.closest('header')
     const nav = header?.querySelector('nav')
     const jumps = JUMPS.map((href) => nav?.querySelector(`a[href="${href}"]`))
+    const picture = header && header.contains(studioPicture(page))
     return [
       detail(
         'The studio name is in a page header',
@@ -43,7 +91,14 @@ export const checks = {
           ? 'The links that move around the page go in the element made for navigation, inside the header.'
           : 'Make the header first.',
         JUMPS.map((href, i) => `${jumps[i] ? 'ok' : 'missing'}  ${href}`).join('\n')
-      )
+      ),
+      detail(
+        'The studio picture is not in the header',
+        !picture,
+        'The studio picture is inside the header. It is main content, so move it below the Jump to line, out of the header.',
+        picture ? 'The header holds the studio picture' : 'The header holds no picture'
+      ),
+      await closedInOrder(t, ['header', 'nav'])
     ]
   },
 
@@ -53,6 +108,7 @@ export const checks = {
     const main = mains[0]
     const inside = SECTIONS.filter(({ title }) => main?.contains(heading(page, title) ?? null))
     const welcome = page.$$('p').find((p) => clean(p.textContent).includes('kettle'))
+    const picture = studioPicture(page)
     return [
       detail(
         'There is exactly one main',
@@ -63,11 +119,14 @@ export const checks = {
         `main elements: ${mains.length}`
       ),
       detail(
-        'The welcome and the three sections are inside main',
-        mains.length === 1 && inside.length === SECTIONS.length && main.contains(welcome ?? null),
-        'Everything between the header and the small print is the reason the page exists, so it all goes inside main.',
+        'The studio picture, the welcome and the three sections are inside main',
+        Boolean(main) &&
+          inside.length === SECTIONS.length &&
+          main.contains(welcome ?? null) &&
+          main.contains(picture ?? null),
+        'Everything between the header and the small print is the reason the page exists, so it all goes inside main, the studio picture too.',
         main
-          ? `Inside main: ${[welcome && main.contains(welcome) ? 'welcome' : null, ...inside.map((s) => s.title)].filter(Boolean).join(', ') || 'nothing yet'}`
+          ? `Inside main: ${[picture && main.contains(picture) ? 'studio picture' : null, welcome && main.contains(welcome) ? 'welcome' : null, ...inside.map((s) => s.title)].filter(Boolean).join(', ') || 'nothing yet'}`
           : 'No main yet'
       ),
       detail(
@@ -75,7 +134,8 @@ export const checks = {
         Boolean(main) && !main.querySelector('header, footer, h1'),
         'The header and the small print sit outside main, before and after it.',
         main ? `In main: ${[...main.querySelectorAll('header, footer, h1')].map(tag).join(', ') || 'neither'}` : 'No main yet'
-      )
+      ),
+      await closedInOrder(t, ['main'])
     ]
   },
 
@@ -108,7 +168,8 @@ export const checks = {
         found.every((s) => s.section?.closest('main')),
         'The three sections are main content, so they sit inside main.',
         found.map((s) => `${s.title}: ${s.section ? chain(s.section) : 'no section'}`).join('\n')
-      )
+      ),
+      await closedInOrder(t, ['section'])
     ]
   },
 
@@ -124,7 +185,8 @@ export const checks = {
           ? 'The line about who made the page belongs in the element for the end of a page, outside main.'
           : 'The small print line is missing. Keep its words as they are.',
         small ? `The small print is ${chain(small)}` : 'not found'
-      )
+      ),
+      await closedInOrder(t, ['footer'])
     ]
   }
 }

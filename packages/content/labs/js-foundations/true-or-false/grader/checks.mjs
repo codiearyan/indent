@@ -13,6 +13,8 @@ const order = (changes) => ({
   ...changes
 })
 
+const big = (g) => g.totalCents >= g.freeShippingFromCents
+
 export const checks = {
   big(t) {
     return cases(t, {
@@ -47,30 +49,41 @@ export const checks = {
       file: FILE,
       name: 'freeShipping',
       task: 'Task 2',
+      after: {
+        names: ['bigOrder'],
+        task: 'Task 1',
+        build: (g, v) => v.bigOrder || g.deliveryZone === 'local'
+      },
+      mistakes: [
+        {
+          value: (g) => big(g) && g.deliveryZone === 'local',
+          hint: 'freeShipping is only true when both rules hold, but one rule is enough here. Look at how you join the two rules.'
+        }
+      ],
       list: [
         {
           name: 'A small local order ships free',
           given: order({ totalCents: 1200, deliveryZone: 'local' }),
           expected: true,
-          hint: 'A local order ships free even when it is small. Compare deliveryZone with the text for the local zone.'
+          hint: 'A local order ships free even when it is small. Look at the zone rule: compare deliveryZone with the text for the local zone, spelt exactly.'
         },
         {
           name: 'A small national order pays for shipping',
           given: order({ totalCents: 1200, deliveryZone: 'national' }),
           expected: false,
-          hint: 'Neither rule holds here: the order is small and not local. Look at how you join the two rules.'
+          hint: 'Neither rule holds here: the order is small and not local, yet freeShipping is true. Look at each rule and at how you join them.'
         },
         {
           name: 'A big order abroad ships free',
           given: order({ totalCents: 9000, deliveryZone: 'abroad' }),
           expected: true,
-          hint: 'A big order ships free wherever it goes. Make sure Task 1 passes and that freeShipping uses it.'
+          hint: 'A big order ships free wherever it goes. Make sure freeShipping uses bigOrder.'
         },
         {
           name: 'A small order abroad pays for shipping',
           given: order({ totalCents: 3000, deliveryZone: 'abroad' }),
           expected: false,
-          hint: 'A small order outside the local zone pays for shipping. Look at how you join the two rules.'
+          hint: 'A small order abroad is not local, yet freeShipping is true. Look at the zone rule: it should hold for the local zone only.'
         }
       ]
     })
@@ -81,18 +94,32 @@ export const checks = {
       file: FILE,
       name: 'canShipToday',
       task: 'Task 3',
+      mistakes: [
+        {
+          value: (g) => g.candlesInStock >= g.quantity && g.shopClosed,
+          hint: 'canShipToday is true when the shop is closed and false when it is open. The shop rule is the wrong way round: how do you turn shopClosed around?'
+        },
+        {
+          value: (g) => g.candlesInStock >= g.quantity || !g.shopClosed,
+          hint: 'canShipToday is true when only one rule holds, but both must hold at the same time. Look at how you join the two rules.'
+        },
+        {
+          value: (g) => g.candlesInStock > g.quantity && !g.shopClosed,
+          hint: 'Exactly enough candles is enough: "at least as many". Which comparison includes the equal case?'
+        }
+      ],
       list: [
         {
           name: 'Ships when exactly enough candles are in stock',
           given: order({ candlesInStock: 2, quantity: 2, shopClosed: false }),
           expected: true,
-          hint: 'Exactly enough candles is enough: "at least as many". Which comparison includes the equal case?'
+          hint: 'Exactly enough candles and the shop is open, yet canShipToday is false. Look at both rules: does the stock comparison include the equal case, and is the shop rule the right way round?'
         },
         {
           name: 'Does not ship when stock is short',
           given: order({ candlesInStock: 1, quantity: 2, shopClosed: false }),
           expected: false,
-          hint: 'With fewer candles in stock than the order needs, it cannot ship. Compare candlesInStock with quantity.'
+          hint: 'With fewer candles in stock than the order needs, it cannot ship. Compare candlesInStock with quantity, and check that both rules must hold.'
         },
         {
           name: 'Does not ship when the shop is closed',
@@ -104,7 +131,13 @@ export const checks = {
           name: 'Does not ship when both rules fail',
           given: order({ candlesInStock: 0, quantity: 1, shopClosed: true }),
           expected: false,
-          hint: 'Nothing in stock and the shop is closed. Look at how you join the two rules.'
+          hint: 'Nothing in stock and the shop is closed, yet canShipToday is true. Look at each rule and at how you join them.'
+        },
+        {
+          name: 'Ships with plenty of stock and the shop open',
+          given: order({ candlesInStock: 10, quantity: 2, shopClosed: false }),
+          expected: true,
+          hint: 'Plenty of stock and the shop is open, so it ships. Look at the shop rule: how do you turn shopClosed around?'
         }
       ]
     })
