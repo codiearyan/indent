@@ -1,0 +1,129 @@
+{
+  "id": "export-and-import",
+  "title": "Code in more than one file",
+  "files": ["src/money.js", "src/labels.js", "src/emails.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the labels file here to see the labels it prints, and the emails file once you have written it.",
+    "suggestedCommand": "node src/labels.js"
+  },
+  "tasks": [
+    {
+      "id": "share",
+      "title": "Share the price code",
+      "file": "src/money.js",
+      "description": "At the bottom of `src/money.js`, under `// Task 1`, write an export line that shares `formatPrice` and `salePrice` with other files. `twoDigits` only helps `formatPrice`, so it is not exported.\n\nCheck imports `src/money.js` from a file of its own, looks at what it exports, and calls `formatPrice` and `salePrice` to make sure they still work as before.",
+      "nextSteps": [
+        "Read the lesson's part on export.",
+        "Under the Task 1 comment, write the word export and a pair of curly braces.",
+        "Inside the braces, name the two functions other files need, with a comma between them.",
+        "Run `node src/money.js`: it prints nothing, and that is right. The next task uses what you shared."
+      ],
+      "hints": [
+        "You have seen this kind of line at the bottom of every file of this repo. Now you write one yourself.",
+        "An export line names, in curly braces, the things this file shares. Anything it does not name stays inside the file, and that is where `twoDigits` belongs.",
+        "The line is `export { formatPrice, salePrice }`, on a line of its own."
+      ],
+      "docs": [
+        {
+          "title": "export",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export"
+        },
+        {
+          "title": "JavaScript modules",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "import",
+      "title": "Use the shared price",
+      "file": "src/labels.js",
+      "description": "In `src/labels.js`, remove `labelPrice`, the old copy of the price code. Import `formatPrice` from `money.js` at the top of the file, and make `shelfLabel` use it, so that `shelfLabel({ name: 'Amber', grams: 200, priceCents: 1850 })` gives `'Amber, 200 g, 18.50 EUR'`.\n\nCheck calls `shelfLabel` with candles of its own. It also puts a `money.js` of its own beside your file, to make sure the price really comes from there and not from a copy.",
+      "nextSteps": [
+        "Read the lesson's parts on import and on the path.",
+        "At the top of `labels.js`, under the first comments, write an import line for `formatPrice`.",
+        "In `shelfLabel`, use `formatPrice` in place of `labelPrice`, then remove `labelPrice`.",
+        "Run `node src/labels.js`: the Amber label should end in 18.50 EUR."
+      ],
+      "hints": [
+        "An import line names what it wants in curly braces, then where it comes from. The names must match the export line of `money.js` exactly.",
+        "`money.js` sits beside `labels.js` in the same folder, so its path starts with `./`, and it ends with the whole file name, `.js` included.",
+        "The line is `import { formatPrice } from './money.js'`, and `shelfLabel` then has `${formatPrice(candle.priceCents)}` where it had `labelPrice`."
+      ],
+      "docs": [
+        {
+          "title": "import",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import"
+        },
+        {
+          "title": "Mandatory file extensions",
+          "url": "https://nodejs.org/api/esm.html#mandatory-file-extensions"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Modules with import and export",
+          "url": "https://www.youtube.com/watch?v=cRHQNNcYf6s"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sale",
+      "title": "A label for the sale",
+      "file": "src/labels.js",
+      "description": "Under `// Task 3` in `src/labels.js`, make `saleLabel(candle, percent)` give the label of a candle on sale: its name and grams as on the shelf label, then the sale price, then how much is off. `saleLabel(fig, 20)` gives `'Fig, 350 g, 19.20 EUR, 20% off'`. Work the sale price out with `salePrice` from `money.js` and write it with `formatPrice`. Put `export` in front of the word `function`.\n\nCheck calls `saleLabel` with candles and percents of its own, makes sure the sale price comes from `money.js`, and reads your file for the `export` in front.",
+      "nextSteps": [
+        "Read the lesson's part on the two ways to export.",
+        "Add `salePrice` to the import line at the top of `labels.js`.",
+        "Write the body of `saleLabel`, then put `export` in front of its first line.",
+        "Run `node src/labels.js`: the last line should show the Fig label on sale."
+      ],
+      "hints": [
+        "Two things come from `money.js` now. One import line can bring in more than one name, with commas between them.",
+        "Work out the sale price first, with `salePrice(candle.priceCents, percent)`, then hand that number to `formatPrice`. The label ends with the percent and the words `% off`.",
+        "The first line reads `export function saleLabel(candle, percent) {`, and the body returns `` `${candle.name}, ${candle.grams} g, ${formatPrice(salePrice(candle.priceCents, percent))}, ${percent}% off` ``."
+      ],
+      "docs": [
+        {
+          "title": "export",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export"
+        },
+        {
+          "title": "import",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "email",
+      "title": "A line for the order email",
+      "file": "src/emails.js",
+      "description": "Write `src/emails.js` yourself, under its comment: an import line that brings in `formatPrice` from `money.js`, and a function `orderLine(candle, qty)` that other files can import. It gives one line of the email: how many, an `x`, the candle's name, a comma, and what they cost together, written with `formatPrice`. `orderLine({ name: 'Cedar', priceCents: 1800 }, 2)` gives `'2 x Cedar, 36.00 EUR'`.\n\nCheck imports `orderLine` from your file, calls it with candles and counts of its own, and puts a `money.js` of its own beside it to make sure the price comes from there.",
+      "nextSteps": [
+        "Look at how `labels.js` imports and exports now.",
+        "Write the import line first.",
+        "Write `orderLine` from the word `function` to its closing brace, and export it.",
+        "Add a `console.log` of your own and run `node src/emails.js`."
+      ],
+      "hints": [
+        "Nothing is given in this file: the import, the function and its export are all yours. `labels.js` has every piece you need, in another order.",
+        "What they cost together is the price of one candle times `qty`, in cents. Hand that number to `formatPrice`.",
+        "The file has `import { formatPrice } from './money.js'`, then `export function orderLine(candle, qty) {` with a body that returns `` `${qty} x ${candle.name}, ${formatPrice(candle.priceCents * qty)}` ``."
+      ],
+      "docs": [
+        {
+          "title": "JavaScript modules",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules"
+        },
+        {
+          "title": "export",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

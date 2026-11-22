@@ -33,12 +33,25 @@ const runner = (exprs) => `
 }
 `
 
-/** Lines at the top level that only print, like the starter's demo lines. */
-const withoutDemo = (text) =>
-  text
+/**
+ * Lines at the top level that only print, like the starter's demo lines, and its wrapped demos:
+ * a `show(` at the top level, up to the line that closes it. An unfinished task must not run there.
+ */
+const withoutDemo = (text) => {
+  let wrapped = false
+  return text
     .split('\n')
-    .map((line) => (/^console\.log\(.*\)\s*;?\s*$/.test(line) ? '' : line))
+    .map((line) => {
+      if (wrapped) {
+        wrapped = !/^\}\)\s*;?\s*$/.test(line)
+        return ''
+      }
+      if (/^(console\.log|show)\(.*\)\s*;?\s*$/.test(line)) return ''
+      wrapped = /^show\(/.test(line)
+      return wrapped ? '' : line
+    })
     .join('\n')
+}
 
 export const readSource = (t, file) => readFile(join(t.workspace, file), 'utf8')
 

@@ -1,0 +1,186 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customer", "label": "Customer", "kind": "story" },
+      { "id": "order", "label": "placeOrder()", "kind": "function", "mine": true, "fn": "placeOrder" },
+      { "id": "cart", "label": "cartTotal()", "kind": "function", "mine": true, "fn": "cartTotal" },
+      { "id": "find", "label": "findCandle()", "kind": "function", "mine": true, "fn": "findCandle" },
+      { "id": "line", "label": "lineTotal()", "kind": "function", "mine": true, "fn": "lineTotal" },
+      { "id": "reply", "label": "Order page", "kind": "story" },
+      { "id": "ines", "label": "Ines packs", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "customer", "to": "order", "label": "cart" },
+      { "from": "order", "to": "cart", "label": "cart" },
+      { "from": "cart", "to": "find", "label": "sku" },
+      { "from": "cart", "to": "line", "label": "candle, qty" },
+      { "from": "order", "to": "reply", "label": "reason" },
+      { "from": "order", "to": "ines", "label": "good order" }
+    ],
+    "note": "The order code throws an error where an order is wrong and catches it in one place, where the customer can be told why."
+  },
+  "tasks": {
+    "quantity": {
+      "trace": {
+        "file": "src/orders.js",
+        "call": "lineTotal",
+        "args": [{ "sku": "CED-200", "name": "Cedar", "priceCents": 1800 }, 2]
+      },
+      "steps": [
+        {
+          "active": ["customer"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "candle", "value": "Cedar" },
+              { "key": "qty", "value": 2 }
+            ]
+          },
+          "note": "A customer asks for two cedar candles."
+        },
+        {
+          "active": ["line"],
+          "note": "lineTotal() first asks whether the quantity makes sense for a candle."
+        },
+        {
+          "active": ["line"],
+          "value": {
+            "kind": "map",
+            "label": "what comes out",
+            "entries": [{ "key": "result", "value": "the line's price, or a RangeError naming the qty" }]
+          },
+          "note": "A good quantity gives the price of the line. A quantity like zero stops right here."
+        }
+      ]
+    },
+    "candle": {
+      "trace": {
+        "file": "src/orders.js",
+        "call": "findCandle",
+        "args": [
+          [
+            { "sku": "CED-200", "name": "Cedar", "priceCents": 1800 },
+            { "sku": "FIG-350", "name": "Fig", "priceCents": 2400 },
+            { "sku": "AMB-200", "name": "Amber", "priceCents": 1900 }
+          ],
+          "FIG-350"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["customer"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "sku", "value": "FIG-350" }]
+          },
+          "note": "A customer orders by sku, the code printed on each candle."
+        },
+        {
+          "active": ["find"],
+          "note": "findCandle() looks through the catalogue for that sku."
+        },
+        {
+          "active": ["find"],
+          "value": {
+            "kind": "map",
+            "label": "what comes out",
+            "entries": [{ "key": "result", "value": "the candle, or a RangeError naming the sku" }]
+          },
+          "note": "A candle the shop sells comes back. An sku it does not sell stops right here, not three steps later."
+        }
+      ]
+    },
+    "cart": {
+      "trace": {
+        "file": "src/orders.js",
+        "call": "cartTotal",
+        "args": [
+          [
+            { "sku": "CED-200", "name": "Cedar", "priceCents": 1800 },
+            { "sku": "FIG-350", "name": "Fig", "priceCents": 2400 },
+            { "sku": "AMB-200", "name": "Amber", "priceCents": 1900 }
+          ],
+          [
+            { "sku": "FIG-350", "qty": 1 },
+            { "sku": "CED-200", "qty": 2 }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["cart"],
+          "value": {
+            "kind": "map",
+            "label": "the cart",
+            "entries": [
+              { "key": "line 1", "value": "FIG-350, 1" },
+              { "key": "line 2", "value": "CED-200, 2" }
+            ]
+          },
+          "note": "A cart comes in with two lines."
+        },
+        {
+          "active": ["cart", "cart->find", "find", "cart->line", "line"],
+          "note": "For each line, cartTotal() finds the candle and works out what the line costs."
+        },
+        {
+          "active": ["cart"],
+          "note": "The lines add up to the total. An error from a wrong line passes up through cartTotal() as it is."
+        }
+      ]
+    },
+    "order": {
+      "trace": {
+        "file": "src/orders.js",
+        "call": "placeOrder",
+        "args": [
+          [
+            { "sku": "CED-200", "name": "Cedar", "priceCents": 1800 },
+            { "sku": "FIG-350", "name": "Fig", "priceCents": 2400 },
+            { "sku": "AMB-200", "name": "Amber", "priceCents": 1900 }
+          ],
+          [
+            { "sku": "FIG-350", "qty": 1 },
+            { "sku": "CED-200", "qty": 2 }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["customer", "customer->order", "order"],
+          "note": "The customer presses Order on the site."
+        },
+        {
+          "active": ["order", "order->cart", "cart", "cart->find", "find", "cart->line", "line"],
+          "note": "placeOrder() asks cartTotal() for the total, ready to catch what comes up."
+        },
+        {
+          "active": ["order", "order->ines", "ines"],
+          "value": {
+            "kind": "map",
+            "label": "a good cart",
+            "entries": [
+              { "key": "ok", "value": "true" },
+              { "key": "totalCents", "value": "the total" }
+            ]
+          },
+          "note": "A good cart goes through, and Ines packs it."
+        },
+        {
+          "active": ["order", "order->reply", "reply"],
+          "value": {
+            "kind": "map",
+            "label": "a mistake in the order",
+            "entries": [
+              { "key": "ok", "value": "false" },
+              { "key": "reason", "value": "what was wrong, in words" }
+            ]
+          },
+          "note": "A mistake in the order gets a reply with the reason. Any other error is not caught here."
+        }
+      ]
+    }
+  }
+}
