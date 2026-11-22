@@ -77,6 +77,10 @@ interface WorkspaceStore {
   companion: boolean
   /** `labId/chapterId` of the issue whose folder the IDE was last asked to open. */
   ideIssue: string | null
+  /** The Browser panel fills the sheet. */
+  browserExpanded: boolean
+  /** The page shows in its own window instead of the Browser panel. */
+  pageWindow: boolean
 
   /** With `here`, starts the issue in the current folder even when an earlier one has its work. */
   open(labId: string, chapterId: string, options?: { here?: boolean }): Promise<void>
@@ -112,6 +116,9 @@ interface WorkspaceStore {
   openInIde(ide: IdeInfo): Promise<void>
   /** Brings the editor back, with the files as the IDE left them. */
   leaveCompanion(): Promise<void>
+  setBrowserExpanded(expanded: boolean): void
+  /** Shows the page in its own window, or brings that window to the front. */
+  openPageWindow(): Promise<void>
 }
 
 const pendingSaves = new Map<string, ReturnType<typeof setTimeout>>()
@@ -190,10 +197,15 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     tourOpen: false,
     companion: false,
     ideIssue: null,
+    browserExpanded: false,
+    pageWindow: false,
 
     open: async (labId, chapterId, { here = false } = {}) => {
       await get().flush()
+      api.preview.close()
       set({
+        browserExpanded: false,
+        pageWindow: false,
         status: 'loading',
         error: null,
         elsewhere: null,
@@ -273,6 +285,8 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     reset: async () => {
       for (const timer of pendingSaves.values()) clearTimeout(timer)
       pendingSaves.clear()
+      api.preview.close()
+      set({ pageWindow: false })
       const snapshot = await api.workspace.reset(...ids())
       applySnapshot(snapshot)
       set((s) => ({ revision: s.revision + 1 }))
@@ -351,6 +365,13 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       await api.ide.setCompact(true)
     },
 
+    setBrowserExpanded: (browserExpanded) => set({ browserExpanded }),
+
+    openPageWindow: async () => {
+      await api.preview.openWindow(...ids())
+      set({ pageWindow: true, browserExpanded: false })
+    },
+
     leaveCompanion: async () => {
       ideLaunch++
       if (!get().companion) return
@@ -358,5 +379,20 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       await api.ide.setCompact(false)
       await get().refresh()
     }
+  }
+})
+
+api.preview.onWindow((event) => {
+  const chapter = useWorkspace.getState().chapter
+  if (event.type === 'closed' && chapter?.labId === event.labId && chapter.id === event.chapterId) {
+    useWorkspace.setState({ pageWindow: false })
+  }
+})
+
+// The page's window and the browser reload after every save, as the panel does.
+useWorkspace.subscribe((state, before) => {
+  const chapter = state.chapter
+  if (chapter?.preview && chapter === before.chapter && state.revision !== before.revision) {
+    api.preview.reload(chapter.labId, chapter.id)
   }
 })
