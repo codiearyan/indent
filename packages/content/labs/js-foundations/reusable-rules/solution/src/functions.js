@@ -5,7 +5,8 @@
 // Task 3: Price with a default quantity
 // Task 4: Put the order together
 //
-// Each task fills in one function below. The empty ones give back undefined until you do.
+// Each task fills in a function below, and Task 2 also has you write one of your own. The empty
+// ones give back undefined until you do.
 
 // Task 1: Write the candle label
 function candleLabel(scent, grams) {
@@ -15,16 +16,21 @@ function candleLabel(scent, grams) {
 console.log(candleLabel('Cedar', 200))
 
 // Task 2: Shipping for any order
-function shippingFor(totalCents, zone) {
-  if (totalCents >= 5000) {
-    return 0
-  } else if (zone === 'local') {
+function zonePrice(zone) {
+  if (zone === 'local') {
     return 250
   } else if (zone === 'national') {
     return 495
   } else {
     return 1295
   }
+}
+
+function shippingFor(totalCents, zone) {
+  if (totalCents >= 5000) {
+    return 0
+  }
+  return zonePrice(zone)
 }
 
 console.log(shippingFor(4200, 'national'))

@@ -51,6 +51,7 @@ export const checks = {
         [2000, 25, 1500],
         [1250, 10, 1125],
         [3000, 50, 1500],
+        [1999, 15, 1699],
         [999, 0, 999]
       ].map(([price, off, expected]) => ({
         name: off ? `${off} percent off ${price}` : `No discount keeps ${price}`,
@@ -62,7 +63,9 @@ export const checks = {
         explain: (v) =>
           off && v.value === price
             ? 'salePrice gave back the full price although percentOff is more than 0. The sale price is worked out inside the braces of the if, but the name the return hands back never gets it. A let inside braces makes a new name there, even when the same name is outside.'
-            : undefined
+            : v.type === 'number' && !Number.isInteger(v.value)
+              ? 'salePrice gave back part of a cent. The task says the price is rounded to whole cents.'
+              : undefined
       }))
     })
   },
@@ -144,7 +147,7 @@ export const checks = {
       shape(
         'Leaves lastNote alone',
         untouched,
-        'packingNote still changes lastNote, a name outside it. Two parcels packed one after the other would overwrite each other\'s note. Give the note back with return and stop setting lastNote.'
+        "packingNote still changes lastNote, a name outside it. Two parcels packed one after the other would overwrite each other's note. Give the note back with return and stop setting lastNote."
       )
     ]
   }

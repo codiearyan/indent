@@ -6,7 +6,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { isDeepStrictEqual } from 'node:util'
-import { code, fileProblem, run, show as showRead } from './grading.mjs'
+import { code, fileProblem, run, show as showRead, source } from './grading.mjs'
 
 const RUNNER = '__indentCase'
 const TIMEOUT = 5000
@@ -69,9 +69,11 @@ function loadProblem(file, r) {
         ? `Two things in ${file} are called ${twice[1]}. A name can be made only once in the same place, so keep one of them.`
         : /Unexpected end of input/.test(error)
           ? `Node reached the end of ${file} while a { was still open. Every { needs its }, so look for the one that is missing.`
-          : /^SyntaxError/.test(error)
-            ? `${file} has a line Node cannot read. Run node ${file} in the terminal, read the line the error points at, fix it and check again.`
-            : `${file} stops with an error before Check can use it. Run node ${file} in the terminal and read the line the error points at.`
+          : /Unexpected token 'export'/.test(error)
+            ? `Node reached the export line at the bottom of ${file} while a { was still open. Every { needs its }, so look for the one that is missing.`
+            : /^SyntaxError/.test(error)
+              ? `${file} has a line Node cannot read. Run node ${file} in the terminal, read the line the error points at, fix it and check again.`
+              : `${file} stops with an error before Check can use it. Run node ${file} in the terminal and read the line the error points at.`
   return {
     name: `${file} runs`,
     passed: false,
@@ -117,6 +119,7 @@ export async function calls(t, { file, fn, list }) {
   const { results, problem } = await evaluate(t, file, list.map((c) => c.expr))
   if (problem) return [problem]
   const given = results.map((r) => r.result)
+  const answersOthers = given.some((v) => v && v.type !== 'undefined')
   // The same answer for cases that need different ones means the inputs were not used.
   const expectedKinds = new Set(list.map((c) => JSON.stringify(c.expected)))
   const sameEveryTime =
@@ -129,11 +132,11 @@ export async function calls(t, { file, fn, list }) {
     const printed = r.printed.length ? `\nIt printed:\n${r.printed.join('\n')}` : ''
     const output = `${c.expr}\n${r.threw ? `stopped with ${r.threw}` : `gave ${show(v)}`}${printed}`
     if (passed) return { name: c.name, passed, output }
-    return { name: c.name, passed, message: why(fn, c, r, sameEveryTime), output }
+    return { name: c.name, passed, message: why(fn, c, r, sameEveryTime, answersOthers), output }
   })
 }
 
-function why(fn, c, r, sameEveryTime) {
+function why(fn, c, r, sameEveryTime, answersOthers) {
   if (r.threw) {
     const unknown = r.threw.match(/ReferenceError: ([\w$]+) is not defined/)
     if (unknown) {
@@ -146,8 +149,11 @@ function why(fn, c, r, sameEveryTime) {
   }
   const v = r.result
   if (v.type === 'undefined') {
-    return r.printed.length
-      ? `${fn} prints its answer but gives nothing back. A function hands its answer back with return.`
+    if (r.printed.length) {
+      return `${fn} prints its answer but gives nothing back. A function hands its answer back with return.`
+    }
+    return answersOthers
+      ? `${fn} gave back undefined for this case, though it answers others. Follow this case through: a let made without a value stays undefined until something gives it one, and a function that ends without reaching a return gives back undefined.`
       : `${fn} gives nothing back yet. A function hands its answer back with return.`
   }
   const exact = c.explain?.(v)
@@ -186,8 +192,12 @@ export async function decide(t, { file, name, task, list }) {
       }
     ]
   }
-  return list.map((c, i) => {
-    const v = runs[i].values[name]
+  const reads = runs.map((r) => r.values[name])
+  const stuck =
+    reads.every((v) => v.type === reads[0].type && v.value === reads[0].value) &&
+    new Set(list.map((c) => c.expected)).size > 1
+  const details = list.map((c, i) => {
+    const v = reads[i]
     const passed = v.type === typeof c.expected && v.value === c.expected
     const close =
       !passed &&
@@ -197,17 +207,28 @@ export async function decide(t, { file, name, task, list }) {
     const given = Object.entries(c.given)
       .map(([key, value]) => `${key} = ${JSON.stringify(value)}`)
       .join(', ')
-    return {
-      name: c.name,
-      passed,
-      message: passed
-        ? undefined
+    const message = passed
+      ? undefined
+      : typeof c.expected === 'number' && v.type === 'string'
+        ? `${name} is text here, not a number: quotes make a value text. Write the number without quotes.`
         : close
           ? `Close. ${name} is nearly the text the task gives. Compare it letter by letter: capital letters and spaces count.`
-          : c.hint,
-      output: `With ${given}\n${name} is ${showRead(v)}`
-    }
+          : stuck
+            ? `${name} came out the same in every case Check tried, though they need different answers. Work it out from the names at the top of the file instead of typing the answer in, and look at the question in your if.`
+            : c.hint
+    return { name: c.name, passed, message, output: `With ${given}\n${name} is ${showRead(v)}` }
   })
+  const printed = new RegExp(`\\bconsole\\.log\\([^\\n]*\\b${name}\\b`).test(
+    code(await source(t, file))
+  )
+  return [
+    ...details,
+    shape(
+      `Prints ${name}`,
+      printed,
+      `The task asks you to print ${name}. Add a console.log line for it under the task.`
+    )
+  ]
 }
 
 /**

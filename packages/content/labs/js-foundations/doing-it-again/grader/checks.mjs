@@ -19,6 +19,10 @@ function batchExplain(scent, count) {
     if (v.value.includes(`${scent} ${count + 1}`)) {
       return `The loop ran once too often: there is a label numbered ${count + 1}. Look at the condition that decides when the counter stops.`
     }
+    const labels = Array.from({ length: count - 1 }, (_, i) => `${scent} ${i + 1}`)
+    if (count > 0 && v.value === labels.join(', ')) {
+      return `The loop ran once too few: the last label is missing. Look at the condition that decides when the counter stops.`
+    }
     if (v.value.endsWith(', ') || v.value.startsWith(', ')) {
       return `A comma and a space go between two labels, never before the first or after the last.`
     }
@@ -84,7 +88,7 @@ export const checks = {
           name: 'Already at the goal takes no weeks',
           expr: `weeksToReach(5, 5)`,
           expected: 0,
-          hint: 'The orders already reach the goal, so no weeks are needed. "Reach goal or more" includes the equal case: look at the condition of your while.'
+          hint: 'The orders already reach the goal, so no weeks are needed. Look at the condition of your while, since "reach goal or more" includes the equal case, and at the number the count of weeks starts from.'
         },
         {
           name: 'One order a week reaches a thousand',
@@ -102,7 +106,7 @@ export const checks = {
           name: 'Above the goal takes no weeks',
           expr: `weeksToReach(12, 9)`,
           expected: 0,
-          hint: 'The orders are already above the goal, so the loop should not run at all.'
+          hint: 'The orders are already above the goal, so the loop should not run at all and the count of weeks stays where it started.'
         }
       ],
       {
@@ -117,7 +121,9 @@ export const checks = {
     const spaces = (message, cents) => (v) =>
       v.value === message.length * cents
         ? `engravingCents charged for the spaces too. Spaces are free, so only the other characters cost centsPerLetter.`
-        : undefined
+        : v.value === cents
+          ? `engravingCents charged for one character only. Start the price at 0 once, before the loop, and return it after the loop: everything inside the loop happens again every round.`
+          : undefined
     return withLoop(
       t,
       'engravingCents',
@@ -133,7 +139,8 @@ export const checks = {
           name: 'A message with no spaces',
           expr: `engravingCents('Thanks', 55)`,
           expected: 330,
-          hint: 'Every character costs centsPerLetter when there are no spaces. Use the two values engravingCents is given.'
+          hint: 'Every character costs centsPerLetter when there are no spaces. Use the two values engravingCents is given.',
+          explain: spaces('Thanks', 55)
         },
         {
           name: 'Only spaces cost nothing',

@@ -6,6 +6,7 @@
       { "id": "total", "label": "orderTotal()", "kind": "function", "mine": true, "fn": "orderTotal" },
       { "id": "price", "label": "priceFor()", "kind": "function", "mine": true, "fn": "priceFor" },
       { "id": "shipping", "label": "shippingFor()", "kind": "function", "mine": true, "fn": "shippingFor" },
+      { "id": "zone", "label": "zonePrice()", "kind": "function", "mine": true },
       { "id": "slip", "label": "Packing slip", "kind": "story" }
     ],
     "edges": [
@@ -15,10 +16,11 @@
       { "from": "ines", "to": "shipping", "label": "total, zone" },
       { "from": "total", "to": "price", "label": "price, quantity" },
       { "from": "total", "to": "shipping", "label": "subtotal, zone" },
+      { "from": "shipping", "to": "zone", "label": "zone" },
       { "from": "label", "to": "slip", "label": "label" },
       { "from": "total", "to": "slip", "label": "to pay" }
     ],
-    "note": "Each rule is written once as a function, and Ines calls it for every order instead of copying lines."
+    "note": "Each rule is written once as a function, and Ines calls it for every order instead of copying lines. Small functions help bigger ones."
   },
   "tasks": {
     "label": {
@@ -68,7 +70,11 @@
         },
         {
           "active": ["shipping"],
-          "note": "The rules from the last issue run on those two values, the total first."
+          "note": "shippingFor() asks about the total first. A big order ships free, wherever it goes."
+        },
+        {
+          "active": ["shipping", "shipping->zone", "zone"],
+          "note": "Otherwise it hands the zone to zonePrice(), the helper you write yourself, and gets back the price for that zone."
         },
         {
           "active": ["shipping"],

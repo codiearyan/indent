@@ -1,6 +1,9 @@
+import { code } from '../../grading.mjs'
 import { calls, evaluate, partOf, readSource, shape } from '../../rules-grading.mjs'
 
 const FILE = 'src/functions.js'
+
+const loaded = (details) => ![`${FILE} runs`, 'Every call finishes'].includes(details[0].name)
 
 const gramsFirst = (grams) => (v) =>
   v.type === 'string' && v.value.startsWith(String(grams))
@@ -38,8 +41,44 @@ export const checks = {
     })
   },
 
-  shipping(t) {
-    return calls(t, {
+  async shipping(t) {
+    const text = code(await readSource(t, FILE))
+    const helper = partOf(text, 'zonePrice')
+    if (!helper) {
+      return [
+        shape(
+          'Writes zonePrice',
+          false,
+          'Check cannot find a function called zonePrice, spelt exactly so, capital P included. Write it yourself under // Task 2, at the left edge: the word function, the name zonePrice, its parameter in round brackets and its rules in curly braces.'
+        )
+      ]
+    }
+    const zone = await calls(t, {
+      file: FILE,
+      fn: 'zonePrice',
+      list: [
+        {
+          name: 'zonePrice prices a local parcel',
+          expr: `zonePrice('local')`,
+          expected: 250,
+          hint: 'For the local zone zonePrice gives the local price. Compare zone with the text for the local zone, using ===.'
+        },
+        {
+          name: 'zonePrice prices a national parcel',
+          expr: `zonePrice('national')`,
+          expected: 495,
+          hint: 'For the national zone zonePrice gives the national price. Look at the part for the national zone.'
+        },
+        {
+          name: 'zonePrice prices a parcel abroad',
+          expr: `zonePrice('abroad')`,
+          expected: 1295,
+          hint: 'A zone that is neither local nor national should reach the last return.'
+        }
+      ]
+    })
+    if (!loaded(zone)) return zone
+    const shipping = await calls(t, {
       file: FILE,
       fn: 'shippingFor',
       list: [
@@ -47,7 +86,13 @@ export const checks = {
           name: 'A big order abroad ships free',
           expr: `shippingFor(5200, 'abroad')`,
           expected: 0,
-          hint: 'A big order ships free wherever it goes. Only the first return that runs counts, so ask about the total before the zone.'
+          hint: 'A big order ships free wherever it goes. Only the first return that runs counts, so ask about the total before anything else.'
+        },
+        {
+          name: 'A big local order ships free',
+          expr: `shippingFor(5600, 'local')`,
+          expected: 0,
+          hint: 'A big order ships free, local ones too. Only the first return that runs counts, so ask about the total before anything else.'
         },
         {
           name: 'An order of exactly 5000 ships free',
@@ -59,22 +104,32 @@ export const checks = {
           name: 'A small local order pays 250',
           expr: `shippingFor(1800, 'local')`,
           expected: 250,
-          hint: 'A small local order pays the local price. Compare zone with the text for the local zone, using ===.'
-        },
-        {
-          name: 'A small national order pays 495',
-          expr: `shippingFor(1800, 'national')`,
-          expected: 495,
-          hint: 'A small national order pays the national price. Look at the part for the national zone.'
+          hint: 'A small order pays what zonePrice gives for its zone. Hand zonePrice the zone shippingFor was given.'
         },
         {
           name: 'A small order abroad pays 1295',
           expr: `shippingFor(4999, 'abroad')`,
           expected: 1295,
-          hint: 'An order that is small and neither local nor national should reach the last return.'
+          hint: 'A small order pays what zonePrice gives for its zone. Hand zonePrice the zone shippingFor was given.'
         }
       ]
     })
+    const body = partOf(text, 'shippingFor')
+    const exported = /^export\s*\{[^}]*\bzonePrice\b/m.test(text)
+    return [
+      ...zone,
+      ...shipping,
+      shape(
+        'shippingFor calls zonePrice',
+        /\bzonePrice\s*\(/.test(body),
+        'The task asks shippingFor to use zonePrice for the zone instead of writing the zone prices again. Call zonePrice inside shippingFor.'
+      ),
+      shape(
+        'zonePrice stays off the export line',
+        !exported,
+        'zonePrice only helps shippingFor, so it stays off the export line at the bottom. Put that line back as it was.'
+      )
+    ]
   },
 
   price(t) {
@@ -121,7 +176,7 @@ export const checks = {
   async total(t) {
     // orderTotal is built from Task 2 and Task 3, so those are probed first.
     const { results, problem } = await evaluate(t, FILE, [
-      `shippingFor(3000, 'local') === 250 && shippingFor(3000, 'national') === 495 && shippingFor(6000, 'abroad') === 0 && shippingFor(3000, 'abroad') === 1295`,
+      `shippingFor(3000, 'local') === 250 && shippingFor(3000, 'national') === 495 && shippingFor(3000, 'abroad') === 1295 && shippingFor(6000, 'abroad') === 0 && shippingFor(5600, 'local') === 0 && shippingFor(5000, 'national') === 0`,
       `priceFor(800, 4) === 3200`
     ])
     if (problem) return [problem]

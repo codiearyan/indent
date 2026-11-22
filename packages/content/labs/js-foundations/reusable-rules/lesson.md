@@ -88,8 +88,8 @@ function billFor(guests) {
 
 Small functions that each do one job, and a bigger one that calls them, is how most programs are built.
 
-A few things that go wrong on the way. Every `{` needs its `}`; a missing one makes Node say `SyntaxError: Unexpected end of input`. If your `console.log` line slips inside the braces of a function, it only runs when the function is called, so nothing prints. And a call with a name spelt differently from the function, a capital letter included, stops with `ReferenceError: ... is not defined`.
+A few things that go wrong on the way. Every `{` needs its `}`; a missing one makes Node stop with a `SyntaxError` near the end of the file. If your `console.log` line slips inside the braces of a function, it only runs when the function is called, so nothing prints. And a call with a name spelt differently from the function, a capital letter included, stops with `ReferenceError: ... is not defined`.
 
 ## Your work in this issue
 
-Open `src/functions.js`. Each task fills in one function that is already there, empty, with no parameters yet. Below each function a `console.log` line calls it, so `node src/functions.js` shows your answers as you go. Check calls your functions with its own values. The last line of the file starts with `export`: it lets Check and the flow reach your functions. Modules and `export` come later in the course, so leave that line as it is, and keep each function's name exactly as given. Do the tasks in order; Task 4 uses Tasks 2 and 3.
+Open `src/functions.js`. Most tasks fill in a function that is already there, empty, with no parameters yet. In Task 2 you also write a whole function of your own, from the word `function` to its closing brace. Below each function a `console.log` line calls it, so `node src/functions.js` shows your answers as you go. Check calls your functions with its own values. The last line of the file starts with `export`: it lets Check and the flow reach your functions. Modules and `export` come later in the course, so leave that line as it is, and keep each function's name exactly as given. Do the tasks in order; Task 4 uses Tasks 2 and 3.
