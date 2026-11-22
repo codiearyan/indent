@@ -1,0 +1,50 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "femi", "label": "Femi", "kind": "story" },
+      { "id": "window", "label": "Window branch", "kind": "data" },
+      { "id": "june", "label": "June finds branch", "kind": "data" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "finds", "label": "finds.html", "kind": "file" },
+      { "id": "main", "label": "main", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "femi", "to": "you", "label": "two merges" },
+      { "from": "window", "to": "main", "label": "left open" },
+      { "from": "june", "to": "finds", "label": "Femi's book" },
+      { "from": "main", "to": "finds", "label": "Wilma's book" },
+      { "from": "you", "to": "finds", "label": "settles" },
+      { "from": "you", "to": "main", "label": "merge commit" }
+    ],
+    "note": "One merge is called off, and one is finished where two changes met."
+  },
+  "tasks": {
+    "calloff": {
+      "steps": [
+        {
+          "active": ["window", "window->main", "main"],
+          "note": "Femi's merge stopped with a conflict and is still open."
+        },
+        { "active": ["femi", "femi->you", "you"], "note": "Wilma has said no to the window display." },
+        { "active": ["you", "main"], "note": "The merge is called off, and main and its files are as they were." }
+      ]
+    },
+    "books": {
+      "steps": [
+        {
+          "active": ["june", "june->finds", "main", "main->finds", "finds"],
+          "note": "Both branches added a book at the same spot on the list."
+        },
+        { "active": ["finds"], "note": "Git writes both versions between markers and stops." },
+        { "active": ["you", "you->finds", "finds"], "note": "Both books stay on the list, and the markers go." }
+      ]
+    },
+    "finish": {
+      "steps": [
+        { "active": ["finds"], "note": "The settled file goes into the staging area." },
+        { "active": ["you", "you->main", "main"], "note": "The merge commit joins the two lines." },
+        { "active": ["main"], "note": "main has both new books, and no merge is open." }
+      ]
+    }
+  }
+}

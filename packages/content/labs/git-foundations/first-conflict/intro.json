@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Femi", "say": "My merge went red, so I left it.", "note": "And my June find is ready." },
+    { "title": "main", "text": "Wilma added a book at the same spot.", "note": "Git cannot choose for you." },
+    {
+      "title": "Your commands",
+      "file": "finds.html",
+      "mine": true,
+      "gap": "A merge left open",
+      "tasks": ["Call off the old merge", "Keep both books", "Finish the merge"]
+    },
+    { "title": "Finds page", "rows": [["Wilma's new book"], ["Femi's new book"], ["No window display"]] }
+  ],
+  "ticket": { "label": "June find", "wrong": "stuck halfway", "why": "Half merged", "right": "on the list" },
+  "captions": [
+    "Femi left a merge open, and his June find is waiting to go on the site.",
+    "Wilma added a book at the same spot, so Git stops and asks.",
+    "You call off one merge, settle a conflict and finish another, in three tasks.",
+    "Both new books are on the shop's list, and no merge is left open.",
+    "Two changes met, and a person decided how they fit."
+  ]
+}
