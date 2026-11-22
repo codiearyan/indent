@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { RotateCw } from 'lucide-react'
 import type { Chapter } from '@shared/types'
-import { PREVIEW_MESSAGE, previewUrl, type PreviewMessage } from '@shared/preview'
+import {
+  PREVIEW_MESSAGE,
+  previewUrl,
+  type PreviewMessage,
+  type PreviewTitle
+} from '@shared/preview'
 import { Button } from '@/components/ui/button'
 import { IconButton } from '@/features/workspace/IconButton'
 import { cn } from '@/lib/utils'
@@ -47,11 +52,15 @@ function Page({
 }: PageProps): React.JSX.Element {
   const frame = useRef<HTMLIFrameElement>(null)
   const [lines, setLines] = useState<PreviewMessage[]>([])
+  const [title, setTitle] = useState('')
 
   useEffect(() => {
-    const onMessage = (event: MessageEvent<Partial<PreviewMessage> | null>): void => {
+    const onMessage = (
+      event: MessageEvent<Partial<PreviewMessage & PreviewTitle> | null>
+    ): void => {
       const data = event.data
       if (event.source !== frame.current?.contentWindow || data?.source !== PREVIEW_MESSAGE) return
+      if (typeof data.title === 'string') return setTitle(data.title.slice(0, 200))
       const line: PreviewMessage = {
         source: PREVIEW_MESSAGE,
         level: data.level === 'error' || data.level === 'warn' ? data.level : 'log',
@@ -70,7 +79,16 @@ function Page({
     <div className="flex h-full flex-col bg-editor">
       <div className="flex h-[41px] shrink-0 items-center gap-2 border-b border-border px-3 text-sm">
         <span className="shrink-0 font-medium">Browser</span>
-        <span className="min-w-0 truncate font-mono text-[13px] text-muted-foreground">{page}</span>
+        {title && <span className="min-w-0 truncate text-[13px]">{title}</span>}
+        <span
+          className={cn(
+            'font-mono text-[13px] text-muted-foreground',
+            // The title gives way first, so the file name stays whole beside it.
+            title ? 'shrink-0' : 'min-w-0 truncate'
+          )}
+        >
+          {page}
+        </span>
         <div className="ml-auto flex shrink-0 items-center gap-1">
           <Button
             variant="ghost"

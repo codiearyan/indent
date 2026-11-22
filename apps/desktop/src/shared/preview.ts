@@ -10,6 +10,12 @@ export interface PreviewMessage {
   text: string
 }
 
+/** A previewed page posts its title once it has loaded; empty when it has none. */
+export interface PreviewTitle {
+  source: typeof PREVIEW_MESSAGE
+  title: string
+}
+
 /** Each workspace is its own origin, so the pages of two issues never share storage. */
 export function previewUrl(labId: string, chapterId: string, page: string): string {
   return `${PREVIEW_SCHEME}://${chapterId}.${labId}/${page}`
