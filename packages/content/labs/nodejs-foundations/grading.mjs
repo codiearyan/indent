@@ -90,11 +90,14 @@ function collect(child, timeoutMs, onOutput) {
 const spawnNode = (args, cwd, { env, input = false } = {}) =>
   spawn(process.execPath, args, { cwd, env: childEnv(env), stdio: [input ? 'pipe' : 'ignore', 'pipe', 'pipe'] })
 
-// Calls onLine(line, type) for each whole line of standard output; type(text) writes to standard input.
+// Calls onLine(line, type) for each whole line of standard output; type(text) writes to standard
+// input, and type(null) ends it, as when a person closes the terminal's input.
 function talk(child, onLine) {
   child.stdin.on('error', () => {})
   const type = (text) => {
-    if (child.stdin.writable) child.stdin.write(text)
+    if (!child.stdin.writable) return
+    if (text === null) child.stdin.end()
+    else child.stdin.write(text)
   }
   let rest = ''
   return (chunk) => {
@@ -128,7 +131,7 @@ const quote = (arg) => (arg === '' || /\s/.test(arg) ? `"${arg}"` : arg)
  * `preload`, a module in dir, runs first and is left out of the command shown.
  * `env` sets settings in its environment (undefined removes one) and `memory` caps its data in MB;
  * either shows the command the way try.js takes it. With `onLine(line, type)`, standard input
- * stays open, like a terminal where nobody types, and type(text) types into it.
+ * stays open, like a terminal where nobody types, type(text) types into it and type(null) ends it.
  * Returns { code, stdout, stderr, timedOut, flooded, command, from, guarded, memory }.
  */
 export async function run(dir, script, args = [], { from = '.', preload, env, memory, onLine } = {}) {
