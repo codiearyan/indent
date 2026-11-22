@@ -1,0 +1,115 @@
+{
+  "id": "quiet-mistakes",
+  "title": "No error, wrong answer",
+  "files": [
+    "src/till.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run the till here and print values to look inside them.",
+    "suggestedCommand": "node src/till.js"
+  },
+  "tasks": [
+    {
+      "id": "total",
+      "title": "Add up the order total",
+      "file": "src/till.js",
+      "description": "Under `// Task 1` in `src/till.js`, `totalCents` should be the price of the candles plus shipping, in cents, as a number. It comes out wrong, with no error. Find the line that makes the wrong value and fix it. `shippingText` arrives as text from the courier's price list, and that line stays as it is.\n\nCheck runs the lines of Task 1 alone, with other amounts in `candlesCents` and `shippingText`, and reads `totalCents`: it must be a number, the two amounts added.",
+      "nextSteps": [
+        "Run `node src/till.js` and compare the total with the example in the comment.",
+        "Print `typeof totalCents` to see what kind of value it is.",
+        "Print each of the two amounts and its type, and find the one that is not a number.",
+        "Fix the line that makes `totalCents`, and run the file again."
+      ],
+      "hints": [
+        "The total looks like the two amounts written side by side. Which operator does that to text?",
+        "`+` with text on either side joins instead of adding. `shippingText` holds digits, but it is text.",
+        "Turn the shipping into a number inside the sum: `candlesCents + Number(shippingText)`."
+      ],
+      "docs": [
+        {
+          "title": "typeof",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof"
+        },
+        {
+          "title": "Number() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/Number"
+        },
+        {
+          "title": "Addition (+)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Addition"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "packed",
+      "title": "Count the candles packed",
+      "file": "src/till.js",
+      "description": "Under `// Task 2`, `candlesPacked` should start at zero and have the boxes Ines packed added to it, each box holding `candlesPerBox` candles. It comes out as `NaN`. Find out why and fix it.\n\nCheck runs the lines of Task 2 alone, with other numbers in `boxesPacked` and `candlesPerBox`, and reads `candlesPacked`: it must be a number, every candle in every box.",
+      "nextSteps": [
+        "Run the file and read what the count prints.",
+        "Add a line that prints `candlesPacked` right before the line that adds to it.",
+        "Ask what a sum gives when one of its parts holds that.",
+        "Fix it so the count starts where the comment says, and run the file again."
+      ],
+      "hints": [
+        "NaN came out of a sum. Print each part of that sum, on the line before it.",
+        "A `let` made without a value holds `undefined`, and `undefined` plus a number is `NaN`.",
+        "Give the count its starting value where it is made: `let candlesPacked = 0`."
+      ],
+      "docs": [
+        {
+          "title": "NaN",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN"
+        },
+        {
+          "title": "undefined",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined"
+        },
+        {
+          "title": "let",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let"
+        }
+      ],
+      "videos": [
+        {
+          "title": "NaN, the number that is not a number",
+          "url": "https://www.youtube.com/watch?v=0ZiltZDg9Gg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "label",
+      "title": "Measure the label",
+      "file": "src/till.js",
+      "description": "Under `// Task 3`, `labelLength` should be how many characters `labelLine` has. It comes out as `undefined`, with no error. Find the mistake and fix it.\n\nCheck runs the lines of Task 3 alone, with another label in `labelLine`, and reads `labelLength`: it must be a number, the length of that label.",
+      "nextSteps": [
+        "Run the file and read what the label length prints.",
+        "Print `typeof labelLength`, then print `labelLine` itself: is the label there?",
+        "If the label is there, look closely at what the line asks the label for.",
+        "Fix it and run the file again."
+      ],
+      "hints": [
+        "The label is fine, so the problem is in what the line asks it for.",
+        "Asking text for something it does not have gives `undefined` instead of an error. Spelling counts, as it does for names.",
+        "The word after the dot is misspelt: it is `labelLine.length`."
+      ],
+      "docs": [
+        {
+          "title": "String: length",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length"
+        },
+        {
+          "title": "undefined",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined"
+        },
+        {
+          "title": "console.log()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/console/log_static"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

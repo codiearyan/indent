@@ -38,7 +38,7 @@ export const checks = {
       shape(
         'Keeps wrap inside labelLine',
         !outside,
-        'wrap is now made at the top level of the file, outside labelLine, so the function reaches outside itself for it. Make wrap inside labelLine, before the if.'
+        'wrap is now made at the top level of the file, outside labelLine, so the function reaches outside itself for it. A function should hold the names it works with.'
       )
     ]
   },

@@ -1,0 +1,133 @@
+{
+  "id": "read-the-error",
+  "title": "Read the error",
+  "files": ["src/morning.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the morning report here and read the error Node prints.",
+    "suggestedCommand": "node src/morning.js"
+  },
+  "tasks": [
+    {
+      "id": "poured",
+      "title": "Bring back the candles poured",
+      "file": "src/morning.js",
+      "description": "Under `// Task 1` in `src/morning.js`, the line that prints the candles poured stops Node before anything prints. Run the file, read the error, and fix that line so it prints `Candles poured:` followed by the number in `candlesPoured`, as the comment above it shows.\n\nCheck runs the lines of Task 1 alone, with another number in `candlesPoured`, and looks for that line with that number. The line that makes `candlesPoured` stays as it is.",
+      "nextSteps": [
+        "Run `node src/morning.js` and read the first line of the error: it ends with a line number.",
+        "Look at the copy of that line in the error and the `^` marks under it.",
+        "Read the kind of error near the bottom, then compare the line with the example in the comment above it.",
+        "Fix the line and run the file again. A new error is good news: it is the next task."
+      ],
+      "hints": [
+        "The number after the colon at the end of the first line of the error is the line to look at. The marks under the copy show where Node got lost.",
+        "Invalid or unexpected token, with marks that run all the way to the end of the line, usually means text that starts with a quote and never ends. Where should this text end?",
+        "The text is only `Candles poured:`. The line has the shape `console.log('...', candlesPoured)`."
+      ],
+      "docs": [
+        {
+          "title": "What went wrong? Troubleshooting JavaScript",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/What_went_wrong"
+        },
+        {
+          "title": "SyntaxError",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError"
+        },
+        {
+          "title": "Errors in Node.js",
+          "url": "https://nodejs.org/api/errors.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading Node error messages",
+          "url": "https://www.youtube.com/watch?v=ZdO4aHK3h0g"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "waiting",
+      "title": "Bring back the orders waiting",
+      "file": "src/morning.js",
+      "description": "Under `// Task 2`, the line that prints the orders waiting stops Node too. Fix it so it prints `Orders waiting:` followed by the number in `ordersWaiting`.\n\nCheck runs the lines of Task 2 alone, with another number in `ordersWaiting`, and looks for that line with that number.",
+      "nextSteps": [
+        "Fix Task 1 first, or Node stops there before it reaches this line.",
+        "Run the file and read the kind of error at the bottom: it says what Node expected and did not find.",
+        "Look at the line the error names and count what opens and what closes on it.",
+        "Fix it and run the file again."
+      ],
+      "hints": [
+        "The error says what Node was waiting for. Read it word by word.",
+        "Every round bracket that opens has to close again. Count the brackets on that line.",
+        "`console.log(` opens a bracket, and nothing closes it. The line needs a `)` at its very end."
+      ],
+      "docs": [
+        {
+          "title": "SyntaxError: missing ) after argument list",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_argument_list"
+        },
+        {
+          "title": "What went wrong? Troubleshooting JavaScript",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/What_went_wrong"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "packed",
+      "title": "Bring back the parcels packed",
+      "file": "src/morning.js",
+      "description": "Under `// Task 3`, the line that prints the parcels packed stops Node with an error that sounds like Task 2's, but its brackets are all there. Find what is really wrong and fix it, so it prints `Parcels packed:` followed by the number in `parcelsPacked`.\n\nCheck runs the lines of Task 3 alone, with another number in `parcelsPacked`, and looks for that line with that number.",
+      "nextSteps": [
+        "Run the file and read the error once Tasks 1 and 2 no longer stop it.",
+        "Count the brackets on the line it names: are any missing?",
+        "Look at where the `^` marks are, and compare the line with the lines above it that work.",
+        "Fix it and run the file again."
+      ],
+      "hints": [
+        "The error message is Node's best guess. Here the guess is wrong, so trust the marks more than the words.",
+        "`console.log` can print several things on one line. Look at what sits between them on the lines that work.",
+        "The text and the name need a comma between them: `console.log('...', parcelsPacked)`."
+      ],
+      "docs": [
+        {
+          "title": "SyntaxError: missing ) after argument list",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_argument_list"
+        },
+        {
+          "title": "console.log()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/console/log_static"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "candle",
+      "title": "Bring back today's candle",
+      "file": "src/morning.js",
+      "description": "Under `// Task 4`, the line that prints the candle of the day stops Node. Fix it so it prints `Today's candle is` followed by the name in `candleOfTheDay`, apostrophe included.\n\nCheck runs the lines of Task 4 alone, with another candle in `candleOfTheDay`, and looks for that line, apostrophe and all.",
+      "nextSteps": [
+        "Run the file and read the error once the tasks above no longer stop it.",
+        "Look where the `^` marks start and where they stop.",
+        "Ask where Node thinks the text in quotes ends.",
+        "Fix it without losing the apostrophe, and run the file again."
+      ],
+      "hints": [
+        "The marks stop at the apostrophe in Today's. That is where Node thinks the text ends.",
+        "An apostrophe is the same character as a single quote, so it ends text that started with one. Text can also sit inside double quotes or backticks.",
+        "Wrap the text in double quotes instead: `console.log(\"Today's candle is\", candleOfTheDay)`."
+      ],
+      "docs": [
+        {
+          "title": "Strings, the basics",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Strings"
+        },
+        {
+          "title": "String: escape sequences",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#escape_sequences"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

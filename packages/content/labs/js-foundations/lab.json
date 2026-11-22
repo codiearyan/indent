@@ -19,6 +19,10 @@
       ]
     },
     {
+      "title": "When it breaks",
+      "chapters": ["read-the-error", "names-and-values", "quiet-mistakes"]
+    },
+    {
       "title": "Rules of the shop",
       "chapters": [
         "making-decisions",
@@ -28,7 +32,13 @@
         "passing-functions"
       ]
     },
-    { "title": "The shelf", "chapters": ["order-reports"] },
-    { "title": "Helpers that remember", "chapters": ["loyalty-cards"] }
+    {
+      "title": "The shelf",
+      "chapters": ["order-reports"]
+    },
+    {
+      "title": "Helpers that remember",
+      "chapters": ["loyalty-cards"]
+    }
   ]
 }
