@@ -52,6 +52,10 @@ const repos: { labId: string; expected: string[] }[] = [
     expected: ['json-bodies/validate', 'list-queries/apply-query', 'auth-and-errors/request-ids']
   },
   {
+    labId: 'express-crud-api',
+    expected: ['creating-workshops/validate', 'changing-workshops/patch']
+  },
+  {
     labId: 'js-bug-hunts',
     expected: [
       'cent-off-totals/reproduce',

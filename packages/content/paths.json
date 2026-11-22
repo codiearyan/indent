@@ -53,11 +53,11 @@
       {
         "title": "Node.js",
         "labs": [
-          "node-api"
+          "node-api",
+          "express-crud-api"
         ],
         "soon": [
-          "Node.js foundations",
-          "A CRUD API with Express"
+          "Node.js foundations"
         ]
       },
       {
@@ -140,7 +140,8 @@
       {
         "title": "An API",
         "labs": [
-          "node-api"
+          "node-api",
+          "express-crud-api"
         ]
       },
       {
