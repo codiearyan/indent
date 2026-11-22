@@ -1,0 +1,100 @@
+{
+  "id": "promises-and-then",
+  "title": "A value that arrives later",
+  "files": ["src/promises.js", "src/demo.js", "src/shop.js"],
+  "terminal": {
+    "description": "A shell in your workspace. The demo prints each promise right away and again after the wait, with the time before every line.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "status",
+      "title": "Read a promise with then",
+      "file": "src/promises.js",
+      "description": "Under `// Task 1` in `src/promises.js`, make `statusLine(parcelId)` give back a promise of one line of text about the parcel: its id, a colon, a space and its status, like `'P-77: out for delivery'`. It gets the parcel from `trackParcel`, which gives back a promise of an object like `{ id: 'P-77', status: 'out for delivery' }`.\n\nCheck calls `statusLine` with parcels of its own, answers the tracker itself, and looks at what the promise you give back is fulfilled with.",
+      "nextSteps": [
+        "Read the lesson's parts on what a promise is and on `then`.",
+        "Call `trackParcel` with the id, and call `then` on what it gives back.",
+        "Hand `then` a function that makes the line from the parcel and gives it back.",
+        "Give back what `then` gives back, and run the demo."
+      ],
+      "hints": [
+        "`trackParcel` gives back a promise, not the parcel. The parcel is only there inside the function you hand `then`.",
+        "`then` gives back a new promise of what its function gives back. Your function gives back that new promise with `return`, and the function inside `then` gives back the line.",
+        "The body has the shape `return trackParcel(parcelId).then((parcel) => ...)`, with the line made from `parcel.id` and `parcel.status` after the arrow."
+      ],
+      "docs": [
+        { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" },
+        { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
+      ],
+      "videos": [{ "title": "Promises in 100 seconds", "url": "https://www.youtube.com/watch?v=RvYYCGs45L4" }],
+      "points": 10
+    },
+    {
+      "id": "set",
+      "title": "A promise of your own",
+      "file": "src/promises.js",
+      "description": "Under `// Task 2`, make `setIn(candle, ms)` give back a new promise that is fulfilled, `ms` milliseconds from now, with the text `'Fig is set'` for the candle `'Fig'`.\n\nCheck runs your timer on its own clock, so nothing really waits. It looks at how long you asked to wait, that the promise is still waiting until the timer runs, and what it is fulfilled with then.",
+      "nextSteps": [
+        "Read the lesson's part on a promise of your own.",
+        "Give back `new Promise(...)`, handing it a function that takes `resolve`.",
+        "Inside that function, start a timer for `ms` milliseconds.",
+        "In the function the timer runs, call `resolve` with the text, and run the demo."
+      ],
+      "hints": [
+        "The promise is fulfilled when `resolve` is called, and not before. So `resolve` is called from the function the timer runs.",
+        "`new Promise` calls the function you hand it at once, with `resolve` as its parameter. Start the timer in there, and hand `setTimeout` a function, not a call.",
+        "The body has the shape `return new Promise((resolve) => { setTimeout(() => { resolve(...) }, ms) })`, with the text inside `resolve`'s round brackets."
+      ],
+      "docs": [
+        { "title": "Promise() constructor", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise" },
+        { "title": "Promise", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "count",
+      "title": "Wrap the old computer",
+      "file": "src/promises.js",
+      "description": "Under `// Task 3`, make `stockCount(name)` give back a promise of the count of the candle called `name`, from the old stock room computer, `askStockRoom`. The promise is fulfilled with the count itself, a number, once the stock room has answered.\n\nCheck hands `stockCount` a stock room of its own that answers when Check says so, and looks at when the promise is fulfilled and with what.",
+      "nextSteps": [
+        "Read the end of the lesson's part on a promise of your own.",
+        "Give back a new promise.",
+        "Inside it, ask `askStockRoom`, handing it a function for the count.",
+        "In that function, call `resolve` with the count, and run the demo."
+      ],
+      "hints": [
+        "`askStockRoom` gives back nothing, so there is no promise to call `then` on. `stockCount` makes one of its own.",
+        "This is the shape of Task 2 with the stock room in place of the timer: the promise is fulfilled from the function the stock room calls with the count.",
+        "The body has the shape `return new Promise((resolve) => { askStockRoom(name, (count) => { resolve(count) }) })`."
+      ],
+      "docs": [
+        { "title": "Promise() constructor", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise" },
+        { "title": "Callback function", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Callback_function" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "order",
+      "title": "Each step feeds the next",
+      "file": "src/promises.js",
+      "description": "Under `// Task 4`, make `orderStatus(orderId)` find the order's parcel with `findParcel`, then track that parcel with `trackParcel`, and give back a promise of one line: the order id, a colon, a space, the parcel id, a space and its status, like `'WC-1042: P-77 out for delivery'`.\n\nCheck answers `findParcel` and the tracker itself, and looks at what each was asked and when: the tracker can only be asked once the order book has answered.",
+      "nextSteps": [
+        "Read the lesson's part on a chain where each step feeds the next.",
+        "Start with `findParcel(orderId)` and call `then` on it.",
+        "In the first step, ask the tracker about the parcel id, and give back its promise.",
+        "Add a second `then` that makes the line, and give back the whole chain."
+      ],
+      "hints": [
+        "Three things happen in turn: the order book answers, the tracker answers, the line is made. Each is one step of the chain.",
+        "A step that starts `trackParcel` must give back its promise with `return`, or the next step runs at once with `undefined`. The order id is still there in the last step, because every step is made inside `orderStatus`.",
+        "The shape is `return findParcel(orderId).then((parcelId) => { return trackParcel(parcelId) }).then((parcel) => ...)`, with the line after the last arrow."
+      ],
+      "docs": [
+        { "title": "Using promises: chaining", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises#chaining" },
+        { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" }
+      ],
+      "points": 10
+    }
+  ]
+}

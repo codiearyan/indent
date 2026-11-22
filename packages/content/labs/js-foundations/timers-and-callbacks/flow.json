@@ -1,0 +1,140 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "theo", "label": "Theo", "kind": "story" },
+      { "id": "remind", "label": "remindLater()", "kind": "function", "mine": true, "fn": "remindLater" },
+      { "id": "hold", "label": "holdParcel()", "kind": "function", "mine": true, "fn": "holdParcel" },
+      { "id": "two", "label": "twoLines()", "kind": "function", "mine": true, "fn": "twoLines" },
+      { "id": "line", "label": "stockLine()", "kind": "function", "mine": true, "fn": "stockLine" },
+      { "id": "room", "label": "Stock room", "kind": "story" },
+      { "id": "clock", "label": "Timer", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "theo", "to": "remind", "label": "note, time" },
+      { "from": "remind", "to": "clock", "label": "print later" },
+      { "from": "theo", "to": "hold", "label": "parcel, time" },
+      { "from": "hold", "to": "clock", "label": "send later" },
+      { "from": "theo", "to": "two", "label": "two candles" },
+      { "from": "two", "to": "line", "label": "one, then next" },
+      { "from": "theo", "to": "line", "label": "candle name" },
+      { "from": "line", "to": "room", "label": "how many?" }
+    ],
+    "note": "Nothing here answers at once, so Theo's code hands each slow thing a function to call when its time comes."
+  },
+  "tasks": {
+    "remind": {
+      "trace": { "file": "src/later.js", "call": "remindLater", "args": ["Wicks arrive at noon", 500] },
+      "steps": [
+        {
+          "active": ["theo", "theo->remind", "remind"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "note", "value": "Wicks arrive at noon" },
+              { "key": "ms", "value": 500 }
+            ]
+          },
+          "note": "Theo wants to be reminded about the wicks in half a second."
+        },
+        {
+          "active": ["remind", "remind->clock", "clock"],
+          "note": "remindLater() hands the timer a function that prints, and finishes at once."
+        },
+        {
+          "active": ["clock"],
+          "value": {
+            "kind": "map",
+            "label": "what is printed, later",
+            "entries": [{ "key": "line", "value": "Reminder, then the note" }]
+          },
+          "note": "When the time is up, the timer calls that function, and the reminder appears."
+        }
+      ]
+    },
+    "stock": {
+      "steps": [
+        {
+          "active": ["theo", "theo->line", "line"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "name", "value": "Cedar" },
+              { "key": "done", "value": "a function for the line" }
+            ]
+          },
+          "note": "Theo asks how many cedar candles there are, and hands over a function for the answer."
+        },
+        {
+          "active": ["line", "line->room", "room"],
+          "note": "stockLine() asks the stock room and hands it a function too. Then it finishes, with no count yet."
+        },
+        {
+          "active": ["room", "line->room", "line"],
+          "value": {
+            "kind": "map",
+            "label": "what done gets, later",
+            "entries": [{ "key": "line", "value": "the name and the count, in stock" }]
+          },
+          "note": "A moment later the stock room calls that function with the count, and the line goes on to done."
+        }
+      ]
+    },
+    "two": {
+      "steps": [
+        {
+          "active": ["theo", "theo->two", "two"],
+          "value": {
+            "kind": "array",
+            "label": "what goes in",
+            "values": ["Sage", "Fig"]
+          },
+          "note": "Theo wants the lines for sage and fig."
+        },
+        {
+          "active": ["two", "two->line", "line", "line->room", "room"],
+          "note": "twoLines() asks for the sage line first, and waits for it."
+        },
+        {
+          "active": ["line", "line->room", "room"],
+          "note": "Only once the sage line is there does it ask about fig."
+        },
+        {
+          "active": ["two", "theo->two", "theo"],
+          "value": {
+            "kind": "array",
+            "label": "what done gets",
+            "values": ["the first line", "the second line"]
+          },
+          "note": "With both lines in hand, done gets them in one list, sage first."
+        }
+      ]
+    },
+    "hold": {
+      "steps": [
+        {
+          "active": ["theo", "theo->hold", "hold"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "id", "value": "P-202" },
+              { "key": "ms", "value": 300 },
+              { "key": "send", "value": "a function that sends it" }
+            ]
+          },
+          "note": "Ines asks Theo to hold parcel P-202 for a while before it goes."
+        },
+        {
+          "active": ["hold", "hold->clock", "clock"],
+          "note": "holdParcel() starts a timer that will send it, and gives back a function to keep it back."
+        },
+        {
+          "active": ["theo", "hold", "clock"],
+          "note": "The customer changes their mind. Theo calls that function, the timer stops, and P-202 stays."
+        }
+      ]
+    }
+  }
+}

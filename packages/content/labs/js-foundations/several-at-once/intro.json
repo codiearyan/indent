@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "Can the morning check be quicker?", "note": "Shelves and parcels, every day." },
+    { "title": "Stock room", "text": "Could count every shelf at the same time." },
+    {
+      "title": "Your code",
+      "file": "together.js",
+      "mine": true,
+      "gap": "Asks one thing at a time",
+      "tasks": ["One after another", "All together", "Keep the rest", "The morning report"]
+    },
+    { "title": "Tracker", "rows": [["P-77", "out for delivery"], ["P-99", "no news"], ["P-12", "packed"]] }
+  ],
+  "ticket": { "label": "Morning list", "wrong": "one by one", "why": "Waits add up", "right": "all at once" },
+  "captions": [
+    "Failures are handled. Now Theo wants his morning check of shelves and parcels faster.",
+    "Today it asks one shelf, waits, asks the next, and one lost parcel empties the whole list.",
+    "You ask one after another on purpose, then all together, and keep the rest when one fails.",
+    "Every shelf and parcel is asked at once, and the answers come back in the order asked.",
+    "The shop waits on the world in good order now: in turn, together, and through failures."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Ring up two sage candles?", "note": "At the Saturday market stall." },
+    { "title": "Card machine", "text": "Thinks for a moment before it says yes." },
+    {
+      "title": "Your code",
+      "file": "checkout.js",
+      "mine": true,
+      "gap": "Steps run before the last ends",
+      "tasks": ["Wait with await", "Always a promise", "Count, then decide", "Close a sale"]
+    },
+    { "title": "Stock room", "rows": [["Cedar", "4"], ["Sage", "9"], ["Fig", "0"]], "mark": 1 }
+  ],
+  "ticket": { "label": "WC-3002", "wrong": "taken, not paid", "why": "Too soon", "right": "paid, 7 left" },
+  "captions": [
+    "Promises work. At the market, Ines wants the laptop to ring up two sage candles.",
+    "Without waiting, the candles leave the shelf before the card machine has said yes.",
+    "You write the waiting as plain lines with async and await, one step after another.",
+    "The card machine says yes, then the candles come off the shelf: paid, and 7 left.",
+    "Waiting code reads top to bottom now, with a decision wherever it is needed."
+  ]
+}

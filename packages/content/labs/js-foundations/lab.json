@@ -56,6 +56,10 @@
     {
       "title": "Helpers that remember",
       "chapters": ["loyalty-cards"]
+    },
+    {
+      "title": "Waiting on the world",
+      "chapters": ["timers-and-callbacks", "promises-and-then", "async-and-await", "when-waiting-fails", "several-at-once"]
     }
   ]
 }

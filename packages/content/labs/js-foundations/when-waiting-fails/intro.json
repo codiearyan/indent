@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "What if a card is declined?", "note": "A queue at the Saturday stall." },
+    { "title": "Card machine", "text": "Declines a card, or says it is busy." },
+    {
+      "title": "Your code",
+      "file": "payments.js",
+      "mine": true,
+      "gap": "One failure stops it all",
+      "tasks": ["Catch a declined card", "Catch on a chain", "Try again", "Screen off either way"]
+    },
+    { "title": "Queue", "say": "Next, please!" }
+  ],
+  "ticket": { "label": "WC-4002", "wrong": "laptop stopped", "why": "Not caught", "right": "card declined" },
+  "captions": [
+    "Await works. At the stall, Ines asks what happens when the card machine says no.",
+    "Today one declined card stops the laptop with red text, and the whole queue waits.",
+    "You catch failures, try a busy machine again, and turn the screen off either way.",
+    "The card for WC-4002 is declined, the laptop says so in one line, and the queue moves on.",
+    "A failed wait is now something your code handles, instead of a crash."
+  ]
+}

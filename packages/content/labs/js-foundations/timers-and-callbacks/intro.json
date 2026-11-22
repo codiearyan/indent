@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "How many cedar candles are left?", "note": "Asks the stock room computer." },
+    { "title": "Stock room", "text": "Counts slowly and answers a moment later." },
+    {
+      "title": "Your code",
+      "file": "later.js",
+      "mine": true,
+      "gap": "Nothing waits for the count",
+      "tasks": ["Remind me later", "Pass the count on", "One, then the next", "Hold a parcel"]
+    },
+    { "title": "Laptop", "rows": [["Cedar", "4"], ["Sage", "9"], ["Fig", "0"]], "mark": 0 }
+  ],
+  "ticket": { "label": "Cedar count", "wrong": "undefined", "why": "Too early", "right": "4 in stock" },
+  "captions": [
+    "The shop waits on slow things now. Theo asks the stock room how many cedar candles it has.",
+    "The laptop prints undefined, and a moment later the stock room counts 4. Too late.",
+    "You hand each slow thing a function to call, so the count is used once it arrives.",
+    "The stock room answers, your function runs, and the line reaches Theo: 4 in stock.",
+    "Code that waits now hands over what to do next, instead of giving an answer back."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Customer", "say": "Where is my order WC-1050?", "note": "Emails Theo." },
+    { "title": "Order book", "text": "Knows the parcel, answers a moment later." },
+    {
+      "title": "Your code",
+      "file": "promises.js",
+      "mine": true,
+      "gap": "No way to wait step by step",
+      "tasks": ["Read it with then", "A promise of your own", "Wrap the old computer", "Chain the steps"]
+    },
+    {
+      "title": "Tracker",
+      "rows": [["P-77", "out for delivery"], ["P-12", "packed"], ["P-81", "delivered"]],
+      "mark": 2
+    }
+  ],
+  "ticket": { "label": "WC-1050", "wrong": "[object Promise]", "why": "Too soon", "right": "delivered" },
+  "captions": [
+    "Slow things answer later now. A customer emails Theo to ask where order WC-1050 is.",
+    "The reply is written before the order book answers, so it says [object Promise].",
+    "You read promises with then, make your own, and chain each step to the next.",
+    "The order book finds the parcel, the tracker finds it delivered, and the reply says so.",
+    "Each slow answer is a promise now, and one step waits for the last without nesting."
+  ]
+}

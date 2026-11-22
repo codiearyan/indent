@@ -1,0 +1,100 @@
+{
+  "id": "when-waiting-fails",
+  "title": "When waiting fails",
+  "files": ["src/payments.js", "src/demo.js", "src/shop.js"],
+  "terminal": {
+    "description": "A shell in your workspace. The demo runs each task in turn, with a declined card and a silent tracker among them.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "pay",
+      "title": "Catch a declined card",
+      "file": "src/payments.js",
+      "description": "Under `// Task 1` in `src/payments.js`, make `tryPayment(order)` charge `order.totalCents` with `chargeCard` and give back a promise of one line: `'WC-4001 paid, code A-301'` when the charge goes through, and `'WC-4002 not paid: Card declined'`, with the message of the error, when it fails. Its promise is never rejected. The lesson shows how with `try` and `catch` around `await`.\n\nCheck hands `tryPayment` a card machine of its own that goes through or fails when Check says so.",
+      "nextSteps": [
+        "Read the lesson's parts on a failed promise and on `try` and `catch` around `await`.",
+        "Make `tryPayment` an `async` function with a `try` and a `catch`.",
+        "Inside the `try`, wait for the charge and return the paid line.",
+        "Inside the `catch`, return the not paid line, and run the demo."
+      ],
+      "hints": [
+        "A declined card makes the promise from `chargeCard` fail, and `await` throws that failure on the line where it waits.",
+        "The `catch` only sees the failure when the `await` is inside the `try`. The words of the failure are in `error.message`.",
+        "The shape is `try { const receipt = await chargeCard(order.totalCents); return ... } catch (error) { return ... }`, inside an `async` function."
+      ],
+      "docs": [
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "await: handling rejected promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await#handling_rejected_promises" }
+      ],
+      "videos": [{ "title": "What happens when a promise fails", "url": "https://www.youtube.com/watch?v=LzlGL3k3p04" }],
+      "points": 10
+    },
+    {
+      "id": "parcel",
+      "title": "Catch at the end of a chain",
+      "file": "src/payments.js",
+      "description": "Under `// Task 2`, make `parcelOrUnknown(parcelId)` give back a promise of the parcel's id and status from `trackParcel`, like `'P-77: out for delivery'`. When the tracker fails, the promise is fulfilled with `'P-99: no news yet'` instead, with the id it was given. Write it as a chain with `then` and `catch`, without `async` or `await`.\n\nCheck hands `parcelOrUnknown` a tracker of its own that answers or fails when Check says so, and reads your function for the `catch`.",
+      "nextSteps": [
+        "Read the lesson's part on `catch` at the end of a chain.",
+        "Start from `trackParcel(parcelId)` and make the line in a `then`.",
+        "Add a `catch` after the `then`, with a function that gives back the no news line.",
+        "Give back the whole chain, and run the demo."
+      ],
+      "hints": [
+        "The tracker's failure skips every `then` and lands in the first `catch` after them.",
+        "What the function you hand `catch` gives back is what the promise is fulfilled with. A `catch` placed before the `then` hands its line on to that `then`.",
+        "The shape is `return trackParcel(parcelId).then((parcel) => ...).catch(() => ...)`."
+      ],
+      "docs": [
+        { "title": "Promise.prototype.catch()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch" },
+        { "title": "Using promises: error handling", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises#error_handling" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "retry",
+      "title": "Try again",
+      "file": "src/payments.js",
+      "description": "Under `// Task 3`, make `chargeWithRetries(totalCents, tries)` charge `totalCents` with `chargeCard`, and when a charge fails, try again, one try after the other, until a charge goes through or it has tried `tries` times. Its promise is fulfilled with the first receipt that goes through. When every try fails, it is rejected with the error of the last try.\n\nCheck hands it a card machine of its own that fails as many times as Check says, and counts the charges and when each one started.",
+      "nextSteps": [
+        "Read the lesson's part on trying again.",
+        "Write a loop that runs at most `tries` times.",
+        "Inside it, `try` to return the awaited charge, and in the `catch` keep the error.",
+        "After the loop, pass the last error on with `throw`."
+      ],
+      "hints": [
+        "Each try has to wait for the one before, so the charge is awaited inside the loop. A `return` ends the function as soon as one goes through.",
+        "A failed try must not end the function: catch it, keep its error in a `let` made before the loop, and let the loop go round again. Without a `throw` at the end, the caller would think it worked.",
+        "The shape is `for (let attempt = 1; attempt <= tries; attempt++) { try { return await chargeCard(totalCents) } catch (error) { lastError = error } }`, then `throw lastError`."
+      ],
+      "docs": [
+        { "title": "throw", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw" },
+        { "title": "for", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "screen",
+      "title": "Turn the screen off either way",
+      "file": "src/payments.js",
+      "description": "Under `// Task 4`, make `payWithScreen(order)` call `screenOn`, charge `order.totalCents` with `chargeCard`, and call `screenOff` once the machine has answered, whether the charge went through or failed. Its promise is fulfilled with the receipt, or rejected with the machine's error: the failure still reaches whoever called `payWithScreen`.\n\nCheck hands it a card machine and a screen of its own, and looks at when the screen was turned on and off, and what the promise did.",
+      "nextSteps": [
+        "Read the lesson's part on cleaning up either way.",
+        "Call `screenOn` first.",
+        "Wait for the charge inside a `try`, and turn the screen off in a `finally`.",
+        "Run the demo: the screen goes off after both the paid and the declined order."
+      ],
+      "hints": [
+        "Turning the screen off belongs to both endings, the receipt and the failure. Writing it after the `await` only covers the first.",
+        "`finally` runs after the `try` either way, and without a `catch` the failure carries on to the caller once it has run.",
+        "The shape is `screenOn()`, then `try { return await chargeCard(order.totalCents) } finally { screenOff() }`, inside an `async` function."
+      ],
+      "docs": [
+        { "title": "try...catch: the finally block", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch#the_finally_block" },
+        { "title": "Promise.prototype.finally()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally" }
+      ],
+      "points": 10
+    }
+  ]
+}

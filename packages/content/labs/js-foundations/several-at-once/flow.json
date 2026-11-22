@@ -1,0 +1,135 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "theo", "label": "Theo", "kind": "story" },
+      { "id": "report", "label": "morningReport()", "kind": "function", "mine": true, "fn": "morningReport" },
+      { "id": "one", "label": "countOneByOne()", "kind": "function", "mine": true, "fn": "countOneByOne" },
+      { "id": "all", "label": "countAll()", "kind": "function", "mine": true, "fn": "countAll" },
+      { "id": "board", "label": "parcelBoard()", "kind": "function", "mine": true, "fn": "parcelBoard" },
+      { "id": "room", "label": "Stock room", "kind": "story" },
+      { "id": "tracker", "label": "Tracker", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "theo", "to": "report", "label": "morning check" },
+      { "from": "report", "to": "all", "label": "candles" },
+      { "from": "report", "to": "board", "label": "parcels" },
+      { "from": "theo", "to": "one", "label": "candles" },
+      { "from": "one", "to": "room", "label": "one at a time" },
+      { "from": "all", "to": "room", "label": "all at once" },
+      { "from": "board", "to": "tracker", "label": "all at once" }
+    ],
+    "note": "Theo's morning check asks every shelf and every parcel at the same time, and keeps the answers in order."
+  },
+  "tasks": {
+    "one-by-one": {
+      "trace": { "file": "src/together.js", "call": "countOneByOne", "args": [["Cedar", "Fig", "Sage"]] },
+      "steps": [
+        {
+          "active": ["theo", "theo->one", "one"],
+          "value": { "kind": "array", "label": "what goes in", "values": ["Cedar", "Fig", "Sage"] },
+          "note": "Theo wants the counts for cedar, fig and sage."
+        },
+        {
+          "active": ["one", "one->room", "room"],
+          "note": "countOneByOne() asks about cedar and waits for the count."
+        },
+        {
+          "active": ["one", "one->room", "room"],
+          "note": "Only then does it ask about fig, and after that about sage."
+        },
+        {
+          "active": ["one", "theo->one", "theo"],
+          "value": { "kind": "array", "label": "what the promise holds", "values": ["count", "count", "count"] },
+          "note": "The counts come back in the order of the names, after three waits in a row."
+        }
+      ]
+    },
+    "all": {
+      "trace": { "file": "src/together.js", "call": "countAll", "args": [["Cedar", "Fig", "Sage"]] },
+      "steps": [
+        {
+          "active": ["all"],
+          "value": { "kind": "array", "label": "what goes in", "values": ["Cedar", "Fig", "Sage"] },
+          "note": "The same three candles, and this time the stock room may count them together."
+        },
+        {
+          "active": ["all", "all->room", "room"],
+          "note": "countAll() starts all three questions before waiting for any."
+        },
+        {
+          "active": ["room", "all->room", "all"],
+          "note": "Fig is counted first and cedar last, but each count goes back to its own place."
+        },
+        {
+          "active": ["all"],
+          "value": { "kind": "array", "label": "what the promise holds", "values": ["Cedar's count", "Fig's count", "Sage's count"] },
+          "note": "One wait instead of three, and the list is in the order Theo asked."
+        }
+      ]
+    },
+    "board": {
+      "trace": { "file": "src/together.js", "call": "parcelBoard", "args": [["P-77", "P-99", "P-12"]] },
+      "steps": [
+        {
+          "active": ["board"],
+          "value": { "kind": "array", "label": "what goes in", "values": ["P-77", "P-99", "P-12"] },
+          "note": "Three parcels are still on their way."
+        },
+        {
+          "active": ["board", "board->tracker", "tracker"],
+          "note": "parcelBoard() asks the tracker about all three at once."
+        },
+        {
+          "active": ["tracker", "board"],
+          "note": "The tracker has no news of P-99. That one parcel's failure is caught on its own."
+        },
+        {
+          "active": ["board"],
+          "value": {
+            "kind": "array",
+            "label": "what the promise holds",
+            "values": ["a status line", "tracker not answering", "a status line"]
+          },
+          "note": "The board shows every parcel, the lost one included, in the order Theo asked."
+        }
+      ]
+    },
+    "report": {
+      "trace": { "file": "src/together.js", "call": "morningReport", "args": [["Amber", "Fig"], ["P-12", "P-77"]] },
+      "steps": [
+        {
+          "active": ["theo", "theo->report", "report"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "names", "value": "Amber, Fig" },
+              { "key": "ids", "value": "P-12, P-77" }
+            ]
+          },
+          "note": "Theo starts the morning check: two shelves and two parcels."
+        },
+        {
+          "active": ["report", "report->all", "all", "report->board", "board"],
+          "note": "morningReport() starts the counts and the parcel board together."
+        },
+        {
+          "active": ["all", "all->room", "room", "board", "board->tracker", "tracker"],
+          "note": "The stock room and the tracker work at the same time."
+        },
+        {
+          "active": ["report", "theo->report", "theo"],
+          "value": {
+            "kind": "map",
+            "label": "what the promise holds",
+            "entries": [
+              { "key": "stock", "value": "the counts, in order" },
+              { "key": "parcels", "value": "the lines, in order" }
+            ]
+          },
+          "note": "When both are done, Theo has the whole report from one wait."
+        }
+      ]
+    }
+  }
+}
