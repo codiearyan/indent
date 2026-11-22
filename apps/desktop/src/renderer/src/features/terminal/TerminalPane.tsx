@@ -189,7 +189,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
       const last = Math.max(downY, event.clientY - box.top)
       pointer = {
         left: Math.max(4, Math.min(x, box.width - 340)),
-        top: first < 56 ? last + 16 : first - 48
+        top: Math.max(4, Math.min(first < 56 ? last + 16 : first - 48, box.height - 44))
       }
       setTimeout(() => {
         const text = term.hasSelection() ? term.getSelection() : ''
