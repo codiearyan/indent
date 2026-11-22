@@ -11,7 +11,7 @@ The form's values have honest types now. Next to them sits Rafe's price list: a 
 
 ## The request from Imogen
 
-> **Imogen:** Rafe's price list worked, as long as he was the one calling it. Last week I called the label function without the size and printed forty labels that said "undefined g". I want the code to stop me before I do that.
+> **Imogen:** Rafe's price list worked, as long as Rafe was the one calling it. Last week I called the label function without the size and printed forty labels that said "undefined g". I want the code to stop me before I do that.
 
 All four tasks are in `src/pricing.ts`.
 

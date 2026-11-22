@@ -1,0 +1,129 @@
+{
+  "id": "object-types",
+  "title": "The shape of an object",
+  "files": ["src/orders.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/orders.ts` runs the orders, and `npm run types` checks their types.",
+    "suggestedCommand": "npm run types"
+  },
+  "tasks": [
+    {
+      "id": "line",
+      "title": "Type an order line",
+      "file": "src/orders.ts",
+      "description": "Under `// Task 1` in `src/orders.ts`, give the parameter of `lineGrams` the type of an order line: an object with `tins` (a number) and `gramsPerTin` (a number). Write its result type too. Leave its body as it is.\n\nCheck reads your function for the result type. It compiles calls of its own: an order line, and a whole line that has a blend as well, must compile, while a line without its grams per tin, tins as text, a number on its own or a result used as text must be refused. It calls `lineGrams` with lines of its own.",
+      "nextSteps": [
+        "Run `npm run types` and read the error for the parameter of `lineGrams`.",
+        "Write an object type after the parameter: curly braces, and each property with its type.",
+        "Write the result type after the round brackets.",
+        "Run both commands again."
+      ],
+      "hints": [
+        "An object type looks like an object, with a type where each value would be.",
+        "Inside the curly braces, write each property's name, a colon and its type, with a semicolon between them.",
+        "`export function lineGrams(line: { tins: number; gramsPerTin: number }): number {`."
+      ],
+      "docs": [
+        {
+          "title": "Object types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#object-types"
+        },
+        {
+          "title": "Object initializer",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Object types",
+          "url": "https://www.youtube.com/watch?v=kujlXOtYVao"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "slip",
+      "title": "Let the gift note be missing",
+      "file": "src/orders.ts",
+      "description": "Under `// Task 2`, the compiler refuses the call to `slipText` for an order with no gift note. Read why, then change the type of the parameter so a gift note may be left out. Then make `slipText` give back just `'Order OK-1043'` for an order without a note, and `'Order OK-1042, note: ...'` with the note for an order that has one.\n\nCheck compiles calls of its own: with and without a note must compile, while an order without an id, a note that is a number or a slip used as a number must be refused. It calls `slipText` with orders of its own, with a note and without.",
+      "nextSteps": [
+        "Run `npm run types` and read the error for the second call, and the note under it.",
+        "Mark the gift note in the type as a property an order may leave out.",
+        "Run `node src/orders.ts`: what does the second slip say now?",
+        "Make the body give back only the order part when there is no note."
+      ],
+      "hints": [
+        "`Property 'giftNote' is missing in type ... but required in type ...` means the object passed has no `giftNote`, and the type says every order must have one.",
+        "A question mark after a property's name in a type makes it optional. Reading it then gives `undefined` when it is missing, and the compiler knows that.",
+        "Write `giftNote?: string` in the type, and in the body `if (order.giftNote === undefined) return `Order ${order.id}`` before the line with the note."
+      ],
+      "docs": [
+        {
+          "title": "Optional properties",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#optional-properties"
+        },
+        {
+          "title": "undefined",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "first",
+      "title": "Keep the order id fixed",
+      "file": "src/orders.ts",
+      "description": "Under `// Task 3`, a line changes the id of `firstOrder`, and the compiler says nothing. Change the type of `firstOrder` so its `id` can never change, while its `tins` still can. Read what the compiler says then, and remove the line it points at.\n\nCheck compiles code of its own: reading the id and changing the tins must compile, while giving the order a new id or tins as text must be refused. It reads `firstOrder` after your lines.",
+      "nextSteps": [
+        "Run `node src/orders.ts`: which id does the first order end with?",
+        "Mark `id` in the type of `firstOrder` as a property that cannot be changed.",
+        "Run `npm run types` and read the error it gives for the line that changes the id.",
+        "Remove that line, keep the one that changes the tins, and run both commands."
+      ],
+      "hints": [
+        "`const` keeps the name `firstOrder` from pointing at another object, but it does not stop the properties of that object from changing.",
+        "The word `readonly` in front of a property in a type means it can be set when the object is made, and never after.",
+        "The type becomes `{ readonly id: string; tins: number }`, and the line `firstOrder.id = 'OK-1043'` goes."
+      ],
+      "docs": [
+        {
+          "title": "readonly properties",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#readonly-properties"
+        },
+        {
+          "title": "const",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "parcel",
+      "title": "Write the parcel function whole",
+      "file": "src/orders.ts",
+      "description": "Under `// Task 4`, write a function called `parcelFor`, with `export` in front, from the word `function` to its closing brace. It takes an order id (text) and the grams in the parcel (a number). It gives back an object with three properties: `orderId`, the id; `grams`, the grams; and `heavy`, `true` when the parcel weighs more than 2000 g. Write the result type as an object type, then take away the `//` in front of the line that prints it.\n\nCheck reads your function for its result type. It compiles code of its own that reads the three properties as text, a number and true or false, which must compile, and code that reads a property a parcel does not have or uses one as the wrong type, which must be refused. It calls `parcelFor` with parcels of its own.",
+      "nextSteps": [
+        "Write the first line: the name, two typed parameters and an object type as the result type.",
+        "Give back an object with the three properties.",
+        "Take away the `//` in front of the line under it.",
+        "Run both commands, and try a heavy parcel on the line."
+      ],
+      "hints": [
+        "A result type can be an object type, written the same way as a parameter's.",
+        "The result type names `orderId`, `grams` and `heavy` with their types. In the body, `heavy` is a comparison.",
+        "It starts `export function parcelFor(orderId: string, grams: number): { orderId: string; grams: number; heavy: boolean } {`."
+      ],
+      "docs": [
+        {
+          "title": "Object types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html"
+        },
+        {
+          "title": "Excess property checks",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#excess-property-checks"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

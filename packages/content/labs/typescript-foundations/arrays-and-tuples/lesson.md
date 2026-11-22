@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Single values have types now: the form, the prices. But most of what happens at the packing table is a list. A parcel is a list of tins, the morning is a list of orders to pick, and an order is a list of lines, each a blend and a number of tins. Rafe's code kept all of them in plain arrays and hoped each one held what he thought. In this issue you give lists their types. By the end of it you will be able to:
+Single values have types now: the form, the prices. But most of what happens at the packing table is a list. A parcel is a list of tins, the morning is a list of orders to pick, and an order is a list of lines, each a blend and a number of tins. Rafe's code kept all of them in plain arrays and hoped each one held the right thing. In this issue you give lists their types. By the end of it you will be able to:
 
 - write the type of a list, and of a list that starts empty
 - read `never` and `string | number` in a message
@@ -39,7 +39,12 @@ A list with items in it rarely needs its type written: the compiler works it out
 
 ## A list that starts empty
 
-An empty list is a puzzle for the compiler. There is nothing in it to work a type out from, and in a list shared across the file it cannot see what you will add later. So it picks the narrowest type there is:
+An empty list is a puzzle for the compiler: there is nothing in it to work a type out from. Inside a function it watches what you add and works the type out as you go. But a list with `export` in front can be used by other files, and the compiler will not guess what they might add. So it picks the narrowest type there is:
+
+```ts
+export const sold = []
+sold.push('cheese')
+```
 
 ```
 src/scones.ts:2:11 - error TS2345: Argument of type '"cheese"' is not assignable to parameter of type 'never'.

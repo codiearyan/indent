@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Imogen", "say": "Why did a slip say note: undefined?", "note": "Most orders have no note." },
+    { "title": "Order code", "text": "Reads any property it hopes is there." },
+    {
+      "title": "Your types",
+      "file": "orders.ts",
+      "mine": true,
+      "gap": "Orders have no shape",
+      "tasks": ["Type an order line", "A note may be missing", "Keep the id fixed", "Write the parcel"]
+    },
+    { "title": "Packing table", "rows": [["OK-1043", "no gift note"], ["OK-1042", "first order"]], "mark": 0 }
+  ],
+  "ticket": { "label": "OK-1043", "wrong": "note: undefined", "why": "No shape", "right": "plain slip" },
+  "captions": [
+    "Imogen asks why a customer's slip at Oakhollow said note: undefined.",
+    "Order OK-1043 has no gift note, and the code read one anyway.",
+    "You write the shape of an order as a type: what it has, what may be missing, what stays.",
+    "Now order OK-1043 gets a plain slip, and the compiler knows every order's shape.",
+    "Every object at the shop now has a shape the compiler checks."
+  ]
+}

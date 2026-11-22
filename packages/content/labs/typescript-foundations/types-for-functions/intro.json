@@ -1,6 +1,6 @@
 {
   "stations": [
-    { "title": "Imogen", "say": "Why do forty labels say undefined?", "note": "She left the size out." },
+    { "title": "Imogen", "say": "Why do forty labels say undefined?", "note": "The size was left out." },
     { "title": "Price list", "text": "Takes anything and gives back anything." },
     {
       "title": "Your types",

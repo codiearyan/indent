@@ -1,0 +1,20 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customer", "label": "Customers", "kind": "story" },
+      { "id": "form", "label": "Order form", "kind": "data" },
+      { "id": "code", "label": "Typed order code", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "imogen", "label": "Imogen", "kind": "story" },
+      { "id": "bryn", "label": "Bryn at the packing table", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "customer", "to": "form", "label": "orders" },
+      { "from": "form", "to": "code", "label": "text" },
+      { "from": "code", "to": "compiler", "label": "types" },
+      { "from": "imogen", "to": "code", "label": "requests" },
+      { "from": "code", "to": "bryn", "label": "what to pack" }
+    ],
+    "note": "You give Oakhollow's order code its types one idea at a time, so the compiler catches what used to reach the packing table as nonsense."
+  }
+}

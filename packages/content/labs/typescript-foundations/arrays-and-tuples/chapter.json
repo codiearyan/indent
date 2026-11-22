@@ -53,7 +53,7 @@
         "Run both commands again."
       ],
       "hints": [
-        "`never` is the type with no values at all. An empty list with no type written is a list of `never`, so nothing may go in.",
+        "`never` is the type with no values at all. An empty list with `export` in front and no type written is a list of `never`, so nothing may go in.",
         "The compiler cannot see what will be added later, so an empty list needs its type written. Order ids are text.",
         "`export const pickList: string[] = []`."
       ],

@@ -48,7 +48,7 @@ console.log('Baked today:', sconesBaked + 6)
 
 `node src/scones.ts` prints `Scones left: 12`, which looks right, and then `Baked today: 306`, because `+` glues text together. The promise said number; the value was text.
 
-**The compiler checks it.** The compiler, `tsc`, reads the whole file and compares every value with every promise. It runs nothing. In this repo you start it with `npm run types`. When the promises hold, it prints nothing at all. When one is broken, it prints a type error:
+**The compiler checks it.** The compiler, `tsc`, reads the whole file and compares every value with every promise. It runs nothing. In this repo you start it with `npm run types`. npm first prints the command it runs; after that, when the promises hold, the compiler prints nothing at all. When one is broken, it prints a type error:
 
 ```
 src/scones.ts:1:7 - error TS2322: Type 'string' is not assignable to type 'number'.

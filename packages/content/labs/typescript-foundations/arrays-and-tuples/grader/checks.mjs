@@ -1,20 +1,11 @@
-import { judge } from '../../grading.mjs'
+import { call, judge } from '../../grading.mjs'
 
 const FILE = 'src/picking.ts'
-const text = (v) => JSON.stringify(v).replaceAll('"', "'")
-
-const call = (fn, args, expected, hint) => ({
-  name: `${fn}(${args.map(text).join(', ')}) gives the right answer`,
-  call: fn,
-  args,
-  expected,
-  setup: `${fn}(${args.map(text).join(', ')})`,
-  hint
-})
 
 export const checks = {
   parcel(t) {
-    const hint = 'parcelGrams should give the sum of every weight in the list, and 0 for an empty list.'
+    const hint =
+      'parcelGrams should give the sum of every weight in the list, and 0 for an empty list.'
     return judge(t, {
       file: FILE,
       task: 1,
@@ -63,8 +54,18 @@ export const checks = {
           "Check's own code reads a third part of the result, or uses a part as the wrong type, and the compiler lets it through. A list type says every item could be either; the result type should say exactly what comes first and what comes second."
       },
       cases: [
-        call('splitCode', ['MK-50'], ['MK', 50], 'splitCode should give the blend code as text and the grams as a number. Leave its body as the starter wrote it.'),
-        call('splitCode', ['SL-125'], ['SL', 125], 'splitCode should give the two parts of any code.')
+        call(
+          'splitCode',
+          ['MK-50'],
+          ['MK', 50],
+          'splitCode should give the blend code as text and the grams as a number. Leave its body as the starter wrote it.'
+        ),
+        call(
+          'splitCode',
+          ['SL-125'],
+          ['SL', 125],
+          'splitCode should give the two parts of any code.'
+        )
       ]
     })
   },
@@ -79,7 +80,12 @@ export const checks = {
       cases: [
         call(
           'orderLines',
-          [[['Smoky Lapsang', 3], ['Hearth Assam', 1]]],
+          [
+            [
+              ['Smoky Lapsang', 3],
+              ['Hearth Assam', 1]
+            ]
+          ],
           ['Smoky Lapsang x3', 'Hearth Assam x1'],
           "orderLines should give one text per line, in the same order: the blend, a space, an x and the number of tins, like 'Hearth Assam x2'."
         ),

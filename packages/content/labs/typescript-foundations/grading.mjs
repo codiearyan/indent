@@ -68,7 +68,11 @@ function part(lines, task) {
   const start = starts.get(task)
   if (start === undefined) return null
   const later = [...starts.values()].filter((i) => i > start)
-  return { start, end: later.length ? Math.min(...later) : lines.length, first: Math.min(...starts.values()) }
+  return {
+    start,
+    end: later.length ? Math.min(...later) : lines.length,
+    first: Math.min(...starts.values())
+  }
 }
 
 /** The code above the first task, without comments or spaces, to compare with the starter's. */
@@ -85,11 +89,13 @@ export function show(v) {
   if (!v || v.type === 'missing') return 'nothing'
   if (['undefined', 'null', 'NaN', 'function'].includes(v.type)) return v.type
   if (v.type === 'string') return literal(v.value)
-  return JSON.stringify(v.value)
+  return code(v.value)
 }
 
 const same = (v, expected) =>
-  v && !['missing', 'undefined', 'NaN', 'function'].includes(v.type) && isDeepStrictEqual(v.value, expected)
+  v &&
+  !['missing', 'undefined', 'NaN', 'function'].includes(v.type) &&
+  isDeepStrictEqual(v.value, expected)
 
 /** The round brackets after `function name`, and what follows them. */
 function afterParams(code, name) {
@@ -111,7 +117,8 @@ function silencers(section, whole) {
     const n = section.start + i + 1
     const shown = section.lines[i].trim()
     if (/\bany\b/.test(line)) found.push(`line ${n}: ${shown}`)
-    else if (/(?:^|[^\w$.])as\s+(?!const\b)[A-Za-z_$({[]/.test(line)) found.push(`line ${n}: ${shown}`)
+    else if (/(?:^|[^\w$.])as\s+(?!const\b)[A-Za-z_$({[]/.test(line))
+      found.push(`line ${n}: ${shown}`)
   })
   const comments = [...section.lines.entries()]
     .filter(([, line]) => /@ts-(ignore|expect-error|nocheck)/.test(line))
@@ -122,7 +129,10 @@ function silencers(section, whole) {
 
 function explainOwn(errors, lines) {
   return errors
-    .map((e) => `line ${e.line}: ${lines[e.line - 1]?.trim() ?? ''}\n  ${e.text}${e.more ? `\n  ${e.more}` : ''}`)
+    .map(
+      (e) =>
+        `line ${e.line}: ${lines[e.line - 1]?.trim() ?? ''}\n  ${e.text}${e.more ? `\n  ${e.more}` : ''}`
+    )
     .join('\n\n')
 }
 
@@ -143,7 +153,9 @@ function explainHidden(errors, lines) {
 
 const missingExport = (errors) =>
   errors
-    .map((e) => /has no exported member(?: named)? '([\w$]+)'|declares '([\w$]+)' locally/.exec(e.text))
+    .map((e) =>
+      /has no exported member(?: named)? '([\w$]+)'|declares '([\w$]+)' locally/.exec(e.text)
+    )
     .map((m) => m && (m[1] ?? m[2]))
     .find(Boolean)
 
@@ -184,7 +196,9 @@ export async function judge(t, spec) {
     return { text: kept.join('\n') }
   }
   const main = withGiven(spec.given ?? {})
-  const missing = main.missing ?? (spec.cases ?? []).map((c) => c.given && withGiven(c.given).missing).find(Boolean)
+  const missing =
+    main.missing ??
+    (spec.cases ?? []).map((c) => c.given && withGiven(c.given).missing).find(Boolean)
   if (missing) {
     return [
       fail(
@@ -279,7 +293,9 @@ export async function judge(t, spec) {
   const shared = own.filter((e) => e.line - 1 < p.first)
   const mine = own.filter((e) => e.line - 1 >= p.first)
   if (crashed) {
-    details.push(fail(`${label} compiles`, 'The compiler could not run. Try Check again.', compiled.output))
+    details.push(
+      fail(`${label} compiles`, 'The compiler could not run. Try Check again.', compiled.output)
+    )
   } else if (shared.length) {
     details.push(
       fail(
@@ -362,15 +378,20 @@ export async function judge(t, spec) {
   return details
 }
 
-const stoppedRun = (r) =>
-  r.printed ? r.printed.code !== 0 || r.printed.timedOut : !r.ok
+const stoppedRun = (r) => (r.printed ? r.printed.code !== 0 || r.printed.timedOut : !r.ok)
 
 function behaviour(cases, runs, file, label) {
   const broken = runs.find(stoppedRun)
   if (broken) {
-    const error = broken.printed ? (broken.printed.timedOut ? 'Timed out' : broken.printed.stderr) : broken.error
+    const error = broken.printed
+      ? broken.printed.timedOut
+        ? 'Timed out'
+        : broken.printed.stderr
+      : broken.error
     const unwritten = /Not implemented/.test(error)
-    const kind = error.split('\n').find((l) => /^\w*Error\b|^SyntaxError/.test(l.trim())) ?? error.split('\n')[0]
+    const kind =
+      error.split('\n').find((l) => /^\w*Error\b|^SyntaxError/.test(l.trim())) ??
+      error.split('\n')[0]
     return [
       fail(
         `${label} runs`,
@@ -396,7 +417,10 @@ function behaviour(cases, runs, file, label) {
   return cases.map((c, i) => {
     const r = runs[i]
     if (c.prints) {
-      const line = r.printed.stdout.split('\n').map((l) => l.trim()).find((l) => l.startsWith(c.prints))
+      const line = r.printed.stdout
+        .split('\n')
+        .map((l) => l.trim())
+        .find((l) => l.startsWith(c.prints))
       const got = line === undefined ? undefined : line.slice(c.prints.length).trim()
       const passed = got === String(c.expected)
       return {
@@ -408,6 +432,28 @@ function behaviour(cases, runs, file, label) {
     }
     const v = r.value
     const passed = same(v, c.expected)
-    return { name: c.name, passed, message: passed ? undefined : c.hint, output: `${c.setup}\nGave: ${show(v)}` }
+    return {
+      name: c.name,
+      passed,
+      message: passed ? undefined : c.hint,
+      output: `${c.setup}\nGave: ${show(v)}`
+    }
   })
+}
+
+/** A value written the way code writes it: { id: 'OK-1', tins: 2 }. */
+export function code(v) {
+  if (typeof v === 'string') return `'${v}'`
+  if (Array.isArray(v)) return `[${v.map(code).join(', ')}]`
+  if (v && typeof v === 'object') {
+    const entries = Object.entries(v).map(([k, x]) => `${k}: ${code(x)}`)
+    return entries.length ? `{ ${entries.join(', ')} }` : '{}'
+  }
+  return String(v)
+}
+
+/** A case that calls `fn` with `args` and compares what it gives back. */
+export function call(fn, args, expected, hint) {
+  const setup = `${fn}(${args.map(code).join(', ')})`
+  return { name: `${setup} gives the right answer`, call: fn, args, expected, setup, hint }
 }

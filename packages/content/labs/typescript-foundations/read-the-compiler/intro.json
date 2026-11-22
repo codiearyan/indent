@@ -1,6 +1,6 @@
 {
   "stations": [
-    { "title": "Imogen", "say": "Why does the sheet print nonsense?", "note": "She gave Rafe's code types." },
+    { "title": "Imogen", "say": "Why does the sheet print nonsense?", "note": "Rafe's code has types now." },
     { "title": "Node", "text": "Runs the code and never looks at the types." },
     {
       "title": "Your fixes",

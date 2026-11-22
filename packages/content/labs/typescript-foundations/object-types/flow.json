@@ -1,0 +1,135 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "imogen", "label": "Imogen", "kind": "story" },
+      { "id": "order", "label": "First order", "kind": "data", "mine": true },
+      { "id": "line", "label": "lineGrams()", "kind": "function", "mine": true, "fn": "lineGrams" },
+      { "id": "slip", "label": "slipText()", "kind": "function", "mine": true, "fn": "slipText" },
+      { "id": "parcel", "label": "parcelFor()", "kind": "function", "mine": true },
+      { "id": "table", "label": "Packing table", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "imogen", "to": "order", "label": "an order" },
+      { "from": "order", "to": "line", "label": "order line" },
+      { "from": "order", "to": "slip", "label": "id, note?" },
+      { "from": "order", "to": "parcel", "label": "id, grams" },
+      { "from": "slip", "to": "table", "label": "slip" },
+      { "from": "parcel", "to": "table", "label": "parcel" }
+    ],
+    "note": "An order's shape is written as a type, so the compiler knows which properties every function may read, which may be missing and which never change."
+  },
+  "tasks": {
+    "line": {
+      "trace": { "file": "src/orders.ts", "call": "lineGrams", "args": [{ "tins": 3, "gramsPerTin": 125 }] },
+      "steps": [
+        {
+          "active": ["order", "order->line"],
+          "value": {
+            "kind": "map",
+            "label": "an order line",
+            "entries": [
+              { "key": "tins", "value": "number" },
+              { "key": "gramsPerTin", "value": "number" }
+            ]
+          },
+          "note": "An order line has a number of tins and the grams in each."
+        },
+        {
+          "active": ["line"],
+          "note": "With the object's shape as the parameter's type, the compiler knows both properties are there and are numbers."
+        },
+        {
+          "active": ["line"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "grams", "value": "number" }]
+          },
+          "note": "The line's weight comes back as one number."
+        }
+      ]
+    },
+    "slip": {
+      "trace": { "file": "src/orders.ts", "call": "slipText", "args": [{ "id": "OK-1043" }] },
+      "steps": [
+        {
+          "active": ["order", "order->slip"],
+          "value": {
+            "kind": "map",
+            "label": "an order",
+            "entries": [
+              { "key": "id", "value": "text" },
+              { "key": "giftNote", "value": "text, or missing" }
+            ]
+          },
+          "note": "Order OK-1043 has an id and no gift note, like most orders."
+        },
+        {
+          "active": ["slip"],
+          "note": "The type says the note may be missing, so the compiler accepts the order, and the function asks whether there is one."
+        },
+        {
+          "active": ["slip", "slip->table", "table"],
+          "note": "The slip says only what is there, and never prints undefined."
+        }
+      ]
+    },
+    "first": {
+      "steps": [
+        {
+          "active": ["imogen", "imogen->order", "order"],
+          "value": {
+            "kind": "map",
+            "label": "the first order",
+            "entries": [
+              { "key": "id", "value": "OK-1042" },
+              { "key": "tins", "value": "a number" }
+            ]
+          },
+          "note": "The first order of the day comes in with its id and a number of tins."
+        },
+        {
+          "active": ["order"],
+          "note": "The customer adds a tin, which is allowed. A later line gives the order a new id, which nothing stops yet."
+        },
+        {
+          "active": ["order"],
+          "note": "Once the type says the id never changes, the compiler refuses that line and the order keeps its id."
+        }
+      ]
+    },
+    "parcel": {
+      "steps": [
+        {
+          "active": ["order", "order->parcel"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "orderId", "value": "text" },
+              { "key": "grams", "value": "number" }
+            ]
+          },
+          "note": "Bryn weighs the packed parcel for order OK-1042."
+        },
+        {
+          "active": ["parcel"],
+          "note": "The parcel is made as an object, and its result type names every property it has."
+        },
+        {
+          "active": ["parcel", "parcel->table", "table"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "orderId", "value": "text" },
+              { "key": "grams", "value": "number" },
+              { "key": "heavy", "value": "true or false" }
+            ]
+          },
+          "note": "The packing table gets a parcel whose properties the compiler knows, so a misspelt one is refused."
+        }
+      ]
+    }
+  }
+}

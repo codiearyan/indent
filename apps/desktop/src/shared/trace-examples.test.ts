@@ -57,7 +57,9 @@ const repos: { labId: string; expected: string[] }[] = [
       'types-for-functions/label',
       'types-for-functions/packed',
       'arrays-and-tuples/parcel',
-      'arrays-and-tuples/code'
+      'arrays-and-tuples/code',
+      'object-types/line',
+      'object-types/slip'
     ]
   },
   {

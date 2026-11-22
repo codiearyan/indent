@@ -15,7 +15,8 @@
         "read-the-compiler",
         "types-for-values",
         "types-for-functions",
-        "arrays-and-tuples"
+        "arrays-and-tuples",
+        "object-types"
       ]
     }
   ]
