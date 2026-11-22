@@ -17,6 +17,7 @@ import { CompanionBar } from './CompanionBar'
 import { LeftPanel } from './LeftPanel'
 import { MomentCard } from '@/features/progress/MomentCard'
 import { useCatalog } from '@/stores/catalog'
+import { api } from '@/lib/api'
 import { RepoNotice } from './RepoNotice'
 import { useWorkspaceShortcuts } from './useWorkspaceShortcuts'
 
@@ -50,8 +51,14 @@ export function WorkspacePage(): React.JSX.Element {
     if (labId && chapterId) void open(labId, chapterId)
   }, [labId, chapterId, open])
 
-  // Leaving the issues gives the window its size back.
-  useEffect(() => () => void useWorkspace.getState().leaveCompanion(), [])
+  // Leaving the issues gives the window its size back and lets the repo update.
+  useEffect(
+    () => () => {
+      void useWorkspace.getState().leaveCompanion()
+      api.content.leave()
+    },
+    []
+  )
 
   // Files may have changed on disk through the terminal.
   useEffect(() => {

@@ -18,7 +18,7 @@ import type {
   PathDef
 } from '@shared/types'
 import { EVENTS } from '@shared/types'
-import { emit, handle } from '../ipc'
+import { emit, handle, listen } from '../ipc'
 import {
   asInstallError,
   fetchIndex,
@@ -39,7 +39,7 @@ const indexFile = (): string => join(contentDir(), 'index.json')
 let index: PackIndex | null | undefined
 const cachedIndex = (): PackIndex | null => (index ??= readIndexFile(indexFile()))
 
-/** The repo last opened in the workspace; quiet updates leave it alone. */
+/** The repo open in the workspace; quiet updates leave it alone until it is left. */
 let openLabId: string | undefined
 
 const installs = new Map<string, Promise<void>>()
@@ -97,15 +97,10 @@ async function refreshIndex(): Promise<boolean> {
 }
 
 let refreshed = false
+let indexFresh = false
+let updating = Promise.resolve()
 
-/** Once a run: a fresh index, then newer versions of repos on disk, one at a time. */
-async function refreshLibrary(): Promise<void> {
-  if (!usesLibrary() || refreshed) return
-  refreshed = true
-  if (!(await refreshIndex())) {
-    refreshed = false
-    return
-  }
+async function updateOnce(): Promise<void> {
   const current = cachedIndex()
   if (!current) return
   for (const entry of staleRepos(current, contentDir())) {
@@ -118,6 +113,35 @@ async function refreshLibrary(): Promise<void> {
       console.warn(`Could not update ${entry.id}:`, (error as Error).message)
     }
   }
+}
+
+/** Newer versions of repos on disk, one pass at a time; the open repo waits until it is left. */
+const updateStale = (): Promise<void> =>
+  (updating = updating
+    .then(updateOnce)
+    .catch((error) => console.warn('Could not update repos:', (error as Error).message)))
+
+/** Once a run: a fresh index, then the repos it has newer versions of. */
+async function refreshLibrary(): Promise<void> {
+  if (!usesLibrary() || refreshed) return
+  refreshed = true
+  if (!(await refreshIndex())) {
+    refreshed = false
+    return
+  }
+  indexFresh = true
+  await updateStale()
+}
+
+/** Only the workspace counts: Home and other views read issues without opening them. */
+export function enterRepo(labId: string): void {
+  openLabId = safeId(labId)
+}
+
+/** The learner left the issues, so the repo skipped while it was open can update now. */
+function leave(): void {
+  openLabId = undefined
+  if (indexFresh) void updateStale()
 }
 
 /** A flow.json that fails its checks is left out, so the repo and the issue still open. */
@@ -170,7 +194,6 @@ export async function milestoneCatalog(): Promise<MilestoneCatalog> {
 /** Downloads the repo first when only the library has it. */
 export async function loadChapter(labId: string, chapterId: string): Promise<Chapter> {
   safeId(labId)
-  openLabId = labId
   await installs.get(labId)?.catch(() => {})
   if (usesLibrary() && !existsSync(join(contentDir(), 'labs', labId, 'lab.json'))) {
     await installRepo(labId)
@@ -234,4 +257,5 @@ export function register(): void {
     narration,
     install
   })
+  listen('content', { leave })
 }
