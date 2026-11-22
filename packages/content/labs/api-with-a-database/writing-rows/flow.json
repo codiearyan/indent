@@ -1,0 +1,159 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "desk",
+        "label": "Front desk",
+        "kind": "story"
+      },
+      {
+        "id": "routes",
+        "label": "Workshop routes",
+        "kind": "file"
+      },
+      {
+        "id": "create",
+        "label": "create()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "update",
+        "label": "update()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "remove",
+        "label": "remove()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "table",
+        "label": "Workshops table",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "desk",
+        "to": "routes",
+        "label": "staff changes"
+      },
+      {
+        "from": "routes",
+        "to": "create",
+        "label": "fields"
+      },
+      {
+        "from": "routes",
+        "to": "update",
+        "label": "id, fields"
+      },
+      {
+        "from": "routes",
+        "to": "remove",
+        "label": "id"
+      },
+      {
+        "from": "create",
+        "to": "table",
+        "label": "INSERT"
+      },
+      {
+        "from": "update",
+        "to": "table",
+        "label": "UPDATE"
+      },
+      {
+        "from": "remove",
+        "to": "table",
+        "label": "DELETE"
+      }
+    ],
+    "note": "Every change from the front desk now becomes a statement on the workshops table, so it outlives a restart."
+  },
+  "tasks": {
+    "create": {
+      "steps": [
+        {
+          "active": ["desk", "desk->routes", "routes", "routes->create", "create"],
+          "value": {
+            "kind": "map",
+            "label": "the fields",
+            "entries": [
+              {
+                "key": "title",
+                "value": "Throwing bowls"
+              },
+              {
+                "key": "day",
+                "value": "fri"
+              },
+              {
+                "key": "seats",
+                "value": 6
+              },
+              {
+                "key": "priceCents",
+                "value": 4400
+              }
+            ]
+          },
+          "note": "Sunniva adds a Friday workshop from the desk."
+        },
+        {
+          "active": ["create", "create->table", "table"],
+          "note": "A new row goes in, and the database picks its id."
+        },
+        {
+          "active": ["create", "routes"],
+          "note": "The new workshop goes back with that id, and it is still in the file after a restart."
+        }
+      ]
+    },
+    "update": {
+      "steps": [
+        {
+          "active": ["desk", "desk->routes", "routes", "routes->update", "update"],
+          "value": {
+            "kind": "map",
+            "label": "the change",
+            "entries": [
+              {
+                "key": "seats",
+                "value": 8
+              }
+            ]
+          },
+          "note": "The desk raises the seats of one workshop and sends nothing else."
+        },
+        {
+          "active": ["update", "update->table", "table"],
+          "note": "Only that column changes; every other column keeps what it holds."
+        },
+        {
+          "active": ["update", "routes"],
+          "note": "The result says how many rows changed. None means no such workshop, and the desk gets a 404."
+        }
+      ]
+    },
+    "remove": {
+      "steps": [
+        {
+          "active": ["desk", "desk->routes", "routes", "routes->remove", "remove"],
+          "note": "The desk takes a workshop off the page."
+        },
+        {
+          "active": ["remove", "remove->table", "table"],
+          "note": "The row with that id is deleted."
+        },
+        {
+          "active": ["remove", "routes"],
+          "note": "Deleted a second time, nothing goes, the result says so, and the desk gets a 404."
+        }
+      ]
+    }
+  }
+}

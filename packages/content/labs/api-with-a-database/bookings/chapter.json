@@ -1,0 +1,97 @@
+{
+  "id": "bookings",
+  "title": "Bookings and places left",
+  "files": [
+    "src/db.js",
+    "src/store.js",
+    "src/routes/bookings.js",
+    "src/routes/workshops.js",
+    "src/app.js",
+    "try.js",
+    "server.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js books places in data/kilnworth.db and shows the places left.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "table",
+      "title": "Keep bookings in a table of their own",
+      "file": "src/db.js",
+      "description": "Change `createTables(db)` in `src/db.js` so it also makes a `bookings` table, unless the database already has it:\n\n- `id`, the `INTEGER PRIMARY KEY`\n- `workshopId`, a whole number that must be the `id` of a row in `workshops`\n- `name`, text\n\nNeither `workshopId` nor `name` may be empty (`NULL`). The workshops table is made as before.\n\nThe check runs `createTables` on an empty database, looks at the columns and the link it made, adds bookings for a workshop that exists, for one that does not and without a name, and runs it a second time.",
+      "nextSteps": [
+        "Add a second `CREATE TABLE` to the SQL in `createTables`.",
+        "Give it the three columns and say which cannot be empty.",
+        "Tell the database what `workshopId` refers to.",
+        "Run `node try.js`."
+      ],
+      "hints": [
+        "One `db.exec` can run two statements when a `;` separates them, and each needs its own `IF NOT EXISTS`.",
+        "`REFERENCES workshops (id)` after a column's type makes it a foreign key: the database then refuses a value that is not the id of a workshop.",
+        "`CREATE TABLE IF NOT EXISTS bookings (id INTEGER PRIMARY KEY, workshopId INTEGER NOT NULL REFERENCES workshops (id), name TEXT NOT NULL)`."
+      ],
+      "docs": [
+        { "title": "SQLite foreign keys", "url": "https://sqlite.org/foreignkeys.html" },
+        { "title": "SQLite CREATE TABLE", "url": "https://sqlite.org/lang_createtable.html" },
+        {
+          "title": "new DatabaseSync() options",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/sqlite.html#new-databasesyncpath-options"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "book",
+      "title": "Book a place",
+      "file": "src/store.js",
+      "description": "Implement `book(workshopId, name)` in `src/store.js`.\n\n- when a workshop has that id, it adds a row to `bookings` and returns `{ booking: { id, workshopId, name } }`, with the id the database gave the row\n- when no workshop has that id, it adds nothing and returns `{ problem: 'not_found' }`\n\nEach value reaches the database in the place of a `?`. The route in `src/routes/bookings.js` answers 201, or 404 for the problem.\n\nThe check sends `POST /bookings` for workshops of its own, one name with an apostrophe in it, and a workshop that is not there, then looks at the bookings table and the SQL your store hands the database.",
+      "nextSteps": [
+        "Find out whether the workshop is there, and return the problem if it is not.",
+        "Write the `INSERT` for a booking with a `?` for each value.",
+        "Return the booking with the id from the result of `run()`.",
+        "Run `node try.js`."
+      ],
+      "hints": [
+        "The store can already read one workshop by its id.",
+        "If the database refuses a booking for a missing workshop, that error reaches the error handler as a 500. Check first with `get(workshopId)`. `lastInsertRowid` is the id of the new row.",
+        "`if (!get(workshopId)) return { problem: 'not_found' }`, then `db.prepare('INSERT INTO bookings (workshopId, name) VALUES (?, ?)').run(workshopId, name)` and `return { booking: { id: lastInsertRowid, workshopId, name } }`."
+      ],
+      "docs": [
+        { "title": "SQLite INSERT", "url": "https://sqlite.org/lang_insert.html" },
+        {
+          "title": "node:sqlite statement.run()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/sqlite.html#statementrunnamedparameters-anonymousparameters"
+        },
+        { "title": "SQLite foreign keys", "url": "https://sqlite.org/foreignkeys.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "places",
+      "title": "Work out the places left",
+      "file": "src/store.js",
+      "description": "Change `list` and `get` in `src/store.js` so each workshop comes back with one more field, `placesLeft`: its `seats` minus the number of its bookings.\n\n- a workshop with no bookings is still there, with every place left\n- the filters of `list` and the 404 of `get` work as before\n- `placesLeft` comes back from the query, worked out by the database\n\nThe check fills a database of its own with workshops and bookings, reads single workshops and lists, and looks at the rows your queries give back.",
+      "nextSteps": [
+        "Join the bookings to the workshops in the query of `get`.",
+        "Keep the workshops that have no bookings.",
+        "Count the bookings per workshop and take them from the seats.",
+        "Do the same in `list`, then run `node try.js`."
+      ],
+      "hints": [
+        "With two tables in the query, a column such as `id` has to say which table it belongs to. Give each table a short name with `AS`.",
+        "`LEFT JOIN` keeps a workshop with no bookings. `COUNT(b.id)` counts only real bookings, `GROUP BY w.id` counts per workshop, and `AS placesLeft` names the result.",
+        "`SELECT w.id, w.title, w.day, w.seats, w.priceCents, w.seats - COUNT(b.id) AS placesLeft FROM workshops AS w LEFT JOIN bookings AS b ON b.workshopId = w.id`, then the `WHERE`, `GROUP BY w.id` and, in `list`, `ORDER BY w.id`."
+      ],
+      "docs": [
+        { "title": "SQLite joins", "url": "https://sqlite.org/lang_select.html#fromclause" },
+        { "title": "SQLite count()", "url": "https://sqlite.org/lang_aggfunc.html#count" },
+        { "title": "SQLite GROUP BY", "url": "https://sqlite.org/lang_select.html#resultset" }
+      ],
+      "videos": [
+        { "title": "Joins explained", "url": "https://www.youtube.com/watch?v=9yeOJ0ZMUYw" }
+      ],
+      "points": 10
+    }
+  ]
+}

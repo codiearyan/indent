@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Sunniva",
+      "say": "Why is it twelve places again?",
+      "note": "After last night's restart."
+    },
+    {
+      "title": "The API",
+      "text": "Keeps workshops in memory, from the code.",
+      "note": "Starts over on every restart."
+    },
+    {
+      "title": "Your code",
+      "file": "db.js",
+      "mine": true,
+      "gap": "No file to keep them in",
+      "tasks": ["Create the table", "Fill it once", "Open the file"]
+    },
+    {
+      "title": "kilnworth.db",
+      "rows": [
+        ["Glazing basics", "6"],
+        ["Family morning", "14"],
+        ["Second steps", "6"]
+      ],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "Family morning",
+    "wrong": "12 again",
+    "why": "Restarted",
+    "right": "still 14"
+  },
+  "captions": [
+    "At the front desk, Sunniva took the family morning up to fourteen places on Monday.",
+    "The API keeps workshops in memory, so last night's restart put twelve back.",
+    "You make a table in a database file, fill it once, and open it on every start.",
+    "The family morning keeps its fourteen places in kilnworth.db, restart or not.",
+    "The workshops now have a file to live in, and the next issues move the API onto it."
+  ]
+}
