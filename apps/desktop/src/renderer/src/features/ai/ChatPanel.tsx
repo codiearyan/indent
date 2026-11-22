@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { SendHorizontal, Square, X } from 'lucide-react'
 import type { AiAttachment } from '@shared/types'
-import { ShortcutKeys } from '@/components/app/ShortcutKeys'
+import { ShortcutKeys, ShortcutSuffix } from '@/components/app/ShortcutKeys'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -10,13 +10,12 @@ import { Markdown } from '@/features/workspace/Markdown'
 import { playLinkedVideo } from '@/features/workspace/video'
 import { isShortcut } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
-import { useSettings } from '@/stores/settings'
 import { activeProvider, useAi } from './aiStore'
 import { focusLine } from './attachments'
+import { toggleTutor } from './toggleTutor'
 import { MESSAGE_BUDGET, useChat } from './chatStore'
 
 export function ChatPanel(): React.JSX.Element {
-  const setPanel = useSettings((s) => s.setPanel)
   const config = useAi((s) => s.config)
   const provider = activeProvider(config)
   const { messages, busy, error, remaining, focus, send, stop } = useChat()
@@ -50,13 +49,17 @@ export function ChatPanel(): React.JSX.Element {
               variant="ghost"
               size="icon-sm"
               aria-label="Close tutor"
+              data-shortcut="openTutor"
               className="text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]"
-              onClick={() => setPanel('chat', false)}
+              onClick={toggleTutor}
             >
               <X />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Close tutor</TooltipContent>
+          <TooltipContent>
+            Close tutor
+            <ShortcutSuffix id="openTutor" />
+          </TooltipContent>
         </Tooltip>
       </header>
       {focus && (

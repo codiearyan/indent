@@ -5,7 +5,7 @@ import '@xterm/xterm/css/xterm.css'
 import { ChevronDown, ChevronUp, Maximize2, Minimize2, RotateCw } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Chapter } from '@shared/types'
-import { ShortcutKeys } from '@/components/app/ShortcutKeys'
+import { ShortcutSuffix } from '@/components/app/ShortcutKeys'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { api } from '@/lib/api'
@@ -398,6 +398,7 @@ function IconButton({
           variant="ghost"
           size="icon-sm"
           aria-label={label}
+          data-shortcut={shortcut}
           onClick={onClick}
           className="text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]"
         >
@@ -406,12 +407,7 @@ function IconButton({
       </TooltipTrigger>
       <TooltipContent>
         {label}
-        {shortcut && (
-          <>
-            {' '}
-            (<ShortcutKeys id={shortcut} />)
-          </>
-        )}
+        {shortcut && <ShortcutSuffix id={shortcut} />}
       </TooltipContent>
     </Tooltip>
   )

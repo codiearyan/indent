@@ -34,6 +34,7 @@ describe('shortcutGroups', () => {
   it('filters by label, ignoring case and spaces around', () => {
     const groups = shortcutGroups('linux', '  NEXT issue ')
     expect(ids(groups)).toEqual(['nextIssue'])
+    expect(groups[0].rows[0].keys).toEqual([])
     expect(groups.map((g) => g.title)).toEqual(['Issue'])
   })
 

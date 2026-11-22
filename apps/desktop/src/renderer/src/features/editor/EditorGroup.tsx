@@ -9,7 +9,8 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { ShortcutKeys } from '@/components/app/ShortcutKeys'
+import { ShortcutKeys, ShortcutSuffix } from '@/components/app/ShortcutKeys'
+import { TAB_SHORTCUTS } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { useWorkspace } from '@/stores/workspace'
 import { TOUR } from '@/features/tour/anchors'
@@ -58,7 +59,7 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
           data-tour={group === 0 ? TOUR.editorTabs : undefined}
           className="flex min-w-0 flex-1 overflow-x-auto [scrollbar-width:none]"
         >
-          {paths.map((path) => {
+          {paths.map((path, index) => {
             const file = files.find((f) => f.path === path)
             if (!file) return null
             const active = path === activePath
@@ -84,6 +85,7 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
                   type="button"
                   role="tab"
                   aria-selected={active}
+                  data-shortcut={focused && index < 9 ? TAB_SHORTCUTS[index] : undefined}
                   onClick={() => openFile(path, group)}
                   className="flex h-full items-center gap-2 pr-1 pl-3 font-mono text-[13px] outline-none"
                 >
@@ -98,6 +100,7 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
                     <button
                       type="button"
                       aria-label={`Close ${name}`}
+                      data-shortcut={active && focused ? 'closeFile' : undefined}
                       onClick={() => closeFile(path, group)}
                       className={cn(
                         'mr-1.5 flex size-5 items-center justify-center rounded-sm text-muted-foreground opacity-0 outline-none group-hover:opacity-100 hover:bg-accent hover:text-foreground focus-visible:bg-accent focus-visible:opacity-100',
@@ -108,7 +111,8 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    Close file (<ShortcutKeys id="closeFile" />)
+                    Close file
+                    <ShortcutSuffix id="closeFile" />
                   </TooltipContent>
                 </Tooltip>
                 <DropdownMenu
@@ -145,6 +149,7 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
                 variant="ghost"
                 size="icon-xs"
                 aria-label="Open to the side"
+                data-shortcut={focused ? 'openToSide' : undefined}
                 disabled={!activePath}
                 onClick={() => activePath && toSide(activePath)}
                 className="text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]"
@@ -153,7 +158,8 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              Open to the side (<ShortcutKeys id="openToSide" />)
+              Open to the side
+              <ShortcutSuffix id="openToSide" />
             </TooltipContent>
           </Tooltip>
         </div>

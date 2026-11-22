@@ -5,7 +5,7 @@ export type ShortcutScope =
 
 export interface Shortcut {
   label: string
-  /** `Mod` is Cmd on macOS and Ctrl elsewhere, e.g. `Mod+Shift+K`. */
+  /** `Mod` is Cmd on macOS and Ctrl elsewhere, e.g. `Mod+Shift+K`. Empty when it has no keys. */
   keys: string
   /** More keys for the same command, for where the first ones belong to the editor. */
   also?: string
@@ -20,27 +20,36 @@ export const SHORTCUTS = {
     also: 'Mod+Shift+/',
     scope: 'everywhere'
   },
-  goHome: { label: 'Go to Home', keys: 'Mod+Alt+1', scope: 'everywhere' },
-  goRepos: { label: 'Go to Repos', keys: 'Mod+Alt+2', scope: 'everywhere' },
-  goRoadmaps: { label: 'Go to Roadmaps', keys: 'Mod+Alt+3', scope: 'everywhere' },
-  goPatterns: { label: 'Go to Patterns', keys: 'Mod+Alt+4', scope: 'everywhere' },
-  goActivity: { label: 'Go to Activity', keys: 'Mod+Alt+5', scope: 'everywhere' },
+  goHome: { label: 'Go to Home', keys: '', scope: 'everywhere' },
+  goRepos: { label: 'Go to Repos', keys: '', scope: 'everywhere' },
+  goRoadmaps: { label: 'Go to Roadmaps', keys: '', scope: 'everywhere' },
+  goPatterns: { label: 'Go to Patterns', keys: '', scope: 'everywhere' },
+  goActivity: { label: 'Go to Activity', keys: '', scope: 'everywhere' },
   check: { label: 'Run checks', keys: 'Mod+Enter', scope: 'workspace' },
   runCommand: { label: 'Run the command', keys: 'Mod+Shift+Enter', scope: 'workspace' },
-  focusEditor: { label: 'Focus the editor', keys: 'Mod+1', scope: 'workspace' },
-  focusLesson: { label: 'Focus the lesson and tasks', keys: 'Mod+2', scope: 'workspace' },
-  focusTerminal: { label: 'Focus the terminal', keys: 'Mod+3', scope: 'workspace' },
+  selectTab1: { label: 'Go to tab 1', keys: 'Mod+1', scope: 'workspace' },
+  selectTab2: { label: 'Go to tab 2', keys: 'Mod+2', scope: 'workspace' },
+  selectTab3: { label: 'Go to tab 3', keys: 'Mod+3', scope: 'workspace' },
+  selectTab4: { label: 'Go to tab 4', keys: 'Mod+4', scope: 'workspace' },
+  selectTab5: { label: 'Go to tab 5', keys: 'Mod+5', scope: 'workspace' },
+  selectTab6: { label: 'Go to tab 6', keys: 'Mod+6', scope: 'workspace' },
+  selectTab7: { label: 'Go to tab 7', keys: 'Mod+7', scope: 'workspace' },
+  selectTab8: { label: 'Go to tab 8', keys: 'Mod+8', scope: 'workspace' },
+  selectTab9: { label: 'Go to tab 9', keys: 'Mod+9', scope: 'workspace' },
+  focusEditor: { label: 'Focus the editor', keys: '', scope: 'workspace' },
+  focusLesson: { label: 'Focus the lesson and tasks', keys: '', scope: 'workspace' },
+  focusTerminal: { label: 'Focus the terminal', keys: '', scope: 'workspace' },
   toggleTerminal: { label: 'Show or hide the terminal', keys: 'Mod+J', scope: 'workspace' },
   toggleFiles: { label: 'Show or hide the file list', keys: 'Mod+B', scope: 'workspace' },
-  toggleFocusMode: { label: 'Focus mode', keys: 'Mod+Shift+F', scope: 'workspace' },
-  nextIssue: { label: 'Next issue', keys: 'Mod+Alt+ArrowRight', scope: 'workspace' },
-  previousIssue: { label: 'Previous issue', keys: 'Mod+Alt+ArrowLeft', scope: 'workspace' },
-  openTutor: { label: 'Open the tutor', keys: 'Mod+Shift+T', scope: 'workspace' },
-  nextHint: { label: 'Show the next hint', keys: 'Mod+Shift+H', scope: 'workspace' },
-  readAloud: { label: 'Read aloud: play or pause', keys: 'Mod+Shift+P', scope: 'workspace' },
+  toggleFocusMode: { label: 'Focus mode', keys: '', scope: 'workspace' },
+  nextIssue: { label: 'Next issue', keys: '', scope: 'workspace' },
+  previousIssue: { label: 'Previous issue', keys: '', scope: 'workspace' },
+  openTutor: { label: 'Show or hide the tutor', keys: 'Mod+Shift+T', scope: 'workspace' },
+  nextHint: { label: 'Show the next hint', keys: '', scope: 'workspace' },
+  readAloud: { label: 'Read aloud: play or pause', keys: '', scope: 'workspace' },
   closeFile: { label: 'Close file', keys: 'Mod+W', scope: 'workspace' },
   quickOpen: { label: 'Open a file by name', keys: 'Mod+P', scope: 'workspace' },
-  openToSide: { label: 'Open to the side', keys: 'Mod+\\', scope: 'workspace' },
+  openToSide: { label: 'Open to the side', keys: '', scope: 'workspace' },
   save: { label: 'Save', keys: 'Mod+S', scope: 'editor' },
   suggest: { label: 'Ask for a suggestion', keys: 'Alt+\\', scope: 'editor' },
   explainCode: { label: 'Explain this code', keys: 'Mod+Shift+E', scope: 'editor' },
@@ -58,6 +67,19 @@ export const SHORTCUTS = {
 } satisfies Record<string, Shortcut>
 
 export type ShortcutId = keyof typeof SHORTCUTS
+
+/** The shortcuts that pick an editor tab by position, the first tab first. */
+export const TAB_SHORTCUTS: ShortcutId[] = [
+  'selectTab1',
+  'selectTab2',
+  'selectTab3',
+  'selectTab4',
+  'selectTab5',
+  'selectTab6',
+  'selectTab7',
+  'selectTab8',
+  'selectTab9'
+]
 
 type Modifier = 'Mod' | 'Alt' | 'Shift'
 
@@ -82,6 +104,7 @@ function parse(keys: string): { modifiers: Modifier[]; key: string } {
 
 /** Writes keys the way the platform does: `⌥⇧⌘K` on macOS, `Ctrl+Alt+Shift+K` elsewhere. */
 export function formatKeys(keys: string, platform: string): string {
+  if (!keys) return ''
   const { modifiers, key } = parse(keys)
   const name = key.length === 1 ? key.toUpperCase() : key
   if (platform === 'darwin') {
@@ -120,6 +143,7 @@ function codeFor(key: string): string | undefined {
  * (Shift+1 types `!`), so with either held the physical key counts as well.
  */
 export function matchesKeys(event: KeyEvent, keys: string): boolean {
+  if (!keys) return false
   const { modifiers, key } = parse(keys)
   if ((event.metaKey || event.ctrlKey) !== modifiers.includes('Mod')) return false
   if (event.altKey !== modifiers.includes('Alt')) return false
@@ -168,20 +192,23 @@ export function toMonacoKeys(
   return modifiers.reduce((binding, m) => binding | mods[m], monaco.KeyCode[code] as number)
 }
 
-/** Every key combination of a shortcut, the main one first. */
+/** Every key combination of a shortcut, the main one first. None when it has no keys. */
 export function keysOf(shortcut: Shortcut): string[] {
-  return shortcut.also ? [shortcut.keys, shortcut.also] : [shortcut.keys]
+  return [shortcut.keys, shortcut.also ?? ''].filter(Boolean)
 }
 
-/** Keys a person picked in Settings, by shortcut id. Only the ones that differ are kept. */
+/**
+ * Keys a person picked in Settings, by shortcut id. Only the ones that differ are kept; an empty
+ * string means they cleared the keys.
+ */
 export type ShortcutOverrides = Partial<Record<ShortcutId, string>>
 
-/** The saved overrides that still name a shortcut and hold keys; anything else is dropped. */
+/** The saved overrides that still name a shortcut and hold keys or none; anything else is dropped. */
 export function cleanOverrides(saved: unknown): ShortcutOverrides {
   if (!saved || typeof saved !== 'object') return {}
   return Object.fromEntries(
     Object.entries(saved).filter(
-      ([id, keys]) => Object.hasOwn(SHORTCUTS, id) && typeof keys === 'string' && keys !== ''
+      ([id, keys]) => Object.hasOwn(SHORTCUTS, id) && typeof keys === 'string'
     )
   )
 }
@@ -192,9 +219,31 @@ export function applyOverrides(overrides: unknown): Record<ShortcutId, Shortcut>
   return Object.fromEntries(
     Object.entries(SHORTCUTS).map(([id, s]: [string, Shortcut]) => {
       const keys = clean[id as ShortcutId]
-      return [id, keys ? { label: s.label, scope: s.scope, keys } : s]
+      return [id, keys !== undefined ? { label: s.label, scope: s.scope, keys } : s]
     })
   ) as Record<ShortcutId, Shortcut>
+}
+
+/**
+ * Keys a person picked stay theirs when a newer default wants the same keys: that default is
+ * left with its other keys, or none. Run on saved overrides when settings load.
+ */
+export function keepPickedKeys(overrides: ShortcutOverrides): ShortcutOverrides {
+  const picked = (Object.keys(overrides) as ShortcutId[]).filter((id) => overrides[id])
+  const next = { ...overrides }
+  for (const [id, shortcut] of Object.entries(SHORTCUTS) as [ShortcutId, Shortcut][]) {
+    if (id in overrides) continue
+    const free = keysOf(shortcut).filter(
+      (keys) =>
+        !picked.some(
+          (other) =>
+            scopesOverlap(shortcut.scope, SHORTCUTS[other].scope) &&
+            sameKeys(overrides[other] as string, keys)
+        )
+    )
+    if (free.length < keysOf(shortcut).length) next[id] = free[0] ?? ''
+  }
+  return next
 }
 
 let effective = applyOverrides({})
@@ -224,11 +273,13 @@ export function isShortcut(event: KeyEvent, id: ShortcutId): boolean {
   return keysOf(effective[id]).some((keys) => matchesKeys(event, keys))
 }
 
-export function monacoShortcut(
+/** The Monaco keybindings of a shortcut: one, or none when it has no keys. */
+export function monacoKeys(
   id: ShortcutId,
   monaco: Pick<typeof Monaco, 'KeyMod' | 'KeyCode'>
-): number {
-  return toMonacoKeys(effective[id].keys, monaco)
+): number[] {
+  const { keys } = effective[id]
+  return keys ? [toMonacoKeys(keys, monaco)] : []
 }
 
 // Which scopes can be live at the same moment.
@@ -261,6 +312,7 @@ export function conflictOf(
   id: ShortcutId,
   keys: string
 ): ShortcutId | null {
+  if (!keys) return null
   const { scope } = shortcuts[id]
   const entries = Object.entries(shortcuts) as [ShortcutId, Shortcut][]
   const found = entries.find(
@@ -356,6 +408,7 @@ export const RESERVED_KEYS: { keys: string; platform?: 'darwin' | 'other'; reaso
  * App-wide shortcuts need Cmd, Ctrl or Alt, or a function key, so typing never sets them off.
  */
 export function refusal(keys: string, scope: ShortcutScope, platform: string): string | null {
+  if (!keys) return null
   const shown = formatKeys(keys, platform)
   const kind = platform === 'darwin' ? 'darwin' : 'other'
   const reserved = RESERVED_KEYS.find(

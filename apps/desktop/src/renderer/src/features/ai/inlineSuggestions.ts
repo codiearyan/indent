@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import type { AiCompleteRequest, ChapterProgress, TaskDef } from '@shared/types'
 import { chapterKey } from '@shared/rules'
 import { api } from '@/lib/api'
-import { monacoShortcut, SHORTCUTS } from '@/lib/shortcuts'
+import { monacoKeys, SHORTCUTS } from '@/lib/shortcuts'
 import { track } from '@/lib/telemetry'
 import { useProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
@@ -138,7 +138,7 @@ export function bindSuggestShortcut(
     editor.addAction({
       id: 'indent.suggest',
       label: SHORTCUTS.suggest.label,
-      keybindings: [monacoShortcut('suggest', monaco)],
+      keybindings: monacoKeys('suggest', monaco),
       keybindingContext: 'suggestOnRequest',
       run: () => editor.trigger('keyboard', 'editor.action.inlineSuggest.trigger', {})
     })

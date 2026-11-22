@@ -4,6 +4,8 @@ import { chapterKey } from '@shared/rules'
 import { useAiEnabled } from '@/features/ai/aiStore'
 import { focusEditorSoon, focusedEditor } from '@/features/editor/editors'
 import { useQuickOpen } from '@/features/editor/quickOpenStore'
+import { toggleTutor } from '@/features/ai/toggleTutor'
+import { TAB_SHORTCUTS } from '@/lib/shortcuts'
 import { useShortcuts } from '@/lib/useShortcuts'
 import { errorMessage } from '@/lib/utils'
 import { useProgress } from '@/stores/progress'
@@ -31,10 +33,17 @@ function focusSoon(selector: string): void {
   requestAnimationFrame(() => document.querySelector<HTMLElement>(selector)?.focus())
 }
 
-function showPanel(key: 'terminal' | 'chat'): void {
-  const { panels, setPanel } = useSettings.getState()
-  if (key === 'chat' && panels.zen) setPanel('zen', false)
-  setPanel(key, true)
+function showTerminal(): void {
+  useSettings.getState().setPanel('terminal', true)
+}
+
+/** Shows the tab at this position, counted from 1, in the focused editor group. */
+function selectTab(position: number): () => void {
+  return () => {
+    const { layout, openFile } = useWorkspace.getState()
+    const path = layout.groups[layout.focused]?.paths[position - 1]
+    if (path) openFile(path, layout.focused)
+  }
 }
 
 function showLesson(): void {
@@ -102,7 +111,7 @@ export function useWorkspaceShortcuts(): void {
       focusSoon('#lesson-panel [role="tab"][aria-selected="true"]')
     },
     focusTerminal: () => {
-      showPanel('terminal')
+      showTerminal()
       focusSoon('.xterm-helper-textarea')
     },
     toggleTerminal: () => togglePanel('terminal'),
@@ -110,12 +119,8 @@ export function useWorkspaceShortcuts(): void {
     toggleFocusMode: () => togglePanel('zen'),
     nextIssue: goTo(chapter?.nextChapterId),
     previousIssue: goTo(chapter?.prevChapterId),
-    openTutor:
-      aiOn &&
-      (() => {
-        showPanel('chat')
-        focusSoon('#tutor-input')
-      }),
+    openTutor: aiOn && toggleTutor,
+    ...Object.fromEntries(TAB_SHORTCUTS.map((id, i) => [id, ready && selectTab(i + 1)])),
     nextHint: ready && showNextHint
   })
 }
