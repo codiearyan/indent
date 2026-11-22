@@ -2,6 +2,7 @@ import {
   WEEK,
   copy,
   detail,
+  loadingLine,
   openApp,
   pageError,
   requestList,
@@ -17,7 +18,7 @@ const PROXY_PAGE = '<html><body><h1>502 Bad Gateway</h1><p>upstream closed</p></
 const RAW =
   /failed to fetch|typeerror|unexpected token|syntaxerror|is not valid json|<html|undefined|null|\[object/i
 
-const loading = (page) => roleTexts(page, 'status').some((text) => /loading/i.test(text))
+const loading = loadingLine
 const alerts = (page) => roleTexts(page, 'alert').filter(Boolean)
 const listShown = (page) => JSON.stringify(titles(page)) === JSON.stringify(TITLES)
 
@@ -52,7 +53,9 @@ async function failing(t, plan, says, missing) {
   first.play(plan)
   await page.settle(50)
   const output = page.errors.join('\n') || screen(page)
-  const problem = judge(page, says) ?? missing
+  const stillWaiting =
+    'The request failed, but the screen still says it is loading. Follow the failure to the code that catches it: that code has to change what the screen shows.'
+  const problem = judge(page, says) ?? (loading(page) ? stillWaiting : missing)
   page.close()
   return { problem, output }
 }
@@ -89,7 +92,9 @@ export const checks = {
       detail(
         'Says the workshops are loading while it waits',
         saidLoading && !listEarly,
-        'While the answer was on its way, the screen showed no line with role="status" that says the workshops are loading.',
+        listEarly
+          ? 'While the answer was on its way, the screen already showed workshops. No list is shown until the answer arrives.'
+          : 'While the answer was on its way, the screen showed no line with role="status" that says the workshops are loading.',
         `while waiting:\n${whileWaiting}`
       ),
       detail(

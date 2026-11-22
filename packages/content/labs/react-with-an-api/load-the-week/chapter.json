@@ -45,7 +45,7 @@
       "id": "show-workshops",
       "title": "Show the workshops that came back",
       "file": "src/App.jsx",
-      "description": "Draw one `WorkshopCard` for each workshop in the answer, in the order the API sent them, inside a `<ul className=\"workshops\">`. Give each card the workshop's `id` as its `key`.\n\n`WorkshopCard` is written for you: it shows the title, the day, the price and the places left.\n\nThe check answers with workshops your code has never seen and reads the cards on the screen.",
+      "description": "Draw one `WorkshopCard` for each workshop in the answer, in the order the API sent them, inside a `<ul>`. The class `workshops` on it gives the list its layout from `styles.css`. Give each card the workshop's `id` as its `key`.\n\n`WorkshopCard` is written for you: it shows the title, the day, the price and the places left.\n\nThe check answers with workshops your code has never seen and reads the cards on the screen.",
       "nextSteps": [
         "Look at what `response.json()` gives you: a promise, not the list itself.",
         "Once the list is in state, map over it in the JSX.",

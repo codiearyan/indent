@@ -108,7 +108,9 @@ export const checks = {
       detail(
         'Says the place is booked, naming the person and the workshop',
         said.includes(NAME) && said.includes(RAKU.title),
-        sent
+        said
+          ? 'The form says something after the booking, but its line with role="status" does not name both the person and the workshop.'
+          : sent
           ? 'The server booked the place, but the form did not say so: no line with role="status" names the person and the workshop.'
           : 'No booking was sent, so there was nothing to confirm yet.',
         formOutput(page)
@@ -117,14 +119,15 @@ export const checks = {
   },
 
   async 'no-double'(t) {
-    let waiting
+    const held = []
     const { api, page, failed } = await readyToBook(t, (request) => {
-      waiting = request
+      held.push(request)
       return 'hold'
     })
     if (failed) return [failed]
     const button = bookButton(page)
     await page.click(button)
+    const [waiting] = held
     if (!waiting) return [noBooking(api, page)]
 
     const offWhileSending = button.disabled
@@ -135,6 +138,22 @@ export const checks = {
     waiting.answer(...booked())
     await page.settle(50)
     const after = bookButton(page)
+    const onAfterBooked = Boolean(after) && !after.disabled
+    const afterBookedOutput = formOutput(page)
+
+    // The same button after an answer that says no.
+    let onAfterRefusal = false
+    let afterRefusalOutput = ''
+    if (onAfterBooked) {
+      const missing = await fillBooking(page, RAKU.id, NAME)
+      if (missing) return [missing]
+      const before = held.length
+      await page.click(bookButton(page))
+      held[before]?.answer(...refusedFull)
+      await page.settle(50)
+      onAfterRefusal = Boolean(held[before]) && !bookButton(page)?.disabled
+      afterRefusalOutput = formOutput(page)
+    }
 
     return [
       detail(
@@ -153,9 +172,13 @@ export const checks = {
       ),
       detail(
         'The button works again once the answer is in',
-        Boolean(after) && !after.disabled,
-        'The booking was answered, but the button stayed off, so nobody can book another place.',
-        `after the answer:\n${formOutput(page)}`
+        onAfterBooked && onAfterRefusal,
+        !onAfterBooked
+          ? 'The booking was answered, but the button stayed off, so nobody can book another place.'
+          : 'The button works again after a booking that worked, but after a booking the server refused it stayed off, so nobody can try again.',
+        onAfterBooked
+          ? `after a refusal:\n${afterRefusalOutput}`
+          : `after the answer:\n${afterBookedOutput}`
       )
     ]
   },

@@ -97,7 +97,7 @@ export const checks = {
         'After the booking the list does not hold the same workshops in the same order any more.'
     } else if (after === before) {
       problem =
-        'After the booking the card still shows the places left from before. The screen has to hear from the server again before it can show the right number.'
+        'After the booking the card still shows the places left from before. Look at how the new number reaches state: React only draws again when it is handed a new list, so a list changed in place shows nothing new, and neither does a handleBooked that never sets state.'
     } else if (after !== placesText(rakuAfter.placesLeft)) {
       problem =
         'The card shows a number the screen worked out itself. The server counted differently: another place went at the front desk while the form was open. Show the number the server sends.'

@@ -19,7 +19,7 @@
       "file": "src/App.jsx",
       "description": "After a booking works, the booked workshop's card shows the places left that the server reports, without a reload. The other cards stay as they are, in the same order.\n\n`BookingForm` calls `onBooked(answer)` with the server's answer, `{ booking, workshop }`, where `workshop` is the workshop as the server has it now. Write `handleBooked` in `App`.\n\nThe number comes from the server, either way you get it: from that answer, or by asking for the list again. Taking one off the old number yourself is not right, because the front desk books places too. The check books a place while the front desk books another one, and reads the card.",
       "nextSteps": [
-        "Set `busy: true` in `server/settings.js`, book a place, and compare the card with a reload.",
+        "Set `busy: true` in `server/settings.js` and book a few places at one workshop: with the front desk booking too, its card should sometimes drop by more than one.",
         "Look at what the booking's answer holds.",
         "Either put that workshop into the list in place of the old one, or ask for the list again.",
         "Make the change through state, never by changing the old list."
@@ -37,6 +37,12 @@
         {
           "title": "Updating state based on the previous state",
           "url": "https://react.dev/reference/react/useState#updating-state-based-on-the-previous-state"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Updating an array of objects in state",
+          "url": "https://www.youtube.com/watch?v=Y62mbztjmus"
         }
       ],
       "points": 10

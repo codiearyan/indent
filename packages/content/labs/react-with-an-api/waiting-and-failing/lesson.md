@@ -61,4 +61,4 @@ The button sets the status back to `'loading'` and adds one to `attempt`. React 
 
 Everything happens in `src/App.jsx`. Add the status and the loading line first. Then handle the three kinds of failure: an error status with the API's message, no answer at all, and an error answer that is not JSON. Last, put a Try again button in the alert.
 
-Use `server/settings.js` to see each case in the Browser panel. `delayMs: 3000` gives you time to see the loading line. `failure: 'always'` makes every request fail, and `failAs` picks between a 503 with a message and no answer at all. `failure: 'first'` fails only the first request, so Try again works on the second.
+Use `server/settings.js` to see these cases in the Browser panel. The stand-in cannot answer with a web page; the check plays that case for you. `delayMs: 3000` gives you time to see the loading line. `failure: 'always'` makes every request fail, and `failAs` picks between a 503 with a message and no answer at all. `failure: 'first'` fails only the first request, so Try again works on the second.

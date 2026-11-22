@@ -55,7 +55,7 @@
       "id": "no-double",
       "title": "Never send one booking twice",
       "file": "src/BookingForm.jsx",
-      "description": "On a slow connection, people press the button again because nothing seems to happen, and book two places.\n\nWhile a booking is on its way, the Book a place button is disabled, so a second press sends nothing. Once the answer is in, whatever it says, the button works again.\n\nThe check holds the answer back, presses the button twice, counts the bookings, then answers and looks at the button.",
+      "description": "On a slow connection, people press the button again because nothing seems to happen, and book two places.\n\nWhile a booking is on its way, the Book a place button is disabled, so a second press sends nothing. Once the answer is in, whatever it says, the button works again.\n\nThe check holds the answer back, presses the button twice, counts the bookings, then answers and looks at the button, after a booking that worked and after one the server refused.",
       "nextSteps": [
         "Set `delayMs` in `server/settings.js` to 3000 and press the button twice.",
         "Add a state that says a booking is on its way, and turn it on before you send.",

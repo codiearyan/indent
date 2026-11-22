@@ -2,6 +2,7 @@ import {
   WEEK,
   copy,
   detail,
+  loadingLine,
   openApp,
   pageError,
   requestList,
@@ -28,7 +29,7 @@ const THURSDAY = [
 ]
 const names = (list) => list.map((workshop) => workshop.title)
 const same = (page, list) => JSON.stringify(titles(page)) === JSON.stringify(names(list))
-const loading = (page) => roleTexts(page, 'status').some((text) => /loading/i.test(text))
+const loading = loadingLine
 const LABELS = { all: 'All', tue: 'Tue', thu: 'Thu' }
 
 /**
@@ -234,7 +235,9 @@ export const checks = {
       detail(
         'A cancelled request is never shown as a failure',
         !alertsAfterCancel.length && !alertsAtEnd.length,
-        'A request that was cancelled on purpose showed up on the screen as a failure. Cancelling makes fetch reject too: tell that apart from a real failure, and look at what request() in src/api.js does with it on the way.',
+        [...alertsAfterCancel, ...alertsAtEnd].some((text) => /abort/i.test(text))
+          ? "A request that was cancelled on purpose showed up on the screen as a failure, in the browser's words for a cancel. Cancelling makes fetch reject too: the code that shows the alert has to tell a cancel apart from a real failure."
+          : 'A request that was cancelled on purpose showed up on the screen as a failure. Cancelling makes fetch reject too, and on its way to the alert the cancel turned into another error: look at what request() in src/api.js does with it.',
         `alert after the cancel: ${alertsAfterCancel.join(' | ') || '(none)'}\nat the end:\n${endScreen}`
       ),
       detail(

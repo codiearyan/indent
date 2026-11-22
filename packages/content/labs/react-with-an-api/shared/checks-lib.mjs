@@ -131,6 +131,12 @@ export const placesOf = (page, title) => cards(page).find((card) => card.title =
 export const roleTexts = (page, role) =>
   page.$$(`[role="${role}"]`).map((element) => clean(element.textContent))
 
+/** A status line outside the booking form that says something, in whatever words. */
+export const loadingLine = (page) =>
+  page
+    .$$('[role="status"]')
+    .some((element) => !element.closest('form.booking') && clean(element.textContent))
+
 export function pageText(page) {
   const { document, window } = page
   const walker = document.createTreeWalker(document.body, window.NodeFilter.SHOW_TEXT)

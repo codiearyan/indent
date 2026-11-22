@@ -54,4 +54,4 @@ Keep the two moments apart. A refresh asks again and leaves the status as it is,
 
 Everything happens in `src/App.jsx`, with one change to `src/BookingForm.jsx`. First write `handleBooked`, so the booked card shows what the server says. Then ask for the list again after a refused booking. Last, make sure that refresh keeps the cards on the screen.
 
-In `server/settings.js`, set `busy: true` and the front desk books places too, now and then, whenever your screen talks to the stand-in. Book a few places and compare the cards with what a reload shows.
+In `server/settings.js`, set `busy: true` and the front desk books places too, now and then, whenever your screen talks to the stand-in. Book a few places at one workshop and watch its card: sometimes it should drop by more than one. A reload does not help to compare, because it starts the stand-in again from the start of the week.
