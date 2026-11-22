@@ -1,4 +1,4 @@
-// The workshops Copperleaf Pottery runs each week. day is the short name of the weekday, seats is
+// The workshops Kilnworth Pottery runs each week. day is the short name of the weekday, seats is
 // how many people fit at the wheels and tables, and priceCents is the price of one place in cents.
 export const workshops = [
   { id: 1, title: 'Wheel throwing for beginners', day: 'tue', seats: 8, priceCents: 4800 },

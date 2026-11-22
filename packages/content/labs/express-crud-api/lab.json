@@ -1,7 +1,7 @@
 {
   "id": "express-crud-api",
   "title": "Build a CRUD API with Express",
-  "description": "Copperleaf Pottery runs evening and weekend workshops from a small studio, and its places are still booked through a paper sign-up sheet by the door. Build the JSON API behind its new sign-up page with Express, one issue at a time: a first app, reading workshops, creating them from a request body, changing and removing them, then routers, middleware and one error handler. You learn how Express handles routes, parameters, bodies, statuses and errors by growing one real API.",
+  "description": "Kilnworth Pottery runs evening and weekend workshops from a small studio, and its places are still booked through a paper sign-up sheet by the door. Build the JSON API behind its new sign-up page with Express, one issue at a time: a first app, reading workshops, creating them from a request body, changing and removing them, then routers, middleware and one error handler. You learn how Express handles routes, parameters, bodies, statuses and errors by growing one real API.",
   "category": "JavaScript and TypeScript",
   "language": "javascript",
   "tags": ["Node.js", "Express"],

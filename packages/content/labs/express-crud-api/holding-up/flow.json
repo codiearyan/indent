@@ -109,6 +109,10 @@
             ]
           },
           "note": "The page gets a calm JSON answer, with no stack trace and no file paths."
+        },
+        {
+          "active": ["router", "router->errors", "errors"],
+          "note": "If the answer had already started when the error came, the handler cannot send a second one. It passes the error on to Express."
         }
       ]
     }

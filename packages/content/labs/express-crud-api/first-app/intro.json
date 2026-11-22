@@ -33,7 +33,7 @@
     "right": "a JSON list"
   },
   "captions": [
-    "At Copperleaf Pottery, Ivo needs this week's workshops for his sign-up page.",
+    "At Kilnworth Pottery, Ivo needs this week's workshops for his sign-up page.",
     "The workshops are only on paper, and nothing answers his request.",
     "You create the Express app, its routes and a JSON 404, in three tasks.",
     "Now the page asks for the workshops and gets every one of them as JSON.",

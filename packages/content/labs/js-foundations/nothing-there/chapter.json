@@ -81,7 +81,7 @@
       "id": "extra",
       "title": "Spot text that is not a number",
       "file": "src/missing.js",
-      "description": "Under `// Task 3`, make a `const` called `extraIsNumber`: `true` when `extraCandlesText` turns into a real number, `false` when it turns into `NaN`. Print it.\n\nCheck tries a word, digits, digits with a word after them, and more digits. It expects `true` or `false` itself.",
+      "description": "Under `// Task 3`, make a `const` called `extraIsNumber`: `true` when `extraCandlesText` turns into a real number, `false` when it turns into `NaN`. Print it.\n\nCheck tries a word, digits, digits with a word after them, more digits and `0`. It expects `true` or `false` itself.",
       "nextSteps": [
         "Turn `extraCandlesText` into a number and print it to see what you get.",
         "Find how the lesson asks whether a value is `NaN`.",

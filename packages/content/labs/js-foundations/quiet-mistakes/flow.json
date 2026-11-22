@@ -1,0 +1,80 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "theo", "label": "Theo", "kind": "story" },
+      { "id": "file", "label": "till.js", "kind": "file", "mine": true },
+      { "id": "node", "label": "Node", "kind": "story" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" },
+      { "id": "totals", "label": "Day's totals", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "theo", "to": "file", "label": "the day" },
+      { "from": "file", "to": "node", "label": "lines" },
+      { "from": "node", "to": "terminal", "label": "printed values" },
+      { "from": "terminal", "to": "totals", "label": "the answers" }
+    ],
+    "note": "The till runs with no error, so the wrong values only show when you print them and follow them back to the line that made them."
+  },
+  "tasks": {
+    "total": {
+      "steps": [
+        {
+          "active": ["theo", "theo->file", "file"],
+          "value": {
+            "kind": "map",
+            "label": "what goes into the total",
+            "entries": [
+              { "key": "candles", "value": "cents, a number" },
+              { "key": "shipping", "value": "cents, from the price list" }
+            ]
+          },
+          "note": "Under Task 1, the order total is the candles plus shipping, and shipping comes from the courier's price list."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "Node runs every line without a complaint, so nothing points at the mistake."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "Printing each value with its type shows which one is not the kind it looks like."
+        },
+        {
+          "active": ["terminal", "terminal->totals", "totals"],
+          "note": "Fixed, the total is a number the size of a real order."
+        }
+      ]
+    },
+    "packed": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "Under Task 2, the candles packed should start at zero and grow by every box Ines packed."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "The count prints as NaN. Printing it one line earlier shows what the sum started from."
+        },
+        {
+          "active": ["terminal", "terminal->totals", "totals"],
+          "note": "Fixed, the count is every candle in every box."
+        }
+      ]
+    },
+    "label": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "Under Task 3, the label length tells Theo whether the label fits the printer."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "It prints undefined. Printing the label itself shows the label is fine, so the question asked of it is not."
+        },
+        {
+          "active": ["terminal", "terminal->totals", "totals"],
+          "note": "Fixed, the length is a count of characters Theo can check against the printer."
+        }
+      ]
+    }
+  }
+}
