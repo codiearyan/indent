@@ -1,0 +1,149 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "shelf", "label": "Shelf", "kind": "data" },
+      { "id": "with", "label": "withScent()", "kind": "function", "mine": true, "fn": "withScent" },
+      { "id": "featured", "label": "featured()", "kind": "function", "mine": true, "fn": "featured" },
+      { "id": "without", "label": "withoutLast()", "kind": "function", "mine": true, "fn": "withoutLast" },
+      { "id": "labels", "label": "labelsFor()", "kind": "function", "mine": true, "fn": "labelsFor" },
+      { "id": "label", "label": "labelFor()", "kind": "function", "mine": true },
+      { "id": "news", "label": "Newsletter", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "shelf", "to": "with", "label": "scents" },
+      { "from": "shelf", "to": "featured", "label": "scents" },
+      { "from": "shelf", "to": "without", "label": "scents" },
+      { "from": "shelf", "to": "labels", "label": "scents" },
+      { "from": "labels", "to": "label", "label": "one scent" },
+      { "from": "featured", "to": "news", "label": "new list" },
+      { "from": "labels", "to": "news", "label": "new list" }
+    ],
+    "note": "Every function reads the shelf and hands back a list of its own, so the shelf is the same after the newsletter as before it."
+  },
+  "tasks": {
+    "with": {
+      "trace": {
+        "file": "src/copies.js",
+        "call": "withScent",
+        "args": [["Cedar", "Sage", "Smoked fig", "Lavender", "Amber"], "Pine"]
+      },
+      "steps": [
+        {
+          "active": ["shelf", "shelf->with", "with"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "scents", "value": "the shelf" },
+              { "key": "scent", "value": "Pine" }
+            ]
+          },
+          "note": "Ines wants to see the shelf as it would be with Pine on it."
+        },
+        {
+          "active": ["with"],
+          "note": "withScent() makes a list of its own with every scent of the shelf and Pine after them."
+        },
+        {
+          "active": ["shelf"],
+          "note": "The shelf itself has no Pine on it: it is the same as before."
+        }
+      ]
+    },
+    "featured": {
+      "trace": {
+        "file": "src/copies.js",
+        "call": "featured",
+        "args": [["Cedar", "Sage", "Smoked fig", "Lavender", "Amber"], 3]
+      },
+      "steps": [
+        {
+          "active": ["shelf", "shelf->featured", "featured"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "scents", "value": "the shelf" },
+              { "key": "count", "value": 3 }
+            ]
+          },
+          "note": "Theo wants the first three scents of the shelf for the newsletter."
+        },
+        {
+          "active": ["featured", "featured->news", "news"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "featured", "value": "a new list of scents" }]
+          },
+          "note": "featured() hands the newsletter a list of its own."
+        },
+        {
+          "active": ["shelf"],
+          "note": "The shelf keeps all its scents."
+        }
+      ]
+    },
+    "without": {
+      "trace": {
+        "file": "src/copies.js",
+        "call": "withoutLast",
+        "args": [["Cedar", "Sage", "Smoked fig", "Lavender", "Amber"]]
+      },
+      "steps": [
+        {
+          "active": ["shelf", "shelf->without", "without"],
+          "note": "Ines plans the shelf for the day the last scent is gone."
+        },
+        {
+          "active": ["without"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "planned shelf", "value": "a new list, one scent shorter" }]
+          },
+          "note": "withoutLast() hands back a new list without the scent at the right end."
+        },
+        {
+          "active": ["shelf"],
+          "note": "The real shelf still ends in the same scent."
+        }
+      ]
+    },
+    "labels": {
+      "trace": {
+        "file": "src/copies.js",
+        "call": "labelsFor",
+        "args": [["Cedar", "Sage", "Smoked fig", "Lavender", "Amber"]]
+      },
+      "steps": [
+        {
+          "active": ["shelf", "shelf->labels", "labels"],
+          "note": "Theo needs a label for every scent for the newsletter."
+        },
+        {
+          "active": ["labels", "labels->label", "label"],
+          "value": {
+            "kind": "map",
+            "label": "one label",
+            "entries": [{ "key": "label", "value": "Wickhollow and the scent" }]
+          },
+          "note": "Your helper makes the label for one scent at a time."
+        },
+        {
+          "active": ["labels", "labels->news", "news"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "labels", "value": "a new list, one label per scent" }]
+          },
+          "note": "labelsFor() hands the newsletter a list of labels of its own."
+        },
+        {
+          "active": ["shelf"],
+          "note": "The shelf still holds plain scent names, so Ines prints it as before."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "prices", "label": "Prices", "kind": "data" },
+      { "id": "market", "label": "marketPrices()", "kind": "function", "mine": true, "fn": "marketPrices" },
+      { "id": "round", "label": "roundUp()", "kind": "function", "mine": true },
+      { "id": "cheap", "label": "cheapTable()", "kind": "function", "mine": true, "fn": "cheapTable" },
+      { "id": "shelf", "label": "Shelf", "kind": "data" },
+      { "id": "find", "label": "firstStartingWith()", "kind": "function", "mine": true, "fn": "firstStartingWith" },
+      { "id": "tags", "label": "tagsFor()", "kind": "function", "mine": true, "fn": "tagsFor" }
+    ],
+    "edges": [
+      { "from": "prices", "to": "market", "label": "prices" },
+      { "from": "market", "to": "round", "label": "one price" },
+      { "from": "prices", "to": "cheap", "label": "prices" },
+      { "from": "shelf", "to": "find", "label": "scents" },
+      { "from": "shelf", "to": "tags", "label": "scents" }
+    ],
+    "note": "The market lists are all made from the shelf and its prices, which stay as they are."
+  },
+  "tasks": {
+    "round": {
+      "trace": {
+        "file": "src/map-filter-find.js",
+        "call": "marketPrices",
+        "args": [[1250, 1800, 900, 1100, 1475, 2000]]
+      },
+      "steps": [
+        {
+          "active": ["prices", "prices->market", "market"],
+          "value": {
+            "kind": "array",
+            "label": "the shelf's prices",
+            "values": [1250, 1800, 900, 1100, 1475, 2000]
+          },
+          "note": "Ines wants round prices for the market stall."
+        },
+        {
+          "active": ["market", "market->round", "round"],
+          "note": "Your helper rounds one price at a time, and map hands it every price in turn."
+        },
+        {
+          "active": ["market"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "market prices", "value": "a new list, one price per price" }]
+          },
+          "note": "A new list of round prices comes back, as long as the old one."
+        }
+      ]
+    },
+    "cheap": {
+      "trace": {
+        "file": "src/map-filter-find.js",
+        "call": "cheapTable",
+        "args": [[1250, 1800, 900, 1100, 1475, 2000], 1200]
+      },
+      "steps": [
+        {
+          "active": ["prices", "prices->cheap", "cheap"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "prices", "value": "the shelf's prices" },
+              { "key": "limit", "value": 1200 }
+            ]
+          },
+          "note": "Ines asks which candles can go on the cheap table at the front."
+        },
+        {
+          "active": ["cheap"],
+          "note": "cheapTable() asks one question about each price, and filter keeps the ones that pass."
+        },
+        {
+          "active": ["cheap"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "cheap table", "value": "some of the prices, in order" }]
+          },
+          "note": "The cheap table gets a new list, often shorter than the old one."
+        }
+      ]
+    },
+    "find": {
+      "trace": {
+        "file": "src/map-filter-find.js",
+        "call": "firstStartingWith",
+        "args": [["Cedar", "Sage", "Smoked fig", "Lavender", "Amber", "Bergamot"], "S"]
+      },
+      "steps": [
+        {
+          "active": ["find"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "letter", "value": "S" }]
+          },
+          "note": "A customer at the stall asks for the scent that starts with S."
+        },
+        {
+          "active": ["shelf", "shelf->find", "find"],
+          "note": "firstStartingWith() looks along the shelf and stops at the first scent that fits."
+        },
+        {
+          "active": ["find"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "answer", "value": "one scent, or None" }]
+          },
+          "note": "Theo gets one scent to show, or a plain word when there is none."
+        }
+      ]
+    },
+    "tags": {
+      "trace": {
+        "file": "src/map-filter-find.js",
+        "call": "tagsFor",
+        "args": [["Cedar", "Sage", "Smoked fig", "Lavender", "Amber", "Bergamot"]]
+      },
+      "steps": [
+        {
+          "active": ["shelf", "shelf->tags", "tags"],
+          "value": {
+            "kind": "array",
+            "label": "the shelf",
+            "values": ["Cedar", "Sage", "Smoked fig", "Lavender", "Amber", "Bergamot"]
+          },
+          "note": "The tag printer needs names it can print."
+        },
+        {
+          "active": ["tags"],
+          "note": "Only the names that fit the printer stay, and each is set in capital letters."
+        },
+        {
+          "active": ["tags"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "tags", "value": "a new list of short names in capitals" }]
+          },
+          "note": "Ines gets a list she can send straight to the printer."
+        }
+      ]
+    }
+  }
+}

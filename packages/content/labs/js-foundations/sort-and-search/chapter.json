@@ -1,0 +1,157 @@
+{
+  "id": "sort-and-search",
+  "title": "Sorting and searching",
+  "files": ["src/sorting.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the sorted lists and the stock answers.",
+    "suggestedCommand": "node src/sorting.js"
+  },
+  "tasks": [
+    {
+      "id": "byname",
+      "title": "Sort the names",
+      "file": "src/sorting.js",
+      "description": "Under `// Task 1` in `src/sorting.js`, make `byName(scents)` return a new list of the scents from A to Z. `scents` stays as it was.\n\nCheck calls `byName` with lists of its own, one scent and none included, then makes sure the list it handed in has not changed and that a new list came back.",
+      "nextSteps": [
+        "Read the lesson's part on what `sort` does to a list.",
+        "Make a copy of `scents`.",
+        "Sort the copy and give it back.",
+        "Run the file: the first line should start with Amber."
+      ],
+      "hints": [
+        "`sort` puts a list in order, but it changes the list it is called on. The list you were handed belongs to someone else.",
+        "Copy first, with the spread form or `slice()`, then sort the copy. Text sorts from A to Z without anything more.",
+        "The body is one line: `return [...scents].sort()`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.sort()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort"
+        },
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cheapest",
+      "title": "Cheapest first",
+      "file": "src/sorting.js",
+      "description": "Under `// Task 2`, make `cheapestFirst(prices)` return a new list of the prices from the lowest to the highest. `prices` stays as it was.\n\nCheck calls `cheapestFirst` with prices of its own, with different numbers of digits and two equal prices among them, then makes sure the list it handed in has not changed and that a new list came back. It also makes sure `cheapestFirst` uses `sort`.",
+      "nextSteps": [
+        "Run the file once with a plain `sort` on a copy and look at the order.",
+        "Read the lesson's part on compare functions.",
+        "Give `sort` a compare function that puts the lower price first.",
+        "Sort a copy, give it back, and run the file again."
+      ],
+      "hints": [
+        "Without help, `sort` compares items as text, so `'1100'` comes before `'900'` the way a dictionary would put them.",
+        "A compare function gets two items and gives back a number: below 0 when the first should come first, above 0 when the second should. Subtracting one price from the other gives exactly that.",
+        "The body is one line: `return [...prices].sort((a, b) => a - b)`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.sort()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort"
+        },
+        {
+          "title": "Arrow function expressions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Sorting lists in six minutes",
+          "url": "https://www.youtube.com/watch?v=CTHhlx25X-U"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "dearest",
+      "title": "The dearest few",
+      "file": "src/sorting.js",
+      "description": "Under `// Task 3`, make `dearest(prices, count)` return a new list of the `count` highest prices, the highest first. When `prices` has fewer than `count`, all of them come back, the highest first. `prices` stays as it was.\n\nCheck calls `dearest` with prices and counts of its own: equal prices, a count larger than the list, a count of 0 and an empty list included. It makes sure the list it handed in has not changed, that a new list came back, and that `dearest` uses `sort`.",
+      "nextSteps": [
+        "Sort a copy of the prices so the highest comes first.",
+        "Keep the first `count` of them with the tool from the issue on copies.",
+        "Give that list back.",
+        "Run the file and try a count larger than the shelf."
+      ],
+      "hints": [
+        "This is two jobs you know: sort a copy, then keep the start of it.",
+        "For the highest first, the compare function subtracts the other way round. `slice(0, count)` keeps the first `count` items and does not mind a list that is shorter.",
+        "The body is one line: `return [...prices].sort((a, b) => b - a).slice(0, count)`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.sort()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort"
+        },
+        {
+          "title": "Array.prototype.slice()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pour",
+      "title": "Time to pour?",
+      "file": "src/sorting.js",
+      "description": "Under `// Task 4`, first write a function of your own, `isLow(count)`: it returns `true` when `count` is below 3, and `false` otherwise. It only helps `needsPouring`, so it stays off the export line.\n\nThen make `needsPouring(stock)` return `true` when at least one count in `stock` is low, and `false` when none is. An empty list needs no pouring. Use `some` and `isLow`.\n\nCheck calls `isLow` with counts of its own, 3 included, then `needsPouring` with stock lists of its own, an empty one included. It makes sure `needsPouring` uses `some` and `isLow`.",
+      "nextSteps": [
+        "Write `isLow` above `needsPouring`, from its name to its closing brace.",
+        "Read the lesson's part on `some` and `every`.",
+        "Hand `isLow` to `some` in `needsPouring` and give back its answer.",
+        "Run the file: today's stock has a low count."
+      ],
+      "hints": [
+        "One list tool answers the question \"is this true for at least one item?\" with true or false.",
+        "`some` calls the function you give it with each item and stops at the first true. You can hand it `isLow` by its name, without round brackets.",
+        "`isLow` is `return count < 3`. `needsPouring` is `return stock.some(isLow)`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.some()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some"
+        },
+        {
+          "title": "Functions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ready",
+      "title": "Ready for the market",
+      "file": "src/sorting.js",
+      "description": "Under `// Task 5`, make `readyForMarket(stock)` return `true` when every count in `stock` is 5 or more, and `false` when any is less. An empty list counts as ready: no scent is short. Use `every`.\n\nCheck calls `readyForMarket` with stock lists of its own: a count of exactly 5, a list with one short count, a list of one, and an empty list. It also makes sure `readyForMarket` uses `every`.",
+      "nextSteps": [
+        "Write the question about one count: is it 5 or more?",
+        "Hand that question to `every`.",
+        "Give back what `every` answers.",
+        "Run the file and change a count in the demo to see the answer flip."
+      ],
+      "hints": [
+        "`every` is the partner of `some`: true only when the question is true for every item.",
+        "5 or more includes 5 itself. `every` on an empty list gives back true, which is what the task asks for.",
+        "The body is one line: `return stock.every((count) => count >= 5)`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.every()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every"
+        },
+        {
+          "title": "Array.prototype.some()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "stations": [
+    {
+      "title": "Theo",
+      "say": "Why is 900 last on the page?",
+      "note": "He sorted the prices, cheapest first."
+    },
+    { "title": "A plain sort", "text": "It compares the prices as text, like words." },
+    {
+      "title": "Your code",
+      "file": "sorting.js",
+      "mine": true,
+      "gap": "Prices sorted like words",
+      "tasks": ["Sort the names", "Sort prices as numbers", "Pick the dearest", "Ask about the stock"]
+    },
+    { "title": "Shop page", "text": "Prices from the lowest, the shelf untouched." }
+  ],
+  "ticket": { "label": "Price list", "wrong": "900 last", "why": "As text", "right": "lowest first" },
+  "captions": [
+    "Theo puts the shelf's prices on the shop page, cheapest first.",
+    "A plain sort compares them as text, so 900 lands after 4500.",
+    "You sort copies the right way and ask yes or no questions about stock.",
+    "Now the price list starts with the cheapest candle, and the shelf keeps its order.",
+    "The shop can order its lists and question them. Next, whole orders."
+  ]
+}
