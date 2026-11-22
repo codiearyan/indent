@@ -141,11 +141,13 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     pendingSaves.delete(path)
     const file = get().files.find((f) => f.path === path)
     if (!file) return
+    const chapter = get().chapter
     try {
       await api.workspace.writeFile(...ids(), path, file.content)
     } catch (error) {
-      // Still pending, so a refresh cannot replace text that never reached the disk.
-      if (!pendingSaves.has(path)) pendingSaves.set(path, undefined)
+      // Still pending, so a refresh cannot replace text that never reached the disk. Only while
+      // this issue is open: in the next one the same path is another file.
+      if (get().chapter === chapter && !pendingSaves.has(path)) pendingSaves.set(path, undefined)
       toast.error(`Could not save ${path}`, {
         id: 'save-failed',
         description: errorMessage(error)
