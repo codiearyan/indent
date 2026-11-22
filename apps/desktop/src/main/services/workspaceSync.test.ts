@@ -213,7 +213,7 @@ describe('restoreMissing', () => {
     await writeTree(dir, { 'src/tools.ts': 'my tools', 'notes.md': 'mine' })
 
     expect((await openWorkspace(starterDir, dir, [])).missing).toEqual(['src/data.ts'])
-    expect(await findMissing(starterDir, dir)).toEqual(['src/data.ts'])
+    expect(await findMissing(starterDir, dir, [])).toEqual(['src/data.ts'])
 
     const snap = await restoreMissing(starterDir, dir, [])
 
