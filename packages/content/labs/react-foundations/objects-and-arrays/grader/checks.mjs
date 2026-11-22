@@ -68,29 +68,96 @@ async function removeLine(page, it) {
   return press(page, line?.li.querySelector('button.remove'))
 }
 
-/** Draws a new till with the check's shelf; the error it stopped on, if any. */
+let shelf = []
+
+/** Draws a new till with a fresh copy of the check's shelf; the error it stopped on, if any. */
 function newTill(page) {
-  const { errors } = drawNew(page, 'Till', { items: SHELF })
+  shelf = SHELF.map((it) => ({ ...it }))
+  const { errors } = drawNew(page, 'Till', { items: shelf })
   return errors[0] ?? null
 }
+
+/** One detail when the till changed the items it was given, which the screen alone does not show. */
+function shelfChanged() {
+  if (shelf.every((it, i) => JSON.stringify(it) === JSON.stringify(SHELF[i]))) return null
+  return detail(
+    'The items on the shelf stay as they were',
+    false,
+    'Adding changed the items the till was given: an item on the shelf is not as it was. A component changes nothing it is given. Make each basket line a new object, made from the item.',
+    `shelf after adding:\n${shelf.map((it) => JSON.stringify(it)).join('\n')}`
+  )
+}
+
+const DRAW_UPDATE = /while rendering a different component/
+
+/** One detail when state was set while a component was being drawn, such as a handler called in the curly braces. */
+function setWhileDrawing(page, logsBefore) {
+  const lines = warningsOf(page.logs.slice(logsBefore), DRAW_UPDATE)
+  if (!lines.length) return null
+  return detail(
+    'Nothing changes the basket while it is being drawn',
+    false,
+    'Something set state while a basket line was being drawn, and React warns about it in the console. A function was called in the curly braces instead of handed over, so it ran as soon as the line was drawn. Hand each event prop a function to call later.',
+    shorten(lines[0])
+  )
+}
+
+const isEvent = (value) => typeof value === 'object' && value !== null && ('target' in value || 'nativeEvent' in value)
 
 const stopped = (error) => detail('The till runs without errors', false, explain(error), error)
 const thrown = (page, before) => (page.errors.length > before ? page.errors[before] : null)
 
 /** One detail when Add does not put a new line in the basket yet: tasks 3 and 4 build on it. */
 async function addProblem(page) {
+  const logsBefore = page.logs.length
   const error = newTill(page)
   if (error) return stopped(error)
   const before = page.errors.length
   await addItem(page, BADGE)
   await addItem(page, LAMP)
   if (thrown(page, before)) return stopped(thrown(page, before))
+  const early = setWhileDrawing(page, logsBefore)
+  if (early) return early
   if (shows(page, [[BADGE, 1], [LAMP, 1]])) return null
   return detail(
     'Add puts an item in the basket',
     false,
     'Adding two different items does not show them in the basket yet. That is the second task of this issue: do it first.',
     `added: ${BADGE.name}, ${LAMP.name}\nbasket: ${basketText(page)}`
+  )
+}
+
+/** One detail when BasketLine, drawn on its own, does not call onRemove once with its line's id. */
+async function lineCallsRemove(page) {
+  if (exportType(page, 'BasketLine') !== 'function') {
+    return detail('Till.jsx exports BasketLine', false, 'Till.jsx has no export called BasketLine any more. Keep the name and the export.')
+  }
+  const line = { id: 'g-flag', name: 'Station flag', pricePence: 300, qty: 2 }
+  const got = []
+  const { root, errors } = drawNew(page, 'BasketLine', { line, onRemove: (...args) => got.push(args) })
+  if (errors.length) return stopped(errors[0])
+  const drawing = got.length
+  const button = root.querySelector('button.remove')
+  const before = page.errors.length
+  if (button) await press(page, button)
+  if (thrown(page, before)) return stopped(thrown(page, before))
+  const firsts = got.map((args) => args[0])
+  if (button && !drawing && got.length === 1 && firsts[0] === line.id) return null
+  let message = "Pressing Remove should call onRemove once, with the line's id."
+  if (!button)
+    message = 'BasketLine draws no button with the class remove yet. It draws one, and calls the function it is given when it is pressed.'
+  else if (drawing)
+    message = 'onRemove was called while the line was being drawn, before anyone pressed Remove. Hand the button a function to call later.'
+  else if (firsts.some(isEvent))
+    message = "onRemove was given the click's event, not the line's id. Call it with the id of the line from the props."
+  else if (!got.length)
+    message = 'Pressing Remove did not call onRemove. BasketLine calls the function it is given in its props.'
+  const shown = (value) => (isEvent(value) ? 'the event' : value === undefined ? 'nothing' : JSON.stringify(value))
+  return detail(
+    "BasketLine calls onRemove with its line's id",
+    false,
+    message,
+    `line: ${JSON.stringify(line)}\nonRemove calls: ${got.map((args) => `(${args.map(shown).join(', ')})`).join(' ') || '(none)'}`
   )
 }
 
@@ -119,8 +186,13 @@ export const checks = {
       const now = { wrap: pressed('wrap'), bag: pressed('bag') }
       const other = name === 'wrap' ? 'bag' : 'wrap'
       if (now.wrap === want.wrap && now.bag === want.bag) continue
+      const label = name === 'wrap' ? 'Gift wrap' : 'Paper bag'
       let message = `Each button switches its own option on and off, and leaves the other as it was.`
-      if (now[name] === before[name])
+      if (now[name] === before[name] && now[other] !== before[other])
+        message = `Pressing ${label} switched ${other === 'wrap' ? 'Gift wrap' : 'Paper bag'} instead. Each button switches its own option.`
+      else if (now[name] === before[name] && before[name])
+        message = `Pressing ${label} again did not switch it off. Each press turns the option round, from on to off and back.`
+      else if (now[name] === before[name])
         message = `Pressing ${name === 'wrap' ? 'Gift wrap' : 'Paper bag'} changed nothing on the screen. If the options object was changed in place, React was handed the same object and did not draw again: hand it a new one.`
       else if (now[other] !== before[other])
         message = `Pressing ${name === 'wrap' ? 'Gift wrap' : 'Paper bag'} also changed ${other === 'wrap' ? 'Gift wrap' : 'Paper bag'}. The new object has to keep every field it does not change.`
@@ -149,6 +221,8 @@ export const checks = {
         log.push(`added ${it.name}: ${basketText(page)}`)
       }
       if (thrown(page, before)) return [...results, stopped(thrown(page, before))]
+      const early = setWhileDrawing(page, logsBefore) ?? shelfChanged()
+      if (early) return [...results, early]
       const want = order.map((it) => [it, 1])
       const got = lines(page)
       let message = 'Each Add puts its item in the basket as a new line, in the order added, with a quantity of 1, and the total follows.'
@@ -157,6 +231,8 @@ export const checks = {
           'Pressing Add left the basket empty on the screen. The basket has to be state, and each Add hands React a new array: an array changed in place is the same array, so React does not draw again.'
       else if (got.length === 1 && order.length > 1)
         message = 'Only one line is in the basket after adding more than one item. Each new array keeps the lines already there.'
+      else if (got.some((line) => line.qty && line.qty !== '1'))
+        message = "Adding a new item raised the quantity of another line. Two of the check's items cost the same: tell a line by something only its item has."
       else if (got.some((line) => !line.name || !line.qty))
         message = 'The basket has lines, but some show no name or quantity. Draw each line with BasketLine, and give each new line the item and a quantity.'
       else if (shows(page, want.slice().reverse()) && order.length > 1)
@@ -201,6 +277,8 @@ export const checks = {
       log.push(`added ${it.name}: ${basketText(page)}`)
     }
     if (thrown(page, before)) return [stopped(thrown(page, before))]
+    const changed = shelfChanged()
+    if (changed) return [changed]
     const want = [
       [RULER, 3],
       [BELL, 1]
@@ -230,6 +308,8 @@ export const checks = {
     if (problem) return [problem]
     const first = await addProblem(page)
     if (first) return [first]
+    const own = await lineCallsRemove(page)
+    if (own) return [own]
     const error = newTill(page)
     if (error) return [stopped(error)]
     const before = page.errors.length

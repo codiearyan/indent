@@ -63,7 +63,8 @@ const thrown = (page, before) => (page.errors.length > before ? page.errors[befo
 /** Types into one field the way a person does, and notes what the field and the preview show. */
 async function typeInto(page, field, value) {
   await page.type(FIELD[field], value)
-  return { typed: value, field: valueOf(page, field), preview: preview(page, field) }
+  const elsewhere = Object.keys(FIELD).find((other) => other !== field && value && preview(page, other) === value)
+  return { typed: value, field: valueOf(page, field), preview: preview(page, field), elsewhere }
 }
 
 const missingField = (field) =>
@@ -94,8 +95,10 @@ async function followsTyping(page, field, values, logsBefore) {
     message = `The ${LABEL[field]} field cannot be typed in: it has its value from state, but nothing changes that state when the visitor types. The console says what is missing.`
   else if (warningsOf(logs, WARNING.toUncontrolled).length)
     message = `After typing, the ${LABEL[field]} in state was undefined, and React warns that the field became uncontrolled. The words typed are the value of the element the event happened on.`
+  else if (seen.some((s) => s.elsewhere && s.preview !== s.typed))
+    message = `Typing in the ${LABEL[field]} field changed the ${LABEL[seen.find((s) => s.elsewhere).elsewhere]} in the preview. Each change sets the value of the field it came from: look at which value this field's handler sets.`
   else if (seen.every((s) => s.preview === ''))
-    message = `The preview's ${LABEL[field]} stays empty while the visitor types. Keep what is typed in state, and show that state in the preview.`
+    message = `The preview's ${LABEL[field]} stays empty while the visitor types. Keep what is typed in state, and show that state in the preview. If the form is one object, hand the setter a new object each time: one changed in place is the same object, so React does not draw again.`
   else if (seen.some((s) => /object|undefined/i.test(s.preview)))
     message = `The preview shows something other than the words typed. The words are the value of the element the event happened on.`
   const results = [detail(`The preview follows the ${LABEL[field]} field`, passed, message, output)]
@@ -208,7 +211,7 @@ export const checks = {
     let message = 'Pressing Sign should put the entry at the top of the book, with its name, where from and comment.'
     if (given.length !== EARLIER.length)
       message =
-        `The entries array was changed in place: the array the book was given at the start now holds the new entry too. ${afterOne[0]?.name === ONE.name ? 'The entry only shows because emptying the form drew the book again.' : 'React was handed the same array, so it did not draw the entry.'} Hand the setter a new array.`
+        `The entries array was changed in place: the array the book was given at the start now holds the new entry too. ${afterOne[0]?.name === ONE.name ? 'Leave that array as it was.' : 'React was handed the same array, so it did not draw the entry.'} Hand the setter a new array.`
     else if (reloaded)
       message =
         'The page tried to reload when the form was sent. In the Browser panel it starts again, and the entry and everything typed are lost. Stop the browser from sending the form itself.'
@@ -290,12 +293,14 @@ export const checks = {
       const over = max + extra
       await page.type(FIELD.comment, 'x'.repeat(over))
       note(`comment of ${over} characters`)
-      const told = new RegExp(`^${extra} characters? too many$`, 'i').test(problemText())
+      const whileTyping = problemText()
+      const told = new RegExp(`^${extra} characters? too many$`, 'i').test(whileTyping)
       const longOff = Boolean(sign()?.disabled)
       const count = entries(page).length
       await page.submit('#root form')
       note('form sent anyway')
       const refused = entries(page).length === count
+      const afterSending = problemText()
 
       await page.type(FIELD.comment, 'y'.repeat(max))
       note(`comment of exactly ${max}`)
@@ -306,7 +311,9 @@ export const checks = {
       let message = 'Sign is disabled while there is no name or the comment is too long, and a paragraph with the class problem says how many characters too many.'
       if (!emptyOff || !nameOn) message = 'Sign should be disabled while the name is empty, and work once there is one.'
       else if (!spacesOff) message = 'A name of only spaces still let the visitor sign. Spaces alone are not a name.'
-      else if (!problemText()?.length && !told)
+      else if (!whileTyping && afterSending)
+        message = 'The problem shows only once the form is sent. Work it out while drawing, from what is in state, so it shows while the visitor types.'
+      else if (!whileTyping)
         message = `With a comment ${extra} characters over the limit, the form should say so in a paragraph with the class problem, like 5 characters too many. The check used a limit of its own, from the maxComment prop.`
       else if (!told) message = `The problem is shown, but not as the number of characters too many. With this limit the comment was ${extra} over.`
       else if (!longOff) message = 'The comment is too long, but Sign still works. Disable it while there is a problem.'

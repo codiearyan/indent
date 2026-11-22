@@ -248,12 +248,12 @@ export function reactProps(element) {
 
 /**
  * Whether a form field takes its value from React: it has a value (or checked) prop and a way to
- * change it. Yes when React's record cannot be read.
+ * change it, onChange or onInput as React accepts. Yes when React's record cannot be read.
  */
 export function isControlled(element) {
   const props = reactProps(element)
   if (!props) return true
-  return ('value' in props || 'checked' in props) && typeof props.onChange === 'function'
+  return ('value' in props || 'checked' in props) && typeof (props.onChange ?? props.onInput) === 'function'
 }
 
 /** Clicks an element and waits for the page to settle; false when there was nothing to click. */

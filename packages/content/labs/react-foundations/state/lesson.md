@@ -42,7 +42,7 @@ function LapCounter() {
 
 `useState(0)` returns two things in an array, and the square brackets take them out by position: the value for this draw, and a function that sets a new value. The first time the component is drawn, `laps` is the starting value, `0`. When `setLaps(1)` is called, React remembers 1 and draws the component again; this time `useState` returns 1. Each `LapCounter` on the page has its own count.
 
-Some rules come with it. Call `useState` at the top level of the component, never inside a handler, a condition or a loop, and never outside a component: there, the page stops with `Cannot read properties of null (reading 'useState')`, and the console says `Invalid hook call`. Do not assign to the value: `laps = laps + 1` stops the bundler with `Cannot assign to "laps" because it is a constant`. And never call a setter while drawing: `onClick={setLaps(laps + 1)}` sets state, which draws again, which sets state again, until React gives up with `Too many re-renders`.
+Some rules come with it. Call `useState` at the top level of the component, never inside a handler, a condition or a loop, and never outside a component. Outside a component the page stops with `Cannot read properties of null (reading 'useState')`, and the console says `Invalid hook call`; inside a handler, pressing the button stops with `Invalid hook call` itself. Do not assign to the value: `laps = laps + 1` stops the bundler with `Cannot assign to "laps" because it is a constant`. And never call a setter while drawing: `onClick={setLaps(laps + 1)}` sets state, which draws again, which sets state again, until React gives up with `Too many re-renders`.
 
 ## Each draw sees one value
 

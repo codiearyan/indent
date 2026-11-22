@@ -37,7 +37,7 @@
       "id": "fields",
       "title": "Do the same for where from and the comment",
       "file": "src/Guestbook.jsx",
-      "description": "Make the input named `from` and the textarea named `comment` controlled too, each starting as an empty string, and show them in the preview's spans with the classes `from` and `comment`. Typing in one field leaves the others as they were. Three pieces of state or one object are both fine.\n\nThe check types, clears and types again in both fields, then types a name and checks that the other two are still in the preview.",
+      "description": "Make the input named `from` and the textarea named `comment` controlled too, each starting as an empty string, and show them in the preview, in the elements with the classes `from` and `comment`. Typing in one field leaves the others as they were. Three pieces of state or one object are both fine.\n\nThe check types, clears and types again in both fields, then types a name and checks that the other two are still in the preview.",
       "nextSteps": [
         "Read \"Several fields\" in the lesson.",
         "Choose three pieces of state or one object.",

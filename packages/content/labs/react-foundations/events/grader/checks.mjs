@@ -41,7 +41,7 @@ function calledWhileDrawing(drawing, fn, what) {
   return detail(
     `Nothing happens before anyone presses`,
     false,
-    `${what} ${early.length === 1 ? 'once' : `${early.length} times`} while the screen was being drawn, before the check pressed anything. The function was called in the curly braces, so React got what it returned instead of the function to call later.`,
+    `${what} ${early.length === 1 ? 'once' : `${early.length} times`} while the screen was being drawn, before the check pressed anything. The function was called while drawing, in the curly braces or in the component itself, instead of being handed to React to call on a press.`,
     `calls while drawing:\n${listCalls(early)}`
   )
 }

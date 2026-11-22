@@ -35,7 +35,7 @@
       "steps": [
         { "active": ["volunteer", "volunteer->buttons", "buttons"], "note": "A family of four comes in on one ticket." },
         { "active": ["buttons", "buttons->counter", "counter"], "note": "One press asks for a visitor four times over." },
-        { "active": ["counter", "counter->state", "state"], "note": "Each ask starts from the count the one before it left." },
+        { "active": ["counter", "counter->state", "state"], "note": "Each of the four asks counts one more visitor." },
         { "active": ["state", "state->screen", "screen"], "note": "All four of them are counted." }
       ]
     },
