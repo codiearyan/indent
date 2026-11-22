@@ -62,10 +62,16 @@ describe('tutorSystemPrompt', () => {
     expect(prompt).not.toContain('SECRET HINT')
   })
 
-  it("lists each task's docs and how its checks went", () => {
+  it("lists each task's docs, videos and how its checks went", () => {
     const withDocs: ChapterDef = {
       ...chapter,
-      tasks: [{ ...chapter.tasks[0], docs: [{ title: 'Finish reason', url: 'https://x.dev/f' }] }]
+      tasks: [
+        {
+          ...chapter.tasks[0],
+          docs: [{ title: 'Finish reason', url: 'https://x.dev/f' }],
+          videos: [{ title: 'Why replies stop', url: 'https://youtu.be/DHvZLI7Db8E' }]
+        }
+      ]
     }
     const prompt = tutorSystemPrompt({
       chapter: withDocs,
@@ -85,6 +91,7 @@ describe('tutorSystemPrompt', () => {
       }
     })
     expect(prompt).toContain('[Finish reason](https://x.dev/f)')
+    expect(prompt).toContain('Videos:\n- [Why replies stop](https://youtu.be/DHvZLI7Db8E)')
     expect(prompt).toContain(
       'fix: failed 3 checks; failing most: long notice (3), short notice (1)'
     )

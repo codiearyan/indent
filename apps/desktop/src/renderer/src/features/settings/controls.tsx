@@ -9,6 +9,7 @@ import {
   TEXT_SCALE_MIN,
   TEXT_SCALE_PRESETS,
   useSettings,
+  type LearnFirst,
   type PanelKey,
   type TextZone
 } from '@/stores/settings'
@@ -198,5 +199,30 @@ function ResetButton({ onClick }: { onClick: () => void }): React.JSX.Element {
       </TooltipTrigger>
       <TooltipContent>Reset to default</TooltipContent>
     </Tooltip>
+  )
+}
+
+/** Whether docs or videos come first in Resources and under a stuck task. */
+export function LearnFirstToggle({ id }: { id?: string }): React.JSX.Element {
+  const learnFirst = useSettings((s) => s.learnFirst)
+  const setLearnFirst = useSettings((s) => s.setLearnFirst)
+  return (
+    <ToggleGroup
+      id={id}
+      type="single"
+      size="sm"
+      spacing={1}
+      aria-label="Show first"
+      className={`w-44 shrink-0 ${segmented}`}
+      value={learnFirst}
+      onValueChange={(value) => value && setLearnFirst(value as LearnFirst)}
+    >
+      <ToggleGroupItem value="reading" className={segment}>
+        Reading
+      </ToggleGroupItem>
+      <ToggleGroupItem value="videos" className={segment}>
+        Videos
+      </ToggleGroupItem>
+    </ToggleGroup>
   )
 }

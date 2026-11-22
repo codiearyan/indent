@@ -12,6 +12,7 @@ export type EditorOption = 'wordWrap' | 'lineNumbers' | 'minimap' | 'vim'
 export type TextZone = 'lesson' | 'tasks' | 'editor' | 'terminal'
 export type PanelKey = 'files' | 'terminal' | 'chat' | 'zen' | 'browser'
 export type LeftTab = 'insights' | 'tasks' | 'resources'
+export type LearnFirst = 'reading' | 'videos'
 export type Experience = 'new' | 'some' | 'experienced'
 export type CursorStyle = 'block' | 'bar' | 'underline'
 
@@ -58,6 +59,8 @@ export interface SettingsState {
   leftTab: LeftTab
   /** Chapter keys whose Resources tab the learner uncovered. */
   resourcesShown: string[]
+  /** Which kind of resource Resources and a stuck task list first. */
+  learnFirst: LearnFirst
   /** Links of the videos the learner played. */
   videosWatched: string[]
   tourSeen: boolean
@@ -99,6 +102,7 @@ export interface SettingsState {
   setLeftTab(tab: LeftTab): void
   showResources(key: string): void
   markVideoWatched(url: string): void
+  setLearnFirst(learnFirst: LearnFirst): void
   setTourSeen(seen: boolean): void
   setOnboarded(onboarded: boolean): void
   setStarAsked(asked: boolean): void
@@ -147,6 +151,7 @@ export const useSettings = create<SettingsState>()(
       leftTab: 'insights',
       resourcesShown: [],
       videosWatched: [],
+      learnFirst: 'reading',
       tourSeen: false,
       onboarded: false,
       starAsked: false,
@@ -187,6 +192,7 @@ export const useSettings = create<SettingsState>()(
         set((s) =>
           s.videosWatched.includes(url) ? s : { videosWatched: [...s.videosWatched, url] }
         ),
+      setLearnFirst: (learnFirst) => set({ learnFirst }),
       setTourSeen: (tourSeen) => set({ tourSeen }),
       setOnboarded: (onboarded) => set({ onboarded }),
       setStarAsked: (starAsked) => set({ starAsked }),

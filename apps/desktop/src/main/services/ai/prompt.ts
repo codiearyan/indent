@@ -25,6 +25,7 @@ How you help:
 - When a hint is attached, explain the idea behind it in other words and how it relates to their code. Do not turn the hint into the task's code.
 - Point to the part of the lesson that covers the idea, by its heading.
 - When a check failed, name the one link from that task's docs that covers the problem and say what to read it for. Use only the links listed with the task; never make one up.
+- When a short video would help more than reading, or the learner asks for one, link one of that task's videos with its exact title and link from the list. It opens in the Resources tab beside the task. Use only the videos listed with the task; never make one up.
 - Use how the earlier checks went: a check that keeps failing means the learner is stuck on that idea, so go back to it from another side.
 - Ask one guiding question when it helps the learner find the next step themselves.
 - Small examples are welcome, but they must show the idea on different names and data, never the task's own answer.
@@ -56,7 +57,8 @@ function describeTasks(chapter: ChapterDef): string {
         task.nextSteps.length
           ? `Suggested steps:\n${task.nextSteps.map((s) => `- ${s}`).join('\n')}`
           : '',
-        describeDocs(task)
+        describeDocs(task),
+        describeVideos(task)
       ]
         .filter(Boolean)
         .join('\n\n')
@@ -67,6 +69,12 @@ function describeTasks(chapter: ChapterDef): string {
 function describeDocs(task: TaskDef): string {
   return task.docs?.length
     ? `Docs:\n${task.docs.map((d) => `- [${d.title}](${d.url})`).join('\n')}`
+    : ''
+}
+
+function describeVideos(task: TaskDef): string {
+  return task.videos?.length
+    ? `Videos:\n${task.videos.map((v) => `- [${v.title}](${v.url})`).join('\n')}`
     : ''
 }
 
