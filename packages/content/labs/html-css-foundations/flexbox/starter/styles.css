@@ -1,0 +1,75 @@
+/*
+  Task 1: put the links in a row.
+  Task 2: space the links apart.
+  Task 3: put the name above the links, both in the middle of the header.
+  Task 4: let the links wrap on a narrow screen, each line in the middle.
+
+  Kofi's notes:
+  I turned the jump links into a list and added one for booking. The rule for .links
+  at the bottom takes off the bullets and the room the browser keeps for them.
+  The links should sit side by side, 24px apart, between rows too when they wrap.
+  The name on top and the links under it, both in the middle of the header.
+  On a narrow window the links should wrap, and each line stay in the middle.
+*/
+
+:root {
+  --clay: #a4492a;
+  --cream: #f7f1e8;
+  --ink: #3b2f2a;
+  --sand: #efdcc3;
+  --stone: #7a6c64;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--ink);
+  font-family: Palatino, serif;
+  font-size: 18px;
+}
+
+h1,
+h2 {
+  color: var(--clay);
+}
+
+h2 {
+  color: var(--ink);
+}
+
+.note {
+  background-color: var(--sand);
+  color: var(--clay);
+  padding: 12px;
+  border-left: 4px solid var(--clay);
+}
+
+section {
+  margin-bottom: 48px;
+}
+
+#mug-of-the-month {
+  text-align: center;
+}
+
+nav a {
+  font-weight: bold;
+}
+
+#contact p {
+  color: var(--stone);
+}
+
+#contact .note {
+  color: var(--clay);
+}
+
+.links {
+  list-style: none;
+  padding-left: 0;
+}

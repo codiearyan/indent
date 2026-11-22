@@ -1,0 +1,110 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kofi", "label": "Kofi's phone", "kind": "story" },
+      { "id": "html", "label": "index.html", "kind": "file", "mine": true },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "page", "label": "Home page", "kind": "data" },
+      { "id": "screen", "label": "Any screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kofi", "to": "html", "label": "its width" },
+      { "from": "html", "to": "page", "label": "content" },
+      { "from": "css", "to": "page", "label": "sizes, layout" },
+      { "from": "page", "to": "screen", "label": "fits" }
+    ],
+    "note": "The same page has to read well on a monitor and on a phone. You tell phones their real width and let sizes and layout follow the screen."
+  },
+  "tasks": {
+    "viewport": {
+      "steps": [
+        {
+          "active": ["kofi"],
+          "note": "Kofi's phone lays the page out for a wide screen, then shrinks it to a tiny copy."
+        },
+        {
+          "active": ["kofi", "kofi->html", "html"],
+          "value": { "kind": "array", "label": "pages with a head", "values": ["index.html", "classes.html"] },
+          "note": "A line in the head of each page tells the phone to use its own width, at normal size."
+        },
+        {
+          "active": ["html", "html->page", "page", "page->screen", "screen"],
+          "note": "The phone lays the page out at its real width, and the words are big enough to read."
+        }
+      ]
+    },
+    "images": {
+      "steps": [
+        {
+          "active": ["page"],
+          "note": "The studio picture is wider than a phone, so it runs off the edge."
+        },
+        {
+          "active": ["css", "css->page", "page"],
+          "value": {
+            "kind": "map",
+            "label": "each picture",
+            "entries": [
+              { "key": "width", "value": "never wider than its box" },
+              { "key": "height", "value": "follows the width" }
+            ]
+          },
+          "note": "Each picture may be narrower than its own size, never wider than its box, and keeps its shape."
+        },
+        {
+          "active": ["page", "page->screen", "screen"],
+          "note": "On a phone the picture fits the screen. On a monitor it keeps its own size."
+        }
+      ]
+    },
+    "rem": {
+      "steps": [
+        {
+          "active": ["screen"],
+          "note": "Some readers set larger text on their phone. A size in px ignores them."
+        },
+        {
+          "active": ["css", "css->page", "page"],
+          "note": "The body's text size is written in rem, measured against the reader's own setting."
+        },
+        {
+          "active": ["page", "page->screen", "screen"],
+          "note": "The page looks the same as before, and grows for readers who asked for larger text."
+        }
+      ]
+    },
+    "width": {
+      "steps": [
+        {
+          "active": ["page"],
+          "note": "The content of the page has one fixed width, wider than any phone."
+        },
+        {
+          "active": ["css", "css->page", "page"],
+          "note": "The fixed width becomes an upper limit in rem: wide screens stop there, narrow ones go below it."
+        },
+        {
+          "active": ["page", "page->screen", "screen"],
+          "note": "On a monitor the lines stay short enough to read. On a phone the content is as wide as the screen."
+        }
+      ]
+    },
+    "phone": {
+      "steps": [
+        {
+          "active": ["page"],
+          "value": { "kind": "array", "label": "the class cards", "values": ["Wheel throwing", "Handbuilding"] },
+          "note": "On a phone the two class cards are squeezed side by side."
+        },
+        {
+          "active": ["css", "css->page", "page"],
+          "note": "A media query changes the columns of the classes, only on screens below Kofi's breakpoint."
+        },
+        {
+          "active": ["page", "page->screen", "screen"],
+          "note": "On a phone one card sits above the other. On a wider screen they stay side by side."
+        }
+      ]
+    }
+  }
+}

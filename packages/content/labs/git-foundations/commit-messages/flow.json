@@ -1,0 +1,41 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilma", "label": "Wilma", "kind": "story" },
+      { "id": "working", "label": "Finds page", "kind": "file" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "history", "label": "History", "kind": "data" },
+      { "id": "reader", "label": "Next year's reader", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "wilma", "to": "you", "label": "request" },
+      { "from": "working", "to": "you", "label": "new postage" },
+      { "from": "you", "to": "history", "label": "messages" },
+      { "from": "history", "to": "reader", "label": "what and why" }
+    ],
+    "note": "Every commit gets a message a person can read: what changed, and why."
+  },
+  "tasks": {
+    "reword": {
+      "steps": [
+        { "active": ["history"], "note": "Femi's last commit has a message that says nothing about what it did." },
+        { "active": ["history", "you"], "note": "It is still the last commit and only on this computer, so its message can be replaced." },
+        { "active": ["you", "you->history", "history", "history->reader", "reader"], "note": "The same change comes back with a first line that says what it was." }
+      ]
+    },
+    "subject": {
+      "steps": [
+        { "active": ["wilma", "wilma->you", "you"], "note": "Wilma asks for new postage on every order." },
+        { "active": ["working", "working->you", "you"], "note": "One line of the finds page changes, and is staged." },
+        { "active": ["you", "you->history", "history"], "note": "The commit's first line names the change in a few words." }
+      ]
+    },
+    "body": {
+      "steps": [
+        { "active": ["wilma"], "note": "Wilma has a reason for the new price." },
+        { "active": ["you", "you->history", "history"], "note": "Under the first line, after an empty line, the body gives that reason." },
+        { "active": ["history", "history->reader", "reader"], "note": "Someone reading the history next year knows why, not only what." }
+      ]
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "id": "undo-before-commit",
+  "title": "Undo before you commit",
+  "files": ["NOTES.md", "shop/visit.html", "shop/style.css", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the shop's folder, then go into shop and work there with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "discard",
+      "title": "Throw away Femi's new look",
+      "file": "shop/style.css",
+      "description": "Run `node setup.mjs` in the top folder, then work inside `shop`. Femi tried a new look for the site in `style.css` and Wilma said no. Throw his change away so `style.css` is back to the version in the last commit. It must not be committed or staged on the way.\n\nThe check expects `style.css` in the working folder and in the staging area to match the last commit, and no commit of yours to have changed it.",
+      "nextSteps": [
+        "Run `git status` and find `style.css` under changes not staged for commit.",
+        "Read the tip Git prints in brackets above it.",
+        "Discard the change in the working folder with that command.",
+        "Run `git status` again: `style.css` is no longer listed."
+      ],
+      "hints": [
+        "git status prints, above each list, the commands that move a file out of it.",
+        "Of the two tips above the lists, the one under changes not staged discards a change in the working folder. What it throws away cannot be brought back.",
+        "Run `git restore style.css`."
+      ],
+      "docs": [
+        { "title": "git restore", "url": "https://git-scm.com/docs/git-restore" },
+        { "title": "Undoing things", "url": "https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "unstage",
+      "title": "Take the closing note out of the staging area",
+      "file": "shop/visit.html",
+      "description": "Femi staged a note in `visit.html`: \"Closed from 4 to 8 May for the book fair.\" Wilma has not confirmed the dates. Take `visit.html` out of the staging area, but keep the note in the file in the working folder, so it is ready once she says yes.\n\nThe check expects `visit.html` in the staging area to match the last commit, the note still in `visit.html` in the working folder, and no commit with the note in it.",
+      "nextSteps": [
+        "Run `git status` and find `visit.html` under changes to be committed.",
+        "Read the tip Git prints above that list.",
+        "Unstage `visit.html` only.",
+        "Run `git status`: `visit.html` is now under changes not staged, and the note is still in the editor."
+      ],
+      "hints": [
+        "Unstaging and discarding are different moves. This one leaves the file on disk as it is.",
+        "`git restore` changes the working folder unless you tell it to work on the staging area instead. Look for that option in git status's tip.",
+        "Run `git restore --staged visit.html`."
+      ],
+      "docs": [
+        { "title": "git restore --staged", "url": "https://git-scm.com/docs/git-restore#Documentation/git-restore.txt---staged" },
+        {
+          "title": "Unstaging a staged file",
+          "url": "https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things#_unstaging"
+        }
+      ],
+      "videos": [
+        { "title": "Unstaging a file, and why Git has two ways", "url": "https://www.youtube.com/watch?v=x4HiSglwBjQ" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ferns",
+      "title": "Commit the new find by itself",
+      "file": "shop/finds.html",
+      "description": "The new find Femi staged in `finds.html`, Ferns and Their Keepers, is ready. Commit it, and only it. Unstage the closing note first, or it goes into the same commit.\n\nThe check finds the commit where the new find first appears and expects no other file in it.",
+      "nextSteps": [
+        "Do the second task first.",
+        "Run `git status` and `git diff --staged`: only `finds.html` and its one new line are staged.",
+        "Commit with a message that says what changed."
+      ],
+      "hints": [
+        "A commit takes everything that is staged, so look at the staging area before you commit.",
+        "`git diff --staged` shows exactly what the next commit will hold.",
+        "Once only finds.html is staged, run `git commit -m \"Add Ferns and Their Keepers to the finds\"`."
+      ],
+      "docs": [
+        { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" },
+        { "title": "git diff --staged", "url": "https://git-scm.com/docs/git-diff" }
+      ],
+      "points": 10
+    }
+  ]
+}

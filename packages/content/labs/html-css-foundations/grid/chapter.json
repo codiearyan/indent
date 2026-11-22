@@ -1,0 +1,102 @@
+{
+  "id": "grid",
+  "title": "The shop as a grid",
+  "files": ["styles.css", "index.html"],
+  "terminal": {
+    "description": "The home page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "columns",
+      "title": "Put the two classes side by side",
+      "file": "styles.css",
+      "description": "The two classes are cards now, in a list with the class `classes`. They sit one above the other.\n\nMake that list a grid with two columns of the same width that share the room there is.\n\nThe check reads the `display` of the list of classes and its `grid-template-columns`.",
+      "nextSteps": [
+        "Read \"Rows and columns\" and \"Sharing the room with fr\" in the lesson.",
+        "Add a new rule to styles.css that picks the list of classes.",
+        "Make it a grid, then give it one size for each of its two columns.",
+        "Save, look at the classes in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "The container is the list, not each card. A grid needs to know its columns too.",
+        "`grid-template-columns` takes one size per column, separated by spaces. `fr` shares out the room equally.",
+        "Write `.classes { display: grid; grid-template-columns: 1fr 1fr; }`."
+      ],
+      "docs": [
+        { "title": "Grids", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Grids" },
+        { "title": "grid-template-columns", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns" }
+      ],
+      "videos": [
+        { "title": "CSS grid in 20 minutes", "url": "https://www.youtube.com/watch?v=9zBsdzdE4sM" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "gap",
+      "title": "Space the cards apart",
+      "file": "styles.css",
+      "description": "The cards touch each other. Dilys's notes ask for 24px between all the cards, across and down.\n\nGive both lists of cards, the classes and the shelf, 24px of `gap` in both directions.\n\nThe check reads the gap of the list of classes and of the shelf, between columns and between rows.",
+      "nextSteps": [
+        "Read \"Gap\" in the lesson.",
+        "Find the rule that already picks both lists of cards.",
+        "Add the space there, once, in px.",
+        "Save, look at the cards, and press Check."
+      ],
+      "hints": [
+        "Space between the cells of a grid is set on the container, not on each card.",
+        "The rule for `.classes, .shelf` picks both containers. One value of `gap` sets both directions.",
+        "Add `gap: 24px;` to the `.classes, .shelf` rule."
+      ],
+      "docs": [
+        { "title": "gap", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/gap" },
+        { "title": "Grids", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Grids" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "shelf",
+      "title": "Fit as many pots in a row as there is room for",
+      "file": "styles.css",
+      "description": "Six pots are on the shelves this week, in a list with the class `shelf`. Dilys wants each card 200px wide, and as many in a row as the screen has room for.\n\nMake the shelf a grid, and write its columns with `repeat()`, so the browser makes as many 200px columns as fit.\n\nThe check reads the display of the shelf and its columns.",
+      "nextSteps": [
+        "Read \"repeat()\" in the lesson.",
+        "Add a new rule to styles.css that picks the shelf.",
+        "Make it a grid, and write its columns with repeat(): first how many, then the size of each.",
+        "Save, drag the Browser panel wider and narrower, and press Check."
+      ],
+      "hints": [
+        "A fixed number of columns is too many on a phone and too few on a big screen. repeat() can count them for you.",
+        "In place of the number, `auto-fill` means as many as fit. The size after the comma is a length.",
+        "Write `.shelf { display: grid; grid-template-columns: repeat(auto-fill, 200px); }`."
+      ],
+      "docs": [
+        { "title": "repeat()", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/repeat" },
+        { "title": "grid-template-columns", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "minmax",
+      "title": "Let the columns fill the row",
+      "file": "styles.css",
+      "description": "With columns of exactly 200px, an empty strip is left at the end of each row, and Dilys does not want it.\n\nKeep as many columns as fit, but give each one a smallest size of 200px and a largest size that is a share of the room left, so the columns grow to fill the row.\n\nThe check reads the columns of the shelf: as many as fit, each with its smallest and largest size.",
+      "nextSteps": [
+        "Read \"minmax()\" in the lesson.",
+        "Go back to the columns of the shelf.",
+        "Replace the size of each column with a smallest and a largest size.",
+        "Save, look for the empty strip at the end of the row, and press Check."
+      ],
+      "hints": [
+        "Only the size of each column inside repeat() changes. The count stays.",
+        "`minmax()` takes the smallest size, a comma, then the largest. `fr` grows to share the room.",
+        "Make the columns `repeat(auto-fill, minmax(200px, 1fr))`."
+      ],
+      "docs": [
+        { "title": "minmax()", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/minmax" },
+        { "title": "repeat()", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/repeat" }
+      ],
+      "points": 10
+    }
+  ]
+}

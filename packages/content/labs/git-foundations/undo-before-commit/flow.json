@@ -1,0 +1,41 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilma", "label": "Wilma", "kind": "story" },
+      { "id": "working", "label": "Working folder", "kind": "data" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "staging", "label": "Staging area", "kind": "data" },
+      { "id": "history", "label": "History", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "wilma", "to": "you", "label": "yes and no" },
+      { "from": "you", "to": "working", "label": "thrown away" },
+      { "from": "staging", "to": "you", "label": "taken out" },
+      { "from": "staging", "to": "history", "label": "one commit" }
+    ],
+    "note": "Two of Femi's changes are taken back before anything is committed, and one goes in."
+  },
+  "tasks": {
+    "discard": {
+      "steps": [
+        { "active": ["working"], "note": "Femi's new look sits in the working folder, never staged." },
+        { "active": ["wilma", "wilma->you", "you"], "note": "Wilma says no to it." },
+        { "active": ["you", "you->working", "working"], "note": "The stylesheet goes back to the version in the last commit, and the new look is gone for good." }
+      ]
+    },
+    "unstage": {
+      "steps": [
+        { "active": ["staging"], "note": "The closing note is staged, ready for the next commit." },
+        { "active": ["staging", "staging->you", "you"], "note": "It comes out of the staging area, because the dates are not confirmed." },
+        { "active": ["working"], "note": "The note is still in the file, waiting for Wilma's yes." }
+      ]
+    },
+    "ferns": {
+      "steps": [
+        { "active": ["staging"], "note": "Only the new find is left in the staging area." },
+        { "active": ["staging", "staging->history", "history"], "note": "One commit saves the new book and nothing else." },
+        { "active": ["working"], "note": "The closing note stays behind in the working folder." }
+      ]
+    }
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "shelf", "label": "Shelf", "kind": "data" },
+      { "id": "last", "label": "lastOnShelf()", "kind": "function", "mine": true, "fn": "lastOnShelf" },
+      { "id": "restock", "label": "restock()", "kind": "function", "mine": true, "fn": "restock" },
+      { "id": "sell", "label": "sellLast()", "kind": "function", "mine": true, "fn": "sellLast" },
+      { "id": "spot", "label": "shelfSpot()", "kind": "function", "mine": true, "fn": "shelfSpot" },
+      { "id": "till", "label": "Till", "kind": "data" },
+      { "id": "takings", "label": "takings()", "kind": "function", "mine": true, "fn": "takings" }
+    ],
+    "edges": [
+      { "from": "shelf", "to": "last", "label": "the scents" },
+      { "from": "restock", "to": "shelf", "label": "new scent" },
+      { "from": "shelf", "to": "sell", "label": "last scent" },
+      { "from": "shelf", "to": "spot", "label": "the scents" },
+      { "from": "till", "to": "takings", "label": "amounts" }
+    ],
+    "note": "The shelf and the till become lists the laptop keeps, so Ines no longer holds them in her head."
+  },
+  "tasks": {
+    "last": {
+      "trace": {
+        "file": "src/arrays.js",
+        "call": "lastOnShelf",
+        "args": [["Cedar", "Sage", "Smoked fig", "Lavender"]]
+      },
+      "steps": [
+        {
+          "active": ["shelf"],
+          "value": {
+            "kind": "array",
+            "label": "today's shelf",
+            "values": ["Cedar", "Sage", "Smoked fig", "Lavender"]
+          },
+          "note": "The shelf is a list of scents, left to right, each at its own position."
+        },
+        {
+          "active": ["shelf", "shelf->last", "last"],
+          "note": "lastOnShelf() finds the far end of the shelf, whatever its length."
+        },
+        {
+          "active": ["last"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "scent", "value": "text" }]
+          },
+          "note": "It hands back the scent at the far right of the shelf."
+        }
+      ]
+    },
+    "restock": {
+      "trace": {
+        "file": "src/arrays.js",
+        "call": "restock",
+        "args": [["Cedar", "Sage", "Smoked fig", "Lavender"], "Amber"]
+      },
+      "steps": [
+        {
+          "active": ["restock"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "shelf", "value": "a list of scents" },
+              { "key": "scent", "value": "Amber" }
+            ]
+          },
+          "note": "A new box of Amber candles arrives."
+        },
+        {
+          "active": ["restock", "shelf"],
+          "note": "A scent that is on the shelf already is never added a second time."
+        },
+        {
+          "active": ["restock", "restock->shelf", "shelf"],
+          "note": "A new scent goes on the right end of the shelf."
+        },
+        {
+          "active": ["restock"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "count", "value": "a whole number" }]
+          },
+          "note": "It tells Ines how many scents the shelf holds now."
+        }
+      ]
+    },
+    "sell": {
+      "trace": {
+        "file": "src/arrays.js",
+        "call": "sellLast",
+        "args": [["Cedar", "Sage", "Smoked fig", "Lavender"]]
+      },
+      "steps": [
+        {
+          "active": ["shelf"],
+          "note": "A customer buys the candle at the right end of the shelf."
+        },
+        {
+          "active": ["shelf", "shelf->sell", "sell"],
+          "note": "sellLast() takes that scent off the shelf, so the shelf is one shorter."
+        },
+        {
+          "active": ["sell"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "line", "value": "Sold and a scent" }]
+          },
+          "note": "It hands back a line that names what was sold."
+        }
+      ]
+    },
+    "spot": {
+      "trace": {
+        "file": "src/arrays.js",
+        "call": "shelfSpot",
+        "args": [["Cedar", "Sage", "Smoked fig", "Lavender"], "Sage"]
+      },
+      "steps": [
+        {
+          "active": ["spot"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "scent", "value": "Sage" }]
+          },
+          "note": "Theo asks where the Sage is."
+        },
+        {
+          "active": ["shelf", "shelf->spot", "spot"],
+          "note": "shelfSpot() looks for the scent's position on the shelf, or learns it is not there."
+        },
+        {
+          "active": ["spot"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "answer", "value": "a spot, counted the shop's way, or not there" }]
+          },
+          "note": "It answers in the shop's words."
+        }
+      ]
+    },
+    "takings": {
+      "trace": {
+        "file": "src/arrays.js",
+        "call": "takings",
+        "args": [[2500, 1800, -900, 1250]]
+      },
+      "steps": [
+        {
+          "active": ["till", "till->takings", "takings"],
+          "value": {
+            "kind": "array",
+            "label": "today's till",
+            "values": [2500, 1800, -900, 1250]
+          },
+          "note": "At closing time the till holds the day's amounts, sales and refunds alike."
+        },
+        {
+          "active": ["takings"],
+          "note": "takings() looks at every amount, and your helper says whether it is a refund."
+        },
+        {
+          "active": ["takings"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "sales", "value": "cents" }]
+          },
+          "note": "Only the sales count toward the day's takings."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilma", "say": "One site, with a record of changes?", "note": "Four copies on the shop computer." },
+    { "title": "Site copies", "text": "Copied folders, each a bit different.", "note": "Nobody knows which one is right." },
+    {
+      "title": "Your commands",
+      "file": "visit.html",
+      "mine": true,
+      "gap": "No history yet",
+      "tasks": ["Make a repository", "Say who you are", "Save the whole site", "Commit new hours"]
+    },
+    { "title": "History", "rows": [["The site as it was"], ["New Saturday hours"]] }
+  ],
+  "ticket": { "label": "Saturday", "wrong": "two answers", "why": "Copies", "right": "on record" },
+  "captions": [
+    "At Pennywhistle Books, Wilma wants one website with a record of every change.",
+    "Today the site lives in copies, and two of them open at different times on Saturdays.",
+    "You turn the folder into a repository and save it, then save the new hours, in four tasks.",
+    "The history holds the site as it was, then the new Saturday hours on top.",
+    "One folder, one answer, and every change written down."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Femi", "say": "Three edits, none of them saved.", "note": "One of them may have a typo." },
+    { "title": "Working folder", "text": "New books, a phone number, a new page.", "note": "All mixed together." },
+    {
+      "title": "Your commands",
+      "file": "finds.html",
+      "mine": true,
+      "gap": "Nothing chosen yet",
+      "tasks": ["Commit the new finds", "Fix and commit phone", "Stage the new page"]
+    },
+    { "title": "History", "rows": [["New finds"], ["Phone number"], ["Page waits for Wilma"]] }
+  ],
+  "ticket": { "label": "3 edits", "wrong": "one big lump", "why": "Mixed up", "right": "each in place" },
+  "captions": [
+    "Femi worked on the shop's site on Saturday and left three changes uncommitted.",
+    "Saved together, they would be one lump, with a typo and an unread page inside.",
+    "You choose what goes into each commit and fix the typo first, in three tasks.",
+    "Two clean commits, and the new page waits in the staging area for Wilma.",
+    "Each change went its own way through the three places."
+  ]
+}

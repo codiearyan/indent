@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilma", "say": "Only the fern book goes up today.", "note": "Keep the closing note for later." },
+    { "title": "Femi's Monday", "text": "A new look, a staged note, a staged book.", "note": "One commit would take two of them." },
+    {
+      "title": "Your commands",
+      "file": "style.css",
+      "mine": true,
+      "gap": "No way back yet",
+      "tasks": ["Drop the new look", "Unstage the note", "Commit the new find"]
+    },
+    { "title": "Website", "rows": [["The old look"], ["One new book"], ["No closing note yet"]] }
+  ],
+  "ticket": { "label": "New look", "wrong": "on the site", "why": "Committed", "right": "never saved" },
+  "captions": [
+    "Wilma wants only Femi's new book on the shop's site today.",
+    "Femi also left a new look and a staged closing note, and a commit would take them along.",
+    "You throw one change away and take one out of the staging area, in three tasks.",
+    "The site keeps its look, gets one new book, and the note waits in the file.",
+    "Nothing went into the history that should not."
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dilys", "label": "Dilys", "kind": "story" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "classes", "label": "Class cards", "kind": "data" },
+      { "id": "shelf", "label": "Shelf of pots", "kind": "data" },
+      { "id": "visitor", "label": "Visitor", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dilys", "to": "css", "label": "her notes" },
+      { "from": "css", "to": "classes", "label": "columns" },
+      { "from": "css", "to": "shelf", "label": "columns" },
+      { "from": "classes", "to": "visitor", "label": "side by side" },
+      { "from": "shelf", "to": "visitor", "label": "rows of pots" }
+    ],
+    "note": "A grid lays out cards in rows and columns. You give the classes two columns and let the shelf fit as many pots in a row as there is room for."
+  },
+  "tasks": {
+    "columns": {
+      "steps": [
+        {
+          "active": ["classes"],
+          "value": { "kind": "array", "label": "the class cards", "values": ["Wheel throwing", "Handbuilding"] },
+          "note": "The two class cards sit one above the other."
+        },
+        {
+          "active": ["css", "css->classes", "classes"],
+          "value": { "kind": "grid", "label": "the list of classes", "cells": [["Wheel throwing", "Handbuilding"]], "colLabels": ["column 1", "column 2"] },
+          "note": "The list becomes a grid with two columns that share the room equally."
+        },
+        {
+          "active": ["classes", "classes->visitor", "visitor"],
+          "note": "A visitor sees both classes at once, side by side."
+        }
+      ]
+    },
+    "gap": {
+      "steps": [
+        {
+          "active": ["classes", "shelf"],
+          "note": "In both lists, the cards touch each other."
+        },
+        {
+          "active": ["dilys", "dilys->css", "css"],
+          "note": "Dilys wants the same space between all the cards, across and down."
+        },
+        {
+          "active": ["css", "css->classes", "classes", "css->shelf", "shelf"],
+          "note": "The space is set once on each list, and lands only between its cards."
+        }
+      ]
+    },
+    "shelf": {
+      "steps": [
+        {
+          "active": ["shelf"],
+          "value": {
+            "kind": "array",
+            "label": "on the shelves",
+            "values": ["Small mug", "Tall mug", "Cereal bowl", "Serving bowl", "Side plate", "Dinner plate"]
+          },
+          "note": "Six pots stand in one long column."
+        },
+        {
+          "active": ["css", "css->shelf", "shelf"],
+          "note": "The shelf becomes a grid, and the browser counts how many columns of one size fit."
+        },
+        {
+          "active": ["shelf", "shelf->visitor", "visitor"],
+          "note": "A wide screen gets more pots in a row, a narrow one fewer."
+        }
+      ]
+    },
+    "minmax": {
+      "steps": [
+        {
+          "active": ["shelf"],
+          "note": "Each row of pots ends with an empty strip the columns do not fill."
+        },
+        {
+          "active": ["css", "css->shelf", "shelf"],
+          "value": {
+            "kind": "map",
+            "label": "each column",
+            "entries": [
+              { "key": "smallest", "value": "Dilys's card width" },
+              { "key": "largest", "value": "a share of the room left" }
+            ]
+          },
+          "note": "Each column gets a smallest and a largest size, so it can grow."
+        },
+        {
+          "active": ["shelf", "shelf->visitor", "visitor"],
+          "note": "The pots fill the whole row, with no empty strip at the end."
+        }
+      ]
+    }
+  }
+}

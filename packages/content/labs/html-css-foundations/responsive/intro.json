@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Kofi",
+      "say": "Why is the page so tiny on my phone?",
+      "note": "He is at the bus stop."
+    },
+    {
+      "title": "Kofi's phone",
+      "text": "A tiny copy, and the picture runs off.",
+      "note": "Made for a monitor"
+    },
+    {
+      "title": "Your code",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "Sizes for one screen",
+      "tasks": ["The viewport line", "Pictures that shrink", "Sizes in rem", "Classes stacked"]
+    },
+    {
+      "title": "Kofi's phone",
+      "rows": [["Wheel throwing"], ["Handbuilding"]],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Classes",
+    "wrong": "too small",
+    "why": "One size",
+    "right": "easy to read"
+  },
+  "captions": [
+    "Kofi opens the studio's page on his phone at the bus stop.",
+    "The phone shows a tiny copy of the big page, and the studio picture runs off the side.",
+    "You add the viewport line, pictures that shrink, rem sizes and a media query.",
+    "On the phone the class cards sit one above the other, big enough to read.",
+    "One page, every screen. The studio now has a page you built from a text file."
+  ]
+}

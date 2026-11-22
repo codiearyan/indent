@@ -1,0 +1,29 @@
+{
+  "stations": [
+    {
+      "title": "Theo",
+      "say": "Why does the shelf say Wickhollow?",
+      "note": "He only made newsletter labels."
+    },
+    { "title": "Theo's labels", "text": "They write each label over the shelf list." },
+    {
+      "title": "Your code",
+      "file": "copies.js",
+      "mine": true,
+      "gap": "Code that changes the shelf",
+      "tasks": ["A list with one more", "Only the first few", "All but the last", "Labels of their own"]
+    },
+    {
+      "title": "The shelf",
+      "rows": [["Cedar", "Sage"], ["Smoked fig", "Lavender"], ["Amber"]]
+    }
+  ],
+  "ticket": { "label": "The shelf", "wrong": "relabelled", "why": "Changed", "right": "as it was" },
+  "captions": [
+    "Theo made labels for the newsletter, and now the shelf list looks wrong.",
+    "His code wrote the labels over the shelf, because both names share one list.",
+    "You write functions that hand back new lists and leave the shelf alone.",
+    "Now the newsletter gets its labels and the shelf comes out as it was.",
+    "The shop has one shelf list, and nothing breaks it by accident any more."
+  ]
+}

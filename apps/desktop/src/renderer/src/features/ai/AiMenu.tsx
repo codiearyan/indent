@@ -22,6 +22,9 @@ import { viewTransition } from '@/lib/viewTransition'
 import { useSettings } from '@/stores/settings'
 import { showTourAgain } from '@/features/tour/showTourAgain'
 import { activeProvider, useAi } from './aiStore'
+import { InstallOpencode } from './InstallOpencode'
+import { CopyCommand } from './CopyCommand'
+import { removeOwnOpencode, signInCommand, useShowOpencodeSetup } from './opencodeInstall'
 import { TestConnection } from './TestConnection'
 
 // Radix Select needs a non-empty value; this one stands for "let the CLI choose".
@@ -144,6 +147,7 @@ export function AiSettings(): React.JSX.Element {
   const clis = config?.providers.filter((p) => p.kind === 'cli') ?? []
   const apis = config?.providers.filter((p) => p.kind === 'api') ?? []
   const mode = config?.suggestions ?? 'off'
+  const showSetup = useShowOpencodeSetup(!!config?.providers.some((p) => p.available))
 
   return (
     <>
@@ -183,6 +187,8 @@ export function AiSettings(): React.JSX.Element {
       />
 
       <Separator />
+
+      {config && showSetup && <InstallOpencode />}
 
       <div role="radiogroup" aria-label="AI provider" className="flex flex-col gap-3">
         <ProviderGroup title="On this computer" providers={clis} />
@@ -298,12 +304,29 @@ function ProviderRow({ provider }: { provider: AiProviderInfo }): React.JSX.Elem
           <span className={cn('text-sm', !provider.available && 'text-muted-foreground')}>
             {provider.label}
           </span>
-          <span className="min-w-0 flex-1 truncate text-right font-mono text-xs text-muted-foreground">
-            {provider.detail}
+          <span
+            className={cn(
+              'min-w-0 flex-1 truncate text-right text-xs text-muted-foreground',
+              !provider.managed && 'font-mono'
+            )}
+          >
+            {provider.managed ? 'App copy' : provider.detail}
           </span>
         </button>
         {provider.kind === 'api' && provider.available && (
           <Button variant="ghost" size="xs" onClick={() => void saveKey(null)}>
+            Remove
+          </Button>
+        )}
+        {provider.managed && (
+          <Button
+            variant="ghost"
+            size="xs"
+            onClick={() => {
+              setError(null)
+              removeOwnOpencode().catch((e: unknown) => setError(errorMessage(e)))
+            }}
+          >
             Remove
           </Button>
         )}
@@ -329,6 +352,14 @@ function ProviderRow({ provider }: { provider: AiProviderInfo }): React.JSX.Elem
             Save
           </Button>
         </form>
+      )}
+      {provider.managed && provider.bin && selected && (
+        <div className="flex flex-col gap-1 pl-8">
+          <span className="text-xs text-muted-foreground">
+            To sign in for a paid plan or your own key, run in a terminal:
+          </span>
+          <CopyCommand name="sign-in" text={signInCommand(provider.bin)} />
+        </div>
       )}
       {error && <p className="pl-8 text-xs text-destructive">{error}</p>}
     </div>

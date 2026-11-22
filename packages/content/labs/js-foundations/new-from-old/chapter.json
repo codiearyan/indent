@@ -1,0 +1,133 @@
+{
+  "id": "new-from-old",
+  "title": "New lists from old",
+  "files": ["src/map-filter-find.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the market lists made from the shelf.",
+    "suggestedCommand": "node src/map-filter-find.js"
+  },
+  "tasks": [
+    {
+      "id": "round",
+      "title": "Round prices for the market",
+      "file": "src/map-filter-find.js",
+      "description": "Under `// Task 1` in `src/map-filter-find.js`, first write a function of your own, `roundUp(cents)`: it returns `cents` rounded up to the next whole 100, so `1250` becomes `1300` and `1800` stays `1800`. It only helps `marketPrices`, so it stays off the export line.\n\nThen make `marketPrices(prices)` return a new list with every price rounded up, in the same order. Use `map` and `roundUp`.\n\nCheck calls `roundUp` with prices of its own, a whole 100 included, then `marketPrices` with lists of its own, an empty one included. It makes sure the list handed in has not changed and that `marketPrices` uses `map` and `roundUp`.",
+      "nextSteps": [
+        "Read the lesson's part on `map`.",
+        "Write `roundUp` above `marketPrices`, from its name to its closing brace.",
+        "In `marketPrices`, give back what `map` makes when it uses `roundUp` on each price.",
+        "Run the file: every price on the first line should end in 00."
+      ],
+      "hints": [
+        "Rounding up to a whole 100 is rounding up a number of hundreds. You met the rounding that always goes up in the issue on numbers.",
+        "Divide by 100, round that up with `Math.ceil`, and multiply by 100 again. `map` calls the function you give it once per price and puts each answer in a new list.",
+        "`roundUp` is `return Math.ceil(cents / 100) * 100`. `marketPrices` is `return prices.map(roundUp)`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.map()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+        },
+        {
+          "title": "Math.ceil()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/ceil"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Eight array methods to know",
+          "url": "https://www.youtube.com/watch?v=R8rmfD9Y5-c"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cheap",
+      "title": "Fill the cheap table",
+      "file": "src/map-filter-find.js",
+      "description": "Under `// Task 2`, make `cheapTable(prices, limit)` return a new list of the prices below `limit`, in their order. A price of exactly `limit` does not go on the cheap table. Use `filter`.\n\nCheck calls `cheapTable` with prices and limits of its own: a price equal to the limit, a limit above every price, one below every price, and an empty list. It also makes sure the list handed in has not changed.",
+      "nextSteps": [
+        "Read the lesson's part on `filter`.",
+        "Write the question to ask about one price: is it below `limit`?",
+        "Hand that question to `filter` and give back the list it makes.",
+        "Run the file and try another limit in the demo line."
+      ],
+      "hints": [
+        "`filter` keeps an item when the function you give it says true for it. So that function is a question about one price.",
+        "The question uses `limit`, which the arrow function can see because it is written inside `cheapTable`. Below means the equal case is left out.",
+        "The body is one line: `return prices.filter((cents) => cents < limit)`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.filter()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"
+        },
+        {
+          "title": "Arrow function expressions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "find",
+      "title": "Find a scent by its letter",
+      "file": "src/map-filter-find.js",
+      "description": "Under `// Task 3`, make `firstStartingWith(scents, letter)` return the first scent of `scents` whose first letter is `letter`, or `'None'` when no scent starts with it. Use `find`.\n\nCheck calls `firstStartingWith` with lists and letters of its own: two scents with the same letter, a scent with the letter later in its name, a letter no scent has, and an empty list.",
+      "nextSteps": [
+        "Read the lesson's part on `find`.",
+        "Write the question about one scent: is its first character `letter`?",
+        "Hand it to `find`, and keep what comes back in a `const`.",
+        "Give back that scent, or `'None'` when `find` found nothing, and run the file."
+      ],
+      "hints": [
+        "`filter` gives back a list of every match. The task asks for one scent, and another list tool stops at the first match and gives back the item itself.",
+        "`scent[0]` is the first character of a text. When nothing matches, `find` gives back `undefined`, and `??`, which you met with `null` and `undefined`, can step in for it.",
+        "`const found = scents.find((scent) => scent[0] === letter)`, then `return found ?? 'None'`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.find()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find"
+        },
+        {
+          "title": "Nullish coalescing operator (??)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "tags",
+      "title": "Print the small tags",
+      "file": "src/map-filter-find.js",
+      "description": "Under `// Task 4`, make `tagsFor(scents)` return a new list of the scents that fit on a tag, each in capital letters, in their order. A tag fits 8 characters at most, spaces included: `'Lavender'` fits as `'LAVENDER'`, `'Smoked fig'` is left out. Use `filter` and `map`.\n\nCheck calls `tagsFor` with lists of its own: a scent of exactly 8 characters, scents with spaces, a list where nothing fits, and an empty list. It also makes sure the list handed in has not changed.",
+      "nextSteps": [
+        "Decide which of the two jobs is `filter` and which is `map`.",
+        "Keep the scents that fit, counting their characters with `length`.",
+        "Turn each kept scent into capital letters.",
+        "Give back the final list and run the file."
+      ],
+      "hints": [
+        "There are two jobs: keep some scents, and change each one. Each of the two list tools from the lesson does one of them.",
+        "`filter` gives back a list, so you can call `map` straight on its answer. At most 8 includes 8 itself. `toUpperCase()` turns text into capital letters.",
+        "`return scents.filter((scent) => scent.length <= 8).map((scent) => scent.toUpperCase())`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.filter()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"
+        },
+        {
+          "title": "Array.prototype.map()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+        },
+        {
+          "title": "String.prototype.toUpperCase()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

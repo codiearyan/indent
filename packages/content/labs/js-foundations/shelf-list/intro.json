@@ -1,0 +1,29 @@
+{
+  "stations": [
+    {
+      "title": "Ines",
+      "say": "Can the laptop keep the shelf?",
+      "note": "She keeps it in her head."
+    },
+    { "title": "Ines's memory", "text": "Cedar, then Sage, then... she goes to look." },
+    {
+      "title": "Your code",
+      "file": "arrays.js",
+      "mine": true,
+      "gap": "No list of the shelf",
+      "tasks": ["Read the last scent", "Restock and sell", "Find a scent's spot", "Add up the till"]
+    },
+    {
+      "title": "The shelf",
+      "rows": [["Cedar", "Sage"], ["Smoked fig", "Lavender"]]
+    }
+  ],
+  "ticket": { "label": "Sage", "wrong": "go and look", "why": "From memory", "right": "spot known" },
+  "captions": [
+    "At Wickhollow Candles, Ines wants the laptop to keep the shelf for her.",
+    "Today the shelf lives in her head, so every question means a walk to look.",
+    "You make the shelf a list and write five small tasks around it.",
+    "Now the laptop knows where the Sage is, and what is at the end.",
+    "Theo has the shop's rules as functions. Now the shop has its first list."
+  ]
+}

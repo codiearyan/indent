@@ -12,6 +12,8 @@ import {
 import { RadioGroup } from '@/components/ui/radio-group'
 import { Skeleton } from '@/components/ui/skeleton'
 import { activeProvider, useAi } from '@/features/ai/aiStore'
+import { InstallOpencode } from '@/features/ai/InstallOpencode'
+import { useShowOpencodeSetup } from '@/features/ai/opencodeInstall'
 import { FolderNote, MoveFolderDialog } from '@/features/workspace/FolderMove'
 import { useWorkspaceRoot } from '@/features/workspace/useWorkspaceRoot'
 import { ChoiceCard } from './ChoiceCard'
@@ -29,6 +31,7 @@ export function Ai({ staged }: { staged: boolean }): React.JSX.Element {
   const connected = provider?.available ? provider : undefined
   const folder = useWorkspaceRoot()
   const [picking, setPicking] = useState(false)
+  const showSetup = useShowOpencodeSetup(!!connected)
 
   // Looks for installed CLIs again, so one installed a minute ago shows up.
   useEffect(() => void load(), [load])
@@ -110,6 +113,7 @@ export function Ai({ staged }: { staged: boolean }): React.JSX.Element {
           </dd>
         </div>
       </dl>
+      {enabled && config && showSetup && !picking && <InstallOpencode className="mt-4 px-5" />}
       {folder.error && <FolderNote folder={folder} className="mt-2 px-5" />}
       <MoveFolderDialog folder={folder} />
 

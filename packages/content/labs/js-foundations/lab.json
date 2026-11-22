@@ -34,7 +34,13 @@
     },
     {
       "title": "The shelf",
-      "chapters": ["order-reports"]
+      "chapters": [
+        "shelf-list",
+        "without-breaking",
+        "new-from-old",
+        "sort-and-search",
+        "order-reports"
+      ]
     },
     {
       "title": "The catalogue",
