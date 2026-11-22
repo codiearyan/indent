@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Why is the report all red?", "note": "Theo changed it last night." },
+    { "title": "Shop laptop", "text": "Prints a red error and no report." },
+    {
+      "title": "Your code",
+      "file": "morning.js",
+      "mine": true,
+      "gap": "Node stops before it prints",
+      "tasks": ["Fix candles poured", "Fix orders waiting", "Fix parcels packed", "Fix today's candle"]
+    },
+    { "title": "Morning report", "text": "Four lines Ines reads before opening." }
+  ],
+  "ticket": { "label": "Report", "wrong": "red text", "why": "Node stops", "right": "printed" },
+  "captions": [
+    "Day two at Wickhollow Candles. Ines asks why the morning report is all red.",
+    "Theo changed the file last night, and now Node stops before it prints a thing.",
+    "You fix the lines Node cannot read, in four small tasks.",
+    "Now Node reads the whole file and the report prints all four lines.",
+    "The red text was a message all along, and now Theo can read it too."
+  ]
+}

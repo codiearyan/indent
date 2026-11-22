@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "No red, but the numbers are odd.", "note": "He runs the till at closing." },
+    { "title": "Till file", "text": "Runs to the end and prints wrong answers." },
+    {
+      "title": "Your code",
+      "file": "till.js",
+      "mine": true,
+      "gap": "Wrong values, no error",
+      "tasks": ["Fix the total", "Fix the packed count", "Fix the label length"]
+    },
+    { "title": "Day's totals", "text": "Numbers Theo can trust at closing." }
+  ],
+  "ticket": { "label": "Day's totals", "wrong": "odd", "why": "Quietly off", "right": "add up" },
+  "captions": [
+    "Closing time at Wickhollow Candles. Theo asks why the day's numbers look odd.",
+    "The till runs with no error at all, and still prints answers nobody believes.",
+    "You find and fix the three lines that make wrong values.",
+    "Now the total, the candles packed and the label length all add up.",
+    "No error is not the same as right. The laptop works again, and Theo has his numbers."
+  ]
+}
