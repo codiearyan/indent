@@ -7,6 +7,7 @@
   "tags": ["Python"],
   "kind": "foundations",
   "tools": ["node", "python"],
+  "format": 4,
   "parts": [
     {
       "title": "First nights at the base",
