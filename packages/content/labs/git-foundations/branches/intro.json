@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilma", "say": "Get the sale ready, live in July.", "note": "The group's new time cannot wait." },
+    { "title": "main", "text": "One line of history, and it is the site.", "note": "The sale would go out too early." },
+    {
+      "title": "Your commands",
+      "file": "index.html",
+      "mine": true,
+      "gap": "No second line",
+      "tasks": ["Make the sale branch", "Commit the sale there", "Switch back to main", "New time on main"]
+    },
+    { "title": "Website", "rows": [["Today's site"], ["New group time"], ["Sale waits on a branch"]] }
+  ],
+  "ticket": { "label": "Sale", "wrong": "out too early", "why": "Too early", "right": "waits for July" },
+  "captions": [
+    "Wilma wants the summer sale ready now, but not on the site before July.",
+    "With one line of history, the sale would go out early or hold everything up.",
+    "You make a branch for the sale and keep main for today's site, in four tasks.",
+    "The sale waits on its branch, and the reading group's new time goes out now.",
+    "Two lines of work, each moving at its own pace."
+  ]
+}

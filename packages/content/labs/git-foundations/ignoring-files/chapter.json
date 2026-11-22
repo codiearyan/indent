@@ -1,0 +1,105 @@
+{
+  "id": "ignoring-files",
+  "title": "Files Git should leave alone",
+  "files": ["NOTES.md", "shop/.gitignore", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the shop's folder, then go into shop and work there with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "stock",
+      "title": "Ignore the till's stock export",
+      "file": "shop/.gitignore",
+      "description": "Run `node setup.mjs` in the top folder, then work inside `shop`. Every evening the shop's till writes `stock.csv` into `shop`. It is not part of the website, and Git should leave it alone.\n\nOpen `shop/.gitignore` in the editor, write a pattern on its own line that matches `stock.csv`, and save. Do not stage or commit `stock.csv`.\n\nThe check asks Git whether a line of `shop/.gitignore` matches `stock.csv`, and expects `stock.csv` to be untracked and no page of the website to be ignored.",
+      "nextSteps": [
+        "Run `git status` and find `stock.csv` under untracked files.",
+        "Open `shop/.gitignore` from the files panel. It is empty.",
+        "Write one line for the stock export and save the file.",
+        "Run `git status` again: `stock.csv` is no longer listed, and `.gitignore` is."
+      ],
+      "hints": [
+        "Git reads the patterns from the file .gitignore in shop, one pattern per line.",
+        "The simplest pattern is the file's own name, spelled exactly as git status prints it.",
+        "Write the line `stock.csv` in .gitignore and save."
+      ],
+      "docs": [
+        { "title": "gitignore", "url": "https://git-scm.com/docs/gitignore" },
+        {
+          "title": "Ignoring files",
+          "url": "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository#_ignoring"
+        }
+      ],
+      "videos": [{ "title": "How .gitignore works", "url": "https://www.youtube.com/watch?v=ErJyWO8TGoM" }],
+      "points": 10
+    },
+    {
+      "id": "drafts",
+      "title": "Ignore Femi's drafts folder",
+      "file": "shop/.gitignore",
+      "description": "Femi keeps pages he has not finished in the folder `drafts`, and he puts all kinds of files there. Add a line to `shop/.gitignore` that makes Git ignore the whole folder, whatever is in it now or later. Save the file.\n\nThe check asks Git about the files in `drafts` and about a file the check makes up inside it. Every one of them must be ignored, none tracked, and no page of the website ignored.",
+      "nextSteps": [
+        "Run `git status`: it lists `drafts/` as one untracked folder.",
+        "Add one line to `.gitignore` for the folder and save.",
+        "Run `git status` again: `drafts/` is gone from the list."
+      ],
+      "hints": [
+        "One line can take a whole folder, so you never list the files in it one by one.",
+        "A pattern that ends with a slash matches a folder and everything inside it.",
+        "Add the line `drafts/` to .gitignore and save."
+      ],
+      "docs": [
+        { "title": "gitignore pattern format", "url": "https://git-scm.com/docs/gitignore#_pattern_format" },
+        { "title": "git check-ignore", "url": "https://git-scm.com/docs/git-check-ignore" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "upload",
+      "title": "Make Git forget upload.log, and keep the file",
+      "file": "shop/.gitignore",
+      "description": "Femi's upload tool writes `upload.log` every time he puts the site online, and a commit took it in by mistake. Since then `git status` lists it as modified after every upload.\n\nAdd a line for `upload.log` to `shop/.gitignore` and save. You will see that `git status` still lists it. Then take `upload.log` out of what Git tracks, while the file itself stays in `shop`, because the upload tool still writes to it.\n\nThe check expects a line of `.gitignore` to match `upload.log`, the file to be gone from the staging area, and the file to be still in the folder.",
+      "nextSteps": [
+        "Add the line to `.gitignore`, save, and run `git status`: `upload.log` is still listed as modified.",
+        "Read the part of the lesson on files Git already tracks.",
+        "Take the file out of the staging area only, so it stays on disk.",
+        "Run `git status`: Git lists `upload.log` as deleted, to be committed, and the file is still in the files panel."
+      ],
+      "hints": [
+        "A pattern in .gitignore only keeps out files Git does not track yet. upload.log is tracked, so Git has to be told to forget it.",
+        "`git rm` stops tracking a file, and on its own it deletes the file from the folder too. One option keeps the file on disk.",
+        "Run `git rm --cached upload.log`."
+      ],
+      "docs": [
+        { "title": "git rm", "url": "https://git-scm.com/docs/git-rm" },
+        {
+          "title": "Removing files",
+          "url": "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository#_removing_files"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "commit",
+      "title": "Commit .gitignore and the end of upload.log",
+      "file": "shop/.gitignore",
+      "description": "Save the new rules in the history: commit `.gitignore` together with the removal of `upload.log`, so whoever gets the shop's history next gets the same rules.\n\nThe check expects the first three tasks to be done, the last commit to hold `.gitignore` exactly as it is in the folder and no longer hold `upload.log`, `stock.csv` or the drafts, no other file of the website to be changed, and `git status` to have nothing left to commit.",
+      "nextSteps": [
+        "Run `git status`: `.gitignore` is untracked and the deletion of `upload.log` is staged.",
+        "Stage `.gitignore`.",
+        "Commit with a message that says what Git leaves alone from now on.",
+        "Run `git status`: nothing to commit, working tree clean."
+      ],
+      "hints": [
+        ".gitignore is a file like any other. Until it is committed, only this folder knows its patterns.",
+        "The removal of upload.log is already staged. Add .gitignore to the staging area and both go into one commit.",
+        "Run `git add .gitignore`, then `git commit -m \"Ignore the stock export, the drafts and the upload log\"`."
+      ],
+      "docs": [
+        { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" },
+        { "title": "git status", "url": "https://git-scm.com/docs/git-status" }
+      ],
+      "points": 10
+    }
+  ]
+}

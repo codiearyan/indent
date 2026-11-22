@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Wilma", "say": "Why does git status list all this?", "note": "Stock list, drafts, upload log." },
+    {
+      "title": "git status",
+      "text": "Three kinds of files that are not the site.",
+      "note": "One git add would take them in."
+    },
+    {
+      "title": "Your rules",
+      "file": ".gitignore",
+      "mine": true,
+      "gap": "No rules yet",
+      "tasks": ["Ignore the stock list", "Ignore the drafts", "Forget the upload log", "Commit the rules"]
+    },
+    { "title": "History", "rows": [["The website"], ["The rules"], ["Nothing else"]] }
+  ],
+  "ticket": { "label": "Upload log", "wrong": "listed weekly", "why": "Tracked", "right": "left alone" },
+  "captions": [
+    "Wilma wants git status to show only the shop's website.",
+    "The till's export, Femi's drafts and an upload log crowd every list, one of them tracked.",
+    "You write the rules Git follows and make it forget one file, in four tasks.",
+    "git status is quiet, and the upload log stays on disk where its tool needs it.",
+    "The rules are in the history, so they travel with the site."
+  ]
+}

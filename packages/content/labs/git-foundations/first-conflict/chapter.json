@@ -1,0 +1,93 @@
+{
+  "id": "first-conflict",
+  "title": "When two changes meet",
+  "files": ["NOTES.md", "shop/finds.html", "shop/index.html", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the shop's folder, then go into shop and work there with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "calloff",
+      "title": "Call off Femi's unfinished merge",
+      "file": "shop/index.html",
+      "description": "Run `node setup.mjs` in the top folder, then work inside `shop`. On Saturday Femi started merging his branch `window-display` into `main`. Git stopped with a conflict in `index.html`, and he left it like that. Wilma has not said yes to the window display.\n\nCall that merge off, so `main` and its files are back as they were before it started. Do not settle the conflict and do not commit it.\n\nThe check expects no merge of `window-display` to be open, `main` not to have Femi's window display, and `index.html` in the working folder to be as `main` has it.",
+      "nextSteps": [
+        "Run `git status` and read its first lines: `You have unmerged paths`.",
+        "Look at `shop/index.html` in the editor: the conflict markers are there.",
+        "Call the merge off with the command from the lesson, which `git status` names too.",
+        "Run `git status` again: nothing to commit, and the markers are gone from the editor."
+      ],
+      "hints": [
+        "A merge that stopped with a conflict is still open. It can be finished, or called off as if it never started.",
+        "git status prints, in brackets under its first lines, the way to call the merge off.",
+        "Run `git merge --abort`."
+      ],
+      "docs": [
+        {
+          "title": "git merge --abort",
+          "url": "https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---abort"
+        },
+        { "title": "git status", "url": "https://git-scm.com/docs/git-status" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "books",
+      "title": "Settle the conflict in finds.html, keeping both books",
+      "file": "shop/finds.html",
+      "description": "Femi's branch `june-finds` adds A Lamp on Gull Island to the finds, and on `main` Wilma added The Orchard Ledger at the same place. Merge `june-finds` into `main`. Git stops with a conflict in `finds.html`.\n\nSettle it in the editor: both books stay on the list, the conflict markers go, and every other line stays as it was. Save the file.\n\nThe check reads `finds.html` (in the working folder while the merge is open, on `main` once it is finished) and expects no marker lines, both new books inside the list, and no other line lost.",
+      "nextSteps": [
+        "Make sure the first task is done and you are on `main`.",
+        "Merge `june-finds` and read what Git prints: `CONFLICT` names the file.",
+        "In `shop/finds.html`, find the block between `<<<<<<<` and `>>>>>>>`.",
+        "Keep both book lines, delete the three marker lines, and save."
+      ],
+      "hints": [
+        "Between the markers, the part above ======= is main's and the part below is june-finds'.",
+        "Settling means the file says what the shop wants. Here that is both lines, so only the marker lines go.",
+        "Run `git merge --no-edit june-finds`, then in the editor delete the lines that start with <<<<<<<, ======= and >>>>>>>, keep both books, and save."
+      ],
+      "docs": [
+        {
+          "title": "Basic merge conflicts",
+          "url": "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging#_basic_merge_conflicts"
+        },
+        {
+          "title": "How conflicts are presented",
+          "url": "https://git-scm.com/docs/git-merge#_how_conflicts_are_presented"
+        }
+      ],
+      "videos": [{ "title": "Merge conflicts, from start to finish", "url": "https://www.youtube.com/watch?v=sfT0WrChMrM" }],
+      "points": 10
+    },
+    {
+      "id": "finish",
+      "title": "Finish the merge",
+      "file": "shop/finds.html",
+      "description": "Tell Git the conflict is settled and make the merge commit. Git wrote its message already, and you can keep it as it is.\n\nThe check expects no merge left open, a merge commit on `main` that brings in `june-finds`, and `finds.html` on `main` with no conflict markers.",
+      "nextSteps": [
+        "Run `git status`: `finds.html` is under Unmerged paths.",
+        "Stage the settled file: that marks it as settled.",
+        "Run `git status` again: All conflicts fixed but you are still merging.",
+        "Make the merge commit with Git's message, without an editor."
+      ],
+      "hints": [
+        "Git waits for you to stage each settled file, then for a commit.",
+        "`git add` marks a file as settled. The commit takes an option that keeps Git's message.",
+        "Run `git add finds.html`, then `git commit --no-edit`."
+      ],
+      "docs": [
+        {
+          "title": "git commit --no-edit",
+          "url": "https://git-scm.com/docs/git-commit#Documentation/git-commit.txt---no-edit"
+        },
+        {
+          "title": "Basic merge conflicts",
+          "url": "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging#_basic_merge_conflicts"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

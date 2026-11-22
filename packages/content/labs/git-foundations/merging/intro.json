@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilma", "say": "It's July! Put them on the site.", "note": "Not the window display yet." },
+    { "title": "Branches", "text": "The sale and the July book wait apart.", "note": "The site shows neither." },
+    {
+      "title": "Your commands",
+      "file": "index.html",
+      "mine": true,
+      "gap": "Nothing merged",
+      "tasks": ["Merge the sale", "Merge the July book", "Delete merged branches"]
+    },
+    { "title": "main", "rows": [["Summer sale"], ["July book"], ["No window display"]] }
+  ],
+  "ticket": { "label": "Sale", "wrong": "still waiting", "why": "Not merged", "right": "on the site" },
+  "captions": [
+    "It is July, and Wilma wants the sale and the reading group's book on the site.",
+    "Both wait on branches of their own, and main does not have them.",
+    "You merge two branches into main and tidy up, in three tasks.",
+    "The sale and the July book are on main, and the window display still waits.",
+    "Branches came back together, and the graph shows how."
+  ]
+}
