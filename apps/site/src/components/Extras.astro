@@ -25,6 +25,7 @@ const roadmaps = listRoadmaps().map((roadmap) => {
     ...roadmap,
     stages: roadmap.stages.map((stage) => ({
       title: stage.title,
+      soon: stage.soon ?? [],
       repos: stage.labs.map((id) => byId.get(id)).filter((repo): repo is Repo => repo !== undefined)
     })),
     issues: members.reduce((n, repo) => n + repo.issues.length, 0),
@@ -129,6 +130,9 @@ const roadmaps = listRoadmaps().map((roadmap) => {
                     <p class="text-[14px] leading-6 font-medium">{stage.title}</p>
                     {stage.repos.map((repo) => (
                       <p class="text-[14px] leading-6 text-muted-foreground">{repo.title}</p>
+                    ))}
+                    {stage.soon.map((title) => (
+                      <p class="text-[14px] leading-6 text-muted-foreground">{title}, coming soon</p>
                     ))}
                   </div>
                 </li>
