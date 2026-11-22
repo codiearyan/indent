@@ -1,10 +1,13 @@
 import {
+  broken,
   checkApp,
   checkRouter,
+  created,
   errorCode,
   hasMessage,
   isJson,
   same,
+  sandbox,
   seed
 } from '../../shared/checks-lib.mjs'
 
@@ -13,6 +16,14 @@ const bowls = { title: 'Throwing bowls', day: 'tue', seats: 6, priceCents: 4400 
 const staffKey = 'check-key-7'
 const staff = { 'x-staff-key': staffKey }
 const secret = 'workshop file locked at /srv/copperleaf/workshops.db'
+const htmlPage = (res) => /text\/html/i.test(res.headers?.['content-type'] ?? '')
+const neverRan = (hint) => (res) => {
+  if (!htmlPage(res)) return hint
+  if (/Not implemented/.test(res.text)) {
+    return `handleErrors still throws 'Not implemented'. Replace that line with your code.`
+  }
+  return 'Express answered with its own HTML error page, so your error handler never ran. Look at how Express tells an error handler from other middleware, and where yours is registered.'
+}
 
 export const checks = {
   async router(t) {
@@ -48,6 +59,12 @@ export const checks = {
           req: { method: 'POST', path: '/classes', json: bowls },
           ok: (res) => res.status === 201 && same(res.json, { ...bowls, id: 16 }),
           hint: "POST to the router's root should create a workshop and answer 201, as before."
+        },
+        {
+          name: 'The location follows where the router is mounted',
+          req: { method: 'POST', path: '/classes', json: { ...bowls, title: 'Throwing jugs' } },
+          ok: (res) => created(res, { ...bowls, title: 'Throwing jugs' }, '/classes'),
+          hint: 'Mounted at /classes, a new workshop lives under /classes, and its location should say so. The router cannot know its prefix ahead of time, but every request it gets carries it.'
         },
         {
           name: 'The router refuses a bad workshop',
@@ -155,14 +172,23 @@ export const checks = {
         {
           name: 'The right key lets a POST through',
           req: { method: 'POST', path: '/workshops', json: bowls, headers: staff },
-          ok: (res) => res.status === 201 && same(res.json, { ...bowls, id: 16 }),
-          hint: 'With the right key the request should reach the route. Compare with the staffKey createApp is given.'
+          ok: (res) => created(res, bowls),
+          hint: (res) =>
+            res.status === 401
+              ? 'This request had the right key in its x-staff-key header and still got 401. Look at how the middleware reads that header: what does it get back?'
+              : 'With the right key the request should reach the route and create the workshop, as before.'
         },
         {
           name: 'The right key lets a PATCH through',
           req: { method: 'PATCH', path: '/workshops/12', json: { seats: 4 }, headers: staff },
           ok: (res) => res.status === 200 && same(res.json, { ...raku, seats: 4 }),
           hint: 'With the right key every change should reach its route.'
+        },
+        {
+          name: 'A path with no route still answers 404',
+          req: { method: 'POST', path: '/kilns', json: bowls },
+          ok: (res) => res.status === 404 && errorCode(res) === 'not_found',
+          hint: 'The key guards the workshops, not the whole app. A request for a path the app does not serve should still get the JSON 404. Look at where the guard is mounted.'
         }
       ],
       { workshops: seed, staffKey }
@@ -170,28 +196,35 @@ export const checks = {
   },
 
   async errors(t) {
-    return checkApp(
+    const answers = await checkApp(
       t,
       [
         {
           name: 'A thrown error answers 500 internal as JSON',
           req: { path: '/workshops' },
+          may500: true,
           ok: (res) =>
             res.status === 500 && isJson(res) && errorCode(res) === 'internal' && hasMessage(res),
-          hint: "When a route throws, the answer should be 500 with { error: { code: 'internal', message } } as JSON, from your error handler."
+          hint: neverRan(
+            "When a route throws, the answer should be 500 with { error: { code: 'internal', message } } as JSON, from your error handler."
+          )
         },
         {
           name: 'The 500 leaks nothing',
           req: { path: '/workshops?day=mon' },
+          may500: true,
           ok: (res) =>
             res.status === 500 &&
             !res.text.includes('locked') &&
             !res.text.includes('/srv/') &&
             !/\bat\s+\S+\s*\(/.test(res.text),
-          hint: 'The client should not see the error message, a file path or a stack trace. Log those, and send a plain sentence.'
+          hint: neverRan(
+            'The client should not see the error message, a file path or a stack trace. Log those, and send a plain sentence.'
+          )
         },
         {
           name: 'Broken JSON answers 400 invalid_json',
+          may500: true,
           req: {
             method: 'POST',
             path: '/workshops',
@@ -203,7 +236,9 @@ export const checks = {
             isJson(res) &&
             errorCode(res) === 'invalid_json' &&
             hasMessage(res),
-          hint: "A body that is not valid JSON should answer 400 with { error: { code: 'invalid_json', message } }. Look at what express.json() puts on the error it passes on."
+          hint: neverRan(
+            "A body that is not valid JSON should answer 400 with { error: { code: 'invalid_json', message } }. Look at what express.json() puts on the error it passes on."
+          )
         },
         {
           name: 'A good request still works',
@@ -220,11 +255,53 @@ export const checks = {
         {
           name: 'A good workshop is still created',
           req: { method: 'POST', path: '/workshops', json: bowls, headers: staff },
-          ok: (res) => res.status === 201 && same(res.json, { ...bowls, id: 16 }),
+          ok: (res) => created(res, bowls),
           hint: 'A valid POST should still answer 201.'
         }
       ],
-      { workshops: seed, staffKey, brokenList: secret }
+      { workshops: seed, staffKey, brokenList: secret },
+      ({ logged }) => {
+        const passed = logged.some((line) => line.includes(secret))
+        return [
+          {
+            name: 'The error is logged for you',
+            passed,
+            message: passed
+              ? undefined
+              : 'The client gets a plain sentence, so the error itself should be logged where you can read it, the way the task says. Nothing with the error in it was logged.',
+            output: logged.length
+              ? `console.error got:\n${logged.join('\n').slice(0, 600)}`
+              : 'Nothing was logged with console.error.'
+          }
+        ]
+      }
     )
+    return [...answers, ...(await afterAnswer(t))]
   }
+}
+
+async function afterAnswer(t) {
+  const r = await t.call(await sandbox(t), '.grader/harness.mjs', 'lateError')
+  if (!r.ok) return broken('handleErrors can be called', r)
+  const { reached } = r.value
+  if (reached && /Not implemented/.test(reached)) return broken('handleErrors is written', { error: reached })
+  const passed = reached === 'same'
+  return [
+    {
+      name: 'An error after the answer started is passed on',
+      passed,
+      message: passed
+        ? undefined
+        : reached
+          ? 'The answer had already started when this error came, and your handler tried to send another one. Look at how a handler can tell that an answer has begun, and hand the error on instead.'
+          : 'The answer had already started when this error came, and your handler kept the error to itself. Hand it on to Express, which knows how to close a half-sent answer.',
+      output: `A route sent part of its answer, then passed on an error.\n${
+        reached === 'same'
+          ? 'The same error reached Express after your handler.'
+          : reached
+            ? `Express got another error instead: ${reached}`
+            : 'No error reached Express after your handler.'
+      }`
+    }
+  ]
 }

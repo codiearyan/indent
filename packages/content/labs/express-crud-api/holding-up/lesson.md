@@ -61,6 +61,8 @@ function openOnWeekdays(req, res, next) {
 }
 ```
 
+A middleware can look at anything in the request. `req.method` is the method in capitals, such as `'GET'` or `'DELETE'`. `req.get('Accept-Language')` reads a header whatever case its name was written in. The same headers are in `req.headers`, but there every name is in lower case, so `req.headers['Accept-Language']` is always `undefined`.
+
 A middleware that needs settings is usually made by a function that takes them and returns the middleware, like `express.json()` itself. `app.use(path, a, b)` runs `a` and then `b` on that path, so a guard can sit right in front of the router it protects.
 
 A **401 Unauthorized** means the request did not prove who sent it. A key in a header is the simplest proof there is. In a real deployment the key comes from the environment and travels only over HTTPS; here `createApp` takes it as `staffKey`.
@@ -78,6 +80,8 @@ app.use((err, req, res, next) => {
 Express tells it apart from other middleware by that count, so all four must be there even when you do not use `next`. Without one, Express answers with its own HTML page, and outside production that page includes the error message and the stack trace: file paths, line numbers, sometimes data. Useful to you, and to anyone curious about your server.
 
 A good error handler does three things. It recognises errors that are the client's fault and says so: `express.json()` passes on an error with `type` set to `'entity.parse.failed'` and `status` 400 when a body is not valid JSON. It logs everything else in full, for you. And it sends the client a plain 500 that says nothing about the inside.
+
+An error can also arrive after a route has started to send its answer. Then it is too late for another one: `res.headersSent` is `true`, and the handler should pass the error on with `next(err)`, so Express can close the half-sent answer.
 
 The order still matters. Routes and the 404 catch-all come first, the error handler last.
 

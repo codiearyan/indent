@@ -52,6 +52,12 @@ export const checks = {
           hint: "Replacing a workshop that does not exist should answer 404 with code 'not_found', and create nothing."
         },
         {
+          name: 'An unknown id answers 404 before the body is checked',
+          req: { method: 'PUT', path: '/workshops/98', json: { title: 'Raku' } },
+          ok: (res) => res.status === 404 && errorCode(res) === 'not_found',
+          hint: 'There is no workshop 98, so what is wrong with the body does not matter yet. Ask about the id first.'
+        },
+        {
           name: 'No workshop was added',
           req: { path: '/workshops' },
           ok: (res) => res.status === 200 && Array.isArray(res.json) && res.json.length === 3,
@@ -139,6 +145,12 @@ export const checks = {
           req: { method: 'PATCH', path: '/workshops/99', json: { seats: 3 } },
           ok: (res) => res.status === 404 && errorCode(res) === 'not_found',
           hint: "Changing a workshop that does not exist should answer 404 with code 'not_found'."
+        },
+        {
+          name: 'An unknown id answers 404 before the body is checked',
+          req: { method: 'PATCH', path: '/workshops/98', json: { seats: 0 } },
+          ok: (res) => res.status === 404 && errorCode(res) === 'not_found',
+          hint: 'There is no workshop 98, so what is wrong with the body does not matter yet. Ask about the id first.'
         }
       ],
       { workshops: seed }
@@ -154,7 +166,10 @@ export const checks = {
           name: 'DELETE answers 204 with no body',
           req: { method: 'DELETE', path: '/workshops/12' },
           ok: (res) => res.status === 204 && res.text === '',
-          hint: 'Removing a workshop should answer 204 No Content, with an empty body.'
+          hint: (res) =>
+            res.status === 404
+              ? 'Workshop 12 is in the store, but the route did not find it. Think about what type an id from the path arrives as, and what type the store uses.'
+              : 'Removing a workshop should answer 204 No Content, with an empty body.'
         },
         {
           name: 'A removed workshop is gone',

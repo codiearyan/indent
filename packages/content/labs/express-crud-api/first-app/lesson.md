@@ -57,17 +57,17 @@ The store is already written, in `src/store.js`. It keeps the workshops in memor
 
 Express keeps your routes and middleware in a list, in the order you added them. For each request it walks down the list and runs the first thing that matches. Once a handler sends an answer, the walk is over.
 
-A request that reaches the end of the list without an answer gets a small HTML page that says `Cannot GET /kilns`. A browser can show that, but Ivo's page expects JSON. So the last thing in the list should be a handler that matches everything:
+A request that reaches the end of the list without an answer gets a small HTML page that says `Cannot GET /kilns`. A browser can show that, but Ivo's page expects JSON. So the last thing in the list should be a handler that matches everything. Here is one for a site that answers with text:
 
 ```js
 app.use((req, res) => {
-  res.status(404).json({ error: { code: 'not_found', message: 'Nothing here' } })
+  res.status(404).send(`No page at ${req.path}`)
 })
 ```
 
 `app.use(handler)` without a path runs for any method and any path. Put it first and it would answer every request before your routes had a chance. Put it last and it only sees what nothing else answered.
 
-The `code` is for programs and never changes. The `message` is for people.
+Ivo's page needs JSON instead, in the same `error` shape as the 503 above. The `code` is for programs and never changes. The `message` is for people.
 
 ## Your work in this issue
 
