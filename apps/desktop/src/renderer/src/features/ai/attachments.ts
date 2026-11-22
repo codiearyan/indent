@@ -41,6 +41,16 @@ export function checkAttachment(detail: CheckDetail): AiAttachment {
   }
 }
 
+export function terminalAttachment(output: string): AiAttachment {
+  const text = output.replace(/\s+$/, '')
+  const lines = text.split('\n').length
+  return {
+    kind: 'terminal',
+    label: lines === 1 ? 'Terminal, 1 line' : `Terminal, ${lines} lines`,
+    text: clipText(text, MAX_CODE_CHARS)
+  }
+}
+
 export function hintAttachment(hint: string, number: number): AiAttachment {
   return { kind: 'hint', label: `Hint ${number}`, text: clipText(hint.trim(), MAX_CODE_CHARS) }
 }

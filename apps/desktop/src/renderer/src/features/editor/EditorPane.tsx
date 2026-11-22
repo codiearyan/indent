@@ -7,6 +7,7 @@ import {
   PanelLeftCloseIcon,
   PanelLeftIcon,
   PlayIcon,
+  SparklesIcon,
   WandSparklesIcon
 } from 'lucide-react'
 import { isChapterComplete } from '@shared/rules'
@@ -18,7 +19,9 @@ import type { ShortcutId } from '@/lib/shortcuts'
 import { useChapterProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
+import { useAi } from '@/features/ai/aiStore'
 import { SuggestionsControl } from '@/features/ai/SuggestionsControl'
+import { askWhyTaskFailed } from '@/features/ai/tutorActions'
 import { TOUR } from '@/features/tour/anchors'
 import { checkAll, runCommand } from '@/features/workspace/useWorkspaceShortcuts'
 import { useRuntime } from '@/stores/runtime'
@@ -191,12 +194,30 @@ export function EditorPane(): React.JSX.Element {
 function CheckSummary(): React.JSX.Element | null {
   const chapter = useWorkspace((s) => s.chapter)
   const progress = useChapterProgress(chapter?.labId ?? '', chapter?.id ?? '')
+  const tutorOn = useAi((s) => !!s.config?.enabled && !!s.config.provider)
   if (!chapter) return null
   const total = chapter.tasks.length
   const passed = chapter.tasks.filter((t) => progress?.tasks[t.id]?.lastResult?.passed).length
+  const failing = chapter.tasks.findIndex(
+    (t) => progress?.tasks[t.id]?.lastResult?.passed === false
+  )
+  const result = failing >= 0 ? progress?.tasks[chapter.tasks[failing].id]?.lastResult : undefined
   return (
-    <span className={passed === total ? 'text-success' : 'text-destructive'}>
-      {passed} of {total} {total === 1 ? 'task passes' : 'tasks pass'}
+    <span className="flex min-w-0 items-center gap-2">
+      <span className={passed === total ? 'text-success' : 'text-destructive'}>
+        {passed} of {total} {total === 1 ? 'task passes' : 'tasks pass'}
+      </span>
+      {tutorOn && result && (
+        <Button
+          variant="ghost"
+          size="xs"
+          className="font-normal text-muted-foreground hover:text-foreground"
+          onClick={() => askWhyTaskFailed(chapter.tasks[failing], failing + 1, result)}
+        >
+          <SparklesIcon />
+          Ask the tutor
+        </Button>
+      )}
     </span>
   )
 }
