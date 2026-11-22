@@ -31,10 +31,8 @@
         "title": "Testing",
         "labs": [
           "testing-foundations",
-          "build-a-test-runner"
-        ],
-        "soon": [
-          "Build your own promise"
+          "build-a-test-runner",
+          "build-a-promise"
         ]
       },
       {
@@ -58,18 +56,17 @@
       {
         "title": "React",
         "labs": [
-          "react-screens"
+          "react-screens",
+          "react-with-an-api"
         ],
         "soon": [
-          "React foundations",
-          "A React app that talks to an API"
+          "React foundations"
         ]
       },
       {
         "title": "How the web works",
-        "labs": [],
-        "soon": [
-          "How the web works"
+        "labs": [
+          "how-the-web-works"
         ]
       },
       {
@@ -77,12 +74,12 @@
         "labs": [
           "node-api",
           "express-crud-api",
+          "api-with-a-database",
+          "sign-in-and-sessions",
           "security-bug-hunts"
         ],
         "soon": [
-          "Node.js foundations",
-          "An API with a real database",
-          "Sign-in and sessions"
+          "Node.js foundations"
         ]
       },
       {
@@ -172,7 +169,14 @@
         "title": "Testing",
         "labs": [
           "testing-foundations",
-          "build-a-test-runner"
+          "build-a-test-runner",
+          "build-a-promise"
+        ]
+      },
+      {
+        "title": "How the web works",
+        "labs": [
+          "how-the-web-works"
         ]
       },
       {
@@ -180,6 +184,8 @@
         "labs": [
           "node-api",
           "express-crud-api",
+          "api-with-a-database",
+          "sign-in-and-sessions",
           "security-bug-hunts"
         ]
       },
@@ -224,9 +230,16 @@
         ]
       },
       {
+        "title": "How the web works",
+        "labs": [
+          "how-the-web-works"
+        ]
+      },
+      {
         "title": "Components",
         "labs": [
-          "react-screens"
+          "react-screens",
+          "react-with-an-api"
         ]
       }
     ]
@@ -243,7 +256,8 @@
           "js-foundations",
           "typescript-essentials",
           "async-js",
-          "build-a-test-runner"
+          "build-a-test-runner",
+          "build-a-promise"
         ]
       },
       {
