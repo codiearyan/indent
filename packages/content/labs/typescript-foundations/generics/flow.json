@@ -1,0 +1,134 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "lists", "label": "Shop lists", "kind": "data" },
+      { "id": "first", "label": "firstOf()", "kind": "function", "mine": true, "fn": "firstOf" },
+      { "id": "byid", "label": "byId()", "kind": "function", "mine": true },
+      {
+        "id": "parse",
+        "label": "parseTins()",
+        "kind": "function",
+        "mine": true,
+        "fn": "parseTins"
+      },
+      { "id": "plain", "label": "addGrams()", "kind": "function", "mine": true, "fn": "addGrams" },
+      { "id": "bryn", "label": "Bryn at the packing table", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "lists", "to": "first", "label": "any list" },
+      { "from": "lists", "to": "byid", "label": "orders, customers" },
+      { "from": "first", "to": "bryn", "label": "same type" },
+      { "from": "byid", "to": "bryn", "label": "the whole thing" },
+      { "from": "parse", "to": "bryn", "label": "a result" },
+      { "from": "plain", "to": "bryn", "label": "grams" }
+    ],
+    "note": "The list helpers hand back the same type of thing they were given, so Bryn can use it without guessing."
+  },
+  "tasks": {
+    "first": {
+      "trace": {
+        "file": "src/lists.ts",
+        "call": "firstOf",
+        "args": [["Hearth Assam", "Frost Sencha", "Ember Oolong"]]
+      },
+      "steps": [
+        {
+          "active": ["lists", "lists->first"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "items", "value": "a list of one type" }]
+          },
+          "note": "Today's blends, a list of text, go to the helper."
+        },
+        {
+          "active": ["first"],
+          "note": "The type parameter takes the type of the items, whatever it is."
+        },
+        {
+          "active": ["first", "first->bryn", "bryn"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "first", "value": "the same type, or undefined" }]
+          },
+          "note": "Bryn gets the first blend back as text, or nothing for an empty list."
+        }
+      ]
+    },
+    "byid": {
+      "steps": [
+        {
+          "active": ["lists", "lists->byid"],
+          "value": {
+            "kind": "map",
+            "label": "an order",
+            "entries": [
+              { "key": "id", "value": "text" },
+              { "key": "tins", "value": "number" }
+            ]
+          },
+          "note": "Bryn looks for order OK-1043 in today's orders."
+        },
+        {
+          "active": ["byid"],
+          "note": "The function needs only an id on each thing, and promises nothing more about it."
+        },
+        {
+          "active": ["byid", "byid->bryn", "bryn"],
+          "note": "What it finds is still a whole order, so Bryn can read its tins. The same function finds customers."
+        }
+      ]
+    },
+    "result": {
+      "trace": { "file": "src/lists.ts", "call": "parseTins", "args": ["3"] },
+      "steps": [
+        {
+          "active": ["parse"],
+          "value": {
+            "kind": "map",
+            "label": "a result",
+            "entries": [
+              { "key": "worked", "value": "ok, value" },
+              { "key": "did not", "value": "ok, reason" }
+            ]
+          },
+          "note": "A customer typed how many tins they want."
+        },
+        {
+          "active": ["parse"],
+          "note": "The function gives back a result that worked, with its value, or one that did not, with a reason."
+        },
+        {
+          "active": ["parse", "parse->bryn", "bryn"],
+          "note": "Bryn checks ok before reading the value. The same result type holds a number here and text for a blend."
+        }
+      ]
+    },
+    "plain": {
+      "trace": { "file": "src/lists.ts", "call": "addGrams", "args": [125, 250] },
+      "steps": [
+        {
+          "active": ["plain"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "a", "value": "grams" },
+              { "key": "b", "value": "grams" }
+            ]
+          },
+          "note": "Two tins go into one parcel, one of 125 g and one of 250 g."
+        },
+        {
+          "active": ["plain"],
+          "note": "Whatever weights go in, a plain number comes out, so there is nothing for a type parameter to tie together."
+        },
+        {
+          "active": ["plain", "plain->bryn", "bryn"],
+          "note": "Bryn gets the weight of the parcel in grams."
+        }
+      ]
+    }
+  }
+}
