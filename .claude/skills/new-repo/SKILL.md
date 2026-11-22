@@ -41,25 +41,29 @@ commands.
    first's. Easy ideas first.
 5. **Write each issue with the `new-issue` skill**, in order. That skill ends with the issue's flow
    and its intro; an issue without both is not done.
-6. **Write the repo's scene**, `labs/<labId>/flow.json`, with the `issue-flow` skill ("A repo's own
+6. **Check the resources across the repo.** Each issue found its docs and videos with the
+   `new-issue` skill ("Find the resources"). Look at them together: three to five videos in the
+   repo, at least one per issue where a good one exists, and the same video on two tasks only when
+   it truly covers both.
+7. **Write the repo's scene**, `labs/<labId>/flow.json`, with the `issue-flow` skill ("A repo's own
    scene").
-7. **A repo that talks to a model** gets `labs/<labId>/model.mjs`: `models` maps a model name to a
+8. **A repo that talks to a model** gets `labs/<labId>/model.mjs`: `models` maps a model name to a
    function from the request to the reply, and every name starts with the repo's name so repos
    never collide. Learner code never reaches a real service.
-8. **The cover**, `labs/<labId>/cover.webp`, 960 by 540. It shows the topic the repo teaches,
+9. **The cover**, `labs/<labId>/cover.webp`, 960 by 540. It shows the topic the repo teaches,
    never the story's place or people, in the set's four inks, with no text, letters, logos or
    people ("Covers" in `AGENTS.md`). It is a picture, so ask the person how they want it made. A
    repo without one shows the name of its language, which is fine to ship.
-9. **The roadmap.** Add the repo's id to a stage in `packages/content/paths.json` when the person
-   named one. Only the first repo of a roadmap ships inside the app (`extraResources` in
-   `apps/desktop/electron-builder.yml`); every other repo downloads, so a new repo needs nothing
-   there.
-10. **Check the whole repo.**
+10. **The roadmap.** Add the repo's id to a stage in `packages/content/paths.json` when the person
+    named one. Only the first repo of a roadmap ships inside the app (`extraResources` in
+    `apps/desktop/electron-builder.yml`); every other repo downloads, so a new repo needs nothing
+    there.
+11. **Check the whole repo.**
     - `node scripts/build-packs.mjs "$(mktemp -d)"`
     - `node scripts/verify-content.mjs "$ROOT" <labId>` (the `new-issue` skill shows how to make
       `$ROOT`)
     - `pnpm test`
-11. **Go through it as a learner.** `pnpm dev`, start the repo, and do every issue in order from
+12. **Go through it as a learner.** `pnpm dev`, start the repo, and do every issue in order from
     its starter. Note where you had to guess: that is where a lesson or a task text is thin.
 
 ## Rules
@@ -77,6 +81,7 @@ commands.
 
 - Every issue is done by the `new-issue` skill's own list.
 - The repo has its scene, and its cover or a note to the person that it has none.
+- Every task has docs and the repo has three to five confirmed videos.
 - The three checks above pass, and you went through the repo in the app.
 - Tell the person what is left for them: narration (`scripts/narrate.mjs` sends lesson text to a
   voice service), the cover, and where it sits on a roadmap.

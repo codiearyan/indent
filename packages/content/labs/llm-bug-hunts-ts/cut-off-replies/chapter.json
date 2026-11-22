@@ -34,6 +34,9 @@
         { "title": "Managing tokens", "url": "https://developers.openai.com/api/docs/guides/advanced-usage#managing-tokens" },
         { "title": "OpenAI Node SDK usage", "url": "https://github.com/openai/openai-node#usage" }
       ],
+      "videos": [
+        { "title": "Large language models, briefly", "url": "https://www.youtube.com/watch?v=LPZh9BOjkQs" }
+      ],
       "points": 10
     },
     {

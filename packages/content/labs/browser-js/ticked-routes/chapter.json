@@ -51,6 +51,9 @@
         { "title": "Event.target", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Event/target" },
         { "title": "EventTarget.addEventListener()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener" }
       ],
+      "videos": [
+        { "title": "Event listeners and delegation", "url": "https://www.youtube.com/watch?v=XF1_MlZ5l6M" }
+      ],
       "points": 10
     },
     {

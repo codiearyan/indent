@@ -34,6 +34,9 @@
         { "title": "Correlated subqueries", "url": "https://www.sqlite.org/lang_expr.html#cosub" },
         { "title": "avg()", "url": "https://www.sqlite.org/lang_aggfunc.html#avg" }
       ],
+      "videos": [
+        { "title": "Subqueries, step by step", "url": "https://www.youtube.com/watch?v=tvBp81WVrCA" }
+      ],
       "points": 10
     },
     {

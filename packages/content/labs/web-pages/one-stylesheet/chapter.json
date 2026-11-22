@@ -51,6 +51,9 @@
         { "title": "var()", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/var" },
         { "title": ":root", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/:root" }
       ],
+      "videos": [
+        { "title": "CSS custom properties", "url": "https://www.youtube.com/watch?v=40K1pvxEwlE" }
+      ],
       "points": 10
     },
     {

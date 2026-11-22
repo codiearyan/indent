@@ -39,14 +39,17 @@ yet, read `packages/content/labs/js-foundations/order-reports/`.
    - `terminal`: a one-sentence `description` and a `suggestedCommand` that runs the demo.
    - `preview`: only for an issue with a page, e.g. `"index.html"`.
    - Each task: `id`, `title` (what to do, as an action), `file`, `description`, `nextSteps`,
-     `hints`, `docs`, `points`.
+     `hints`, `docs`, `videos`, `points`.
      - `description` is Markdown. It names the function or file, says exactly what it takes and
        returns, and ends by saying what the check does, in words.
      - `nextSteps`: three or four short ordered steps. They say where to look, never the answer.
      - `hints`: one for each hint a task can unlock (`MAX_HINTS` in
        `apps/desktop/src/shared/rules.ts`), from a light nudge to almost there. The first names
        where to look, the next the idea, and only the last may show the shape of the line.
-     - `docs`: two or three links to official reference pages for what the task tests.
+     - `docs`: two or three links to official reference pages for what the task tests: the
+       language's or the library's own documentation, opened once to confirm the page exists and
+       covers the idea. Title each by the page's subject (`Promise.all()`, `CSS flex-wrap`).
+     - `videos`: optional; see "Find the resources" below.
      - `points`: the same as the tasks beside it; copy it from another task of the repo.
 4. **Write the starter and the solution** with the same relative paths.
    - The starter runs. Every function the learner writes throws `Not implemented`, and the file
@@ -73,8 +76,27 @@ args)`, `node`, `vitest`, `typecheck`, `page()` for an issue with a page, and `j
      idea with an example about a _different_ thing than the tasks ask for, and "Your work in this
      issue" (which files, in which order, and the command to run).
    - 550 to 900 words. It teaches the idea; it does not walk through the tasks' answers.
-7. **Add the issue to `lab.json`**, in the part it belongs to.
-8. **Prove it grades.** The starter must fail every task and the solution must pass every task:
+7. **Find the resources.** Every issue gets at least one video on the task its idea is hardest
+   in, when a good one exists. The learner sees docs and videos in the issue's Resources tab from
+   the start, and under "Watch" and "Read up" once a task keeps failing.
+   - Search for short explainers of the task's idea (a few minutes, from a channel known for
+     teaching) rather than long courses. A playlist is fine when the idea is a series.
+   - A link is `https://www.youtube.com/watch?v=<id>` or `https://www.youtube.com/playlist?list=<id>`.
+     For a long video, `start` and `end` in whole seconds point at the part that matters; a
+     playlist takes neither.
+   - Confirm every link before using it. This prints its title and channel, and fails when the
+     video is gone or does not allow embedding, so pick another:
+
+     ```sh
+     curl -sf "https://www.youtube.com/oembed?format=json&url=<link>" || echo "not usable"
+     ```
+
+   - `title` says what the video teaches, in sentence case ("Closures in 100 seconds", "Joins
+     explained"). Never the channel's name or the video's own clickbait title.
+   - A video shows the idea, never the task's answer: no walkthrough of this issue's exercise.
+   - The pack check fails on a link that is not a video or playlist, and on bad times.
+8. **Add the issue to `lab.json`**, in the part it belongs to.
+9. **Prove it grades.** The starter must fail every task and the solution must pass every task:
 
    ```sh
    ROOT=$(mktemp -d)
@@ -83,13 +105,13 @@ args)`, `node`, `vitest`, `typecheck`, `page()` for an issue with a page, and `j
    node scripts/verify-content.mjs "$ROOT" <labId>
    ```
 
-9. **Write the flow**: follow the `issue-flow` skill.
-10. **Write the intro**: follow the `issue-intro` skill.
-11. **Check everything**: `node scripts/build-packs.mjs "$(mktemp -d)"` and `pnpm test`. The pack
+10. **Write the flow**: follow the `issue-flow` skill.
+11. **Write the intro**: follow the `issue-intro` skill.
+12. **Check everything**: `node scripts/build-packs.mjs "$(mktemp -d)"` and `pnpm test`. The pack
     check fails on an issue without a flow or an intro, and on a task without a flow.
-12. **Look at it.** `pnpm dev`, open the issue, read the lesson, do the tasks from the starter with
+13. **Look at it.** `pnpm dev`, open the issue, read the lesson, do the tasks from the starter with
     only the lesson and the hints, and press Check after each.
-13. **Narration.** `node scripts/narrate.mjs <labId>` records the lesson parts. It sends the lesson
+14. **Narration.** `node scripts/narrate.mjs <labId>` records the lesson parts. It sends the lesson
     text to a voice service, so ask the person before you run it.
 
 ## Rules
@@ -116,5 +138,7 @@ args)`, `node`, `vitest`, `typecheck`, `page()` for an issue with a page, and `j
 - `verify-content.mjs` says ok for the issue: the starter fails every task, the solution passes.
 - `build-packs.mjs` and `pnpm test` pass.
 - The issue has its `flow.json` with a flow for every task, and its `intro.json`.
+- Every task has docs, the issue has at least one video when a good one exists, and every link was
+  confirmed.
 - You did the tasks yourself from the starter in the app.
 - Tell the person what is left for them: narration, and screenshots if a pull request follows.

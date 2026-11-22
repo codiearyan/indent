@@ -28,6 +28,9 @@
         { "title": "Node.textContent", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent" },
         { "title": "HTMLElement.dataset", "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset" }
       ],
+      "videos": [
+        { "title": "Change the page from JavaScript", "url": "https://www.youtube.com/watch?v=y17RuWkWdn8" }
+      ],
       "points": 10
     },
     {

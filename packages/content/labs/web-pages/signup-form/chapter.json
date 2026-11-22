@@ -28,6 +28,9 @@
         { "title": "<input type=\"radio\">", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/radio" },
         { "title": "<input type=\"checkbox\">", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/checkbox" }
       ],
+      "videos": [
+        { "title": "Accessible forms, with examples", "url": "https://www.youtube.com/watch?v=ffxwEyBcdf0" }
+      ],
       "points": 10
     },
     {

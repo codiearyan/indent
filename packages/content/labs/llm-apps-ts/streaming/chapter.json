@@ -28,6 +28,9 @@
         { "title": "for await...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of" },
         { "title": "Chat completions API reference", "url": "https://developers.openai.com/api/reference/resources/chat" }
       ],
+      "videos": [
+        { "title": "How server-sent events stream", "url": "https://www.youtube.com/watch?v=4HlNv1qpZFY" }
+      ],
       "points": 10
     },
     {

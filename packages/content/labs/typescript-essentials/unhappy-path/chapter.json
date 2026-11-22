@@ -28,6 +28,9 @@
         { "title": "Using type predicates", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates" },
         { "title": "Array.isArray()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray" }
       ],
+      "videos": [
+        { "title": "Write your own type guards", "url": "https://www.youtube.com/watch?v=FvSaID3TjhI" }
+      ],
       "points": 10
     },
     {

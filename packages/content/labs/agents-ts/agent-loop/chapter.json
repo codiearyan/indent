@@ -50,6 +50,9 @@
         { "title": "Manage conversation state", "url": "https://developers.openai.com/api/docs/guides/conversation-state#manually-manage-conversation-state" },
         { "title": "while", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/while" }
       ],
+      "videos": [
+        { "title": "What an AI agent is", "url": "https://www.youtube.com/watch?v=F8NKVhkZZWI" }
+      ],
       "points": 10
     },
     {

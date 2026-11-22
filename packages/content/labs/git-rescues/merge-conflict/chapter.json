@@ -27,6 +27,9 @@
         { "title": "How conflicts are presented", "url": "https://git-scm.com/docs/git-merge#_how_conflicts_are_presented" },
         { "title": "How to resolve conflicts", "url": "https://git-scm.com/docs/git-merge#_how_to_resolve_conflicts" }
       ],
+      "videos": [
+        { "title": "Resolve a merge conflict", "url": "https://www.youtube.com/watch?v=xNVM5UxlFSA" }
+      ],
       "points": 10
     },
     {

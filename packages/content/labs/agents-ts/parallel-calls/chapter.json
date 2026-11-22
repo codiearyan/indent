@@ -27,6 +27,9 @@
         { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises#composition" },
         { "title": "Parallel function calling", "url": "https://developers.openai.com/api/docs/guides/function-calling#parallel-function-calling" }
       ],
+      "videos": [
+        { "title": "Promise.all, race, allSettled and any", "url": "https://www.youtube.com/watch?v=vQtgi8uElmk" }
+      ],
       "points": 10
     },
     {

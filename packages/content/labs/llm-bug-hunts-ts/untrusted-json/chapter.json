@@ -56,6 +56,9 @@
         { "title": "Narrowing", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html" },
         { "title": "Structured outputs vs JSON mode", "url": "https://developers.openai.com/api/docs/guides/structured-outputs#structured-outputs-vs-json-mode" }
       ],
+      "videos": [
+        { "title": "Getting JSON back from a model", "url": "https://www.youtube.com/watch?v=eJvYafgLh40" }
+      ],
       "points": 10
     },
     {

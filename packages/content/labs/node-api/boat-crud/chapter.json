@@ -51,6 +51,9 @@
         { "title": "Location", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location" },
         { "title": "409 Conflict", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409" }
       ],
+      "videos": [
+        { "title": "REST APIs in 100 seconds", "url": "https://www.youtube.com/watch?v=-MTSQjw5DrM" }
+      ],
       "points": 10
     },
     {

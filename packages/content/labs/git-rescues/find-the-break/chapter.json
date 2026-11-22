@@ -27,6 +27,9 @@
         { "title": "git bisect", "url": "https://git-scm.com/docs/git-bisect" },
         { "title": "git bisect run", "url": "https://git-scm.com/docs/git-bisect#_bisect_run" }
       ],
+      "videos": [
+        { "title": "Find the bad commit with git bisect", "url": "https://www.youtube.com/watch?v=aulaZBVS16g" }
+      ],
       "points": 10
     },
     {

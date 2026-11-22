@@ -51,6 +51,9 @@
         { "title": "message.method", "url": "https://nodejs.org/docs/latest/api/http.html#messagemethod" },
         { "title": "url.pathname", "url": "https://nodejs.org/docs/latest/api/url.html#urlpathname" }
       ],
+      "videos": [
+        { "title": "An API in Node without a framework", "url": "https://www.youtube.com/watch?v=mV2y_3irbKk" }
+      ],
       "points": 10
     },
     {

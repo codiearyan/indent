@@ -57,6 +57,9 @@
         { "title": "Math.round()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round" },
         { "title": "Number.prototype.toFixed()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed" }
       ],
+      "videos": [
+        { "title": "Why decimals are not exact", "url": "https://www.youtube.com/watch?v=PZRI1IfStY0" }
+      ],
       "points": 10
     },
     {

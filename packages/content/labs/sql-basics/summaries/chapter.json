@@ -32,6 +32,9 @@
         { "title": "Aggregate functions", "url": "https://www.sqlite.org/lang_aggfunc.html" },
         { "title": "GROUP BY", "url": "https://www.sqlite.org/lang_select.html#resultset" }
       ],
+      "videos": [
+        { "title": "GROUP BY and HAVING", "url": "https://www.youtube.com/watch?v=sJECAtWB05k" }
+      ],
       "points": 10
     },
     {

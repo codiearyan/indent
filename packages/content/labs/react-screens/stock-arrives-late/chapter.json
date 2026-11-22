@@ -28,6 +28,9 @@
         { "title": "Using the Fetch API", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch" },
         { "title": "Response.json()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/json" }
       ],
+      "videos": [
+        { "title": "useEffect in 13 minutes", "url": "https://www.youtube.com/watch?v=0ZJgIjIuY7U" }
+      ],
       "points": 10
     },
     {
@@ -73,6 +76,9 @@
       "docs": [
         { "title": "Reusing logic with custom hooks", "url": "https://react.dev/learn/reusing-logic-with-custom-hooks" },
         { "title": "Rules of Hooks", "url": "https://react.dev/reference/rules/rules-of-hooks" }
+      ],
+      "videos": [
+        { "title": "Custom hooks in 10 minutes", "url": "https://www.youtube.com/watch?v=6ThXsUwLWvc" }
       ],
       "points": 10
     }

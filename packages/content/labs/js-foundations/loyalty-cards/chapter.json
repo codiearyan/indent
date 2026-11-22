@@ -28,6 +28,9 @@
         { "title": "let", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let" },
         { "title": "Method definitions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions" }
       ],
+      "videos": [
+        { "title": "Closures in 7 minutes", "url": "https://www.youtube.com/watch?v=3a0I8ICR1Vg" }
+      ],
       "points": 10
     },
     {
@@ -50,6 +53,9 @@
         { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures" },
         { "title": "Map", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" },
         { "title": "Map.prototype.has()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/has" }
+      ],
+      "videos": [
+        { "title": "Closures in 100 seconds", "url": "https://www.youtube.com/watch?v=vKJpN5FAeF4" }
       ],
       "points": 10
     },

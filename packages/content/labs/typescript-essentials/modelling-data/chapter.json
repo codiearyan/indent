@@ -28,6 +28,9 @@
         { "title": "Union types", "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types" },
         { "title": "Equality narrowing", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#equality-narrowing" }
       ],
+      "videos": [
+        { "title": "TypeScript in 100 seconds", "url": "https://www.youtube.com/watch?v=zQnBQ4tB3ZA" }
+      ],
       "points": 10
     },
     {

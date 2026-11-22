@@ -74,6 +74,9 @@
         { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" },
         { "title": "JSON.stringify()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" }
       ],
+      "videos": [
+        { "title": "localStorage and event delegation", "url": "https://www.youtube.com/watch?v=YL1F4dCUlLc" }
+      ],
       "points": 10
     }
   ]

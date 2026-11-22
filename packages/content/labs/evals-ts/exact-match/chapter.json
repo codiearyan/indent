@@ -28,6 +28,9 @@
         { "title": "String.prototype.split()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split" },
         { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" }
       ],
+      "videos": [
+        { "title": "What LLM evaluations are", "url": "https://www.youtube.com/watch?v=cNF_MO82Qew" }
+      ],
       "points": 10
     },
     {
@@ -72,6 +75,9 @@
         { "title": "Create an eval for a task", "url": "https://developers.openai.com/api/docs/guides/evals#create-an-eval-for-a-task" },
         { "title": "Metric-based evals", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices#metric-based-evals" },
         { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" }
+      ],
+      "videos": [
+        { "title": "How to evaluate an LLM app", "url": "https://www.youtube.com/watch?v=RIGU1hy3UR8" }
       ],
       "points": 10
     }
