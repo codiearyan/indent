@@ -15,7 +15,7 @@ export const checks = {
       file: FILE,
       fn: 'statusLine',
       cases: [
-        ['P-12', 'packed'],
+        ['P-36', 'packed'],
         ['P-90', 'out for delivery'],
         ['P-5', 'delivered']
       ].map(([id, status]) => ({

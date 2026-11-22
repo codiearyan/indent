@@ -179,6 +179,8 @@ export const checks = {
             const charge = at(r, 'chargeCard(')
             const answered = r.log.findIndex((l) => /^chargeCard\(.*\) (answered|failed)/.test(l))
             if (charge === -1) return 'payWithScreen never charged the card. Call chargeCard with the order total.'
+            const amount = asked(r, 'chargeCard')[0].args[0]
+            if (amount !== show(c.o.totalCents)) return `chargeCard was asked for ${amount}. Charge the total of the order payWithScreen is given.`
             if (on.length !== 1) return on.length ? 'screenOn was called more than once. Once, before the charge.' : 'payWithScreen never called screenOn. Turn the screen on before the charge.'
             if (at(r, 'screenOn(') > charge) return 'The screen was turned on after the charge had started. Turn it on first.'
             if (off.length === 0) {

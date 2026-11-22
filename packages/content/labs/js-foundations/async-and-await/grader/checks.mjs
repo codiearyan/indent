@@ -118,6 +118,9 @@ export const checks = {
                 return `There are fewer than target ${c.who} in stock, so reorder orders the missing ones with orderCandles.`
               }
               if (ordered.length > 1) return 'reorder ordered more than once. One order is enough.'
+              if (ordered.length && ordered[0].args[0] !== show(c.who)) {
+                return `orderCandles was asked for ${ordered[0].args[0]}. Order the candle reorder is given.`
+              }
               if (ordered.length && ordered[0].args[1] !== show(c.target - c.count)) {
                 return `orderCandles was asked for ${ordered[0].args[1]} candles. Order as many as are missing: target minus the count.`
               }
