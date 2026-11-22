@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Anjali", "say": "Show what I have, cheapest first.", "note": "She runs the gift shop." },
+    { "title": "shop.js", "text": "Six items, one of them sold out.", "note": "New items go at the end." },
+    {
+      "title": "Your list",
+      "file": "ShopList.jsx",
+      "mine": true,
+      "gap": "Three items typed in",
+      "tasks": ["A line per item", "Keys from the data", "Leave out sold out", "Cheapest first"]
+    },
+    {
+      "title": "Till screen",
+      "rows": [["Network map, 1950"], ["Enamel pin, tram 14"], ["Foundry Belle mug"]],
+      "mark": 0
+    }
+  ],
+  "ticket": { "label": "Network map", "wrong": "still shown", "why": "Typed list", "right": "off the list" },
+  "captions": [
+    "At the gift shop, Anjali wants the till screen to show her stock, cheapest first.",
+    "The screen shows three items typed in last month, and the map sold out weeks ago.",
+    "You draw the list from her stock and put it in order, in four tasks.",
+    "The sold-out map is gone and every item in stock is listed by price.",
+    "Same stock list, a true screen. New items appear the moment she adds them."
+  ]
+}

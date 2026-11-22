@@ -1,0 +1,53 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "elspeth", "label": "Elspeth", "kind": "story" },
+      { "id": "trams", "label": "trams.js", "kind": "data" },
+      { "id": "app", "label": "App", "kind": "function", "mine": true },
+      { "id": "card", "label": "TramCard", "kind": "function", "mine": true },
+      { "id": "shed", "label": "Shed screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "elspeth", "to": "trams", "label": "which trams" },
+      { "from": "trams", "to": "app", "label": "the list" },
+      { "from": "app", "to": "card", "label": "props" },
+      { "from": "card", "to": "shed", "label": "one card each" }
+    ],
+    "note": "One TramCard draws every tram on show from the props App hands it, so no card is copied by hand."
+  },
+  "tasks": {
+    "tram-card": {
+      "steps": [
+        { "active": ["card"], "note": "A card for one tram needs its number, its name and the year it was built." },
+        {
+          "active": ["app", "app->card", "card"],
+          "value": { "kind": "map", "label": "Props", "entries": [{ "key": "number", "value": "number" }, { "key": "name", "value": "text" }, { "key": "built", "value": "year" }] },
+          "note": "Those three values arrive as props, whoever uses the card."
+        },
+        { "active": ["card", "card->shed", "shed"], "note": "The card shows them, laid out like every other card." }
+      ]
+    },
+    "three-cards": {
+      "steps": [
+        { "active": ["trams"], "note": "The shed list has three trams, in the order they stand." },
+        { "active": ["trams", "trams->app", "app"], "note": "App takes each tram from the list." },
+        { "active": ["app", "app->card", "card"], "note": "It hands each one to a TramCard as props." },
+        { "active": ["card", "card->shed", "shed"], "note": "The shed screen matches the list, with no copied mistakes." }
+      ]
+    },
+    "extra-children": {
+      "steps": [
+        { "active": ["app"], "note": "One tram needs a line of its own on its card." },
+        { "active": ["app", "app->card", "card"], "note": "App writes that line between the card's tags." },
+        { "active": ["card", "card->shed", "shed"], "note": "The card shows it in the box at the bottom." }
+      ]
+    },
+    "status": {
+      "steps": [
+        { "active": ["app", "app->card", "card"], "note": "Sometimes App says a tram is away; most days it says nothing." },
+        { "active": ["card"], "note": "The card shows the status it was given, or a default when none came." },
+        { "active": ["card", "card->shed", "shed"], "note": "Every card in the shed says whether its tram is there." }
+      ]
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "anjali", "label": "Anjali", "kind": "story" },
+      { "id": "shop", "label": "shop.js", "kind": "data" },
+      { "id": "app", "label": "App", "kind": "function" },
+      { "id": "list", "label": "ShopList", "kind": "function", "mine": true },
+      { "id": "till", "label": "Till screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "anjali", "to": "shop", "label": "her stock" },
+      { "from": "shop", "to": "app", "label": "items" },
+      { "from": "app", "to": "list", "label": "items prop" },
+      { "from": "list", "to": "till", "label": "list items" }
+    ],
+    "note": "The till screen shows whatever is in Anjali's stock list, however long it gets."
+  },
+  "tasks": {
+    "every-item": {
+      "steps": [
+        { "active": ["anjali", "anjali->shop", "shop"], "note": "Anjali adds a new item at the end of her stock list." },
+        { "active": ["app", "app->list", "list"], "value": { "kind": "array", "label": "Each item", "values": ["id", "name", "pricePence", "stock"] }, "note": "The list gets every item as a prop." },
+        { "active": ["list", "list->till", "till"], "note": "One line per item appears on the till screen, with its name and price." }
+      ]
+    },
+    "keys": {
+      "steps": [
+        { "active": ["list"], "note": "Each line on the screen stands for one item of stock." },
+        { "active": ["shop", "shop->app", "app", "app->list", "list"], "note": "An item sells out or a new one arrives, and the list is drawn again." },
+        { "active": ["list", "list->till", "till"], "note": "Every item keeps its own line, because each line is named after its item." }
+      ]
+    },
+    "in-stock": {
+      "steps": [
+        { "active": ["shop"], "note": "Some items in the stock list have none left." },
+        { "active": ["app", "app->list", "list"], "note": "The list leaves those out before drawing." },
+        { "active": ["list", "list->till", "till"], "note": "Visitors only see what they can buy." }
+      ]
+    },
+    "cheapest-first": {
+      "steps": [
+        { "active": ["shop"], "note": "The stock list is in the order Anjali added things." },
+        { "active": ["app", "app->list", "list"], "note": "The list puts its own copy in order of price and leaves Anjali's list as it is." },
+        { "active": ["list", "list->till", "till"], "note": "Parents find the cheapest thing at the top." }
+      ]
+    }
+  }
+}

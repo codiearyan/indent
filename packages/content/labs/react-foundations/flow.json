@@ -1,0 +1,20 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "elspeth", "label": "Elspeth", "kind": "story" },
+      { "id": "wilf", "label": "Wilf", "kind": "story" },
+      { "id": "anjali", "label": "Anjali", "kind": "story" },
+      { "id": "data", "label": "The day's data", "kind": "data" },
+      { "id": "components", "label": "Your components", "kind": "file", "mine": true },
+      { "id": "screens", "label": "Visitor screens", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "wilf", "to": "data", "label": "rota, plan" },
+      { "from": "anjali", "to": "data", "label": "stock" },
+      { "from": "elspeth", "to": "components", "label": "requests" },
+      { "from": "data", "to": "components", "label": "props" },
+      { "from": "components", "to": "screens", "label": "markup" }
+    ],
+    "note": "You replace the museum's hand-edited screens with React components that draw themselves from the day's data."
+  }
+}

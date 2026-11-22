@@ -1,0 +1,112 @@
+{
+  "id": "first-component",
+  "title": "A first component",
+  "files": ["src/main.jsx", "src/App.jsx", "index.html", "styles.css"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "show-app",
+      "title": "Put App on the screen",
+      "file": "src/main.jsx",
+      "description": "`src/main.jsx` is the script `index.html` loads. Make it draw the `App` component from `src/App.jsx` inside the element with the id `root`.\n\nWhen it works, the Browser panel shows the museum's name.\n\nThe check swaps in an `App` of its own and looks for what it draws inside `#root`.",
+      "nextSteps": [
+        "Read \"Putting it on the screen\" in the lesson.",
+        "Import `createRoot` from `react-dom/client`.",
+        "Make a root on the element with the id `root`.",
+        "Render `App` into it, save, and look at the Browser panel."
+      ],
+      "hints": [
+        "Open `index.html` and find the one element React should draw into.",
+        "`createRoot` takes an element of the page and gives back a root. A root has a `render` method that takes what to draw.",
+        "React wants an element, so the component goes to `render` written as a tag: `<App />`, not `App`."
+      ],
+      "docs": [
+        { "title": "createRoot", "url": "https://react.dev/reference/react-dom/client/createRoot" },
+        {
+          "title": "Add React to an existing project",
+          "url": "https://react.dev/learn/add-react-to-an-existing-project"
+        }
+      ],
+      "videos": [{ "title": "React in 100 seconds", "url": "https://www.youtube.com/watch?v=Tn6-PIqc4UM" }],
+      "points": 10
+    },
+    {
+      "id": "opening-hours",
+      "title": "Write the OpeningHours component",
+      "file": "src/App.jsx",
+      "description": "Below `App` in `src/App.jsx`, write a component called `OpeningHours` and export it by name. It returns:\n\n- a `<section>` with the class `hours`\n- inside it, an `<h2>` that reads `Opening hours`\n- and a `<p>` that reads `Every day, 10:00 to 16:00`\n\nThe check draws `OpeningHours` on its own and reads what it returns. React's warnings count too: a class written the HTML way fails the task.",
+      "nextSteps": [
+        "Read \"A component is a function that returns markup\" in the lesson.",
+        "Write an exported function named `OpeningHours`, with a capital O and a capital H.",
+        "Return the section with its heading and its line.",
+        "Look at the console in the Browser panel: it should show no warning."
+      ],
+      "hints": [
+        "A component is a plain function. Its name, its `export` and its `return` work like any other function.",
+        "The markup is HTML with JSX's names for attributes. Look at how `App` gives the outer `div` its class.",
+        "The function returns one `section` element with the `className` `hours`; the `h2` and the `p` sit inside it."
+      ],
+      "docs": [
+        { "title": "Your first component", "url": "https://react.dev/learn/your-first-component" },
+        { "title": "Writing markup with JSX", "url": "https://react.dev/learn/writing-markup-with-jsx" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "use-opening-hours",
+      "title": "Show the opening hours in App",
+      "file": "src/App.jsx",
+      "description": "Make `App` show your `OpeningHours` under the heading, by using it as a tag. Keep the heading and the footer where they are.\n\nThe check draws `App` and looks for the opening hours under the heading. It also asks React which component drew them, so markup copied into `App` does not count.",
+      "nextSteps": [
+        "Read \"Components inside components\" in the lesson.",
+        "Find the heading in what `App` returns.",
+        "Use `OpeningHours` on the line below it.",
+        "Save and look at the Browser panel."
+      ],
+      "hints": [
+        "A component you wrote is used in JSX the same way as an HTML element.",
+        "The tag is the component's name, exactly as you wrote it, capital letters included.",
+        "Under the `h1`, add `<OpeningHours />`."
+      ],
+      "docs": [
+        {
+          "title": "Nesting and organizing components",
+          "url": "https://react.dev/learn/your-first-component#nesting-and-organizing-components"
+        },
+        {
+          "title": "Your UI as a tree",
+          "url": "https://react.dev/learn/understanding-your-ui-as-a-tree"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "footer-lines",
+      "title": "Two lines in the footer",
+      "file": "src/App.jsx",
+      "description": "Below `OpeningHours`, write a component called `FooterLines` and export it by name. It returns two paragraphs, in this order:\n\n- `Foundry Lane, Coalbrook`\n- `Run by volunteers since 1987`\n\nNothing wraps them: no `div`, no other element. Then show `FooterLines` inside the `footer` that `App` already has.\n\nThe check draws `FooterLines` on its own and expects exactly the two paragraphs, with no warning from React. Then it draws `App` and looks inside the footer.",
+      "nextSteps": [
+        "Read \"One element comes back\" in the lesson.",
+        "Write `FooterLines` returning the two paragraphs.",
+        "If the page stops loading, read the bundler's message in the Browser panel's console.",
+        "Use `FooterLines` inside the footer in `App`."
+      ],
+      "hints": [
+        "A function gives back one value. Two elements next to each other are two values.",
+        "There is a way to group elements that adds nothing to the page. It looks like a tag with no name.",
+        "Wrap the two paragraphs in `<>` and `</>`, then put `<FooterLines />` between the footer's tags."
+      ],
+      "docs": [
+        { "title": "Fragment (<>...</>)", "url": "https://react.dev/reference/react/Fragment" },
+        {
+          "title": "Return a single root element",
+          "url": "https://react.dev/learn/writing-markup-with-jsx#1-return-a-single-root-element"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

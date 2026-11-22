@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Elspeth", "say": "One card that fills itself in?", "note": "She copies cards by hand." },
+    { "title": "trams.js", "text": "Three trams, each with a number and a year.", "note": "The real list." },
+    {
+      "title": "Your card",
+      "file": "TramCard.jsx",
+      "mine": true,
+      "gap": "Cards copied and edited",
+      "tasks": ["Write TramCard", "A card per tram", "Show the children", "Status by default"]
+    },
+    {
+      "title": "Shed screen",
+      "rows": [["The Kettleby Car"], ["The Foundry Belle"], ["The Wenlow Open-top"]],
+      "mark": 1
+    }
+  ],
+  "ticket": { "label": "Foundry Belle", "wrong": "built 1904", "why": "Copied card", "right": "right year" },
+  "captions": [
+    "In the tram shed, Elspeth wants one card that fills itself in for every tram.",
+    "The cards were copied by hand, and the Foundry Belle got the wrong year.",
+    "You write TramCard with props and use it for each tram, in four tasks.",
+    "Each card now shows its own tram, straight from the list in trams.js.",
+    "Same three trams, one component. A new tram needs no copying."
+  ]
+}

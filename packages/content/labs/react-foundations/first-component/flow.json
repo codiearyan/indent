@@ -1,0 +1,50 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "elspeth", "label": "Elspeth", "kind": "story" },
+      { "id": "main", "label": "main.jsx", "kind": "file", "mine": true },
+      { "id": "app", "label": "App", "kind": "function", "mine": true },
+      { "id": "hours", "label": "OpeningHours", "kind": "function", "mine": true },
+      { "id": "footer", "label": "FooterLines", "kind": "function", "mine": true },
+      { "id": "screen", "label": "Welcome screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "elspeth", "to": "main", "label": "the request" },
+      { "from": "main", "to": "app", "label": "renders" },
+      { "from": "app", "to": "hours", "label": "uses" },
+      { "from": "app", "to": "footer", "label": "uses" },
+      { "from": "app", "to": "screen", "label": "markup" }
+    ],
+    "note": "The welcome screen stops being a page edited by hand and becomes App, built from smaller components."
+  },
+  "tasks": {
+    "show-app": {
+      "steps": [
+        { "active": ["elspeth", "elspeth->main", "main"], "note": "The page loads main.jsx, and today it draws nothing at all." },
+        { "active": ["main", "main->app", "app"], "note": "main.jsx makes a root on the page's root element and hands it App." },
+        { "active": ["app", "app->screen", "screen"], "note": "The welcome screen shows the museum's name." }
+      ]
+    },
+    "opening-hours": {
+      "steps": [
+        { "active": ["elspeth"], "note": "Visitors ask when the museum is open." },
+        { "active": ["hours"], "note": "A new component returns a section with a heading and one line about the hours." },
+        { "active": ["hours"], "note": "The component can be drawn by itself, wherever a screen needs it." }
+      ]
+    },
+    "use-opening-hours": {
+      "steps": [
+        { "active": ["app"], "note": "App draws the museum's name." },
+        { "active": ["app", "app->hours", "hours"], "note": "Under the name, App uses OpeningHours as a tag." },
+        { "active": ["app", "app->screen", "screen"], "note": "The welcome screen shows the name, then the hours." }
+      ]
+    },
+    "footer-lines": {
+      "steps": [
+        { "active": ["footer"], "note": "A component gives back the address line and the volunteers line." },
+        { "active": ["app", "app->footer", "footer"], "note": "App puts it inside the footer it already has." },
+        { "active": ["app", "app->screen", "screen"], "note": "The two lines sit at the bottom of the screen, with nothing extra around them." }
+      ]
+    }
+  }
+}

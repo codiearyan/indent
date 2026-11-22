@@ -1,0 +1,25 @@
+{
+  "stations": [
+    { "title": "Elspeth", "say": "Can the welcome be in React?", "note": "She edits it every morning." },
+    { "title": "index.html", "text": "It loads a script that draws nothing yet.", "note": "One empty root element." },
+    {
+      "title": "Your components",
+      "file": "App.jsx",
+      "mine": true,
+      "gap": "An empty screen",
+      "tasks": ["Put App on screen", "Write OpeningHours", "Show the hours", "Two footer lines"]
+    },
+    {
+      "title": "Entrance hall",
+      "rows": [["The museum's name"], ["When it is open"], ["Two footer lines"]]
+    }
+  ],
+  "ticket": { "label": "Welcome", "wrong": "blank", "why": "Not drawn", "right": "on screen" },
+  "captions": [
+    "At Coalbrook Tram Museum, Elspeth wants the welcome screen rebuilt in React.",
+    "The page loads a script, but nothing draws anything, so the screen stays blank.",
+    "You write App's parts as components and put App on the screen, in four tasks.",
+    "The entrance hall shows the museum's name, the opening hours and the footer.",
+    "Same welcome as before, now built from parts the other screens can reuse."
+  ]
+}

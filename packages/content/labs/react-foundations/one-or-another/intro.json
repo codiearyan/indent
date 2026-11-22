@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Wilf", "say": "Just say Full!", "note": "The ten thirty has no seats." },
+    { "title": "rides.js", "text": "The ten thirty has no seats left.", "note": "And no step-free door." },
+    {
+      "title": "Your rows",
+      "file": "Rides.jsx",
+      "mine": true,
+      "gap": "Every mark on every row",
+      "tasks": ["Full or seats", "Marks only if true", "When rides are over", "Write Notice"]
+    },
+    {
+      "title": "Rides screen",
+      "rows": [["10:30 Foundry Belle"], ["11:00 Wenlow Open-top"], ["13:00 Foundry Belle"]],
+      "mark": 0
+    }
+  ],
+  "ticket": { "label": "Ten thirty", "wrong": "0 seats left", "why": "Shows it all", "right": "says Full" },
+  "captions": [
+    "At the tram stop, Wilf wants the rides screen to say plainly which rides are full.",
+    "Every row shows every mark, so the ten thirty reads 0 seats left and step-free.",
+    "You make each part of the rides screen depend on the ride, in five tasks.",
+    "The ten thirty says it is full, and each row shows only what is true of it.",
+    "Same rota, a screen that decides. Wilf's notice appears only on days he writes one."
+  ]
+}
