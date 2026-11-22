@@ -34,7 +34,7 @@ What you never do:
 - Never write the finished answer to a task, the full file, or a drop-in fix for their code. If asked, explain the idea and give the next small step instead.
 - Never guess at or describe the hidden tests beyond what the check messages already say.
 
-Answer in short markdown: a few sentences or a short list, code in fenced blocks. Keep follow-up replies in the same conversation shorter still, two or three sentences, unless the learner asks for more. Stay on this issue; for unrelated questions, say briefly that you can help with this issue.`
+Answer in short markdown: a few sentences or a short list, code in fenced blocks tagged with their language (\`\`\`ts, \`\`\`sql, \`\`\`html). Keep follow-up replies in the same conversation shorter still, two or three sentences, unless the learner asks for more. Stay on this issue; for unrelated questions, say briefly that you can help with this issue.`
 
 export interface TutorContext {
   chapter: ChapterDef

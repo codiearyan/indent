@@ -101,7 +101,7 @@ html.window-fullscreen {
   .prose-lab p,
   .prose-lab ul,
   .prose-lab ol,
-  .prose-lab pre,
+  .prose-lab .code-block,
   .prose-lab blockquote,
   .prose-lab table {
     @apply my-4;
@@ -125,7 +125,7 @@ html.window-fullscreen {
     @apply rounded-sm bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground;
   }
   .prose-lab pre {
-    @apply overflow-x-auto rounded-lg border bg-card p-4 font-mono text-[0.8125rem] leading-6;
+    @apply overflow-x-auto px-4 py-3 font-mono text-[0.8125rem] leading-6;
   }
   .prose-lab pre code {
     @apply bg-transparent p-0 text-[1em];
@@ -146,7 +146,7 @@ html.window-fullscreen {
   .prose-lab.prose-compact p,
   .prose-lab.prose-compact ul,
   .prose-lab.prose-compact ol,
-  .prose-lab.prose-compact pre {
+  .prose-lab.prose-compact .code-block {
     @apply my-2;
   }
 }
