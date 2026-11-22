@@ -26,7 +26,7 @@ accept: text/plain
 authorization: Bearer card-5521
 ```
 
-The **first line** has three parts with a space between each: the **method** (`DELETE`), the **target**, which is the path with its question mark part, and the version of the conversation, `HTTP/1.1`. The scheme and the host are not on that line. The host travels in a `host` header, because one computer can answer for many names.
+The **first line** has three parts with a space between each: the **method** (`DELETE`), the **target**, which is the path with its question mark part, and the version of the conversation, `HTTP/1.1`. The scheme and the host are not on that line. The host travels in a `host` header, because one computer can answer for many names. A `URL` holds the question mark part, question mark included, in its `search` property, and `''` when there is none.
 
 Every line after it is a **header**: a name, a colon, and a value. When the headers end, a blank line follows, and then a body if the request has one. You will send bodies in a later issue.
 

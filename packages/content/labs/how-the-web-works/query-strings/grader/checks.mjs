@@ -29,7 +29,12 @@ const valueCase = (name, address, key, expected) => ({
 function valueProblem(label, typed, url) {
   const got = url.searchParams.get(label)
   if (got === typed) return null
-  if (got === null) return `The server would find no ${label} in this address.`
+  if (got === null) {
+    const near = [...url.searchParams.keys()].find((k) => k.toLowerCase() === label)
+    return near
+      ? `The server would find no ${label} in this address, only ${near}. Names in the question mark part are matched exactly, capital letters included.`
+      : `The server would find no ${label} in this address.`
+  }
   const seen = `The server would read ${label} as "${got}".`
   if (typed.includes('&') && typed.startsWith(got)) {
     return `${seen} An & in the question mark part ends one value and starts the next, so an & that belongs to a value must be encoded.`
@@ -103,7 +108,12 @@ function searchCase(name, artist, title, body) {
       const sent =
         valueProblem('artist', artist, url) ??
         (title === undefined ? null : valueProblem('title', title, url))
-      if (sent) return sent.replaceAll('would read', 'read')
+      if (sent) {
+        return sent
+          .replaceAll('would read', 'read')
+          .replaceAll('would find', 'found')
+          .replaceAll('this address', 'this request')
+      }
       if (title === undefined && url.searchParams.has('title')) {
         return `No title was given, but the request still had a title in it ("${url.searchParams.get('title')}"). Leave it out when it is not given.`
       }

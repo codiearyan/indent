@@ -78,7 +78,7 @@ function typeCase(name, type) {
           : `This answer has no content-type header, so contentType must give back null. It gave back ${v.kind === 'string' ? `'${v.value}'` : kindText(v)}.`
       }
       if (v.kind === 'null') {
-        return "contentType gave back null, but this answer has a content-type header. A header is found by its exact name, so compare the spelling with the task's."
+        return 'contentType gave back null, but this answer has a content-type header. Either the name is not spelt as the task gives it, or the header was read like a property of a plain object, which the headers of an answer are not: look at how the lesson reads a header.'
       }
       if (v.kind !== 'string' || v.value !== type)
         return 'contentType gave back something other than the whole value of the content-type header.'

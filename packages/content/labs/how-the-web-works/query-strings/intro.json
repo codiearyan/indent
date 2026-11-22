@@ -30,7 +30,7 @@
   "captions": [
     "Ffion looks up a listener's song request: anything by Mabli & the Moths.",
     "The search is plain glued text, so the server reads the artist as just Mabli.",
-    "You read and build the question mark part with searchParams, in four tasks.",
+    "You read and build the question mark part so every value survives, in four tasks.",
     "The artist arrives exactly as typed, and the server finds the songs.",
     "Names and values, encoded on the way: the server reads what Ffion typed."
   ]

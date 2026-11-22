@@ -22,7 +22,8 @@ export function kindText(v) {
     object: 'an object',
     url: 'a URL object',
     response: 'the whole answer',
-    function: 'a function'
+    function: 'a function',
+    error: 'an Error'
   }
   return words[v.kind] ?? v.kind
 }
@@ -30,6 +31,9 @@ export function kindText(v) {
 /** What the learner's function gave back, or how it stopped, in plain words. */
 export function outcomeText(fn, outcome) {
   if (outcome.kind === 'returned') return `${fn} gave back ${outcome.shown}`
+  if (outcome.kind === 'threw' && outcome.notError) {
+    return `${fn} threw ${literal(outcome.message)}, which is not an Error`
+  }
   if (outcome.kind === 'threw') {
     const cause = outcome.cause ? ` (cause: ${outcome.cause})` : ''
     return `${fn} stopped with ${outcome.name}: ${outcome.message}${cause}`
@@ -44,7 +48,8 @@ export function receivedText(received, headers = [], turnedAway = 0, total = rec
     return "The check's server could not read the request it was sent, and answered 400 Bad Request."
   if (total === 0) return "The check's server received no request."
   const lines = received.map((r) => {
-    const shownHeaders = headers
+    const names = headers.length ? [...new Set([...headers, ...extraHeaderNames(r)])] : []
+    const shownHeaders = names
       .filter((h) => r.headers[h] !== undefined)
       .map((h) => `\n  ${h}: ${r.headers[h]}`)
       .join('')

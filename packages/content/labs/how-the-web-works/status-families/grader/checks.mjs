@@ -30,6 +30,17 @@ const familyCase = (status) => {
       if (v.value.toLowerCase().replace(/[-_]/g, ' ').trim() === expected) {
         return `statusFamily gave back '${v.value}'. The names must be written exactly as the task gives them, in small letters with a space.`
       }
+      const names = [
+        'information',
+        'success',
+        'redirect',
+        'client error',
+        'server error',
+        'unknown'
+      ]
+      if (!names.includes(v.value)) {
+        return `statusFamily gave back '${v.value}', which is not one of the names the task lists. Use the task's exact words.`
+      }
       if (expected === 'unknown')
         return `${status} is outside every family, so its family is unknown.`
       return `${status} is not in the family statusFamily named. Look at the edges: each family runs from a number ending in 00 to one ending in 99.`
@@ -57,6 +68,9 @@ function showCase(name, status, body, expect) {
         return `showText sent ${received.length} requests for one show. One is enough.`
       const family = familyOf(status)
       if (expect === 'throw') {
+        if (outcome.kind === 'threw' && outcome.notError) {
+          return 'showText threw text, not an Error. The task asks for an Error whose message has the status number in it; the lesson shows how to make one.'
+        }
         if (outcome.kind === 'threw') {
           if (/is not a function|Body is unusable|Cannot read properties/.test(outcome.message))
             return fetchMistake('showText', outcome)
@@ -64,7 +78,12 @@ function showCase(name, status, body, expect) {
             ? null
             : `showText threw, but the message of its error does not have the status number, ${status}, in it.`
         }
-        const gave = outcome.value?.kind === 'null' ? 'null' : 'a value'
+        const gave =
+          outcome.value?.kind === 'null'
+            ? 'null'
+            : outcome.value?.kind === 'error'
+              ? 'an Error without throwing it'
+              : 'a value'
         return `${status} is in the server error family: the show may well be on the schedule, but the server could not answer. showText gave back ${gave}, and for this family it must throw an Error instead.`
       }
       if (outcome.kind === 'threw') {
@@ -122,6 +141,13 @@ function retryCase(name, statuses, tries, expectedSent) {
       if (sent < expectedSent) {
         return `fetchWithRetry stopped after ${sent} ${sent === 1 ? 'request' : 'requests'}, although the last answer was a ${lastSeen}, in the server error family, and tries ${tries} allowed more.`
       }
+      if (
+        outcome.kind === 'threw' &&
+        familyOf(last.status) === 'server error' &&
+        /stopped with an error/.test(fetchMistake('fetchWithRetry', outcome))
+      ) {
+        return 'fetchWithRetry threw when its tries ran out. The task asks it to give back the status and body of the last answer it got, even when that is still a server error.'
+      }
       const mistake = fetchMistake('fetchWithRetry', outcome)
       if (mistake) return mistake
       const v = outcome.value
@@ -153,7 +179,7 @@ export const checks = {
     return cases(t, {
       file: FILE,
       fn: 'statusFamily',
-      list: [101, 204, 304, 400, 499, 500, 599, 600, 99].map(familyCase)
+      list: [101, 204, 304, 400, 499, 500, 599, 600, 99, 42].map(familyCase)
     })
   },
 
@@ -191,7 +217,7 @@ export const checks = {
         list: [
           retryCase('Asks again until the server is back', [503, 503, 200], 3, 3),
           retryCase('Stops asking once an answer goes well', [500, 200], 5, 2),
-          retryCase('Gives up after tries requests', [502], 3, 3),
+          retryCase('Gives up after tries requests', [502, 500, 503], 3, 3),
           retryCase('Never asks again after a client error', [404], 3, 1),
           retryCase('Sends one request when tries is 1', [503], 1, 1)
         ]

@@ -28,6 +28,12 @@ function lineProblem(v, method, address) {
   if (url.search && t === url.pathname) {
     return 'The question mark part is missing. It travels with the path, right after it.'
   }
+  if (!url.search && t === `${url.pathname}?`) {
+    return 'The line has a question mark after the path, but this address has no question mark part. URL keeps that part with its question mark, and empty when there is none.'
+  }
+  if (!t?.startsWith('/')) {
+    return 'The middle of the line does not start with a slash. A path always does, even for an address with nothing after its host, and URL knows what that path is.'
+  }
   if (t !== target)
     return 'The middle of the line is not the path of the address with its question mark part.'
   if (version !== 'HTTP/1.1' || rest.length) {
@@ -109,11 +115,26 @@ function keyProblem(r, key) {
 function studioCase(name, id) {
   const key = `chk-${token()}`
   const body = `Request ${id} is off the list, check ${token()}`
+  const path = `/requests/${id}`
   return {
     name,
     args: ['$base', id, key],
     headers: ['authorization'],
-    routes: [{ method: 'DELETE', path: `/requests/${id}`, answers: [{ status: 200, body }] }],
+    routes: [
+      {
+        method: 'DELETE',
+        path,
+        when: { header: 'authorization', value: `Bearer ${key}` },
+        answers: [{ status: 200, body }]
+      },
+      {
+        method: 'DELETE',
+        path,
+        answers: [
+          { status: 401, body: 'Only the studio may remove a request. Send the studio key.' }
+        ]
+      }
+    ],
     judge: (r) =>
       removalProblem('removeAsStudio', r, id) ??
       keyProblem(r.received[0], key) ??
@@ -129,7 +150,23 @@ function acceptCase(name, type) {
     args: ['$base', path, type],
     headers: ['accept'],
     routes: [
-      { method: 'GET', path, answers: [{ status: 200, headers: { 'content-type': type }, body }] }
+      {
+        method: 'GET',
+        path,
+        when: { header: 'accept', value: type },
+        answers: [{ status: 200, headers: { 'content-type': type }, body }]
+      },
+      {
+        method: 'GET',
+        path,
+        answers: [
+          {
+            status: 200,
+            headers: { 'content-type': 'text/plain' },
+            body: `The schedule as plain text, check ${token()}`
+          }
+        ]
+      }
     ],
     judge: ({ received, outcome }) => {
       if (received.length === 0) {

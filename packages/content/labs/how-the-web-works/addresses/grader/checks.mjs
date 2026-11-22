@@ -40,7 +40,11 @@ function partsProblem(v, expected) {
     }
   }
   if (got.path !== expected.path) {
-    problems.push('path is not the part after the host, starting with its slash.')
+    problems.push(
+      got.path === ''
+        ? 'path is empty. This address writes nothing after the host, but a path always starts with its slash, and URL knows what an address with no path asks for.'
+        : 'path is not the part after the host, starting with its slash.'
+    )
   }
   return problems.length ? problems.join(' ') : null
 }
@@ -141,7 +145,7 @@ export const checks = {
           path: '/shows/allotment-hour',
           written: true
         }),
-        partsCase('Reads an http address with no port and no path', 'http://studio-desk.example/', {
+        partsCase('Reads an http address with no port and no path', 'http://studio-desk.example', {
           scheme: 'http',
           host: 'studio-desk.example',
           port: 80,

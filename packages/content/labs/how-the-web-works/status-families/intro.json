@@ -11,7 +11,7 @@
       "file": "statuses.js",
       "mine": true,
       "gap": "Every status looks the same",
-      "tasks": ["Name the family", "Show, null or error", "Ask again, not forever"]
+      "tasks": ["Name the family", "Show it, or say why", "Ask again, not forever"]
     },
     { "title": "Cupboard server", "text": "Answers 503 for a few seconds, then 200." }
   ],

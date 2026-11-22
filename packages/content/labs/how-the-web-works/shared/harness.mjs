@@ -13,7 +13,7 @@ const unhandled = []
 process.on('unhandledRejection', (reason) => unhandled.push(errorInfo(reason)))
 
 function errorInfo(err) {
-  if (!(err instanceof Error)) return { name: 'Error', message: String(err) }
+  if (!(err instanceof Error)) return { name: 'Error', message: String(err), notError: true }
   const cause = err.cause?.code ?? err.cause?.message
   return { name: err.name, message: err.message, ...(cause ? { cause: String(cause) } : {}) }
 }
@@ -29,6 +29,7 @@ function describe(value) {
   if (typeof value === 'function') return { kind: 'function' }
   if (value instanceof Headers) return { kind: 'headers' }
   if (value instanceof URL) return { kind: 'url', href: value.href }
+  if (value instanceof Error) return { kind: 'error', message: value.message }
   if (typeof value === 'object') {
     const inside = Object.entries(value).find(
       ([, v]) => v instanceof Promise || v instanceof Response || v instanceof Headers
@@ -56,6 +57,7 @@ function describe(value) {
 
 function shown(value) {
   if (value instanceof Response) return `the whole answer (a Response with status ${value.status})`
+  if (value instanceof Error) return `${value.name}: ${value.message}`
   return inspect(value, { depth: 4, breakLength: 100 })
 }
 
@@ -78,7 +80,10 @@ function startServer(routes, received) {
         body: Buffer.concat(chunks).toString('utf8')
       })
       const route = routes.find(
-        (r) => r.path === url.pathname && (!r.method || r.method === req.method)
+        (r) =>
+          r.path === url.pathname &&
+          (!r.method || r.method === req.method) &&
+          (!r.when || req.headers[r.when.header]?.toLowerCase() === r.when.value.toLowerCase())
       )
       let answer = { status: 404, body: 'Check has no page at this path.' }
       if (route) {
@@ -112,8 +117,9 @@ const withBase = (value, base) =>
 
 /**
  * Calls `fn` from the learner's `file` with `args` ('$base' in a string becomes the server's
- * address) while a server answers `routes`: [{ method?, path, answers: [{ status, reason?,
- * headers?, body? }] }], one answer per request in order, the last one repeating.
+ * address) while a server answers `routes`: [{ method?, path, when?: { header, value }, answers:
+ * [{ status, reason?, headers?, body? }] }], one answer per request in order, the last one
+ * repeating. The first route that matches answers; `when` matches a header, ignoring capitals.
  */
 export async function exchange({ file, fn, args = [], routes = [] }) {
   const received = []
