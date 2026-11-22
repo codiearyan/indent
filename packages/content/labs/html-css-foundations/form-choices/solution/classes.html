@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Classes at Kilnworth Pottery</title>
+  </head>
+  <body>
+    <p><a href="index.html">Back to Kilnworth Pottery</a></p>
+
+    <h1>Classes</h1>
+    <p>Every class is six weeks long. Clay, glazes and firing are included.</p>
+
+    <table>
+      <caption>Autumn timetable</caption>
+      <tr>
+        <th scope="col">Class</th>
+        <th scope="col">Day</th>
+        <th scope="col">Time</th>
+        <th scope="col">Price</th>
+        <th scope="col">Places</th>
+      </tr>
+      <tr>
+        <th scope="row">Wheel throwing</th>
+        <td>Thursday</td>
+        <td>6pm to 8.30pm</td>
+        <td>£180</td>
+        <td>6</td>
+      </tr>
+      <tr>
+        <th scope="row">Handbuilding</th>
+        <td>Saturday</td>
+        <td>10am to 12.30pm</td>
+        <td>£150</td>
+        <td>8</td>
+      </tr>
+    </table>
+
+    <h2>Thursday wheel class</h2>
+    <p>Thursdays, 6pm to 8.30pm, with Kofi. Learn to centre clay and throw mugs and bowls.</p>
+
+    <h2>Saturday handbuilding</h2>
+    <p>Saturdays, 10am to 12.30pm, with Kofi. Pinch, coil and slab your way to a set of plates.</p>
+
+    <p>To book a place, come into the studio or ask Kofi after a class.</p>
+
+    <h2>Book a place</h2>
+    <p>Fill this in and Kofi will email you to say your place is kept.</p>
+    <form>
+      <p>
+        <label for="name">Your name</label>
+        <input type="text" id="name" name="name" required />
+      </p>
+      <p>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required />
+      </p>
+      <p>
+        <label for="places">Places</label>
+        <input type="number" id="places" name="places" min="1" max="4" required />
+      </p>
+      <p>
+        <label for="class">Class</label>
+        <select id="class" name="class">
+          <option>Wheel throwing</option>
+          <option>Handbuilding</option>
+        </select>
+      </p>
+      <fieldset>
+        <legend>Have you made pots before?</legend>
+        <label><input type="radio" name="experience" value="first" required /> This is my first time</label>
+        <label><input type="radio" name="experience" value="few" /> I have made a few</label>
+        <label><input type="radio" name="experience" value="often" /> I make pots often</label>
+      </fieldset>
+      <p>
+        <label><input type="checkbox" name="news" /> Send me news when the kiln is opened</label>
+      </p>
+      <p>
+        <label for="notes">Anything Kofi should know?</label>
+        <textarea id="notes" name="notes"></textarea>
+      </p>
+      <button type="submit">Book my place</button>
+    </form>
+  </body>
+</html>

@@ -1,0 +1,103 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kofi", "label": "Kofi", "kind": "story" },
+      { "id": "html", "label": "classes.html", "kind": "file", "mine": true },
+      { "id": "form", "label": "Booking form", "kind": "data" },
+      { "id": "visitor", "label": "Visitor", "kind": "story" },
+      { "id": "browser", "label": "Browser", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kofi", "to": "html", "label": "questions" },
+      { "from": "html", "to": "form", "label": "choices" },
+      { "from": "visitor", "to": "form", "label": "picks" },
+      { "from": "form", "to": "browser", "label": "send" }
+    ],
+    "note": "The booking form learns to ask questions that are picked, not typed, and the browser refuses a booking with the main answers missing."
+  },
+  "tasks": {
+    "class": {
+      "steps": [
+        {
+          "active": ["kofi", "kofi->html", "html"],
+          "value": { "kind": "array", "label": "the classes", "values": ["Wheel throwing", "Handbuilding"] },
+          "note": "Kofi needs to know which of his two classes each booking is for."
+        },
+        {
+          "active": ["html", "html->form", "form"],
+          "note": "A menu with one option per class replaces the line about the class."
+        },
+        {
+          "active": ["visitor", "visitor->form", "form"],
+          "note": "The visitor picks a class instead of typing it, so it is never misspelt."
+        }
+      ]
+    },
+    "experience": {
+      "steps": [
+        {
+          "active": ["kofi", "kofi->html", "html"],
+          "note": "Kofi asks one question with three answers, so he can seat beginners well."
+        },
+        {
+          "active": ["html", "html->form", "form"],
+          "value": {
+            "kind": "map",
+            "label": "each radio button",
+            "entries": [
+              { "key": "name", "value": "shared" },
+              { "key": "value", "value": "its own" },
+              { "key": "label", "value": "one answer" }
+            ]
+          },
+          "note": "Three radio buttons share a name, and a fieldset with the question as its legend groups them."
+        },
+        {
+          "active": ["visitor", "visitor->form", "form"],
+          "note": "Picking one answer clears the others, and a screen reader says the question before each answer."
+        }
+      ]
+    },
+    "extras": {
+      "steps": [
+        {
+          "active": ["kofi", "kofi->html", "html"],
+          "note": "Two more things to ask: a yes or no about the news, and anything else to know."
+        },
+        {
+          "active": ["html", "html->form", "form"],
+          "note": "A checkbox for the news, and a box that takes several lines for the notes."
+        },
+        {
+          "active": ["visitor", "visitor->form", "form"],
+          "note": "The visitor ticks the box if they want the news and writes as much as they need."
+        }
+      ]
+    },
+    "required": {
+      "steps": [
+        {
+          "active": ["visitor", "visitor->form", "form", "form->browser", "browser"],
+          "note": "Today someone can press the button with nothing filled in."
+        },
+        {
+          "active": ["html", "html->form", "form"],
+          "value": {
+            "kind": "map",
+            "label": "which answers",
+            "entries": [
+              { "key": "name, email, places", "value": "required" },
+              { "key": "experience", "value": "required" },
+              { "key": "news, notes", "value": "optional" }
+            ]
+          },
+          "note": "The main answers are marked as required. The news and the notes stay up to the visitor."
+        },
+        {
+          "active": ["form", "form->browser", "browser"],
+          "note": "The browser stops an empty booking and says which answer is missing."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dilys", "label": "Dilys", "kind": "story" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "box", "label": "Each box", "kind": "data" },
+      { "id": "page", "label": "Home page", "kind": "data" },
+      { "id": "visitor", "label": "Visitor", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dilys", "to": "css", "label": "measurements" },
+      { "from": "css", "to": "box", "label": "space, lines" },
+      { "from": "box", "to": "page", "label": "laid out" },
+      { "from": "page", "to": "visitor", "label": "room to read" }
+    ],
+    "note": "Every element is drawn as a box. You give the notes room inside and a line on one side, and space the sections apart."
+  },
+  "tasks": {
+    "padding": {
+      "steps": [
+        {
+          "active": ["page"],
+          "note": "The words of each note touch the edges of its sand background."
+        },
+        {
+          "active": ["css", "css->box", "box"],
+          "value": { "kind": "array", "label": "layers of a box", "values": ["content", "padding", "border", "margin"] },
+          "note": "The space between the words and the edge of the background is the padding of the note's box."
+        },
+        {
+          "active": ["box", "box->page", "page"],
+          "note": "With room inside, the sand frames each note."
+        }
+      ]
+    },
+    "border": {
+      "steps": [
+        {
+          "active": ["dilys", "dilys->css", "css"],
+          "note": "Dilys wants a line down the side of each note, like the clay stripe on the mugs."
+        },
+        {
+          "active": ["css", "css->box", "box"],
+          "value": {
+            "kind": "map",
+            "label": "a border",
+            "entries": [
+              { "key": "width", "value": "how thick" },
+              { "key": "style", "value": "what kind of line" },
+              { "key": "colour", "value": "which colour" }
+            ]
+          },
+          "note": "A border on one side of the note's box, with all three of its parts."
+        },
+        {
+          "active": ["box", "box->page", "page"],
+          "note": "Each note has a clay line down its left side and no line elsewhere."
+        }
+      ]
+    },
+    "margin": {
+      "steps": [
+        {
+          "active": ["page"],
+          "value": { "kind": "array", "label": "the sections", "values": ["Classes", "The shop", "Visit us"] },
+          "note": "The three parts of the page run straight into each other."
+        },
+        {
+          "active": ["css", "css->box", "box"],
+          "note": "Space outside each section's box, below it, keeps the next one away."
+        },
+        {
+          "active": ["page", "page->visitor", "visitor"],
+          "note": "A visitor sees where one part ends and the next begins."
+        }
+      ]
+    },
+    "box-sizing": {
+      "steps": [
+        {
+          "active": ["box"],
+          "note": "By default, a box's width counts only its content. Padding and border are added on top."
+        },
+        {
+          "active": ["css", "css->box", "box"],
+          "note": "One rule for every element makes the width include the padding and the border."
+        },
+        {
+          "active": ["box", "box->page", "page"],
+          "note": "The page looks the same today, and any width set later is the width you get."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,20 @@
+/*
+  Task 1: colour the main heading and the h2 headings clay, with one rule.
+  Task 2: give the two notes the class note, and a sand background.
+  Task 3: give the mug of the month the id mug-of-the-month, and centre it.
+  Task 4: make the Jump to links bold, and only those.
+
+  Dilys's notes:
+  Headings in the orange of fired clay: #a4492a
+  The two things nobody should miss, the line about muddy clothes and the opening hours,
+  on the colour of sand: #efdcc3
+  The mug of the month in the middle of the page, caption and all.
+  The Jump to links in bold, so people see them first.
+*/
+
+body {
+  background-color: #f7f1e8;
+  color: #3b2f2a;
+  font-family: Georgia, serif;
+  font-size: 18px;
+}

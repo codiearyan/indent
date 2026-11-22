@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Kofi",
+      "say": "Can people book from the page?",
+      "note": "They ring to book now."
+    },
+    {
+      "title": "Classes page",
+      "text": "Book a place, then lines of words to read.",
+      "note": "Nothing to type into"
+    },
+    {
+      "title": "Your HTML",
+      "file": "classes.html",
+      "mine": true,
+      "gap": "No way to answer",
+      "tasks": ["Three fields", "A label each", "Places 1 to 4", "A button"]
+    },
+    {
+      "title": "Booking",
+      "rows": [["Your name"], ["Email"], ["Places"]],
+      "mark": 2
+    }
+  ],
+  "ticket": {
+    "label": "Two places",
+    "wrong": "a phone call",
+    "why": "No form",
+    "right": "ready to send"
+  },
+  "captions": [
+    "Kofi wants people to book a class from the page, without ringing him.",
+    "The page says Book a place, but there is nothing to type into.",
+    "You add a form with three fields, a label for each, limits and a button.",
+    "A visitor types a name, an email and two places, and the booking is ready to send.",
+    "The timetable says when. Now the same page asks for the booking."
+  ]
+}

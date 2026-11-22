@@ -1,0 +1,103 @@
+{
+  "id": "form-choices",
+  "title": "Choices in a form",
+  "files": ["classes.html"],
+  "terminal": {
+    "description": "The classes page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "classes.html",
+  "tasks": [
+    {
+      "id": "class",
+      "title": "Let people pick their class",
+      "file": "classes.html",
+      "description": "In the form, the line `Class: Wheel throwing or Handbuilding` is a choice between the two classes.\n\nReplace it with a `select` named `class`, with a label `Class` tied to it, and one `option` for each class in Kofi's words. An extra first option that only asks the visitor to pick is fine if its value is empty.\n\nThe check finds the menu, makes sure it is in the form with the right name, reads its label and its options, and makes sure the old line is gone.",
+      "nextSteps": [
+        "Read \"A menu to pick from\" in the lesson.",
+        "Find the line that starts Class: in the form.",
+        "Replace it with a label and a select, with one option per class.",
+        "Save, open the menu in the Browser panel and press Check."
+      ],
+      "hints": [
+        "A list to pick one thing from is its own element, and each thing in it is an element too.",
+        "The menu is a `select` with `name=\"class\"`, and each class is an `option` inside it. The label ties to the select like it does to an input.",
+        "`<label for=\"class\">Class</label>`, then `<select id=\"class\" name=\"class\">` with `<option>Wheel throwing</option>` and one more, then `</select>`."
+      ],
+      "docs": [
+        { "title": "<select>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/select" },
+        { "title": "<option>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/option" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "experience",
+      "title": "Ask about experience with radio buttons",
+      "file": "classes.html",
+      "description": "The next line is Kofi's question, `Have you made pots before?`, and his three answers: `This is my first time`, `I have made a few` and `I make pots often`.\n\nReplace it with three radio buttons that share `name=\"experience\"`, each with a `value` of its own and a label with one of Kofi's answers. Group them in a `fieldset` whose `legend` is the question.\n\nThe check finds the three choices, makes sure they are radio buttons in the form with the same name and different values, reads each label, then looks for the fieldset around them and reads its legend.",
+      "nextSteps": [
+        "Read \"One answer out of a few\" in the lesson.",
+        "Open a fieldset where the question is, with the question as its legend.",
+        "Add three radio buttons that share one name, each inside a label with one answer.",
+        "Give each a value, close the fieldset, remove the old line, save and press Check."
+      ],
+      "hints": [
+        "Radio buttons that answer one question share a name, so picking one clears the others.",
+        "Each `input type=\"radio\"` gets the same `name` and its own `value`. The question becomes the `legend`, the first thing inside the `fieldset`.",
+        "`<fieldset><legend>Have you made pots before?</legend>`, then three of `<label><input type=\"radio\" name=\"experience\" value=\"first\" /> This is my first time</label>`, then `</fieldset>`."
+      ],
+      "docs": [
+        { "title": "<input type=\"radio\">", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/radio" },
+        { "title": "<fieldset>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/fieldset" },
+        { "title": "<legend>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/legend" }
+      ],
+      "videos": [
+        { "title": "Forms from the first field", "url": "https://www.youtube.com/watch?v=fNcJuPIZ2WE" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "extras",
+      "title": "Add a checkbox and a box for notes",
+      "file": "classes.html",
+      "description": "Two lines are left: `Send me news when the kiln is opened` and `Anything Kofi should know?`.\n\n- Replace the first with a checkbox named `news`, with the line as its label.\n- Replace the second with a `textarea` named `notes`, with the question as its label.\n\nThe check finds each field, makes sure it is the right kind, in the form, with the right name, and reads its label. Then it makes sure the old lines are gone.",
+      "nextSteps": [
+        "Read \"Yes or no, and longer answers\" in the lesson.",
+        "Replace the news line with a checkbox inside a label.",
+        "Replace the last question with a label and a textarea.",
+        "Remove the old lines, save, try both in the Browser panel and press Check."
+      ],
+      "hints": [
+        "A single yes or no is a different type of input from a radio button. Longer text has its own element, not an input.",
+        "The news field is `input type=\"checkbox\"`; the notes field is a `textarea`, which has a closing tag.",
+        "`<label><input type=\"checkbox\" name=\"news\" /> Send me news...</label>` and `<textarea id=\"notes\" name=\"notes\"></textarea>` with a label for it."
+      ],
+      "docs": [
+        { "title": "<input type=\"checkbox\">", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/checkbox" },
+        { "title": "<textarea>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/textarea" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "required",
+      "title": "Make the main answers required",
+      "file": "classes.html",
+      "description": "Kofi cannot keep a place without a name, an email, a number of places and an answer to his question. The news and the notes are up to the visitor.\n\nMake the name, email and places fields and the experience question required. Leave the news checkbox and the notes optional.\n\nThe check reads which fields are required, then fills in a booking with only the required answers and makes sure the browser lets it through.",
+      "nextSteps": [
+        "Read \"Required answers\" in the lesson.",
+        "Add the attribute to the name, email and places fields.",
+        "Add it to one of the experience radio buttons.",
+        "Save, press the button with the form empty, and press Check."
+      ],
+      "hints": [
+        "One attribute, with no value, tells the browser a field must be filled in before the form is sent.",
+        "Add `required` to the three inputs. For radio buttons, one of the group is enough.",
+        "For example `<input type=\"email\" id=\"email\" name=\"email\" required />`, and the same on the name, the places and the first radio button."
+      ],
+      "docs": [
+        { "title": "required", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/required" },
+        { "title": "Client-side form validation", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation" }
+      ],
+      "points": 10
+    }
+  ]
+}
