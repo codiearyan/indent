@@ -1,6 +1,8 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
+import { CodeBlock } from './CodeBlock'
+import { fenceOf } from './fence'
 
 export function Markdown({
   children,
@@ -17,6 +19,7 @@ export function Markdown({
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
+          pre: ({ node }) => <CodeBlock {...fenceOf(node)} />,
           a: ({ href, children }) => (
             <a
               href={href}
