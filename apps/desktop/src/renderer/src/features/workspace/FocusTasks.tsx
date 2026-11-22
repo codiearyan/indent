@@ -47,9 +47,9 @@ export function FocusTasks({ chapter }: { chapter: Chapter }): React.JSX.Element
   return (
     <section
       aria-label="Tasks"
-      className="motion-enter w-80 rounded-lg border border-border bg-popover text-popover-foreground shadow-md"
+      className="motion-enter flex min-h-0 w-80 flex-col rounded-lg border border-border bg-popover text-popover-foreground shadow-md"
     >
-      <header className="flex h-10 items-center gap-2 border-b border-rule pr-1 pl-3">
+      <header className="flex h-10 shrink-0 items-center gap-2 border-b border-rule pr-1 pl-3">
         <h2 className="text-sm font-semibold">Tasks</h2>
         <span className="text-[13px] text-muted-foreground tabular-nums">
           {passed} of {tasks.length}
@@ -70,7 +70,7 @@ export function FocusTasks({ chapter }: { chapter: Chapter }): React.JSX.Element
           <ChevronDown />
         </IconButton>
       </header>
-      <ol className="max-h-72 divide-y divide-rule overflow-y-auto zone-tasks">
+      <ol className="max-h-72 min-h-0 divide-y divide-rule overflow-y-auto zone-tasks">
         {tasks.map((task) => (
           <li key={task.id} className="flex gap-2.5 px-3 py-2.5">
             {mark(task.id, task.status)}
