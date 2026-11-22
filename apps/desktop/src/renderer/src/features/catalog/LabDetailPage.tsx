@@ -67,6 +67,7 @@ export function LabDetailPage(): React.JSX.Element {
   }
 
   const summary = labProgress(lab, progress.chapters)
+  const compact = lab.kind === 'foundations'
 
   return (
     <div className="space-y-6">
@@ -137,7 +138,13 @@ export function LabDetailPage(): React.JSX.Element {
       {lab.parts.map((part, i) => (
         <section key={part.title} data-tour={i === 0 ? TOUR.repoIssues : undefined}>
           <h2 className="mb-2 text-[13px] text-muted-foreground">{part.title}</h2>
-          <ol className="overflow-hidden rounded-lg border border-border">
+          <ol
+            className={
+              compact
+                ? 'grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3'
+                : 'overflow-hidden rounded-lg border border-border'
+            }
+          >
             {lab.chapters
               .filter((c) => part.chapters.includes(c.id))
               .map((chapter) => (
@@ -146,6 +153,7 @@ export function LabDetailPage(): React.JSX.Element {
                   lab={lab}
                   chapter={chapter}
                   chapters={progress.chapters}
+                  compact={compact}
                 />
               ))}
           </ol>
@@ -155,14 +163,17 @@ export function LabDetailPage(): React.JSX.Element {
   )
 }
 
+/** One issue: a row of the list, or with `compact` a card of the grid a long repo uses. */
 function ChapterRow({
   lab,
   chapter,
-  chapters
+  chapters,
+  compact
 }: {
   lab: LabSummary
   chapter: ChapterSummary
   chapters: ProgressState['chapters']
+  compact: boolean
 }): React.JSX.Element {
   const { status, tasksPassed } = chapterState(lab.id, chapter, chapters)
   const label =
@@ -172,10 +183,19 @@ function ChapterRow({
         ? `${tasksPassed} of ${chapter.taskCount} tasks`
         : 'Not started'
   return (
-    <li className="border-b border-rule last:border-b-0">
+    <li
+      className={
+        compact
+          ? 'overflow-hidden rounded-lg border border-border'
+          : 'border-b border-rule last:border-b-0'
+      }
+    >
       <Link
         to={`/learn/${lab.id}/${chapter.id}`}
-        className="flex h-[52px] items-center gap-4 px-5 text-sm transition-colors outline-none hover:bg-muted/60 focus-visible:bg-muted/60"
+        className={cn(
+          'flex h-[52px] items-center text-sm transition-colors outline-none hover:bg-muted/60 focus-visible:bg-muted/60',
+          compact ? 'gap-3 px-4' : 'gap-4 px-5'
+        )}
       >
         <span className="w-6 shrink-0 font-mono text-xs text-muted-foreground tabular-nums">
           {String(chapter.number).padStart(2, '0')}
@@ -184,7 +204,7 @@ function ChapterRow({
         <span
           role="img"
           aria-label={`${tasksPassed} of ${chapter.taskCount} tasks passed`}
-          className="flex w-24 shrink-0 gap-px"
+          className={cn('flex shrink-0 gap-px', compact ? 'w-12' : 'w-24')}
         >
           {Array.from({ length: chapter.taskCount }, (_, i) => (
             <span
@@ -196,14 +216,16 @@ function ChapterRow({
             />
           ))}
         </span>
-        <span
-          className={cn(
-            'w-24 shrink-0 text-right text-[13px] tabular-nums',
-            status === 'not-started' && 'text-muted-foreground'
-          )}
-        >
-          {label}
-        </span>
+        {!compact && (
+          <span
+            className={cn(
+              'w-24 shrink-0 text-right text-[13px] tabular-nums',
+              status === 'not-started' && 'text-muted-foreground'
+            )}
+          >
+            {label}
+          </span>
+        )}
       </Link>
     </li>
   )

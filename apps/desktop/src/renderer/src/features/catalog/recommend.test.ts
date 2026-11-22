@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { LabSummary, Level, PathDef } from '../../../../shared/types'
+import type { Kind, LabSummary, PathDef } from '../../../../shared/types'
 import { recommendedOrder } from './recommend'
 
-function lab(id: string, level: Level): LabSummary {
+function lab(id: string, kind?: Kind): LabSummary {
   return {
     id,
     title: id,
@@ -10,13 +10,18 @@ function lab(id: string, level: Level): LabSummary {
     category: '',
     language: 'javascript',
     tags: [],
-    level,
+    kind,
     parts: [],
     chapters: []
   }
 }
 
-const labs = [lab('react', 'medium'), lab('basics', 'easy'), lab('api', 'hard'), lab('sql', 'easy')]
+const labs = [
+  lab('react', 'project'),
+  lab('basics', 'foundations'),
+  lab('api', 'bug-hunt'),
+  lab('sql', 'foundations')
+]
 const paths: PathDef[] = [
   {
     id: 'frontend',
@@ -37,7 +42,7 @@ const paths: PathDef[] = [
 const ids = (list: LabSummary[]): string[] => list.map((l) => l.id)
 
 describe('recommendedOrder', () => {
-  it('puts easy repos first, then follows the roadmaps, without a goal', () => {
+  it('puts foundations first, then follows the roadmaps, without a goal', () => {
     expect(ids(recommendedOrder(labs, paths, [], null))).toEqual(['basics', 'sql', 'react', 'api'])
     expect(ids(recommendedOrder(labs, paths, [], 'some'))).toEqual(
       ids(recommendedOrder(labs, paths, [], null))
@@ -53,7 +58,7 @@ describe('recommendedOrder', () => {
     ])
   })
 
-  it('gives new learners easy repos first outside the goal', () => {
+  it('gives new learners foundations first outside the goal', () => {
     expect(ids(recommendedOrder(labs, paths, ['backend'], 'new'))).toEqual([
       'basics',
       'api',
@@ -62,7 +67,7 @@ describe('recommendedOrder', () => {
     ])
   })
 
-  it('moves easy repos last for experienced learners, but keeps the goal order', () => {
+  it('moves foundations last for experienced learners, but keeps the goal order', () => {
     expect(ids(recommendedOrder(labs, paths, ['frontend'], 'experienced'))).toEqual([
       'basics',
       'react',
@@ -90,6 +95,12 @@ describe('recommendedOrder', () => {
       'api',
       'sql'
     ])
+  })
+
+  it('counts a repo with no kind as a project', () => {
+    const mixed = [lab('old'), lab('basics', 'foundations')]
+    expect(ids(recommendedOrder(mixed, [], [], 'new'))).toEqual(['basics', 'old'])
+    expect(ids(recommendedOrder(mixed, [], [], 'experienced'))).toEqual(['old', 'basics'])
   })
 
   it('ignores a goal whose roadmap is gone', () => {

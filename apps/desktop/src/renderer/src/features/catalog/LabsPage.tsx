@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, Check, Search } from 'lucide-react'
 import { repoRequestUrl } from '@shared/repo'
-import type { LabSummary, ProgressState } from '@shared/types'
+import type { Kind, LabSummary, ProgressState } from '@shared/types'
 import { BuildStrip } from '@/components/app/BuildStrip'
 import { Cover } from '@/components/app/Cover'
 import { LanguageIcon } from '@/components/app/LanguageIcon'
@@ -14,7 +14,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { languageName } from '@/lib/languages'
 import { useCatalog } from '@/stores/catalog'
 import { useProgress } from '@/stores/progress'
-import { LEVELS, NO_FILTERS, matchesFilters, type LabFilters } from './labFilters'
+import { NO_FILTERS, kindOf, matchesFilters, type LabFilters } from './labFilters'
 import { labProgress, type LabProgress } from './labStatus'
 import { NeedsTools } from './NeedsTools'
 
@@ -23,6 +23,20 @@ const STATUS_TABS: { value: LabFilters['status']; label: string }[] = [
   { value: 'in-progress', label: 'In progress' },
   { value: 'not-started', label: 'Not started' },
   { value: 'completed', label: 'Finished' }
+]
+
+const SECTIONS: { kind: Kind; title: string; note: string }[] = [
+  {
+    kind: 'foundations',
+    title: 'Foundations',
+    note: 'Learn a language from the start, one topic at a time.'
+  },
+  { kind: 'project', title: 'Projects', note: 'Build one real thing over a few issues.' },
+  {
+    kind: 'bug-hunt',
+    title: 'Bug hunts',
+    note: 'Reproduce a bug, fix its cause and write the test that catches it.'
+  }
 ]
 
 const plural = (n: number, word: string): string => `${n} ${n === 1 ? word : `${word}s`}`
@@ -56,8 +70,7 @@ export function LabsPage(): React.JSX.Element {
     filters.query !== '' ||
     filters.status !== 'all' ||
     filters.fields.length > 0 ||
-    filters.languages.length > 0 ||
-    filters.levels.length > 0
+    filters.languages.length > 0
 
   const loading = !labs || !progress
 
@@ -125,12 +138,6 @@ export function LabsPage(): React.JSX.Element {
 
         <div className="grid grid-cols-[5rem_1fr] items-start gap-x-3 gap-y-2.5">
           <Facet
-            label="Level"
-            options={LEVELS}
-            value={filters.levels}
-            onChange={(next) => set({ levels: next as LabFilters['levels'] })}
-          />
-          <Facet
             label="Field"
             options={fields.map((field) => ({ value: field, label: field }))}
             value={filters.fields}
@@ -157,11 +164,26 @@ export function LabsPage(): React.JSX.Element {
         </ul>
       ) : visible.length > 0 ? (
         <>
-          <ul className={grid}>
-            {visible.map(({ lab, progress: p }) => (
-              <RepoCard key={lab.id} lab={lab} progress={p} chapters={progress.chapters} />
-            ))}
-          </ul>
+          {SECTIONS.map(({ kind, title, note }) => {
+            const inSection = visible.filter((r) => kindOf(r.lab) === kind)
+            return (
+              inSection.length > 0 && (
+                <section key={kind} aria-labelledby={`repos-${kind}`} className="space-y-3">
+                  <div>
+                    <h2 id={`repos-${kind}`} className="text-sm font-semibold">
+                      {title}
+                    </h2>
+                    <p className="mt-0.5 text-[13px] text-muted-foreground">{note}</p>
+                  </div>
+                  <ul className={grid}>
+                    {inSection.map(({ lab, progress: p }) => (
+                      <RepoCard key={lab.id} lab={lab} progress={p} chapters={progress.chapters} />
+                    ))}
+                  </ul>
+                </section>
+              )
+            )
+          })}
           <p className="text-center text-[13px] text-muted-foreground">
             Can&apos;t find what you want to learn? <RequestRepo topic={filters.query} />
           </p>
@@ -269,13 +291,8 @@ function RepoCard({
             <LanguageIcon language={lab.language} className="size-[18px] text-[8px]" />
             <span className="shrink-0 font-medium">{languageName(lab.language)}</span>
             <span className="truncate text-muted-foreground">{lab.category}</span>
-            {lab.level && (
-              <span className="ml-auto shrink-0 rounded-sm border border-input px-1.5 text-xs leading-5 text-muted-foreground">
-                {LEVELS.find((l) => l.value === lab.level)?.label}
-              </span>
-            )}
           </div>
-          <h2 className="mt-2.5 text-sm font-semibold">{lab.title}</h2>
+          <h3 className="mt-2.5 text-sm font-semibold">{lab.title}</h3>
           <p className="mt-1 line-clamp-2 text-[13px] leading-5 text-muted-foreground">
             {lab.description}
           </p>

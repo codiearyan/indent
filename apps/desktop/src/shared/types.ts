@@ -8,10 +8,11 @@ export const TOOL_IDS: ToolId[] = ['node', 'git']
 
 /** content/labs/<labId>/lab.json */
 /**
- * How much a repo asks. Easy keeps each issue in one file, medium spreads a change over a few
- * files, hard is a whole project laid out by its own conventions.
+ * What a repo is for. Foundations teach a language from the start, one topic and one file per
+ * issue. A project builds or fixes one thing over a few issues. A bug hunt is a set of tickets,
+ * each a bug to reproduce, fix and cover with a test.
  */
-export type Level = 'easy' | 'medium' | 'hard'
+export type Kind = 'foundations' | 'project' | 'bug-hunt'
 
 export interface LabMeta {
   id: string
@@ -23,8 +24,8 @@ export interface LabMeta {
   language: string
   /** Short labels on the card, e.g. ["TypeScript", "Interview"]. */
   tags: string[]
-  /** Optional so a pack without one still loads; it then matches no level filter. */
-  level?: Level
+  /** Missing in a pack written before kinds; it then counts as a project. */
+  kind?: Kind
   /** What this repo needs from the app, compared with PACK_FORMAT; 1 when missing. */
   format?: number
   /** Tools it needs on the computer; Node alone when missing. */

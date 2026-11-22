@@ -32,8 +32,9 @@ commands.
    - `language`: the lowercase id that picks the icon and the editor language (`typescript`,
      `javascript`, `react`, `html`, `sql`, `shell`).
    - `tags`: one or two short labels for the card.
-   - `level`: `easy` keeps each issue in one file, `medium` spreads a change over a few files,
-     `hard` is a whole project laid out by its own conventions.
+   - `kind`: `foundations` teaches a language from the start, one topic and one file per issue;
+     `project` builds one thing over a few issues; `bug-hunt` is a set of tickets, each a bug to
+     reproduce, fix and cover with a test.
    - `tools`: only when it needs more than Node, e.g. `["node", "git"]`.
    - `parts`: one or two titled groups that list the issue ids in order.
 4. **Plan the issues.** Five is usual, two is the least. Each is one request from someone at the

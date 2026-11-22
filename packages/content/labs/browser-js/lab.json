@@ -5,7 +5,7 @@
   "category": "Web and frontend",
   "language": "javascript",
   "tags": ["JavaScript", "DOM"],
-  "level": "medium",
+  "kind": "project",
   "parts": [
     { "title": "A board made from data", "chapters": ["route-board", "ticked-routes", "find-a-route"] },
     { "title": "A board that keeps up", "chapters": ["log-a-climb", "board-remembers"] }
