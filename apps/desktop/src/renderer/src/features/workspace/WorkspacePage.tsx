@@ -17,6 +17,7 @@ import { LeftPanel } from './LeftPanel'
 import { MomentCard } from '@/features/progress/MomentCard'
 import { useCatalog } from '@/stores/catalog'
 import { api } from '@/lib/api'
+import { cn } from '@/lib/utils'
 import { RepoNotice } from './RepoNotice'
 import { useWorkspaceShortcuts } from './useWorkspaceShortcuts'
 import { useActivePaneTracking, type PaneId } from './activePane'
@@ -38,6 +39,7 @@ export function WorkspacePage(): React.JSX.Element {
   const chat = panels.chat && !panels.zen
   const companion = useWorkspace((s) => s.companion)
   const browser = useWorkspace((s) => Boolean(s.chapter?.preview)) && panels.browser
+  const browserExpanded = useWorkspace((s) => s.browserExpanded) && browser
   const status = useWorkspace((s) => s.status)
   const downloading = useCatalog((s) => !!labId && s.downloads[labId]?.state === 'running')
   // The sheet shows the repo's download, work left in an earlier folder, or why the issue could
@@ -53,14 +55,20 @@ export function WorkspacePage(): React.JSX.Element {
     if (labId && chapterId) void open(labId, chapterId)
   }, [labId, chapterId, open])
 
-  // Leaving the issues gives the window its size back and lets the repo update.
+  // Leaving the issues gives the window its size back, closes the page's window and lets the repo
+  // update.
   useEffect(
     () => () => {
       void useWorkspace.getState().leaveCompanion()
+      api.preview.close()
       api.content.leave()
     },
     []
   )
+
+  useEffect(() => {
+    if (!browser) useWorkspace.getState().setBrowserExpanded(false)
+  }, [browser])
 
   // Files may have changed on disk through the terminal.
   useEffect(() => {
@@ -96,7 +104,7 @@ export function WorkspacePage(): React.JSX.Element {
       {labId && <ToolNotice labId={labId} />}
       <MissingFilesNotice />
       <CompanionBar />
-      <div className="mx-2 mb-2 min-h-0 flex-1 overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="relative mx-2 mb-2 min-h-0 flex-1 overflow-hidden rounded-2xl border border-border bg-card">
         {notice && labId && chapterId ? (
           <RepoNotice labId={labId} chapterId={chapterId} />
         ) : companion ? (
@@ -150,7 +158,11 @@ export function WorkspacePage(): React.JSX.Element {
                 {browser && <Separator className={`w-px ${separator}`} />}
                 {browser && (
                   <Panel id="browser" defaultSize="45%" minSize="20%">
-                    <Pane id="browser">
+                    {/* Expanded, the pane covers the sheet but stays in place, so the page keeps running. */}
+                    <Pane
+                      id="browser"
+                      className={browserExpanded ? 'absolute inset-0 z-10 bg-card' : undefined}
+                    >
                       <BrowserPane />
                     </Pane>
                   </Panel>
@@ -176,9 +188,17 @@ export function WorkspacePage(): React.JSX.Element {
 }
 
 /** Focus here takes the active mark off the editor; only the editors and the terminal draw it. */
-function Pane({ id, children }: { id: PaneId; children: React.ReactNode }): React.JSX.Element {
+function Pane({
+  id,
+  className,
+  children
+}: {
+  id: PaneId
+  className?: string
+  children: React.ReactNode
+}): React.JSX.Element {
   return (
-    <div data-pane={id} className="h-full">
+    <div data-pane={id} className={cn('h-full', className)}>
       {children}
     </div>
   )

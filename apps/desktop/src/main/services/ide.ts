@@ -1,8 +1,8 @@
 import { access } from 'fs/promises'
 import { homedir } from 'os'
-import { BrowserWindow, screen } from 'electron'
+import { screen } from 'electron'
 import type { IdeInfo } from '@shared/types'
-import { handle } from '../ipc'
+import { appWindows, handle } from '../ipc'
 import { shellEnv } from '../labEnv'
 import { workspaceDir } from '../paths'
 import { which } from './ai/cli'
@@ -59,7 +59,7 @@ let before: { bounds: Electron.Rectangle; minimum: number[] } | null = null
 
 /** Makes the window narrow and docks it to the right of its screen, or gives its size back. */
 async function setCompact(compact: boolean): Promise<void> {
-  const window = BrowserWindow.getAllWindows()[0]
+  const window = appWindows()[0]
   if (!window || window.isDestroyed()) return
   if (compact && !before && !window.isFullScreen()) {
     if (window.isMaximized()) window.unmaximize()
