@@ -46,8 +46,10 @@ function repoJustStarted(progress: ProgressState, labId: string, chapterId: stri
 }
 
 interface WorkspaceStore {
-  status: 'idle' | 'loading' | 'ready' | 'error'
+  status: 'idle' | 'loading' | 'ready' | 'error' | 'elsewhere'
   error: string | null
+  /** The earlier work folder holding this issue's work, while the learner chooses what to do. */
+  elsewhere: string | null
   chapter: Chapter | null
   /** Absolute workspace folder on disk. */
   dir: string
@@ -78,7 +80,8 @@ interface WorkspaceStore {
   /** `labId/chapterId` of the issue whose folder the IDE was last asked to open. */
   ideIssue: string | null
 
-  open(labId: string, chapterId: string): Promise<void>
+  /** With `here`, starts the issue in the current folder even when an earlier one has its work. */
+  open(labId: string, chapterId: string, options?: { here?: boolean }): Promise<void>
   /** Opens a file as a tab of a group, the focused one by default, and makes it active. */
   openFile(path: string, group?: number): void
   /** Opens a file in the other group, adding a second group when there is one only. */
@@ -179,6 +182,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
   return {
     status: 'idle',
     error: null,
+    elsewhere: null,
     chapter: null,
     dir: '',
     files: [],
@@ -196,11 +200,12 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     companion: false,
     ideIssue: null,
 
-    open: async (labId, chapterId) => {
+    open: async (labId, chapterId, { here = false } = {}) => {
       await get().flush()
       set({
         status: 'loading',
         error: null,
+        elsewhere: null,
         chapter: null,
         files: [],
         folders: [],
@@ -219,6 +224,11 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
         }
       }
       try {
+        const elsewhere = here ? null : await api.workspace.findElsewhere(labId, chapterId)
+        if (elsewhere) {
+          set({ status: 'elsewhere', elsewhere })
+          return
+        }
         const [chapter, snapshot, progress] = await Promise.all([
           api.content.getChapter(labId, chapterId),
           api.workspace.open(labId, chapterId),

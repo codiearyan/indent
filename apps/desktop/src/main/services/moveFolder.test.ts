@@ -3,7 +3,18 @@ import { existsSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { describe, expect, it } from 'vitest'
-import { NEW_FOLDER, isEmptyFolder, isInsideOrSame, moveContents, planMove } from './moveFolder'
+import {
+  NEW_FOLDER,
+  bringRepoBack,
+  clearIfNoWork,
+  isEmptyFolder,
+  isInsideOrSame,
+  moveContents,
+  moveRepos,
+  planMove,
+  reposIn,
+  sizeOf
+} from './moveFolder'
 
 async function tempDir(): Promise<string> {
   return mkdtemp(join(tmpdir(), 'indent-move-'))
@@ -106,5 +117,132 @@ describe('planMove', () => {
     await expect(planMove(current, join(current, 'sub'), app)).rejects.toThrow('not inside')
     await expect(planMove(current, join(app, 'x'), app)).rejects.toThrow('outside the app')
     expect(await planMove(current, current, app)).toEqual({ to: current, inside: false })
+  })
+})
+
+async function workFolder(base: string): Promise<string> {
+  const root = join(base, 'old')
+  for (const [lab, issue] of [
+    ['a-lab', 'one'],
+    ['a-lab', 'two'],
+    ['b-lab', 'one'],
+    ['c-lab', 'one']
+  ]) {
+    await mkdir(join(root, lab, issue), { recursive: true })
+    await writeFile(join(root, lab, issue, 'index.js'), `${lab} ${issue}`)
+  }
+  await mkdir(join(root, 'node_modules', 'vitest'), { recursive: true })
+  await writeFile(join(root, 'package.json'), '{}')
+  await mkdir(join(root, '.sandbox'), { recursive: true })
+  return root
+}
+
+describe('reposIn', () => {
+  it('lists the repos with work and how many issues each has', async () => {
+    const root = await workFolder(await tempDir())
+    await mkdir(join(root, 'empty-lab'))
+    expect(await reposIn(root)).toEqual([
+      { labId: 'a-lab', issues: 2 },
+      { labId: 'b-lab', issues: 1 },
+      { labId: 'c-lab', issues: 1 }
+    ])
+  })
+
+  it('finds nothing in a missing folder', async () => {
+    expect(await reposIn(join(await tempDir(), 'missing'))).toEqual([])
+  })
+})
+
+describe('moveRepos', () => {
+  it('moves the repo tools and the chosen repos, and leaves the others', async () => {
+    const base = await tempDir()
+    const from = await workFolder(base)
+    const to = join(base, 'new')
+    const seen: (string | null)[] = []
+
+    const result = await moveRepos(from, to, ['a-lab', 'c-lab'], (p) => seen.push(p.labId))
+
+    expect(result).toEqual({ moved: ['a-lab', 'c-lab'], failed: null })
+    // The same drive: renames, nothing to measure.
+    expect(seen).toEqual([null, 'a-lab', 'c-lab'])
+    expect(await readFile(join(to, 'a-lab', 'two', 'index.js'), 'utf8')).toBe('a-lab two')
+    expect(existsSync(join(to, 'node_modules', 'vitest'))).toBe(true)
+    expect(existsSync(join(to, 'b-lab'))).toBe(false)
+    expect(await readFile(join(from, 'b-lab', 'one', 'index.js'), 'utf8')).toBe('b-lab one')
+    expect(existsSync(join(from, 'a-lab'))).toBe(false)
+  })
+
+  it('stops at a repo that cannot move and keeps it and the rest in the old folder', async () => {
+    const base = await tempDir()
+    const from = await workFolder(base)
+    const to = join(base, 'new')
+    await mkdir(join(to, 'b-lab', 'taken'), { recursive: true })
+
+    const result = await moveRepos(from, to, ['a-lab', 'b-lab', 'c-lab'])
+
+    expect(result.moved).toEqual(['a-lab'])
+    expect(result.failed?.labId).toBe('b-lab')
+    expect(existsSync(join(to, 'a-lab', 'one'))).toBe(true)
+    expect(existsSync(join(from, 'b-lab', 'one'))).toBe(true)
+    expect(existsSync(join(from, 'c-lab', 'one'))).toBe(true)
+  })
+})
+
+describe('bringRepoBack', () => {
+  it('brings the issues of a repo over and keeps an issue already started here', async () => {
+    const base = await tempDir()
+    const earlier = await workFolder(base)
+    const current = join(base, 'new')
+    await mkdir(join(current, 'a-lab', 'two'), { recursive: true })
+    await writeFile(join(current, 'a-lab', 'two', 'index.js'), 'fresh here')
+
+    await bringRepoBack(earlier, current, 'a-lab')
+
+    expect(await readFile(join(current, 'a-lab', 'one', 'index.js'), 'utf8')).toBe('a-lab one')
+    expect(await readFile(join(current, 'a-lab', 'two', 'index.js'), 'utf8')).toBe('fresh here')
+    expect(await readFile(join(earlier, 'a-lab', 'two', 'index.js'), 'utf8')).toBe('a-lab two')
+    expect(existsSync(join(earlier, 'a-lab', 'one'))).toBe(false)
+  })
+})
+
+describe('clearIfNoWork', () => {
+  it('keeps a folder that still has repos', async () => {
+    const base = await tempDir()
+    const root = await workFolder(base)
+    expect(await clearIfNoWork(root, join(base, 'new'))).toBe(false)
+    expect(existsSync(join(root, 'node_modules'))).toBe(true)
+  })
+
+  it('removes the repo tools and the folder once no repo is left', async () => {
+    const base = await tempDir()
+    const root = await workFolder(base)
+    await moveRepos(root, join(base, 'new'), ['a-lab', 'b-lab', 'c-lab'])
+    await writeFile(join(root, 'package.json'), '{}')
+    expect(await clearIfNoWork(root, join(base, 'new'))).toBe(true)
+    expect(existsSync(root)).toBe(false)
+  })
+
+  it('moves the repo tools to the current folder when it has none', async () => {
+    const base = await tempDir()
+    const earlier = await workFolder(base)
+    const current = join(base, 'new')
+    await mkdir(current)
+    for (const labId of ['a-lab', 'b-lab', 'c-lab']) await bringRepoBack(earlier, current, labId)
+
+    expect(await clearIfNoWork(earlier, current)).toBe(true)
+
+    expect(existsSync(join(current, 'node_modules', 'vitest'))).toBe(true)
+    expect(existsSync(join(current, 'package.json'))).toBe(true)
+    expect(existsSync(earlier)).toBe(false)
+  })
+})
+
+describe('sizeOf', () => {
+  it('adds up the files under a folder', async () => {
+    const root = await workFolder(await tempDir())
+    // Four index.js files of 9 bytes ('a-lab one' and so on) and package.json of 2.
+    expect(await sizeOf(join(root, 'a-lab'))).toBe(18)
+    expect(await sizeOf(root)).toBe(38)
+    expect(await sizeOf(join(root, 'missing'))).toBe(0)
   })
 })

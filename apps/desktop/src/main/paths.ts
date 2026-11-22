@@ -80,8 +80,28 @@ export function workspacesRoot(): string {
   return root
 }
 
-export function setWorkspacesRoot(dir: string): void {
-  writeFileSync(dataFile('workspace.json'), JSON.stringify({ root: dir }))
+let earlier: string[] | undefined
+
+/** Folders that still hold work of repos the learner chose not to move, newest first. */
+export function earlierRoots(): string[] {
+  if (!earlier) {
+    try {
+      const saved = (
+        JSON.parse(readFileSync(dataFile('workspace.json'), 'utf8')) as { earlier?: unknown }
+      ).earlier
+      earlier = Array.isArray(saved)
+        ? saved.filter((dir): dir is string => typeof dir === 'string' && isAbsolute(dir))
+        : []
+    } catch {
+      earlier = []
+    }
+  }
+  return earlier
+}
+
+export function setWorkspacesRoot(dir: string, earlierDirs: string[] = earlierRoots()): void {
+  earlier = [...new Set(earlierDirs)].filter((other) => other !== dir)
+  writeFileSync(dataFile('workspace.json'), JSON.stringify({ root: dir, earlier }))
   root = dir
 }
 
@@ -104,8 +124,10 @@ export function dataFile(name: string): string {
 }
 
 /** Ids come from the renderer; reject anything that could escape its folder. */
+export const isSafeId = (id: string): boolean => /^[a-z0-9][a-z0-9-_]*$/i.test(id)
+
 export function safeId(id: string): string {
-  if (!/^[a-z0-9][a-z0-9-_]*$/i.test(id)) throw new Error(`Invalid id: ${id}`)
+  if (!isSafeId(id)) throw new Error(`Invalid id: ${id}`)
   return id
 }
 
