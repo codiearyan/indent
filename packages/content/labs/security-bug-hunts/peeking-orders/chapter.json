@@ -1,0 +1,88 @@
+{
+  "id": "peeking-orders",
+  "title": "Anyone's order by its number",
+  "files": [
+    "src/orders.js",
+    "src/reproduce.js",
+    "src/orders.test.js",
+    "src/db.js",
+    "src/seed.js",
+    "src/demo.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the demo opens Greta's order list and two of her links.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Catch a customer opening someone else's order",
+      "file": "src/reproduce.js",
+      "description": "Before you change anything, prove the hole. In `src/reproduce.js`, implement `reproduceOrderPeek()`.\n\nSign in as one customer, with a session `{ customerId }` and an id from `seed.js`, and ask the original `getOrder()` for an order that belongs to another customer. Use a fresh `openDb()`. Return an object with:\n\n- `session` and `orderId`: what you asked with\n- `shown`: exactly what `getOrder(db, session, orderId)` returned\n\nThe check runs your function against the original `orders.js`. It passes when `shown` is real and is an order of another customer.",
+      "nextSteps": [
+        "Run `node src/demo.js` and look at Greta's order numbers.",
+        "Find in `seed.js` an order that belongs to someone else.",
+        "Open it with Greta's session, the way a changed link would.",
+        "Run the demo again and read whose address `shown` holds."
+      ],
+      "hints": [
+        "The order page takes its number from the link, and a customer can type any number there.",
+        "getOrder never looks at the session. Any order number that exists opens, whoever asks.",
+        "Use the session { customerId: 102 } and the order number 2041, which is Greta's."
+      ],
+      "docs": [
+        { "title": "Insecure direct object reference prevention", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html" },
+        { "title": "Authorization", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Show an order only to its customer",
+      "file": "src/orders.js",
+      "description": "Fix `getOrder(db, session, orderId)` in `src/orders.js` so a customer can only ever open their own orders.\n\n- A customer's own order comes back in full, as `{ id, title, status, note, shipTo, total }`, whether `orderId` is a number or the text of a number from a link.\n- An order that belongs to someone else gives `null`, exactly like an order that does not exist. It never throws and never says whose it is.\n- An order that does not exist gives `null`.\n\nThe check opens orders of every customer with every customer's session, and one number with no order.",
+      "nextSteps": [
+        "Read how `listOrders` keeps to one customer.",
+        "Decide where `getOrder` should learn who is asking.",
+        "Make an order of someone else look exactly like a missing one.",
+        "Run `node src/demo.js` and try one of Cosmo's numbers with Greta's session."
+      ],
+      "hints": [
+        "The cause is that getOrder only asks whether the order exists, never whose it is. The session knows who is signed in.",
+        "The order list is already safe because its query keeps to the session's customer. The single order can ask the database the same question.",
+        "Add AND customer_id = ? to the query and pass session.customerId as the second value. A row that is not theirs is then simply not found."
+      ],
+      "docs": [
+        { "title": "Authorization", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html" },
+        { "title": "node:sqlite statement.get()", "url": "https://nodejs.org/docs/latest-v22.x/api/sqlite.html#statementgetnamedparameters-anonymousparameters" },
+        { "title": "Insecure direct object reference prevention", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html" }
+      ],
+      "videos": [
+        { "title": "Changing a number to reach someone else's data", "url": "https://www.youtube.com/watch?v=vliEtDxQWNc" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/orders.test.js",
+      "description": "Write vitest tests in `src/orders.test.js` that guard this hole for good. Use a fresh `openDb()` and sessions such as `{ customerId: 101 }`.\n\nThe check runs your test file four times: beside the original `orders.js` (it must fail), beside a correct fix (it must pass), beside a fix that throws an error saying the order belongs to another customer (it must fail) and beside a fix that gives `null` for every order (it must fail).",
+      "nextSteps": [
+        "Import `openDb` and `getOrder`.",
+        "Open one of Greta's orders with Cosmo's session.",
+        "Say exactly what the answer should be, the same as for a number with no order.",
+        "Run `npx vitest run src/orders.test.js`."
+      ],
+      "hints": [
+        "A test that only opens a customer's own order passes on the original code. The hole is in what another customer gets.",
+        "The fix that throws keeps the order hidden, but it answers differently than for a missing order. Assert the exact answer.",
+        "Expect getOrder(db, { customerId: 102 }, 2041) toBeNull(), and keep one test that Greta still opens 2041."
+      ],
+      "docs": [
+        { "title": "Vitest expect", "url": "https://vitest.dev/api/expect.html" },
+        { "title": "Authorization", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html" }
+      ],
+      "points": 10
+    }
+  ]
+}

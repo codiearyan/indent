@@ -1,0 +1,114 @@
+{
+  "id": "a-readable-report",
+  "title": "A report people can read",
+  "files": [
+    "src/report.js",
+    "src/runner.js",
+    "tests/quote.test.js",
+    "src/price-list.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where Idris's nightly steps run: the tests, then the price list only if they all pass.",
+    "suggestedCommand": "node tests/quote.test.js && node src/price-list.js"
+  },
+  "tasks": [
+    {
+      "id": "lines",
+      "title": "A line per test",
+      "file": "src/report.js",
+      "description": "Implement `formatReport(results)` in `src/report.js`. It returns one string, its lines joined with `'\\n'`.\n\n- for each result, in order, a line `PASS <name>` or `FAIL <name>`\n- under a failed test, its reason: an `Error`'s message, or for anything else that was thrown, the value written with `inspect()`\n- every line of the reason is indented by two spaces, so a message that runs over several lines stays under its test\n\nThe check builds results of its own, with errors of every kind, and reads the lines of your report. Any other lines, such as the summary of the next task, are left out of this check.",
+      "nextSteps": [
+        "Build an array of lines and join it at the end.",
+        "Push a `PASS` or `FAIL` line for each result.",
+        "Under a failed one, push its reason with every line indented.",
+        "Your report shows in the terminal once `main()` from task 3 prints it."
+      ],
+      "hints": [
+        "Keep the shape of the text out of the runner: `run()` gives facts, `formatReport` turns them into words.",
+        "`error instanceof Error` tells you whether the value has a real message. `split('\\n')` and `join('\\n')` let you work on a message one line at a time.",
+        "For the reason: `(error instanceof Error ? error.message : inspect(error)).split('\\n').map((line) => '  ' + line).join('\\n')`."
+      ],
+      "docs": [
+        {
+          "title": "instanceof",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof"
+        },
+        {
+          "title": "String.prototype.split()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split"
+        },
+        {
+          "title": "util.inspect()",
+          "url": "https://nodejs.org/api/util.html#utilinspectobject-options"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "summary",
+      "title": "A summary at the end",
+      "file": "src/report.js",
+      "description": "Make the last line of `formatReport(results)` a summary: `<p> passed, <f> failed, <n> total`, such as `2 passed, 1 failed, 3 total`.\n\n- a result counts as failed when its `passed` is false, whatever its error is\n- the summary is there even when nothing failed, and even for an empty list\n\nThe check reads only the last line of your report, for lists of results of its own.",
+      "nextSteps": [
+        "Count the failed results.",
+        "Work out the passed ones from the total.",
+        "Push the summary as the last line.",
+        "Read the report in the terminal once task 3 is done."
+      ],
+      "hints": [
+        "Two of the three numbers are enough to work out the third.",
+        "A failed result's error can be `undefined`, so do not count failures by looking at `error`.",
+        "`const failed = results.filter((r) => !r.passed).length`, and then the summary from `results.length - failed`, `failed` and `results.length`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.filter()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"
+        },
+        {
+          "title": "Template literals",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "exit-code",
+      "title": "An exit code a script can trust",
+      "file": "src/runner.js",
+      "description": "Implement `main()` in `src/runner.js`. It runs every test and prints `formatReport(results)` with `console.log`.\n\n- then it sets `process.exitCode` to `0` when every test passed and to `1` when any failed, however many\n- when there are no tests at all it prints `No tests found` instead, and the exit code is `1`\n\nThe check runs small test files of its own as real programs, each ending in `main()`, and reads what they print and the exit code they end with.",
+      "nextSteps": [
+        "Call `run()` and keep the results.",
+        "Handle the case with no tests first.",
+        "Print the report, then set the exit code.",
+        "Run `node tests/quote.test.js && node src/price-list.js`: the price list should not print while a test fails."
+      ],
+      "hints": [
+        "The exit code is how a program answers yes or no to whatever started it. 0 means yes, it worked.",
+        "`process.exitCode` sets the code the program ends with, once it has finished by itself. `process.exit()` stops at once, which can cut off what you just printed.",
+        "After printing, `process.exitCode = results.every((r) => r.passed) ? 0 : 1`."
+      ],
+      "docs": [
+        {
+          "title": "process.exitCode",
+          "url": "https://nodejs.org/api/process.html#processexitcode-1"
+        },
+        {
+          "title": "process.exit()",
+          "url": "https://nodejs.org/api/process.html#processexitcode"
+        },
+        {
+          "title": "Array.prototype.every()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What exit codes are for",
+          "url": "https://www.youtube.com/watch?v=qAn5SBWA8Sg"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

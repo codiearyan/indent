@@ -1,0 +1,118 @@
+{
+  "id": "expectations",
+  "title": "Expectations that explain themselves",
+  "files": [
+    "src/expect.js",
+    "tests/quote.test.js",
+    "src/runner.js",
+    "src/quote.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where Sefton's quote tests run with your expectations.",
+    "suggestedCommand": "node tests/quote.test.js"
+  },
+  "tasks": [
+    {
+      "id": "to-be",
+      "title": "Expect the same value",
+      "file": "src/expect.js",
+      "description": "Implement `toBe(expected)` in `src/expect.js`.\n\n- it returns quietly when `actual` and `expected` are the same value, as `Object.is` sees it, so `NaN` is the same as `NaN`\n- otherwise it throws an `Error` whose message shows the expected value first and then the value it got, each written with `inspect()` from `node:util`, like `Expected 4500 but got 4050`\n\nThe check calls `expect(...).toBe(...)` on numbers, strings and objects of its own and reads what is thrown.",
+      "nextSteps": [
+        "Run `node tests/quote.test.js` and read the failing lines.",
+        "Compare `actual` with `expected` in `toBe`.",
+        "Throw an `Error` with both values when they differ.",
+        "Run it again: only the bulk price test should fail, with a message that shows both prices."
+      ],
+      "hints": [
+        "`toBe` asks one question: is this the very same value? For objects that means the same object, not one that looks alike.",
+        "`===` says `NaN` is not equal to itself. `Object.is` says it is. `inspect('5')` writes the quotes, so text and numbers look different in a message.",
+        "When `!Object.is(actual, expected)`, throw `new Error('Expected ' + inspect(expected) + ' but got ' + inspect(actual))`."
+      ],
+      "docs": [
+        {
+          "title": "Object.is()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"
+        },
+        {
+          "title": "Equality comparisons and sameness",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Equality_comparisons_and_sameness"
+        },
+        {
+          "title": "util.inspect()",
+          "url": "https://nodejs.org/api/util.html#utilinspectobject-options"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "to-equal",
+      "title": "Expect equal objects and arrays",
+      "file": "src/expect.js",
+      "description": "Implement `toEqual(expected)` in `src/expect.js`. It works like `toBe`, but two arrays or two plain objects are equal when they hold equal values.\n\n- objects: the same keys, in any order, and equal values under each key\n- arrays: the same length and equal values at the same places\n- values inside are compared the same way, all the way down\n- an array never equals an object that is not an array, and `null` never equals an object\n- anything else is compared as `toBe` does\n\nWhen the values are not equal it throws an `Error` with the same message as `toBe`. The check compares objects and arrays of its own, including ones that differ deep inside, in their keys, or only in key order.",
+      "nextSteps": [
+        "Write a small function `equals(a, b)` above `expect` that returns true or false.",
+        "Start with the case where the two are the same value.",
+        "Then handle two objects: compare their keys, then each value with `equals` again.",
+        "Run the file: the printed quote test should pass."
+      ],
+      "hints": [
+        "An object can hold other objects, so the comparison has to call itself for the values inside. Each call handles one level.",
+        "`Object.keys` lists an object's own keys, and works on arrays too. Count them on both sides, and make sure every key of one is a key of the other. `Array.isArray` tells arrays apart from objects.",
+        "Return true if `Object.is(a, b)`. Return false unless both are objects and not null, and unless `Array.isArray(a) === Array.isArray(b)`. Then compare the key counts, and check every key with `Object.hasOwn(b, key) && equals(a[key], b[key])`."
+      ],
+      "docs": [
+        {
+          "title": "Object.keys()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys"
+        },
+        {
+          "title": "Array.isArray()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray"
+        },
+        {
+          "title": "Object.hasOwn()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Primitive and reference values",
+          "url": "https://www.youtube.com/watch?v=FxUQazhlS9o"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "to-throw",
+      "title": "Expect a function to throw",
+      "file": "src/expect.js",
+      "description": "Implement `toThrow(text)` in `src/expect.js`. Here `actual` is a function.\n\n- it calls the function once and returns quietly when it throws anything\n- when the function returns instead, it throws an `Error` with the message `Expected the function to throw`\n- when `text` is given, the thrown error's `message` must include it; when it does not, it throws an `Error` like `Expected an error with 'Unknown item' but got 'Price missing'`, each written with `inspect()`\n\nThe check passes functions of its own that throw, throw a string, or return.",
+      "nextSteps": [
+        "Call `actual` inside a `try`.",
+        "Remember whether it threw, and what.",
+        "After the `try`, throw your own error when it did not throw or the message is wrong.",
+        "Run the file: the unknown item test should pass."
+      ],
+      "hints": [
+        "There are two different errors here: the one the function throws, which you expect, and the one you throw when the expectation fails. Keep them apart.",
+        "Anything thrown inside a `try` lands in its `catch`, including your own `throw`. If you throw your failure inside the `try`, your `catch` swallows it.",
+        "Catch into a variable, such as `thrown = { error }`, and do every check after the `try...catch`: first whether anything was thrown, then whether `thrown.error.message.includes(text)`."
+      ],
+      "docs": [
+        {
+          "title": "try...catch",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
+        },
+        {
+          "title": "String.prototype.includes()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes"
+        },
+        {
+          "title": "Error.prototype.message",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/message"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

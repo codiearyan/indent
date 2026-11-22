@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Fig 1 to Fig 12, all by hand?", "note": "She numbers a batch on paper." },
+    { "title": "This morning", "rows": [["Batch", "Fig, 12"], ["Engraving", "Love you"]] },
+    {
+      "title": "Your code",
+      "file": "loops.js",
+      "mine": true,
+      "gap": "Every step done by hand",
+      "tasks": ["Number a batch", "Weeks to the goal", "Price the engraving", "Find the first digit"]
+    },
+    { "title": "Workbench", "text": "Labels, counts and prices, done in a blink." }
+  ],
+  "ticket": { "label": "Fig batch", "wrong": "half done", "why": "By hand", "right": "numbered" },
+  "captions": [
+    "The rules are functions now. Today Ines has jobs that repeat the same small step.",
+    "She numbers a batch, counts weeks and counts letters by hand, and loses her place.",
+    "You write each repeated step once with for, while and for...of, in four tasks.",
+    "Now the whole batch is numbered and the engraving priced in one run.",
+    "Loops repeat a step for you, and stop when the job is done."
+  ]
+}

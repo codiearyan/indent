@@ -1,0 +1,118 @@
+{
+  "id": "tests-that-wait",
+  "title": "Tests that wait",
+  "files": [
+    "src/runner.js",
+    "tests/quote.test.js",
+    "src/paper.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where Sefton's tests, some of which wait for the paper store, run on your runner.",
+    "suggestedCommand": "node tests/quote.test.js"
+  },
+  "tasks": [
+    {
+      "id": "await",
+      "title": "Wait for async tests",
+      "file": "src/runner.js",
+      "description": "Change `run()` in `src/runner.js` so it waits for tests that return a promise.\n\n- `run()` returns a promise of the results\n- a test whose promise fulfils passes; a test whose promise rejects fails, and the rejection value is its `error`\n- plain tests that return or throw still pass or fail as before\n- `main()` waits for `run()` before it prints the report and sets the exit code\n\nThe check gives your runner async tests of its own that pass or fail after waiting, and runs a small test file that ends in `await main()`.",
+      "nextSteps": [
+        "Run `node tests/quote.test.js` and look at the poster test: it says PASS, then the program crashes.",
+        "Make `run()` an async function.",
+        "Wait for what each test function returns, inside the `try`.",
+        "Make `main()` wait for `run()`, and run the file again."
+      ],
+      "hints": [
+        "An async test has not finished when its function returns. It hands back a promise, and its real outcome comes later.",
+        "Inside an async function, `await` on a promise that rejects throws right there, so the `catch` you already have sees it. `await` on a plain value just gives the value back.",
+        "Write `async function run()` and `await fn()` in place of `fn()`. Then `async function main()` with `const results = await run()`."
+      ],
+      "docs": [
+        {
+          "title": "async function",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function"
+        },
+        {
+          "title": "await",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Async and await, start to finish",
+          "url": "https://www.youtube.com/watch?v=vn3tm0quoqE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "in-order",
+      "title": "One test at a time",
+      "file": "src/runner.js",
+      "description": "Make `run()` run the tests one after another: a test starts only once the one before it has finished, whether it passed or failed.\n\nThe check gives your runner tests of its own that wait for different lengths of time, and records when each one starts and ends.",
+      "nextSteps": [
+        "Look at how your loop calls the tests.",
+        "Make sure each test is waited for before the loop moves on.",
+        "Run the file: the results come in the same order as the tests."
+      ],
+      "hints": [
+        "Tests often share things: a file, a list, a clock. Two tests running at the same time can trip over each other.",
+        "`forEach` and `map` call their callback for every item at once and do not wait for promises. `Promise.all` waits for all of them, but they all started together.",
+        "An `await` inside a plain `for...of` loop pauses the loop itself, so the next test only starts after it."
+      ],
+      "docs": [
+        {
+          "title": "for...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of"
+        },
+        {
+          "title": "Array.prototype.forEach()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach"
+        },
+        {
+          "title": "Promise.all()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "timeout",
+      "title": "A time limit for every test",
+      "file": "src/runner.js",
+      "description": "Give every test a time limit.\n\n- `test(name, fn, options)` takes an optional third argument; `options.timeout` is the limit in milliseconds, `2000` when it is not given\n- a test still running at its limit fails with an `Error` whose message is `Timed out after <ms> ms`, such as `Timed out after 500 ms`, and the next test runs\n- a test that passes or fails before its limit keeps its own result\n- a test that finishes quickly must not leave its timer behind to keep the program open\n\nThe check gives your runner tests of its own that never finish, finish slowly or fail quickly, and runs a small test file with one quick test and a long limit to see that the program ends at once.",
+      "nextSteps": [
+        "Save the limit with the test in `test()`.",
+        "Make a promise that rejects with the timeout error when a timer fires.",
+        "Wait for whichever comes first: the test or the timer.",
+        "Stop the timer when the test is over, and run the file: the supplier test should fail after half a second."
+      ],
+      "hints": [
+        "A runner cannot stop a promise. It can only stop waiting for it, by waiting for something else at the same time.",
+        "`Promise.race` settles the way the first of its promises settles. `setTimeout` returns an id, and `clearTimeout(id)` cancels the timer so it no longer keeps Node running.",
+        "Make `limit` a new promise whose body sets `timer = setTimeout(() => reject(new Error('Timed out after ' + ms + ' ms')), ms)`. Then `await Promise.race([fn(), limit])`, with `clearTimeout(timer)` in a `finally`."
+      ],
+      "docs": [
+        {
+          "title": "Promise.race()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race"
+        },
+        {
+          "title": "setTimeout() in Node",
+          "url": "https://nodejs.org/api/timers.html#settimeoutcallback-delay-args"
+        },
+        {
+          "title": "Promise.prototype.finally()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally"
+        }
+      ],
+      "videos": [
+        {
+          "title": "How the event loop works",
+          "url": "https://www.youtube.com/watch?v=8aGhZQkoFbQ"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

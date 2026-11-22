@@ -1,9 +1,8 @@
 import { existsSync } from 'fs'
-import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'fs/promises'
+import { mkdir, mkdtemp, readdir, readFile, rename, rm, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { describe, expect, it } from 'vitest'
-import { createFolder, removePath, renamePath } from './workspaceOps'
 import {
   findMissing,
   openWorkspace,
@@ -104,15 +103,15 @@ describe('openWorkspace', () => {
   it('lists folders, empty ones too, and never the app folder', async () => {
     const { starterDir, dir } = await setup({ 'src/lib/a.ts': 'a' })
     await openWorkspace(starterDir, dir, [])
-    await createFolder(dir, 'empty')
+    await mkdir(join(dir, 'empty'))
     expect((await openWorkspace(starterDir, dir, [])).folders).toEqual(['empty', 'src', 'src/lib'])
   })
 
   it('treats a starter file the learner deleted or renamed as their change', async () => {
     const { starterDir, dir } = await setup({ 'a.ts': 'a', 'src/b.ts': 'b', 'c.ts': 'c' })
     await openWorkspace(starterDir, dir, [])
-    await removePath(dir, 'a.ts')
-    await renamePath(dir, 'src', 'lib')
+    await rm(join(dir, 'a.ts'))
+    await rename(join(dir, 'src'), join(dir, 'lib'))
     await updateStarter(starterDir, { 'a.ts': 'a', 'src/b.ts': 'b', 'c.ts': 'c 2' })
 
     const snap = await openWorkspace(starterDir, dir, [])
@@ -210,7 +209,7 @@ describe('restoreMissing', () => {
   it('finds starter files that are gone and brings back only those', async () => {
     const { starterDir, dir } = await setup({ 'src/data.ts': 'data', 'src/tools.ts': 'tools' })
     await openWorkspace(starterDir, dir, [])
-    await renamePath(dir, 'src/data.ts', 'src/old.ts')
+    await rename(join(dir, 'src/data.ts'), join(dir, 'src/old.ts'))
     await writeTree(dir, { 'src/tools.ts': 'my tools', 'notes.md': 'mine' })
 
     expect((await openWorkspace(starterDir, dir, [])).missing).toEqual(['src/data.ts'])

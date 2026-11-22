@@ -1,0 +1,81 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "file", "label": "quote.test.js", "kind": "file" },
+      { "id": "run", "label": "run()", "kind": "function", "mine": true },
+      { "id": "paper", "label": "paper.js", "kind": "file" },
+      { "id": "store", "label": "Store room list", "kind": "data" },
+      { "id": "supplier", "label": "Supplier feed", "kind": "story" },
+      { "id": "results", "label": "Results", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "file", "to": "run", "label": "tests" },
+      { "from": "run", "to": "paper", "label": "one at a time" },
+      { "from": "paper", "to": "store", "label": "read later" },
+      { "from": "paper", "to": "supplier", "label": "no answer" },
+      { "from": "run", "to": "results", "label": "when done" }
+    ],
+    "note": "Some tests now wait for the store room list or the supplier, and your runner waits with them, but never forever."
+  },
+  "tasks": {
+    "await": {
+      "steps": [
+        {
+          "active": ["file", "file->run", "run"],
+          "note": "run() calls the poster paper test, and gets a promise back instead of an outcome."
+        },
+        {
+          "active": ["run", "run->paper", "paper", "paper->store", "store"],
+          "note": "The test reads the store room list. Only when that is read does it know if there are enough sheets."
+        },
+        {
+          "active": ["run", "run->results", "results"],
+          "value": { "kind": "map", "label": "a result, once settled", "entries": [{ "key": "fulfilled", "value": "passed" }, { "key": "rejected", "value": "failed, with its error" }] },
+          "note": "run() writes the result only once the promise has settled, and main() waits for run() in turn."
+        }
+      ]
+    },
+    "in-order": {
+      "steps": [
+        {
+          "active": ["file", "file->run", "run"],
+          "value": { "kind": "array", "label": "tests waiting", "values": ["card paper", "poster paper", "supplier"] },
+          "note": "Three tests that wait are next in the list."
+        },
+        {
+          "active": ["run", "run->paper", "paper"],
+          "note": "The card paper test starts, and run() waits for it to finish before anything else starts."
+        },
+        {
+          "active": ["run", "run->paper", "paper"],
+          "note": "Only then does the poster paper test start, even though the card test failed or passed long ago."
+        },
+        {
+          "active": ["run", "run->results", "results"],
+          "note": "The results come out in the same order as the tests, and no two tests ever ran side by side."
+        }
+      ]
+    },
+    "timeout": {
+      "steps": [
+        {
+          "active": ["file", "file->run", "run"],
+          "value": { "kind": "map", "label": "a test", "entries": [{ "key": "name", "value": "text" }, { "key": "fn", "value": "function" }, { "key": "timeout", "value": "ms" }] },
+          "note": "The supplier test comes with its own time limit. Other tests get the usual one."
+        },
+        {
+          "active": ["run", "run->paper", "paper", "paper->supplier", "supplier"],
+          "note": "The test asks the supplier for a price. The workshop is offline, so no answer will ever come."
+        },
+        {
+          "active": ["run"],
+          "note": "run() waits for the answer and the limit at the same time. The limit comes first."
+        },
+        {
+          "active": ["run", "run->results", "results"],
+          "note": "The test fails with a timeout, the timer is cleared, and the next test runs."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "link", "label": "Proof link", "kind": "story" },
+      { "id": "reproduce", "label": "reproduceProofEscape()", "kind": "function", "mine": true, "fn": "reproduceProofEscape" },
+      { "id": "read", "label": "readProof()", "kind": "function", "mine": true, "fn": "readProof" },
+      { "id": "proofs", "label": "proofs folder", "kind": "data" },
+      { "id": "outside", "label": "Staff files", "kind": "data" },
+      { "id": "test", "label": "proofs.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "link", "to": "read", "label": "file name" },
+      { "from": "reproduce", "to": "read", "label": "file name" },
+      { "from": "read", "to": "proofs", "label": "reads" },
+      { "from": "read", "to": "outside", "label": "climbs out" },
+      { "from": "test", "to": "read", "label": "names" }
+    ],
+    "note": "Every proof download goes through readProof(), and a name with .. in it reaches the staff files beside the proofs."
+  },
+  "tasks": {
+    "reproduce": {
+      "trace": { "file": "src/reproduce.js", "call": "reproduceProofEscape", "args": [] },
+      "steps": [
+        {
+          "active": ["reproduce"],
+          "value": {
+            "kind": "map",
+            "label": "what you pick",
+            "entries": [{ "key": "fileName", "value": "a name that climbs out" }]
+          },
+          "note": "reproduceProofEscape() picks a file name that leads out of the proofs folder to a file that exists."
+        },
+        {
+          "active": ["reproduce", "reproduce->read", "read", "read->outside", "outside"],
+          "note": "It runs the name through the original readProof(), which follows the name wherever it leads."
+        },
+        {
+          "active": ["reproduce", "outside"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "fileName", "value": "the name" },
+              { "key": "shown", "value": "the text of that file" }
+            ]
+          },
+          "note": "The text goes on AP-22. The proof is that it came from outside the proofs folder."
+        }
+      ]
+    },
+    "fix": {
+      "steps": [
+        {
+          "active": ["link", "link->read", "read"],
+          "value": {
+            "kind": "map",
+            "label": "a download",
+            "entries": [
+              { "key": "proofsDir", "value": "the proofs folder, a full path" },
+              { "key": "fileName", "value": "from the link, any text" }
+            ]
+          },
+          "note": "A customer follows a proof link. The file name in it can be anything they typed."
+        },
+        {
+          "active": ["read"],
+          "note": "readProof() works out where the name really leads, every .. followed, before it reads anything."
+        },
+        {
+          "active": ["read", "read->proofs", "proofs"],
+          "note": "A name that lands inside the proofs folder is read and its text comes back."
+        },
+        {
+          "active": ["read", "outside"],
+          "note": "A name that lands anywhere else, the staff files beside it included, gives the same answer as a proof that does not exist."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->read", "read"],
+          "note": "proofs.test.js asks for names that climb out, and for a real proof that must still download."
+        },
+        {
+          "active": ["test", "read", "read->outside", "outside"],
+          "note": "First it runs beside the original readProof(), the one behind AP-22. There it must fail."
+        },
+        {
+          "active": ["test", "read", "proofs"],
+          "note": "Then it runs beside a correct fix, where it must pass."
+        },
+        {
+          "active": ["test", "read"],
+          "value": {
+            "kind": "map",
+            "label": "four runs of the test file",
+            "entries": [
+              { "key": "original proofs.js", "value": "must fail" },
+              { "key": "a correct fix", "value": "must pass" },
+              { "key": "checks only the start", "value": "must fail" },
+              { "key": "refuses every name", "value": "must fail" }
+            ]
+          },
+          "note": "Last it runs beside a fix that only checks the full path starts with the folder's path, and one that refuses every name. Both must fail too."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "theo", "label": "Theo", "kind": "story" },
+      { "id": "label", "label": "labelLine()", "kind": "function", "mine": true, "fn": "labelLine" },
+      { "id": "sale", "label": "salePrice()", "kind": "function", "mine": true, "fn": "salePrice" },
+      { "id": "zone", "label": "shippingNote()", "kind": "function", "mine": true, "fn": "shippingNote" },
+      { "id": "note", "label": "packingNote()", "kind": "function", "mine": true, "fn": "packingNote" },
+      { "id": "table", "label": "Packing table", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "theo", "to": "label", "label": "scent, wrap" },
+      { "from": "theo", "to": "sale", "label": "price, percent" },
+      { "from": "theo", "to": "zone", "label": "zone" },
+      { "from": "theo", "to": "note", "label": "weight" },
+      { "from": "label", "to": "table", "label": "label" },
+      { "from": "sale", "to": "table", "label": "sale price" },
+      { "from": "zone", "to": "table", "label": "note" },
+      { "from": "note", "to": "table", "label": "box" }
+    ],
+    "note": "Theo's four functions each take what they are given and hand an answer to the packing table, with every name used where it lives."
+  },
+  "tasks": {
+    "label": {
+      "trace": { "file": "src/scope.js", "call": "labelLine", "args": ["Cedar", true] },
+      "steps": [
+        {
+          "active": ["theo", "theo->label"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "scent", "value": "Cedar" },
+              { "key": "giftWrap", "value": "true" }
+            ]
+          },
+          "note": "Theo asks for the label of a cedar candle that is gift wrapped."
+        },
+        {
+          "active": ["label"],
+          "note": "A decision picks the wrapping words, and they have to be there when the label is put together."
+        },
+        {
+          "active": ["label", "label->table", "table"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "label", "value": "text" }]
+          },
+          "note": "The label goes to the packing table."
+        }
+      ]
+    },
+    "sale": {
+      "trace": { "file": "src/scope.js", "call": "salePrice", "args": [2000, 25] },
+      "steps": [
+        {
+          "active": ["theo", "theo->sale"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "priceCents", "value": 2000 },
+              { "key": "percentOff", "value": 25 }
+            ]
+          },
+          "note": "Theo puts a candle on sale."
+        },
+        {
+          "active": ["sale"],
+          "note": "When there is a discount, the price is worked out again, and that new price is the one to hand back."
+        },
+        {
+          "active": ["sale", "sale->table", "table"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "sale price", "value": "whole cents" }]
+          },
+          "note": "The sale price goes on the tag."
+        }
+      ]
+    },
+    "zone": {
+      "trace": { "file": "src/scope.js", "call": "shippingNote", "args": ["abroad"] },
+      "steps": [
+        {
+          "active": ["theo", "theo->zone"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "zone", "value": "abroad" }]
+          },
+          "note": "Theo asks how an order abroad will travel."
+        },
+        {
+          "active": ["zone"],
+          "note": "The answer depends only on the zone in the question, not on any other order."
+        },
+        {
+          "active": ["zone", "zone->table", "table"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "note", "value": "one of three texts" }]
+          },
+          "note": "The shipping note goes on the parcel."
+        }
+      ]
+    },
+    "note": {
+      "trace": { "file": "src/scope.js", "call": "packingNote", "args": [1500] },
+      "steps": [
+        {
+          "active": ["theo", "theo->note"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "weightGrams", "value": 1500 }]
+          },
+          "note": "Theo weighs a parcel."
+        },
+        {
+          "active": ["note"],
+          "note": "The weight decides the box, and the function keeps nothing of its own outside."
+        },
+        {
+          "active": ["note", "note->table", "table"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "box", "value": "one of two texts" }]
+          },
+          "note": "The note is handed back, so each parcel gets its own."
+        }
+      ]
+    }
+  }
+}

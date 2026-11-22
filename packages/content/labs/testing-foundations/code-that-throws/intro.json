@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Effie", "say": "Who ordered a huge box?", "note": "It reached Wendell's list." },
+    { "title": "Order form", "text": "Turns bad orders away, but nothing tests it." },
+    {
+      "title": "Your tests",
+      "file": "orders.test.js",
+      "mine": true,
+      "gap": "Nobody tests the no",
+      "tasks": ["Test an unknown size", "Test the kind of error", "Test the message", "Test a good order"]
+    },
+    { "title": "Packing list", "text": "Only good orders reach Wendell." }
+  ],
+  "ticket": { "label": "Huge box", "wrong": "on the list", "why": "Let through", "right": "turned away" },
+  "captions": [
+    "Someone ordered a huge box from Thistlecombe Farm, and it reached the packing list.",
+    "The order form should turn bad orders away, and nothing checks that it does.",
+    "You test that bad orders throw the right error, and that good ones go through.",
+    "Now a huge box is turned away at the form, and good orders still reach Wendell.",
+    "Same form, same rules. It says no to bad orders and yes to good ones."
+  ]
+}

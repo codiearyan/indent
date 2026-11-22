@@ -1,4 +1,3 @@
-import { movedPath } from './fileTree'
 import { closeTab, initialTabs, NO_TABS, openTab, pruneTabs, type OpenTabs } from './tabs'
 
 /** One or two editor groups side by side, each with its own tabs. */
@@ -90,15 +89,6 @@ export function pruneLayout(layout: EditorLayout, existing: string[]): EditorLay
     layout.groups.map((g) => pruneTabs(g, existing)),
     layout.focused
   )
-}
-
-/** Follows a renamed file or folder in every group. */
-export function renameInLayout(layout: EditorLayout, from: string, to: string): EditorLayout {
-  const groups = layout.groups.map(({ paths, active }) => ({
-    paths: paths.map((p) => movedPath(p, from, to)),
-    active: active && movedPath(active, from, to)
-  }))
-  return { ...layout, groups }
 }
 
 export function clampSplit(split: number): number {

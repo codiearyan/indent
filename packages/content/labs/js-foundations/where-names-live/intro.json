@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "I wrote these. Why do they fail?", "note": "Four functions, four problems." },
+    { "title": "Order abroad", "rows": [["Zone", "abroad"], ["Weight", "1500 g"]] },
+    {
+      "title": "Your code",
+      "file": "scope.js",
+      "mine": true,
+      "gap": "Names used where they don't live",
+      "tasks": ["Keep the wrap inside", "Let the sale price out", "Use the given zone", "Hand the note back"]
+    },
+    { "title": "Packing table", "text": "A label, a price, a note and a box." }
+  ],
+  "ticket": { "label": "Order abroad", "wrong": "by hand", "why": "Wrong zone", "right": "sent right" },
+  "captions": [
+    "Loops are done. Over the weekend Theo wrote four functions of his own.",
+    "One crashes, and an order abroad is marked for hand delivery.",
+    "You fix where each name is made and used, in four small tasks.",
+    "Now the order abroad gets the right note, its own label and its own box.",
+    "Every name lives in its braces, and each function uses what it is given."
+  ]
+}

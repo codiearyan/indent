@@ -1,0 +1,112 @@
+{
+  "id": "code-that-throws",
+  "title": "When code says no",
+  "files": ["src/orders.test.js", "src/orders.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here and read what they say.",
+    "suggestedCommand": "npx vitest run src/orders.test.js"
+  },
+  "tasks": [
+    {
+      "id": "size",
+      "title": "Test that an unknown size is turned away",
+      "file": "src/orders.test.js",
+      "description": "The farm sells small, medium and large boxes. In the `unknown size` block of `src/orders.test.js`, test that `placeOrder` throws an error for an order whose size the farm does not sell, such as `'huge'`.\n\nCheck runs your tests on the working code and on versions that take any size, or only turn away an order with no size. A test in this block must pass on the first and fail on the others.",
+      "nextSteps": [
+        "Read `placeOrder` in `orders.js` and find the size rule.",
+        "Make an order that is good in every way except its size.",
+        "Hand the call to `expect` the way the lesson shows, and expect it to throw.",
+        "Run the tests."
+      ],
+      "hints": [
+        "If you call `placeOrder` directly inside `expect(...)`, the error is thrown before `expect` can see it, and the test fails.",
+        "Wrap the call in a function, `() => placeOrder(order)`, and give that function to `expect`.",
+        "Write `expect(() => placeOrder({ ...order, size: 'huge' })).toThrow()`."
+      ],
+      "docs": [
+        { "title": "toThrow", "url": "https://vitest.dev/api/expect#tothrow" },
+        {
+          "title": "throw",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw"
+        },
+        {
+          "title": "Arrow function expressions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "eggs",
+      "title": "Test the kind of error for bad eggs",
+      "file": "src/orders.test.js",
+      "description": "Eggs come in whole dozens. A negative number of dozens is a number out of range, so `placeOrder` throws a `RangeError` for it, and the order form shows a different message for that kind of error.\n\nIn the `bad eggs` block, test that an order with `-1` dozens throws a `RangeError`, not just any error.\n\nCheck runs your tests on the working code and on versions that take negative dozens or throw a plain `Error`. A test in this block must pass on the first and fail on the others.",
+      "nextSteps": [
+        "Find the eggs rule in `placeOrder` and the kind of error it throws.",
+        "Make a good order with `-1` dozens.",
+        "Expect the call to throw, and say which kind of error.",
+        "Run the tests."
+      ],
+      "hints": [
+        "`toThrow()` with nothing in the brackets passes for any error at all.",
+        "The lesson shows what to put in the brackets of `toThrow` to check the kind of error.",
+        "Write `expect(() => placeOrder({ ...order, dozens: -1 })).toThrow(RangeError)`."
+      ],
+      "docs": [
+        { "title": "toThrow", "url": "https://vitest.dev/api/expect#tothrow" },
+        {
+          "title": "RangeError",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "village",
+      "title": "Test that the error names the village",
+      "file": "src/orders.test.js",
+      "description": "The farm delivers to four villages. When someone orders from further away, Effie reads the error to see where they live. In the `far village` block, test that an order from a village the farm does not deliver to throws an error whose message names that village.\n\nCheck runs your tests on the working code and on versions that deliver anywhere, or say no without naming the village. A test in this block must pass on the first and fail on the others.",
+      "nextSteps": [
+        "Find the list of villages in `orders.js`.",
+        "Make a good order from a village that is not on it.",
+        "Expect the call to throw, and check the message for the village's name.",
+        "Run the tests."
+      ],
+      "hints": [
+        "A test that only checks that something was thrown passes even when the message is no help to Effie.",
+        "Text in the brackets of `toThrow` checks that the error's message contains that text.",
+        "Write `expect(() => placeOrder({ ...order, village: 'Hexley' })).toThrow('Hexley')`, with a village of your own."
+      ],
+      "docs": [
+        { "title": "toThrow", "url": "https://vitest.dev/api/expect#tothrow" },
+        {
+          "title": "Error: message",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/message"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "good",
+      "title": "Test that a good order goes through",
+      "file": "src/orders.test.js",
+      "description": "Rules that say no can easily say no too often. In the `good order` block, test that a good order with eggs in it, such as a medium box with 2 dozen eggs for Tarrow, does not throw and comes back exactly as it was asked.\n\nCheck runs your tests on the working code and on versions that turn away every order with eggs, or drop the eggs. A test in this block must pass on the first and fail on the others.",
+      "nextSteps": [
+        "Make a good order: a size the farm sells, whole dozens, a village on the list.",
+        "Call `placeOrder` with it.",
+        "Compare what comes back with the order you sent.",
+        "Run the tests."
+      ],
+      "hints": [
+        "If `placeOrder` throws, the test fails by itself, so a plain call already checks that nothing was thrown.",
+        "Checking only that nothing was thrown misses a version that quietly changes the order. Compare what comes back too.",
+        "Write `expect(placeOrder(order)).toEqual(order)` with an order that has eggs in it."
+      ],
+      "docs": [
+        { "title": "toEqual", "url": "https://vitest.dev/api/expect#toequal" },
+        { "title": "not", "url": "https://vitest.dev/api/expect#not" }
+      ],
+      "points": 10
+    }
+  ]
+}

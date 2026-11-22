@@ -1,0 +1,125 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "orders", "label": "Orders table", "kind": "data" },
+      { "id": "reproduce", "label": "reproduceNoteMarkup()", "kind": "function", "mine": true, "fn": "reproduceNoteMarkup" },
+      { "id": "card", "label": "renderOrderCard()", "kind": "function", "mine": true, "fn": "renderOrderCard" },
+      { "id": "board", "label": "Staff board", "kind": "story" },
+      { "id": "ticket", "label": "AP-15", "kind": "story" },
+      { "id": "test", "label": "orderCard.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "orders", "to": "card", "label": "an order" },
+      { "from": "reproduce", "to": "card", "label": "an order" },
+      { "from": "card", "to": "board", "label": "HTML" },
+      { "from": "board", "to": "ticket", "label": "missing words" },
+      { "from": "test", "to": "card", "label": "orders" }
+    ],
+    "note": "Every order card on the portal comes from renderOrderCard(), and words customers typed are turning into HTML on the staff board."
+  },
+  "tasks": {
+    "reproduce": {
+      "trace": { "file": "src/reproduce.js", "call": "reproduceNoteMarkup", "args": [] },
+      "steps": [
+        {
+          "active": ["reproduce"],
+          "value": {
+            "kind": "map",
+            "label": "an order",
+            "entries": [
+              { "key": "id", "value": "a number" },
+              { "key": "title", "value": "typed by the customer" },
+              { "key": "status", "value": "set by the shop" },
+              { "key": "customerName", "value": "typed by the customer" },
+              { "key": "note", "value": "typed by the customer" }
+            ]
+          },
+          "note": "reproduceNoteMarkup() makes an order whose title, name or note holds text a browser reads as HTML."
+        },
+        {
+          "active": ["reproduce", "reproduce->card", "card"],
+          "note": "It runs the order through the original renderOrderCard() and keeps the HTML, untouched."
+        },
+        {
+          "active": ["card", "card->board", "board", "board->ticket", "ticket"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "order", "value": "the order" },
+              { "key": "html", "value": "the card, as text" }
+            ]
+          },
+          "note": "The order and its card go on AP-15. The proof is that the board builds something other than what the customer typed."
+        }
+      ]
+    },
+    "fix": {
+      "trace": {
+        "file": "src/orderCard.js",
+        "call": "renderOrderCard",
+        "args": [
+          {
+            "id": 2046,
+            "title": "Gig posters",
+            "status": "proof sent",
+            "customerName": "Yusra Penhallow",
+            "note": "Size A2 <not A3>."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "active": ["orders", "orders->card", "card"],
+          "value": {
+            "kind": "map",
+            "label": "order 2046",
+            "entries": [
+              { "key": "title", "value": "Gig posters" },
+              { "key": "customerName", "value": "Yusra Penhallow" },
+              { "key": "note", "value": "Size A2 <not A3>." }
+            ]
+          },
+          "note": "Yusra's order reaches renderOrderCard() with the note just as she typed it."
+        },
+        {
+          "active": ["card"],
+          "note": "Every value is written so the browser shows it as text, at the moment it goes into the card, the note field included."
+        },
+        {
+          "active": ["card", "card->board", "board"],
+          "note": "The staff board shows the title, the name and the note exactly as typed, and the card has only the tags the shop wrote."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->card", "card"],
+          "note": "orderCard.test.js renders cards for notes with a tag and with a quote, and reads them back the way a browser would."
+        },
+        {
+          "active": ["test", "card", "board", "board->ticket", "ticket"],
+          "note": "First it runs beside the original renderOrderCard(), the one behind AP-15. There it must fail."
+        },
+        {
+          "active": ["test", "card"],
+          "note": "Then it runs beside a correct fix, where it must pass."
+        },
+        {
+          "active": ["test", "card"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the test file",
+            "entries": [
+              { "key": "original orderCard.js", "value": "must fail" },
+              { "key": "a correct fix", "value": "must pass" },
+              { "key": "escapes all but quotes", "value": "must fail" }
+            ]
+          },
+          "note": "Last it runs beside a fix that escapes angle brackets and ampersands but not quotes. That one must fail too."
+        }
+      ]
+    }
+  }
+}

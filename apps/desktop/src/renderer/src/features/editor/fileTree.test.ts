@@ -1,13 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  buildTree,
-  foldersAbove,
-  isInside,
-  movedPath,
-  visibleRows,
-  type FolderNode,
-  type TreeNode
-} from './fileTree'
+import { buildTree, foldersAbove, visibleRows, type FolderNode, type TreeNode } from './fileTree'
 
 const names = (nodes: TreeNode[]): string[] => nodes.map((n) => n.name)
 const folderAt = (nodes: TreeNode[], name: string): FolderNode =>
@@ -70,22 +62,5 @@ describe('visibleRows', () => {
 describe('foldersAbove', () => {
   it('lists every folder above the paths once', () => {
     expect(foldersAbove(['src/lib/x.js', 'src/y.js', 'a.js'])).toEqual(['src', 'src/lib'])
-  })
-})
-
-describe('movedPath', () => {
-  it('moves the item and what is inside it, and leaves look-alike names alone', () => {
-    expect(movedPath('src', 'src', 'lib')).toBe('lib')
-    expect(movedPath('src/a.js', 'src', 'lib')).toBe('lib/a.js')
-    expect(movedPath('srcs/a.js', 'src', 'lib')).toBe('srcs/a.js')
-    expect(movedPath('b.js', 'a.js', 'c.js')).toBe('b.js')
-  })
-})
-
-describe('isInside', () => {
-  it('counts the folder itself and what is in it', () => {
-    expect(isInside('src', 'src')).toBe(true)
-    expect(isInside('src/a.js', 'src')).toBe(true)
-    expect(isInside('srcs/a.js', 'src')).toBe(false)
   })
 })

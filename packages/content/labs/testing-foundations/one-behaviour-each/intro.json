@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Effie",
+      "say": "Which rule broke this time?",
+      "note": "She changed how pauses work."
+    },
+    {
+      "title": "Lorcan's test",
+      "text": "One test for all rules. It just says failed."
+    },
+    {
+      "title": "Your tests",
+      "file": "weekly.test.js",
+      "mine": true,
+      "gap": "No test names the rule",
+      "tasks": [
+        "Test a paused week",
+        "Test a fortnight box",
+        "Test a size change",
+        "One rule in each test"
+      ]
+    },
+    {
+      "title": "Terminal",
+      "text": "The failing test's name says which rule."
+    }
+  ],
+  "ticket": {
+    "label": "Failure",
+    "wrong": "says nothing",
+    "why": "No clue",
+    "right": "names the rule"
+  },
+  "captions": [
+    "Effie changed the subscription code, and a test failed without saying why.",
+    "Lorcan's one test checks every rule at once, so its failure cannot name the cause.",
+    "You write one test per rule, grouped and named, and split Lorcan's test.",
+    "Now when a rule breaks, the failing test's name says which rule it was.",
+    "Same code, same rules. The terminal tells Effie where to look."
+  ]
+}

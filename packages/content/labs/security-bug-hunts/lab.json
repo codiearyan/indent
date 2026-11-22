@@ -1,0 +1,13 @@
+{
+  "id": "security-bug-hunts",
+  "title": "JavaScript security bug hunts",
+  "description": "Ashgrove Press is a two-press letterpress shop whose customer portal grew over a few weekends without anyone asking what an unfriendly user might type. As its new developer you work through five tickets, each a security hole in ordinary code: prove it, close it at the cause, and write the test that keeps it closed. You learn to pass values apart from queries, escape what goes into a page, check who owns what, keep file names inside their folder and keep secrets out of logs.",
+  "category": "Interview bug cases",
+  "language": "javascript",
+  "tags": ["JavaScript", "Security"],
+  "kind": "bug-hunt",
+  "parts": [
+    { "title": "Input that changes the code", "chapters": ["search-leak", "notes-as-html"] },
+    { "title": "Data that reaches the wrong person", "chapters": ["peeking-orders", "proof-escape", "leaky-log"] }
+  ]
+}
