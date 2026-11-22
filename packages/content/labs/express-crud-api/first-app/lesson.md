@@ -2,18 +2,18 @@
 
 ## What you will be able to do
 
-Copperleaf Pottery is a small studio with six wheels, two long tables and a kiln out the back. It runs evening and weekend workshops, and every place is still booked on a paper sheet by the door. You are the developer the studio hired to build the JSON API behind its new sign-up page, with Express. By the end of this issue you will be able to:
+Kilnworth Pottery is a small studio on Saddler Street with six wheels, two long tables and a kiln out the back. It is the studio whose first web page is written in the HTML and CSS foundations repo. It runs evening and weekend workshops, and every place is still booked on a paper sheet by the door. You are the developer the studio hired to build the JSON API behind its new sign-up page, with Express. By the end of this issue you will be able to:
 
 - create an Express app and keep it apart from the server that listens
 - add a route for a method and a path
 - answer with JSON and the status you choose
 - give every request nobody answered a clear 404 in JSON
 
-## The request from Nadia
+## The request from Dilys
 
-Nadia Osei owns Copperleaf and teaches most of the wheel classes. Her first note is short.
+Dilys owns Kilnworth, and Kofi teaches most of its classes. Her first note is short.
 
-> **Nadia:** Ivo is building the sign-up page. Before anything else he needs two things from you: a way to tell the API is running, and the list of this week's workshops. And please, when he asks for something that does not exist, tell him in a way his page can read.
+> **Dilys:** Ivo is building the sign-up page. Before anything else he needs two things from you: a way to tell the API is running, and the list of this week's workshops. And please, when he asks for something that does not exist, tell him in a way his page can read.
 
 That is two routes, `GET /health` and `GET /workshops`, and one rule for everything else.
 

@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Your API now answers with every workshop at Copperleaf Pottery. A sign-up page needs more than one long list, though: a page per workshop, and a way to narrow the list down. By the end of this issue you will be able to:
+Your API now answers with every workshop at Kilnworth Pottery. A sign-up page needs more than one long list, though: a page per workshop, and a way to narrow the list down. By the end of this issue you will be able to:
 
 - put a value in the path with a route parameter and read it with `req.params`
 - read optional filters from the query string with `req.query`

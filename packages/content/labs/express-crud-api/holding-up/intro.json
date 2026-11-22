@@ -30,7 +30,7 @@
     "right": "a JSON 400"
   },
   "captions": [
-    "Ivo sent half a body by mistake, and Nadia wants only staff to change workshops.",
+    "Ivo sent half a body by mistake, and Dilys wants only staff to change workshops.",
     "Today the error comes back as HTML full of file paths, and anyone can delete.",
     "You add a router, a staff check and one error handler that answers in JSON.",
     "Now half a body gets a short JSON 400 the sign-up page can show.",
