@@ -1,0 +1,215 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "bryn",
+        "label": "Bryn",
+        "kind": "story"
+      },
+      {
+        "id": "refs",
+        "label": "refLine()",
+        "kind": "function",
+        "mine": true,
+        "fn": "refLine"
+      },
+      {
+        "id": "zone",
+        "label": "zoneFee()",
+        "kind": "function",
+        "mine": true,
+        "fn": "zoneFee"
+      },
+      {
+        "id": "status",
+        "label": "nextStatus()",
+        "kind": "function",
+        "mine": true,
+        "fn": "nextStatus"
+      },
+      {
+        "id": "deliveries",
+        "label": "Today's deliveries",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "courier",
+        "label": "Courier",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "bryn",
+        "to": "refs",
+        "label": "a ref"
+      },
+      {
+        "from": "bryn",
+        "to": "zone",
+        "label": "a zone"
+      },
+      {
+        "from": "bryn",
+        "to": "status",
+        "label": "a status"
+      },
+      {
+        "from": "bryn",
+        "to": "deliveries",
+        "label": "parcels"
+      },
+      {
+        "from": "zone",
+        "to": "courier",
+        "label": "fee"
+      },
+      {
+        "from": "deliveries",
+        "to": "courier",
+        "label": "how each goes"
+      }
+    ],
+    "note": "Each value of the delivery code allows a few kinds, and exactly those, so a word nobody uses is refused before a parcel goes out."
+  },
+  "tasks": {
+    "refs": {
+      "trace": {
+        "file": "src/delivery.ts",
+        "call": "refLine",
+        "args": [977]
+      },
+      "steps": [
+        {
+          "active": ["bryn", "bryn->refs"],
+          "value": {
+            "kind": "map",
+            "label": "a ref",
+            "entries": [
+              {
+                "key": "ref",
+                "value": "number, or text"
+              }
+            ]
+          },
+          "note": "An old order has a number for a ref, like 977, and a new one has text."
+        },
+        {
+          "active": ["refs"],
+          "note": "The parameter takes either kind, so both old and new orders get through, and nothing else does."
+        },
+        {
+          "active": ["refs"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              {
+                "key": "line",
+                "value": "text"
+              }
+            ]
+          },
+          "note": "Either kind of ref comes back as one line of text."
+        }
+      ]
+    },
+    "zone": {
+      "trace": {
+        "file": "src/delivery.ts",
+        "call": "zoneFee",
+        "args": ["national"]
+      },
+      "steps": [
+        {
+          "active": ["bryn", "bryn->zone"],
+          "value": {
+            "kind": "map",
+            "label": "a zone",
+            "entries": [
+              {
+                "key": "zone",
+                "value": "one of three words"
+              }
+            ]
+          },
+          "note": "The courier knows three zones, written exactly one way."
+        },
+        {
+          "active": ["zone"],
+          "note": "A parcel to the national zone gets its fee. A word with a capital, or one the courier does not know, is refused before the call runs."
+        },
+        {
+          "active": ["zone", "zone->courier", "courier"],
+          "note": "The courier is paid the fee for the zone the parcel really goes to."
+        }
+      ]
+    },
+    "status": {
+      "trace": {
+        "file": "src/delivery.ts",
+        "call": "nextStatus",
+        "args": ["paid"]
+      },
+      "steps": [
+        {
+          "active": ["bryn", "bryn->status"],
+          "value": {
+            "kind": "map",
+            "label": "a status",
+            "entries": [
+              {
+                "key": "status",
+                "value": "one of three words, in order"
+              }
+            ]
+          },
+          "note": "An order moves through three statuses, one after the other."
+        },
+        {
+          "active": ["status"],
+          "note": "A paid order is packed next. What comes back must be one of the three words too."
+        },
+        {
+          "active": ["status"],
+          "note": "A word the shop does not use is refused where the function gives it back, before an email goes out."
+        }
+      ]
+    },
+    "delivery": {
+      "steps": [
+        {
+          "active": ["bryn", "bryn->deliveries", "deliveries"],
+          "value": {
+            "kind": "map",
+            "label": "three ways a parcel goes",
+            "entries": [
+              {
+                "key": "post",
+                "value": "an address"
+              },
+              {
+                "key": "locker",
+                "value": "a locker number"
+              },
+              {
+                "key": "collect",
+                "value": "nothing more"
+              }
+            ]
+          },
+          "note": "Each of today's parcels goes one of three ways, and each way needs something different."
+        },
+        {
+          "active": ["deliveries"],
+          "note": "Each way has its own kind, so the compiler knows what a parcel needs from its kind alone."
+        },
+        {
+          "active": ["deliveries", "deliveries->courier", "courier"],
+          "note": "A locker parcel whose number sits in the wrong field is refused, so the courier never gets a label without it."
+        }
+      ]
+    }
+  }
+}

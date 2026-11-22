@@ -1,0 +1,129 @@
+{
+  "id": "unions-and-literals",
+  "title": "One of a few kinds",
+  "files": ["src/delivery.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/delivery.ts` runs the delivery code, and `npm run types` checks its types.",
+    "suggestedCommand": "npm run types"
+  },
+  "tasks": [
+    {
+      "id": "refs",
+      "title": "Take old and new order refs",
+      "file": "src/delivery.ts",
+      "description": "Under `// Task 1` in `src/delivery.ts`, give the parameter of `refLine` a type that takes an old ref, which is a number like `977`, or a new one, which is text like `'OK-1042'`. Write its result type, and leave its body as it is. Then write the type of `todaysRefs`: a list in which each entry is a ref of either kind.\n\nCheck reads your lines for the result type of `refLine` and the type of `todaysRefs`. It compiles code of its own: refs of both kinds passed to `refLine` and added to `todaysRefs` must compile, while true or false, a list passed as one ref, a ref line used as a number or true or false added to the list must be refused. It calls `refLine` with refs of its own.",
+      "nextSteps": [
+        "Write a union of the two types after the parameter of `refLine`, and its result type after the round brackets.",
+        "Write the type of `todaysRefs` after its name: a list of that union.",
+        "If the compiler says a list is not assignable to `number[]`, read the lesson's part on brackets.",
+        "Run both commands again."
+      ],
+      "hints": [
+        "A union type is two or more types with `|` between them, read as \"or\". A value of any one of them fits.",
+        "`string | number[]` means text, or a list of numbers. For a list whose entries can be either, the union needs round brackets around it before the `[]`.",
+        "`refLine(ref: string | number): string` and `todaysRefs: (string | number)[]`."
+      ],
+      "docs": [
+        {
+          "title": "Union types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types"
+        },
+        {
+          "title": "Arrays",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#arrays"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "zone",
+      "title": "Allow exactly three zones",
+      "file": "src/delivery.ts",
+      "description": "Under `// Task 2`, write a type called `Zone`, with `export` in front, that allows exactly the three words `'local'`, `'national'` and `'europe'`, and nothing else. Use it as the type of the parameter of `zoneFee`, and leave its body as it is. Then read what the compiler says about the calls under it, and fix the one it points at.\n\nCheck reads `zoneFee` for `Zone` in its parameter. It compiles code of its own: each of the three zones must compile, while `'Local'` with a capital, a zone the courier does not know, or a value typed as any text, must be refused. It calls `zoneFee` with zones of its own.",
+      "nextSteps": [
+        "Write the type alias above `zoneFee`, with the three words joined by `|`.",
+        "Use `Zone` on the parameter of `zoneFee`.",
+        "Run `npm run types` and read the error for the second call.",
+        "Fix that call, and run both commands again."
+      ],
+      "hints": [
+        "A word in quotes can be a type of its own: the type that allows exactly that text and nothing else.",
+        "Join the three word types with `|`, as in any union. Text that only looks like a zone, with a capital or a space, is then refused.",
+        "`export type Zone = 'local' | 'national' | 'europe'`, then `zoneFee(zone: Zone)`, and the call becomes `zoneFee('local')`."
+      ],
+      "docs": [
+        {
+          "title": "Literal types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types"
+        },
+        {
+          "title": "Literal inference",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-inference"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "status",
+      "title": "Give back only a real status",
+      "file": "src/delivery.ts",
+      "description": "Under `// Task 3`, write a type called `Status`, with `export` in front, that allows exactly `'paid'`, `'packed'` and `'sent'`. Use it for the parameter of `nextStatus` and as its result type. Then read what the compiler says about the body, and fix the line it points at. `nextStatus` gives `'packed'` after `'paid'`, `'sent'` after `'packed'`, and `'sent'` after `'sent'`.\n\nCheck reads `nextStatus` for `Status` in its parameter and for its result type. It compiles code of its own: each of the three statuses must compile, and so must what `nextStatus` gives back used as one of the three words, while a status the shop does not use, `'Sent'` with a capital or a status used as a number must be refused. It calls `nextStatus` with each status.",
+      "nextSteps": [
+        "Write `Status` above `nextStatus`, like `Zone` in the task before.",
+        "Use it after the parameter and after the round brackets.",
+        "Run `npm run types` and read the error inside the body.",
+        "Fix that line, and run both commands again."
+      ],
+      "hints": [
+        "A result type checks every `return` in the body. With a result type of three words, a fourth word is refused.",
+        "`Type '\"shipped\"' is not assignable to type 'Status'` means one `return` gives a word that is not one of the three.",
+        "The first line is `export function nextStatus(status: Status): Status {`, and the second `return` gives `'sent'`."
+      ],
+      "docs": [
+        {
+          "title": "Literal types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types"
+        },
+        {
+          "title": "Return type annotations",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#return-type-annotations"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "delivery",
+      "title": "Write the delivery type whole",
+      "file": "src/delivery.ts",
+      "description": "Under `// Task 4`, write a type called `Delivery`, with `export` in front, from the word `type` to its end. It is one of three object shapes:\n\n- by post: `kind` is `'post'`, and `address` is text\n- to a parcel locker: `kind` is `'locker'`, and `locker` is the locker's number, as text\n- collected at the shop: `kind` is `'collect'`, and nothing else\n\nThen write the type of `todaysDeliveries`: a list of `Delivery`. Read what the compiler says about it, and fix the entry it points at, keeping its locker number.\n\nCheck reads your lines for the type of `todaysDeliveries`. It compiles code of its own: a delivery of each kind, with what that kind needs, and its kind read as one of the three words, which must compile, and a locker delivery without its number, a post delivery with a locker number, a kind the shop does not use, `'Locker'` with a capital or text added to the list, which must be refused. It reads `todaysDeliveries` after your lines.",
+      "nextSteps": [
+        "Write one object shape for each way, each with its own exact `kind`.",
+        "Join the three shapes into one type with `|`.",
+        "Write the type of `todaysDeliveries`, then run `npm run types` and read the error for the list.",
+        "Fix that entry, and run both commands again."
+      ],
+      "hints": [
+        "The kind of each shape is a word type, so each shape allows only its own word. That is how the compiler tells the three apart.",
+        "A union can join object shapes, just as it joins words. A value fits when it fits one of the shapes whole: its kind, and the property that kind needs.",
+        "`export type Delivery = { kind: 'post'; address: string } | { kind: 'locker'; locker: string } | { kind: 'collect' }`, and the second entry gets `locker:` instead of `address:`."
+      ],
+      "docs": [
+        {
+          "title": "Union types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types"
+        },
+        {
+          "title": "Discriminated unions",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Union types",
+          "url": "https://www.youtube.com/watch?v=5eDUCK327cY"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

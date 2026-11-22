@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Bryn",
+      "say": "Why was a local parcel charged more?",
+      "note": "Someone typed Local."
+    },
+    {
+      "title": "Delivery code",
+      "text": "Lets any text through as a zone."
+    },
+    {
+      "title": "Your types",
+      "file": "delivery.ts",
+      "mine": true,
+      "gap": "Any word is let through",
+      "tasks": [
+        "Old and new refs",
+        "Exactly three zones",
+        "Only real statuses",
+        "Three ways to deliver"
+      ]
+    },
+    {
+      "title": "Courier",
+      "text": "Charges by the zone the code gives it."
+    }
+  ],
+  "ticket": {
+    "label": "OK-1042",
+    "wrong": "abroad price",
+    "why": "Any text",
+    "right": "local fee"
+  },
+  "captions": [
+    "Bryn asks why a local parcel from Oakhollow was charged as if it went abroad.",
+    "Someone typed Local with a capital, and the code took it as a zone it did not know.",
+    "You write types that allow a few kinds of value, and exactly those.",
+    "Now a zone with a capital is refused before the parcel goes out.",
+    "Zones, statuses and deliveries only take the words the shop really uses."
+  ]
+}
