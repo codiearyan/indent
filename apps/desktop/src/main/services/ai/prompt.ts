@@ -265,7 +265,7 @@ export function withInstructions(system: string, prompt: string): string {
   return `<instructions>\n${system}\n</instructions>\n\n${prompt}`
 }
 
-export const COMPLETION_RULES = `You are an inline code completion engine in a learning app. Reply with only the code to insert at <cursor/>: no explanation, no markdown fences, no text that repeats what is already before or after the cursor. Insert at most a few lines, usually finishing the current line or statement. Never write a whole function body or a whole task answer in one go; the learner is practicing. If nothing useful fits, reply with nothing.
+export const COMPLETION_RULES = `You are an inline code completion engine in a learning app. Reply with only the code to insert at <cursor/>: no explanation, no markdown fences or backticks around it, no text that repeats what is already before or after the cursor. Insert at most a few lines, usually finishing the current line or statement. Never write a whole function body or a whole task answer in one go; the learner is practicing. If nothing useful fits, reply with nothing.
 
 When a task is given, it is the one the learner is working on. Suggest only the next small step toward it from where the cursor is, one or two lines, and leave the rest to the learner. Never write code that would make the task pass on its own: no whole function body, no complete loop or calculation the task asks for. If checks are failing, a step may move toward what they name, but never fix all of it at once.`
 
@@ -312,6 +312,9 @@ const MAX_COMPLETION_LINES = 6
 /** Strips fences and chatter models add anyway, and keeps the suggestion short. */
 export function cleanCompletion(raw: string): string {
   let text = raw.replace(/^\s*```[\w-]*\n?/, '').replace(/\n?```\s*$/, '')
+  // A one-line reply wrapped like inline code; a template literal with ${} is left alone.
+  const inline = /^\s*`([^`\n]+)`\s*$/.exec(text)
+  if (inline && !inline[1].includes('${')) text = inline[1]
   if (!text.trim()) return ''
   text = text.split('\n').slice(0, MAX_COMPLETION_LINES).join('\n')
   return text.replace(/\s+$/, '')

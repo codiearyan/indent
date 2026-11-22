@@ -230,6 +230,9 @@ describe('completions', () => {
   it('strips fences and keeps a few lines', () => {
     expect(cleanCompletion('```ts\nconst a = 1\n```')).toBe('const a = 1')
     expect(cleanCompletion('   \n')).toBe('')
+    expect(cleanCompletion('`services.getSailing(route)`')).toBe('services.getSailing(route)')
+    expect(cleanCompletion('`Hi ${name}`')).toBe('`Hi ${name}`')
+    expect(cleanCompletion('a + `b`')).toBe('a + `b`')
     expect(
       cleanCompletion(Array.from({ length: 20 }, (_, i) => `l${i}`).join('\n')).split('\n')
     ).toHaveLength(6)
