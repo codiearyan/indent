@@ -1,0 +1,110 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "imogen", "label": "Imogen", "kind": "story" },
+      { "id": "sheet", "label": "order-sheet.ts", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "node", "label": "Node", "kind": "story" },
+      { "id": "table", "label": "Packing table", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "imogen", "to": "sheet", "label": "types" },
+      { "from": "sheet", "to": "compiler", "label": "values, promises" },
+      { "from": "sheet", "to": "node", "label": "code only" },
+      { "from": "node", "to": "table", "label": "order sheet" }
+    ],
+    "note": "Imogen's types are promises. The compiler compares them with the code and Node runs the code without them, so you read the compiler to fix what Node gets wrong."
+  },
+  "tasks": {
+    "shelf": {
+      "steps": [
+        {
+          "active": ["sheet", "sheet->node", "node", "node->table", "table"],
+          "note": "Node runs the Task 1 lines without looking at the types, and the count of tins after the delivery comes out wrong."
+        },
+        {
+          "active": ["sheet", "sheet->compiler", "compiler"],
+          "value": {
+            "kind": "array",
+            "label": "the parts of a type error",
+            "values": ["file, line, column", "error code", "message", "copy of the line", "marks"]
+          },
+          "note": "The compiler compares the value of the tins on the shelf with the type it was promised, and says where they disagree."
+        },
+        {
+          "active": ["compiler", "imogen"],
+          "note": "The type says what Imogen meant, so the line is what changes."
+        }
+      ]
+    },
+    "grams": {
+      "steps": [
+        {
+          "active": ["sheet", "sheet->node", "node"],
+          "note": "Node asks the order for something it does not have, gets nothing back, and the grams come out as NaN."
+        },
+        {
+          "active": ["sheet", "sheet->compiler", "compiler"],
+          "value": {
+            "kind": "map",
+            "label": "what the order has",
+            "entries": [
+              { "key": "id", "value": "string" },
+              { "key": "blend", "value": "string" },
+              { "key": "tins", "value": "number" },
+              { "key": "gramsPerTin", "value": "number" },
+              { "key": "zone", "value": "string" }
+            ]
+          },
+          "note": "The compiler knows every property the order has, and says the one asked for is not among them."
+        },
+        {
+          "active": ["node", "node->table", "table"],
+          "note": "With the right property, the order sheet shows how much tea the order holds."
+        }
+      ]
+    },
+    "label": {
+      "steps": [
+        {
+          "active": ["sheet", "sheet->node", "node", "node->table", "table"],
+          "note": "The label on the tin comes out with the weight where the blend should be."
+        },
+        {
+          "active": ["sheet", "sheet->compiler", "compiler"],
+          "value": {
+            "kind": "array",
+            "label": "what the label function takes",
+            "values": ["blend: string", "grams: number"]
+          },
+          "note": "The compiler lines up each value in the call with the parameter that receives it, and one does not fit."
+        },
+        {
+          "active": ["node", "node->table", "table"],
+          "note": "Once the call matches the parameters, the tin gets a label Bryn can use."
+        }
+      ]
+    },
+    "shipping": {
+      "steps": [
+        {
+          "active": ["sheet", "sheet->node", "node", "node->table", "table"],
+          "note": "Every order pays the shipping for abroad, whatever its zone."
+        },
+        {
+          "active": ["sheet", "sheet->compiler", "compiler"],
+          "value": {
+            "kind": "array",
+            "label": "what the shipping function takes",
+            "values": ["grams: number", "zone: string"]
+          },
+          "note": "The compiler counts the values in the call and finds one missing, and a note under the error names it."
+        },
+        {
+          "active": ["node", "node->table", "table"],
+          "note": "With both values passed, the shipping follows the order's weight and zone."
+        }
+      ]
+    }
+  }
+}

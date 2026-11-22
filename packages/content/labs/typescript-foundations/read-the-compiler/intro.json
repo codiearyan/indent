@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Imogen", "say": "Why does the sheet print nonsense?", "note": "Rafe's code has types now." },
+    { "title": "Node", "text": "Runs the code and never looks at the types." },
+    {
+      "title": "Your fixes",
+      "file": "order-sheet.ts",
+      "mine": true,
+      "gap": "Four lines break their types",
+      "tasks": ["Fix the tins", "Fix the grams", "Fix the label", "Fix the shipping"]
+    },
+    { "title": "Packing table", "text": "Bryn packs order OK-1042 from the sheet." }
+  ],
+  "ticket": { "label": "OK-1042", "wrong": "NaN grams", "why": "No checking", "right": "ready to pack" },
+  "captions": [
+    "Oakhollow Tea Company. Imogen asks why the order sheet still prints nonsense.",
+    "Node runs the sheet without a look at the types, so order OK-1042 comes out wrong.",
+    "You read what the compiler says about four lines, and fix each line.",
+    "Now the compiler is quiet, and order OK-1042 reaches the packing table right.",
+    "The types were promises all along, and now the code keeps them."
+  ]
+}

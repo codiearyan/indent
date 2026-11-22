@@ -1,0 +1,133 @@
+{
+  "id": "types-for-functions",
+  "title": "Types for functions",
+  "files": ["src/pricing.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/pricing.ts` runs the price list, and `npm run types` checks its types.",
+    "suggestedCommand": "npm run types"
+  },
+  "tasks": [
+    {
+      "id": "price",
+      "title": "Type the price of a tin",
+      "file": "src/pricing.ts",
+      "description": "Under `// Task 1` in `src/pricing.ts`, the compiler refuses the parameters of `tinPrice`, because nothing says what they are. Give `grams` and `pencePer100g` their types, and write the type of what `tinPrice` gives back. Leave its body as it is.\n\nCheck reads your function for the result type. It compiles it with calls of its own: right calls must compile, and calls that pass text or use the price as text must be refused. It calls `tinPrice` with prices of its own.",
+      "nextSteps": [
+        "Run `npm run types` and read the two errors for the line of `tinPrice`.",
+        "Write a type after each parameter, the way you wrote one after a variable.",
+        "Write the result type after the closing round bracket of the parameters, before the `{`.",
+        "Run both commands again."
+      ],
+      "hints": [
+        "`Parameter 'grams' implicitly has an 'any' type` means the compiler does not know what `grams` is, and will not guess for a parameter.",
+        "A parameter gets its type the same way a variable does: the name, a colon, the type. The result type goes after the `)` of the parameters, also after a colon.",
+        "`export function tinPrice(grams: number, pencePer100g: number): number {`."
+      ],
+      "docs": [
+        {
+          "title": "Parameter type annotations",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#parameter-type-annotations"
+        },
+        {
+          "title": "Return type annotations",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#return-type-annotations"
+        },
+        {
+          "title": "noImplicitAny",
+          "url": "https://www.typescriptlang.org/tsconfig/#noImplicitAny"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Types for parameters and results",
+          "url": "https://www.youtube.com/watch?v=jXoSaX_yFh4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "label",
+      "title": "Give the label a usual size",
+      "file": "src/pricing.ts",
+      "description": "Under `// Task 2`, give `tinLabel` its types: a blend that is text, grams that are a number, and a result that is text. Most tins hold 100 g, so make the grams something a call may leave out: `tinLabel('Morning Keemun')` gives back `Morning Keemun, 100 g`.\n\nCheck reads your function for the result type. It compiles calls of its own: with and without the grams must compile, while a call with no blend, with grams as text, or using the label as a number must be refused. It calls `tinLabel` both ways.",
+      "nextSteps": [
+        "Run `npm run types` and read the errors for Task 2, including the one about the call with one argument.",
+        "Give the two parameters and the result their types.",
+        "Make the grams a parameter a call may leave out, worth 100 when it is left out.",
+        "Run both commands: the second label should read 100 g."
+      ],
+      "hints": [
+        "A parameter is required unless the function says otherwise. The lesson shows two ways to say a parameter may be left out.",
+        "A default value, written `= value` after the parameter's type, is used when the call leaves the parameter out. The compiler then lets calls skip it.",
+        "`export function tinLabel(blend: string, grams: number = 100): string {`."
+      ],
+      "docs": [
+        {
+          "title": "Optional parameters",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#optional-parameters"
+        },
+        {
+          "title": "Default parameters",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "packed",
+      "title": "Give back the packing line",
+      "file": "src/pricing.ts",
+      "description": "Under `// Task 3`, the compiler refuses the line that calls `packedLine`. Read why, then change `packedLine` so it gives back a line like `Packed 3 tins for OK-1042` instead of only printing it, and write its result type.\n\nCheck reads your function for the result type, and compiles calls of its own: using the line as text must compile, while swapping the order id and the tins, or using the line as a number, must be refused. It calls `packedLine` with orders of its own.",
+      "nextSteps": [
+        "Run `npm run types` and read the error for the line of `line`.",
+        "Point at `packedLine` in the editor: what result type did the compiler work out?",
+        "Write the result type the line should have, and read the new error.",
+        "Make the function give the line back, and run both commands again."
+      ],
+      "hints": [
+        "`void` is the type of what a function gives back when it gives nothing back. A function with no `return` has the result type `void`.",
+        "Once the result type is written, the compiler checks the body against it. A function that promises text must end with a `return` of text.",
+        "Change the result type to `: string` and the `console.log(...)` inside to `return` with the same template literal."
+      ],
+      "docs": [
+        {
+          "title": "void",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#void"
+        },
+        {
+          "title": "return",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "shipping",
+      "title": "Write the shipping function whole",
+      "file": "src/pricing.ts",
+      "description": "Under `// Task 4`, write a function called `shippingFor`, with `export` in front, from the word `function` to its closing brace. It takes the grams in an order (a number) and whether it goes express (true or false), and gives back the shipping in pence (a number), with every type written:\n\n- up to and including 500 g: `295`\n- up to and including 2000 g: `450`\n- anything heavier: `900`\n- express adds `350` to any of these\n\nThen take away the `//` in front of the line that prints it, to see it run. Check reads your function for its result type, compiles calls of its own (a call without express, or with text, must be refused), and calls it with orders on both sides of each edge.",
+      "nextSteps": [
+        "Write the first line: `export function`, the name, two typed parameters and the result type.",
+        "Work out the price from the grams, then add the express part.",
+        "Take away the `//` in front of the line under it.",
+        "Run both commands, and try a few weights of your own on the line."
+      ],
+      "hints": [
+        "A whole function is the word `function`, its name, the parameters with their types in round brackets, a colon and the result type, then the body in curly braces.",
+        "Ask about the grams from small to large with `if` and `else if`, and keep the price in a `let`. Then add 350 when `express` is true.",
+        "It starts `export function shippingFor(grams: number, express: boolean): number {`, and `grams <= 500` is the first question."
+      ],
+      "docs": [
+        {
+          "title": "More on functions",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html"
+        },
+        {
+          "title": "if...else",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

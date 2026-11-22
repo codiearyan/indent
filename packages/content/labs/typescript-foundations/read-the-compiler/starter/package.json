@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "types": "tsc --noEmit --strict --target es2022 --module nodenext --allowImportingTsExtensions --erasableSyntaxOnly --skipLibCheck --types node src/order-sheet.ts"
+  }
+}

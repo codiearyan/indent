@@ -1,0 +1,129 @@
+{
+  "id": "types-for-values",
+  "title": "Types for values",
+  "files": ["src/order-form.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/order-form.ts` runs the order form, and `npm run types` checks its types.",
+    "suggestedCommand": "node src/order-form.ts"
+  },
+  "tasks": [
+    {
+      "id": "tin",
+      "title": "Write the types of a tin",
+      "file": "src/order-form.ts",
+      "description": "Under `// Task 1` in `src/order-form.ts`, write the type of `blendName`, `gramsInTin` and `caffeineFree` after each name: the blend is text, the grams are a number, and caffeine free is true or false.\n\nCheck reads your lines for the three types. It compiles them with code of its own that uses each value as what it is, which must compile, and as something it is not, which must be refused.",
+      "nextSteps": [
+        "Point at each name in the editor and read the type the compiler worked out for it.",
+        "Write a colon and that type between the name and the `=`.",
+        "Run `npm run types`: it should print nothing.",
+        "Try a wrong type on one of them, read the error, and put the right one back."
+      ],
+      "hints": [
+        "A type annotation goes right after the name: the name, a colon, the type, then `=` and the value.",
+        "TypeScript has three types for the simplest values: one for text, one for numbers and one for true or false. Their names are written in lowercase.",
+        "The three lines start `export let blendName: string`, `export let gramsInTin: number` and `export let caffeineFree: boolean`."
+      ],
+      "docs": [
+        {
+          "title": "The primitives: string, number and boolean",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#the-primitives-string-number-and-boolean"
+        },
+        {
+          "title": "Type annotations on variables",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-annotations-on-variables"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Strings, numbers and booleans",
+          "url": "https://www.youtube.com/watch?v=0DzDqtcxnz0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "grams",
+      "title": "Turn the form's text into grams",
+      "file": "src/order-form.ts",
+      "description": "Under `// Task 2`, the compiler refuses to multiply `tins` by `gramsPerTin`, because both are still the form's text. Make `tins` and `gramsPerTin` numbers made from `formTins` and `formGramsPerTin`, and make `orderGrams` the grams in the order. Write the type of all three.\n\nCheck reads your lines for the three types, and compiles them with code of its own that uses them as numbers. It runs your Task 2 lines with form values of its own and looks at `tins`, `gramsPerTin` and the line that prints the grams.",
+      "nextSteps": [
+        "Run `npm run types` and read the two errors for the line of `orderGrams`.",
+        "Point at `tins` in the editor: what type does it have, and why?",
+        "Make each of the two names a number made from its form field, and write the types.",
+        "Run both commands. The grams should print and the compiler should say nothing."
+      ],
+      "hints": [
+        "`The left-hand side of an arithmetic operation must be of type ... 'number'` means the value before the `*` is not a number. The `~` marks show which one.",
+        "A value typed into a form is text. JavaScript has a function that turns text such as `'125'` into the number `125`.",
+        "`export const tins: number = Number(formTins)`, the same for `gramsPerTin`, and `orderGrams: number` for the product."
+      ],
+      "docs": [
+        {
+          "title": "Number() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/Number"
+        },
+        {
+          "title": "Type annotations on variables",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-annotations-on-variables"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "gift",
+      "title": "Decide if it is a gift",
+      "file": "src/order-form.ts",
+      "description": "Under `// Task 3`, `isGift` is promised to be a boolean, and the compiler refuses the form's text as its value. Make it `true` when `formGift` is exactly `'yes'`, and `false` for any other text. Keep its type written.\n\nCheck compiles your Task 3 lines, and runs them with `formGift` set to `'yes'`, `'no'`, an empty text and a word of its own.",
+      "nextSteps": [
+        "Run `npm run types` and read the error for the line of `isGift`.",
+        "Think of a question about `formGift` whose answer is true or false.",
+        "Write that question as the value of `isGift`.",
+        "Change `formGift` to `'no'` for a moment, run the file, and put it back."
+      ],
+      "hints": [
+        "`Type 'string' is not assignable to type 'boolean'` means text was given where true or false was promised.",
+        "A comparison such as `a === b` gives back a boolean. That is a value you can store.",
+        "`export const isGift: boolean = formGift === 'yes'`."
+      ],
+      "docs": [
+        {
+          "title": "Strict equality (===)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality"
+        },
+        {
+          "title": "The primitives: string, number and boolean",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#the-primitives-string-number-and-boolean"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "delivery",
+      "title": "Count the shelf after a delivery",
+      "file": "src/order-form.ts",
+      "description": "Under `// Task 4`, the shelf after a delivery prints `4012`, and the compiler says nothing. Write the type `tinsAfterDelivery` should have, read what the compiler says then, and fix the value so it is the tins on the shelf plus the tins delivered.\n\nCheck reads your line for the type, and compiles it with code of its own that uses the result as a number and as text, which must be refused. It runs your Task 4 lines with two deliveries of its own.",
+      "nextSteps": [
+        "Point at `tinsAfterDelivery`: which type did the compiler work out, and why?",
+        "Write the type the tins after a delivery should have, and run `npm run types`.",
+        "Read the error: which value is not what it should be?",
+        "Fix that value before it is added, and run both commands again."
+      ],
+      "hints": [
+        "`40 + '12'` is allowed in JavaScript: it glues the two together as text. So the compiler works out a string, and nothing is wrong yet as far as it knows.",
+        "Once you write `number` as the type, the compiler compares the glued text with your promise. The fix is to add two numbers, so the delivery must become a number before the `+`.",
+        "`export const tinsAfterDelivery: number = shelfTins + Number(deliveredTins)`."
+      ],
+      "docs": [
+        {
+          "title": "Addition (+)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Addition"
+        },
+        {
+          "title": "Type inference",
+          "url": "https://www.typescriptlang.org/docs/handbook/type-inference.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
