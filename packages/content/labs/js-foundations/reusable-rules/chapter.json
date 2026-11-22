@@ -1,0 +1,129 @@
+{
+  "id": "reusable-rules",
+  "title": "Rules you can reuse",
+  "files": ["src/functions.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to call your functions with a few orders.",
+    "suggestedCommand": "node src/functions.js"
+  },
+  "tasks": [
+    {
+      "id": "label",
+      "title": "Write the candle label",
+      "file": "src/functions.js",
+      "description": "Under `// Task 1` in `src/functions.js`, give `candleLabel` two parameters, `scent` and `grams`, in that order, and make it return a label like `Cedar candle, 200 g`.\n\nCheck calls `candleLabel` with other scents and sizes and compares the text it gives back.",
+      "nextSteps": [
+        "Name the two parameters between the round brackets after `candleLabel`.",
+        "Build the label from them inside the curly braces.",
+        "Hand it back with `return`.",
+        "Run `node src/functions.js`: the first line should now be a label."
+      ],
+      "hints": [
+        "A function only knows the values it is given. Parameters are the names those values get inside it.",
+        "Printing is not giving back. `console.log` shows text in the terminal; `return` hands a value to whoever called the function.",
+        "The function has the shape `function candleLabel(scent, grams) { return ... }`, where the dots are a template literal built from the two names."
+      ],
+      "docs": [
+        {
+          "title": "Functions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions"
+        },
+        {
+          "title": "return",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Functions, parameters and return",
+          "url": "https://www.youtube.com/watch?v=JcKse_OhnfQ"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "shipping",
+      "title": "Shipping for any order",
+      "file": "src/functions.js",
+      "description": "Under `// Task 2`, give `shippingFor` two parameters, `totalCents` and `zone`, and make it return the shipping in cents:\n\n- `0` when `totalCents` is 5000 or more, wherever it goes\n- otherwise `250` for `'local'`, `495` for `'national'` and `1295` for anywhere else\n\nCheck calls `shippingFor` with big and small orders in every zone.",
+      "nextSteps": [
+        "Name the two parameters.",
+        "Ask about the total first, then about the zone.",
+        "Give back each price with `return`.",
+        "Run the file and call it with a few orders of your own."
+      ],
+      "hints": [
+        "These are the shipping rules from the last issue. This time they live in a function, so they work for any order you hand them.",
+        "`return` ends the function at once, so each part of an `if` can give back its own price.",
+        "The function starts `function shippingFor(totalCents, zone) { if (totalCents >= 5000) { return 0 } ... }` and goes on with the zones."
+      ],
+      "docs": [
+        {
+          "title": "return",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return"
+        },
+        {
+          "title": "if...else",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "price",
+      "title": "Price with a default quantity",
+      "file": "src/functions.js",
+      "description": "Under `// Task 3`, give `priceFor` two parameters, `priceCents` and `quantity`, and make it return `priceCents` times `quantity`. When `priceFor` is called without a quantity, it counts one candle. A quantity of `0` still costs nothing.\n\nCheck calls `priceFor` with and without a quantity, and with 0.",
+      "nextSteps": [
+        "Name the two parameters and return the product.",
+        "Call `priceFor(1250)` and look at what comes back.",
+        "Give `quantity` a default value, as the lesson shows.",
+        "Run the file again: both lines for Task 3 should be prices."
+      ],
+      "hints": [
+        "A parameter that is left out when the function is called is `undefined`, and a number times `undefined` is `NaN`.",
+        "A parameter can have a default value, written right where it is named. It is used only when that value is left out.",
+        "The first line has the shape `function priceFor(priceCents, quantity = ...) {`, with the default quantity after the `=`."
+      ],
+      "docs": [
+        {
+          "title": "Default parameters",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters"
+        },
+        {
+          "title": "Functions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "total",
+      "title": "Put the order together",
+      "file": "src/functions.js",
+      "description": "Under `// Task 4`, give `orderTotal` three parameters, `priceCents`, `quantity` and `zone`, and make it return what the customer pays: the price of the candles plus the shipping for that price. Call `priceFor` and `shippingFor` inside it instead of writing their rules again.\n\nCheck first makes sure Tasks 2 and 3 work, then calls `orderTotal` with several orders and looks for both calls inside it.",
+      "nextSteps": [
+        "Make sure Tasks 2 and 3 pass.",
+        "Inside `orderTotal`, call `priceFor` and keep its answer in a `const`.",
+        "Call `shippingFor` with that price and the zone.",
+        "Return the sum, and run the file."
+      ],
+      "hints": [
+        "A function can call other functions. Their answers come back where you called them, like any value.",
+        "Shipping depends on the price of all the candles together, so `shippingFor` needs the price `priceFor` gives, not the price of one candle.",
+        "The body has the shape `const subtotal = priceFor(priceCents, quantity)` and then `return subtotal + shippingFor(subtotal, zone)`."
+      ],
+      "docs": [
+        {
+          "title": "Calling functions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#calling_functions"
+        },
+        {
+          "title": "Functions: reusable blocks of code",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Functions"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

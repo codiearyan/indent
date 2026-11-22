@@ -1,0 +1,125 @@
+{
+  "id": "making-decisions",
+  "title": "Making decisions",
+  "files": ["src/decisions.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see which way each of the shop's rules goes for today's order.",
+    "suggestedCommand": "node src/decisions.js"
+  },
+  "tasks": [
+    {
+      "id": "stock",
+      "title": "Warn when stock runs low",
+      "file": "src/decisions.js",
+      "description": "Under `// Task 1` in `src/decisions.js`, make a `let` called `stockNote`. Use `if` and `else` to give it the text `Running low` when `candlesInStock` is fewer than 5, and `Plenty on the shelf` otherwise. Print it.\n\nCheck runs your file with other stock counts, including exactly 5, and compares `stockNote` with the task's text letter by letter.",
+      "nextSteps": [
+        "Make `stockNote` with `let` and no value, above the `if`.",
+        "Write the `if` with a comparison of `candlesInStock` and 5 in its round brackets.",
+        "Give `stockNote` its text in the `if` part and in the `else` part.",
+        "Print it, run the file, then change `candlesInStock` at the top and run it again."
+      ],
+      "hints": [
+        "An `if` runs the code in its braces only when the condition in its round brackets is true. The `else` part runs otherwise.",
+        "Make the variable before the `if`, so it is still there after the closing brace. \"Fewer than 5\" leaves out 5 itself.",
+        "The shape is `if (candlesInStock < 5) { stockNote = '...' } else { stockNote = '...' }`, with the two texts from the task."
+      ],
+      "docs": [
+        {
+          "title": "if...else",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else"
+        },
+        {
+          "title": "Making decisions in your code",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Conditionals"
+        }
+      ],
+      "videos": [
+        {
+          "title": "If, else if and else",
+          "url": "https://www.youtube.com/watch?v=rjLHje_SkE4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "shipping",
+      "title": "Price the shipping",
+      "file": "src/decisions.js",
+      "description": "Under `// Task 2`, make a `let` called `shippingCents` and give it one value with `if`, `else if` and `else`:\n\n- an order whose `totalCents` is 5000 or more ships free (`0`), wherever it goes\n- otherwise a `'local'` order pays `250`\n- otherwise a `'national'` order pays `495`\n- otherwise it pays `1295`\n\nPrint it. Check tries big and small orders in every zone, and one exactly on 5000.",
+      "nextSteps": [
+        "Make `shippingCents` with `let`, above the chain.",
+        "Write the question about the total first: only the first true condition runs.",
+        "Add an `else if` for each zone, and an `else` for everything left.",
+        "Print it and try a big order abroad at the top."
+      ],
+      "hints": [
+        "A chain of `if`, `else if` and `else` asks its questions from top to bottom and runs only the first part whose condition is true.",
+        "Free shipping holds in every zone, so ask about the total before you ask about the zone. Compare text with `===`, and \"or more\" includes the equal case.",
+        "The chain starts `if (totalCents >= 5000) { shippingCents = 0 } else if (deliveryZone === 'local') { ... }` and goes on the same way."
+      ],
+      "docs": [
+        {
+          "title": "if...else",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else"
+        },
+        {
+          "title": "Strict equality (===)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "word",
+      "title": "One candle or many",
+      "file": "src/decisions.js",
+      "description": "Under `// Task 3`, make a `const` called `candleWord` with the short form, `? :`. It is the text `candle` when `quantity` is exactly 1, and `candles` for any other quantity, 0 included. Print it.\n\nCheck tries several quantities and looks for `?` and `:` in the line that makes `candleWord`.",
+      "nextSteps": [
+        "Read the lesson's part on the short form.",
+        "Write the question first: is the quantity the same as 1?",
+        "After `?` put the value for yes, after `:` the value for no.",
+        "Print it next to `quantity` and try 1 and 0 at the top."
+      ],
+      "hints": [
+        "The short form picks one of two values in a single line, so it can go straight after `const candleWord =`.",
+        "Only exactly one takes the single word, so ask with `===`, not with `>`.",
+        "The line has the shape `const candleWord = quantity === 1 ? '...' : '...'`, with the two words from the task."
+      ],
+      "docs": [
+        {
+          "title": "Conditional (ternary) operator",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "when",
+      "title": "Say when it ships",
+      "file": "src/decisions.js",
+      "description": "Under `// Task 4`, make a `let` called `shipsWhen`:\n\n- `When restocked`, if `candlesInStock` is fewer than the order's `quantity`\n- otherwise `Today`, if `hourNow` is before 14\n- otherwise `Tomorrow`\n\nPrint it. Check tries a short stock early in the day, exactly enough stock, and the hours around 14.",
+      "nextSteps": [
+        "Decide which question comes first: the stock one holds at any hour.",
+        "Write the chain with `if`, `else if` and `else`.",
+        "Use the comparisons that match \"fewer than\" and \"before\".",
+        "Print it and try different hours at the top."
+      ],
+      "hints": [
+        "Only the first true part of a chain runs. A short stock waits for a restock even at nine in the morning.",
+        "Exactly as many candles as the order needs is enough, and 14 itself is not before 14.",
+        "The chain starts `if (candlesInStock < quantity) { shipsWhen = 'When restocked' } else if (hourNow < 14) { ... }` and ends with an `else`."
+      ],
+      "docs": [
+        {
+          "title": "if...else",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else"
+        },
+        {
+          "title": "Less than (<)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Less_than"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

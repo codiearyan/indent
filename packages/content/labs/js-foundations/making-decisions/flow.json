@@ -1,0 +1,135 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "order", "label": "Today's order", "kind": "data" },
+      { "id": "stock", "label": "stockNote", "kind": "data", "mine": true },
+      { "id": "shipping", "label": "shippingCents", "kind": "data", "mine": true },
+      { "id": "word", "label": "candleWord", "kind": "data", "mine": true },
+      { "id": "when", "label": "shipsWhen", "kind": "data", "mine": true },
+      { "id": "theo", "label": "Theo", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "order", "to": "stock", "label": "stock" },
+      { "from": "order", "to": "shipping", "label": "total, zone" },
+      { "from": "order", "to": "word", "label": "quantity" },
+      { "from": "order", "to": "when", "label": "stock, hour" },
+      { "from": "stock", "to": "theo", "label": "shelf note" },
+      { "from": "shipping", "to": "theo", "label": "price" },
+      { "from": "word", "to": "theo", "label": "slip word" },
+      { "from": "when", "to": "theo", "label": "day" }
+    ],
+    "note": "Each rule in Theo's notebook becomes a decision that picks a value for today's order."
+  },
+  "tasks": {
+    "stock": {
+      "steps": [
+        {
+          "active": ["order", "order->stock"],
+          "value": {
+            "kind": "map",
+            "label": "today's order",
+            "entries": [{ "key": "candlesInStock", "value": 2 }]
+          },
+          "note": "The rule looks at how many candles are on the shelf."
+        },
+        {
+          "active": ["stock"],
+          "note": "One question, two roads: fewer than five takes the first, anything else the other."
+        },
+        {
+          "active": ["stock", "stock->theo", "theo"],
+          "value": {
+            "kind": "map",
+            "label": "what comes out",
+            "entries": [{ "key": "stockNote", "value": "one of two texts" }]
+          },
+          "note": "Theo reads one short note about the shelf."
+        }
+      ]
+    },
+    "shipping": {
+      "steps": [
+        {
+          "active": ["order", "order->shipping"],
+          "value": {
+            "kind": "map",
+            "label": "today's order",
+            "entries": [
+              { "key": "totalCents", "value": 4200 },
+              { "key": "deliveryZone", "value": "national" }
+            ]
+          },
+          "note": "Shipping depends on the order's total and where it goes."
+        },
+        {
+          "active": ["shipping"],
+          "note": "The questions are asked from top to bottom, and the first one that holds decides."
+        },
+        {
+          "active": ["shipping"],
+          "note": "A big order ships free in every zone, so that question comes before the zones."
+        },
+        {
+          "active": ["shipping", "shipping->theo", "theo"],
+          "value": {
+            "kind": "map",
+            "label": "what comes out",
+            "entries": [{ "key": "shippingCents", "value": "whole cents" }]
+          },
+          "note": "Theo gets one shipping price in cents."
+        }
+      ]
+    },
+    "word": {
+      "steps": [
+        {
+          "active": ["order", "order->word"],
+          "value": {
+            "kind": "map",
+            "label": "today's order",
+            "entries": [{ "key": "quantity", "value": 3 }]
+          },
+          "note": "The packing slip needs the right word for the number of candles."
+        },
+        {
+          "active": ["word"],
+          "note": "One question in one line picks between the single word and the plural."
+        },
+        {
+          "active": ["word", "word->theo", "theo"],
+          "note": "Theo writes the number and the word on the slip."
+        }
+      ]
+    },
+    "when": {
+      "steps": [
+        {
+          "active": ["order", "order->when"],
+          "value": {
+            "kind": "map",
+            "label": "today's order",
+            "entries": [
+              { "key": "candlesInStock", "value": 2 },
+              { "key": "quantity", "value": 3 },
+              { "key": "hourNow", "value": 11 }
+            ]
+          },
+          "note": "When an order ships depends on the stock and on the shop clock."
+        },
+        {
+          "active": ["when"],
+          "note": "A short stock waits for a restock whatever the hour, so it is asked about first."
+        },
+        {
+          "active": ["when", "when->theo", "theo"],
+          "value": {
+            "kind": "map",
+            "label": "what comes out",
+            "entries": [{ "key": "shipsWhen", "value": "one of three texts" }]
+          },
+          "note": "Theo knows the day the parcel leaves."
+        }
+      ]
+    }
+  }
+}

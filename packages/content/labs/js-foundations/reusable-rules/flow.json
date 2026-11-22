@@ -1,0 +1,150 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ines", "label": "Ines", "kind": "story" },
+      { "id": "label", "label": "candleLabel()", "kind": "function", "mine": true, "fn": "candleLabel" },
+      { "id": "total", "label": "orderTotal()", "kind": "function", "mine": true, "fn": "orderTotal" },
+      { "id": "price", "label": "priceFor()", "kind": "function", "mine": true, "fn": "priceFor" },
+      { "id": "shipping", "label": "shippingFor()", "kind": "function", "mine": true, "fn": "shippingFor" },
+      { "id": "slip", "label": "Packing slip", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ines", "to": "label", "label": "scent, grams" },
+      { "from": "ines", "to": "total", "label": "an order" },
+      { "from": "ines", "to": "price", "label": "price, quantity" },
+      { "from": "ines", "to": "shipping", "label": "total, zone" },
+      { "from": "total", "to": "price", "label": "price, quantity" },
+      { "from": "total", "to": "shipping", "label": "subtotal, zone" },
+      { "from": "label", "to": "slip", "label": "label" },
+      { "from": "total", "to": "slip", "label": "to pay" }
+    ],
+    "note": "Each rule is written once as a function, and Ines calls it for every order instead of copying lines."
+  },
+  "tasks": {
+    "label": {
+      "trace": { "file": "src/functions.js", "call": "candleLabel", "args": ["Cedar", 200] },
+      "steps": [
+        {
+          "active": ["ines", "ines->label"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "scent", "value": "Cedar" },
+              { "key": "grams", "value": 200 }
+            ]
+          },
+          "note": "Ines calls candleLabel() with a scent and a size, in that order."
+        },
+        {
+          "active": ["label"],
+          "note": "Inside, the two values have the names of the parameters, and the label is built from them."
+        },
+        {
+          "active": ["label", "label->slip", "slip"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "label", "value": "text" }]
+          },
+          "note": "The label is handed back with return, ready for the packing slip."
+        }
+      ]
+    },
+    "shipping": {
+      "trace": { "file": "src/functions.js", "call": "shippingFor", "args": [4200, "national"] },
+      "steps": [
+        {
+          "active": ["ines", "ines->shipping"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "totalCents", "value": 4200 },
+              { "key": "zone", "value": "national" }
+            ]
+          },
+          "note": "Ines calls shippingFor() with any order's total and zone."
+        },
+        {
+          "active": ["shipping"],
+          "note": "The rules from the last issue run on those two values, the total first."
+        },
+        {
+          "active": ["shipping"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "shipping", "value": "whole cents" }]
+          },
+          "note": "The first return that runs hands back the price and ends the function."
+        }
+      ]
+    },
+    "price": {
+      "trace": { "file": "src/functions.js", "call": "priceFor", "args": [1250] },
+      "steps": [
+        {
+          "active": ["ines", "ines->price"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "priceCents", "value": 1250 },
+              { "key": "quantity", "value": "left out" }
+            ]
+          },
+          "note": "Ines calls priceFor() with a price and no quantity."
+        },
+        {
+          "active": ["price"],
+          "note": "A quantity that is left out takes its default, so the order counts one candle."
+        },
+        {
+          "active": ["price"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "price", "value": "whole cents" }]
+          },
+          "note": "The price of the candles comes back. A quantity of 0 that is handed in stays 0."
+        }
+      ]
+    },
+    "total": {
+      "trace": { "file": "src/functions.js", "call": "orderTotal", "args": [1250, 3, "local"] },
+      "steps": [
+        {
+          "active": ["ines", "ines->total", "total"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "priceCents", "value": 1250 },
+              { "key": "quantity", "value": 3 },
+              { "key": "zone", "value": "local" }
+            ]
+          },
+          "note": "Ines calls orderTotal() with one order: the price of a candle, how many, and the zone."
+        },
+        {
+          "active": ["total", "total->price", "price"],
+          "note": "orderTotal() asks priceFor() for the price of all the candles."
+        },
+        {
+          "active": ["total", "total->shipping", "shipping"],
+          "note": "Then it asks shippingFor() for the shipping on that price."
+        },
+        {
+          "active": ["total", "total->slip", "slip"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "to pay", "value": "whole cents" }]
+          },
+          "note": "The two answers add up to what the customer pays."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Can a rule be something we plug in?", "note": "A weekend sale is coming." },
+    { "title": "Price rules", "rows": [["Weekend", "20% off"], ["Weekday", "full price"]] },
+    {
+      "title": "Your code",
+      "file": "callbacks.js",
+      "mine": true,
+      "gap": "One function per rule",
+      "tasks": ["The short way", "Pick the day's rule", "Apply any rule", "Count with a test"]
+    },
+    { "title": "Price tag", "text": "Any rule, plugged in, on any price." }
+  ],
+  "ticket": { "label": "Sunday price", "wrong": "copied rule", "why": "Hard-wired", "right": "plugged in" },
+  "captions": [
+    "Theo's functions work. Now Ines plans a weekend sale and wants rules she can swap.",
+    "Each new rule means a new pricing function, copied from the last one.",
+    "You treat rules as values: write, pick, pass and call them, in four tasks.",
+    "Now Sunday's price comes from the weekend rule, plugged into one function.",
+    "Functions are values. The rules of the shop can change without new code."
+  ]
+}

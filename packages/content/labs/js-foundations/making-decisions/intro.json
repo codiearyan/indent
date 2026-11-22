@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "What does shipping cost on this one?", "note": "He looks it up in his notebook." },
+    { "title": "Today's order", "rows": [["Total", "42.00"], ["Zone", "national"], ["Candles", "3"]] },
+    {
+      "title": "Your code",
+      "file": "decisions.js",
+      "mine": true,
+      "gap": "Rules only in a notebook",
+      "tasks": ["Warn on low stock", "Price the shipping", "Candle or candles", "Say when it ships"]
+    },
+    { "title": "Packing slip", "text": "A price, a word and a day for the order." }
+  ],
+  "ticket": { "label": "Today's order", "wrong": "looked up", "why": "By hand", "right": "decided" },
+  "captions": [
+    "A new week at Wickhollow Candles. Theo wants the laptop to follow his rules.",
+    "He looks up shipping, stock and the shipping day in his notebook for every order.",
+    "You turn each rule into a decision with if, else and the short form, in four tasks.",
+    "Now the order gets its price, its word and its day without the notebook.",
+    "Code that chooses: one question, and the laptop takes the right road."
+  ]
+}

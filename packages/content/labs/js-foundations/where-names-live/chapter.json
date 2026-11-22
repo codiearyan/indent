@@ -1,0 +1,129 @@
+{
+  "id": "where-names-live",
+  "title": "Where a name lives",
+  "files": ["src/scope.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here and read what Theo's functions do.",
+    "suggestedCommand": "node src/scope.js"
+  },
+  "tasks": [
+    {
+      "id": "label",
+      "title": "Keep the wrap inside the label",
+      "file": "src/scope.js",
+      "description": "Under `// Task 1` in `src/scope.js`, fix `labelLine(scent, giftWrap)` so it returns the scent, a comma and a space, then `gift wrapped` when `giftWrap` is true or `plain box` when it is false: `'Cedar, gift wrapped'`. Keep `wrap` inside the function.\n\nCheck calls `labelLine` with other scents, wrapped and plain, and makes sure `wrap` is not made at the top level of the file.",
+      "nextSteps": [
+        "Run `node src/scope.js` and read the error: it names a line and a name.",
+        "Find where that name is made, and where it is used.",
+        "Make it once inside the function, where the `return` can see it.",
+        "Run the file again: the first line should be a label."
+      ],
+      "hints": [
+        "`ReferenceError: wrap is not defined` means that at the `return`, no `wrap` can be seen from where it is used.",
+        "A name made with `let` inside `{ }` lives only until the closing brace. Both `wrap`s are gone before the `return`.",
+        "Write `let wrap` once at the start of the function, before the `if`, and in the two parts only give it its value: `wrap = '...'`."
+      ],
+      "docs": [
+        {
+          "title": "Scope",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Scope"
+        },
+        {
+          "title": "let",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Scope in ten minutes",
+          "url": "https://www.youtube.com/watch?v=TkFN6e9ZDMw"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sale",
+      "title": "Let the sale price out",
+      "file": "src/scope.js",
+      "description": "Under `// Task 2`, fix `salePrice(priceCents, percentOff)` so it returns the price with `percentOff` percent taken off, rounded to whole cents. With a `percentOff` of 0 the price stays as it is.\n\nCheck calls `salePrice` with other prices and discounts, 0 included.",
+      "nextSteps": [
+        "Run the file and look at what `salePrice(2000, 25)` prints.",
+        "Count how many names called `price` the function makes.",
+        "Make sure the sale price goes into the `price` the `return` hands back.",
+        "Run the file again."
+      ],
+      "hints": [
+        "The sum inside the `if` is right. The trouble is where its answer goes.",
+        "`let` inside the braces makes a second `price` that hides the first one until the closing brace. The `return` comes after it, so it sees the first.",
+        "Inside the `if`, give the outer `price` its new value without `let`: `price = Math.round(...)`."
+      ],
+      "docs": [
+        {
+          "title": "block",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/block"
+        },
+        {
+          "title": "let",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "zone",
+      "title": "Use the zone you are given",
+      "file": "src/scope.js",
+      "description": "Under `// Task 3`, fix `shippingNote(zone)` so it returns `Hand delivered` for `'local'`, `Sent by courier` for `'national'`, and `Sent by air mail` for anywhere else, whatever `todaysZone` says.\n\nCheck calls `shippingNote` with each zone.",
+      "nextSteps": [
+        "Run the file: Theo asked about an order abroad. What did he get?",
+        "Look at which name the questions inside `shippingNote` ask about.",
+        "Make the function decide on what it is given.",
+        "Run the file again and try other zones."
+      ],
+      "hints": [
+        "`shippingNote` has a parameter, `zone`, but it never uses it.",
+        "A function can see names outside it, which is why this runs without an error. But then it answers about `todaysZone`, not about the order it was asked about.",
+        "In both questions, compare `zone` instead of `todaysZone`."
+      ],
+      "docs": [
+        {
+          "title": "Function scopes and closures",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#function_scopes_and_closures"
+        },
+        {
+          "title": "Scope",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Scope"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "note",
+      "title": "Hand the note back",
+      "file": "src/scope.js",
+      "description": "Under `// Task 4`, fix `packingNote(weightGrams)` so it returns `Heavy box` for more than 1000 grams and `Light box` otherwise. It must give its note back with `return` and leave `lastNote` alone. You may delete `lastNote` once nothing uses it.\n\nCheck calls `packingNote` with heavy and light parcels, 1000 grams included, and makes sure `lastNote` does not change.",
+      "nextSteps": [
+        "Run the file: what does `packingNote(1500)` print?",
+        "Notice the function writes its answer into a name outside it.",
+        "Give each note back with `return` instead.",
+        "Delete `lastNote` if nothing else uses it, and run the file."
+      ],
+      "hints": [
+        "A function with no `return` gives back `undefined`, whatever it does inside.",
+        "Writing into a name outside the function means two parcels share one note, and the second overwrites the first. A function should hand its answer back.",
+        "In each part of the `if`, write `return 'Heavy box'` or `return 'Light box'` in place of the line that sets `lastNote`."
+      ],
+      "docs": [
+        {
+          "title": "return",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return"
+        },
+        {
+          "title": "Function scopes and closures",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#function_scopes_and_closures"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
