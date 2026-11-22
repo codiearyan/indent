@@ -246,7 +246,8 @@ export async function build(t, { file, task, vars = {}, cases = [{}] }) {
   const starter = starterText.replace(/\r\n/g, '\n').split('\n')
 
   const { starts, twice } = marks(lines)
-  const lost = [...marks(starter).starts.keys()].filter((n) => !starts.has(n))
+  const starterStarts = marks(starter).starts
+  const lost = [...starterStarts.keys()].filter((n) => !starts.has(n))
   if (lost.length || twice.size) {
     const n = lost[0] ?? [...twice][0]
     return {
@@ -299,8 +300,9 @@ export async function build(t, { file, task, vars = {}, cases = [{}] }) {
   // The given lines, as the starter wrote them: their types must stay.
   const givenNames = Object.keys(cases[0].given ?? {})
   const givens = []
+  const starterFirst = Math.min(...starterStarts.values())
   for (const name of givenNames) {
-    const at = starter.findIndex((l, i) => i < first && DECLARED(ANY_TYPE, name).test(l))
+    const at = starter.findIndex((l, i) => i < starterFirst && DECLARED(ANY_TYPE, name).test(l))
     const type = DECLARED(ANY_TYPE, name).exec(starter[at])[2]
     const re = DECLARED(typePattern(type), name)
     const lineAt = kept.findIndex((l, i) => i < first && re.test(l))

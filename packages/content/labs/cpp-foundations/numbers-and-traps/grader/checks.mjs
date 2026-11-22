@@ -127,7 +127,7 @@ export const checks = {
           lines: [line(`Beats: ${beats}`)],
           hint: ({ reads }) =>
             reads.guaranteeBeats === wrapped(beats) && beats !== wrapped(beats)
-              ? 'guaranteeBeats is wrong for a long guarantee, though the type is right. The multiplication is worked out in int, which tops out a little over two billion, before the result goes into the long long. Make the first number of the multiplication a long long.'
+              ? 'guaranteeBeats is wrong for a long guarantee, though the type is right. The multiplication is worked out in int, which tops out a little over two billion, before the result goes into the long long. Read the part of the lesson on how big a number can get.'
               : reads.guaranteeBeats === beats
                 ? 'guaranteeBeats is right, but the printed line is not. Print Beats: and then guaranteeBeats.'
                 : 'guaranteeBeats is not the beats in a second, times the seconds in a year of 365 days, times the years. Count the seconds in a day again.'
@@ -149,7 +149,7 @@ export const checks = {
         lines: [line(`Parts: ${p.toFixed(2)}`)],
         hint: ({ stdout }) =>
           stdout.includes('Parts: ')
-            ? 'The parts price does not have exactly two digits after the point. std::setprecision(2) alone counts every digit of the number; with std::fixed before it, it counts the digits after the point.'
+            ? 'The parts price does not have exactly two digits after the point. Read the part of the lesson on printing prices: it shows what a price needs to always print two digits after the point, and the header those tools come from.'
             : 'No line starts with Parts: yet. Print Parts: and then partsCost, with two digits after the point.'
       }))
     })
