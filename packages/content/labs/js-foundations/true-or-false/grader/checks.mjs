@@ -120,13 +120,13 @@ export const checks = {
           name: 'No note gives false',
           given: order({ giftNote: '' }),
           expected: false,
-          hint: 'An empty note should give false. hasGiftNote must be true or false itself, not the note.'
+          hint: 'An empty note is no note at all. hasGiftNote must be true or false itself, not the note.'
         },
         {
           name: 'A note gives true',
           given: order({ giftNote: 'Happy birthday, Sam' }),
           expected: true,
-          hint: 'A note with words in it should give true, and the value must be true itself, not the note.'
+          hint: 'A note with words in it is a note. hasGiftNote must be true or false itself, not the note.'
         },
         {
           name: 'A one-letter note gives true',

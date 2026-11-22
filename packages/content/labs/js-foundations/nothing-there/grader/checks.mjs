@@ -82,13 +82,13 @@ export const checks = {
           name: 'A word is not a number',
           given: form({ extraCandlesText: 'two' }),
           expected: false,
-          hint: 'Text like two turns into NaN. extraIsNumber should be false then, and it must be true or false itself.'
+          hint: 'Text like two does not turn into a real number. extraIsNumber must say so, as true or false itself.'
         },
         {
           name: 'Digits are a number',
           given: form({ extraCandlesText: '4' }),
           expected: true,
-          hint: 'Text like 4 turns into a real number, so extraIsNumber should be true.'
+          hint: 'Text like 4 turns into a real number. extraIsNumber must say so, as true or false itself.'
         },
         {
           name: 'Digits with words after them are not a number',
@@ -122,19 +122,19 @@ export const checks = {
           name: 'Text that is not a number counts as one',
           given: form({ quantityText: 'three' }),
           expected: 1,
-          hint: 'Here quantity is NaN, so safeQuantity should be 1. NaN is one of the falsy values.'
+          hint: 'Here quantity is NaN, so the fallback from the task should take over. NaN is one of the falsy values.'
         },
         {
           name: 'Zero counts as one',
           given: form({ quantityText: '0' }),
           expected: 1,
-          hint: 'A quantity of 0 should count as one candle too. Which default operator treats 0 as missing?'
+          hint: 'A quantity of 0 should get the fallback from the task too. Which default operator treats 0 as missing?'
         },
         {
           name: 'An empty box counts as one',
           given: form({ quantityText: null }),
           expected: 1,
-          hint: 'When quantityText is null, safeQuantity should still be 1.'
+          hint: 'When quantityText is null, safeQuantity should still be the fallback from the task.'
         }
       ]
     })

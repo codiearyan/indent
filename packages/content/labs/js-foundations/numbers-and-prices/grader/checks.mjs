@@ -33,7 +33,7 @@ export const checks = {
           name: 'An order of no candles costs nothing',
           given: order(1250, 0, 10, 495, 4),
           expected: 0,
-          hint: 'With a quantity of 0, the subtotal should be 0. Look at how the two names are combined.'
+          hint: 'With no candles in the order there is nothing to pay for. Look at how the two names are combined.'
         }
       ]
     })
@@ -111,7 +111,7 @@ export const checks = {
           name: 'A small order fits in one box',
           given: order(1250, 3, 10, 495, 5),
           expected: 1,
-          hint: 'Three candles fit in one box of five, but the box is only partly full. A partly full box still counts as a whole box.'
+          hint: 'Here the candles do not fill a box. A box that is only partly full still counts as a whole box. Look at how you round.'
         },
         {
           name: 'Full boxes, nothing left over',
