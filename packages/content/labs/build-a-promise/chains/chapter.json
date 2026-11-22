@@ -1,0 +1,80 @@
+{
+  "id": "chains",
+  "title": "One step after another",
+  "files": ["src/docket.js", "src/price-list.js", "src/store.js"],
+  "terminal": {
+    "description": "A shell in your workspace where Sefton's question runs as a chain: the paper count, then the press queue, then the answer.",
+    "suggestedCommand": "node src/price-list.js"
+  },
+  "tasks": [
+    {
+      "id": "new-docket",
+      "title": "then() gives back a new docket",
+      "file": "src/docket.js",
+      "description": "Change `then()` in `src/docket.js` so it returns a new `Docket` every time it is called.\n\n- never the docket it was called on, and never the same one twice\n- the new docket stays pending until this docket is kept and `onFulfilled` has run; then the new docket is kept too\n- the callbacks still run as before\n\nThe check calls `then()` on dockets of its own and reads the state of what comes back before and after they settle. What the new docket is kept with is the next task, and what happens when this docket fails is the next issue.",
+      "nextSteps": [
+        "Run `node src/price-list.js` and read the error: the second `.then` has nothing to be called on.",
+        "Make `then()` create a `Docket` and return it.",
+        "Find the moment `onFulfilled` has run, and keep the new docket there.",
+        "Run the script: the press line should appear, though it does not look right yet."
+      ],
+      "hints": [
+        "Each step of a chain needs its own outcome to wait on. The docket `then()` was called on already has an outcome: the value before the step.",
+        "Inside `then()`, `new Docket((resolve, reject) => { ... })` runs its executor at once, so everything `then()` used to do can move inside it, with the new docket's `resolve` in reach.",
+        "`return new Docket((resolve, reject) => { /* the code then() had, keeping or running a handler */ })`, where the handler calls `resolve(...)` right after `onFulfilled` has run."
+      ],
+      "docs": [
+        { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" },
+        { "title": "Using promises: chaining", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises#chaining" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "values-flow-on",
+      "title": "What a callback returns flows on",
+      "file": "src/docket.js",
+      "description": "Keep the docket from `then()` with the right value.\n\n- it is kept with whatever `onFulfilled` returned, `undefined` included\n- when `onFulfilled` is missing or not a function, it is kept with this docket's value, unchanged, so the next step gets it\n- this works on a docket that is already kept, too\n\nThis task builds on task 1; the check says so when `then()` does not return a new docket yet. It chains `then()` calls on dockets of its own and reads what each callback got and what the last docket holds.",
+      "nextSteps": [
+        "Look at the answer line in the price list.",
+        "Keep the result of calling `onFulfilled`.",
+        "Keep the new docket with it.",
+        "Decide what the new docket holds when there is no `onFulfilled` to call."
+      ],
+      "hints": [
+        "A chain is a relay. Each step hands what it made to the next, and the docket from `then()` is how it hands it over.",
+        "A callback that returns nothing returns `undefined`, and that is a real result: the step has finished. With no callback at all, nothing changed the value.",
+        "`const result = onFulfilled(this.value); resolve(result)`, and when `onFulfilled` is not a function, `resolve(this.value)`."
+      ],
+      "docs": [
+        { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" },
+        { "title": "return", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "returned-dockets",
+      "title": "A returned docket is waited for",
+      "file": "src/docket.js",
+      "description": "When `onFulfilled` returns a `Docket`, the docket from `then()` waits for it, then settles the same way: kept with its value, or failed with its reason.\n\n- it is never kept with the returned docket itself as its value\n- the next step in the chain gets the value, not a docket\n- a returned docket that has already settled works too\n\nThis task builds on tasks 1 and 2. The check returns dockets of its own from callbacks, settles them later or before, and reads the docket from `then()`.",
+      "nextSteps": [
+        "Look at the press line in the price list: `[object Object]` there is a docket, not a day.",
+        "After calling `onFulfilled`, look at what it returned.",
+        "When it is a `Docket`, wait for it before you settle the new docket.",
+        "Run the script: the press line should name a day."
+      ],
+      "hints": [
+        "`firstFreeDay()` hands back a docket because the day is not known yet. Keeping the next docket with that docket would pass the waiting on to whoever comes next.",
+        "`instanceof` tells you whether a value was made by `Docket`. And you already have a way to wait for a docket and do something when it settles.",
+        "`if (result instanceof Docket) result.then(resolve, reject); else resolve(result)`."
+      ],
+      "docs": [
+        { "title": "instanceof", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof" },
+        { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" }
+      ],
+      "videos": [
+        { "title": "From then chains to async and await", "url": "https://www.youtube.com/watch?v=vn3tm0quoqE" }
+      ],
+      "points": 10
+    }
+  ]
+}

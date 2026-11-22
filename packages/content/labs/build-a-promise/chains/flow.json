@@ -1,0 +1,73 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "sefton", "label": "Sefton", "kind": "story" },
+      { "id": "paper", "label": "Paper count", "kind": "data" },
+      { "id": "then", "label": "then()", "kind": "function", "mine": true },
+      { "id": "queue", "label": "Press queue", "kind": "data" },
+      { "id": "next", "label": "Next docket", "kind": "data" },
+      { "id": "answer", "label": "Answer", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "sefton", "to": "paper", "label": "300 invitations?" },
+      { "from": "paper", "to": "then", "label": "sheets" },
+      { "from": "then", "to": "queue", "label": "asks" },
+      { "from": "queue", "to": "next", "label": "first free day" },
+      { "from": "then", "to": "next", "label": "returns" },
+      { "from": "next", "to": "answer", "label": "a day" }
+    ],
+    "note": "Each then() gives back a docket for its own step, so Sefton's question runs as steps written one under the other."
+  },
+  "tasks": {
+    "new-docket": {
+      "steps": [
+        {
+          "active": ["sefton", "sefton->paper", "paper", "paper->then", "then"],
+          "note": "Sefton's chain starts with the paper count, and calls then() on it with the next step."
+        },
+        {
+          "active": ["then", "then->next", "next"],
+          "value": { "kind": "map", "label": "next docket", "entries": [{ "key": "state", "value": "pending" }] },
+          "note": "then() gives back a new docket at once, for the outcome of that step, so the next then() has something to be called on."
+        },
+        {
+          "active": ["then", "next"],
+          "note": "Once the count is kept and the callback has run, the next docket is kept too."
+        }
+      ]
+    },
+    "values-flow-on": {
+      "steps": [
+        {
+          "active": ["paper", "paper->then", "then"],
+          "note": "The callback gets the invitation sheets in the store room."
+        },
+        {
+          "active": ["then", "then->next", "next"],
+          "value": { "kind": "map", "label": "next docket", "entries": [{ "key": "state", "value": "fulfilled" }, { "key": "value", "value": "what the callback returned" }] },
+          "note": "Whatever the callback returns keeps the next docket, so the step after gets it."
+        },
+        {
+          "active": ["next", "next->answer", "answer"],
+          "note": "Step by step the values travel down the chain to the answer line."
+        }
+      ]
+    },
+    "returned-dockets": {
+      "steps": [
+        {
+          "active": ["then", "then->queue", "queue"],
+          "note": "The step after the paper count asks for the first free day, which means reading another file, so it returns a docket."
+        },
+        {
+          "active": ["queue", "queue->next", "next"],
+          "note": "The next docket waits for that docket instead of holding it, and settles the same way once the queue has been read."
+        },
+        {
+          "active": ["next", "next->answer", "answer"],
+          "note": "So the answer line gets a day, not a docket."
+        }
+      ]
+    }
+  }
+}

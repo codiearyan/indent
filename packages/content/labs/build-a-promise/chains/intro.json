@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Sefton", "say": "300 invitations, and when?", "note": "Paper first, then the press queue." },
+    { "title": "Paper count", "text": "400 invitation sheets in the store room.", "note": "The next step has to wait for it." },
+    {
+      "title": "Your then()",
+      "file": "docket.js",
+      "mine": true,
+      "gap": "No next step to call",
+      "tasks": ["A new docket", "Values flow on", "Wait for dockets"]
+    },
+    { "title": "Press queue", "rows": [["Monday", "full"], ["Tuesday", "full"], ["Wednesday", "room"]], "mark": 2 }
+  ],
+  "ticket": { "label": "300 invites", "wrong": "no day", "why": "Chain breaks", "right": "Wednesday" },
+  "captions": [
+    "At the counter, Sefton needs the paper count, then the press queue, then an answer.",
+    "Today then() gives back nothing, so the chain breaks after its first step.",
+    "You make then() give back a docket each step can wait on, in three tasks.",
+    "Now the question runs step by step and ends on the first free day.",
+    "Sefton writes the steps one under the other, and the answer comes out at the end."
+  ]
+}

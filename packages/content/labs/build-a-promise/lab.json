@@ -1,0 +1,13 @@
+{
+  "id": "build-a-promise",
+  "title": "Build your own promise",
+  "description": "Idris's nightly price list at Ashgrove Press waits for the paper count and the press queue, and one night it printed half a list and nobody could say why, so Hesper says the waiting code goes unless someone at the shop can explain every line of it. You write the shop a small promise of its own, the docket: three states, then, chains, errors and catch, callbacks that always run later, all and race. By the end you know what happens each time you write then or await.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": ["JavaScript", "Build your own"],
+  "kind": "project",
+  "parts": [
+    { "title": "Waiting for a value", "chapters": ["a-value-later", "when-it-arrives", "chains"] },
+    { "title": "Errors, order and many at once", "chapters": ["when-it-fails", "later-and-together"] }
+  ]
+}
