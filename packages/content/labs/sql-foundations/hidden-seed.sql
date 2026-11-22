@@ -2,7 +2,7 @@
 -- It holds the edges the shipped data does not: values right on a limit, a town, a species and
 -- a kind of treatment the shipped data never has, and more empty cells.
 -- The rows added last are for sorting and totals: a tie on a birthday, a charge right on a limit,
--- a bill right on a limit.
+-- a bill right on a limit, and an owner who shares an email with another.
 
 INSERT INTO owners (id, first_name, last_name, phone, email, town) VALUES
   (201, 'Freya', 'Nkemelu', '01632 960201', NULL, 'Hollybank'),
@@ -14,7 +14,8 @@ INSERT INTO owners (id, first_name, last_name, phone, email, town) VALUES
   (207, 'Alfie', 'Bellweather', '01632 960207', 'alfie.b@mail.example', 'Hollybank'),
   (208, 'Seren', 'Moffat', '01632 960208', 'seren@moffat.example', 'Elmstead'),
   (209, 'Duncan', 'Tull', '01632 960209', NULL, 'Hollybank'),
-  (210, 'Gwen', 'Rook', '01632 960210', 'gwen.rook@mail.example', 'Larkhill');
+  (210, 'Gwen', 'Rook', '01632 960210', 'gwen.rook@mail.example', 'Larkhill'),
+  (211, 'Idris', 'Wynne', '01632 960211', 'gwen.rook@mail.example', 'Larkhill');
 
 INSERT INTO animals (id, owner_id, name, species, breed, born, weight_kg) VALUES
   (301, 201, 'Mango', 'dog', 'Labrador', '2019-01-01', 25.0),

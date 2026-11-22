@@ -89,7 +89,7 @@
       "id": "big-charges",
       "title": "Total the charges over £250",
       "file": "queries/4-big-charges.sql",
-      "description": "The insurer asks how many single charges came to more than £250, and what they added up to. Rosamund thinks there were none this year, and the form wants a number in both boxes.\n\nIn `queries/4-big-charges.sql`, return one row from `treatments` with two columns, in this order:\n\n- `charges`: how many treatments cost more than £250\n- `total`: their prices added up, and `0` when there are none\n\nCheck compares the columns and the row on the data you can see and on hidden data, which has charges over £250 and one of exactly £250.",
+      "description": "The insurer asks how many single charges came to more than £250, and what they added up to. Rosamund thinks there were none, and the form wants a number in both boxes.\n\nIn `queries/4-big-charges.sql`, return one row from `treatments` with two columns, in this order:\n\n- `charges`: how many treatments cost more than £250\n- `total`: their prices added up, and `0` when there are none\n\nCheck compares the columns and the row on the data you can see and on hidden data, which has charges over £250 and one of exactly £250.",
       "nextSteps": [
         "Write the condition for a price over £250 and count the rows.",
         "Add the total of their prices, and run it. Look hard at what the total shows.",

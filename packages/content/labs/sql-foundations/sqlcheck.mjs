@@ -151,6 +151,9 @@ function hints(mine, missing, unexpected, values) {
   if (aggregate && unexpected.some((r) => r.includes(null)) && missing.some((r) => r.includes(0))) {
     found.push('When no rows match, COUNT gives 0, but SUM, AVG, MIN and MAX give NULL.')
   }
+  if (/\bsum\s*\([^)]*\)\s*\/\s*count\s*\(\s*\*\s*\)|\bavg\s*\(\s*(coalesce|ifnull)\s*\(/.test(code)) {
+    found.push('AVG skips empty cells. Dividing by COUNT(*), or turning the gaps into 0 first, counts every empty cell as a 0 and pulls the average down.')
+  }
   return found
 }
 
@@ -208,6 +211,9 @@ function twoNames(code) {
   return list.split(',').some((part) => /^\s*[\w.]+\s+[\w"]+\s*$/.test(part) && !/^\s*distinct\b/i.test(part))
 }
 
+/** The expected row that differs from `bad` in exactly one column, if any. */
+const twinOf = (missing, bad) => missing.find((r) => r.filter((v, i) => key([v]) !== key([bad[i]])).length === 1)
+
 /** Compares a result with the expected one; returns null when they match, or what differs in plain words. */
 function compare(want, mine, values, ordered = false) {
   const hidden = values === null
@@ -256,29 +262,35 @@ function compare(want, mine, values, ordered = false) {
   if (!missing.length && !unexpected.length) return ordered ? outOfOrder(want, mine, hidden) : null
 
   const { columns } = want
+  const aggregate = /\b(count|sum|avg|min|max|total)\s*\(/i.test(mine.code)
+  const grouped = /\bgroup\s+by\b/i.test(mine.code)
+  const condition = grouped ? '.' : ': look at your condition.'
   const n = mine.rows.length
   const m = want.rows.length
   let message
   if (n > m) {
-    message = `Your result has ${plural(n, 'row')}; it should have ${m}. Some rows get through that the task leaves out${hidden ? ': look at your condition.' : `. For example, this row should not be there: ${describe(columns, unexpected[0])}.`}`
+    message = `Your result has ${plural(n, 'row')}; it should have ${m}. Some rows get through that the task leaves out${hidden ? condition : `. For example, this row should not be there: ${describe(columns, unexpected[0])}.`}`
   } else if (n < m) {
-    const squeezed = n === 1 && /\b(count|sum|avg|min|max|total)\s*\(/i.test(mine.code) && !/\bgroup\s+by\b/i.test(mine.code)
-    message = `Your result has ${plural(n, 'row')}; it should have ${m}. Some rows that belong are left out${squeezed ? '.' : ': look at your condition.'}`
-  } else if (hidden) {
+    const squeezed = n === 1 && aggregate && !grouped
+    message = `Your result has ${plural(n, 'row')}; it should have ${m}. Some rows that belong are left out${squeezed ? '.' : condition}`
+  } else if (hidden && (ordered || !aggregate || !twinOf(missing, unexpected[0]))) {
     message = ordered
       ? 'Your result has the right number of rows, but some of them are not the ones the task asks for.'
       : 'Your result has the right number of rows, but some of them are not the ones the task asks for: look at your condition, and at how each column is worked out.'
   } else {
     const bad = unexpected[0]
-    const twin = missing.find((r) => r.filter((v, i) => key([v]) !== key([bad[i]])).length === 1)
-    if (ordered) {
+    const twin = twinOf(missing, bad)
+    if (hidden) {
+      const col = columns.findIndex((_, i) => key([twin[i]]) !== key([bad[i]]))
+      message = `${unexpected.length === 1 ? 'One row has' : `${unexpected.length} rows have`} the wrong ${columns[col]}. Look at how that column is worked out.`
+    } else if (ordered) {
       message = `This row should not be in the result: ${describe(columns, bad)}. Another row belongs in its place.`
     } else if (twin) {
       const col = columns.findIndex((_, i) => key([twin[i]]) !== key([bad[i]]))
       const wrong = unexpected.length === 1 ? 'One row has' : `${unexpected.length} rows have`
       message = `${wrong} the wrong ${columns[col]}. One of yours is ${show(bad[col])}. Look at how that column is worked out.`
     } else {
-      message = `This row should not be in the result: ${describe(columns, bad)}. Another row belongs in its place: look at your condition.`
+      message = `This row should not be in the result: ${describe(columns, bad)}. Another row belongs in its place: look at your condition${aggregate ? ', and at how each column is worked out' : ''}.`
     }
   }
   const extra = ordered ? orderHints(mine, want.rows, missing, unexpected) : []

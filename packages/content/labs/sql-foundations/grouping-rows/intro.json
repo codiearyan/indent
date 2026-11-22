@@ -3,7 +3,7 @@
     {
       "title": "Ifan",
       "say": "Which breeds do we see most?",
-      "note": "For the breed leaflets."
+      "note": "Species by species."
     },
     {
       "title": "animals",
@@ -19,16 +19,16 @@
     }
   ],
   "ticket": {
-    "label": "Breed leaflets",
+    "label": "Breed list",
     "wrong": "one total",
     "why": "No groups",
     "right": "per breed"
   },
   "captions": [
-    "Ifan wants to know which breeds the practice sees, to order the right leaflets.",
+    "Ifan wants to know which breeds the practice sees, species by species.",
     "A count squeezes the whole table into one number, so every breed is lumped together.",
     "You split the rows into groups, pick and sort the groups by their totals, in four tasks.",
-    "Now each species and breed gets its own count, and Ifan orders what he needs.",
+    "Now each species and breed gets its own count, and Ifan sees which breeds come in.",
     "Same records, now with a figure for every group."
   ]
 }
