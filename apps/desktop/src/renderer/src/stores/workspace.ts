@@ -218,9 +218,10 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       await get()
         .flush()
         .catch(() => {})
+      // Before the timers: by now they may belong to the issue a newer open is showing.
+      if (opening !== opens) return
       for (const timer of pendingSaves.values()) clearTimeout(timer)
       pendingSaves.clear()
-      if (opening !== opens) return
       api.preview.close()
       set({
         browserExpanded: false,
