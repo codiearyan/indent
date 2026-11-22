@@ -123,7 +123,7 @@ export function EditorPane(): React.JSX.Element {
           shortcut="foldComments"
           onClick={() => {
             const editor = focusedEditor()
-            if (editor && activePath) toggleCommentFolds(editor, focusedGroup, activePath)
+            if (editor && activePath) void toggleCommentFolds(editor, focusedGroup, activePath)
           }}
         >
           {commentsFolded ? <UnfoldVerticalIcon /> : <FoldVerticalIcon />}

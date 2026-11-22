@@ -118,7 +118,7 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
         keybindings: [monacoShortcut('foldComments', monaco)],
         run: () => {
           const path = useWorkspace.getState().layout.groups[group]?.active
-          if (path) toggleCommentFolds(editor, group, path)
+          if (path) void toggleCommentFolds(editor, group, path)
         }
       })
     ])

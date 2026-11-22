@@ -18,11 +18,11 @@ export function foldKey(group: number, path: string): string {
  * Folds the comment runs of the editor's file, or shows them again. Folds are made as manual
  * ranges from selections, the one way Monaco lets a caller add a fold region of its own.
  */
-export function toggleCommentFolds(
+export async function toggleCommentFolds(
   editor: monaco.editor.ICodeEditor,
   group: number,
   path: string
-): void {
+): Promise<void> {
   const key = foldKey(group, path)
   const model = editor.getModel()
   if (!model) return
@@ -37,7 +37,8 @@ export function toggleCommentFolds(
     const action = folded
       ? 'editor.removeManualFoldingRanges'
       : 'editor.createFoldingRangeFromSelection'
-    editor.trigger('indent', action, null)
+    // The action reads the selections only once the folding model is ready, so wait for it.
+    await editor.getAction(action)?.run()
     // A cursor left inside a folded run would open it again, so it moves to the run's first line.
     const cursors = (selections ?? []).map((sel) => {
       const line = folded ? sel.positionLineNumber : lineOutsideFolds(sel.positionLineNumber, runs)
