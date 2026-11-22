@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { patterns } from '../../../desktop/src/renderer/src/features/dsa/registry'
+import type { Intro, Kind } from '../../../desktop/src/shared/types'
 
 // Patterns are plain data and logic with no React, so the site reads the app's own list.
 export const listPatterns = (): { title: string; group: string; time: string }[] =>
@@ -8,6 +9,8 @@ export const listPatterns = (): { title: string; group: string; time: string }[]
 
 // The shared repo packs at the monorepo root; the site builds with apps/site as the working directory.
 const contentDir = resolve(process.cwd(), '..', '..', 'packages', 'content')
+
+export type { Intro, Kind }
 
 export interface Issue {
   id: string
@@ -23,6 +26,7 @@ export interface Repo {
   category: string
   language: string
   tags: string[]
+  kind: Kind
   issues: Issue[]
   tasks: number
 }
@@ -48,6 +52,7 @@ interface LabFile {
   category: string
   language: string
   tags: string[]
+  kind?: Kind
   parts: { title: string; chapters: string[] }[]
 }
 
@@ -83,6 +88,8 @@ export function listRepos(): Repo[] {
         category: lab.category,
         language: lab.language,
         tags: lab.tags,
+        // A repo without a kind counts as a project, as in the app.
+        kind: lab.kind ?? 'project',
         issues,
         tasks: issues.reduce((n, issue) => n + issue.tasks, 0)
       }
@@ -101,4 +108,8 @@ export function readTask(labId: string, chapterId: string, taskId: string): Task
 
 export function readSource(labId: string, path: string): string {
   return readFileSync(join(contentDir, 'labs', labId, path), 'utf8')
+}
+
+export function readIntro(labId: string, chapterId: string): Intro {
+  return readJson<Intro>(join(contentDir, 'labs', labId, chapterId, 'intro.json'))
 }
