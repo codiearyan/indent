@@ -72,6 +72,8 @@ Because each method gives back a string, you can call another method right after
 flavour.slice(0, 4).toUpperCase() // 'RASP'
 ```
 
+A method only runs with its round brackets. Without them, as in `flavour.toUpperCase`, you get the method itself, and `console.log` prints `[Function: toUpperCase]` instead of a string.
+
 ## How long is it?
 
 `length` tells you how many characters a string has, spaces and punctuation included. It is not a method, so it has no brackets:
@@ -80,6 +82,8 @@ flavour.slice(0, 4).toUpperCase() // 'RASP'
 const order = 'Two scones, please'
 console.log(order.length) // 18
 ```
+
+Adding brackets anyway, as in `order.length()`, stops Node with `TypeError: order.length is not a function`.
 
 Strings have many more methods. `includes`, for example, says whether one string appears inside another; its answer is true or false, which the next issue is all about.
 

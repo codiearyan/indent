@@ -2,6 +2,37 @@ import { cases, code, fileProblem, run, show, source } from '../../grading.mjs'
 
 const FILE = 'src/variables.js'
 
+const textHint = (hint) => (v) =>
+  v?.type === 'string'
+    ? 'cedarOnShelf holds text, not a number. A name inside quotes is just text; a variable is used by writing its name without quotes.'
+    : hint
+
+// Task 2 is judged with the lines that change cedarOnShelf later taken out, so Task 3 cannot
+// change what Task 2 made.
+function shelfCases(t) {
+  return cases(t, {
+    file: FILE,
+    name: 'cedarOnShelf',
+    task: 'Task 2',
+    drop: /^\s*cedarOnShelf\s*[-+*/]?=(?!=).*$/,
+    typed: 'Check changed the delivery and cedarOnShelf stayed the same. Build it on the name cedarDelivered, not on a number you typed.',
+    list: [
+      {
+        name: 'Starts with the candles delivered',
+        given: { cedarDelivered: 31, cedarSold: 0 },
+        expected: 31,
+        hint: textHint('cedarOnShelf should start at the number delivered this morning.')
+      },
+      {
+        name: 'Follows a different delivery',
+        given: { cedarDelivered: 12, cedarSold: 0 },
+        expected: 12,
+        hint: textHint('Check changed the delivery and cedarOnShelf did not start at it.')
+      }
+    ]
+  })
+}
+
 async function declaredWith(t, keyword, name) {
   return new RegExp(`\\b${keyword}\\s+${name}\\b`).test(code(await source(t, FILE)))
 }
@@ -35,25 +66,7 @@ export const checks = {
   },
 
   async shelf(t) {
-    const details = await cases(t, {
-      file: FILE,
-      name: 'cedarOnShelf',
-      task: 'Task 2',
-      list: [
-        {
-          name: 'Starts with the candles delivered',
-          given: { cedarDelivered: 31, cedarSold: 0 },
-          expected: 31,
-          hint: 'With nothing sold, cedarOnShelf should be the number delivered. Build it on the name cedarDelivered, not on a number you typed.'
-        },
-        {
-          name: 'Follows a different delivery',
-          given: { cedarDelivered: 12, cedarSold: 0 },
-          expected: 12,
-          hint: 'Check changed the delivery and cedarOnShelf did not follow. Use the name cedarDelivered, not a number you typed.'
-        }
-      ]
-    })
+    const details = await shelfCases(t)
     if (details.length === 1 && !details[0].passed) return details
     const isLet = await declaredWith(t, 'let', 'cedarOnShelf')
     return [
@@ -73,28 +86,44 @@ export const checks = {
       file: FILE,
       name: 'cedarOnShelf',
       task: 'Task 2',
+      typed: 'Check changed the numbers at the top and cedarOnShelf stayed the same. Build it on the names, not on a number you typed.',
+      mistakes: [
+        {
+          value: (g) => g.cedarDelivered - 5,
+          hint: 'cedarOnShelf takes the same number away every morning, whatever was sold. Use cedarSold, not a number you typed.'
+        }
+      ],
       list: [
         {
           name: 'Takes the sale off the shelf',
           given: { cedarDelivered: 31, cedarSold: 6 },
           expected: 25,
-          hint: 'After the sale, cedarOnShelf should be what was delivered with the sold candles taken away. Use the names, not numbers you typed.'
+          hint: textHint(
+            'After the sale, cedarOnShelf should be what was on the shelf with the sold candles taken away.'
+          )
         },
         {
           name: 'Works when everything sold',
           given: { cedarDelivered: 12, cedarSold: 12 },
           expected: 0,
-          hint: 'When every candle sold, the shelf should be empty. Check the sum you wrote for Task 3.'
+          hint: textHint('When every candle sold, the shelf should be empty. Check the sum you wrote for Task 3.')
         },
         {
           name: 'Works for another morning',
           given: { cedarDelivered: 40, cedarSold: 1 },
           expected: 39,
-          hint: 'Check changed the numbers and cedarOnShelf did not follow. Use cedarSold, not a number you typed.'
+          hint: textHint(
+            'Check changed the numbers and cedarOnShelf did not follow them. Look at each name in your Task 3 line.'
+          )
         }
       ]
     })
     if (details.length === 1 && !details[0].passed) return details
+    if (!details.every((d) => d.passed) && !(await shelfCases(t)).every((d) => d.passed)) {
+      const message =
+        'Task 2 is not right yet, and Task 3 changes the count Task 2 starts. Get Task 2 passing first, then check again.'
+      return details.map((d) => (d.passed ? d : { ...d, message }))
+    }
     const reassigned = /^\s*cedarOnShelf\s*(-?=)(?!=)/m.test(code(await source(t, FILE)))
     return [
       ...details,
