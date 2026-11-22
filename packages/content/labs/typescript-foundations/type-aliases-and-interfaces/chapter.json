@@ -1,0 +1,133 @@
+{
+  "id": "type-aliases-and-interfaces",
+  "title": "A name for a shape",
+  "files": ["src/orders.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/orders.ts` runs the order code, and `npm run types` checks its types.",
+    "suggestedCommand": "npm run types"
+  },
+  "tasks": [
+    {
+      "id": "line",
+      "title": "Name the shape of an order line",
+      "file": "src/orders.ts",
+      "description": "Under `// Task 1` in `src/orders.ts`, `lineGrams` and `lineLabel` take the same shape written out twice, and the second copy is out of date. Write a type alias called `Line`, with `export` in front: an object with `blend` (text), `tins` (a number) and `gramsPerTin` (a number). Use `Line` as the type of the parameter of both functions. Leave their bodies and result types as they are.\n\nCheck reads both functions for `Line` in their parameters and for their result types. It compiles code of its own: a `Line` passed to both functions must compile, while a `Line` with a property missing or of the wrong type, or a line without its grams per tin passed to `lineLabel`, must be refused. It calls both functions with lines of its own.",
+      "nextSteps": [
+        "Run `npm run types` and read the error for `lineLabel`: which property does its copy of the shape not have?",
+        "Write the type alias above the two functions: `export type`, the name, `=` and the object type.",
+        "Replace both written-out object types with the name.",
+        "Run both commands again."
+      ],
+      "hints": [
+        "`Property 'gramsPerTin' does not exist on type '{ blend: string; tins: number; }'` means the shape written on `lineLabel` has only two properties. Writing the shape once, with a name, keeps the copies from drifting apart.",
+        "A type alias is the word `type`, a name, `=` and any type, here an object type with all three properties. After that, the name can go wherever a type goes.",
+        "`export type Line = { blend: string; tins: number; gramsPerTin: number }`, then `line: Line` in both parameter lists."
+      ],
+      "docs": [
+        {
+          "title": "Type aliases",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-aliases"
+        },
+        {
+          "title": "Object types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "customer",
+      "title": "Write a customer as an interface",
+      "file": "src/orders.ts",
+      "description": "Under `// Task 2`, write an interface called `Customer`, with `export` in front: `name` (text), `email` (text) and `phone` (text), which a customer may leave out. Use `Customer` as the type of the parameter of `contactLine` and of `firstCustomer`, and write the result type of `contactLine`. Leave the body of `contactLine` as it is.\n\nCheck reads your lines for the word `interface` in front of `Customer`, for `Customer` on `contactLine` and `firstCustomer`, and for the result type. It compiles code of its own: customers with and without a phone number must compile, while a customer without an email, a phone number that is a number, a contact line used as a number or a property `firstCustomer` does not have must be refused. It calls `contactLine` with customers of its own.",
+      "nextSteps": [
+        "Write the interface above `contactLine`: `export interface`, the name and the properties in curly braces.",
+        "Mark the phone number as a property a customer may leave out.",
+        "Put the name after the parameter of `contactLine` and after `firstCustomer`, and write the result type.",
+        "Run both commands again."
+      ],
+      "hints": [
+        "An interface names an object shape, like a type alias does, but it is written without `=`: the word `interface`, the name and the curly braces.",
+        "A question mark after a property's name makes it one an object may leave out, the same as in the object types of the last issue.",
+        "`export interface Customer { name: string; email: string; phone?: string }`, then `customer: Customer`, `): string` and `firstCustomer: Customer`."
+      ],
+      "docs": [
+        {
+          "title": "Interfaces",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#interfaces"
+        },
+        {
+          "title": "Optional properties",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#optional-properties"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "parcel",
+      "title": "Put an address inside a parcel",
+      "file": "src/orders.ts",
+      "description": "Under `// Task 3`, write a type called `Address`: `name`, `street`, `town` and `postcode`, all text. Then write a type called `Parcel`: `orderId` (text), `grams` (a number) and `to`, an `Address`. Use `Address` by its name inside `Parcel`, and put `export` in front of both. Then use `Parcel` as the type of the parameter of `shipTo`, and write its result type. Either a type alias or an interface is fine for each.\n\nCheck reads your lines for `Address` inside `Parcel`, for `Parcel` on `shipTo` and for its result type. It compiles code of its own: a parcel with an address, its town read as text and its address used as an `Address`, which must compile, and an address without a postcode, an address written as one line of text, grams as text or a parcel without an address, which must be refused. It calls `shipTo` with a parcel of its own.",
+      "nextSteps": [
+        "Write `Address` first, with its four properties.",
+        "Write `Parcel` under it, and give `to` the type `Address`.",
+        "Use `Parcel` on the parameter of `shipTo`, and write its result type.",
+        "Run both commands again."
+      ],
+      "hints": [
+        "A property's type can be any type, and that includes a name you wrote yourself.",
+        "Write `Address` before `Parcel`, so it reads in order. Then in `Parcel`, `to` gets the type `Address`, just as `grams` gets `number`.",
+        "`export type Parcel = { orderId: string; grams: number; to: Address }`, and `shipTo(parcel: Parcel): string`."
+      ],
+      "docs": [
+        {
+          "title": "Object types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html"
+        },
+        {
+          "title": "Type aliases",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-aliases"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "batch",
+      "title": "Build batch tins on tins",
+      "file": "src/orders.ts",
+      "description": "Under `// Task 4`, write a type called `BatchTin`, with `export` in front: everything a `Tin` has, and `batch` (a number) as well. Build it on the `Tin` above it instead of writing its properties out again, with either form the lesson shows. Leave `Tin` as it is. Then write a function called `batchLabel`, with `export` in front, from the word `function` to its closing brace. It takes a `BatchTin` and gives back text like `'Ember Oolong, 100 g, batch 3'`. Write its result type, then take away the `//` in front of the line at the end, to see it run.\n\nCheck reads your lines for `Tin` in `BatchTin` and for the result type of `batchLabel`. It compiles code of its own: a plain tin, a batch tin, a batch tin used as a tin and its label as text must compile, while a batch tin without its batch or its grams, a batch as text, a plain tin passed to `batchLabel` or a label used as a number must be refused. It calls `batchLabel` with tins of its own.",
+      "nextSteps": [
+        "Pick one of the two ways the lesson shows to build one shape on another.",
+        "Write `BatchTin` under `Tin`, with only the batch number written out.",
+        "Write `batchLabel` whole, with its parameter type and result type.",
+        "Take away the `//` in front of the last line, and run both commands."
+      ],
+      "hints": [
+        "Writing `blend` and `grams` out again would work today, but when `Tin` gets a new property, `BatchTin` would not. Building on `Tin` keeps them together.",
+        "An interface can say `extends` and the name of the shape it builds on. A type alias can join two shapes with `&`.",
+        "`export interface BatchTin extends Tin { batch: number }`, then `export function batchLabel(tin: BatchTin): string {` and a template literal."
+      ],
+      "docs": [
+        {
+          "title": "Extending types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#extending-types"
+        },
+        {
+          "title": "Intersection types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#intersection-types"
+        },
+        {
+          "title": "Differences between type aliases and interfaces",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#differences-between-type-aliases-and-interfaces"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Type aliases and interfaces",
+          "url": "https://www.youtube.com/watch?v=hKkyCvu4MQ8"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
