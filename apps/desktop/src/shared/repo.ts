@@ -2,6 +2,7 @@
 export const REPO = 'codiearyan/indent'
 export const REPO_URL = `https://github.com/${REPO}`
 export const RELEASES_URL = `${REPO_URL}/releases/latest`
+export const SPONSOR_URL = 'https://github.com/sponsors/codiearyan'
 
 /** A new issue that asks for a repo, its title filled in with what the person searched for. */
 export function repoRequestUrl(topic: string): string {
