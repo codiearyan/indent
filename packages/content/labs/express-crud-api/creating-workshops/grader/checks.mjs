@@ -1,6 +1,7 @@
 import {
   checkApp,
   checkValidate,
+  created,
   errorCode,
   hasMessage,
   isJson,
@@ -20,7 +21,15 @@ export const checks = {
           name: 'POST /workshops answers 201 with the saved workshop',
           req: { method: 'POST', path: '/workshops', json: bowls },
           ok: (res) => res.status === 201 && isJson(res) && same(res.json, { ...bowls, id: 16 }),
-          hint: 'A valid POST should answer 201 Created with the workshop as the store saved it, id included. Is the JSON body being read at all?'
+          hint: (res) => {
+            if (res.status === 200) {
+              return 'The POST answered 200. A request that creates something has a status of its own; look at what the lesson says a create answers.'
+            }
+            if (res.status === 201 && res.json?.title === undefined) {
+              return 'The workshop came back without the fields that were sent. Is the JSON body being read at all?'
+            }
+            return 'A valid POST should answer 201 Created with the workshop as the store saved it: the four fields that were sent and the id the store gave it.'
+          }
         },
         {
           name: 'The 201 has a location header',
@@ -39,7 +48,8 @@ export const checks = {
           req: { method: 'POST', path: '/workshops', json: { ...bowls, id: 99, featured: true } },
           ok: (res) =>
             res.status === 201 &&
-            res.json?.id === 18 &&
+            Number.isInteger(res.json?.id) &&
+            res.json.id !== 99 &&
             !('featured' in res.json) &&
             same(Object.keys(res.json).sort(), ['day', 'id', 'priceCents', 'seats', 'title']),
           hint: 'A client should not choose the id or add fields of its own. Save only title, day, seats and priceCents, and let the store pick the id.'
@@ -242,8 +252,8 @@ export const checks = {
         {
           name: 'A good workshop is still created',
           req: { method: 'POST', path: '/workshops', json: bowls },
-          ok: (res) => res.status === 201 && same(res.json, { ...bowls, id: 16 }),
-          hint: 'A valid POST should still answer 201 with the saved workshop.'
+          ok: (res) => created(res, bowls),
+          hint: 'A valid POST should still answer 201 with the saved workshop and its location.'
         }
       ],
       { workshops: seed }

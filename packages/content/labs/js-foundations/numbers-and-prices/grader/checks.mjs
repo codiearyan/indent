@@ -10,18 +10,32 @@ const order = (candlePriceCents, quantity, discountPercent, shippingCents, candl
   candlesPerBox
 })
 
+/** Tells a rounding mistake from a percentage that ignores discountPercent or subtotalCents. */
+const discountHint = (exact) => (v) => {
+  if (v?.type !== 'number') return 'discountCents should be a number of cents.'
+  if (!Number.isInteger(v.value)) {
+    return 'Here the discount does not come out as whole cents. Money is kept in whole cents, rounded to the nearest one. Look at the part of the lesson on rounding.'
+  }
+  if (Math.abs(v.value - exact) < 1) {
+    return 'Close, but this rounds the wrong way. The task rounds to the nearest whole cent, and exactly half a cent goes up.'
+  }
+  return 'discountCents is not discountPercent percent of subtotalCents here. A percent is that many hundredths: check how you turn discountPercent into a part of subtotalCents, using both names.'
+}
+
 export const checks = {
   subtotal(t) {
     return cases(t, {
       file: FILE,
       name: 'subtotalCents',
       task: 'Task 1',
+      typed:
+        'Check changed the order and subtotalCents stayed the same. Use the names candlePriceCents and quantity, not numbers you typed.',
       list: [
         {
           name: 'Prices several candles',
           given: order(1199, 3, 10, 495, 4),
           expected: 3597,
-          hint: 'subtotalCents should be the price of one candle, once for every candle in the order. Use the names candlePriceCents and quantity, not numbers you typed.'
+          hint: 'subtotalCents should be the price of one candle, once for every candle in the order. Which operator did you use?'
         },
         {
           name: 'Prices one candle',
@@ -44,30 +58,43 @@ export const checks = {
       file: FILE,
       name: 'discountCents',
       task: 'Task 2',
+      after: {
+        names: ['subtotalCents'],
+        task: 'Task 1',
+        build: (g, v) => Math.round((v.subtotalCents * g.discountPercent) / 100)
+      },
+      typed:
+        'Check changed the order and discountCents stayed the same. Use the names discountPercent and subtotalCents, not numbers you typed.',
+      mistakes: [
+        {
+          value: (g) => Math.round((g.candlePriceCents * g.quantity * 10) / 100),
+          hint: 'discountCents takes the same percent off every order. Use discountPercent, not a number you typed.'
+        }
+      ],
       list: [
         {
           name: 'Takes a percentage that comes out even',
           given: order(1500, 2, 20, 495, 4),
           expected: 600,
-          hint: 'A percent is that many hundredths. Check how you turn discountPercent into a part of subtotalCents. If Task 1 does not pass yet, start there.'
+          hint: discountHint(600)
         },
         {
           name: 'Rounds to the nearest whole cent',
           given: order(1199, 3, 15, 495, 4),
           expected: 540,
-          hint: 'Here the discount does not come out as whole cents. Money is kept in whole cents, rounded to the nearest one. Look at the part of the lesson on rounding.'
+          hint: discountHint(539.55)
         },
         {
           name: 'Rounds a half cent up',
           given: order(333, 1, 50, 495, 4),
           expected: 167,
-          hint: 'Exactly half a cent rounds up, like in school. Which way does your rounding go?'
+          hint: discountHint(166.5)
         },
         {
           name: 'No discount is 0',
           given: order(1250, 2, 0, 495, 4),
           expected: 0,
-          hint: 'With discountPercent at 0, nothing comes off.'
+          hint: 'With discountPercent at 0, nothing comes off. Use the name discountPercent, not a number you typed.'
         }
       ]
     })
@@ -78,18 +105,25 @@ export const checks = {
       file: FILE,
       name: 'totalCents',
       task: 'Task 3',
+      after: {
+        names: ['subtotalCents', 'discountCents'],
+        task: 'Tasks 1 and 2',
+        build: (g, v) => v.subtotalCents - v.discountCents + g.shippingCents
+      },
+      typed:
+        'Check changed the order and totalCents stayed the same. Use the names, not numbers you typed.',
       list: [
         {
           name: 'Takes off the discount and adds shipping',
           given: order(1199, 3, 15, 495, 4),
           expected: 3552,
-          hint: 'The total is the subtotal, minus the discount, plus shipping. Check the signs, and that Tasks 1 and 2 pass.'
+          hint: 'The total is the subtotal, minus the discount, plus shipping. Check the signs.'
         },
         {
           name: 'Works with free shipping',
           given: order(1250, 4, 10, 0, 4),
           expected: 4500,
-          hint: 'With shippingCents at 0, the total is the subtotal minus the discount. Use the names, not numbers you typed.'
+          hint: 'With shippingCents at 0, the total is the subtotal minus the discount. Use the name shippingCents, not a number you typed.'
         },
         {
           name: 'Works with no discount',
@@ -106,6 +140,14 @@ export const checks = {
       file: FILE,
       name: 'boxes',
       task: 'Task 4',
+      typed:
+        'Check changed the order and boxes stayed the same. Use the names quantity and candlesPerBox, not numbers you typed.',
+      mistakes: [
+        {
+          value: (g) => Math.ceil(g.quantity / 4),
+          hint: 'boxes did not change when Check made the boxes bigger. Use candlesPerBox, not a number you typed.'
+        }
+      ],
       list: [
         {
           name: 'A small order fits in one box',
@@ -126,10 +168,16 @@ export const checks = {
           hint: 'One candle left over still needs its own box. Which of the Math rounding helpers always goes up?'
         },
         {
-          name: 'Works with bigger boxes',
+          name: 'One candle needs one box',
           given: order(1250, 1, 10, 495, 6),
           expected: 1,
-          hint: 'Use candlesPerBox, not a number you typed: Check tried another box size.'
+          hint: 'A single candle still needs a box of its own. Look at how you round.'
+        },
+        {
+          name: 'Works with bigger boxes',
+          given: order(1250, 9, 10, 495, 5),
+          expected: 2,
+          hint: 'With bigger boxes, fewer are needed. Look at how you divide and round.'
         }
       ]
     })

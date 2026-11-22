@@ -77,7 +77,7 @@ Ids keep working, too. The Jump to links still point at the ids on the headings,
 
 Everything happens in `index.html`. You are only adding elements around what is there; keep every element you already wrote.
 
-1. Put the studio name and the Jump to links in a `header`, with the links in a `nav`.
+1. Put the studio name and the Jump to links in a `header`, with the links in a `nav`. The studio picture between them is main content, so move it below the Jump to line first.
 2. Wrap everything between the header and the small print in one `main`.
 3. Give Classes, The shop and Visit us a `section` each, from the heading to the end of that part.
 4. Put the small print at the bottom in a `footer`.

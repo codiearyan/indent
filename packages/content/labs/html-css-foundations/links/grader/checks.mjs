@@ -22,6 +22,25 @@ const listLinks = (links) =>
   links.map((a) => `<a href="${a.getAttribute('href')}">${clean(a.textContent)}</a>`).join('\n') ||
   'No links on the page'
 
+/** What keeps a phone link from dialling the studio from anywhere, or null. */
+function phoneProblem(href) {
+  if (!href)
+    return 'On a phone, tapping the number should offer to call it. A link can begin with a scheme for that, followed by the number.'
+  if (!/^tel:/i.test(href))
+    return 'The phone number is a link, but its address does not start with the scheme for calls.'
+  // Dashes, dots and brackets are allowed in a phone link; the lesson only rules out spaces.
+  const number = href.slice(4)
+  if (/\s|%20/.test(number))
+    return 'The number in a phone link has no spaces. The words on the page can keep theirs.'
+  const bare = number.replace(/[-.()]/g, '')
+  if (!bare.startsWith('+44'))
+    return 'A phone link works from anywhere when the number starts with a + and the country code. Look at how the lesson writes a UK number.'
+  if (bare.startsWith('+440')) return 'After the country code, a UK number drops its first 0.'
+  if (bare !== `+44${PHONE}`)
+    return 'The phone link has the right start, but some digits differ from the number on the page. Check every digit.'
+  return null
+}
+
 export const checks = {
   async 'to-classes'(t) {
     const page = await t.page()
@@ -93,26 +112,28 @@ export const checks = {
   async contact(t) {
     const page = await t.page()
     const links = page.$$('a[href]')
-    const email = links.find((a) => {
-      const href = a.getAttribute('href').trim()
-      return /^mailto:/i.test(href) && href.slice(7).split('?')[0].toLowerCase() === EMAIL
-    })
-    const phone = links.find((a) => {
-      const href = a.getAttribute('href').trim()
-      return /^tel:/i.test(href) && href.replace(/\D/g, '').endsWith(PHONE)
-    })
+    const href = (a) => a.getAttribute('href').trim()
+    const email = links.find((a) => `${href(a)} ${a.textContent}`.toLowerCase().includes(EMAIL))
+    const phone = links.find((a) => `${href(a)} ${a.textContent}`.replace(/\D/g, '').includes(PHONE))
+    const emailProblem = !email
+      ? 'Clicking the studio email should start a new email to it. A link can begin with a scheme for that instead of a page address.'
+      : !/^mailto:/i.test(href(email))
+        ? 'The email address is a link, but its address does not start with the scheme for email.'
+        : href(email).slice(7).split('?')[0].toLowerCase() !== EMAIL
+          ? "The email link has the right scheme, but the address after it is not the studio's. Check every letter."
+          : null
     return [
       detail(
         'The email address opens an email',
-        Boolean(email),
-        'Clicking the studio email should start a new email to it. A link can begin with a scheme for that instead of a page address.',
-        listLinks(links.filter((a) => /^mailto:/i.test(a.getAttribute('href').trim())))
+        !emailProblem,
+        emailProblem,
+        email ? listLinks([email]) : 'The email address is not a link yet'
       ),
       detail(
         'The phone number can be called',
-        Boolean(phone),
-        'On a phone, tapping the number should offer to call it. A link can begin with a scheme for that, followed by the number. Check every digit.',
-        listLinks(links.filter((a) => /^tel:/i.test(a.getAttribute('href').trim())))
+        !phoneProblem(phone && href(phone)),
+        phoneProblem(phone && href(phone)),
+        phone ? listLinks([phone]) : 'The phone number is not a link yet'
       )
     ]
   }

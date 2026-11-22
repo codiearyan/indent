@@ -1,22 +1,30 @@
 const TITLES = ['Classes', 'The shop', 'Visit us']
+// A piece is found by any of its phrases, so a typo elsewhere in it is not taken for a missing
+// paragraph.
 const PARTS = [
-  { find: 'Kofi teaches two classes', name: 'the classes text' },
-  { find: 'Wear clothes', name: 'the line about clothes' },
-  { find: 'Everything on our shelves', name: 'the shop text' },
-  { find: 'The kiln is opened', name: 'the line about the kiln' },
-  { find: 'OS4 7RB', name: 'the address' },
-  { find: 'Open Tuesday to Saturday', name: 'the opening hours' }
+  { find: ['kofi teaches', 'thursday evenings', 'no wheel at all'], name: 'the classes text' },
+  { find: ['wear clothes', 'getting muddy'], name: 'the line about clothes' },
+  { find: ['everything on our shelves', 'every firing', 'come back often'], name: 'the shop text' },
+  { find: ['kiln is opened', 'friday nights'], name: 'the line about the kiln' },
+  { find: ['os4', '7rb', 'ostley'], name: 'the address' },
+  { find: ['open tuesday', '10am to 5pm'], name: 'the opening hours' }
 ]
+const [, CLOTHES, , KILN, ADDRESS] = PARTS
+const CLOTHES_LINE = 'wear clothes you do not mind getting muddy'
 const HEADINGS = 'h1, h2, h3, h4, h5, h6'
+// The address element suits the studio's own address too.
+const BLOCKS = 'p, address'
 
 const clean = (text) => text.replace(/\s+/g, ' ').trim()
+const lower = (el) => clean(el.textContent).toLowerCase()
 const detail = (name, passed, message, output) => ({
   name,
   passed,
   message: passed ? undefined : message,
   output
 })
-const paragraphWith = (page, text) => page.$$('p').find((p) => clean(p.textContent).includes(text))
+const blockWith = (page, part) =>
+  page.$$(BLOCKS).find((p) => part.find.some((words) => lower(p).includes(words)))
 
 export const checks = {
   async headings(t) {
@@ -53,7 +61,7 @@ export const checks = {
 
   async paragraphs(t) {
     const page = await t.page()
-    const found = PARTS.map((part) => ({ ...part, p: paragraphWith(page, part.find) }))
+    const found = PARTS.map((part) => ({ ...part, p: blockWith(page, part) }))
     const missing = found.filter((part) => !part.p).map((part) => part.name)
     const shared = found.filter(
       (part, i) => part.p && found.some((other, j) => j !== i && other.p === part.p)
@@ -70,11 +78,11 @@ export const checks = {
       ),
       detail(
         'Each idea has a paragraph of its own',
-        missing.length === 0 && shared.length === 0,
+        shared.length === 0,
         'Some pieces still share one paragraph. Give each one listed in the task its own paragraph.',
         shared.length
           ? `Sharing a paragraph: ${shared.map((part) => part.name).join(', ')}`
-          : `${found.length} pieces, ${new Set(found.map((part) => part.p)).size} paragraphs`
+          : `${found.length - missing.length} of ${found.length} pieces in a paragraph, none sharing one`
       ),
       detail(
         'No paragraph starts with a section title',
@@ -89,31 +97,36 @@ export const checks = {
 
   async emphasis(t) {
     const page = await t.page()
-    const important = page
+    const marked = page
       .$$('strong')
-      .find((el) => clean(el.textContent).includes('clothes you do not mind getting muddy'))
-    const kiln = paragraphWith(page, 'The kiln is opened')
-    const stressed = kiln
-      ? [...kiln.querySelectorAll('em')].find(
-          (el) => clean(el.textContent).toLowerCase() === 'saturday'
-        )
-      : null
+      .find((el) => ['clothes', ...CLOTHES.find].some((words) => lower(el).includes(words)))
+    const line = marked ? lower(marked.closest(BLOCKS) ?? marked) : ''
+    const kiln = blockWith(page, KILN)
+    const ems = kiln ? [...kiln.querySelectorAll('em')] : []
+    const stressed = ems.find((el) => lower(el) === 'saturday')
     const looks = page.$$('b, i').map((el) => `<${el.tagName.toLowerCase()}> ${clean(el.textContent)}`)
     return [
       detail(
         'The line about clothes is marked as important',
-        Boolean(important),
-        'Kofi wants nobody to miss the line about clothes. Wrap it in the element that marks words as important, not just bold.',
-        page.$$('strong').map((el) => clean(el.textContent)).join('\n') || `No important words yet${looks.length ? `\nFound: ${looks.join(', ')}` : ''}`
+        Boolean(marked) && lower(marked).includes(CLOTHES_LINE.slice(5)),
+        !marked
+          ? 'Kofi wants nobody to miss the line about clothes. Wrap it in the element that marks words as important, not just bold.'
+          : !line.includes(CLOTHES_LINE)
+            ? "The line about clothes is marked as important, but its words have changed. Keep Kofi's words as he wrote them."
+            : 'Only part of the line about clothes is marked. Mark the whole line as important.',
+        page.$$('strong').map((el) => clean(el.textContent)).join('\n') ||
+          `No important words yet${looks.length ? `\nFound: ${looks.join(', ')}` : ''}`
       ),
       detail(
         'The word Saturday is stressed',
         Boolean(stressed),
+        !kiln
+          ? 'The line about the kiln is not in a paragraph yet. Do the paragraphs first.'
+          : ems.length === 1 && !lower(ems[0]).includes(' ')
+            ? 'One word in the line about the kiln is stressed, but it is not Saturday as Kofi wrote it. Check which word it is and how it is spelled.'
+            : 'In the line about the kiln, one word is said with stress. Wrap only that word in the element for stress.',
         kiln
-          ? 'In the line about the kiln, one word is said with stress. Wrap only that word in the element for stress.'
-          : 'The line about the kiln is not in a paragraph yet. Do the paragraphs first.',
-        kiln
-          ? [...kiln.querySelectorAll('em')].map((el) => clean(el.textContent)).join(', ') || 'No stressed words in that line'
+          ? ems.map((el) => clean(el.textContent)).join(', ') || 'No stressed words in that line'
           : 'Line not found'
       )
     ]
@@ -121,15 +134,19 @@ export const checks = {
 
   async 'address-lines'(t) {
     const page = await t.page()
-    const address = paragraphWith(page, 'OS4 7RB')
+    const address = blockWith(page, ADDRESS)
     const text = address ? clean(address.textContent) : ''
     const breaks = address ? address.querySelectorAll('br').length : 0
+    const alone = Boolean(address) && !/open tuesday|kiln|shelves/i.test(text)
+    const kept = ['14 Saddler Street', 'Ostley', 'OS4 7RB'].every((part) => text.includes(part))
     return [
       detail(
         'The address is one paragraph on its own',
-        Boolean(address) && text.includes('14 Saddler Street') && text.includes('Ostley') && !text.includes('Open Tuesday'),
-        'The three lines of the address belong together in one paragraph, with nothing else in it.',
-        address ? text : 'No paragraph holds the postcode'
+        alone && kept,
+        alone
+          ? 'The address has a paragraph of its own, but some of its words have changed. Keep the street, the town and the postcode as Kofi wrote them.'
+          : 'The three lines of the address belong together in one paragraph, with nothing else in it.',
+        address ? text : 'No paragraph holds the address'
       ),
       detail(
         'Each part of the address starts a new line',

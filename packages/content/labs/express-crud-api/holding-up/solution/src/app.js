@@ -13,7 +13,7 @@ import { workshops } from './workshops.js'
 
 export function createApp({
   store = createStore(workshops),
-  staffKey = process.env.STAFF_KEY ?? 'copperleaf-staff'
+  staffKey = process.env.STAFF_KEY ?? 'kilnworth-staff'
 } = {}) {
   const app = express()
   app.use(express.json())
