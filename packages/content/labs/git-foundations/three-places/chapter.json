@@ -1,0 +1,85 @@
+{
+  "id": "three-places",
+  "title": "Three places a change lives",
+  "files": ["NOTES.md", "shop/visit.html", "shop/finds.html", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the shop's folder, then go into shop and work there with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "finds",
+      "title": "Commit the new finds by themselves",
+      "file": "shop/finds.html",
+      "description": "Run `node setup.mjs` in the top folder, then work inside `shop`. Femi left three changes in the working folder: two new books in `finds.html`, a phone number in `visit.html` and a new page, `events.html`.\n\nMake a commit that holds the new books in `finds.html` and nothing else.\n\nThe check finds the commit where both new books first appear in `finds.html` and expects no other file in it.",
+      "nextSteps": [
+        "Run `git status` and find the three changes: two modified files and one untracked file.",
+        "Stage `finds.html` only.",
+        "Run `git status` again: `finds.html` is the only file under changes to be committed.",
+        "Commit it with a short message."
+      ],
+      "hints": [
+        "A commit takes everything in the staging area, so what you stage decides what goes in.",
+        "`git add` with one file name stages only that file. `git add .` would stage all three changes.",
+        "Run `git add finds.html`, then `git commit -m \"Add two finds for March\"`."
+      ],
+      "docs": [
+        { "title": "git add", "url": "https://git-scm.com/docs/git-add" },
+        { "title": "git status", "url": "https://git-scm.com/docs/git-status" }
+      ],
+      "videos": [
+        {
+          "title": "The working tree, the staging area and the repository",
+          "url": "https://www.youtube.com/watch?v=uR6G2v_WsRA"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "phone",
+      "title": "Fix the phone number, then commit it by itself",
+      "file": "shop/visit.html",
+      "description": "Femi typed the shop's phone number into `visit.html` with two digits swapped. Wilma's number is `01632 960 418`. Fix it in the editor and save, then make a commit that holds `visit.html` and nothing else.\n\nThe check finds the commit where `visit.html` first has Wilma's number and expects no other file in it.",
+      "nextSteps": [
+        "Open `shop/visit.html` in the editor, correct the phone line and save.",
+        "Stage `visit.html` after the fix, not before.",
+        "Run `git status` to see that only `visit.html` is staged.",
+        "Commit it."
+      ],
+      "hints": [
+        "The staging area holds a file as it was when you added it. Fix first, then stage.",
+        "If you staged visit.html before fixing it, git status lists it twice: once staged and once modified. Add it again to stage the fixed version.",
+        "Save the fixed file, then run `git add visit.html` and `git commit -m \"Add the shop's phone number\"`."
+      ],
+      "docs": [
+        { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" },
+        {
+          "title": "Recording changes to the repository",
+          "url": "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "events",
+      "title": "Stage the reading group page without committing it",
+      "file": "shop/events.html",
+      "description": "Wilma wants to read `events.html` before it goes into the history. Put it in the staging area, ready for the next commit, and do not commit it.\n\nThe check expects `events.html` in the staging area, in no commit, and still in the working folder.",
+      "nextSteps": [
+        "Run `git status`: `events.html` is listed as untracked.",
+        "Stage it.",
+        "Run `git status` again and stop there: it is under changes to be committed."
+      ],
+      "hints": [
+        "Staging and committing are two separate steps. This task is only the first one.",
+        "The same command that staged the other files stages this one.",
+        "Run `git add events.html`, and no `git commit` after it."
+      ],
+      "docs": [
+        { "title": "git add", "url": "https://git-scm.com/docs/git-add" },
+        { "title": "The index (staging area)", "url": "https://git-scm.com/docs/gitglossary#def_index" }
+      ],
+      "points": 10
+    }
+  ]
+}

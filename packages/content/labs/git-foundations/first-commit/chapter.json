@@ -1,0 +1,112 @@
+{
+  "id": "first-commit",
+  "title": "A history for the shop",
+  "files": ["NOTES.md", "shop/visit.html", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the shop's folder, then go into shop and work there with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "init",
+      "title": "Make the shop's folder a repository",
+      "file": "shop/index.html",
+      "description": "Run `node setup.mjs` in the top folder first. It builds `shop`, the folder that holds the shop's website: four files and no history.\n\nTurn `shop` into a Git repository, so Git can start keeping its history. Make the repository in `shop` itself, not in the top folder above it.\n\nThe check looks for the `.git` folder inside `shop`.",
+      "nextSteps": [
+        "Run `node setup.mjs` in the top folder, then move into `shop`.",
+        "Run `git status` once: Git says the folder is not a repository yet.",
+        "Make the repository with the command from the lesson.",
+        "Run `git status` again. It now talks about commits and untracked files."
+      ],
+      "hints": [
+        "The terminal starts in the top folder, which holds setup.mjs. The shop's folder is one level down.",
+        "Git makes the repository in the folder the terminal is in. Move into shop with `cd` before you make it.",
+        "From the top folder run `cd shop`, then `git init`."
+      ],
+      "docs": [
+        { "title": "git init", "url": "https://git-scm.com/docs/git-init" },
+        {
+          "title": "Getting a Git repository",
+          "url": "https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository"
+        }
+      ],
+      "videos": [
+        { "title": "What Git is, in 100 seconds", "url": "https://www.youtube.com/watch?v=hwP7WQkmECE" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "identity",
+      "title": "Tell Git who you are in this repository",
+      "file": "shop/index.html",
+      "description": "Every commit records who made it. Set your name and an email address in the settings of the `shop` repository only. A made-up address is fine.\n\nDo not add `--global`: that would change the settings for every repository on this computer, and this course keeps its settings inside each repository.\n\nThe check reads `user.name` and `user.email` from the settings of `shop` itself. The name must not be empty, and the email needs an `@` and no spaces.",
+      "nextSteps": [
+        "Make sure the terminal is inside `shop`.",
+        "Set `user.name` with `git config`, putting a name with a space in quotes.",
+        "Set `user.email` the same way.",
+        "Read each one back with `git config user.name` and `git config user.email`."
+      ],
+      "hints": [
+        "Both settings are made with one command, `git config`, run inside shop.",
+        "`git config` takes the name of the setting first and its value after it. A value with a space goes in double quotes.",
+        "Run `git config user.name \"Your Name\"`, then `git config user.email \"you@example.com\"`, with your own values."
+      ],
+      "docs": [
+        { "title": "git config", "url": "https://git-scm.com/docs/git-config" },
+        {
+          "title": "First-time Git setup",
+          "url": "https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "first",
+      "title": "Save the whole site in a first commit",
+      "file": "shop/index.html",
+      "description": "Save the site exactly as Femi left it in one first commit. That commit must hold all four files: `finds.html`, `index.html`, `style.css` and `visit.html`. Do not change any of them before this commit.\n\nThe check reads the first commit in the history of `shop` and lists the files in it.",
+      "nextSteps": [
+        "Run `git status` and read which files Git lists as untracked.",
+        "Add every file to the staging area.",
+        "Run `git status` again: the files are now under changes to be committed.",
+        "Commit with a short message, given with `-m`."
+      ],
+      "hints": [
+        "A commit holds only what is in the staging area, so all four files have to be added first.",
+        "`git add` takes file names, and `.` stands for everything in the folder you are in. Then `git commit` with `-m` and a message in quotes.",
+        "Run `git add .` and then `git commit -m \"Add the website as Femi left it\"`."
+      ],
+      "docs": [
+        { "title": "git add", "url": "https://git-scm.com/docs/git-add" },
+        { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" },
+        { "title": "git status", "url": "https://git-scm.com/docs/git-status" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "saturday",
+      "title": "Change the Saturday hours in a commit of their own",
+      "file": "shop/visit.html",
+      "description": "Wilma opens at 9:00 on Saturdays now, not 10:00. Closing time stays 17:00. Open `shop/visit.html` in the editor, change the opening time on the Saturday line and save. Then commit that change as a second commit.\n\nThe check finds the commit where `visit.html` starts opening at 9:00 on Saturdays. It expects the commit before it to still say 10:00, the Saturday line to still close at 17:00, every other line of `visit.html` to be as it was, and no other file in that commit.",
+      "nextSteps": [
+        "Open `shop/visit.html` from the files panel and change only the Saturday opening time. Save.",
+        "Run `git status`: Git lists `visit.html` as modified.",
+        "Stage that file and commit it with a message that says what changed.",
+        "Run `git log --oneline`: there are now two commits."
+      ],
+      "hints": [
+        "This change goes through the same two steps as the first commit: stage, then commit.",
+        "Saving in the editor changes only the working folder. Git needs `git add visit.html` before the commit can hold it.",
+        "Run `git add visit.html`, then `git commit -m \"Open at 9:00 on Saturdays\"`."
+      ],
+      "docs": [
+        { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" },
+        {
+          "title": "Recording changes to the repository",
+          "url": "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

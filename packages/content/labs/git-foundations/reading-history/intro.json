@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilma", "say": "Who took Sundays off our website?", "note": "A customer asked about it." },
+    { "title": "History", "text": "Nine commits. Messages do not say it.", "note": "Femi's new finds wait unchecked." },
+    {
+      "title": "Your commands",
+      "file": "visit.html",
+      "mine": true,
+      "gap": "Nobody has looked back",
+      "tasks": ["Put Sundays back", "Name the commit", "Check the new finds"]
+    },
+    { "title": "Wilma", "say": "So that's where it went." }
+  ],
+  "ticket": { "label": "Sunday hours", "wrong": "gone", "why": "Unnoticed", "right": "back" },
+  "captions": [
+    "Wilma wants to know who took the Sunday hours off the shop's website.",
+    "No message mentions it, and Femi's new finds are waiting, written in a hurry.",
+    "You read the history and the changes, then commit what you found, in three tasks.",
+    "The Sunday hours are back, the commit that took them is named, and no book went missing.",
+    "Wilma has her answer, straight from the history."
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "id": "reading-history",
+  "title": "Reading the history",
+  "files": ["NOTES.md", "shop/visit.html", "shop/finds.html", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the shop's folder, then go into shop and work there with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "sunday",
+      "title": "Put the Sunday hours back on the visit page",
+      "file": "shop/visit.html",
+      "description": "Run `node setup.mjs` in the top folder, then work inside `shop`. The visit page used to list Sunday opening hours, and one of the commits took that line off. Find the commit, read the line it removed, put that line back in the list of hours in `shop/visit.html` exactly as it was, and commit it. Femi's changes to `finds.html` belong to the third task, so this commit can leave them out.\n\nThe check reads `visit.html` in your last commit. It expects the old Sunday line, character for character, inside the list of hours, and every other line still there.",
+      "nextSteps": [
+        "Run `git log --oneline` and read the first lines of the commits.",
+        "Run `git show` on the commits that sound like they touched the visit page, and look for a red line about Sunday.",
+        "Copy that line into the list of hours in `shop/visit.html` and save.",
+        "Stage `visit.html` only, and keep the commit for the next task, which is about its message."
+      ],
+      "hints": [
+        "A tidy-up can take more with it than it says. Read what each commit did, not only its message.",
+        "`git show <hash>` prints a commit's changes. Lines that start with `-` were removed. `git log --oneline -- visit.html` lists only the commits that changed that file.",
+        "Look at the commit `Tidy up the visit page` with `git show`, copy its removed Sunday line without the `-`, then `git add visit.html`."
+      ],
+      "docs": [
+        { "title": "git log", "url": "https://git-scm.com/docs/git-log" },
+        { "title": "git show", "url": "https://git-scm.com/docs/git-show" },
+        {
+          "title": "Viewing the commit history",
+          "url": "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History"
+        }
+      ],
+      "videos": [
+        { "title": "Reading diffs, logs and single commits", "url": "https://www.youtube.com/watch?v=Ka5xBfX_RWE" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "name",
+      "title": "Name the commit that removed them",
+      "file": "shop/visit.html",
+      "description": "Wilma wants to know where the Sunday hours went. In the message of the commit that puts them back, name the commit that removed them by its short hash, the seven characters `git log --oneline` prints before its message.\n\nThe check reads the messages of the commits you made and looks for a hash of the commit that removed the Sunday line.",
+      "nextSteps": [
+        "Find the short hash of the commit you found in the first task, in `git log --oneline`.",
+        "Commit the Sunday line with a message that names that hash.",
+        "Run `git log --oneline -n 2` and compare the hash in your message with the commit's own."
+      ],
+      "hints": [
+        "Every commit has a hash, and Git accepts its first seven characters wherever a commit is meant.",
+        "Write the hash into the first line of the message, as part of a sentence about the change.",
+        "Commit with `-m \"Put back the Sunday hours removed in <hash>\"`, putting the short hash in place of `<hash>`."
+      ],
+      "docs": [
+        { "title": "git log --oneline", "url": "https://git-scm.com/docs/git-log#Documentation/git-log.txt---oneline" },
+        { "title": "Naming commits", "url": "https://git-scm.com/docs/gitrevisions" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "review",
+      "title": "Look at Femi's April finds before you commit them",
+      "file": "shop/finds.html",
+      "description": "Femi left two new April books in `finds.html` in the working folder. Nothing was sold this week, so every book already on the list stays. Look at exactly what changed before you commit it, put right anything Femi did not mean to change, and commit the April finds.\n\nThe check finds the commit where both April books first appear and compares its list of books with the list before your commits: no book may be missing or changed.",
+      "nextSteps": [
+        "Run `git diff` and read every line, the red ones too.",
+        "Fix in the editor what does not belong to the April finds, and save.",
+        "Run `git diff` again: only the two new books are left as changes.",
+        "Stage `finds.html` and commit it."
+      ],
+      "hints": [
+        "Femi's change is bigger than two new lines. Read all of it.",
+        "In `git diff` a line that starts with `-` is in the last commit but not in the working folder. A book on that list would vanish from the site.",
+        "Put the line that `git diff` shows with a `-` back into `shop/finds.html` without the `-`, then run `git diff` again before you stage and commit."
+      ],
+      "docs": [
+        { "title": "git diff", "url": "https://git-scm.com/docs/git-diff" },
+        {
+          "title": "Viewing your staged and unstaged changes",
+          "url": "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository#_git_diff_staged"
+        }
+      ],
+      "videos": [
+        { "title": "What git diff shows", "url": "https://www.youtube.com/watch?v=vXN50AmJjgY" }
+      ],
+      "points": 10
+    }
+  ]
+}

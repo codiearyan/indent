@@ -1,0 +1,46 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilma", "label": "Wilma", "kind": "story" },
+      { "id": "folder", "label": "Shop's folder", "kind": "data" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "history", "label": "History", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "wilma", "to": "you", "label": "request" },
+      { "from": "folder", "to": "you", "label": "site files" },
+      { "from": "you", "to": "history", "label": "commits" }
+    ],
+    "note": "The shop's website stops being copied around and starts keeping a history."
+  },
+  "tasks": {
+    "init": {
+      "steps": [
+        { "active": ["folder"], "note": "The shop's folder holds four files and no record of how they got there." },
+        { "active": ["folder", "folder->you", "you"], "note": "You turn that very folder into a repository, from inside it." },
+        { "active": ["you", "you->history", "history"], "note": "An empty history is ready. Nothing is saved in it yet." }
+      ]
+    },
+    "identity": {
+      "steps": [
+        { "active": ["you"], "note": "Every commit will carry a name and an email." },
+        { "active": ["you", "history"], "note": "You store yours in the settings of this repository, and of no other." },
+        { "active": ["history"], "note": "From now on the history can say who saved each change." }
+      ]
+    },
+    "first": {
+      "steps": [
+        { "active": ["folder"], "note": "The site as Femi left it: four files, all still untracked." },
+        { "active": ["folder", "folder->you", "you"], "note": "Every file goes into the staging area, unchanged." },
+        { "active": ["you", "you->history", "history"], "note": "One commit saves them together as the first snapshot." }
+      ]
+    },
+    "saturday": {
+      "steps": [
+        { "active": ["wilma", "wilma->you", "you"], "note": "Wilma has new Saturday opening hours." },
+        { "active": ["folder"], "note": "One line of the visit page changes in the editor." },
+        { "active": ["folder", "folder->you", "you", "you->history", "history"], "note": "That one change is staged and saved as the next snapshot, after the first." }
+      ]
+    }
+  }
+}

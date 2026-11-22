@@ -1,0 +1,16 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "people", "label": "Wilma and Femi", "kind": "story" },
+      { "id": "site", "label": "Shop's folder", "kind": "data" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "history", "label": "History", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "people", "to": "you", "label": "requests" },
+      { "from": "site", "to": "you", "label": "changes" },
+      { "from": "you", "to": "history", "label": "commits" }
+    ],
+    "note": "You give the bookshop's website a history in Git, one command at a time."
+  }
+}

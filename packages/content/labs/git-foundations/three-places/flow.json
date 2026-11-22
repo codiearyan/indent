@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "femi", "label": "Femi", "kind": "story" },
+      { "id": "working", "label": "Working folder", "kind": "data" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "staging", "label": "Staging area", "kind": "data" },
+      { "id": "history", "label": "History", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "femi", "to": "working", "label": "three edits" },
+      { "from": "working", "to": "you", "label": "changes" },
+      { "from": "you", "to": "staging", "label": "chosen files" },
+      { "from": "staging", "to": "history", "label": "one commit" }
+    ],
+    "note": "Femi's three changes leave the working folder one at a time, each on its own way."
+  },
+  "tasks": {
+    "finds": {
+      "steps": [
+        { "active": ["femi", "femi->working", "working"], "note": "Femi's edits all sit in the working folder, none of them staged." },
+        { "active": ["working", "working->you", "you", "you->staging", "staging"], "note": "Only the finds page goes into the staging area." },
+        { "active": ["staging", "staging->history", "history"], "note": "The commit holds the new books and nothing else." }
+      ]
+    },
+    "phone": {
+      "steps": [
+        { "active": ["working"], "note": "The visit page has the phone number with two digits swapped." },
+        { "active": ["working", "working->you", "you"], "note": "The number is fixed in the editor first, in the working folder." },
+        { "active": ["you", "you->staging", "staging"], "note": "Then the fixed page is staged, as it is now." },
+        { "active": ["staging", "staging->history", "history"], "note": "Its own commit saves the right number." }
+      ]
+    },
+    "events": {
+      "steps": [
+        { "active": ["working"], "note": "The reading group page is new, and Git does not track it yet." },
+        { "active": ["working", "working->you", "you", "you->staging", "staging"], "note": "It moves into the staging area, ready for Wilma to read." },
+        { "active": ["history"], "note": "The history does not change until she says yes." }
+      ]
+    }
+  }
+}

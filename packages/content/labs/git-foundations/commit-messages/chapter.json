@@ -1,0 +1,84 @@
+{
+  "id": "commit-messages",
+  "title": "A commit that says why",
+  "files": ["NOTES.md", "shop/finds.html", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the shop's folder, then go into shop and work there with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "reword",
+      "title": "Give Femi's last commit a message that says what it did",
+      "file": "shop/visit.html",
+      "description": "Run `node setup.mjs` in the top folder, then work inside `shop`. Femi's last commit is only on this computer, so nobody else has it yet, and its message is `changes`. Change that commit's message so it says what the commit did. Do this first, while it is still the last commit, and with nothing staged.\n\nThe check expects no commit called `changes` in the history, Femi's change still in a commit of its own right after `Add the reading group page`, and its new first line to say what changed in at most 72 characters.",
+      "nextSteps": [
+        "Run `git show` to see what the last commit changed.",
+        "Run `git status` and make sure nothing is staged.",
+        "Change the message of the last commit, giving the new message with `-m`.",
+        "Run `git log --oneline -n 3` and read the new message."
+      ],
+      "hints": [
+        "`git show` with no commit named shows the last one: look at which line it added.",
+        "`git commit` has an option that replaces the last commit instead of adding a new one on top. The lesson names it.",
+        "Run `git commit --amend -m \"Mention the Thursday late opening\"`."
+      ],
+      "docs": [
+        { "title": "git commit --amend", "url": "https://git-scm.com/docs/git-commit#Documentation/git-commit.txt---amend" },
+        { "title": "git show", "url": "https://git-scm.com/docs/git-show" },
+        { "title": "Undoing things", "url": "https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "subject",
+      "title": "Commit the new postage with a first line that says what changed",
+      "file": "shop/finds.html",
+      "description": "Wilma's request: postage on any order goes up from 2.50 to 3.20. Change the postage line in `shop/finds.html` in the editor and save, then commit it. The first line of the message says what changed, in at most 72 characters, and names the postage.\n\nThe check finds the commit where the postage on `finds.html` first becomes 3.20 and reads the first line of its message: not longer than 72 characters, more than one word, not a word like \"update\" or \"fix\" on its own, and about the postage.",
+      "nextSteps": [
+        "Change the price on the postage line of `shop/finds.html` and save.",
+        "Stage `finds.html`.",
+        "Write a first line that would make sense in a list of commits, about the postage.",
+        "Keep reading: the next task adds the body in the same commit."
+      ],
+      "hints": [
+        "Read `git log --oneline` and ask which messages tell you what happened without opening the commit.",
+        "A good first line reads like an instruction: \"Raise the price of X\", not \"changes\" or \"finds.html\".",
+        "Commit with `-m \"Raise postage to 3.20\"`, and see the next task for the body."
+      ],
+      "docs": [
+        { "title": "git commit: discussion of messages", "url": "https://git-scm.com/docs/git-commit#_discussion" },
+        {
+          "title": "Commit guidelines",
+          "url": "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project#_commit_guidelines"
+        }
+      ],
+      "videos": [
+        { "title": "How to write a good commit message", "url": "https://www.youtube.com/watch?v=t2AuoBR_UOs" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "body",
+      "title": "Say why in the body of the postage commit",
+      "file": "shop/finds.html",
+      "description": "Give the same postage commit a body that says why: the courier put its price up, so the shop was paying for part of every parcel. The body comes after the first line, with an empty line between them, and is at least one full sentence.\n\nThe check reads the message of the commit where the postage first becomes 3.20. It expects an empty line after the first line, a body of at least six words that is not the first line again, and Wilma's reason, the courier, in it.",
+      "nextSteps": [
+        "Write the body before you commit: one or two sentences about why, not what.",
+        "Give `git commit` a second `-m` for the body. Git puts the empty line in for you.",
+        "Run `git log -n 1` to read the whole message.",
+        "Already committed the postage with one line? It is the last commit, so change its message the way you did in the first task, with both parts."
+      ],
+      "hints": [
+        "The first line says what changed. The body says why, for someone reading the history a year from now.",
+        "Each `-m` you give `git commit` becomes its own paragraph, with an empty line between them.",
+        "Commit with `-m \"Raise postage to 3.20\" -m \"The courier put its price up, so the shop was paying for part of every parcel.\"`."
+      ],
+      "docs": [
+        { "title": "git commit -m", "url": "https://git-scm.com/docs/git-commit#Documentation/git-commit.txt--mmsg" },
+        { "title": "git log", "url": "https://git-scm.com/docs/git-log" }
+      ],
+      "points": 10
+    }
+  ]
+}
