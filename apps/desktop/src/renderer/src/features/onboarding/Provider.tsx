@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Check, Copy } from 'lucide-react'
 import type { AiProviderInfo } from '@shared/types'
 import { ProviderIcon } from '@/components/app/ProviderIcon'
 import { Badge } from '@/components/ui/badge'
@@ -8,9 +7,10 @@ import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ModelSelect } from '@/features/ai/AiMenu'
+import { InstallOpencode } from '@/features/ai/InstallOpencode'
+import { useOpencodeSetup } from '@/features/ai/opencodeInstall'
 import { activeProvider, useAi } from '@/features/ai/aiStore'
 import { TestConnection } from '@/features/ai/TestConnection'
-import { IconButton } from '@/features/workspace/IconButton'
 import { cn, errorMessage } from '@/lib/utils'
 
 type ProviderId = AiProviderInfo['id']
@@ -39,6 +39,7 @@ export function ProviderPicker(): React.JSX.Element {
     void load().finally(() => setLoading(false))
   }
 
+  const setupStep = useOpencodeSetup((s) => s.setup.step)
   const clis = config?.providers.filter((p) => p.kind === 'cli') ?? []
   const apis = (config?.providers.filter((p) => p.kind === 'api') ?? []).sort(freeFirst)
   const active = loading ? undefined : activeProvider(config)
@@ -58,7 +59,17 @@ export function ProviderPicker(): React.JSX.Element {
           rows={4}
         >
           {clis.some((p) => p.available) ? (
-            clis.map((p, i) => <ProviderRow key={p.id} provider={p} index={i} />)
+            <>
+              {clis.map((p, i) => (
+                <ProviderRow key={p.id} provider={p} index={i} />
+              ))}
+              {/* The result of a setup started here stays in view once OpenCode is listed. */}
+              {setupStep !== 'idle' && (
+                <li className="px-4 py-3">
+                  <InstallOpencode />
+                </li>
+              )}
+            </>
           ) : (
             <InstallHelp onCheck={lookAgain} />
           )}
@@ -186,11 +197,6 @@ function ProviderRow({
   )
 }
 
-const INSTALL_OPENCODE =
-  window.platform === 'win32'
-    ? 'npm install -g @opencode/cli'
-    : 'curl -fsSL https://opencode.ai/v2/install | bash'
-
 /** Stands in for the list when no coding CLI is installed: the command that sets one up. */
 function InstallHelp({ onCheck }: { onCheck(): void }): React.JSX.Element {
   return (
@@ -199,10 +205,10 @@ function InstallHelp({ onCheck }: { onCheck(): void }): React.JSX.Element {
         <ProviderIcon id="opencode" className="mt-0.5 text-foreground" />
         <span>
           None found yet. <span className="text-foreground">OpenCode</span> is open source and comes
-          with free models. One command in a terminal installs it.
+          with free models. Install it here with one click, or with one command in a terminal.
         </span>
       </p>
-      <Command name="install" text={INSTALL_OPENCODE} />
+      <InstallOpencode />
       <div className="flex items-center gap-3">
         <Button
           variant="outline"
@@ -216,32 +222,7 @@ function InstallHelp({ onCheck }: { onCheck(): void }): React.JSX.Element {
           Claude Code, Codex and Gemini CLI work too.
         </span>
       </div>
-      <p className="text-xs text-muted-foreground">
-        Signing in is only for a paid plan or your own key:
-      </p>
-      <Command name="sign-in" text="opencode auth login" />
     </li>
-  )
-}
-
-function Command({ name, text }: { name: string; text: string }): React.JSX.Element {
-  const [copied, setCopied] = useState(false)
-  const copy = async (): Promise<void> => {
-    await navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
-  }
-  return (
-    <div className="flex h-8 items-center gap-1 rounded-md border border-input pr-1 pl-2.5">
-      <code className="min-w-0 flex-1 truncate font-mono text-[11px]">{text}</code>
-      <IconButton
-        label={copied ? 'Copied' : `Copy the ${name} command`}
-        className="size-6"
-        onClick={() => void copy()}
-      >
-        {copied ? <Check /> : <Copy />}
-      </IconButton>
-    </div>
   )
 }
 
