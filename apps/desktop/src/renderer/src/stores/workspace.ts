@@ -121,7 +121,7 @@ interface WorkspaceStore {
   openPageWindow(): Promise<void>
 }
 
-const pendingSaves = new Map<string, ReturnType<typeof setTimeout>>()
+const pendingSaves = new Map<string, ReturnType<typeof setTimeout> | undefined>()
 
 /** Counts launches of an IDE and leavings of an issue, so a launch knows when it was left behind. */
 let ideLaunch = 0
@@ -133,14 +133,23 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     return [chapter.labId, chapter.id]
   }
 
-  const save = (path: string): Promise<void> => {
+  const save = async (path: string): Promise<void> => {
     clearTimeout(pendingSaves.get(path))
     pendingSaves.delete(path)
     const file = get().files.find((f) => f.path === path)
-    if (!file) return Promise.resolve()
-    return api.workspace
-      .writeFile(...ids(), path, file.content)
-      .then(() => set((s) => ({ revision: s.revision + 1 })))
+    if (!file) return
+    try {
+      await api.workspace.writeFile(...ids(), path, file.content)
+    } catch (error) {
+      // Still pending, so a refresh cannot replace text that never reached the disk.
+      if (!pendingSaves.has(path)) pendingSaves.set(path, undefined)
+      toast.error(`Could not save ${path}`, {
+        id: 'save-failed',
+        description: errorMessage(error)
+      })
+      throw error
+    }
+    set((s) => ({ revision: s.revision + 1 }))
   }
 
   const setLayout = (layout: EditorLayout): void => {
@@ -251,7 +260,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     openToSide: (path, from) => setLayout(openToSide(get().layout, path, from)),
 
     closeFile: (path, group) => {
-      if (pendingSaves.has(path)) void save(path)
+      if (pendingSaves.has(path)) void save(path).catch(() => {})
       setLayout(closeInGroup(get().layout, path, group))
     },
 
@@ -268,7 +277,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       clearTimeout(pendingSaves.get(path))
       pendingSaves.set(
         path,
-        setTimeout(() => void save(path), SAVE_DELAY_MS)
+        setTimeout(() => void save(path).catch(() => {}), SAVE_DELAY_MS)
       )
     },
 
