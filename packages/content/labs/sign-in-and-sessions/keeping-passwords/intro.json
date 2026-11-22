@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "Can we each sign in as ourselves?",
+      "note": "The staff key is everywhere."
+    },
+    {
+      "title": "Staff store",
+      "text": "Keeps exactly what it is given.",
+      "note": "Nothing hashes a password yet."
+    },
+    {
+      "title": "Your code",
+      "file": "passwords.js",
+      "mine": true,
+      "gap": "Passwords would be kept as typed",
+      "tasks": ["Hash with a salt", "Check in constant time", "Save without password"]
+    },
+    {
+      "title": "Staff store",
+      "rows": [
+        ["Dilys", "a hash"],
+        ["Kofi", "a hash"],
+        ["Sunniva", "a hash"]
+      ],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "A password",
+    "wrong": "kept as typed",
+    "why": "Readable",
+    "right": "only a hash"
+  },
+  "captions": [
+    "Dilys wants every member of staff at Kilnworth to sign in as themselves, not with one key.",
+    "Today a password would be saved exactly as it was typed, for anyone who sees the store.",
+    "You write a salted hash, a constant-time check, and staff saved without their password.",
+    "Now the store holds only a salted hash for Kofi, and his password still checks out.",
+    "The API can tell a right password from a wrong one without ever knowing either."
+  ]
+}

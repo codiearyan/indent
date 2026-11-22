@@ -1,0 +1,105 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kofi", "label": "Kofi", "kind": "story" },
+      { "id": "clock", "label": "The clock", "kind": "data" },
+      { "id": "signin", "label": "POST /sign-in", "kind": "function", "mine": true },
+      { "id": "signout", "label": "POST /sign-out", "kind": "function", "mine": true },
+      { "id": "sessions", "label": "Session store", "kind": "data" },
+      { "id": "cookie", "label": "Session cookie", "kind": "data" },
+      { "id": "read", "label": "readSession()", "kind": "function", "mine": true }
+    ],
+    "edges": [
+      { "from": "kofi", "to": "signin", "label": "sign in" },
+      { "from": "kofi", "to": "signout", "label": "sign out" },
+      { "from": "clock", "to": "signin", "label": "the time" },
+      { "from": "signin", "to": "sessions", "label": "expiresAt" },
+      { "from": "signin", "to": "cookie", "label": "Max-Age" },
+      { "from": "signout", "to": "sessions", "label": "remove" },
+      { "from": "signout", "to": "cookie", "label": "clear" },
+      { "from": "clock", "to": "read", "label": "the time" },
+      { "from": "read", "to": "sessions", "label": "refuse ended" }
+    ],
+    "note": "Every session now ends: the server forgets it when its owner signs out, and refuses it once its eight hours are up."
+  },
+  "tasks": {
+    "sign-out": {
+      "steps": [
+        {
+          "active": ["kofi", "kofi->signout", "signout"],
+          "note": "Kofi presses Sign out on the studio laptop."
+        },
+        {
+          "active": ["signout", "signout->sessions", "sessions"],
+          "note": "The server forgets his session first, so the token is worthless wherever it was copied."
+        },
+        {
+          "active": ["signout", "signout->cookie", "cookie"],
+          "value": {
+            "kind": "map",
+            "label": "the cookie sent back",
+            "entries": [
+              { "key": "name and path", "value": "the same as before" },
+              { "key": "value", "value": "empty" },
+              { "key": "date", "value": "in the past" }
+            ]
+          },
+          "note": "Then the browser is told to drop the cookie."
+        },
+        {
+          "active": ["signout"],
+          "note": "With no session, or a token nobody knows, the answer is the same quiet 204. Kofi's session on another computer stays."
+        }
+      ]
+    },
+    "expires": {
+      "steps": [
+        {
+          "active": ["kofi", "kofi->signin", "signin"],
+          "note": "Kofi signs in before his morning class."
+        },
+        {
+          "active": ["clock", "clock->signin", "signin"],
+          "note": "The route reads the time from now(), the clock the app was given, never from Date.now() itself."
+        },
+        {
+          "active": ["signin", "signin->sessions", "sessions"],
+          "value": {
+            "kind": "map",
+            "label": "what the server keeps",
+            "entries": [
+              { "key": "staffId", "value": "Kofi's id" },
+              { "key": "expiresAt", "value": "eight hours from now, in ms" }
+            ]
+          },
+          "note": "The session is saved with the moment it ends."
+        },
+        {
+          "active": ["signin", "signin->cookie", "cookie"],
+          "value": {
+            "kind": "map",
+            "label": "the cookie",
+            "entries": [{ "key": "lasts", "value": "eight hours, written in seconds" }]
+          },
+          "note": "The cookie gets the same lifetime, so the browser drops it on its own."
+        }
+      ]
+    },
+    "expired": {
+      "steps": [
+        {
+          "active": ["clock", "clock->read", "read"],
+          "note": "The next morning, the laptop still sends Kofi's old cookie."
+        },
+        {
+          "active": ["read", "read->sessions", "sessions"],
+          "note": "readSession() finds the session and compares its end with the time now() gives."
+        },
+        {
+          "active": ["read"],
+          "note": "At or past its end, the session is removed and nobody is signed in. Reading workshops still works."
+        }
+      ]
+    }
+  }
+}

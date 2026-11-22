@@ -1,0 +1,20 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "staff", "label": "Kilnworth staff", "kind": "story" },
+      { "id": "browser", "label": "Browser", "kind": "story" },
+      { "id": "auth", "label": "Sign-in and sessions", "kind": "file", "mine": true },
+      { "id": "people", "label": "Staff store", "kind": "data" },
+      { "id": "sessions", "label": "Session store", "kind": "data" },
+      { "id": "routes", "label": "Workshop routes", "kind": "file" }
+    ],
+    "edges": [
+      { "from": "staff", "to": "browser", "label": "email, password" },
+      { "from": "browser", "to": "auth", "label": "requests" },
+      { "from": "auth", "to": "people", "label": "checks hashes" },
+      { "from": "auth", "to": "sessions", "label": "keeps tokens" },
+      { "from": "auth", "to": "routes", "label": "who is asking" }
+    ],
+    "note": "Each member of staff signs in from their browser, and the sign-in you build checks a salted hash, keeps a session and tells the workshop routes who is asking."
+  }
+}

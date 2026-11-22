@@ -1,0 +1,120 @@
+{
+  "id": "staying-signed-in",
+  "title": "Staying signed in",
+  "files": [
+    "src/tokens.js",
+    "src/routes/signIn.js",
+    "src/middleware/readSession.js",
+    "src/app.js",
+    "src/sessionStore.js",
+    "try.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js signs Kofi in and sends GET /me with no cookie, with the cookie the sign-in sent and with a made-up one.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "token",
+      "title": "Make a token nobody can guess",
+      "file": "src/tokens.js",
+      "description": "Implement `newToken()` in `src/tokens.js`. Each call returns a new session token:\n\n- made from at least 32 random bytes from `node:crypto`\n- written as base64url or hex text, so it can go in a cookie as it is: 43 or 64 characters\n- never built from `Math.random`, the time or a counter\n\nThe check makes many tokens while `Math.random` and the clock are held still, and watches where their randomness comes from.",
+      "nextSteps": [
+        "Read the lesson part on tokens.",
+        "Get the random bytes.",
+        "Turn them into text a cookie can carry.",
+        "Run `node try.js` once the sign-in sends a cookie, and look at it."
+      ],
+      "hints": [
+        "A token is only as hard to guess as the randomness inside it. The lesson says where good randomness comes from in Node.",
+        "`randomBytes(n)` from `node:crypto` gives `n` bytes nobody can predict. A Buffer becomes text with `.toString(encoding)`, and one of the encodings is made for URLs and cookies.",
+        "`return randomBytes(32).toString('base64url')`"
+      ],
+      "docs": [
+        {
+          "title": "crypto.randomBytes()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/crypto.html#cryptorandombytessize-callback"
+        },
+        {
+          "title": "Buffers and character encodings",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/buffer.html#buffers-and-character-encodings"
+        },
+        {
+          "title": "Session management",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cookie",
+      "title": "Start a session at sign-in",
+      "file": "src/routes/signIn.js",
+      "description": "When a sign-in works, make `POST /sign-in` in `src/routes/signIn.js` start a session:\n\n- make a token with `newToken()` and save `{ staffId }` under it with `sessions.save(token, ...)`\n- send it in a cookie named `session`, HttpOnly so the page's scripts cannot read it, with SameSite `Lax` (or the stricter `Strict`) and the path `/`\n- the body stays `{ staff }`, and the token never reaches the body or the log\n- a refused sign-in sends no cookie and saves nothing\n\nThe check signs in to an app with staff and a session store of its own, reads the `Set-Cookie` header and looks in the store.",
+      "nextSteps": [
+        "Find the place in the route where the sign-in has worked.",
+        "Make a token and save the session.",
+        "Send the cookie with the options the task names.",
+        "Run `node try.js` and read the `set-cookie` line."
+      ],
+      "hints": [
+        "A session has two halves holding the same token: what the server keeps, and what the browser carries back.",
+        "`sessions.save(token, { staffId: member.id })` keeps the server's half. `res.cookie(name, value, options)` sets the browser's, and its options are written in camel case.",
+        "`res.cookie('session', token, { httpOnly: true, sameSite: 'lax' })` before `res.json(...)`. The path is `/` unless you say otherwise."
+      ],
+      "docs": [
+        { "title": "res.cookie()", "url": "https://expressjs.com/en/5x/api/response#rescookie" },
+        {
+          "title": "Set-Cookie",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie"
+        },
+        {
+          "title": "Using HTTP cookies",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Cross-site request forgery explained",
+          "url": "https://www.youtube.com/watch?v=vRBihr41JTo"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "read",
+      "title": "Know who sent each request",
+      "file": "src/middleware/readSession.js",
+      "description": "Implement `readSession(staff, sessions)` in `src/middleware/readSession.js`. It returns a middleware that:\n\n- reads the request's `Cookie` header and finds the cookie named exactly `session`\n- when the session store knows its token and the staff store still has that member, sets `req.staff` to `{ id, name, email, role }`\n- otherwise leaves `req.staff` unset\n- always calls `next()`, so reads keep working for everyone, and never logs a token\n\nMount it in `createApp` right after `express.json()`. `GET /me`, written for you, answers with `req.staff`. The check saves sessions of its own and sends `GET /me` with all kinds of `Cookie` headers.",
+      "nextSteps": [
+        "Read the lesson part on reading a cookie back.",
+        "Find the session cookie's value in the header.",
+        "Look up the session, then the member.",
+        "Mount the middleware, then run `node try.js`."
+      ],
+      "hints": [
+        "The browser sends all of a site's cookies in one `Cookie` header. Find the shape of that header in the lesson.",
+        "`req.get('cookie')` gives the header, or `undefined`. Split it at `;`, trim each piece, and split each at its first `=` into a name and a value. Compare the name with `===`.",
+        "With the token: `const session = token && sessions.get(token)`, then `const member = session && staff.get(session.staffId)`, then `if (member) req.staff = publicStaff(member)`, and `next()` in every case."
+      ],
+      "docs": [
+        { "title": "req.get()", "url": "https://expressjs.com/en/5x/api/request#reqget" },
+        {
+          "title": "Cookie",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cookie"
+        },
+        {
+          "title": "String.prototype.split()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Sessions and tokens in 100 seconds",
+          "url": "https://www.youtube.com/watch?v=UBUNrFtufWo"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "Only I remove a workshop.",
+      "note": "And the key goes for good."
+    },
+    {
+      "title": "The API",
+      "text": "Anyone with the key can delete anything.",
+      "note": "Every sign-in counts the same."
+    },
+    {
+      "title": "Your guards",
+      "file": "allow.js",
+      "mine": true,
+      "gap": "Nobody checks who may do what",
+      "tasks": ["Sign-in for changes", "Owner-only delete", "Owner's staff list"]
+    },
+    {
+      "title": "Workshops",
+      "rows": [
+        ["Glazing basics", "thu"],
+        ["Second steps", "thu"],
+        ["Family morning", "sat"]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Kofi's delete",
+    "wrong": "allowed",
+    "why": "No roles",
+    "right": "refused"
+  },
+  "captions": [
+    "Dilys wants the shared key gone, and only her to remove a workshop.",
+    "Today anyone with the key can change or delete anything, and nobody knows who did.",
+    "You write a sign-in guard, a role guard, and a staff list only the owner can see.",
+    "Now Kofi's delete of the glazing class is refused, while his changes still go through.",
+    "Reads stay open, changes come from named people, and each role does only its part."
+  ]
+}

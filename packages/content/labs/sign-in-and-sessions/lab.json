@@ -1,0 +1,17 @@
+{
+  "id": "sign-in-and-sessions",
+  "title": "Secure sign-in and sessions with Express",
+  "description": "At Kilnworth Pottery every change to the workshops still needs one shared staff key, and by now that key has been passed around far too much. Give each member of staff a sign-in of their own: passwords kept only as salted hashes, a sign-in that gives nothing away, sessions in cookies scripts cannot read, routes that know who may do what, and sessions that end. You learn how a real sign-in is built, and why each tempting shortcut is unsafe.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": ["Node.js", "Security"],
+  "kind": "project",
+  "format": 2,
+  "parts": [
+    {
+      "title": "Who is asking",
+      "chapters": ["keeping-passwords", "signing-in", "staying-signed-in"]
+    },
+    { "title": "What they may do", "chapters": ["guarding-routes", "signing-out"] }
+  ]
+}

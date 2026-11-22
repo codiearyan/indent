@@ -1,0 +1,120 @@
+{
+  "id": "keeping-passwords",
+  "title": "Never keep the password",
+  "files": [
+    "src/passwords.js",
+    "src/staff.js",
+    "src/staffStore.js",
+    "src/team.js",
+    "try.js",
+    "src/app.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js hashes a password twice, checks a right and a wrong one, and prints what the staff store holds.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "hash",
+      "title": "Hash a password with a salt",
+      "file": "src/passwords.js",
+      "description": "Implement `hashPassword(password)` in `src/passwords.js`. It returns one string, `'<salt>:<hash>'`:\n\n- the salt is 16 random bytes, new on every call, written as hex\n- the hash is 64 bytes of scrypt of the password, with the salt's hex text as the salt, written as hex\n- the password itself is nowhere in the result\n\nThe check hashes passwords of its own, each one twice, and works out the scrypt of each from the salt you returned.",
+      "nextSteps": [
+        "Run `node try.js` and read what it prints today.",
+        "Make the salt and write it as hex.",
+        "Hash the password with that salt.",
+        "Join the two parts and run `node try.js` again."
+      ],
+      "hints": [
+        "Everything you need is in `node:crypto`, and the lesson's part on salt shows each piece on its own.",
+        "`randomBytes(16)` gives the salt's bytes and `scryptSync(password, salt, 64)` the hash's. Both are Buffers, and a Buffer becomes hex text with `.toString('hex')`.",
+        "Make `const salt = randomBytes(16).toString('hex')` first, give that text to `scryptSync`, and return the two hex strings joined with a `:`."
+      ],
+      "docs": [
+        {
+          "title": "crypto.scryptSync()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/crypto.html#cryptoscryptsyncpassword-salt-keylen-options"
+        },
+        {
+          "title": "crypto.randomBytes()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/crypto.html#cryptorandombytessize-callback"
+        },
+        {
+          "title": "Password storage",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html"
+        }
+      ],
+      "points": 10,
+      "videos": [
+        {
+          "title": "Why a site keeps a hash, not the password",
+          "url": "https://www.youtube.com/watch?v=8ZtInClXe1Q"
+        },
+        {
+          "title": "Hashing, salts and peppers explained",
+          "url": "https://www.youtube.com/watch?v=--tnZMuoK3E"
+        }
+      ]
+    },
+    {
+      "id": "verify",
+      "title": "Check a password against its hash",
+      "file": "src/passwords.js",
+      "description": "Implement `verifyPassword(password, stored)` in `src/passwords.js`. `stored` is a value `hashPassword` made. It returns `true` when `password` is the one it was made from, and `false` otherwise:\n\n- it compares the two hashes in constant time\n- a stored value that is not exactly a salt and a hash, both in hex, or whose hash has another length, gives `false` and never throws\n\nThe check makes stored values of its own and tries the right password, near misses, plain text and broken values. It also watches how the hashes are compared.",
+      "nextSteps": [
+        "Split the stored value into its salt and its hash.",
+        "Hash the typed password the same way `hashPassword` did.",
+        "Compare the two in constant time.",
+        "Make a broken stored value answer `false`, then run `node try.js`."
+      ],
+      "hints": [
+        "A hash cannot be turned back into a password. To check one, you make a second hash the same way and see whether the two match.",
+        "The salt comes from the stored value, not from new random bytes. `timingSafeEqual(a, b)` compares two Buffers of the same length and throws when their lengths differ.",
+        "`const [salt, hash] = stored.split(':')`, then `Buffer.from(hash, 'hex')` and `scryptSync(password, salt, 64)`. Return `false` when a part is missing or the lengths differ, and `timingSafeEqual` of the two otherwise."
+      ],
+      "docs": [
+        {
+          "title": "crypto.timingSafeEqual()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/crypto.html#cryptotimingsafeequala-b"
+        },
+        {
+          "title": "Buffer.from(string, encoding)",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/buffer.html#static-method-bufferfromstring-encoding"
+        },
+        {
+          "title": "Password storage",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "add-staff",
+      "title": "Save staff without their password",
+      "file": "src/staff.js",
+      "description": "Implement `addStaff(staff, person)` in `src/staff.js`. `person` is `{ name, email, role, password }` and `staff` is a store from `createStaffStore()`.\n\n- save the person with the store's `add()`, with a `passwordHash` field made by `hashPassword()` in place of the password\n- the store never holds the password itself\n- return the saved member as `{ id, name, email, role }`, with the id the store gave it and without the hash\n\nThe check adds people of its own to a fresh store, then reads everything the store holds.",
+      "nextSteps": [
+        "Read `src/staffStore.js` to see what `add()` returns.",
+        "Take the password out of the person.",
+        "Save the rest with its hash.",
+        "Return the member without the hash, then run `node try.js`."
+      ],
+      "hints": [
+        "Whatever you hand to `add()` is what the store keeps, so the password must not be in it.",
+        "Destructuring with a rest element takes one field out and keeps the others: `const { password, ...rest } = person`.",
+        "`staff.add({ ...rest, passwordHash: hashPassword(password) })` saves it. Take `passwordHash` out of what `add()` returns the same way before you return it."
+      ],
+      "docs": [
+        {
+          "title": "Destructuring",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring"
+        },
+        {
+          "title": "Spread syntax",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

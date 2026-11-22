@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Ivo",
+      "say": "Can the API remember Sunniva?",
+      "note": "The next request forgets her."
+    },
+    {
+      "title": "The API",
+      "text": "Signs her in, then forgets her at once.",
+      "note": "HTTP keeps no memory."
+    },
+    {
+      "title": "Your code",
+      "file": "readSession.js",
+      "mine": true,
+      "gap": "Nothing remembers a sign-in",
+      "tasks": ["A token no one guesses", "A cookie at sign-in", "Know who is asking"]
+    },
+    {
+      "title": "Ivo's page",
+      "say": "Still you, Sunniva.",
+      "note": "Its scripts never see the token."
+    }
+  ],
+  "ticket": {
+    "label": "Next request",
+    "wrong": "a stranger",
+    "why": "No memory",
+    "right": "Sunniva"
+  },
+  "captions": [
+    "Ivo's page signs Sunniva in, and he wants the API to remember her on the next request.",
+    "Today each request stands alone, so the next one comes from a stranger.",
+    "You make a secure token, send it in a cookie, and read it back on every request.",
+    "Now the next request carries the cookie, and the API knows it is Sunniva.",
+    "The browser carries the token, the server keeps the session, and scripts never see it."
+  ]
+}

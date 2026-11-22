@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Sunniva",
+      "say": "Can I sign in with my own email?",
+      "note": "The old site told on people."
+    },
+    {
+      "title": "The API",
+      "text": "Keeps a hash for each of the staff.",
+      "note": "But has no way to sign in."
+    },
+    {
+      "title": "Your code",
+      "file": "signIn.js",
+      "mine": true,
+      "gap": "No sign-in route",
+      "tasks": ["Same answer every time", "A sign-in route", "Log without secrets"]
+    },
+    {
+      "title": "Front desk",
+      "say": "I'm in. Morning, everyone.",
+      "note": "A stranger learns nothing."
+    }
+  ],
+  "ticket": {
+    "label": "Sunniva",
+    "wrong": "no way in",
+    "why": "No route",
+    "right": "signed in"
+  },
+  "captions": [
+    "Sunniva wants to sign in at the front desk with her own email and password.",
+    "Today the API keeps her hash but has no way to sign in, so only the shared key works.",
+    "You write the sign-in check, its route and its log lines, in three tasks.",
+    "Now Sunniva signs in, and a wrong email gets the same answer as a wrong password.",
+    "A stranger learns nothing from a refusal, and no secret ever reaches the log."
+  ]
+}

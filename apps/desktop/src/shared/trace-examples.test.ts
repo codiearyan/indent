@@ -73,6 +73,10 @@ const repos: { labId: string; expected: string[] }[] = [
     expected: ['creating-workshops/validate', 'changing-workshops/patch']
   },
   {
+    labId: 'sign-in-and-sessions',
+    expected: ['keeping-passwords/hash', 'staying-signed-in/token']
+  },
+  {
     labId: 'js-bug-hunts',
     expected: [
       'cent-off-totals/reproduce',

@@ -1,0 +1,107 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "visitor", "label": "Sign-up page", "kind": "story" },
+      { "id": "people", "label": "Signed-in staff", "kind": "story" },
+      { "id": "read", "label": "readSession()", "kind": "function" },
+      { "id": "signed", "label": "signedIn()", "kind": "function", "mine": true },
+      { "id": "allow", "label": "allow()", "kind": "function", "mine": true },
+      { "id": "workshops", "label": "Workshop routes", "kind": "file" },
+      { "id": "list", "label": "staffRouter()", "kind": "function", "mine": true }
+    ],
+    "edges": [
+      { "from": "visitor", "to": "read", "label": "reads" },
+      { "from": "people", "to": "read", "label": "cookie" },
+      { "from": "read", "to": "signed", "label": "req.staff" },
+      { "from": "read", "to": "allow", "label": "req.staff" },
+      { "from": "signed", "to": "workshops", "label": "next()" },
+      { "from": "allow", "to": "workshops", "label": "owner's delete" },
+      { "from": "allow", "to": "list", "label": "owner only" }
+    ],
+    "note": "The shared key is gone: changes need a signed-in member, removing a workshop and the staff list need the owner, and reading workshops stays open."
+  },
+  "tasks": {
+    "signed-in": {
+      "steps": [
+        {
+          "active": [
+            "visitor",
+            "visitor->read",
+            "read",
+            "read->signed",
+            "signed",
+            "signed->workshops",
+            "workshops"
+          ],
+          "note": "Ivo's sign-up page reads the workshops with no sign-in, and the reads go through as before."
+        },
+        {
+          "active": ["people", "people->read", "read", "read->signed", "signed"],
+          "value": {
+            "kind": "map",
+            "label": "three changes",
+            "entries": [
+              { "key": "PATCH with the old key", "value": "nobody signed in" },
+              { "key": "PATCH with a made-up cookie", "value": "nobody signed in" },
+              { "key": "PATCH with Kofi's cookie", "value": "Kofi" }
+            ]
+          },
+          "note": "Changes arrive, and readSession() has already said who sent each one."
+        },
+        {
+          "active": ["signed"],
+          "note": "A change from nobody stops here with a 401 and never reaches a route. Kofi's goes on."
+        }
+      ]
+    },
+    "allow": {
+      "steps": [
+        {
+          "active": ["people", "people->read", "read", "read->allow", "allow"],
+          "value": {
+            "kind": "map",
+            "label": "who tries to remove a workshop",
+            "entries": [
+              { "key": "Dilys", "value": "owner" },
+              { "key": "Kofi", "value": "teacher" },
+              { "key": "Sunniva", "value": "desk" }
+            ]
+          },
+          "note": "Three signed-in people try to remove the glazing class."
+        },
+        {
+          "active": ["allow"],
+          "note": "allow('owner') knows who is asking and looks at the role. Nobody signed in at all is a 401."
+        },
+        {
+          "active": ["allow", "allow->workshops", "workshops"],
+          "note": "Only the owner's delete reaches the route. The others are signed in and still not allowed: a 403."
+        }
+      ]
+    },
+    "staff-list": {
+      "steps": [
+        {
+          "active": ["people", "people->read", "read", "read->allow", "allow"],
+          "note": "Dilys asks who has an account. So does Kofi, out of curiosity."
+        },
+        {
+          "active": ["allow", "allow->list", "list"],
+          "note": "This read is not open to everyone. Only the owner gets through to the list."
+        },
+        {
+          "active": ["list"],
+          "value": {
+            "kind": "map",
+            "label": "each member in the list",
+            "entries": [
+              { "key": "has", "value": "id, name, email, role" },
+              { "key": "never has", "value": "a password hash" }
+            ]
+          },
+          "note": "The list comes from the staff store, with every hash left out."
+        }
+      ]
+    }
+  }
+}
