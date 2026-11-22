@@ -1,0 +1,109 @@
+{
+  "id": "json",
+  "title": "JSON going out and coming back",
+  "files": [
+    "src/json.js",
+    "run.js",
+    "server/station.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "line",
+      "title": "Read one show from JSON",
+      "file": "src/json.js",
+      "description": "Under `// Task 1` in `src/json.js`, make `showLine(text)` take the JSON text of one show, an object with `name`, `day`, `time` and `presenter` (and sometimes more), and give back one line about it: the name, a comma and a space, the day, ` at `, the time, `, with ` and the presenter, like `'Brass on Sunday, sunday at 11:00, with Gethin'`.\n\nCheck calls `showLine` with JSON texts of its own: names with commas and quotes in them, names in another order, and JSON written over several lines.",
+      "nextSteps": [
+        "Print `text` and `typeof text` to see that it is one piece of text.",
+        "Turn the text into an object with the method the lesson shows.",
+        "Build the line from the object's properties.",
+        "Run `node run.js`: the show's name has two commas in it."
+      ],
+      "hints": [
+        "Text has no `name` property, so reading `text.name` gives `undefined`. The values are in there, but they have to be read out first.",
+        "`JSON.parse(text)` gives back the object the text describes, commas, quotes and all. Read `name`, `day`, `time` and `presenter` from that.",
+        "`const show = JSON.parse(text)`, then return `` `${show.name}, ${show.day} at ${show.time}, with ${show.presenter}` ``."
+      ],
+      "docs": [
+        {
+          "title": "JSON.parse()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse"
+        },
+        {
+          "title": "Working with JSON",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON"
+        }
+      ],
+      "videos": [
+        {
+          "title": "JSON in ten minutes",
+          "url": "https://www.youtube.com/watch?v=iiADhChRriM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "names",
+      "title": "Read every show from the server",
+      "file": "src/json.js",
+      "description": "Under `// Task 2`, make `showNames(base)` ask the server at `base` for the page `/api/shows`, whose body is a JSON list of shows, and give back a list of the names of those shows, in the order the server sent them. When the list is empty, it gives back an empty list.\n\nCheck starts a server of its own that answers with shows of its own, and looks at the request its server received and at the list `showNames` gave back.",
+      "nextSteps": [
+        "Send the request and wait for the answer.",
+        "Read the body as JSON, not as text, and wait for that too.",
+        "Make a new list with the name of each show.",
+        "Run `node run.js` and compare the names with the body printed above them."
+      ],
+      "hints": [
+        "The body is JSON, so reading it as text gives one long piece of text, not a list of shows.",
+        "`response.json()` reads the body and parses it in one go, and needs `await` like `text()`. A list's `map` makes a new list with one value for each item.",
+        "`const shows = await response.json()`, then `return shows.map((show) => show.name)`."
+      ],
+      "docs": [
+        {
+          "title": "Response: json() method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/json"
+        },
+        {
+          "title": "Array.prototype.map()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "read",
+      "title": "Read JSON only when the answer says it is JSON",
+      "file": "src/json.js",
+      "description": "Under `// Task 3`, make `readJson(address)` ask for the page at `address` and look at the answer's `content-type`:\n\n- when it says the body is JSON, with or without a `charset` after it, give back the value read from the body\n- for any other content-type, or none at all, give back `null` without reading the body as JSON\n- when the answer says it is JSON but its body is not, do not catch the error: the error from reading it comes out of `readJson`\n\nCheck starts a server of its own that answers with JSON, with plain text that looks like JSON, with a web page, with no content-type, and with a body that says JSON and is not.",
+      "nextSteps": [
+        "Send the request and read the `content-type` of the answer.",
+        "Decide from it whether the body is JSON. Remember the charset, and an answer with no content-type.",
+        "Read the body as JSON only when it is, and give back `null` otherwise.",
+        "Run `node run.js`: one answer is JSON, one is plain text, and `/api/now` says JSON and is not."
+      ],
+      "hints": [
+        "`response.json()` never looks at the content-type. Whether to call it is your decision, made from the header.",
+        "`headers.get('content-type')` gives `null` when there is no such header, and the value may have `; charset=utf-8` after the type. Text has a method that tests how it starts.",
+        "`const type = response.headers.get('content-type') ?? ''`, then `if (!type.startsWith('application/json')) return null`, and otherwise `return await response.json()`."
+      ],
+      "docs": [
+        {
+          "title": "Content-Type header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type"
+        },
+        {
+          "title": "String.prototype.startsWith()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith"
+        },
+        {
+          "title": "SyntaxError: JSON.parse: bad parsing",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/JSON_bad_parse"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

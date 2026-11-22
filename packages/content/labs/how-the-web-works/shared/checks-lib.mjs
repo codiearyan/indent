@@ -42,8 +42,14 @@ export function outcomeText(fn, outcome) {
   return `${fn} could not be called`
 }
 
-/** The requests the check's server received, with the headers a task is about. */
-export function receivedText(received, headers = [], turnedAway = 0, total = received.length) {
+/** The requests the check's server received, with the headers a task is about, and their bodies. */
+export function receivedText(
+  received,
+  headers = [],
+  turnedAway = 0,
+  total = received.length,
+  bodies = false
+) {
   if (turnedAway)
     return "The check's server could not read the request it was sent, and answered 400 Bad Request."
   if (total === 0) return "The check's server received no request."
@@ -53,11 +59,16 @@ export function receivedText(received, headers = [], turnedAway = 0, total = rec
       .filter((h) => r.headers[h] !== undefined)
       .map((h) => `\n  ${h}: ${r.headers[h]}`)
       .join('')
-    return `  ${r.method} ${r.target}${shownHeaders}`
+    return `  ${r.method} ${r.target}${shownHeaders}${bodies && r.body ? bodyText(r.body) : ''}`
   })
   const count = total === 1 ? 'one request' : `${total} requests`
   const more = total > received.length ? `\n  ... and ${total - received.length} more` : ''
   return `The check's server received ${count}:\n${lines.slice(0, 8).join('\n')}${received.length > 8 ? `\n  ... and ${total - 8} more` : more}`
+}
+
+function bodyText(body) {
+  const cut = body.length > 600 ? `${body.slice(0, 600)}...` : body
+  return `\n\n  ${cut.replaceAll('\r\n', '\n').replaceAll('\n', '\n  ')}`
 }
 
 /** One detail for a result that cannot be judged case by case, or null. */
@@ -97,7 +108,7 @@ function problem(file, fn, r) {
 
 /**
  * Runs the learner's `fn` once per case, each against a fresh server of the check's own, and
- * judges both sides. A case is { name, args, routes?, headers?, judge(r) }, where judge gets
+ * judges both sides. A case is { name, args, routes?, headers?, bodies?, judge(r) }, where judge gets
  * { received, outcome, printed, base } and returns a message when the case fails, or nothing.
  */
 export async function cases(t, { file, fn, list }) {
@@ -130,7 +141,7 @@ export async function cases(t, { file, fn, list }) {
       callText(fn, c.args, r.base),
       ...(c.network === false
         ? []
-        : [receivedText(r.received, c.headers, r.turnedAway, r.receivedCount)]),
+        : [receivedText(r.received, c.headers, r.turnedAway, r.receivedCount, c.bodies)]),
       outcomeText(fn, r.outcome) + printed
     ].join('\n')
     return { name: c.name, passed: !message, ...(message ? { message } : {}), output }
