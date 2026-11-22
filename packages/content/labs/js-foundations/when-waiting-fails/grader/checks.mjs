@@ -49,7 +49,7 @@ export const checks = {
   },
 
   async parcel(t) {
-    const body = partOf(code(await readSource(t, FILE)), 'parcelOrUnknown')
+    const body = partOf(code(await readSource(t, FILE)), 'parcelOrUnknown').replace(/(['"`])(?:\\.|(?!\1)[^\\])*\1/g, "''")
     const details = await play(t, {
       file: FILE,
       fn: 'parcelOrUnknown',
@@ -132,7 +132,7 @@ export const checks = {
                 : `chargeWithRetries charged the card ${charges.length} times. It tries at most tries times, ${c.tries} here.`
             }
             if (charges.length < needed) {
-              return `chargeWithRetries gave up after ${charges.length} ${charges.length === 1 ? 'try' : 'tries'}, though it may try ${c.tries} times and none had gone through.${r.outcome?.state === 'rejected' ? ' A failed charge ends the function unless it is caught: catch each failed try, so the next one can run.' : ''}`
+              return `chargeWithRetries gave up after ${charges.length} ${charges.length === 1 ? 'try' : 'tries'}, though it may try ${c.tries} times and none had gone through.${charges.length > 1 ? ' Count how many times your loop goes round: once for every try, tries times in all.' : r.outcome?.state === 'rejected' ? ' A failed charge ends the function unless it is caught: catch each failed try, so the next one can run.' : ''}`
             }
             const o = r.outcome ?? {}
             if (!works) {

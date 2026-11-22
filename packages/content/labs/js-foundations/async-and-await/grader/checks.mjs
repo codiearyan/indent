@@ -1,4 +1,4 @@
-import { calledIn, earlier, play, promised, readSource, show } from '../../waiting-grading.mjs'
+import { calledIn, code, earlier, partOf, play, promised, readSource, show } from '../../waiting-grading.mjs'
 
 const FILE = 'src/checkout.js'
 
@@ -44,7 +44,8 @@ export const checks = {
     })
   },
 
-  noted(t) {
+  async noted(t) {
+    const asksIn = /\bin\s+noted\b|\bhasOwn/.test(partOf(code(await readSource(t, FILE)), 'stockFor'))
     return play(t, {
       file: FILE,
       fn: 'stockFor',
@@ -63,7 +64,7 @@ export const checks = {
           const isNoted = c.who in c.notes
           if (!sync(r, 'stockFor')) {
             if (isNoted && counted.length) {
-              return c.want === 0
+              return c.want === 0 && !asksIn
                 ? `stockFor asked the stock room about ${c.who}, though its count is noted as 0. 0 counts as false: ask whether the name is in noted at all, not what its count is.`
                 : `stockFor asked the stock room about ${c.who}, though its count is noted. Take the count from noted.`
             }
@@ -153,7 +154,7 @@ export const checks = {
             if (charge) return charge
             if (taken.length === 0 && r.outcome?.state !== 'not a promise') return 'closeSale never took the candles from stock. Once the order is paid, call takeFromStock.'
             if (taken.length && taken[0].startedAfter === 0) {
-              return 'closeSale took the candles from stock before the card machine had answered. Wait for the payment first: paidLine gives back a promise of its line, not the line.'
+              return `closeSale took the candles from stock before the card machine had answered. Wait for the payment first, then take them.${/Promise \{/.test(r.outcome?.shown ?? '') ? ' paidLine gives back a promise of its line, not the line.' : ''}`
             }
             if (taken.length > 1) return 'closeSale took candles from stock more than once.'
             if (taken.length && (taken[0].args[0] !== show(o.candle) || taken[0].args[1] !== show(o.qty))) {

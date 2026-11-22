@@ -9,6 +9,9 @@ const listed = (r) => r.outcome?.shown ?? ''
 /** What is wrong with the questions to one machine, when each of `keys` must be asked once. */
 function questions(r, fn, machine, keys, what) {
   const calls = asked(r, machine)
+  if (calls.length === 0 && keys.length && /\[(?:Async)?Function/.test(listed(r))) {
+    return `${fn} handed Promise.all functions, not promises. A function does its work only when it is called: call it, and hand Promise.all what it gives back.`
+  }
   if (calls.length === 0 && keys.length) return `${fn} never asked the ${what}. Ask about every item of the list it is given.`
   const got = calls.map((c) => c.args[0]).sort()
   const want = keys.map(show).sort()
@@ -48,7 +51,9 @@ function early(r, fn, fix) {
   const fulfilled = r.log.findIndex((l) => l.startsWith(`the promise from ${fn} was fulfilled`))
   const answered = r.log.findIndex((l) => / answered /.test(l))
   return fulfilled !== -1 && answered !== -1 && fulfilled < answered
-    ? `The promise ${fn} gave back was fulfilled before any answer had arrived. forEach does not wait for an async function it calls. ${fix}`
+    ? /undefined/.test(listed(r))
+      ? `The promise ${fn} gave back was fulfilled before any answer had arrived, with undefined in it: an answer was read from a promise before it arrived. await each answer before you use it.`
+      : `The promise ${fn} gave back was fulfilled before any answer had arrived. forEach does not wait for an async function it calls. ${fix}`
     : undefined
 }
 

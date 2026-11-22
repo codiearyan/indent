@@ -9,6 +9,11 @@ import { format, inspect } from 'node:util'
 const OPTIONS = { depth: 4, breakLength: Infinity }
 export const show = (v) => inspect(v, OPTIONS)
 
+// An error is shown by its name and message alone: its stack points into the check, not the learner's code.
+Error.prototype[inspect.custom] = function () {
+  return `${this.name}: ${this.message}`
+}
+
 /** The value as JSON keeps it, or undefined when JSON would change it (a promise, undefined, NaN). */
 function plain(v) {
   try {
@@ -57,7 +62,9 @@ export function stage() {
     unhandled.push(errorText(e))
     note(`a promise failed and nothing caught it: ${errorText(e)}`)
   })
-  console.log = (...parts) => note(`printed: ${format(...parts)}`)
+  console.log = (...parts) => {
+    note(`printed: ${format(...parts)}`)
+  }
 
   globalThis.setTimeout = function setTimeout(fn, ms, ...args) {
     if (typeof fn !== 'function') {
@@ -79,6 +86,14 @@ export function stage() {
     timer.state = 'stopped'
     note(`the ${show(timer.ms)} ms timer was stopped`)
   }
+  globalThis.setInterval = function setInterval(fn, ms, ...args) {
+    const handle = globalThis.setTimeout(fn, ms, ...args)
+    const timer = timers.at(-1)
+    timer.every = Math.max(timer.due - now, 1)
+    log[log.length - 1] = `a repeating timer was set for ${show(timer.ms)} ms`
+    return handle
+  }
+  globalThis.clearInterval = globalThis.clearTimeout
 
   /** Runs `fn`, noting a throw instead of letting it stop the case. */
   function guard(fn, where) {
@@ -216,7 +231,8 @@ export function stage() {
         .sort((a, b) => a.due - b.due || a.id - b.id)[0]
       if (!due) return false
       now = due.due
-      due.state = 'ran'
+      if (due.every) due.due = now + due.every
+      else due.state = 'ran'
       note(`the ${show(due.ms)} ms timer ran`)
       guard(() => due.fn(...due.args), `the function the ${show(due.ms)} ms timer ran`)
       await settle()

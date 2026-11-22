@@ -21,7 +21,7 @@ const TIMEOUT = 8000
 export const show = (v) => inspect(v, { depth: 4, breakLength: Infinity })
 
 /** The problem that stops every case of a check, in plain words, or null. */
-function problem(file, fn, runs) {
+function problem(file, fn, runs, body) {
   const timedOut = runs.find((r) => r.timedOut)
   if (timedOut) {
     return {
@@ -72,7 +72,9 @@ function problem(file, fn, runs) {
     return {
       name: `${fn} is written`,
       passed: false,
-      message: `${fn} still throws 'Not implemented'. Replace that line with your code.`
+      message: /Not implemented/.test(body)
+        ? `${fn} still throws 'Not implemented'. Replace that line with your code.`
+        : `${fn} uses a function that still throws 'Not implemented'. Write the task it belongs to first, then check again.`
     }
   }
   return null
@@ -97,12 +99,15 @@ export async function play(t, { file, fn, cases }) {
   const runs = await Promise.all(
     cases.map((c) => t.call(dir, '.grader/drive.mjs', c.run, c.args ?? [], { timeoutMs: TIMEOUT }))
   )
-  const stop = problem(file, fn, runs)
+  const body = partOf(code(await readSource(t, file).catch(() => '')), fn)
+  const stop = problem(file, fn, runs, body)
   if (stop) return [stop]
   return cases.map((c, i) => {
     const r = runs[i].value
     const message = r.endless
-      ? `${fn} kept starting new waits until Check stopped it. Look at what decides when it stops trying.`
+      ? r.log.some((l) => l.startsWith('a repeating timer'))
+        ? 'A repeating timer kept running until Check stopped it. setInterval calls its function again and again, until the timer is stopped with clearInterval; setTimeout calls it once.'
+        : `${fn} kept starting new waits until Check stopped it. Look at what decides when it stops trying.`
       : c.judge(r)
     return {
       name: c.name,
@@ -175,9 +180,12 @@ export function promised(r, fn, want, explain = () => undefined) {
       : neverSettled(fn)
   }
   if (o.state === 'rejected') {
+    const error = `${o.error.name ? `${o.error.name}: ` : ''}${o.error.message}`
     return (
       explain(r) ??
-      `The promise ${fn} gave back was rejected with ${o.error.name ? `${o.error.name}: ` : ''}${o.error.message}. Follow the list below to the step where it went wrong.`
+      (o.error.name === 'ReferenceError'
+        ? stopped(fn, error)
+        : `The promise ${fn} gave back was rejected, which means it failed, with ${error}. Follow the list below to the step where it went wrong.`)
     )
   }
   if (o.shown === show(want)) return undefined
@@ -185,7 +193,7 @@ export function promised(r, fn, want, explain = () => undefined) {
   if (o.shown === 'undefined') {
     return (
       explain(r) ??
-      `The promise ${fn} gave back was fulfilled with undefined. The function that makes the answer gives back nothing: with braces after =>, the answer needs return.`
+      `The promise ${fn} gave back was fulfilled with undefined: the answer was never given back. Look for a way to the end with no return in it, such as an arrow function with braces after =>, or one part of an if or a try.`
     )
   }
   return (

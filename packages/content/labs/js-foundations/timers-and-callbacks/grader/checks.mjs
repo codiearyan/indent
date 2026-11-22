@@ -182,6 +182,9 @@ function judgeStock(r, name, count) {
   if (asked.length > 1) return 'stockLine asked the stock room more than once. One question is enough.'
   if (asked[0].args[0] !== show(name)) return `stockLine asked the stock room about ${asked[0].args[0]}. Ask about the name stockLine is given.`
   const early = r.done.find((d) => d.afterAnswers === 0)
+  if (early && r.log.some((l) => l.startsWith('askStockRoom had no function'))) {
+    return 'askStockRoom was handed the answer of a call, not a function. With round brackets right there, done runs at once, before any count, and askStockRoom gets what it gives back. Hand askStockRoom a function that takes the count.'
+  }
   if (early) {
     return `stockLine called done before the stock room answered${/undefined/.test(early.args[0] ?? '') ? ', so the count in the line was still undefined' : ''}. The line after askStockRoom runs right away; only the function you hand askStockRoom runs once the count is there. Call done from inside it.`
   }
@@ -205,6 +208,7 @@ function judgeStock(r, name, count) {
 }
 
 function gaveFunction(r) {
+  if (handedCall(r)) return HANDED_SEND
   const bad = r.gaveBack.find((g) => g !== 'function')
   if (bad === undefined) return undefined
   if (/^Timeout /.test(bad)) {
@@ -213,10 +217,11 @@ function gaveFunction(r) {
   return `holdParcel gave back ${bad}, not a function. It gives back a function that keeps the parcel back when it is called.`
 }
 
+const HANDED_SEND =
+  'setTimeout was handed the answer of a call, not a function. With round brackets right there, send runs at once and setTimeout gets what it gives back. Hand setTimeout a function that calls send.'
+
 function timing(r) {
-  if (handedCall(r)) {
-    return 'setTimeout was handed the answer of a call, not a function. With round brackets right there, send runs at once and setTimeout gets what it gives back. Hand setTimeout a function that calls send.'
-  }
+  if (handedCall(r)) return HANDED_SEND
   if (r.timers.length === 0) return 'holdParcel set no timer. It hands setTimeout a function that sends the parcel, and the number of milliseconds to wait.'
   if (r.timers[0].ms !== show(200)) return `The timer was set for ${r.timers[0].ms} ms. The task asks for the number of milliseconds holdParcel is given.`
   const at = ran(r, 200)

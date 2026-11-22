@@ -98,7 +98,7 @@ export const checks = {
         setup: `stockCount(${show(name)}), and the stock room counts ${count}`,
         judge(r) {
           const calls = asked(r, 'askStockRoom')
-          if (calls.length === 0 && !r.thrown.length) return 'stockCount never asked the stock room. Call askStockRoom with the name and a function for the count.'
+          if (calls.length === 0 && !r.thrown.length && r.outcome?.state !== 'rejected') return 'stockCount never asked the stock room. Call askStockRoom with the name and a function for the count.'
           if (calls.length > 1) return 'stockCount asked the stock room more than once. One question is enough.'
           if (calls.length && calls[0].args[0] !== show(name)) return `stockCount asked the stock room about ${calls[0].args[0]}. Ask about the name stockCount is given.`
           if (r.log.some((l) => l.startsWith('askStockRoom had no function'))) {
