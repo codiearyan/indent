@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilma", "say": "What did this commit even change?", "note": "And postage is going up." },
+    { "title": "History", "text": "One commit's whole message is one word.", "note": "Nobody can tell what it did." },
+    {
+      "title": "Your commands",
+      "file": "finds.html",
+      "mine": true,
+      "gap": "Messages that say nothing",
+      "tasks": ["Reword Femi's commit", "Say what changed", "Say why"]
+    },
+    { "title": "Next year", "say": "So that's why postage went up." }
+  ],
+  "ticket": { "label": "Postage", "wrong": "a mystery", "why": "No reason", "right": "explained" },
+  "captions": [
+    "Wilma reads the shop's history and cannot tell what one commit did.",
+    "Postage is changing too, and a bare commit would not say why.",
+    "You reword Femi's commit and write a message with a what and a why, in three tasks.",
+    "Each commit now says what it changed, and the postage commit says why.",
+    "A reader next year understands the history without asking anyone."
+  ]
+}

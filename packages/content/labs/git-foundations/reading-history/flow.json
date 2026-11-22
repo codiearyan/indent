@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilma", "label": "Wilma", "kind": "story" },
+      { "id": "history", "label": "History", "kind": "data" },
+      { "id": "working", "label": "Working folder", "kind": "data" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "next", "label": "Next commits", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "wilma", "to": "you", "label": "questions" },
+      { "from": "history", "to": "you", "label": "old changes" },
+      { "from": "working", "to": "you", "label": "new changes" },
+      { "from": "you", "to": "next", "label": "checked commits" }
+    ],
+    "note": "You read the history and the working folder before anything new goes in."
+  },
+  "tasks": {
+    "sunday": {
+      "steps": [
+        { "active": ["wilma", "wilma->you", "you"], "note": "A customer says the site no longer mentions Sundays." },
+        { "active": ["history", "history->you", "you"], "note": "One of the commits on the visit page took a line off. Its changes show the line." },
+        { "active": ["you", "you->next", "next"], "note": "That line goes back into the list of hours, exactly as it was, in a new commit." }
+      ]
+    },
+    "name": {
+      "steps": [
+        { "active": ["history"], "note": "Every commit has a short hash, its name in the history." },
+        { "active": ["history", "history->you", "you"], "note": "The hash of the commit that removed the line is the answer to Wilma's question." },
+        { "active": ["you", "you->next", "next"], "note": "The new commit's message names it, so the history points at itself." }
+      ]
+    },
+    "review": {
+      "steps": [
+        { "active": ["working"], "note": "Femi's April finds wait in the working folder, written in a hurry." },
+        { "active": ["working", "working->you", "you"], "note": "Every changed line is read, the removed ones too." },
+        { "active": ["you"], "note": "Whatever Femi did not mean to change is put right in the editor." },
+        { "active": ["you", "you->next", "next"], "note": "Only the new books go into the commit, and the rest of the list stays." }
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "git-foundations",
+  "title": "Git foundations",
+  "description": "Pennywhistle Books is a small second-hand bookshop whose website lives in one folder that Wilma and Femi copy and rename every time they change it, until nobody knows which copy is right. You have never used Git, and you start by giving that folder a history: commits, the staging area, messages that say why, reading what changed and undoing what should not go in. Each issue teaches one part of Git, typed in a real terminal and checked by reading the repository you leave behind.",
+  "category": "DevOps and tools",
+  "language": "shell",
+  "tags": ["Git"],
+  "kind": "foundations",
+  "tools": ["node", "git"],
+  "parts": [
+    {
+      "title": "Keeping a history",
+      "chapters": ["first-commit", "three-places", "commit-messages", "reading-history", "undo-before-commit"]
+    }
+  ]
+}
