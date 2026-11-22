@@ -76,3 +76,24 @@ INSERT INTO treatments (id, visit_id, name, kind, price) VALUES
   (518, 412, 'Dental under anaesthetic', 'procedure', 250.0),
   (519, 413, 'Consultation', 'consultation', 48.0),
   (520, 413, 'Anti-inflammatory', 'medicine', 52.0);
+
+-- Added for joins: Idris Wynne's son, also Idris Wynne, who shares the house phone and has two
+-- animals, one of them a second Max; a second owner with no animals; a visit for that Max, a free
+-- visit for Rocky, and a second visit for Ginger that costs the same as her first consultation.
+
+INSERT INTO owners (id, first_name, last_name, phone, email, town) VALUES
+  (212, 'Idris', 'Wynne', '01632 960211', NULL, 'Larkhill'),
+  (213, 'Tegan', 'Ashby', '01632 960213', 'tegan@ashby.example', 'Elmstead');
+
+INSERT INTO animals (id, owner_id, name, species, breed, born, weight_kg) VALUES
+  (322, 212, 'Max', 'cat', NULL, '2024-04-04', 4.9),
+  (323, 212, 'Pip', 'dog', 'Whippet', '2022-09-09', 12.6);
+
+INSERT INTO visits (id, animal_id, visit_date, vet, reason, notes) VALUES
+  (414, 322, '2026-11-05', 'Mabel Tranter', 'Booster vaccine', NULL),
+  (415, 303, '2026-11-20', 'Mabel Tranter', 'Bandage change', 'Healing well.'),
+  (416, 318, '2026-11-22', 'Ifan Pryce', 'Limping', 'Better. Keep resting.');
+
+INSERT INTO treatments (id, visit_id, name, kind, price) VALUES
+  (521, 414, 'Booster vaccine', 'vaccine', 54.0),
+  (522, 416, 'Consultation', 'consultation', 48.0);
