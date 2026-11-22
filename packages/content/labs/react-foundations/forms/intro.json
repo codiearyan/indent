@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Elspeth", "say": "Can they sign the book here?", "note": "The paper one got wet." },
+    { "title": "Visitor", "text": "Types a name and a comment, presses Sign.", "note": "On the way out." },
+    {
+      "title": "Your form",
+      "file": "Guestbook.jsx",
+      "mine": true,
+      "gap": "Typing goes nowhere",
+      "tasks": ["Name in state", "The other fields", "Sign, no reload", "Say what is wrong"]
+    },
+    { "title": "Visitor book", "rows": [["Priya and Sam"], ["Gareth Pugh"]] }
+  ],
+  "ticket": { "label": "An entry", "wrong": "goes nowhere", "why": "Not kept", "right": "on top" },
+  "captions": [
+    "By the exit, Elspeth wants visitors to sign the museum's book on the new screen.",
+    "A visitor types a name and a comment, and nothing appears anywhere.",
+    "You keep each field in state and handle the form being sent, in four tasks.",
+    "The entry shows as it is typed, and Sign puts it at the top of the book.",
+    "Same book, now it keeps what you type. It even says when a comment is too long."
+  ]
+}

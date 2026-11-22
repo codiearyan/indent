@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Elspeth", "say": "How many are inside now?", "note": "The museum has a limit." },
+    { "title": "Door volunteer", "text": "Presses In each time a visitor walks in.", "note": "On a busy morning." },
+    {
+      "title": "Your counter",
+      "file": "DoorCounter.jsx",
+      "mine": true,
+      "gap": "The number never moves",
+      "tasks": ["Count in", "Count out", "A whole family", "Doors open or shut"]
+    },
+    { "title": "Door screen", "rows": [["Inside now"], ["Doors"]], "mark": 0 }
+  ],
+  "ticket": { "label": "Visitors", "wrong": "stuck at 0", "why": "Forgets", "right": "counted" },
+  "captions": [
+    "At the door, Elspeth needs to know how many visitors are inside on a busy day.",
+    "The volunteer presses In, and the number on the screen stays at 0.",
+    "You give the counter values it remembers between presses, in four tasks.",
+    "Every press of In, Out and Family moves the count on the screen.",
+    "Same buttons, now with a memory. The screen even says when the doors are closed."
+  ]
+}

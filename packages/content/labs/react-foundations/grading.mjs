@@ -38,6 +38,18 @@ async function bundleErrors(dir, entry) {
 
 const KNOWN = [
   [
+    /Too many re-renders/,
+    'React drew the component again and again and gave up: something sets state while the component is being drawn. Look for a handler that is called in the curly braces instead of handed over.'
+  ],
+  [
+    /listener to be a function/,
+    'An event prop was given something that is not a function. A handler was called while drawing and its result handed over: hand over the function itself.'
+  ],
+  [
+    /reading 'useState'|Invalid hook call/,
+    'useState was called outside the body of a component, or inside a handler or a condition. Call it at the top of the component, every time it draws.'
+  ],
+  [
     /Objects are not valid as a React child/,
     'React was handed a whole object to show. JSX can show text and numbers, not an object: pick the field you mean.'
   ],
@@ -56,6 +68,10 @@ const KNOWN = [
   [
     /Cannot assign to read only property|object is not extensible/,
     'A component tried to change an array or an object it was given as a prop. Props are read-only.'
+  ],
+  [
+    /reading 'target'/,
+    'The code read an event while the screen was being drawn, when there is no event yet. Read the event inside the function the event prop is given.'
   ],
   [
     /Cannot read properties of (undefined|null)/,
@@ -163,7 +179,12 @@ export const WARNING = {
   unknownTag: /is unrecognized in this browser/,
   functionChild: /Functions are not valid as a React child/,
   styleName: /Unsupported style property/,
-  nan: /Received NaN/
+  nan: /Received NaN/,
+  eventName: /Invalid event handler property/,
+  listener: /listener to be a function/,
+  noOnChange: /without an `onChange` handler/,
+  toControlled: /changing an uncontrolled input to be controlled/,
+  toUncontrolled: /changing a controlled input to be uncontrolled/
 }
 
 export const warningsOf = (logs, pattern) =>
@@ -205,3 +226,39 @@ export const childList = (parent) =>
   [...(parent?.children ?? [])]
     .map((el) => el.tagName.toLowerCase() + (el.className ? `.${el.className.split(' ').join('.')}` : ''))
     .join(', ') || '(nothing)'
+
+let fresh = 0
+
+/** Draws one export as a new element, so any state it keeps starts again from the beginning. */
+export const drawNew = (page, name, props = {}, ...children) =>
+  draw(page, name, { ...props, key: `fresh-${++fresh}` }, ...children)
+
+/**
+ * The props React gave an element of the page, read from the element the way drawnBy reads its
+ * component. Undefined when that record cannot be read, so nothing should be judged from it.
+ */
+export function reactProps(element) {
+  try {
+    const key = element && Object.keys(element).find((name) => name.startsWith('__reactProps$'))
+    return key && typeof element[key] === 'object' ? element[key] : undefined
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * Whether a form field takes its value from React: it has a value (or checked) prop and a way to
+ * change it. Yes when React's record cannot be read.
+ */
+export function isControlled(element) {
+  const props = reactProps(element)
+  if (!props) return true
+  return ('value' in props || 'checked' in props) && typeof props.onChange === 'function'
+}
+
+/** Clicks an element and waits for the page to settle; false when there was nothing to click. */
+export async function press(page, element) {
+  if (!element) return false
+  await page.click(element)
+  return true
+}

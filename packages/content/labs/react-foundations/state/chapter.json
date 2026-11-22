@@ -1,0 +1,114 @@
+{
+  "id": "state",
+  "title": "A value the screen remembers",
+  "files": ["src/DoorCounter.jsx", "src/App.jsx"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "count",
+      "title": "Make In count a visitor in",
+      "file": "src/DoorCounter.jsx",
+      "description": "Keep the number of visitors inside in state, starting at `0`, in place of the plain variable `inside`. Each press of In adds one, and the span with the class `count` shows the new number at once.\n\nThe check draws a new counter, presses In three times and reads the count after each press, then does the same with a second new counter.",
+      "nextSteps": [
+        "Read \"Why a plain variable forgets\" and \"useState\" in the lesson.",
+        "Import `useState` from `react`.",
+        "Replace `let inside = 0` with state.",
+        "Make `letIn` set the new count, and press In in the Browser panel."
+      ],
+      "hints": [
+        "The variable changes, but React is never asked to draw again, and every draw starts it at 0.",
+        "`useState(0)` gives you the count for this draw and a function that sets the next one. Setting it draws the component again.",
+        "`const [inside, setInside] = useState(0)`, then in `letIn`, `setInside(inside + 1)`."
+      ],
+      "docs": [
+        { "title": "State: a component's memory", "url": "https://react.dev/learn/state-a-components-memory" },
+        { "title": "useState", "url": "https://react.dev/reference/react/useState" }
+      ],
+      "videos": [{ "title": "Using state with useState", "url": "https://www.youtube.com/watch?v=4pO-HcG2igk" }],
+      "points": 10
+    },
+    {
+      "id": "out",
+      "title": "Make Out count a visitor out",
+      "file": "src/DoorCounter.jsx",
+      "description": "Each press of the button with the class `out` takes one off the count. The count never goes below `0`: pressing Out when nobody is inside leaves it at `0`.\n\nThe check presses In and Out in a row, more Outs than Ins, and reads the count after each press, then presses Out on a new, empty counter.",
+      "nextSteps": [
+        "Write a function for Out next to `letIn`.",
+        "Give the Out button that function.",
+        "Decide what Out does when the count is already 0.",
+        "Press Out more times than In in the Browser panel."
+      ],
+      "hints": [
+        "Out is In the other way round, with one more question to ask first.",
+        "Work out the next count from the present one: one less, unless that would be below 0.",
+        "Something like `setInside(inside > 0 ? inside - 1 : 0)`, or `Math.max`."
+      ],
+      "docs": [
+        {
+          "title": "Adding interactivity",
+          "url": "https://react.dev/learn/adding-interactivity"
+        },
+        {
+          "title": "Math.max()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/max"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "family",
+      "title": "Make Family count all four of a family",
+      "file": "src/DoorCounter.jsx",
+      "description": "`letInFamily` calls `letIn` four times, one for each person on a family ticket. Make `letIn` work so that four calls in one press count four visitors, and In still counts one.\n\nThe check presses Family twice and then In, and reads the count after each press.",
+      "nextSteps": [
+        "Read \"Each draw sees one value\" in the lesson.",
+        "Press Family in the Browser panel and see how many it counts.",
+        "Change how `letIn` sets the count, not how often it is called."
+      ],
+      "hints": [
+        "All four calls happen in one click, inside one draw. What does each of them read as the count?",
+        "A setter can take a function instead of a value. React calls it with the newest count, after the changes already asked for in the same click.",
+        "`setInside((n) => n + 1)`"
+      ],
+      "docs": [
+        {
+          "title": "Queueing a series of state updates",
+          "url": "https://react.dev/learn/queueing-a-series-of-state-updates"
+        },
+        { "title": "State as a snapshot", "url": "https://react.dev/learn/state-as-a-snapshot" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "doors",
+      "title": "Show when the doors are closed",
+      "file": "src/DoorCounter.jsx",
+      "description": "Keep a second piece of state: whether the doors are open. They start open.\n\n- Add a button with the class `doors`. It reads `Close doors` while the doors are open and `Open doors` while they are closed, and each press switches them.\n- While the doors are closed, a paragraph with the class `closed` says `Doors closed`, and the In and Family buttons are disabled. Out still works: people can leave.\n- While they are open, there is no closed paragraph and In and Family work.\n\nThe count is not changed by opening or closing. The check counts two visitors in, closes the doors, presses In and Out, opens them again and presses In.",
+      "nextSteps": [
+        "Read \"More than one piece of state\" in the lesson.",
+        "Add the state for the doors, and the doors button that switches it.",
+        "Choose the button's words and the closed paragraph from that state.",
+        "Disable In and Family while the doors are closed."
+      ],
+      "hints": [
+        "Open or closed is a value of its own, true or false, separate from the count.",
+        "A second `useState(true)`. The button sets it to the opposite of what it is. The words, the paragraph and `disabled` are all worked out from it while drawing.",
+        "`const [open, setOpen] = useState(true)`, the button `onClick={() => setOpen(!open)}`, and `disabled={!open}` on In and Family."
+      ],
+      "docs": [
+        {
+          "title": "Giving a component multiple state variables",
+          "url": "https://react.dev/learn/state-a-components-memory#giving-a-component-multiple-state-variables"
+        },
+        {
+          "title": "HTML attribute: disabled",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/disabled"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

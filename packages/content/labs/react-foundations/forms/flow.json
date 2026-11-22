@@ -1,0 +1,51 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "visitor", "label": "Visitor", "kind": "story" },
+      { "id": "fields", "label": "Name, from, comment", "kind": "story" },
+      { "id": "book", "label": "Guestbook", "kind": "function", "mine": true },
+      { "id": "state", "label": "Form and entries", "kind": "data", "mine": true },
+      { "id": "screen", "label": "Preview and book", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "visitor", "to": "fields", "label": "types" },
+      { "from": "fields", "to": "book", "label": "onChange" },
+      { "from": "book", "to": "state", "label": "set" },
+      { "from": "state", "to": "fields", "label": "value" },
+      { "from": "state", "to": "screen", "label": "draw" }
+    ],
+    "note": "What a visitor types lives in state, so the screen can show it, check it and sign it into the book."
+  },
+  "tasks": {
+    "name": {
+      "steps": [
+        { "active": ["visitor", "visitor->fields", "fields"], "note": "A visitor starts typing their name." },
+        { "active": ["fields", "fields->book", "book", "book->state", "state"], "value": { "kind": "map", "label": "Form", "entries": [{ "key": "name", "value": "text" }] }, "note": "Each key sets the name in state." },
+        { "active": ["state", "state->fields", "fields"], "note": "The field shows what is in state." },
+        { "active": ["state", "state->screen", "screen"], "note": "The preview shows the same name as it is typed." }
+      ]
+    },
+    "fields": {
+      "steps": [
+        { "active": ["visitor", "visitor->fields", "fields"], "note": "The visitor fills in where they are from and a comment." },
+        { "active": ["fields", "fields->book", "book", "book->state", "state"], "value": { "kind": "map", "label": "Form", "entries": [{ "key": "name", "value": "text" }, { "key": "from", "value": "text" }, { "key": "comment", "value": "text" }] }, "note": "Each field sets its own part, and the others stay as they were." },
+        { "active": ["state", "state->screen", "screen"], "note": "The preview shows the whole entry before it is signed." }
+      ]
+    },
+    "sign": {
+      "steps": [
+        { "active": ["visitor", "visitor->fields", "fields", "fields->book", "book"], "note": "The visitor presses Sign, or Enter in a field." },
+        { "active": ["book"], "note": "The page stays where it is: nothing is sent away." },
+        { "active": ["book", "book->state", "state"], "value": { "kind": "array", "label": "Entries", "values": ["new entry", "entry", "entry"] }, "note": "A new list of entries starts with this one, and the form goes back to empty." },
+        { "active": ["state", "state->screen", "screen"], "note": "The entry is at the top of the book, ready for the next visitor." }
+      ]
+    },
+    "problems": {
+      "steps": [
+        { "active": ["visitor", "visitor->fields", "fields"], "note": "A visitor writes a long story about tram brakes." },
+        { "active": ["state", "book"], "note": "While drawing, the book works out what is wrong from what is in state." },
+        { "active": ["state", "state->screen", "screen"], "note": "The form says how much too long, and Sign waits until it fits." }
+      ]
+    }
+  }
+}

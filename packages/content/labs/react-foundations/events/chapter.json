@@ -1,0 +1,119 @@
+{
+  "id": "events",
+  "title": "Buttons that do something",
+  "files": ["src/Kiosk.jsx", "src/desk.js", "src/choices.js", "src/App.jsx"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "ring",
+      "title": "Ring the bell when Ring for help is pressed",
+      "file": "src/Kiosk.jsx",
+      "description": "Import `ringBell` from `desk.js`, and make the button with the class `ring` call it each time it is pressed. Nothing rings while the kiosk is being drawn.\n\nThe check uses a desk of its own that writes down every call. It looks at the calls made while the kiosk is drawn, then presses Ring for help twice and expects two rings.",
+      "nextSteps": [
+        "Read \"Handing React a function\" in the lesson.",
+        "Import `ringBell` at the top of `Kiosk.jsx`.",
+        "Give the Ring for help button its event prop.",
+        "Press it in the Browser panel and look for the desk's line in the console."
+      ],
+      "hints": [
+        "React calls a function you give the button when it is clicked. Which prop takes it?",
+        "Event props start with `on` and are written in camel case. Their value is a function in curly braces, without brackets after its name.",
+        "`<button className=\"ring\" onClick={ringBell}>`"
+      ],
+      "docs": [
+        { "title": "Responding to events", "url": "https://react.dev/learn/responding-to-events" },
+        {
+          "title": "Adding event handlers",
+          "url": "https://react.dev/learn/responding-to-events#adding-event-handlers"
+        }
+      ],
+      "videos": [{ "title": "Click events in React", "url": "https://www.youtube.com/watch?v=0XSDAup85SA" }],
+      "points": 10
+    },
+    {
+      "id": "tickets",
+      "title": "Print the right ticket when a ticket button is pressed",
+      "file": "src/Kiosk.jsx",
+      "description": "Each button with the class `ticket` calls `printTicket` from `desk.js` with its own kind, the words on the button, each time it is pressed. Nothing prints while the kiosk is being drawn.\n\nThe check changes `choices.js` to tickets of its own, presses the second button twice and the first once, and expects exactly those three tickets, in that order.",
+      "nextSteps": [
+        "Read \"Passing, not calling\" in the lesson.",
+        "Import `printTicket`.",
+        "Give each button in the `map` a function that prints its own kind.",
+        "Reload the Browser panel: does the console print anything before you press?"
+      ],
+      "hints": [
+        "`printTicket` needs to know which ticket, so it cannot be handed over as it is.",
+        "Writing `printTicket(kind)` straight into the curly braces calls it while drawing. Wrap the call in a new function that React can call later.",
+        "`onClick={() => printTicket(kind)}`"
+      ],
+      "docs": [
+        {
+          "title": "Reading props in event handlers",
+          "url": "https://react.dev/learn/responding-to-events#reading-props-in-event-handlers"
+        },
+        {
+          "title": "Arrow function expressions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "heard",
+      "title": "Tell the desk which answer a visitor picks",
+      "file": "src/Kiosk.jsx",
+      "description": "When a visitor picks an answer in the select with the class `answer`, call `recordAnswer` from `desk.js` with the answer they picked, as text, once for each pick.\n\nThe check changes `choices.js` to answers of its own, picks two of them one after the other, and expects `recordAnswer` to get each answer, in order.",
+      "nextSteps": [
+        "Read \"The event\" in the lesson.",
+        "Find the event a select fires when its choice changes.",
+        "In its handler, find the answer the visitor picked.",
+        "Pick two answers in the Browser panel and read the console."
+      ],
+      "hints": [
+        "React hands your handler one argument that says what happened.",
+        "The event's `target` is the select itself, and a select's `value` is the option picked.",
+        "`onChange={(event) => recordAnswer(event.target.value)}`"
+      ],
+      "docs": [
+        {
+          "title": "React event object",
+          "url": "https://react.dev/reference/react-dom/components/common#react-event-object"
+        },
+        { "title": "Event: target", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Event/target" },
+        { "title": "<select>", "url": "https://react.dev/reference/react-dom/components/select" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ticket-button",
+      "title": "Write TicketButton and use it for the tickets",
+      "file": "src/Kiosk.jsx",
+      "description": "Below `Kiosk`, write a component called `TicketButton` and export it by name. It takes two props:\n\n- `kind`, the ticket, shown as the words of a `<button>` with the class `ticket`\n- `onChoose`, a function it calls with `kind` each time the button is pressed\n\n`TicketButton` never calls the desk itself: it only calls what it is given. Then draw the kiosk's ticket buttons with `TicketButton`, one per ticket, with `printTicket` as each one's `onChoose`.\n\nThe check draws `TicketButton` with kinds and an `onChoose` of its own and presses it twice, then presses ticket buttons on the kiosk.",
+      "nextSteps": [
+        "Read \"Handlers as props\" in the lesson.",
+        "Write `TicketButton` below `Kiosk`, with its two props.",
+        "Call `onChoose` with the kind when the button is pressed.",
+        "Use `TicketButton` in the kiosk's `map`, and check that the tickets still print."
+      ],
+      "hints": [
+        "The button should not know about the desk. It tells whoever drew it which ticket was chosen.",
+        "`onChoose` is a function from the props. Call it from a small function of the button's own, with `kind`. In the kiosk, hand `printTicket` over without calling it.",
+        "`<button className=\"ticket\" onClick={() => onChoose(kind)}>{kind}</button>`, and in the kiosk `<TicketButton key={kind} kind={kind} onChoose={printTicket} />`."
+      ],
+      "docs": [
+        {
+          "title": "Passing event handlers as props",
+          "url": "https://react.dev/learn/responding-to-events#passing-event-handlers-as-props"
+        },
+        {
+          "title": "Naming event handler props",
+          "url": "https://react.dev/learn/responding-to-events#naming-event-handler-props"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

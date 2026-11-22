@@ -10,6 +10,10 @@
     {
       "title": "Screens from components",
       "chapters": ["first-component", "values-in-jsx", "props", "lists-and-keys", "one-or-another"]
+    },
+    {
+      "title": "Screens that respond",
+      "chapters": ["events", "state", "objects-and-arrays", "forms"]
     }
   ]
 }

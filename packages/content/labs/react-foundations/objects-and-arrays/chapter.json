@@ -1,0 +1,120 @@
+{
+  "id": "objects-and-arrays",
+  "title": "State that is an object or a list",
+  "files": ["src/Till.jsx", "src/shop.js", "src/App.jsx", "src/money.js"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "options",
+      "title": "Make Gift wrap and Paper bag switch on their own",
+      "file": "src/Till.jsx",
+      "description": "The options are one object in state, `{ wrap, bag }`. Make `toggleWrap` switch `wrap` and write `toggleBag` to switch `bag`, so that each press of Gift wrap or Paper bag turns its own option on or off and leaves the other as it was. Each button shows its option with `aria-pressed`, which the starter already sets.\n\nThe check draws a new till and presses Gift wrap, Paper bag, Gift wrap, Paper bag, reading both options after each press.",
+      "nextSteps": [
+        "Read \"Same object, no new draw\" and \"A new object\" in the lesson.",
+        "Find out why `toggleWrap` changes nothing on the screen.",
+        "Hand the setter a new object instead.",
+        "Write `toggleBag` the same way, and press both in the Browser panel."
+      ],
+      "hints": [
+        "`toggleWrap` changes the object React already holds and hands it back. To React, nothing is new.",
+        "Make a new object that copies every field of the old one, then sets the one that changes.",
+        "`setOptions({ ...options, wrap: !options.wrap })`"
+      ],
+      "docs": [
+        { "title": "Updating objects in state", "url": "https://react.dev/learn/updating-objects-in-state" },
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "add",
+      "title": "Put an item in the basket when Add is pressed",
+      "file": "src/Till.jsx",
+      "description": "Keep the basket in state: an array of lines that starts empty, in place of `const basket = []`. Pressing Add next to an item puts a new line at the end of the basket, made from the item with a `qty` of `1`, like `{ ...item, qty: 1 }`.\n\nDraw the basket in the list with the class `basket-list`: one `BasketLine` per line, in order, each with a key and the line as its `line` prop. The total below already works itself out from the basket.\n\nThe check draws new tills with a shelf of its own, adds two and then three different items, and reads the lines and the total.",
+      "nextSteps": [
+        "Read \"Lists in state\" in the lesson.",
+        "Replace `const basket = []` with state.",
+        "Write `add` so that it hands the setter a new array.",
+        "Draw one `BasketLine` per line, and press Add in the Browser panel."
+      ],
+      "hints": [
+        "`push` changes the array React already holds. The basket needs a new array each time.",
+        "The spread makes a new array with every line of the old one, and a new line after them. Give each `BasketLine` a key that belongs to its line.",
+        "`setBasket([...basket, { ...item, qty: 1 }])`, and in the list `basket.map((line) => <BasketLine key={line.id} line={line} />)`."
+      ],
+      "docs": [
+        {
+          "title": "Adding to an array",
+          "url": "https://react.dev/learn/updating-arrays-in-state#adding-to-an-array"
+        },
+        { "title": "Rendering lists", "url": "https://react.dev/learn/rendering-lists" }
+      ],
+      "videos": [
+        { "title": "Updating an array of objects in state", "url": "https://www.youtube.com/watch?v=Y62mbztjmus" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "more",
+      "title": "Raise the quantity of an item already in the basket",
+      "file": "src/Till.jsx",
+      "description": "When Add is pressed for an item that is already in the basket, its line's `qty` goes up by one instead of a second line appearing. The line stays where it is, and the other lines are left as they were. An item that is not in the basket yet still gets a new line at the end.\n\nThe check adds one item, then a second, then the first twice more, and reads the lines and the total.",
+      "nextSteps": [
+        "Read the end of \"Lists in state\" in the lesson.",
+        "In `add`, find out first whether the item has a line already.",
+        "If it has, hand the setter a new array with that one line changed.",
+        "Add the same item three times in the Browser panel."
+      ],
+      "hints": [
+        "There are two cases now: a new item, and one that has a line already.",
+        "`some` tells you which case it is. `map` makes a new array with one line replaced by a new object, every other line as it was.",
+        "`basket.map((line) => (line.id === item.id ? { ...line, qty: line.qty + 1 } : line))`"
+      ],
+      "docs": [
+        {
+          "title": "Replacing items in an array",
+          "url": "https://react.dev/learn/updating-arrays-in-state#replacing-items-in-an-array"
+        },
+        {
+          "title": "Array.prototype.some()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "remove",
+      "title": "Take a line out with its Remove button",
+      "file": "src/Till.jsx",
+      "description": "Give `BasketLine` an `onRemove` prop, and a button with the class `remove` that reads `Remove` and calls `onRemove` with the line's `id` when it is pressed. In `Till`, write `remove(id)`, which takes that line out of the basket, and hand it to each `BasketLine`.\n\nThe check fills a basket with three lines, removes the first and then the last, adds another item, and reads the basket after each step. It also checks that each line keeps its own list item when the first one leaves.",
+      "nextSteps": [
+        "Read \"Keys when items leave\" in the lesson.",
+        "Add the Remove button to `BasketLine`, calling its `onRemove` prop.",
+        "Write `remove` in `Till`, handing the setter a new array.",
+        "Pass `remove` to each `BasketLine`, and remove the first line in the Browser panel."
+      ],
+      "hints": [
+        "The button is in `BasketLine`, but the basket is in `Till`. The line tells its owner, with a function from its props, as the ticket buttons did.",
+        "`filter` makes a new array without the line whose id matches. A key from the line's id keeps each element with its line.",
+        "`setBasket(basket.filter((line) => line.id !== id))`, and in `BasketLine`, `onClick={() => onRemove(line.id)}`."
+      ],
+      "docs": [
+        {
+          "title": "Removing from an array",
+          "url": "https://react.dev/learn/updating-arrays-in-state#removing-from-an-array"
+        },
+        {
+          "title": "Keeping list items in order with key",
+          "url": "https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "anjali", "label": "Anjali", "kind": "story" },
+      { "id": "shelf", "label": "shop.js", "kind": "data" },
+      { "id": "till", "label": "Till", "kind": "function", "mine": true },
+      { "id": "basket", "label": "Basket and options", "kind": "data", "mine": true },
+      { "id": "line", "label": "BasketLine", "kind": "function", "mine": true },
+      { "id": "screen", "label": "Till screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "shelf", "to": "till", "label": "items" },
+      { "from": "anjali", "to": "till", "label": "presses" },
+      { "from": "till", "to": "basket", "label": "a new copy" },
+      { "from": "basket", "to": "line", "label": "one line" },
+      { "from": "line", "to": "till", "label": "onRemove(id)" },
+      { "from": "line", "to": "screen", "label": "lines, total" }
+    ],
+    "note": "The till keeps the basket in state, and every change hands React a new list or object."
+  },
+  "tasks": {
+    "options": {
+      "steps": [
+        { "active": ["anjali", "anjali->till", "till"], "note": "A customer wants a present wrapped, so Anjali presses Gift wrap." },
+        { "active": ["till", "till->basket", "basket"], "value": { "kind": "map", "label": "Options", "entries": [{ "key": "wrap", "value": "true or false" }, { "key": "bag", "value": "true or false" }] }, "note": "A new options object replaces the old one, with the other option as it was." },
+        { "active": ["basket", "screen"], "note": "The screen shows both options as they are now." }
+      ]
+    },
+    "add": {
+      "steps": [
+        { "active": ["shelf", "shelf->till", "till"], "note": "The shelf by the till lists what is for sale." },
+        { "active": ["anjali", "anjali->till", "till", "till->basket", "basket"], "value": { "kind": "array", "label": "Basket", "values": ["line", "line", "new line"] }, "note": "Add makes a new basket: the lines that were there, and one more at the end." },
+        { "active": ["basket", "basket->line", "line", "line->screen", "screen"], "note": "Each line is drawn, and the total follows." }
+      ]
+    },
+    "more": {
+      "steps": [
+        { "active": ["anjali", "anjali->till", "till"], "note": "A customer takes a second mug of the same kind." },
+        { "active": ["till", "till->basket", "basket"], "value": { "kind": "map", "label": "A line", "entries": [{ "key": "id", "value": "text" }, { "key": "name", "value": "text" }, { "key": "qty", "value": "number" }] }, "note": "The mug's line is replaced by a new one with one more, in the same place." },
+        { "active": ["basket", "basket->line", "line", "line->screen", "screen"], "note": "The basket shows one line for the mugs, not two." }
+      ]
+    },
+    "remove": {
+      "steps": [
+        { "active": ["line", "screen"], "note": "A customer changes their mind about the first thing in the basket." },
+        { "active": ["line", "line->till", "till"], "note": "That line's Remove button tells the till which line." },
+        { "active": ["till", "till->basket", "basket"], "note": "A new basket is made without that line." },
+        { "active": ["basket", "basket->line", "line", "line->screen", "screen"], "note": "Every other line keeps its own place on the screen." }
+      ]
+    }
+  }
+}

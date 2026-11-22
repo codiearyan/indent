@@ -1,0 +1,122 @@
+{
+  "id": "forms",
+  "title": "Forms that keep what you type",
+  "files": ["src/Guestbook.jsx", "src/book.js", "src/App.jsx"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "name",
+      "title": "Keep the name in state and show it in the preview",
+      "file": "src/Guestbook.jsx",
+      "description": "Make the input named `name` controlled: its value comes from state, which starts as an empty string, and every change the visitor makes sets that state. Show the same state in the preview, in the span with the class `name`, so it follows every key pressed.\n\nThe check draws a new book, types a name, clears the field, types another name, and compares the field and the preview after each step.",
+      "nextSteps": [
+        "Read \"A field whose value lives in state\" in the lesson.",
+        "Add state for the name, starting at `''`.",
+        "Give the name input its `value` and its `onChange`.",
+        "Show the name in the preview, and type in the Browser panel."
+      ],
+      "hints": [
+        "The field needs to show what is in state, and state needs to change when the visitor types.",
+        "`value` takes the state. `onChange` gets an event, and the text typed is the value of the element the event happened on.",
+        "`<input name=\"name\" value={name} onChange={(event) => setName(event.target.value)} />`, and `{name}` in the preview's span."
+      ],
+      "docs": [
+        {
+          "title": "Controlling an input with a state variable",
+          "url": "https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable"
+        },
+        { "title": "<input>", "url": "https://react.dev/reference/react-dom/components/input" }
+      ],
+      "videos": [{ "title": "Controlled inputs", "url": "https://www.youtube.com/watch?v=IkMND33x0qQ" }],
+      "points": 10
+    },
+    {
+      "id": "fields",
+      "title": "Do the same for where from and the comment",
+      "file": "src/Guestbook.jsx",
+      "description": "Make the input named `from` and the textarea named `comment` controlled too, each starting as an empty string, and show them in the preview's spans with the classes `from` and `comment`. Typing in one field leaves the others as they were. Three pieces of state or one object are both fine.\n\nThe check types, clears and types again in both fields, then types a name and checks that the other two are still in the preview.",
+      "nextSteps": [
+        "Read \"Several fields\" in the lesson.",
+        "Choose three pieces of state or one object.",
+        "Give both fields their `value` and `onChange`.",
+        "Fill all three fields in the Browser panel and watch the preview."
+      ],
+      "hints": [
+        "Each field works like the name. The question is only how to keep three values.",
+        "With one object, each change makes a new object that keeps every field and changes one. A field's `name` says which.",
+        "`setForm({ ...form, [event.target.name]: event.target.value })`, with `value={form.from}` and `value={form.comment}`."
+      ],
+      "docs": [
+        {
+          "title": "Using a single event handler for multiple fields",
+          "url": "https://react.dev/learn/updating-objects-in-state#using-a-single-event-handler-for-multiple-fields"
+        },
+        { "title": "<textarea>", "url": "https://react.dev/reference/react-dom/components/textarea" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sign",
+      "title": "Sign the book without a reload",
+      "file": "src/Guestbook.jsx",
+      "description": "When the form is sent, by pressing Sign or by pressing Enter in a field, the page does not reload. A new entry with `id`, `name`, `from` and `comment` goes at the top of the book, above the entries already there, and every field is emptied, so the preview is empty too.\n\nThe check fills the form and presses Sign, then fills it again and sends the form the way Enter does. It reads the book and the fields after each.",
+      "nextSteps": [
+        "Read \"Sending without a reload\" in the lesson.",
+        "Handle the form being sent, on the form itself.",
+        "Stop the browser's own sending first, then add the entry.",
+        "Empty the fields, and sign the book twice in the Browser panel."
+      ],
+      "hints": [
+        "Pressing the button and pressing Enter both fire one event, on the form.",
+        "`onSubmit` on the `<form>`. Call `preventDefault()` on its event, hand the entries setter a new array with the new entry first, and set the fields back to empty strings. `crypto.randomUUID()` makes an id.",
+        "`setEntries([{ id: crypto.randomUUID(), ...form }, ...entries])` after `event.preventDefault()`, then empty the form's state."
+      ],
+      "docs": [
+        {
+          "title": "Handling form submission",
+          "url": "https://react.dev/reference/react-dom/components/form"
+        },
+        {
+          "title": "Event: preventDefault()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault"
+        },
+        {
+          "title": "Preventing default behavior",
+          "url": "https://react.dev/learn/responding-to-events#preventing-default-behavior"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "problems",
+      "title": "Show what is wrong before the book is signed",
+      "file": "src/Guestbook.jsx",
+      "description": "While the visitor types, the form says what would stop it being signed:\n\n- While the comment is longer than `maxComment` characters, a paragraph with the class `problem` says how many too many, like `5 characters too many`. A comment of exactly `maxComment` characters is fine.\n- The Sign button is disabled while the name is empty or only spaces, or the comment is too long.\n- If the form is sent anyway while something is wrong, nothing is added.\n\nThe check draws books with limits of its own from the `maxComment` prop, types a name of spaces, a name, a comment that is too long and one that just fits, and sends the form while the comment is too long.",
+      "nextSteps": [
+        "Read \"Showing what is wrong first\" in the lesson.",
+        "Work out, while drawing, how many characters too many and whether the book can be signed.",
+        "Show the problem paragraph only when there is one, and disable Sign.",
+        "In the submit handler, stop when the book cannot be signed."
+      ],
+      "hints": [
+        "Everything you need is already in state; nothing new needs remembering.",
+        "The comment's `length` minus `maxComment` is how many too many. `trim()` turns a name of spaces into an empty one. A disabled button does not stop a form being sent in other ways.",
+        "`const tooMany = form.comment.length - maxComment`, `const canSign = form.name.trim() !== '' && tooMany <= 0`, `disabled={!canSign}`, and `if (!canSign) return` in the handler."
+      ],
+      "docs": [
+        {
+          "title": "String.prototype.trim()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim"
+        },
+        {
+          "title": "Avoid redundant state",
+          "url": "https://react.dev/learn/choosing-the-state-structure#avoid-redundant-state"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
