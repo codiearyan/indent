@@ -31,8 +31,31 @@ export function show(req, res) {
   const headers = ['content-type', 'location']
     .filter((h) => res.headers[h] !== undefined)
     .map((h) => `${h}: ${res.headers[h]}`)
-  return [`${line}${sent}${key}`, `-> ${res.status}`, ...headers, clip(res.text)].join('\n')
+  const late = res.late ? [`(then) ${res.late}`] : []
+  return [`${line}${sent}${key}`, `-> ${res.status}`, ...headers, clip(res.text), ...late].join(
+    '\n'
+  )
 }
+
+const TWICE =
+  'The client got this answer, and then the code went on running and tried to answer again. Once a handler has sent an answer, nothing after it should run.'
+const CRASHED =
+  'Your code threw an error while it handled this request, so Express answered 500. Read the error below, then run node try.js.'
+
+// A sent object compared without its id, for checks that must not depend on how many ids
+// earlier requests used up.
+export const withoutId = (value) => {
+  if (typeof value !== 'object' || value === null) return value
+  const { id, ...rest } = value
+  return rest
+}
+
+/** A 201 with `fields` saved under a fresh id, and a location that points at that id. */
+export const created = (res, fields, prefix = '/workshops') =>
+  res.status === 201 &&
+  same(withoutId(res.json), fields) &&
+  Number.isInteger(res.json.id) &&
+  res.headers.location === `${prefix}/${res.json.id}`
 
 /** A whole check failed before any request could be judged, e.g. createApp threw. */
 export function broken(name, r) {
@@ -49,25 +72,43 @@ export function broken(name, r) {
   ]
 }
 
-/** Judges each case against its response: { name, req, ok(res) => boolean, hint }. */
+/**
+ * Judges each case against its response: { name, req, ok(res) => boolean, hint, may500? }.
+ * `hint` is a string, or a function of the response when the cause depends on what came back.
+ */
 export function judge(cases, responses) {
   return cases.map((c, i) => {
     const res = responses[i]
     let passed = false
     try {
-      passed = Boolean(res && !res.error && c.ok(res))
+      passed = Boolean(res && !res.error && !res.late && c.ok(res))
     } catch {}
-    const message = res?.error ? `${c.hint} The request got no proper response.` : c.hint
-    return { name: c.name, passed, message: passed ? undefined : message, output: show(c.req, res) }
+    return {
+      name: c.name,
+      passed,
+      message: passed ? undefined : explain(c, res),
+      output: show(c.req, res)
+    }
   })
 }
 
-/** Sends every case's request to createApp() in order and judges the responses. */
-export async function checkApp(t, cases, options = {}) {
+function explain(c, res) {
+  const hint = typeof c.hint === 'function' ? c.hint(res ?? {}) : c.hint
+  if (!res || res.error) return `${hint} The request got no proper response.`
+  if (res.late) return TWICE
+  if (res.status === 500 && !c.may500) return CRASHED
+  return hint
+}
+
+/**
+ * Sends every case's request to createApp() in order and judges the responses. `more` turns the
+ * run ({ responses, logged }, logged being what reached console.error) into extra results.
+ */
+export async function checkApp(t, cases, options = {}, more = () => []) {
   const dir = await sandbox(t)
   const r = await t.call(dir, '.grader/harness.mjs', 'app', [cases.map((c) => c.req), options])
   if (!r.ok) return broken('The app starts', r)
-  return judge(cases, r.value.responses)
+  return [...judge(cases, r.value.responses), ...more(r.value)]
 }
 
 /** Sends every case's request to workshopsRouter() mounted at `options.mount`. */

@@ -45,7 +45,7 @@ The default `= {}` keeps every old call, like `check(body)`, working as before. 
 
 ## DELETE answers with nothing
 
-A DELETE removes the thing at the address. When it works there is nothing left to describe, so the answer is **204 No Content**: a status and no body at all. `res.json()` always writes a body, so end the response without one instead:
+A DELETE removes the thing at the address. When it works there is nothing left to describe, so the answer is **204 No Content**: a status and no body at all. Express quietly drops anything you hand `res.json()` with a 204, so a body there would only mislead whoever reads the code. Say what you mean and end the response without one:
 
 ```js
 res.status(204).end()

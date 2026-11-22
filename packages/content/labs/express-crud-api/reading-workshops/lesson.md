@@ -48,7 +48,7 @@ if (!loaf) return res.status(404).json({ error: { code: 'not_found', message: 'N
 res.json(loaf)
 ```
 
-Without the `return`, the code goes on and tries to answer a second time, and Express complains that the headers were already sent.
+Without the `return`, the code goes on and tries to answer a second time. Here that second `res.json(loaf)` happens to do nothing you can see: the client already has its 404 and nothing is printed. With other code after the check, Node may throw an error because the answer has already gone out, or the code may change data it should have left alone. So stop as soon as you have answered. The checks watch for a second answer.
 
 ## The query string
 
