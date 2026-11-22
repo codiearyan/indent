@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { Group, Panel, Separator } from 'react-resizable-panels'
 import {
+  FoldVerticalIcon,
   Loader2Icon,
   Maximize2Icon,
   Minimize2Icon,
@@ -8,6 +9,7 @@ import {
   PanelLeftIcon,
   PlayIcon,
   SparklesIcon,
+  UnfoldVerticalIcon,
   WandSparklesIcon
 } from 'lucide-react'
 import { isChapterComplete } from '@shared/rules'
@@ -25,6 +27,7 @@ import { askWhyTaskFailed } from '@/features/ai/tutorActions'
 import { TOUR } from '@/features/tour/anchors'
 import { checkAll, runCommand } from '@/features/workspace/useWorkspaceShortcuts'
 import { useRuntime } from '@/stores/runtime'
+import { foldKey, toggleCommentFolds, useCommentFolds } from './commentFolds'
 import { ConflictDialog } from './ConflictDialog'
 import { EditorGroup } from './EditorGroup'
 import { focusedEditor } from './editors'
@@ -67,6 +70,11 @@ export function EditorPane(): React.JSX.Element {
   const hideSummary = useCallback(() => setShowSummary(false), [])
   useModels(files, hideSummary)
   const command = chapter?.terminal.suggestedCommand
+  const focusedGroup = useWorkspace((s) => s.layout.focused)
+  const activePath = useWorkspace((s) => s.layout.groups[s.layout.focused]?.active ?? null)
+  const commentsFolded = useCommentFolds(
+    (s) => !!activePath && !!s.folded[foldKey(focusedGroup, activePath)]
+  )
 
   return (
     <div className="flex h-full flex-col bg-editor">
@@ -109,6 +117,16 @@ export function EditorPane(): React.JSX.Element {
           onClick={() => void focusedEditor()?.getAction('editor.action.formatDocument')?.run()}
         >
           <WandSparklesIcon />
+        </IconButton>
+        <IconButton
+          label={commentsFolded ? 'Show comments' : 'Collapse comments'}
+          shortcut="foldComments"
+          onClick={() => {
+            const editor = focusedEditor()
+            if (editor && activePath) toggleCommentFolds(editor, focusedGroup, activePath)
+          }}
+        >
+          {commentsFolded ? <UnfoldVerticalIcon /> : <FoldVerticalIcon />}
         </IconButton>
         {command && (
           <Tooltip>

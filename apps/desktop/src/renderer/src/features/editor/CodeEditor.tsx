@@ -11,6 +11,7 @@ import { registerEditor } from './editors'
 import { monaco, themeName, uriFor } from './monaco'
 import { useQuickOpen } from './quickOpenStore'
 import { bindShortcuts } from './shortcutBindings'
+import { toggleCommentFolds } from './commentFolds'
 
 const fontOptions = (t: Typography, scale: number): monaco.editor.IEditorOptions => ({
   fontFamily: fontStack(t.monoFont, 'mono'),
@@ -110,6 +111,15 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
         label: SHORTCUTS.quickOpen.label,
         keybindings: [monacoShortcut('quickOpen', monaco)],
         run: () => useQuickOpen.getState().setOpen(true)
+      }),
+      editor.addAction({
+        id: 'indent.foldComments',
+        label: SHORTCUTS.foldComments.label,
+        keybindings: [monacoShortcut('foldComments', monaco)],
+        run: () => {
+          const path = useWorkspace.getState().layout.groups[group]?.active
+          if (path) toggleCommentFolds(editor, group, path)
+        }
       })
     ])
     bindSuggestShortcut(monaco, editor)
