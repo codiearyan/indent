@@ -161,17 +161,16 @@ function Quiz({
         {card.choices.map((option, i) => {
           const chosen = picked === i
           return (
-            <button
+            <Button
               key={i}
-              type="button"
-              disabled={picked !== null}
+              variant="outline"
+              // The chosen answer stays clear; the others fade once one is picked.
+              disabled={picked !== null && !chosen}
               aria-pressed={chosen}
               onClick={() => setPicked(i)}
               className={cn(
-                'flex min-h-10 items-center gap-2 rounded-md border border-input px-3 py-2 text-left text-sm',
-                picked === null && 'hover:bg-accent',
-                chosen && 'border-foreground bg-accent',
-                picked !== null && !chosen && 'text-muted-foreground'
+                'h-auto min-h-10 justify-start gap-2 border-input bg-transparent px-3 py-2 text-left font-normal whitespace-normal shadow-none dark:bg-transparent',
+                chosen && 'border-foreground bg-accent dark:bg-accent'
               )}
             >
               <span className="flex-1">{option.text}</span>
@@ -181,7 +180,7 @@ function Quiz({
                 ) : (
                   <X className="size-4 shrink-0 text-destructive" aria-label="Not quite" />
                 ))}
-            </button>
+            </Button>
           )
         })}
       </div>

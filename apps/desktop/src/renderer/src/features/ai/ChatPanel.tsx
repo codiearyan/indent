@@ -87,7 +87,11 @@ export function ChatPanel(): React.JSX.Element {
                 </div>
               ) : (
                 <div key={i} className="text-sm">
-                  <Markdown compact onLink={playLinkedVideo}>
+                  <Markdown
+                    compact
+                    streaming={busy && i === messages.length - 1}
+                    onLink={playLinkedVideo}
+                  >
                     {message.content}
                   </Markdown>
                   {busy && i === messages.length - 1 && (
