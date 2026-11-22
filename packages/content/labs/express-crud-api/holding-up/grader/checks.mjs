@@ -150,7 +150,7 @@ export const checks = {
           name: 'Refused changes changed nothing',
           req: { path: '/workshops' },
           ok: (res) => res.status === 200 && same(res.json, seed),
-          hint: 'A refused request must stop before the route runs. Do not call next() after you answered.'
+          hint: 'A refused request must stop before the route runs. Look at what your middleware does after it has answered.'
         },
         {
           name: 'The right key lets a POST through',

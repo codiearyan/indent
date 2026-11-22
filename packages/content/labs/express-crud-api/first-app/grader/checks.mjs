@@ -15,7 +15,7 @@ export const checks = {
           name: 'GET /health is sent as JSON',
           req: { path: '/health' },
           ok: (res) => res.status === 200 && isJson(res),
-          hint: 'Answer with res.json() so the content-type says the body is JSON.'
+          hint: 'The content-type of the answer should say the body is JSON. Look at how the lesson sends an object back.'
         }
       ],
       { workshops: seed }

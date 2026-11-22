@@ -35,7 +35,7 @@
   "captions": [
     "Nadia has three changes this week, and glazing basics is cancelled.",
     "The API can add workshops but not change or remove one, so glazing stays on the page.",
-    "You add PUT, PATCH and DELETE, each checking the id first and the body second.",
+    "You add the routes that replace, change and remove a workshop, in three tasks.",
     "Glazing is removed, and the other two changes are saved.",
     "Workshops can now change all week, and the page always shows what really runs."
   ]
