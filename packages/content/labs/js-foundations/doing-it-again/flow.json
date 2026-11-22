@@ -1,0 +1,141 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ines", "label": "Ines", "kind": "story" },
+      { "id": "theo", "label": "Theo", "kind": "story" },
+      { "id": "batch", "label": "batchLine()", "kind": "function", "mine": true, "fn": "batchLine" },
+      { "id": "weeks", "label": "weeksToReach()", "kind": "function", "mine": true, "fn": "weeksToReach" },
+      { "id": "engrave", "label": "engravingCents()", "kind": "function", "mine": true, "fn": "engravingCents" },
+      { "id": "digit", "label": "firstDigitAt()", "kind": "function", "mine": true, "fn": "firstDigitAt" },
+      { "id": "machine", "label": "Engraving machine", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ines", "to": "batch", "label": "scent, count" },
+      { "from": "theo", "to": "weeks", "label": "orders, goal" },
+      { "from": "ines", "to": "engrave", "label": "message" },
+      { "from": "ines", "to": "digit", "label": "message" },
+      { "from": "engrave", "to": "machine", "label": "price" },
+      { "from": "digit", "to": "machine", "label": "position" }
+    ],
+    "note": "Each function repeats one small step, so the laptop does the counting Ines and Theo did by hand."
+  },
+  "tasks": {
+    "batch": {
+      "trace": { "file": "src/loops.js", "call": "batchLine", "args": ["Fig", 3] },
+      "steps": [
+        {
+          "active": ["ines", "ines->batch"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "scent", "value": "Fig" },
+              { "key": "count", "value": 3 }
+            ]
+          },
+          "note": "Ines poured a batch and wants every candle in it numbered."
+        },
+        {
+          "active": ["batch"],
+          "note": "A counter steps from 1 up to the count, and each round adds one label to the line."
+        },
+        {
+          "active": ["batch"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "line", "value": "labels with commas between" }]
+          },
+          "note": "One line of labels comes back. A batch of none gives empty text."
+        }
+      ]
+    },
+    "weeks": {
+      "trace": { "file": "src/loops.js", "call": "weeksToReach", "args": [3, 20] },
+      "steps": [
+        {
+          "active": ["theo", "theo->weeks"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "ordersPerWeek", "value": 3 },
+              { "key": "goal", "value": 20 }
+            ]
+          },
+          "note": "Theo knows this week's orders and the goal he hopes for."
+        },
+        {
+          "active": ["weeks"],
+          "note": "While the orders are below the goal, they double and one more week is counted."
+        },
+        {
+          "active": ["weeks"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "weeks", "value": "a whole number" }]
+          },
+          "note": "The number of weeks comes back. Already at the goal means no weeks at all."
+        }
+      ]
+    },
+    "engraving": {
+      "trace": { "file": "src/loops.js", "call": "engravingCents", "args": ["Love you", 40] },
+      "steps": [
+        {
+          "active": ["ines", "ines->engrave"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "message", "value": "Love you" },
+              { "key": "centsPerLetter", "value": 40 }
+            ]
+          },
+          "note": "A customer wants a message engraved on the lid."
+        },
+        {
+          "active": ["engrave"],
+          "note": "The loop looks at each character in turn, and every one that is not a space adds to the price."
+        },
+        {
+          "active": ["engrave", "engrave->machine", "machine"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "price", "value": "whole cents" }]
+          },
+          "note": "The price for the engraving comes back, spaces free."
+        }
+      ]
+    },
+    "digit": {
+      "trace": { "file": "src/loops.js", "call": "firstDigitAt", "args": ["Happy 30th"] },
+      "steps": [
+        {
+          "active": ["ines", "ines->digit"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "text", "value": "Happy 30th" }]
+          },
+          "note": "The machine cannot cut digits, so Ines checks a message before it goes in."
+        },
+        {
+          "active": ["digit"],
+          "note": "The loop walks the positions from 0 and stops at the first character that is a digit."
+        },
+        {
+          "active": ["digit", "digit->machine", "machine"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "position", "value": "a position, or -1" }]
+          },
+          "note": "Ines gets where the first digit is, or -1 when the message has none."
+        }
+      ]
+    }
+  }
+}

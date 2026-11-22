@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "Which tests are about paper?", "note": "And Sefton waits for all of them." },
+    { "title": "Your runner", "text": "One long list, sharing one job book.", "note": "Tests break each other." },
+    {
+      "title": "Your code",
+      "file": "runner.js",
+      "mine": true,
+      "gap": "No groups, no setup",
+      "tasks": ["Groups with names", "Setup before each", "Run only one test"]
+    },
+    { "title": "Workshop screen", "rows": [["quote > cards", "4 tests"], ["paper", "3 tests"], ["job book", "3 tests"]] }
+  ],
+  "ticket": { "label": "Job book test", "wrong": "broken", "why": "Shared book", "right": "fresh book" },
+  "captions": [
+    "Hesper can't find anything in the long report, and Sefton waits for every test.",
+    "Today the job book tests share one book, so each finds the last one's jobs.",
+    "You add groups, setup and a way to run one test alone, in three tasks.",
+    "Now every job book test starts with a fresh book, under its group's name.",
+    "From a list of functions to a runner of its own, every line one Ashgrove can read."
+  ]
+}

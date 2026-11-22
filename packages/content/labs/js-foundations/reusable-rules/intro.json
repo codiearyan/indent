@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Can I write each rule just once?", "note": "One copy came out wrong." },
+    { "title": "Copied lines", "text": "The same rules pasted once for every order." },
+    {
+      "title": "Your code",
+      "file": "functions.js",
+      "mine": true,
+      "gap": "No rule has a name",
+      "tasks": ["Write the label", "Shipping for any order", "Default quantity", "Put it together"]
+    },
+    { "title": "Packing slip", "text": "A label and a total for every order." }
+  ],
+  "ticket": { "label": "Six orders", "wrong": "one wrong", "why": "Copied", "right": "all right" },
+  "captions": [
+    "The rules work for one order. Now Ines has six, all at once.",
+    "She copies the lines for every order, and one copy comes out wrong.",
+    "You write each rule once as a function, in four small tasks.",
+    "Now every order calls the same functions, and all six come out right.",
+    "Write it once, call it often: a fix happens in one place."
+  ]
+}

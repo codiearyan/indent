@@ -1,0 +1,116 @@
+{
+  "id": "equal-values",
+  "title": "Equal values, equal objects",
+  "files": ["src/boxes.test.js", "src/boxes.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here and read what they say.",
+    "suggestedCommand": "npx vitest run src/boxes.test.js"
+  },
+  "tasks": [
+    {
+      "id": "contents",
+      "title": "Test what goes in a medium box",
+      "file": "src/boxes.test.js",
+      "description": "In the `boxContents` block of `src/boxes.test.js`, write a test that `boxContents('medium')` gives the whole list for a medium box, every item in its place. The list is in `src/boxes.js`, and its order is the order Wendell packs in.\n\nCheck runs your tests on the working code and on versions that leave an item out, pack in the wrong order, or give the small list. A test in this block must pass on the first and fail on each of the others.",
+      "nextSteps": [
+        "Find the medium list in `boxes.js`.",
+        "Write a test in the `boxContents` block that compares `boxContents('medium')` with that list.",
+        "Run the tests. If it fails, read what the output says about the two lists.",
+        "Use the matcher the lesson gives for comparing what is inside a list."
+      ],
+      "hints": [
+        "`toBe` asks whether two values are the very same one. Two lists made at different times never are, even with the same items.",
+        "The lesson's part on lists and objects names the matcher that compares what is inside, item by item, in order.",
+        "Write `expect(boxContents('medium')).toEqual([...])` with the six items of the medium list, in the same order."
+      ],
+      "docs": [
+        { "title": "toEqual", "url": "https://vitest.dev/api/expect#toequal" },
+        { "title": "toBe", "url": "https://vitest.dev/api/expect#tobe" },
+        {
+          "title": "Equality comparisons and sameness",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Equality_comparisons_and_sameness"
+        }
+      ],
+      "videos": [
+        { "title": "Using different matchers", "url": "https://www.youtube.com/watch?v=qj7nPbRgXNc" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "slip",
+      "title": "Test a whole packing slip",
+      "file": "src/boxes.test.js",
+      "description": "Every box goes out with a packing slip. In the `packingSlip` block, write a test for Cora Pellow's order:\n\n```js\n{ customer: 'Cora Pellow', size: 'medium', dozens: 2 }\n```\n\nCompare the whole slip that `packingSlip` gives back, every field; one check on the whole object does it. Read `packingSlip` in `src/boxes.js` to see which fields a slip has.\n\nCheck runs your tests on the working code and on versions that drop the eggs, list the wrong items, or leave the name or the size off. A test in this block must pass on the first and fail on each of the others.",
+      "nextSteps": [
+        "Read `packingSlip` and list the four fields of a slip.",
+        "Work out by hand what each field should be for Cora's order.",
+        "Write one test that compares the slip with the object you worked out.",
+        "Run the tests and read any difference the output shows."
+      ],
+      "hints": [
+        "A test that only checks the name passes even when the eggs are missing. Check all four fields.",
+        "The matcher that compares lists item by item also compares objects field by field, and the lists inside them.",
+        "Write `expect(packingSlip(order)).toEqual({ customer: ..., size: ..., items: [...], eggs: ... })`, with the medium list as the items."
+      ],
+      "docs": [
+        { "title": "toEqual", "url": "https://vitest.dev/api/expect#toequal" },
+        {
+          "title": "Working with objects",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_objects"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "weighed",
+      "title": "Test a price with pennies",
+      "file": "src/boxes.test.js",
+      "description": "Apples are sold loose at the farm gate, by weight. In the `weighedPrice` block, write a test for 0.7 kilos of apples at the farm's price, `APPLES_PER_KILO`.\n\nWork the price out to the penny on paper. The answer the code gives is a decimal, so compare it in the way the lesson shows for decimals.\n\nCheck runs your tests on the working code and on versions that ignore the weight, add instead of multiply, or cut the price down to ten pence. A test in this block must pass on the first and fail on each of the others.",
+      "nextSteps": [
+        "Multiply 0.7 by the price per kilo on paper.",
+        "Write a test that calls `weighedPrice(0.7, APPLES_PER_KILO)`.",
+        "Run it and read the Received line closely.",
+        "Use the matcher for decimals from the lesson."
+      ],
+      "hints": [
+        "Run your test with `toBe` once and look at how many digits the code really gave.",
+        "Decimals are stored in binary, so a price can come out a hair above or below the exact amount. The lesson names a matcher that allows for that.",
+        "Write `expect(weighedPrice(0.7, APPLES_PER_KILO)).toBeCloseTo(...)` with the price to the penny."
+      ],
+      "docs": [
+        { "title": "toBeCloseTo", "url": "https://vitest.dev/api/expect#tobecloseto" },
+        {
+          "title": "Number encoding",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number#number_encoding"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "swap",
+      "title": "Test a swap that leaves the old list alone",
+      "file": "src/boxes.test.js",
+      "description": "Customers can swap one item for another, say kale for chard. `swapItem(items, out, replacement)` gives back a new list with the swap made, and must leave the list it was given exactly as it was, because Wendell still packs other boxes from it.\n\nIn the `swapItem` block, write a test that checks both: the list you get back has the swap, and the list you passed in has not changed.\n\nCheck runs your tests on the working code, on a version that changes the list it was given, and on a version that forgets the swap. A test in this block must pass on the first and fail on the others.",
+      "nextSteps": [
+        "Make a list in your test and keep it in a variable.",
+        "Call `swapItem` with it and keep the result in another variable.",
+        "Check what is in the result.",
+        "Then check the list you started with, or whether the two are the very same list."
+      ],
+      "hints": [
+        "A version that changes the list in place still gives back a list with the swap in it. Checking only the result cannot tell the two apart.",
+        "Check the original list after the call with the matcher for contents. `.not` turns any check around, and `toBe` tells whether two lists are the very same one.",
+        "After `const after = swapItem(before, 'kale', 'chard')`, check `after` with `toEqual`, check `before` still holds its old items, or check `expect(after).not.toBe(before)`."
+      ],
+      "docs": [
+        { "title": "not", "url": "https://vitest.dev/api/expect#not" },
+        { "title": "toEqual", "url": "https://vitest.dev/api/expect#toequal" },
+        {
+          "title": "Array.prototype.map()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

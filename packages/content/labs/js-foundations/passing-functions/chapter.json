@@ -1,0 +1,135 @@
+{
+  "id": "passing-functions",
+  "title": "Passing functions along",
+  "files": ["src/callbacks.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to try the shop's price rules on a few prices.",
+    "suggestedCommand": "node src/callbacks.js"
+  },
+  "tasks": [
+    {
+      "id": "wrap",
+      "title": "Write it the short way",
+      "file": "src/callbacks.js",
+      "description": "Under `// Task 1` in `src/callbacks.js`, rewrite `addWrapping` as an arrow function kept in a `const` with the same name. It still takes `cents` and returns `cents` plus 350.\n\nCheck calls `addWrapping` with other prices and makes sure it is kept in a `const` and written with `=>`.",
+      "nextSteps": [
+        "Read the lesson's part on arrow functions.",
+        "Write `const addWrapping =`, then the parameter, `=>` and the sum.",
+        "Delete the old `function addWrapping` so the name is made only once.",
+        "Run the file: the first line should not change."
+      ],
+      "hints": [
+        "An arrow function is a shorter way to write a function. You keep it in a variable, like any value.",
+        "Without curly braces after `=>`, the value after it is given back by itself, no `return` needed. A name can be made only once, so the old function has to go.",
+        "The line has the shape `const addWrapping = (cents) => ...`, with the sum in place of the dots."
+      ],
+      "docs": [
+        {
+          "title": "Arrow function expressions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions"
+        },
+        {
+          "title": "Functions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Arrow functions in eight minutes",
+          "url": "https://www.youtube.com/watch?v=fRRRkognpOs"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rule",
+      "title": "Pick the rule for the day",
+      "file": "src/callbacks.js",
+      "description": "Under `// Task 2`, make `ruleFor(day)` return `weekendRule` when `day` is `'Saturday'` or `'Sunday'`, and `weekdayRule` for any other day. It returns the rule itself, a function, not a price.\n\nCheck calls `ruleFor` with both weekend days and two weekdays, and looks at which function comes back.",
+      "nextSteps": [
+        "Look at the two rules above `ruleFor`: they are functions kept in `const`s.",
+        "Ask whether `day` is one of the two weekend days.",
+        "Return the right rule by its name, with no round brackets after it.",
+        "Run the file: the line for Task 2 should name a function."
+      ],
+      "hints": [
+        "A function is a value. You can return it like a number or a text.",
+        "With round brackets after its name, a function runs and you get its answer. Without them you have the function itself, which is what `ruleFor` hands back.",
+        "The function has the shape `if (day === 'Saturday' || day === 'Sunday') { return weekendRule }`, then `return weekdayRule`."
+      ],
+      "docs": [
+        {
+          "title": "First-class function",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/First-class_Function"
+        },
+        {
+          "title": "Logical OR (||)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_OR"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "apply",
+      "title": "Apply any rule",
+      "file": "src/callbacks.js",
+      "description": "Under `// Task 3`, make `applyRule(priceCents, rule)` call `rule` with `priceCents` and return what `rule` gives back.\n\nCheck calls `applyRule` with prices and rules of its own, written as arrow functions.",
+      "nextSteps": [
+        "Remember that `rule` is a function, handed in like any other value.",
+        "Call it with `priceCents` between its round brackets.",
+        "Return its answer.",
+        "Run the file and try `weekdayRule` in place of `weekendRule`."
+      ],
+      "hints": [
+        "A parameter can hold a function. Inside, you call it by the parameter's name.",
+        "`rule` without brackets is the function; `rule(priceCents)` runs it on the price and gives its answer.",
+        "The body is one line: `return rule(priceCents)`."
+      ],
+      "docs": [
+        {
+          "title": "Callback function",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Callback_function"
+        },
+        {
+          "title": "Arrow function expressions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Callbacks in seven minutes",
+          "url": "https://www.youtube.com/watch?v=i2SPq-nb3NQ"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "count",
+      "title": "Count what passes a test",
+      "file": "src/callbacks.js",
+      "description": "Under `// Task 4`, make `countWhere(text, test)` go through every character of `text`, call `test` with it, and return how many characters `test` gave back `true` for.\n\nCheck calls `countWhere` with texts and tests of its own, an empty text and a test that is never true included.",
+      "nextSteps": [
+        "Start a count at 0.",
+        "Go through `text` with `for...of`, as in the issue on loops.",
+        "For each character, call `test` with it and count one when it gives back true.",
+        "Return the count and run the file."
+      ],
+      "hints": [
+        "This is the counting loop you know, with one change: the question about each character comes from `test`.",
+        "`test` alone is a function and always counts as true. Call it with the character to get its answer.",
+        "Inside the loop, `if (test(character)) { count++ }`, with `count` made before the loop."
+      ],
+      "docs": [
+        {
+          "title": "Callback function",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Callback_function"
+        },
+        {
+          "title": "for...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

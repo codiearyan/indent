@@ -1,0 +1,82 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "file", "label": "quote.test.js", "kind": "file" },
+      { "id": "quote", "label": "quote.js", "kind": "file" },
+      { "id": "expect", "label": "expect()", "kind": "function", "mine": true },
+      { "id": "runner", "label": "run()", "kind": "function" },
+      { "id": "results", "label": "Results", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "file", "to": "quote", "label": "a job" },
+      { "from": "quote", "to": "expect", "label": "the price" },
+      { "from": "expect", "to": "runner", "label": "a clear error" },
+      { "from": "runner", "to": "results", "label": "one each" }
+    ],
+    "note": "Each test hands its answer to expect(), which throws a message that says what was wanted and what came."
+  },
+  "tasks": {
+    "to-be": {
+      "steps": [
+        {
+          "active": ["file", "file->quote", "quote"],
+          "note": "A test asks quote.js to price 250 cards in one colour."
+        },
+        {
+          "active": ["quote", "quote->expect", "expect"],
+          "value": { "kind": "map", "label": "toBe compares", "entries": [{ "key": "expected", "value": "Sefton's price" }, { "key": "actual", "value": "the quote" }] },
+          "note": "expect() gets the quote, and toBe compares it with the price Sefton wrote down."
+        },
+        {
+          "active": ["expect", "expect->runner", "runner"],
+          "note": "When they are not the same value, toBe throws, and the message names both prices."
+        },
+        {
+          "active": ["runner", "runner->results", "results"],
+          "note": "The runner already turns that throw into a failed result, with the message kept."
+        }
+      ]
+    },
+    "to-equal": {
+      "steps": [
+        {
+          "active": ["file", "file->quote", "quote"],
+          "note": "A test asks for the printed quote of 100 invites: setup, printing and total."
+        },
+        {
+          "active": ["quote", "quote->expect", "expect"],
+          "value": { "kind": "map", "label": "a printed quote", "entries": [{ "key": "setup", "value": "pence" }, { "key": "printing", "value": "pence" }, { "key": "total", "value": "pence" }] },
+          "note": "The answer is a new object, so it can never be the very same object Sefton wrote."
+        },
+        {
+          "active": ["expect"],
+          "note": "toEqual compares what the two objects hold instead: the same keys, and equal values under each, all the way down."
+        },
+        {
+          "active": ["expect", "expect->runner", "runner"],
+          "note": "Only a real difference throws, with both objects in the message."
+        }
+      ]
+    },
+    "to-throw": {
+      "steps": [
+        {
+          "active": ["file", "file->quote", "quote"],
+          "note": "A test wants a quote for a mug, which the press does not print, to be refused."
+        },
+        {
+          "active": ["quote", "quote->expect", "expect"],
+          "note": "expect() gets a function that asks for the mug quote, and toThrow calls it."
+        },
+        {
+          "active": ["expect"],
+          "note": "quote.js throws, and its message says the item is unknown. That is the outcome the test wants."
+        },
+        {
+          "active": ["expect", "expect->runner", "runner"],
+          "note": "Had the quote come back instead, toThrow would throw its own error, and the test would fail."
+        }
+      ]
+    }
+  }
+}

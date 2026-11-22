@@ -173,7 +173,10 @@ export function EditorPane(): React.JSX.Element {
 
       <div className="flex min-h-0 flex-1 border-t border-border">
         {panels.files && status === 'ready' && (
-          <div className="flex w-[200px] shrink-0 flex-col border-r border-border">
+          <div
+            data-pane="files"
+            className="flex w-[200px] shrink-0 flex-col border-r border-border"
+          >
             <FilesPanel />
           </div>
         )}

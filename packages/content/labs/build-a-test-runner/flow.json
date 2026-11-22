@@ -1,0 +1,20 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "sefton", "label": "Sefton", "kind": "story" },
+      { "id": "tests", "label": "quote.test.js", "kind": "file" },
+      { "id": "runner", "label": "Your test runner", "kind": "file", "mine": true },
+      { "id": "quote", "label": "quote.js", "kind": "file" },
+      { "id": "report", "label": "Report", "kind": "data" },
+      { "id": "idris", "label": "Idris's price list", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "sefton", "to": "tests", "label": "the right prices" },
+      { "from": "tests", "to": "runner", "label": "tests" },
+      { "from": "runner", "to": "quote", "label": "each test" },
+      { "from": "runner", "to": "report", "label": "pass or fail" },
+      { "from": "runner", "to": "idris", "label": "exit code" }
+    ],
+    "note": "At Ashgrove Press, a runner you write yourself checks every price after every change, and holds back the price list when one is wrong."
+  }
+}

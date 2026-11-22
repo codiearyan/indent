@@ -1,0 +1,88 @@
+{
+  "id": "search-leak",
+  "title": "A search that shows every order",
+  "files": [
+    "src/search.js",
+    "src/reproduce.js",
+    "src/search.test.js",
+    "src/db.js",
+    "src/seed.js",
+    "src/demo.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the demo runs three customers' searches.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Catch the search showing someone else's orders",
+      "file": "src/reproduce.js",
+      "description": "Before you change anything, prove the hole. In `src/reproduce.js`, implement `reproduceSearchLeak()`.\n\nPick a customer id from `seed.js` and a search text that changes the query instead of being searched for. Run them through the original `searchOrders()` with a fresh `openDb()`. Return an object with:\n\n- `customerId` and `text`: what you searched with\n- `shown`: exactly what `searchOrders(db, customerId, text)` returned\n\nThe check runs your function against the original `search.js`. It passes when `shown` is real and holds at least one order that belongs to another customer.",
+      "nextSteps": [
+        "Run `node src/demo.js` and read the error for Yusra's search.",
+        "Read the SQL that `searchOrders` builds and find where the text goes.",
+        "Write a text that ends the quoted part and adds a condition of its own.",
+        "Run the demo again and look at whose orders `shown` holds."
+      ],
+      "hints": [
+        "In searchOrders the text sits between two quotes inside the SQL. What does the database do when the text holds a quote of its own?",
+        "Once the text's quote ends the string, the rest of the text is read as SQL. A condition that is always true, joined with OR, makes every row match, and -- turns the rest of the line into a comment.",
+        "Search as customer 101 for the text ' OR 1=1 -- and look at which orders come back."
+      ],
+      "docs": [
+        { "title": "SQL injection prevention", "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html" },
+        { "title": "SQLite expressions and parameters", "url": "https://sqlite.org/lang_expr.html#varparam" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Keep the search text out of the query",
+      "file": "src/search.js",
+      "description": "Fix `searchOrders(db, customerId, text)` in `src/search.js` so the customer's text can never change the query.\n\n- It returns the customer's own orders whose title contains `text`, ignoring case, as `[{ id, title, status }]` sorted by id. An empty text lists all of them.\n- Text that looks like SQL is searched for like any other text, so it finds nothing.\n- Honest text keeps working, apostrophes included.\n- Neither the text nor the customer id is written into the SQL itself.\n\nThe check runs honest and unfriendly searches for each customer and looks at the SQL your function hands the database.",
+      "nextSteps": [
+        "Find every value that is pasted into the SQL string.",
+        "Leave a place for each value in the query instead.",
+        "Hand the values to the database separately when you run the query.",
+        "Run `node src/demo.js` and check Yusra's search works."
+      ],
+      "hints": [
+        "The cause is that the text is written into the SQL. Removing or changing characters in the text does not change that, and it breaks honest searches.",
+        "A node:sqlite query can hold a ? where a value goes. The values are passed to .all() in the same order, and they never become part of the SQL text.",
+        "Two ? marks, one for the customer and one for the title pattern, then .all(customerId, `%${text}%`). The % signs belong to the value, not to the query."
+      ],
+      "docs": [
+        { "title": "node:sqlite statement.all()", "url": "https://nodejs.org/docs/latest-v22.x/api/sqlite.html#statementallnamedparameters-anonymousparameters" },
+        { "title": "SQLite expressions and parameters", "url": "https://sqlite.org/lang_expr.html#varparam" },
+        { "title": "SQL injection prevention", "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html" }
+      ],
+      "videos": [
+        { "title": "How text changes a SQL query", "url": "https://www.youtube.com/watch?v=ciNHn38EyRc" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/search.test.js",
+      "description": "Write vitest tests in `src/search.test.js` that guard this hole for good. Use a fresh `openDb()` and call `searchOrders()` directly.\n\nThe check runs your test file three times: beside the original `search.js` (it must fail), beside a correct fix (it must pass) and beside a fix that strips quotes out of the text before writing it into the SQL (it must fail).",
+      "nextSteps": [
+        "Import `openDb` and `searchOrders`.",
+        "Search with text that tries to reach other customers' orders and expect nothing back.",
+        "Add an honest search the strip-quotes fix gets wrong.",
+        "Run `npx vitest run src/search.test.js`."
+      ],
+      "hints": [
+        "Compare the ids that come back with toEqual. An empty list is the right answer for text no title holds.",
+        "The strip-quotes fix keeps unfriendly text from changing the query, so a test with only unfriendly text passes on it. Which honest customer has a quote in what they would type?",
+        "Search as customer 103 for Mother's Day and expect order 2044 back."
+      ],
+      "docs": [
+        { "title": "Vitest expect", "url": "https://vitest.dev/api/expect.html" },
+        { "title": "SQL injection prevention", "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html" }
+      ],
+      "points": 10
+    }
+  ]
+}

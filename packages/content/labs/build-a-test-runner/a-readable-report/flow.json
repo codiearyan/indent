@@ -1,0 +1,74 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "file", "label": "quote.test.js", "kind": "file" },
+      { "id": "main", "label": "main()", "kind": "function", "mine": true },
+      { "id": "run", "label": "run()", "kind": "function" },
+      { "id": "report", "label": "formatReport()", "kind": "function", "mine": true },
+      { "id": "screen", "label": "Idris's screen", "kind": "story" },
+      { "id": "list", "label": "price-list.js", "kind": "file" }
+    ],
+    "edges": [
+      { "from": "file", "to": "main", "label": "at the end" },
+      { "from": "main", "to": "run", "label": "results" },
+      { "from": "main", "to": "report", "label": "results" },
+      { "from": "report", "to": "screen", "label": "lines" },
+      { "from": "main", "to": "list", "label": "exit code" }
+    ],
+    "note": "The results become a report Idris can read, and an exit code that decides whether the price list runs."
+  },
+  "tasks": {
+    "lines": {
+      "steps": [
+        {
+          "active": ["main", "main->report", "report"],
+          "value": { "kind": "array", "label": "results", "values": ["passed", "failed", "passed"] },
+          "note": "formatReport gets the results of a night's run, in order."
+        },
+        {
+          "active": ["report"],
+          "note": "Each result becomes one line that starts with PASS or FAIL, then the test's name."
+        },
+        {
+          "active": ["report", "report->screen", "screen"],
+          "value": { "kind": "array", "label": "report lines", "values": ["PASS name", "FAIL name", "  reason", "PASS name"] },
+          "note": "Under a failed test comes its reason, indented, every line of it."
+        }
+      ]
+    },
+    "summary": {
+      "steps": [
+        {
+          "active": ["report"],
+          "note": "After the last test, formatReport counts the results by whether they passed."
+        },
+        {
+          "active": ["report", "report->screen", "screen"],
+          "value": { "kind": "map", "label": "the last line", "entries": [{ "key": "passed", "value": "count" }, { "key": "failed", "value": "count" }, { "key": "total", "value": "count" }] },
+          "note": "The summary goes last. Often it is the only line Idris reads."
+        },
+        {
+          "active": ["screen"],
+          "note": "With nothing failed, the summary still shows, so a good night looks different from no night at all."
+        }
+      ]
+    },
+    "exit-code": {
+      "steps": [
+        {
+          "active": ["file", "file->main", "main", "main->run", "run"],
+          "note": "The test file adds its tests and ends by calling main(), which runs them all."
+        },
+        {
+          "active": ["main", "main->report", "report", "report->screen", "screen"],
+          "note": "main() prints the report for Idris."
+        },
+        {
+          "active": ["main", "main->list", "list"],
+          "value": { "kind": "map", "label": "exit code", "entries": [{ "key": "all passed", "value": "go on" }, { "key": "any failed", "value": "stop" }, { "key": "no tests", "value": "stop" }] },
+          "note": "Then the exit code tells the shell whether the price list may run."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Rune", "say": "Yusra's note lost half its words.", "note": "On the staff board. AP-15." },
+    {
+      "title": "Order 2046",
+      "rows": [["Title", "Gig posters"], ["Name", "Yusra Penhallow"], ["Note", "About paper size"]],
+      "note": "Typed by Yusra."
+    },
+    {
+      "title": "Your code",
+      "file": "orderCard.js",
+      "mine": true,
+      "gap": "Words become HTML",
+      "tasks": ["Catch the bad note", "Write words as text", "Write the test"]
+    },
+    { "title": "Staff board", "text": "Every open order as a card.", "note": "Where Rune plans the presses." }
+  ],
+  "ticket": { "label": "Note", "wrong": "half missing", "why": "Read as HTML", "right": "shown as typed" },
+  "captions": [
+    "Next, Rune finds that a customer's note lost half its words on the staff board.",
+    "The browser read part of the note as a tag, so those words never showed.",
+    "You catch the bad note, write customers' words as text and write the test, in three tasks.",
+    "Now the board shows every title, name and note exactly as it was typed.",
+    "Same order, same board. Nothing a customer types can become part of the page."
+  ]
+}

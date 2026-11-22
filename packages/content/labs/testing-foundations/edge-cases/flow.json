@@ -1,0 +1,89 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridget", "label": "Bridget", "kind": "story" },
+      { "id": "edges", "label": "The edges", "kind": "data" },
+      { "id": "tests", "label": "delivery.test.js", "kind": "file", "mine": true },
+      { "id": "delivery", "label": "delivery.js", "kind": "file" },
+      { "id": "van", "label": "Friday van", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bridget", "to": "edges", "label": "awkward cases" },
+      { "from": "edges", "to": "tests", "label": "test values" },
+      { "from": "tests", "to": "delivery", "label": "calls" },
+      { "from": "delivery", "to": "van", "label": "charges, trips" }
+    ],
+    "note": "Your tests feed delivery.js the awkward values at the edges of each rule, where ordinary examples never look."
+  },
+  "tasks": {
+    "line": {
+      "steps": [
+        {
+          "active": ["bridget", "bridget->edges", "edges"],
+          "value": { "kind": "array", "label": "orders to test", "values": ["on the line", "just under it"] },
+          "note": "A customer spent exactly the free delivery amount and was charged anyway."
+        },
+        {
+          "active": ["edges", "edges->tests", "tests", "tests->delivery", "delivery"],
+          "note": "Your tests try an order right on the line and one a penny under it."
+        },
+        {
+          "active": ["delivery", "delivery->van", "van"],
+          "note": "If the line moves even a little, one of the two tests fails."
+        }
+      ]
+    },
+    "empty": {
+      "steps": [
+        {
+          "active": ["bridget", "bridget->edges", "edges"],
+          "value": { "kind": "array", "label": "boxes this Friday", "values": [] },
+          "note": "One Friday in January there were no boxes at all."
+        },
+        {
+          "active": ["tests", "tests->delivery", "delivery"],
+          "note": "Your test asks for the total weight of an empty load."
+        },
+        {
+          "active": ["delivery", "delivery->van", "van"],
+          "note": "The answer must be a weight, not a crash and not nothing."
+        }
+      ]
+    },
+    "ends": {
+      "steps": [
+        {
+          "active": ["edges", "edges->tests", "tests"],
+          "value": { "kind": "array", "label": "a load", "values": ["heaviest", "box", "box"] },
+          "note": "One test puts the heaviest box first in the list."
+        },
+        {
+          "active": ["edges", "edges->tests", "tests"],
+          "value": { "kind": "array", "label": "a load", "values": ["box", "box", "heaviest"] },
+          "note": "Another puts it last."
+        },
+        {
+          "active": ["tests", "tests->delivery", "delivery", "delivery->van", "van"],
+          "note": "A loop that skips either end loses the heaviest box, and a test fails."
+        }
+      ]
+    },
+    "trips": {
+      "steps": [
+        {
+          "active": ["bridget", "bridget->edges", "edges"],
+          "value": { "kind": "array", "label": "box counts", "values": ["none", "a full van", "one more"] },
+          "note": "Wendell cares about three counts: no boxes, a full van, and one box over."
+        },
+        {
+          "active": ["edges", "edges->tests", "tests", "tests->delivery", "delivery"],
+          "note": "Your tests ask how many trips each count needs."
+        },
+        {
+          "active": ["delivery", "delivery->van", "van"],
+          "note": "Each count catches a different slip in the rounding."
+        }
+      ]
+    }
+  }
+}

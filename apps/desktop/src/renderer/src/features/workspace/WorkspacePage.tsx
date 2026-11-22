@@ -20,6 +20,7 @@ import { useCatalog } from '@/stores/catalog'
 import { api } from '@/lib/api'
 import { RepoNotice } from './RepoNotice'
 import { useWorkspaceShortcuts } from './useWorkspaceShortcuts'
+import { useActivePaneTracking, type PaneId } from './activePane'
 
 /** Height of the terminal's header bar, which stays visible while the terminal is collapsed. */
 export const TERMINAL_HEADER_PX = 41
@@ -46,6 +47,7 @@ export function WorkspacePage(): React.JSX.Element {
   const notice =
     status === 'error' || status === 'elsewhere' || (status === 'loading' && downloading)
   useWorkspaceShortcuts()
+  useActivePaneTracking()
   // Here and not in the tasks list, which focus mode hides.
   useOpenWhenFinished(labId)
 
@@ -83,7 +85,9 @@ export function WorkspacePage(): React.JSX.Element {
 
   const lesson = !panels.zen && (
     <Panel id="lesson" defaultSize="38%" minSize="24%">
-      <LeftPanel />
+      <Pane id="lesson">
+        <LeftPanel />
+      </Pane>
     </Panel>
   )
 
@@ -100,12 +104,16 @@ export function WorkspacePage(): React.JSX.Element {
         ) : companion ? (
           <Group orientation="vertical">
             <Panel id="lesson" minSize="30%">
-              <LeftPanel />
+              <Pane id="lesson">
+                <LeftPanel />
+              </Pane>
             </Panel>
             {panels.chat && aiOn && <Separator className={`h-px ${separator}`} />}
             {panels.chat && aiOn && (
               <Panel id="chat" defaultSize="40%" minSize="25%">
-                <ChatPanel />
+                <Pane id="tutor">
+                  <ChatPanel />
+                </Pane>
               </Panel>
             )}
           </Group>
@@ -135,14 +143,18 @@ export function WorkspacePage(): React.JSX.Element {
                         }
                       }}
                     >
-                      <TerminalPane />
+                      <Pane id="terminal">
+                        <TerminalPane />
+                      </Pane>
                     </Panel>
                   </Group>
                 </Panel>
                 {browser && <Separator className={`w-px ${separator}`} />}
                 {browser && (
                   <Panel id="browser" defaultSize="45%" minSize="20%">
-                    <BrowserPane />
+                    <Pane id="browser">
+                      <BrowserPane />
+                    </Pane>
                   </Panel>
                 )}
               </Group>
@@ -152,13 +164,24 @@ export function WorkspacePage(): React.JSX.Element {
             {chat && <Separator className={`w-px ${separator}`} />}
             {chat && (
               <Panel id="chat" defaultSize="26%" minSize="20%">
-                <ChatPanel />
+                <Pane id="tutor">
+                  <ChatPanel />
+                </Pane>
               </Panel>
             )}
           </Group>
         )}
       </div>
       <Tour />
+    </div>
+  )
+}
+
+/** Focus here takes the active mark off the editor; only the editor draws the mark. */
+function Pane({ id, children }: { id: PaneId; children: React.ReactNode }): React.JSX.Element {
+  return (
+    <div data-pane={id} className="h-full">
+      {children}
     </div>
   )
 }
