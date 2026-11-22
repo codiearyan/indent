@@ -1,0 +1,133 @@
+{
+  "id": "read-the-compiler",
+  "title": "Read the compiler",
+  "files": ["src/order-sheet.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/order-sheet.ts` runs the order sheet, and `npm run types` asks the compiler what it thinks of it.",
+    "suggestedCommand": "npm run types"
+  },
+  "tasks": [
+    {
+      "id": "shelf",
+      "title": "Fix the tins on the shelf",
+      "file": "src/order-sheet.ts",
+      "description": "Under `// Task 1` in `src/order-sheet.ts`, the compiler refuses the line that makes `tinsOnShelf`, and Node prints a count of tins that cannot be right. Read the compiler's message for that line and fix the value, so the line under it prints the tins on the shelf plus the delivery.\n\nLeave the type `number` where it is: it says what Rafe meant. Check compiles your Task 1 lines with code of its own that uses `tinsOnShelf` as a number, and code that uses it as text, which must be refused. It reads the value, and runs the lines with another delivery to see the sum follow.",
+      "nextSteps": [
+        "Run `node src/order-sheet.ts` and look at the first line it prints.",
+        "Run `npm run types` and find the error whose line number is the line of `tinsOnShelf`.",
+        "Read the message word by word: which type was promised, and which type was given?",
+        "Change the value so it is what the type promises, then run both commands again."
+      ],
+      "hints": [
+        "The error for this line starts with `src/order-sheet.ts:` and the line number of `tinsOnShelf`. The `~` marks sit under the name that was promised a type.",
+        "`Type 'string' is not assignable to type 'number'` means a string was given where a number was promised. Look at the quotes around the value.",
+        "A count is written without quotes. The line has the shape `export const tinsOnShelf: number = 24`."
+      ],
+      "docs": [
+        {
+          "title": "The basics: static type checking",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/basic-types.html"
+        },
+        {
+          "title": "Running TypeScript with Node",
+          "url": "https://nodejs.org/api/typescript.html"
+        },
+        {
+          "title": "Addition (+)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Addition"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading TypeScript errors",
+          "url": "https://www.youtube.com/watch?v=2DSVPAvWYK4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "grams",
+      "title": "Fix the grams in an order",
+      "file": "src/order-sheet.ts",
+      "description": "Under `// Task 2`, Node prints `NaN` for the grams in the order, and the compiler refuses the line that makes `orderGrams`. Read its message and fix the line, so it prints the tins of the order times the grams in each tin.\n\nCheck runs your Task 2 lines with an order of its own and looks for the line that prints the grams. Your lines must compile too, without any change to `order` at the top of the file.",
+      "nextSteps": [
+        "Run `npm run types` and find the error for the line of `orderGrams`.",
+        "Read the end of its message: the compiler has a guess.",
+        "Look at the line it points to as being where the right name is declared.",
+        "Fix the line under Task 2, not the order, and run both commands again."
+      ],
+      "hints": [
+        "`Property ... does not exist on type ...` means the code asks the object for something it does not have. The long `{ ... }` in the message is the object's type: every property it has.",
+        "The compiler ends the message with `Did you mean` and a name. Compare that name with the one under the `~` marks, letter by letter.",
+        "The property is `gramsPerTin`, with an s after gram, as in the order at the top of the file."
+      ],
+      "docs": [
+        {
+          "title": "The basics: non-exception failures",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/basic-types.html#non-exception-failures"
+        },
+        {
+          "title": "NaN",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "label",
+      "title": "Fix the label on the tin",
+      "file": "src/order-sheet.ts",
+      "description": "Under `// Task 3`, the label reads `125, Hearth Assam g`, and the compiler refuses the call to `tinLabel`. Read its message and fix the call, so it prints the blend, a comma and the grams of one tin.\n\nLeave `tinLabel` as it is. Check calls `tinLabel` with code of its own the way its parameters say, which must still compile, and runs your Task 3 lines with another order to see the label follow.",
+      "nextSteps": [
+        "Run `npm run types` and find the error for the line of `label`.",
+        "Read which type the argument has and which type the parameter wants.",
+        "Look at the parameters of `tinLabel` near the top of the file, in order.",
+        "Fix the call under Task 3 and run both commands again."
+      ],
+      "hints": [
+        "An argument is a value you pass in a call; a parameter is the name it gets inside the function. The `~` marks sit under the argument the compiler refuses.",
+        "The first argument is a number, and the first parameter of `tinLabel` is `blend: string`. What should come first?",
+        "Swap the two arguments: `tinLabel(order.blend, order.gramsPerTin)`."
+      ],
+      "docs": [
+        {
+          "title": "Parameter type annotations",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#parameter-type-annotations"
+        },
+        {
+          "title": "Functions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "shipping",
+      "title": "Fix the shipping for an order",
+      "file": "src/order-sheet.ts",
+      "description": "Under `// Task 4`, every order pays the shipping for abroad, and the compiler refuses the call to `shippingFor`. Read its message, including the note under it, and fix the call so the shipping follows the order's weight and the order's own zone.\n\nLeave `shippingFor` as it is. Check calls it with code of its own, where a call without a zone must still be refused, and runs your Task 4 lines with an order of its own to see the shipping follow.",
+      "nextSteps": [
+        "Run `npm run types` and find the error for the line of `shipping`.",
+        "Read how many arguments were expected and how many were given.",
+        "Read the note indented under the error: it names what is missing.",
+        "Pass what is missing from the order, and run both commands again."
+      ],
+      "hints": [
+        "`Expected 2 arguments, but got 1` counts the values between the round brackets of the call.",
+        "The note under the error says `An argument for 'zone' was not provided`. The order at the top of the file has a zone.",
+        "Add the order's zone as the second argument: `shippingFor(order.tins * order.gramsPerTin, order.zone)`."
+      ],
+      "docs": [
+        {
+          "title": "Functions: parameters and arguments",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html"
+        },
+        {
+          "title": "The basics: tsc, the TypeScript compiler",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/basic-types.html#tsc-the-typescript-compiler"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

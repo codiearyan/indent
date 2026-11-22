@@ -1,0 +1,122 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customer", "label": "Customer", "kind": "story" },
+      { "id": "form", "label": "Form fields", "kind": "data" },
+      { "id": "file", "label": "order-form.ts", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "bryn", "label": "Bryn", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "customer", "to": "form", "label": "typed in" },
+      { "from": "form", "to": "file", "label": "text" },
+      { "from": "file", "to": "compiler", "label": "types" },
+      { "from": "file", "to": "bryn", "label": "what to pack" }
+    ],
+    "note": "Every field of the form arrives as text. You give each value an honest type, so the compiler can tell a count from a word before Bryn packs the order."
+  },
+  "tasks": {
+    "tin": {
+      "steps": [
+        {
+          "active": ["file"],
+          "value": {
+            "kind": "map",
+            "label": "a tin",
+            "entries": [
+              { "key": "blendName", "value": "text" },
+              { "key": "gramsInTin", "value": "a number" },
+              { "key": "caffeineFree", "value": "true or false" }
+            ]
+          },
+          "note": "A tin of tea has a name, a weight and an answer to whether it has caffeine."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "The compiler has already worked out a type for each. You write the same types down, so they are part of the code."
+        },
+        {
+          "active": ["compiler"],
+          "note": "From then on, the compiler refuses any use of a value as something it is not."
+        }
+      ]
+    },
+    "grams": {
+      "steps": [
+        {
+          "active": ["customer", "customer->form", "form"],
+          "value": {
+            "kind": "map",
+            "label": "what the form sends",
+            "entries": [
+              { "key": "formTins", "value": "text" },
+              { "key": "formGramsPerTin", "value": "text" }
+            ]
+          },
+          "note": "The customer types how many tins they want, and the form sends it on as text."
+        },
+        {
+          "active": ["form", "form->file", "file", "file->compiler", "compiler"],
+          "note": "The compiler refuses to multiply text, and says which side of the sum is not a number."
+        },
+        {
+          "active": ["file"],
+          "value": {
+            "kind": "map",
+            "label": "what Task 2 makes",
+            "entries": [
+              { "key": "tins", "value": "number" },
+              { "key": "gramsPerTin", "value": "number" },
+              { "key": "orderGrams", "value": "number" }
+            ]
+          },
+          "note": "Turned into numbers first, the two fields multiply into the grams in the order."
+        },
+        {
+          "active": ["file", "file->bryn", "bryn"],
+          "note": "Bryn reads how much tea the order holds."
+        }
+      ]
+    },
+    "gift": {
+      "steps": [
+        {
+          "active": ["customer", "customer->form", "form"],
+          "note": "The customer answers whether the order is a gift, and the form sends the word they picked."
+        },
+        {
+          "active": ["form", "form->file", "file", "file->compiler", "compiler"],
+          "note": "The answer is promised to be true or false, and a word is neither, so the compiler refuses it."
+        },
+        {
+          "active": ["file", "file->bryn", "bryn"],
+          "note": "Asked as a question about the word, the answer becomes true or false, and Bryn knows whether to wrap it."
+        }
+      ]
+    },
+    "delivery": {
+      "steps": [
+        {
+          "active": ["file"],
+          "value": {
+            "kind": "map",
+            "label": "what is added",
+            "entries": [
+              { "key": "shelfTins", "value": "number" },
+              { "key": "deliveredTins", "value": "text" }
+            ]
+          },
+          "note": "The stock book counts the tins on the shelf, and the delivery note was typed in as text."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "Adding a number to text glues them together, which is allowed, so the compiler says nothing until it knows the result must be a number."
+        },
+        {
+          "active": ["file", "file->bryn", "bryn"],
+          "note": "With the delivery turned into a number before it is added, Bryn sees how many tins are really on the shelf."
+        }
+      ]
+    }
+  }
+}

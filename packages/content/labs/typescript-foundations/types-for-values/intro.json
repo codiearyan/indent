@@ -1,0 +1,52 @@
+{
+  "stations": [
+    {
+      "title": "Bryn",
+      "say": "Do we really have 4012 tins?",
+      "note": "Bryn packs from the form."
+    },
+    {
+      "title": "Order form",
+      "text": "Sends every field as text, numbers too."
+    },
+    {
+      "title": "Your types",
+      "file": "order-form.ts",
+      "mine": true,
+      "gap": "Text used as if it were numbers",
+      "tasks": [
+        "Types of a tin",
+        "Grams from the form",
+        "A gift or not",
+        "Shelf after delivery"
+      ]
+    },
+    {
+      "title": "Stock book",
+      "rows": [
+        [
+          "Hearth Assam",
+          "on shelf"
+        ],
+        [
+          "Delivery note",
+          "typed in"
+        ]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Shelf",
+    "wrong": "4012 tins",
+    "why": "Glued text",
+    "right": "counted"
+  },
+  "captions": [
+    "Bryn packs orders at Oakhollow, and the form says the shelf holds 4012 tins.",
+    "The form sends every field as text, and the code glues numbers together.",
+    "You give each value an honest type and turn the text into numbers.",
+    "Now the shelf count adds up, and the compiler would catch the glue.",
+    "Every value on the form now says what it is, and the compiler checks it."
+  ]
+}
