@@ -11,10 +11,11 @@ import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { AudioCard } from './AudioCard'
 import { Markdown } from './Markdown'
+import { ResourcesPanel } from './ResourcesPanel'
 import { TaskList } from './TaskList'
 import { useLessonPart } from './useLessonPart'
 
-// Both tabs stay mounted so the audio keeps playing and scroll positions survive a tab switch.
+// Every tab stays mounted so the audio keeps playing and scroll positions survive a tab switch.
 const content = 'min-h-0 data-[state=inactive]:hidden'
 // Radix wraps scroll content in a display: table div, which lets wide code blocks stretch the panel.
 // Zoom sits inside the viewport so the scroll area keeps the panel's size.
@@ -45,6 +46,9 @@ export function LeftPanel(): React.JSX.Element {
           <TabsTrigger value="tasks" data-tour={TOUR.tasksTab} className={trigger}>
             Tasks
             {chapter && <TaskCount chapter={chapter} />}
+          </TabsTrigger>
+          <TabsTrigger value="resources" className={trigger}>
+            Resources
           </TabsTrigger>
         </TabsList>
       </div>
@@ -85,6 +89,13 @@ export function LeftPanel(): React.JSX.Element {
             <ScrollArea className={scroll}>
               <div className="zone-tasks">
                 <TaskList chapter={chapter} />
+              </div>
+            </ScrollArea>
+          </TabsContent>
+          <TabsContent value="resources" forceMount className={content}>
+            <ScrollArea className={scroll}>
+              <div className="zone-tasks px-6 pt-5 pb-10">
+                <ResourcesPanel chapter={chapter} />
               </div>
             </ScrollArea>
           </TabsContent>

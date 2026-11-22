@@ -114,6 +114,10 @@ the chrome is neutral, and the one hue is a calm orange.
   group per chapter, one cell per task, green when passed. Use it instead of a generic progress bar
   wherever a lab's progress is shown.
 - **Empty states keep the frame**: the card and its header stay, with one plain sentence inside.
+- **Covers are the one blur.** Content the learner chooses when to see (the Resources tab of an
+  issue) is drawn as it is with `blur-sm`, `inert` and `aria-hidden`, under a floating card with one
+  sentence and a button that uncovers it. Blur the content itself, never a backdrop behind a
+  surface.
 - **Never:** gradients, glows, glass or backdrop blur, emoji, a greeting as the title, a hue on the
   chrome, more than one filled button in a view.
 - **Motion from tokens.** `packages/design/tokens.css` holds the curves and durations: `--ease-out`
