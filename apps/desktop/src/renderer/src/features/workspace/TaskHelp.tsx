@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { ChevronRight, Compass, Lightbulb, LockIcon, Sparkles } from 'lucide-react'
 import type { TaskDef, TaskProgress } from '@shared/types'
 import { Button } from '@/components/ui/button'
-import { TOUR } from '@/features/tour/anchors'
 import { useShownHints } from './hints'
 import { showHint } from './recordHint'
 import { type HelpRow, afterChecks, afterFails, helpLadder } from './helpLadder'
@@ -14,7 +13,6 @@ interface Props {
   task: TaskDef
   progress: TaskProgress | undefined
   nonGreenChecks: number
-  first: boolean
   aiOn: boolean
   /** Given only while the tutor is on. */
   onExplain?(hint: string, number: number): void
@@ -32,7 +30,6 @@ export function TaskHelp({
   task,
   progress,
   nonGreenChecks,
-  first,
   aiOn,
   onExplain,
   onAskTutor,
@@ -160,7 +157,6 @@ export function TaskHelp({
           className="group flex min-w-0 flex-1 items-baseline gap-1.5 rounded-md py-1.5 text-left text-[13px] text-muted-foreground hover:text-foreground"
           aria-expanded={open}
           onClick={() => setOpen(id, !open)}
-          data-tour={first ? TOUR.taskNext : undefined}
         >
           <ChevronRight
             className="size-3.5 shrink-0 translate-y-0.5 transition-transform group-aria-expanded:rotate-90"

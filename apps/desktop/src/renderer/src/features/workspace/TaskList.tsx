@@ -32,7 +32,6 @@ export function TaskList({ chapter }: { chapter: Chapter }): React.JSX.Element {
             hintKey={hintKey(chapter.labId, chapter.id, task.id)}
             number={i + 1}
             progress={progress}
-            first={i === 0}
             scene={chapter.flow?.scene}
             flow={chapter.flow?.tasks?.[task.id]}
           />

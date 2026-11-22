@@ -7,7 +7,6 @@ import { Switch } from '@/components/ui/switch'
 import { LayoutControls, TextSizeControls } from '@/features/settings/controls'
 import { useSettingsDialog } from '@/features/settings/dialogStore'
 import { useShortcutList } from '@/features/shortcuts/dialogStore'
-import { TOUR } from '@/features/tour/anchors'
 import { cn } from '@/lib/utils'
 import { TEXT_SCALE_PRESETS, useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
@@ -41,7 +40,7 @@ export function ViewPopover(): React.JSX.Element {
     <>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <IconButton label="View" pressed={open} data-tour={TOUR.view}>
+          <IconButton label="View" pressed={open}>
             <SlidersHorizontal />
           </IconButton>
         </PopoverTrigger>

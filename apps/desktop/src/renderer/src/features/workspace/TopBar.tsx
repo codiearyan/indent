@@ -104,12 +104,7 @@ export function TopBar(): React.JSX.Element {
           Tutor
         </Button>
         <ViewPopover />
-        <IconButton
-          label="Take the tour"
-          disabled={!ready}
-          onClick={() => setTourOpen(true)}
-          data-tour={TOUR.help}
-        >
+        <IconButton label="Take the tour" disabled={!ready} onClick={() => setTourOpen(true)}>
           <CircleHelp />
         </IconButton>
       </div>

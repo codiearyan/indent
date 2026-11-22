@@ -13,7 +13,6 @@ import { ShortcutKeys, ShortcutSuffix } from '@/components/app/ShortcutKeys'
 import { TAB_SHORTCUTS } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { useWorkspace } from '@/stores/workspace'
-import { TOUR } from '@/features/tour/anchors'
 import { usePane } from '@/features/workspace/activePane'
 import { CodeEditor } from './CodeEditor'
 import { focusEditorSoon } from './editors'
@@ -60,7 +59,6 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
         <div
           role="tablist"
           aria-label={split ? (group === 0 ? 'Left editor' : 'Right editor') : undefined}
-          data-tour={group === 0 ? TOUR.editorTabs : undefined}
           className="flex min-w-0 flex-1 overflow-x-auto [scrollbar-width:none]"
         >
           {paths.map((path, index) => {

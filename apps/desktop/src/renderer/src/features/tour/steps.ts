@@ -21,44 +21,21 @@ const showTerminal = (): void => useSettings.getState().setPanel('zen', false)
 
 export const TOUR_STEPS: TourStep[] = [
   {
-    anchor: TOUR.tasksTab,
-    title: 'Tasks',
-    text: 'This is what you build in this issue. A task turns green once your code passes its hidden checks.',
-    prepare: showLeft('tasks')
-  },
-  {
     anchor: TOUR.insightsTab,
     title: 'Lesson',
-    text: 'The lesson: the story, the problem and the ideas you need for the tasks.',
+    text: 'The story and the ideas you need. Press play at the bottom to hear it read aloud.',
     prepare: showLeft('insights')
   },
   {
-    anchor: TOUR.audio,
-    title: 'Read aloud',
-    text: 'Have the lesson read aloud, part by part, while you keep reading or coding.',
-    prepare: showLeft('insights')
-  },
-  {
-    anchor: TOUR.taskCheck,
-    title: 'Check',
-    text: 'Runs the hidden tests for just this task and tells you in plain words what to look at.',
+    anchor: TOUR.tasksTab,
+    title: 'Tasks',
+    text: 'What you build. Check a task to run its hidden tests; hints unlock as checks fail.',
     prepare: showLeft('tasks')
-  },
-  {
-    anchor: TOUR.taskNext,
-    title: 'Help',
-    text: 'Next steps, then hints as checks fail, then the tutor. It says what you can open now and what unlocks next.',
-    prepare: showLeft('tasks')
-  },
-  {
-    anchor: TOUR.editorTabs,
-    title: 'Your files',
-    text: 'The files you have open, starting with the ones this issue is about. Switch or close them here.'
   },
   {
     anchor: TOUR.editor,
     title: 'The editor',
-    text: 'Write your code here. Everything saves to disk as you type.'
+    text: 'Write your code here. It saves to disk as you type.'
   },
   {
     anchor: TOUR.checkAll,
@@ -74,16 +51,6 @@ export const TOUR_STEPS: TourStep[] = [
   {
     anchor: TOUR.chat,
     title: 'Tutor',
-    text: 'A chat that knows the lesson, your tasks, the open file and your latest check. Switch the AI under the message box.'
-  },
-  {
-    anchor: TOUR.view,
-    title: 'View',
-    text: 'Text size, layout, theme and reset live here.'
-  },
-  {
-    anchor: TOUR.help,
-    title: 'This tour',
-    text: 'Open it again any time from here.'
+    text: 'Ask about this issue. It knows your lesson, tasks, open file and latest check. Switch the AI under the message box.'
   }
 ]
