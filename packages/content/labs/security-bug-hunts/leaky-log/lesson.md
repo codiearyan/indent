@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-The Larkspur Letterpress portal now keeps customers to their own orders and its downloads to their folder. The last ticket is about what the portal writes down about itself. By the end of this issue you will be able to:
+The Ashgrove Press portal now keeps customers to their own orders and its downloads to their folder. The last ticket is about what the portal writes down about itself. By the end of this issue you will be able to:
 
 - name the secrets a sign in touches and say why each one matters
 - reproduce a log line and a message that give a secret away
@@ -13,7 +13,7 @@ The Larkspur Letterpress portal now keeps customers to their own orders and its 
 
 Deshawn Pirelli forwards a message from the contractor who helps with the site now and then.
 
-> **Deshawn:** Our contractor was reading the portal log to chase a slow page and stopped to tell us something. The log is full of customers' passwords, and lines with session ids in them. On top of that, a customer who mistyped a password got an error page with two long strings of letters and numbers. The contractor did not try anything, but anyone with the log could. LL-26.
+> **Deshawn:** Our contractor was reading the portal log to chase a slow page and stopped to tell us something. The log is full of customers' passwords, and lines with session ids in them. On top of that, a customer who mistyped a password got an error page with two long strings of letters and numbers. The contractor did not try anything, but anyone with the log could. AP-26.
 
 A few lines from the log:
 
@@ -65,7 +65,7 @@ Run the demo:
 node src/demo.js
 ```
 
-It signs Greta in, lets Cosmo mistype, and prints each log line. `signIn()` takes the log as a function, so in `src/reproduce.js` you can hand it one that pushes every line into an array. Sign in once and return the form, the lines and the result. A secret in one of them is the proof you attach to LL-26.
+It signs Greta in, lets Cosmo mistype, and prints each log line. `signIn()` takes the log as a function, so in `src/reproduce.js` you can hand it one that pushes every line into an array. Sign in once and return the form, the lines and the result. A secret in one of them is the proof you attach to AP-26.
 
 ## How to test it
 

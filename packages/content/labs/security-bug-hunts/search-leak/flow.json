@@ -5,7 +5,7 @@
       { "id": "reproduce", "label": "reproduceSearchLeak()", "kind": "function", "mine": true, "fn": "reproduceSearchLeak" },
       { "id": "search", "label": "searchOrders()", "kind": "function", "mine": true, "fn": "searchOrders" },
       { "id": "orders", "label": "Orders table", "kind": "data" },
-      { "id": "ticket", "label": "LL-12", "kind": "story" },
+      { "id": "ticket", "label": "AP-12", "kind": "story" },
       { "id": "test", "label": "search.test.js", "kind": "file", "mine": true }
     ],
     "edges": [
@@ -53,7 +53,7 @@
               { "key": "shown", "value": "a list of { id, title, status }" }
             ]
           },
-          "note": "The rows go on LL-12. The proof is a row that belongs to another customer."
+          "note": "The rows go on AP-12. The proof is a row that belongs to another customer."
         }
       ]
     },
@@ -94,7 +94,7 @@
         },
         {
           "active": ["test", "search", "orders", "reproduce", "ticket"],
-          "note": "First it runs beside the original searchOrders(), the one behind LL-12. There it must fail."
+          "note": "First it runs beside the original searchOrders(), the one behind AP-12. There it must fail."
         },
         {
           "active": ["test", "search"],

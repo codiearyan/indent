@@ -3,7 +3,19 @@
 import { hashPassword, openDb } from '../src/db.js'
 import { signIn } from '../src/signIn.js'
 
+// The check reads stdout itself; console.error and console.warn go to stderr, kept here.
+export const stderr = []
+const writeStderr = process.stderr.write.bind(process.stderr)
+process.stderr.write = (chunk, ...rest) => {
+  stderr.push(String(chunk))
+  return writeStderr(chunk, ...rest)
+}
+
 export function attempts(forms) {
+  return { runs: signInAll(forms), stderr: stderr.join('') }
+}
+
+function signInAll(forms) {
   const db = openDb()
   const lookup = db.prepare('SELECT id, salt, password_hash FROM customers WHERE email = ?')
   const session = db.prepare('SELECT customer_id FROM sessions WHERE token = ?')

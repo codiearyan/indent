@@ -1,4 +1,4 @@
-// Task 1: catch a customer reading someone else's order (ticket LL-19).
+// Task 1: catch a customer reading someone else's order (ticket AP-19).
 //
 // Sign in as one customer (a session is { customerId }, with an id from seed.js) and ask the
 // original getOrder() for an order that belongs to another customer, with a fresh openDb().

@@ -1,4 +1,4 @@
-// Task 3: a test that would have caught LL-12.
+// Task 3: a test that would have caught AP-12.
 //
 // Write vitest tests for searchOrders() with a fresh openDb(). Search with text that tries to
 // reach other customers' orders, and with honest text a customer could type.

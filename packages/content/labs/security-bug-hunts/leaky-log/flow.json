@@ -49,7 +49,7 @@
               { "key": "result", "value": "what signIn() returned" }
             ]
           },
-          "note": "The lines and the result go on LL-26. The proof is a secret in one of them."
+          "note": "The lines and the result go on AP-26. The proof is a secret in one of them."
         }
       ]
     },
@@ -89,7 +89,7 @@
         },
         {
           "active": ["test", "signin", "signin->log", "log"],
-          "note": "First it runs beside the original signIn(), the one behind LL-26. There it must fail."
+          "note": "First it runs beside the original signIn(), the one behind AP-26. There it must fail."
         },
         {
           "active": ["test", "signin"],

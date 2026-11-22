@@ -1,4 +1,4 @@
-// Task 1: catch the search showing orders that are not the customer's (ticket LL-12).
+// Task 1: catch the search showing orders that are not the customer's (ticket AP-12).
 //
 // Pick a customer id from seed.js and a search text that changes the query instead of being
 // searched for. Run them through the original searchOrders() with a fresh openDb().

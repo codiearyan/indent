@@ -1,4 +1,4 @@
-// Task 2: show what customers typed as text, never as HTML (ticket LL-15).
+// Task 2: show what customers typed as text, never as HTML (ticket AP-15).
 //
 // renderOrderCard(order) returns the HTML of one order card. The same card is on the customer's
 // order page and on the staff board, where Rune and Deshawn are signed in with staff rights.

@@ -48,7 +48,7 @@ export const checks = {
     const usable =
       typeof form?.email === 'string' && typeof form?.password === 'string' && Array.isArray(log)
     const run = usable ? await t.call(dir, '.grader/drive.mjs', 'attempts', [[form]]) : undefined
-    const real = run?.ok ? run.value[0] : undefined
+    const real = run?.ok ? run.value.runs[0] : undefined
     const same =
       real?.result !== undefined &&
       isDeepStrictEqual(
@@ -100,7 +100,7 @@ export const checks = {
         }
       ]
     }
-    const runs = run.value
+    const { runs } = run.value
     const call = (f) => `signIn(db, log, ${JSON.stringify({ email: f.email, password: f.password })})`
     const story = (f, r) =>
       `${call(f)}\nreturned ${r.error ?? show(r.result)}\nlogged ${show(r.log)}`
@@ -130,7 +130,9 @@ export const checks = {
     const passwordInMessage = find((f, r) => String(r.result?.message ?? '').includes(f.password))
     const noLine = find((f, r) => !r.log.some((line) => line.includes(f.email)))
     const everySecret = runs.flatMap((r, i) => [forms[i].password, r.result?.token, ...r.hashes])
-    const printed = holds(run.stdout, everySecret)
+    const printed = holds(run.stdout + run.value.stderr, everySecret)
+    const messages = runs.flatMap((r, i) => (!forms[i].ok && !r.error ? [r.result?.message] : []))
+    const oneMessage = new Set(messages).size <= 1
     details.push(
       {
         name: 'No log line holds a password',
@@ -163,7 +165,14 @@ export const checks = {
         name: 'Nothing secret is printed to the console',
         passed: !printed,
         message: 'A secret was printed to the console. On a server, the console ends up in a log too.',
-        output: printed ? run.stdout : undefined
+        output: printed ? run.stdout + run.value.stderr : undefined
+      },
+      {
+        name: 'A wrong password and an unknown email get the same message',
+        passed: oneMessage,
+        message:
+          'The message for a wrong password differs from the one for an email nobody has, so it tells anyone which emails have an account here.',
+        output: oneMessage ? undefined : messages.map((m) => JSON.stringify(m)).join('\n')
       },
       {
         name: 'Every attempt still logs a line with its email',

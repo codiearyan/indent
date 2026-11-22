@@ -5,7 +5,7 @@
       { "id": "reproduce", "label": "reproduceNoteMarkup()", "kind": "function", "mine": true, "fn": "reproduceNoteMarkup" },
       { "id": "card", "label": "renderOrderCard()", "kind": "function", "mine": true, "fn": "renderOrderCard" },
       { "id": "board", "label": "Staff board", "kind": "story" },
-      { "id": "ticket", "label": "LL-15", "kind": "story" },
+      { "id": "ticket", "label": "AP-15", "kind": "story" },
       { "id": "test", "label": "orderCard.test.js", "kind": "file", "mine": true }
     ],
     "edges": [
@@ -50,7 +50,7 @@
               { "key": "html", "value": "the card, as text" }
             ]
           },
-          "note": "The order and its card go on LL-15. The proof is that the board builds something other than what the customer typed."
+          "note": "The order and its card go on AP-15. The proof is that the board builds something other than what the customer typed."
         }
       ]
     },
@@ -100,7 +100,7 @@
         },
         {
           "active": ["test", "card", "board", "board->ticket", "ticket"],
-          "note": "First it runs beside the original renderOrderCard(), the one behind LL-15. There it must fail."
+          "note": "First it runs beside the original renderOrderCard(), the one behind AP-15. There it must fail."
         },
         {
           "active": ["test", "card"],

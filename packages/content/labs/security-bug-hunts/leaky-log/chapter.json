@@ -40,7 +40,7 @@
       "id": "fix",
       "title": "Keep secrets out of the log and the page",
       "file": "src/signIn.js",
-      "description": "Fix `signIn(db, log, form)` in `src/signIn.js` so no secret ever leaves it, except the token handed back to the customer who signed in.\n\n- The right password still signs in and returns `{ ok: true, token }`, with the token saved as a session.\n- A wrong password, or an email nobody has, returns `{ ok: false, message }`.\n- No log line holds a password, a session token or a password hash, and no message holds a password or a hash.\n- Nothing secret is printed to the console.\n- Every attempt still logs a line with its email.\n\nThe check signs in with right and wrong passwords and an unknown email, and looks for every secret in each log line, each message and the console.",
+      "description": "Fix `signIn(db, log, form)` in `src/signIn.js` so no secret ever leaves it, except the token handed back to the customer who signed in.\n\n- The right password still signs in and returns `{ ok: true, token }`, with the token saved as a session.\n- A wrong password, or an email nobody has, returns `{ ok: false, message }`, with the same message for both.\n- No log line holds a password, a session token or a password hash, and no message holds a password or a hash.\n- Nothing secret is printed to the console.\n- Every attempt still logs a line with its email.\n\nThe check signs in with right and wrong passwords and an unknown email, and looks for every secret in each log line, each message and the console.",
       "nextSteps": [
         "List every secret `signIn` touches.",
         "Find every place one of them leaves the function.",
@@ -56,6 +56,9 @@
         { "title": "Logging", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html" },
         { "title": "Error handling", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html" },
         { "title": "crypto.scryptSync()", "url": "https://nodejs.org/docs/latest-v22.x/api/crypto.html#cryptoscryptsyncpassword-salt-keylen-options" }
+      ],
+      "videos": [
+        { "title": "Why a site keeps a hash, not the password", "url": "https://www.youtube.com/watch?v=8ZtInClXe1Q" }
       ],
       "points": 10
     },

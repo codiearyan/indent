@@ -1,6 +1,6 @@
 {
   "stations": [
-    { "title": "Deshawn", "say": "One search showed every order.", "note": "Found in the log. LL-12." },
+    { "title": "Deshawn", "say": "One search showed every order.", "note": "Found in the log. AP-12." },
     { "title": "Search box", "text": "Customers type what they look for.", "note": "Any text at all." },
     {
       "title": "Your code",
@@ -17,7 +17,7 @@
   ],
   "ticket": { "label": "Search", "wrong": "shows all orders", "why": "Not theirs", "right": "shows only theirs" },
   "captions": [
-    "At Larkspur Letterpress, Deshawn finds a search that answered with every order.",
+    "At Ashgrove Press, Deshawn finds a search that answered with every order.",
     "The text a customer typed changed the query, so other people's orders came back.",
     "You catch the leak, keep the text out of the query and write its test, in three tasks.",
     "Now every search finds only the customer's own orders, whatever they type.",

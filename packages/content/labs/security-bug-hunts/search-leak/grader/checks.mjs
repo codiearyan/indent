@@ -53,6 +53,7 @@ export const checks = {
     const run = usable ? await t.call(dir, '.grader/drive.mjs', 'search', [[[customerId, text]]]) : undefined
     const real = run?.ok ? run.value[0] : undefined
     const leaked = Array.isArray(real?.rows) && real.rows.some((row) => !ownIds(customerId).includes(row?.id))
+    const same = usable && real?.rows !== undefined && isDeepStrictEqual(shown, real.rows)
     return clear([
       {
         name: 'Returns the customer and the text it used',
@@ -62,15 +63,18 @@ export const checks = {
       },
       {
         name: 'shown is what the original searchOrders() returned',
-        passed: usable && real?.rows !== undefined && isDeepStrictEqual(shown, real.rows),
+        passed: same,
         message: 'shown should be exactly the list searchOrders(db, customerId, text) returned, unchanged.',
-        output: `${show(r.value)}\n\nsearchOrders() returned:\n${real?.error ?? show(real?.rows)}`
+        output: usable
+          ? `${show(r.value)}\n\nsearchOrders() returned:\n${real?.error ?? show(real?.rows)}`
+          : show(r.value)
       },
       {
         name: 'shown holds an order that is not the customer\'s',
-        passed: usable && leaked,
-        message:
-          'Every row here belongs to this customer, so it does not show the hole. The text has to end the quoted part of the query and add a condition of its own.',
+        passed: same && leaked,
+        message: !same
+          ? 'This is judged once shown is exactly what searchOrders() returned for your customer id and text.'
+          : 'Every row here belongs to this customer, so it does not show the hole. Write out the whole query with your text in it: the text has to end the quoted part, add a condition of its own, and leave nothing after it that undoes that condition.',
         output: `${show(r.value)}\n\nThe customer's own orders: ${ownIds(customerId).join(', ') || 'none'}`
       }
     ])

@@ -1,4 +1,4 @@
-// Task 2: show an order only to the customer it belongs to (ticket LL-19).
+// Task 2: show an order only to the customer it belongs to (ticket AP-19).
 //
 // getOrder(db, session, orderId) returns one order for the order page as
 // { id, title, status, note, shipTo, total }, or null when there is no order to show.

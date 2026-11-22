@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Larkspur Letterpress is a two-press print studio. It prints wedding invitations, menus and posters, and its customers order, follow and change their orders on a small portal a friend built over a few weekends. You have just become its developer. By the end of this issue you will be able to:
+Ashgrove Press is a two-press letterpress shop. It prints wedding invitations, menus and posters, and its customers order, follow and change their orders on a small portal a friend built over a few weekends. You have just become its developer. By the end of this issue you will be able to:
 
 - explain how text typed into a form can change a database query
 - reproduce a search that hands one customer another customer's orders
@@ -13,7 +13,7 @@ Larkspur Letterpress is a two-press print studio. It prints wedding invitations,
 
 Deshawn Pirelli runs the front desk and answers the customer emails. A forwarded email arrives with a note on top.
 
-> **Deshawn:** Yusra says the order search gets an error page for a search for Mother's Day. While I was looking at the log I found something worse. Someone signed in as a customer searched for a strange bit of text with quotes in it, and the portal answered with forty rows. That is every order we have, other people's included. LL-12.
+> **Deshawn:** Yusra says the order search gets an error page for a search for Mother's Day. While I was looking at the log I found something worse. Someone signed in as a customer searched for a strange bit of text with quotes in it, and the portal answered with forty rows. That is every order we have, other people's included. AP-12.
 
 The error Yusra saw:
 
@@ -66,7 +66,7 @@ Run the demo:
 node src/demo.js
 ```
 
-It runs three customers' searches from `src/seed.js`. On Node 22 it first prints a line saying SQLite is experimental; that is expected. Then make the hole visible in data: in `src/reproduce.js`, search as one customer with text that changes the query, and return what came back. Rows that belong to another customer are the proof you attach to LL-12.
+It runs three customers' searches from `src/seed.js`. On Node 22 it first prints a line saying SQLite is experimental; that is expected. Then make the hole visible in data: in `src/reproduce.js`, search as one customer with text that changes the query, and return what came back. Rows that belong to another customer are the proof you attach to AP-12.
 
 ## How to test it
 

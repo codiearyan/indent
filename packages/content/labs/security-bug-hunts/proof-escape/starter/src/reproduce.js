@@ -1,4 +1,4 @@
-// Task 1: catch a download reading a file outside the proofs folder (ticket LL-22).
+// Task 1: catch a download reading a file outside the proofs folder (ticket AP-22).
 //
 // Pick a fileName that leads out of the proofs folder to a file that exists, and run it through
 // the original readProof() with PROOFS_DIR. Return { fileName, shown }:

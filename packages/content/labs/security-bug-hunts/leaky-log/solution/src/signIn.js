@@ -1,4 +1,4 @@
-// Task 2: keep secrets out of the log and the sign in page (ticket LL-26).
+// Task 2: keep secrets out of the log and the sign in page (ticket AP-26).
 //
 // signIn(db, log, form) checks form = { email, password }. When they match a customer it saves a
 // session and returns { ok: true, token }; otherwise it returns { ok: false, message } with the

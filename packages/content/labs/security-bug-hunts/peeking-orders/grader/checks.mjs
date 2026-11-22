@@ -47,6 +47,7 @@ export const checks = {
     const usable = orders.some((o) => o.customerId === customerId) && orderId !== undefined
     const run = usable ? await t.call(dir, '.grader/drive.mjs', 'open', [[[session, orderId]]]) : undefined
     const real = run?.ok ? run.value[0] : undefined
+    const same = usable && real?.order !== undefined && isDeepStrictEqual(shown, real.order)
     return clear([
       {
         name: 'Returns the session and the order number it used',
@@ -56,18 +57,24 @@ export const checks = {
       },
       {
         name: 'shown is what the original getOrder() returned',
-        passed: usable && real?.order !== undefined && isDeepStrictEqual(shown, real.order),
+        passed: same,
         message: 'shown should be exactly what getOrder(db, session, orderId) returned, unchanged.',
-        output: `${show(r.value)}\n\ngetOrder() returned:\n${real?.error ?? show(real?.order)}`
+        output: usable
+          ? `${show(r.value)}\n\ngetOrder() returned:\n${real?.error ?? show(real?.order)}`
+          : show(r.value)
       },
       {
         name: 'shown is an order that belongs to someone else',
-        passed: usable && shown !== null && ownerOf(orderId) !== undefined && ownerOf(orderId) !== customerId,
-        message:
-          ownerOf(orderId) === undefined
+        passed: same && shown !== null && ownerOf(orderId) !== undefined && ownerOf(orderId) !== customerId,
+        message: !same
+          ? 'This is judged once shown is exactly what getOrder() returned for your session and order number.'
+          : ownerOf(orderId) === undefined
             ? 'There is no order with this number, so nothing was shown. Pick an order from seed.js.'
             : 'This order belongs to the signed-in customer, so it does not show the hole. Ask for one of another customer\'s orders.',
-        output: `${show(r.value)}\n\nOrder ${orderId} belongs to customer ${ownerOf(orderId) ?? 'nobody'}`
+        output:
+          ownerOf(orderId) === undefined
+            ? `${show(r.value)}\n\nThere is no order ${orderId} in seed.js.`
+            : `${show(r.value)}\n\nOrder ${orderId} belongs to customer ${ownerOf(orderId)}`
       }
     ])
   },
@@ -89,7 +96,8 @@ export const checks = {
       ]
     }
     const call = (c) => `getOrder(db, { customerId: ${c.customerId} }, ${JSON.stringify(c.orderId)})`
-    const got = (r) => r.error ?? show(r.order)
+    const got = (r) => r.error ?? (r.order === 'undefined' ? 'undefined' : show(r.order))
+    const opened = (r, c) => Number(r.order?.id) === Number(c.orderId)
     const details = own.map((c, i) => {
       const r = run.value[i]
       return {
@@ -97,9 +105,11 @@ export const checks = {
         passed: !r.error && isDeepStrictEqual(r.order, page(c.orderId)),
         message: r.error
           ? 'getOrder threw for the customer\'s own order.'
-          : typeof c.orderId === 'string'
-            ? 'The customer did not get their own order. A number from a link arrives as text, and their own orders must still open.'
-            : 'The customer did not get their own order in full. Their own orders must still open.',
+          : opened(r, c)
+            ? 'The customer\'s own order came back, but not as { id, title, status, note, shipTo, total }: it has fields missing, extra fields, or values that differ from the database.'
+            : typeof c.orderId === 'string'
+              ? 'The customer did not get their own order. A number from a link arrives as text, and their own orders must still open.'
+              : 'The customer did not get their own order. Their own orders must still open.',
         output: `${call(c)}\ngot ${got(r)}`
       }
     })
@@ -112,7 +122,11 @@ export const checks = {
           ? 'getOrder threw for an order that is not theirs. An order that does not exist gives null, so this answer tells the customer the number is a real order.'
           : r.order === null
             ? undefined
-            : 'Changing the number in the link opened another customer\'s order. Who may see an order is decided by the signed-in customer, not by the number they ask for.',
+            : opened(r, c)
+              ? 'Changing the number in the link opened another customer\'s order. Who may see an order is decided by the signed-in customer, not by the number they ask for.'
+              : r.order === 'undefined'
+                ? 'getOrder gave undefined. An order that is not theirs gives null, exactly like an order that does not exist.'
+                : 'This answer is not null, the answer for an order that does not exist, so it tells the customer the number is a real order.',
         output: `${call(c)}\ngot ${got(r)}\n\nOrder ${c.orderId} belongs to customer ${ownerOf(c.orderId)}`
       })
     })
@@ -120,18 +134,37 @@ export const checks = {
     details.push({
       name: 'An order that does not exist gives null',
       passed: !missing.error && missing.order === null,
-      message: 'getOrder should give null when there is no order with this number.',
+      message:
+        missing.order === 'undefined'
+          ? 'getOrder gave undefined. It should give null when there is no order with this number.'
+          : 'getOrder should give null when there is no order with this number.',
       output: `${call(MISSING)}\ngot ${got(missing)}`
     })
     return clear(details)
   },
 
-  test(t) {
-    return t.judgeTest({
-      test: 'src/orders.test.js',
-      target: 'src/orders.js',
-      wrong: 'grader/variants/tell-the-owner.js',
-      wrongLabel: 'a fix that refuses with an error saying the order is someone else\'s'
-    })
+  async test(t) {
+    const [details, hidden] = await Promise.all([
+      t.judgeTest({
+        test: 'src/orders.test.js',
+        target: 'src/orders.js',
+        wrong: 'grader/variants/tell-the-owner.js',
+        wrongLabel: 'a fix that refuses with an error saying the order is someone else\'s'
+      }),
+      t.sandbox({ 'src/orders.js': t.chapterPath('grader/variants/hide-every-order.js') }).then((dir) =>
+        t.vitest(dir, 'src/orders.test.js')
+      )
+    ])
+    return [
+      ...details,
+      {
+        name: 'Fails on a fix that gives null for every order',
+        passed: !hidden.passed,
+        message: hidden.passed
+          ? 'Your test passed beside a fix that gives null for every order, the customer\'s own included. Keep a case where a customer opens their own order.'
+          : undefined,
+        output: hidden.output
+      }
+    ]
   }
 }

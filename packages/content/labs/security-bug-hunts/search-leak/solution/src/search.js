@@ -1,4 +1,4 @@
-// Task 2: make the order search treat the customer's text as text (ticket LL-12).
+// Task 2: make the order search treat the customer's text as text (ticket AP-12).
 //
 // searchOrders(db, customerId, text) returns one customer's orders whose title contains text,
 // ignoring case, as [{ id, title, status }] sorted by id. customerId comes from the signed-in

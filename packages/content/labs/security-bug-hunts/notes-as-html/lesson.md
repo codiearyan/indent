@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-The search at Larkspur Letterpress now keeps every customer to their own orders. The next ticket is about what the portal shows. By the end of this issue you will be able to:
+The search at Ashgrove Press now keeps every customer to their own orders. The next ticket is about what the portal shows. By the end of this issue you will be able to:
 
 - explain how text a customer typed can become part of a page
 - reproduce a note that the browser reads as HTML
@@ -13,7 +13,7 @@ The search at Larkspur Letterpress now keeps every customer to their own orders.
 
 Rune Kasprzak runs the presses and works from the staff board, a page that lists every open order as a card.
 
-> **Rune:** We nearly printed Yusra's gig posters at the wrong size. The note says "Size A2" and then nothing, but Yusra swears there was more. The order page shows the same. And Cosmo's name showed up in bold on the board last week, which nobody did on purpose. LL-15.
+> **Rune:** We nearly printed Yusra's gig posters at the wrong size. The note says "Size A2" and then nothing, but Yusra swears there was more. The order page shows the same. And Cosmo's name showed up in bold on the board last week, which nobody did on purpose. AP-15.
 
 The note Yusra typed was `Size A2 <not A3>.` The staff board showed `Size A2 .`
 
@@ -59,7 +59,7 @@ Run the demo:
 node src/demo.js
 ```
 
-It renders order 2046 and prints what the staff board makes of it with `readCard()` from `src/staffScreen.js`. That helper reads a card the way a browser would and tells you the words in each part, the value in the note field, every tag and every event attribute. It never runs scripts, so any card is safe to read with it. In `src/reproduce.js`, make an order whose text becomes HTML and return it with its card. A card whose tags or words differ from what the customer typed is the proof you attach to LL-15.
+It renders order 2046 and prints what the staff board makes of it with `readCard()` from `src/staffScreen.js`. That helper reads a card the way a browser would and tells you the words in each part, the value in the note field, every tag and every event attribute. It never runs scripts, so any card is safe to read with it. In `src/reproduce.js`, make an order whose text becomes HTML and return it with its card. A card whose tags or words differ from what the customer typed is the proof you attach to AP-15.
 
 ## How to test it
 

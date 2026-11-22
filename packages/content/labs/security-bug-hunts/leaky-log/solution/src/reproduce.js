@@ -1,4 +1,4 @@
-// Task 1: catch a secret in the log or on the sign in page (ticket LL-26).
+// Task 1: catch a secret in the log or on the sign in page (ticket AP-26).
 //
 // Sign in once through the original signIn() with a fresh openDb(), collecting every log line in
 // an array. Use a customer from seed.js, with the right password or a wrong one.

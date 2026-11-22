@@ -65,7 +65,7 @@
       "id": "test",
       "title": "Write the test that would have caught it",
       "file": "src/proofs.test.js",
-      "description": "Write vitest tests in `src/proofs.test.js` that guard this hole for good. Call `readProof()` with `PROOFS_DIR` from `folders.js`.\n\nThe check runs your test file three times: beside the original `proofs.js` (it must fail), beside a correct fix (it must pass) and beside a fix that only checks the full path starts with the folder's path (it must fail).",
+      "description": "Write vitest tests in `src/proofs.test.js` that guard this hole for good. Call `readProof()` with `PROOFS_DIR` from `folders.js`.\n\nThe check runs your test file four times: beside the original `proofs.js` (it must fail), beside a correct fix (it must pass), beside a fix that only checks the full path starts with the folder's path (it must fail) and beside a fix that gives `null` for every name (it must fail).",
       "nextSteps": [
         "Import `PROOFS_DIR` and `readProof`.",
         "Ask for a name that climbs out of `proofs` and expect `null`.",

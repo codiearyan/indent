@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Before Larkspur Letterpress prints anything, the customer approves a proof: a picture of exactly what will be printed. The portal lets them download it. By the end of this issue you will be able to:
+Before Ashgrove Press prints anything, the customer approves a proof: a picture of exactly what will be printed. The portal lets them download it. By the end of this issue you will be able to:
 
 - explain how a file name from a link can reach files it was never meant to
 - reproduce a download that reads a file outside its folder
@@ -13,7 +13,7 @@ Before Larkspur Letterpress prints anything, the customer approves a proof: a pi
 
 Rune Kasprzak looks after the proofs, and reads the download log once a week.
 
-> **Rune:** Something odd in the download log. Someone asked for a proof called ../proofs-staff/2041-costs.txt and got it. That is our cost sheet for Greta's invitations, with our margin on it. There is also a request for ../config/mail.json, which holds the studio's mail password. Nobody should get either. LL-22.
+> **Rune:** Something odd in the download log. Someone asked for a proof called ../proofs-staff/2041-costs.txt and got it. That is our cost sheet for Greta's invitations, with our margin on it. There is also a request for ../config/mail.json, which holds the shop's mail password. Nobody should get either. AP-22.
 
 A proof link looks like `/proofs?file=2041/front.txt`. The portal reads `2041/front.txt` from its `proofs` folder and sends the text back. In the real portal a proof is a PDF; here a text file stands in for it.
 
@@ -65,7 +65,7 @@ Run the demo:
 node src/demo.js
 ```
 
-It downloads three names with `PROOFS_DIR` from `src/folders.js`. Look at the folders beside `proofs` in your workspace: `proofs-staff` and `config`. In `src/reproduce.js`, pick a name that climbs out of `proofs` to one of their files. Its text in your result is the proof you attach to LL-22.
+It downloads three names with `PROOFS_DIR` from `src/folders.js`. Look at the folders beside `proofs` in your workspace: `proofs-staff` and `config`. In `src/reproduce.js`, pick a name that climbs out of `proofs` to one of their files. Its text in your result is the proof you attach to AP-22.
 
 ## How to test it
 
@@ -73,4 +73,4 @@ Call `readProof()` with `PROOFS_DIR`. Ask for names that lead outside and expect
 
 ## Your work in this issue
 
-Start in `src/reproduce.js`, then fix `src/proofs.js`, then write `src/proofs.test.js`. Run your tests with `npx vitest run src/proofs.test.js`. The check runs them beside the original code, a correct fix and a fix that only checks the start of the path, and expects fail, pass, fail.
+Start in `src/reproduce.js`, then fix `src/proofs.js`, then write `src/proofs.test.js`. Run your tests with `npx vitest run src/proofs.test.js`. The check runs them beside the original code, a correct fix, a fix that only checks the start of the path and a fix that refuses every name, and expects fail, pass, fail, fail.

@@ -1,6 +1,6 @@
 {
   "stations": [
-    { "title": "Ottilie", "say": "Cosmo saw someone else's order.", "note": "By changing the link. LL-19." },
+    { "title": "Hesper", "say": "Cosmo saw someone else's order.", "note": "By changing the link. AP-19." },
     { "title": "Order link", "text": "The order number sits in the address.", "note": "Anyone can type a number." },
     {
       "title": "Your code",
@@ -17,7 +17,7 @@
   ],
   "ticket": { "label": "Order page", "wrong": "any order", "why": "Not checked", "right": "only yours" },
   "captions": [
-    "Then Ottilie forwards an email: Cosmo changed a link and saw a stranger's order.",
+    "Then Hesper forwards an email: Cosmo changed a link and saw a stranger's order.",
     "The portal knows who is signed in, but never asks whose order it hands over.",
     "You catch the peek, check the owner and write the test, in three tasks.",
     "Now an order opens only for its own customer, and others get not found.",

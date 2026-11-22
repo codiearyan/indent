@@ -5,7 +5,7 @@
       { "id": "reproduce", "label": "reproduceOrderPeek()", "kind": "function", "mine": true, "fn": "reproduceOrderPeek" },
       { "id": "get", "label": "getOrder()", "kind": "function", "mine": true, "fn": "getOrder" },
       { "id": "orders", "label": "Orders table", "kind": "data" },
-      { "id": "ticket", "label": "LL-19", "kind": "story" },
+      { "id": "ticket", "label": "AP-19", "kind": "story" },
       { "id": "test", "label": "orders.test.js", "kind": "file", "mine": true }
     ],
     "edges": [
@@ -49,7 +49,7 @@
               { "key": "shown", "value": "{ id, title, status, note, shipTo, total }" }
             ]
           },
-          "note": "The order goes on LL-19. The proof is that it belongs to another customer."
+          "note": "The order goes on AP-19. The proof is that it belongs to another customer."
         }
       ]
     },
@@ -85,7 +85,7 @@
         },
         {
           "active": ["test", "get", "orders", "reproduce", "ticket"],
-          "note": "First it runs beside the original getOrder(), the one behind LL-19. There it must fail."
+          "note": "First it runs beside the original getOrder(), the one behind AP-19. There it must fail."
         },
         {
           "active": ["test", "get"],
@@ -95,14 +95,15 @@
           "active": ["test", "get"],
           "value": {
             "kind": "map",
-            "label": "three runs of the test file",
+            "label": "four runs of the test file",
             "entries": [
               { "key": "original orders.js", "value": "must fail" },
               { "key": "a correct fix", "value": "must pass" },
-              { "key": "throws naming the owner", "value": "must fail" }
+              { "key": "throws naming the owner", "value": "must fail" },
+              { "key": "hides every order", "value": "must fail" }
             ]
           },
-          "note": "Last it runs beside a fix that throws an error saying the order is someone else's. That one must fail too."
+          "note": "Last it runs beside a fix that throws an error saying the order is someone else's, and one that hides every order. Both must fail too."
         }
       ]
     }

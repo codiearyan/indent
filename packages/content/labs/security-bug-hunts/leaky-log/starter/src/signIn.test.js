@@ -1,4 +1,4 @@
-// Task 3: a test that would have caught LL-26.
+// Task 3: a test that would have caught AP-26.
 //
 // Write vitest tests for signIn() with a fresh openDb() and a log that collects its lines in an
 // array. Sign in with a right password and with a wrong one, and look at every line and message.

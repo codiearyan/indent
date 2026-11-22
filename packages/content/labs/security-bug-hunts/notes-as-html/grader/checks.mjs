@@ -44,6 +44,11 @@ function cause(seen, order) {
     return 'A quote in the customer\'s text ended the note field\'s value early, and the rest of the text was read as part of the tag.'
   }
   const typed = [order.title, order.customerName, order.note].join('')
+  const shown = [seen.title, seen.customer, seen.note, seen.noteField].join('')
+  const reference = /&(amp|lt|gt|quot|#39|#34);/
+  if (reference.test(shown) && !reference.test(typed)) {
+    return 'The page shows a character reference where the customer typed one character, so a reference was escaped a second time. Think about the order in which the characters are turned into references.'
+  }
   if (typed.includes('&') && !typed.includes('<')) {
     return 'The page shows different words than the customer typed. To a browser, & starts a code for another character, so text that holds one can change what is shown.'
   }
@@ -73,28 +78,35 @@ export const checks = {
     }
     const { order, html } = r.value ?? {}
     const usable =
-      order && ['title', 'customerName', 'note'].every((key) => typeof order[key] === 'string')
+      order &&
+      ['title', 'customerName', 'note'].every((key) => typeof order[key] === 'string') &&
+      !/[<>&"']/.test(`${order.id}${order.status}`)
     const run = usable ? await t.call(dir, '.grader/drive.mjs', 'cards', [[order]]) : undefined
     const real = run?.ok ? run.value[0] : undefined
+    const same = !!usable && real?.html !== undefined && html === real.html
     const broken = real?.seen && !isDeepStrictEqual(real.seen, expectedSeen(order))
     return clear([
       {
         name: 'Returns the order it used',
         passed: !!usable,
-        message: 'Return order with a title, a customerName and a note as strings, the way renderOrderCard() takes it.',
+        message:
+          'Return order with a title, a customerName and a note as strings, the way renderOrderCard() takes it. The id and the status are set by the shop, so keep them plain.',
         output: show(r.value)
       },
       {
         name: 'html is what the original renderOrderCard() returned',
-        passed: !!usable && real?.html !== undefined && html === real.html,
+        passed: same,
         message: 'html should be exactly the text renderOrderCard(order) returned, unchanged.',
-        output: `${show(r.value)}\n\nrenderOrderCard() returned:\n${real?.error ?? real?.html}`
+        output: usable
+          ? `${show(r.value)}\n\nrenderOrderCard() returned:\n${real?.error ?? real?.html}`
+          : show(r.value)
       },
       {
-        name: 'The browser builds something else than the customer typed',
-        passed: !!broken,
-        message:
-          'The browser shows this card just as the customer typed it, so it does not show the hole. Put text in a title, a name or a note that the browser reads as a tag.',
+        name: 'The browser builds something other than what the customer typed',
+        passed: same && !!broken,
+        message: !same
+          ? 'This is judged once html is exactly what renderOrderCard() returned for your order.'
+          : 'The browser shows this card just as the customer typed it, so it does not show the hole. Put text in a title, a name or a note that the browser reads as a tag.',
         output: real?.seen ? `What the staff board shows:\n${show(real.seen)}` : undefined
       }
     ])

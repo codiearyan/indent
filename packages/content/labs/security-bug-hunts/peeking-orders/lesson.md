@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Larkspur Letterpress's search and order cards are safe now. The next ticket comes from a customer who did nothing more clever than edit a link. By the end of this issue you will be able to:
+Ashgrove Press's search and order cards are safe now. The next ticket comes from a customer who did nothing more clever than edit a link. By the end of this issue you will be able to:
 
 - tell the difference between knowing who someone is and knowing what they may see
 - reproduce a customer opening another customer's order by changing a number
@@ -11,13 +11,13 @@ Larkspur Letterpress's search and order cards are safe now. The next ticket come
 
 ## The ticket
 
-Ottilie Ferraby owns the studio, and forwards an email from a customer with one line on top.
+Hesper owns Ashgrove Press, and forwards an email from a customer with one line on top.
 
-> **Ottilie:** Please read this today. LL-19.
+> **Hesper:** Please read this today. AP-19.
 >
 > **Cosmo:** Hello, I was checking my menu boards and noticed the address bar said /orders/2042. Out of curiosity I typed 2041 instead, and I got someone's wedding invitations, with their name, their note and their home address. I closed it straight away, but I thought you should know.
 
-Cosmo is right, and was kind to tell. Anyone signed in can walk through every order the studio has ever taken, one number at a time.
+Cosmo is right, and was kind to tell. Anyone signed in can walk through every order the shop has ever taken, one number at a time.
 
 ## The idea: signed in is not the same as allowed
 
@@ -67,7 +67,7 @@ Run the demo:
 node src/demo.js
 ```
 
-It shows Greta's order list and opens two links as Greta. In `src/reproduce.js`, sign in as one customer and open an order that belongs to another. Someone else's address on the screen is the proof you attach to LL-19.
+It shows Greta's order list and opens two links as Greta. In `src/reproduce.js`, sign in as one customer and open an order that belongs to another. Someone else's address on the screen is the proof you attach to AP-19.
 
 ## How to test it
 
@@ -75,4 +75,4 @@ Call `getOrder()` with a fresh `openDb()` and a session. Open another customer's
 
 ## Your work in this issue
 
-Start in `src/reproduce.js`, then fix `getOrder` in `src/orders.js`, then write `src/orders.test.js`. Run your tests with `npx vitest run src/orders.test.js`. The check runs them beside the original code, a correct fix and a fix that throws an error naming the other customer's order, and expects fail, pass, fail.
+Start in `src/reproduce.js`, then fix `getOrder` in `src/orders.js`, then write `src/orders.test.js`. Run your tests with `npx vitest run src/orders.test.js`. The check runs them beside the original code, a correct fix, a fix that throws an error naming the other customer's order and a fix that hides every order, and expects fail, pass, fail, fail.

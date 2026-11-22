@@ -1,4 +1,4 @@
-// Test data for the local copy of the Larkspur Letterpress portal. The passwords and salts are
+// Test data for the local copy of the Ashgrove Press portal. The passwords and salts are
 // for this copy only: the real portal never keeps a password, only its hash.
 
 export const customers = [

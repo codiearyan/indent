@@ -138,12 +138,28 @@ export const checks = {
     return clear(details)
   },
 
-  test(t) {
-    return t.judgeTest({
-      test: 'src/proofs.test.js',
-      target: 'src/proofs.js',
-      wrong: 'grader/variants/starts-with-folder.js',
-      wrongLabel: 'a fix that only checks the full path starts with the folder\'s path'
-    })
+  async test(t) {
+    const [details, refused] = await Promise.all([
+      t.judgeTest({
+        test: 'src/proofs.test.js',
+        target: 'src/proofs.js',
+        wrong: 'grader/variants/starts-with-folder.js',
+        wrongLabel: 'a fix that only checks the full path starts with the folder\'s path'
+      }),
+      t.sandbox({ 'src/proofs.js': t.chapterPath('grader/variants/refuse-every-name.js') }).then((dir) =>
+        t.vitest(dir, 'src/proofs.test.js')
+      )
+    ])
+    return [
+      ...details,
+      {
+        name: 'Fails on a fix that gives null for every name',
+        passed: !refused.passed,
+        message: refused.passed
+          ? 'Your test passed beside a fix that gives null for every name, real proofs included. Keep a case where a real proof still downloads.'
+          : undefined,
+        output: refused.output
+      }
+    ]
   }
 }

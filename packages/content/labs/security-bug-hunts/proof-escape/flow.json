@@ -44,7 +44,7 @@
               { "key": "shown", "value": "the text of that file" }
             ]
           },
-          "note": "The text goes on LL-22. The proof is that it came from outside the proofs folder."
+          "note": "The text goes on AP-22. The proof is that it came from outside the proofs folder."
         }
       ]
     },
@@ -84,7 +84,7 @@
         },
         {
           "active": ["test", "read", "read->outside", "outside"],
-          "note": "First it runs beside the original readProof(), the one behind LL-22. There it must fail."
+          "note": "First it runs beside the original readProof(), the one behind AP-22. There it must fail."
         },
         {
           "active": ["test", "read", "proofs"],
@@ -94,14 +94,15 @@
           "active": ["test", "read"],
           "value": {
             "kind": "map",
-            "label": "three runs of the test file",
+            "label": "four runs of the test file",
             "entries": [
               { "key": "original proofs.js", "value": "must fail" },
               { "key": "a correct fix", "value": "must pass" },
-              { "key": "checks only the start", "value": "must fail" }
+              { "key": "checks only the start", "value": "must fail" },
+              { "key": "refuses every name", "value": "must fail" }
             ]
           },
-          "note": "Last it runs beside a fix that only checks the full path starts with the folder's path. That one must fail too."
+          "note": "Last it runs beside a fix that only checks the full path starts with the folder's path, and one that refuses every name. Both must fail too."
         }
       ]
     }

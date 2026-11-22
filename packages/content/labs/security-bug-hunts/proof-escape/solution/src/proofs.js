@@ -1,4 +1,4 @@
-// Task 2: keep every download inside the proofs folder (ticket LL-22).
+// Task 2: keep every download inside the proofs folder (ticket AP-22).
 //
 // readProof(proofsDir, fileName) returns the text of a proof file inside proofsDir, or null when
 // there is no proof to give. proofsDir is an absolute path. fileName comes from the download
