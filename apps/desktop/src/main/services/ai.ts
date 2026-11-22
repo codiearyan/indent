@@ -1,5 +1,6 @@
 import { safeStorage } from 'electron'
 import { randomUUID } from 'crypto'
+import { existsSync } from 'fs'
 import { copyFile, readFile, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 import type {
@@ -18,13 +19,15 @@ import { EVENTS } from '@shared/types'
 import { FAILS_BEFORE_TIP, chapterKey } from '@shared/rules'
 import { emit, handle, listen } from '../ipc'
 import { refreshShellPath, shellEnv } from '../labEnv'
-import { chapterContentDir, dataFile, workspaceDir } from '../paths'
+import { chapterContentDir, dataFile, ownOpencodeBin, workspaceDir } from '../paths'
 import { getProgress, saveTip } from './progress'
 import { resolveInside } from './workspaceFiles'
 import { CLI_BINS, cliModels, cliVersion, runCli, which } from './ai/cli'
 import { GEMINI_URL, OPENAI_URL, anthropicStream, openAiCompatibleStream } from './ai/http'
 import type { CliProviderId } from './ai/parsers'
 import { learnerContext } from './ai/learner'
+import { freeModel } from './ai/opencodeBuild'
+import { installOpencode, removeOpencode } from './ai/opencodeInstall'
 import {
   COMPLETION_RULES,
   TIP_RULES,
@@ -118,7 +121,10 @@ function detectClis(): Promise<AiProviderInfo[]> {
     const env = await shellEnv()
     return Promise.all(
       CLI_PROVIDERS.map(async ({ id, label }): Promise<AiProviderInfo> => {
-        const path = await which(CLI_BINS[id], env.PATH ?? '')
+        let path = await which(CLI_BINS[id], env.PATH ?? '')
+        // The learner's own OpenCode wins; the app's copy is used only when there is none.
+        const managed = !path && id === 'opencode' && existsSync(ownOpencodeBin())
+        if (managed) path = ownOpencodeBin()
         if (!path) {
           cliPaths.delete(id)
           return { id, label, kind: 'cli', available: false, detail: 'Not installed', models: [] }
@@ -128,7 +134,8 @@ function detectClis(): Promise<AiProviderInfo[]> {
           cliVersion(path, env),
           cliModels(id, path, env)
         ])
-        return { id, label, kind: 'cli', available: true, detail, models }
+        const bin = managed ? path : undefined
+        return { id, label, kind: 'cli', available: true, detail, models, managed, bin }
       })
     )
   })()
@@ -233,6 +240,36 @@ function stopEverything(): void {
   for (const tip of tips.values()) tip.abort()
   completion?.abort()
   testing?.abort()
+}
+
+let opencodeInstall: AbortController | undefined
+
+/** Installs the app's OpenCode, then picks it with a free model so AI works right away. */
+async function setUpOpencode(): Promise<AiConfig> {
+  if (opencodeInstall) throw new Error('OpenCode is already being installed.')
+  const cancel = (opencodeInstall = new AbortController())
+  try {
+    await installOpencode(cancel.signal, (done) => emit(EVENTS.aiInstall, done))
+  } finally {
+    opencodeInstall = undefined
+  }
+  const opencode = (await providerList(true)).find((p) => p.id === 'opencode')
+  settings = { ...(await loadSettings()), enabled: true, provider: 'opencode', model: null }
+  if (opencode?.managed) settings.model = freeModel(opencode.models)
+  await saveSettings()
+  return buildConfig()
+}
+
+/** Deletes the app's OpenCode; the learner's own copy, if any, is left alone and stays picked. */
+async function removeOwnOpencode(): Promise<AiConfig> {
+  await removeOpencode()
+  const opencode = (await providerList(true)).find((p) => p.id === 'opencode')
+  const current = await loadSettings()
+  if (current.provider === 'opencode' && !opencode?.available) {
+    settings = { ...current, provider: null, model: null }
+    await saveSettings()
+  }
+  return buildConfig()
 }
 
 function send(event: AiChatEvent): void {
@@ -489,11 +526,14 @@ export function register(): void {
     complete,
 
     test: testConnection,
-    tip
+    tip,
+    installOpencode: setUpOpencode,
+    removeOpencode: removeOwnOpencode
   })
 
   listen('ai', {
     cancel: (requestId) => chats.get(requestId)?.abort(),
-    cancelComplete: () => completion?.abort()
+    cancelComplete: () => completion?.abort(),
+    cancelOpencodeInstall: () => opencodeInstall?.abort()
   })
 }

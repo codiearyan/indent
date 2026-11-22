@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils'
 import { activeProvider, useAi } from './aiStore'
 import { focusLine } from './attachments'
 import { toggleTutor } from './toggleTutor'
+import { InstallOpencode } from './InstallOpencode'
+import { useOpencodeSetup } from './opencodeInstall'
 import { MESSAGE_BUDGET, useChat } from './chatStore'
 
 export function ChatPanel(): React.JSX.Element {
@@ -203,15 +205,18 @@ function EmptyState({
   loading: boolean
 }): React.JSX.Element | null {
   const openMenu = useAi((s) => s.openMenu)
+  const setupStep = useOpencodeSetup((s) => s.setup.step)
   if (loading) return null
-  if (!hasProvider) {
+  // A setup started here stays in view until OpenCode has answered.
+  if (!hasProvider || (setupStep !== 'idle' && setupStep !== 'ready')) {
     return (
       <div className="flex flex-col items-start gap-3 text-sm text-muted-foreground">
         <p>
           The tutor needs an AI provider. If Claude Code, Codex, OpenCode or Gemini CLI is installed
           and signed in on this computer, it is picked up on its own. You can also add your own API
-          key.
+          key, or install OpenCode here with its free models.
         </p>
+        <InstallOpencode />
         <Button variant="outline" size="sm" onClick={openMenu}>
           Set up AI
         </Button>
