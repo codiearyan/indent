@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { AiMenu } from '@/features/ai/AiMenu'
 import { StreakStatus } from '@/features/progress/StreakStatus'
 import { useAiEnabled } from '@/features/ai/aiStore'
+import { toggleTutor } from '@/features/ai/toggleTutor'
 import { cn } from '@/lib/utils'
 import { TOUR } from '@/features/tour/anchors'
 import { useIde } from '@/stores/ides'
@@ -20,7 +21,6 @@ export function TopBar(): React.JSX.Element {
   const navigate = useNavigate()
   const chapter = useWorkspace((s) => s.chapter)
   const chatOpen = useSettings((s) => s.panels.chat)
-  const togglePanel = useSettings((s) => s.togglePanel)
   const aiOn = useAiEnabled()
   const ready = useWorkspace((s) => s.status === 'ready')
   const setTourOpen = useWorkspace((s) => s.setTourOpen)
@@ -93,8 +93,9 @@ export function TopBar(): React.JSX.Element {
             variant="ghost"
             size="sm"
             aria-pressed={chatOpen}
-            onClick={() => togglePanel('chat')}
+            onClick={toggleTutor}
             data-tour={TOUR.chat}
+            data-shortcut="openTutor"
             className={cn(
               'font-normal text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]',
               chatOpen && 'bg-accent text-foreground'

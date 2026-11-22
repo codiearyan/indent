@@ -13,7 +13,7 @@ import {
   WandSparklesIcon
 } from 'lucide-react'
 import { isChapterComplete } from '@shared/rules'
-import { ShortcutKeys } from '@/components/app/ShortcutKeys'
+import { ShortcutSuffix } from '@/components/app/ShortcutKeys'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -136,6 +136,7 @@ export function EditorPane(): React.JSX.Element {
                 variant="outline"
                 className="ml-1"
                 disabled={status !== 'ready'}
+                data-shortcut="runCommand"
                 onClick={runCommand}
               >
                 <PlayIcon />
@@ -143,8 +144,8 @@ export function EditorPane(): React.JSX.Element {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              Runs <span className="font-mono">{command}</span> in the terminal (
-              <ShortcutKeys id="runCommand" />)
+              Runs <span className="font-mono">{command}</span> in the terminal
+              <ShortcutSuffix id="runCommand" />
             </TooltipContent>
           </Tooltip>
         )}
@@ -155,6 +156,7 @@ export function EditorPane(): React.JSX.Element {
               variant={finished ? 'outline' : 'default'}
               className="ml-1"
               data-tour={TOUR.checkAll}
+              data-shortcut="check"
               disabled={checking !== null || status !== 'ready' || toolsBroken}
               onClick={checkAll}
             >
@@ -163,7 +165,8 @@ export function EditorPane(): React.JSX.Element {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            Checks every task (<ShortcutKeys id="check" />)
+            Checks every task
+            <ShortcutSuffix id="check" />
           </TooltipContent>
         </Tooltip>
       </div>
@@ -258,6 +261,7 @@ function IconButton({
           variant="ghost"
           size="icon-sm"
           aria-label={label}
+          data-shortcut={shortcut}
           onClick={onClick}
           className="text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]"
         >
@@ -266,12 +270,7 @@ function IconButton({
       </TooltipTrigger>
       <TooltipContent>
         {label}
-        {shortcut && (
-          <>
-            {' '}
-            (<ShortcutKeys id={shortcut} />)
-          </>
-        )}
+        {shortcut && <ShortcutSuffix id={shortcut} />}
       </TooltipContent>
     </Tooltip>
   )

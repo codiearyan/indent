@@ -36,6 +36,7 @@ export function AudioCard({
         size="icon-sm"
         className="shrink-0 rounded-full border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent [&_svg]:stroke-[1.5]"
         aria-label={playing ? 'Pause' : 'Play'}
+        data-shortcut="readAloud"
         onClick={toggle}
       >
         {playing ? <Pause /> : <Play />}

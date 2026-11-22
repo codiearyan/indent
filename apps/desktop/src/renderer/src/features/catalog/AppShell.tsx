@@ -30,11 +30,11 @@ import { useSettings } from '@/stores/settings'
 import { EmptyState } from './EmptyState'
 
 const NAV = [
-  { to: '/', label: 'Home', icon: House },
-  { to: '/labs', label: 'Repos', icon: FolderGit2 },
-  { to: '/paths', label: 'Roadmaps', icon: Route },
-  { to: '/dsa', label: 'Patterns', icon: Workflow },
-  { to: '/year', label: 'Activity', icon: CalendarDays }
+  { to: '/', label: 'Home', icon: House, shortcut: 'goHome' as const },
+  { to: '/labs', label: 'Repos', icon: FolderGit2, shortcut: 'goRepos' as const },
+  { to: '/paths', label: 'Roadmaps', icon: Route, shortcut: 'goRoadmaps' as const },
+  { to: '/dsa', label: 'Patterns', icon: Workflow, shortcut: 'goPatterns' as const },
+  { to: '/year', label: 'Activity', icon: CalendarDays, shortcut: 'goActivity' as const }
 ]
 
 const row =
@@ -76,11 +76,12 @@ export function AppShell(): React.JSX.Element {
           {APP_NAME}
         </NavLink>
         <nav className="flex flex-col gap-0.5">
-          {NAV.map(({ to, label, icon: Icon }) => (
+          {NAV.map(({ to, label, icon: Icon, shortcut }) => (
             <NavLink
               key={to}
               to={to}
               end={to === '/'}
+              data-shortcut={shortcut}
               className={({ isActive }) =>
                 cn(
                   row,

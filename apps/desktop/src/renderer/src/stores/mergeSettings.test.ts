@@ -55,6 +55,14 @@ describe('mergeSettings', () => {
     expect(mergeSettings(saved, defaults, 'dark').shortcuts).toEqual({ check: 'Mod+K' })
   })
 
+  it('keeps keys a person picked over a default that wants them now', () => {
+    const saved = { shortcuts: { check: 'Mod+2' } }
+    expect(mergeSettings(saved, defaults, 'dark').shortcuts).toEqual({
+      check: 'Mod+2',
+      selectTab2: ''
+    })
+  })
+
   it('keeps the theme of settings saved before appearance existed', () => {
     const merged = mergeSettings({ theme: 'light', panels: { files: true } }, defaults, 'dark')
     expect(merged.appearance).toBe('light')

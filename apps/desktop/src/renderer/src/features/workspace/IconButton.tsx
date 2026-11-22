@@ -1,4 +1,4 @@
-import { ShortcutKeys } from '@/components/app/ShortcutKeys'
+import { ShortcutSuffix } from '@/components/app/ShortcutKeys'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { ShortcutId } from '@/lib/shortcuts'
@@ -26,6 +26,7 @@ export function IconButton({
           size="icon-sm"
           aria-label={label}
           aria-pressed={pressed}
+          data-shortcut={shortcut}
           className={cn(
             'text-muted-foreground hover:text-foreground [&_svg]:stroke-[1.5]',
             pressed && 'bg-accent text-foreground',
@@ -36,12 +37,7 @@ export function IconButton({
       </TooltipTrigger>
       <TooltipContent>
         {label}
-        {shortcut && (
-          <>
-            {' '}
-            (<ShortcutKeys id={shortcut} />)
-          </>
-        )}
+        {shortcut && <ShortcutSuffix id={shortcut} />}
       </TooltipContent>
     </Tooltip>
   )

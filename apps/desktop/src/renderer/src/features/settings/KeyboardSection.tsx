@@ -1,4 +1,5 @@
 import { useEffect, useEffectEvent, useState } from 'react'
+import { XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -12,17 +13,20 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   applyOverrides,
   conflictOf,
   formatKeys,
   keysFromEvent,
   refusal,
+  sameKeys,
   SHORTCUTS,
   swapKeys,
   withKeys,
   type ShortcutId
 } from '@/lib/shortcuts'
+import { cn } from '@/lib/utils'
 import { useSettings } from '@/stores/settings'
 import { shortcutGroups, type ShortcutRow } from '@/features/shortcuts/list'
 import { Group, Row, card } from './controls'
@@ -31,7 +35,10 @@ type Editing =
   | { id: ShortcutId; recording: true; message?: string }
   | { id: ShortcutId; recording: false; keys: string; other: ShortcutId }
 
-/** Every shortcut with its keys; a click on the keys records new ones. */
+/**
+ * Every shortcut with its keys; a click on the keys records new ones. Settings and the shortcut
+ * list both show this, so they always agree.
+ */
 export function KeyboardSection(): React.JSX.Element {
   const overrides = useSettings((s) => s.shortcuts)
   const setShortcuts = useSettings((s) => s.setShortcuts)
@@ -59,7 +66,14 @@ export function KeyboardSection(): React.JSX.Element {
   }
 
   const onKey = useEffectEvent((event: KeyboardEvent) => {
-    if (!recording) return
+    if (!editing) return
+    // Escape while Swap is offered drops the offer and keeps the window open.
+    if (!recording) {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      return setEditing(null)
+    }
     event.preventDefault()
     event.stopImmediatePropagation()
     if (event.repeat) return
@@ -71,12 +85,18 @@ export function KeyboardSection(): React.JSX.Element {
     else pick(recording, keys)
   })
 
+  const active = editing !== null
   useEffect(() => {
-    if (!recording) return
+    if (!active) return
     const listener = (event: KeyboardEvent): void => onKey(event)
     window.addEventListener('keydown', listener, true)
     return () => window.removeEventListener('keydown', listener, true)
-  }, [recording])
+  }, [active])
+
+  const clear = (id: ShortcutId): void => {
+    setShortcuts(withKeys(useSettings.getState().shortcuts, id, ''))
+    setEditing(null)
+  }
 
   const swap = (): void => {
     if (editing?.recording !== false) return
@@ -104,7 +124,11 @@ export function KeyboardSection(): React.JSX.Element {
         id={`shortcut-${id}`}
         label={label}
         hint={hint}
-        onReset={overrides[id] ? () => pick(id, SHORTCUTS[id].keys) : undefined}
+        onReset={
+          sameKeys(shortcuts[id].keys, SHORTCUTS[id].keys)
+            ? undefined
+            : () => pick(id, SHORTCUTS[id].keys)
+        }
       >
         {mine && !mine.recording ? (
           <div className="flex shrink-0 items-center gap-2">
@@ -117,17 +141,38 @@ export function KeyboardSection(): React.JSX.Element {
             </Button>
           </div>
         ) : (
-          <Button
-            id={`shortcut-${id}`}
-            variant="outline"
-            size="sm"
-            aria-pressed={!!mine}
-            className="shrink-0 font-mono text-xs font-normal"
-            onClick={() => setEditing(mine ? null : { id, recording: true })}
-            onBlur={() => mine && setEditing(null)}
-          >
-            {mine ? 'Press keys' : keys.join(' or ')}
-          </Button>
+          <div className="flex shrink-0 items-center gap-1">
+            {keys.length > 0 && !mine && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    aria-label={`Clear the keys of ${label}`}
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={() => clear(id)}
+                  >
+                    <XIcon />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Clear keys</TooltipContent>
+              </Tooltip>
+            )}
+            <Button
+              id={`shortcut-${id}`}
+              variant="outline"
+              size="sm"
+              aria-pressed={!!mine}
+              className={cn(
+                'font-mono text-xs font-normal',
+                !mine && keys.length === 0 && 'font-sans text-muted-foreground'
+              )}
+              onClick={() => setEditing(mine ? null : { id, recording: true })}
+              onBlur={() => mine && setEditing(null)}
+            >
+              {mine ? 'Press keys' : keys.length > 0 ? keys.join(' or ') : 'Set keys'}
+            </Button>
+          </div>
         )}
       </Row>
     )

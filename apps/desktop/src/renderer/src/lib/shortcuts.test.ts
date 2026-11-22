@@ -12,6 +12,7 @@ import {
   toMonacoKeys,
   applyOverrides,
   conflictOf,
+  keepPickedKeys,
   keysFromEvent,
   refusal,
   setShortcutOverrides,
@@ -218,6 +219,19 @@ describe('SHORTCUTS', () => {
     expect(clashes).toEqual([])
   })
 
+  it('picks editor tabs with Mod and a digit, and leaves the panes without keys', () => {
+    for (let n = 1; n <= 9; n++) {
+      const id = `selectTab${n}` as ShortcutId
+      expect(SHORTCUTS[id]).toMatchObject({ keys: `Mod+${n}`, scope: 'workspace' })
+      expect(isShortcut(press(String(n), { ctrlKey: true }), id)).toBe(true)
+    }
+    expect([SHORTCUTS.focusEditor, SHORTCUTS.focusLesson, SHORTCUTS.focusTerminal]).toEqual(
+      expect.arrayContaining([expect.objectContaining({ keys: '' })])
+    )
+    const core: ShortcutId[] = ['quickOpen', 'save', 'check', 'toggleTerminal', 'openTutor']
+    expect(core.filter((id) => !SHORTCUTS[id].keys)).toEqual([])
+  })
+
   it('opens the shortcut list with either of its keys', () => {
     expect(isShortcut(press('/', { metaKey: true }, 'Slash'), 'shortcutList')).toBe(true)
     expect(isShortcut(press('?', { metaKey: true, shiftKey: true }, 'Slash'), 'shortcutList')).toBe(
@@ -325,8 +339,14 @@ describe('applyOverrides', () => {
   })
 
   it('ignores what is not keys', () => {
-    expect(applyOverrides({ check: 4, save: '' }).check).toBe(SHORTCUTS.check)
+    expect(applyOverrides({ check: 4 }).check).toBe(SHORTCUTS.check)
     expect(applyOverrides(null).save).toBe(SHORTCUTS.save)
+  })
+
+  it('keeps keys a person cleared empty', () => {
+    const shortcuts = applyOverrides({ save: '', shortcutList: '' })
+    expect(shortcuts.save.keys).toBe('')
+    expect(keysOf(shortcuts.shortcutList)).toEqual([])
   })
 
   it('is what the registry helpers read', () => {
@@ -336,6 +356,23 @@ describe('applyOverrides', () => {
     expect(isAppShortcut(press('Enter', { metaKey: true }))).toBe(false)
     setShortcutOverrides({})
     expect(isShortcut(press('Enter', { metaKey: true }), 'check')).toBe(true)
+  })
+})
+
+describe('keepPickedKeys', () => {
+  it('leaves a newer default without the keys a person picked', () => {
+    expect(keepPickedKeys({ check: 'Mod+1' })).toEqual({ check: 'Mod+1', selectTab1: '' })
+    expect(keepPickedKeys({ check: 'Mod+Shift+/' })).toEqual({
+      check: 'Mod+Shift+/',
+      shortcutList: 'Mod+/'
+    })
+  })
+
+  it('changes nothing without a clash, and keeps what it changed', () => {
+    expect(keepPickedKeys({ check: 'Mod+K', save: '' })).toEqual({ check: 'Mod+K', save: '' })
+    const once = keepPickedKeys({ check: 'Mod+1' })
+    expect(keepPickedKeys(once)).toEqual(once)
+    expect(keepPickedKeys({ playPause: 'Mod+1' })).toEqual({ playPause: 'Mod+1' })
   })
 })
 
@@ -365,6 +402,28 @@ describe('withKeys', () => {
   it('keeps an override only while it differs from the default', () => {
     expect(withKeys({}, 'check', 'Mod+K')).toEqual({ check: 'Mod+K' })
     expect(withKeys({ check: 'Mod+K' }, 'check', 'Mod+Enter')).toEqual({})
+  })
+
+  it('clears keys, and drops the override of a shortcut with no keys by default', () => {
+    expect(withKeys({}, 'check', '')).toEqual({ check: '' })
+    expect(withKeys({ goHome: 'Mod+Alt+1' }, 'goHome', '')).toEqual({})
+  })
+})
+
+describe('shortcuts with no keys', () => {
+  it('never match, show nothing and need no checks', () => {
+    expect(matchesKeys(press('1', { metaKey: true }), '')).toBe(false)
+    expect(formatKeys('', 'darwin')).toBe('')
+    expect(keysOf(SHORTCUTS.focusEditor)).toEqual([])
+    expect(refusal('', 'workspace', 'darwin')).toBeNull()
+    expect(conflictOf(applyOverrides({}), 'goHome', '')).toBeNull()
+  })
+
+  it('take keys from another shortcut, which is left with none', () => {
+    expect(swapKeys({}, 'focusEditor', 'check', 'Mod+Enter', 'darwin')).toEqual({
+      focusEditor: 'Mod+Enter',
+      check: ''
+    })
   })
 })
 

@@ -1,7 +1,7 @@
 import type * as Monaco from 'monaco-editor'
 import type { CheckResult, TaskDef, TaskProgress } from '@shared/types'
 import { chapterKey } from '@shared/rules'
-import { monacoShortcut } from '@/lib/shortcuts'
+import { monacoKeys } from '@/lib/shortcuts'
 import { useProgress } from '@/stores/progress'
 import { useWorkspace } from '@/stores/workspace'
 import { bindShortcuts } from '@/features/editor/shortcutBindings'
@@ -116,7 +116,7 @@ export function bindTutorActions(
       id: 'indent.tutor.explain',
       label: 'Explain this',
       precondition: 'tutorOn',
-      keybindings: [monacoShortcut('explainCode', monaco)],
+      keybindings: monacoKeys('explainCode', monaco),
       contextMenuGroupId: 'tutor',
       contextMenuOrder: 1,
       run: explain

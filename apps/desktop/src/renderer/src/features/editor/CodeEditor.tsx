@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { fontStack } from '@/lib/fonts'
-import { monacoShortcut, SHORTCUTS } from '@/lib/shortcuts'
+import { monacoKeys, SHORTCUTS } from '@/lib/shortcuts'
 import { useSettings, type Typography } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { bindSuggestShortcut } from '@/features/ai/inlineSuggestions'
@@ -68,19 +68,19 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
       editor.addAction({
         id: 'indent.save',
         label: SHORTCUTS.save.label,
-        keybindings: [monacoShortcut('save', monaco)],
+        keybindings: monacoKeys('save', monaco),
         run: () => void useWorkspace.getState().flush()
       }),
       editor.addAction({
         id: 'indent.check',
         label: SHORTCUTS.check.label,
-        keybindings: [monacoShortcut('check', monaco)],
+        keybindings: monacoKeys('check', monaco),
         run: onCheck
       }),
       editor.addAction({
         id: 'indent.runCommand',
         label: SHORTCUTS.runCommand.label,
-        keybindings: [monacoShortcut('runCommand', monaco)],
+        keybindings: monacoKeys('runCommand', monaco),
         run: () => {
           // Without a command to run, the keys keep the editor's own meaning.
           if (useWorkspace.getState().chapter?.terminal.suggestedCommand) onRun()
@@ -90,7 +90,7 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
       editor.addAction({
         id: 'indent.closeFile',
         label: SHORTCUTS.closeFile.label,
-        keybindings: [monacoShortcut('closeFile', monaco)],
+        keybindings: monacoKeys('closeFile', monaco),
         run: () => {
           const { layout, closeFile } = useWorkspace.getState()
           const path = layout.groups[group]?.active
@@ -100,7 +100,7 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
       editor.addAction({
         id: 'indent.openToSide',
         label: SHORTCUTS.openToSide.label,
-        keybindings: [monacoShortcut('openToSide', monaco)],
+        keybindings: monacoKeys('openToSide', monaco),
         run: () => {
           const { layout, openToSide } = useWorkspace.getState()
           const path = layout.groups[group]?.active
@@ -110,13 +110,13 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
       editor.addAction({
         id: 'indent.quickOpen',
         label: SHORTCUTS.quickOpen.label,
-        keybindings: [monacoShortcut('quickOpen', monaco)],
+        keybindings: monacoKeys('quickOpen', monaco),
         run: () => useQuickOpen.getState().setOpen(true)
       }),
       editor.addAction({
         id: 'indent.foldComments',
         label: SHORTCUTS.foldComments.label,
-        keybindings: [monacoShortcut('foldComments', monaco)],
+        keybindings: monacoKeys('foldComments', monaco),
         run: () => {
           const path = useWorkspace.getState().layout.groups[group]?.active
           if (path) void toggleCommentFolds(editor, group, path)
