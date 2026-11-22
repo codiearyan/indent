@@ -5,7 +5,7 @@ const typeHint =
   (name, type, extra = '') =>
   (got) =>
     got === 'String'
-      ? `${name} holds text, not a number. A name inside double quotes is just text.`
+      ? `${name} holds text, not a number. Anything inside double quotes is text, even when it looks like a number.`
       : `${name} is made as ${a(got)}, and the task asks for ${a(type)}.${extra}`
 
 const typed = (name) =>
@@ -99,12 +99,12 @@ export const checks = tasks({
             {
               name: 'Counts trips that come out exactly',
               expected: (g) => g.queue / g.seats,
-              hint: 'When the queue fills the boat exactly twice, there are two full trips.'
+              hint: 'When the queue fills the boats exactly, the last boatload is a full trip too, and it counts.'
             },
             {
               name: 'Works for a small boat',
               expected: (g) => Math.floor(g.queue / g.seats),
-              hint: 'Check changed the numbers and fullTrips did not follow them.'
+              hint: 'fullTrips should be how many whole boatloads the queue fills.'
             }
           ]
         })(runs)
@@ -142,7 +142,7 @@ export const checks = tasks({
             {
               name: 'Works for a small boat',
               expected: (g) => g.queue % g.seats,
-              hint: 'Check changed the numbers and leftOver did not follow them.'
+              hint: 'leftOver should be the people still waiting once the full trips have gone.'
             }
           ]
         })(runs)
@@ -186,12 +186,12 @@ export const checks = tasks({
           {
             name: 'Keeps a half',
             expected: (g) => g.passengersToday / g.crossingsToday,
-            hint: 'With 10 passengers over 4 crossings the average has a half in it. Check that nothing is cut off.'
+            hint: 'With these numbers the average has a part after the point. Check that nothing is cut off.'
           },
           {
             name: 'Works when it comes out whole',
             expected: (g) => g.passengersToday / g.crossingsToday,
-            hint: 'Check changed the numbers and averagePerCrossing did not follow them.'
+            hint: 'averagePerCrossing should be the passengers today divided by the crossings today.'
           }
         ]
       })
@@ -248,12 +248,12 @@ export const checks = tasks({
             {
               name: 'Numbers the last ticket of a day',
               expected: (g) => BigInt(g.dateCode) * 100000n + BigInt(g.ticketOfDay),
-              hint: 'Check changed the numbers and ticketNumber did not follow them.'
+              hint: 'ticketNumber should be the date code times 100000, plus the ticket of the day.'
             },
             {
               name: 'Numbers a ticket on another day',
               expected: (g) => BigInt(g.dateCode) * 100000n + BigInt(g.ticketOfDay),
-              hint: 'Check changed the numbers and ticketNumber did not follow them.'
+              hint: 'ticketNumber should be the date code times 100000, plus the ticket of the day.'
             }
           ]
         })(runs)

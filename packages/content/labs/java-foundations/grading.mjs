@@ -9,6 +9,7 @@
 // RunTasks.java in one JVM, which compiles each in memory and runs it. So one task is judged on
 // its own, whatever state the others are in, and Java starts once per Check.
 import { spawn, spawnSync } from 'node:child_process'
+import { randomBytes } from 'node:crypto'
 import { accessSync, constants, existsSync, realpathSync, statSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { delimiter, dirname, join } from 'node:path'
@@ -135,6 +136,18 @@ function shared(text, l) {
 const lineOf = (text, at) => text.slice(0, at).split('\n').length
 
 const blank = (s) => s.replace(/[^\n]/g, ' ')
+
+// Learner code runs in the same JVM as Check's runner. These reach into it (its classes, its
+// hidden reads, the real output) rather than doing a task, so a task that uses one is not run.
+// A \u escape is refused too: javac reads it before anything else, even inside a comment.
+const REACHES =
+  /RunTasks|__Indent|(?:get|set|clear)Propert(?:y|ies)\b|reflect|Accessible|forName|Declared|ClassLoader|MethodHandle|VarHandle|Unsafe|FileDescriptor|getRuntime|ProcessBuilder|ProcessHandle|\bset(?:Out|Err|In)\b|StackWalker|getModule|ModuleLayer/
+
+/** The first thing in a task's lines that reaches into the runner, or null. */
+function reaches(text) {
+  if (/\\u+[0-9a-fA-F]{4}/.test(text)) return '\\u'
+  return REACHES.exec(codeOnly(text))?.[0] ?? null
+}
 
 // --- Building what runs -------------------------------------------------------------------------
 
@@ -264,38 +277,53 @@ async function build(t, spec) {
   if (outside) return { stop: 'outside', task: outside[0] }
   if (bare(shared(text, l)) !== bare(shared(starter, s))) return { stop: 'shared' }
 
+  const reached = new Map()
+  for (const [n, sec] of l.sections) {
+    const word = reaches(text.slice(sec.start, sec.end))
+    if (word) reached.set(n, word)
+  }
   const units = []
   for (const [id, task] of Object.entries(spec.tasks)) {
     const keep = [task.task, ...(task.needs ?? [])]
+    if (keep.some((n) => reached.has(n))) continue
     task.cases.forEach((c, i) => {
       const v = variant(text, l, keep, c.given ?? {}, task.reads ?? [])
       if (v.missing) throw new Error(`The starter has no line that makes ${v.missing}`)
       units.push({ id: `${id}.${i}`, task: id, ...v })
     })
   }
+  if (units.length === 0) return { text, l, units, results: new Map(), starter, reached }
   const dir = await t.sandbox()
-  const input = units
-    .map((u) => `UNIT ${u.id} ${fileClass} ${u.source.length}\n${u.source}\n`)
-    .join('')
+  // A result counts only with this key, which learner code cannot see, so a line it prints
+  // straight to the real output is never taken for one.
+  const key = randomBytes(16).toString('hex')
+  const input =
+    `KEY ${key}\n` +
+    units.map((u) => `UNIT ${u.id} ${fileClass} ${u.source.length}\n${u.source}\n`).join('')
   const r = await runJava(bin, dir, input)
   const results = new Map()
   let fatal = null
   for (const line of r.stdout.split('\n')) {
     if (!line.startsWith('{')) continue
-    const parsed = JSON.parse(line)
+    let parsed
+    try {
+      parsed = JSON.parse(line)
+    } catch {
+      continue
+    }
     if (parsed.fatal) fatal = parsed
-    else results.set(parsed.id, parsed)
+    else if (parsed.key === key) results.set(parsed.id, parsed)
   }
   if (fatal) return { stop: 'fatal', fatal }
   if (results.size === 0) return { stop: 'crashed', output: r.stderr }
-  return { text, l, units, results, starter }
+  return { text, l, units, results, starter, reached }
 }
 
 // --- Saying what went wrong ---------------------------------------------------------------------
 
 /** One error as javac prints it, for the learner's own line and file name. */
 function javacLike(file, lines, e) {
-  const [first, ...rest] = e.message.split('\n')
+  const [first, ...rest] = e.message.replace(/\bjava\.(?:lang|io)\.(?=[A-Z])/g, '').split('\n')
   const src = lines[e.line - 1] ?? ''
   const caret = src.slice(0, Math.max(0, e.col - 1)).replace(/[^\t]/g, ' ') + '^'
   return [`${file}:${e.line}: error: ${first}`, src, caret, ...rest].join('\n')
@@ -307,7 +335,7 @@ const GLOSS = [
     /^compiler\.err\.expected/,
     (e) =>
       /';' expected/.test(e.message) &&
-      'A statement ends with a semicolon. javac points just after the last thing on the line that is missing one.'
+      'A statement ends with a semicolon, and javac expected one where the ^ points. Often the semicolon is missing just before it; if the line holds text, check that the text is inside double quotes.'
   ],
   [
     /^compiler\.err\.cant\.resolve/,
@@ -355,6 +383,23 @@ const GLOSS = [
       'A closing brace } too many ends main, or the class, before the end of the file.'
   ],
   [
+    /^compiler\.err\.expected/,
+    (e, src) =>
+      /<identifier> expected/.test(e.message) &&
+      /\d,\d/.test(src) &&
+      'In Java a number with a part after the point is written with a point. A comma is not part of a number.'
+  ],
+  [
+    /^compiler\.err\.else\.without\.if/,
+    () =>
+      'An else has to follow straight after the closing brace of its if. A semicolon right after the round brackets of an if ends the if there.'
+  ],
+  [
+    /^compiler\.err\.unexpected\.type/,
+    () =>
+      '= stores a value, so it needs a variable on its left. To ask whether two values are equal, the lesson shows a different operator.'
+  ],
+  [
     /^compiler\.err\.int\.number\.too\.large/,
     () =>
       'A whole number written in the code is an int, unless it ends in L, and this one is too big for an int.'
@@ -377,10 +422,10 @@ const GLOSS = [
   ]
 ]
 
-function gloss(e) {
+function gloss(e, src) {
   for (const [code, say] of GLOSS) {
     if (code.test(e.code)) {
-      const text = say(e)
+      const text = say(e, src ?? '')
       if (text) return ` ${text}`
     }
   }
@@ -398,6 +443,12 @@ function compileProblem(spec, b, task, unit, result) {
   const mine = result.errors.filter((e) => !isRead(e))
   const n = task.task
   if (mine.length === 0) {
+    if (result.errors.some((e) => /unreachable/.test(e.code))) {
+      return fail(
+        `${label(n)} runs`,
+        `Java says the lines after ${label(n)} can never run: something in it never ends, or leaves main early. Look at the lines of ${label(n)} for it.`
+      )
+    }
     const missing = result.errors
       .map((e) => /symbol:\s+variable (\S+)/.exec(e.message)?.[1])
       .find(Boolean)
@@ -414,7 +465,7 @@ function compileProblem(spec, b, task, unit, result) {
     return fail(
       `${label(n)} makes ${name}`,
       unset && !missing
-        ? `${name} is made under // ${label(n)} but never given a value. Give it one with = on the same line or on a line below.`
+        ? `${name} is made under // ${label(n)}, but on some way through your lines it is never given a value, so Java says it might not have been initialized. Give it a value on every way through: in each branch, or where it is made.`
         : `Check cannot find a variable called ${name} made under // ${label(n)}. Make it there, with exactly that name (capital letters count), directly inside main and not inside braces of its own.`
     )
   }
@@ -442,7 +493,7 @@ function compileProblem(spec, b, task, unit, result) {
   }
   return fail(
     `${label(n)} compiles`,
-    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run java ${spec.file} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0])}`,
+    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run java ${spec.file} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1])}`,
     shown
   )
 }
@@ -461,8 +512,9 @@ const THROWN = [
   [/NumberFormatException/, 'A text that is not a number was read as a number.']
 ]
 
-function runProblem(spec, task, result) {
+function runProblem(spec, task, result, given = {}) {
   const n = task.task
+  const values = Object.keys(given).length ? `With ${givenText(given)}\n` : ''
   if (!result) {
     return fail(
       `${label(n)} runs`,
@@ -491,15 +543,15 @@ function runProblem(spec, task, result) {
     return fail(
       `${label(n)} runs`,
       `${label(n)} waits for someone to type. Check gives a program no typing: everything a task needs is already in the file.`,
-      result.exception
+      values + result.exception
     )
   }
   if (result.exception) {
     const known = THROWN.find(([re]) => re.test(result.exception))
     return fail(
       `${label(n)} runs`,
-      `${label(n)} compiles, but stops with an exception when it runs. Read the first line of the stack trace below for what went wrong, and the line starting with at that names ${spec.file} for where.${known ? ` ${known[1]}` : ''}`,
-      result.exception
+      `${label(n)} compiles, but stops with an exception when it runs with the values below. Read the first line of the stack trace for what went wrong, and the line starting with at that names ${spec.file} for where.${known ? ` ${known[1]}` : ''}`,
+      values + result.exception
     )
   }
   return null
@@ -579,13 +631,28 @@ export function tasks(spec) {
       const [name, message] = stopMessage(spec, b)
       return [fail(name, message, b.output)]
     }
+    const blocked = [task.task, ...(task.needs ?? [])].find((n) => b.reached.has(n))
+    if (blocked !== undefined) {
+      const word = b.reached.get(blocked)
+      return [
+        fail(
+          `${label(task.task)} uses only Java the lessons teach`,
+          blocked !== task.task
+            ? `${label(task.task)} builds on ${label(blocked)}, which Check does not run yet. Get ${label(blocked)} passing first, then check again.`
+            : word === '\\u'
+              ? `${label(blocked)} has a \\u escape, which Java turns into a character before it reads anything else, even in a comment. Type the character itself instead, so Check runs your lines.`
+              : `${label(blocked)} uses ${word}, which reaches into how Check runs your program instead of doing the task. Nothing in this issue needs it, and Check does not run it: take it out.`
+        )
+      ]
+    }
     const units = b.units.filter((u) => u.task === id)
     for (const u of units) {
       const problem = compileProblem(spec, b, task, u, b.results.get(u.id))
       if (problem) return [problem]
     }
     for (const u of units) {
-      const problem = runProblem(spec, task, b.results.get(u.id))
+      const given = task.cases[Number(u.id.split('.').pop())].given
+      const problem = runProblem(spec, task, b.results.get(u.id), given)
       if (problem) return [problem]
     }
     const runs = units.map((u, i) => {

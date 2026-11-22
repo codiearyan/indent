@@ -58,7 +58,7 @@
         },
         {
           "active": ["file"],
-          "note": "A crossing that cannot sail is cancelled however full it is, so that check comes first."
+          "note": "A crossing that cannot sail is cancelled however full it is, whatever else is true."
         },
         {
           "active": ["file", "file->board", "board"],
@@ -74,7 +74,7 @@
         },
         {
           "active": ["clipboard", "clipboard->file", "file"],
-          "note": "The youngest go free, children pay half, everyone else the single fare. The youngest are checked first."
+          "note": "The youngest go free, children pay half, everyone else the single fare. A child of three is also under sixteen."
         },
         {
           "active": ["file", "file->fares", "fares"],

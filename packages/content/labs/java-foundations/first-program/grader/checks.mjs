@@ -7,6 +7,16 @@ const OLD = 'Bicycles cross free on Sundays'
 
 const trimmed = (run) => run.lines.map((l) => l.trimEnd())
 
+/** True when a line of the output is `text` and the line was ended after it. */
+const ended = (run, text) =>
+  run.stdout
+    .split('\n')
+    .slice(0, -1)
+    .some((l) => l.trimEnd() === text)
+
+const OPEN =
+  'The line is printed, but it never ends: whatever prints next would carry on right after it. One way of printing ends the line after it, and the other does not.'
+
 /** The text of each comment in a task's lines. */
 const comments = (text) =>
   [...text.matchAll(/"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?|\/\/([^\n]*)|\/\*([\s\S]*?)\*\//g)]
@@ -21,14 +31,17 @@ export const checks = tasks({
       cases: [{}],
       judge: ([run]) => {
         const lines = trimmed(run)
-        const passed = lines.includes(WELCOME)
-        const close = !passed && lines.some((l) => near(l, WELCOME))
+        const there = lines.includes(WELCOME)
+        const passed = there && ended(run, WELCOME)
+        const close = !there && lines.some((l) => near(l, WELCOME))
         return [
           passed
             ? pass('Prints the welcome', printed(run))
             : fail(
                 'Prints the welcome',
-                close
+                there
+                  ? OPEN
+                  : close
                   ? 'Close. One line is nearly the welcome. Compare it letter by letter with the task: capital letters, spaces and spelling count, and nothing extra goes on the line.'
                   : 'No line printed the welcome yet. Under // Task 1, print it with System.out.println, with the text in double quotes.',
                 printed(run)
@@ -45,19 +58,22 @@ export const checks = tasks({
         const first = lines.indexOf(TIMES[0])
         const second = lines.indexOf(TIMES[1])
         const both = first !== -1 && second !== -1
+        const open = both && !TIMES.every((t) => ended(run, t))
         const close =
           !both && TIMES.some((t) => !lines.includes(t) && lines.some((l) => near(l, t)))
         const glued = !both && lines.some((l) => near(l, TIMES.join('')))
         return [
-          both
+          both && !open
             ? pass('Prints both crossing times', printed(run))
             : fail(
                 'Prints both crossing times',
-                glued
-                  ? 'Both times came out on one line. print carries on on the same line; println ends the line after it.'
+                open
+                  ? OPEN
+                  : glued
+                  ? 'Both times came out on one line. Each println prints one line and then ends it, so each time needs its own.'
                   : close
                     ? 'Close. A line is nearly one of the two. Compare it letter by letter with the task: capital letters and spaces count.'
-                    : 'One or both lines are missing. Each line needs its own System.out.println, with the text exactly as the task gives it.',
+                    : 'One or both lines are missing from what your Task 2 lines print. Under // Task 2, each line needs its own System.out.println, with the text exactly as the task gives it.',
                 printed(run)
               ),
           both && second === first + 1
@@ -78,16 +94,12 @@ export const checks = tasks({
       judge: ([run], { section }) => {
         const lines = trimmed(run)
         const one = lines.includes(HOURS)
-        const ended = run.stdout
-          .split('\n')
-          .slice(0, -1)
-          .some((l) => l.trimEnd() === HOURS)
         const code = codeOnly(section)
         const prints = (code.match(/System\s*\.\s*out\s*\.\s*print(?:ln)?\s*\(/g) ?? []).length
         const usesPrint = /System\s*\.\s*out\s*\.\s*print\s*\(/.test(code)
         const close = !one && lines.some((l) => near(l, HOURS))
         return [
-          one && ended
+          one && ended(run, HOURS)
             ? pass('Prints the hours on one line', printed(run))
             : fail(
                 'Prints the hours on one line',

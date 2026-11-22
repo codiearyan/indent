@@ -3,7 +3,8 @@
 // one JVM, because starting Java is slow. Nothing is written to disk. Each run has its own output,
 // no typing, and a shared deadline; one JSON line per unit is printed as it finishes.
 //
-// Input, repeated: a line `UNIT <id> <class> <chars>`, then exactly <chars> characters of source.
+// Input: a line `KEY <key>`, then, repeated, a line `UNIT <id> <class> <chars>` and exactly <chars>
+// characters of source. Every result line carries the key, which learner code never sees.
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -28,12 +29,14 @@ import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 public class RunTasks {
     static final long DEADLINE_MS = 4000;
     static final int MAX_OUTPUT = 20000;
-    static final PrintStream REAL_OUT = System.out;
+    private static final PrintStream REAL_OUT = System.out;
+    private static String key = "";
 
     static final class Unit {
         String id;
@@ -137,6 +140,19 @@ public class RunTasks {
             this.classes = classes;
         }
 
+        // Child first: a class file the learner compiled in the workspace (the JVM's working folder
+        // is a copy of it) must never stand in for the source Check just compiled.
+        @Override
+        protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+            if (!classes.containsKey(name)) return super.loadClass(name, resolve);
+            synchronized (getClassLoadingLock(name)) {
+                Class<?> c = findLoadedClass(name);
+                if (c == null) c = findClass(name);
+                if (resolve) resolveClass(c);
+                return c;
+            }
+        }
+
         @Override
         protected Class<?> findClass(String name) throws ClassNotFoundException {
             byte[] b = classes.get(name);
@@ -158,6 +174,9 @@ public class RunTasks {
         String input = new String(System.in.readAllBytes(), StandardCharsets.UTF_8);
         List<Unit> units = parse(input);
         StandardJavaFileManager standard = compiler.getStandardFileManager(null, Locale.ENGLISH, StandardCharsets.UTF_8);
+        // Nothing from the working folder: each unit compiles from its own source and the JDK alone.
+        standard.setLocation(StandardLocation.CLASS_PATH, List.of());
+        standard.setLocation(StandardLocation.SOURCE_PATH, List.of());
         for (Unit unit : units) compile(compiler, standard, unit);
 
         System.setIn(new ByteArrayInputStream(new byte[0]));
@@ -217,6 +236,11 @@ public class RunTasks {
     static List<Unit> parse(String input) {
         List<Unit> units = new ArrayList<>();
         int at = 0;
+        if (input.startsWith("KEY ")) {
+            int eol = input.indexOf('\n');
+            key = input.substring(4, eol).trim();
+            at = eol + 1;
+        }
         while (at < input.length()) {
             int eol = input.indexOf('\n', at);
             String[] head = input.substring(at, eol).trim().split(" ");
@@ -289,7 +313,7 @@ public class RunTasks {
             if (unit.reported) return;
             unit.reported = true;
         }
-        StringBuilder b = new StringBuilder("{\"id\":").append(json(unit.id));
+        StringBuilder b = new StringBuilder("{\"key\":").append(json(key)).append(",\"id\":").append(json(unit.id));
         b.append(",\"compiled\":").append(unit.compiled);
         b.append(",\"errors\":[").append(String.join(",", unit.errors)).append("]");
         if (unit.compiled) {

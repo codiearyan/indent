@@ -73,7 +73,7 @@ Notice.java:3: error: ';' expected
 
 Read it from the left: the file, the line number, and what it expected. The line is shown again with a `^` under the spot. Here the `^` sits just after the last thing on the line that is missing its semicolon.
 
-A misspelt name gives `cannot find symbol`, followed by the name it did not know: write `Println` and it says `symbol: method Println(java.lang.String)`. Write `system` with a small s and it says `package system does not exist`. Text in single quotes gives `unclosed character literal`: single quotes hold one character only.
+A misspelt name gives `cannot find symbol`, followed by the name it did not know: write `Println` and it says `symbol: method Println(String)`. Write `system` with a small s and it says `package system does not exist`. Text in single quotes gives `unclosed character literal`: single quotes hold one character only.
 
 Fix the line the first error points at, then run again. The compiler sometimes stops at the first problem it finds, so a second error may appear once the first is gone.
 

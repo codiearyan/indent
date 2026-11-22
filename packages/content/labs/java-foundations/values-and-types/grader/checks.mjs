@@ -11,7 +11,7 @@ import {
 
 const typeHint = (name, type) => (got) =>
   got === 'String' && type !== 'String'
-    ? `${name} holds text, not a number. A name inside double quotes is just text: a variable is used by writing its name without quotes.`
+    ? `${name} holds text, not a number. Anything inside double quotes is text, even when it looks like a number: write the number without quotes, and make the variable with the type the task asks for.`
     : `${name} is made as ${/^[aeiou]/.test(got) ? 'an' : 'a'} ${got}, and the task asks for ${/^[aeiou]/.test(type) ? 'an' : 'a'} ${type}. The type is the word in front of the name, where the variable is made.`
 
 const withPrint = (judge, name, message) => (runs) => {
@@ -48,7 +48,7 @@ export const checks = tasks({
 
     'seats-left': {
       task: 2,
-      cases: [{ given: { seats: 30, boarded: 0 } }, { given: { seats: 61, boarded: 0 } }],
+      cases: [{ given: { seats: 30, boarded: 7 } }, { given: { seats: 61, boarded: 20 } }],
       reads: ['seatsLeft'],
       judge: withPrint(
         valueCases({
@@ -57,6 +57,12 @@ export const checks = tasks({
           typeHint: typeHint('seatsLeft', 'int'),
           typed:
             'Check changed seats and seatsLeft stayed the same. Build it on the name seats, not on a number you typed.',
+          mistakes: [
+            {
+              value: (g) => g.seats - g.boarded,
+              hint: 'seatsLeft already has the boarded passengers taken off. In Task 2 it starts at all the seats on the boat; Task 3 is where the passengers board.'
+            }
+          ],
           cases: [
             {
               name: 'Starts with the seats on the boat',
@@ -114,7 +120,7 @@ export const checks = tasks({
             {
               name: 'Works for another crossing',
               expected: (g) => g.seats - g.boarded,
-              hint: 'Check changed the numbers and seatsLeft did not follow them. Look at each name in your Task 3 line.'
+              hint: 'After boarding, seatsLeft should be the seats there were with the boarded passengers taken away. Look at each name in your Task 3 line.'
             }
           ]
         })(runs)
@@ -191,7 +197,11 @@ export const checks = tasks({
                 'a and b are gone',
                 `${left.join(' and ')} still appears under // Task 5. Rename it everywhere it is used, rather than making new variables next to it.`
               ),
-          run.lines.includes('Skipper: Ossian') && run.lines.includes('Boat: Linnet')
+          run.lines.includes('Skipper: Ossian') &&
+          run.lines.includes('Boat: Linnet') &&
+          ['skipper', 'boatName'].every(
+            (n) => (code.match(new RegExp(`(?<![\\w$.])${n}(?![\\w$])`, 'g')) ?? []).length >= 2
+          )
             ? pass('Prints the same two lines as before', printed(run))
             : fail(
                 'Prints the same two lines as before',

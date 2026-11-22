@@ -34,7 +34,7 @@ export const checks = tasks({
         const stuck = got.every((g) => g === got[0])
         return runs.map((r, i) => {
           const want = String(r.given.adults + r.given.children)
-          const name = `Prints the party for ${r.given.adults} adults and ${r.given.children} children`
+          const name = `Prints the party for ${r.given.adults} ${r.given.adults === 1 ? 'adult' : 'adults'} and ${r.given.children} ${r.given.children === 1 ? 'child' : 'children'}`
           if (got[i] === want) return pass(name, printed(r))
           return fail(
             name,
@@ -70,7 +70,7 @@ export const checks = tasks({
         mistakes: [
           {
             value: (g) => g.destination.slice(0, 3),
-            hint: 'code has the right letters, but not in capitals. The lesson shows the method that gives a capital copy.'
+            hint: 'code has the right letters, but not in capitals. toUpperCase() gives a capital copy and leaves the String it was asked of as it was, so the copy is what code has to hold.'
           },
           {
             value: (g) => g.destination.toUpperCase(),
@@ -94,7 +94,7 @@ export const checks = tasks({
           {
             name: 'Makes the code for another name',
             expected: (g) => g.destination.slice(0, 3).toUpperCase(),
-            hint: 'Check changed destination and code did not follow it.'
+            hint: 'code should be the first three letters of destination, in capitals.'
           },
           {
             name: 'Makes the code for a three letter name',
@@ -110,7 +110,9 @@ export const checks = tasks({
       cases: [
         { given: { ticket: 'Linnet 07:30 Corran', todayBoat: 'Linnet' } },
         { given: { ticket: 'Mayfly 08:00 Corran', todayBoat: 'Linnet' } },
-        { given: { ticket: 'Kittiwake 09:15 Corran', todayBoat: 'Kittiwake' } }
+        { given: { ticket: 'Kittiwake 09:15 Corran', todayBoat: 'Kittiwake' } },
+        { given: { ticket: 'Linnetta 10:45 Corran', todayBoat: 'Linnet' } },
+        { given: { ticket: 'linnet 11:00 Corran', todayBoat: 'Linnet' } }
       ],
       reads: ['rightBoat'],
       judge: (runs, { section }) => {
@@ -133,10 +135,22 @@ export const checks = tasks({
               name: 'True for another boat and its own ticket',
               expected: () => true,
               hint: "The ticket names today's boat, and rightBoat is false."
+            },
+            {
+              name: 'False for a boat whose name starts the same',
+              expected: () => false,
+              hint: "The ticket names a boat whose name only starts like today's boat, and rightBoat is true. The same text means every letter, and no more."
+            },
+            {
+              name: 'False when the capital letters differ',
+              expected: () => false,
+              hint: 'The ticket names the boat with a small letter where today\'s boat has a capital, and rightBoat is true. Capital letters count: the same text means the very same letters.'
             }
           ]
         })(runs)
-        const usesEquals = /==/.test(codeOnly(section))
+        const usesEquals = /\b(?:ticketBoat|todayBoat)\s*[=!]=|[=!]=\s*(?:ticketBoat|todayBoat)\b(?!\s*\.)/.test(
+          codeOnly(section)
+        )
         if (usesEquals && !details.every((d) => d.passed)) {
           const message =
             'rightBoat says false even when the two names are the same text. == on two Strings asks whether they are the very same object, not whether they hold the same letters, and ticketBoat was cut out of the ticket, so it is a different object. The lesson shows how to compare the text.'
@@ -177,17 +191,17 @@ export const checks = tasks({
           {
             name: 'Counts the space left after a long ticket',
             expected: (g) => 24 - g.ticket.length,
-            hint: 'spaceLeft should be 24 less the number of characters in ticket.'
+            hint: 'spaceLeft should be what is left of the 24 characters after the characters of ticket.'
           },
           {
             name: 'Counts the space left after a short ticket',
             expected: (g) => 24 - g.ticket.length,
-            hint: 'Check changed ticket and spaceLeft did not follow it.'
+            hint: 'spaceLeft should be what is left of the 24 characters after the characters of ticket.'
           },
           {
             name: 'Counts the space left after another ticket',
             expected: (g) => 24 - g.ticket.length,
-            hint: 'Check changed ticket and spaceLeft did not follow it.'
+            hint: 'spaceLeft should be what is left of the 24 characters after the characters of ticket.'
           }
         ]
       })

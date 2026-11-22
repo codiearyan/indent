@@ -19,7 +19,8 @@ export const checks = tasks({
         { given: { passengers: 41, seats: 48 } },
         { given: { passengers: 48, seats: 48 } },
         { given: { passengers: 50, seats: 48 } },
-        { given: { passengers: 0, seats: 12 } }
+        { given: { passengers: 0, seats: 12 } },
+        { given: { passengers: 20, seats: 20 } }
       ],
       reads: ['full'],
       judge: valueCases({
@@ -60,6 +61,11 @@ export const checks = tasks({
             name: 'Not full when nobody has boarded',
             expected: () => false,
             hint: 'Nobody has boarded, and full is true.'
+          },
+          {
+            name: 'Full on a smaller boat',
+            expected: () => true,
+            hint: 'Every seat of a smaller boat is taken, and full is false. Compare passengers with seats, not with a number you typed.'
           }
         ]
       })

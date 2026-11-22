@@ -19,7 +19,7 @@
         "Run `java Clipboard.java` and read the output."
       ],
       "hints": [
-        "A variable is made with a type, a name and a value. The lesson makes one for a kettle.",
+        "A variable is made with a type, a name and a value. The lesson makes one for apples.",
         "The type for text is `String`, with a capital S. The text goes in double quotes.",
         "The line has the shape `String crossing = \"...\";`, then `System.out.println(crossing);` under it."
       ],
