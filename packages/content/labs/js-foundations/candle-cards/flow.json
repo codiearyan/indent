@@ -1,0 +1,171 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "theo", "label": "Theo", "kind": "story" },
+      { "id": "make", "label": "makeCandle()", "kind": "function", "mine": true, "fn": "makeCandle" },
+      { "id": "line", "label": "cardLine()", "kind": "function", "mine": true, "fn": "cardLine" },
+      { "id": "has", "label": "hasLine()", "kind": "function", "mine": true },
+      { "id": "sell", "label": "sell()", "kind": "function", "mine": true, "fn": "sell" },
+      { "id": "restock", "label": "restock()", "kind": "function", "mine": true, "fn": "restock" },
+      { "id": "card", "label": "Candle card", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "theo", "to": "make", "label": "name, size, price" },
+      { "from": "make", "to": "card", "label": "new card" },
+      { "from": "theo", "to": "line", "label": "card, field" },
+      { "from": "line", "to": "has", "label": "is it there?" },
+      { "from": "card", "to": "line", "label": "one line" },
+      { "from": "theo", "to": "sell", "label": "candles sold" },
+      { "from": "theo", "to": "restock", "label": "candles poured" },
+      { "from": "sell", "to": "card", "label": "changes" },
+      { "from": "restock", "to": "card", "label": "changes" }
+    ],
+    "note": "Each candle becomes one object with named properties, which Theo can make, read and change instead of a paper card."
+  },
+  "tasks": {
+    "make": {
+      "trace": { "file": "src/objects.js", "call": "makeCandle", "args": ["Cedar", 200, 1800] },
+      "steps": [
+        {
+          "active": ["theo", "theo->make"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "name", "value": "Cedar" },
+              { "key": "grams", "value": 200 },
+              { "key": "priceCents", "value": 1800 }
+            ]
+          },
+          "note": "Theo has a new candle: a name, a size and a price."
+        },
+        {
+          "active": ["make"],
+          "note": "makeCandle() puts the three together in one object, with a stock of its own."
+        },
+        {
+          "active": ["make", "make->card", "card"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "name", "value": "text" },
+              { "key": "grams", "value": "a number" },
+              { "key": "priceCents", "value": "a number" },
+              { "key": "stock", "value": "a number" }
+            ]
+          },
+          "note": "A new card comes back, with four named properties."
+        }
+      ]
+    },
+    "line": {
+      "trace": {
+        "file": "src/objects.js",
+        "call": "cardLine",
+        "args": [{ "name": "Fig", "grams": 350, "priceCents": 2400, "stock": 0 }, "grams"]
+      },
+      "steps": [
+        {
+          "active": ["theo", "theo->line", "line"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "card", "value": "the Fig card" },
+              { "key": "field", "value": "grams" }
+            ]
+          },
+          "note": "Someone emails to ask how big the fig candle is, and Theo asks for one line of its card."
+        },
+        {
+          "active": ["line", "line->has", "has"],
+          "note": "cardLine() first asks hasLine() whether the card has a property by that name."
+        },
+        {
+          "active": ["card", "card->line", "line"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "line", "value": "the name, a colon and the value, or not on the card" }]
+          },
+          "note": "It reads the property whose name Theo gave, or says the card does not have it."
+        }
+      ]
+    },
+    "sell": {
+      "trace": {
+        "file": "src/objects.js",
+        "call": "sell",
+        "args": [{ "name": "Amber", "grams": 200, "priceCents": 1900, "stock": 3 }, 3]
+      },
+      "steps": [
+        {
+          "active": ["theo", "theo->sell", "sell"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "card", "value": "the Amber card" },
+              { "key": "count", "value": 3 }
+            ]
+          },
+          "note": "Three amber candles go out in today's parcels."
+        },
+        {
+          "active": ["sell", "sell->card", "card"],
+          "note": "sell() changes the stock on the card itself, not on a copy."
+        },
+        {
+          "active": ["card"],
+          "value": {
+            "kind": "map",
+            "label": "what the card holds",
+            "entries": [
+              { "key": "stock", "value": "what is left" },
+              { "key": "soldOut", "value": "only when nothing is left" }
+            ]
+          },
+          "note": "When nothing is left, the card is marked sold out, as Theo did in pencil."
+        }
+      ]
+    },
+    "restock": {
+      "trace": {
+        "file": "src/objects.js",
+        "call": "restock",
+        "args": [{ "name": "Sage", "grams": 200, "priceCents": 1700, "stock": 0, "soldOut": true }, 5]
+      },
+      "steps": [
+        {
+          "active": ["theo", "theo->restock", "restock"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "card", "value": "the Sage card" },
+              { "key": "count", "value": 5 }
+            ]
+          },
+          "note": "Ines pours five sage candles, and the sage card says sold out."
+        },
+        {
+          "active": ["restock", "restock->card", "card"],
+          "note": "restock() adds to the stock on the card itself."
+        },
+        {
+          "active": ["card"],
+          "value": {
+            "kind": "map",
+            "label": "what the card holds",
+            "entries": [
+              { "key": "stock", "value": "more than before" },
+              { "key": "soldOut", "value": "gone" }
+            ]
+          },
+          "note": "The sold out mark is rubbed out: the property is gone from the card."
+        }
+      ]
+    }
+  }
+}

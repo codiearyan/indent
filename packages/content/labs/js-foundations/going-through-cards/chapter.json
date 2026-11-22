@@ -1,0 +1,129 @@
+{
+  "id": "going-through-cards",
+  "title": "Going through the cards",
+  "files": ["src/object-loops.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the shelf count and the catalogue worked out.",
+    "suggestedCommand": "node src/object-loops.js"
+  },
+  "tasks": [
+    {
+      "id": "total",
+      "title": "Count every candle on the shelf",
+      "file": "src/object-loops.js",
+      "description": "Under `// Task 1` in `src/object-loops.js`, make `totalStock(shelf)` return how many candles are on the shelf, of every scent together. `shelf` is an object whose keys are scents and whose values are counts, like `{ cedar: 4, fig: 0, amber: 12 }`. An empty shelf, `{}`, has `0`. The shelf object stays as it is.\n\nCheck calls `totalStock` with shelves of its own, an empty one included, and makes sure each shelf is unchanged afterwards.",
+      "nextSteps": [
+        "Read the lesson's part on getting a list out of an object.",
+        "Get the counts of the shelf as a list.",
+        "Add them up, starting from 0.",
+        "Return the total and run the file."
+      ],
+      "hints": [
+        "for...of goes through a list, not an object. Ask `Object` for a list first.",
+        "`Object.values(shelf)` is a list of the counts alone. From there it is the adding loop you know, or `reduce` with a starting value.",
+        "The function has the shape `let total = 0`, then `for (const count of Object.values(shelf)) { total = total + count }`, then `return total`."
+      ],
+      "docs": [
+        {
+          "title": "Object.values()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/values"
+        },
+        {
+          "title": "for...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "soldout",
+      "title": "Find the scents that ran out",
+      "file": "src/object-loops.js",
+      "description": "Under `// Task 2`, make `soldOutScents(shelf)` return a list of the scents whose count is `0`, in the order they are in the shelf object. When none ran out, it returns an empty list. The shelf object stays as it is.\n\nCheck calls `soldOutScents` with shelves of its own, one with nothing sold out and an empty one included.",
+      "nextSteps": [
+        "Read the lesson's part on `Object.entries`.",
+        "Start with an empty list.",
+        "Go through the shelf's pairs of scent and count, and push the scent when its count is `0`.",
+        "Return the list and run the file: fig and sage should come back."
+      ],
+      "hints": [
+        "You need both halves here: the count to ask about, and the scent to keep.",
+        "`Object.entries(shelf)` gives a list of pairs. Each pair is a small list: the key at index 0 and the value at index 1. `Object.keys` with brackets works too.",
+        "Inside `for (const entry of Object.entries(shelf))`, ask `if (entry[1] === 0)` and push `entry[0]`."
+      ],
+      "docs": [
+        {
+          "title": "Object.entries()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries"
+        },
+        {
+          "title": "Object.keys()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Object keys, values and entries",
+          "url": "https://www.youtube.com/watch?v=VmicKaGcs5g"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "prices",
+      "title": "Make a price list",
+      "file": "src/object-loops.js",
+      "description": "Under `// Task 3`, make `priceList(candles)` return a new object with one property per candle in the list: its key is the candle's `sku` and its value the candle's `priceCents`. An empty list gives `{}`. The list and its cards stay as they are.\n\nWith the catalogue at the top of the file, `priceList(catalogue)` gives `{ 'CED-200': 1800, 'FIG-350': 2400, 'AMB-200': 1900 }`.\n\nCheck calls `priceList` with lists of its own and makes sure each list is unchanged afterwards.",
+      "nextSteps": [
+        "Start with an empty object.",
+        "Go through the list of candles with `for...of`.",
+        "For each candle, add a property to your object, with the candle's sku as the key.",
+        "Return the object and run the file."
+      ],
+      "hints": [
+        "Each candle in the list is an object, so `candle.sku` and `candle.priceCents` read its two values.",
+        "The key of the new property is not written in your code; it is the text inside `candle.sku`. That is a job for brackets with no quotes.",
+        "Inside the loop, `prices[candle.sku] = candle.priceCents`, with `const prices = {}` before it and `return prices` after."
+      ],
+      "docs": [
+        {
+          "title": "Property accessors",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors"
+        },
+        {
+          "title": "Working with objects",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_objects"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "value",
+      "title": "What the stock is worth",
+      "file": "src/object-loops.js",
+      "description": "Under `// Task 4`, first write a function of your own called `candleValue`, from the word `function` to its closing brace. It has one parameter, `candle`, and returns what the candles on that card are worth in cents: its `priceCents` times its `stock`. It only helps `stockValue`, so it stays off the `export` line.\n\nThen make `stockValue(candles)` return what all the candles in the list are worth together, adding up what `candleValue` gives for each card. An empty list is worth `0`. The list and its cards stay as they are.\n\nCheck calls `candleValue` and `stockValue` with cards of its own, and reads your file for `candleValue` and the use of it inside `stockValue`.",
+      "nextSteps": [
+        "Above `stockValue`, write `function candleValue(candle) {` and its closing `}` yourself.",
+        "Make it give back the card's price times its stock.",
+        "In `stockValue`, add up `candleValue` of every card, starting from 0.",
+        "Run the file: the last line is what the whole catalogue is worth."
+      ],
+      "hints": [
+        "Two small jobs: one card, then the whole list. The first function does one card, the second calls it for each.",
+        "Adding up a list into one number is the job of a loop with a total, or of `reduce` with a starting value of 0.",
+        "`candleValue` is `return candle.priceCents * candle.stock`, and `stockValue` can be `return candles.reduce((total, candle) => total + candleValue(candle), 0)`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.reduce()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce"
+        },
+        {
+          "title": "Functions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

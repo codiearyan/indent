@@ -1,0 +1,212 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "sales",
+        "label": "Week's sales",
+        "kind": "data"
+      },
+      {
+        "id": "count",
+        "label": "countScents()",
+        "kind": "function",
+        "mine": true,
+        "fn": "countScents"
+      },
+      {
+        "id": "best",
+        "label": "bestSeller()",
+        "kind": "function",
+        "mine": true,
+        "fn": "bestSeller"
+      },
+      {
+        "id": "unique",
+        "label": "uniqueScents()",
+        "kind": "function",
+        "mine": true,
+        "fn": "uniqueScents"
+      },
+      {
+        "id": "emails",
+        "label": "Customer emails",
+        "kind": "data"
+      },
+      {
+        "id": "new",
+        "label": "newCustomers()",
+        "kind": "function",
+        "mine": true,
+        "fn": "newCustomers"
+      },
+      {
+        "id": "ines",
+        "label": "Ines",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "sales",
+        "to": "count",
+        "label": "scents"
+      },
+      {
+        "from": "count",
+        "to": "best",
+        "label": "counts"
+      },
+      {
+        "from": "sales",
+        "to": "unique",
+        "label": "scents"
+      },
+      {
+        "from": "emails",
+        "to": "new",
+        "label": "two lists"
+      },
+      {
+        "from": "best",
+        "to": "ines",
+        "label": "what to pour"
+      },
+      {
+        "from": "new",
+        "to": "ines",
+        "label": "thank-you list"
+      }
+    ],
+    "note": "A Map keeps a count for each scent and a Set keeps each thing once, so Friday's questions get exact answers."
+  },
+  "tasks": {
+    "count": {
+      "trace": {
+        "file": "src/maps-and-sets.js",
+        "call": "countScents",
+        "args": [["fig", "cedar", "fig", "amber", "fig", "cedar"]]
+      },
+      "steps": [
+        {
+          "active": ["sales"],
+          "value": {
+            "kind": "array",
+            "label": "what goes in",
+            "values": ["fig", "cedar", "fig", "amber", "fig", "cedar"]
+          },
+          "note": "The week's sales: one scent for every candle that went out."
+        },
+        {
+          "active": ["sales", "sales->count", "count"],
+          "note": "countScents() keeps a running count for each scent as it goes."
+        },
+        {
+          "active": ["count"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              {
+                "key": "a scent",
+                "value": "how many sold"
+              }
+            ]
+          },
+          "note": "A Map comes back, one entry per scent."
+        }
+      ]
+    },
+    "best": {
+      "steps": [
+        {
+          "active": ["count", "count->best", "best"],
+          "note": "bestSeller() gets the counts of the week."
+        },
+        {
+          "active": ["best"],
+          "note": "It goes through the entries and remembers the best one so far."
+        },
+        {
+          "active": ["best", "best->ines", "ines"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              {
+                "key": "scent",
+                "value": "one scent, or null"
+              }
+            ]
+          },
+          "note": "Ines knows what to pour on Monday."
+        }
+      ]
+    },
+    "unique": {
+      "trace": {
+        "file": "src/maps-and-sets.js",
+        "call": "uniqueScents",
+        "args": [["fig", "cedar", "fig", "amber", "fig", "cedar"]]
+      },
+      "steps": [
+        {
+          "active": ["sales", "sales->unique", "unique"],
+          "note": "Theo needs every scent sold this week for the newsletter."
+        },
+        {
+          "active": ["unique"],
+          "note": "uniqueScents() lets a Set drop the repeats."
+        },
+        {
+          "active": ["unique"],
+          "value": {
+            "kind": "array",
+            "label": "what comes back",
+            "values": ["scent", "scent", "..."]
+          },
+          "note": "A list comes back, each scent in it once."
+        }
+      ]
+    },
+    "customers": {
+      "trace": {
+        "file": "src/maps-and-sets.js",
+        "call": "newCustomers",
+        "args": [["ada@mail.com", " Noor@Mail.com", "ada@mail.com"], ["noor@mail.com"]]
+      },
+      "steps": [
+        {
+          "active": ["emails", "emails->new", "new"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              {
+                "key": "thisWeek",
+                "value": "emails as people typed them"
+              },
+              {
+                "key": "known",
+                "value": "emails of known customers"
+              }
+            ]
+          },
+          "note": "This week's emails and the known ones, typed in every way people type."
+        },
+        {
+          "active": ["new"],
+          "note": "newCustomers() tidies every email with a small function of yours before it compares."
+        },
+        {
+          "active": ["new", "new->ines", "ines"],
+          "value": {
+            "kind": "array",
+            "label": "what comes back",
+            "values": ["tidy email", "..."]
+          },
+          "note": "Ines gets each new customer once, ready for a thank-you note."
+        }
+      ]
+    }
+  }
+}

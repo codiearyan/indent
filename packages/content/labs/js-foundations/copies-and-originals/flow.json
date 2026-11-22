@@ -1,0 +1,148 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "theo", "label": "Theo", "kind": "story" },
+      { "id": "cards", "label": "Shop's cards", "kind": "data" },
+      { "id": "sale", "label": "saleCopy()", "kind": "function", "mine": true, "fn": "saleCopy" },
+      { "id": "same", "label": "sameDetails()", "kind": "function", "mine": true, "fn": "sameDetails" },
+      { "id": "copy", "label": "copyCard()", "kind": "function", "mine": true, "fn": "copyCard" },
+      { "id": "all", "label": "markAllOnSale()", "kind": "function", "mine": true, "fn": "markAllOnSale" },
+      { "id": "page", "label": "Sale page", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "cards", "to": "sale", "label": "a card" },
+      { "from": "theo", "to": "same", "label": "two cards" },
+      { "from": "cards", "to": "copy", "label": "a card" },
+      { "from": "cards", "to": "all", "label": "every card" },
+      { "from": "sale", "to": "page", "label": "new card" },
+      { "from": "all", "to": "page", "label": "new cards" }
+    ],
+    "note": "Sale prices live on new cards, so looking at the sale never changes the shop's own cards."
+  },
+  "tasks": {
+    "sale": {
+      "trace": {
+        "file": "src/references.js",
+        "call": "saleCopy",
+        "args": [{ "name": "Cedar", "priceCents": 1800, "notes": ["cedar", "smoke"] }, 25]
+      },
+      "steps": [
+        {
+          "active": ["cards", "cards->sale", "sale"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "candle", "value": "the shop's Cedar card" },
+              { "key": "percentOff", "value": 25 }
+            ]
+          },
+          "note": "Theo opens the sale page, and the cedar card goes to saleCopy()."
+        },
+        {
+          "active": ["sale"],
+          "note": "saleCopy() lowers a price, and the question is on which card."
+        },
+        {
+          "active": ["sale", "sale->page", "page"],
+          "note": "The sale page shows a new card with the lower price, and the shop's card keeps the real one."
+        }
+      ]
+    },
+    "same": {
+      "trace": {
+        "file": "src/references.js",
+        "call": "sameDetails",
+        "args": [{ "name": "Fig", "priceCents": 2400 }, { "name": "Fig", "priceCents": 2400 }]
+      },
+      "steps": [
+        {
+          "active": ["theo", "theo->same", "same"],
+          "value": {
+            "kind": "array",
+            "label": "what goes in",
+            "values": ["a Fig card", "another Fig card"]
+          },
+          "note": "Theo has two fig cards and wants to know if they say the same."
+        },
+        {
+          "active": ["same"],
+          "note": "sameDetails() compares what the cards hold, not whether they are one card."
+        },
+        {
+          "active": ["same"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "answer", "value": "true or false" }]
+          },
+          "note": "Two separate cards with the same details count as the same."
+        }
+      ]
+    },
+    "copy": {
+      "trace": {
+        "file": "src/references.js",
+        "call": "copyCard",
+        "args": [{ "name": "Fig", "priceCents": 2400, "notes": ["fig", "leaf"] }]
+      },
+      "steps": [
+        {
+          "active": ["cards", "cards->copy", "copy"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "name", "value": "Fig" },
+              { "key": "priceCents", "value": 2400 },
+              { "key": "notes", "value": "a list" }
+            ]
+          },
+          "note": "Ines wants a draft of the fig card to try new scent notes on."
+        },
+        {
+          "active": ["copy"],
+          "note": "copyCard() makes a new card, and a new list inside it as well."
+        },
+        {
+          "active": ["cards"],
+          "note": "Notes added to the draft never show up on the shop's fig card."
+        }
+      ]
+    },
+    "on-sale": {
+      "trace": {
+        "file": "src/references.js",
+        "call": "markAllOnSale",
+        "args": [
+          [
+            { "name": "Cedar", "priceCents": 1800, "notes": ["cedar", "smoke"] },
+            { "name": "Fig", "priceCents": 2400, "notes": ["fig", "leaf"] }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["cards", "cards->all", "all"],
+          "note": "Ines puts the whole catalogue on sale for a weekend."
+        },
+        {
+          "active": ["all"],
+          "note": "markAllOnSale() makes a new card for each one with a small function of yours."
+        },
+        {
+          "active": ["all", "all->page", "page"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "a new list", "value": "one new card per candle" },
+              { "key": "onSale", "value": "on every new card" }
+            ]
+          },
+          "note": "The sale page gets marked cards, and the shop's cards are as they were on Monday."
+        }
+      ]
+    }
+  }
+}

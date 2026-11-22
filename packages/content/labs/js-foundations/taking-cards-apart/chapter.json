@@ -1,0 +1,129 @@
+{
+  "id": "taking-cards-apart",
+  "title": "Taking cards apart",
+  "files": ["src/destructuring.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the tags, the pick of the month and the copies it makes.",
+    "suggestedCommand": "node src/destructuring.js"
+  },
+  "tasks": [
+    {
+      "id": "tag",
+      "title": "Print a shelf tag",
+      "file": "src/destructuring.js",
+      "description": "Under `// Task 1` in `src/destructuring.js`, make `shelfTag(candle)` pull `name`, `grams` and `priceCents` out of the card by name, with destructuring, and return them as one line: `'Cedar, 200 g, 1800 cents'`. When the card has no `grams`, the tag shows `200 g`: give `grams` a default of `200` where you pull it out.\n\nCheck calls `shelfTag` with cards of its own, old ones with no grams included, and reads your file for the destructuring and the default.",
+      "nextSteps": [
+        "Read the lesson's parts on pulling properties out and on defaults.",
+        "Write one line that makes `name`, `grams` and `priceCents` from the card.",
+        "Give `grams` its default inside the braces.",
+        "Return the tag and run the file: the old fig card should show 200 g."
+      ],
+      "hints": [
+        "Destructuring makes several variables from one object in one line, each named after a key.",
+        "The names in the braces must match the keys of the card. A default goes right after a name, with `=`, and is used when the card has no such property.",
+        "The first line is `const { name, grams = 200, priceCents } = candle`, then a template literal with the three names."
+      ],
+      "docs": [
+        {
+          "title": "Destructuring",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring"
+        },
+        {
+          "title": "Template literals",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Why destructuring is so useful",
+          "url": "https://www.youtube.com/watch?v=NIq3qLaHCIs"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pick",
+      "title": "Pick the candle of the month",
+      "file": "src/destructuring.js",
+      "description": "Under `// Task 2`, `monthPick(names)` is given a list of candle names with at least one name in it. The first name is the candle of the month and the others are the runners-up. Pull the first name out with destructuring and collect the others with rest, then return the first name, the word `and`, the number of runners-up and the word `more`: `'Fig and 2 more'`. The list stays as it is.\n\nCheck calls `monthPick` with lists of its own, one with a single name included, and reads your file for the destructuring.",
+      "nextSteps": [
+        "Read the lesson's parts on taking lists apart and on rest.",
+        "Write one line that makes the first name and a list of the others.",
+        "Count the others with `length`.",
+        "Return the text and run the file."
+      ],
+      "hints": [
+        "Square brackets on the left of `=` take a list apart by position, the way curly braces take an object apart by key.",
+        "Three dots before the last name collect everything that is left into a new list. With one name, that list is empty.",
+        "The first line is `const [first, ...others] = names`, then the text uses `first` and `others.length`."
+      ],
+      "docs": [
+        {
+          "title": "Destructuring",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring"
+        },
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "copy",
+      "title": "Change the price on a copy",
+      "file": "src/destructuring.js",
+      "description": "Under `// Task 3`, make `withPrice(candle, priceCents)` return a new card: a copy of `candle` with every property it has, except that its `priceCents` is the one given. The card it was given stays as it is.\n\nCheck calls `withPrice` with cards of its own, some with properties the others do not have, and makes sure each card it gave is unchanged afterwards.",
+      "nextSteps": [
+        "Read the lesson's part on copying an object with a change.",
+        "Make a new object that spreads the card's properties into it.",
+        "Give the new object its new price, after the spread.",
+        "Run the file: the second line shows the cedar card, with its old price."
+      ],
+      "hints": [
+        "Changing `candle.priceCents` changes the shop's own card. Make a new object instead.",
+        "Three dots inside the curly braces of a new object copy every property of another object into it. When a key appears twice, the one written last wins.",
+        "The function is one line: `return { ...candle, priceCents }`, or `priceCents: priceCents`."
+      ],
+      "docs": [
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        },
+        {
+          "title": "Object initializer",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hide",
+      "title": "Hide what a candle costs us",
+      "file": "src/destructuring.js",
+      "description": "Under `// Task 4`, first write a function of your own called `publicCard`, from the word `function` to its closing brace. It has one parameter, `candle`, and returns a new card with every property of `candle` except `costCents`, which the site must never show. It only helps `publicCatalogue`, so it stays off the `export` line.\n\nThen make `publicCatalogue(candles)` return a new list with the public card of every candle in the list, in the same order, made by `publicCard`. The list and its cards stay as they are.\n\nCheck calls `publicCard` and `publicCatalogue` with cards of its own, and reads your file for `publicCard` and the use of it inside `publicCatalogue`. A left out property must be gone, not just hold `undefined`.",
+      "nextSteps": [
+        "Above `publicCatalogue`, write `function publicCard(candle) {` and its closing `}` yourself.",
+        "Pull `costCents` out of the card and collect the rest into a new object.",
+        "Return the rest, then make `publicCatalogue` build a new list with `publicCard`.",
+        "Run the file: no card in the last line shows costCents."
+      ],
+      "hints": [
+        "Deleting `costCents` from the card itself would take it off the shop's own card too.",
+        "Rest works in curly braces as well: name the key you want out, and three dots before a last name collect every other property into a new object. `map` makes a new list from another.",
+        "`publicCard` can be `const { costCents, ...shown } = candle` then `return shown`, and `publicCatalogue` is `return candles.map(publicCard)`."
+      ],
+      "docs": [
+        {
+          "title": "Destructuring",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring"
+        },
+        {
+          "title": "Array.prototype.map()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

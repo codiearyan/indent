@@ -1,0 +1,129 @@
+{
+  "id": "maps-and-sets",
+  "title": "Counts and no repeats",
+  "files": ["src/maps-and-sets.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to count this week's sales and find the new customers.",
+    "suggestedCommand": "node src/maps-and-sets.js"
+  },
+  "tasks": [
+    {
+      "id": "count",
+      "title": "Count the scents sold",
+      "file": "src/maps-and-sets.js",
+      "description": "Under `// Task 1` in `src/maps-and-sets.js`, make `countScents(sold)` return a `Map` with one entry per scent in the list: the scent is the key and how many times it appears is the value. An empty list gives an empty `Map`. The list stays as it is.\n\nCheck calls `countScents` with lists of its own, an empty one included.",
+      "nextSteps": [
+        "Read the lesson's parts on making a Map and counting with one.",
+        "Make a new, empty Map.",
+        "Go through the list and, for each scent, set its count to what it was plus one.",
+        "Return the Map and run the file."
+      ],
+      "hints": [
+        "A Map has methods of its own: `set` writes an entry, `get` reads one, `has` asks whether one is there.",
+        "The first time a scent comes up, `get` gives `undefined`, and `undefined + 1` is `NaN`. Start a new scent from 0.",
+        "Inside the loop, `counts.set(scent, (counts.get(scent) ?? 0) + 1)`, with `const counts = new Map()` before it."
+      ],
+      "docs": [
+        {
+          "title": "Map",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"
+        },
+        {
+          "title": "Map.prototype.get()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/get"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Maps and Sets explained",
+          "url": "https://www.youtube.com/watch?v=hLgUTM3FOII"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "best",
+      "title": "Find the best seller",
+      "file": "src/maps-and-sets.js",
+      "description": "Under `// Task 2`, `bestSeller(counts)` is given a `Map` like the one `countScents` makes. Make it return the scent with the highest count. When two scents have the same highest count, the one that comes first in the Map wins. An empty Map gives `null`. The Map stays as it is.\n\nCheck calls `bestSeller` with Maps of its own, a tie and an empty Map included.",
+      "nextSteps": [
+        "Read the lesson's part on going through a Map.",
+        "Start with no best scent yet.",
+        "Go through the entries and keep the scent whenever its count beats the best so far.",
+        "Return the best scent and run the file."
+      ],
+      "hints": [
+        "for...of goes through a Map's entries, each a pair of key and value, in the order they were added.",
+        "Keep two variables, the best scent and its count. Only a count that is higher, not one that is equal, replaces them, so a tie keeps the first.",
+        "Start with `let best = null` and `let bestCount = 0`, then `for (const [scent, count] of counts)` and an `if` that asks whether this is the first or a higher count."
+      ],
+      "docs": [
+        {
+          "title": "Map: iterating with for...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#iterating_map_with_for...of"
+        },
+        {
+          "title": "Destructuring",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "unique",
+      "title": "Every scent once",
+      "file": "src/maps-and-sets.js",
+      "description": "Under `// Task 3`, make `uniqueScents(sold)` return a new list with every scent in `sold` once, in the order each first appears. Use a `Set` to leave out the repeats. The list it is given stays as it is.\n\nCheck calls `uniqueScents` with lists of its own and reads your file for the Set.",
+      "nextSteps": [
+        "Read the lesson's part on Sets.",
+        "Make a Set from the list.",
+        "Turn the Set back into a list.",
+        "Return it and run the file."
+      ],
+      "hints": [
+        "A Set keeps each value once, in the order it was first added, and it can be made straight from a list.",
+        "A Set is not a list, but spread works on it: three dots inside square brackets make a list of what it holds.",
+        "The function is one line: `return [...new Set(sold)]`."
+      ],
+      "docs": [
+        {
+          "title": "Set",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set"
+        },
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "customers",
+      "title": "Who is new this week",
+      "file": "src/maps-and-sets.js",
+      "description": "Under `// Task 4`, first write a function of your own called `emailKey`, from the word `function` to its closing brace. It has one parameter, `email`, and returns the email with the spaces at either end taken off and every letter in lower case, so `' Noor@Mail.com'` and `'noor@mail.com'` give the same key. It only helps `newCustomers`, so it stays off the `export` line.\n\nThen make `newCustomers(thisWeek, known)` return a list of the keys `emailKey` gives for the emails in `thisWeek` that are not the email of a known customer, each key once, in the order each first appears. Compare emails by their keys. Both lists stay as they are.\n\nCheck calls `emailKey` and `newCustomers` with emails of its own, in mixed capitals and with spaces, and reads your file for `emailKey` and the use of it inside `newCustomers`.",
+      "nextSteps": [
+        "Above `newCustomers`, write `function emailKey(email) {` and its closing `}` yourself.",
+        "Make a Set of the keys of the known emails.",
+        "Go through this week's emails and keep each key that is not in that Set, once.",
+        "Return the keys as a list and run the file: only Ada is new."
+      ],
+      "hints": [
+        "`trim` and `toLowerCase` from the issue on text do the work of `emailKey`.",
+        "A Set answers `has` quickly, so it is the place for the known keys. A second Set for the new keys leaves out repeats by itself.",
+        "`emailKey` is `return email.trim().toLowerCase()`. In `newCustomers`, `const knownKeys = new Set(known.map(emailKey))`, then add each key that `knownKeys.has` says no to into a second Set, and return `[...found]`."
+      ],
+      "docs": [
+        {
+          "title": "Set.prototype.has()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set/has"
+        },
+        {
+          "title": "String.prototype.trim()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

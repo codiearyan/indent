@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "I only looked at the sale!", "note": "Now the real price is lower." },
+    { "title": "Sale page", "text": "Shows 25 percent off every candle." },
+    {
+      "title": "Your code",
+      "file": "references.js",
+      "mine": true,
+      "gap": "The sale edits real cards",
+      "tasks": ["Fix the sale copy", "Same details?", "A copy of its own", "Everything on sale"]
+    },
+    { "title": "Shop's cards", "rows": [["Cedar", "real price"], ["Fig", "real price"]] }
+  ],
+  "ticket": { "label": "Cedar price", "wrong": "went down", "why": "Shared card", "right": "kept" },
+  "captions": [
+    "The cards go to the site now. Theo looks at the sale prices and nothing else.",
+    "Afterwards the real cedar price has gone down too, though nobody changed it.",
+    "You learn when two names share one card, and make copies that share nothing.",
+    "The sale page shows its lower prices, and the cedar card keeps its real one.",
+    "Copies stay copies. The shop's cards change only when you mean them to."
+  ]
+}

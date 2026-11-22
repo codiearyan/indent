@@ -1,0 +1,145 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "theo", "label": "Theo", "kind": "story" },
+      { "id": "cards", "label": "Candle cards", "kind": "data" },
+      { "id": "tag", "label": "shelfTag()", "kind": "function", "mine": true, "fn": "shelfTag" },
+      { "id": "pick", "label": "monthPick()", "kind": "function", "mine": true, "fn": "monthPick" },
+      { "id": "copy", "label": "withPrice()", "kind": "function", "mine": true, "fn": "withPrice" },
+      { "id": "public", "label": "publicCatalogue()", "kind": "function", "mine": true, "fn": "publicCatalogue" },
+      { "id": "site", "label": "Shop site", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "cards", "to": "tag", "label": "one card" },
+      { "from": "theo", "to": "pick", "label": "names" },
+      { "from": "cards", "to": "copy", "label": "card, price" },
+      { "from": "cards", "to": "public", "label": "every card" },
+      { "from": "tag", "to": "theo", "label": "shelf tag" },
+      { "from": "public", "to": "site", "label": "safe cards" }
+    ],
+    "note": "Cards are taken apart for the parts that are needed and put back together as new cards, so the shop's own cards never change."
+  },
+  "tasks": {
+    "tag": {
+      "trace": {
+        "file": "src/destructuring.js",
+        "call": "shelfTag",
+        "args": [{ "sku": "FIG-OLD", "name": "Fig", "priceCents": 2400, "costCents": 910 }]
+      },
+      "steps": [
+        {
+          "active": ["cards", "cards->tag", "tag"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "name", "value": "Fig" },
+              { "key": "grams", "value": "not on this old card" },
+              { "key": "priceCents", "value": 2400 }
+            ]
+          },
+          "note": "An old fig card goes in, with no size written on it."
+        },
+        {
+          "active": ["tag"],
+          "note": "shelfTag() pulls out the three parts it needs by name, and a size for cards that have none."
+        },
+        {
+          "active": ["tag", "tag->theo", "theo"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "tag", "value": "name, size and price in one line" }]
+          },
+          "note": "Theo gets a tag for the shelf."
+        }
+      ]
+    },
+    "pick": {
+      "trace": { "file": "src/destructuring.js", "call": "monthPick", "args": [["Fig", "Cedar", "Amber"]] },
+      "steps": [
+        {
+          "active": ["theo", "theo->pick", "pick"],
+          "value": { "kind": "array", "label": "what goes in", "values": ["Fig", "Cedar", "Amber"] },
+          "note": "Theo has the month's names in order, the favourite first."
+        },
+        {
+          "active": ["pick"],
+          "note": "monthPick() takes the first name apart from the others."
+        },
+        {
+          "active": ["pick"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "line", "value": "the pick and how many more" }]
+          },
+          "note": "One line for the site: the candle of the month and the count of runners-up."
+        }
+      ]
+    },
+    "copy": {
+      "trace": {
+        "file": "src/destructuring.js",
+        "call": "withPrice",
+        "args": [{ "sku": "CED-200", "name": "Cedar", "grams": 200, "priceCents": 1800, "costCents": 640 }, 1600]
+      },
+      "steps": [
+        {
+          "active": ["cards", "cards->copy", "copy"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "candle", "value": "the Cedar card" },
+              { "key": "priceCents", "value": 1600 }
+            ]
+          },
+          "note": "Ines wants to try a lower price on cedar."
+        },
+        {
+          "active": ["copy"],
+          "note": "withPrice() makes a new card with everything the cedar card has, and the new price."
+        },
+        {
+          "active": ["cards"],
+          "note": "The shop's own cedar card keeps its price."
+        }
+      ]
+    },
+    "hide": {
+      "trace": {
+        "file": "src/destructuring.js",
+        "call": "publicCatalogue",
+        "args": [
+          [
+            { "sku": "CED-200", "name": "Cedar", "grams": 200, "priceCents": 1800, "costCents": 640 },
+            { "sku": "FIG-OLD", "name": "Fig", "priceCents": 2400, "costCents": 910 }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["cards", "cards->public", "public"],
+          "note": "Every card goes to the site, and every card says what the candle costs to make."
+        },
+        {
+          "active": ["public"],
+          "note": "publicCatalogue() makes a public card of each with a small function of yours, leaving the cost out."
+        },
+        {
+          "active": ["public", "public->site", "site"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "a list", "value": "one public card per candle" },
+              { "key": "costCents", "value": "on none of them" }
+            ]
+          },
+          "note": "The site gets cards it can show, and the shop's cards keep their costs."
+        }
+      ]
+    }
+  }
+}

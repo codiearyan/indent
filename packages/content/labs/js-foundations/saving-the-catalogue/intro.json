@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "The site has to come up!", "note": "Saving broke halfway last week." },
+    { "title": "Saved file", "text": "Cut off halfway through the fig card." },
+    {
+      "title": "Your code",
+      "file": "saving.js",
+      "mine": true,
+      "gap": "Nothing survives a restart",
+      "tasks": ["Save as text", "Load, even if broken", "Save the stock Map", "Settings, defaults"]
+    },
+    { "title": "Shop site", "rows": [["Catalogue", "loaded"], ["Settings", "loaded"]] }
+  ],
+  "ticket": { "label": "Shop page", "wrong": "an error", "why": "Broken file", "right": "comes up" },
+  "captions": [
+    "Maps and Sets count the sales now. Theo needs the catalogue saved to a file.",
+    "Last week saving stopped halfway, and the shop page was only an error.",
+    "You save data as JSON text, load it back, and catch what a broken file throws.",
+    "The broken file gives an empty catalogue, and the shop page comes up.",
+    "The catalogue is done: cards, counts and copies that are saved and loaded safely."
+  ]
+}

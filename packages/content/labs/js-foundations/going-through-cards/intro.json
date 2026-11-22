@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "What should I pour next?", "note": "She counts the shelf each morning." },
+    { "title": "Sticky note", "rows": [["cedar", "4"], ["amber", "12"]] },
+    {
+      "title": "Your code",
+      "file": "object-loops.js",
+      "mine": true,
+      "gap": "One card at a time",
+      "tasks": ["Count the shelf", "Find what ran out", "Make a price list", "Worth of the stock"]
+    },
+    { "title": "Ines", "text": "What to pour, and totals that agree." }
+  ],
+  "ticket": { "label": "Shelf count", "wrong": "phone sums", "why": "By hand", "right": "worked out" },
+  "captions": [
+    "Every candle has a card now. Ines counts the shelf and asks what to pour next.",
+    "She adds the note up on her phone and gets a different total every time.",
+    "You go through objects and lists of cards to count, find, list and add up.",
+    "The shelf count comes back as one total and a list of the scents to pour.",
+    "Objects can be gone through now, key by key and card by card."
+  ]
+}

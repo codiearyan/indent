@@ -1,0 +1,129 @@
+{
+  "id": "copies-and-originals",
+  "title": "Copies and originals",
+  "files": ["src/references.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here and watch whether the shop's own cards change.",
+    "suggestedCommand": "node src/references.js"
+  },
+  "tasks": [
+    {
+      "id": "sale",
+      "title": "Stop the sale changing the real price",
+      "file": "src/references.js",
+      "description": "Under `// Task 1` in `src/references.js`, `saleCopy(candle, percentOff)` should return a new card with every property of `candle`, and its `priceCents` lowered by `percentOff` percent, rounded to whole cents. As Theo wrote it, the card it is given loses its real price every time. Fix it so that card stays as it is. Keep the name and the parameters.\n\nCheck calls `saleCopy` with cards of its own and makes sure each card it gave is unchanged afterwards.",
+      "nextSteps": [
+        "Run the file: the second line shows the cedar card with the sale price.",
+        "Read the lesson's part on two names for one object.",
+        "Make `copy` a new object with the card's properties.",
+        "Run the file again: the cedar card keeps its price."
+      ],
+      "hints": [
+        "Look at the first line of the function. What does `copy` point at?",
+        "`const copy = candle` gives the same card a second name; it does not make a second card. A new object is made with curly braces, and spread copies another object's properties into it.",
+        "Change the first line to `const copy = { ...candle }`; the rest can stay."
+      ],
+      "docs": [
+        {
+          "title": "Working with objects: comparing objects",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_objects#comparing_objects"
+        },
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Values and references",
+          "url": "https://www.youtube.com/watch?v=--Md6-8GAio"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "same",
+      "title": "Same details, two cards",
+      "file": "src/references.js",
+      "description": "Under `// Task 2`, make `sameDetails(a, b)` return `true` when `a` and `b` have exactly the same keys, each holding the same value in both, even when they are two different objects, and `false` otherwise. The order of the keys does not matter. Check only gives cards whose values are numbers, text, or `true` and `false`.\n\nCheck calls `sameDetails` with pairs of its own: twins, one card given twice, cards with a key more on either side, and a number against the same digits as text.",
+      "nextSteps": [
+        "Read the lesson's part on equal and the same.",
+        "Compare how many keys the two cards have.",
+        "Go through the keys of one card and compare each value with the other card's.",
+        "Run the file: two separate Fig cards should give true."
+      ],
+      "hints": [
+        "`a === b` is only true when both names point at one object. Two separate cards need to be compared key by key.",
+        "Two cards with the same number of keys, where every key of the first is in the second with the same value, have the same details. `Object.keys`, `in` and `every` all help.",
+        "One way: return false when `Object.keys(a).length !== Object.keys(b).length`, then `return Object.keys(a).every((key) => key in b && a[key] === b[key])`."
+      ],
+      "docs": [
+        {
+          "title": "Equality comparisons and sameness",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness"
+        },
+        {
+          "title": "Object.keys()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "copy",
+      "title": "A copy that shares nothing",
+      "file": "src/references.js",
+      "description": "Under `// Task 3`, make `copyCard(candle)` return a copy of `candle` with every property it has, sharing nothing with it: changing the copy, its list of `notes` included, must never change `candle`.\n\nCheck calls `copyCard` with cards of its own, then changes each copy's notes and makes sure the card's own notes did not change.",
+      "nextSteps": [
+        "Read the lesson's part on copies one level deep.",
+        "Copy the card's properties into a new object.",
+        "Give the copy a new list of notes, a copy of the card's.",
+        "Run the file: the copy of the fig card should look like the card."
+      ],
+      "hints": [
+        "`{ ...candle }` is a new card, but the notes in it are not a new list.",
+        "Spread copies each property as it is. A property that holds a list holds the same list in the copy, so that list needs a copy of its own, the way you copy any list.",
+        "The function is one line: `return { ...candle, notes: [...candle.notes] }`."
+      ],
+      "docs": [
+        {
+          "title": "Shallow copy",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy"
+        },
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "on-sale",
+      "title": "Put the whole catalogue on sale",
+      "file": "src/references.js",
+      "description": "Under `// Task 4`, first write a function of your own called `onSaleCopy`, from the word `function` to its closing brace. It has one parameter, `candle`, and returns a new card with every property of `candle` and one more, `onSale`, with the value `true`. It only helps `markAllOnSale`, so it stays off the `export` line.\n\nThen make `markAllOnSale(candles)` return a new list with what `onSaleCopy` gives for every card, in the same order. The list and the cards in it stay as they are.\n\nCheck calls `onSaleCopy` and `markAllOnSale` with cards of its own, makes sure the list and every card it gave are unchanged afterwards, and reads your file for `onSaleCopy` and the use of it inside `markAllOnSale`.",
+      "nextSteps": [
+        "Above `markAllOnSale`, write `function onSaleCopy(candle) {` and its closing `}` yourself.",
+        "Make it give back a new card with `onSale` added.",
+        "In `markAllOnSale`, build a new list from what `onSaleCopy` gives for each card.",
+        "Run the file: the last line shows the cedar card without onSale."
+      ],
+      "hints": [
+        "A new list can hold the very same cards as the old one. Changing a card through it changes the shop's card.",
+        "Each card in the new list must itself be new: a spread with one more property. `map` makes the new list.",
+        "`onSaleCopy` is `return { ...candle, onSale: true }`, and `markAllOnSale` is `return candles.map(onSaleCopy)`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.map()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+        },
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

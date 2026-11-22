@@ -37,6 +37,17 @@
       "chapters": ["order-reports"]
     },
     {
+      "title": "The catalogue",
+      "chapters": [
+        "candle-cards",
+        "going-through-cards",
+        "taking-cards-apart",
+        "copies-and-originals",
+        "maps-and-sets",
+        "saving-the-catalogue"
+      ]
+    },
+    {
       "title": "Helpers that remember",
       "chapters": ["loyalty-cards"]
     }

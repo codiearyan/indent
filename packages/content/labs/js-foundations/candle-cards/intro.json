@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "Can the laptop keep the cards?", "note": "One paper card per candle." },
+    { "title": "Card box", "text": "Paper cards, sold out written in pencil." },
+    {
+      "title": "Your code",
+      "file": "objects.js",
+      "mine": true,
+      "gap": "Nowhere to keep a candle",
+      "tasks": ["Make a card", "Read any line", "Sell from a card", "Restock a card"]
+    },
+    { "title": "Shop site", "rows": [["Fig", "350 g"], ["Amber", "200 g"], ["Sage", "200 g"]], "mark": 2 }
+  ],
+  "ticket": { "label": "Sage card", "wrong": "on paper", "why": "Paper only", "right": "back in stock" },
+  "captions": [
+    "Lists work now. Next, Theo wants the candle cards he keeps on paper on the laptop.",
+    "Every card lives in a box behind the counter, and the site cannot read any of them.",
+    "You keep each candle as an object, then read it, sell from it and restock it.",
+    "When Ines pours more sage, its card loses the sold out mark and shows the new stock.",
+    "A candle is one value with named parts now, ready for a whole catalogue."
+  ]
+}
