@@ -1,0 +1,38 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "Can this be a real page?",
+      "note": "She runs Kilnworth Pottery."
+    },
+    {
+      "title": "Her text file",
+      "text": "The words are there, with no HTML at all.",
+      "note": "Saved as index.html"
+    },
+    {
+      "title": "Your HTML",
+      "file": "index.html",
+      "mine": true,
+      "gap": "Just plain text",
+      "tasks": ["Start the page", "Add a head and title", "Fill the body"]
+    },
+    {
+      "title": "Browser",
+      "rows": [["Tab: the studio name"], ["Heading"], ["Two paragraphs"]]
+    }
+  ],
+  "ticket": {
+    "label": "Home page",
+    "wrong": "one line",
+    "why": "No tags",
+    "right": "a page"
+  },
+  "captions": [
+    "Dilys runs Kilnworth Pottery and wants the studio's first web page.",
+    "She typed her words into a file, but the browser shows them as one long line.",
+    "You write the page's skeleton, its head and its body, in three tasks.",
+    "The tab shows the studio's name and the words sit on their own lines.",
+    "Same words as before. Now the file is a real page."
+  ]
+}

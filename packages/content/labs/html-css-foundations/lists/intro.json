@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Kofi",
+      "say": "What should students bring?",
+      "note": "New students always ask."
+    },
+    {
+      "title": "Classes section",
+      "text": "Four things in one long line of commas.",
+      "note": "Easy to miss one"
+    },
+    {
+      "title": "Your HTML",
+      "file": "index.html",
+      "mine": true,
+      "gap": "Lists hiding in lines",
+      "tasks": ["List what to bring", "Number the steps", "Group the shelves"]
+    },
+    {
+      "title": "Checklist",
+      "rows": [["Apron or old shirt"], ["Small towel"], ["Hair tie"]],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "Small towel",
+    "wrong": "missed",
+    "why": "One line",
+    "right": "packed"
+  },
+  "captions": [
+    "Kofi wants new students to know what to bring to their first class.",
+    "It is all in one line of commas, so the towel gets missed.",
+    "You turn three lines into lists: bulleted, numbered, and one inside another.",
+    "The towel is its own item on a checklist, and it gets packed.",
+    "Same words from Kofi. Now each set of things is a real list."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "html-css-foundations",
+  "title": "HTML and CSS foundations",
+  "description": "Kilnworth Pottery is a two-person studio on Saddler Street that makes mugs and bowls by hand and teaches evening classes, and it has never had a web page. Dilys, who runs it, typed what she wants into a text file, and Kofi wants people to find his classes. Starting from that file, you write the studio's page yourself and learn HTML and CSS from the very first tag.",
+  "category": "Web and frontend",
+  "language": "html",
+  "tags": ["HTML", "CSS"],
+  "kind": "foundations",
+  "parts": [
+    {
+      "title": "A page from a text file",
+      "chapters": [
+        "first-page",
+        "headings-and-paragraphs",
+        "links",
+        "images",
+        "lists",
+        "page-structure"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kofi", "label": "Kofi", "kind": "story" },
+      { "id": "text", "label": "Pasted text", "kind": "data" },
+      { "id": "html", "label": "index.html", "kind": "file", "mine": true },
+      { "id": "outline", "label": "Page outline", "kind": "data" },
+      { "id": "page", "label": "Home page", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kofi", "to": "text", "label": "sends" },
+      { "from": "text", "to": "html", "label": "one paragraph" },
+      { "from": "html", "to": "outline", "label": "headings" },
+      { "from": "html", "to": "page", "label": "sections" }
+    ],
+    "note": "Kofi's text arrives as one block, and the elements you choose turn it into an outline and short sections a visitor can scan."
+  },
+  "tasks": {
+    "headings": {
+      "steps": [
+        {
+          "active": ["kofi", "kofi->text", "text"],
+          "value": {
+            "kind": "array",
+            "label": "section titles in the text",
+            "values": ["Classes", "The shop", "Visit us"]
+          },
+          "note": "Kofi's text has three section titles, but they sit inside the paragraph like any other words."
+        },
+        {
+          "active": ["text", "text->html", "html"],
+          "note": "Turn each title into a heading one level below the studio name, with its words unchanged."
+        },
+        {
+          "active": ["html", "html->outline", "outline"],
+          "value": {
+            "kind": "array",
+            "label": "the outline, by level",
+            "values": ["level 1: studio name", "next level: three titles"]
+          },
+          "note": "The headings form the page's outline, and no level is skipped on the way down."
+        }
+      ]
+    },
+    "paragraphs": {
+      "steps": [
+        {
+          "active": ["text"],
+          "value": {
+            "kind": "array",
+            "label": "pieces under the titles",
+            "values": ["classes", "clothes", "shop", "kiln", "address", "opening hours"]
+          },
+          "note": "Under the titles there are six pieces of text, each one idea."
+        },
+        {
+          "active": ["html"],
+          "note": "Give each piece its own paragraph, with the headings standing between them."
+        },
+        {
+          "active": ["html", "html->page", "page"],
+          "note": "The browser leaves space between paragraphs, so the block turns into short sections."
+        }
+      ]
+    },
+    "emphasis": {
+      "steps": [
+        {
+          "active": ["text"],
+          "note": "One line is a warning about clothes, and one line leans on the word Saturday."
+        },
+        {
+          "active": ["html"],
+          "note": "Mark the warning as important and the one word as stressed, with the elements that carry meaning."
+        },
+        {
+          "active": ["html", "html->page", "page"],
+          "note": "The browser shows them in bold and italics, and a screen reader knows they matter."
+        }
+      ]
+    },
+    "address-lines": {
+      "steps": [
+        {
+          "active": ["page"],
+          "value": {
+            "kind": "array",
+            "label": "the address",
+            "values": ["street", "town", "postcode"]
+          },
+          "note": "On the page the three parts of the address run together on one line."
+        },
+        {
+          "active": ["html"],
+          "note": "Keep the address in one paragraph of its own and break the line after the street and the town."
+        },
+        {
+          "active": ["html", "html->page", "page"],
+          "note": "Now the address reads the way it would on an envelope."
+        }
+      ]
+    }
+  }
+}

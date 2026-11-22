@@ -1,0 +1,83 @@
+{
+  "id": "first-page",
+  "title": "A page from a text file",
+  "files": ["index.html"],
+  "terminal": {
+    "description": "The page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "doctype",
+      "title": "Start the page and wrap it",
+      "file": "index.html",
+      "description": "Give `index.html` the two things every page starts with.\n\n- The very first line is the doctype that says this is a modern HTML page.\n- An `html` element wraps everything after it: its opening tag right after the doctype, its closing tag at the very end of the file.\n- The opening `html` tag says the page is in English.\n\nThe check reads the file for the doctype and both `html` tags, and looks for the language on the root element.",
+      "nextSteps": [
+        "Read \"The skeleton of every page\" in the lesson.",
+        "Write the doctype above everything else, below the comment if you like.",
+        "Open the `html` element after it and close it on the last line.",
+        "Add the attribute that names the language, save and press Check."
+      ],
+      "hints": [
+        "The doctype is not an element. It is one short line that starts with `<!` and ends with `>`.",
+        "The root element is named after the language itself. It is the one element every other element sits inside.",
+        "The language goes in an attribute on the opening tag, written as a name, an equals sign and a value in quotes. The value for English is two letters."
+      ],
+      "docs": [
+        { "title": "Doctype", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Doctype" },
+        { "title": "<html>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/html" },
+        { "title": "The lang attribute", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/lang" }
+      ],
+      "videos": [
+        { "title": "HTML in 100 seconds", "url": "https://www.youtube.com/watch?v=ok-plXXHlWw" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "head",
+      "title": "Give the page a head and a title",
+      "file": "index.html",
+      "description": "Add a `head` element as the first thing inside `html`. In it:\n\n- a `meta` element that sets the character set to UTF-8\n- a `title` whose text is `Kilnworth Pottery`, so the browser tab shows the studio's name\n\nThe check reads the file for the opening and closing `head` tags, then looks for the character set and the title inside the head.",
+      "nextSteps": [
+        "Read \"What goes in the head\" in the lesson.",
+        "Open and close a `head` element right after the opening `html` tag.",
+        "Add the character set inside it, then the title.",
+        "Save and look at the tab of the Browser panel, then press Check."
+      ],
+      "hints": [
+        "Nothing in the head shows on the page. You will see the title on the tab of the Browser panel.",
+        "The character set is an element with no content and no closing tag. Its only job is one attribute.",
+        "The meta element has a `charset` attribute set to `utf-8`. The title is an ordinary pair of tags with the studio name between them."
+      ],
+      "docs": [
+        { "title": "<head>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/head" },
+        { "title": "<title>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/title" },
+        { "title": "<meta>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "body",
+      "title": "Put the words in the body",
+      "file": "index.html",
+      "description": "Add a `body` element after the head and move Dilys's words into it.\n\n- `Kilnworth Pottery` is the one main heading of the page.\n- The sentence about Saddler Street and the sentence about the kettle are two paragraphs, one each.\n- No words are left loose in the body, outside an element.\n\nKeep her words as they are. The check reads the file for the `body` tags, then looks for the heading, the two paragraphs and any loose text.",
+      "nextSteps": [
+        "Read \"Headings and paragraphs\" in the lesson.",
+        "Open a `body` after the head and close it just before the closing `html` tag.",
+        "Wrap the studio name in the main heading element.",
+        "Wrap each sentence in a paragraph, save and press Check."
+      ],
+      "hints": [
+        "Everything you can see on the page lives in the body. The head and the body sit side by side inside `html`.",
+        "The main heading is level one of six heading elements. Paragraphs have a one-letter element.",
+        "You need an `h1` around the name and a `p` around each of the two sentences, all inside `<body>` and `</body>`."
+      ],
+      "docs": [
+        { "title": "<body>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/body" },
+        { "title": "<h1> to <h6> heading elements", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements" },
+        { "title": "Basic HTML syntax", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Basic_HTML_syntax" }
+      ],
+      "points": 10
+    }
+  ]
+}

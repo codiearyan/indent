@@ -1,0 +1,96 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "html", "label": "index.html", "kind": "file", "mine": true },
+      { "id": "header", "label": "Top of the page", "kind": "data" },
+      { "id": "main", "label": "Main content", "kind": "data" },
+      { "id": "footer", "label": "Small print", "kind": "data" },
+      { "id": "reader", "label": "Screen reader", "kind": "story" },
+      { "id": "friend", "label": "Dilys's friend", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "html", "to": "header", "label": "header" },
+      { "from": "html", "to": "main", "label": "main" },
+      { "from": "html", "to": "footer", "label": "footer" },
+      { "from": "main", "to": "reader", "label": "landmarks" },
+      { "from": "reader", "to": "friend", "label": "skip ahead" }
+    ],
+    "note": "The page looks the same, but index.html now says which part is the top, the main content and the end, so a screen reader can jump between them."
+  },
+  "tasks": {
+    "header": {
+      "steps": [
+        {
+          "active": ["friend", "reader", "reader->friend"],
+          "note": "Every visit, Dilys's friend has to hear the studio name and the links before anything else."
+        },
+        {
+          "active": ["html", "html->header", "header"],
+          "value": {
+            "kind": "array",
+            "label": "the top of the page",
+            "values": ["studio name", "Jump to links"]
+          },
+          "note": "Wrap the studio name and the Jump to links in a header, and the links themselves in a nav."
+        },
+        {
+          "active": ["header", "reader"],
+          "note": "The screen reader now knows where the top of the page is and where the main links are."
+        }
+      ]
+    },
+    "main": {
+      "steps": [
+        {
+          "active": ["html", "html->main", "main"],
+          "value": {
+            "kind": "array",
+            "label": "the main content",
+            "values": ["studio picture", "welcome", "Classes", "The shop", "Visit us"]
+          },
+          "note": "Everything between the header and the small print is why the page exists. Wrap it in one main."
+        },
+        {
+          "active": ["main", "main->reader", "reader"],
+          "note": "The main content becomes a landmark the screen reader can jump to."
+        },
+        {
+          "active": ["reader", "reader->friend", "friend"],
+          "note": "Dilys's friend skips the top of the page and lands straight on the welcome."
+        }
+      ]
+    },
+    "sections": {
+      "steps": [
+        {
+          "active": ["main"],
+          "note": "Inside main, Classes, The shop and Visit us are three parts, each starting at its heading."
+        },
+        {
+          "active": ["html", "html->main", "main"],
+          "note": "Wrap each part in a section that starts with its heading and ends just before the next one."
+        },
+        {
+          "active": ["main", "main->reader", "reader"],
+          "note": "Each part is now one piece in the HTML, ready for styles to space it out in the next part of the repo."
+        }
+      ]
+    },
+    "footer": {
+      "steps": [
+        {
+          "active": ["footer"],
+          "note": "At the bottom, the small print says who made the page and where the studio is."
+        },
+        {
+          "active": ["html", "html->footer", "footer"],
+          "note": "Wrap it in a footer, after main and outside it."
+        },
+        {
+          "active": ["header", "main", "footer"],
+          "note": "The page has its three landmarks: the top, the main content and the end."
+        }
+      ]
+    }
+  }
+}

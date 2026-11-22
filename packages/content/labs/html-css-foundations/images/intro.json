@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "Show them the front of the studio.",
+      "note": "People walk straight past."
+    },
+    {
+      "title": "pictures folder",
+      "text": "Her drawings of the studio and a mug.",
+      "note": "Not on the page yet"
+    },
+    {
+      "title": "Your HTML",
+      "file": "index.html",
+      "mine": true,
+      "gap": "No pictures at all",
+      "tasks": ["Show the studio", "Write the alt text", "Give it a size", "Caption the mug"]
+    },
+    {
+      "title": "Home page",
+      "rows": [["Studio front"], ["Welcome"], ["Mug of the month"]],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Studio front",
+    "wrong": "missing",
+    "why": "Words only",
+    "right": "on the page"
+  },
+  "captions": [
+    "Dilys wants people to recognise Kilnworth Pottery when they walk down Saddler Street.",
+    "Her drawings sit in the pictures folder, but the page shows only words.",
+    "You add the pictures, describe them, give them a size and caption the mug.",
+    "The studio front is at the top of the page, described for everyone.",
+    "Same page, now with pictures that everyone can see or hear."
+  ]
+}

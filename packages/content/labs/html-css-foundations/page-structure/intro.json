@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "Can my friend skip to the classes?",
+      "note": "Her friend uses a screen reader."
+    },
+    {
+      "title": "Screen reader",
+      "text": "Skips to the main part, if a page has one.",
+      "note": "This page has none."
+    },
+    {
+      "title": "Your HTML",
+      "file": "index.html",
+      "mine": true,
+      "gap": "No parts to jump to",
+      "tasks": ["Mark the header", "Mark the main part", "Add sections", "Mark the footer"]
+    },
+    {
+      "title": "Home page",
+      "rows": [["Header"], ["Main content"], ["Footer"]],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "Skip ahead",
+    "wrong": "hears it all",
+    "why": "No landmarks",
+    "right": "lands on main"
+  },
+  "captions": [
+    "Dilys's friend opens the studio's page with her screen reader and wants the classes.",
+    "Her reader could skip straight to the main part, but the page does not have one.",
+    "You mark the header, the main content, each section and the footer.",
+    "She skips the top of the page and lands right on the main content.",
+    "Same look as before. Now the page is complete, well-built HTML, ready for styles."
+  ]
+}

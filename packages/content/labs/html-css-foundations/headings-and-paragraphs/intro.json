@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Kofi",
+      "say": "Where did my titles go?",
+      "note": "He teaches the classes."
+    },
+    {
+      "title": "Pasted text",
+      "text": "Classes, shop and address in one block.",
+      "note": "All in one paragraph"
+    },
+    {
+      "title": "Your HTML",
+      "file": "index.html",
+      "mine": true,
+      "gap": "One huge block",
+      "tasks": ["Make headings", "Split paragraphs", "Mark what matters", "Break the address"]
+    },
+    {
+      "title": "Home page",
+      "rows": [["Classes"], ["The shop"], ["Visit us"]],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Classes",
+    "wrong": "buried",
+    "why": "One block",
+    "right": "easy to find"
+  },
+  "captions": [
+    "Kofi sent the text about his classes, the shop and the address for the studio's page.",
+    "It all landed in one paragraph, so the Classes title is buried in the middle.",
+    "You add headings, split the paragraphs, mark what matters and break the address.",
+    "Classes now has its own heading, with short paragraphs under it.",
+    "Same words as Kofi sent. Now the page has an outline."
+  ]
+}
