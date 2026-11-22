@@ -15,18 +15,26 @@ export const checks = {
       file: FILE,
       name: 'quantity',
       task: 'Task 1',
+      typed:
+        'Check changed quantityText and quantity stayed the same. Build it on quantityText, not on a number you typed.',
       list: [
         {
           name: 'Turns digits into a number',
           given: form({ quantityText: '7' }),
           expected: 7,
-          hint: 'quantity should be a number, not text that looks like one. Build it on quantityText, not on a number you typed.'
+          hint: (v) =>
+            v?.type === 'string'
+              ? 'quantity is still text that looks like a number. Look at the part of the lesson on turning text into numbers.'
+              : 'quantity should be the number quantityText stands for.'
         },
         {
           name: 'Works for two digits',
           given: form({ quantityText: '12' }),
           expected: 12,
-          hint: 'Check tried another quantity and quantity did not follow. Turn quantityText into a number.'
+          hint: (v) =>
+            v?.type === 'string'
+              ? 'quantity is still text that looks like a number. Look at the part of the lesson on turning text into numbers.'
+              : 'quantity should be the number quantityText stands for.'
         },
         {
           name: 'Ignores spaces around the digits',
@@ -77,6 +85,17 @@ export const checks = {
       file: FILE,
       name: 'extraIsNumber',
       task: 'Task 3',
+      typed: 'Check changed extraCandlesText and extraIsNumber stayed the same. Build it on extraCandlesText.',
+      mistakes: [
+        {
+          value: () => true,
+          hint: 'extraIsNumber is true for every text Check tried, words included, so it does not follow extraCandlesText. If you compared with NaN, that never works: NaN is not equal to anything, not even itself.'
+        },
+        {
+          value: () => false,
+          hint: 'extraIsNumber is false for every text Check tried, digits included, so it does not follow extraCandlesText. If you compared with NaN, that never works: NaN is not equal to anything, not even itself.'
+        }
+      ],
       list: [
         {
           name: 'A word is not a number',
@@ -100,7 +119,13 @@ export const checks = {
           name: 'Works for more digits',
           given: form({ extraCandlesText: '10' }),
           expected: true,
-          hint: 'Check tried other text and extraIsNumber did not follow. Build it on extraCandlesText.'
+          hint: 'Text like 10 turns into a real number. extraIsNumber must say so, as true or false itself.'
+        },
+        {
+          name: 'Zero is a number too',
+          given: form({ extraCandlesText: '0' }),
+          expected: true,
+          hint: '0 is a real number, even though it is falsy. Ask whether the text turned into NaN, not whether the number is truthy.'
         }
       ]
     })
@@ -111,12 +136,13 @@ export const checks = {
       file: FILE,
       name: 'safeQuantity',
       task: 'Task 4',
+      after: { names: ['quantity'], task: 'Task 1', build: (g, v) => v.quantity || 1 },
       list: [
         {
           name: 'Keeps a real quantity',
           given: form({ quantityText: '4' }),
           expected: 4,
-          hint: 'When quantity is a real number other than 0, safeQuantity should be that number. Make sure Task 1 passes.'
+          hint: 'When quantity is a real number other than 0, safeQuantity should be that number.'
         },
         {
           name: 'Text that is not a number counts as one',

@@ -31,7 +31,7 @@
             "label": "the top of the page",
             "values": ["studio name", "Jump to links"]
           },
-          "note": "Wrap the studio name and the Jump to links in a header, and the links themselves in a nav."
+          "note": "Wrap the studio name and the Jump to links in a header, and the links themselves in a nav. The studio picture between them is main content and goes below the header."
         },
         {
           "active": ["header", "reader"],
