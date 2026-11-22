@@ -650,6 +650,8 @@ export interface Api {
     onInstallProgress(listener: (labId: string, done: number) => void): Unsubscribe
     /** The list of repos or roadmaps changed: a newer index, an install or an update. */
     onChanged(listener: () => void): Unsubscribe
+    /** The learner left the issues; a repo skipped while it was open may update now. */
+    leave(): void
   }
   ide: {
     /** The IDEs found on this computer, in the order they are offered. */
@@ -830,6 +832,7 @@ export const INVOKE_METHODS = {
 
 /** Fire-and-forget renderer to main messages. */
 export const SEND_METHODS = {
+  content: ['leave'],
   terminal: ['write', 'resize', 'kill'],
   ai: ['cancel', 'cancelComplete'],
   telemetry: ['track']
