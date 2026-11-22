@@ -119,6 +119,15 @@ export function ownNodeBin(): string {
   return process.platform === 'win32' ? ownNodeDir() : join(ownNodeDir(), 'bin')
 }
 
+/** The app's own copy of OpenCode, for learners with no AI set up; found only by the app. */
+export function ownOpencodeDir(): string {
+  return join(toolsDir(), 'opencode')
+}
+
+export function ownOpencodeBin(): string {
+  return join(ownOpencodeDir(), process.platform === 'win32' ? 'opencode.exe' : 'opencode')
+}
+
 export function dataFile(name: string): string {
   return join(app.getPath('userData'), name)
 }
