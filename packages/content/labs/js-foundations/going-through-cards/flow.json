@@ -1,0 +1,154 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ines", "label": "Ines", "kind": "story" },
+      { "id": "shelf", "label": "Shelf count", "kind": "data" },
+      { "id": "catalogue", "label": "Catalogue", "kind": "data" },
+      { "id": "total", "label": "totalStock()", "kind": "function", "mine": true, "fn": "totalStock" },
+      { "id": "soldout", "label": "soldOutScents()", "kind": "function", "mine": true, "fn": "soldOutScents" },
+      { "id": "prices", "label": "priceList()", "kind": "function", "mine": true, "fn": "priceList" },
+      { "id": "value", "label": "stockValue()", "kind": "function", "mine": true, "fn": "stockValue" }
+    ],
+    "edges": [
+      { "from": "ines", "to": "shelf", "label": "counts" },
+      { "from": "shelf", "to": "total", "label": "counts" },
+      { "from": "shelf", "to": "soldout", "label": "scent, count" },
+      { "from": "catalogue", "to": "prices", "label": "cards" },
+      { "from": "catalogue", "to": "value", "label": "cards" }
+    ],
+    "note": "The shelf count and the catalogue are gone through property by property and card by card, so every question has one answer."
+  },
+  "tasks": {
+    "total": {
+      "trace": {
+        "file": "src/object-loops.js",
+        "call": "totalStock",
+        "args": [{ "cedar": 4, "fig": 0, "amber": 12, "sage": 0 }]
+      },
+      "steps": [
+        {
+          "active": ["ines", "ines->shelf", "shelf"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "cedar", "value": 4 },
+              { "key": "fig", "value": 0 },
+              { "key": "amber", "value": 12 },
+              { "key": "sage", "value": 0 }
+            ]
+          },
+          "note": "Ines counts the shelf: one key per scent, one count per key."
+        },
+        {
+          "active": ["shelf", "shelf->total", "total"],
+          "note": "totalStock() goes through the counts alone; the scents do not matter here."
+        },
+        {
+          "active": ["total"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "total", "value": "a whole number" }]
+          },
+          "note": "One number comes back: every candle on the shelf."
+        }
+      ]
+    },
+    "soldout": {
+      "trace": {
+        "file": "src/object-loops.js",
+        "call": "soldOutScents",
+        "args": [{ "cedar": 4, "fig": 0, "amber": 12, "sage": 0 }]
+      },
+      "steps": [
+        {
+          "active": ["shelf"],
+          "note": "The same shelf count, with a scent and a count in every property."
+        },
+        {
+          "active": ["shelf", "shelf->soldout", "soldout"],
+          "note": "soldOutScents() looks at each scent together with its count."
+        },
+        {
+          "active": ["soldout"],
+          "value": {
+            "kind": "array",
+            "label": "what comes back",
+            "values": ["scent", "scent", "..."]
+          },
+          "note": "A list of scents comes back, so Ines knows what to pour next."
+        }
+      ]
+    },
+    "prices": {
+      "trace": {
+        "file": "src/object-loops.js",
+        "call": "priceList",
+        "args": [
+          [
+            { "sku": "CED-200", "name": "Cedar", "priceCents": 1800, "stock": 4 },
+            { "sku": "FIG-350", "name": "Fig", "priceCents": 2400, "stock": 0 },
+            { "sku": "AMB-200", "name": "Amber", "priceCents": 1900, "stock": 12 }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["catalogue"],
+          "value": {
+            "kind": "array",
+            "label": "what goes in",
+            "values": ["Cedar card", "Fig card", "Amber card"]
+          },
+          "note": "The catalogue is a list of cards, each with a sku and a price."
+        },
+        {
+          "active": ["catalogue", "catalogue->prices", "prices"],
+          "note": "priceList() goes through the cards one by one and adds a line to a new object for each."
+        },
+        {
+          "active": ["prices"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "a sku", "value": "its price in cents" }]
+          },
+          "note": "The site gets one object to look prices up by sku."
+        }
+      ]
+    },
+    "value": {
+      "trace": {
+        "file": "src/object-loops.js",
+        "call": "stockValue",
+        "args": [
+          [
+            { "sku": "CED-200", "name": "Cedar", "priceCents": 1800, "stock": 4 },
+            { "sku": "FIG-350", "name": "Fig", "priceCents": 2400, "stock": 0 },
+            { "sku": "AMB-200", "name": "Amber", "priceCents": 1900, "stock": 12 }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["catalogue", "catalogue->value", "value"],
+          "note": "Theo needs what all the stock is worth, for the insurance."
+        },
+        {
+          "active": ["value"],
+          "note": "stockValue() asks a small function of yours what each card is worth, and adds those up."
+        },
+        {
+          "active": ["value"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "worth", "value": "whole cents" }]
+          },
+          "note": "One sum comes back, the same every time it is asked."
+        }
+      ]
+    }
+  }
+}

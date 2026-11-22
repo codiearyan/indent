@@ -38,7 +38,18 @@
         "shelf-list",
         "without-breaking",
         "new-from-old",
-        "sort-and-search",
+        "sort-and-search"
+      ]
+    },
+    {
+      "title": "The catalogue",
+      "chapters": [
+        "candle-cards",
+        "going-through-cards",
+        "taking-cards-apart",
+        "copies-and-originals",
+        "maps-and-sets",
+        "saving-the-catalogue",
         "order-reports"
       ]
     },

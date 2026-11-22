@@ -1,0 +1,141 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "catalogue", "label": "Catalogue", "kind": "data" },
+      { "id": "save", "label": "saveCatalogue()", "kind": "function", "mine": true, "fn": "saveCatalogue" },
+      { "id": "file", "label": "Saved file", "kind": "file" },
+      { "id": "load", "label": "loadCatalogue()", "kind": "function", "mine": true, "fn": "loadCatalogue" },
+      { "id": "stock", "label": "saveStock()", "kind": "function", "mine": true, "fn": "saveStock" },
+      { "id": "settings", "label": "loadSettings()", "kind": "function", "mine": true, "fn": "loadSettings" },
+      { "id": "site", "label": "Shop site", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "catalogue", "to": "save", "label": "cards" },
+      { "from": "save", "to": "file", "label": "JSON text" },
+      { "from": "file", "to": "load", "label": "text" },
+      { "from": "stock", "to": "file", "label": "stock text" },
+      { "from": "file", "to": "settings", "label": "settings text" },
+      { "from": "load", "to": "site", "label": "cards" },
+      { "from": "settings", "to": "site", "label": "settings" }
+    ],
+    "note": "The shop's data goes into files as text and comes back out as data, and a broken file never takes the site down."
+  },
+  "tasks": {
+    "save": {
+      "trace": {
+        "file": "src/saving.js",
+        "call": "saveCatalogue",
+        "args": [
+          [
+            { "sku": "CED-200", "name": "Cedar", "priceCents": 1800 },
+            { "sku": "FIG-350", "name": "Fig", "priceCents": 2400 }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["catalogue", "catalogue->save", "save"],
+          "value": { "kind": "array", "label": "what goes in", "values": ["Cedar card", "Fig card"] },
+          "note": "The catalogue is a list of cards, and a file can only hold text."
+        },
+        {
+          "active": ["save"],
+          "note": "saveCatalogue() writes the list as JSON, one property to a line."
+        },
+        {
+          "active": ["save", "save->file", "file"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "text", "value": "JSON that Theo can read" }]
+          },
+          "note": "The text goes into the file the site reads."
+        }
+      ]
+    },
+    "load": {
+      "trace": {
+        "file": "src/saving.js",
+        "call": "loadCatalogue",
+        "args": ["[{\"sku\":\"CED-200\",\"na"]
+      },
+      "steps": [
+        {
+          "active": ["file", "file->load", "load"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "text", "value": "a file cut off halfway" }]
+          },
+          "note": "The laptop died while saving, and the file stops halfway through a card."
+        },
+        {
+          "active": ["load"],
+          "note": "loadCatalogue() tries to read the text, and is ready for it to fail."
+        },
+        {
+          "active": ["load", "load->site", "site"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "cards", "value": "a list, never an error" }]
+          },
+          "note": "The site comes up either way."
+        }
+      ]
+    },
+    "stock": {
+      "steps": [
+        {
+          "active": ["stock"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "stock", "value": "a Map from sku to count" }]
+          },
+          "note": "The stock lives in a Map, and JSON does not know Maps."
+        },
+        {
+          "active": ["stock", "stock->file", "file"],
+          "note": "saveStock() turns the Map into something JSON keeps before it saves."
+        },
+        {
+          "active": ["file"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "loaded", "value": "a Map with the same entries" }]
+          },
+          "note": "loadStock() reads that text and turns it into a Map again."
+        }
+      ]
+    },
+    "settings": {
+      "trace": { "file": "src/saving.js", "call": "loadSettings", "args": ["{\"perPage\":24}"] },
+      "steps": [
+        {
+          "active": ["file", "file->settings", "settings"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "text", "value": "only the settings Ines changed" }]
+          },
+          "note": "Ines saved one setting, and nobody remembers the others."
+        },
+        {
+          "active": ["settings"],
+          "note": "loadSettings() reads the text safely with a small function of yours, and starts from the defaults."
+        },
+        {
+          "active": ["settings", "settings->site", "site"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "settings", "value": "every setting, saved ones on top" }]
+          },
+          "note": "The site gets a full set of settings, and the defaults stay as they were."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "id": "saving-the-catalogue",
+  "title": "Saving the catalogue",
+  "files": ["src/saving.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the catalogue, the stock and the settings turned into text and back.",
+    "suggestedCommand": "node src/saving.js"
+  },
+  "tasks": [
+    {
+      "id": "save",
+      "title": "Save the catalogue as text",
+      "file": "src/saving.js",
+      "description": "Under `// Task 1` in `src/saving.js`, make `saveCatalogue(candles)` return the list as JSON text, indented by two spaces so Theo can read the file. The list stays as it is.\n\nCheck calls `saveCatalogue` with lists of its own, an empty one included, and compares the text letter by letter.",
+      "nextSteps": [
+        "Read the lesson's part on turning data into text.",
+        "Turn the list into JSON text.",
+        "Ask for two spaces of indent.",
+        "Run the file: each property should be on a line of its own."
+      ],
+      "hints": [
+        "`String(candles)` and template literals turn objects into `[object Object]`. JSON keeps what is inside.",
+        "`JSON.stringify` takes the value first. Its third value is the indent; the second can be `null`.",
+        "The function is one line: `return JSON.stringify(candles, null, 2)`."
+      ],
+      "docs": [
+        {
+          "title": "JSON.stringify()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify"
+        },
+        {
+          "title": "Working with JSON",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON"
+        }
+      ],
+      "videos": [
+        {
+          "title": "JSON in two minutes",
+          "url": "https://www.youtube.com/watch?v=C_xv7t8rllM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "load",
+      "title": "Load it back, even when it is broken",
+      "file": "src/saving.js",
+      "description": "Under `// Task 2`, make `loadCatalogue(text)` return the list that `text` holds. When `text` is not JSON, because the file was cut off or someone typed in it, it returns an empty list instead of stopping. Check only gives it the text of a saved list, or broken text.\n\nCheck calls `loadCatalogue` with saved lists, a cut off file, an empty file and text that is not JSON at all.",
+      "nextSteps": [
+        "Read the lesson's parts on reading JSON and on broken text.",
+        "Turn the text back into a list.",
+        "Put that inside a `try`, and give back an empty list in its `catch`.",
+        "Run the file: the second line for Task 2 should be an empty list, not an error."
+      ],
+      "hints": [
+        "`JSON.parse` reads JSON text back into data, and throws an error on text it cannot read.",
+        "An error inside `try { }` does not stop the program: Node jumps to the `catch { }` part, and the function can give back something else from there.",
+        "The body has the shape `try { return JSON.parse(text) } catch { return [] }`."
+      ],
+      "docs": [
+        {
+          "title": "JSON.parse()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse"
+        },
+        {
+          "title": "try...catch",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stock",
+      "title": "Save the stock Map and bring it back",
+      "file": "src/saving.js",
+      "description": "Under `// Task 3`, make `saveStock(stock)` return JSON text that keeps every entry of `stock`, a `Map` from sku to count. Then make `loadStock(text)` take text that `saveStock` made and return a `Map` with the same entries.\n\nCheck saves Maps of its own with your `saveStock`, an empty one included, makes sure the text keeps every entry, then loads that text with your `loadStock` and compares the Map it gives with the one it started from.",
+      "nextSteps": [
+        "Read the lesson's part on what does not survive the trip.",
+        "In `saveStock`, turn the Map into something JSON keeps, then into JSON text.",
+        "In `loadStock`, read the text back and turn what you get into a Map.",
+        "Run the file: the last line for Task 3 should be a Map again."
+      ],
+      "hints": [
+        "`JSON.stringify` on a Map gives `{}`: its entries are not properties, so JSON leaves them out.",
+        "Spread turns a Map into a list of `[key, value]` pairs, and JSON keeps lists. `new Map()` takes such a list and makes a Map from it.",
+        "`saveStock` is `return JSON.stringify([...stock])`, and `loadStock` is `return new Map(JSON.parse(text))`."
+      ],
+      "docs": [
+        {
+          "title": "Map() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/Map"
+        },
+        {
+          "title": "JSON.stringify(): description",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "settings",
+      "title": "Load the settings with defaults",
+      "file": "src/saving.js",
+      "description": "Under `// Task 4`, first write a function of your own called `readJson`, from the word `function` to its closing brace. It has two parameters, `text` and `fallback`, and returns the value `text` holds as JSON, or `fallback` when `text` is not JSON. A value that counts as false, such as `0` or `null`, is still JSON. It only helps `loadSettings`, so it stays off the `export` line.\n\nThen make `loadSettings(text)` return a new object with every setting of `defaultSettings`, and over them every setting saved in `text`, which may be only some of them. When `text` is not JSON, it returns the defaults. Use `readJson` to read the text. `defaultSettings` stays as it is. Check only gives it the text of a saved settings object, or broken text.\n\nCheck calls `readJson` and `loadSettings` with texts of its own, makes sure `defaultSettings` is unchanged afterwards, and reads your file for `readJson` and the call to it inside `loadSettings`.",
+      "nextSteps": [
+        "Above `loadSettings`, write `function readJson(text, fallback) {` and its closing `}` yourself.",
+        "Make it give back what the text holds, or the fallback when reading it throws.",
+        "In `loadSettings`, make a new object with the defaults, then the saved settings over them.",
+        "Run the file: the broken text should give the default settings."
+      ],
+      "hints": [
+        "`readJson` is `loadCatalogue` from Task 2 with the fallback as a parameter.",
+        "Spreading two objects into a new one copies both; when a key appears twice, the one written last wins. An empty object is a handy fallback, since spreading it adds nothing.",
+        "`readJson` is `try { return JSON.parse(text) } catch { return fallback }`, and `loadSettings` is `return { ...defaultSettings, ...readJson(text, {}) }`."
+      ],
+      "docs": [
+        {
+          "title": "try...catch",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
+        },
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

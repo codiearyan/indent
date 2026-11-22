@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "What sold best this week?", "note": "Monday's pouring depends on it." },
+    { "title": "Week's sales", "text": "One scent per candle, repeats and all." },
+    {
+      "title": "Your code",
+      "file": "maps-and-sets.js",
+      "mine": true,
+      "gap": "No counts, only a long list",
+      "tasks": ["Count the scents", "Find the best seller", "Every scent once", "New customers"]
+    },
+    { "title": "Ines", "text": "A count per scent and a pick for Monday." }
+  ],
+  "ticket": { "label": "Friday report", "wrong": "long list", "why": "No counts", "right": "counted" },
+  "captions": [
+    "Copies stay copies now. On Friday Ines asks what sold best this week.",
+    "The sales are one long list of scents, and she counts them on paper.",
+    "You count with a Map, find the best seller, and drop repeats with a Set.",
+    "The report comes back with a count for every scent and the best seller.",
+    "Maps count and Sets keep things once. Next, the catalogue learns to be saved."
+  ]
+}

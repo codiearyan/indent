@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "The site must not show our costs.", "note": "Every card has the cost on it." },
+    { "title": "Candle cards", "rows": [["Cedar", "1800"], ["Fig", "2400"], ["Amber", "1900"]] },
+    {
+      "title": "Your code",
+      "file": "destructuring.js",
+      "mine": true,
+      "gap": "Cards go out whole",
+      "tasks": ["Shelf tags", "Candle of the month", "Price on a copy", "Hide the cost"]
+    },
+    { "title": "Shop site", "text": "Names, sizes and prices, and no costs." }
+  ],
+  "ticket": { "label": "Cedar card", "wrong": "cost shows", "why": "All of it", "right": "safe to show" },
+  "captions": [
+    "The cards can be gone through now. Theo gets them ready for the shop's site.",
+    "Each card goes out whole, the cost of making the candle included.",
+    "You take cards apart and make new ones: tags, a monthly pick, copies, public cards.",
+    "The cedar card reaches the site with its name and price, and its cost stays home.",
+    "Objects and lists can be taken apart and put together again without changing them."
+  ]
+}

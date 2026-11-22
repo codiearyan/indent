@@ -1,0 +1,129 @@
+{
+  "id": "candle-cards",
+  "title": "A card for every candle",
+  "files": ["src/objects.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the cards it makes and changes.",
+    "suggestedCommand": "node src/objects.js"
+  },
+  "tasks": [
+    {
+      "id": "make",
+      "title": "Make a card",
+      "file": "src/objects.js",
+      "description": "Under `// Task 1` in `src/objects.js`, make `makeCandle(name, grams, priceCents)` return a new card: an object with the properties `name`, `grams` and `priceCents`, set from its parameters, and `stock`, set to `0`.\n\n`makeCandle('Cedar', 200, 1800)` gives `{ name: 'Cedar', grams: 200, priceCents: 1800, stock: 0 }`.\n\nCheck calls `makeCandle` with candles of its own and compares every property of the card it gives back.",
+      "nextSteps": [
+        "Read the lesson's part on making an object.",
+        "Return an object in curly braces from `makeCandle`.",
+        "Give it the four properties, each a name, a colon and a value, with commas between them.",
+        "Run the file: the first line should show the Cedar card."
+      ],
+      "hints": [
+        "An object is written in curly braces, with a name and a value for each property.",
+        "The value of a property can be a parameter. `name: name` takes the value from the parameter called `name`; when the two names are the same you may write just `name`.",
+        "The function is one line: `return { name: name, grams: grams, ... }`, with `priceCents` and `stock: 0` in place of the dots."
+      ],
+      "docs": [
+        {
+          "title": "Working with objects",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_objects"
+        },
+        {
+          "title": "Object initializer",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Objects in six minutes",
+          "url": "https://www.youtube.com/watch?v=VxKW61lWDDg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "line",
+      "title": "Read any line of a card",
+      "file": "src/objects.js",
+      "description": "Under `// Task 2`, first write a function of your own called `hasLine`, from the word `function` to its closing brace. It has two parameters, `card` and `field`, and returns `true` when `card` has a property whose name is the text in `field`, and `false` when it does not. It only helps `cardLine`, so it stays off the `export` line.\n\nThen make `cardLine(card, field)` return the name in `field`, a colon, a space and the value of that property: `'grams: 350'`. When the card has no property by that name, it returns `'scent: not on the card'`, with the name in `field` at the start. It calls `hasLine` to find out.\n\nCheck calls `hasLine` and `cardLine` with a card of its own, a property whose value is `0` included, and reads your file for `hasLine` and the call to it.",
+      "nextSteps": [
+        "Read the lesson's parts on brackets and on asking whether a property is there.",
+        "Above `cardLine`, write `function hasLine(card, field) {` and its closing `}` yourself.",
+        "In `cardLine`, ask `hasLine` first, then read the property whose name is in `field`.",
+        "Run the file: the two lines for Task 2 should show grams and a missing scent."
+      ],
+      "hints": [
+        "`field` holds the name of a property as text. A dot only works with a name written in the code itself.",
+        "Brackets with no quotes read the property whose name is inside a variable. Asking whether a property is there is a question of its own, with `in`: a value of `0` is there, though it counts as false.",
+        "`hasLine` is one line, `return field in card`, and `cardLine` starts ``if (hasLine(card, field)) { return `${field}: ${card[field]}` }``."
+      ],
+      "docs": [
+        {
+          "title": "Property accessors",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors"
+        },
+        {
+          "title": "The in operator",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/in"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sell",
+      "title": "Sell from a card",
+      "file": "src/objects.js",
+      "description": "Under `// Task 3`, make `sell(card, count)` take `count` off the card's `stock`, changing the card itself, and return the card. When the stock reaches `0`, it also gives the card a property `soldOut` with the value `true`.\n\nCheck sells from cards of its own, never more than a card has in stock, and looks at the card it gave `sell` afterwards.",
+      "nextSteps": [
+        "Read the lesson's part on changing and adding properties.",
+        "Give `card.stock` a new value: the old one minus `count`.",
+        "When the stock is now `0`, give the card `soldOut`.",
+        "Return the card and run the file."
+      ],
+      "hints": [
+        "A property can be given a new value with a single `=`, the way a `let` can.",
+        "Giving a value to a property the object does not have yet adds that property. Ask about the stock after you have changed it, and compare with `===`.",
+        "The body has the shape `card.stock = card.stock - count`, then `if (card.stock === 0) { card.soldOut = true }`, then `return card`."
+      ],
+      "docs": [
+        {
+          "title": "Working with objects",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_objects"
+        },
+        {
+          "title": "Property accessors",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "restock",
+      "title": "Restock a card",
+      "file": "src/objects.js",
+      "description": "Under `// Task 4`, make `restock(card, count)` add `count` to the card's `stock`, changing the card itself, remove the `soldOut` property when the card has one, and return the card.\n\nCheck restocks cards of its own, some sold out and some not, and looks at the card it gave `restock` afterwards. A removed property must be gone, not just hold a different value.",
+      "nextSteps": [
+        "Read the lesson's part on removing a property.",
+        "Add `count` to `card.stock`.",
+        "Remove `soldOut` from the card.",
+        "Return the card and run the file: the Sage card should have stock and no soldOut."
+      ],
+      "hints": [
+        "Giving `soldOut` the value `false` or `undefined` keeps the property on the card. The task asks for it to be gone.",
+        "`delete` removes a property from an object. Removing a property the object does not have does no harm, so there is no need to ask first.",
+        "The body has the shape `card.stock = card.stock + count`, then `delete card.soldOut`, then `return card`."
+      ],
+      "docs": [
+        {
+          "title": "The delete operator",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete"
+        },
+        {
+          "title": "Working with objects",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_objects"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
