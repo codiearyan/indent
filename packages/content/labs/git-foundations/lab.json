@@ -15,6 +15,10 @@
     {
       "title": "Branching out",
       "chapters": ["ignoring-files", "branches", "merging", "first-conflict"]
+    },
+    {
+      "title": "Working with others",
+      "chapters": ["cloning", "fetching-and-pulling", "pushing"]
     }
   ]
 }
