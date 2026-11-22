@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "Can we explain the waiting code?", "note": "Last night's list was half done." },
+    { "title": "Store room", "text": "Reading paper.json takes a moment.", "note": "No count to hand back yet." },
+    {
+      "title": "Your docket",
+      "file": "docket.js",
+      "mine": true,
+      "gap": "Nothing stands for the count",
+      "tasks": ["Keep or fail it", "Settle only once", "Catch a throw"]
+    },
+    { "title": "Idris's price list", "text": "Gets a docket at once, the count later." }
+  ],
+  "ticket": { "label": "Card count", "wrong": "nowhere", "why": "Not here yet", "right": "on a docket" },
+  "captions": [
+    "At Ashgrove Press, Hesper wants the price list's waiting code explained, line by line.",
+    "The paper count takes a moment to read, and there is nothing to hand back meanwhile.",
+    "You write a docket that stands for the count until it arrives, in three tasks.",
+    "Now the card count comes back at once on a docket, and is kept when the file is read.",
+    "A value that arrives later now has a home the whole shop can read."
+  ]
+}

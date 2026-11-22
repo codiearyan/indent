@@ -1,0 +1,77 @@
+{
+  "id": "when-it-fails",
+  "title": "When something fails",
+  "files": ["src/docket.js", "src/price-list.js", "src/store.js"],
+  "terminal": {
+    "description": "A shell in your workspace where Idris's price list quotes three papers, and every failure lands in one catch().",
+    "suggestedCommand": "node src/price-list.js"
+  },
+  "tasks": [
+    {
+      "id": "throws-in-callbacks",
+      "title": "A throw in a callback",
+      "file": "src/docket.js",
+      "description": "When `onFulfilled` or `onRejected` throws, the docket from `then()` fails with exactly what was thrown.\n\n- the throw goes no further: `resolve`, `reject` and `then()` never throw because a callback did\n- one callback that throws does not stop the other callbacks waiting on the same docket\n- this holds on a docket that settles later and on one already settled\n\nThe check gives dockets of its own callbacks that throw, settles them, and reads the docket from `then()` and anything that escaped.",
+      "nextSteps": [
+        "Run `node src/price-list.js` and read the error: the poster's throw crashes the script.",
+        "Find the one place where a callback is called.",
+        "Catch what it throws there, and fail the docket from `then()` with it.",
+        "Run the script again: it now stops at `catch()`, which is the next task."
+      ],
+      "hints": [
+        "Whoever called `resolve` (the code that read a file, a timer) has no idea a callback is waiting, and cannot do anything sensible with its error. The docket from `then()` is the one place the error belongs.",
+        "A `try` around the callback call catches it. In the `catch`, the docket from `then()` has a function for exactly this.",
+        "`try { const result = callback(this.value); /* settle as before */ } catch (error) { reject(error) }`, where `reject` belongs to the docket `then()` returns."
+      ],
+      "docs": [
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "catch",
+      "title": "catch()",
+      "file": "src/docket.js",
+      "description": "Implement `catch(onRejected)` in `src/docket.js`. It works like `then(undefined, onRejected)`.\n\n- it returns a new docket\n- on a failure, `onRejected(reason)` runs once, and the new docket is kept with what it returned, so the chain carries on; a returned docket is waited for, as with `onFulfilled`\n- on a docket that is kept, `onRejected` does not run and the new docket is kept with the same value\n- `then(undefined, onRejected)` behaves the same way: what `onRejected` returns keeps the docket from `then()`\n\nThe check uses `catch()` and `then(undefined, handler)` on dockets of its own that fail or are kept, and reads the new docket.",
+      "nextSteps": [
+        "Write `catch()` in terms of `then()`.",
+        "Look at what `then()` does today after `onRejected` has run.",
+        "Make `onRejected`'s result settle the new docket the same way `onFulfilled`'s does.",
+        "Run the script: the poster and napkin lines should now say why there is no quote."
+      ],
+      "hints": [
+        "`catch()` is not a new idea, only a shorter way to write a `then()` with no `onFulfilled`. All the work is in `then()`.",
+        "Today `then()` treats the two callbacks differently: one's result keeps the next docket, the other's is thrown away. A handler that dealt with the failure has finished its step like any other.",
+        "`catch(onRejected) { return this.then(undefined, onRejected) }`, and in `then()` pick the callback by state, then settle the new docket from its result the same way for both."
+      ],
+      "docs": [
+        { "title": "Promise.prototype.catch()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch" },
+        { "title": "Using promises: error handling", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises#error_handling" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "skip-ahead",
+      "title": "A failure skips ahead",
+      "file": "src/docket.js",
+      "description": "Make a failure travel down a chain to the first callback that takes it.\n\n- when `onRejected` is missing or not a function, the docket from `then()` fails with the same reason, unchanged\n- no `onFulfilled` runs on the way\n- this holds for a docket that failed, one that fails later, and a throw in an earlier callback\n\nThe check builds chains of `then()` calls with only `onFulfilled`, ending in `then(undefined, handler)`, and records what ran and how a docket in the middle ended. The last case builds on task 1; the check says so when it is not done.",
+      "nextSteps": [
+        "Look at the napkin quote: its count fails, and two `then()` calls stand between it and `catch()`.",
+        "Find what `then()` does today when the docket failed and there is no `onRejected`.",
+        "Pass the failure on to the docket from `then()`, the way a missing `onFulfilled` passes a value on.",
+        "Run the script: every line should end in a quote or a reason."
+      ],
+      "hints": [
+        "A step that has nothing to do with the failure must not swallow it. The next docket has to fail too, or the failure is lost.",
+        "You already pass a value on when there is no `onFulfilled`. A missing `onRejected` is the same idea for the other state.",
+        "When the matching callback is not a function: `kept ? resolve(this.value) : reject(this.value)`."
+      ],
+      "docs": [
+        { "title": "Using promises: error handling", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises#error_handling" },
+        { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" }
+      ],
+      "points": 10
+    }
+  ]
+}
