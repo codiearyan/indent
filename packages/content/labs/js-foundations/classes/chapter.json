@@ -1,0 +1,135 @@
+{
+  "id": "classes",
+  "title": "Objects with their own functions",
+  "files": ["src/candles.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the candles file here: each line at the bottom tries one task and prints what came out, or the error it stopped with.",
+    "suggestedCommand": "node src/candles.js"
+  },
+  "tasks": [
+    {
+      "id": "card",
+      "title": "A card that sells itself",
+      "file": "src/candles.js",
+      "description": "Under `// Task 1` in `src/candles.js`, make `makeCard(name, stock)` return an object with the properties `name` and `stock`, and a method `sell(count)` that takes `count` off the `stock` property of the object it is called on, using `this`.\n\nCheck makes cards of its own and sells from them. It also changes a card's stock before selling, and calls `sell` on another object, to make sure `sell` works through `this`.",
+      "nextSteps": [
+        "Read the lesson's parts on methods and on this.",
+        "Return an object with `name` and `stock` from `makeCard`.",
+        "Add `sell(count)` to it as a method, and change `this.stock` inside it.",
+        "Run the file: the first line should show the Fig card's stock after the sale."
+      ],
+      "hints": [
+        "You returned an object of methods in the issue on helpers that remember. This time the stock is a property of the object, not a variable kept beside it.",
+        "Inside a method, `this` is the object before the dot of the call: in `card.sell(2)`, it is `card`. A method written with `=>` has no `this` of its own.",
+        "The object is `{ name, stock, sell(count) { this.stock = this.stock - count } }`."
+      ],
+      "docs": [
+        {
+          "title": "this",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this"
+        },
+        {
+          "title": "Method definitions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "candle",
+      "title": "A class for candles",
+      "file": "src/candles.js",
+      "description": "Under `// Task 2`, write a class `Candle`, and export it. `new Candle(name, priceCents)` makes a candle with the properties `name` and `priceCents`, set from its parameters, and `stock`, set to `0`. It has three methods:\n\n- `restock(count)` adds `count` to its stock\n- `sell(count)` takes `count` off its stock\n- `label()` gives `'Sage: 2 left'`, or `'Sage: sold out'` when its stock is `0`\n\nCheck makes candles of its own with `new`, restocks and sells from them, reads their labels, and reads your file for the class and its export.",
+      "nextSteps": [
+        "Read the lesson's part on classes.",
+        "Write `export class Candle {` and its closing brace.",
+        "Inside, write the constructor first, then the three methods.",
+        "Run the file: the Sage line should show its label."
+      ],
+      "hints": [
+        "Every property a candle has gets its first value in the constructor, `stock` included, so a candle is whole the moment it is made.",
+        "Inside the class, `this` is the candle the method was called on, or the new candle in the constructor. The methods are written like the `sell` of Task 1, with no commas between them.",
+        "The constructor sets `this.name = name`, `this.priceCents = priceCents` and `this.stock = 0`; `label()` starts ``if (this.stock === 0) { return `${this.name}: sold out` }``."
+      ],
+      "docs": [
+        {
+          "title": "Classes",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes"
+        },
+        {
+          "title": "constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/constructor"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Classes, objects and constructors",
+          "url": "https://www.youtube.com/watch?v=5AWRivBk0Gw"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "limited",
+      "title": "A limited edition, built on Candle",
+      "file": "src/candles.js",
+      "description": "Under `// Task 3`, write a class `LimitedCandle`, built on `Candle` with `extends`, and export it. `new LimitedCandle(name, priceCents, edition)` makes a candle the way `Candle` does, and also has the property `edition`. Its `label()` gives the label of `Candle`, then `, limited to ` and the edition: `'Snow: 3 left, limited to 20'`. Use the label of `Candle` for the first part. `restock` and `sell` come from `Candle`, unchanged.\n\nCheck makes limited candles of its own, reads their labels, restocks and sells from them, and changes the label of `Candle` to make sure the limited label uses it.",
+      "nextSteps": [
+        "Read the lesson's part on one class built on another.",
+        "Write `export class LimitedCandle extends Candle {` and its closing brace.",
+        "In its constructor, let `Candle` make the candle first, then set `edition`.",
+        "Write `label()`, using the label of `Candle`, and run the file."
+      ],
+      "hints": [
+        "A class built on another has every method of the first. It only writes what is new or different: here, the constructor and the label.",
+        "`super(...)` runs the constructor of `Candle`, and must come before any use of `this`. `super.label()` gives the label `Candle` would give.",
+        "The constructor is `super(name, priceCents)` then `this.edition = edition`; `label()` returns `` `${super.label()}, limited to ${this.edition}` ``."
+      ],
+      "docs": [
+        {
+          "title": "extends",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/extends"
+        },
+        {
+          "title": "super",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/super"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "payment",
+      "title": "Sell when the payment comes in",
+      "file": "src/candles.js",
+      "description": "Under `// Task 4`, make `sellOnPayment(candle, order)` hand `whenPaid` a handler that sells from `candle` the number of candles it is called with, so they are taken off its stock once the order is paid. Leave `whenPaid` as it is.\n\nCheck calls `sellOnPayment` with a candle of its own, and with a till that is paid later, to make sure nothing is sold before the payment comes in.",
+      "nextSteps": [
+        "Read the lesson's part on passing a method.",
+        "Call `whenPaid` with the order and a handler.",
+        "Make sure that when the handler runs, `sell` is called on the candle.",
+        "Run the file: the Amber line should show the stock after the payment."
+      ],
+      "hints": [
+        "`whenPaid` calls the handler by itself, as `handler(order.qty)`, with nothing before the dot.",
+        "Handing over `candle.sell` passes the method on its own: when `whenPaid` calls it, `this` is `undefined`. A small arrow function of your own can call `sell` on the candle.",
+        "The body is `whenPaid(order, (count) => candle.sell(count))`."
+      ],
+      "docs": [
+        {
+          "title": "this: callbacks",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this#callbacks"
+        },
+        {
+          "title": "Arrow function expressions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What this is, in 100 seconds",
+          "url": "https://www.youtube.com/watch?v=YOlr79NaAtQ"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

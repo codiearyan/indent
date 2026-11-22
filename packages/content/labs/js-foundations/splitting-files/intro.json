@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "I scroll all day to find things.", "note": "The site is one long file." },
+    { "title": "shop.js", "text": "Candles, stock rules and the page, in one." },
+    {
+      "title": "Your files",
+      "file": "shop.js",
+      "mine": true,
+      "gap": "Nowhere to look first",
+      "tasks": ["Candles to a file", "Stock rules to a file", "Read the settings", "Page to a file"]
+    },
+    { "title": "Ines", "say": "Found where low is set." }
+  ],
+  "ticket": { "label": "Low stock", "wrong": "hard to find", "why": "Too long", "right": "in stock.js" },
+  "captions": [
+    "Prices live in one file now. Next, Theo's site file has grown too long to read.",
+    "Ines wants to change when a candle counts as low, and cannot find the number.",
+    "You move the candles, the stock rules and the page into files of their own.",
+    "The low stock number comes from the settings now, and stock.js reads it.",
+    "Each part of the site has a file named after it, and shop.js only runs them."
+  ]
+}
