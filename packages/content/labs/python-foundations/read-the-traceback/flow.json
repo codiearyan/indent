@@ -25,14 +25,14 @@
           "value": { "kind": "array", "label": "what the error shows", "values": ["file and line", "copy of the line", "a ^ mark", "kind of error"] },
           "note": "The error names the line and the kind of mistake, so nothing else in the file has run."
         },
-        { "active": ["python", "python->shift", "shift"], "note": "Once the text ends where it should, the callouts print again." }
+        { "active": ["python", "python->shift", "shift"], "note": "Once Python can read the line, the callouts print again." }
       ]
     },
     "hours": {
       "steps": [
         { "active": ["file", "file->python", "python"], "note": "With Task 1 fixed, Python reads further and stops at the line under Task 2." },
         { "active": ["python", "python->error", "error"], "note": "This time the complaint is about where the line starts, not about its words." },
-        { "active": ["python", "python->shift", "shift"], "note": "A line that starts at the left edge is read, and the hours print again." }
+        { "active": ["python", "python->shift", "shift"], "note": "Once that line can be read too, the hours print again." }
       ]
     },
     "officer": {
@@ -40,14 +40,14 @@
         { "active": ["file", "file->python", "python"], "note": "Now the whole file can be read, so Python runs it from the top." },
         { "active": ["python", "python->shift", "shift"], "note": "The callouts and the hours print, then one line stops everything." },
         { "active": ["python", "python->error", "error"], "note": "Read from the bottom, the traceback names a variable nobody made." },
-        { "active": ["python", "python->shift", "shift"], "note": "With the name spelt as it was made, the kit officer prints." }
+        { "active": ["python", "python->shift", "shift"], "note": "Once Python knows the name on that line, the kit officer prints." }
       ]
     },
     "crew": {
       "steps": [
         { "active": ["file", "file->python", "python"], "note": "The last line joins words and a number." },
         { "active": ["python", "python->error", "error"], "note": "The traceback says which two kinds of value met." },
-        { "active": ["python", "python->shift", "shift"], "note": "With the number printed beside the text, the whole report reaches the next shift." }
+        { "active": ["python", "python->shift", "shift"], "note": "Once the two kinds of value can go together, the whole report reaches the next shift." }
       ]
     }
   }

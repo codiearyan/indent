@@ -35,15 +35,23 @@ def emit(record):
 
 
 def guard(root):
-    """Lets the learner's code write only inside the sandbox copy, and start no other program."""
+    """Lets the learner's code write only inside the sandbox copy, and start no other program.
+
+    It stops a beginner's accident: an absolute path typed by mistake, a `..` too many, a file
+    removed by a wrong name, a link out of the folder, a program started from the file. It is not
+    a sandbox. Reading files outside the copy is allowed, and code that sets out to get past it
+    can (native code, a process started without an audit event such as multiprocessing on 3.9).
+    The learner's file runs on their own computer as their own user either way.
+    """
     writes = os.O_WRONLY | os.O_RDWR | os.O_APPEND | os.O_CREAT | os.O_TRUNC
     changes = {
         'os.remove', 'os.rmdir', 'os.mkdir', 'os.rename', 'os.chmod', 'os.chown', 'os.truncate',
-        'os.utime', 'os.symlink', 'os.link', 'shutil.rmtree', 'shutil.copyfile', 'shutil.move'
+        'os.utime', 'os.symlink', 'os.link', 'os.mkfifo', 'os.mknod', 'os.chflags',
+        'os.setxattr', 'os.removexattr', 'shutil.rmtree', 'shutil.copyfile', 'shutil.move'
     }
     programs = {
         'subprocess.Popen', 'os.system', 'os.exec', 'os.posix_spawn', 'os.spawn', 'os.fork',
-        'os.forkpty', 'os.startfile', 'os.kill', 'os.killpg'
+        'os.forkpty', 'os.startfile', 'os.kill', 'os.killpg', 'ctypes.dlopen'
     }
 
     def inside(path):
@@ -65,7 +73,7 @@ def guard(root):
                 if isinstance(arg, (str, bytes, os.PathLike)) and not inside(arg):
                     raise PermissionError('Check lets a program change files only inside its workspace')
         elif event in programs:
-            raise PermissionError('Check does not let a program start other programs')
+            raise PermissionError('Check does not let a program start other programs or load native code')
 
     sys.addaudithook(hook)
 
@@ -127,6 +135,28 @@ def error_of(error, shown):
     }
 
 
+def kind_of(node):
+    """The kind of value a given line holds, as far as Check cares: a number, text, True or False,
+    None, or something else such as `7,5` (two numbers) or an expression."""
+    try:
+        value = ast.literal_eval(node)
+    except (ValueError, TypeError, SyntaxError, MemoryError, RecursionError):
+        return 'other'
+    if value is None:
+        return 'none'
+    if isinstance(value, bool):
+        return 'bool'
+    if isinstance(value, (int, float)):
+        return 'number'
+    return 'text' if isinstance(value, str) else 'other'
+
+
+def changed(mine, checks):
+    """Whether a given line no longer holds the kind of value Check puts there. None stands for
+    a value not known yet, so it may become anything."""
+    return mine == 'other' or (mine != checks and 'none' not in (mine, checks))
+
+
 def comments_in(source):
     found = []
     try:
@@ -151,7 +181,7 @@ def task_starts(lines):
 
 
 def main():
-    spec = json.loads(sys.stdin.read())
+    spec = json.loads(sys.stdin.buffer.read())
     sys.stdin = io.StringIO('')
     shown = spec['shown']
     root = os.path.realpath(spec['root'])
@@ -190,6 +220,9 @@ def main():
         )
         if line is None:
             emit({'kind': 'missing-given', 'name': name})
+            return
+        if changed(kind_of(line.value), kind_of(ast.Constant(value=value))):
+            emit({'kind': 'changed-given', 'name': name, 'line': line.lineno})
             return
         line.value = ast.copy_location(ast.Constant(value=value), line.value)
     ast.fix_missing_locations(tree)

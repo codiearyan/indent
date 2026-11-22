@@ -110,7 +110,12 @@ export const checks = {
       name: 'ready_to_go',
       list: list.map(([name, crew, channel, packed, ready]) => ({
         name,
-        given: team({ stretcher_packed: packed }),
+        // The values at the top agree with the answers Tasks 1 and 2 are given.
+        given: team({
+          stretcher_packed: packed,
+          ...(crew ? {} : { crew_ready: 3 }),
+          ...(channel ? {} : { radio_channel: 2 })
+        }),
         inject: { enough_crew: crew, on_channel: channel },
         expected: ready ? yes : no,
         hint: notBool(

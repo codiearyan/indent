@@ -97,7 +97,7 @@ export const checks = {
         : fail(
             'The line is still in the file, as a comment',
             off
-              ? 'The line is gone from the file. Rhona wants to keep it, switched off. Put the line back and turn it into a comment.'
+              ? 'Check cannot find the line as a comment. Rhona wants the same line kept, switched off: put it back as it was, with # at its start and its words unchanged.'
               : 'Switch the old meeting place off first.'
           )
     ]
@@ -125,7 +125,7 @@ export const checks = {
         ? pass('Has a comment of your own')
         : fail(
             'Has a comment of your own',
-            'Check cannot find a comment of your own. Write a line that starts with # and a few words after it. The comments that came with the file, and the switched-off meeting place, do not count.'
+            'Check cannot find a comment of your own with at least two words. Write a line that starts with # and a few words after it. The comments that came with the file, and the switched-off meeting place, do not count.'
           )
     ]
   }

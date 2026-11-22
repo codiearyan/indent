@@ -46,19 +46,22 @@ function collect(child, input, timeoutMs) {
   })
 }
 
+/** Every program called `name` on the PATH, in order. On Windows only a real `.exe`: the app's
+ * `python3.cmd` cannot start without a shell, and the system's own stubs fail `--version`. */
 async function onPath(name) {
   const ext = process.platform === 'win32' ? '.exe' : ''
+  const found = []
   for (const dir of (process.env.PATH ?? '').split(delimiter)) {
     if (!dir) continue
     const file = join(dir, name + ext)
     try {
       await access(file, constants.X_OK)
-      return file
+      found.push(file)
     } catch {
       // not in this folder
     }
   }
-  return null
+  return found
 }
 
 const quick = (bin, args) =>
@@ -68,13 +71,13 @@ const quick = (bin, args) =>
 // they are asked for first, the way the app does.
 async function findPython() {
   for (const name of ['python3', 'python']) {
-    const bin = await onPath(name)
-    if (!bin) continue
-    if (process.platform === 'darwin' && bin === `/usr/bin/${name}`) {
-      if ((await quick('xcode-select', ['-p'])).code !== 0) continue
+    for (const bin of await onPath(name)) {
+      if (process.platform === 'darwin' && bin === `/usr/bin/${name}`) {
+        if ((await quick('xcode-select', ['-p'])).code !== 0) continue
+      }
+      const r = await quick(bin, ['--version'])
+      if (r.code === 0 && /^Python 3\./m.test(r.stdout + r.stderr)) return bin
     }
-    const r = await quick(bin, ['--version'])
-    if (r.code === 0 && /^Python 3\./m.test(r.stdout + r.stderr)) return bin
   }
   return null
 }
@@ -98,6 +101,11 @@ export async function runFile(
 ) {
   const bin = await python()
   if (!bin) return { noPython: true }
+  try {
+    await access(join(t.workspace, ...file.split('/')))
+  } catch {
+    return { missingFile: true }
+  }
   const dir = await realpath(await t.sandbox())
   const spec = {
     file: join(dir, ...file.split('/')),
@@ -118,6 +126,7 @@ export async function runFile(
     const record = JSON.parse(line.slice(MARK.length))
     if (record.kind === 'syntax') result.syntax = record
     else if (record.kind === 'missing-given') result.missingGiven = record.name
+    else if (record.kind === 'changed-given') result.changedGiven = record
     else if (record.kind === 'missing-task') result.missingTask = record.task
     else if (record.kind === 'comments') result.comments = record.list
     else if (record.kind === 'start') running = record.task
@@ -128,7 +137,12 @@ export async function runFile(
       running = undefined
     }
   }
-  const ended = result.done || result.syntax || result.missingGiven || result.missingTask
+  const ended =
+    result.done ||
+    result.syntax ||
+    result.missingGiven ||
+    result.changedGiven ||
+    result.missingTask
   if (!ended && !result.stopped) {
     if (running !== undefined)
       result.stopped = { task: running, why: r.timedOut ? 'time' : 'crash' }
@@ -176,7 +190,9 @@ function syntaxCause(s) {
   }
   if (/does not match opening|unmatched/.test(m))
     return 'a closing bracket does not match one that opened'
-  if (/forgot a comma/.test(m)) return 'two things sit side by side with nothing between them'
+  if (/forgot a comma/.test(m)) {
+    return 'two things sit side by side with nothing between them, such as words that should be text in quotes'
+  }
   if (count(text, '"') % 2 === 1 || count(text, "'") % 2 === 1) {
     return 'a quote on that line has no partner, so the text does not end where it should'
   }
@@ -285,6 +301,12 @@ function runCause(error, names) {
  */
 export function problem(r, file, task) {
   if (r.noPython) return fail('Python runs', 'Python was not found on this computer.')
+  if (r.missingFile) {
+    return fail(
+      `${file} is there`,
+      `Check cannot find ${file} in your workspace. If you renamed or moved it, give it back its name and its place: Check runs only ${file}.`
+    )
+  }
   if (r.crashed !== undefined) {
     return fail(
       `${file} runs`,
@@ -292,12 +314,7 @@ export function problem(r, file, task) {
       r.crashed
     )
   }
-  if (r.missingTask !== undefined) {
-    return fail(
-      `${file} keeps its tasks`,
-      `Check cannot find the # Task ${task} comment in ${file}. Put it back above the lines of that task, so Check knows which lines are which.`
-    )
-  }
+  if (r.missingTask !== undefined) return lostTask(file, task)
   if (r.syntax) {
     const s = r.syntax
     const at = s.line ? ` at line ${s.line}${s.task ? `, under # Task ${s.task},` : ''}` : ''
@@ -305,6 +322,13 @@ export function problem(r, file, task) {
       `Python can read ${file}`,
       `Python cannot read ${file}, so nothing in it runs, not even the lines above the mistake. It stops${at} with ${s.type}: ${s.message}${/[.?!]$/.test(s.message) ? '' : '.'} That usually means ${syntaxCause(s)}. Run python3 ${file} in the terminal, fix the line it points at and check again.`,
       s.shown
+    )
+  }
+  if (r.changedGiven) {
+    const { name, line } = r.changedGiven
+    return fail(
+      `${file} keeps the line that makes ${name}`,
+      `The line that makes ${name}, line ${line}, no longer holds the kind of value it came with. Put it back as it was: Check puts its own value on that line, and your code below builds on the name.`
     )
   }
   if (r.missingGiven) {
@@ -317,7 +341,7 @@ export function problem(r, file, task) {
     const { task: at, why } = r.stopped
     const what =
       why === 'flood'
-        ? `${file} printed without stopping while it ran ${where(at)}, so Check stopped it.`
+        ? `${file} printed far more than any task needs while it ran ${where(at)}, so Check stopped it. Look there for a line that keeps printing without end.`
         : why === 'time'
           ? `${file} did not end: Check stopped it after ${SECONDS} seconds while it ran ${where(at)}. Look there for a line that keeps going or waits for something.`
           : `Python stopped without a word while it ran ${where(at)}.`
@@ -327,6 +351,7 @@ export function problem(r, file, task) {
         : ` Check runs the lines of each task in turn, so it never got to Task ${task}.`
     return fail(`${file} ends`, what + later)
   }
+  if (!r.parts.has(task)) return lostTask(file, task)
   const head = r.parts.get(0)
   if (head?.error && task !== 0) {
     return fail(
@@ -345,6 +370,12 @@ export function problem(r, file, task) {
   }
   return null
 }
+
+const lostTask = (file, task) =>
+  fail(
+    `${file} keeps its tasks`,
+    `Check cannot find the # Task ${task} comment in ${file}. Put it back above the lines of that task, so Check knows which lines are which.`
+  )
 
 function errorText(error, names, task) {
   const at = error.line ? ` at line ${error.line}` : ''
@@ -470,7 +501,7 @@ export function lineProblem(out, want, { label = want, value } = {}) {
 export const LINE_WORDS = {
   'space-ends': 'One line is right but for a space at its start or end. Look inside the quotes.',
   spaces:
-    'One line is right but for the spaces in it. print puts one space between the values it is given, and + joins text with no space at all.',
+    'One line is right but for the spaces in it. print puts one space between the values it is given and adds no other: compare the spaces inside the quotes with the task.',
   case: 'One line is right but for its capital letters. Compare it with the task letter by letter.',
   marks:
     'One line has the right words but not the same punctuation. Compare its colons, commas and full stops with the task.'
@@ -546,6 +577,12 @@ export function textNear(name, v, want) {
   if (!v) return null
   if (v.type === 'builtin_function_or_method' || v.type === 'method') {
     return `${name} holds a method itself, not what it gives back. A method only runs when round brackets follow its name.`
+  }
+  if (v.type === 'tuple') {
+    return `${name} holds several values with a comma between them, not one text. A comma separates the values print shows, but after = it makes a group of values.`
+  }
+  if (v.type === 'NoneType') {
+    return `${name} holds nothing, which is what print gives back. print shows a line; give ${name} the text itself.`
   }
   if (v.type !== 'str') return `${name} holds ${aKind(v.type)}, not text.`
   const got = v.value

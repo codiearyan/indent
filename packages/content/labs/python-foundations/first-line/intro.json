@@ -17,6 +17,6 @@
     "Today the laptop says it is on and points people to the old base, but prints no check.",
     "You write the lines that print it, in four small tasks.",
     "Now the name and the radio check print, and the old base is switched off.",
-    "One file, run with python3. The laptop talks, and Rhona has the radio check."
+    "One file, run in the terminal. The laptop talks, and Rhona has the radio check."
   ]
 }
