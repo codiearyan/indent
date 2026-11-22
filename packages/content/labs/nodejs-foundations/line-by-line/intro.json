@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Imran", "say": "What did each tap use this year?", "note": "The logger writes every minute." },
+    { "title": "The logger box", "text": "Little memory, and a year of readings." },
+    {
+      "title": "Your scripts",
+      "file": "tap-totals.js",
+      "mine": true,
+      "gap": "Reads the whole year at once",
+      "tasks": ["Count the readings", "Add up the litres", "Total each tap"]
+    },
+    { "title": "Imran's screen", "text": "One total for each tap." }
+  ],
+  "ticket": { "label": "The year", "wrong": "out of memory", "why": "Read whole", "right": "totalled" },
+  "captions": [
+    "At Marrowfield, Imran wants a year of the logger's readings added up, tap by tap.",
+    "The little box by the tap runs out of memory reading the whole year at once.",
+    "You write scripts that read the log a line at a time and keep only totals, in three tasks.",
+    "Now the year goes through a line at a time, and the memory stays flat.",
+    "Same year of readings, same little box. Imran sees which tap uses the most."
+  ]
+}

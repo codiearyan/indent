@@ -22,7 +22,8 @@
     {
       "title": "Settings, big files and long jobs",
       "chapters": [
-        "environment"
+        "environment",
+        "line-by-line"
       ]
     }
   ]
