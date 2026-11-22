@@ -68,8 +68,9 @@ export const LINUX_MANAGERS: [string, string[]][] = [
 const LINUX_PACKAGES: Record<SystemTool, Record<string, string>> = {
   git: { 'apt-get': 'git', dnf: 'git', pacman: 'git', zypper: 'git' },
   python: { 'apt-get': 'python3', dnf: 'python3', pacman: 'python', zypper: 'python3' },
+  // Debian 12 has no 21; 17 is in every apt suite still supported and is new enough.
   java: {
-    'apt-get': 'openjdk-21-jdk',
+    'apt-get': 'openjdk-17-jdk',
     dnf: 'java-21-openjdk-devel',
     pacman: 'jdk21-openjdk',
     zypper: 'java-21-openjdk-devel'

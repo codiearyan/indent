@@ -87,7 +87,7 @@ describe('installerFor', () => {
     const on = (...bins: string[]): Set<string> => new Set(['pkexec', ...bins])
     expect(installerFor('java', 'linux', on('apt-get', 'dnf'))).toEqual({
       cmd: 'pkexec',
-      args: ['apt-get', 'install', '-y', 'openjdk-21-jdk']
+      args: ['apt-get', 'install', '-y', 'openjdk-17-jdk']
     })
     expect(installerFor('cpp', 'linux', on('apt-get'))?.args.at(-1)).toBe('g++')
     expect(installerFor('cpp', 'linux', on('dnf'))?.args).toEqual([
