@@ -22,7 +22,13 @@ const norm = (text) =>
     .toLowerCase()
     .replace(/[:.?]+$/, '')
 const same = (a, b) => norm(a) === norm(b)
-const labelText = (field) => clean([...(field?.labels ?? [])].map((l) => l.textContent).join(' '))
+/** A label's own words, without the text inside a field it wraps. */
+const wordsOf = (label) => {
+  const copy = label.cloneNode(true)
+  for (const field of copy.querySelectorAll('select, textarea, input, button')) field.remove()
+  return clean(copy.textContent)
+}
+const labelText = (field) => clean([...(field?.labels ?? [])].map(wordsOf).join(' '))
 const startsWith = (el, words) =>
   clean(el.textContent).toLowerCase().startsWith(words.toLowerCase())
 

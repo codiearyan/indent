@@ -15,7 +15,7 @@
       "file": "classes.html",
       "mine": true,
       "gap": "No way to answer",
-      "tasks": ["Three fields", "A label each", "Places 1 to 4", "A button"]
+      "tasks": ["Three fields", "A label each", "Limit the places", "A button"]
     },
     {
       "title": "Booking",

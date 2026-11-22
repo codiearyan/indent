@@ -27,13 +27,19 @@ const detail = (name, passed, message, output) => ({
 })
 const html = (el) => (el ? clean(el.outerHTML) : 'not found')
 const same = (a, b) => clean(a).replace(/:$/, '').toLowerCase() === b.toLowerCase()
-const labelText = (field) => clean([...(field.labels ?? [])].map((l) => l.textContent).join(' '))
+/** A label's own words, without the text inside a field it wraps. */
+const wordsOf = (label) => {
+  const copy = label.cloneNode(true)
+  for (const field of copy.querySelectorAll('select, textarea, input, button')) field.remove()
+  return clean(copy.textContent)
+}
+const labelText = (field) => clean([...(field.labels ?? [])].map(wordsOf).join(' '))
 
 /** The field for one answer: by its name, else by the label with Kofi's words, else by its type. */
 function findField(page, f) {
   const byName = page.$(`input[name="${f.name}"]`)
   if (byName) return { field: byName, byName: true }
-  const label = page.$$('label').find((l) => same(l.textContent, f.label))
+  const label = page.$$('label').find((l) => same(wordsOf(l), f.label))
   const byLabel = label?.control
   const byType = f.type === 'text' ? null : page.$(`input[type="${f.type}"]`)
   return { field: byLabel ?? byType ?? null, byName: false }
@@ -97,7 +103,7 @@ export const checks = {
       const text = labelText(field)
       const loose = page
         .$$('label')
-        .find((l) => same(l.textContent, f.label) && l.control !== field)
+        .find((l) => same(wordsOf(l), f.label) && l.control !== field)
       let message = `The ${f.what} field has no label. Tie a label with Kofi's words to it.`
       if (text)
         message = `The ${f.what} field has a label, but its words have changed. Keep Kofi's words as he wrote them.`
