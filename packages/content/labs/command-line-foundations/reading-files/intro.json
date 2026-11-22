@@ -1,0 +1,30 @@
+{
+  "stations": [
+    {
+      "title": "Idris",
+      "say": "What do these files actually say?",
+      "note": "The accountant is waiting."
+    },
+    {
+      "title": "Shop files",
+      "text": "Hundreds of orders and a log for each month.",
+      "note": "Too long to scroll through."
+    },
+    {
+      "title": "Your commands",
+      "file": "today.txt",
+      "mine": true,
+      "gap": "Nobody can read them",
+      "tasks": ["One mailing list", "The first orders", "The last entries", "Count each log"]
+    },
+    { "title": "Top folder", "text": "Four new files, each holding what was asked." }
+  ],
+  "ticket": { "label": "The files", "wrong": "unread", "why": "Too long", "right": "answered" },
+  "captions": [
+    "At Ashgrove, Idris wants to know what the order list and the press logs say.",
+    "The files are hundreds of lines long, far too many to scroll through or copy.",
+    "You read them from the terminal and save what matters, in four small tasks.",
+    "Each answer sits in a file of its own, with just the lines that were asked for.",
+    "The accountant, Hesper and Idris have their answers, and no file was copied by hand."
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "id": "finding-by-name",
+  "title": "Finding files by name",
+  "files": ["today.txt"],
+  "terminal": {
+    "description": "A shell that starts in the shop's top folder. Run each search and read its list before you save it.",
+    "suggestedCommand": "find old-sticks"
+  },
+  "tasks": [
+    {
+      "id": "drawings",
+      "title": "List every drawing",
+      "file": "today.txt",
+      "description": "Hesper's old drawings are `.svg` files, spread over `old-sticks` and the folders inside it, some several levels deep. Save the path of every `.svg` file anywhere in `old-sticks`, one per line, into `drawings.txt` in the top folder.\n\nCheck compares the paths in `drawings.txt` with the `.svg` files in `old-sticks`. Each path must lead to its file from the top folder, and the list may be in any order.",
+      "nextSteps": [
+        "Run `find old-sticks` to see how deep the folders go.",
+        "Add a test that keeps only names ending in `.svg`.",
+        "Read the list: every line ends in `.svg` and starts with `old-sticks`.",
+        "Run it again with `>` and the file's name."
+      ],
+      "hints": [
+        "`ls` shows one folder at a time. The lesson's command looks in every folder below the one you give it.",
+        "`find` takes where to start first, then `-name` and a pattern. Put the pattern in quotes, or the shell changes it first.",
+        "Run `find old-sticks -name \"*.svg\" > drawings.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "find: base name patterns",
+          "url": "https://www.gnu.org/software/findutils/manual/html_node/find_html/Base-Name-Patterns.html"
+        },
+        {
+          "title": "find: the standard",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/find.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Finding files with find",
+          "url": "https://www.youtube.com/watch?v=KCVaNb_zOuw"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "invoices",
+      "title": "List every invoice, whatever its capitals",
+      "file": "today.txt",
+      "description": "Idris needs every file in `old-sticks` that has the word invoice anywhere in its name, however it is written: `invoice`, `Invoice` or `INVOICE`. Save their paths, one per line, into `invoices.txt` in the top folder.\n\nCheck compares the paths in `invoices.txt` with the names in `old-sticks` that contain invoice in any letter case. The list may be in any order.",
+      "nextSteps": [
+        "Search `old-sticks` for names with invoice in them, and count the lines.",
+        "Look at the names in `old-sticks/stick-2/books` with `ls`: not all of them use small letters.",
+        "Use the test that ignores letter case, with the word anywhere in the name.",
+        "Save the list with `>`."
+      ],
+      "hints": [
+        "`-name` cares about capitals. The lesson shows a test that does not.",
+        "`-iname` matches a pattern in any letter case. A `*` on each side of the word lets it sit anywhere in the name.",
+        "Run `find old-sticks -iname \"*invoice*\" > invoices.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "find: the standard",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/find.html"
+        },
+        {
+          "title": "find: base name patterns",
+          "url": "https://www.gnu.org/software/findutils/manual/html_node/find_html/Base-Name-Patterns.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "proofs",
+      "title": "List the proofs folders",
+      "file": "today.txt",
+      "description": "Each client's proofs are in a folder called `proofs`, somewhere in `old-sticks`. Sol also wrote notes called `proofs`, and those are files. Save the path of every folder called `proofs`, and none of the files, one per line, into `proof-folders.txt` in the top folder.\n\nCheck compares the paths in `proof-folders.txt` with the folders in `old-sticks` named exactly `proofs`. The list may be in any order.",
+      "nextSteps": [
+        "Search `old-sticks` for the name `proofs` and read what comes back.",
+        "Give `ls` one of the paths: a folder lists what it holds, and a file shows only its own name.",
+        "Add the test that keeps only folders.",
+        "Save the list with `>`."
+      ],
+      "hints": [
+        "A name can belong to a file or to a folder. The lesson shows a test that tells them apart.",
+        "`-type d` keeps only folders. Combine it with `-name`; find prints only what passes both.",
+        "Run `find old-sticks -type d -name proofs > proof-folders.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "find: type",
+          "url": "https://www.gnu.org/software/findutils/manual/html_node/find_html/Type.html"
+        },
+        {
+          "title": "find: the standard",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/find.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

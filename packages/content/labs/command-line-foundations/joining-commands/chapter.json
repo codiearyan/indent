@@ -1,0 +1,125 @@
+{
+  "id": "joining-commands",
+  "title": "Joining commands",
+  "files": ["today.txt"],
+  "terminal": {
+    "description": "A shell that starts in the shop's top folder. Build each chain one command at a time and read what it prints.",
+    "suggestedCommand": "head market/sold.txt"
+  },
+  "tasks": [
+    {
+      "id": "items",
+      "title": "List what sold at the market",
+      "file": "today.txt",
+      "description": "`market/sold.txt` has one line per sale, so most items appear many times. Save every item that was sold, each one only once, in alphabetical order, into `items.txt` in the top folder.\n\nCheck compares `items.txt` with the items in `market/sold.txt`: each once, nothing else, in alphabetical order.",
+      "nextSteps": [
+        "Look at the start of `market/sold.txt` with `head`.",
+        "Sort its lines and read the result: equal items now sit together.",
+        "Pipe that into the command that drops repeats.",
+        "Save the end of the chain with `>`."
+      ],
+      "hints": [
+        "Two commands from the lesson, joined with a pipe, do this.",
+        "`uniq` only drops a line that repeats the one right above it, so `sort` has to come first.",
+        "Run `sort market/sold.txt | uniq > items.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "Pipelines",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Pipelines.html"
+        },
+        {
+          "title": "uniq: uniquify files",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/uniq-invocation.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Redirection and pipes",
+          "url": "https://www.youtube.com/watch?v=l2kodNMKroQ"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "top",
+      "title": "Find the five best sellers",
+      "file": "today.txt",
+      "description": "Hesper wants the five items that sold most at the market, each with how many were sold, the best seller first. Save those five lines, a count and an item on each, into `top-five.txt` in the top folder.\n\nCheck reads the count and the item on each line of `top-five.txt` and compares them with `market/sold.txt`: the right counts, the five biggest, the biggest first.",
+      "nextSteps": [
+        "Start from the chain of the last task, and make it count each item.",
+        "Sort that by the numbers, the biggest first, and read it.",
+        "Keep only the first five lines.",
+        "Save it with `>` and look at it with `cat`."
+      ],
+      "hints": [
+        "The lesson's part on `uniq` shows an option that counts, and the part on `sort` shows how to sort by number.",
+        "`uniq -c` counts equal lines that sit together, `sort -rn` puts the biggest number first, and `head -n` keeps the top lines. Join them with pipes.",
+        "Run `sort market/sold.txt | uniq -c | sort -rn | head -n 5 > top-five.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "sort: sort text files",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/sort-invocation.html"
+        },
+        {
+          "title": "uniq: uniquify files",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/uniq-invocation.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "done",
+      "title": "Add today's finished jobs to the list",
+      "file": "today.txt",
+      "description": "`jobs-done.txt` is Idris's running list of every finished job. Add the lines of `logs/today.log` that end in `finished` to the end of it, each once, and keep every line it already holds, in its order.\n\nCheck compares `jobs-done.txt` with the lines it started with, followed by today's finished jobs.",
+      "nextSteps": [
+        "Look at `jobs-done.txt` and `logs/today.log` with `cat`.",
+        "Search the log for the finished jobs and read what that prints.",
+        "Add that output to the end of `jobs-done.txt`, without replacing what is there.",
+        "Look at the end of `jobs-done.txt` with `tail`."
+      ],
+      "hints": [
+        "`>` would replace the whole list. The lesson shows a way to add to the end of a file.",
+        "`grep` finds the finished lines, and `>>` adds what a command prints to the end of a file. Run it once only.",
+        "Run `grep finished logs/today.log >> jobs-done.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "Appending redirected output",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html#Appending-Redirected-Output"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stock",
+      "title": "Sort the stock list in place",
+      "file": "today.txt",
+      "description": "Put `stock.txt` itself in alphabetical order, with every line it holds now. The sorted list must end up in `stock.txt`, not only in another file.\n\nCheck reads `stock.txt` and compares it with its lines at the start, in alphabetical order.",
+      "nextSteps": [
+        "Look at `stock.txt` with `cat`.",
+        "Print it sorted, without saving anything, and read it.",
+        "Save the sorted lines under a new name, and look at that file.",
+        "Move the new file over `stock.txt`, and look at `stock.txt` again."
+      ],
+      "hints": [
+        "Saving into the file a command reads empties it first. The lesson's part on when `>` destroys shows a safe way.",
+        "Sort into a new file, check it, then use `mv` to put it where `stock.txt` is.",
+        "Run `sort stock.txt > stock-sorted.txt`, then `mv stock-sorted.txt stock.txt`."
+      ],
+      "docs": [
+        {
+          "title": "sort: sort text files",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/sort-invocation.html"
+        },
+        {
+          "title": "Redirections",
+          "url": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
