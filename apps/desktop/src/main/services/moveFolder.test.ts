@@ -207,8 +207,9 @@ describe('bringRepoBack', () => {
 
 describe('clearIfNoWork', () => {
   it('keeps a folder that still has repos', async () => {
-    const root = await workFolder(await tempDir())
-    expect(await clearIfNoWork(root)).toBe(false)
+    const base = await tempDir()
+    const root = await workFolder(base)
+    expect(await clearIfNoWork(root, join(base, 'new'))).toBe(false)
     expect(existsSync(join(root, 'node_modules'))).toBe(true)
   })
 
@@ -217,8 +218,22 @@ describe('clearIfNoWork', () => {
     const root = await workFolder(base)
     await moveRepos(root, join(base, 'new'), ['a-lab', 'b-lab', 'c-lab'])
     await writeFile(join(root, 'package.json'), '{}')
-    expect(await clearIfNoWork(root)).toBe(true)
+    expect(await clearIfNoWork(root, join(base, 'new'))).toBe(true)
     expect(existsSync(root)).toBe(false)
+  })
+
+  it('moves the repo tools to the current folder when it has none', async () => {
+    const base = await tempDir()
+    const earlier = await workFolder(base)
+    const current = join(base, 'new')
+    await mkdir(current)
+    for (const labId of ['a-lab', 'b-lab', 'c-lab']) await bringRepoBack(earlier, current, labId)
+
+    expect(await clearIfNoWork(earlier, current)).toBe(true)
+
+    expect(existsSync(join(current, 'node_modules', 'vitest'))).toBe(true)
+    expect(existsSync(join(current, 'package.json'))).toBe(true)
+    expect(existsSync(earlier)).toBe(false)
   })
 })
 

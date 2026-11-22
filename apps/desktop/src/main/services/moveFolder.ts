@@ -224,9 +224,18 @@ export async function bringRepoBack(
   await rmdir(join(earlier, labId)).catch(() => {})
 }
 
-/** Removes the repo tools of a folder with no repos left, and the folder once it is empty. */
-export async function clearIfNoWork(dir: string): Promise<boolean> {
+/**
+ * Removes the repo tools of a folder with no repos left, and the folder once it is empty. When
+ * `current` has no repo tools of its own, they move there instead, so nothing downloads again.
+ */
+export async function clearIfNoWork(dir: string, current: string): Promise<boolean> {
   if ((await reposIn(dir)).length) return false
+  const here = await entriesOf(current)
+  if (!here.includes('node_modules')) {
+    const there = await entriesOf(dir)
+    const tools = RUNTIME_ENTRIES.filter((name) => there.includes(name) && !here.includes(name))
+    await moveEntries(dir, current, tools).catch(() => {})
+  }
   for (const name of [...RUNTIME_ENTRIES, '.sandbox']) {
     await rm(join(dir, name), { recursive: true, force: true })
   }

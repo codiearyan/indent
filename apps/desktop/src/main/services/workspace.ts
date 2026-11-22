@@ -162,13 +162,16 @@ async function moveRoot(labIds: string[]): Promise<FolderMoveResult> {
           throw new Error(plainError(error))
         })
       : { moved: [], failed: null }
-    if ((await repos(current)).length) {
-      setWorkspacesRoot(next, [current, ...earlierRoots()])
-    } else {
-      // Nothing of the learner's is left, so the rest comes along as it always did.
-      await moveContents(current, next, ['.sandbox'])
-      setWorkspacesRoot(next)
-    }
+    // Nothing of the learner's is left, so the rest comes along as it always did. The repos that
+    // moved are in `next` either way, so it becomes the folder even when the rest cannot follow.
+    const left = await repos(current).catch(() => [{ labId: '', issues: 0 }])
+    const cleared =
+      !left.length &&
+      (await moveContents(current, next, ['.sandbox']).then(
+        () => true,
+        () => false
+      ))
+    setWorkspacesRoot(next, cleared ? earlierRoots() : [current, ...earlierRoots()])
     return {
       root: next,
       moved,
@@ -194,7 +197,7 @@ function bringBack(labId: string, chapterId: string): Promise<void> {
     await bringRepoBack(earlier, workspacesRoot(), safeId(labId)).catch((error: unknown) => {
       throw new Error(plainError(error))
     })
-    if (await clearIfNoWork(earlier)) {
+    if (await clearIfNoWork(earlier, workspacesRoot())) {
       setWorkspacesRoot(
         workspacesRoot(),
         earlierRoots().filter((dir) => dir !== earlier)
