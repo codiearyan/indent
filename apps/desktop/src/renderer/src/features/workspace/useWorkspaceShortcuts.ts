@@ -83,6 +83,7 @@ export function useWorkspaceShortcuts(): void {
   const chapter = useWorkspace((s) => s.chapter)
   const ready = useWorkspace((s) => s.status === 'ready')
   const togglePanel = useSettings((s) => s.togglePanel)
+  const browser = useSettings((s) => s.panels.browser) && !!chapter?.preview
 
   const goTo = (chapterId?: string): false | (() => void) =>
     !!chapter && !!chapterId && (() => navigate(`/learn/${chapter.labId}/${chapterId}`))
@@ -115,6 +116,12 @@ export function useWorkspaceShortcuts(): void {
     toggleTerminal: () => togglePanel('terminal'),
     toggleFiles: () => togglePanel('files'),
     toggleFocusMode: () => togglePanel('zen'),
+    expandBrowser:
+      browser &&
+      (() => {
+        const { browserExpanded, pageWindow, setBrowserExpanded } = useWorkspace.getState()
+        if (!pageWindow) setBrowserExpanded(!browserExpanded)
+      }),
     nextIssue: goTo(chapter?.nextChapterId),
     previousIssue: goTo(chapter?.prevChapterId),
     openTutor: toggleTutor,

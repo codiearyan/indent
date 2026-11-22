@@ -1,5 +1,7 @@
 // The contract between content packs, the main process and the renderer.
 
+import type { PreviewWindowEvent } from './preview'
+
 // ---------- Content ----------
 
 /** A development tool a repo can need on the learner's computer. */
@@ -709,6 +711,17 @@ export interface Api {
     /** Makes the window narrow enough to sit beside an IDE, or gives it its size back. */
     setCompact(compact: boolean): Promise<void>
   }
+  preview: {
+    /** Opens the issue's page in its own window, or brings that window to the front. */
+    openWindow(labId: string, chapterId: string): Promise<void>
+    /** Opens the issue's page in the system browser, on a local address only this app hands out. */
+    openInBrowser(labId: string, chapterId: string): Promise<void>
+    /** Reloads the page in its window and in the browser, after a save. */
+    reload(labId: string, chapterId: string): void
+    /** Closes the page's window and stops its local address: the learner left the issue. */
+    close(): void
+    onWindow(listener: (event: PreviewWindowEvent) => void): Unsubscribe
+  }
   workspace: {
     /** Creates the folder from the starter files on first open; otherwise reads it from disk. */
     open(labId: string, chapterId: string): Promise<WorkspaceSnapshot>
@@ -872,6 +885,7 @@ export const INVOKE_METHODS = {
     'bringBack'
   ],
   ide: ['list', 'open', 'setCompact'],
+  preview: ['openWindow', 'openInBrowser'],
   checks: ['run', 'trace', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch', 'showHint', 'setDailyGoal'],
   backup: ['exportFile', 'pickImport', 'applyImport'],
@@ -904,6 +918,7 @@ export const INVOKE_METHODS = {
 /** Fire-and-forget renderer to main messages. */
 export const SEND_METHODS = {
   content: ['leave'],
+  preview: ['reload', 'close'],
   terminal: ['write', 'resize', 'kill'],
   ai: ['cancel', 'cancelComplete', 'cancelOpencodeInstall'],
   telemetry: ['track']
@@ -920,5 +935,6 @@ export const EVENTS = {
   runtime: 'checks:runtime',
   folderMove: 'workspace:moveProgress',
   toolInstall: 'tools:installProgress',
-  update: 'updates:status'
+  update: 'updates:status',
+  previewWindow: 'preview:window'
 } as const
