@@ -31,7 +31,31 @@ async function send(base, { method = 'GET', path, headers = {}, body, json }) {
   }
 }
 
-async function exchange(handler, requests) {
+// Wraps the learner's app so a second answer to one request is seen: Node either throws once the
+// headers are out, or quietly ignores a second end(). Either way the client never notices.
+async function guarded(inner) {
+  const { default: express } = await import('express')
+  const outer = express()
+  const late = []
+  outer.use((req, res, next) => {
+    const end = res.end
+    res.end = function (...args) {
+      if (this.writableEnded) late.push('It answered again after the answer had been sent.')
+      return end.apply(this, args)
+    }
+    inner(req, res, next)
+  })
+  outer.use((err, req, res, next) => {
+    if (!res.headersSent) return next(err)
+    // Recorded, not passed on: Express would drop the connection and fail the next request too.
+    late.push(`After answering, it threw ${err?.name ?? 'an error'}: ${err?.message}`)
+    if (!res.writableEnded) res.end()
+  })
+  return { handler: outer, late }
+}
+
+async function exchange(inner, requests) {
+  const { handler, late } = await guarded(inner)
   const server = createServer(handler)
   await new Promise((resolve, reject) => {
     server.once('error', reject)
@@ -40,7 +64,12 @@ async function exchange(handler, requests) {
   const base = `http://127.0.0.1:${server.address().port}`
   try {
     const responses = []
-    for (const request of requests) responses.push(await send(base, request))
+    for (const request of requests) {
+      const res = await send(base, request)
+      await new Promise((resolve) => setImmediate(resolve))
+      if (late.length > 0) res.late = late.splice(0).join('\n')
+      responses.push(res)
+    }
     return responses
   } finally {
     server.closeAllConnections()
@@ -72,7 +101,49 @@ export async function app(requests, options = {}) {
   const given = { store: await storeFor(options) }
   if (options.staffKey) given.staffKey = options.staffKey
   const handler = expressApp(createApp(given), 'createApp()')
-  return { responses: await exchange(handler, requests) }
+  const logged = []
+  const log = console.error
+  console.error = (...args) => logged.push(args.map(describe).join(' '))
+  try {
+    return { responses: await exchange(handler, requests), logged }
+  } finally {
+    console.error = log
+  }
+}
+
+const describe = (value) => (value instanceof Error ? `${value.stack}` : String(value))
+
+/**
+ * Runs handleErrors on an error that comes after the answer has started, and says what reached
+ * the end of the line: the same error, another one, or nothing.
+ */
+export async function lateError() {
+  const { default: express } = await import('express')
+  const { handleErrors } = await import('../src/middleware/errors.js')
+  const app = express()
+  const original = new Error('late failure')
+  let reached = null
+  app.get('/', (req, res, next) => {
+    res.write('partly sent')
+    next(original)
+    setTimeout(() => res.writableEnded || res.end(), 200)
+  })
+  app.use((err, req, res, next) => handleErrors(err, req, res, next))
+  app.use((err, req, res, next) => {
+    reached = err === original ? 'same' : `${err?.name}: ${err?.message}`
+    res.end()
+  })
+  const server = createServer(app)
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
+  try {
+    const res = await fetch(`http://127.0.0.1:${server.address().port}/`, {
+      signal: AbortSignal.timeout(TIMEOUT_MS)
+    })
+    await res.text().catch(() => {})
+  } catch {}
+  server.closeAllConnections()
+  await new Promise((resolve) => server.close(resolve))
+  return { reached }
 }
 
 /** Mounts the learner's workshopsRouter(store) at `options.mount` in an app of its own. */

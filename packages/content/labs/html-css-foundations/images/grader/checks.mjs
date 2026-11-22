@@ -27,9 +27,13 @@ async function exists(t, path) {
   }
 }
 
-function altProblem(alt) {
+const words = (text) => clean(text.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' '))
+
+function altProblem(alt, caption = '') {
   if (alt === null) return 'It has no alt attribute.'
   const text = clean(alt)
+  if (text && caption && words(caption).includes(words(text)))
+    return 'Its alt text repeats words from the caption.'
   if (!text) return 'Its alt text is empty, which says the picture is only decoration.'
   if (/\.(svg|png|jpe?g|gif|webp)\b/i.test(text)) return 'Its alt text is a file name.'
   if (GENERIC.test(text) || text.split(' ').length < 3)
@@ -45,6 +49,10 @@ export const checks = {
     const img = named(page, 'studio.svg')
     const path = img ? pathOf(page, img) : ''
     const found = img ? await exists(t, path) : false
+    const h1 = page.$('h1')
+    const welcome = page.$$('p').find((p) => clean(p.textContent).includes('Saddler Street'))
+    const follows = (a, b) => Boolean(a && b && a.compareDocumentPosition(b) & 4)
+    const placed = follows(h1, img) && (!welcome || follows(img, welcome))
     return [
       detail(
         'The studio picture is on the page',
@@ -57,6 +65,16 @@ export const checks = {
         found,
         'The browser cannot find the picture at that address. Start from the folder index.html is in, then the pictures folder, then the file.',
         img ? `src="${img.getAttribute('src')}" looks for ${path.slice(1)}` : 'Add the picture first'
+      ),
+      detail(
+        'It sits just under the main heading',
+        placed,
+        img
+          ? 'The studio picture is on the page, but not just under the main heading. Visitors should see it first, above the welcome.'
+          : 'Add the picture first.',
+        img
+          ? `Comes ${follows(h1, img) ? 'after' : 'before'} the main heading and ${follows(img, welcome) ? 'before' : 'after'} the welcome`
+          : 'not found'
       )
     ]
   },
@@ -117,7 +135,7 @@ export const checks = {
     const figure = mug?.closest('figure')
     const caption = figure?.querySelector('figcaption')
     const captionText = caption ? clean(caption.textContent) : ''
-    const mugAlt = mug ? altProblem(mug.getAttribute('alt')) : null
+    const mugAlt = mug ? altProblem(mug.getAttribute('alt'), captionText) : null
     const found = mug ? await exists(t, pathOf(page, mug)) : false
     return [
       detail(

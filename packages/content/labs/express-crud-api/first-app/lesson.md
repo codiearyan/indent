@@ -2,18 +2,18 @@
 
 ## What you will be able to do
 
-Copperleaf Pottery is a small studio with six wheels, two long tables and a kiln out the back. It runs evening and weekend workshops, and every place is still booked on a paper sheet by the door. You are the developer the studio hired to build the JSON API behind its new sign-up page, with Express. By the end of this issue you will be able to:
+Kilnworth Pottery is a small studio on Saddler Street with six wheels, two long tables and a kiln out the back. It is the studio whose first web page is written in the HTML and CSS foundations repo. It runs evening and weekend workshops, and every place is still booked on a paper sheet by the door. You are the developer the studio hired to build the JSON API behind its new sign-up page, with Express. By the end of this issue you will be able to:
 
 - create an Express app and keep it apart from the server that listens
 - add a route for a method and a path
 - answer with JSON and the status you choose
 - give every request nobody answered a clear 404 in JSON
 
-## The request from Nadia
+## The request from Dilys
 
-Nadia Osei owns Copperleaf and teaches most of the wheel classes. Her first note is short.
+Dilys owns Kilnworth, and Kofi teaches most of its classes. Her first note is short.
 
-> **Nadia:** Ivo is building the sign-up page. Before anything else he needs two things from you: a way to tell the API is running, and the list of this week's workshops. And please, when he asks for something that does not exist, tell him in a way his page can read.
+> **Dilys:** Ivo is building the sign-up page. Before anything else he needs two things from you: a way to tell the API is running, and the list of this week's workshops. And please, when he asks for something that does not exist, tell him in a way his page can read.
 
 That is two routes, `GET /health` and `GET /workshops`, and one rule for everything else.
 
@@ -57,17 +57,17 @@ The store is already written, in `src/store.js`. It keeps the workshops in memor
 
 Express keeps your routes and middleware in a list, in the order you added them. For each request it walks down the list and runs the first thing that matches. Once a handler sends an answer, the walk is over.
 
-A request that reaches the end of the list without an answer gets a small HTML page that says `Cannot GET /kilns`. A browser can show that, but Ivo's page expects JSON. So the last thing in the list should be a handler that matches everything:
+A request that reaches the end of the list without an answer gets a small HTML page that says `Cannot GET /kilns`. A browser can show that, but Ivo's page expects JSON. So the last thing in the list should be a handler that matches everything. Here is one for a site that answers with text:
 
 ```js
 app.use((req, res) => {
-  res.status(404).json({ error: { code: 'not_found', message: 'Nothing here' } })
+  res.status(404).send(`No page at ${req.path}`)
 })
 ```
 
 `app.use(handler)` without a path runs for any method and any path. Put it first and it would answer every request before your routes had a chance. Put it last and it only sees what nothing else answered.
 
-The `code` is for programs and never changes. The `message` is for people.
+Ivo's page needs JSON instead, in the same `error` shape as the 503 above. The `code` is for programs and never changes. The `message` is for people.
 
 ## Your work in this issue
 

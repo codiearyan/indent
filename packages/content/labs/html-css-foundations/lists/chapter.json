@@ -37,7 +37,7 @@
       "id": "steps",
       "title": "Number the steps of a first class",
       "file": "index.html",
-      "description": "The paragraph about a first wheel class describes four steps: wedge the clay, centre it on the wheel, open it up and pull up the walls, and cut it off and leave it to dry.\n\nTurn them into a list with one step per item, in the order Kofi wrote them. Keep a short paragraph before it that introduces the steps.\n\nThe check finds the list that holds the four steps, looks at which kind of list it is, and reads the steps in order.",
+      "description": "The paragraph about a first wheel class describes four steps: wedge the clay, centre it on the wheel, open it up and pull up the walls, and cut it off and leave it to dry.\n\nTurn them into a list with one step per item, in the order Kofi wrote them. Keep a short paragraph before it that introduces the steps.\n\nThe check finds the list that holds the four steps, looks at which kind of list it is, reads the steps in order, and makes sure no numbers are typed into them.",
       "nextSteps": [
         "Read \"Numbered lists\" in the lesson.",
         "Find where each step starts in Kofi's paragraph.",

@@ -51,7 +51,7 @@ Every page starts the same way. Here is the skeleton of a page for a street fair
 </html>
 ```
 
-- `<!doctype html>` is the first line. It tells the browser this is a modern HTML page. It is not an element and has no closing tag.
+- `<!doctype html>` comes first, above everything else; only a comment may sit over it. It tells the browser this is a modern HTML page. It is not an element and has no closing tag.
 - `html` wraps everything else. It is the root of the page. Its `lang` attribute says which language the page is in, so a screen reader picks the right voice and a browser can offer to translate. `en` means English.
 - `head` holds facts about the page that are not shown on it.
 - `body` holds everything people see.

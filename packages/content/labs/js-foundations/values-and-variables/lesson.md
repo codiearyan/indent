@@ -61,7 +61,9 @@ console.log(cupsLeft)
 
 The second line reads "take the value `cupsLeft` has now, take 3 away, and store the result back in `cupsLeft`". It prints `7`.
 
-If you try to change a `const`, Node stops with `TypeError: Assignment to constant variable`. That is a useful error: it means a value you said would never change is being changed. Either the code is wrong, or the variable should have been a `let`.
+A variable is made only once. Writing `let cupsLeft = ...` a second time stops Node before it runs anything, with `SyntaxError: Identifier 'cupsLeft' has already been declared`.
+
+If you try to change a `const`, Node stops with `TypeError: Assignment to constant variable`. That is a useful error: it means a value you said would never change is being changed. Either the code is wrong, or the variable should have been a `let`. The error points at the line that changes the value, but when the variable should have been a `let`, the fix is on the line that made it.
 
 A good habit is to start with `const` and switch to `let` only when the value really has to change.
 

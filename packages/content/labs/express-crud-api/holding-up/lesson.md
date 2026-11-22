@@ -2,22 +2,22 @@
 
 ## What you will be able to do
 
-The workshops API now does everything Copperleaf asked for: list, read, create, replace, change and remove. It does it all from one long `createApp`, it lets anyone change anything, and when something breaks it shows its insides. In this last issue you make it hold up. By the end you will be able to:
+The workshops API now does everything Kilnworth asked for: list, read, create, replace, change and remove. It does it all from one long `createApp`, it lets anyone change anything, and when something breaks it shows its insides. In this last issue you make it hold up. By the end you will be able to:
 
 - split routes into a router module and mount it on a path
 - write a middleware of your own that decides whether a request goes on
 - write one error handler so no route ever leaks a stack trace
 - explain the order in which Express runs all of these
 
-## The request from Ivo and Nadia
+## The request from Ivo and Dilys
 
 Two notes arrive on the same day. First Ivo:
 
 > **Ivo:** I sent a half-written body by mistake and got back a whole page of HTML with file paths from your server in it. My page can't read that, and I don't think strangers should see it either.
 
-Then Nadia:
+Then Dilys:
 
-> **Nadia:** Ivo mentioned that anyone who finds the address could delete a workshop. Only the studio's computers should be able to change things. Reading is fine for everyone.
+> **Dilys:** Ivo mentioned that anyone who finds the address could delete a workshop. Only the studio's computers should be able to change things. Reading is fine for everyone.
 
 That is a staff key for every change, and one place that turns any error into a calm JSON answer. First, though, `createApp` needs to be easier to work in.
 
@@ -61,6 +61,8 @@ function openOnWeekdays(req, res, next) {
 }
 ```
 
+A middleware can look at anything in the request. `req.method` is the method in capitals, such as `'GET'` or `'DELETE'`. `req.get('Accept-Language')` reads a header whatever case its name was written in. The same headers are in `req.headers`, but there every name is in lower case, so `req.headers['Accept-Language']` is always `undefined`.
+
 A middleware that needs settings is usually made by a function that takes them and returns the middleware, like `express.json()` itself. `app.use(path, a, b)` runs `a` and then `b` on that path, so a guard can sit right in front of the router it protects.
 
 A **401 Unauthorized** means the request did not prove who sent it. A key in a header is the simplest proof there is. In a real deployment the key comes from the environment and travels only over HTTPS; here `createApp` takes it as `staffKey`.
@@ -78,6 +80,8 @@ app.use((err, req, res, next) => {
 Express tells it apart from other middleware by that count, so all four must be there even when you do not use `next`. Without one, Express answers with its own HTML page, and outside production that page includes the error message and the stack trace: file paths, line numbers, sometimes data. Useful to you, and to anyone curious about your server.
 
 A good error handler does three things. It recognises errors that are the client's fault and says so: `express.json()` passes on an error with `type` set to `'entity.parse.failed'` and `status` 400 when a body is not valid JSON. It logs everything else in full, for you. And it sends the client a plain 500 that says nothing about the inside.
+
+An error can also arrive after a route has started to send its answer. Then it is too late for another one: `res.headersSent` is `true`, and the handler should pass the error on with `next(err)`, so Express can close the half-sent answer.
 
 The order still matters. Routes and the 404 catch-all come first, the error handler last.
 

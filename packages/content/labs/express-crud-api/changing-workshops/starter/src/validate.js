@@ -19,7 +19,7 @@ const rules = {
   priceCents: (value) => Number.isInteger(value) && value >= 0
 }
 
-export function validateWorkshop(body, { partial = false } = {}) {
+export function validateWorkshop(body) {
   if (typeof body !== 'object' || body === null || Array.isArray(body)) return [...FIELDS]
   return FIELDS.filter((field) => !rules[field](body[field]))
 }
