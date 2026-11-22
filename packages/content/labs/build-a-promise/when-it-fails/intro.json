@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "A price or why not, every time.", "note": "After two bad nights in a row." },
+    { "title": "Poster quote", "text": "60 sheets, 100 asked for: the step throws.", "note": "And the whole script dies." },
+    {
+      "title": "Your docket",
+      "file": "docket.js",
+      "mine": true,
+      "gap": "A throw ends the whole script",
+      "tasks": ["Catch callback throws", "Write catch()", "Skip to the handler"]
+    },
+    { "title": "Price list", "rows": [["Card", "a day"], ["Poster", "too few sheets"], ["Napkin", "not listed"]], "mark": 1 }
+  ],
+  "ticket": { "label": "Poster quote", "wrong": "crash", "why": "Uncaught", "right": "a reason" },
+  "captions": [
+    "Idris wants every quote in the price list to end with a price or a reason.",
+    "Today a quote that throws takes the whole script down with it.",
+    "You turn throws into failed dockets and send them to one catch(), in three tasks.",
+    "Now the poster quote says why there is no price, and the others carry on.",
+    "One catch() at the end of each chain, and the price list never crashes."
+  ]
+}
