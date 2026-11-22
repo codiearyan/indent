@@ -90,16 +90,36 @@ export function mediaDecls(css) {
 export const mediaLine = (d) =>
   d.media.length ? `@media ${d.media.join(' and ')} { ${line(d)} }` : line(d)
 
+const FEATURES = ['width', 'min-width', 'max-width', 'height', 'min-height', 'max-height', 'orientation']
+
 /** Why a media query cannot work as written, or null. */
 export function queryProblem(query) {
   const text = query.replace(/^(only\s+)?(screen|all)\s*(and\s*)?/i, '').trim()
   if (!text) return null
   if (!/^\(.*\)$/.test(text))
     return 'The condition of a media query goes in round brackets, or the browser ignores the whole query.'
+  for (const [, feature] of text.matchAll(/\(\s*([a-z-]+)\s*[:<>=]/gi))
+    if (
+      !FEATURES.includes(feature.toLowerCase()) &&
+      FEATURES.slice(0, 3).some((f) => distance(feature.toLowerCase(), f) <= 2)
+    )
+      return `${feature} is not something a media query knows, so the browser ignores the whole query. Check its spelling.`
+  if (/\(\s*(min-|max-)?width\s+[\d.]/i.test(text))
+    return 'Inside the brackets, the width and its value are separated by a colon, or the browser ignores the whole query.'
+  if (/width\s*(?::|<=|>=|<|>)\s*[\d.]+\s+[a-z]+/i.test(text))
+    return 'The width in the media query has a space between the number and its unit. They are written together, or the browser ignores the whole query.'
   for (const [, value] of text.matchAll(/(?:min-|max-)?width\s*(?::|<=|>=|<|>)\s*([^)\s]+)/gi))
     if (/^[\d.]+$/.test(value) && Number(value) !== 0)
       return 'The width in the media query is a number with no unit, so the browser ignores the whole query.'
   return null
+}
+
+/** How strong a selector is: ids, then classes, then element names. */
+export function weight(selector) {
+  const ids = selector.match(/#[\w-]+/g) ?? []
+  const classes = selector.match(/\.[\w-]+|\[[^\]]*\]|:(?!:)[\w-]+/g) ?? []
+  const names = selector.match(/(^|[\s>+~])[a-z][\w-]*/gi) ?? []
+  return ids.length * 10000 + classes.length * 100 + names.length
 }
 
 const split = (text) => {

@@ -1,5 +1,5 @@
 import { broken, clean, detail, distance, judge, line, notLinked, openStyled } from '../../style-checks.mjs'
-import { mediaDecls, mediaLine, nearName, noneYet, queryProblem, tracks } from '../../layout-checks.mjs'
+import { mediaDecls, mediaLine, nearName, noneYet, queryProblem, tracks, weight } from '../../layout-checks.mjs'
 
 const FIX = 'Put the link back in its head.'
 const PAGES = ['index.html', 'classes.html']
@@ -170,6 +170,8 @@ export const checks = {
       wants: 'the same 18px, written in rem',
       length: true,
       wrong: (v) => {
+        if (/^\d+,\d+/.test(v))
+          return 'CSS writes a decimal with a point, not a comma, so the browser skips the line.'
         if (/px$/.test(v))
           return "The body's text size is still in px, a fixed size. Kofi's notes ask for rem, which follows the reader's own setting."
         if (/^\d*\.?\d+(rem|em|%)$/.test(v))
@@ -293,7 +295,7 @@ export const checks = {
         return fail(
           'The classes are in one column at every width, a wide screen too. The one-column rule should apply only to narrow screens, inside a media query.'
         )
-      if (wide.every((r) => r.kind === 'one column') && narrow.every((r) => r.kind === 'two columns'))
+      if (wide.some((r) => r.kind === 'one column') && narrow.every((r) => r.kind === 'two columns'))
         return fail(
           'One column on a wide screen and two on a phone: the media query is the wrong way round. Look at whether it asks for a smallest or a largest width.'
         )
@@ -340,6 +342,25 @@ export const checks = {
           'There is a media query, but nothing inside it changes the columns of the list of classes.',
           inMedia.map(mediaLine).join('\n')
         )
+      const last = forClasses.at(-1)
+      if (tracks(last.value)?.list?.length === 2)
+        return fail(
+          'The last rule for the classes inside a media query still gives them two columns. On a phone they need one.',
+          mediaLine(last)
+        )
+      const strength = (d) => Math.max(...d.selectors.filter((x) => s.matches(el, x)).map(weight))
+      const stronger = all.find(
+        (d) =>
+          !d.media.length &&
+          d.property === 'grid-template-columns' &&
+          d.selectors.some((x) => s.matches(el, x)) &&
+          strength(d) > strength(last)
+      )
+      if (stronger)
+        return fail(
+          'The selector inside the media query is weaker than the one in the rule that gives the classes two columns, so that rule wins at every width. A media query adds no weight; use a selector at least as strong.',
+          `${mediaLine(last)}\nStronger: ${line(stronger)}`
+        )
       return fail(
         'The media query does not apply on a phone. Check the width in it against Kofi\'s notes, and whether it asks for a smallest or a largest width.',
         forClasses.map(mediaLine).join('\n')
@@ -348,6 +369,11 @@ export const checks = {
     if (narrow.some((r) => r.kind === 'two columns'))
       return fail(
         "The classes go to one column only on the narrowest screens. Check the width in the media query against Kofi's notes."
+      )
+    const notGrid = narrow.find((r) => r.kind.startsWith('display:'))
+    if (notGrid)
+      return fail(
+        `On a phone the list of classes is not a grid any more (${notGrid.kind}). Keep the grid from the last issue and give it one column.`
       )
     return fail(
       'On a phone the classes have columns, but not one column.',

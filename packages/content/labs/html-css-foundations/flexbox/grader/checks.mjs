@@ -59,9 +59,11 @@ export const checks = {
       what: 'display',
       wants: 'flex',
       wrong: unknownWord(s, 'display', (v) =>
-        /^(inline-flex|grid|inline)$/.test(v)
-          ? `display: ${v} is a different kind of box. The task asks for a flex container.`
-          : null
+        v === 'inline-flex'
+          ? 'display: inline-flex makes a flex container that sits inside a line of text, like a word. The lesson makes one that is a box of its own.'
+          : /^(grid|inline)$/.test(v)
+            ? `display: ${v} is a different kind of box. The task asks for a flex container.`
+            : null
       ),
       hint: listHint(s, ul, 'display', (v) => v === 'flex')
     })
@@ -165,7 +167,11 @@ export const checks = {
       target,
       what: 'alignment across',
       wants: 'the middle',
-      wrong: unknownWord(s, 'align-items'),
+      wrong: unknownWord(
+        s,
+        'align-items',
+        (v) => `align-items: ${v} does not put the name and the links in the middle from side to side.`
+      ),
       hint: headerHint(s, header, 'alignment', (v) => v === 'center')
     })
     const st = s.style(header)
@@ -198,7 +204,11 @@ export const checks = {
       what: 'wrapping',
       wants: 'wrap',
       wrong: unknownWord(s, 'flex-wrap', (v) =>
-        v === 'nowrap' ? 'nowrap keeps every link on one line, however narrow the window.' : null
+        v === 'nowrap'
+          ? 'nowrap keeps every link on one line, however narrow the window.'
+          : v === 'wrap-reverse'
+            ? 'wrap-reverse wraps the links, but puts each new line above the one before. Kofi wants them to run down the page.'
+            : null
       ),
       hint: listHint(s, ul, 'wrapping', (v) => /wrap/.test(v))
     })
@@ -206,7 +216,11 @@ export const checks = {
       target,
       what: 'alignment along the row',
       wants: 'the middle',
-      wrong: unknownWord(s, 'justify-content'),
+      wrong: unknownWord(
+        s,
+        'justify-content',
+        (v) => `justify-content: ${v} does not put each line of links in the middle.`
+      ),
       hint: listHint(s, ul, 'alignment', (v) => v === 'center')
     })
     const st = s.style(ul)

@@ -48,7 +48,7 @@ A length in `px` is the same on every screen and for every reader. Many people s
 
 `rem` is measured against the text size of the page's root, the `html` element, which follows that setting. With nobody changing it, `1rem` is 16px, so `2rem` is 32px and `0.5rem` is 8px. A reader who picks larger text gets every `rem` larger with it. To turn a size in px into rem, divide it by 16.
 
-`em` is measured against the text size of the element's parent instead. On the `body`, whose parent is `html`, the two are the same. Deeper in the page they differ, so `rem` is the safer choice for widths.
+`em` is measured against a text size deeper in the page instead: in `font-size`, the parent's; in a width or a margin, the element's own. On the `body`, whose parent is `html`, a font size in `em` and in `rem` is the same. Deeper in the page they differ, so `rem` is the safer choice for widths.
 
 `rem` works for widths too. A cycling club might keep its articles readable like this:
 

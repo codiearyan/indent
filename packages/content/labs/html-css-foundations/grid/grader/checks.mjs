@@ -1,5 +1,5 @@
 import { clean, detail, judge, line, notLinked, openStyled } from '../../style-checks.mjs'
-import { missedHint, noneYet, tracks, unknownWord, withGap } from '../../layout-checks.mjs'
+import { missedHint, noneYet, onChildren, tracks, unknownWord, withGap } from '../../layout-checks.mjs'
 
 const FIX = 'Put the link back in its head.'
 const MIN = '200px'
@@ -44,6 +44,10 @@ function judgeList(s, el, key, property, ok, { what, phrase, wanted, ...options 
     ...options,
     hint: missedHint(s, el, { phrase, container: target, name, wanted, others: OTHERS(s) })
   })
+  if (r.message?.includes(' set on what is inside '))
+    r.output = [r.output.split('\n')[0]]
+      .concat(onChildren(s, el, s.decls.filter((d) => d.property === property), true).map(line))
+      .join('\n')
   return noneYet(r, `${target[0].toUpperCase()}${target.slice(1)} has no ${what} yet.`)
 }
 

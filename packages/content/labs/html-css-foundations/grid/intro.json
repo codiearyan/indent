@@ -32,7 +32,7 @@
   "captions": [
     "Dilys wants the shop to look like the shelves in the studio window.",
     "The pots stand in one long column, so the bowls are far down the page.",
-    "You make the classes and the shelf grids, with columns, a gap, repeat() and minmax().",
+    "You make the classes and the shelf grids, with columns that fit the screen and a gap.",
     "The bowls stand on the shelf in a row with other pots, the way they do in the window.",
     "Same pots, same words. Now the shop has rows, and it fits any screen."
   ]
