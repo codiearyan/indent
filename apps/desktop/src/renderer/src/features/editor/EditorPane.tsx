@@ -3,8 +3,6 @@ import { Group, Panel, Separator } from 'react-resizable-panels'
 import {
   FoldVerticalIcon,
   Loader2Icon,
-  Maximize2Icon,
-  Minimize2Icon,
   PanelLeftCloseIcon,
   PanelLeftIcon,
   PlayIcon,
@@ -105,13 +103,6 @@ export function EditorPane(): React.JSX.Element {
           </p>
         )}
         <SuggestionsControl />
-        <IconButton
-          label="Focus mode"
-          shortcut="toggleFocusMode"
-          onClick={() => togglePanel('zen')}
-        >
-          {panels.zen ? <Minimize2Icon /> : <Maximize2Icon />}
-        </IconButton>
         <IconButton
           label="Format file"
           onClick={() => void focusedEditor()?.getAction('editor.action.formatDocument')?.run()}

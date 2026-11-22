@@ -19,6 +19,7 @@ import { useCatalog } from '@/stores/catalog'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { RepoNotice } from './RepoNotice'
+import { FocusTasks } from './FocusTasks'
 import { useWorkspaceShortcuts } from './useWorkspaceShortcuts'
 import { useActivePaneTracking, type PaneId } from './activePane'
 
@@ -41,6 +42,7 @@ export function WorkspacePage(): React.JSX.Element {
   const browser = useWorkspace((s) => Boolean(s.chapter?.preview)) && panels.browser
   const browserExpanded = useWorkspace((s) => s.browserExpanded) && browser
   const status = useWorkspace((s) => s.status)
+  const chapter = useWorkspace((s) => s.chapter)
   const downloading = useCatalog((s) => !!labId && s.downloads[labId]?.state === 'running')
   // The sheet shows the repo's download, work left in an earlier folder, or why the issue could
   // not open.
@@ -104,7 +106,7 @@ export function WorkspacePage(): React.JSX.Element {
       {labId && <ToolNotice labId={labId} />}
       <MissingFilesNotice />
       <CompanionBar />
-      <div className="relative mx-2 mb-2 min-h-0 flex-1 overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="mx-2 mb-2 min-h-0 flex-1 overflow-hidden rounded-2xl border border-border bg-card">
         {notice && labId && chapterId ? (
           <RepoNotice labId={labId} chapterId={chapterId} />
         ) : companion ? (
@@ -132,7 +134,21 @@ export function WorkspacePage(): React.JSX.Element {
                 <Panel id="code" minSize="30%">
                   <Group orientation="vertical">
                     <Panel id="editor" minSize="20%">
-                      <EditorPane />
+                      {/* The task card sits in the editor's bottom corner on the lesson's side, so it
+                          stays above the terminal at any height. */}
+                      <div className="relative h-full">
+                        <EditorPane />
+                        {panels.zen && chapter && status === 'ready' && (
+                          <div
+                            className={cn(
+                              'absolute bottom-3 z-10 flex max-h-[calc(100%-1.5rem)] flex-col',
+                              lessonSide === 'left' ? 'left-3' : 'right-3'
+                            )}
+                          >
+                            <FocusTasks chapter={chapter} />
+                          </div>
+                        )}
+                      </div>
                     </Panel>
                     <Separator className={`h-px ${separator}`} />
                     <Panel

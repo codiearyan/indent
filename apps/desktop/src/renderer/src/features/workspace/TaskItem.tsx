@@ -210,7 +210,7 @@ export function TaskItem({
   )
 }
 
-function StatusIcon(props: {
+export function StatusIcon(props: {
   checking: boolean
   failed: boolean
   passed: boolean
