@@ -1,0 +1,129 @@
+{
+  "id": "numbers",
+  "title": "Numbers",
+  "files": ["batteries.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to work out tonight's batteries and walk.",
+    "suggestedCommand": "python3 batteries.py"
+  },
+  "tasks": [
+    {
+      "id": "batteries",
+      "title": "Count the batteries",
+      "file": "batteries.py",
+      "description": "Under `# Task 1` in `batteries.py`, make a variable called `batteries_needed`: how many batteries fill every head torch, when there are `head_torches` torches and each takes `batteries_per_torch` batteries. Print it to see it.\n\nCheck runs your file with other kit in place of the numbers at the top, so build on the names, not on the numbers.",
+      "nextSteps": [
+        "Read tonight's kit near the top of the file.",
+        "Under `# Task 1`, make `batteries_needed`.",
+        "On the right of `=`, combine the two names with the right operator.",
+        "Print it and run `python3 batteries.py`."
+      ],
+      "hints": [
+        "Fourteen torches that each take three batteries need three batteries, fourteen times over.",
+        "Python writes \"times\" as `*`. Both values you need already have names at the top of the file.",
+        "The line has the shape `batteries_needed = ... * ...`, with the two names from the kit in place of the dots."
+      ],
+      "docs": [
+        {
+          "title": "Numbers in the Python tutorial",
+          "url": "https://docs.python.org/3/tutorial/introduction.html#using-python-as-a-calculator"
+        },
+        {
+          "title": "Binary arithmetic operations",
+          "url": "https://docs.python.org/3/reference/expressions.html#binary-arithmetic-operations"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "packs",
+      "title": "Count the full packs",
+      "file": "batteries.py",
+      "description": "Under `# Task 2`, make a variable called `full_packs`: how many whole packs `batteries_needed` fills, when one pack holds `batteries_per_pack` batteries. A pack that is only partly full does not count. Print it to see it.\n\nCheck starts Task 2 from `batteries_needed` as Task 1 should make it, and tries numbers that fill the packs exactly, numbers with some left over, too few for one pack, and other pack sizes. `full_packs` must be a whole number.",
+      "nextSteps": [
+        "Divide the batteries by the pack size and look at the result.",
+        "Ask what happens to the part after the decimal point.",
+        "Pick the division that keeps only the whole packs.",
+        "Print it and try 24 and 25 batteries in your head."
+      ],
+      "hints": [
+        "Seventeen batteries in packs of eight make two full packs and one battery over. Two is the answer, not 2.125.",
+        "Python has two ways to divide. One gives a decimal number, the other gives only the whole times one number fits into the other.",
+        "The line has the shape `full_packs = batteries_needed // ...`, with the pack size's name where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "Binary arithmetic operations",
+          "url": "https://docs.python.org/3/reference/expressions.html#binary-arithmetic-operations"
+        },
+        {
+          "title": "int and float",
+          "url": "https://docs.python.org/3/builtins/stdtypes.html#numeric-types-int-float-complex"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Whole numbers and decimal numbers in Python",
+          "url": "https://www.youtube.com/watch?v=khKv-8q7YmY"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "loose",
+      "title": "Count the loose batteries",
+      "file": "batteries.py",
+      "description": "Under `# Task 3`, make a variable called `loose_batteries`: how many batteries are left over once the full packs are filled. Print it to see it.\n\nCheck starts Task 3 from `batteries_needed` and `full_packs` as Tasks 1 and 2 should make them, and tries numbers with some left over, none left over, and too few for a whole pack.",
+      "nextSteps": [
+        "Think of 19 batteries in packs of 8: how many are not in a full pack?",
+        "Read the part of the lesson on what is left after dividing.",
+        "Make `loose_batteries` from the names you already have.",
+        "Print it and check it by hand once."
+      ],
+      "hints": [
+        "Nineteen in packs of eight leave three over. Twenty-four leave none. Three leave all three.",
+        "Python has an operator that gives what is left over after dividing one whole number by another.",
+        "The line has the shape `loose_batteries = batteries_needed % ...`, with the pack size's name where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "Binary arithmetic operations",
+          "url": "https://docs.python.org/3/reference/expressions.html#binary-arithmetic-operations"
+        },
+        {
+          "title": "Numbers in the Python tutorial",
+          "url": "https://docs.python.org/3/tutorial/introduction.html#using-python-as-a-calculator"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "walk",
+      "title": "Time the walk in",
+      "file": "batteries.py",
+      "description": "Under `# Task 4`, make a variable called `walk_in_hours`: how many hours it takes to walk `walk_in_km` kilometres at `walking_speed_kmh` kilometres an hour, rounded to one decimal place. Print it to see it.\n\nCheck tries walks that need rounding, walks that come out even and walks of whole hours. `walk_in_hours` must be a decimal number, so a walk of three hours is `3.0`.",
+      "nextSteps": [
+        "Hours are the distance divided by the speed.",
+        "Pick the division that keeps the part after the decimal point.",
+        "Round the result to one decimal place.",
+        "Print it and run the file."
+      ],
+      "hints": [
+        "Ten kilometres at three an hour takes a little over three hours. Walking time is not a whole number.",
+        "`/` keeps the decimal part. `round` takes a second number in its brackets: how many decimal places to keep.",
+        "The line has the shape `walk_in_hours = round(walk_in_km / ..., 1)`, with the speed's name where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "round()",
+          "url": "https://docs.python.org/3/builtins/functions.html#round"
+        },
+        {
+          "title": "Floating point arithmetic",
+          "url": "https://docs.python.org/3/tutorial/floatingpoint.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

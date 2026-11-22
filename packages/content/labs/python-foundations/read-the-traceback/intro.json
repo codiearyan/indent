@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Why is the report all error?", "note": "Dougie tidied a few lines." },
+    { "title": "Night report", "text": "Stops on the first line Python cannot read." },
+    {
+      "title": "Your fixes",
+      "file": "night_report.py",
+      "mine": true,
+      "gap": "Four broken lines",
+      "tasks": ["Fix the callouts", "Fix the hours", "Fix the kit officer", "Fix the crew"]
+    },
+    { "title": "Next shift", "text": "Reads how the week went, line by line." }
+  ],
+  "ticket": { "label": "Report", "wrong": "an error", "why": "Broken lines", "right": "printed" },
+  "captions": [
+    "Monday at the base. Rhona opens the night report and gets a block of error text.",
+    "Today Python stops at the first broken line, and the next shift reads nothing.",
+    "You read each error from the bottom up and fix the line it names.",
+    "Now the whole report prints, from the callouts to the crew on call.",
+    "Four errors, read and fixed. Next time Dougie can read one too."
+  ]
+}

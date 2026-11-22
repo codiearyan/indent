@@ -1,0 +1,129 @@
+{
+  "id": "read-the-traceback",
+  "title": "Read the traceback",
+  "files": ["night_report.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the night report here and read the error Python prints.",
+    "suggestedCommand": "python3 night_report.py"
+  },
+  "tasks": [
+    {
+      "id": "callouts",
+      "title": "Bring back the callouts",
+      "file": "night_report.py",
+      "description": "Under `# Task 1` in `night_report.py`, the line that prints the callouts this month stops Python before anything prints. Run the file, read the error, and fix that line so it prints `Callouts this month:` followed by the number in `callouts_this_month`, as the comment above it shows.\n\nCheck runs your file with other numbers in `callouts_this_month` and looks for that line among the lines Task 1 prints. The line that makes `callouts_this_month` stays as it is.",
+      "nextSteps": [
+        "Run `python3 night_report.py` and read the first line of the error: it ends with a line number.",
+        "Look at the copy of that line and the `^` under it.",
+        "Read the kind of error on the last line, then compare the line with the example in the comment above it.",
+        "Fix the line and run the file again. A new error is good news: it is the next task."
+      ],
+      "hints": [
+        "The number after `line` in the first line of the error is the line to look at. The `^` shows where Python got lost.",
+        "A `SyntaxError` about a string that never ends means a text starts with a quote and the quote that should close it is missing. Where should this text end?",
+        "The text is only `Callouts this month:`. The line has the shape `print(\"...\", callouts_this_month)`."
+      ],
+      "docs": [
+        {
+          "title": "Errors and exceptions",
+          "url": "https://docs.python.org/3/tutorial/errors.html"
+        },
+        {
+          "title": "SyntaxError",
+          "url": "https://docs.python.org/3/builtins/exceptions.html#SyntaxError"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hours",
+      "title": "Bring back the hours on the hill",
+      "file": "night_report.py",
+      "description": "Under `# Task 2`, the line that prints the hours on the hill stops Python too. Fix it so it prints `Hours on the hill:` followed by the number in `hours_on_the_hill`.\n\nCheck runs your file with other numbers in `hours_on_the_hill` and looks for that line among the lines Task 2 prints.",
+      "nextSteps": [
+        "Fix Task 1 first: Python reads the whole file before it runs any of it, so it stops there first.",
+        "Run the file and read the kind of error on the last line.",
+        "Look at the very start of the line it names, and compare it with the lines around it.",
+        "Fix it and run the file again."
+      ],
+      "hints": [
+        "The error does not complain about any word on the line. It complains about where the line starts.",
+        "`unexpected indent` means a line starts further right than Python expects. A line that is not inside anything starts at the very left edge.",
+        "Remove the spaces in front of `print` on that line, so it starts in the same place as the line above it."
+      ],
+      "docs": [
+        {
+          "title": "IndentationError",
+          "url": "https://docs.python.org/3/builtins/exceptions.html#IndentationError"
+        },
+        {
+          "title": "Indentation",
+          "url": "https://docs.python.org/3/reference/lexical_analysis.html#indentation"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "officer",
+      "title": "Bring back the kit officer",
+      "file": "night_report.py",
+      "description": "Under `# Task 3`, the line that prints the kit officer stops Python while the file runs, after the lines above it have printed. Fix it so it prints `Kit officer on call:` followed by the name in `kit_officer`.\n\nCheck runs your file with other names in `kit_officer` and looks for that line among the lines Task 3 prints.",
+      "nextSteps": [
+        "Run the file once Tasks 1 and 2 are fixed, and see which lines print before the error.",
+        "Read the traceback from the bottom: the kind of error and the name it does not know.",
+        "Compare that name, letter by letter, with the line that makes the variable.",
+        "Fix it and run the file again."
+      ],
+      "hints": [
+        "This error comes from a line that Python could read but not run. Read the last line of the traceback first.",
+        "A `NameError` names a variable Python does not know. Look for the line that makes that variable: are the two spelt the same?",
+        "The line should use `kit_officer`, spelt exactly as on the line above it."
+      ],
+      "docs": [
+        {
+          "title": "NameError",
+          "url": "https://docs.python.org/3/builtins/exceptions.html#NameError"
+        },
+        {
+          "title": "Errors and exceptions",
+          "url": "https://docs.python.org/3/tutorial/errors.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "How to read a Python traceback",
+          "url": "https://www.youtube.com/watch?v=Qmj5UQRkL4s"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "crew",
+      "title": "Bring back the crew on call",
+      "file": "night_report.py",
+      "description": "Under `# Task 4`, the line that prints the crew on call stops Python too. Fix it so it prints `Crew on call:` followed by the number in `crew_on_call`, with one space between them.\n\nCheck runs your file with other numbers in `crew_on_call` and looks for that line among the lines Task 4 prints, spaces included.",
+      "nextSteps": [
+        "Run the file and read the last line of the traceback.",
+        "Ask what kind of value sits on each side of the `+`.",
+        "Pick one of the ways the lessons showed to print text and a number together.",
+        "Fix it, run the file and check the space after the colon."
+      ],
+      "hints": [
+        "A `TypeError` means a value of the wrong kind was used. The message says which two kinds met.",
+        "`+` can join text to text, but `crew_on_call` is a number. `print` can also take the text and the number as two values, with a comma between them.",
+        "Either `print(\"Crew on call:\", crew_on_call)`, or join with `+` after turning the number into text with `str`."
+      ],
+      "docs": [
+        {
+          "title": "TypeError",
+          "url": "https://docs.python.org/3/builtins/exceptions.html#TypeError"
+        },
+        {
+          "title": "print()",
+          "url": "https://docs.python.org/3/builtins/functions.html#print"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

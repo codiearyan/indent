@@ -1,0 +1,121 @@
+{
+  "id": "first-line",
+  "title": "Your first line",
+  "files": ["first_line.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here and read what it prints.",
+    "suggestedCommand": "python3 first_line.py"
+  },
+  "tasks": [
+    {
+      "id": "welcome",
+      "title": "Print the team's name",
+      "file": "first_line.py",
+      "description": "Under `# Task 1` in `first_line.py`, print this line:\n\n```\nBrackenridge Mountain Rescue\n```\n\nCheck runs your file with Python and looks for a line printed by the lines under `# Task 1` that matches this one exactly, capital letters and spaces included.",
+      "nextSteps": [
+        "Run `python3 first_line.py` once and read what it prints today.",
+        "Look at the first `print` line in the file: it is your model.",
+        "Write a new line under `# Task 1` that prints the team's name.",
+        "Run the file again and compare the output with the task."
+      ],
+      "hints": [
+        "The file already prints one line. Read how that line is written.",
+        "Text has to sit inside quotes, and the quotes sit inside the round brackets of `print`.",
+        "The line has the shape `print(\"...\")`, with the team's name where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "print()",
+          "url": "https://docs.python.org/3/builtins/functions.html#print"
+        },
+        {
+          "title": "Using the Python interpreter",
+          "url": "https://docs.python.org/3/tutorial/interpreter.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Writing and running a first Python file",
+          "url": "https://www.youtube.com/watch?v=MR1R4D1zz8E"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "radio",
+      "title": "Print the radio check",
+      "file": "first_line.py",
+      "description": "Under `# Task 2`, print the two lines of the radio check, in this order:\n\n```\nBase to all teams, radio check\nReply with your call sign\n```\n\nCheck runs your file and looks for both lines under `# Task 2`, the second right after the first.",
+      "nextSteps": [
+        "Find `# Task 2` and read the two lines in the comment.",
+        "Print the first line with its own `print`.",
+        "Print the second line on the line below it.",
+        "Run the file and read the output from top to bottom."
+      ],
+      "hints": [
+        "One `print` prints one line. How many lines does the radio check have?",
+        "Python runs your lines from the top of the file to the bottom, so the order you write them in is the order they print in.",
+        "Two `print` lines, one under the other, each with one line of the radio check in quotes."
+      ],
+      "docs": [
+        {
+          "title": "print()",
+          "url": "https://docs.python.org/3/builtins/functions.html#print"
+        },
+        {
+          "title": "Text in the Python tutorial",
+          "url": "https://docs.python.org/3/tutorial/introduction.html#text"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "old",
+      "title": "Switch off the old meeting place",
+      "file": "first_line.py",
+      "description": "Under `# Task 3` there is a line that prints where the team met before it moved. Turn it into a comment, so it stays in the file but no longer runs.\n\nCheck runs your file to see that the old meeting place is not printed, then reads the file to see that the line is still there as a comment.",
+      "nextSteps": [
+        "Run the file and find the old meeting place in the output.",
+        "Find the line under `# Task 3` that prints it.",
+        "Turn that one line into a comment. Do not delete it.",
+        "Run the file again: the old meeting place should be gone from the output."
+      ],
+      "hints": [
+        "The lesson shows a way to keep a line in the file while Python skips it.",
+        "Every comment in this file starts the same way. Look at the start of the lines that do not print anything.",
+        "Put `#` at the very start of the line that prints the old meeting place."
+      ],
+      "docs": [
+        {
+          "title": "Comments in Python",
+          "url": "https://docs.python.org/3/reference/lexical_analysis.html#comments"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "note",
+      "title": "Leave a note for Rhona",
+      "file": "first_line.py",
+      "description": "Write a comment of your own anywhere in `first_line.py`: a line that starts with `#`, followed by a few words for Rhona, for example what the file prints.\n\nCheck reads your file and looks for a comment of at least two words that was not there when you started. The file must still run.",
+      "nextSteps": [
+        "Pick a place for your note, for example under `# Task 4`.",
+        "Start a new line with `#`.",
+        "Write a few words after it.",
+        "Run the file: your note should not change what it prints."
+      ],
+      "hints": [
+        "A comment is for people. Python skips it, so you can write anything in it.",
+        "A comment starts with `#`. Everything after it on that line is skipped.",
+        "A line like `# Rhona, ...` with a short sentence after it is all it takes."
+      ],
+      "docs": [
+        {
+          "title": "Comments in Python",
+          "url": "https://docs.python.org/3/reference/lexical_analysis.html#comments"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

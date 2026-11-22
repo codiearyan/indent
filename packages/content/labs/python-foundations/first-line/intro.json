@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Can the laptop read the radio check?", "note": "Read out at every callout." },
+    { "title": "Base laptop", "text": "Says it is on, then points to the old base." },
+    {
+      "title": "Your code",
+      "file": "first_line.py",
+      "mine": true,
+      "gap": "Nothing prints the check",
+      "tasks": ["Print the name", "Print the radio check", "Turn off the old base", "Leave Rhona a note"]
+    },
+    { "title": "Radio desk", "text": "The check is printed and ready to read." }
+  ],
+  "ticket": { "label": "Radio check", "wrong": "missing", "why": "Not printed", "right": "printed" },
+  "captions": [
+    "First night at the Brackenridge base. Rhona wants the laptop to print the radio check.",
+    "Today the laptop says it is on and points people to the old base, but prints no check.",
+    "You write the lines that print it, in four small tasks.",
+    "Now the name and the radio check print, and the old base is switched off.",
+    "One file, run with python3. The laptop talks, and Rhona has the radio check."
+  ]
+}

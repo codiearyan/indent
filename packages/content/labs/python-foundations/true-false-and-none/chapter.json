@@ -1,0 +1,125 @@
+{
+  "id": "true-false-and-none",
+  "title": "True, False and None",
+  "files": ["ready_to_go.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see whether the team is ready to go.",
+    "suggestedCommand": "python3 ready_to_go.py"
+  },
+  "tasks": [
+    {
+      "id": "crew",
+      "title": "Is there enough crew?",
+      "file": "ready_to_go.py",
+      "description": "Under `# Task 1` in `ready_to_go.py`, make a variable called `enough_crew`: `True` when `crew_ready` is `crew_needed` or more, `False` otherwise. Print it to see it.\n\nCheck runs your file with other crews, including one with exactly the crew needed, and expects `True` or `False` itself.",
+      "nextSteps": [
+        "Read the team's state near the top of the file.",
+        "Pick the comparison that means \"or more\".",
+        "Make `enough_crew` from that comparison of the two names.",
+        "Print it and run `python3 ready_to_go.py`."
+      ],
+      "hints": [
+        "A comparison is already True or False. You can store it in a variable as it is.",
+        "There are two comparisons for \"bigger\": one leaves out the equal case and one includes it. The task includes it.",
+        "The line has the shape `enough_crew = crew_ready ... crew_needed`, with \"bigger than or equal to\" in place of the dots."
+      ],
+      "docs": [
+        {
+          "title": "Comparisons",
+          "url": "https://docs.python.org/3/builtins/stdtypes.html#comparisons"
+        },
+        {
+          "title": "Value comparisons",
+          "url": "https://docs.python.org/3/reference/expressions.html#value-comparisons"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "channel",
+      "title": "Is the radio on the team channel?",
+      "file": "ready_to_go.py",
+      "description": "Under `# Task 2`, make a variable called `on_channel`: `True` when `radio_channel` is the same as `team_channel`, `False` otherwise. Print it to see it.\n\nCheck tries channels that are the same, channels far apart and channels one apart.",
+      "nextSteps": [
+        "Read the part of the lesson on `=` and `==`.",
+        "Pick the comparison that asks whether two values are the same.",
+        "Make `on_channel` from it.",
+        "Print it, then change `radio_channel` at the top to see it change."
+      ],
+      "hints": [
+        "You are asking a question about two values, not storing one in the other.",
+        "One `=` stores a value. Asking whether two values are the same takes two.",
+        "The line has the shape `on_channel = radio_channel ... team_channel`, with the comparison for \"the same as\" in place of the dots."
+      ],
+      "docs": [
+        {
+          "title": "Comparisons",
+          "url": "https://docs.python.org/3/builtins/stdtypes.html#comparisons"
+        },
+        {
+          "title": "Value comparisons",
+          "url": "https://docs.python.org/3/reference/expressions.html#value-comparisons"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ready",
+      "title": "Ready to go?",
+      "file": "ready_to_go.py",
+      "description": "Under `# Task 3`, make a variable called `ready_to_go`: `True` only when there is enough crew (`enough_crew`), the radio is on the team channel (`on_channel`) and the stretcher is packed (`stretcher_packed`). Print it to see it.\n\nCheck starts Task 3 from `enough_crew` and `on_channel` as Tasks 1 and 2 should make them, and tries every one of the three missing in turn.",
+      "nextSteps": [
+        "List the three things that must all be true.",
+        "Pick the word that is True only when both sides are.",
+        "Join the three names with it.",
+        "Print it, then set `stretcher_packed` to `False` at the top and run it again."
+      ],
+      "hints": [
+        "One thing missing is enough to keep the team at the base.",
+        "Python has `and`, `or` and `not`. Only one of them needs every side to be True.",
+        "The line has the shape `ready_to_go = enough_crew ... on_channel ... stretcher_packed`, with the same word in both gaps."
+      ],
+      "docs": [
+        {
+          "title": "Boolean operations, and, or, not",
+          "url": "https://docs.python.org/3/builtins/stdtypes.html#boolean-operations-and-or-not"
+        }
+      ],
+      "videos": [
+        {
+          "title": "True, False, and, or, not and None",
+          "url": "https://www.youtube.com/watch?v=4cX-nC61BTU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "name",
+      "title": "Is the casualty's name known?",
+      "file": "ready_to_go.py",
+      "description": "Under `# Task 4`, `casualty_name` is `None` until someone gives the team a name. Make a variable called `name_known`: `False` when `casualty_name` is `None`, `True` when it holds a name. Print it to see it.\n\nCheck tries no name and two different names.",
+      "nextSteps": [
+        "Read the part of the lesson on None.",
+        "Find the words Python uses to ask whether something is None.",
+        "Turn the question round: you want True when it is not None.",
+        "Print it, then put a name in `casualty_name` at the top and run it again."
+      ],
+      "hints": [
+        "None is not text and not zero. It is Python's value for \"nothing here yet\".",
+        "Python asks about None with `is` rather than `==`, and `not` turns an answer round.",
+        "The line has the shape `name_known = casualty_name is ... None`, with the word that turns the answer round in the gap."
+      ],
+      "docs": [
+        {
+          "title": "None",
+          "url": "https://docs.python.org/3/builtins/constants.html#None"
+        },
+        {
+          "title": "Identity comparisons, is and is not",
+          "url": "https://docs.python.org/3/reference/expressions.html#is-not"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
