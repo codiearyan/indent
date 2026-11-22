@@ -33,6 +33,11 @@ const secondCopy = app.isPackaged && !app.requestSingleInstanceLock()
 if (secondCopy) app.quit()
 app.on('second-instance', () => showWindow())
 
+// A dev build started to be driven and photographed, not looked at: no window, no Dock icon.
+const hidden = is.dev && process.env['INDENT_HIDDEN'] === '1'
+// Before the app finishes launching, or macOS brings it to the front and takes the keyboard.
+if (hidden && process.platform === 'darwin') app.setActivationPolicy('accessory')
+
 function createWindow(route?: string): void {
   const mainWindow = new BrowserWindow({
     width: 1440,
@@ -52,7 +57,7 @@ function createWindow(route?: string): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    if (!hidden) mainWindow.show()
     perf('window shown', process.uptime() * 1000)
   })
   // A page's window belongs to an issue open in this window.
@@ -137,7 +142,7 @@ app.whenReady().then(() => {
   } catch (error) {
     console.error('Could not copy the shipped repos into the data folder:', error)
   }
-  if (is.dev) app.dock?.setIcon(icon)
+  if (is.dev && !hidden) app.dock?.setIcon(icon)
   electronApp.setAppUserModelId('com.indent.app')
 
   app.on('browser-window-created', (_, window) => {

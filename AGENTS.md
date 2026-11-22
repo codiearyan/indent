@@ -147,7 +147,10 @@ the chrome is neutral, and the one hue is a calm orange.
 - Guided tour: elements the tour points at carry `data-tour={TOUR.x}` from `features/tour/anchors.ts`.
 - To look at a change: `pnpm dev` starts the app; `node scripts/cdp.mjs navshot "#/labs|/tmp/x.png"`
   navigates the running window and saves a screenshot (start Electron with
-  `--remote-debugging-port=9222`, or set `CDP_PORT`).
+  `--remote-debugging-port=9222`, or set `CDP_PORT`). A build started only to be driven this way
+  runs with `INDENT_HIDDEN=1`: it opens no window, shows no Dock icon and never takes the keyboard,
+  so it does not disturb the person at the computer. Screenshots work the same. Use it for every
+  check and screenshot an agent takes, with a separate `--user-data-dir`.
 
 ## First-run setup
 
