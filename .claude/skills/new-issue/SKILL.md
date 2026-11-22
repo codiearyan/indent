@@ -136,6 +136,42 @@ args)`, `node`, `vitest`, `typecheck`, `page()` for an issue with a page, and `j
   say so to the person: those learners need Reset to go on. Then update the flow and the intro in
   the same change.
 
+## What keeps going wrong
+
+Every repo written so far failed some of these in its first version. A learner playing the issue
+without the solution found them, or the review of the pull request did. Go through the list before
+you call an issue done.
+
+- **A message names the real cause.** It says what to look at. It never states the answer, the
+  code, command or method to write, or a value a hidden case expects, and its `output` agrees
+  with it. A typo in the given words gets a message about the words, not about the structure
+  around them.
+- **Try wrong answers against your own check.** At least three natural ones per task: a typed-in
+  result, the shortcut the lesson warns against, the near miss. Each must fail on its real cause.
+  Then write one right answer in a different honest way from your solution; it must pass.
+- **Use the check's own values, and more than one case.** One case lets a wrong answer through
+  that happens to fit it.
+- **A right task never fails because of another task.** Judge each task on what the learner built
+  it from, or say plainly which earlier task is not right yet. Give every case fresh state, so an
+  earlier mistake in the same check cannot use up an id or leave something open.
+- **Every "must" in a task is checked.** When it cannot be checked reliably, soften the text.
+- **The solution meets the task text too**, its edge cases included. Reviews have found solutions
+  that accepted what their own task says to refuse.
+- **Nothing is asked before it is taught**, the errors a learner will hit on the way included,
+  and how to read them. In a foundations repo the learner writes each new thing whole at least
+  once, not only the inside of a shell the starter gives.
+- **An intro shows no value a check compares:** no limit, length, name or text a task asks for.
+  A flow neither.
+- **Check claims by running them** on the versions in the repo tools: what a tool prints, what a
+  library does with a wrong call. Do not write them from memory.
+- **A check gives the same result on every run**, never hangs, and leaves nothing behind in the
+  workspace. Do not compare how long two things take.
+- **The app is more than the grader.** `verify-content.mjs` runs the grader directly, so it does
+  not see what the app adds around it. An issue whose tasks move, rename or remove starter files
+  needs `movesFiles` (step 3). An issue with a page is worth opening in a dev build.
+- **Windows.** The app's terminal there is PowerShell. Teach with `node` scripts unless the shell
+  itself is the topic, and then say in the first lesson which systems the repo is for.
+
 ## Done when
 
 - `verify-content.mjs` says ok for the issue: the starter fails every task, the solution passes.
