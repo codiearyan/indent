@@ -20,14 +20,23 @@ const SHELF = [
   item('g-cap', "Driver's cap", 1250, 2),
   item('g-kit', 'Model tram kit', 2400, 4)
 ]
+// Same price and same stock: only something that belongs to each item tells them apart.
+const TWINS = [item('t-14', 'Fridge magnet, tram 14', 250, 8), item('t-22', 'Fridge magnet, tram 22', 250, 8)]
 const MIXED = [
   item('m-print', 'Poster, 1930 timetable', 800, 0),
   item('m-pen', 'Pencil with a tram', 120, 50),
   item('m-scarf', 'Scarf, Coalbrook green', 1800, 5),
   item('m-badge', 'Cloth badge', 300, 0),
-  item('m-guide', 'Guide book', 650, 11)
+  item('m-guide', 'Guide book', 650, 11),
+  item('m-card', 'Postcard, the depot', 90, 1)
 ]
 const SOLD_OUT = [item('s-a', 'Lantern slide', 700, 0), item('s-b', 'Old ticket punch', 2200, 0)]
+
+/** Text drawn straight into the list, outside any list item: where a stray 0 ends up. */
+const strayText = (root) =>
+  [...(root.querySelector('ul.shop-list')?.childNodes ?? [])]
+    .filter((node) => node.nodeType === 3 && node.nodeValue.trim())
+    .map((node) => node.nodeValue.trim())
 
 const rowsOf = (root) =>
   [...root.querySelectorAll('ul.shop-list > li')].map((li) => ({
@@ -66,7 +75,13 @@ function drawAll(page, sets) {
   for (const items of sets) {
     const { root, errors, warnings } = draw(page, 'ShopList', { items })
     if (errors.length) return { error: errors[0] }
-    shown.push({ items, rows: rowsOf(root), warnings, hasList: Boolean(root.querySelector('ul.shop-list')) })
+    shown.push({
+      items,
+      rows: rowsOf(root),
+      stray: strayText(root),
+      warnings,
+      hasList: Boolean(root.querySelector('ul.shop-list'))
+    })
   }
   return { shown }
 }
@@ -85,7 +100,8 @@ function everyItemProblem(page) {
   else if (many.rows.length && many.rows.every((row) => row.name && !SHELF.some((i) => i.name === row.name)))
     message = 'The list still shows items typed in by hand. The check passed items of its own, and the list should come from the items prop.'
   else if (!many.rows.length)
-    message = 'The list is empty. If you wrote the callback of map with curly braces, it needs a return; without it map gives back nothing for each item.'
+    message =
+      'The list is empty. map gives back what its callback returns: a callback in curly braces needs a return, and forEach gives back nothing at all.'
   else if (many.rows.some((row) => !row.price.startsWith('£')))
     message = "Each price is written the shop's way, with formatPence."
   return { message, output: `expected:\n${wanted(bad.items)}\nshown:\n${listed(bad.rows)}` }
@@ -138,12 +154,27 @@ export const checks = {
     draw(page, 'ShopList', { items: SHELF.slice(1) })
     const after = rowsOf(page.$('#root'))
     const kept = after.every((row) => row.li.graderName === row.name)
+    const allNew = after.every((row) => row.li.graderName === undefined)
     results.push(
       detail(
         'Each item keeps its own list item when the list changes',
         kept,
-        'When the first item left the list, React reused the list items by their place: the element that held one item now holds another. A key should belong to the item itself, not to its place in the list.',
+        allNew
+          ? 'When the list was drawn again, React made a new list item for every item: the keys changed although the items did not. A key belongs to the item and stays the same every time.'
+          : 'When the first item left the list, React reused the list items by their place: the element that held one item now holds another. A key should belong to the item itself, not to its place in the list.',
         after.map((row) => `${row.name}: drawn in the element that held ${row.li.graderName ?? 'nothing before'}`).join('\n')
+      )
+    )
+    if (!kept) return results
+
+    // Drawn last: two items with one key can leave the list in a state later draws trip over.
+    const twins = draw(page, 'ShopList', { items: TWINS }).warnings.filter((line) => WARNING.sameKey.test(line))
+    results.push(
+      detail(
+        'Two items that cost the same get keys of their own',
+        !twins.length,
+        'The check drew two items with the same price and the same stock, and React found two list items with the same key. Use something that belongs to each item and that no other item shares.',
+        twins.map(shorten).join('\n') || TWINS.map((i) => i.name).join(', ')
       )
     )
     return results
@@ -155,17 +186,20 @@ export const checks = {
     if (everyItemProblem(page)) return [taskOneFirst()]
     const { shown, error } = drawAll(page, [MIXED, SOLD_OUT])
     if (error) return [stopped(error)]
-    const results = shown.map(({ items, rows }) => {
+    const results = shown.map(({ items, rows, stray }) => {
       const want = items.filter((i) => i.stock > 0)
       const names = rows.map((row) => row.name)
-      const passed = want.length === names.length && want.every((i) => names.includes(i.name))
+      const passed = want.length === names.length && want.every((i) => names.includes(i.name)) && !stray.length
+      let message = 'Some items that are in stock are missing. Only the items with a stock of 0 are left out.'
+      if (names.some((name) => items.some((i) => i.name === name && i.stock === 0)))
+        message = 'An item with a stock of 0 is still on the list. Leave those out before drawing.'
+      else if (stray.length)
+        message = `Something that is not a list item is drawn inside the list: ${stray.join(' ')}. Leave the sold-out items out before map, so it only gets the items to draw.`
       return detail(
         want.length ? 'Leaves out the items that are out of stock' : 'Shows nothing when everything is sold out',
         passed,
-        names.some((name) => items.some((i) => i.name === name && i.stock === 0))
-          ? 'An item with a stock of 0 is still on the list. Leave those out before drawing.'
-          : 'Some items that are in stock are missing. Only the items with a stock of 0 are left out.',
-        `in stock: ${want.map((i) => i.name).join(', ') || '(none)'}\nshown: ${names.join(', ') || '(none)'}`
+        message,
+        `in stock: ${want.map((i) => i.name).join(', ') || '(none)'}\nshown: ${names.join(', ') || '(none)'}${stray.length ? `\ntext outside any list item: ${stray.join(' ')}` : ''}`
       )
     })
     return results
@@ -201,7 +235,7 @@ export const checks = {
         sorted && rows.length > 1,
         reversed
           ? 'The items are in order of price, but the most expensive comes first. Look at which way round your comparison is written.'
-          : 'The items are not in order of price, cheapest first. Compare the prices of two items, not their names.',
+          : 'The items are not in order of price, cheapest first. Compare two items by their price in pence, as numbers.',
         `shown: ${rows.map((row) => `${row.name} ${row.price}`).join(', ') || '(none)'}\nprices in that order: ${prices.join(', ')}`
       )
     ]

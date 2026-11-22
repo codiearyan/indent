@@ -31,11 +31,14 @@ async function boards(t) {
 const text = (board, selector) => clean(board.querySelector(selector)?.textContent ?? '(missing)')
 
 /** Why a line does not show the check's data, in plain words. */
-function why(found, field, hint) {
+function why(found, want, field, hint) {
   if (/\btoday\.|\bformatPence\b/.test(found))
     return `The board shows the name of a value as text instead of the value. Without curly braces, JSX writes ${field} as it is.`
   if (/NaN/.test(found))
-    return 'The board shows NaN: a sum used something that is not a number. Look at the field names you read from today.'
+    return 'The board shows NaN: a sum used something that is not a number. Look at the field names you read from today, and do sums on numbers, not on text.'
+  const bare = (line) => line.toLowerCase().replace(/[^a-z0-9£.]+/g, ' ').trim()
+  if (bare(found) === bare(want))
+    return 'The values follow the day, but the words around them are not written as the task says. Compare the line with the task, commas and spaces included.'
   return `The check gave the board a different day, and this line did not follow it. ${hint}`
 }
 
@@ -45,7 +48,7 @@ function lineCheck(name, shown, selector, expected, field, hint) {
   return detail(
     name,
     !bad,
-    bad && why(bad.found, field, hint),
+    bad && why(bad.found, bad.want, field, hint),
     rows.map((row) => `expected: ${row.want}\nshown:    ${row.found}`).join('\n')
   )
 }

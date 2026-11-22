@@ -5,6 +5,7 @@ import {
   detail,
   draw,
   drawnBy,
+  isDrawnBy,
   exportType,
   nearName,
   openComponent,
@@ -135,20 +136,22 @@ export const checks = {
     }
     const h1 = root.querySelector('h1')
     const section = root.querySelector('section.hours')
-    const byComponent = drawnBy(section) === 'OpeningHours'
+    const byComponent = isDrawnBy(section, 'OpeningHours')
     const below = Boolean(h1 && section && h1.compareDocumentPosition(section) & 4)
+    const inFooter = Boolean(section?.closest('footer'))
     let message = 'App does not show the opening hours yet. Use OpeningHours inside what App returns.'
     if (section && !byComponent)
       message =
-        'The opening hours are on the screen, but OpeningHours did not draw them: the markup was written into App again. Use the component as a tag instead.'
+        'The opening hours are on the screen, but OpeningHours did not draw them as a component: the markup was copied into App, or the function was called in curly braces. Use the component as a tag instead.'
     else if (section && !h1) message = 'The opening hours are there, but the heading Coalbrook Tram Museum is gone. Keep it.'
     else if (section && !below) message = 'The opening hours are drawn above the heading. They go under it.'
+    else if (inFooter) message = 'The opening hours are inside the footer. They go under the heading, before the footer.'
     return [
       detail(
         'App shows OpeningHours under the heading',
-        byComponent && below,
+        byComponent && below && !inFooter,
         message,
-        `App draws: ${childList(root.firstElementChild)}${section ? `\nthe hours section is drawn by: ${drawnBy(section)}` : ''}`
+        `App draws: ${childList(root.firstElementChild)}${section ? `\nthe hours section is drawn by: ${drawnBy(section) ?? '(could not tell)'}` : ''}`
       )
     ]
   },
@@ -196,12 +199,12 @@ export const checks = {
     const footer = root.querySelector('footer.footer')
     const inside = [...(footer?.children ?? [])]
     const placed =
-      inside.length === 2 && inside.every((el) => el.tagName === 'P' && drawnBy(el) === 'FooterLines')
+      inside.length === 2 && inside.every((el) => el.tagName === 'P' && isDrawnBy(el, 'FooterLines'))
     results.push(
       detail(
         'App shows FooterLines in its footer',
         placed,
-        inside.length && !inside.every((el) => drawnBy(el) === 'FooterLines')
+        inside.length && !inside.every((el) => isDrawnBy(el, 'FooterLines'))
           ? 'The footer has lines in it, but FooterLines did not draw them. Use the component as a tag inside the footer.'
           : 'The footer in App should hold FooterLines, and nothing else.',
         `inside the footer: ${footer ? childList(footer) : '(there is no footer with the class footer)'}`

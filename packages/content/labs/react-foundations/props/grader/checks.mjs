@@ -2,7 +2,7 @@ import {
   clean,
   detail,
   draw,
-  drawnBy,
+  isDrawnBy,
   explain,
   exportType,
   nearName,
@@ -27,7 +27,7 @@ function wrongFields(card, tram) {
   const wrong = []
   if (!same(fieldText(card, 'h3'), tram.name)) wrong.push('name')
   if (!same(fieldText(card, '.number'), `No. ${tram.number}`)) wrong.push('number')
-  if (!same(fieldText(card, '.built'), `Built in ${tram.built}`)) wrong.push('built')
+  if (!same(fieldText(card, '.built'), `Built in ${tram.built}`)) wrong.push('year')
   return wrong
 }
 
@@ -90,7 +90,7 @@ function cardProblem(page) {
   const wrong = [...new Set(drawn.flatMap(({ card, tram }) => wrongFields(card, tram)))]
   if (wrong.length) {
     return {
-      message: `The card did not show the ${wrong.join(', ')} it was given. Each value comes from the prop of that name, laid out as the task says.`,
+      message: `The card did not show the ${wrong.join(' and ').replace(/ and (?=.* and )/, ', ')} it was given. Each value comes from the prop of that name, laid out as the task says.`,
       output
     }
   }
@@ -119,7 +119,7 @@ export const checks = {
     const { page, problem } = await openScreen(t, { 'src/trams.js': 'grader/trams.mjs' })
     if (problem) return [problem]
     const cards = page.$$('.tram-card')
-    const byComponent = cards.filter((card) => drawnBy(card) === 'TramCard')
+    const byComponent = cards.filter((card) => isDrawnBy(card, 'TramCard'))
     const output = `trams: ${SHED.map((tram) => tram.name).join(', ')}\n${cards.map(cardLines).join('\n') || '(no cards)'}`
     const names = cards.map((card) => fieldText(card, 'h3'))
     let message = 'The cards did not show the trams in trams.js, in order. The check used trams of its own.'
@@ -128,8 +128,8 @@ export const checks = {
     else if (cards.length !== SHED.length) message = `There should be one card for each of the ${SHED.length} trams.`
     else if (names.some((name) => /trams\[|\.name/.test(name)))
       message = 'A card shows the words you wrote instead of a value. A prop in quotes is text; a value from JavaScript goes in curly braces.'
-    else if (names.every((name) => !name))
-      message = 'The cards are there but empty. TramCard reads number, name and built: look at the names of the props App passes.'
+    else if (cards.some((card) => !fieldText(card, 'h3') || fieldText(card, '.number') === 'No.' || fieldText(card, '.built') === 'Built in'))
+      message = 'Some cards are missing a value. TramCard reads number, name and built: look at the names of the props App passes.'
     else if (names.every((name, i) => name === STARTER_NAMES[i]))
       message = 'The cards show the trams typed into App, not the ones in trams.js. The check changed trams.js and the cards did not follow.'
     const passed =

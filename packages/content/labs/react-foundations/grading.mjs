@@ -174,14 +174,30 @@ export const shorten = (line) => clean(line.replace(/^(error|warn): /, '')).slic
 
 /**
  * The name of the component that drew an element: React keeps it on the element itself. Used to
- * tell a component used as a tag from the same markup copied by hand.
+ * tell a component used as a tag from the same markup copied by hand. That record is React's own
+ * detail, so undefined means it could not be read and nothing should be judged from it.
  */
 export function drawnBy(element) {
-  const key = element && Object.keys(element).find((name) => name.startsWith('__reactFiber$'))
-  for (let fiber = key ? element[key].return : null; fiber; fiber = fiber.return) {
-    if (typeof fiber.type === 'function') return fiber.type.displayName || fiber.type.name
+  try {
+    const key = element && Object.keys(element).find((name) => name.startsWith('__reactFiber$'))
+    if (!key || typeof element[key] !== 'object') return undefined
+    for (let fiber = element[key].return; fiber; fiber = fiber.return) {
+      if (typeof fiber.type === 'function') return fiber.type.displayName || fiber.type.name || undefined
+    }
+    return undefined
+  } catch {
+    return undefined
   }
-  return null
+}
+
+/**
+ * Whether the component `name` drew the element. When React's record cannot be read, the answer
+ * is yes, so a change inside React never turns a right answer red. The bundler may add digits to a
+ * name it has seen twice.
+ */
+export const isDrawnBy = (element, name) => {
+  const by = drawnBy(element)
+  return by === undefined || new RegExp(`^${name}\\d*$`).test(by)
 }
 
 /** Elements directly inside `parent`, as `tag.class` text for an output line. */

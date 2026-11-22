@@ -1,4 +1,4 @@
-import { clean, detail, draw, drawnBy, explain, exportType, nearName, openComponent, openScreen, same } from '../../grading.mjs'
+import { clean, detail, draw, explain, isDrawnBy, exportType, nearName, openComponent, openScreen, same } from '../../grading.mjs'
 
 const FILE = 'src/Rides.jsx'
 const ride = (id, time, tram, seatsLeft, stepFree, wheelchairSpaces) => ({
@@ -12,6 +12,7 @@ const ride = (id, time, tram, seatsLeft, stepFree, wheelchairSpaces) => ({
 const FULL = ride('g-1', '12:15', 'Pithead Works Car', 0, true, 3)
 const ROOM = ride('g-2', '15:45', 'Hartsop Single-deck', 7, false, 0)
 const BUSY = ride('g-3', '16:30', 'Market Cross Special', 23, true, 0)
+const ONE = ride('g-4', '17:15', 'Hartsop Single-deck', 12, false, 1)
 const NOTICE = 'Rides stop at Foundry Lane today while the points are cleaned.'
 
 async function ridesPage(t, name) {
@@ -117,7 +118,7 @@ export const checks = {
     const { page, problem } = await ridesPage(t, 'RideRow')
     if (problem) return [problem]
     const results = []
-    for (const r of [FULL, ROOM]) {
+    for (const r of [FULL, ONE, ROOM]) {
       const { li, error } = row(page, r)
       if (error) return [stopped(error)]
       const mark = li?.querySelector('.wheelchair')
@@ -125,8 +126,9 @@ export const checks = {
       let passed
       let message
       if (r.wheelchairSpaces > 0) {
-        passed = same(mark?.textContent, `${r.wheelchairSpaces} wheelchair spaces`)
-        message = `A ride with ${r.wheelchairSpaces} spaces should show a span with the class wheelchair that reads ${r.wheelchairSpaces} wheelchair spaces.`
+        // One space may read "1 wheelchair space"; the task only gives the plural as an example.
+        passed = new RegExp(`^${r.wheelchairSpaces} wheelchair spaces?$`, 'i').test(clean(mark?.textContent))
+        message = `A ride with ${r.wheelchairSpaces} ${r.wheelchairSpaces === 1 ? 'space' : 'spaces'} should show a span with the class wheelchair that reads the number and wheelchair spaces, like 2 wheelchair spaces.`
       } else {
         passed = !mark && !loose.length
         message = loose.includes('0')
@@ -135,7 +137,9 @@ export const checks = {
       }
       results.push(
         detail(
-          r.wheelchairSpaces > 0 ? 'Shows the wheelchair spaces' : 'Shows nothing when there are no spaces',
+          r.wheelchairSpaces > 0
+            ? `Shows ${r.wheelchairSpaces === 1 ? 'one wheelchair space' : 'the wheelchair spaces'}`
+            : 'Shows nothing when there are no spaces',
           passed,
           message,
           `wheelchairSpaces: ${r.wheelchairSpaces}\nrow: ${rowText(li)}${loose.length ? `\ntext outside any element: ${loose.join(' ')}` : ''}`
@@ -224,17 +228,24 @@ export const checks = {
     const shown = screen.$('.notice')
     const h1 = screen.$('h1')
     const rides = screen.$('section.rides')
-    const placed =
-      drawnBy(shown) === 'Notice' &&
-      same(shown?.textContent, NOTICE) &&
-      Boolean(h1 && rides && h1.compareDocumentPosition(shown) & 4 && shown.compareDocumentPosition(rides) & 4)
+    const between = Boolean(
+      shown && h1 && rides && h1.compareDocumentPosition(shown) & 4 && shown.compareDocumentPosition(rides) & 4
+    )
+    const placed = isDrawnBy(shown, 'Notice') && same(shown?.textContent, NOTICE) && between
+    let message =
+      'App shows no notice yet. Use Notice between the heading and the rides section, with the notice from rides.js as its text prop.'
+    if (shown && !isDrawnBy(shown, 'Notice'))
+      message = 'A notice is on the screen, but Notice did not draw it. Use the component in App.'
+    else if (shown && !same(shown.textContent, NOTICE))
+      message =
+        'Notice is on the screen, but not with the notice from rides.js. The check changed rides.js; hand Notice its notice as a value, not words typed in.'
+    else if (shown && !between)
+      message = 'The notice is right, but it goes between the heading and the rides section, outside the section.'
     results.push(
       detail(
         "App shows Wilf's notice above the rides",
         placed,
-        shown && drawnBy(shown) !== 'Notice'
-          ? 'A notice is on the screen, but Notice did not draw it. Use the component in App.'
-          : 'App should use Notice between the heading and the rides, with the notice from rides.js as its text.',
+        message,
         `notice on the screen: ${shown ? clean(shown.textContent) : '(none)'}`
       )
     )
