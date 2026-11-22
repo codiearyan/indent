@@ -163,8 +163,11 @@ function hints(mine, missing, unexpected, values) {
   if (aggregate && unexpected.some((r) => r.includes(null)) && missing.some((r) => r.includes(0))) {
     found.push('When no rows match, COUNT gives 0, but SUM, AVG, MIN and MAX give NULL.')
   }
+  const squeezed = aggregate && !grouped
   if (mine.rows.length > wanted && unpaired(code)) {
     found.push(UNPAIRED)
+  } else if (squeezed) {
+    // the hint about GROUP BY above names the cause
   } else if (joined && !left && whereAt === -1 && mine.rows.length < wanted) {
     found.push(
       'A JOIN keeps only the rows that find a partner through ON. A row with no partner, or one that ON pairs with the wrong rows, drops out without a word.'
@@ -190,7 +193,7 @@ function hints(mine, missing, unexpected, values) {
   const twin = unexpected.length ? twinOf(missing, unexpected[0]) : undefined
   const col = twin ? twin.findIndex((v, i) => key([v]) !== key([unexpected[0][i]])) : -1
   const [mineValue, wantValue] = col === -1 ? [] : [unexpected[0][col], twin[col]]
-  if (joined && aggregate && typeof mineValue === 'number' && typeof wantValue === 'number' && mineValue > wantValue) {
+  if (joined && grouped && typeof mineValue === 'number' && typeof wantValue === 'number' && mineValue > wantValue) {
     found.push(
       left && wantValue === 0 && /\bcount\s*\(\s*\*\s*\)/.test(code)
         ? 'COUNT(*) counts rows, and a LEFT JOIN keeps one row for each row that has no partner, with NULL in the columns of the other table. That row counts as 1.'
