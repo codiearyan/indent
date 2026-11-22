@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSettings } from '@/stores/settings'
 import { CodeBlock } from './CodeBlock'
+import { useCodeStyle } from './codeStyle'
 import { type Diagram, drawDiagram } from './diagram'
 import { IconButton } from './IconButton'
 
@@ -15,6 +16,7 @@ export function DiagramBlock({ code }: { code: string }): React.JSX.Element {
   const [drawn, setDrawn] = useState<Drawn>(null)
   const [showSource, setShowSource] = useState(false)
   const [large, setLarge] = useState(false)
+  const codeStyle = useCodeStyle()
 
   useEffect(() => {
     let live = true
@@ -56,7 +58,7 @@ export function DiagramBlock({ code }: { code: string }): React.JSX.Element {
         </IconButton>
       </figcaption>
       {showSource ? (
-        <pre>
+        <pre style={codeStyle}>
           <code>{code}</code>
         </pre>
       ) : drawn ? (
