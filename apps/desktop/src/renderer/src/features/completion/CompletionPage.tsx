@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { SPONSOR_URL } from '@shared/repo'
 import type { LabSummary, ProgressState } from '@shared/types'
+import { APP_NAME } from '@/components/app/Brand'
 import { BuildStrip } from '@/components/app/BuildStrip'
 import { LanguageIcon } from '@/components/app/LanguageIcon'
 import { Button } from '@/components/ui/button'
@@ -235,6 +237,19 @@ export function CompletionPage(): React.JSX.Element {
           <NextList lab={lab} labs={labs} chapters={progress.chapters} />
         </Panel>
       </div>
+
+      <p className="done-stage text-[13px] text-muted-foreground" style={delay(restAt + 2 * stage)}>
+        {APP_NAME} is free and has no accounts. If this repo helped you, you can{' '}
+        <a
+          href={SPONSOR_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="underline decoration-input underline-offset-2 hover:text-foreground hover:decoration-foreground"
+        >
+          sponsor it on GitHub
+        </a>
+        .
+      </p>
     </div>
   )
 }
