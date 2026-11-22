@@ -52,6 +52,8 @@ function formatTable(columns, rows) {
 }
 
 // Statements that change the data or the database. The first issues only read.
+const CHANGES = ['INSERT', 'UPDATE', 'DELETE', 'REPLACE', 'DROP', 'CREATE', 'ALTER']
+const MAX_ROWS = 1000
 const REFUSED = ['INSERT', 'UPDATE', 'DELETE', 'REPLACE', 'DROP', 'CREATE', 'ALTER', 'ATTACH', 'DETACH', 'VACUUM', 'REINDEX', 'PRAGMA', 'BEGIN', 'COMMIT', 'END', 'ROLLBACK', 'SAVEPOINT', 'RELEASE', 'ANALYZE']
 
 const file = process.argv[2]
@@ -81,18 +83,37 @@ if (statements.length === 0) {
 
 for (const [index, sql] of statements.entries()) {
   if (index > 0) console.log('')
-  const word = sql.split(/\s+/)[0].toUpperCase()
+  const word = (sql.match(/^[a-z]+/i)?.[0] ?? '').toUpperCase()
+  const refuse = (start) =>
+    console.log(`Skipped: ${start} In this issue a query only reads, so it starts with SELECT. Nothing was run.`)
   if (REFUSED.includes(word)) {
-    console.log(`Skipped a statement that starts with ${word}. Here a query only reads, so it starts with SELECT.`)
+    refuse(`this statement starts with ${word}${CHANGES.includes(word) ? ', which changes the data' : ', not SELECT'}.`)
     continue
   }
   try {
     const stmt = db.prepare(sql)
+    const columns = stmt.columns().map((c) => c.name)
+    // A statement that returns no columns is not a query; ATTACH or VACUUM INTO would write a file.
+    if (columns.length === 0) {
+      refuse('this statement tries to change the data.')
+      continue
+    }
     stmt.setReturnArrays(true)
-    console.log(formatTable(stmt.columns().map((c) => c.name), stmt.all()))
+    const rows = []
+    for (const row of stmt.iterate()) {
+      if (rows.length === MAX_ROWS) break
+      rows.push(row)
+    }
+    console.log(formatTable(columns, rows))
+    if (rows.length === MAX_ROWS) {
+      console.log(`Stopped after ${MAX_ROWS} rows, far more than any table here holds. Look for a part of the query that repeats rows.`)
+    }
   } catch (err) {
-    const message = /readonly/.test(err.message) ? 'this query tries to change the data, and here a query only reads.' : err.message
-    console.log(`SQL error: ${message}`)
+    if (/readonly/.test(err.message)) {
+      refuse('this statement tries to change the data.')
+      continue
+    }
+    console.log(`SQL error: ${err.message}`)
     console.log(`  ${sql.split('\n')[0]}`)
     process.exitCode = 1
   }

@@ -67,7 +67,7 @@ function runFile(db, file) {
   if (statements.length > 1) return { count: statements.length }
   const [{ text, code, literals }] = statements
   const result = { code, literals, line: text.split('\n')[0] }
-  const word = code.trim().split(/\s+/)[0].toUpperCase()
+  const word = (code.trim().match(/^[a-z]+/i)?.[0] ?? '').toUpperCase()
   if (REFUSED.includes(word)) return { ...result, refused: word }
   try {
     const stmt = db.prepare(text)

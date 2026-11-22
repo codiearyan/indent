@@ -41,9 +41,9 @@ function problem(mine, file) {
       `${file} has ${mine.count} statements. Check reads one query per file, so keep only the one that answers the task and remove the others.`
     )
   }
-  if (mine.refused) {
+  if (mine.refused !== undefined) {
     const changes = CHANGES.includes(mine.refused)
-    const start = mine.refused === 'WITH' ? 'Your query tries to change the data.' : `Your query starts with ${mine.refused}${changes ? ', which changes the data' : ', not SELECT'}.`
+    const start = mine.refused === 'WITH' || !mine.refused ? 'Your query tries to change the data.' : `Your query starts with ${mine.refused}${changes ? ', which changes the data' : ', not SELECT'}.`
     return fail(
       'The query only reads',
       `${start} In this issue a query only reads, so the file holds one query that starts with SELECT. Check did not run it, and nothing was changed.`
@@ -69,20 +69,23 @@ function problem(mine, file) {
 function hints(mine, missing, unexpected, values) {
   const found = []
   const code = mine.code.toLowerCase()
-  const plain = /\bwhere\b/.test(code) && !mine.literals.some((lit) => lit.trim().toUpperCase() === 'NULL')
-    ? mine.literals.filter((lit) => /[a-z]/i.test(lit) && !/[%_]/.test(lit) && !/^\d{4}-\d\d-\d\d$/.test(lit))
+  const litsBefore = (i) => (code.slice(0, i).match(/''/g) ?? []).length
+  const whereAt = code.search(/\bwhere\b/)
+  const conditionLits = whereAt === -1 ? [] : mine.literals.slice(litsBefore(whereAt))
+  const plain = whereAt !== -1 && !conditionLits.some((lit) => lit.trim().toUpperCase() === 'NULL')
+    ? conditionLits.filter((lit) => /[a-z]/i.test(lit) && !/[%_]/.test(lit) && !/^\d{4}-\d\d-\d\d$/.test(lit))
     : []
   const same = (v, lit) => v.toLowerCase() === lit.trim().toLowerCase()
   const wrongCase = values ? plain.find((lit) => !values.includes(lit) && values.some((v) => same(v, lit))) : undefined
   const unknown = values ? plain.find((lit) => !values.some((v) => same(v, lit))) : undefined
   const where = /\bwhere\b/.test(code)
-  if (where && mine.literals.some((lit) => lit.trim().toUpperCase() === 'NULL')) {
+  if (where && conditionLits.some((lit) => lit.trim().toUpperCase() === 'NULL')) {
     found.push(`'NULL' in quotes is text made of four letters, not a missing value.`)
-  } else if (where && mine.literals.includes('')) {
+  } else if (where && conditionLits.includes('')) {
     found.push(`Your query compares with empty text '', but an empty cell holds NULL, which is not text at all.`)
   } else if (wrongCase !== undefined) {
     found.push(
-      `Your query looks for '${wrongCase}', but the data never spells it exactly that way. In SQLite, comparing text with = or <> is exact, capital letters and spaces included.`
+      `Your query looks for '${wrongCase}', but the data never spells it exactly that way. In SQLite, comparing text with =, <> or IN is exact, capital letters and spaces included.`
     )
   } else if (unknown !== undefined && !/\blike\b/.test(code)) {
     found.push(`Your query looks for '${unknown}', which never appears in the data. Compare its spelling with seed.sql.`)
@@ -91,6 +94,19 @@ function hints(mine, missing, unexpected, values) {
     found.push(
       'A date without quotes is a sum to SQLite: 2026-10-01 means 2026 minus 10 minus 1. Dates here are text, so they go in single quotes.'
     )
+  }
+  if (/(=|<>|!=)\s*''/.test(code) && conditionLits.some((lit) => lit.includes('%')) && !/\blike\b/.test(code)) {
+    found.push('% stands for any run of characters only in a LIKE pattern. With = it is just a percent sign.')
+  }
+  if (/\blike\s*''/.test(code) && missing.length && !conditionLits.some((lit) => /[%_]/.test(lit))) {
+    found.push('A LIKE pattern with no % in it matches whole values only, as = does.')
+  }
+  for (const m of code.matchAll(/\bbetween\s*(?:''\s*and\s*''|(-?[\d.]+)\s*and\s*(-?[\d.]+))/g)) {
+    const [low, high] = m[1] === undefined ? mine.literals.slice(litsBefore(m.index)) : [Number(m[1]), Number(m[2])]
+    if (low > high) {
+      found.push('BETWEEN takes the smaller limit first. With the larger one first, no value falls between them.')
+      break
+    }
   }
   if (/\bdistinct\b/.test(code)) {
     found.push('DISTINCT removes rows that repeat, and this task keeps every row, repeats included.')
@@ -116,7 +132,7 @@ function hints(mine, missing, unexpected, values) {
       'Your condition mixes AND and OR without brackets. SQLite works out AND before OR, so the parts may not pair up the way you meant.'
     )
   }
-  if (missing.length && !unexpected.length && missing.every((r) => r.includes(null)) && !/\bis\s+(not\s+)?null\b/.test(code)) {
+  if (missing.length && !unexpected.length && missing.every((r) => r.includes(null)) && !/\bis\s+(not\s+)?null\b|(=|<>|!=)\s*null\b/.test(code)) {
     found.push(
       'Every row left out has an empty cell (NULL) in it. A comparison with an empty cell is never true, so such a row drops out of a condition without a word.'
     )
@@ -132,6 +148,7 @@ function twoNames(code) {
 
 /** Compares a result with the expected one; returns null when they match, or what differs in plain words. */
 function compare(want, mine, values) {
+  const hidden = values === null
   if (!mine.columns) return problem(mine, 'The file').message
   if (!/\bfrom\b/i.test(mine.code)) {
     return 'Your query has no FROM, so it reads no table: its values were typed in by hand and only fit the rows you can see. Ask the table for them instead.'
@@ -181,15 +198,18 @@ function compare(want, mine, values) {
   const m = want.rows.length
   let message
   if (n > m) {
-    message = `Your result has ${plural(n, 'row')}; it should have ${m}. Some rows get through that the task leaves out. For example, this row should not be there: ${describe(columns, unexpected[0])}.`
+    message = `Your result has ${plural(n, 'row')}; it should have ${m}. Some rows get through that the task leaves out${hidden ? ': look at your condition.' : `. For example, this row should not be there: ${describe(columns, unexpected[0])}.`}`
   } else if (n < m) {
     message = `Your result has ${plural(n, 'row')}; it should have ${m}. Some rows that belong are left out: look at your condition.`
+  } else if (hidden) {
+    message = 'Your result has the right number of rows, but some of them are not the ones the task asks for: look at your condition, and at how each column is worked out.'
   } else {
     const bad = unexpected[0]
     const twin = missing.find((r) => r.filter((v, i) => key([v]) !== key([bad[i]])).length === 1)
     if (twin) {
       const col = columns.findIndex((_, i) => key([twin[i]]) !== key([bad[i]]))
-      message = `One row has the wrong ${columns[col]}: yours is ${show(bad[col])}. Look at how that column is worked out.`
+      const wrong = unexpected.length === 1 ? 'One row has' : `${unexpected.length} rows have`
+      message = `${wrong} the wrong ${columns[col]}. One of yours is ${show(bad[col])}. Look at how that column is worked out.`
     } else {
       message = `This row should not be in the result: ${describe(columns, bad)}. Another row belongs in its place: look at your condition.`
     }

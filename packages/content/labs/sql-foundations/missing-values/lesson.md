@@ -55,7 +55,7 @@ This looks like "every animal under 5 kg", and the animals nobody has weighed ar
 WHERE weight_kg < 5 OR weight_kg IS NULL
 ```
 
-The same thing happens with `<>`. "Every visit not seen by Ifan" written as `vet <> 'Ifan Pryce'` would drop a visit with no vet recorded. Whenever a condition tests a column that can be empty, ask yourself where the empty rows should go. And when the extra `OR` meets an `AND`, remember the brackets from the issue about choosing rows.
+The same thing happens with `<>` and `NOT LIKE`. "Every owner whose email is not at mail.example" written as `email NOT LIKE '%@mail.example'` drops the owners with no email at all. Whenever a condition tests a column that can be empty, ask yourself where the empty rows should go. And when the extra `OR` meets an `AND`, remember the brackets from the issue about choosing rows.
 
 ## Filling a gap: COALESCE
 

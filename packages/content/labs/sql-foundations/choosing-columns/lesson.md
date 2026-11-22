@@ -50,7 +50,7 @@ FROM treatments;
 
 Every row gets its own answer, worked out from its own price. Without `AS`, the column would be called `price * 1.2`, which is why a worked-out column almost always gets a name.
 
-One thing about dividing is particular to SQLite: when both numbers are whole, the part after the point is dropped, so `7 / 2` gives `3`. Write `7.0 / 2` to get `3.5`.
+One thing about dividing catches people out in SQLite, as in some other databases: when both numbers are whole, the part after the point is dropped, so `7 / 2` gives `3`. Write `7.0 / 2` to get `3.5`.
 
 Text is joined with two bars, `||`:
 

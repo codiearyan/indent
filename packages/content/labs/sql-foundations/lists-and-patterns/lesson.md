@@ -13,7 +13,7 @@ You can keep rows with `=`, `<`, `>`, `AND` and `OR`, and that already answers m
 
 Rosamund Ashdown owns the practice and does the accounts on Friday afternoons.
 
-> **Rosamund:** The vaccine and test suppliers both put their prices up, so I need to see what we charge for those. Ifan wants every terrier for a skin check, however the breed was typed in. I need October's visits for the monthly report. And Mabel keeps asking how many of our patients are something other than a dog, a cat or a rabbit.
+> **Rosamund:** The vaccine and test suppliers both put their prices up, so I need to see what we charge for those. Ifan wants every terrier for a skin check, however the breed was typed in. I need October's visits for the monthly report. And Mabel keeps asking which of our patients are something other than a dog, a cat or a rabbit.
 
 ## One of a list: IN
 

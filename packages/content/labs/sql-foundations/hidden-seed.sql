@@ -23,7 +23,7 @@ INSERT INTO animals (id, owner_id, name, species, breed, born, weight_kg) VALUES
   (306, 204, 'Kit', 'cat', NULL, '2026-09-01', 0.6),
   (307, 205, 'Bruno', 'dog', NULL, NULL, NULL),
   (308, 205, 'Pebble', 'tortoise', NULL, NULL, 0.5),
-  (309, 206, 'Squeak', 'guinea pig', 'Abyssinian', '2025-06-06', 0.85),
+  (309, 206, 'Squeak', 'guinea pig', 'Abyssinian', '2025-06-06', 0.97),
   (310, 206, 'Nugget', 'guinea pig', NULL, '2024-12-12', 1.0),
   (311, 207, 'Rex', 'dog', 'Yorkshire terrier mix', '2020-10-10', 3.2),
   (312, 207, 'Smudge', 'cat', 'Tabby', '2017-07-07', 5.0),
@@ -32,9 +32,9 @@ INSERT INTO animals (id, owner_id, name, species, breed, born, weight_kg) VALUES
   (315, 209, 'Luna', 'cat', NULL, NULL, 4.4),
   (316, 209, 'Max', 'dog', 'Labrador', '2015-12-25', 33.3),
   (317, 210, 'Bun', 'rabbit', NULL, '2022-02-02', NULL),
-  (318, 210, 'Ginger', 'dog', 'Spaniel', '2022-06-15', 14.0),
+  (318, 210, 'Ginger', 'dog', 'Irish setter', '2022-06-15', 14.0),
   (319, 204, 'Clementine', 'goat', 'Pygmy goat', '2021-03-30', 28.0),
-  (320, 206, 'Murphy', 'dog', 'Collie cross', '2020-11-11', 26.4);
+  (320, 206, 'Murphy', 'dog', 'Collie cross', '2020-11-11', 25.4);
 
 INSERT INTO visits (id, animal_id, visit_date, vet, reason, notes) VALUES
   (401, 301, '2026-10-01', 'Ifan Pryce', 'Booster vaccine', NULL),
