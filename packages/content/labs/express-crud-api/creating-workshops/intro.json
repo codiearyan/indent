@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Sunniva",
+      "say": "Can I add workshops myself?",
+      "note": "From the front desk form."
+    },
+    {
+      "title": "The API",
+      "text": "Reads workshops, but never takes new ones.",
+      "note": "From the last issue."
+    },
+    {
+      "title": "Your code",
+      "file": "app.js",
+      "mine": true,
+      "gap": "Nothing reads a body",
+      "tasks": ["Create a workshop", "Check each field", "Refuse a bad one"]
+    },
+    {
+      "title": "Workshops",
+      "rows": [
+        ["Glazing basics", "thu"],
+        ["Family morning", "sat"],
+        ["Throwing bowls", "fri"]
+      ],
+      "mark": 2
+    }
+  ],
+  "ticket": {
+    "label": "Throwing bowls",
+    "wrong": "no route",
+    "why": "Code change",
+    "right": "saved"
+  },
+  "captions": [
+    "At the front desk, Sunniva wants to add a Friday workshop without a code change.",
+    "The API can read workshops, but nothing takes a new one from a request.",
+    "You read the JSON body, check every field and save only what passes.",
+    "Throwing bowls is saved with its own id, and a bad form gets a list of what to fix.",
+    "New workshops come from the desk now, and nonsense never reaches the store."
+  ]
+}

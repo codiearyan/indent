@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Ivo",
+      "say": "I got a page of file paths!",
+      "note": "After sending half a body."
+    },
+    {
+      "title": "The API",
+      "text": "Errors come back as HTML with a stack trace.",
+      "note": "Anyone can change things too."
+    },
+    {
+      "title": "Your code",
+      "file": "errors.js",
+      "mine": true,
+      "gap": "No guard, no error handler",
+      "tasks": ["Move to a router", "Staff key for changes", "Errors as JSON"]
+    },
+    {
+      "title": "Sign-up page",
+      "say": "Got it, I can show that.",
+      "note": "Reads the JSON error."
+    }
+  ],
+  "ticket": {
+    "label": "Half a body",
+    "wrong": "file paths",
+    "why": "It leaks",
+    "right": "a JSON 400"
+  },
+  "captions": [
+    "Ivo sent half a body by mistake, and Nadia wants only staff to change workshops.",
+    "Today the error comes back as HTML full of file paths, and anyone can delete.",
+    "You add a router, a staff check and one error handler that answers in JSON.",
+    "Now half a body gets a short JSON 400 the sign-up page can show.",
+    "Changes need the staff key, and no error ever shows the server's insides."
+  ]
+}

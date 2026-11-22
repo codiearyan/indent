@@ -1,0 +1,21 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Sign-up page", "kind": "story" },
+      { "id": "desk", "label": "Front desk", "kind": "story" },
+      { "id": "app", "label": "Express app", "kind": "file", "mine": true },
+      { "id": "routes", "label": "Workshop routes", "kind": "file", "mine": true },
+      { "id": "store", "label": "Workshop store", "kind": "file" },
+      { "id": "reply", "label": "JSON answer", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "page", "to": "app", "label": "reads" },
+      { "from": "desk", "to": "app", "label": "changes" },
+      { "from": "app", "to": "routes", "label": "checked requests" },
+      { "from": "routes", "to": "store", "label": "reads and writes" },
+      { "from": "routes", "to": "reply", "label": "status and body" },
+      { "from": "reply", "to": "page", "label": "answers" }
+    ],
+    "note": "Ivo's sign-up page and Sunniva's front desk send requests to the Express app you build, which checks them, runs the workshop routes and answers in JSON."
+  }
+}

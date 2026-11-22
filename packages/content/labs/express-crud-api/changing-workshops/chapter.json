@@ -1,0 +1,107 @@
+{
+  "id": "changing-workshops",
+  "title": "Change and remove",
+  "files": [
+    "src/app.js",
+    "src/validate.js",
+    "src/store.js",
+    "src/workshops.js",
+    "try.js",
+    "server.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js starts your API on a free port and sends it a few requests.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "put",
+      "title": "Replace a workshop",
+      "file": "src/app.js",
+      "description": "Add `PUT /workshops/:id` to `createApp` in `src/app.js`. A PUT sends the whole workshop and replaces what was there:\n\n- an id the store does not have answers `404` with code `not_found`, and nothing is created\n- the body is checked with `validateWorkshop(body)`, exactly as for POST; problems answer `400` with code `validation_failed` and `fields`\n- otherwise save only the four fields with `store.update(id, fields)` and answer `200` with the whole saved workshop\n\nThe id always comes from the path, never from the body. The check replaces workshops, sends incomplete bodies and an unknown id, and reads the results back.",
+      "nextSteps": [
+        "Add the route with an `:id` parameter, and turn the id into a number.",
+        "Answer 404 when the store has no such workshop.",
+        "Check the body the same way POST does.",
+        "Save, answer 200 with the result, and run `node try.js`."
+      ],
+      "hints": [
+        "Most of this route already exists in pieces: the id from GET one, the check and the picking from POST.",
+        "`store.get(id)` tells you whether the workshop exists before you change anything. `store.update(id, fields)` returns the saved workshop.",
+        "404 if `!store.get(id)`, then 400 if `validateWorkshop(req.body)` is not empty, then `res.json(store.update(id, picked))`."
+      ],
+      "docs": [
+        { "title": "app.put()", "url": "https://expressjs.com/en/5x/api/application#appput" },
+        {
+          "title": "PUT",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/PUT"
+        }
+      ],
+      "videos": [
+        { "title": "What a REST API is", "url": "https://www.youtube.com/watch?v=lsMQRaeKNDk" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "patch",
+      "title": "Change part of a workshop",
+      "file": "src/app.js",
+      "description": "A PATCH sends only the fields that change, like `{ \"seats\": 14 }`. Two parts:\n\n1. In `src/validate.js`, give `validateWorkshop` a second argument. With `validateWorkshop(body, { partial: true })` a field that is not in the body is not a problem; the fields that are there still follow their rules. A body that is not an object still gets all four names, and without the option nothing changes.\n2. In `src/app.js`, add `PATCH /workshops/:id`: `404` for an unknown id, `400` with `fields` when partial validation finds problems, and otherwise save only the fields that were sent (of the four) and answer `200` with the **whole** workshop.\n\nThe check calls `validateWorkshop` in both modes, then sends PATCH requests and reads the workshops back.",
+      "nextSteps": [
+        "Read the second argument of `validateWorkshop`, with a default for when it is not given.",
+        "In partial mode, only test the fields the body has.",
+        "Add the PATCH route next to PUT; it differs in one call.",
+        "Run `node try.js` and look at the two PATCH answers."
+      ],
+      "hints": [
+        "PUT and PATCH both change a workshop. The only difference is which fields must be there.",
+        "`field in body` tells you whether a field was sent. A default like `{ partial = false } = {}` keeps old calls working.",
+        "Test `partial ? FIELDS.filter((field) => field in body) : FIELDS` instead of all of `FIELDS`. The route is PUT's, with `{ partial: true }` passed to `validateWorkshop`."
+      ],
+      "docs": [
+        {
+          "title": "PATCH",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/PATCH"
+        },
+        { "title": "app.METHOD()", "url": "https://expressjs.com/en/5x/api/application#appmethod" },
+        {
+          "title": "Default parameters",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "delete",
+      "title": "Remove a workshop",
+      "file": "src/app.js",
+      "description": "Add `DELETE /workshops/:id`:\n\n- remove the workshop with `store.remove(id)` and answer `204` with an **empty** body\n- an id the store does not have (or one that is not a number) answers `404` with code `not_found`\n\nThe check removes a workshop, reads it, removes it again and lists what is left.",
+      "nextSteps": [
+        "Add the route with an `:id` parameter.",
+        "Look at what `store.remove` returns.",
+        "Answer 204 with nothing in the body, or 404.",
+        "Run `node try.js` and look at the last two answers."
+      ],
+      "hints": [
+        "`store.remove(id)` returns `true` when it removed something and `false` when there was nothing to remove.",
+        "204 No Content means the request worked and there is nothing to send back. `res.json()` would send a body.",
+        "`if (!store.remove(id)) return ...404...`, then `res.status(204).end()` or `res.sendStatus(204)`."
+      ],
+      "docs": [
+        {
+          "title": "DELETE",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/DELETE"
+        },
+        {
+          "title": "204 No Content",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/204"
+        },
+        {
+          "title": "res.sendStatus()",
+          "url": "https://expressjs.com/en/5x/api/response#ressendstatus"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

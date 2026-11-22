@@ -1,0 +1,120 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Sign-up page", "kind": "story" },
+      { "id": "app", "label": "createApp()", "kind": "function", "mine": true },
+      { "id": "routes", "label": "Routes", "kind": "file", "mine": true },
+      { "id": "store", "label": "Workshop store", "kind": "file" },
+      { "id": "missing", "label": "Catch-all 404", "kind": "file", "mine": true },
+      { "id": "reply", "label": "JSON answer", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "page", "to": "app", "label": "method and path" },
+      { "from": "app", "to": "routes", "label": "in order" },
+      { "from": "store", "to": "routes", "label": "workshops" },
+      { "from": "routes", "to": "missing", "label": "no match" },
+      { "from": "routes", "to": "reply", "label": "status, body" },
+      { "from": "missing", "to": "reply", "label": "404" },
+      { "from": "reply", "to": "page", "label": "answer" }
+    ],
+    "note": "Every request from Ivo's sign-up page walks down the routes in createApp() in order, and leaves as JSON, even when nothing matched."
+  },
+  "tasks": {
+    "health": {
+      "steps": [
+        {
+          "active": ["app"],
+          "note": "createApp() makes a new Express app and hands it back without listening, so try.js and the checks can start it on any free port."
+        },
+        {
+          "active": ["page", "page->app", "app", "app->routes", "routes"],
+          "value": {
+            "kind": "map",
+            "label": "a request from the page",
+            "entries": [
+              { "key": "method", "value": "GET" },
+              { "key": "path", "value": "/health" }
+            ]
+          },
+          "note": "Ivo's page asks whether the API is running."
+        },
+        {
+          "active": ["routes", "routes->reply", "reply", "reply->page"],
+          "value": {
+            "kind": "map",
+            "label": "what goes back",
+            "entries": [
+              { "key": "status", "value": 200 },
+              { "key": "body", "value": "a small object with a status" }
+            ]
+          },
+          "note": "The health route answers at once, as JSON."
+        }
+      ]
+    },
+    "list": {
+      "steps": [
+        {
+          "active": ["page", "page->app", "app->routes", "routes"],
+          "value": {
+            "kind": "map",
+            "label": "a request from the page",
+            "entries": [
+              { "key": "method", "value": "GET" },
+              { "key": "path", "value": "/workshops?day=thu" }
+            ]
+          },
+          "note": "The page asks for this week's workshops. The query string is not part of the path, so the request still reaches the list route."
+        },
+        {
+          "active": ["store", "store->routes", "routes"],
+          "note": "The route asks the store createApp() was given for every workshop, not the list in workshops.js."
+        },
+        {
+          "active": ["routes", "routes->reply", "reply", "reply->page"],
+          "value": {
+            "kind": "map",
+            "label": "what goes back",
+            "entries": [
+              { "key": "status", "value": 200 },
+              { "key": "body", "value": "the store's workshops, unchanged" }
+            ]
+          },
+          "note": "The workshops go back to the page as a JSON list."
+        }
+      ]
+    },
+    "not-found": {
+      "steps": [
+        {
+          "active": ["page", "page->app", "app->routes", "routes"],
+          "value": {
+            "kind": "map",
+            "label": "two requests no route serves",
+            "entries": [
+              { "key": "GET /kilns", "value": "no such path" },
+              { "key": "POST /health", "value": "no such method" }
+            ]
+          },
+          "note": "Not every request matches a route. Ivo will send some of these while he builds the page."
+        },
+        {
+          "active": ["routes", "routes->missing", "missing"],
+          "note": "Express tries each route in order. A request none of them answered reaches the catch-all at the end of the list."
+        },
+        {
+          "active": ["missing", "missing->reply", "reply", "reply->page"],
+          "value": {
+            "kind": "map",
+            "label": "the shape of an error body",
+            "entries": [
+              { "key": "error.code", "value": "not_found" },
+              { "key": "error.message", "value": "a sentence for a developer" }
+            ]
+          },
+          "note": "It answers 404 with an error object, so the page always gets JSON it can read."
+        }
+      ]
+    }
+  }
+}
