@@ -1,9 +1,14 @@
 import { APP_NAME, BrandMark } from '@/components/app/Brand'
+import { Button } from '@/components/ui/button'
+import { useBackupImport } from '@/features/settings/BackupImport'
 import { cn } from '@/lib/utils'
+import { useSettings } from '@/stores/settings'
 import { WelcomeScene } from './scenes/WelcomeScene'
 import picture from './welcome.webp'
 
 export function Welcome({ staged }: { staged: boolean }): React.JSX.Element {
+  // A restored backup brings its settings, so the rest of the setup has nothing left to ask.
+  const restore = useBackupImport(() => useSettings.getState().setOnboarded(true))
   const stage = (index: number): { className?: string; style?: React.CSSProperties } =>
     staged ? { className: 'ob-stage', style: { '--stage': index } as React.CSSProperties } : {}
 
@@ -30,12 +35,24 @@ export function Welcome({ staged }: { staged: boolean }): React.JSX.Element {
           Each repo is a small company with a problem, and you are its developer. Read the issue,
           write the code, run it, and press Check.
         </p>
-        <p
+        <div
           className={cn('mt-6 text-[13px] text-muted-foreground', stage(3).className)}
           style={stage(3).style}
         >
-          Everything stays on this computer. No account needed.
-        </p>
+          <p>Everything stays on this computer. No account needed.</p>
+          <p className="mt-1">
+            Your progress is never lost. Coming from another computer?{' '}
+            <Button
+              variant="link"
+              className="h-auto p-0 text-[13px] font-normal underline"
+              disabled={restore.busy}
+              onClick={restore.pick}
+            >
+              Import a backup
+            </Button>
+          </p>
+          {restore.dialog}
+        </div>
       </div>
 
       <div className="relative pr-4 pb-20">

@@ -415,6 +415,21 @@ async function tip(labId: string, chapterId: string, taskId: string): Promise<Pr
   }
 }
 
+export const savedAiChoice = (): Promise<AiSettings> => loadSettings()
+
+/** Takes the AI choice from a backup. A provider this version does not know is left unpicked. */
+export async function restoreAiChoice(saved: unknown): Promise<void> {
+  const next = readSettings(saved)
+  if (![...CLI_PROVIDERS, ...API_PROVIDERS].some((p) => p.id === next.provider)) {
+    next.provider = null
+    next.model = null
+  }
+  if (next.model?.startsWith('-')) next.model = null
+  settings = next
+  await saveSettings()
+  if (!next.enabled) stopEverything()
+}
+
 export function register(): void {
   handle('ai', {
     getConfig: () => buildConfig(true),
