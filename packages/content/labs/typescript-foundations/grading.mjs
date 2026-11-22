@@ -52,12 +52,40 @@ function parseErrors(output) {
   return errors
 }
 
+const NOT_CODE =
+  /\/\*[\s\S]*?\*\/|\/\/[^\n]*|'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g
+const blank = (text) => text.replace(/[^\n]/g, ' ')
+
 /** Comments and the inside of strings blanked out, so only code is searched. */
-export const codeOnly = (source) =>
-  source.replace(
-    /\/\*[\s\S]*?\*\/|\/\/[^\n]*|'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g,
-    (m) => m.replace(/[^\n]/g, ' ')
-  )
+export const codeOnly = (source) => source.replace(NOT_CODE, blank)
+
+/** The code inside the `${...}` of a template literal, with the text around it blanked. */
+function templateCode(literal) {
+  let out = ''
+  let depth = 0
+  for (let i = 0; i < literal.length; i++) {
+    const ch = literal[i]
+    if (depth > 0) {
+      if (ch === '{') depth++
+      if (ch === '}') depth--
+      out += depth > 0 ? ch : ' '
+    } else if (ch === '\\') {
+      out += blank(literal.slice(i, i + 2))
+      i++
+    } else if (ch === '$' && literal[i + 1] === '{') {
+      out += '  '
+      i++
+      depth = 1
+    } else {
+      out += blank(ch)
+    }
+  }
+  return codeOnly(out)
+}
+
+/** codeOnly, but what is written inside `${...}` counts as code: `${(tin as any).grams}`. */
+const checkedCode = (source) =>
+  source.replace(NOT_CODE, (m) => (m.startsWith('`') ? templateCode(m) : blank(m)))
 
 // Loose on purpose: `//task 2` and `/* Task 2 */` still mark Task 2.
 const TASK_MARK = /^\s*(?:\/\/+|\/\*+)\s*task\s*(\d+)\b/i
@@ -93,13 +121,17 @@ function part(lines, task) {
 
 /**
  * The code above the first task, to compare with the starter's. Spaces, semicolons, trailing
- * commas and the `|` before the first member of a union are left out, so a file an editor
- * formatted still counts as unchanged.
+ * commas, quotes and the `|` before the first member of a union are left out, so a file an editor
+ * formatted still counts as unchanged. A string stays as '', so the comma after the last of a
+ * list of strings is still the one an editor added.
  */
 function sharedCode(lines) {
   const starts = [...parts(lines).values()]
   const first = starts.length ? Math.min(...starts) : lines.length
-  return codeOnly(lines.slice(0, first).join('\n'))
+  return lines
+    .slice(0, first)
+    .join('\n')
+    .replace(NOT_CODE, (m) => (m.startsWith('/') ? ' ' : "''"))
     .replace(/\s+|;/g, '')
     .replace(/,(?=[}\])])/g, '')
     .replace(/=[|&]/g, '=')
@@ -148,7 +180,7 @@ function afterParams(code, name) {
 }
 
 function silencers(section, whole) {
-  const code = codeOnly(section.text)
+  const code = checkedCode(section.text)
   const at = new Set()
   for (const m of code.matchAll(/\bany\b|(?:^|[^\w$.])as\s+(?!const\b)[A-Za-z_$({[]/gm)) {
     at.add(code.slice(0, m.index + m[0].search(/any|as/)).split('\n').length - 1)
@@ -163,7 +195,7 @@ function silencers(section, whole) {
 
 /** The lines of the section with a `!` after a value: `count!` or `line.samples!.length`. */
 function nonNullAssertions(section) {
-  return codeOnly(section.text)
+  return checkedCode(section.text)
     .split('\n')
     .flatMap((line, i) =>
       /[\w$)\]]!(?!=)/.test(line) ? [`line ${section.start + i + 1}: ${section.lines[i].trim()}`] : []
@@ -221,7 +253,9 @@ const pass = (name, output) => ({ name, passed: true, output })
  * - runner: a chapter-relative .mjs whose exports each take the learner's function and use it; a
  *   case { call, run } passes its `call` export to the runner's `run` export, for what JSON
  *   arguments cannot carry (a callback, a function that gives back a function, undefined)
- * - a case with throws: true passes when the call stops with an error instead of giving back
+ * - a case with throws: true passes when the call stops with an error instead of giving back;
+ *   throws: 'text' also wants that text in the error's message
+ * - messages.real: what to do instead, at the end of the message about any, as and @ts-
  */
 export async function judge(t, spec) {
   const { file, task } = spec
@@ -253,7 +287,10 @@ export async function judge(t, spec) {
       )
     ]
   }
-  const base = lines.map((line, i) => (i < p.first || (i >= p.start && i < p.end) ? line : ''))
+  const borrowed = borrowedTypes(lines, p)
+  const base = lines.map((line, i) =>
+    i < p.first || (i >= p.start && i < p.end) || borrowed.has(i) ? line : ''
+  )
   const withGiven = (given) => {
     const kept = [...base]
     for (const [name, value] of Object.entries(given)) {
@@ -363,7 +400,7 @@ export async function judge(t, spec) {
     details.push(
       fail(
         `${label} uses real types`,
-        `The word any, or a value followed by as and a type, tells the compiler to stop checking that value. It hides mistakes instead of catching them, so Check does not accept it here. Write a real type and let the compiler check it.`,
+        `The word any, or a value followed by as and a type, tells the compiler to stop checking that value. It hides mistakes instead of catching them, so Check does not accept it here. ${spec.messages?.real ?? 'Write a real type and let the compiler check it.'}`,
         off.found.join('\n')
       )
     )
@@ -479,7 +516,10 @@ export async function judge(t, spec) {
               ? `Check cannot find ${absent} exported from ${file}. It should be under // ${label}, with the name the task gives and export in front of it.`
               : (spec.messages?.uses ??
                   `Check's own code uses ${label} the right way, and the compiler refuses it. A type you wrote is narrower than the task asks or a different one (type names are lowercase), or a name is different. The output says which use.`),
-            explainHidden(usesErrors, usesText.split('\n'))
+            explainHidden(
+              absent ? usesErrors.filter((e) => missingExport([e])) : usesErrors,
+              usesText.split('\n')
+            )
           )
     )
   }
@@ -526,6 +566,8 @@ function behaviour(cases, runs, file, label) {
         : broken.printed.stderr
       : broken.error
     const unwritten = /Not implemented/.test(error)
+    const which = cases[runs.indexOf(broken)]
+    const byCheck = !broken.printed && Boolean(which.call || which.given) && !/Timed out/.test(error)
     const kind =
       error.split('\n').find((l) => /^\w*Error\b|^SyntaxError/.test(l.trim())) ??
       error.split('\n')[0]
@@ -536,8 +578,10 @@ function behaviour(cases, runs, file, label) {
           ? `A function of ${label} still throws 'Not implemented'. Replace that line with your code.`
           : /Timed out/.test(error)
             ? `${label} did not finish within a few seconds, so Check stopped it. Look for a loop that never ends.`
-            : `Node stops with an error when it runs the lines of ${label}. Run node ${file} in the terminal and read the error it prints.`,
-        kind.trim()
+            : byCheck
+              ? `Node stops with an error when Check runs ${label} with a value of its own. The output shows the call and the error: follow what your code does with that value.`
+              : `Node stops with an error when it runs the lines of ${label}. Run node ${file} in the terminal and read the error it prints.`,
+        byCheck ? `${which.setup}\n${kind.trim()}` : kind.trim()
       )
     ]
   }
@@ -568,12 +612,12 @@ function behaviour(cases, runs, file, label) {
       }
     }
     if (c.throws) {
-      const passed = !r.ok
+      const passed = !r.ok && (typeof c.throws !== 'string' || r.error.includes(c.throws))
       return {
         name: c.name,
         passed,
         message: passed ? undefined : c.hint,
-        output: `${c.setup}\n${passed ? `Stopped with: ${r.error}` : `Gave: ${show(r.value)}`}`
+        output: `${c.setup}\n${r.ok ? `Gave: ${show(r.value)}` : `Stopped with: ${r.error}`}`
       }
     }
     const v = r.value
@@ -613,6 +657,26 @@ function typeDeclaration(code, name) {
     keyword: re.exec(lines[at])[1],
     text: lines.slice(at, typeEnd(lines, at) + 1).join('\n')
   }
+}
+
+/**
+ * The lines of each type written under another task that this task's code uses by name, such as
+ * a PriceRule from Task 2 as the result type in Task 4. The learner's npm run types sees them, so
+ * Check keeps them too; values and functions of other tasks stay blanked.
+ */
+function borrowedTypes(lines, p) {
+  const code = codeOnly(lines.join('\n')).split('\n')
+  const own = code.slice(p.start, p.end).join('\n')
+  const kept = new Set()
+  const re = /(?:^|[^\w$.])(?:type|interface)\s+([A-Za-z_$][\w$]*)/
+  for (let i = p.first; i < lines.length; i++) {
+    if (i >= p.start && i < p.end) continue
+    const m = re.exec(code[i])
+    if (!m || !new RegExp(`(?:^|[^\\w$.])${m[1].replaceAll('$', '\\$')}\\b`).test(own)) continue
+    const end = typeEnd(code, i)
+    for (let j = i; j <= end; j++) kept.add(j)
+  }
+  return kept
 }
 
 /** Where `where` says which types it uses: its declaration, its parameters or its annotation. */

@@ -1,6 +1,8 @@
 import { call, code, judge } from '../../grading.mjs'
 
 const FILE = 'src/cafe.ts'
+const CHECK_FIRST =
+  'Keep the value unknown, and find out what it holds with typeof, === or in before you use it.'
 
 const stops = (fn, args, hint) => ({
   ...call(fn, args, undefined, hint),
@@ -49,7 +51,8 @@ export const checks = {
       uses: 'grader/types/tins.uses.ts',
       misuse: 'grader/types/tins.misuse.ts',
       messages: {
-        uses: "Check's own code passes tinsFrom whatever a till might send (a number, text, null, undefined, a list), and the compiler refuses one of them. The parameter should accept any value at all, and still be checked before it is used."
+        uses: "Check's own code passes tinsFrom whatever a till might send (a number, text, null, undefined, true, a list, an object), and the compiler refuses one of them. The parameter should accept any value at all, and still be checked before it is used.",
+        real: CHECK_FIRST
       },
       cases: [
         call('tinsFrom', [6], 6, 'For a number, tinsFrom should give that number.'),
@@ -79,7 +82,8 @@ export const checks = {
       messages: {
         uses: "Check's own code passes readOrder whatever JSON.parse might make, and the compiler refuses one of them. Leave the first line of the function as the starter wrote it.",
         misuse:
-          "Check's own code uses what readOrder gives back without checking for null, or reads a property an order does not have, and the compiler lets it through. Leave the first line of the function as the starter wrote it."
+          "Check's own code uses what readOrder gives back without checking for null, or reads a property an order does not have, and the compiler lets it through. Leave the first line of the function as the starter wrote it.",
+        real: CHECK_FIRST
       },
       cases: [
         call(
@@ -99,6 +103,12 @@ export const checks = {
           [{ blend: 7, tins: 3 }],
           null,
           nothing('Here the blend is a number, not text.')
+        ),
+        call(
+          'readOrder',
+          [{ blend: 'Morning Keemun', tins: 3, paid: true }],
+          { blend: 'Morning Keemun', tins: 3 },
+          'Here the order has a property more. readOrder should give back a new order with only the blend and the tins, not the object it was given.'
         ),
         call('readOrder', [{ tins: 3 }], null, nothing('Here the blend is missing.')),
         call(
@@ -154,11 +164,14 @@ export const checks = {
           ['lost'],
           'A status that slipped in from outside should reach the default and stop the code with an error, not give a line. Make the default hand it to notHandled.'
         ),
-        stops(
-          'notHandled',
-          ['lost'],
-          'notHandled should throw an Error, so the code stops there instead of going on.'
-        )
+        {
+          ...stops(
+            'notHandled',
+            ['lost'],
+            'notHandled should throw an Error whose message names the value, so the code stops there and says what nobody handled.'
+          ),
+          throws: 'lost'
+        }
       ]
     })
   }

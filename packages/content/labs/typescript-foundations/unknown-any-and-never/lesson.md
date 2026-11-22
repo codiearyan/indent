@@ -73,7 +73,7 @@ function readTray(value: unknown): Scone | null {
 }
 ```
 
-Without the first line, `in` is refused with `'value' is possibly 'null'`. After the second, `value.flavour` may be read, but it is still `unknown` until `typeof` says more. A list is an object too, and gets through the first line, but it has no `flavour`, so the second line stops it.
+With only its `typeof` half, `in` is refused with `'value' is possibly 'null'`. After the second, `value.flavour` may be read, but it is still `unknown` until `typeof` says more. A list is an object too, and gets through the first line, but it has no `flavour`, so the second line stops it.
 
 Why build a new object instead of `return value`? The compiler does not carry the property checks back onto the object, so that is refused with a long message that ends in the part to read:
 

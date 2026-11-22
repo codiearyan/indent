@@ -106,7 +106,7 @@
         },
         {
           "active": ["order"],
-          "note": "The function checks step by step: an object, not null, both properties there, each of the right type."
+          "note": "The function finds out what arrived before it trusts any of it."
         },
         {
           "active": ["order", "order->table", "table"],
