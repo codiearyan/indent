@@ -1,0 +1,248 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "owners",
+        "label": "owners",
+        "kind": "data"
+      },
+      {
+        "id": "visits",
+        "label": "visits",
+        "kind": "data"
+      },
+      {
+        "id": "animals",
+        "label": "animals",
+        "kind": "data"
+      },
+      {
+        "id": "q1",
+        "label": "1-no-email.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q2",
+        "label": "2-visit-notes.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q3",
+        "label": "3-not-labradors.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q4",
+        "label": "4-contact-list.sql",
+        "kind": "file",
+        "mine": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "owners",
+        "to": "q1",
+        "label": "rows"
+      },
+      {
+        "from": "visits",
+        "to": "q2",
+        "label": "rows"
+      },
+      {
+        "from": "animals",
+        "to": "q3",
+        "label": "rows"
+      },
+      {
+        "from": "owners",
+        "to": "q4",
+        "label": "rows"
+      }
+    ],
+    "note": "Four queries find, skip, keep and fill the empty cells in the practice's records."
+  },
+  "tasks": {
+    "no-email": {
+      "steps": [
+        {
+          "active": [
+            "owners",
+            "owners->q1"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "one row of owners",
+            "colLabels": [
+              "first_name",
+              "last_name",
+              "phone",
+              "email"
+            ],
+            "cells": [
+              [
+                "a first name",
+                "a last name",
+                "a phone number",
+                "an email or NULL"
+              ]
+            ]
+          },
+          "note": "Every owner comes in. Some never gave an email, and their cell shows NULL."
+        },
+        {
+          "active": [
+            "q1"
+          ],
+          "note": "An empty cell is not equal to anything, so it needs its own test to be found."
+        },
+        {
+          "active": [
+            "q1"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "first_name",
+              "last_name",
+              "phone"
+            ],
+            "cells": [
+              [
+                "a first name",
+                "a last name",
+                "a phone number"
+              ]
+            ]
+          },
+          "note": "Winnie gets the owners to phone about email reminders."
+        }
+      ]
+    },
+    "visit-notes": {
+      "steps": [
+        {
+          "active": [
+            "visits",
+            "visits->q2"
+          ],
+          "note": "Every visit comes in, with notes or without."
+        },
+        {
+          "active": [
+            "q2"
+          ],
+          "note": "Only the visits where a note was written stay."
+        },
+        {
+          "active": [
+            "q2"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "visit_date",
+              "vet",
+              "notes"
+            ],
+            "cells": [
+              [
+                "a date",
+                "a vet",
+                "a note"
+              ]
+            ]
+          },
+          "note": "Ifan gets the visits he can read back through, and no empty notes."
+        }
+      ]
+    },
+    "not-labradors": {
+      "steps": [
+        {
+          "active": [
+            "animals",
+            "animals->q3"
+          ],
+          "note": "Every animal comes in. Some dogs have a breed nobody knows."
+        },
+        {
+          "active": [
+            "q3"
+          ],
+          "note": "A test on the breed is never true for an empty breed, so on its own it would drop those dogs without a word."
+        },
+        {
+          "active": [
+            "q3"
+          ],
+          "note": "The empty breeds are brought back in on purpose, and only for dogs."
+        },
+        {
+          "active": [
+            "q3"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "name",
+              "breed"
+            ],
+            "cells": [
+              [
+                "a name",
+                "a breed or NULL"
+              ]
+            ]
+          },
+          "note": "Ifan gets every dog he asked about, unknown breeds included."
+        }
+      ]
+    },
+    "contact-list": {
+      "steps": [
+        {
+          "active": [
+            "owners",
+            "owners->q4"
+          ],
+          "note": "Every owner comes in, with an email, a phone, or both."
+        },
+        {
+          "active": [
+            "q4"
+          ],
+          "note": "For each row the email is tried first, and the phone fills the gap when there is no email."
+        },
+        {
+          "active": [
+            "q4"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "first_name",
+              "last_name",
+              "contact"
+            ],
+            "cells": [
+              [
+                "a first name",
+                "a last name",
+                "an email or a phone"
+              ]
+            ]
+          },
+          "note": "Winnie gets one way to reach every owner, and no row is left empty."
+        }
+      ]
+    }
+  }
+}

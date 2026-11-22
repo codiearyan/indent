@@ -1,0 +1,38 @@
+{
+  "stations": [
+    {
+      "title": "Winnie",
+      "say": "Who is Biscuit? The phone's ringing.",
+      "note": "Front desk, Hollybank Vets."
+    },
+    {
+      "title": "Practice database",
+      "text": "Every owner, animal and visit, in SQLite.",
+      "note": "Only Ifan knows how to ask it."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "file": "1-every-animal.sql",
+      "gap": "Nobody here can ask it",
+      "tasks": [
+        "Show every animal",
+        "Show every owner",
+        "Fix Ifan's query"
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Biscuit",
+    "wrong": "unknown",
+    "why": "Ifan's busy",
+    "right": "found"
+  },
+  "captions": [
+    "At Hollybank Vets, Winnie has a caller on the line and no idea who Biscuit is.",
+    "The answer is in the practice's database, but only Ifan can ask it, and he is in surgery.",
+    "You write your first queries, in three tasks: animals, owners and a broken query to fix.",
+    "Now every animal is on Winnie's screen, and Biscuit is one row in it.",
+    "Same database, no waiting. The front desk can see its own records."
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Ifan",
+      "say": "Which dogs need the big scales?",
+      "note": "Between two appointments."
+    },
+    {
+      "title": "animals",
+      "text": "Every animal, light or heavy, in one table.",
+      "note": "Every query returns all of them."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "file": "2-heavy-dogs.sql",
+      "gap": "No way to choose rows",
+      "tasks": [
+        "Find the cats",
+        "Dogs for big scales",
+        "Outside the village",
+        "Light small pets"
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Big scales",
+    "wrong": "every row",
+    "why": "No filter",
+    "right": "short list"
+  },
+  "captions": [
+    "Ifan wants to know which dogs are too heavy for the small scales.",
+    "Every query still returns every animal, so he would have to read them all.",
+    "You keep only the rows that match a condition, with AND, OR and NOT, in four tasks.",
+    "Now Ifan gets a short list of exactly the dogs he asked about.",
+    "Same table, the right rows. Each question gets only its own answer."
+  ]
+}

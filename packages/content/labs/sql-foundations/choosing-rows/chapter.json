@@ -1,0 +1,110 @@
+{
+  "id": "choosing-rows",
+  "title": "Choosing rows",
+  "files": [
+    "queries/1-cats.sql",
+    "queries/2-heavy-dogs.sql",
+    "queries/3-out-of-town.sql",
+    "queries/4-light-small-pets.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-cats.sql"
+  },
+  "tasks": [
+    {
+      "id": "cats",
+      "title": "Find the cats",
+      "file": "queries/1-cats.sql",
+      "description": "Ifan wants every cat for the new flea treatment.\n\nIn `queries/1-cats.sql`, return two columns from `animals`, in this order:\n\n- `name`\n- `breed`\n\nOnly animals whose `species` is `cat`. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write the query with the two columns and run it: you get every animal.",
+        "Add a condition after `FROM` that keeps only the cats.",
+        "Run it again and check every row is a cat, and no cat is missing."
+      ],
+      "hints": [
+        "Look at how the species is stored in `seed.sql`, letter for letter.",
+        "Text you compare with goes in single quotes, and `=` compares it exactly, capital letters included.",
+        "The condition has the shape `WHERE column = 'value'`."
+      ],
+      "docs": [
+        { "title": "The WHERE clause", "url": "https://www.sqlite.org/lang_select.html#whereclause" },
+        { "title": "SQL expressions", "url": "https://www.sqlite.org/lang_expr.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "heavy-dogs",
+      "title": "Find the dogs for the big scales",
+      "file": "queries/2-heavy-dogs.sql",
+      "description": "The small scales go up to 25 kg, so Ifan wants every dog that is too heavy for them.\n\nIn `queries/2-heavy-dogs.sql`, return two columns from `animals`, in this order:\n\n- `name`\n- `weight_kg`\n\nOnly dogs that weigh more than 25 kg. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, which has a dog that weighs exactly 25 kg.",
+      "nextSteps": [
+        "Write a query that keeps only the dogs, and run it.",
+        "Write the weight condition on its own, and run it.",
+        "Put both conditions in one `WHERE` so a row must pass both.",
+        "Ask yourself whether a dog of exactly 25 kg belongs on the list."
+      ],
+      "hints": [
+        "A row has to pass two tests here: what it is, and what it weighs.",
+        "`AND` keeps a row only when both conditions are true. Numbers take no quotes.",
+        "\"More than\" is `>`, not `>=`. The condition has the shape `WHERE species = '...' AND weight_kg > number`."
+      ],
+      "docs": [
+        { "title": "The WHERE clause", "url": "https://www.sqlite.org/lang_select.html#whereclause" },
+        { "title": "SQL operators", "url": "https://www.sqlite.org/lang_expr.html#operators_and_parse_affecting_attributes" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "out-of-town",
+      "title": "Find the owners outside Hollybank",
+      "file": "queries/3-out-of-town.sql",
+      "description": "On Thursdays Ifan does home visits outside the village.\n\nIn `queries/3-out-of-town.sql`, return three columns from `owners`, in this order:\n\n- `first_name`\n- `last_name`\n- `town`\n\nOnly owners whose `town` is not `Hollybank`. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, which has towns you cannot see.",
+      "nextSteps": [
+        "Run a query with the three columns and look at the towns.",
+        "Write a condition that is true for every town except Hollybank.",
+        "Run it and make sure no Hollybank owner is left."
+      ],
+      "hints": [
+        "Listing the other towns by name only fits the towns you can see today. Describe the rule instead.",
+        "The lesson's table of comparisons has one for \"is not equal to\". `NOT` works too.",
+        "The condition has the shape `WHERE town <> 'value'`."
+      ],
+      "docs": [
+        { "title": "SQL operators", "url": "https://www.sqlite.org/lang_expr.html#operators_and_parse_affecting_attributes" },
+        { "title": "The WHERE clause", "url": "https://www.sqlite.org/lang_select.html#whereclause" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "light-small-pets",
+      "title": "Find the light rabbits and guinea pigs",
+      "file": "queries/4-light-small-pets.sql",
+      "description": "Ifan wants to call in the small animals that may be too light.\n\nIn `queries/4-light-small-pets.sql`, return three columns from `animals`, in this order:\n\n- `name`\n- `species`\n- `weight_kg`\n\nOnly rabbits and guinea pigs, and of those only the ones that weigh under 1 kg. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, which has other light animals that are not rabbits or guinea pigs.",
+      "nextSteps": [
+        "Write a query that keeps the rabbits and the guinea pigs, and run it.",
+        "Add the weight condition.",
+        "Run it and check every row: is each one a rabbit or a guinea pig, and under 1 kg?",
+        "Check that no heavier rabbit has slipped through."
+      ],
+      "hints": [
+        "One row is never both a rabbit and a guinea pig, so the species part needs `OR`.",
+        "When a condition mixes `AND` and `OR`, SQLite works out `AND` first. Brackets decide which parts belong together.",
+        "Put brackets around the two species tests, then add `AND weight_kg < 1` after them."
+      ],
+      "docs": [
+        { "title": "Operators and their order", "url": "https://www.sqlite.org/lang_expr.html#operators_and_parse_affecting_attributes" },
+        { "title": "The WHERE clause", "url": "https://www.sqlite.org/lang_select.html#whereclause" }
+      ],
+      "videos": [
+        {
+          "title": "Filtering rows with AND, OR and NOT",
+          "url": "https://www.youtube.com/watch?v=cMUJFau5Wvg"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

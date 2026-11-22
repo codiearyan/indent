@@ -1,0 +1,89 @@
+{
+  "id": "first-query",
+  "title": "Your first query",
+  "files": [
+    "queries/1-every-animal.sql",
+    "queries/2-every-owner.sql",
+    "queries/3-fix-the-query.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-every-animal.sql"
+  },
+  "tasks": [
+    {
+      "id": "every-animal",
+      "title": "Show every animal",
+      "file": "queries/1-every-animal.sql",
+      "description": "Winnie wants to see every animal the practice knows.\n\nIn `queries/1-every-animal.sql`, write one query that returns every row and every column of the `animals` table.\n\nCheck runs your query against the data you can see and against a hidden set of animals, and compares the columns and the rows that come back.",
+      "nextSteps": [
+        "Run `node run.mjs queries/1-every-animal.sql` once and read what it prints today.",
+        "Find the `animals` table in `schema.sql` and look at its columns.",
+        "Write your query below the comments in the file.",
+        "Run the file again and look for Biscuit in the rows."
+      ],
+      "hints": [
+        "The lesson's part \"Asking with SELECT\" shows a query that returns a whole table.",
+        "A query names what to give back, then which table to read. One symbol stands for every column.",
+        "The query has the shape `SELECT * FROM table_name;` with the name of the animals table in place of `table_name`."
+      ],
+      "docs": [
+        { "title": "SELECT", "url": "https://www.sqlite.org/lang_select.html" },
+        { "title": "Datatypes in SQLite", "url": "https://www.sqlite.org/datatype3.html" }
+      ],
+      "videos": [
+        {
+          "title": "Tables, columns and rows",
+          "url": "https://www.youtube.com/watch?v=9jnfWJIw97I"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "every-owner",
+      "title": "Show every owner",
+      "file": "queries/2-every-owner.sql",
+      "description": "Next Winnie wants the people behind the animals.\n\nIn `queries/2-every-owner.sql`, write one query that returns every row and every column of the `owners` table.\n\nCheck runs your query against the data you can see and against a hidden set of owners, and compares the columns and the rows.",
+      "nextSteps": [
+        "Find the `owners` table in `schema.sql`.",
+        "Write your query below the comments, the same way as in task 1.",
+        "Run `node run.mjs queries/2-every-owner.sql`.",
+        "Look at the `email` column: some owners show `NULL`."
+      ],
+      "hints": [
+        "This is the same kind of query as task 1, about another table.",
+        "Only the table name changes. Copy it from `schema.sql` so every letter matches.",
+        "If SQLite says `no such table`, compare the name it shows with the name after `CREATE TABLE` in `schema.sql`."
+      ],
+      "docs": [
+        { "title": "SELECT", "url": "https://www.sqlite.org/lang_select.html" },
+        { "title": "SQL comments", "url": "https://www.sqlite.org/lang_comment.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix-the-query",
+      "title": "Fix Ifan's query",
+      "file": "queries/3-fix-the-query.sql",
+      "description": "Ifan left a query that is meant to list every visit, but SQLite refuses to run it.\n\nIn `queries/3-fix-the-query.sql`, fix the query so it returns every row and every column of the `visits` table. Read each error SQLite prints and fix the spot it points at. Keep it one query.\n\nCheck runs your query against the data you can see and against a hidden set of visits, and compares the columns and the rows.",
+      "nextSteps": [
+        "Run `node run.mjs queries/3-fix-the-query.sql` and read the error.",
+        "Fix only the spot the error points at, then run the file again.",
+        "Repeat until rows come back instead of an error.",
+        "Compare the table name with `schema.sql` letter for letter."
+      ],
+      "hints": [
+        "SQLite stops at the first mistake it finds, so you fix them one at a time.",
+        "A `syntax error` near a word usually means that word, or the one just before it, is misspelt. Compare each keyword with the query in task 1.",
+        "There are three mistakes: two misspelt keywords and a table name that is not quite the one in `schema.sql`."
+      ],
+      "docs": [
+        { "title": "SQL keywords", "url": "https://www.sqlite.org/lang_keywords.html" },
+        { "title": "SELECT", "url": "https://www.sqlite.org/lang_select.html" }
+      ],
+      "points": 10
+    }
+  ]
+}

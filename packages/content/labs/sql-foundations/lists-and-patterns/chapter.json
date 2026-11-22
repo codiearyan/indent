@@ -1,0 +1,107 @@
+{
+  "id": "lists-and-patterns",
+  "title": "Lists, patterns and ranges",
+  "files": [
+    "queries/1-vaccines-and-tests.sql",
+    "queries/2-terriers.sql",
+    "queries/3-october-visits.sql",
+    "queries/4-other-species.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-vaccines-and-tests.sql"
+  },
+  "tasks": [
+    {
+      "id": "vaccines-and-tests",
+      "title": "List the vaccines and tests",
+      "file": "queries/1-vaccines-and-tests.sql",
+      "description": "Rosamund wants to see what the practice charges for vaccines and tests.\n\nIn `queries/1-vaccines-and-tests.sql`, return three columns from `treatments`, in this order:\n\n- `name`\n- `kind`\n- `price`\n\nOnly treatments whose `kind` is `vaccine` or `test`. Some treatments appear more than once, and every one of them belongs in the result. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Run a query with the three columns and look at the kinds there are.",
+        "Keep the rows whose kind is one of the two.",
+        "Run it and check that both kinds appear and no other kind does."
+      ],
+      "hints": [
+        "You could write this with `OR`, as in the last issue. This issue has a shorter way.",
+        "`IN` is true when a value is any one of a list in brackets. Each text value has its own single quotes.",
+        "The condition has the shape `WHERE kind IN ('...', '...')`."
+      ],
+      "docs": [
+        { "title": "IN and NOT IN", "url": "https://www.sqlite.org/lang_expr.html#the_in_and_not_in_operators" }
+      ],
+      "videos": [
+        {
+          "title": "IN, BETWEEN and LIKE",
+          "url": "https://www.youtube.com/watch?v=toLeLHhER_I"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "terriers",
+      "title": "Find every terrier",
+      "file": "queries/2-terriers.sql",
+      "description": "Ifan wants every terrier for a skin check, and the breeds were typed in by different people over the years.\n\nIn `queries/2-terriers.sql`, return two columns from `animals`, in this order:\n\n- `name`\n- `breed`\n\nOnly animals whose `breed` has the word `terrier` anywhere in it: at the start, in the middle or at the end, with a capital T or without. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Run a query with `name` and `breed` and read every breed that mentions terriers.",
+        "Notice where the word sits in each one, and how it is written.",
+        "Write one condition that catches all of them.",
+        "Run it and count: is every terrier there?"
+      ],
+      "hints": [
+        "`=` compares the whole value, so it cannot find a word inside a longer breed.",
+        "In a `LIKE` pattern, `%` stands for any run of characters, including none. In SQLite, `LIKE` ignores letter case for A to Z.",
+        "The pattern needs a `%` on both sides of the word: `WHERE breed LIKE '%...%'`."
+      ],
+      "docs": [
+        { "title": "The LIKE operator", "url": "https://www.sqlite.org/lang_expr.html#like" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "october-visits",
+      "title": "List October's visits",
+      "file": "queries/3-october-visits.sql",
+      "description": "Rosamund needs October's visits for the monthly report.\n\nIn `queries/3-october-visits.sql`, return three columns from `visits`, in this order:\n\n- `visit_date`\n- `vet`\n- `reason`\n\nOnly visits from 1 October 2026 to 31 October 2026, both days included. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, which has visits on the first and the last day of the month and in October of other years.",
+      "nextSteps": [
+        "Run a query with the three columns and look at how the dates are written.",
+        "Write the first and the last day of the month the same way.",
+        "Keep the visits from one to the other, both days included.",
+        "Check the edges: a visit on 30 September or 1 November must not appear."
+      ],
+      "hints": [
+        "Dates here are text in the shape year-month-day, so they compare in date order. They need quotes.",
+        "`BETWEEN` keeps values from one limit to the other, and both limits are included.",
+        "The condition has the shape `WHERE visit_date BETWEEN '2026-10-..' AND '2026-10-..'`, with the first and last day of the month."
+      ],
+      "docs": [
+        { "title": "The BETWEEN operator", "url": "https://www.sqlite.org/lang_expr.html#between" },
+        { "title": "Dates and times in SQLite", "url": "https://www.sqlite.org/datatype3.html#date_and_time_datatype" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "other-species",
+      "title": "Find the other species",
+      "file": "queries/4-other-species.sql",
+      "description": "Mabel, the practice's other vet, wants to know which patients are not a dog, a cat or a rabbit.\n\nIn `queries/4-other-species.sql`, return two columns from `animals`, in this order:\n\n- `name`\n- `species`\n\nOnly animals whose `species` is none of `dog`, `cat` and `rabbit`. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, which has species your data does not.",
+      "nextSteps": [
+        "Run a query with the two columns and look at the species there are.",
+        "Describe the rows to leave out, not the rows to keep.",
+        "Run it and make sure no dog, cat or rabbit is left."
+      ],
+      "hints": [
+        "Listing the species you can see only fits today's patients. A new kind of animal tomorrow would be missed.",
+        "`IN` has an opposite that is true when a value is none of the list.",
+        "The condition has the shape `WHERE species NOT IN ('...', '...', '...')`."
+      ],
+      "docs": [
+        { "title": "IN and NOT IN", "url": "https://www.sqlite.org/lang_expr.html#the_in_and_not_in_operators" }
+      ],
+      "points": 10
+    }
+  ]
+}

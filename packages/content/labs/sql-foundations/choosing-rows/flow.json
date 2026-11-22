@@ -1,0 +1,262 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "animals",
+        "label": "animals",
+        "kind": "data"
+      },
+      {
+        "id": "owners",
+        "label": "owners",
+        "kind": "data"
+      },
+      {
+        "id": "q1",
+        "label": "1-cats.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q2",
+        "label": "2-heavy-dogs.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q3",
+        "label": "3-out-of-town.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "q4",
+        "label": "4-light-small-pets.sql",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "ifan",
+        "label": "Ifan",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "animals",
+        "to": "q1",
+        "label": "rows"
+      },
+      {
+        "from": "animals",
+        "to": "q2",
+        "label": "rows"
+      },
+      {
+        "from": "owners",
+        "to": "q3",
+        "label": "rows"
+      },
+      {
+        "from": "animals",
+        "to": "q4",
+        "label": "rows"
+      },
+      {
+        "from": "q1",
+        "to": "ifan",
+        "label": "flea list"
+      },
+      {
+        "from": "q2",
+        "to": "ifan",
+        "label": "big scales"
+      },
+      {
+        "from": "q3",
+        "to": "ifan",
+        "label": "home visits"
+      },
+      {
+        "from": "q4",
+        "to": "ifan",
+        "label": "call-ins"
+      }
+    ],
+    "note": "Four queries test every row against a condition and hand Ifan only the rows he asked about."
+  },
+  "tasks": {
+    "cats": {
+      "steps": [
+        {
+          "active": [
+            "animals",
+            "animals->q1"
+          ],
+          "note": "Every animal comes in, of every species."
+        },
+        {
+          "active": [
+            "q1"
+          ],
+          "note": "Each row's species is compared with one word, exactly as it is stored."
+        },
+        {
+          "active": [
+            "q1",
+            "q1->ifan",
+            "ifan"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "name",
+              "breed"
+            ],
+            "cells": [
+              [
+                "a name",
+                "a breed or NULL"
+              ]
+            ]
+          },
+          "note": "Only the rows that pass reach Ifan's flea list."
+        }
+      ]
+    },
+    "heavy-dogs": {
+      "steps": [
+        {
+          "active": [
+            "animals",
+            "animals->q2"
+          ],
+          "note": "Every animal comes in, heavy or light."
+        },
+        {
+          "active": [
+            "q2"
+          ],
+          "note": "A row has to pass two tests: what kind of animal it is, and whether it weighs more than the small scales take."
+        },
+        {
+          "active": [
+            "q2"
+          ],
+          "note": "An animal right on the limit is not more than it, so it stays on the small scales."
+        },
+        {
+          "active": [
+            "q2",
+            "q2->ifan",
+            "ifan"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "name",
+              "weight_kg"
+            ],
+            "cells": [
+              [
+                "a name",
+                "a weight"
+              ]
+            ]
+          },
+          "note": "Ifan gets the dogs for the big scales."
+        }
+      ]
+    },
+    "out-of-town": {
+      "steps": [
+        {
+          "active": [
+            "owners",
+            "owners->q3"
+          ],
+          "note": "Every owner comes in, from the village and from further out."
+        },
+        {
+          "active": [
+            "q3"
+          ],
+          "note": "The condition describes the rule, not today's towns, so a town nobody has seen yet is still caught."
+        },
+        {
+          "active": [
+            "q3",
+            "q3->ifan",
+            "ifan"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "first_name",
+              "last_name",
+              "town"
+            ],
+            "cells": [
+              [
+                "a first name",
+                "a last name",
+                "a town"
+              ]
+            ]
+          },
+          "note": "Ifan gets the owners for his Thursday round."
+        }
+      ]
+    },
+    "light-small-pets": {
+      "steps": [
+        {
+          "active": [
+            "animals",
+            "animals->q4"
+          ],
+          "note": "Every animal comes in, including light ones that are not small pets."
+        },
+        {
+          "active": [
+            "q4"
+          ],
+          "note": "The first question is the kind of animal: one of two species, so either may pass."
+        },
+        {
+          "active": [
+            "q4"
+          ],
+          "note": "The second question is the weight, and it applies to both species alike."
+        },
+        {
+          "active": [
+            "q4",
+            "q4->ifan",
+            "ifan"
+          ],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": [
+              "name",
+              "species",
+              "weight_kg"
+            ],
+            "cells": [
+              [
+                "a name",
+                "a species",
+                "a weight"
+              ]
+            ]
+          },
+          "note": "Ifan gets the small pets to call in, and nothing else."
+        }
+      ]
+    }
+  }
+}

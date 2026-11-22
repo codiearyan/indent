@@ -1,0 +1,23 @@
+{
+  "id": "sql-foundations",
+  "title": "SQL foundations",
+  "description": "Hollybank Vets keeps every owner, animal and visit in a database that only one of its vets knows how to question, so the front desk waits for him between appointments. You have never seen a database, and you start there: your first query, then choosing columns, choosing rows, matching text and handling the gaps in the records. Each issue teaches one part of SQL in small queries you run yourself against the practice's data.",
+  "category": "Databases",
+  "language": "sql",
+  "tags": [
+    "SQL"
+  ],
+  "kind": "foundations",
+  "parts": [
+    {
+      "title": "Questions about one table",
+      "chapters": [
+        "first-query",
+        "choosing-columns",
+        "choosing-rows",
+        "lists-and-patterns",
+        "missing-values"
+      ]
+    }
+  ]
+}

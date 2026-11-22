@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Winnie",
+      "say": "Just names and phone numbers.",
+      "note": "She phones owners all day."
+    },
+    {
+      "title": "Practice database",
+      "text": "SELECT * brings back every column.",
+      "note": "Most of them are noise on a call."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "file": "2-phone-list.sql",
+      "gap": "Far too many columns",
+      "tasks": [
+        "Names and species",
+        "The phone list",
+        "Full names",
+        "Weights in grams"
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Phone list",
+    "wrong": "too wide",
+    "why": "Every column",
+    "right": "ready"
+  },
+  "captions": [
+    "Winnie wants a phone list with the names and numbers she needs, and the word surname.",
+    "Today every query brings back every column, and the numbers drown in emails and towns.",
+    "You choose and name the columns, and work out new ones, in four tasks.",
+    "Now the phone list has exactly the columns Winnie reads, under the names she uses.",
+    "Same tables, the right columns. Each list fits the question it answers."
+  ]
+}

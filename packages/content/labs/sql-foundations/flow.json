@@ -1,0 +1,45 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "visits",
+        "label": "Owners and their animals",
+        "kind": "story"
+      },
+      {
+        "id": "db",
+        "label": "Practice database",
+        "kind": "data"
+      },
+      {
+        "id": "queries",
+        "label": "Your queries",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "team",
+        "label": "Winnie, Ifan and Rosamund",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "visits",
+        "to": "db",
+        "label": "records"
+      },
+      {
+        "from": "db",
+        "to": "queries",
+        "label": "rows"
+      },
+      {
+        "from": "queries",
+        "to": "team",
+        "label": "answers"
+      }
+    ],
+    "note": "The practice's records sit in one database, and your queries turn them into the answers the front desk used to wait for."
+  }
+}
