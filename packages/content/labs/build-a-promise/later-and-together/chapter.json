@@ -1,0 +1,82 @@
+{
+  "id": "later-and-together",
+  "title": "Later, and all together",
+  "files": ["src/docket.js", "src/price-list.js", "src/store.js"],
+  "terminal": {
+    "description": "A shell in your workspace where tonight's price list counts the paper twice, then asks for everything at once.",
+    "suggestedCommand": "node src/price-list.js"
+  },
+  "tasks": [
+    {
+      "id": "always-later",
+      "title": "Callbacks always run later",
+      "file": "src/docket.js",
+      "description": "Make every callback run later, never during the call that set it off.\n\n- a callback never runs inside `then()`, even on a docket already settled, and never inside `resolve()` or `reject()`\n- it runs once the code that is running now has finished, before any timer set at the same moment: use `queueMicrotask`\n- callbacks run in the order their `then()` calls were made\n- the executor still runs at once, and a callback that throws still fails the docket from `then()`\n\nThe check writes down, in order, what its own code and its callbacks do, with and without a timer beside them.",
+      "nextSteps": [
+        "Run `node src/price-list.js` and compare the order of the lines for card and for invite.",
+        "Find the two places where a callback's handler is run: in `then()` and when the docket settles.",
+        "Hand the handler to `queueMicrotask` in both places instead of running it.",
+        "Run the script: both counts should print in the same order."
+      ],
+      "hints": [
+        "Code that sometimes runs a callback at once and sometimes later forces every caller to handle both orders. Always later means only one.",
+        "`queueMicrotask(fn)` runs `fn` as soon as the code that is running now has finished, before timers and file reads, and runs queued jobs in the order they were queued.",
+        "Replace `handle()` with `queueMicrotask(handle)` in `then()` and in the loop that runs the waiting handlers when the docket settles. Leave the executor call as it is."
+      ],
+      "docs": [
+        { "title": "queueMicrotask()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/queueMicrotask" },
+        { "title": "Microtasks", "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API/Microtask_guide" },
+        { "title": "Timers in Node", "url": "https://nodejs.org/api/timers.html" }
+      ],
+      "videos": [
+        { "title": "The event loop and the microtask queue", "url": "https://www.youtube.com/watch?v=eiC58R16hb8" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "all",
+      "title": "Docket.all()",
+      "file": "src/docket.js",
+      "description": "Implement the static method `Docket.all(dockets)` in `src/docket.js`. It takes an array of dockets and returns a new docket.\n\n- once every docket is kept, it is kept with an array of their values, in the order of the list, not the order they arrived in\n- as soon as one fails, it fails with that reason, without waiting for the others; later failures change nothing\n- an empty list gives a docket kept with an empty array\n\nThe check gives it dockets of its own, settles them in an order of its choosing, and reads the docket it returned.",
+      "nextSteps": [
+        "Return a new `Docket` from `Docket.all()`.",
+        "Wait for each docket in the list with `then()`.",
+        "Put each value at its own place, and count how many have arrived.",
+        "Decide what happens when there is nothing to wait for."
+      ],
+      "hints": [
+        "Asking for three paper counts at once is faster than one after the other. The answers come back in any order; the list you give back must not.",
+        "`values[i] = value` puts a value at its place. When the last place is filled first, the array's length jumps to the full count while the other places are still empty, so keep a count of your own. A failure needs no count: the first one decides.",
+        "Inside `new Docket((resolve, reject) => { ... })`: `let left = dockets.length`, `dockets.forEach((d, i) => d.then((v) => { values[i] = v; if (--left === 0) resolve(values) }, reject))`, and resolve at once when `left` starts at 0."
+      ],
+      "docs": [
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
+        { "title": "static", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static" },
+        { "title": "Array.prototype.forEach()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "race",
+      "title": "Docket.race()",
+      "file": "src/docket.js",
+      "description": "Implement the static method `Docket.race(dockets)` in `src/docket.js`. It takes an array of dockets and returns a new docket that settles the way the first of them to settle does: kept with its value, or failed with its reason.\n\n- the dockets that settle after it change nothing, and its callbacks run once\n- a docket in the list that has already settled counts as first\n- while none has settled, it stays pending\n\nThe check gives it dockets of its own, settles them in an order of its choosing, and reads the docket it returned and its callbacks.",
+      "nextSteps": [
+        "Return a new `Docket` from `Docket.race()`.",
+        "Listen to every docket in the list.",
+        "Let whichever settles first settle the new docket.",
+        "Run the script: the race against the time limit should give a day."
+      ],
+      "hints": [
+        "Racing the press queue against a timer that fails is how a script stops waiting for something that may never answer.",
+        "Every docket in the list can try to settle the new one. Think about what your docket already does with every attempt after the first.",
+        "`new Docket((resolve, reject) => { for (const d of dockets) d.then(resolve, reject) })`."
+      ],
+      "docs": [
+        { "title": "Promise.race()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race" },
+        { "title": "static", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static" }
+      ],
+      "points": 10
+    }
+  ]
+}

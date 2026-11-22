@@ -1,0 +1,74 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "list", "label": "price-list.js", "kind": "file" },
+      { "id": "then", "label": "then()", "kind": "function", "mine": true },
+      { "id": "waiting", "label": "Waiting callbacks", "kind": "data" },
+      { "id": "settle", "label": "resolve or reject", "kind": "function" },
+      { "id": "callback", "label": "Your callback", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "list", "to": "then", "label": "two callbacks" },
+      { "from": "then", "to": "waiting", "label": "kept" },
+      { "from": "settle", "to": "waiting", "label": "settled" },
+      { "from": "waiting", "to": "callback", "label": "value or reason" },
+      { "from": "then", "to": "callback", "label": "already there" }
+    ],
+    "note": "Instead of looking again after a timer, the price list hands the docket what to do when the count arrives."
+  },
+  "tasks": {
+    "waiting-callbacks": {
+      "steps": [
+        {
+          "active": ["list", "list->then", "then"],
+          "note": "The price list calls then() on the card docket, which is still pending, with one callback for a count and one for a failure."
+        },
+        {
+          "active": ["then", "then->waiting", "waiting"],
+          "note": "then() cannot run anything yet, so it keeps the callbacks on the docket and returns."
+        },
+        {
+          "active": ["settle", "settle->waiting", "waiting"],
+          "note": "When the file has been read, resolve settles the docket, the one moment that knows the count is there."
+        },
+        {
+          "active": ["waiting", "waiting->callback", "callback"],
+          "note": "The callback for that outcome runs once with the count, and the other one does not run at all."
+        }
+      ]
+    },
+    "already-settled": {
+      "steps": [
+        {
+          "active": ["list", "list->then", "then"],
+          "note": "The posters were counted by hand, so their docket is kept before then() is called."
+        },
+        {
+          "active": ["then"],
+          "note": "Nothing will settle that docket again, so then() looks at its state itself."
+        },
+        {
+          "active": ["then", "then->callback", "callback"],
+          "note": "The outcome is already known, so the matching callback runs with the docket's value."
+        }
+      ]
+    },
+    "many-callbacks": {
+      "steps": [
+        {
+          "active": ["list", "list->then", "then", "then->waiting", "waiting"],
+          "value": { "kind": "array", "label": "waiting callbacks", "values": ["first then()", "second then()", "..."] },
+          "note": "The price list reads the card count twice, so two callbacks wait on one docket, in the order they were added."
+        },
+        {
+          "active": ["settle", "settle->waiting", "waiting", "waiting->callback", "callback"],
+          "note": "When the docket is kept, every waiting callback gets its turn, first added first."
+        },
+        {
+          "active": ["then"],
+          "note": "A then() with no callback for failures has nothing to run when a count fails, and that is skipped quietly."
+        }
+      ]
+    }
+  }
+}

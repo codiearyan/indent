@@ -1,0 +1,70 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "count", "label": "Paper count", "kind": "data" },
+      { "id": "step", "label": "Enough sheets?", "kind": "story" },
+      { "id": "then", "label": "then()", "kind": "function", "mine": true },
+      { "id": "catch", "label": "catch()", "kind": "function", "mine": true },
+      { "id": "line", "label": "Price list line", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "count", "to": "then", "label": "sheets or a reason" },
+      { "from": "then", "to": "step", "label": "runs" },
+      { "from": "step", "to": "then", "label": "returns or throws" },
+      { "from": "then", "to": "catch", "label": "a failure, passed on" },
+      { "from": "catch", "to": "line", "label": "a price or why not" }
+    ],
+    "note": "Every quote now ends one of two ways, a price or a reason, and the reason is written once, at the end of the chain."
+  },
+  "tasks": {
+    "throws-in-callbacks": {
+      "steps": [
+        {
+          "active": ["count", "count->then", "then", "then->step", "step"],
+          "note": "The poster count arrives, and the step checks it against the 100 sheets asked for."
+        },
+        {
+          "active": ["step", "step->then", "then"],
+          "note": "There are not enough, so the step throws."
+        },
+        {
+          "active": ["then"],
+          "value": { "kind": "map", "label": "docket from then()", "entries": [{ "key": "state", "value": "rejected" }, { "key": "value", "value": "what was thrown" }] },
+          "note": "then() catches the throw and fails its next docket with it, so the script does not crash and the other quotes go on."
+        }
+      ]
+    },
+    "catch": {
+      "steps": [
+        {
+          "active": ["then", "then->catch", "catch"],
+          "note": "A failed quote reaches catch(), which is then() with only a handler for failures."
+        },
+        {
+          "active": ["catch"],
+          "note": "The handler turns the reason into a sentence saying why there is no quote tonight."
+        },
+        {
+          "active": ["catch", "catch->line", "line"],
+          "note": "What the handler returns keeps the next docket, so the chain carries on and the line is printed."
+        }
+      ]
+    },
+    "skip-ahead": {
+      "steps": [
+        {
+          "active": ["count", "count->then", "then"],
+          "note": "The napkin count fails at once: there is no line for napkins."
+        },
+        {
+          "active": ["then"],
+          "note": "The steps after it have nothing to do with a failure, so each passes it on unchanged and runs nothing."
+        },
+        {
+          "active": ["then", "then->catch", "catch", "catch->line", "line"],
+          "note": "The failure reaches the first handler that takes it, at the end, and the line says why."
+        }
+      ]
+    }
+  }
+}
