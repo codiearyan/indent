@@ -105,8 +105,8 @@ export const checks = {
   },
 
   async count(t) {
-    const unix = 'D1,Ines Kowal\nD2,\nD3,Rowan Amberley\nD4,Kit Oduya\nD5,\n'
-    const windows = 'E1,\r\nE2,Bram Tierney\r\n\r\nE3,Odile Marr\r\nE4,\r\nE5,\r\nE6,Femi Aldous\r\n\r\n'
+    const unix = 'D1,Cassius Kowal\nD2,\nD3,Rowan Amberley\nD4,Tobiah Grint\nD5,\n'
+    const windows = 'E1,\r\nE2,Elsbeth Tierney\r\n\r\nE3,Rennick Prosser\r\nE4,\r\nE5,\r\nE6,Morwenna Calloway\r\n\r\n'
     const dir = await box(t, { 'north-field.txt': unix, 'south-field.txt': windows })
     const cases = [
       ['north-field.txt', '5 plots, 2 free', 'whose lines end with \\n'],
@@ -147,7 +147,7 @@ export const checks = {
   },
 
   async holder(t) {
-    const list = 'F1,Ines Kowal\r\nF2,\r\nF3,Rowan Amberley\r\nF4,Kit Oduya\r\n'
+    const list = 'F1,Cassius Kowal\r\nF2,\r\nF3,Rowan Amberley\r\nF4,Tobiah Grint\r\n'
     const dir = await box(t, { 'east-field.txt': list })
     const [held, free, nowhere] = await Promise.all([
       run(dir, 'holder.js', ['east-field.txt', 'F3']),

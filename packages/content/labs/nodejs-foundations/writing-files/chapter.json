@@ -1,0 +1,104 @@
+{
+  "id": "writing-files",
+  "title": "Writing files and folders",
+  "files": ["add-to-list.js", "next-on-list.js", "monthly-report.js", "list-reports.js", "waiting-list.txt"],
+  "terminal": {
+    "description": "A terminal in your workspace. Your scripts change real files here: `node add-to-list.js Wendeline Achterberg` adds a name to the waiting list, and the editor shows the file as it is now.",
+    "suggestedCommand": "node add-to-list.js Wendeline Achterberg"
+  },
+  "tasks": [
+    {
+      "id": "add",
+      "title": "Add a name to the waiting list",
+      "file": "add-to-list.js",
+      "description": "Write `add-to-list.js` so that `node add-to-list.js Wendeline Achterberg` adds `Wendeline Achterberg` as a new line at the end of `waiting-list.txt`, and prints one line that says so. The names already on the list stay, in order. A name can be typed as several words; they are all part of it.\n\nThe list is the one beside the script, whatever folder the command is typed in. With no name, the script prints one line on standard error, ends with exit code 1, and leaves the list as it was.\n\nCheck puts a list of its own beside the script, adds two names, one of them from another folder, reads the list after, and runs the script with no name.",
+      "nextSteps": [
+        "Join every word typed after the script's name into one name.",
+        "Build the path to `waiting-list.txt` from the script's own folder.",
+        "Add the name and a line break to the end of the file.",
+        "Run it, then look at `waiting-list.txt` in the editor."
+      ],
+      "hints": [
+        "`node add-to-list.js Wendeline Achterberg` gives the script two arguments. Writing the whole file would lose the names already there.",
+        "`process.argv.slice(2).join(' ')` is the name. `appendFile` from `node:fs/promises` adds to the end of a file and keeps what is there.",
+        "`await appendFile(join(import.meta.dirname, 'waiting-list.txt'), `${name}\\n`)`."
+      ],
+      "docs": [
+        { "title": "fsPromises.appendFile()", "url": "https://nodejs.org/api/fs.html#fspromisesappendfilepath-data-options" },
+        { "title": "path.join()", "url": "https://nodejs.org/api/path.html#pathjoinpaths" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "Offer the plot to the next in line",
+      "file": "next-on-list.js",
+      "description": "When a plot comes free, it goes to whoever is at the top of the waiting list. Write `next-on-list.js` so that `node next-on-list.js` prints:\n\n```\nOffer the plot to Thaddeus Fairbairn.\n```\n\nwith the first name on the list, and writes the list back without that name. The others stay, in order, one per line. When nobody is on the list, it prints `Nobody is waiting.`, changes nothing, and ends with exit code 0.\n\nCheck runs `next-on-list.js` twice on a list of its own, once from another folder, reads the list after each run, and runs it on an empty list.",
+      "nextSteps": [
+        "Read `waiting-list.txt` beside the script and split it into names.",
+        "Take the first name off, and keep the rest.",
+        "Write the rest back to the file, one per line, in place of what was there.",
+        "Print who to offer the plot to, or that nobody is waiting."
+      ],
+      "hints": [
+        "This time the whole file is meant to change, so adding to its end will not do.",
+        "`writeFile` replaces everything in a file with what you give it. Write the remaining names, each followed by a line break.",
+        "`const [first, ...rest] = names`, then `await writeFile(list, rest.map((n) => `${n}\\n`).join(''))`."
+      ],
+      "docs": [
+        { "title": "fsPromises.writeFile()", "url": "https://nodejs.org/api/fs.html#fspromiseswritefilefile-data-options" },
+        { "title": "fsPromises.readFile()", "url": "https://nodejs.org/api/fs.html#fspromisesreadfilepath-options" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "report",
+      "title": "Write the monthly report",
+      "file": "monthly-report.js",
+      "description": "The committee wants a short report each month. Write `monthly-report.js` so that `node monthly-report.js 2026-06` writes the file `reports/2026-06.txt` beside the script, with three lines:\n\n```\nPlots: 12\nFree: 3\nWaiting: 3\n```\n\nThe counts come from `plots.txt` and `waiting-list.txt` as they are when the script runs. The `reports` folder may not exist yet: make it when it is missing, and leave the reports already in it alone. The script prints one line that says where it wrote the report. With no month, it prints one line on standard error, ends with exit code 1, and writes nothing. Build every path with `node:path`.\n\nCheck runs `monthly-report.js` with lists and months of its own, with no reports folder, with one that already holds a report, and with no month.",
+      "nextSteps": [
+        "Read the month, and refuse a missing one as before.",
+        "Count the plots, the free plots and the names, from the files beside the script.",
+        "Make the `reports` folder, in a way that does not fail when it is already there.",
+        "Write the three lines into the report and print where it went."
+      ],
+      "hints": [
+        "Writing `reports/2026-06.txt` fails with ENOENT while there is no `reports` folder. Making a folder that is there fails with EEXIST.",
+        "`mkdir` from `node:fs/promises` makes a folder. With `{ recursive: true }` it also makes the folders above it, and does not mind when it is already there.",
+        "`await mkdir(join(import.meta.dirname, 'reports'), { recursive: true })`, then `writeFile(join(folder, `${month}.txt`), ...)`."
+      ],
+      "docs": [
+        { "title": "fsPromises.mkdir()", "url": "https://nodejs.org/api/fs.html#fspromisesmkdirpath-options" },
+        { "title": "fsPromises.writeFile()", "url": "https://nodejs.org/api/fs.html#fspromiseswritefilefile-data-options" },
+        { "title": "Common system errors", "url": "https://nodejs.org/api/errors.html#common-system-errors" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "list",
+      "title": "List the reports",
+      "file": "list-reports.js",
+      "description": "Write `list-reports.js` so that `node list-reports.js` prints the month of every report in the `reports` folder beside the script, one per line, oldest first:\n\n```\n2026-05\n2026-06\n```\n\nOnly `.txt` files are reports; anything else in the folder is left out. When the folder is not there, or holds no report, the script prints `No reports yet.` and ends with exit code 0.\n\nCheck runs `list-reports.js` from another folder with reports and a note of its own, with no `reports` folder, and with a folder that holds no report.",
+      "nextSteps": [
+        "Read the names in the `reports` folder beside the script.",
+        "Keep the ones whose extension is `.txt`, and take the extension off.",
+        "Sort them and print one per line.",
+        "Handle a `reports` folder that is not there, or empty."
+      ],
+      "hints": [
+        "A folder's list of names comes back in no promised order. A folder that is not there gives ENOENT, like a file.",
+        "`readdir` from `node:fs/promises` gives the names in a folder. `extname(name)` and `basename(name, '.txt')` from `node:path` split a name.",
+        "Catch ENOENT around `await readdir(folder)` and use `[]`; then `.filter(...)`, `.map((n) => basename(n, '.txt'))` and `.sort()`."
+      ],
+      "docs": [
+        { "title": "fsPromises.readdir()", "url": "https://nodejs.org/api/fs.html#fspromisesreaddirpath-options" },
+        { "title": "path.basename()", "url": "https://nodejs.org/api/path.html#pathbasenamepath-suffix" },
+        {
+          "title": "Array.prototype.sort()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

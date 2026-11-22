@@ -14,7 +14,8 @@
       "chapters": [
         "first-script",
         "reading-files",
-        "paths"
+        "paths",
+        "writing-files"
       ]
     }
   ]
