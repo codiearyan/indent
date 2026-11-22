@@ -1,0 +1,129 @@
+{
+  "id": "names-and-values",
+  "title": "Names and values",
+  "files": ["kit_store.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see tonight's rope count.",
+    "suggestedCommand": "python3 kit_store.py"
+  },
+  "tasks": [
+    {
+      "id": "team",
+      "title": "Name the team",
+      "file": "kit_store.py",
+      "description": "Under `# Task 1` in `kit_store.py`, make a variable called `team_name` that holds the text `Brackenridge Mountain Rescue`, then print it.\n\nCheck runs your file and reads `team_name` after the lines under `# Task 1`: it must hold exactly that text. Then it looks for the name among the lines those lines print.",
+      "nextSteps": [
+        "Find `# Task 1` in the file.",
+        "Write the name, `=` and the text in quotes.",
+        "Print it with `print` on the next line.",
+        "Run `python3 kit_store.py` and read the output."
+      ],
+      "hints": [
+        "A variable is made with a name, `=` and a value. The lesson shows one for the hall.",
+        "The value is text, so it needs quotes. When you print the variable, its name goes without quotes.",
+        "Two lines: `team_name = \"...\"` with the team's name where the dots are, then `print(team_name)`."
+      ],
+      "docs": [
+        {
+          "title": "Assignment statements",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#assignment-statements"
+        },
+        {
+          "title": "Text in the Python tutorial",
+          "url": "https://docs.python.org/3/tutorial/introduction.html#text"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "count",
+      "title": "Count the ropes",
+      "file": "kit_store.py",
+      "description": "Under `# Task 2`, make a variable called `ropes_left`. It starts with the number of ropes in the store, which is in `ropes_in_store` near the top of the file. Print it like this, with the number `ropes_left` holds:\n\n```\nRopes in store: 9\n```\n\nCheck runs your file with other counts in place of the ones at the top, so `ropes_left` has to be built on the name `ropes_in_store`, not on a number you type. Then it looks for that line under `# Task 2`.",
+      "nextSteps": [
+        "Read the two lines under \"Tonight's count\".",
+        "Under `# Task 2`, make `ropes_left`.",
+        "Give it the value of `ropes_in_store` by writing that name.",
+        "Print the text and the variable together, then run the file."
+      ],
+      "hints": [
+        "A variable can start with the value of another variable, not only with a number or text you type.",
+        "On the right of `=`, write the name of the variable that holds the count. `print` can take the text and the variable together, with a comma between them.",
+        "`ropes_left = ...` with the store's variable name where the dots are, then `print(\"Ropes in store:\", ropes_left)`."
+      ],
+      "docs": [
+        {
+          "title": "Assignment statements",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#assignment-statements"
+        },
+        {
+          "title": "print()",
+          "url": "https://docs.python.org/3/builtins/functions.html#print"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Printing variables with print()",
+          "url": "https://www.youtube.com/watch?v=cVUwwZ9IVGI"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "taken",
+      "title": "Take ropes out for a callout",
+      "file": "kit_store.py",
+      "description": "Under `# Task 3`, `ropes_taken_out` ropes went out on tonight's callout. Give `ropes_left` a new value: the number of ropes left in the store. Then print it like this:\n\n```\nRopes after the callout: 5\n```\n\nCheck starts Task 3 from `ropes_left` as Task 2 should make it, with other numbers at the top, and reads `ropes_left` after the lines under `# Task 3`. Then it looks for that line.",
+      "nextSteps": [
+        "Under `# Task 3`, start a line with the name `ropes_left` and `=`.",
+        "On the right, take `ropes_taken_out` away from what is in the store now.",
+        "Print the new count like the task shows it.",
+        "Run the file: you should see two different counts."
+      ],
+      "hints": [
+        "You are not making a new variable here. You are giving the one you made a new value.",
+        "Giving a variable a new value is its name, `=` and the new value. The right side can use the variable's own value from before.",
+        "The line has the shape `ropes_left = ropes_left - ...`, with the variable for the ropes that went out where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "Assignment statements",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#assignment-statements"
+        },
+        {
+          "title": "Numbers in the Python tutorial",
+          "url": "https://docs.python.org/3/tutorial/introduction.html#using-python-as-a-calculator"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "names",
+      "title": "Give x and y real names",
+      "file": "kit_store.py",
+      "description": "Under `# Task 4`, two variables are called `x` and `y`, and nobody can tell what they hold. Rename `x` to `leader_name` and `y` to `kit_officer_name`, everywhere they appear. Their values stay the same.\n\nCheck runs your file and reads `leader_name` and `kit_officer_name` after the lines under `# Task 4`, and makes sure `x` and `y` are gone.",
+      "nextSteps": [
+        "Read the four lines under `# Task 4`.",
+        "Rename `x` where it is made.",
+        "Rename it where it is used too, then do the same for `y`.",
+        "Run the file: it should print the same two lines as before."
+      ],
+      "hints": [
+        "A variable's name appears where it is made and everywhere it is used.",
+        "If you rename it in one place only, Python stops with a `NameError` that names the one it no longer knows. Read it: it tells you which line to fix.",
+        "Four places change: the two lines that make `x` and `y`, and the two `print` lines that use them."
+      ],
+      "docs": [
+        {
+          "title": "Names in Python",
+          "url": "https://docs.python.org/3/reference/lexical_analysis.html#identifiers"
+        },
+        {
+          "title": "NameError",
+          "url": "https://docs.python.org/3/builtins/exceptions.html#NameError"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

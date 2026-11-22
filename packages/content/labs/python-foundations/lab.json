@@ -1,0 +1,24 @@
+{
+  "id": "python-foundations",
+  "title": "Python foundations",
+  "description": "Brackenridge Mountain Rescue is a team of volunteers, and its callout log, kit lists and rota live in a notebook and a spreadsheet nobody trusts. You have never written a line of code, and you start there: make the laptop at the base print, count, store and check what the team needs, and learn to read what Python says when something is wrong. Each issue teaches one part of Python in one small program you run yourself in a real terminal.",
+  "category": "Programming languages",
+  "language": "python",
+  "tags": ["Python"],
+  "kind": "foundations",
+  "tools": ["node", "python"],
+  "format": 4,
+  "parts": [
+    {
+      "title": "First nights at the base",
+      "chapters": [
+        "first-line",
+        "names-and-values",
+        "numbers",
+        "text-and-f-strings",
+        "true-false-and-none",
+        "read-the-traceback"
+      ]
+    }
+  ]
+}
