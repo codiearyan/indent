@@ -1,0 +1,109 @@
+{
+  "id": "forms",
+  "title": "Sending a form",
+  "files": [
+    "src/forms.js",
+    "run.js",
+    "server/station.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "body",
+      "title": "Write a form body",
+      "file": "src/forms.js",
+      "description": "Under `// Task 1` in `src/forms.js`, make `formBody(fields)` take an object of names and values, like `{ song: 'Weather for Ducks', from: 'Bram, who is nine' }`, and give back the text of the body a form sends for them, in the same order. Every value must arrive as typed, also when it has `&`, `=`, `+` or `%` in it. For an empty object it gives back empty text.\n\nCheck calls `formBody` with fields of its own and reads the text it gives back the way a server reads a form body.",
+      "nextSteps": [
+        "Find in the lesson what a form body looks like, and which object writes it.",
+        "Make that object from the fields.",
+        "Give back its text, not the object.",
+        "Run `node run.js` and look at how the `&` in the name was written."
+      ],
+      "hints": [
+        "A form body is written exactly like the question mark part of an address, with the same codes for characters that have a job.",
+        "`URLSearchParams` can start from an object of names and values, and encodes each value for you. Its `toString()` writes the text.",
+        "`return new URLSearchParams(fields).toString()`."
+      ],
+      "docs": [
+        {
+          "title": "URLSearchParams() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams"
+        },
+        {
+          "title": "URLSearchParams: toString() method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/toString"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "send",
+      "title": "Send the request form",
+      "file": "src/forms.js",
+      "description": "Under `// Task 2`, make `sendRequestForm(base, fields)` send `fields` to the server at `base` the way the website's request form does: a `POST` to `/forms/request` whose body is a form body, with the content type of a form body. It gives back the text of the answer's body, whatever the status.\n\nCheck starts a server of its own and looks at the method, the `content-type` and the body its server received, and at the text `sendRequestForm` gave back.",
+      "nextSteps": [
+        "Hand `fetch` the method and a form body in its options.",
+        "Make sure the request says it carries a form body: print it, or read the request `run.js` shows.",
+        "Read the body of the answer as text and give it back.",
+        "Run `node run.js`: one slip is for a song that is already on the list."
+      ],
+      "hints": [
+        "The server takes this form only as a form body, labelled with the long content type the lesson names. Anything else gets 415.",
+        "Handed a `URLSearchParams` as its body, `fetch` writes the text and adds the right `content-type` by itself. Handed text, it labels it as plain text.",
+        "`fetch(new URL('/forms/request', base), { method: 'POST', body: new URLSearchParams(fields) })`, then `return await response.text()`."
+      ],
+      "docs": [
+        {
+          "title": "Sending form data",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Sending_and_retrieving_form_data"
+        },
+        {
+          "title": "Using the Fetch API: setting a body",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#setting_a_body"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "jingle",
+      "title": "Send a jingle entry with its file",
+      "file": "src/forms.js",
+      "description": "Under `// Task 3`, make `enterJingle(base, entrant, fileName, script)` send a jingle entry to the server at `base` the way the website's jingle form does: a `POST` to `/forms/jingle` whose body is `multipart/form-data` with two parts:\n\n- `entrant`, a plain value: the entrant's name\n- `script`, a file called `fileName` whose contents are `script`\n\nIt gives back the text of the answer's body.\n\nCheck starts a server of its own, finds the parts in the body its server received, and looks at each part's name, file name and contents.",
+      "nextSteps": [
+        "Make the object the lesson uses to hold the parts of a form.",
+        "Add the entrant's name, then the script as a file with its file name.",
+        "Hand that object to `fetch` as the body, and leave the `content-type` alone.",
+        "Run `node run.js` and read the parts in the body it prints."
+      ],
+      "hints": [
+        "A file needs a body made of parts. `fetch` writes one for you from a `FormData`, boundary and all.",
+        "`append` takes a name and a value. For a file, the value is a `Blob` made from the contents, and the file name goes third. Setting a `content-type` yourself loses the boundary.",
+        "`form.append('entrant', entrant)` and `form.append('script', new Blob([script], { type: 'text/plain' }), fileName)`, then `fetch(new URL('/forms/jingle', base), { method: 'POST', body: form })`."
+      ],
+      "docs": [
+        {
+          "title": "FormData: append() method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/FormData/append"
+        },
+        {
+          "title": "Blob",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Blob"
+        },
+        {
+          "title": "Content-Type: multipart/form-data",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type#content-type_in_multipart_forms"
+        }
+      ],
+      "videos": [
+        {
+          "title": "File uploads from a form",
+          "url": "https://www.youtube.com/watch?v=iAxUpo0aJSk"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -23,7 +23,8 @@
       "title": "Sending and receiving data",
       "chapters": [
         "json",
-        "sending-data"
+        "sending-data",
+        "forms"
       ]
     }
   ]

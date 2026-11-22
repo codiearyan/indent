@@ -251,7 +251,7 @@ function printRequest(ex) {
   }
   if (!ex.body) return
   console.log('')
-  for (const line of ex.body.replaceAll('\r\n', '\n').split('\n')) console.log(`    ${line}`)
+  for (const line of ex.body.replaceAll('\r\n', '\n').replace(/\n$/, '').split('\n')) console.log(`    ${line}`)
 }
 
 function printAnswer(ex) {
