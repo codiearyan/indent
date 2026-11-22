@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { useEffect, useLayoutEffect, useRef } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
   ArrowUpRight,
   Bug,
@@ -68,6 +68,13 @@ export function AppShell(): React.JSX.Element {
     })
   }, [loadCatalog, loadProgress])
 
+  // The sheet scrolls, not the window, so a new page would open where the last one was left.
+  const sheet = useRef<HTMLElement>(null)
+  const { pathname } = useLocation()
+  useLayoutEffect(() => {
+    sheet.current?.scrollTo(0, 0)
+  }, [pathname])
+
   return (
     <div className="flex h-full bg-background">
       <aside className="app-drag flex w-[228px] shrink-0 flex-col px-3 pt-[var(--sidebar-top)] pb-3">
@@ -133,7 +140,10 @@ export function AppShell(): React.JSX.Element {
           </div>
         </div>
       </aside>
-      <main className="my-2 mr-2 min-w-0 flex-1 overflow-auto rounded-2xl border border-border bg-card">
+      <main
+        ref={sheet}
+        className="my-2 mr-2 min-w-0 flex-1 overflow-auto rounded-2xl border border-border bg-card"
+      >
         <div className="mx-auto w-full max-w-[1180px] px-10 py-9">
           {catalogFailed ? (
             <EmptyState title="Could not read the repos.">
