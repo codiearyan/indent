@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Deshawn", "say": "One search showed every order.", "note": "Found in the log. AP-12." },
+    { "title": "Search box", "text": "Customers type what they look for.", "note": "Any text at all." },
+    {
+      "title": "Your code",
+      "file": "search.js",
+      "mine": true,
+      "gap": "Text becomes part of the query",
+      "tasks": ["Catch the leak", "Keep text out", "Write the test"]
+    },
+    {
+      "title": "Orders table",
+      "rows": [["2041", "Greta"], ["2042", "Cosmo"], ["2044", "Yusra"]],
+      "note": "Each order has one owner."
+    }
+  ],
+  "ticket": { "label": "Search", "wrong": "shows all orders", "why": "Not theirs", "right": "shows only theirs" },
+  "captions": [
+    "At Ashgrove Press, Deshawn finds a search that answered with every order.",
+    "The text a customer typed changed the query, so other people's orders came back.",
+    "You catch the leak, keep the text out of the query and write its test, in three tasks.",
+    "Now every search finds only the customer's own orders, whatever they type.",
+    "Same search box, same table. Text is only ever searched for."
+  ]
+}

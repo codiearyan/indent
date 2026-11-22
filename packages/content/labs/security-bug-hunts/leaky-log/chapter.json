@@ -1,0 +1,88 @@
+{
+  "id": "leaky-log",
+  "title": "Passwords in the log",
+  "files": [
+    "src/signIn.js",
+    "src/reproduce.js",
+    "src/signIn.test.js",
+    "src/db.js",
+    "src/seed.js",
+    "src/demo.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the demo signs two customers in and prints the log lines.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Catch a secret in the log",
+      "file": "src/reproduce.js",
+      "description": "Before you change anything, prove the hole. In `src/reproduce.js`, implement `reproduceLeak()`.\n\nSign in once through the original `signIn()` with a fresh `openDb()`, using a customer from `seed.js`, and collect every log line in an array. Return an object with:\n\n- `form`: the `{ email, password }` you signed in with\n- `log`: every line `signIn()` logged, in order\n- `result`: exactly what `signIn()` returned\n\nThe check runs your function against the original `signIn.js`. It passes when `log` and `result` are real and a password, a session token or a password hash shows in a log line or in the message.",
+      "nextSteps": [
+        "Run `node src/demo.js` and read every log line it prints.",
+        "Write a log function that pushes each line into an array.",
+        "Sign in once with it and keep the result.",
+        "Run the demo again and find the secret in what you return."
+      ],
+      "hints": [
+        "signIn takes the log as a function, so you decide where its lines go.",
+        "const log = [] and (line) => log.push(line) collect every line signIn writes.",
+        "Sign in as cosmo@example.com with the wrong password tin-lantern-5, and return the form, the lines and the result."
+      ],
+      "docs": [
+        { "title": "Logging", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html" },
+        { "title": "Error handling", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Keep secrets out of the log and the page",
+      "file": "src/signIn.js",
+      "description": "Fix `signIn(db, log, form)` in `src/signIn.js` so no secret ever leaves it, except the token handed back to the customer who signed in.\n\n- The right password still signs in and returns `{ ok: true, token }`, with the token saved as a session.\n- A wrong password, or an email nobody has, returns `{ ok: false, message }`, with the same message for both.\n- No log line holds a password, a session token or a password hash, and no message holds a password or a hash.\n- Nothing secret is printed to the console.\n- Every attempt still logs a line with its email.\n\nThe check signs in with right and wrong passwords and an unknown email, and looks for every secret in each log line, each message and the console.",
+      "nextSteps": [
+        "List every secret `signIn` touches.",
+        "Find every place one of them leaves the function.",
+        "Write each log line from what happened, not from what was typed.",
+        "Run `node src/demo.js` and read the log lines again."
+      ],
+      "hints": [
+        "Three secrets pass through: the password typed, the stored hash and the new session token. Only the token should ever leave, and only in the result.",
+        "Logging the whole form logs the password with it. A log line can name the email and the outcome without copying the form.",
+        "Log a line such as `sign in failed for ${form.email}` or `signed in ${form.email}`, and make the wrong password message the same plain sentence as for an unknown email."
+      ],
+      "docs": [
+        { "title": "Logging", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html" },
+        { "title": "Error handling", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html" },
+        { "title": "crypto.scryptSync()", "url": "https://nodejs.org/docs/latest-v22.x/api/crypto.html#cryptoscryptsyncpassword-salt-keylen-options" }
+      ],
+      "videos": [
+        { "title": "Why a site keeps a hash, not the password", "url": "https://www.youtube.com/watch?v=8ZtInClXe1Q" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/signIn.test.js",
+      "description": "Write vitest tests in `src/signIn.test.js` that guard this hole for good. Use a fresh `openDb()` and a log that collects its lines in an array.\n\nThe check runs your test file three times: beside the original `signIn.js` (it must fail), beside a correct fix (it must pass) and beside a fix that keeps the session token out of the log but still logs the form (it must fail).",
+      "nextSteps": [
+        "Import `openDb` and `signIn`.",
+        "Sign in with the right password and check no line holds the token.",
+        "Add a check the token-only fix gets wrong.",
+        "Run `npx vitest run src/signIn.test.js`."
+      ],
+      "hints": [
+        "expect(line).not.toContain(secret) says a secret is not in a line. Loop over every line.",
+        "The token-only fix still logs the whole form. What is in the form?",
+        "For every line, also expect it not to contain the password you signed in with, for a right and for a wrong password."
+      ],
+      "docs": [
+        { "title": "Vitest expect", "url": "https://vitest.dev/api/expect.html" },
+        { "title": "Logging", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html" }
+      ],
+      "points": 10
+    }
+  ]
+}
