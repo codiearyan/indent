@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 import { useSettings } from '@/stores/settings'
+import { useCodeStyle } from './codeStyle'
 import { IconButton } from './IconButton'
 
 type MonacoModule = typeof import('@/features/editor/monaco')
@@ -43,6 +44,7 @@ export function CodeBlock({
   const codeTheme = useSettings((s) => s.codeTheme)
   const [colored, setColored] = useState<Colored | null>(null)
   const [copied, setCopied] = useState(false)
+  const codeStyle = useCodeStyle()
   const tag = language?.toLowerCase()
 
   useEffect(() => {
@@ -81,7 +83,9 @@ export function CodeBlock({
           {copied ? <Check /> : <Copy />}
         </IconButton>
       </figcaption>
-      <pre>{html ? <code dangerouslySetInnerHTML={{ __html: html }} /> : <code>{code}</code>}</pre>
+      <pre style={codeStyle}>
+        {html ? <code dangerouslySetInnerHTML={{ __html: html }} /> : <code>{code}</code>}
+      </pre>
     </figure>
   )
 }
