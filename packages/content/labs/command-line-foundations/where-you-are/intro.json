@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "What is even on this laptop?", "note": "Sol left a note somewhere." },
+    { "title": "Shop folder", "text": "Years of files, and nobody knows where.", "note": "Sizes and hidden files do not show." },
+    {
+      "title": "Your commands",
+      "file": "notes.txt",
+      "mine": true,
+      "gap": "Nobody has looked yet",
+      "tasks": ["Where the folder is", "The biggest drawing", "The hidden note"]
+    },
+    { "title": "Notes for Idris", "text": "Three answers, each on its own line." }
+  ],
+  "ticket": { "label": "The laptop", "wrong": "a mystery", "why": "Not looked", "right": "mapped" },
+  "captions": [
+    "Ashgrove Press. Idris wants to know what is on the shared laptop.",
+    "Since Sol left, the folder is a mystery, and some files do not even show.",
+    "You type your first commands to look around, in three small tasks.",
+    "Now Idris knows where the folder is, which drawing is huge, and where the note hides.",
+    "No file moved. You looked, and the laptop has a map."
+  ]
+}

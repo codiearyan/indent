@@ -1,0 +1,102 @@
+{
+  "id": "selectors",
+  "title": "Picking what to style",
+  "files": ["styles.css", "index.html"],
+  "terminal": {
+    "description": "The home page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "headings",
+      "title": "Colour both kinds of heading with one rule",
+      "file": "styles.css",
+      "description": "Dilys wants the headings in the orange of fired clay; her notes in `styles.css` give the code.\n\nWrite one rule that picks the `h1` and every `h2` and sets their `color` to her code.\n\nThe check reads the colour of the main heading and of each h2 heading on the home page, and looks for one rule whose selector lists both.",
+      "nextSteps": [
+        "Read \"Picking elements by name\" and \"Grouping\" in the lesson.",
+        "Under the body rule, start a new rule.",
+        "List both kinds of heading in its selector.",
+        "Set the colour, save, and press Check."
+      ],
+      "hints": [
+        "A selector made of an element's name picks every element with that name.",
+        "Two selectors separated by a comma share one set of declarations.",
+        "The shape is `h1, h2 { color: ...; }`, with the clay code from the notes."
+      ],
+      "docs": [
+        { "title": "Type selectors", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Type_selectors" },
+        { "title": "Selector list", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Selector_list" }
+      ],
+      "videos": [
+        { "title": "Every kind of CSS selector", "url": "https://www.youtube.com/watch?v=l1mER1bV0N0" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "note",
+      "title": "Give the two notes a class",
+      "file": "index.html",
+      "description": "Two lines on the home page are things nobody should miss: `Wear clothes you do not mind getting muddy.` and `Open Tuesday to Saturday, 10am to 5pm.`\n\nIn `index.html`, give both paragraphs `class=\"note\"`. In `styles.css`, write a rule that picks that class and sets `background-color` to the sand code in Dilys's notes. No other paragraph gets the sand.\n\nThe check finds the two paragraphs by their words, reads their class and their background colour, makes sure no other paragraph is sand, and looks for a rule that picks the class.",
+      "nextSteps": [
+        "Read \"Classes\" in the lesson.",
+        "Add the class attribute to the paragraph about muddy clothes and to the opening hours.",
+        "In styles.css, write a rule for the class with the sand background.",
+        "Save, find both notes in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "A class is a name you give to elements in the HTML, so CSS can pick just those.",
+        "The class goes on the `p` itself. In CSS, a class is picked with a dot in front of its name.",
+        "In the HTML, `<p class=\"note\">`; in styles.css, `.note { background-color: ...; }`."
+      ],
+      "docs": [
+        { "title": "Class selectors", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Class_selectors" },
+        { "title": "class", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/class" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "mug",
+      "title": "Centre the mug of the month",
+      "file": "index.html",
+      "description": "Dilys wants the mug of the month in the middle of the page, caption and all.\n\nIn `index.html`, give the `figure` the id `mug-of-the-month`. In `styles.css`, write a rule that picks that id and sets `text-align` to `center`.\n\nThe check reads the id of the figure and its text alignment, and looks for a rule that picks the id.",
+      "nextSteps": [
+        "Read \"Ids\" in the lesson.",
+        "Find the figure in The shop and give it the id.",
+        "In styles.css, write a rule that picks the id and centres the text.",
+        "Save, look at the mug in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "An id names one element on the page. CSS can pick it by that name.",
+        "In CSS, an id is picked with a `#` in front of it. `text-align` lines up text and pictures inside an element.",
+        "In the HTML, `<figure id=\"mug-of-the-month\">`; in styles.css, `#mug-of-the-month { text-align: center; }`."
+      ],
+      "docs": [
+        { "title": "ID selectors", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/ID_selectors" },
+        { "title": "text-align", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/text-align" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "nav-links",
+      "title": "Make the Jump to links bold",
+      "file": "styles.css",
+      "description": "Dilys wants the three Jump to links at the top in bold, so people see them first. The other links on the page, and the words `Jump to:`, stay as they are.\n\nWrite a rule that picks the links inside the `nav`, without adding anything to the HTML, and sets `font-weight` to bold.\n\nThe check reads the weight of each Jump to link, of the other links and of the words Jump to, and looks for a rule that picks links by where they sit.",
+      "nextSteps": [
+        "Read \"Picking by where an element sits\" in the lesson.",
+        "Find the nav in index.html and see what is inside it.",
+        "Write a rule whose selector picks only the links inside the nav.",
+        "Set the weight, save, and press Check."
+      ],
+      "hints": [
+        "A rule for every link would reach the classes page link and the email link too.",
+        "Two selectors with a space between them pick the second one only inside the first.",
+        "The shape is `nav a { font-weight: bold; }`."
+      ],
+      "docs": [
+        { "title": "Descendant combinator", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Descendant_combinator" },
+        { "title": "font-weight", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight" }
+      ],
+      "points": 10
+    }
+  ]
+}

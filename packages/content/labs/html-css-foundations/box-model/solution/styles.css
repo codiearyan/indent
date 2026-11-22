@@ -1,0 +1,56 @@
+:root {
+  --clay: #a4492a;
+  --cream: #f7f1e8;
+  --ink: #3b2f2a;
+  --sand: #efdcc3;
+  --stone: #7a6c64;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--ink);
+  font-family: Palatino, serif;
+  font-size: 18px;
+}
+
+h1,
+h2 {
+  color: var(--clay);
+}
+
+h2 {
+  color: var(--ink);
+}
+
+.note {
+  background-color: var(--sand);
+  color: var(--clay);
+  padding: 12px;
+  border-left: 4px solid var(--clay);
+}
+
+section {
+  margin-bottom: 48px;
+}
+
+#mug-of-the-month {
+  text-align: center;
+}
+
+nav a {
+  font-weight: bold;
+}
+
+#contact p {
+  color: var(--stone);
+}
+
+#contact .note {
+  color: var(--clay);
+}

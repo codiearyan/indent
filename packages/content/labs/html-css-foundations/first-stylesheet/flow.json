@@ -1,0 +1,77 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dilys", "label": "Dilys", "kind": "story" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "pages", "label": "Both pages", "kind": "file", "mine": true },
+      { "id": "browser", "label": "Browser", "kind": "story" },
+      { "id": "visitor", "label": "Visitor", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dilys", "to": "css", "label": "her notes" },
+      { "from": "css", "to": "pages", "label": "linked" },
+      { "from": "pages", "to": "browser", "label": "page, rules" },
+      { "from": "browser", "to": "visitor", "label": "the look" }
+    ],
+    "note": "One stylesheet, linked from both pages, gives the studio's pages the colours and letters of the studio itself."
+  },
+  "tasks": {
+    "link": {
+      "steps": [
+        {
+          "active": ["css"],
+          "note": "styles.css holds Dilys's notes, but no page loads it."
+        },
+        {
+          "active": ["css", "css->pages", "pages"],
+          "note": "A link in the head of each page loads styles.css as a stylesheet."
+        },
+        {
+          "active": ["pages", "pages->browser", "browser"],
+          "note": "Now the browser reads the stylesheet along with each page."
+        }
+      ]
+    },
+    "colours": {
+      "steps": [
+        {
+          "active": ["dilys", "dilys->css", "css"],
+          "value": {
+            "kind": "map",
+            "label": "Dilys's colours",
+            "entries": [
+              { "key": "background", "value": "cream of the walls" },
+              { "key": "writing", "value": "brown of the clay" }
+            ]
+          },
+          "note": "Dilys gives two colours as codes: one for behind the page, one for the writing."
+        },
+        {
+          "active": ["css"],
+          "note": "A rule for the body sets its background colour and its text colour."
+        },
+        {
+          "active": ["browser", "browser->visitor", "visitor"],
+          "note": "Visitors see a cream page with dark brown writing, on both pages."
+        }
+      ]
+    },
+    "font": {
+      "steps": [
+        {
+          "active": ["dilys", "dilys->css", "css"],
+          "note": "Dilys wants the letters of the sign over the door, and bigger writing."
+        },
+        {
+          "active": ["css"],
+          "value": { "kind": "array", "label": "the font list", "values": ["the font she wants", "a family to fall back on"] },
+          "note": "The body rule names the font, then a general family in case a computer does not have it, and a text size."
+        },
+        {
+          "active": ["browser", "browser->visitor", "visitor"],
+          "note": "Every heading, paragraph and link takes the new letters and size."
+        }
+      ]
+    }
+  }
+}

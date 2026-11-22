@@ -13,12 +13,28 @@
         ]
       },
       {
+        "title": "The command line",
+        "labs": [
+          "command-line-foundations"
+        ]
+      },
+      {
         "title": "JavaScript",
         "labs": [
           "js-foundations",
           "browser-js",
           "async-js",
           "js-bug-hunts"
+        ]
+      },
+      {
+        "title": "Testing",
+        "labs": [
+          "testing-foundations",
+          "build-a-test-runner"
+        ],
+        "soon": [
+          "Build your own promise"
         ]
       },
       {
@@ -45,17 +61,28 @@
           "react-screens"
         ],
         "soon": [
-          "React foundations"
+          "React foundations",
+          "A React app that talks to an API"
+        ]
+      },
+      {
+        "title": "How the web works",
+        "labs": [],
+        "soon": [
+          "How the web works"
         ]
       },
       {
         "title": "Node.js",
         "labs": [
           "node-api",
-          "express-crud-api"
+          "express-crud-api",
+          "security-bug-hunts"
         ],
         "soon": [
-          "Node.js foundations"
+          "Node.js foundations",
+          "An API with a real database",
+          "Sign-in and sessions"
         ]
       },
       {
@@ -123,6 +150,12 @@
     "description": "Get solid in JavaScript and TypeScript, handle slow and failing services, build a JSON API with nothing but Node, learn the SQL behind it, and keep your history clean when things go wrong.",
     "stages": [
       {
+        "title": "The command line",
+        "labs": [
+          "command-line-foundations"
+        ]
+      },
+      {
         "title": "JavaScript",
         "labs": [
           "js-foundations",
@@ -136,10 +169,18 @@
         ]
       },
       {
+        "title": "Testing",
+        "labs": [
+          "testing-foundations",
+          "build-a-test-runner"
+        ]
+      },
+      {
         "title": "An API",
         "labs": [
           "node-api",
-          "express-crud-api"
+          "express-crud-api",
+          "security-bug-hunts"
         ]
       },
       {
@@ -201,14 +242,16 @@
         "labs": [
           "js-foundations",
           "typescript-essentials",
-          "async-js"
+          "async-js",
+          "build-a-test-runner"
         ]
       },
       {
         "title": "Bug stories",
         "labs": [
           "js-bug-hunts",
-          "llm-bug-hunts-ts"
+          "llm-bug-hunts-ts",
+          "security-bug-hunts"
         ]
       }
     ]

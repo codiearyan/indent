@@ -1,0 +1,38 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "Can the page feel like us?",
+      "note": "Cream walls, brown clay."
+    },
+    {
+      "title": "Both pages",
+      "text": "Black on white, in the browser's letters.",
+      "note": "styles.css is not used"
+    },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "No stylesheet linked",
+      "tasks": ["Link the stylesheet", "Colours on the body", "Font and size"]
+    },
+    {
+      "title": "Home page",
+      "rows": [["Cream background"], ["Brown writing"], ["Serif letters"]]
+    }
+  ],
+  "ticket": {
+    "label": "The look",
+    "wrong": "plain",
+    "why": "No styles",
+    "right": "like the studio"
+  },
+  "captions": [
+    "Dilys wants the page to feel like walking into the studio.",
+    "Both pages are still black on white, and nothing uses the new stylesheet.",
+    "You link the stylesheet and give the body her colours, letters and size.",
+    "The home page turns cream, with brown writing in the letters of the sign.",
+    "Same HTML as before. One stylesheet now sets the look of both pages."
+  ]
+}
