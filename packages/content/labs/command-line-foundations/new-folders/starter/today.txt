@@ -1,0 +1,6 @@
+Today's jobs, from Idris
+
+1. A folder called receipts in the top folder, for the card machine slips.
+2. In orders, a folder 2026 with a folder for jan, feb and mar inside it.
+3. In artwork, a folder called poster ideas, for Hesper.
+4. An empty file print-queue.txt in the top folder.

@@ -1,0 +1,6 @@
+Today's jobs, from Hesper
+
+1. artwork has a duplicate of the fox poster called "fox-poster copy.svg". Remove it.
+2. Clear the .tmp files out of downloads.
+3. Sol says keep the logo from old-site. Put it in artwork.
+4. Then the old-site folder can go, with everything in it.

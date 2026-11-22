@@ -38,6 +38,9 @@ yet, read `packages/content/labs/js-foundations/order-reports/`.
    - `files`: the files the learner opens, in tab order, the one they write first.
    - `terminal`: a one-sentence `description` and a `suggestedCommand` that runs the demo.
    - `preview`: only for an issue with a page, e.g. `"index.html"`.
+   - `movesFiles`: `true` only for an issue whose tasks have the learner move, rename or remove
+     starter files. Without it the app asks for a missing starter file back and holds its checks.
+     Its repo sets `"format": 3` in `lab.json`.
    - Each task: `id`, `title` (what to do, as an action), `file`, `description`, `nextSteps`,
      `hints`, `docs`, `videos`, `points`.
      - `description` is Markdown. It names the function or file, says exactly what it takes and

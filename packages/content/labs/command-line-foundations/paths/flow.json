@@ -1,0 +1,82 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "idris", "label": "Idris", "kind": "story" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "top", "label": "Top folder", "kind": "data" },
+      { "id": "deep", "label": "Folders inside", "kind": "data" },
+      { "id": "notes", "label": "notes.txt", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "idris", "to": "you", "label": "where to go" },
+      { "from": "you", "to": "top", "label": "start here" },
+      { "from": "top", "to": "deep", "label": "a path" },
+      { "from": "deep", "to": "notes", "label": "answers" }
+    ],
+    "note": "You move the shell from folder to folder with paths and write down the paths that work."
+  },
+  "tasks": {
+    "inside": {
+      "steps": [
+        {
+          "active": ["idris", "idris->you"],
+          "note": "Hesper wants last autumn's market notes, three folders down in the archive."
+        },
+        {
+          "active": ["you", "you->top", "top"],
+          "value": { "kind": "array", "label": "the way down", "values": ["archive", "2025", "autumn"] },
+          "note": "From the top folder the shell goes down through the archive, one folder inside the next."
+        },
+        {
+          "active": ["top", "top->deep", "deep"],
+          "note": "Once there, the terminal can print the full path of where it now stands."
+        },
+        {
+          "active": ["deep", "deep->notes", "notes"],
+          "note": "That full path goes after inside: in the notes."
+        }
+      ]
+    },
+    "back": {
+      "steps": [
+        {
+          "active": ["idris", "idris->you"],
+          "note": "Idris works inside orders and keeps needing the March invoices."
+        },
+        {
+          "active": ["you", "you->top", "top"],
+          "note": "Orders and invoices both sit in the top folder, side by side."
+        },
+        {
+          "active": ["top", "top->deep", "deep"],
+          "note": "A relative path is followed from orders, one folder name at a time."
+        },
+        {
+          "active": ["deep", "deep->notes", "notes"],
+          "note": "The path that lists the March invoices from orders goes after back: in the notes."
+        }
+      ]
+    },
+    "proofs": {
+      "steps": [
+        {
+          "active": ["idris", "idris->you"],
+          "note": "Nobody can get into client proofs: the terminal just complains."
+        },
+        {
+          "active": ["you", "you->top", "top"],
+          "value": { "kind": "array", "label": "what the shell reads", "values": ["command", "one folder name"] },
+          "note": "The shell splits a line at every space, and this folder's name has one."
+        },
+        {
+          "active": ["top", "top->deep", "deep"],
+          "note": "Once the shell reads the name as one, the move into client proofs works."
+        },
+        {
+          "active": ["deep", "deep->notes", "notes"],
+          "note": "The command that worked goes after proofs: in the notes."
+        }
+      ]
+    }
+  }
+}

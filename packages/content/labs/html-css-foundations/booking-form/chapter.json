@@ -1,0 +1,102 @@
+{
+  "id": "booking-form",
+  "title": "A booking form",
+  "files": ["classes.html"],
+  "terminal": {
+    "description": "The classes page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "classes.html",
+  "tasks": [
+    {
+      "id": "fields",
+      "title": "Add a form with three fields",
+      "file": "classes.html",
+      "description": "Under `Book a place`, Kofi wants to know three things: a name, an email address and how many places.\n\nAdd a `form` after the line `Fill this in and Kofi will email you...`, and inside it three `input` fields:\n\n- a text field with `name=\"name\"`\n- an email field with `name=\"email\"`\n- a number field with `name=\"places\"`\n\nThe check finds the form, finds each field by its name, and makes sure it is inside the form and has the right type.",
+      "nextSteps": [
+        "Read \"A form and its fields\" and \"Types of field\" in the lesson.",
+        "Open a form under the line that starts Fill this in.",
+        "Add one input for each answer, each with its type and its name.",
+        "Close the form, save, try typing in the fields and press Check."
+      ],
+      "hints": [
+        "A form wraps the fields that are sent together. Each field is an input element.",
+        "The `type` attribute picks the kind of field and `name` says what the answer is sent under. Email and number are both types.",
+        "Inside `<form>` and `</form>`, write `<input type=\"email\" name=\"email\" />` and two more like it for the name and the places."
+      ],
+      "docs": [
+        { "title": "<form>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form" },
+        { "title": "<input>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input" },
+        { "title": "Your first form", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Your_first_form" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "labels",
+      "title": "Tie a label to each field",
+      "file": "classes.html",
+      "description": "Kofi's words for the three fields are `Your name`, `Email` and `Places`, still paragraphs under the form's heading.\n\nGive each field a `label` with his words, tied to that field: either point the label at the field's `id` with `for`, or put the field inside the label. Remove the old paragraphs.\n\nThe check finds each field and reads the label the browser ties to it, then makes sure the old paragraphs are gone.",
+      "nextSteps": [
+        "Read \"Labels\" in the lesson.",
+        "Give the name field an id.",
+        "Write a label with Kofi's words whose for matches that id.",
+        "Do the same for the other two fields, delete the old paragraphs, save and press Check."
+      ],
+      "hints": [
+        "Text next to a field is only text. The browser ties a field to its label element, nothing else.",
+        "A label is tied when its `for` is the same as the field's `id`, or when the field sits inside the label.",
+        "For example `<label for=\"email\">Email</label>` with `<input type=\"email\" id=\"email\" name=\"email\" />`."
+      ],
+      "docs": [
+        { "title": "<label>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/label" },
+        { "title": "Your first form", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Your_first_form" }
+      ],
+      "videos": [
+        { "title": "Accessible forms, with examples", "url": "https://www.youtube.com/watch?v=ffxwEyBcdf0" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "limits",
+      "title": "Keep places between 1 and 4",
+      "file": "classes.html",
+      "description": "Kofi takes no more than four people from one booking, and a booking for no places makes no sense.\n\nGive the places field a smallest value of 1 and a largest value of 4.\n\nThe check finds the places field, makes sure it is a number field, and reads its smallest and largest values.",
+      "nextSteps": [
+        "Read \"Types of field\" again, the part about numbers.",
+        "Find the places field.",
+        "Add the attribute for its smallest value and the one for its largest.",
+        "Save, try typing 9 and pressing the arrows in the field, and press Check."
+      ],
+      "hints": [
+        "A number field can be told how low and how high it may go.",
+        "The two attributes are short names for minimum and maximum.",
+        "Add `min=\"1\"` and `max=\"4\"` to the places input."
+      ],
+      "docs": [
+        { "title": "<input type=\"number\">", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/number" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "submit",
+      "title": "End the form with a button",
+      "file": "classes.html",
+      "description": "The last line under the form is `Book my place`, the words Kofi wants on the button.\n\nAdd a `button` with those words at the end of the form, inside it, that sends the form when pressed. Remove the old paragraph.\n\nThe check finds the button by its words, makes sure it is inside the form and that pressing it sends the form, and that the words are not also a paragraph.",
+      "nextSteps": [
+        "Read \"Sending the form\" in the lesson.",
+        "Find the closing form tag.",
+        "Add a button with Kofi's words just before it.",
+        "Delete the old paragraph, save, press the button in the Browser panel and press Check."
+      ],
+      "hints": [
+        "A form is sent by a button inside it.",
+        "A `button` inside a form sends it by default. Only `type=\"button\"` stops that.",
+        "Just before `</form>`, write `<button type=\"submit\">Book my place</button>`."
+      ],
+      "docs": [
+        { "title": "<button>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/button" },
+        { "title": "Sending form data", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Sending_and_retrieving_form_data" }
+      ],
+      "points": 10
+    }
+  ]
+}

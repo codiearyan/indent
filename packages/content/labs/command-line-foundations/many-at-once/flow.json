@@ -1,0 +1,82 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "hesper", "label": "Hesper", "kind": "story" },
+      { "id": "pattern", "label": "Your pattern", "kind": "story", "mine": true },
+      { "id": "shell", "label": "The shell", "kind": "story" },
+      { "id": "from", "label": "Mixed folder", "kind": "data" },
+      { "id": "to", "label": "Right folder", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "hesper", "to": "pattern", "label": "which files" },
+      { "from": "pattern", "to": "shell", "label": "a pattern" },
+      { "from": "shell", "to": "from", "label": "matching names" },
+      { "from": "from", "to": "to", "label": "one move" }
+    ],
+    "note": "One pattern names a whole group of files, and one command moves them all."
+  },
+  "tasks": {
+    "drawings": {
+      "steps": [
+        {
+          "active": ["hesper", "hesper->pattern"],
+          "note": "Hesper's new drawings are mixed in with invoices and lists in downloads."
+        },
+        {
+          "active": ["pattern", "pattern->shell", "shell"],
+          "value": { "kind": "array", "label": "downloads holds", "values": ["drawings", "invoices", "price ideas", "stock count", "market list"] },
+          "note": "Every drawing's name ends the same way, so a pattern can pick them out by their ending."
+        },
+        {
+          "active": ["shell", "shell->from", "from"],
+          "note": "Listed first, the matching names are only the drawings, nothing else."
+        },
+        {
+          "active": ["from", "from->to", "to"],
+          "note": "One move takes them all to artwork, and downloads keeps everything else."
+        }
+      ]
+    },
+    "invoices": {
+      "steps": [
+        {
+          "active": ["hesper", "hesper->pattern"],
+          "note": "The March invoices sit in downloads beside other spreadsheets."
+        },
+        {
+          "active": ["pattern", "pattern->shell", "shell"],
+          "note": "The ending is shared with files that are not invoices, so the pattern has to use how the names start."
+        },
+        {
+          "active": ["shell", "shell->from", "from"],
+          "note": "Listed first, the matching names are the three invoices and no other spreadsheet."
+        },
+        {
+          "active": ["from", "from->to", "to"],
+          "note": "They join the March invoices Idris already has."
+        }
+      ]
+    },
+    "pellow": {
+      "steps": [
+        {
+          "active": ["hesper", "hesper->pattern"],
+          "note": "Idris wants every Pellow Bakery order in one folder of its own inside orders."
+        },
+        {
+          "active": ["pattern", "pattern->shell", "shell"],
+          "value": { "kind": "array", "label": "an order's name", "values": ["order", "number", "customer"] },
+          "note": "Order names start alike and end with the customer, so the pattern fixes the end and leaves the number free."
+        },
+        {
+          "active": ["shell", "shell->from", "from"],
+          "note": "Listed first, the matching names are only Pellow Bakery's orders."
+        },
+        {
+          "active": ["from", "from->to", "to"],
+          "note": "They move into the new folder, and the other customers' orders and the 2026 folder stay put."
+        }
+      ]
+    }
+  }
+}
