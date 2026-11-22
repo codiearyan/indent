@@ -1,0 +1,18 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customers", "label": "Customers", "kind": "story" },
+      { "id": "portal", "label": "Customer portal", "kind": "story", "mine": true },
+      { "id": "orders", "label": "Orders and proofs", "kind": "data" },
+      { "id": "staff", "label": "Staff board", "kind": "story" },
+      { "id": "log", "label": "Portal log", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "customers", "to": "portal", "label": "searches, links" },
+      { "from": "portal", "to": "orders", "label": "only theirs" },
+      { "from": "portal", "to": "staff", "label": "order cards" },
+      { "from": "portal", "to": "log", "label": "what happened" }
+    ],
+    "note": "Five tickets from Larkspur Letterpress, and for each one you prove the hole in the portal, close it at the cause and write the test that keeps it closed."
+  }
+}

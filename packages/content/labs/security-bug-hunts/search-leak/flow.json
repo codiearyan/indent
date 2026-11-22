@@ -1,0 +1,119 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "box", "label": "Search box", "kind": "story" },
+      { "id": "reproduce", "label": "reproduceSearchLeak()", "kind": "function", "mine": true, "fn": "reproduceSearchLeak" },
+      { "id": "search", "label": "searchOrders()", "kind": "function", "mine": true, "fn": "searchOrders" },
+      { "id": "orders", "label": "Orders table", "kind": "data" },
+      { "id": "ticket", "label": "LL-12", "kind": "story" },
+      { "id": "test", "label": "search.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "box", "to": "search", "label": "customer, text" },
+      { "from": "reproduce", "to": "search", "label": "customer, text" },
+      { "from": "search", "to": "orders", "label": "query" },
+      { "from": "orders", "to": "search", "label": "rows" },
+      { "from": "reproduce", "to": "ticket", "label": "the proof" },
+      { "from": "test", "to": "search", "label": "searches" }
+    ],
+    "note": "Every search on the portal goes through searchOrders(), and some text typed in the box reaches other customers' orders."
+  },
+  "tasks": {
+    "reproduce": {
+      "trace": { "file": "src/reproduce.js", "call": "reproduceSearchLeak", "args": [] },
+      "steps": [
+        {
+          "active": ["reproduce"],
+          "value": {
+            "kind": "map",
+            "label": "what you pick",
+            "entries": [
+              { "key": "customerId", "value": "a customer from seed.js" },
+              { "key": "text", "value": "a search text" }
+            ]
+          },
+          "note": "reproduceSearchLeak() signs in as one customer and picks a search text that changes the query instead of being searched for."
+        },
+        {
+          "active": ["reproduce", "reproduce->search", "search"],
+          "note": "It runs them through the original searchOrders() with a fresh database."
+        },
+        {
+          "active": ["search", "search->orders", "orders", "orders->search"],
+          "note": "The text ends up inside the query, and the orders table answers the question the text asked."
+        },
+        {
+          "active": ["reproduce", "reproduce->ticket", "ticket"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "customerId", "value": "the customer" },
+              { "key": "text", "value": "the text" },
+              { "key": "shown", "value": "a list of { id, title, status }" }
+            ]
+          },
+          "note": "The rows go on LL-12. The proof is a row that belongs to another customer."
+        }
+      ]
+    },
+    "fix": {
+      "steps": [
+        {
+          "active": ["box", "box->search", "search"],
+          "value": {
+            "kind": "map",
+            "label": "a search",
+            "entries": [
+              { "key": "customerId", "value": "from the session" },
+              { "key": "text", "value": "what the customer typed" }
+            ]
+          },
+          "note": "A customer types in the search box. Their id comes from the session, the text from the box."
+        },
+        {
+          "active": ["search", "search->orders", "orders"],
+          "note": "The query that reaches the orders table is the same every time. The customer and the text travel beside it as values."
+        },
+        {
+          "active": ["orders", "orders->search", "search"],
+          "value": {
+            "kind": "array",
+            "label": "rows",
+            "values": ["{ id, title, status }", "{ id, title, status }"]
+          },
+          "note": "Only this customer's orders whose title holds the text come back, sorted by id. Text that looks like SQL finds nothing."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->search", "search"],
+          "note": "search.test.js searches with text that tries to reach other orders, and with honest text that holds a quote."
+        },
+        {
+          "active": ["test", "search", "orders", "reproduce", "ticket"],
+          "note": "First it runs beside the original searchOrders(), the one behind LL-12. There it must fail."
+        },
+        {
+          "active": ["test", "search"],
+          "note": "Then it runs beside a correct fix, where it must pass."
+        },
+        {
+          "active": ["test", "search"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the test file",
+            "entries": [
+              { "key": "original search.js", "value": "must fail" },
+              { "key": "a correct fix", "value": "must pass" },
+              { "key": "strips quotes from the text", "value": "must fail" }
+            ]
+          },
+          "note": "Last it runs beside a fix that strips quotes from the text. That one must fail too."
+        }
+      ]
+    }
+  }
+}

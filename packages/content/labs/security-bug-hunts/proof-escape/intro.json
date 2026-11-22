@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Rune", "say": "Someone downloaded our cost sheet.", "note": "Seen in the download log. LL-22." },
+    { "title": "Proof link", "text": "A file name customers can change.", "note": "Meant for proofs only." },
+    {
+      "title": "Your code",
+      "file": "proofs.js",
+      "mine": true,
+      "gap": "Follows the name anywhere",
+      "tasks": ["Catch the escape", "Stay in the folder", "Write the test"]
+    },
+    {
+      "title": "Studio files",
+      "rows": [["proofs", "for customers"], ["proofs-staff", "staff only"], ["config", "staff only"]],
+      "note": "Side by side on one disk."
+    }
+  ],
+  "ticket": { "label": "Download", "wrong": "a staff file", "why": "Left folder", "right": "proofs only" },
+  "captions": [
+    "Then Rune spots a download of the studio's own cost sheet in the log.",
+    "The download follows a file name wherever it leads, even out of the proofs folder.",
+    "You catch the escape, keep downloads in the folder and write the test, in three tasks.",
+    "Now a download gives a proof from the proofs folder, or nothing at all.",
+    "Same links, same disk. Staff files stay with the staff."
+  ]
+}

@@ -143,6 +143,17 @@ const repos: { labId: string; expected: string[] }[] = [
   {
     labId: 'llm-bug-hunts-ts',
     expected: ['cut-off-replies/reproduce', 'cut-off-replies/fix', 'untrusted-json/fix']
+  },
+  {
+    labId: 'security-bug-hunts',
+    expected: [
+      'search-leak/reproduce',
+      'notes-as-html/reproduce',
+      'notes-as-html/fix',
+      'peeking-orders/reproduce',
+      'proof-escape/reproduce',
+      'leaky-log/reproduce'
+    ]
   }
 ]
 

@@ -1,0 +1,87 @@
+{
+  "id": "proof-escape",
+  "title": "A download that leaves its folder",
+  "files": [
+    "src/proofs.js",
+    "src/reproduce.js",
+    "src/proofs.test.js",
+    "src/folders.js",
+    "src/demo.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the demo downloads three proofs by name.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Catch a download from outside the proofs folder",
+      "file": "src/reproduce.js",
+      "description": "Before you change anything, prove the hole. In `src/reproduce.js`, implement `reproduceProofEscape()`.\n\nPick a `fileName` that leads out of the proofs folder to a file that exists, and run it through the original `readProof()` with `PROOFS_DIR`. Return an object with:\n\n- `fileName`: the name you used\n- `shown`: exactly what `readProof(PROOFS_DIR, fileName)` returned\n\nThe check runs your function against the original `proofs.js`. It passes when `shown` is real and is the text of a file outside the proofs folder.",
+      "nextSteps": [
+        "Run `node src/demo.js` and look at the names it downloads.",
+        "Look at the folders beside `proofs` in your workspace.",
+        "Write a name that climbs out of `proofs` and into one of them.",
+        "Run the demo again and read what `shown` holds."
+      ],
+      "hints": [
+        "readProof joins the folder and the name and reads whatever file that gives.",
+        "In a path, .. means the folder above. A name that starts with it leaves proofs at once.",
+        "Try the name ../config/mail.json."
+      ],
+      "docs": [
+        { "title": "Path traversal", "url": "https://owasp.org/www-community/attacks/Path_Traversal" },
+        { "title": "path.join()", "url": "https://nodejs.org/docs/latest-v22.x/api/path.html#pathjoinpaths" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Keep every download inside the proofs folder",
+      "file": "src/proofs.js",
+      "description": "Fix `readProof(proofsDir, fileName)` in `src/proofs.js` so it can only ever read files inside `proofsDir`.\n\n- A name that leads to a file inside the folder gives its text, folders in the name included, and dots in a file name are just part of it.\n- A name that leads anywhere outside the folder gives `null`: names with `..`, full paths, and folders beside it whose names start the same.\n- A name inside the folder with no file gives `null`.\n\nThe check downloads honest and unfriendly names from a copy of your workspace whose files outside `proofs` are real.",
+      "nextSteps": [
+        "Work out the full path a name leads to before you read anything.",
+        "Work out the full path of the folder the same way.",
+        "Compare the two so a folder that merely starts with the same letters does not count.",
+        "Run `node src/demo.js` and check the real proofs still download."
+      ],
+      "hints": [
+        "The cause is that the name is trusted to stay inside. Looking for .. in the name, or removing it, judges how the name looks, not where it leads.",
+        "path.resolve() turns the folder and the name into one full path with every .. followed. Then the question is whether that path is inside the folder.",
+        "Resolve the folder and the file, then refuse unless the file's path starts with the folder's path followed by path.sep."
+      ],
+      "docs": [
+        { "title": "path.resolve()", "url": "https://nodejs.org/docs/latest-v22.x/api/path.html#pathresolvepaths" },
+        { "title": "path.sep", "url": "https://nodejs.org/docs/latest-v22.x/api/path.html#pathsep" },
+        { "title": "Path traversal", "url": "https://owasp.org/www-community/attacks/Path_Traversal" }
+      ],
+      "videos": [
+        { "title": "How a file name climbs out of its folder", "url": "https://www.youtube.com/watch?v=NQwUDLMOrHo" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/proofs.test.js",
+      "description": "Write vitest tests in `src/proofs.test.js` that guard this hole for good. Call `readProof()` with `PROOFS_DIR` from `folders.js`.\n\nThe check runs your test file three times: beside the original `proofs.js` (it must fail), beside a correct fix (it must pass) and beside a fix that only checks the full path starts with the folder's path (it must fail).",
+      "nextSteps": [
+        "Import `PROOFS_DIR` and `readProof`.",
+        "Ask for a name that climbs out of `proofs` and expect `null`.",
+        "Add a name the starts-with fix lets through.",
+        "Run `npx vitest run src/proofs.test.js`."
+      ],
+      "hints": [
+        "Keep one test that a real proof still downloads, so a fix that refuses everything fails it.",
+        "The path of proofs-staff starts with the path of proofs. What does a check on the start of the path make of it?",
+        "Expect readProof(PROOFS_DIR, '../proofs-staff/2041-costs.txt') toBeNull()."
+      ],
+      "docs": [
+        { "title": "Vitest expect", "url": "https://vitest.dev/api/expect.html" },
+        { "title": "path.resolve()", "url": "https://nodejs.org/docs/latest-v22.x/api/path.html#pathresolvepaths" }
+      ],
+      "points": 10
+    }
+  ]
+}

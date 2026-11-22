@@ -1,0 +1,114 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Sign in page", "kind": "story" },
+      { "id": "reproduce", "label": "reproduceLeak()", "kind": "function", "mine": true, "fn": "reproduceLeak" },
+      { "id": "signin", "label": "signIn()", "kind": "function", "mine": true, "fn": "signIn" },
+      { "id": "customers", "label": "Customers table", "kind": "data" },
+      { "id": "log", "label": "Portal log", "kind": "story" },
+      { "id": "test", "label": "signIn.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "page", "to": "signin", "label": "email, password" },
+      { "from": "reproduce", "to": "signin", "label": "a form" },
+      { "from": "signin", "to": "customers", "label": "lookup" },
+      { "from": "signin", "to": "log", "label": "lines" },
+      { "from": "signin", "to": "page", "label": "token or message" },
+      { "from": "test", "to": "signin", "label": "forms" }
+    ],
+    "note": "Every sign in goes through signIn(), and passwords, tokens and hashes are leaking into the log and onto the page."
+  },
+  "tasks": {
+    "reproduce": {
+      "trace": { "file": "src/reproduce.js", "call": "reproduceLeak", "args": [] },
+      "steps": [
+        {
+          "active": ["reproduce"],
+          "value": {
+            "kind": "map",
+            "label": "a form",
+            "entries": [
+              { "key": "email", "value": "a customer from seed.js" },
+              { "key": "password", "value": "right or wrong" }
+            ]
+          },
+          "note": "reproduceLeak() picks a customer and a password, and a log that keeps every line in an array."
+        },
+        {
+          "active": ["reproduce", "reproduce->signin", "signin", "signin->customers", "customers"],
+          "note": "It signs in once through the original signIn()."
+        },
+        {
+          "active": ["signin", "signin->log", "log", "reproduce"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "form", "value": "{ email, password }" },
+              { "key": "log", "value": "every line, in order" },
+              { "key": "result", "value": "what signIn() returned" }
+            ]
+          },
+          "note": "The lines and the result go on LL-26. The proof is a secret in one of them."
+        }
+      ]
+    },
+    "fix": {
+      "steps": [
+        {
+          "active": ["page", "page->signin", "signin"],
+          "value": {
+            "kind": "map",
+            "label": "a form",
+            "entries": [
+              { "key": "email", "value": "typed by the customer" },
+              { "key": "password", "value": "typed by the customer" }
+            ]
+          },
+          "note": "A customer sends the sign in form."
+        },
+        {
+          "active": ["signin", "signin->customers", "customers"],
+          "note": "signIn() looks the customer up and checks the password against the stored hash."
+        },
+        {
+          "active": ["signin", "signin->log", "log"],
+          "note": "The log gets one line saying who tried and how it ended, with no password, token or hash in it."
+        },
+        {
+          "active": ["signin", "signin->page", "page"],
+          "note": "The customer gets a token after a good sign in, or a plain message after a bad one, with no secret in it."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->signin", "signin"],
+          "note": "signIn.test.js signs in with a right and a wrong password and checks every log line and message for the secrets it knows."
+        },
+        {
+          "active": ["test", "signin", "signin->log", "log"],
+          "note": "First it runs beside the original signIn(), the one behind LL-26. There it must fail."
+        },
+        {
+          "active": ["test", "signin"],
+          "note": "Then it runs beside a correct fix, where it must pass."
+        },
+        {
+          "active": ["test", "signin", "log"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the test file",
+            "entries": [
+              { "key": "original signIn.js", "value": "must fail" },
+              { "key": "a correct fix", "value": "must pass" },
+              { "key": "hides only the token", "value": "must fail" }
+            ]
+          },
+          "note": "Last it runs beside a fix that keeps the token out but still logs the form. That one must fail too."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "link", "label": "Order link", "kind": "story" },
+      { "id": "reproduce", "label": "reproduceOrderPeek()", "kind": "function", "mine": true, "fn": "reproduceOrderPeek" },
+      { "id": "get", "label": "getOrder()", "kind": "function", "mine": true, "fn": "getOrder" },
+      { "id": "orders", "label": "Orders table", "kind": "data" },
+      { "id": "ticket", "label": "LL-19", "kind": "story" },
+      { "id": "test", "label": "orders.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "link", "to": "get", "label": "session, number" },
+      { "from": "reproduce", "to": "get", "label": "session, number" },
+      { "from": "get", "to": "orders", "label": "query" },
+      { "from": "orders", "to": "get", "label": "one order" },
+      { "from": "reproduce", "to": "ticket", "label": "the proof" },
+      { "from": "test", "to": "get", "label": "sessions" }
+    ],
+    "note": "Every order page asks getOrder() for the number in its link, and today any signed-in customer gets any order."
+  },
+  "tasks": {
+    "reproduce": {
+      "trace": { "file": "src/reproduce.js", "call": "reproduceOrderPeek", "args": [] },
+      "steps": [
+        {
+          "active": ["reproduce"],
+          "value": {
+            "kind": "map",
+            "label": "what you pick",
+            "entries": [
+              { "key": "session", "value": "{ customerId }" },
+              { "key": "orderId", "value": "an order number" }
+            ]
+          },
+          "note": "reproduceOrderPeek() signs in as one customer and picks an order number that belongs to someone else."
+        },
+        {
+          "active": ["reproduce", "reproduce->get", "get", "get->orders", "orders"],
+          "note": "It asks the original getOrder() for that number, the way a changed link would."
+        },
+        {
+          "active": ["orders", "orders->get", "get", "reproduce", "reproduce->ticket", "ticket"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "session", "value": "the session" },
+              { "key": "orderId", "value": "the number" },
+              { "key": "shown", "value": "{ id, title, status, note, shipTo, total }" }
+            ]
+          },
+          "note": "The order goes on LL-19. The proof is that it belongs to another customer."
+        }
+      ]
+    },
+    "fix": {
+      "steps": [
+        {
+          "active": ["link", "link->get", "get"],
+          "value": {
+            "kind": "map",
+            "label": "an order page",
+            "entries": [
+              { "key": "session", "value": "who is signed in" },
+              { "key": "orderId", "value": "the number in the link, any number" }
+            ]
+          },
+          "note": "A customer opens an order link. Their session says who they are; the number can be anything they typed."
+        },
+        {
+          "active": ["get", "get->orders", "orders"],
+          "note": "getOrder() asks the orders table for that number and for whose it is, taken from the session."
+        },
+        {
+          "active": ["orders", "orders->get", "get"],
+          "note": "Their own order comes back in full. An order of someone else and a number with no order give the same answer."
+        }
+      ]
+    },
+    "test": {
+      "steps": [
+        {
+          "active": ["test", "test->get", "get"],
+          "note": "orders.test.js opens orders with sessions of different customers, and says exactly what each should get."
+        },
+        {
+          "active": ["test", "get", "orders", "reproduce", "ticket"],
+          "note": "First it runs beside the original getOrder(), the one behind LL-19. There it must fail."
+        },
+        {
+          "active": ["test", "get"],
+          "note": "Then it runs beside a correct fix, where it must pass."
+        },
+        {
+          "active": ["test", "get"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the test file",
+            "entries": [
+              { "key": "original orders.js", "value": "must fail" },
+              { "key": "a correct fix", "value": "must pass" },
+              { "key": "throws naming the owner", "value": "must fail" }
+            ]
+          },
+          "note": "Last it runs beside a fix that throws an error saying the order is someone else's. That one must fail too."
+        }
+      ]
+    }
+  }
+}

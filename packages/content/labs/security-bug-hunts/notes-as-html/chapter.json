@@ -1,0 +1,89 @@
+{
+  "id": "notes-as-html",
+  "title": "Notes that turn into HTML",
+  "files": [
+    "src/orderCard.js",
+    "src/reproduce.js",
+    "src/orderCard.test.js",
+    "src/staffScreen.js",
+    "src/db.js",
+    "src/seed.js",
+    "src/demo.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the demo renders order 2046 and shows what the staff board makes of it.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "reproduce",
+      "title": "Catch a note the browser reads as HTML",
+      "file": "src/reproduce.js",
+      "description": "Before you change anything, prove the hole. In `src/reproduce.js`, implement `reproduceNoteMarkup()`.\n\nMake an order whose title, customer name or note holds text the browser reads as HTML, and run it through the original `renderOrderCard()`. Return an object with:\n\n- `order`: `{ id, title, status, customerName, note }`, all three customer fields as strings\n- `html`: exactly what `renderOrderCard(order)` returned\n\nThe check runs your function against the original `orderCard.js` and reads the card the way a browser would. It passes when `html` is real and the browser builds something other than what the customer typed.",
+      "nextSteps": [
+        "Run `node src/demo.js` and compare order 2046's note with what the staff board shows.",
+        "Read `renderOrderCard` and see where each value lands.",
+        "Make an order whose note holds a tag of its own.",
+        "Run the demo again and read `tags` in what the staff board shows."
+      ],
+      "hints": [
+        "Yusra's note on order 2046 already shows the hole. Look at what the staff board shows for it.",
+        "The browser reads every < in the card as the start of a tag, wherever it came from.",
+        "Copy order 2046 from the demo into an object, keep its note Size A2 <not A3>., and return it with renderOrderCard(order)."
+      ],
+      "docs": [
+        { "title": "Cross-site scripting", "url": "https://developer.mozilla.org/en-US/docs/Web/Security/Attacks/XSS" },
+        { "title": "Character references", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Character_reference" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Write customers' words as text",
+      "file": "src/orderCard.js",
+      "description": "Fix `renderOrderCard(order)` in `src/orderCard.js` so whatever customers typed is shown exactly as they typed it, and never becomes HTML.\n\n- The title, the customer name and the note each show as typed, in the note field too: angle brackets, ampersands and quotes included.\n- No text from the order adds a tag or an attribute to the card.\n- The HTML around the values stays the same.\n\nThe check renders cards with honest and unfriendly orders and reads each one the way a browser would, with `readCard()`.",
+      "nextSteps": [
+        "List the characters that mean something in HTML.",
+        "Write a small function that turns each of them into its character reference.",
+        "Run every value through it where it goes into the HTML, the note field included.",
+        "Run `node src/demo.js` and check order 2046's note."
+      ],
+      "hints": [
+        "The cause is that the customer's words are pasted into the HTML as they are. Removing characters changes what they wrote; the browser has a way to show any character as text.",
+        "Five characters need it: & < > \" and '. Turn & into its reference first, or you will change the references you just wrote.",
+        "A function that returns String(value).replaceAll('&', '&amp;') and so on for the other four, called on every ${...} in the card."
+      ],
+      "docs": [
+        { "title": "Character references", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Character_reference" },
+        { "title": "Cross-site scripting prevention", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html" },
+        { "title": "String.prototype.replaceAll()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replaceAll" }
+      ],
+      "videos": [
+        { "title": "How a page runs code it was sent", "url": "https://www.youtube.com/watch?v=L5l9lSnNMxg" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "test",
+      "title": "Write the test that would have caught it",
+      "file": "src/orderCard.test.js",
+      "description": "Write vitest tests in `src/orderCard.test.js` that guard this hole for good. Render cards with `renderOrderCard()` and read them back with `readCard()` from `staffScreen.js`.\n\nThe check runs your test file three times: beside the original `orderCard.js` (it must fail), beside a correct fix (it must pass) and beside a fix that escapes `<`, `>` and `&` but not quotes (it must fail).",
+      "nextSteps": [
+        "Import `renderOrderCard` and `readCard`.",
+        "Render a note with a tag in it and assert the browser shows it as text.",
+        "Add a case the fix without quotes gets wrong.",
+        "Run `npx vitest run src/orderCard.test.js`."
+      ],
+      "hints": [
+        "readCard tells you the words in each part, the note field's value, the tags and any event attributes. Compare them with what the customer typed.",
+        "The fix without quotes keeps tags out, so a test with only a tag passes on it. Where does a quote matter in this card?",
+        "Put a note that holds a double quote in the order and expect readCard(html).noteField to be that exact note."
+      ],
+      "docs": [
+        { "title": "Vitest expect", "url": "https://vitest.dev/api/expect.html" },
+        { "title": "Cross-site scripting prevention", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html" }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Deshawn", "say": "The log is full of passwords.", "note": "A contractor noticed. LL-26." },
+    { "title": "Sign in page", "text": "Customers type an email and a password.", "note": "Many times a day." },
+    {
+      "title": "Your code",
+      "file": "signIn.js",
+      "mine": true,
+      "gap": "Writes down the secrets",
+      "tasks": ["Catch the leak", "Keep secrets out", "Write the test"]
+    },
+    { "title": "Portal log", "text": "Read by the team and contractors.", "note": "Kept for months." }
+  ],
+  "ticket": { "label": "Log", "wrong": "holds passwords", "why": "Leaked", "right": "says what happened" },
+  "captions": [
+    "Last, Deshawn hears from the contractor that the portal log is full of passwords.",
+    "Every sign in writes the password, the session or a hash where many people can read it.",
+    "You catch the leak, keep the secrets out and write the test, in three tasks.",
+    "Now the log says who signed in and how it went, and nothing anyone could reuse.",
+    "Same sign in, same log. The secrets stay where they belong."
+  ]
+}
