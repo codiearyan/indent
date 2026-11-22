@@ -49,6 +49,9 @@
         { "title": "OpenAI Node SDK usage", "url": "https://github.com/openai/openai-node#usage" },
         { "title": "Nullish coalescing operator (??)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing" }
       ],
+      "videos": [
+        { "title": "Large language models, briefly", "url": "https://www.youtube.com/watch?v=LPZh9BOjkQs" }
+      ],
       "points": 10
     },
     {

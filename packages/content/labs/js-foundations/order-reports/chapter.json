@@ -51,6 +51,9 @@
         { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" },
         { "title": "String.prototype.localeCompare()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare" }
       ],
+      "videos": [
+        { "title": "Eight array methods to know", "url": "https://www.youtube.com/watch?v=R8rmfD9Y5-c" }
+      ],
       "points": 10
     },
     {
@@ -73,6 +76,9 @@
         { "title": "Property accessors", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors" },
         { "title": "Nullish coalescing operator (??)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing" },
         { "title": "String.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/slice" }
+      ],
+      "videos": [
+        { "title": "filter, map and reduce on real data", "url": "https://www.youtube.com/watch?v=EzB6Pk66XW8" }
       ],
       "points": 10
     }

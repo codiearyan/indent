@@ -27,6 +27,9 @@
         { "title": "Best practices for defining functions", "url": "https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions" },
         { "title": "Supported JSON schemas", "url": "https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas" }
       ],
+      "videos": [
+        { "title": "How tool calling works", "url": "https://www.youtube.com/watch?v=64sytAQHncU" }
+      ],
       "points": 10
     },
     {

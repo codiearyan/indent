@@ -51,6 +51,9 @@
         { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" },
         { "title": "Array.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice" }
       ],
+      "videos": [
+        { "title": "What a vector database is", "url": "https://www.youtube.com/watch?v=klTvEwg3oJ4" }
+      ],
       "points": 10
     },
     {

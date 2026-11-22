@@ -58,6 +58,9 @@
         { "title": "Manage conversation state", "url": "https://developers.openai.com/api/docs/guides/conversation-state#manually-manage-conversation-state" },
         { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" }
       ],
+      "videos": [
+        { "title": "A model as the judge", "url": "https://www.youtube.com/watch?v=Qj3u_kzfJVo" }
+      ],
       "points": 10
     },
     {

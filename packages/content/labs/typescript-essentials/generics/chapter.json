@@ -28,6 +28,9 @@
         { "title": "Generic functions", "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#generic-functions" },
         { "title": "The ReadonlyArray type", "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#the-readonlyarray-type" }
       ],
+      "videos": [
+        { "title": "Learn generics", "url": "https://www.youtube.com/watch?v=xk_PbxR7G8A" }
+      ],
       "points": 10
     },
     {

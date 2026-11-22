@@ -48,6 +48,9 @@
         { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" },
         { "title": "git diff", "url": "https://git-scm.com/docs/git-diff" }
       ],
+      "videos": [
+        { "title": "Squash commits with an interactive rebase", "url": "https://www.youtube.com/watch?v=VIojxkH5gqU" }
+      ],
       "points": 10
     },
     {

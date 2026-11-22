@@ -27,6 +27,9 @@
         { "title": "String.prototype.lastIndexOf()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf" },
         { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" }
       ],
+      "videos": [
+        { "title": "Getting JSON back from a model", "url": "https://www.youtube.com/watch?v=eJvYafgLh40" }
+      ],
       "points": 10
     },
     {

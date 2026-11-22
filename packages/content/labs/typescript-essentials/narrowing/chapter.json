@@ -28,6 +28,9 @@
         { "title": "typeof type guards", "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#typeof-type-guards" },
         { "title": "Number.isFinite()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isFinite" }
       ],
+      "videos": [
+        { "title": "Type guards that narrow", "url": "https://www.youtube.com/watch?v=ZdMfiVK7fcM" }
+      ],
       "points": 10
     },
     {

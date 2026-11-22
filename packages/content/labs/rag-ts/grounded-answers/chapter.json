@@ -28,6 +28,9 @@
         { "title": "Message roles", "url": "https://developers.openai.com/api/docs/guides/prompt-engineering#message-roles-and-instruction-following" },
         { "title": "Array.prototype.join()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join" }
       ],
+      "videos": [
+        { "title": "What retrieval-augmented generation is", "url": "https://www.youtube.com/watch?v=T-D1OfcDW1M" }
+      ],
       "points": 10
     },
     {

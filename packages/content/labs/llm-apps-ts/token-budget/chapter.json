@@ -50,6 +50,9 @@
         { "title": "Counting tokens", "url": "https://developers.openai.com/api/docs/guides/token-counting" },
         { "title": "Array.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice" }
       ],
+      "videos": [
+        { "title": "How text becomes tokens (long)", "url": "https://www.youtube.com/watch?v=zduSFxRajkE" }
+      ],
       "points": 10
     },
     {

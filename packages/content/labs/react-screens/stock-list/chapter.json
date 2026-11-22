@@ -37,6 +37,9 @@
         { "title": "Passing props to a component", "url": "https://react.dev/learn/passing-props-to-a-component" },
         { "title": "JavaScript in JSX with curly braces", "url": "https://react.dev/learn/javascript-in-jsx-with-curly-braces" }
       ],
+      "videos": [
+        { "title": "React in 100 seconds", "url": "https://www.youtube.com/watch?v=Tn6-PIqc4UM" }
+      ],
       "points": 10
     },
     {

@@ -28,6 +28,9 @@
         { "title": "CSS justify-content", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/justify-content" },
         { "title": "CSS flex-wrap", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-wrap" }
       ],
+      "videos": [
+        { "title": "Flexbox in 15 minutes", "url": "https://www.youtube.com/watch?v=fYq5PXgSsbE" }
+      ],
       "points": 10
     },
     {
@@ -50,6 +53,9 @@
         { "title": "CSS grid-template-columns", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns" },
         { "title": "minmax()", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/minmax" },
         { "title": "Viewport meta tag", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/viewport" }
+      ],
+      "videos": [
+        { "title": "CSS grid in 20 minutes", "url": "https://www.youtube.com/watch?v=9zBsdzdE4sM" }
       ],
       "points": 10
     },

@@ -28,6 +28,9 @@
         { "title": "Buffer.concat()", "url": "https://nodejs.org/docs/latest/api/buffer.html#static-method-bufferconcatlist-totallength" },
         { "title": "413 Content Too Large", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/413" }
       ],
+      "videos": [
+        { "title": "A REST API in plain Node", "url": "https://www.youtube.com/watch?v=_1xa8Bsho6A" }
+      ],
       "points": 10
     },
     {

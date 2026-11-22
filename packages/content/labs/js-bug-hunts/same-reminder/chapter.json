@@ -57,6 +57,9 @@
         { "title": "let", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let" },
         { "title": "var", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/var" }
       ],
+      "videos": [
+        { "title": "Closures in 100 seconds", "url": "https://www.youtube.com/watch?v=vKJpN5FAeF4" }
+      ],
       "points": 10
     },
     {

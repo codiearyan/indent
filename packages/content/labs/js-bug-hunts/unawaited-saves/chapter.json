@@ -57,6 +57,9 @@
         { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
         { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" }
       ],
+      "videos": [
+        { "title": "Promise.all, race, allSettled and any", "url": "https://www.youtube.com/watch?v=vQtgi8uElmk" }
+      ],
       "points": 10
     },
     {
