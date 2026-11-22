@@ -1,0 +1,53 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilf", "label": "Wilf", "kind": "story" },
+      { "id": "tracker", "label": "Tram tracker", "kind": "story" },
+      { "id": "where", "label": "Whereabouts", "kind": "function", "mine": true },
+      { "id": "at", "label": "Where it is", "kind": "data", "mine": true },
+      { "id": "map", "label": "LineMap", "kind": "function", "mine": true },
+      { "id": "screen", "label": "Depot screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "wilf", "to": "where", "label": "picks a tram" },
+      { "from": "where", "to": "tracker", "label": "follow, stop" },
+      { "from": "tracker", "to": "at", "label": "each stop" },
+      { "from": "at", "to": "where", "label": "draw" },
+      { "from": "where", "to": "map", "label": "stops, at" },
+      { "from": "map", "to": "screen", "label": "still to come" }
+    ],
+    "note": "An effect keeps the depot screen in step with the tracker, which React knows nothing about."
+  },
+  "tasks": {
+    "follow": {
+      "steps": [
+        { "active": ["where", "screen"], "note": "The screen appears, saying it is waiting for the tracker." },
+        { "active": ["where", "where->tracker", "tracker"], "value": { "kind": "map", "label": "follow", "entries": [{ "key": "number", "value": "the tram" }, { "key": "onStop", "value": "a function" }] }, "note": "After the screen is drawn, the effect starts following the tram, once." },
+        { "active": ["tracker", "tracker->at", "at"], "note": "Each time the tram reaches a stop, the tracker calls back, and the stop goes into state." },
+        { "active": ["at", "at->where", "where", "screen"], "note": "The screen is drawn again and says where the tram is." }
+      ]
+    },
+    "stop": {
+      "steps": [
+        { "active": ["where", "where->tracker", "tracker"], "note": "The screen is following a tram." },
+        { "active": ["where"], "note": "Someone closes the screen." },
+        { "active": ["where", "where->tracker", "tracker"], "note": "React runs the effect's cleanup, and the tracker stops following that tram." }
+      ]
+    },
+    "chosen": {
+      "steps": [
+        { "active": ["wilf", "wilf->where", "where"], "note": "Wilf picks another tram." },
+        { "active": ["where", "where->tracker", "tracker"], "note": "The old tram is no longer followed, and the new one is, in that order." },
+        { "active": ["at", "screen"], "note": "Until the new tram reports, the screen says it is waiting, not where the old tram was." },
+        { "active": ["tracker", "tracker->at", "at", "at->where", "where", "screen"], "note": "The new tram's first stop arrives and shows." }
+      ]
+    },
+    "ahead": {
+      "steps": [
+        { "active": ["at", "at->where", "where", "where->map", "map"], "value": { "kind": "map", "label": "LineMap's props", "entries": [{ "key": "stops", "value": "the line" }, { "key": "at", "value": "a stop, or nothing yet" }] }, "note": "LineMap is handed the line and where the tram is." },
+        { "active": ["map"], "note": "While drawing, it works out the stops after that one, to the end of the line." },
+        { "active": ["map", "map->screen", "screen"], "note": "The stops still to come show in the same draw, never a step behind." }
+      ]
+    }
+  }
+}

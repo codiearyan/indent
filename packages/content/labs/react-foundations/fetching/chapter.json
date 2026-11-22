@@ -1,0 +1,103 @@
+{
+  "id": "fetching",
+  "title": "Data that arrives later",
+  "files": ["src/Timetable.jsx", "timetable/sat.json", "src/App.jsx", "src/days.js"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. The timetable files it loads are in the timetable folder of your workspace."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "load",
+      "title": "Load the chosen day's rides",
+      "file": "src/Timetable.jsx",
+      "description": "In `Timetable`, write an effect that asks for `/timetable/<day>.json`, where `<day>` is the `day` prop, reads the answer's body as JSON and keeps the rides in the `rides` state. Each day is asked for once, and a new `day` is asked for again.\n\nThe check gives the page a timetable of its own that writes down every request. It draws `Timetable` with a day of its own, answers with rides of its own, changes the day and answers again, and looks at the list and at how many requests went out.",
+      "nextSteps": [
+        "Read \"Asking for data\" and \"Async inside an effect\" in the lesson.",
+        "Write an async function inside the effect that calls `fetch` and then `json()`.",
+        "Call it from the effect, and give the effect its dependency list.",
+        "Change the day in the Browser panel and watch the rides change."
+      ],
+      "hints": [
+        "Asking for data is talking to something outside React, so it belongs in an effect that runs again when the day changes.",
+        "`fetch` returns a promise of the answer, and the answer's `json()` returns a promise of the data. `await` both, inside an async function that the effect calls; the effect itself is not async.",
+        "`` useEffect(() => { async function load() { const response = await fetch(`/timetable/${day}.json`); setRides(await response.json()) } load() }, [day]) ``."
+      ],
+      "docs": [
+        { "title": "Using the Fetch API", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch" },
+        { "title": "Fetching data with effects", "url": "https://react.dev/reference/react/useEffect#fetching-data-with-effects" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "loading",
+      "title": "Say when the rides are loading",
+      "file": "src/Timetable.jsx",
+      "description": "While a day's rides are on their way, show a paragraph with the class `loading` that says so, and no rides: not even the last day's. Once they arrive, the loading line goes and the rides show. Every time the day changes, it loads again.\n\nThe check holds each answer back. It looks at the screen while a day is on its way and after it arrives, for two days in a row.",
+      "nextSteps": [
+        "Read \"Loading\" in the lesson.",
+        "Add state for whether a request is on its way.",
+        "Switch it on when the request goes out and off when the answer is in.",
+        "Draw the loading line or the rides, never both."
+      ],
+      "hints": [
+        "Whether a request is out is one more thing the screen has to remember.",
+        "Set it to true at the start of the effect and to false once the rides are in state. Then show either the loading line or the list.",
+        "`const [loading, setLoading] = useState(true)`, `setLoading(true)` at the start of the effect, `setLoading(false)` after `setRides`, and `{loading ? <p className=\"loading\">Loading…</p> : <ul className=\"rides\">…</ul>}`."
+      ],
+      "docs": [
+        { "title": "Conditional rendering", "url": "https://react.dev/learn/conditional-rendering" },
+        { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "failed",
+      "title": "Say so when the rides cannot be loaded",
+      "file": "src/Timetable.jsx",
+      "description": "When the timetable answers with an error status, like 404 for a day that has no file, or gives no answer at all, show a paragraph with the class `problem` that says so in plain words of your own, not the error's own message. The loading line goes, and no rides are shown. When another day loads fine afterwards, the problem goes.\n\nThe check answers one day with 404, one with 503 and a message, and one not at all, then picks a day that loads, and looks at the screen after each.",
+      "nextSteps": [
+        "Read \"When it goes wrong\" in the lesson.",
+        "Check the answer's `ok` before reading its body.",
+        "Catch every failure, keep a problem in state, and switch loading off either way.",
+        "Pick Monday in the Browser panel: it has no file yet."
+      ],
+      "hints": [
+        "A request can fail in two ways, and `fetch` only rejects for one of them.",
+        "`response.ok` is false for an error status: throw an error yourself then, and one `catch` handles both. `finally` runs after either, which is a good place to switch loading off. Clear the problem when a new request goes out.",
+        "`if (!response.ok) throw new Error(...)` before `json()`, `catch { setProblem('The rides for this day could not be loaded.') }`, `finally { setLoading(false) }`, and `setProblem(null)` at the start of the effect."
+      ],
+      "docs": [
+        { "title": "Response: ok property", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/ok" },
+        {
+          "title": "try...catch",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "latest",
+      "title": "Show the day picked last",
+      "file": "src/Timetable.jsx",
+      "description": "When the day changes while a request is still on its way, the answer to the old request must change nothing: not the rides, not the loading line, not the problem. Whatever order the answers arrive in, the screen shows the day picked last.\n\nThe check picks one day and then another before the first answers, and answers them in the wrong order, twice. Then it lets an old request fail after the newer one has loaded.",
+      "nextSteps": [
+        "Read \"Answers out of order\" in the lesson.",
+        "In the effect, keep a flag that says whether this request's answer is still wanted.",
+        "Turn it off in the effect's cleanup.",
+        "Only set state while the answer is still wanted."
+      ],
+      "hints": [
+        "When the day changes, React runs the old effect's cleanup before the new effect. That is the moment the old answer stops being wanted.",
+        "A variable declared inside the effect belongs to that run only. Set it in the cleanup, and check it before every `set...` call in that run. Cancelling the request with an `AbortController` works too, as long as a cancel is not shown as a problem.",
+        "`let ignore = false` at the start of the effect, `return () => { ignore = true }` at its end, and `if (!ignore)` before `setRides`, `setProblem` and `setLoading`."
+      ],
+      "docs": [
+        { "title": "Fetching data with effects", "url": "https://react.dev/learn/synchronizing-with-effects#fetching-data" },
+        { "title": "AbortController", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortController" }
+      ],
+      "videos": [{ "title": "Answers out of order in an effect", "url": "https://www.youtube.com/watch?v=iXGOVcAe_xo" }],
+      "points": 10
+    }
+  ]
+}

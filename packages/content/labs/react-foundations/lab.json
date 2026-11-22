@@ -1,7 +1,7 @@
 {
   "id": "react-foundations",
   "title": "React foundations",
-  "description": "Coalbrook Tram Museum is run by volunteers, and its visitor screens for today's rides, the trams on show and the gift shop are pages of HTML that Elspeth edits by hand every morning. You rebuild them in React from the very first component: what JSX turns into, values in curly braces, props, lists with keys and screens that show one thing or another, then buttons that respond, state, lists in state and forms. Each issue teaches one idea in one small screen that reloads beside your code every time you save.",
+  "description": "Coalbrook Tram Museum is run by volunteers, and its visitor screens for today's rides, the trams on show and the gift shop are pages of HTML that Elspeth edits by hand every morning. You rebuild them in React from the very first component: what JSX turns into, values in curly braces, props, lists with keys and screens that show one thing or another, then buttons that respond, state, lists in state and forms, and last state that two components share, effects and data fetched while the screen waits. Each issue teaches one idea in one small screen that reloads beside your code every time you save.",
   "category": "Web and frontend",
   "language": "react",
   "tags": ["React"],
@@ -14,6 +14,10 @@
     {
       "title": "Screens that respond",
       "chapters": ["events", "state", "objects-and-arrays", "forms"]
+    },
+    {
+      "title": "Sharing state and the world outside",
+      "chapters": ["lifting-state", "effects", "fetching"]
     }
   ]
 }

@@ -120,7 +120,7 @@ export async function openScreen(t, overrides = {}) {
  * A page that loads one learner file and can draw any of its exports with any props, so a check
  * can try a component with data the learner never saw.
  */
-export async function openComponent(t, file, overrides = {}) {
+export async function openComponent(t, file, overrides = {}, options = {}) {
   const files = {}
   for (const [rel, source] of Object.entries(overrides)) files[rel] = t.chapterPath(source)
   const dir = await t.sandbox(files)
@@ -131,7 +131,7 @@ export async function openComponent(t, file, overrides = {}) {
   )
   await writeFile(
     join(dir, '.grader/harness.jsx'),
-    `import { createElement } from 'react'
+    `import { createElement, Profiler } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import * as mod from '../${file}'
@@ -140,9 +140,23 @@ window.h = createElement
 const root = createRoot(document.getElementById('root'))
 window.show = (name, props, ...children) =>
   flushSync(() => root.render(createElement(mod[name], props, ...children)))
+window.commits = []
+let burst = 0
+const onRender = () => {
+  if (burst++ === 0) queueMicrotask(() => (burst = 0))
+  // A draw that asks for the next draw, for ever, never hands the check its turn back: stop it.
+  if (burst > 1000) {
+    window.drawnOverAndOver = true
+    throw new Error('The screen was drawn over and over without end, and the check stopped it.')
+  }
+  window.commits.push(document.getElementById('root').innerHTML)
+}
+window.showCounted = (name, props) =>
+  flushSync(() => root.render(createElement(Profiler, { id: 'check', onRender }, createElement(mod[name], props))))
+window.clear = () => flushSync(() => root.render(null))
 `
   )
-  const page = await t.page('.grader/harness.html', { dir })
+  const page = await t.page('.grader/harness.html', { dir, ...options })
   const problem = await loadProblem(page, dir, file)
   return { page, problem }
 }
@@ -184,7 +198,10 @@ export const WARNING = {
   listener: /listener to be a function/,
   noOnChange: /without an `onChange` handler/,
   toControlled: /changing an uncontrolled input to be controlled/,
-  toUncontrolled: /changing a controlled input to be uncontrolled/
+  toUncontrolled: /changing a controlled input to be uncontrolled/,
+  asyncEffect: /must not return anything besides a function/,
+  maxDepth: /Maximum update depth exceeded/,
+  readOnly: /Cannot assign to read only property/
 }
 
 export const warningsOf = (logs, pattern) =>
@@ -261,4 +278,59 @@ export async function press(page, element) {
   if (!element) return false
   await page.click(element)
   return true
+}
+
+/**
+ * Draws one export inside React's Profiler and waits for its effects, so a check can see every
+ * screen it was drawn as: one entry per time React put it on the page, with the HTML it showed.
+ * Without a key in the props, a draw updates the element drawn before and keeps its state.
+ */
+export async function drawCounted(page, name, props = {}) {
+  const before = page.window.commits.length
+  const errorsBefore = page.errors.length
+  try {
+    page.window.showCounted(name, props)
+  } catch (error) {
+    page.errors.push(error?.message ?? String(error))
+  }
+  await page.settle()
+  return { screens: page.window.commits.slice(before), errors: page.errors.slice(errorsBefore) }
+}
+
+/**
+ * One detail when a component drawn with drawCounted was drawn over and over in one go, without
+ * end, until the harness stopped it: something called while drawing set state each time.
+ */
+export function drawnOverAndOver(page, what = 'The screen') {
+  if (!page.window.drawnOverAndOver) return null
+  page.window.drawnOverAndOver = false
+  return detail(
+    `${what} stops drawing`,
+    false,
+    `${what} was drawn over and over without end, and the check stopped it. A function that sets state was called while drawing, so every draw asked for the next one; in the Browser panel the page would freeze. Hand each event prop a function to call later, instead of calling it in the curly braces.`,
+    page.logs.filter((line) => /while rendering a different component/.test(line)).map(shorten)[0]
+  )
+}
+
+/**
+ * One detail when an effect set state on every draw and React kept drawing, which never ends by
+ * itself. Drawing that changes nothing on the page lets the page settle while it goes on, so this
+ * also waits once more and looks for new draws of a component drawn with drawCounted. The drawing
+ * is stopped by taking the component off the page.
+ */
+export async function runaway(page, logsBefore, what = 'The screen', where = '') {
+  const endless = drawnOverAndOver(page, what)
+  if (endless) return endless
+  const commits = page.window.commits?.length ?? 0
+  await page.settle()
+  const still = (page.window.commits?.length ?? 0) > commits
+  const lines = warningsOf(page.logs.slice(logsBefore), WARNING.maxDepth)
+  if (!still && !lines.length) return null
+  page.window.clear?.()
+  return detail(
+    `${what} stops drawing`,
+    false,
+    `${what} was drawn again and again until the check stopped it. An effect sets state, the new state draws the component again, and the effect runs again after that draw, for ever. In the Browser panel React says Maximum update depth exceeded in the console once it has gone on for a while. Give the effect the list of values it depends on, or work the value out while drawing.${where ? ` ${where}` : ''}`,
+    lines.length ? shorten(lines[0]) : 'still drawing after the page should have settled'
+  )
 }
