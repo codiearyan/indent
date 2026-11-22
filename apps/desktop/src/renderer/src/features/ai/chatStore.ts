@@ -28,6 +28,8 @@ interface ChatStore {
   focus: TutorFocus | null
   send(text: string, context?: AskContext): Promise<void>
   stop(): void
+  /** Asks the last question again after its reply failed; the failed try is not counted. */
+  retry(): void
   /** Opens the chat panel and sends the question, e.g. "Why did task 2 fail?". */
   ask(question: string, context?: AskContext): void
 }
@@ -162,6 +164,19 @@ export const useChat = create<ChatStore>()((set, get) => {
     stop: () => {
       if (requestId) api.ai.cancel(requestId)
       if (get().busy) finish(streamingKey, null)
+    },
+
+    retry: () => {
+      const key = currentKey()
+      const thread = key ? (get().threads[key] ?? []) : []
+      const last = thread[thread.length - 1]
+      if (!key || get().busy || last?.role !== 'user') return
+      setThread(key, (messages) => messages.slice(0, -1))
+      set((s) => ({ sent: { ...s.sent, [key]: Math.max(0, (s.sent[key] ?? 1) - 1) } }))
+      void get().send(last.content, {
+        attachment: last.attachment,
+        focus: get().focus ?? undefined
+      })
     },
 
     ask: (question, context) => {

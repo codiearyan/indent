@@ -2,7 +2,8 @@ import { create } from 'zustand'
 import { api } from '@/lib/api'
 import { track } from '@/lib/telemetry'
 import { errorMessage } from '@/lib/utils'
-import { useAi } from './aiStore'
+import { activeProvider, useAi } from './aiStore'
+import { runConnectionTest } from './connectionTest'
 
 export const INSTALL_OPENCODE =
   window.platform === 'win32'
@@ -58,6 +59,13 @@ export async function testOpencode(): Promise<void> {
       message: errorMessage(error).replace(/^OpenCode could not answer: /, '')
     })
   }
+}
+
+/** After a switch from OpenCode's result: test OpenCode's new model, or the new provider. */
+export function retryAfterSwitch(): void {
+  if (activeProvider(useAi.getState().config)?.id === 'opencode') return void testOpencode()
+  set({ step: 'idle' })
+  void runConnectionTest()
 }
 
 export function cancelOpencodeSetup(): void {
