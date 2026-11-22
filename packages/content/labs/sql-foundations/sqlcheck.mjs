@@ -200,7 +200,7 @@ function outOfOrder(want, mine, hidden) {
     message = `The right rows, in a different order. ${look}`
   } else {
     const i = mine.rows.findIndex((r, j) => key(r) !== key(want.rows[j]))
-    message = `The right rows, in a different order. Row ${i + 1} should be ${describe(want.columns, want.rows[i])}, and yours is ${describe(want.columns, mine.rows[i])}. ${look}`
+    message = `The right rows, in a different order. The first one out of place is row ${i + 1}: ${describe(want.columns, mine.rows[i])}. ${look}`
   }
   return [message, ...orderHints(mine, want.rows, [], [])].join(' ')
 }
