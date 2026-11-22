@@ -82,7 +82,7 @@ export async function runPart(t, file, task, { given = {}, names = [] } = {}) {
   await writeFile(join(dir, file), kept.join('\n') + reader(names))
   const r = await t.call(dir, file, READER)
   if (r.ok) {
-    return { ok: true, lines: r.stdout.split('\n').map((l) => l.trimEnd()), values: r.value ?? {} }
+    return { ok: true, lines: r.stdout.split('\n').map((l) => l.trimEnd()), values: r.value ?? {}, whole: text }
   }
   const ran = await t.node(dir, [file])
   const output = ran.timedOut ? 'Timed out' : await tidy(ran.stderr, dir)
@@ -108,7 +108,7 @@ export function cause(error, code = '', source = '', whole = source) {
       return 'the text ends earlier than it looks, because a quote inside it is read as the end of the text'
     }
     if (count(code, '(') > count(code, ')')) return 'a round bracket opens on that line and never closes'
-    return 'two things sit side by side on that line with nothing between them, where Node expects a comma or the closing bracket'
+    return 'two things sit side by side on that line with nothing between them. Compare it with a line above that works'
   }
   if ((m = /Identifier '(\w+)' has already been declared/.exec(error))) {
     return `the name ${m[1]} is made twice`
@@ -122,6 +122,9 @@ export function cause(error, code = '', source = '', whole = source) {
       return `Node does not know the name ${m[1]}, because no line above it makes a variable by that name. Look for a name spelt a little differently, or a line that should make it and is gone`
     }
     return `Node does not know the name ${m[1]}. Compare it, letter by letter and capitals included, with the line that makes it`
+  }
+  if ((m = /Cannot access '(\w+)' before initialization/.exec(error))) {
+    return `${m[1]} is used before the line that makes it is done. Look at that line and at the line that makes ${m[1]}`
   }
   if (/Assignment to constant variable/.test(error)) {
     return 'a const is given a new value there. Look at the line that makes that variable, too'
@@ -152,7 +155,7 @@ export function partProblem(file, task, r) {
     return {
       name: `${file} keeps the line that makes ${r.missingGiven}`,
       passed: false,
-      message: `Check cannot find the line that makes ${r.missingGiven} under // Task ${task}. That line is not broken: keep it as it was, with the same name, and fix the line Node stops at.`
+      message: `Check cannot find the line that makes ${r.missingGiven} under the // Task ${task} comment. That line is not broken: keep it as it was, with the same name, below that comment, and fix the line Node stops at.`
     }
   }
   if (r.ok) return null

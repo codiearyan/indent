@@ -21,11 +21,13 @@ async function prints(t, { task, name, value, label, close, what }) {
     ? undefined
     : near
       ? `The line runs now, but the apostrophe in Today's is gone. Theo wants the text exactly as before: keep the apostrophe, and write the text so that it does not end it.`
-      : !line
-        ? `The Task ${task} lines run, but none of the lines they print starts with ${label} as the comment above them shows. The broken line is the one that prints ${what}: fix it rather than removing it.`
-        : line.includes(name)
-          ? `The line prints the word ${name}, not the value it holds. A name inside the quotes is only text: keep the name outside them.`
-          : `The line does not print what ${name} holds: Check gave ${name} another value and the line did not follow. Print the name ${name}, not a value you typed.`
+      : !line && r.lines.some((l) => l !== '')
+        ? `The Task ${task} lines run, but none of the lines they print starts with ${label} as the comment above them shows. Compare the text in quotes with the comment, letter by letter.`
+        : !line
+          ? `The Task ${task} lines run, but none of the lines they print starts with ${label} as the comment above them shows. The broken line is the one that prints ${what}: fix it rather than removing it.`
+          : line.includes(name)
+            ? `The line prints the word ${name}, not the value it holds. A name inside the quotes is only text: keep the name outside them.`
+            : `The line does not print what ${name} holds: Check gave ${name} another value and the line did not follow. Print the name ${name}, not a value you typed.`
   return [
     {
       name: `Prints ${what} from ${name}`,

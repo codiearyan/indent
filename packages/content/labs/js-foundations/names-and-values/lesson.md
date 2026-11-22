@@ -32,7 +32,7 @@ console.log('Today:', teaname)
 ReferenceError: teaname is not defined
 ```
 
-A `ReferenceError` means Node met a name that refers to nothing it knows. The message says which name, and the mark sits under it. Look for the line that makes the variable and compare the two letter by letter. The usual causes are a typo, a capital letter, or a name used on a line above the one that makes it. The exact wording of these messages can differ a little between versions of Node.
+A `ReferenceError` means Node met a name that refers to nothing it knows. The message says which name, and the mark sits under it. Look for the line that makes the variable and compare the two letter by letter. The usual causes are a typo or a capital letter. A name used on a line above the one that makes it is a `ReferenceError` too, but in other words: `Cannot access 'teaName' before initialization`. The exact wording of these messages can differ a little between versions of Node.
 
 ## A const that has to change
 
