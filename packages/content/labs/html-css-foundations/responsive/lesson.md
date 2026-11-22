@@ -90,3 +90,5 @@ A media query adds no weight to the rules inside it. When two rules with the sam
 5. At Kofi's breakpoint and narrower, put the two class cards in one column.
 
 Save after each step, drag the Browser panel narrower to see the page as a phone would, and press Check. When you are done, the studio has a page you built from a text file, on every screen.
+
+One thing stays as it is: the timetable on the classes page can still be a little too wide for a small phone. A table does not fold the way a grid does, so it is left for another day.
