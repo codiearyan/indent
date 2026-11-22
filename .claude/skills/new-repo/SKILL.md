@@ -47,8 +47,8 @@ commands.
    and its intro; an issue without both is not done.
 6. **Check the resources across the repo.** Each issue found its docs and videos with the
    `new-issue` skill ("Find the resources"). Look at them together: three to five videos in the
-   repo, at least one per issue where a good one exists, and the same video on two tasks only when
-   it truly covers both.
+   repo (in a foundations repo, which is much longer, about one per issue), at least one per issue
+   where a good one exists, and the same video on two tasks only when it truly covers both.
 7. **Write the repo's scene**, `labs/<labId>/flow.json`, with the `issue-flow` skill ("A repo's own
    scene").
 8. **A repo that talks to a model** gets `labs/<labId>/model.mjs`: `models` maps a model name to a
@@ -85,7 +85,8 @@ commands.
 
 - Every issue is done by the `new-issue` skill's own list.
 - The repo has its scene, and its cover or a note to the person that it has none.
-- Every task has docs and the repo has three to five confirmed videos.
+- Every task has docs and the repo has three to five confirmed videos, or about one per issue in
+  a foundations repo.
 - The three checks above pass, and you went through the repo in the app.
 - Tell the person what is left for them: narration (`scripts/narrate.mjs` sends lesson text to a
   voice service), the cover, and where it sits on a roadmap.
