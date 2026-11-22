@@ -89,9 +89,12 @@ chats, keys or anything that identifies you. The events are listed in `Telemetry
 
 Copyright (C) 2026 Aryan Bhati
 
-Indent is free software under the [GNU General Public License, version 3](LICENSE). You may use,
-change and share the code, the repos and the pictures. If you share a version of your own, it has
-to come with its source under the same license. There is no warranty.
+Indent is source available and free for personal and other noncommercial use. The code is under
+the [PolyForm Noncommercial License 1.0.0](LICENSE), the repos' content under
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), and starter and solution
+code under 0BSD, so what you build from it is yours. A company, bootcamp or paid course that uses
+Indent needs a commercial license: write to codiearyan07@gmail.com. There is no warranty.
 
-The names and logos of other products that appear in the app (AI providers, programming languages)
-belong to their owners.
+[docs/LICENSING.md](docs/LICENSING.md) says what each license covers and who pays. The Indent name
+and logo are not licensed, and the names and logos of other products that appear in the app belong
+to their owners.
