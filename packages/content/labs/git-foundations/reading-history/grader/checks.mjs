@@ -7,6 +7,7 @@ const TIP = 'Link the reading group from the home page'
 const CULPRIT = 'Tidy up the visit page'
 const SUNDAY = '<li>Sunday: 11:00 to 16:00</li>'
 const APRIL = ['The Marrowby Sisters', 'A Kettle for Grandmother Ash']
+const AMEND = `While that commit is your last one, you can put the book back, stage finds.html and amend the commit. ${START_OVER.replace('To start', 'Or, to start')}`
 
 function open(t, names) {
   if (!hasShop(t)) return { fail: allFail(names, NO_SETUP) }
@@ -106,8 +107,8 @@ export const checks = {
         name,
         gone.length === 0,
         gone.length > 1
-          ? 'The commit with the April finds also takes books off the list. Nothing was sold this week, so every book stays. Look at what git diff marks with a minus before you commit.'
-          : 'The commit with the April finds also takes a book off the list, or changes one. Nothing was sold this week, so every book stays. Look at what git diff marks with a minus before you commit.',
+          ? `The commit with the April finds also takes books off the list. Nothing was sold this week, so every book stays. Look at what git diff marks with a minus before you commit. ${AMEND}`
+          : `The commit with the April finds also takes a book off the list, or changes one. Nothing was sold this week, so every book stays. Look at what git diff marks with a minus before you commit. ${AMEND}`,
         log(git)
       )
     ]

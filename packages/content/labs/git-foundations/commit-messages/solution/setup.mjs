@@ -116,7 +116,7 @@ const march = [
   'Seven Lamps on Quillon Street, Rosamund Pell, paperback, £4.00'
 ]
 const marchNew = [
-  'The Tidecaller\'s Almanac, Hal Oyelaran, hardback, £7.50',
+  'The Tidecaller\'s Almanac, Hal Brennick, hardback, £7.50',
   'Notes from a Copper Town, Margit Svensen, paperback, £3.00'
 ]
 

@@ -27,7 +27,7 @@ Git is a program that keeps the history of a folder. You turn a folder into a re
 git init
 ```
 
-Git answers `Initialized empty Git repository in .../.git/`. It made a hidden folder called `.git`, where the whole history lives. The files panel does not show it, and you never edit it by hand. Delete it, and the history is gone while the files stay.
+Git answers `Initialized empty Git repository in .../.git/`. On some computers a block of lines that start with `hint:` comes first, about the name Git gives the first branch and a `git config --global` command to change it. You can ignore it: this repo never needs `--global`, and the branch may be called `main` or `master`. Either way Git made a hidden folder called `.git`, where the whole history lives. The files panel does not show it, and you never edit it by hand. Delete it, and the history is gone while the files stay.
 
 A commit is a snapshot of the folder at one moment: the files as they were, who saved them, when, and a short message about why. Commits in a row are the history. Each one has an id made of letters and digits, its hash, which Git usually shortens to seven characters, like `3dbd671`.
 
@@ -54,7 +54,7 @@ git config user.name "Kit Oduya"
 git config user.email "kit@example.com"
 ```
 
-The quotes keep a value with a space together. Both settings are stored in this repository only. With `--global` they would apply to every repository on the computer; this course never needs that. A made-up email is fine here.
+The quotes keep a value with a space together. Both settings are stored in this repository only. With `--global` they would apply to every repository on the computer; this repo never needs that. A made-up email is fine here.
 
 If no name is set anywhere, `git commit` stops with `Author identity unknown` and `Please tell me who you are`. Set the two values and commit again.
 
@@ -69,7 +69,7 @@ git add recipes.txt
 git commit -m "Add the soup recipes"
 ```
 
-`git add` takes file names, or `.` for everything in the folder you are in. `-m` gives the commit its message, in quotes. Forget `-m`, and Git opens a text editor for the message. If you are stuck in one, closing it with an empty message cancels the commit: in a screen full of `~` signs, type `:q!` and press Enter.
+`git add` takes file names, or `.` for everything in the folder you are in. If it answers `pathspec 'visit.htm' did not match any files`, check the spelling and that the terminal is inside `shop`. `-m` gives the commit its message, in quotes. Forget `-m`, and Git opens a text editor for the message. If you are stuck in one, closing it with an empty message cancels the commit: in a screen full of `~` signs, type `:q!` and press Enter; if the bottom lines show `^X Exit`, press Ctrl+X.
 
 After the first commit the same two steps save each change: edit and save a file, and `git status` lists it as modified; add it and commit it. `git log --oneline` lists the commits, newest first. If a list fills the screen, press `q` to leave it.
 

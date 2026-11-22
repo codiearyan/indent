@@ -16,7 +16,7 @@
         "Run `git log --oneline` and read the first lines of the commits.",
         "Run `git show` on the commits that sound like they touched the visit page, and look for a red line about Sunday.",
         "Copy that line into the list of hours in `shop/visit.html` and save.",
-        "Stage `visit.html` only, and keep the commit for the next task, which is about its message."
+        "Read the next task before you commit: the message of this commit names the commit you found. Then commit `visit.html` by itself."
       ],
       "hints": [
         "A tidy-up can take more with it than it says. Read what each commit did, not only its message.",

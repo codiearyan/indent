@@ -33,4 +33,4 @@ git commit -m "Message"               save everything staged as one commit
 git log --oneline                     the commits, newest first
 ```
 
-Press `q` to leave a long list. Stuck in an editor after `git commit`? Type `:q!` and press Enter.
+Press `q` to leave a long list. Stuck in an editor after `git commit`? Type `:q!` and press Enter, or Ctrl+X if it shows `^X Exit`.

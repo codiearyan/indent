@@ -20,7 +20,7 @@
       ],
       "hints": [
         "git status prints, above each list, the commands that move a file out of it.",
-        "`git restore` with a file name puts the working folder's copy back to the version Git has for it. What it throws away cannot be brought back.",
+        "Of the two tips above the lists, the one under changes not staged discards a change in the working folder. What it throws away cannot be brought back.",
         "Run `git restore style.css`."
       ],
       "docs": [

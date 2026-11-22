@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process'
 import {
   allFail, changedIn, check, commitOf, commits, fileAt, hasRepo, hasShop, listOf, NO_SETUP,
   openShop, parentOf, reference, stagedFile, START_OVER, status, strayRepo, workFile
@@ -6,18 +5,12 @@ import {
 
 const SITE = ['finds.html', 'index.html', 'style.css', 'visit.html']
 
-const NOT_INIT = `shop is not a repository yet, so Git keeps no history for it. ${START_OVER}`
+const NOT_INIT = 'shop is not a repository yet, so Git keeps no settings or history for it. The first task makes it one.'
 
 function noRepo(t, names) {
   if (!hasShop(t)) return allFail(names, NO_SETUP)
   if (!hasRepo(t)) return allFail(names, NOT_INIT)
   return null
-}
-
-/** The learner's own setting for every repository, read only to explain a failure. */
-function globalSetting(key) {
-  const r = spawnSync('git', ['config', '--global', '--get', key], { encoding: 'utf8', timeout: 5000 })
-  return r.status === 0 ? r.stdout.trim() : ''
 }
 
 const saturdayLine = (text) => (text ?? '').split('\n').find((line) => /saturday/i.test(line)) ?? null
@@ -58,15 +51,14 @@ export const checks = {
     const userName = local('user.name')
     const email = local('user.email')
     const output = `in shop: user.name = ${userName || '(not set)'}, user.email = ${email || '(not set)'}`
-    const elsewhere = (key) =>
-      globalSetting(key)
-        ? ' There is one in the settings for every repository on this computer, but this task asks for the setting of this repository only, made from inside shop without --global.'
-        : ''
+    // The learner's global settings are never read, so the message says what --global does.
+    const here =
+      ' Set it from inside shop without --global: a setting made with --global goes to every repository on this computer, not to shop.'
     return [
       check(
         names[0],
         userName.length > 0,
-        `shop's own settings have no user.name yet.${elsewhere('user.name')}`,
+        `shop's own settings have no user.name yet.${here}`,
         output
       ),
       check(
@@ -74,7 +66,7 @@ export const checks = {
         email.includes('@') && !/\s/.test(email),
         email
           ? 'The user.email in shop does not look like an email address: it needs an @ and no spaces. A made-up one is fine.'
-          : `shop's own settings have no user.email yet.${elsewhere('user.email')}`,
+          : `shop's own settings have no user.email yet.${here}`,
         output
       )
     ]
@@ -165,8 +157,8 @@ export const checks = {
           name,
           false,
           lost.length
-            ? 'The commit with the new hours also changed another line of visit.html. Only the opening time on Saturdays was meant to change.'
-            : 'The Saturday line no longer closes at 17:00. Only the opening time was meant to change.',
+            ? `The commit with the new hours also changed another line of visit.html. Only the opening time on Saturdays was meant to change. ${START_OVER}`
+            : `The Saturday line no longer closes at 17:00. Only the opening time was meant to change. ${START_OVER}`,
           output
         )
       ]
@@ -176,7 +168,7 @@ export const checks = {
       check(
         name,
         others.length === 0,
-        `The commit with the new hours also holds ${listOf(others)}. This commit should hold the one change to visit.html.`,
+        `The commit with the new hours also holds ${listOf(others)}. This commit should hold the one change to visit.html. ${START_OVER}`,
         output
       )
     ]

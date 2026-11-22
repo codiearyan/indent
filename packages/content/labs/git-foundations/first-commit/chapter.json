@@ -39,7 +39,7 @@
       "id": "identity",
       "title": "Tell Git who you are in this repository",
       "file": "shop/index.html",
-      "description": "Every commit records who made it. Set your name and an email address in the settings of the `shop` repository only. A made-up address is fine.\n\nDo not add `--global`: that would change the settings for every repository on this computer, and this course keeps its settings inside each repository.\n\nThe check reads `user.name` and `user.email` from the settings of `shop` itself. The name must not be empty, and the email needs an `@` and no spaces.",
+      "description": "Every commit records who made it. Set your name and an email address in the settings of the `shop` repository only. A made-up address is fine.\n\nDo not add `--global`: that would change the settings for every repository on this computer, and this repo keeps its settings inside each repository.\n\nThe check reads `user.name` and `user.email` from the settings of `shop` itself. The name must not be empty, and the email needs an `@` and no spaces.",
       "nextSteps": [
         "Make sure the terminal is inside `shop`.",
         "Set `user.name` with `git config`, putting a name with a space in quotes.",

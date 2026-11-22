@@ -27,7 +27,7 @@ function describe(git, hash) {
 }
 
 function notCommitted(t, git, file, done, what) {
-  if (done(stagedFile(git, file))) return `${what} staged, but no commit holds it yet.`
+  if (done(stagedFile(git, file))) return `${what} staged, but no commit holds that yet.`
   if (done(workFile(t, file))) {
     return `${what} in the working folder, but not staged or committed yet. Git saves a change in two steps.`
   }

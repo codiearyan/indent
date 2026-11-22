@@ -92,7 +92,7 @@ export const checks = {
         )
       ]
     }
-    const problem = subjectProblem(subjectOf(git, reworded), /thursday|late/i, 'look at the line the commit added to visit.html')
+    const problem = subjectProblem(subjectOf(git, reworded), /thursday|thurs\b|late|evening|20[:.]00|8 ?pm/i, 'look at the line the commit added to visit.html')
     return [check(name, problem === null, problem, output)]
   },
 
@@ -106,7 +106,7 @@ export const checks = {
     const message = messageOf(git, hash)
     const swept = sweptIn(git, mine, hash)
     if (swept) return [check(name, false, swept, message)]
-    const problem = subjectProblem(message.split('\n')[0].trim(), /postage|delivery|shipping|p&p/i, 'it never mentions the postage')
+    const problem = subjectProblem(message.split('\n')[0].trim(), /postage|posting|\bpost\b|delivery|shipping|p&p/i, 'it never mentions the postage')
     return [check(name, problem === null, problem, message)]
   },
 

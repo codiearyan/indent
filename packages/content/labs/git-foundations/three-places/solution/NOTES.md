@@ -32,4 +32,4 @@ git config user.name "Your Name"      who you are, in this repository only
 git config user.email "you@example.com"
 ```
 
-Press `q` to leave a long list. Stuck in an editor after `git commit`? Type `:q!` and press Enter.
+Press `q` to leave a long list. Stuck in an editor after `git commit`? Type `:q!` and press Enter, or Ctrl+X if it shows `^X Exit`.
