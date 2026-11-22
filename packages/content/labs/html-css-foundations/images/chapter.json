@@ -11,7 +11,7 @@
       "id": "studio-picture",
       "title": "Show the picture of the studio",
       "file": "index.html",
-      "description": "Show the drawing of the studio front just under the main heading in `index.html`. The file is `studio.svg`, in the `pictures` folder next to `index.html`.\n\nThe check looks for an image of `studio.svg` and makes sure its address leads to the real file.",
+      "description": "Show the drawing of the studio front just under the main heading in `index.html`. The file is `studio.svg`, in the `pictures` folder next to `index.html`.\n\nThe check looks for an image of `studio.svg`, makes sure its address leads to the real file, and that it sits under the main heading, above the welcome.",
       "nextSteps": [
         "Read \"The image element\" in the lesson.",
         "Add an image element right after the main heading.",
@@ -64,7 +64,7 @@
       "description": "Tell the browser how big the studio picture is before it loads, so the text under it does not jump. Its real size is written on the first line of `pictures/studio.svg`.\n\nThe check reads the width and height attributes of the studio picture and compares them with the file.",
       "nextSteps": [
         "Read \"Width and height\" in the lesson.",
-        "Open `pictures/studio.svg` from the files list and find its width and height on the first line.",
+        "In the files list, open the `pictures` folder, then `studio.svg`, and find its width and height on the first line.",
         "Add the two size attributes to the studio picture.",
         "Save and press Check."
       ],
@@ -83,7 +83,7 @@
       "id": "figure",
       "title": "Caption the mug of the month",
       "file": "index.html",
-      "description": "In the shop section, the line `Mug of the month: ...` should sit under a picture of the mug.\n\n- show `pictures/mug.svg` with alt text that says what the mug looks like\n- group the picture and the line in a figure, with the line as its caption\n\nThe check looks for the mug picture inside a figure, the caption inside the same figure, and the mug's alt text.",
+      "description": "In the shop section, the line `Mug of the month: ...` should sit under a picture of the mug.\n\n- show `pictures/mug.svg` with alt text that says what the mug looks like\n- group the picture and the line in a figure, with the line as its caption\n\nThe check looks for the mug picture inside a figure, the caption inside the same figure, and the mug's alt text, which describes the mug instead of repeating the caption.",
       "nextSteps": [
         "Read \"Figures and captions\" in the lesson.",
         "Wrap the line about the mug of the month in a figure.",

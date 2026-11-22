@@ -72,7 +72,7 @@ The browser indents the inner list and gives it a different bullet, so the group
 
 ## Your work in this issue
 
-Everything happens in `index.html`. For each list, keep a short paragraph that introduces it, such as "What to bring:", and move the items into the list. Keep Kofi's words for each item.
+Everything happens in `index.html`. For each list, keep a short paragraph that introduces it, such as "What to bring:", and move the items into the list. Keep Kofi's words for each item. Words that only joined the items in his sentence, like "and", "First" or "Then", can go, because the list does that job now.
 
 1. Under Classes, turn what to bring into a bulleted list of four items.
 2. Turn the first wheel class into a numbered list of its four steps, in the order Kofi wrote them.
