@@ -1,0 +1,99 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kofi", "label": "Kofi", "kind": "story" },
+      { "id": "lines", "label": "Timetable lines", "kind": "data" },
+      { "id": "html", "label": "classes.html", "kind": "file", "mine": true },
+      { "id": "table", "label": "Timetable", "kind": "data" },
+      { "id": "visitor", "label": "Visitor", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kofi", "to": "lines", "label": "typed" },
+      { "from": "lines", "to": "html", "label": "pieces" },
+      { "from": "html", "to": "table", "label": "rows, cells" },
+      { "from": "table", "to": "visitor", "label": "read across" }
+    ],
+    "note": "Kofi's timetable stops being lines with commas and becomes a table that a visitor, or a screen reader, can read across and down."
+  },
+  "tasks": {
+    "rows": {
+      "steps": [
+        {
+          "active": ["kofi", "kofi->lines", "lines"],
+          "value": {
+            "kind": "array",
+            "label": "Kofi's lines",
+            "values": ["names of the columns", "wheel throwing", "handbuilding"]
+          },
+          "note": "Kofi typed three lines, with commas between the pieces of each."
+        },
+        {
+          "active": ["lines", "lines->html", "html"],
+          "note": "Each line becomes a row of the table, and each piece between two commas becomes a cell."
+        },
+        {
+          "active": ["html", "html->table", "table"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of the table",
+            "colLabels": ["class", "day", "time", "price", "places"],
+            "cells": [
+              ["...", "...", "...", "...", "..."],
+              ["...", "...", "...", "...", "..."],
+              ["...", "...", "...", "...", "..."]
+            ]
+          },
+          "note": "Three rows of five cells, so every column holds one kind of fact."
+        }
+      ]
+    },
+    "column-headers": {
+      "steps": [
+        {
+          "active": ["table"],
+          "note": "The top row does not hold data. It names what each column holds."
+        },
+        {
+          "active": ["html", "html->table", "table"],
+          "note": "Its cells become header cells that say they head the column below them."
+        },
+        {
+          "active": ["table", "table->visitor", "visitor"],
+          "note": "A screen reader can now say the name of the column with every price and every time."
+        }
+      ]
+    },
+    "row-headers": {
+      "steps": [
+        {
+          "active": ["table"],
+          "note": "In each class row, the first cell says what the whole row is about."
+        },
+        {
+          "active": ["html", "html->table", "table"],
+          "note": "That cell becomes a header for its row. The day, time, price and places stay data."
+        },
+        {
+          "active": ["table", "table->visitor", "visitor"],
+          "note": "Reaching a price, a listener hears which class it belongs to and which column it is in."
+        }
+      ]
+    },
+    "caption": {
+      "steps": [
+        {
+          "active": ["lines"],
+          "note": "Kofi's title for the timetable is still a loose line above the table."
+        },
+        {
+          "active": ["html", "html->table", "table"],
+          "note": "It becomes the table's caption, the first thing inside the table."
+        },
+        {
+          "active": ["table", "table->visitor", "visitor"],
+          "note": "Anyone who reaches the table hears what it holds before the first row."
+        }
+      ]
+    }
+  }
+}

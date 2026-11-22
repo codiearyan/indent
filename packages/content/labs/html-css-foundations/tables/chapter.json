@@ -1,0 +1,104 @@
+{
+  "id": "tables",
+  "title": "A timetable in a table",
+  "files": ["classes.html"],
+  "terminal": {
+    "description": "The classes page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "classes.html",
+  "tasks": [
+    {
+      "id": "rows",
+      "title": "Put the timetable in a table",
+      "file": "classes.html",
+      "description": "On the classes page, Kofi typed his timetable as three lines with commas between the pieces: the names of the columns, then one line per class.\n\nTurn the three lines into one `table`: one row for each line, and one cell for each piece, in Kofi's order and with his words. Leave the `Autumn timetable` line for the last task. Remove the old lines once they are in the table.\n\nThe check finds the table, finds the row that holds each line, reads the cells of each row in order, and makes sure the old lines are gone.",
+      "nextSteps": [
+        "Read \"Rows and cells\" in the lesson.",
+        "Open a table where the three lines are now.",
+        "Turn each line into a row, and each piece between the commas into a cell.",
+        "Delete the old lines, save, look at the Browser panel and press Check."
+      ],
+      "hints": [
+        "A table is built row by row. Each row holds its cells, from left to right.",
+        "Every line of Kofi's becomes one `tr`, and every piece between two commas becomes one cell inside it. The commas go.",
+        "The shape is `<table>`, then `<tr><td>Wheel throwing</td><td>Thursday</td>...</tr>` for each line, then `</table>`."
+      ],
+      "docs": [
+        { "title": "<table>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table" },
+        { "title": "<tr>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/tr" },
+        { "title": "HTML table basics", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/HTML_table_basics" }
+      ],
+      "videos": [
+        { "title": "Tables, with a caption and headers", "url": "https://www.youtube.com/watch?v=phkB7Aj3Klw" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "column-headers",
+      "title": "Make the top row into column headers",
+      "file": "classes.html",
+      "description": "The top row of the table, `Class`, `Day`, `Time`, `Price` and `Places`, names what is in each column.\n\nMake its five cells header cells, and give each one `scope=\"col\"` so it says it heads the column below it. The row stays the first row of the table.\n\nThe check finds the row with the column names, makes sure it comes first and that every cell in it is a header cell, and reads the scope of each.",
+      "nextSteps": [
+        "Read \"Header cells\" in the lesson.",
+        "Find the row with the names of the columns.",
+        "Change each of its cells into a header cell.",
+        "Add the attribute that says each one heads a column, save and press Check."
+      ],
+      "hints": [
+        "There are two kinds of cell: one for data and one for headers. The browser shows header cells in bold.",
+        "A header cell is a `th`. The `scope` attribute says whether it heads a column or a row.",
+        "Each cell of the top row becomes `<th scope=\"col\">Day</th>`, and the same for the other four."
+      ],
+      "docs": [
+        { "title": "<th>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/th" },
+        { "title": "Table accessibility", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Table_accessibility" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "row-headers",
+      "title": "Make each class name a row header",
+      "file": "classes.html",
+      "description": "In the two class rows, the first cell, `Wheel throwing` or `Handbuilding`, says what the whole row is about.\n\nMake that first cell a header cell with `scope=\"row\"`. The day, time, price and places are data, so they stay ordinary cells.\n\nThe check finds each class row, reads its first cell and its scope, and makes sure the other cells of the row are not header cells.",
+      "nextSteps": [
+        "Read \"Header cells\" again, the part about rows.",
+        "Find the first cell of the wheel throwing row.",
+        "Make it a header cell that heads its row.",
+        "Do the same for handbuilding, save and press Check."
+      ],
+      "hints": [
+        "A header does not have to sit at the top. It can sit at the start of a row and name that row.",
+        "It is the same header cell as the top row, with a different value for `scope`.",
+        "The first cell of each class row becomes `<th scope=\"row\">Wheel throwing</th>`; the rest stay `td`."
+      ],
+      "docs": [
+        { "title": "<th>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/th" },
+        { "title": "<td>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/td" },
+        { "title": "Table accessibility", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Table_accessibility" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "caption",
+      "title": "Give the table its caption",
+      "file": "classes.html",
+      "description": "Kofi's title for the timetable is the line `Autumn timetable`, still a paragraph above it.\n\nMake it the table's `caption`, right after the opening table tag and before the first row, with the same words. Then remove the old paragraph.\n\nThe check reads the caption of the table and its words, makes sure it comes first in the table, and that the title is not also a paragraph.",
+      "nextSteps": [
+        "Read \"A title for the table\" in the lesson.",
+        "Find the opening table tag.",
+        "Add the caption right after it, with Kofi's title.",
+        "Delete the old paragraph, save and press Check."
+      ],
+      "hints": [
+        "A table has its own element for its title. It lives inside the table, not above it.",
+        "The `caption` must be the very first thing inside the table, before any row.",
+        "Right after `<table>`, write `<caption>Autumn timetable</caption>`."
+      ],
+      "docs": [
+        { "title": "<caption>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/caption" },
+        { "title": "Table accessibility", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Table_accessibility" }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+Answers for Idris.
+Write each answer after its colon, on the same line.
+
+inside:
+back:
+proofs:

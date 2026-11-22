@@ -1,0 +1,94 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dilys", "label": "Dilys's rules", "kind": "data" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "cascade", "label": "The browser decides", "kind": "story" },
+      { "id": "page", "label": "Home page", "kind": "data" },
+      { "id": "visitor", "label": "Visitor", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dilys", "to": "css", "label": "added" },
+      { "from": "css", "to": "cascade", "label": "rules that clash" },
+      { "from": "cascade", "to": "page", "label": "one value each" },
+      { "from": "page", "to": "visitor", "label": "the look" }
+    ],
+    "note": "When rules disagree, the browser picks one value by order, by how strong the selector is, and by inheritance. You make Dilys's rules win the way she meant."
+  },
+  "tasks": {
+    "source-order": {
+      "steps": [
+        {
+          "active": ["dilys", "dilys->css", "css"],
+          "note": "Dilys added a rule for the h2 headings near the top of the file."
+        },
+        {
+          "active": ["css", "css->cascade", "cascade"],
+          "value": { "kind": "array", "label": "rules for the h2 colour", "values": ["Dilys's rule", "the rule for both headings"] },
+          "note": "Two rules set the h2 colour, and only one of them can show."
+        },
+        {
+          "active": ["cascade", "cascade->page", "page"],
+          "note": "Once her rule wins, the h2 headings are dark brown and the main heading stays clay."
+        }
+      ]
+    },
+    "specificity": {
+      "steps": [
+        {
+          "active": ["dilys", "dilys->css", "css"],
+          "note": "One rule greys the lines of Visit us by its id. Another gives the notes clay letters by their class."
+        },
+        {
+          "active": ["css", "css->cascade", "cascade"],
+          "value": {
+            "kind": "map",
+            "label": "what each selector holds",
+            "entries": [
+              { "key": "the grey rule", "value": "an id, an element" },
+              { "key": "the clay rule", "value": "a class" }
+            ]
+          },
+          "note": "The opening hours are picked by both rules, and only one colour can show."
+        },
+        {
+          "active": ["cascade", "cascade->page", "page"],
+          "note": "Once the clay wins for the hours, they stand out, and the rest of Visit us stays grey."
+        }
+      ]
+    },
+    "inheritance": {
+      "steps": [
+        {
+          "active": ["dilys", "dilys->css", "css"],
+          "note": "Dilys copied the new font into a rule for headings, paragraphs and list items."
+        },
+        {
+          "active": ["css", "css->cascade", "cascade"],
+          "note": "The caption is none of those, so it still takes the old font from the body."
+        },
+        {
+          "active": ["cascade", "cascade->page", "page", "page->visitor", "visitor"],
+          "note": "Set once on the body, the font passes down to every element on the page."
+        }
+      ]
+    },
+    "custom-properties": {
+      "steps": [
+        {
+          "active": ["css"],
+          "value": { "kind": "array", "label": "the colours", "values": ["clay", "cream", "ink", "sand", "stone"] },
+          "note": "Five colour codes are copied from rule to rule."
+        },
+        {
+          "active": ["css", "css->cascade", "cascade"],
+          "note": "Each code gets a name on :root, and every rule uses the name instead."
+        },
+        {
+          "active": ["cascade", "cascade->page", "page", "page->visitor", "visitor"],
+          "note": "The page looks the same. Changing a colour now means changing one line."
+        }
+      ]
+    }
+  }
+}

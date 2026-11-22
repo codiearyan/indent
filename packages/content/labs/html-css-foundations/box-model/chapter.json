@@ -1,0 +1,102 @@
+{
+  "id": "box-model",
+  "title": "Room to breathe",
+  "files": ["styles.css"],
+  "terminal": {
+    "description": "The home page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "padding",
+      "title": "Give the notes room inside",
+      "file": "styles.css",
+      "description": "The two notes are squashed into their sand background: the words touch its edges. Dilys's notes in `styles.css` ask for 12px of room all round, inside.\n\nGive the notes 12px of `padding` on every side, in the rule for the class `note`.\n\nThe check reads the padding on each side of both notes, and makes sure no other paragraph got padding.",
+      "nextSteps": [
+        "Read \"Every element is a box\" and \"Padding\" in the lesson.",
+        "Find the rule for the notes in styles.css.",
+        "Add the padding, in px, for all four sides at once.",
+        "Save, look at the notes in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "The space between the content of a box and its edge has its own property.",
+        "`padding` with one value sets all four sides. A length needs its unit.",
+        "Add `padding: 12px;` to the `.note` rule."
+      ],
+      "docs": [
+        { "title": "padding", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/padding" },
+        { "title": "The box model", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Box_model" }
+      ],
+      "videos": [
+        { "title": "The box model in eight minutes", "url": "https://www.youtube.com/watch?v=rIO5326FgPE" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "border",
+      "title": "Draw a line down the left of each note",
+      "file": "styles.css",
+      "description": "Dilys wants a line down the left side of each note: 4px wide, solid, in clay.\n\nGive the notes a left border of 4px, solid, in the clay colour, and no border on the other sides. Use the colour's name from the last issue.\n\nThe check reads the width, style and colour of the left border of both notes, makes sure the colour is written with its name, and makes sure the top, right and bottom have none.",
+      "nextSteps": [
+        "Read \"Borders\" in the lesson.",
+        "Go back to the rule for the notes.",
+        "Add a border for the left side only, with its width, style and colour.",
+        "Save, look at the notes, and press Check."
+      ],
+      "hints": [
+        "A border has three parts: a width, a style and a colour. Without a style, it does not show.",
+        "Each side has its own property; the one for the left side is `border-left`.",
+        "Add `border-left: 4px solid var(--clay);` to the `.note` rule."
+      ],
+      "docs": [
+        { "title": "border-left", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/border-left" },
+        { "title": "border-style", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/border-style" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "margin",
+      "title": "Space the sections apart",
+      "file": "styles.css",
+      "description": "The three parts of the home page, Classes, The shop and Visit us, run into each other.\n\nGive every `section` 48px of `margin` below it.\n\nThe check reads the margin below each section inside main.",
+      "nextSteps": [
+        "Read \"Margin\" in the lesson.",
+        "Add a new rule to styles.css that picks the sections.",
+        "Give it the margin below, in px.",
+        "Save, scroll through the page, and press Check."
+      ],
+      "hints": [
+        "The space outside a box, between it and the next one, has its own property.",
+        "Each side of the margin has its own property too, such as `margin-bottom`.",
+        "Write `section { margin-bottom: 48px; }`."
+      ],
+      "docs": [
+        { "title": "margin", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/margin" },
+        { "title": "The box model", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Box_model" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "box-sizing",
+      "title": "Count padding and border in the size",
+      "file": "styles.css",
+      "description": "By default, a width set on an element is the width of its content only, and padding and border are added on top. Most stylesheets switch that off for every element, so the width you set is the width you get. Sooner or later every page sets widths, so this stylesheet does it now.\n\nSet `box-sizing` to `border-box` for every element on the page.\n\nThe check reads the box-sizing of every element of the home page, from html down to the links and pictures.",
+      "nextSteps": [
+        "Read \"How big is a box\" in the lesson.",
+        "Think about which selector picks every element.",
+        "Write a rule with that selector near the top of styles.css.",
+        "Set box-sizing, save, and press Check."
+      ],
+      "hints": [
+        "box-sizing is not passed down from the body, so the rule has to pick each element itself.",
+        "The universal selector, `*`, picks every element.",
+        "Write `* { box-sizing: border-box; }` near the top of the file."
+      ],
+      "docs": [
+        { "title": "box-sizing", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing" },
+        { "title": "Universal selectors", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Universal_selectors" }
+      ],
+      "points": 10
+    }
+  ]
+}

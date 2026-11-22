@@ -1,0 +1,56 @@
+/*
+  Task 1: make the h2 headings dark brown, as Dilys tried to.
+  Task 2: make the opening hours clay, as Dilys tried to, without !important.
+  Task 3: set Palatino once, on the body, and remove the copies.
+  Task 4: give the studio's five colours names on :root, and use the names everywhere.
+
+  Dilys's notes:
+  I tried some changes myself, and three did not work the way I hoped.
+  - The h2 headings in dark brown, so only the main heading is clay. They stayed clay.
+  - The lines of Visit us in grey. I gave that section the id contact for it, and it worked.
+    Then the opening hours in clay letters, like the muddy clothes line. That line turned clay,
+    but the opening hours stayed grey.
+  - A new font, Palatino, falling back to any serif. Some of the text changed and some did not.
+  Names for the colours: clay for the orange, cream for the walls, ink for the dark brown,
+  sand for the notes and stone for the grey.
+*/
+
+h2 {
+  color: #3b2f2a;
+}
+
+body {
+  background-color: #f7f1e8;
+  color: #3b2f2a;
+  font-family: Georgia, serif;
+  font-size: 18px;
+}
+
+h1,
+h2 {
+  color: #a4492a;
+}
+
+h1,
+h2,
+p,
+li {
+  font-family: Palatino, serif;
+}
+
+.note {
+  background-color: #efdcc3;
+  color: #a4492a;
+}
+
+#mug-of-the-month {
+  text-align: center;
+}
+
+nav a {
+  font-weight: bold;
+}
+
+#contact p {
+  color: #7a6c64;
+}
