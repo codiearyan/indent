@@ -1,0 +1,19 @@
+{
+  "id": "react-with-an-api",
+  "title": "React screens that talk to an API",
+  "description": "Kilnworth Pottery has a JSON API for its workshops, and Ivo still needs the sign-up screen that uses it: this week's workshops with their day, price and places left, and a way to book a place. You build that screen in React, one issue at a time, against a stand-in of the studio's API that can be slow, fail or answer late. You learn to load data in a component, show loading and error states, send a form without sending it twice, keep the screen in step with the server, and handle answers that arrive out of order.",
+  "category": "Web and frontend",
+  "language": "react",
+  "tags": ["React"],
+  "kind": "project",
+  "parts": [
+    {
+      "title": "Reading from the API",
+      "chapters": ["load-the-week", "waiting-and-failing"]
+    },
+    {
+      "title": "Writing to the API",
+      "chapters": ["a-form-that-saves", "in-step-with-the-server", "late-answers"]
+    }
+  ]
+}

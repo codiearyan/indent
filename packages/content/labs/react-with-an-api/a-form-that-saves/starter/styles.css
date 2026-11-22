@@ -1,0 +1,210 @@
+:root {
+  --clay: #f4ece3;
+  --sheet: #fffaf4;
+  --ink: #2a211b;
+  --muted: #74675c;
+  --line: #e6d8c8;
+  --glaze: #9c4a23;
+  --glaze-ink: #fff7ef;
+  --refused: #a3261b;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  color: var(--ink);
+  background: var(--clay);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.screen {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.topbar {
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.brand {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.brand-sub {
+  margin: 2px 0 0;
+  color: var(--muted);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.workshops {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workshop {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--sheet);
+}
+
+.workshop h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.workshop p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.workshop .places {
+  margin-top: 6px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.workshop.is-full .places {
+  color: var(--muted);
+}
+
+.empty-line,
+.status-line {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+}
+
+.error-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--refused);
+  border-radius: 10px;
+  color: var(--refused);
+  background: var(--sheet);
+}
+
+.days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.days button,
+.error-line button {
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--sheet);
+  color: var(--ink);
+}
+
+.days button[aria-pressed='true'] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--sheet);
+}
+
+.booking {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--sheet);
+}
+
+.booking h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.booking label {
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.booking input,
+.booking select {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  color: var(--ink);
+}
+
+.booking button[type='submit'] {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--glaze);
+  color: var(--glaze-ink);
+  font-weight: 600;
+}
+
+.booking button[type='submit']:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.booking-done {
+  margin: 0;
+  color: var(--ink);
+}
+
+.booking-refused {
+  margin: 0;
+  color: var(--refused);
+}

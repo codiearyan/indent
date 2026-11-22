@@ -1,0 +1,138 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "visitor",
+        "label": "Visitor",
+        "kind": "story"
+      },
+      {
+        "id": "form",
+        "label": "BookingForm.jsx",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "request",
+        "label": "request()",
+        "kind": "function"
+      },
+      {
+        "id": "api",
+        "label": "Studio API",
+        "kind": "story"
+      },
+      {
+        "id": "reply",
+        "label": "Answer",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "visitor",
+        "to": "form",
+        "label": "name, workshop"
+      },
+      {
+        "from": "form",
+        "to": "request",
+        "label": "POST booking"
+      },
+      {
+        "from": "request",
+        "to": "api",
+        "label": "JSON body"
+      },
+      {
+        "from": "api",
+        "to": "reply",
+        "label": "201 or refusal"
+      },
+      {
+        "from": "reply",
+        "to": "form",
+        "label": "shown"
+      }
+    ],
+    "note": "The booking form sends one booking per press to the studio's API and shows what the server answered."
+  },
+  "tasks": {
+    "send-booking": {
+      "steps": [
+        {
+          "active": ["visitor", "visitor->form", "form"],
+          "note": "A visitor picks a workshop, types a name and presses Book a place. The page does not reload."
+        },
+        {
+          "active": ["form", "form->request", "request", "request->api", "api"],
+          "value": {
+            "kind": "map",
+            "label": "the booking",
+            "entries": [
+              {
+                "key": "workshopId",
+                "value": "number"
+              },
+              {
+                "key": "name",
+                "value": "text"
+              }
+            ]
+          },
+          "note": "The form sends the booking as JSON to POST /api/bookings."
+        },
+        {
+          "active": ["api", "api->reply", "reply", "reply->form", "form"],
+          "note": "The API answers 201 with the booking and the workshop, and the form says who is booked on what."
+        }
+      ]
+    },
+    "no-double": {
+      "steps": [
+        {
+          "active": ["visitor", "visitor->form", "form"],
+          "note": "On slow wifi, nothing seems to happen after the press."
+        },
+        {
+          "active": ["form", "form->request", "request"],
+          "note": "From the moment the booking leaves, the button is off, so a second press sends nothing."
+        },
+        {
+          "active": ["reply", "reply->form", "form"],
+          "note": "Once the answer is in, whatever it says, the button works again."
+        }
+      ]
+    },
+    "show-refusal": {
+      "steps": [
+        {
+          "active": ["form", "form->request", "request", "request->api", "api"],
+          "note": "The visitor books a workshop that filled up a minute ago."
+        },
+        {
+          "active": ["api", "api->reply", "reply"],
+          "value": {
+            "kind": "map",
+            "label": "a refusal",
+            "entries": [
+              {
+                "key": "status",
+                "value": "409"
+              },
+              {
+                "key": "error.message",
+                "value": "a sentence"
+              }
+            ]
+          },
+          "note": "The server refuses with a reason."
+        },
+        {
+          "active": ["reply", "reply->form", "form"],
+          "note": "The form shows that reason in an alert and keeps the name, ready for another try."
+        }
+      ]
+    }
+  }
+}
