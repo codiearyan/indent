@@ -8,7 +8,8 @@ const NAMES: Record<string, string> = {
   python: 'Python',
   go: 'Go',
   rust: 'Rust',
-  java: 'Java'
+  java: 'Java',
+  cpp: 'C++'
 }
 
 /** The name of a repo's language as people say it; the id itself when it is not known here. */

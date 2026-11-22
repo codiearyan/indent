@@ -1,4 +1,5 @@
 import type { IconType } from '@icons-pack/react-simple-icons'
+import SiCplusplus from '@icons-pack/react-simple-icons/icons/SiCplusplus'
 import SiGnubash from '@icons-pack/react-simple-icons/icons/SiGnubash'
 import SiGo from '@icons-pack/react-simple-icons/icons/SiGo'
 import SiHtml5 from '@icons-pack/react-simple-icons/icons/SiHtml5'
@@ -26,7 +27,8 @@ const LOGOS: Record<string, { icon: IconType; plain?: boolean }> = {
   python: { icon: SiPython },
   go: { icon: SiGo },
   rust: { icon: SiRust, plain: true },
-  java: { icon: SiOpenjdk, plain: true }
+  java: { icon: SiOpenjdk, plain: true },
+  cpp: { icon: SiCplusplus }
 }
 
 export function LanguageIcon({

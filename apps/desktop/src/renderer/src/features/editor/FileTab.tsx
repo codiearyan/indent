@@ -17,7 +17,12 @@ const LANGUAGES: Record<string, string> = {
   py: 'python',
   go: 'go',
   rs: 'rust',
-  java: 'java'
+  java: 'java',
+  cpp: 'cpp',
+  cc: 'cpp',
+  cxx: 'cpp',
+  h: 'cpp',
+  hpp: 'cpp'
 }
 
 export function FileTypeIcon({ path }: { path: string }): React.JSX.Element {

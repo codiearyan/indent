@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Check, Loader2 } from 'lucide-react'
-import type { LabModelStatus, NodeOption, ToolStatus } from '@shared/types'
+import { TOOL_IDS, type LabModelStatus, type NodeOption, type ToolStatus } from '@shared/types'
 import { ToolInstallButton } from '@/components/app/ToolInstallButton'
 import { Button } from '@/components/ui/button'
 import {
@@ -142,7 +142,7 @@ export function ToolsSection(): React.JSX.Element {
                 )}
               </li>
             ))
-          : [0, 1].map((i) => (
+          : TOOL_IDS.map((i) => (
               <li key={i} className="flex h-14 items-center justify-between px-4">
                 <Skeleton className="h-3.5 w-24" />
                 <Skeleton className="h-3 w-16" />
