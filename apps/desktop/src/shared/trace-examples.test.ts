@@ -76,7 +76,24 @@ const repos: { labId: string; expected: string[] }[] = [
       'throwing-errors/candle',
       'throwing-errors/cart',
       'throwing-errors/order',
-      'classes/card'
+      'classes/card',
+      'timers-and-callbacks/remind',
+      'promises-and-then/status',
+      'promises-and-then/set',
+      'promises-and-then/count',
+      'promises-and-then/order',
+      'async-and-await/paid',
+      'async-and-await/noted',
+      'async-and-await/restock',
+      'async-and-await/close',
+      'when-waiting-fails/pay',
+      'when-waiting-fails/parcel',
+      'when-waiting-fails/retry',
+      'when-waiting-fails/screen',
+      'several-at-once/one-by-one',
+      'several-at-once/all',
+      'several-at-once/board',
+      'several-at-once/report'
     ]
   },
   {

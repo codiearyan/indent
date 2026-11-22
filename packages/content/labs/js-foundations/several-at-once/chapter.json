@@ -1,0 +1,100 @@
+{
+  "id": "several-at-once",
+  "title": "Several at once",
+  "files": ["src/together.js", "src/demo.js", "src/shop.js"],
+  "terminal": {
+    "description": "A shell in your workspace. The machines print a line when they start, so the demo shows whether your code asks one at a time or all together.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "one-by-one",
+      "title": "One after another",
+      "file": "src/together.js",
+      "description": "Under `// Task 1` in `src/together.js`, make `countOneByOne(names)` give back a promise of a list of the counts of the candles in `names`, in the same order as `names`, from `countStock`. It asks about one candle at a time: each question only once the last one has been answered. An empty list gives `[]`.\n\nCheck answers the stock room itself and looks at when each question started.",
+      "nextSteps": [
+        "Read the lesson's part on one after another.",
+        "Make an empty list, and go through `names` with `for...of`.",
+        "For each name, wait for its count and push it onto the list.",
+        "Return the list, and run the demo: each count starts after the last one arrived."
+      ],
+      "hints": [
+        "Each question waits for the one before, so the `await` goes inside the loop.",
+        "`forEach` does not wait for an `async` function, so the list would be given back before any count arrived. A `for...of` loop inside an `async` function does wait.",
+        "The shape is `const counts = []`, then `for (const name of names) { counts.push(await countStock(name)) }`, then `return counts`."
+      ],
+      "docs": [
+        { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" },
+        { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "all",
+      "title": "All together",
+      "file": "src/together.js",
+      "description": "Under `// Task 2`, make `countAll(names)` give back a promise of the same list, in the same order as `names`, but ask the stock room about every candle at once, before any answer has arrived: `Promise.all` from the lesson does this. When one count fails, its promise is rejected with that error. An empty list gives `[]`.\n\nCheck answers the last question first, so the counts arrive in another order than they were asked. It looks at whether every question started before the first answer, at the order of the list, and at a count that fails.",
+      "nextSteps": [
+        "Read the lesson's parts on `Promise.all`, on keeping the order and on when one fails.",
+        "Turn `names` into a list of promises with `map`.",
+        "Hand that list to `Promise.all`.",
+        "Give back what `Promise.all` gives back, and run the demo: all three counts start together."
+      ],
+      "hints": [
+        "Starting a question and waiting for it are two things. Start every one first; wait for them all once.",
+        "`map` with a function that calls `countStock` gives a list of promises, and `Promise.all` turns that list into one promise of the counts, in the order of the list, failing as soon as one fails.",
+        "The body is one line: `return Promise.all(names.map((name) => countStock(name)))`."
+      ],
+      "docs": [
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
+        { "title": "Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" }
+      ],
+      "videos": [{ "title": "Promise.all and its relatives", "url": "https://www.youtube.com/watch?v=vQtgi8uElmk" }],
+      "points": 10
+    },
+    {
+      "id": "board",
+      "title": "One failure, the rest still shown",
+      "file": "src/together.js",
+      "description": "Under `// Task 3`, make `parcelBoard(ids)` ask the tracker about every parcel at once and give back a promise of a list of lines, in the same order as `ids`: `'P-77: out for delivery'` for a parcel the tracker found, and `'P-99: tracker not answering'` for one it failed on. Its promise is never rejected.\n\nCheck answers the last question first, fails on some parcels, and looks at whether every question started before the first answer and what each line says.",
+      "nextSteps": [
+        "Read the end of the lesson's part on when one fails.",
+        "Hand `map` an `async` function that takes one id.",
+        "Inside it, `try` to wait for the parcel and return its line, and in the `catch` return the not answering line.",
+        "Hand the list to `Promise.all`, and run the demo: P-99 fails and the others still show."
+      ],
+      "hints": [
+        "A plain `Promise.all` fails as a whole when one parcel fails. The failure has to be caught for each parcel on its own, before `Promise.all` sees it.",
+        "An `async` function with `try` and `catch` gives back a promise that never fails. Make one per parcel inside `map`, and `Promise.all` keeps their order.",
+        "The shape is `return Promise.all(ids.map(async (id) => { try { const parcel = await trackParcel(id); return ... } catch { return ... } }))`."
+      ],
+      "docs": [
+        { "title": "Promise.all(): rejection", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all#promise.all_fail-fast_behavior" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "report",
+      "title": "The morning report",
+      "file": "src/together.js",
+      "description": "Under `// Task 4`, make `morningReport(names, ids)` give back a promise of an object with two lists: `stock`, the list `countAll` gives for `names`, and `parcels`, the list `parcelBoard` gives for `ids`. Every count and every parcel is asked for at once, before any answer has arrived.\n\nCheck answers the last question first and looks at whether the tracker and the stock room were both asked before either answered.",
+      "nextSteps": [
+        "Read the lesson's part on two different things at once.",
+        "Start `countAll(names)` and `parcelBoard(ids)` without waiting for either.",
+        "Wait for both with one `Promise.all`, and take its list apart.",
+        "Return the object, and run the demo: every machine starts at the same time."
+      ],
+      "hints": [
+        "Two `await`s on two lines start the parcels only once every count is in. Both jobs have to start first.",
+        "`Promise.all` takes any list of promises, two included, and its answer is a list you can take apart into two names.",
+        "The shape is `const [stock, parcels] = await Promise.all([countAll(names), parcelBoard(ids)])`, then `return { stock, parcels }`, inside an `async` function."
+      ],
+      "docs": [
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
+        { "title": "Destructuring", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring" }
+      ],
+      "points": 10
+    }
+  ]
+}

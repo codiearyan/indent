@@ -1,0 +1,153 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "card", "label": "Card machine", "kind": "story" },
+      { "id": "paid", "label": "paidLine()", "kind": "function", "mine": true, "fn": "paidLine" },
+      { "id": "close", "label": "closeSale()", "kind": "function", "mine": true, "fn": "closeSale" },
+      { "id": "noted", "label": "stockFor()", "kind": "function", "mine": true, "fn": "stockFor" },
+      { "id": "reorder", "label": "reorder()", "kind": "function", "mine": true, "fn": "reorder" },
+      { "id": "room", "label": "Stock room", "kind": "story" },
+      { "id": "supplier", "label": "Supplier", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "card", "to": "paid", "label": "receipt" },
+      { "from": "paid", "to": "close", "label": "paid line" },
+      { "from": "room", "to": "close", "label": "how many left" },
+      { "from": "room", "to": "noted", "label": "count" },
+      { "from": "room", "to": "reorder", "label": "count" },
+      { "from": "reorder", "to": "supplier", "label": "order" }
+    ],
+    "note": "Ines's market stall waits on the card machine, the stock room and the supplier, written as plain lines with await."
+  },
+  "tasks": {
+    "paid": {
+      "trace": {
+        "file": "src/checkout.js",
+        "call": "paidLine",
+        "args": [{ "id": "WC-3001", "candle": "Cedar", "qty": 1, "totalCents": 1800 }]
+      },
+      "steps": [
+        {
+          "active": ["paid", "card"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "id", "value": "WC-3001" },
+              { "key": "totalCents", "value": 1800 }
+            ]
+          },
+          "note": "Someone at the stall buys a cedar candle, and paidLine() asks the card machine to charge it."
+        },
+        {
+          "active": ["paid"],
+          "note": "paidLine() pauses at await. The rest of the laptop carries on meanwhile."
+        },
+        {
+          "active": ["card", "card->paid", "paid"],
+          "value": {
+            "kind": "map",
+            "label": "what the promise holds",
+            "entries": [{ "key": "line", "value": "the order id, paid, and the receipt's code" }]
+          },
+          "note": "The machine answers with a receipt, and the next line makes the paid line from it."
+        }
+      ]
+    },
+    "noted": {
+      "trace": { "file": "src/checkout.js", "call": "stockFor", "args": ["Fig", { "Fig": 0, "Sage": 9 }] },
+      "steps": [
+        {
+          "active": ["noted"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "name", "value": "Fig" },
+              { "key": "noted", "value": "Fig 0, Sage 9" }
+            ]
+          },
+          "note": "Theo noted some counts this morning. Ines asks how many fig candles there are."
+        },
+        {
+          "active": ["noted"],
+          "note": "Fig is noted, so stockFor() uses the note and does not ask the stock room."
+        },
+        {
+          "active": ["room", "room->noted", "noted"],
+          "note": "For a candle that is not noted, it asks the stock room and waits for the count."
+        },
+        {
+          "active": ["noted"],
+          "value": { "kind": "map", "label": "what comes back", "entries": [{ "key": "count", "value": "always a promise of a number" }] },
+          "note": "Either way the caller gets a promise, so it never has to know which way it went."
+        }
+      ]
+    },
+    "restock": {
+      "trace": { "file": "src/checkout.js", "call": "reorder", "args": ["Cedar", 10] },
+      "steps": [
+        {
+          "active": ["reorder", "room"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "name", "value": "Cedar" },
+              { "key": "target", "value": 10 }
+            ]
+          },
+          "note": "Ines wants ten cedar candles for the market, and reorder() counts the shelf first."
+        },
+        {
+          "active": ["room", "room->reorder", "reorder"],
+          "note": "With the count in hand, it decides: enough already, or some are missing."
+        },
+        {
+          "active": ["reorder", "reorder->supplier", "supplier"],
+          "value": {
+            "kind": "map",
+            "label": "what the promise holds",
+            "entries": [{ "key": "line", "value": "enough in stock, or how many ordered and when they arrive" }]
+          },
+          "note": "When some are missing, it orders them from the supplier and waits for the delivery date."
+        }
+      ]
+    },
+    "close": {
+      "trace": {
+        "file": "src/checkout.js",
+        "call": "closeSale",
+        "args": [{ "id": "WC-3002", "candle": "Sage", "qty": 2, "totalCents": 4400 }]
+      },
+      "steps": [
+        {
+          "active": ["close", "paid", "paid->close"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "id", "value": "WC-3002" },
+              { "key": "candle", "value": "Sage" },
+              { "key": "qty", "value": 2 }
+            ]
+          },
+          "note": "Two sage candles sold. closeSale() waits for paidLine() to have the card machine charge them."
+        },
+        {
+          "active": ["card", "card->paid", "paid", "paid->close", "close"],
+          "note": "Only once the payment is through does it go on."
+        },
+        {
+          "active": ["room", "room->close", "close"],
+          "value": {
+            "kind": "array",
+            "label": "what the promise holds",
+            "values": ["the paid line", "how many are left"]
+          },
+          "note": "Then the candles come off the shelf, and Ines sees both lines."
+        }
+      ]
+    }
+  }
+}

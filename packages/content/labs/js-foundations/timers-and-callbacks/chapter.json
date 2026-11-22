@@ -1,0 +1,102 @@
+{
+  "id": "timers-and-callbacks",
+  "title": "Later, not now",
+  "files": ["src/later.js", "src/demo.js", "src/shop.js"],
+  "terminal": {
+    "description": "A shell in your workspace. The demo prints the time before every line, so you can see what waited and what did not.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "remind",
+      "title": "Remind me later",
+      "file": "src/later.js",
+      "description": "Under `// Task 1` in `src/later.js`, make `remindLater(note, ms)` print `Reminder: ` followed by the note, `ms` milliseconds from now, using `setTimeout`. `remindLater('Wicks arrive at noon', 500)` prints `Reminder: Wicks arrive at noon` half a second later.\n\nCheck calls `remindLater` with notes and times of its own and runs your timer on its own clock, so nothing really waits. It looks at how long you asked to wait, and that nothing is printed before the timer runs.",
+      "nextSteps": [
+        "Read the lesson's parts on the line after and on handing over a function.",
+        "Call `setTimeout` inside `remindLater` with two things: a function and a number of milliseconds.",
+        "Make the function you hand it print the reminder.",
+        "Run `node src/demo.js`: the reminder should come half a second after the line below it."
+      ],
+      "hints": [
+        "`remindLater` itself prints nothing. It hands the printing to `setTimeout`, which runs it later.",
+        "`setTimeout` takes a function, not a call. With round brackets, `console.log(...)` runs at once and `setTimeout` gets its answer. An arrow function with the `console.log` inside it waits.",
+        "The body has the shape `setTimeout(() => { console.log(...) }, ms)`, with the reminder text in the round brackets of `console.log`."
+      ],
+      "docs": [
+        { "title": "setTimeout()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout" },
+        { "title": "Timers in Node", "url": "https://nodejs.org/api/timers.html" }
+      ],
+      "videos": [
+        { "title": "Code that runs now and code that runs later", "url": "https://www.youtube.com/watch?v=Kpn2ajSa92c" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stock",
+      "title": "Pass the count on",
+      "file": "src/later.js",
+      "description": "Under `// Task 2`, make `stockLine(name, done)` ask the stock room for the count of the candle called `name`, with `askStockRoom` from `src/shop.js`. Once the count arrives, it calls `done` with one line of text: `'Cedar: 4 in stock'` for 4 cedar candles.\n\nThe count arrives after `stockLine` has finished, so it cannot be given back with `return`.\n\nCheck hands `stockLine` a stock room of its own that answers when Check says so, and a `done` that notes when it was called and with what.",
+      "nextSteps": [
+        "Read the lesson's part on why the answer cannot be given back.",
+        "Call `askStockRoom` with the name and a function that takes the count.",
+        "Inside that function, make the line and call `done` with it.",
+        "Run the demo: the Cedar line comes after the line that says it asked."
+      ],
+      "hints": [
+        "The count only exists inside the function you hand `askStockRoom`. Everything that needs the count happens in there.",
+        "A line after the call to `askStockRoom` runs right away, before the count arrives. A `return` inside the function you hand it goes back to `askStockRoom`, which ignores it.",
+        "The body has the shape `askStockRoom(name, (count) => { done(...) })`, with the line made from `name` and `count` inside the call to `done`."
+      ],
+      "docs": [
+        { "title": "Callback function", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Callback_function" },
+        { "title": "Introducing asynchronous JavaScript", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Async_JS/Introducing" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "two",
+      "title": "One count, then the next",
+      "file": "src/later.js",
+      "description": "Under `// Task 3`, make `twoLines(first, second, done)` get the line for the candle called `first`, and only once that line is there, the line for `second`. Then it calls `done` once, with a list of the two lines, the first one first: `['Sage: 9 in stock', 'Fig: 0 in stock']`. It may use `stockLine` from Task 2.\n\nCheck answers each question to the stock room itself, and looks at whether the second question was asked only after the first answer arrived.",
+      "nextSteps": [
+        "Read the lesson's part on one thing after another.",
+        "Ask for the first line, with a function that gets it.",
+        "Inside that function, ask for the second line, with a function of its own.",
+        "Inside the second function both lines are known: call `done` with them."
+      ],
+      "hints": [
+        "Two questions in a row, each on its own line, both start at once. The second has to wait until the first answer is there.",
+        "The only place that knows the first answer has arrived is the function that gets it. Ask the second question from inside it, and the second function can still see the first line.",
+        "The shape is `stockLine(first, (firstLine) => { stockLine(second, (secondLine) => { done([...]) }) })`."
+      ],
+      "docs": [
+        { "title": "Callback function", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Callback_function" },
+        { "title": "Introducing asynchronous JavaScript", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Async_JS/Introducing" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hold",
+      "title": "Hold a parcel",
+      "file": "src/later.js",
+      "description": "Under `// Task 4`, make `holdParcel(id, ms, send)` call `send` with `id`, `ms` milliseconds from now. It gives back a function. When that function is called before the time is up, the parcel is kept back: `send` is never called for it.\n\nCheck holds parcels of its own on its own clock, keeps some back, and looks at which ones were sent. Two parcels held at the same time each keep their own timer.",
+      "nextSteps": [
+        "Read the lesson's part on changing your mind.",
+        "Start the timer with `setTimeout` and keep what it gives back in a `const`.",
+        "Give back a function that stops that timer.",
+        "Run the demo: P-201 goes to the courier and P-202 never does."
+      ],
+      "hints": [
+        "`setTimeout` gives back the timer it started, and `clearTimeout` with that timer stops it before it runs.",
+        "The function you give back is made inside `holdParcel`, so it can still see a `const` made there. That is what makes each held parcel stop its own timer.",
+        "The body has the shape `const timer = setTimeout(() => { send(id) }, ms)`, then `return () => { clearTimeout(timer) }`."
+      ],
+      "docs": [
+        { "title": "clearTimeout()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/clearTimeout" },
+        { "title": "setTimeout()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout" }
+      ],
+      "points": 10
+    }
+  ]
+}

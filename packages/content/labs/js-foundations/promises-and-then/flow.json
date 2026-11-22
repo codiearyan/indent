@@ -1,0 +1,117 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "book", "label": "Order book", "kind": "story" },
+      { "id": "tracker", "label": "Tracker", "kind": "story" },
+      { "id": "order", "label": "orderStatus()", "kind": "function", "mine": true, "fn": "orderStatus" },
+      { "id": "status", "label": "statusLine()", "kind": "function", "mine": true, "fn": "statusLine" },
+      { "id": "set", "label": "setIn()", "kind": "function", "mine": true, "fn": "setIn" },
+      { "id": "count", "label": "stockCount()", "kind": "function", "mine": true, "fn": "stockCount" },
+      { "id": "room", "label": "Stock room", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "book", "to": "order", "label": "parcel id" },
+      { "from": "tracker", "to": "order", "label": "parcel" },
+      { "from": "tracker", "to": "status", "label": "parcel" },
+      { "from": "room", "to": "count", "label": "count, later" }
+    ],
+    "note": "Every slow answer now comes as a promise, which Theo's code reads with then, makes itself, and chains."
+  },
+  "tasks": {
+    "status": {
+      "trace": { "file": "src/promises.js", "call": "statusLine", "args": ["P-77"] },
+      "steps": [
+        {
+          "active": ["status"],
+          "value": { "kind": "map", "label": "what goes in", "entries": [{ "key": "parcelId", "value": "P-77" }] },
+          "note": "Someone asks where parcel P-77 is, and statusLine() asks the tracker. It gives back a promise at once."
+        },
+        {
+          "active": ["tracker", "tracker->status", "status"],
+          "value": {
+            "kind": "map",
+            "label": "what the tracker answers",
+            "entries": [
+              { "key": "id", "value": "the parcel id" },
+              { "key": "status", "value": "where it is" }
+            ]
+          },
+          "note": "A moment later the tracker answers with the parcel, and then calls the function it was handed."
+        },
+        {
+          "active": ["status"],
+          "value": { "kind": "map", "label": "what the promise holds", "entries": [{ "key": "line", "value": "the id, a colon and the status" }] },
+          "note": "That function makes the line, and the promise statusLine() gave back is fulfilled with it."
+        }
+      ]
+    },
+    "set": {
+      "trace": { "file": "src/promises.js", "call": "setIn", "args": ["Fig", 600] },
+      "steps": [
+        {
+          "active": ["set"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "candle", "value": "Fig" },
+              { "key": "ms", "value": 600 }
+            ]
+          },
+          "note": "Ines has poured a fig candle, and the wax needs a while to set."
+        },
+        {
+          "active": ["set"],
+          "note": "setIn() makes a new promise and starts a timer inside it. The promise is still pending."
+        },
+        {
+          "active": ["set"],
+          "value": { "kind": "map", "label": "what the promise holds, later", "entries": [{ "key": "text", "value": "the candle, then is set" }] },
+          "note": "When the time is up, the timer's function calls resolve, and the promise is fulfilled."
+        }
+      ]
+    },
+    "count": {
+      "trace": { "file": "src/promises.js", "call": "stockCount", "args": ["Sage"] },
+      "steps": [
+        {
+          "active": ["count"],
+          "value": { "kind": "map", "label": "what goes in", "entries": [{ "key": "name", "value": "Sage" }] },
+          "note": "Theo wants the sage count as a promise, like everything else."
+        },
+        {
+          "active": ["count", "room"],
+          "note": "stockCount() makes a promise and, inside it, asks the old stock room computer with a function for the count."
+        },
+        {
+          "active": ["room", "room->count", "count"],
+          "value": { "kind": "map", "label": "what the promise holds", "entries": [{ "key": "count", "value": "a number" }] },
+          "note": "When the stock room calls that function, it calls resolve, and the promise holds the count."
+        }
+      ]
+    },
+    "order": {
+      "trace": { "file": "src/promises.js", "call": "orderStatus", "args": ["WC-1050"] },
+      "steps": [
+        {
+          "active": ["order", "book"],
+          "value": { "kind": "map", "label": "what goes in", "entries": [{ "key": "orderId", "value": "WC-1050" }] },
+          "note": "A customer emails about order WC-1050, and orderStatus() asks the order book for its parcel."
+        },
+        {
+          "active": ["book", "book->order", "order", "tracker"],
+          "note": "Once the order book answers with the parcel id, the next step asks the tracker about that parcel."
+        },
+        {
+          "active": ["tracker", "tracker->order", "order"],
+          "value": {
+            "kind": "map",
+            "label": "what the promise holds",
+            "entries": [{ "key": "line", "value": "the order id, the parcel id and its status" }]
+          },
+          "note": "Once the tracker answers, the last step makes one line, and Theo can write back."
+        }
+      ]
+    }
+  }
+}

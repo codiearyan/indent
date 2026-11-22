@@ -1,0 +1,100 @@
+{
+  "id": "async-and-await",
+  "title": "Top to bottom with await",
+  "files": ["src/checkout.js", "src/demo.js", "src/shop.js"],
+  "terminal": {
+    "description": "A shell in your workspace. The demo runs each task in turn and prints what it gives back right away and after await.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "paid",
+      "title": "Wait with await",
+      "file": "src/checkout.js",
+      "description": "Under `// Task 1` in `src/checkout.js`, make `paidLine(order)` charge `order.totalCents` with `chargeCard` and give back a promise of one line: the order id, then ` paid, code ` and the code on the receipt, like `'WC-3001 paid, code A-118'`. The lesson shows how to write it with `async` and `await`.\n\nCheck calls `paidLine` with orders of its own and answers the card machine itself.",
+      "nextSteps": [
+        "Read the lesson's part on `await`.",
+        "Put `async` in front of `function paidLine`.",
+        "Wait for the receipt with `await chargeCard(...)` and keep it in a `const`.",
+        "Return the line made from the order and the receipt, and run the demo."
+      ],
+      "hints": [
+        "`chargeCard` gives back a promise of the receipt. The receipt's `code` is only there once that promise is fulfilled.",
+        "`await` in front of the call gives you the receipt itself, and `await` needs `async` in front of the function around it.",
+        "The body has the shape `const receipt = await chargeCard(order.totalCents)`, then `return` the line with `order.id` and `receipt.code` in it."
+      ],
+      "docs": [
+        { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
+        { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" }
+      ],
+      "videos": [{ "title": "async and await", "url": "https://www.youtube.com/watch?v=V_Kr9OSfDeU" }],
+      "points": 10
+    },
+    {
+      "id": "noted",
+      "title": "Always a promise",
+      "file": "src/checkout.js",
+      "description": "Under `// Task 2`, make `stockFor(name, noted)` give back a promise of the count of the candle called `name`. `noted` is an object of counts Theo wrote down today, like `{ Fig: 0, Sage: 9 }`. When `name` is in `noted`, the count comes from there and the stock room is not asked. Otherwise it comes from `countStock`.\n\nEither way, `stockFor` gives back a promise. Check calls it with notes of its own, a noted count of `0` included, and looks at whether the stock room was asked.",
+      "nextSteps": [
+        "Read the lesson's part on what an async function gives back.",
+        "Ask whether `name` is in `noted`, the way the issue on objects showed.",
+        "If it is, return the noted count. If not, return the count from `countStock`.",
+        "Run the demo: both lines of Task 2 show a promise right away."
+      ],
+      "hints": [
+        "Whichever way it goes, the caller gets a promise. An `async` function always gives back a promise, even when it returns a value it already had.",
+        "A count of `0` counts as false, so `if (noted[name])` asks the stock room about it. Ask whether the property is there at all instead.",
+        "The body has the shape `if (name in noted) { return noted[name] }`, then `return await countStock(name)`, inside an `async` function."
+      ],
+      "docs": [
+        { "title": "What an async function gives back", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function#description" },
+        { "title": "The in operator", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/in" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "restock",
+      "title": "Count, then decide",
+      "file": "src/checkout.js",
+      "description": "Under `// Task 3`, make `reorder(name, target)` count the candle called `name` with `countStock`. When there are at least `target`, it gives back a promise of `'Cedar: enough in stock'` for Cedar. Otherwise it orders as many as are missing, `target` minus the count, with `orderCandles`, and gives back a promise of a line made from the delivery: `'Cedar: 6 ordered, arrives Thursday'`.\n\nCheck answers the stock room and the supplier itself, and looks at what the supplier was asked for and when.",
+      "nextSteps": [
+        "Read the lesson's parts on forgetting `await` and on deciding after a wait.",
+        "Wait for the count, then compare it with `target`.",
+        "When there are enough, return the first line.",
+        "Otherwise wait for the delivery from `orderCandles` and return the line made from it."
+      ],
+      "hints": [
+        "Two machines, one after the other, with a decision between them. Each needs its own `await`.",
+        "Without `await`, the count is a promise: in a sum it gives `NaN`, and it is never at least `target`. Without `await` on the order, the delivery's `count` and `arrives` are `undefined`.",
+        "The shape is `const count = await countStock(name)`, then an `if` that returns the first line, then `const delivery = await orderCandles(name, target - count)` and the second line."
+      ],
+      "docs": [
+        { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" },
+        { "title": "if...else", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "close",
+      "title": "Close a sale",
+      "file": "src/checkout.js",
+      "description": "Under `// Task 4`, make `closeSale(order)` charge the order, with your `paidLine` from Task 1 for example, and once it is paid, and not before, take `order.qty` candles of `order.candle` from stock with `takeFromStock`. It gives back a promise of a list of two lines: the line from `paidLine`, and `'Sage: 7 left'` when 7 sage candles are left.\n\nCheck answers the card machine and the stock room itself, and looks at whether the candles were taken only after the card machine answered.",
+      "nextSteps": [
+        "Read the end of the lesson's part on what an async function gives back.",
+        "Wait for the line from `paidLine(order)`.",
+        "Then wait for what `takeFromStock` says is left.",
+        "Return a list of the two lines, and run the demo."
+      ],
+      "hints": [
+        "`paidLine` is an `async` function, so it gives back a promise. Treat it like any machine of the shop.",
+        "Without `await` on `paidLine`, the list holds a promise, and the candles leave the shelf before the card machine has answered.",
+        "The shape is `const paid = await paidLine(order)`, then `const left = await takeFromStock(order.candle, order.qty)`, then `return [paid, ...]`."
+      ],
+      "docs": [
+        { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" },
+        { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" }
+      ],
+      "points": 10
+    }
+  ]
+}

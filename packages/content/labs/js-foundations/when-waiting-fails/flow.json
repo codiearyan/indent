@@ -1,0 +1,146 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ines", "label": "Ines", "kind": "story" },
+      { "id": "pay", "label": "tryPayment()", "kind": "function", "mine": true, "fn": "tryPayment" },
+      { "id": "retry", "label": "chargeWithRetries()", "kind": "function", "mine": true, "fn": "chargeWithRetries" },
+      { "id": "screen", "label": "payWithScreen()", "kind": "function", "mine": true, "fn": "payWithScreen" },
+      { "id": "card", "label": "Card machine", "kind": "story" },
+      { "id": "parcel", "label": "parcelOrUnknown()", "kind": "function", "mine": true, "fn": "parcelOrUnknown" },
+      { "id": "tracker", "label": "Tracker", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ines", "to": "pay", "label": "order" },
+      { "from": "ines", "to": "retry", "label": "total, tries" },
+      { "from": "ines", "to": "screen", "label": "order" },
+      { "from": "pay", "to": "card", "label": "charge" },
+      { "from": "retry", "to": "card", "label": "charge again" },
+      { "from": "screen", "to": "card", "label": "charge" },
+      { "from": "parcel", "to": "tracker", "label": "where is it?" }
+    ],
+    "note": "The card machine and the tracker can fail, and Ines's code now catches, retries and cleans up instead of stopping."
+  },
+  "tasks": {
+    "pay": {
+      "trace": { "file": "src/payments.js", "call": "tryPayment", "args": [{ "id": "WC-4002", "totalCents": 9000 }] },
+      "steps": [
+        {
+          "active": ["ines", "ines->pay", "pay"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "id", "value": "WC-4002" },
+              { "key": "totalCents", "value": 9000 }
+            ]
+          },
+          "note": "Someone in the queue pays for a large order by card."
+        },
+        {
+          "active": ["pay", "pay->card", "card"],
+          "note": "tryPayment() asks the card machine, and waits inside a try."
+        },
+        {
+          "active": ["card", "pay"],
+          "value": {
+            "kind": "map",
+            "label": "what the promise holds",
+            "entries": [{ "key": "line", "value": "paid with the code, or not paid with the reason" }]
+          },
+          "note": "The card is declined. The catch turns the failure into a line, and the queue keeps moving."
+        }
+      ]
+    },
+    "parcel": {
+      "trace": { "file": "src/payments.js", "call": "parcelOrUnknown", "args": ["P-99"] },
+      "steps": [
+        {
+          "active": ["parcel", "parcel->tracker", "tracker"],
+          "value": { "kind": "map", "label": "what goes in", "entries": [{ "key": "parcelId", "value": "P-99" }] },
+          "note": "A customer asks about parcel P-99, and parcelOrUnknown() asks the tracker."
+        },
+        {
+          "active": ["tracker", "parcel"],
+          "note": "The tracker has no news and fails. The then step is skipped."
+        },
+        {
+          "active": ["parcel"],
+          "value": {
+            "kind": "map",
+            "label": "what the promise holds",
+            "entries": [{ "key": "line", "value": "the status, or no news yet" }]
+          },
+          "note": "The catch at the end of the chain gives the line to use instead."
+        }
+      ]
+    },
+    "retry": {
+      "trace": { "file": "src/payments.js", "call": "chargeWithRetries", "args": [2600, 3] },
+      "steps": [
+        {
+          "active": ["ines", "ines->retry", "retry"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "totalCents", "value": 2600 },
+              { "key": "tries", "value": 3 }
+            ]
+          },
+          "note": "Ines charges 26.00, and the machine is having a busy morning."
+        },
+        {
+          "active": ["retry", "retry->card", "card"],
+          "note": "The first charge fails with busy. chargeWithRetries() catches it and tries again once it has failed."
+        },
+        {
+          "active": ["retry", "retry->card", "card"],
+          "note": "It keeps trying, one at a time, until a charge goes through or it runs out of tries."
+        },
+        {
+          "active": ["retry", "ines->retry", "ines"],
+          "value": {
+            "kind": "map",
+            "label": "what the promise holds",
+            "entries": [{ "key": "answer", "value": "the first receipt, or the last failure" }]
+          },
+          "note": "Ines gets the receipt, or, when every try failed, the last reason."
+        }
+      ]
+    },
+    "screen": {
+      "trace": { "file": "src/payments.js", "call": "payWithScreen", "args": [{ "id": "WC-4003", "totalCents": 1200 }] },
+      "steps": [
+        {
+          "active": ["ines", "ines->screen", "screen"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "id", "value": "WC-4003" },
+              { "key": "totalCents", "value": 1200 }
+            ]
+          },
+          "note": "A sale at the stall. payWithScreen() turns the machine's screen on."
+        },
+        {
+          "active": ["screen", "screen->card", "card"],
+          "note": "It charges the card and waits for the machine to answer."
+        },
+        {
+          "active": ["card", "screen"],
+          "note": "Whether the charge went through or failed, the finally turns the screen off."
+        },
+        {
+          "active": ["screen", "ines->screen", "ines"],
+          "value": {
+            "kind": "map",
+            "label": "what the promise holds",
+            "entries": [{ "key": "answer", "value": "the receipt, or the machine's failure" }]
+          },
+          "note": "Ines gets the receipt, or the failure itself, never a quiet nothing."
+        }
+      ]
+    }
+  }
+}
