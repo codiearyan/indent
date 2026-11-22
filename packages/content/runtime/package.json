@@ -5,6 +5,7 @@
   "dependencies": {
     "@types/node": "^26.6.6",
     "esbuild": "^0.28.2",
+    "express": "^5.3.0",
     "jsdom": "^31.0.1",
     "openai": "^7.60.0",
     "react": "^19.3.1",

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { ChapterProgress, DayActivity, LabSummary } from '../../../../shared/types'
 import { NO_FILTERS, kindOf, matchesFilters } from './labFilters'
-import { labProgress } from './labStatus'
+import { labProgress, stageFinished } from './labStatus'
 import { intensity, longestStreak, recentWeeks, yearSummary, yearWeeks } from './activity'
 
 const lab: LabSummary = {
@@ -107,6 +107,24 @@ describe('streaks and year summary', () => {
     )
     expect(s).toMatchObject({ points: 30, tasksPassed: 3, activeDays: 2 })
     expect(s.monthPoints.slice(0, 3)).toEqual([20, 0, 10])
+  })
+})
+
+describe('stageFinished', () => {
+  const labs = new Map([[lab.id, lab]])
+  const all = { 'lab/a': chapter(true), 'lab/b': chapter(true) }
+
+  it('is finished when every repo of the stage is finished', () => {
+    expect(stageFinished({ title: 'S', labs: ['lab'] }, labs, all)).toBe(true)
+    expect(stageFinished({ title: 'S', labs: ['lab'] }, labs, { 'lab/a': chapter(true) })).toBe(
+      false
+    )
+  })
+
+  it('is not finished while it is empty, has a repo still to come, or names one that is not here', () => {
+    expect(stageFinished({ title: 'S', labs: [] }, labs, all)).toBe(false)
+    expect(stageFinished({ title: 'S', labs: ['lab'], soon: ['Next'] }, labs, all)).toBe(false)
+    expect(stageFinished({ title: 'S', labs: ['lab', 'gone'] }, labs, all)).toBe(false)
   })
 })
 

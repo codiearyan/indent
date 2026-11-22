@@ -1,5 +1,5 @@
 // Relative imports keep this file loadable by vitest, which has no path aliases.
-import type { ChapterSummary, LabSummary, ProgressState } from '../../../../shared/types'
+import type { ChapterSummary, LabSummary, PathDef, ProgressState } from '../../../../shared/types'
 import { chapterKey } from '../../../../shared/rules'
 
 export type Status = 'not-started' | 'in-progress' | 'completed'
@@ -74,4 +74,20 @@ export function labProgress(lab: LabSummary, chapters: Chapters): LabProgress {
     nextChapterId: nextChapterId ?? lab.chapters[0]?.id,
     lastOpenedAt
   }
+}
+
+/** A roadmap stage is finished when it has repos, none still to come, and every one is finished. */
+export function stageFinished(
+  stage: PathDef['stages'][number],
+  labs: Map<string, LabSummary>,
+  chapters: Chapters
+): boolean {
+  return (
+    stage.labs.length > 0 &&
+    !stage.soon?.length &&
+    stage.labs.every((id) => {
+      const lab = labs.get(id)
+      return !!lab && labProgress(lab, chapters).status === 'completed'
+    })
+  )
 }
