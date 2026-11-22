@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Imran", "say": "Why does it say ENOENT?", "note": "He works in the water folder." },
+    { "title": "The old script", "text": "Looks for the readings where he typed." },
+    {
+      "title": "Your scripts",
+      "file": "water-total.js",
+      "mine": true,
+      "gap": "Paths start in the wrong place",
+      "tasks": ["Show both folders", "Add up from anywhere", "Describe a typed path"]
+    },
+    { "title": "Imran's terminal", "text": "The week's litres, from any folder." }
+  ],
+  "ticket": { "label": "Sunday's water", "wrong": "ENOENT", "why": "Wrong folder", "right": "added up" },
+  "captions": [
+    "At Marrowfield, Imran adds up the water the troughs used, from the water folder.",
+    "The old script looks for the readings from where he typed, and stops with ENOENT.",
+    "You teach the scripts where a path starts, in three tasks.",
+    "Now the total comes out the same, whatever folder Imran types in.",
+    "Same readings, same folder. Imran gets his total without moving."
+  ]
+}

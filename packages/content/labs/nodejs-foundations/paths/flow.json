@@ -1,0 +1,95 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "imran", "label": "Imran", "kind": "story" },
+      { "id": "cwd", "label": "Working directory", "kind": "data" },
+      { "id": "where", "label": "where.js", "kind": "file", "mine": true },
+      { "id": "info", "label": "file-info.js", "kind": "file", "mine": true },
+      { "id": "pathmod", "label": "node:path", "kind": "file" },
+      { "id": "readings", "label": "readings.txt", "kind": "file" },
+      { "id": "total", "label": "water-total.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "imran", "to": "cwd", "label": "works in" },
+      { "from": "cwd", "to": "where", "label": "run from" },
+      { "from": "cwd", "to": "info", "label": "typed path" },
+      { "from": "pathmod", "to": "info", "label": "parts" },
+      { "from": "pathmod", "to": "total", "label": "joined path" },
+      { "from": "readings", "to": "total", "label": "litres" },
+      { "from": "total", "to": "imran", "label": "total" }
+    ],
+    "note": "Your scripts learn where a path starts: a typed path from the folder Imran works in, and the water readings from the script's own folder."
+  },
+  "tasks": {
+    "where": {
+      "steps": [
+        {
+          "active": ["imran", "imran->cwd", "cwd"],
+          "note": "Imran's terminal is in the water folder, where he types his readings."
+        },
+        {
+          "active": ["cwd->where", "where"],
+          "note": "He runs node ../where.js, so the script sits one folder above him."
+        },
+        {
+          "active": ["where"],
+          "value": {
+            "kind": "map",
+            "label": "what where.js prints",
+            "entries": [
+              { "key": "Run from:", "value": "the folder he typed in" },
+              { "key": "Script in:", "value": "the folder of where.js" }
+            ]
+          },
+          "note": "where.js prints both: the working directory, and the folder that holds the script."
+        }
+      ]
+    },
+    "total": {
+      "steps": [
+        {
+          "active": ["imran", "imran->cwd", "cwd"],
+          "note": "Imran runs the adding-up script from the water folder."
+        },
+        {
+          "active": ["pathmod", "pathmod->total", "total"],
+          "note": "water-total.js builds the path to the readings from its own folder, with join."
+        },
+        {
+          "active": ["readings", "readings->total", "total"],
+          "value": { "kind": "array", "label": "one line of readings", "values": ["date", "trough", "litres"] },
+          "note": "It reads every line and adds up the litres, the third part of each."
+        },
+        {
+          "active": ["total->imran", "imran"],
+          "note": "One total goes back to Imran, the same from any folder."
+        }
+      ]
+    },
+    "info": {
+      "steps": [
+        {
+          "active": ["imran", "cwd", "cwd->info", "info"],
+          "note": "Imran types a path after file-info.js, like water/readings.txt."
+        },
+        {
+          "active": ["info"],
+          "note": "The path is relative to the folder he typed it in, so the full path starts from there."
+        },
+        {
+          "active": ["pathmod", "pathmod->info", "info"],
+          "value": {
+            "kind": "map",
+            "label": "what file-info.js prints",
+            "entries": [
+              { "key": "Full path:", "value": "from his folder" },
+              { "key": "Name:", "value": "the last part" },
+              { "key": "Extension:", "value": "from the last dot" }
+            ]
+          },
+          "note": "node:path gives the full path, the name and the extension, the same way on every system."
+        }
+      ]
+    }
+  }
+}
