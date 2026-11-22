@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-You can find your way around the studio laptop now. So far you have only looked; from this issue on, your commands change what is on the disk. First you make places for things to go. By the end of this issue you will be able to:
+You can find your way around the shop laptop now. So far you have only looked; from this issue on, your commands change what is on the disk. First you make places for things to go. By the end of this issue you will be able to:
 
 - make a folder with `mkdir`, or several at once
 - make folders inside folders that do not exist yet with `mkdir -p`
@@ -13,7 +13,7 @@ You can find your way around the studio laptop now. So far you have only looked;
 
 Idris left a list for you in `today.txt`, the file open in the editor.
 
-> **Idris:** Before we move anything, we need places to put it. Receipts need a folder. The orders need a folder per month this year. Maeve wants a folder for rough poster ideas, and an empty file to start the print queue.
+> **Idris:** Before we move anything, we need places to put it. Receipts need a folder. The orders need a folder per month this year. Hesper wants a folder for rough poster ideas, and an empty file to start the print queue.
 
 Every job on the list is one folder or one file in the right place, with exactly the right name.
 

@@ -51,7 +51,7 @@
       "steps": [
         {
           "active": ["list", "list->you"],
-          "note": "Maeve is about to change the price list, and Idris wants it kept as it is today."
+          "note": "Hesper is about to change the price list, and Idris wants it kept as it is today."
         },
         {
           "active": ["you", "you->from", "from"],
@@ -77,7 +77,7 @@
         },
         {
           "active": ["from", "from->to", "to"],
-          "note": "The backup is a new folder that holds the same files in the same folders."
+          "note": "The backup is a new folder that holds the same files in the same folders, and orders stays as it was."
         }
       ]
     }

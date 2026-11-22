@@ -3,7 +3,7 @@
   "title": "Moving around with paths",
   "files": ["notes.txt"],
   "terminal": {
-    "description": "A shell that starts in the studio's top folder. Move with cd, and run pwd whenever you are not sure where you are.",
+    "description": "A shell that starts in the shop's top folder. Move with cd, and run pwd whenever you are not sure where you are.",
     "suggestedCommand": "ls"
   },
   "tasks": [
@@ -11,7 +11,7 @@
       "id": "inside",
       "title": "Go deep and say where you are",
       "file": "notes.txt",
-      "description": "Maeve wants the notes from last autumn's market stall, which are somewhere in `archive`. Move the shell into `archive/2025/autumn`, run `pwd` there, and write the line it prints after `inside:` in `notes.txt`.\n\nCheck compares your line with the full path of `archive/2025/autumn` in this workspace.",
+      "description": "Hesper wants the notes from last autumn's market stall, which are somewhere in `archive`. Move the shell into `archive/2025/autumn`, run `pwd` there, and write the line it prints after `inside:` in `notes.txt`.\n\nCheck compares your line with the full path of `archive/2025/autumn` in this workspace.",
       "nextSteps": [
         "Run `ls archive` to see which folders it holds, then go one level deeper.",
         "Move into `archive/2025/autumn`, in one step or in three.",

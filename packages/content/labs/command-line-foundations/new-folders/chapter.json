@@ -3,7 +3,7 @@
   "title": "Making folders and files",
   "files": ["today.txt"],
   "terminal": {
-    "description": "A shell that starts in the studio's top folder. Make what the jobs ask for, then list it to see it is there.",
+    "description": "A shell that starts in the shop's top folder. Make what the jobs ask for, then list it to see it is there.",
     "suggestedCommand": "ls"
   },
   "tasks": [
@@ -64,7 +64,7 @@
       "id": "ideas",
       "title": "Make a folder for poster ideas",
       "file": "today.txt",
-      "description": "Maeve wants a folder for rough drawings inside `artwork`, called `poster ideas`, with the space.\n\nCheck looks for `artwork/poster ideas`. It also fails while a stray empty `poster` or `ideas` folder is left in `artwork` or the top folder, from a name the shell split at the space.",
+      "description": "Hesper wants a folder for rough drawings inside `artwork`, called `poster ideas`, with the space.\n\nCheck looks for `artwork/poster ideas`. It also fails while a stray empty `poster` or `ideas` folder is left in `artwork` or the top folder, from a name the shell split at the space.",
       "nextSteps": [
         "Remember from the last issue what the shell does with a space.",
         "Make the folder inside `artwork`, keeping the space inside the name.",
@@ -92,7 +92,7 @@
       "id": "queue",
       "title": "Make an empty print queue file",
       "file": "today.txt",
-      "description": "Maeve keeps a list of what to print next. Make an empty file called `print-queue.txt` in the top folder. It gets filled in later.\n\nCheck looks for a file with exactly that name in the top folder and checks that it is empty.",
+      "description": "Hesper keeps a list of what to print next. Make an empty file called `print-queue.txt` in the top folder. It gets filled in later.\n\nCheck looks for a file with exactly that name in the top folder and checks that it is empty.",
       "nextSteps": [
         "Go back to the top folder if you moved.",
         "Make the empty file with the command from the lesson.",

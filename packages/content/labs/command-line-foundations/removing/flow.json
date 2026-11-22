@@ -1,14 +1,14 @@
 {
   "scene": {
     "nodes": [
-      { "id": "maeve", "label": "Maeve", "kind": "story" },
+      { "id": "hesper", "label": "Hesper", "kind": "story" },
       { "id": "look", "label": "Look first", "kind": "story", "mine": true },
       { "id": "remove", "label": "Your removals", "kind": "story", "mine": true },
       { "id": "clutter", "label": "Clutter", "kind": "data" },
       { "id": "keep", "label": "What stays", "kind": "data" }
     ],
     "edges": [
-      { "from": "maeve", "to": "look", "label": "what can go" },
+      { "from": "hesper", "to": "look", "label": "what can go" },
       { "from": "look", "to": "remove", "label": "the exact list" },
       { "from": "remove", "to": "clutter", "label": "gone for good" },
       { "from": "look", "to": "keep", "label": "left alone" }
@@ -19,7 +19,7 @@
     "duplicate": {
       "steps": [
         {
-          "active": ["maeve", "maeve->look", "look"],
+          "active": ["hesper", "hesper->look", "look"],
           "note": "artwork holds the fox poster twice, and the copy's name has a space in it."
         },
         {
@@ -35,9 +35,9 @@
     "temp": {
       "steps": [
         {
-          "active": ["maeve", "maeve->look", "look"],
+          "active": ["hesper", "hesper->look", "look"],
           "value": { "kind": "array", "label": "downloads holds", "values": ["printer leftovers", "price ideas", "stock count"] },
-          "note": "downloads mixes the printer's leftovers with files Maeve still needs."
+          "note": "downloads mixes the printer's leftovers with files Hesper still needs."
         },
         {
           "active": ["look", "look->remove", "remove"],
@@ -52,7 +52,7 @@
     "rescue": {
       "steps": [
         {
-          "active": ["maeve", "maeve->look", "look"],
+          "active": ["hesper", "hesper->look", "look"],
           "note": "The old web site is going, but the logo inside it has to stay."
         },
         {
@@ -74,7 +74,7 @@
         },
         {
           "active": ["remove", "remove->clutter", "clutter"],
-          "note": "The whole old site is gone from the top folder, for good."
+          "note": "The whole old site is gone for good, not moved somewhere else."
         }
       ]
     }

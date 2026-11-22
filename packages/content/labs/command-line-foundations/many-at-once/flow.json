@@ -1,14 +1,14 @@
 {
   "scene": {
     "nodes": [
-      { "id": "maeve", "label": "Maeve", "kind": "story" },
+      { "id": "hesper", "label": "Hesper", "kind": "story" },
       { "id": "pattern", "label": "Your pattern", "kind": "story", "mine": true },
       { "id": "shell", "label": "The shell", "kind": "story" },
       { "id": "from", "label": "Mixed folder", "kind": "data" },
       { "id": "to", "label": "Right folder", "kind": "data" }
     ],
     "edges": [
-      { "from": "maeve", "to": "pattern", "label": "which files" },
+      { "from": "hesper", "to": "pattern", "label": "which files" },
       { "from": "pattern", "to": "shell", "label": "a pattern" },
       { "from": "shell", "to": "from", "label": "matching names" },
       { "from": "from", "to": "to", "label": "one move" }
@@ -19,8 +19,8 @@
     "drawings": {
       "steps": [
         {
-          "active": ["maeve", "maeve->pattern"],
-          "note": "Maeve's new drawings are mixed in with invoices and lists in downloads."
+          "active": ["hesper", "hesper->pattern"],
+          "note": "Hesper's new drawings are mixed in with invoices and lists in downloads."
         },
         {
           "active": ["pattern", "pattern->shell", "shell"],
@@ -40,7 +40,7 @@
     "invoices": {
       "steps": [
         {
-          "active": ["maeve", "maeve->pattern"],
+          "active": ["hesper", "hesper->pattern"],
           "note": "The March invoices sit in downloads beside other spreadsheets."
         },
         {
@@ -60,7 +60,7 @@
     "pellow": {
       "steps": [
         {
-          "active": ["maeve", "maeve->pattern"],
+          "active": ["hesper", "hesper->pattern"],
           "note": "Idris wants every Pellow Bakery order in one folder of its own inside orders."
         },
         {
@@ -74,7 +74,7 @@
         },
         {
           "active": ["from", "from->to", "to"],
-          "note": "They move into the new folder, and the other customers' orders stay put."
+          "note": "They move into the new folder, and the other customers' orders and the 2026 folder stay put."
         }
       ]
     }

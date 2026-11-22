@@ -3,7 +3,7 @@
     "nodes": [
       { "id": "idris", "label": "Idris", "kind": "story" },
       { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
-      { "id": "folder", "label": "Studio folder", "kind": "data" },
+      { "id": "folder", "label": "Shop folder", "kind": "data" },
       { "id": "screen", "label": "Terminal", "kind": "story" },
       { "id": "notes", "label": "notes.txt", "kind": "file", "mine": true }
     ],
@@ -13,18 +13,18 @@
       { "from": "folder", "to": "screen", "label": "what is there" },
       { "from": "screen", "to": "notes", "label": "answers" }
     ],
-    "note": "You look around the studio folder from the terminal and write what you find in notes.txt."
+    "note": "You look around the shop folder from the terminal and write what you find in notes.txt."
   },
   "tasks": {
     "here": {
       "steps": [
         {
           "active": ["idris", "idris->you"],
-          "note": "Idris wants to know where on the laptop the studio folder is."
+          "note": "Idris wants to know where on the laptop the shop folder is."
         },
         {
           "active": ["you", "you->folder", "folder"],
-          "note": "The shell is always inside one folder. When the terminal opens, it is the studio folder."
+          "note": "The shell is always inside one folder. When the terminal opens, it is the shop folder."
         },
         {
           "active": ["folder", "folder->screen", "screen"],

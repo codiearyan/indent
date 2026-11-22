@@ -3,7 +3,7 @@
   "title": "Where you are and what is here",
   "files": ["notes.txt"],
   "terminal": {
-    "description": "A shell that starts in the studio's folder. Type a command, press Enter and read what it prints.",
+    "description": "A shell that starts in the shop's folder. Type a command, press Enter and read what it prints.",
     "suggestedCommand": "pwd"
   },
   "tasks": [

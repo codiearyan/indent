@@ -3,7 +3,7 @@
   "title": "Many files at once",
   "files": ["today.txt"],
   "terminal": {
-    "description": "A shell that starts in the studio's top folder. Try each pattern with ls before you move anything with it.",
+    "description": "A shell that starts in the shop's top folder. Try each pattern with ls before you move anything with it.",
     "suggestedCommand": "ls downloads"
   },
   "tasks": [
@@ -11,7 +11,7 @@
       "id": "drawings",
       "title": "Move every drawing into artwork",
       "file": "today.txt",
-      "description": "Maeve's new drawings were saved into `downloads`, between invoices and lists. Move every `.svg` file in `downloads` into `artwork`, and nothing else.\n\nCheck looks for each drawing from `downloads` in `artwork`, checks that none is left in `downloads`, and fails if a file that is not a drawing ended up in `artwork`.",
+      "description": "Hesper's new drawings were saved into `downloads`, between invoices and lists. Move every `.svg` file in `downloads` into `artwork`, and nothing else.\n\nCheck looks for each drawing from `downloads` in `artwork`, checks that none is left in `downloads`, and fails if a file that is not a drawing ended up in `artwork`.",
       "nextSteps": [
         "Run `ls downloads` and pick out the drawings by their ending.",
         "Write a pattern that matches only those names, and try it with `ls`.",
@@ -73,7 +73,7 @@
       "id": "pellow",
       "title": "Gather the Pellow Bakery orders",
       "file": "today.txt",
-      "description": "Idris wants every order from Pellow Bakery together. Make a folder `pellow` inside `orders`, then move every file directly in `orders` whose name ends in `-pellow.txt` into it. Orders from other customers stay where they are, and the `2026` folder is left alone.\n\nCheck looks for each Pellow Bakery order in `orders/pellow`, checks that none is left loose in `orders`, and fails if another customer's order ended up in `orders/pellow`.",
+      "description": "Idris wants every order from Pellow Bakery together. Make a folder `pellow` inside `orders`, then move every file directly in `orders` whose name ends in `-pellow.txt` into it. Orders from other customers stay where they are, and the `2026` folder is left alone.\n\nCheck looks for each Pellow Bakery order in `orders/pellow`, checks that none is left loose in `orders`, and fails if another customer's order or anything from `2026` was moved.",
       "nextSteps": [
         "Run `ls orders` and find what the Pellow Bakery orders have in common.",
         "Make the `pellow` folder inside `orders`.",

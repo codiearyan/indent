@@ -1,6 +1,6 @@
 {
   "stations": [
-    { "title": "Idris", "say": "Can we tidy before Maeve edits?", "note": "Back up before anything changes." },
+    { "title": "Idris", "say": "Can we tidy before Hesper edits?", "note": "Back up before anything changes." },
     { "title": "Top folder", "text": "A loose invoice, a muddled poster name.", "note": "No copy of prices or orders." },
     {
       "title": "Your commands",
@@ -13,7 +13,7 @@
   ],
   "ticket": { "label": "Invoice 0303", "wrong": "loose", "why": "Not filed", "right": "filed" },
   "captions": [
-    "At Ashgrove, Idris wants things filed and backed up before Maeve changes prices.",
+    "At Ashgrove, Idris wants things filed and backed up before Hesper changes prices.",
     "Today an invoice lies loose, the fox poster has a muddled name, and nothing is backed up.",
     "You copy and move files into place, in four tasks.",
     "The invoice is filed with March, the poster is renamed, and both backups exist.",

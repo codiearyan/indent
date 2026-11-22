@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Ashgrove Print Studio is a two-person screen-print studio on Tanner Row. Maeve draws and prints the posters, cards and tote bags. Idris takes the orders and keeps the books. Their shared laptop holds years of artwork, orders and invoices in one folder, and since Sol, their Saturday helper, left, nobody can find anything in it. You are going to sort it out from the terminal, a window where you type commands instead of clicking. You have never typed one, and that is where this issue starts. By the end of it you will be able to:
+Ashgrove Press is a letterpress shop with two old presses. Hesper runs it, and draws and prints the posters, cards and tote bags. Idris takes the orders and keeps the books. Their shared laptop holds years of artwork, orders and invoices in one folder, and since Sol, their Saturday helper, left, nobody can find anything in it. You are going to sort it out from the terminal, a window where you type commands instead of clicking. You have never typed one, and that is where this issue starts. By the end of it you will be able to:
 
 - type a command and read what it prints
 - find out which folder you are in with `pwd`
@@ -53,7 +53,7 @@ cakes   notes.txt   soups
 
 Some names are folders and some are files; a name with a dot and an ending, like `notes.txt`, is usually a file. To list another folder, give `ls` its name after a space. `ls soups` lists what is inside `soups`, without moving there.
 
-If nothing has that name, `ls` says so, with words such as `No such file or directory`. Check the spelling, and remember that capital letters count: type every name exactly as the listing shows it.
+If nothing has that name, `ls` says so, with words such as `No such file or directory`. Check the spelling, and type every name exactly as the listing shows it, capitals included. A Mac often forgives a wrong capital, but Linux does not, and neither do the checks in this repo.
 
 ## Options change what a command does
 

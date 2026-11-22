@@ -3,7 +3,7 @@
   "title": "Removing for good",
   "files": ["today.txt"],
   "terminal": {
-    "description": "A shell that starts in the studio's top folder. List what you are about to remove before you remove it.",
+    "description": "A shell that starts in the shop's top folder. List what you are about to remove before you remove it.",
     "suggestedCommand": "ls artwork downloads old-site"
   },
   "tasks": [
@@ -96,7 +96,7 @@
       "id": "old-site",
       "title": "Remove the old site",
       "file": "today.txt",
-      "description": "Once the logo is safe, remove the folder `old-site` with everything still in it, the `images` folder included.\n\nCheck looks for `old-site` in the top folder and passes when it is gone.",
+      "description": "Once the logo is safe, remove the folder `old-site` with everything still in it, the `images` folder included.\n\nCheck passes when `old-site` is gone from the top folder and none of its files is left anywhere else in the workspace.",
       "nextSteps": [
         "Check the previous task is done: the logo is in `artwork`.",
         "Run `ls old-site` to see what is about to go.",

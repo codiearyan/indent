@@ -3,7 +3,7 @@
   "title": "Copying and moving",
   "files": ["today.txt"],
   "terminal": {
-    "description": "A shell that starts in the studio's top folder. Copy and move what the jobs ask for, then list both places to see the result.",
+    "description": "A shell that starts in the shop's top folder. Copy and move what the jobs ask for, then list both places to see the result.",
     "suggestedCommand": "ls"
   },
   "tasks": [
@@ -63,7 +63,7 @@
       "id": "copy",
       "title": "Keep a copy of the old prices",
       "file": "today.txt",
-      "description": "Maeve is about to change `prices.csv`. First make a copy of it called `prices-2025.csv` in the top folder. `prices.csv` stays where it is, unchanged.\n\nCheck compares both files with the price list the issue started with.",
+      "description": "Hesper is about to change `prices.csv`. First make a copy of it called `prices-2025.csv` in the top folder. `prices.csv` stays where it is, unchanged.\n\nCheck compares both files with the price list the issue started with.",
       "nextSteps": [
         "Make the copy with the command from the lesson, giving the new name as the second name.",
         "Run `ls` and find both names in the top folder.",
@@ -86,7 +86,7 @@
       "id": "backup",
       "title": "Back up the orders folder",
       "file": "today.txt",
-      "description": "Idris wants a backup of the whole `orders` folder before sorting it: a folder called `orders-backup` in the top folder, holding a copy of everything in `orders`, the month folders and their orders included.\n\nCheck compares every file in `orders`, as the issue started, with the one at the same place in `orders-backup`.",
+      "description": "Idris wants a backup of the whole `orders` folder before sorting it: a folder called `orders-backup` in the top folder, holding a copy of everything in `orders`, the month folders and their orders included.\n\nCheck compares every file in `orders`, as the issue started, with the one at the same place in `orders-backup`, and checks that `orders` is still there as it was.",
       "nextSteps": [
         "Look at what `orders` holds, with its subfolders: `ls orders` and `ls orders/2026`.",
         "Copy the whole folder in one command, to the new name `orders-backup`.",

@@ -79,7 +79,7 @@ export const checks = {
     if (original === null) {
       message = 'prices.csv is gone from the top folder. A copy leaves the original where it was: put prices.csv back first.'
     } else if (original !== content) {
-      message = 'prices.csv has changed since the issue started. Maeve has not changed the prices yet, so it should be as it was. Reset puts it back.'
+      message = 'prices.csv has changed since the issue started. Hesper has not changed the prices yet, so it should be as it was. Reset puts it back.'
     } else if (!isFile(ws, 'prices-2025.csv')) {
       message = otherCase(ws, 'prices-2025.csv')
         ? `There is ${otherCase(ws, 'prices-2025.csv')}, but names care about capital letters. The task asks for prices-2025.csv.`
@@ -115,11 +115,15 @@ export const checks = {
       (rel) => read(join(base, ...rel.split('/'))) !== starterText(t, `orders/${rel}`)
     )
     const output = `orders-backup:\n${filesUnder(backup).join('\n') || '(empty)'}`
-    if (!missing.length) return [check(name, true, '', output)]
-    const message =
-      missing.length === starterOrders.length
+    const lost = starterOrders.filter((rel) => at(ws, `orders/${rel}`) !== starterText(t, `orders/${rel}`))
+    if (!missing.length && !lost.length) return [check(name, true, '', output)]
+    const message = missing.length
+      ? missing.length === starterOrders.length
         ? 'orders-backup has none of the files from orders yet, or they changed on the way.'
         : `orders-backup is missing part of orders: ${missing.join(', ')}. Copy the folder with everything inside it, subfolders too.`
-    return [check(name, false, message, output)]
+      : !isDir(ws, 'orders')
+        ? 'orders-backup is complete, but orders is gone from the top folder: that was a move. A backup is a copy, and orders stays where it was. Reset puts orders back.'
+        : `orders-backup is complete, but orders has lost ${lost.join(', ')}. A backup leaves orders as it was. Reset puts the files back.`
+    return [check(name, false, message, `${output}\n\norders:\n${listing(ws, 'orders')}`)]
   }
 }

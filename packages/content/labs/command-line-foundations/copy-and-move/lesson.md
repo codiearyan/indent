@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-The studio has folders for everything now. Next, the files have to get into them. This issue is about the two commands you will use more than any other when sorting: one copies, one moves. By the end of it you will be able to:
+The shop has folders for everything now. Next, the files have to get into them. This issue is about the two commands you will use more than any other when sorting: one copies, one moves. By the end of it you will be able to:
 
 - copy a file with `cp`, to a new name or into a folder
 - copy a whole folder with `cp -r`
@@ -13,7 +13,7 @@ The studio has folders for everything now. Next, the files have to get into them
 
 The list is in `today.txt` again.
 
-> **Idris:** An invoice is lying loose in the top folder, and the fox poster has the silliest name I have ever seen. Before Maeve touches the price list, keep a copy of it as it is today. And before I start sorting orders, I want a backup of the whole folder, just in case.
+> **Idris:** An invoice is lying loose in the top folder, and the fox poster has the silliest name I have ever seen. Before Hesper touches the price list, keep a copy of it as it is today. And before I start sorting orders, I want a backup of the whole folder, just in case.
 
 ## Copying a file: cp
 

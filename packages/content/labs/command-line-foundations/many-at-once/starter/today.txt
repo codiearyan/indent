@@ -1,4 +1,4 @@
-Today's jobs, from Maeve
+Today's jobs, from Hesper
 
 1. Every drawing in downloads (the .svg files) goes in artwork.
 2. Every invoice in downloads goes in invoices/march.

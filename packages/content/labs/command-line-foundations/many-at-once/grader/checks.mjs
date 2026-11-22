@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { check, findByName, isDir, kind, listing, names, read, starterText } from '../../grading.mjs'
+import { check, filesUnder, findByName, isDir, kind, listing, names, read, starterText } from '../../grading.mjs'
 
 /** Starter files directly in `folder` whose names pass `keep`. */
 const starterNames = (t, folder, keep) =>
@@ -80,14 +80,37 @@ export const checks = {
             : 'orders has no pellow folder yet. Make it before you move anything into it.'
       return [check('All of the Pellow Bakery orders are in orders/pellow', false, message, `orders:\n${listing(ws, 'orders')}`)]
     }
+    const others = all.filter((n) => !wanted.includes(n))
     return [
       judgeMove(t, {
         from: 'orders',
         to: 'orders/pellow',
         wanted,
-        unwanted: all.filter((n) => !wanted.includes(n)),
+        unwanted: others,
         what: 'the Pellow Bakery orders'
-      })
+      }),
+      leftAlone(t, others)
     ]
   }
+}
+
+/** The pellow task also asks that orders/2026 and the other customers' orders stay as they were. */
+function leftAlone(t, others) {
+  const ws = t.workspace
+  const name = 'The 2026 folder and the other orders are left alone'
+  const output = `orders:\n${listing(ws, 'orders')}\n\norders/2026:\n${listing(ws, 'orders', '2026')}`
+  const year = filesUnder(t.chapterPath('starter/orders/2026'))
+  const strayed = year.filter((rel) => read(join(ws, 'orders', '2026', ...rel.split('/'))) !== starterText(t, `orders/2026/${rel}`))
+  const moved = others.filter((n) => kind(ws, 'orders', n) !== 'file')
+  let message
+  if (isDir(ws, 'orders', 'pellow', '2026')) {
+    message = 'The 2026 folder went into orders/pellow too. It stays in orders as it was: move it back.'
+  } else if (strayed.length) {
+    message = `${list(strayed.map((rel) => `2026/${rel}`))} ${strayed.length > 1 ? 'have' : 'has'} left orders/2026. Only the orders loose in orders move; the 2026 folder stays as it was, so put ${strayed.length > 1 ? 'them' : 'it'} back.`
+  } else if (moved.length) {
+    message = `${list(moved)} ${moved.length > 1 ? 'have' : 'has'} left orders. Orders from other customers stay where they are: move ${moved.length > 1 ? 'them' : 'it'} back to orders.`
+  } else {
+    return check(name, true, '', output)
+  }
+  return check(name, false, message, output)
 }

@@ -1,4 +1,4 @@
-Today's jobs, from Maeve
+Today's jobs, from Hesper
 
 1. artwork has a duplicate of the fox poster called "fox-poster copy.svg". Remove it.
 2. Clear the .tmp files out of downloads.

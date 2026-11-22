@@ -26,7 +26,9 @@ export const checks = {
         check(
           name,
           false,
-          'pwd prints a full path, starting with / at the top of the computer. Go into the folder, run pwd there and copy the whole line.',
+          / \/./.test(value)
+            ? 'Write only the path pwd printed, from its first / to the end, without the prompt or the command before it.'
+            : 'pwd prints a full path, starting with / at the top of the computer. Go into the folder, run pwd there and copy the whole line.',
           output
         )
       ]

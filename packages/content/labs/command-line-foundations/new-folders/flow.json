@@ -11,7 +11,7 @@
       { "from": "you", "to": "top", "label": "new names" },
       { "from": "top", "to": "inside", "label": "a path" }
     ],
-    "note": "You make the folders and the file the studio needs before anything is sorted into them."
+    "note": "You make the folders and the file the shop needs before anything is sorted into them."
   },
   "tasks": {
     "receipts": {
@@ -51,7 +51,7 @@
       "steps": [
         {
           "active": ["list", "list->you"],
-          "note": "Maeve wants a folder for rough drawings, and its name has a space."
+          "note": "Hesper wants a folder for rough drawings, and its name has a space."
         },
         {
           "active": ["you", "you->top", "top", "top->inside", "inside"],
@@ -67,7 +67,7 @@
       "steps": [
         {
           "active": ["list", "list->you"],
-          "note": "Maeve keeps a list of what to print next, and wants an empty file to start it."
+          "note": "Hesper keeps a list of what to print next, and wants an empty file to start it."
         },
         {
           "active": ["you", "you->top", "top"],

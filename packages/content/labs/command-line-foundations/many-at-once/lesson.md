@@ -2,18 +2,18 @@
 
 ## What you will be able to do
 
-Moving one file at a time works, but the studio has dozens of them. In this issue you learn to name a whole group of files in a few characters, and to hand that group to any command. By the end of it you will be able to:
+Moving one file at a time works, but the shop has dozens of them. In this issue you learn to name a whole group of files in a few characters, and to hand that group to any command. By the end of it you will be able to:
 
 - match many names with the wildcards `*` and `?`
 - test a pattern with `ls` before you use it
 - move or copy a group of files in one command
 - tell what happened when a pattern matched nothing
 
-## The request from Maeve
+## The request from Hesper
 
-Maeve wrote today's list in `today.txt`.
+Hesper wrote today's list in `today.txt`.
 
-> **Maeve:** I saved my new drawings straight into `downloads`, and the March invoices landed there too, mixed up with my price ideas and the stock count. Can you get the drawings into `artwork` and the invoices where Idris keeps them? And Idris wants all the Pellow Bakery orders in one place.
+> **Hesper:** I saved my new drawings straight into `downloads`, and the March invoices landed there too, mixed up with my price ideas and the stock count. Can you get the drawings into `artwork` and the invoices where Idris keeps them? And Idris wants all the Pellow Bakery orders in one place.
 
 `downloads` holds more than a dozen files of three kinds. Doing this one name at a time would be slow and easy to get wrong.
 
@@ -67,7 +67,7 @@ zsh: no matches found: *.jpeg
 
 bash hands the pattern to the command unchanged, and the command looks for a file that is really called `*.jpeg`, so it reports `No such file or directory`. Either way, nothing was moved. Check which folder you are in and how the names really end.
 
-When a pattern caught too much and moved files where they do not belong, move those files back with a narrower pattern or one by one. The Reset button puts every starter file back where it started, but it does not remove the files you moved, so after a Reset they are in both places.
+When a pattern caught too much and moved files where they do not belong, move those files back with a narrower pattern or one by one. The Reset button puts every starter file back where it started, but it does not remove the files you moved, so after a Reset they are in both places. A move onto a file of the same name replaces it, so moving them again leaves each file in one place.
 
 ## Your work in this issue
 

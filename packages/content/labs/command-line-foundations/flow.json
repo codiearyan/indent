@@ -1,8 +1,8 @@
 {
   "scene": {
     "nodes": [
-      { "id": "people", "label": "Maeve and Idris", "kind": "story" },
-      { "id": "laptop", "label": "Studio laptop", "kind": "data" },
+      { "id": "people", "label": "Hesper and Idris", "kind": "story" },
+      { "id": "laptop", "label": "Shop laptop", "kind": "data" },
       { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
       { "id": "sorted", "label": "Sorted folders", "kind": "data" }
     ],
@@ -11,6 +11,6 @@
       { "from": "laptop", "to": "you", "label": "messy files" },
       { "from": "you", "to": "sorted", "label": "sorted" }
     ],
-    "note": "You sort the studio laptop's files from the terminal, one command at a time."
+    "note": "You sort the shop laptop's files from the terminal, one command at a time."
   }
 }

@@ -105,7 +105,7 @@ export const checks = {
           name,
           size === 0,
           'print-queue.txt has something in it. The task asks for an empty file.',
-          `print-queue.txt: ${size} bytes`
+          `print-queue.txt: ${size} byte${size === 1 ? '' : 's'}`
         )
       ]
     }

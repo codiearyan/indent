@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { check, filesUnder, isDir, kind, listing, names, read, starterText } from '../../grading.mjs'
+import { check, filesUnder, findByContent, isDir, kind, listing, names, read, starterText } from '../../grading.mjs'
 
 const RESET = 'Nothing comes back from rm, but the Reset button puts the starter\'s files back.'
 const list = (items) => items.join(', ')
@@ -12,7 +12,10 @@ export const checks = {
     const original = read(join(ws, 'artwork', 'fox-poster.svg'))
     let message
     if (kind(ws, 'artwork', 'fox-poster.svg') !== 'file') {
-      message = `fox-poster.svg is gone from artwork too. Only the copy had to go. ${RESET}`
+      message =
+        kind(ws, 'artwork', 'fox-poster copy.svg') === 'file'
+          ? `fox-poster.svg is gone, and fox-poster copy.svg is still there: the original went instead of the copy. ${RESET}`
+          : `fox-poster.svg is gone from artwork too. Only the copy had to go. ${RESET}`
     } else if (original !== starterText(t, 'artwork/fox-poster.svg')) {
       message = 'fox-poster.svg in artwork has changed. It should be the poster as it was, untouched.'
     } else if (kind(ws, 'artwork', 'fox-poster copy.svg') !== null) {
@@ -70,7 +73,19 @@ export const checks = {
     const name = 'The old-site folder is gone'
     const ws = t.workspace
     const k = kind(ws, 'old-site')
-    if (k === null) return [check(name, true, '', listing(ws))]
+    if (k === null) {
+      const site = filesUnder(t.chapterPath('starter/old-site')).filter((rel) => rel !== 'logo.svg')
+      const left = site.flatMap((rel) => findByContent(ws, starterText(t, `old-site/${rel}`)))
+      if (!left.length) return [check(name, true, '', listing(ws))]
+      return [
+        check(
+          name,
+          false,
+          `old-site is gone from the top folder, but its files are still in the workspace, at ${left[0]}${left.length > 1 ? ` and ${left.length - 1} more` : ''}. The site goes for good: remove those too.`,
+          left.join('\n')
+        )
+      ]
+    }
     const inside = k === 'dir' ? filesUnder(join(ws, 'old-site')) : []
     const message =
       k === 'file'

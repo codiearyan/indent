@@ -21,7 +21,9 @@ export const checks = {
       const message =
         value === basename(t.workspace)
           ? 'That is only the name of the folder. Check wants its full path: the whole line pwd prints, from the first / to the end.'
-          : 'A full path starts with / at the top of the computer. Copy the whole line pwd prints.'
+          : / \/./.test(value)
+            ? 'Write only the path, from its first / to the end, without the prompt or the command before it.'
+            : 'A full path starts with / at the top of the computer. Copy the whole line pwd prints.'
       return [check(name, false, message, output)]
     }
     const answer = real(path)
@@ -67,6 +69,8 @@ export const checks = {
       message = 'Names care about capital letters. Write the name exactly as ls shows it.'
     } else if (files.some((n) => stem(n) === value)) {
       message = 'Write the whole name as ls shows it, with the part after the dot.'
+    } else if (value.split(/\s+/).some((word) => files.includes(word))) {
+      message = 'Write only the file\'s name, without the rest of the line ls printed.'
     } else {
       message = 'No file in artwork has that name. Copy the name from the listing ls prints.'
     }
@@ -95,6 +99,8 @@ export const checks = {
       message = 'The dot at the start is part of a hidden file\'s name. Write the name exactly as ls shows it.'
     } else if (hidden.some((n) => n.toLowerCase() === value.toLowerCase())) {
       message = 'Names care about capital letters. Write the name exactly as ls shows it.'
+    } else if (value.split(/\s+/).some((word) => all.includes(bare(word, 'desk')))) {
+      message = 'Write only the hidden file\'s name, without the command or the other names ls printed.'
     } else {
       message = 'No file in desk has that name. Copy the name from what ls prints for desk.'
     }

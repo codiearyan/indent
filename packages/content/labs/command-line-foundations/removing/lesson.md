@@ -2,16 +2,16 @@
 
 ## What you will be able to do
 
-The studio folder is nearly sorted. What is left is clutter: duplicates, temporary files and a whole old web site. This issue is about removing things, the one job where the terminal gives you no second chance, so it is as much about care as about commands. By the end of it you will be able to:
+The shop folder is nearly sorted. What is left is clutter: duplicates, temporary files and a whole old web site. This issue is about removing things, the one job where the terminal gives you no second chance, so it is as much about care as about commands. By the end of it you will be able to:
 
 - remove files with `rm`, one by one or with a pattern
 - remove a folder with everything inside it with `rm -r`
 - make `rm` ask before each removal with `-i`
 - check what you are about to remove before you remove it
 
-## The request from Maeve
+## The request from Hesper
 
-> **Maeve:** Let's finish this. There is a copy of the fox poster I never asked for, and `downloads` is full of `.tmp` rubbish from the printer. Sol's note says the old web site can go, but keep the logo, I still like it.
+> **Hesper:** Let's finish this. There is a copy of the fox poster I never asked for, and `downloads` is full of `.tmp` rubbish from the printer. Sol's note says the old web site can go, but keep the logo, I still like it.
 
 The list is in `today.txt`.
 

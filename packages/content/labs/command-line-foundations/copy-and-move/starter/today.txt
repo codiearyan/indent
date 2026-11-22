@@ -2,5 +2,5 @@ Today's jobs, from Idris
 
 1. invoice-0303.csv is loose in the top folder. It goes in invoices/march.
 2. Rename the fox poster in artwork to fox-poster.svg.
-3. Before Maeve changes prices.csv, keep a copy of it called prices-2025.csv.
+3. Before Hesper changes prices.csv, keep a copy of it called prices-2025.csv.
 4. A backup of the whole orders folder, called orders-backup.

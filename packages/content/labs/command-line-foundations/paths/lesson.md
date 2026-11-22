@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-In the last issue you looked at the studio laptop from one place: the folder the terminal starts in. That gets slow once folders hold folders. In this issue you move the shell itself from folder to folder, and learn the paths that tell it where to go. By the end of it you will be able to:
+In the last issue you looked at the shop laptop from one place: the folder the terminal starts in. That gets slow once folders hold folders. In this issue you move the shell itself from folder to folder, and learn the paths that tell it where to go. By the end of it you will be able to:
 
 - move into a folder and back out with `cd`
 - write a path from where you are, or from the top of the computer
@@ -11,7 +11,7 @@ In the last issue you looked at the studio laptop from one place: the folder the
 
 ## The request from Idris
 
-> **Idris:** Thanks for the map. Now I need to get around in it. Maeve wants last autumn's market notes, which are deep in `archive`. I spend my day in `orders` and keep needing the March invoices from there. And nobody can get into `client proofs`: the terminal just complains.
+> **Idris:** Thanks for the map. Now I need to get around in it. Hesper wants last autumn's market notes, which are deep in `archive`. I spend my day in `orders` and keep needing the March invoices from there. And nobody can get into `client proofs`: the terminal just complains.
 
 You answer in `notes.txt` again.
 
