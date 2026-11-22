@@ -259,7 +259,10 @@ const repos: { labId: string; expected: string[] }[] = [
       'query-strings/build',
       'query-strings/next',
       'requests/line',
-      'status-families/family'
+      'status-families/family',
+      'json/line',
+      'forms/body',
+      'redirects/kind'
     ]
   },
   {

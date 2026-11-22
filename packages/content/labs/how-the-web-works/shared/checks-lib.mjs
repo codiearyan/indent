@@ -108,8 +108,9 @@ function problem(file, fn, r) {
 
 /**
  * Runs the learner's `fn` once per case, each against a fresh server of the check's own, and
- * judges both sides. A case is { name, args, routes?, headers?, bodies?, judge(r) }, where judge gets
- * { received, outcome, printed, base } and returns a message when the case fails, or nothing.
+ * judges both sides. A case is { name, args, routes?, headers?, bodies?, judge(r) }, where judge
+ * gets { received, outcome, printed, base } and returns a message when the case fails, or nothing.
+ * `bodies` shows the body of each request in the output.
  */
 export async function cases(t, { file, fn, list }) {
   const dir = await t.sandbox({ [HARNESS]: harness })

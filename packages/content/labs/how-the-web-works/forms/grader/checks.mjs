@@ -70,9 +70,12 @@ function textProblem(fn, outcome, body) {
   return null
 }
 
-function sendCase(name, fields) {
+function sendCase(name, fields, status = 200) {
   const path = '/forms/request'
-  const body = `Thank you, request ${token()} is on the list.`
+  const body =
+    status === 200
+      ? `Thank you, request ${token()} is on the list.`
+      : `That song is already on the list, check ${token()}.`
   return {
     name,
     args: ['$base', fields],
@@ -83,7 +86,7 @@ function sendCase(name, fields) {
         method: 'POST',
         path,
         when: { header: 'content-type', startsWith: FORM_TYPE },
-        answers: [{ status: 200, body }]
+        answers: [{ status, body }]
       },
       {
         method: 'POST',
@@ -107,6 +110,9 @@ function sendCase(name, fields) {
       }
       if (!isDeepStrictEqual(entries(sent.body), Object.entries(fields)))
         return 'The server read names and values from the body that are not the fields sendRequestForm was handed. If Task 1 builds the body, get it to pass first.'
+      const v = r.outcome.value
+      if (status !== 200 && r.outcome.kind === 'returned' && v.kind !== 'string' && v.kind !== 'response')
+        return `The server turned this slip down with a ${status}, and sendRequestForm gave back ${kindText(v)}. The task asks for the text of the answer whatever the status: it says why.`
       return textProblem('sendRequestForm', r.outcome, body)
     }
   }
@@ -223,7 +229,12 @@ export const checks = {
           song: `100% Rain ${token()}`,
           from: 'the + club',
           table: '7'
-        })
+        }),
+        sendCase(
+          'Gives back the text of a refusal too',
+          { song: `Kite Hill ${token()}`, from: 'Dilys' },
+          409
+        )
       ]
     })
   },

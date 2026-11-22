@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Gethin",
+      "say": "Where did the song requests go?",
+      "note": "The form posts to an old address."
+    },
+    {
+      "title": "Old address",
+      "text": "Sends the form on, and fetch follows unseen."
+    },
+    {
+      "title": "Your code",
+      "file": "redirects.js",
+      "mine": true,
+      "gap": "Nobody sees the redirect",
+      "tasks": [
+        "Name the redirect",
+        "See where it leads",
+        "Follow, with a limit"
+      ]
+    },
+    {
+      "title": "Request form",
+      "text": "Takes song requests sent with POST."
+    }
+  ],
+  "ticket": {
+    "label": "Wyn's request",
+    "wrong": "lost",
+    "why": "Sent on",
+    "right": "found"
+  },
+  "captions": [
+    "Gethin moved the cupboard server's addresses, and song requests stopped arriving.",
+    "The old form address sends each request on, and it arrives with nothing in it.",
+    "You name each redirect, see where it leads and follow trails with a limit, in three tasks.",
+    "Gethin sees every step from the old address to the form, and where the request went.",
+    "A redirect says where to go next. How it says it decides whether your data gets there."
+  ]
+}
