@@ -11,10 +11,10 @@
     },
     { "title": "Door screen", "rows": [["Inside now"], ["Doors"]], "mark": 0 }
   ],
-  "ticket": { "label": "Visitors", "wrong": "stuck at 0", "why": "Forgets", "right": "counted" },
+  "ticket": { "label": "Visitors", "wrong": "never moves", "why": "Forgets", "right": "counted" },
   "captions": [
     "At the door, Elspeth needs to know how many visitors are inside on a busy day.",
-    "The volunteer presses In, and the number on the screen stays at 0.",
+    "The volunteer presses In, and the number on the screen does not move.",
     "You give the counter values it remembers between presses, in four tasks.",
     "Every press of In, Out and Family moves the count on the screen.",
     "Same buttons, now with a memory. The screen even says when the doors are closed."

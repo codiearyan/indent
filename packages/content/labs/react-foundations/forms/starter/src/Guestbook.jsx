@@ -31,7 +31,7 @@ export function Guestbook({ earlier, maxComment }) {
       </form>
       <div className="preview">
         <p>
-          <span className="name"></span>, <span className="from"></span>
+          <span className="name"></span> <span className="from"></span>
         </p>
         <p className="comment"></p>
       </div>
@@ -39,7 +39,7 @@ export function Guestbook({ earlier, maxComment }) {
         {entries.map((entry) => (
           <li key={entry.id}>
             <p>
-              <span className="name">{entry.name}</span>, <span className="from">{entry.from}</span>
+              <span className="name">{entry.name}</span> <span className="from">{entry.from}</span>
             </p>
             <p className="comment">{entry.comment}</p>
           </li>

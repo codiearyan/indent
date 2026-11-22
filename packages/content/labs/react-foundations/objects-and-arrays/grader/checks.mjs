@@ -56,7 +56,6 @@ function shows(page, want) {
     total(page) === `Total ${pence(sum)}`
   )
 }
-const wanted = (want) => want.map(([it, qty]) => `${it.name} x ${qty}`).join(', ') || '(empty)'
 
 async function addItem(page, it) {
   const li = page.$$('#root .stock-list > li').find((row) => clean(row.querySelector('.name')?.textContent) === it.name)
@@ -254,7 +253,7 @@ export const checks = {
           `Adding ${order.length} items puts ${order.length} lines in the basket`,
           shows(page, want),
           message,
-          `${log.join('\n')}\nexpected: ${wanted(want)}, Total ${pence(want.reduce((s, [it]) => s + it.pricePence, 0))}\nshown total: ${total(page) || '(none)'}`
+          `${log.join('\n')}\nshown total: ${total(page) || '(none)'}`
         )
       )
       if (!results.at(-1).passed) return results
@@ -298,7 +297,7 @@ export const checks = {
         'Adding the same item again raises its quantity',
         shows(page, want),
         message,
-        `${log.join('\n')}\nexpected: ${wanted(want)}, Total ${pence(RULER.pricePence * 3 + BELL.pricePence)}\nshown total: ${total(page) || '(none)'}${doubled.length ? `\n${shorten(doubled[0])}` : ''}`
+        `${log.join('\n')}\nshown total: ${total(page) || '(none)'}${doubled.length ? `\n${shorten(doubled[0])}` : ''}`
       )
     ]
   },

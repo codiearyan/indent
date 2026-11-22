@@ -297,6 +297,11 @@ textarea {
   display: block;
 }
 
+/* The comma between a name and a place, only when there is a place to show. */
+.from:not(:empty)::before {
+  content: ', ';
+}
+
 .who {
   font-weight: 600;
 }
