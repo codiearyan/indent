@@ -1,0 +1,103 @@
+{
+  "id": "page-structure",
+  "title": "The parts of a page",
+  "files": ["index.html"],
+  "terminal": {
+    "description": "The page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "header",
+      "title": "Mark the top of the page",
+      "file": "index.html",
+      "description": "The studio name and the Jump to links are the top of the page.\n\n- wrap them in a `header`, outside the main content\n- inside the header, put the Jump to links in a `nav`\n\nThe check finds the main heading and looks for the header around it, then for a nav in that header that holds the three Jump to links.",
+      "nextSteps": [
+        "Read \"Landmarks\" in the lesson.",
+        "Open a header before the main heading and close it after the Jump to line.",
+        "If the studio picture sits between them, move it below the Jump to line, out of the header.",
+        "Wrap the Jump to line in a nav, save and press Check."
+      ],
+      "hints": [
+        "Both new elements are named after their job: the top of a page, and the links you navigate with.",
+        "The nav sits inside the header, and the paragraph with the links can stay inside the nav.",
+        "The shape is `<header>`, the `h1`, then `<nav>` around the Jump to paragraph and `</nav>`, then `</header>`."
+      ],
+      "docs": [
+        { "title": "<header>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/header" },
+        { "title": "<nav>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/nav" },
+        { "title": "Structuring documents", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Structuring_documents" }
+      ],
+      "videos": [
+        { "title": "Why headings and landmarks matter", "url": "https://www.youtube.com/watch?v=vAAzdi1xuUY" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "main",
+      "title": "Mark the main content",
+      "file": "index.html",
+      "description": "Everything between the header and the small print is the main content: the studio picture, the welcome, the divider and the three parts.\n\nWrap it all in one `main`. The header and the small print stay outside it.\n\nThe check counts the main elements, looks for the welcome and the three section headings inside it, and makes sure the header and the small print are not.",
+      "nextSteps": [
+        "Find where the header ends and where the small print starts.",
+        "Open a main right after the header.",
+        "Close it just before the small print.",
+        "Save, check the page looks the same, and press Check."
+      ],
+      "hints": [
+        "This element marks the content that is the reason the page exists. A page has exactly one.",
+        "It opens after the closing header tag and closes before the paragraph with the small print.",
+        "Add `<main>` after `</header>` and `</main>` before the small print paragraph."
+      ],
+      "docs": [
+        { "title": "<main>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/main" },
+        { "title": "Structuring documents", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Structuring_documents" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sections",
+      "title": "Give each part a section",
+      "file": "index.html",
+      "description": "Inside main, Classes, The shop and Visit us are three parts, each with its own heading.\n\nWrap each part in a `section` that starts with its heading and runs to just before the next heading. Keep the ids on the headings.\n\nThe check finds each heading, looks for the section around it, makes sure the heading leads it and that it holds the rest of its part, and that the sections are inside main.",
+      "nextSteps": [
+        "Read \"Sections\" in the lesson.",
+        "Open a section right before the Classes heading.",
+        "Close it just before The shop heading, and open the next one there.",
+        "Do the same for Visit us, save and press Check."
+      ],
+      "hints": [
+        "A section starts at a heading and ends where the next part begins.",
+        "The last section ends just before the closing main tag.",
+        "Each part becomes `<section>`, its `h2`, everything under it, then `</section>`, three times."
+      ],
+      "docs": [
+        { "title": "<section>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/section" },
+        { "title": "Structuring documents", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Structuring_documents" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "footer",
+      "title": "Mark the end of the page",
+      "file": "index.html",
+      "description": "The small print at the bottom, `Kilnworth Pottery, 14 Saddler Street, Ostley. Words and drawings by Dilys.`, is the end of the page.\n\nWrap it in a `footer`, after main and outside it. Keep its words as they are.\n\nThe check finds the small print and looks for the footer around it, outside main.",
+      "nextSteps": [
+        "Find the small print at the end of the body.",
+        "Make sure it sits after the closing main tag.",
+        "Wrap it in the element for the end of a page.",
+        "Save and press Check."
+      ],
+      "hints": [
+        "This is the last of the four landmarks in the lesson.",
+        "It goes around the small print paragraph, after main closes.",
+        "Wrap the paragraph in `<footer>` and `</footer>`."
+      ],
+      "docs": [
+        { "title": "<footer>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/footer" },
+        { "title": "Structuring documents", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Structuring_documents" }
+      ],
+      "points": 10
+    }
+  ]
+}

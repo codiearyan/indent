@@ -1,0 +1,191 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "pictures",
+        "label": "pictures folder",
+        "kind": "data"
+      },
+      {
+        "id": "html",
+        "label": "index.html",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "browser",
+        "label": "Browser",
+        "kind": "story"
+      },
+      {
+        "id": "reader",
+        "label": "Screen reader",
+        "kind": "story"
+      },
+      {
+        "id": "visitor",
+        "label": "Visitor",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "html",
+        "to": "pictures",
+        "label": "src"
+      },
+      {
+        "from": "html",
+        "to": "browser",
+        "label": "images"
+      },
+      {
+        "from": "html",
+        "to": "reader",
+        "label": "alt text"
+      },
+      {
+        "from": "browser",
+        "to": "visitor",
+        "label": "sees"
+      },
+      {
+        "from": "reader",
+        "to": "visitor",
+        "label": "hears"
+      }
+    ],
+    "note": "Each picture is a file in the pictures folder that index.html points at, with words for anyone who cannot see it."
+  },
+  "tasks": {
+    "studio-picture": {
+      "steps": [
+        {
+          "active": [
+            "pictures"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "in the pictures folder",
+            "values": [
+              "studio.svg",
+              "mug.svg",
+              "divider.svg"
+            ]
+          },
+          "note": "Dilys's drawings are files in the pictures folder, next to index.html."
+        },
+        {
+          "active": [
+            "html",
+            "html->pictures",
+            "pictures"
+          ],
+          "note": "Add an image under the main heading whose source is the address of the studio drawing, starting from where index.html is."
+        },
+        {
+          "active": [
+            "html",
+            "html->browser",
+            "browser",
+            "browser->visitor",
+            "visitor"
+          ],
+          "note": "The browser fetches the file and shows the studio front, so visitors recognise it on the street."
+        }
+      ]
+    },
+    "alt-text": {
+      "steps": [
+        {
+          "active": [
+            "html",
+            "html->reader",
+            "reader"
+          ],
+          "note": "A screen reader cannot see a picture. It reads out the picture's alt text, or the file name when there is none."
+        },
+        {
+          "active": [
+            "html"
+          ],
+          "note": "Describe what the studio drawing shows in a few words, and give the divider an empty alt because it is only decoration."
+        },
+        {
+          "active": [
+            "reader",
+            "reader->visitor",
+            "visitor"
+          ],
+          "note": "Dilys's friend hears what the studio looks like, and the divider is skipped."
+        }
+      ]
+    },
+    "size": {
+      "steps": [
+        {
+          "active": [
+            "browser"
+          ],
+          "note": "Until the file arrives, the browser does not know how much room the picture needs, so the text below jumps."
+        },
+        {
+          "active": [
+            "html"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "from the first line of studio.svg",
+            "values": [
+              "width",
+              "height"
+            ]
+          },
+          "note": "Read the drawing's real width and height from its file, and write them on its image element."
+        },
+        {
+          "active": [
+            "html",
+            "html->browser",
+            "browser"
+          ],
+          "note": "The browser keeps the right space from the start, and nothing moves when the picture appears."
+        }
+      ]
+    },
+    "figure": {
+      "steps": [
+        {
+          "active": [
+            "html"
+          ],
+          "note": "In the shop section, the line about the mug of the month has no picture beside it."
+        },
+        {
+          "active": [
+            "html",
+            "html->pictures",
+            "pictures"
+          ],
+          "note": "Add the mug drawing, with alt text that says how it looks."
+        },
+        {
+          "active": [
+            "html"
+          ],
+          "note": "Group the picture and the line in a figure, with the line as its caption."
+        },
+        {
+          "active": [
+            "html",
+            "html->browser",
+            "browser",
+            "browser->visitor",
+            "visitor"
+          ],
+          "note": "The mug and its name show together, and both belong to one figure."
+        }
+      ]
+    }
+  }
+}

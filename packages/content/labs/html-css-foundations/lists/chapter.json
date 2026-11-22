@@ -1,0 +1,81 @@
+{
+  "id": "lists",
+  "title": "Lists",
+  "files": ["index.html"],
+  "terminal": {
+    "description": "The page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "bring-list",
+      "title": "List what to bring",
+      "file": "index.html",
+      "description": "Under Classes, the line `What to bring: ...` names four things: an apron or an old shirt, a small towel, a hair tie, and a bag for wet clay.\n\nTurn them into a list with one item each. Their order does not matter. Keep a short paragraph, `What to bring:`, before the list.\n\nThe check finds the list that holds the four things, each in its own item, and looks at which kind of list it is.",
+      "nextSteps": [
+        "Read \"Bulleted lists\" in the lesson.",
+        "Shorten the paragraph so it only introduces the list.",
+        "Add a list after it, with each thing to bring as one item.",
+        "Save, look at the bullets in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "Ask whether the meaning changes if the four things are shuffled. That picks the kind of list.",
+        "The list for things in no special order draws bullets. Each thing is a list item inside it.",
+        "Write a `ul` with four `li` elements: the apron, the towel, the hair tie and the bag."
+      ],
+      "docs": [
+        { "title": "<ul>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/ul" },
+        { "title": "<li>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/li" },
+        { "title": "Lists", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Lists" }
+      ],
+      "videos": [
+        { "title": "Bulleted and numbered lists", "url": "https://www.youtube.com/watch?v=eL5fsojMe4w" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "steps",
+      "title": "Number the steps of a first class",
+      "file": "index.html",
+      "description": "The paragraph about a first wheel class describes four steps: wedge the clay, centre it on the wheel, open it up and pull up the walls, and cut it off and leave it to dry.\n\nTurn them into a list with one step per item, in the order Kofi wrote them. Keep a short paragraph before it that introduces the steps.\n\nThe check finds the list that holds the four steps, looks at which kind of list it is, and reads the steps in order.",
+      "nextSteps": [
+        "Read \"Numbered lists\" in the lesson.",
+        "Find where each step starts in Kofi's paragraph.",
+        "Move each step into its own item, without typing any numbers.",
+        "Save, look at the numbers in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "Here the order matters: you cannot centre clay you have not wedged.",
+        "The list that numbers its items is not the one you used for what to bring.",
+        "Write an `ol` with four `li` elements in Kofi's order. Words like First and Then can go, because the numbers say it."
+      ],
+      "docs": [
+        { "title": "<ol>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/ol" },
+        { "title": "Lists", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Lists" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "nested",
+      "title": "Group what is on the shelves",
+      "file": "index.html",
+      "description": "Under The shop, the line `On the shelves: ...` has three things, and two of them come in kinds.\n\n- Make one list whose items start with `Mugs`, `Bowls` and `Plates`.\n- Inside the mugs item, a list of its kinds: small and tall.\n- Inside the bowls item, a list of its kinds: cereal and serving.\n\nThe check finds the list of mugs, bowls and plates, then looks for a list inside the mugs item and inside the bowls item that holds their kinds.",
+      "nextSteps": [
+        "Read \"Lists inside lists\" in the lesson.",
+        "Make the outer list of three items first, and save.",
+        "Inside the mugs item, after the word Mugs, add a list of its kinds.",
+        "Do the same for bowls, save and press Check."
+      ],
+      "hints": [
+        "Build it in two passes: the outer list first, then the lists inside two of its items.",
+        "An inner list goes inside the item it belongs to, before that item's closing tag.",
+        "The mugs item looks like `<li>Mugs <ul><li>small</li><li>tall</li></ul></li>`. The bowls item follows the same shape."
+      ],
+      "docs": [
+        { "title": "<li>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/li" },
+        { "title": "Lists", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Lists" }
+      ],
+      "points": 10
+    }
+  ]
+}

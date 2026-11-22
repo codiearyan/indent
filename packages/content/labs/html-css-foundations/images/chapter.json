@@ -1,0 +1,105 @@
+{
+  "id": "images",
+  "title": "Pictures on the page",
+  "files": ["index.html"],
+  "terminal": {
+    "description": "The page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "studio-picture",
+      "title": "Show the picture of the studio",
+      "file": "index.html",
+      "description": "Show the drawing of the studio front just under the main heading in `index.html`. The file is `studio.svg`, in the `pictures` folder next to `index.html`.\n\nThe check looks for an image of `studio.svg` and makes sure its address leads to the real file.",
+      "nextSteps": [
+        "Read \"The image element\" in the lesson.",
+        "Add an image element right after the main heading.",
+        "Point its source at the file, starting from the folder `index.html` is in.",
+        "Save, look for the drawing in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "An image has no closing tag. The file goes in an attribute.",
+        "The address is relative, like a link to another page, and the file is one folder down.",
+        "Write an `img` whose `src` is the folder name, a slash and the file name."
+      ],
+      "docs": [
+        { "title": "<img>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img" },
+        { "title": "HTML images", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/HTML_images" }
+      ],
+      "videos": [
+        { "title": "Images in HTML in three minutes", "url": "https://www.youtube.com/watch?v=Hh_se2Zqsdk" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "alt-text",
+      "title": "Describe the pictures",
+      "file": "index.html",
+      "description": "Give both pictures on the page the alt text they need.\n\n- The studio picture shows something a visitor should know about. Describe what it shows in a few words.\n- The wavy divider is only decoration. Mark it so a screen reader skips it.\n\nThe check reads the alt text of each picture. A description is at least three words, is not a file name, and does not start with \"picture of\".",
+      "nextSteps": [
+        "Read \"Alt text\" in the lesson.",
+        "Look at the studio drawing and say out loud what is in it.",
+        "Write that as the studio picture's alt text.",
+        "Give the divider the alt value for decoration, save and press Check."
+      ],
+      "hints": [
+        "Imagine telling someone on the phone what the studio drawing shows, in one short sentence.",
+        "Decoration still gets an alt attribute. Leaving it out is not the same as leaving it empty.",
+        "The studio picture gets `alt=\"...\"` with your sentence in it. The divider gets `alt=\"\"`, two quotes with nothing between them."
+      ],
+      "docs": [
+        { "title": "<img>: the alt attribute", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img#alt" },
+        { "title": "HTML images", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/HTML_images" }
+      ],
+      "videos": [
+        { "title": "Writing good alt text", "url": "https://www.youtube.com/watch?v=CizNbSuRRew" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "size",
+      "title": "Give the studio picture its size",
+      "file": "index.html",
+      "description": "Tell the browser how big the studio picture is before it loads, so the text under it does not jump. Its real size is written on the first line of `pictures/studio.svg`.\n\nThe check reads the width and height attributes of the studio picture and compares them with the file.",
+      "nextSteps": [
+        "Read \"Width and height\" in the lesson.",
+        "Open `pictures/studio.svg` from the files list and find its width and height on the first line.",
+        "Add the two size attributes to the studio picture.",
+        "Save and press Check."
+      ],
+      "hints": [
+        "The size goes in two attributes on the image element, one for each direction.",
+        "The numbers come from the svg file. Copy them as plain numbers, without `px`.",
+        "Add `width=\"640\"` and `height=\"400\"` to the studio picture."
+      ],
+      "docs": [
+        { "title": "<img>: the width attribute", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img#width" },
+        { "title": "HTML images", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/HTML_images" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "figure",
+      "title": "Caption the mug of the month",
+      "file": "index.html",
+      "description": "In the shop section, the line `Mug of the month: ...` should sit under a picture of the mug.\n\n- show `pictures/mug.svg` with alt text that says what the mug looks like\n- group the picture and the line in a figure, with the line as its caption\n\nThe check looks for the mug picture inside a figure, the caption inside the same figure, and the mug's alt text.",
+      "nextSteps": [
+        "Read \"Figures and captions\" in the lesson.",
+        "Wrap the line about the mug of the month in a figure.",
+        "Add the mug picture inside the figure, then turn the line into its caption.",
+        "Save, look at the shop section in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "Two new elements work together here: one around the whole group, one around the caption.",
+        "The paragraph around the caption line is replaced by the caption element. The picture sits next to it, inside the group.",
+        "Use `<figure>` around an `img` of the mug and a `<figcaption>` that holds the line."
+      ],
+      "docs": [
+        { "title": "<figure>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/figure" },
+        { "title": "<figcaption>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/figcaption" }
+      ],
+      "points": 10
+    }
+  ]
+}

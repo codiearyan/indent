@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Kofi",
+      "say": "When is the Thursday class?",
+      "note": "Visitors keep asking him."
+    },
+    {
+      "title": "Home page",
+      "text": "Says the times are on the classes page.",
+      "note": "Nothing leads there."
+    },
+    {
+      "title": "Your links",
+      "file": "index.html",
+      "mine": true,
+      "gap": "No way to get there",
+      "tasks": ["Link to classes", "Link back home", "Jump to sections", "Email and call"]
+    },
+    {
+      "title": "Classes page",
+      "rows": [["Thursday wheel class"], ["Saturday handbuilding"]],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Thursday class",
+    "wrong": "stuck",
+    "why": "No links",
+    "right": "one click"
+  },
+  "captions": [
+    "Visitors keep asking Kofi when his Thursday wheel class is.",
+    "The times are on his new classes page, but nothing on the home page leads there.",
+    "You link the pages both ways, add jump links, and make email and phone links.",
+    "One click from the home page and the Thursday class is right there.",
+    "Same two pages. Now they work as one small site."
+  ]
+}

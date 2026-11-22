@@ -1,0 +1,102 @@
+{
+  "id": "links",
+  "title": "Links between pages",
+  "files": ["index.html", "classes.html"],
+  "terminal": {
+    "description": "The page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "to-classes",
+      "title": "Link the home page to the classes page",
+      "file": "index.html",
+      "description": "Under Classes in `index.html`, the sentence says times and prices are on the classes page. Make the words `classes page` a link to `classes.html`.\n\nUse a relative address: both files sit in the same folder. The check looks for a link on the home page that leads to `classes.html`, and makes sure its words say where it goes.",
+      "nextSteps": [
+        "Read \"The anchor element\" and \"Addresses: full and relative\" in the lesson.",
+        "Find the sentence about the classes page under Classes.",
+        "Wrap the words that name the page in a link with the right address.",
+        "Save, click the link in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "A link wraps the words a visitor clicks. The address goes in an attribute on the opening tag.",
+        "Both pages are in the same folder, so the address is only the file name.",
+        "The words become `<a href=\"...\">classes page</a>`, with the other page's file name in the quotes."
+      ],
+      "docs": [
+        { "title": "<a>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a" },
+        { "title": "Creating links", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Creating_links" }
+      ],
+      "videos": [
+        { "title": "Links, from the first tag", "url": "https://www.youtube.com/watch?v=tsEQgGjSmkM" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "back-home",
+      "title": "Link back from the classes page",
+      "file": "classes.html",
+      "description": "At the top of `classes.html`, make `Back to Kilnworth Pottery` a link to the home page, `index.html`.\n\nThe check opens `classes.html` and looks for a link that leads to the home page and has words a visitor can read.",
+      "nextSteps": [
+        "Open `classes.html`.",
+        "Find the line about going back at the top.",
+        "Wrap its words in a link to the home page.",
+        "Save and press Check. To try it, follow your first link in the Browser panel and click this one."
+      ],
+      "hints": [
+        "This is the same kind of link as the first task, in the other direction.",
+        "The home page is the file the Browser panel opens first. It sits in the same folder.",
+        "Wrap the whole line in `<a href=\"index.html\">` and `</a>`."
+      ],
+      "docs": [
+        { "title": "<a>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a" },
+        { "title": "Creating links", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Creating_links" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "jump-links",
+      "title": "Jump to each section",
+      "file": "index.html",
+      "description": "Near the top of `index.html` is a line that says `Jump to: Classes, The shop, Visit us`. Make each of those words a link to its section on the same page.\n\n- give the headings the ids `classes`, `shop` and `visit`\n- link `Classes`, `The shop` and `Visit us` to them\n\nThe check looks for each id on its heading, and for a link to each one.",
+      "nextSteps": [
+        "Read \"Jumping within a page\" in the lesson.",
+        "Add an `id` to each of the three section headings.",
+        "Wrap each word after \"Jump to\" in a link to its id.",
+        "Save, click each link in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "A link to a part of the same page has two halves: a name on the part, and a link that uses the name.",
+        "The name is an `id` attribute on the heading. The link's address is that id with one character in front.",
+        "For example `<h2 id=\"shop\">The shop</h2>` and `<a href=\"#shop\">The shop</a>`. Do the same for the other two."
+      ],
+      "docs": [
+        { "title": "The id attribute", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/id" },
+        { "title": "Creating links", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Creating_links" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "contact",
+      "title": "Make the email and phone number links",
+      "file": "index.html",
+      "description": "Under Visit us, the last line gives the studio's email address and phone number.\n\n- clicking `hello@kilnworth.example` starts a new email to it\n- tapping `01632 960418` offers to call it. The number is in the UK, so the international form starts `+44`\n\nThe text on the page stays as it is. The check looks for an email link to the studio's address and a phone link with the studio's number.",
+      "nextSteps": [
+        "Read \"Email and phone links\" in the lesson.",
+        "Wrap the email address in a link with the scheme for email.",
+        "Wrap the phone number in a link with the scheme for calls.",
+        "Save and press Check."
+      ],
+      "hints": [
+        "These are ordinary links. Only the start of the address is different.",
+        "The email scheme is a word that ends in `to:`. The phone scheme is three letters and a colon.",
+        "Use `mailto:` followed by the address, and `tel:` followed by `+44` and the number without its first 0 or any spaces."
+      ],
+      "docs": [
+        { "title": "<a>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a" },
+        { "title": "Creating links", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Creating_links" }
+      ],
+      "points": 10
+    }
+  ]
+}

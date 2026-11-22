@@ -1,0 +1,102 @@
+{
+  "id": "headings-and-paragraphs",
+  "title": "Headings, paragraphs and emphasis",
+  "files": ["index.html"],
+  "terminal": {
+    "description": "The page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "headings",
+      "title": "Turn the section titles into headings",
+      "file": "index.html",
+      "description": "In the text Kofi pasted, `Classes`, `The shop` and `Visit us` are the titles of three sections. Make each one a heading one level below the main heading.\n\n- the studio name stays the one main heading\n- the words of each title stay exactly as they are\n- going down the page, no heading level is skipped\n\nThe check reads every heading on the page, in order, with its level.",
+      "nextSteps": [
+        "Find the three titles inside the big paragraph.",
+        "Decide which level sits just below the studio name.",
+        "Wrap each title in a heading of that level. The paragraph around them will need closing and opening again, which the next task finishes.",
+        "Save, look at the Browser panel and press Check."
+      ],
+      "hints": [
+        "A heading cannot sit inside a paragraph. Close the paragraph before each title.",
+        "The studio name is level one. Each section title is the next level down.",
+        "Each title becomes an `h2`, for example `<h2>The shop</h2>`, with the paragraph closed before it."
+      ],
+      "docs": [
+        { "title": "<h1> to <h6> heading elements", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements" },
+        { "title": "Headings and paragraphs", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Headings_and_paragraphs" }
+      ],
+      "videos": [
+        { "title": "Paragraphs and headings", "url": "https://www.youtube.com/watch?v=yqcd-XkxZNM" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "paragraphs",
+      "title": "Give each idea its own paragraph",
+      "file": "index.html",
+      "description": "Split the rest of Kofi's text into paragraphs. Each of these is one paragraph of its own:\n\n- the classes text, from `Kofi teaches` to `no wheel at all.`\n- the line about clothes\n- the shop text, from `Everything on our shelves` to `come back often.`\n- the line about the kiln\n- the three lines of the address\n- the opening hours\n\nNo paragraph holds a section title. The check finds the paragraph around each piece and makes sure no two pieces share one.",
+      "nextSteps": [
+        "Read \"One idea per paragraph\" in the lesson.",
+        "Under each heading, find where one idea ends and the next begins.",
+        "Wrap each piece in its own paragraph, and remove any paragraph tags left around the headings.",
+        "Save and press Check."
+      ],
+      "hints": [
+        "The blank lines Kofi typed show where the pieces split. The browser ignores them, so each piece needs tags.",
+        "Count the pieces in the task: six paragraphs, and the headings stand between them.",
+        "Under Classes there are two paragraphs, under The shop two, and under Visit us two: the address and the opening hours."
+      ],
+      "docs": [
+        { "title": "<p>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/p" },
+        { "title": "Headings and paragraphs", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Headings_and_paragraphs" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "emphasis",
+      "title": "Mark what is important and what is stressed",
+      "file": "index.html",
+      "description": "Two bits of Kofi's text need more than plain words.\n\n- The line about clothes is a warning nobody should miss. Mark the whole line as important.\n- In the line about the kiln, the word `Saturday` is said with stress. Stress that one word.\n\nUse the elements that carry meaning, not the ones that only change the look. The check looks for the important line and the stressed word by the elements around them.",
+      "nextSteps": [
+        "Read \"Important or stressed\" in the lesson.",
+        "Wrap the line about clothes, inside its paragraph.",
+        "Wrap only the word Saturday in the line about the kiln.",
+        "Save and press Check."
+      ],
+      "hints": [
+        "Important and stressed are two different elements. Bold and italic tags would look the same but mean nothing.",
+        "The element for importance is shown in bold. The element for stress is shown in italics.",
+        "Use `strong` around the line about clothes and `em` around the one word, both inside their paragraphs."
+      ],
+      "docs": [
+        { "title": "<strong>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/strong" },
+        { "title": "<em>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/em" },
+        { "title": "Emphasis and importance", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Emphasis_and_importance" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "address-lines",
+      "title": "Keep the address on its lines",
+      "file": "index.html",
+      "description": "The studio's address is three lines: the street, the town and the postcode. Keep it in one paragraph of its own, and make each part start on a new line.\n\nThe check finds the paragraph with the postcode, makes sure it holds the street and the town and nothing else, and counts the line breaks in it.",
+      "nextSteps": [
+        "Read \"Line breaks\" in the lesson.",
+        "Find the paragraph that holds the address.",
+        "Break the line after the street and after the town.",
+        "Save, check the address in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "This is the one place where a new line belongs inside a paragraph, because the lines are part of the address.",
+        "The element for a line break has no content and no closing tag.",
+        "Put a `br` at the end of the street line and another at the end of the town line."
+      ],
+      "docs": [
+        { "title": "<br>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/br" }
+      ],
+      "points": 10
+    }
+  ]
+}

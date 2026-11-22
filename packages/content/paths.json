@@ -8,10 +8,8 @@
       {
         "title": "HTML and CSS",
         "labs": [
+          "html-css-foundations",
           "web-pages"
-        ],
-        "soon": [
-          "HTML and CSS foundations"
         ]
       },
       {
@@ -167,6 +165,7 @@
       {
         "title": "The page",
         "labs": [
+          "html-css-foundations",
           "web-pages"
         ]
       },

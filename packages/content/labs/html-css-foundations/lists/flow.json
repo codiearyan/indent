@@ -1,0 +1,87 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kofi", "label": "Kofi", "kind": "story" },
+      { "id": "lines", "label": "Lines with commas", "kind": "data" },
+      { "id": "html", "label": "index.html", "kind": "file", "mine": true },
+      { "id": "reader", "label": "Screen reader", "kind": "story" },
+      { "id": "students", "label": "New students", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kofi", "to": "lines", "label": "writes" },
+      { "from": "lines", "to": "html", "label": "sentences" },
+      { "from": "html", "to": "reader", "label": "lists" },
+      { "from": "html", "to": "students", "label": "checklists" }
+    ],
+    "note": "Kofi's lists arrive as sentences, and the right kind of list turns each one into something students can scan and count."
+  },
+  "tasks": {
+    "bring-list": {
+      "steps": [
+        {
+          "active": ["kofi", "kofi->lines", "lines"],
+          "value": {
+            "kind": "array",
+            "label": "what to bring",
+            "values": ["apron or old shirt", "small towel", "hair tie", "bag for wet clay"]
+          },
+          "note": "Kofi wrote what to bring as one line, with the four things split by commas."
+        },
+        {
+          "active": ["lines", "lines->html", "html"],
+          "note": "Their order does not matter, so they become the items of a bulleted list, after a short line that introduces it."
+        },
+        {
+          "active": ["html", "html->students", "students", "html->reader", "reader"],
+          "note": "Students see a checklist, and a screen reader says how many things there are before reading them."
+        }
+      ]
+    },
+    "steps": {
+      "steps": [
+        {
+          "active": ["lines"],
+          "value": {
+            "kind": "array",
+            "label": "a first wheel class",
+            "values": ["wedge", "centre", "open and pull up", "cut off and dry"]
+          },
+          "note": "The first wheel class is four steps in one paragraph."
+        },
+        {
+          "active": ["html"],
+          "note": "Here the order matters, so each step becomes an item of a numbered list, in Kofi's order."
+        },
+        {
+          "active": ["html", "html->students", "students"],
+          "note": "The browser numbers the steps, and a student can follow them one by one."
+        }
+      ]
+    },
+    "nested": {
+      "steps": [
+        {
+          "active": ["lines"],
+          "value": {
+            "kind": "map",
+            "label": "on the shelves",
+            "entries": [
+              { "key": "mugs", "value": "two kinds" },
+              { "key": "bowls", "value": "two kinds" },
+              { "key": "plates", "value": "one kind" }
+            ]
+          },
+          "note": "The shop line names three things, and two of them come in kinds."
+        },
+        {
+          "active": ["html"],
+          "note": "Mugs, bowls and plates become one list. Inside the mugs item and the bowls item goes a list of their kinds."
+        },
+        {
+          "active": ["html", "html->reader", "reader"],
+          "note": "The groups are clear on screen and to a screen reader, which hears the inner lists as part of their items."
+        }
+      ]
+    }
+  }
+}

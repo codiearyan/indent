@@ -1,0 +1,97 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "visitor", "label": "Visitor", "kind": "story" },
+      { "id": "home", "label": "index.html", "kind": "file", "mine": true },
+      { "id": "classes", "label": "classes.html", "kind": "file", "mine": true },
+      { "id": "sections", "label": "Page sections", "kind": "data" },
+      { "id": "studio", "label": "The studio", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "visitor", "to": "home", "label": "arrives" },
+      { "from": "home", "to": "classes", "label": "link" },
+      { "from": "home", "to": "sections", "label": "jump" },
+      { "from": "home", "to": "studio", "label": "email, call" }
+    ],
+    "note": "Links turn two separate files into a small site, and let a visitor reach a section, an email or a call in one click."
+  },
+  "tasks": {
+    "to-classes": {
+      "steps": [
+        {
+          "active": ["visitor", "visitor->home", "home"],
+          "note": "A visitor wants class times. The home page says they are on the classes page, but nothing leads there."
+        },
+        {
+          "active": ["home"],
+          "note": "Wrap the words that name the classes page in a link, with the other file's name as its address."
+        },
+        {
+          "active": ["home", "home->classes", "classes"],
+          "note": "One click takes the visitor from the home page to Kofi's classes page."
+        }
+      ]
+    },
+    "back-home": {
+      "steps": [
+        {
+          "active": ["classes"],
+          "note": "On the classes page, the line about going back is plain text, so the visitor is stuck."
+        },
+        {
+          "active": ["classes"],
+          "note": "Make that line a link to the home page, in the same folder."
+        },
+        {
+          "active": ["classes", "home->classes", "home"],
+          "note": "The visitor can move between the two pages in both directions."
+        }
+      ]
+    },
+    "jump-links": {
+      "steps": [
+        {
+          "active": ["sections"],
+          "value": {
+            "kind": "array",
+            "label": "sections to jump to",
+            "values": ["Classes", "The shop", "Visit us"]
+          },
+          "note": "The home page has three sections, and the Jump to line names them."
+        },
+        {
+          "active": ["home"],
+          "note": "Give each section heading a name with an id, so a link can point at it."
+        },
+        {
+          "active": ["home", "home->sections", "sections"],
+          "note": "Each word on the Jump to line links to its id, and the page scrolls straight there."
+        }
+      ]
+    },
+    "contact": {
+      "steps": [
+        {
+          "active": ["home"],
+          "value": {
+            "kind": "map",
+            "label": "under Visit us",
+            "entries": [
+              { "key": "email", "value": "hello@kilnworth.example" },
+              { "key": "phone", "value": "01632 960418" }
+            ]
+          },
+          "note": "Under Visit us, the email address and the phone number are plain text."
+        },
+        {
+          "active": ["home"],
+          "note": "Wrap each one in a link whose address starts with the scheme for email or for calls."
+        },
+        {
+          "active": ["visitor", "home", "home->studio", "studio"],
+          "note": "A tap on a phone starts an email or a call to the studio, with nothing to copy by hand."
+        }
+      ]
+    }
+  }
+}
