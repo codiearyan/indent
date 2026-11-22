@@ -54,6 +54,21 @@ describe('workspace files', () => {
     expect(files[1].content).toBe('main')
   })
 
+  it('reads a dot file only when the chapter lists it, and never a dot folder', async () => {
+    const dir = await tree({
+      'shop/.gitignore': 'drafts/',
+      'shop/.env': 'secret',
+      '.git/config': 'core',
+      'shop/index.html': 'page'
+    })
+    const listed = ['shop/.gitignore', '.git/config']
+    expect((await readWorkspace(dir, listed)).map((f) => f.path)).toEqual([
+      'shop/.gitignore',
+      'shop/index.html'
+    ])
+    expect((await readWorkspace(dir, [])).map((f) => f.path)).toEqual(['shop/index.html'])
+  })
+
   it('creates an empty folder when the chapter has no starter', async () => {
     const dir = join(await mkdtemp(join(tmpdir(), 'indent-ws-')), 'w')
     await copyStarter(join(dir, 'no-starter'), dir)
