@@ -1,0 +1,162 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "imogen", "label": "Imogen", "kind": "story" },
+      { "id": "shapes", "label": "Named shapes", "kind": "data", "mine": true },
+      { "id": "line", "label": "lineGrams()", "kind": "function", "mine": true, "fn": "lineGrams" },
+      {
+        "id": "contact",
+        "label": "contactLine()",
+        "kind": "function",
+        "mine": true,
+        "fn": "contactLine"
+      },
+      { "id": "ship", "label": "shipTo()", "kind": "function", "mine": true, "fn": "shipTo" },
+      { "id": "batch", "label": "batchLabel()", "kind": "function", "mine": true },
+      { "id": "table", "label": "Packing table", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "imogen", "to": "shapes", "label": "each shape once" },
+      { "from": "shapes", "to": "line", "label": "Line" },
+      { "from": "shapes", "to": "contact", "label": "Customer" },
+      { "from": "shapes", "to": "ship", "label": "Parcel" },
+      { "from": "shapes", "to": "batch", "label": "BatchTin" },
+      { "from": "contact", "to": "table", "label": "contact" },
+      { "from": "ship", "to": "table", "label": "address" },
+      { "from": "batch", "to": "table", "label": "tin label" }
+    ],
+    "note": "Each shape of the order code is written once, with a name, and every function that takes it uses that name."
+  },
+  "tasks": {
+    "line": {
+      "trace": {
+        "file": "src/orders.ts",
+        "call": "lineGrams",
+        "args": [{ "blend": "Hearth Assam", "tins": 3, "gramsPerTin": 125 }]
+      },
+      "steps": [
+        {
+          "active": ["imogen", "imogen->shapes", "shapes"],
+          "value": {
+            "kind": "map",
+            "label": "an order line",
+            "entries": [
+              { "key": "blend", "value": "text" },
+              { "key": "tins", "value": "number" },
+              { "key": "gramsPerTin", "value": "number" }
+            ]
+          },
+          "note": "An order line is written once, with a name, instead of once in every function."
+        },
+        {
+          "active": ["shapes", "shapes->line", "line"],
+          "note": "The functions that take a line say its name, so they all see the same three properties."
+        },
+        {
+          "active": ["line"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "grams", "value": "number" }]
+          },
+          "note": "Three tins of Hearth Assam come back as one weight."
+        }
+      ]
+    },
+    "customer": {
+      "trace": {
+        "file": "src/orders.ts",
+        "call": "contactLine",
+        "args": [{ "name": "Wren Ashby", "email": "wren@example.com", "phone": "01632 960184" }]
+      },
+      "steps": [
+        {
+          "active": ["shapes"],
+          "value": {
+            "kind": "map",
+            "label": "a customer",
+            "entries": [
+              { "key": "name", "value": "text" },
+              { "key": "email", "value": "text" },
+              { "key": "phone", "value": "text, or missing" }
+            ]
+          },
+          "note": "A customer is written as an interface: a name, an email, and a phone number some leave out."
+        },
+        {
+          "active": ["shapes", "shapes->contact", "contact"],
+          "note": "Wren Ashby gave a phone number, so the contact line has three parts."
+        },
+        {
+          "active": ["contact", "contact->table", "table"],
+          "note": "The packing table gets one line of text to reach the customer by."
+        }
+      ]
+    },
+    "parcel": {
+      "trace": {
+        "file": "src/orders.ts",
+        "call": "shipTo",
+        "args": [
+          {
+            "orderId": "OK-1042",
+            "grams": 375,
+            "to": {
+              "name": "Ottoline Marsh",
+              "street": "4 Mill Lane",
+              "town": "Bramwell",
+              "postcode": "OH3 2TL"
+            }
+          }
+        ]
+      },
+      "steps": [
+        {
+          "active": ["shapes"],
+          "value": {
+            "kind": "map",
+            "label": "a parcel",
+            "entries": [
+              { "key": "orderId", "value": "text" },
+              { "key": "grams", "value": "number" },
+              { "key": "to", "value": "an address" }
+            ]
+          },
+          "note": "A parcel has an address inside it, and the address is a shape of its own, with a name."
+        },
+        {
+          "active": ["shapes", "shapes->ship", "ship"],
+          "note": "Order OK-1042 goes to Ottoline Marsh, and the compiler checks the address as closely as the parcel."
+        },
+        {
+          "active": ["ship", "ship->table", "table"],
+          "note": "The packing table gets the order and where it is going."
+        }
+      ]
+    },
+    "batch": {
+      "steps": [
+        {
+          "active": ["shapes"],
+          "value": {
+            "kind": "map",
+            "label": "a batch tin",
+            "entries": [
+              { "key": "everything a tin has", "value": "blend, grams" },
+              { "key": "batch", "value": "number" }
+            ]
+          },
+          "note": "Imogen blends a small batch of a seasonal tea. A batch tin is a tin, with its batch number as well."
+        },
+        {
+          "active": ["shapes", "shapes->batch", "batch"],
+          "note": "The batch tin is built on the tin, so when a tin gets a new property, the batch tin gets it too."
+        },
+        {
+          "active": ["batch", "batch->table", "table"],
+          "note": "The tin's label says which batch it came from."
+        }
+      ]
+    }
+  }
+}

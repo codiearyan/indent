@@ -99,7 +99,16 @@ const repos: { labId: string; expected: string[] }[] = [
       'arrays-and-tuples/parcel',
       'arrays-and-tuples/code',
       'object-types/line',
-      'object-types/slip'
+      'object-types/slip',
+      'type-aliases-and-interfaces/line',
+      'type-aliases-and-interfaces/customer',
+      'type-aliases-and-interfaces/parcel',
+      'unions-and-literals/refs',
+      'unions-and-literals/zone',
+      'unions-and-literals/status',
+      'narrowing/refs',
+      'narrowing/count',
+      'narrowing/shelf'
     ]
   },
   {
