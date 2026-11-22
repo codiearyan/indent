@@ -1,0 +1,117 @@
+{
+  "id": "database-file",
+  "title": "A database file and a table",
+  "files": [
+    "src/db.js",
+    "src/workshops.js",
+    "try.js",
+    "src/store.js",
+    "src/app.js",
+    "src/routes/workshops.js",
+    "server.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js opens data/kilnworth.db and prints the workshops it holds.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "table",
+      "title": "Create the workshops table",
+      "file": "src/db.js",
+      "description": "Implement `createTables(db)` in `src/db.js`. It makes a table called `workshops` with these columns:\n\n- `id`, the `INTEGER PRIMARY KEY`\n- `title` and `day`, text\n- `seats` and `priceCents`, whole numbers\n\nNone of `title`, `day`, `seats` and `priceCents` may be left empty (`NULL`). When the table is already there, `createTables` leaves it and its rows as they are.\n\nThe check runs it on an empty database, looks at the columns it made, adds a row without an id and one without a title, and runs it a second time.",
+      "nextSteps": [
+        "Write the `CREATE TABLE` statement with its five columns.",
+        "Mark the primary key and the columns that cannot be empty.",
+        "Make it safe to run when the table already exists.",
+        "Run it with `db.exec`."
+      ],
+      "hints": [
+        "The column names are the same as the fields of a workshop in `src/workshops.js`.",
+        "Whole numbers are `INTEGER` and text is `TEXT`. `NOT NULL` after a column refuses a row without that value. `IF NOT EXISTS` after `CREATE TABLE` makes a second run do nothing.",
+        "`db.exec(`CREATE TABLE IF NOT EXISTS workshops (id INTEGER PRIMARY KEY, title TEXT NOT NULL, ...)`)`, with the other three columns in the same shape."
+      ],
+      "docs": [
+        {
+          "title": "SQLite CREATE TABLE",
+          "url": "https://sqlite.org/lang_createtable.html"
+        },
+        {
+          "title": "INTEGER PRIMARY KEY and rowid",
+          "url": "https://sqlite.org/lang_createtable.html#rowid"
+        },
+        {
+          "title": "node:sqlite database.exec()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/sqlite.html#databaseexecsql"
+        }
+      ],
+      "videos": [
+        {
+          "title": "SQL in 100 seconds",
+          "url": "https://www.youtube.com/watch?v=zsjvFFKOm3c"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "seed",
+      "title": "Fill the table once",
+      "file": "src/db.js",
+      "description": "Implement `seedWorkshops(db, workshops)` in `src/db.js`. When the `workshops` table has no rows, it adds every workshop in the list it is given, each with its own `id`, `title`, `day`, `seats` and `priceCents`. When the table already has any row, it adds nothing.\n\nEvery value reaches the database apart from the SQL text, in the place of a `?`.\n\nThe check gives it workshops of its own on an empty table, calls it again, removes one workshop and calls it a third time. It also reads the SQL your function hands the database.",
+      "nextSteps": [
+        "Count the rows the table has, and stop when there are any.",
+        "Prepare one `INSERT` with a `?` for each column.",
+        "Run it once for each workshop, with that workshop's values.",
+        "Run `node try.js` twice and compare."
+      ],
+      "hints": [
+        "A restart must not bring back a workshop the desk removed, so the only safe time to add the list is when the table is empty.",
+        "`SELECT COUNT(*) AS count FROM workshops` with `.get()` gives back `{ count }`. A prepared statement can run many times, each time with new values.",
+        "`const insert = db.prepare('INSERT INTO workshops (id, title, day, seats, priceCents) VALUES (?, ?, ?, ?, ?)')`, then `insert.run(w.id, w.title, w.day, w.seats, w.priceCents)` for each workshop."
+      ],
+      "docs": [
+        {
+          "title": "SQLite INSERT",
+          "url": "https://sqlite.org/lang_insert.html"
+        },
+        {
+          "title": "node:sqlite statement.run()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/sqlite.html#statementrunnamedparameters-anonymousparameters"
+        },
+        {
+          "title": "SQLite parameters",
+          "url": "https://sqlite.org/lang_expr.html#varparam"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "open",
+      "title": "Open the database file",
+      "file": "src/db.js",
+      "description": "Implement `openDatabase(file)` in `src/db.js`. It:\n\n- makes the folder `file` goes in, when it is not there yet\n- opens `file` as a SQLite database\n- runs `createTables`, then `seedWorkshops` with the studio's `workshops` from `src/workshops.js`\n- returns the open database\n\nThe check opens a file in a folder that does not exist yet, changes two workshops, closes it and opens the same file again, as a server restart would. It judges this task once the first two pass.",
+      "nextSteps": [
+        "Make the folder of `file`.",
+        "Open the file with `DatabaseSync`.",
+        "Set it up with the two functions you wrote, and return it.",
+        "Run `node try.js` and look for `data/kilnworth.db`."
+      ],
+      "hints": [
+        "SQLite makes a database file that is missing, but it cannot make the folder around it.",
+        "`dirname(file)` from `node:path` is the folder of a path, and `mkdirSync(folder, { recursive: true })` from `node:fs` makes it and does nothing when it is there. `new DatabaseSync(file)` opens the file.",
+        "`mkdirSync(dirname(file), { recursive: true })`, then `const db = new DatabaseSync(file)`, `createTables(db)`, `seedWorkshops(db, workshops)` and `return db`."
+      ],
+      "docs": [
+        {
+          "title": "new DatabaseSync()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/sqlite.html#new-databasesyncpath-options"
+        },
+        {
+          "title": "fs.mkdirSync()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/fs.html#fsmkdirsyncpath-options"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

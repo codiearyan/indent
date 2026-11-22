@@ -1,0 +1,95 @@
+{
+  "id": "writing-rows",
+  "title": "Write, change and remove rows",
+  "files": [
+    "src/store.js",
+    "src/routes/workshops.js",
+    "src/db.js",
+    "try.js",
+    "src/app.js",
+    "server.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where try.js adds a workshop to data/kilnworth.db, restarts the API, then changes and removes it.",
+    "suggestedCommand": "node try.js"
+  },
+  "tasks": [
+    {
+      "id": "create",
+      "title": "Add a workshop",
+      "file": "src/store.js",
+      "description": "Implement `create(fields)` in `src/store.js`. `fields` is `{ title, day, seats, priceCents }`, already checked by the route. It adds a row to the `workshops` table, lets the database pick its `id`, and returns the new workshop as `{ id, title, day, seats, priceCents }`. Each value reaches the database in the place of a `?`.\n\nThe check posts two workshops to a database file of its own, restarts the server on the same file and lists the workshops again. It also reads the SQL your store hands the database.",
+      "nextSteps": [
+        "Write an `INSERT` for the four fields, with a `?` for each.",
+        "Run it with the four values in the same order.",
+        "Read the id of the new row from the result of `run()`.",
+        "Return the new workshop and run `node try.js`."
+      ],
+      "hints": [
+        "Leave `id` out of the `INSERT`: the `INTEGER PRIMARY KEY` gives the row the next free number.",
+        "`run()` returns `{ changes, lastInsertRowid }`. `lastInsertRowid` is the id the new row got, and `get` reads a row by its id.",
+        "`const { lastInsertRowid } = db.prepare('INSERT INTO workshops (title, day, seats, priceCents) VALUES (?, ?, ?, ?)').run(fields.title, fields.day, fields.seats, fields.priceCents)`, then `return get(lastInsertRowid)`."
+      ],
+      "docs": [
+        { "title": "SQLite INSERT", "url": "https://sqlite.org/lang_insert.html" },
+        {
+          "title": "node:sqlite statement.run()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/sqlite.html#statementrunnamedparameters-anonymousparameters"
+        },
+        {
+          "title": "INTEGER PRIMARY KEY and rowid",
+          "url": "https://sqlite.org/lang_createtable.html#rowid"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "update",
+      "title": "Change a workshop",
+      "file": "src/store.js",
+      "description": "Implement `update(id, fields)` in `src/store.js`. `fields` holds some or all of `title`, `day`, `seats` and `priceCents`, already checked by the route.\n\n- it changes only the columns in `fields`; the others keep what they hold\n- it returns the whole workshop as it is now, or `undefined` when no row has that `id`\n- it never adds a row\n\nEach value, the id too, reaches the database in the place of a `?`. The check sends `PATCH` and `PUT` for ids in its table and for ids that are not, then looks at the table and at the SQL your store hands the database.",
+      "nextSteps": [
+        "Write an `UPDATE` with a `WHERE` on the id.",
+        "Make a field that was not sent keep what the column holds.",
+        "Use the result of `run()` to tell whether a row was there.",
+        "Return the workshop as it is now, or `undefined`, and run `node try.js`."
+      ],
+      "hints": [
+        "An `UPDATE` whose `WHERE` matches nothing is not an error. It runs and changes zero rows, and the result of `run()` says so.",
+        "`COALESCE(?, title)` keeps the title when the value is `NULL`. A field that was not sent is `undefined`, which SQLite cannot take, so hand over `fields.title ?? null`. `changes` is how many rows the statement changed.",
+        "`SET title = COALESCE(?, title), day = COALESCE(?, day), ...` with `WHERE id = ?`, then `.run(fields.title ?? null, ..., id)` and `return changes === 0 ? undefined : get(id)`."
+      ],
+      "docs": [
+        { "title": "SQLite UPDATE", "url": "https://sqlite.org/lang_update.html" },
+        { "title": "SQLite coalesce()", "url": "https://sqlite.org/lang_corefunc.html#coalesce" },
+        { "title": "SQLite changes()", "url": "https://sqlite.org/lang_corefunc.html#changes" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "remove",
+      "title": "Remove a workshop",
+      "file": "src/store.js",
+      "description": "Implement `remove(id)` in `src/store.js`. It deletes the row whose `id` is `id` and returns `true`, or returns `false` when no row had that id. Only that row goes. The id reaches the database in the place of a `?`.\n\nThe check deletes a workshop twice, deletes an id that never had a row, then looks at what is left in the table and at the SQL your store hands the database.",
+      "nextSteps": [
+        "Write a `DELETE` with a `WHERE` on the id.",
+        "Run it with the id.",
+        "Return whether it removed a row.",
+        "Run `node try.js` and look at the last answer."
+      ],
+      "hints": [
+        "A `DELETE` that matches nothing runs without an error, so its result is the only way to know whether a row was there.",
+        "`changes` in the result of `run()` is the number of rows removed: 1 or 0 here.",
+        "`return db.prepare('DELETE FROM workshops WHERE id = ?').run(id).changes > 0`."
+      ],
+      "docs": [
+        { "title": "SQLite DELETE", "url": "https://sqlite.org/lang_delete.html" },
+        {
+          "title": "node:sqlite statement.run()",
+          "url": "https://nodejs.org/docs/latest-v22.x/api/sqlite.html#statementrunnamedparameters-anonymousparameters"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

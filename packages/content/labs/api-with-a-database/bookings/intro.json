@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "Fourteen names for twelve places!",
+      "note": "On the paper sheet."
+    },
+    {
+      "title": "Sign-up page",
+      "text": "Shows the workshops, but takes no bookings.",
+      "note": "Places left are a guess."
+    },
+    {
+      "title": "Your code",
+      "file": "store.js",
+      "mine": true,
+      "gap": "No bookings, no count",
+      "tasks": ["A bookings table", "Book a place", "Count places left"]
+    },
+    {
+      "title": "Family morning",
+      "rows": [
+        ["Seats", "12"],
+        ["Booked", "2"],
+        ["Places left", "10"]
+      ],
+      "mark": 2
+    }
+  ],
+  "ticket": {
+    "label": "Bronagh Kell",
+    "wrong": "on paper",
+    "why": "No booking",
+    "right": "booked"
+  },
+  "captions": [
+    "Dilys found fourteen names on the paper sheet for a morning with twelve places.",
+    "The page shows the workshops, but it takes no bookings and cannot count places.",
+    "You add a bookings table, a way to book, and places left counted by the database.",
+    "Bronagh books the family morning on the page, and its places left go down.",
+    "Bookings live beside the workshops, and every workshop shows what it has left."
+  ]
+}

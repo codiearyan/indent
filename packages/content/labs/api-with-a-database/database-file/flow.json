@@ -1,0 +1,137 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "start",
+        "label": "Server start",
+        "kind": "story"
+      },
+      {
+        "id": "open",
+        "label": "openDatabase()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "tables",
+        "label": "createTables()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "seed",
+        "label": "seedWorkshops()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "list",
+        "label": "workshops.js",
+        "kind": "file"
+      },
+      {
+        "id": "file",
+        "label": "kilnworth.db",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "open",
+        "label": "file path"
+      },
+      {
+        "from": "open",
+        "to": "tables",
+        "label": "database"
+      },
+      {
+        "from": "open",
+        "to": "seed",
+        "label": "database"
+      },
+      {
+        "from": "list",
+        "to": "seed",
+        "label": "five workshops"
+      },
+      {
+        "from": "tables",
+        "to": "file",
+        "label": "a table"
+      },
+      {
+        "from": "seed",
+        "to": "file",
+        "label": "rows"
+      }
+    ],
+    "note": "Every start of the server opens one database file, makes sure its workshops table is there and fills it only the very first time."
+  },
+  "tasks": {
+    "table": {
+      "steps": [
+        {
+          "active": ["start", "start->open", "open", "open->tables", "tables"],
+          "note": "Every time the server starts, the tables are set up before anything else."
+        },
+        {
+          "active": ["tables", "tables->file", "file"],
+          "value": {
+            "kind": "array",
+            "label": "columns",
+            "values": ["id", "title", "day", "seats", "priceCents"]
+          },
+          "note": "The first time, the file gets a workshops table with one column for each field of a workshop."
+        },
+        {
+          "active": ["tables", "file"],
+          "note": "On every later start the table is already there, and it is left alone, rows and all."
+        }
+      ]
+    },
+    "seed": {
+      "steps": [
+        {
+          "active": ["list", "list->seed", "seed"],
+          "note": "The studio's five workshops from workshops.js are handed over."
+        },
+        {
+          "active": ["seed", "seed->file", "file"],
+          "note": "When the table has no rows, each workshop goes in with its own id, its values apart from the SQL."
+        },
+        {
+          "active": ["seed", "file"],
+          "note": "When the table already has rows, nothing is added, so Monday's changes and removals stay."
+        }
+      ]
+    },
+    "open": {
+      "steps": [
+        {
+          "active": ["start", "start->open", "open"],
+          "value": {
+            "kind": "map",
+            "label": "the path",
+            "entries": [
+              {
+                "key": "file",
+                "value": "data/kilnworth.db"
+              }
+            ]
+          },
+          "note": "The server starts with a path. The folder in it may not be there yet."
+        },
+        {
+          "active": ["open", "open->tables", "tables", "open->seed", "seed"],
+          "note": "openDatabase opens the file and sets it up with the two functions you wrote."
+        },
+        {
+          "active": ["open", "file"],
+          "note": "It hands back the open database. Closed and opened again, the file still holds every change."
+        }
+      ]
+    }
+  }
+}

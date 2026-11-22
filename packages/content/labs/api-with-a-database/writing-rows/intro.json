@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Sunniva",
+      "say": "Will my changes stay this time?",
+      "note": "A new Friday class."
+    },
+    {
+      "title": "The API",
+      "text": "Reads the file, but changes go nowhere.",
+      "note": "Adding a workshop fails."
+    },
+    {
+      "title": "Your code",
+      "file": "store.js",
+      "mine": true,
+      "gap": "Nothing writes to the file",
+      "tasks": ["Add a workshop", "Change a workshop", "Remove a workshop"]
+    },
+    {
+      "title": "kilnworth.db",
+      "rows": [
+        ["Glazing basics", "thu"],
+        ["Family morning", "sat"],
+        ["Throwing bowls", "fri"]
+      ],
+      "mark": 2
+    }
+  ],
+  "ticket": {
+    "label": "Throwing bowls",
+    "wrong": "a 500",
+    "why": "Not written",
+    "right": "saved"
+  },
+  "captions": [
+    "At the front desk, Sunniva adds a Friday class and wants it to stay this time.",
+    "The API reads the file now, but adding, changing and removing still fail.",
+    "You write the insert, the update and the delete, and read what each one changed.",
+    "Throwing bowls is saved with its own id and is still there after a restart.",
+    "Changes outlive the server, and a change to a workshop that is gone answers 404."
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "page",
+        "label": "Sign-up page",
+        "kind": "story"
+      },
+      {
+        "id": "desk",
+        "label": "Front desk",
+        "kind": "story"
+      },
+      {
+        "id": "routes",
+        "label": "Express routes",
+        "kind": "file"
+      },
+      {
+        "id": "store",
+        "label": "Workshop store",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "db",
+        "label": "kilnworth.db",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "page",
+        "to": "routes",
+        "label": "reads, books"
+      },
+      {
+        "from": "desk",
+        "to": "routes",
+        "label": "changes"
+      },
+      {
+        "from": "routes",
+        "to": "store",
+        "label": "calls"
+      },
+      {
+        "from": "store",
+        "to": "db",
+        "label": "SQL, values, rows"
+      }
+    ],
+    "note": "Ivo's sign-up page and Sunniva's front desk still talk to the same Express routes, but the store you write now keeps workshops and bookings in a SQLite file that outlives every restart."
+  }
+}

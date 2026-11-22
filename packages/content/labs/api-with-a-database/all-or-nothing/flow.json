@@ -1,0 +1,130 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "page",
+        "label": "Sign-up page",
+        "kind": "story"
+      },
+      {
+        "id": "route",
+        "label": "Bookings routes",
+        "kind": "file"
+      },
+      {
+        "id": "book",
+        "label": "book()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "group",
+        "label": "bookGroup()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "db",
+        "label": "Bookings table",
+        "kind": "data"
+      },
+      {
+        "id": "errors",
+        "label": "Error handler",
+        "kind": "file"
+      }
+    ],
+    "edges": [
+      {
+        "from": "page",
+        "to": "route",
+        "label": "one name, a family"
+      },
+      {
+        "from": "route",
+        "to": "book",
+        "label": "name"
+      },
+      {
+        "from": "route",
+        "to": "group",
+        "label": "names"
+      },
+      {
+        "from": "book",
+        "to": "db",
+        "label": "INSERT"
+      },
+      {
+        "from": "group",
+        "to": "db",
+        "label": "in one transaction"
+      },
+      {
+        "from": "group",
+        "to": "errors",
+        "label": "a failure"
+      }
+    ],
+    "note": "A full workshop now says no, and a family's bookings go into the table together or not at all."
+  },
+  "tasks": {
+    "full": {
+      "steps": [
+        {
+          "active": ["page", "page->route", "route", "route->book", "book"],
+          "note": "A seventh person tries to book glazing basics, which has six places."
+        },
+        {
+          "active": ["book"],
+          "note": "book reads the places left before it adds anything."
+        },
+        {
+          "active": ["book", "route", "page"],
+          "note": "With no place left nothing is added, and the page hears 409, full."
+        }
+      ]
+    },
+    "group": {
+      "steps": [
+        {
+          "active": ["page", "page->route", "route", "route->group", "group"],
+          "value": {
+            "kind": "array",
+            "label": "names",
+            "values": ["Jo Marr", "Kit Lund", "Lev Orr", "Mo Tae"]
+          },
+          "note": "A family books the Thursday wheel class together."
+        },
+        {
+          "active": ["group"],
+          "note": "The whole family is compared with the places left before anyone is booked."
+        },
+        {
+          "active": ["group", "group->db", "db"],
+          "note": "A family that fits goes in name by name. One that does not fit adds nobody."
+        }
+      ]
+    },
+    "atomic": {
+      "steps": [
+        {
+          "active": ["group", "group->db", "db"],
+          "note": "The family's bookings start inside a transaction."
+        },
+        {
+          "active": ["db"],
+          "note": "If the second booking fails, the first is undone with it, as if neither had run."
+        },
+        {
+          "active": ["group", "group->errors", "errors"],
+          "note": "The error goes on to the error handler, which answers 500."
+        },
+        {
+          "active": ["db"],
+          "note": "The transaction has ended either way, so the next booking is saved as usual."
+        }
+      ]
+    }
+  }
+}
