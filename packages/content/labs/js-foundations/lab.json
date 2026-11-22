@@ -18,8 +18,27 @@
         "nothing-there"
       ]
     },
-    { "title": "When it breaks", "chapters": ["read-the-error", "names-and-values", "quiet-mistakes"] },
-    { "title": "The shelf", "chapters": ["order-reports"] },
-    { "title": "Helpers that remember", "chapters": ["loyalty-cards"] }
+    {
+      "title": "When it breaks",
+      "chapters": ["read-the-error", "names-and-values", "quiet-mistakes"]
+    },
+    {
+      "title": "Rules of the shop",
+      "chapters": [
+        "making-decisions",
+        "reusable-rules",
+        "doing-it-again",
+        "where-names-live",
+        "passing-functions"
+      ]
+    },
+    {
+      "title": "The shelf",
+      "chapters": ["order-reports"]
+    },
+    {
+      "title": "Helpers that remember",
+      "chapters": ["loyalty-cards"]
+    }
   ]
 }

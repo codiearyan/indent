@@ -1,0 +1,133 @@
+{
+  "id": "doing-it-again",
+  "title": "Doing it again",
+  "files": ["src/loops.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see your loops at work. If it keeps running, press Ctrl+C to stop it.",
+    "suggestedCommand": "node src/loops.js"
+  },
+  "tasks": [
+    {
+      "id": "batch",
+      "title": "Number a batch",
+      "file": "src/loops.js",
+      "description": "Under `// Task 1` in `src/loops.js`, make `batchLine(scent, count)` return the labels of one batch on one line, numbered from 1 up to `count`, with a comma and a space between them: `batchLine('Fig', 3)` is `'Fig 1, Fig 2, Fig 3'`. A batch of 0 gives empty text. Use a `for` loop with a counter.\n\nCheck calls `batchLine` with other scents and counts, 0 and 1 included, and looks for a `for` loop with a counter in it.",
+      "nextSteps": [
+        "Make a `let` with empty text to build the line in.",
+        "Write a `for` loop whose counter goes from 1 up to `count`.",
+        "Each time round, add a label to the line, with a comma and a space before every label but the first.",
+        "Return the line and run `node src/loops.js`."
+      ],
+      "hints": [
+        "A `for` loop has three parts in its round brackets: where the counter starts, the condition to keep going, and how the counter changes.",
+        "The counter starts at 1, and `count` itself is the last label, so the condition includes the equal case. The first label has no comma before it.",
+        "The loop has the shape `for (let number = 1; number <= count; number++) { ... }`, and inside it you add `, ` only when `number` is more than 1."
+      ],
+      "docs": [
+        {
+          "title": "for",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for"
+        },
+        {
+          "title": "Loops and iteration",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "weeks",
+      "title": "Weeks to the goal",
+      "file": "src/loops.js",
+      "description": "Under `// Task 2`, make `weeksToReach(ordersPerWeek, goal)` return how many weeks of doubling it takes until the weekly orders reach `goal` or more. Every week the orders double. When they already reach the goal, that is `0` weeks. `ordersPerWeek` is always 1 or more. Use a `while` loop.\n\nCheck calls `weeksToReach` with other numbers, including orders already at the goal, and looks for a `while` loop.",
+      "nextSteps": [
+        "Keep the orders and the count of weeks in two `let` variables.",
+        "Write a `while` loop that keeps going as long as the orders are below the goal.",
+        "Inside it, double the orders and count one more week.",
+        "Return the weeks. If the file keeps running, press Ctrl+C and look at what changes inside the loop."
+      ],
+      "hints": [
+        "A `while` loop is for when you do not know in advance how many times it runs. It checks its condition before every round.",
+        "The loop keeps going while the orders are below the goal, so it never runs when they already reach it. Something inside the loop must change the orders, or it never ends.",
+        "The loop has the shape `while (orders < goal) { orders = orders * 2; weeks++ }`, with `orders` starting at `ordersPerWeek` and `weeks` at 0."
+      ],
+      "docs": [
+        {
+          "title": "while",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/while"
+        },
+        {
+          "title": "Loops and iteration",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration"
+        }
+      ],
+      "videos": [
+        {
+          "title": "While loops in eight minutes",
+          "url": "https://www.youtube.com/watch?v=TDUz9QcGPoE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "engraving",
+      "title": "Price the engraving",
+      "file": "src/loops.js",
+      "description": "Under `// Task 3`, make `engravingCents(message, centsPerLetter)` return the price of engraving `message`: every character costs `centsPerLetter`, but spaces are free. Go through the message with `for...of`.\n\nCheck calls `engravingCents` with messages with and without spaces, and an empty one, and looks for `for...of`.",
+      "nextSteps": [
+        "Start a `let` price at 0.",
+        "Go through `message` with `for (const character of message)`.",
+        "Add `centsPerLetter` only when the character is not a space.",
+        "Return the price and run the file."
+      ],
+      "hints": [
+        "`for...of` hands you each character of a text in turn, from the first to the last.",
+        "A space is the text `' '`. Ask whether the character is not the same as it before you add to the price.",
+        "Inside the loop, `if (character !== ' ') { cents = cents + centsPerLetter }`, with `cents` made before the loop."
+      ],
+      "docs": [
+        {
+          "title": "for...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of"
+        },
+        {
+          "title": "Strict inequality (!==)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_inequality"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "digit",
+      "title": "Find the first digit",
+      "file": "src/loops.js",
+      "description": "Under `// Task 4`, make `firstDigitAt(text)` return the position of the first digit (`0` to `9`) in `text`, counting from 0, or `-1` when there is none. Stop looking as soon as you find one.\n\nCheck calls `firstDigitAt` with texts that have a digit at the start, in the middle, several digits, and none.",
+      "nextSteps": [
+        "Write a `for` loop over the positions of the text, from 0 while below `text.length`.",
+        "Read the character at a position with `text[position]`.",
+        "When it is a digit, return its position straight away.",
+        "After the loop, return -1: the loop finished without finding one."
+      ],
+      "hints": [
+        "`return` inside a loop ends the loop and the function at once. That is the easiest way to stop early.",
+        "`'0123456789'.includes(character)` says whether a character is a digit. The -1 belongs after the loop, not inside it.",
+        "The loop has the shape `for (let position = 0; position < text.length; position++) { if ('0123456789'.includes(text[position])) { return position } }`."
+      ],
+      "docs": [
+        {
+          "title": "break",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/break"
+        },
+        {
+          "title": "String.prototype.includes()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes"
+        },
+        {
+          "title": "Character access in strings",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#character_access"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
