@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { LearnFirstToggle } from '@/features/settings/controls'
 import { cn } from '@/lib/utils'
 import { useCatalog } from '@/stores/catalog'
 import { useSettings } from '@/stores/settings'
@@ -82,6 +83,12 @@ export function Goal({ staged }: { staged: boolean }): React.JSX.Element {
           )
         })}
       </ToggleGroup>
+      <div className="mt-3 flex h-12 items-center justify-between gap-4 rounded-lg border border-border px-4">
+        <label htmlFor="setup-learn-first" className="text-sm">
+          When you want to learn more, show first
+        </label>
+        <LearnFirstToggle id="setup-learn-first" />
+      </div>
     </StepLayout>
   )
 }

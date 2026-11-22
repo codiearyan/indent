@@ -3,6 +3,7 @@ import type { Chapter, TaskDef, VideoLink } from '@shared/types'
 import { videoSource } from '@shared/video'
 import { chapterKey } from '@shared/rules'
 import { useSettings } from '@/stores/settings'
+import { useWorkspace } from '@/stores/workspace'
 
 interface Playing {
   /** The issue it plays for, so it stops showing when another issue opens. */
@@ -30,3 +31,21 @@ export function stopVideo(): void {
 /** A task's videos the app can play; a link the player can't open is left out. */
 export const taskVideos = (task: TaskDef): VideoLink[] =>
   (task.videos ?? []).filter((video) => videoSource(video.url))
+
+/** Plays a link from a tutor reply in Resources when it is one of this issue's videos. */
+export function playLinkedVideo(href: string): boolean {
+  const chapter = useWorkspace.getState().chapter
+  const source = videoSource(href)
+  if (!chapter || !source) return false
+  for (const task of chapter.tasks) {
+    const video = taskVideos(task).find((v) => {
+      const other = videoSource(v.url)
+      return other?.kind === source.kind && other.id === source.id
+    })
+    if (video) {
+      playVideo(chapter, video)
+      return true
+    }
+  }
+  return false
+}

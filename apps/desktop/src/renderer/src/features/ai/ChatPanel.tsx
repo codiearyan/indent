@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useSettingsDialog } from '@/features/settings/dialogStore'
 import { Markdown } from '@/features/workspace/Markdown'
+import { playLinkedVideo } from '@/features/workspace/video'
 import { isShortcut } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/stores/settings'
@@ -86,7 +87,9 @@ export function ChatPanel(): React.JSX.Element {
                 </div>
               ) : (
                 <div key={i} className="text-sm">
-                  <Markdown compact>{message.content}</Markdown>
+                  <Markdown compact onLink={playLinkedVideo}>
+                    {message.content}
+                  </Markdown>
                   {busy && i === messages.length - 1 && (
                     <span
                       aria-label="Writing"

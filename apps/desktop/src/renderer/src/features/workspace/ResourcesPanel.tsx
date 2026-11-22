@@ -16,6 +16,7 @@ export function ResourcesPanel({ chapter }: { chapter: Chapter }): React.JSX.Ele
   const playing = useVideo((s) => (s.playing?.key === key ? s.playing.video : null))
   const tasks = chapter.tasks.filter((task) => task.docs?.length || taskVideos(task).length)
   const hasVideos = tasks.some((task) => taskVideos(task).length > 0)
+  const videosFirst = useSettings((s) => s.learnFirst === 'videos')
 
   if (tasks.length === 0) {
     return (
@@ -37,26 +38,29 @@ export function ResourcesPanel({ chapter }: { chapter: Chapter }): React.JSX.Ele
           !shown && 'blur-sm select-none'
         )}
       >
-        {tasks.map((task) => (
-          <section key={task.id} className="rounded-lg border border-border">
-            <h3 className="px-4 pt-3 pb-1 text-sm font-semibold">{task.title}</h3>
-            <ul className="divide-y divide-rule">
-              {(task.docs ?? []).map((doc) => (
-                <li key={doc.url}>
-                  <a href={doc.url} target="_blank" rel="noreferrer" className={row}>
-                    <span className={title}>{doc.title}</span>
-                    <ExternalLink className={icon} strokeWidth={1.5} aria-hidden />
-                  </a>
-                </li>
-              ))}
-              {taskVideos(task).map((video) => (
-                <li key={video.url}>
-                  <VideoRow video={video} onPlay={() => playVideo(chapter, video)} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
+        {tasks.map((task) => {
+          const docRows = (task.docs ?? []).map((doc) => (
+            <li key={doc.url}>
+              <a href={doc.url} target="_blank" rel="noreferrer" className={row}>
+                <span className={title}>{doc.title}</span>
+                <ExternalLink className={icon} strokeWidth={1.5} aria-hidden />
+              </a>
+            </li>
+          ))
+          const videoRows = taskVideos(task).map((video) => (
+            <li key={video.url}>
+              <VideoRow video={video} onPlay={() => playVideo(chapter, video)} />
+            </li>
+          ))
+          return (
+            <section key={task.id} className="rounded-lg border border-border">
+              <h3 className="px-4 pt-3 pb-1 text-sm font-semibold">{task.title}</h3>
+              <ul className="divide-y divide-rule">
+                {videosFirst ? [videoRows, docRows] : [docRows, videoRows]}
+              </ul>
+            </section>
+          )
+        })}
       </div>
       {!shown && (
         <div className="absolute inset-x-0 top-0 flex justify-center px-4 pt-10">

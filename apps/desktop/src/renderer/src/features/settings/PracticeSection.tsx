@@ -15,7 +15,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { api } from '@/lib/api'
 import { errorMessage } from '@/lib/utils'
 import { useReminders } from '@/stores/reminders'
-import { Group, Row, card, segment, segmented } from './controls'
+import { Group, LearnFirstToggle, Row, card, segment, segmented } from './controls'
 
 const QUICK_PICKS: { label: string; days: Weekday[] }[] = [
   { label: 'Every day', days: WEEK },
@@ -54,6 +54,17 @@ export function PracticeSection(): React.JSX.Element {
         Pick the days you want to practice. At that time Indent reminds you where you left off.
       </p>
       <Schedule schedule={config.schedule} />
+      <Group title="Learning resources">
+        <div className={card}>
+          <Row
+            id="learn-first"
+            label="Show first"
+            hint="What the Resources tab and a stuck task list first. Both stay there."
+          >
+            <LearnFirstToggle id="learn-first" />
+          </Row>
+        </div>
+      </Group>
       <KeepRunning config={config} />
     </>
   )
