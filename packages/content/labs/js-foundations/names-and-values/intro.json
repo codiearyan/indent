@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "I only renamed a few things.", "note": "The restock sheet stops halfway." },
+    { "title": "Shop laptop", "text": "Runs a few lines, then stops with an error." },
+    {
+      "title": "Your code",
+      "file": "restock.js",
+      "mine": true,
+      "gap": "Stops partway through",
+      "tasks": ["Fix the wax jars", "Fix the shelf count", "Fix the label", "Fix the city code"]
+    },
+    { "title": "Ines", "say": "The supplier calls at ten.", "note": "She needs the whole sheet." }
+  ],
+  "ticket": { "label": "Restock sheet", "wrong": "stops", "why": "Stops early", "right": "ready" },
+  "captions": [
+    "The report prints again. Now Theo admits he tidied the restock sheet too.",
+    "Ines runs it before the supplier calls, and it stops halfway with an error.",
+    "You fix the names and values that stop it, in four small tasks.",
+    "Now the restock sheet runs to the end and Ines has every number.",
+    "Theo knows what each error meant, and the supplier gets the order on time."
+  ]
+}

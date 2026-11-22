@@ -1,0 +1,101 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "theo", "label": "Theo", "kind": "story" },
+      { "id": "file", "label": "morning.js", "kind": "file", "mine": true },
+      { "id": "node", "label": "Node", "kind": "story" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" },
+      { "id": "ines", "label": "Ines", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "theo", "to": "file", "label": "his changes" },
+      { "from": "file", "to": "node", "label": "lines" },
+      { "from": "node", "to": "terminal", "label": "error or report" },
+      { "from": "terminal", "to": "ines", "label": "the report" }
+    ],
+    "note": "Theo's changes left lines Node cannot read, so the terminal shows an error until you fix each one and the report reaches Ines."
+  },
+  "tasks": {
+    "poured": {
+      "steps": [
+        {
+          "active": ["theo", "theo->file", "file"],
+          "note": "Under Task 1, one line should print how many candles Ines poured, but Theo's change broke it."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "Node reads the whole file before it runs anything, and stops at the first line it cannot read."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "value": {
+            "kind": "array",
+            "label": "the parts of an error",
+            "values": ["file and line", "copy of the line", "marks", "kind of error"]
+          },
+          "note": "The terminal shows where Node stopped: the file, the line, the marks under it and the kind of error."
+        },
+        {
+          "active": ["terminal", "terminal->ines", "ines"],
+          "note": "Once the line can be read, the candles poured are back in the report."
+        }
+      ]
+    },
+    "waiting": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "Under Task 2, the line for the orders waiting is the next one Node cannot read."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "Node gets as far as that line and finds something it was waiting for is not there."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "The kind of error says what Node expected, and the marks show where."
+        },
+        {
+          "active": ["terminal", "terminal->ines", "ines"],
+          "note": "With the line whole again, Ines sees how many orders wait to be packed."
+        }
+      ]
+    },
+    "packed": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "Under Task 3, the line for the parcels packed has every bracket it needs, and still Node stops."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "The message is Node's guess at the cause. The marks show where the trouble really starts."
+        },
+        {
+          "active": ["terminal", "terminal->ines", "ines"],
+          "note": "Fixed, the line prints the parcels packed so far."
+        }
+      ]
+    },
+    "candle": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "Under Task 4, the line names the candle of the day, and its text has an apostrophe in it."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "Node reads the text in quotes and decides it ends sooner than Theo meant."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "The marks stop where Node thinks the text ended."
+        },
+        {
+          "active": ["terminal", "terminal->ines", "ines"],
+          "note": "The report names today's candle, apostrophe and all, and Ines can start pouring."
+        }
+      ]
+    }
+  }
+}
