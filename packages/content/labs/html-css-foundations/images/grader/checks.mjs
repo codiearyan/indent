@@ -9,7 +9,11 @@ const detail = (name, passed, message, output) => ({
   message: passed ? undefined : message,
   output
 })
-const pathOf = (page, img) => new URL(img.getAttribute('src'), page.window.location.href).pathname
+// A picture from another site does not count, whatever its path.
+const pathOf = (page, img) => {
+  const url = new URL(img.getAttribute('src'), page.window.location.href)
+  return url.host === page.window.location.host ? url.pathname : ''
+}
 const named = (page, file) =>
   page.$$('img[src]').find((img) => img.getAttribute('src').split(/[/\\]/).pop() === file)
 const show = (img) => (img ? clean(img.outerHTML) : 'not found')

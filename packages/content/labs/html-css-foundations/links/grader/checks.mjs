@@ -13,7 +13,11 @@ const detail = (name, passed, message, output) => ({
   message: passed ? undefined : message,
   output
 })
-const pathOf = (page, a) => new URL(a.getAttribute('href'), page.window.location.href).pathname
+// A link that leaves the workspace does not count, whatever its path.
+const pathOf = (page, a) => {
+  const url = new URL(a.getAttribute('href'), page.window.location.href)
+  return url.host === page.window.location.host ? url.pathname : ''
+}
 const listLinks = (links) =>
   links.map((a) => `<a href="${a.getAttribute('href')}">${clean(a.textContent)}</a>`).join('\n') ||
   'No links on the page'
