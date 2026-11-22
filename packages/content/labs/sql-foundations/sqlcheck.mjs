@@ -166,8 +166,8 @@ function hints(mine, missing, unexpected, values) {
   const squeezed = aggregate && !grouped
   if (mine.rows.length > wanted && unpaired(code)) {
     found.push(UNPAIRED)
-  } else if (squeezed) {
-    // the hint about GROUP BY above names the cause
+  } else if (squeezed || (!aggregate && /\bselect\s+distinct\b/.test(code))) {
+    // the hint about GROUP BY or DISTINCT above names the cause
   } else if (joined && !left && whereAt === -1 && mine.rows.length < wanted) {
     found.push(
       'A JOIN keeps only the rows that find a partner through ON. A row with no partner, or one that ON pairs with the wrong rows, drops out without a word.'
@@ -185,7 +185,12 @@ function hints(mine, missing, unexpected, values) {
       'Some rows that did find a partner pass your test for NULL too: on a real row of the other table, the column you test can still be empty. Test one that is never empty there.'
     )
   }
-  if (left && whereAt !== -1 && missing.length && !/\bis\s+(not\s+)?null\b/.test(whereClause)) {
+  if (joined && !left && !grouped && values && unexpected.length && mine.rows.length === wanted) {
+    found.push(
+      'If a value comes from the other table, look at ON too: when it compares the wrong columns, each row is paired with one that is not its partner, and SQLite gives no error.'
+    )
+  }
+  if (left && whereAt !== -1 && missing.length && !/\bis\s+(not\s+)?null\b|(=|<>|!=)\s*null\b/.test(whereClause)) {
     found.push(
       'WHERE runs after the join. On a row that a LEFT JOIN kept without a partner, every column of the other table is NULL, so a test on those columns is not true and the row drops out again.'
     )

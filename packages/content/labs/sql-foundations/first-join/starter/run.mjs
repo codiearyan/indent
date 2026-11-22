@@ -106,7 +106,7 @@ for (const [index, sql] of statements.entries()) {
     }
     console.log(formatTable(columns, rows))
     if (rows.length === MAX_ROWS) {
-      console.log(`Stopped after ${MAX_ROWS} rows, far more than any table here holds. Look for a part of the query that repeats rows.`)
+      console.log(`Stopped after ${MAX_ROWS} rows, far more than any table here holds. Look for a part of the query that repeats rows, such as a JOIN with no ON.`)
     }
   } catch (err) {
     if (/readonly/.test(err.message)) {

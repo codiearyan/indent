@@ -97,3 +97,18 @@ INSERT INTO visits (id, animal_id, visit_date, vet, reason, notes) VALUES
 INSERT INTO treatments (id, visit_id, name, kind, price) VALUES
   (521, 414, 'Booster vaccine', 'vaccine', 54.0),
   (522, 416, 'Consultation', 'consultation', 48.0);
+
+-- A second Rocky, another dog, who ate a sock: two visits on the same day, the first with two
+-- X-rays at the same price, the second a free check.
+
+INSERT INTO animals (id, owner_id, name, species, breed, born, weight_kg) VALUES
+  (324, 205, 'Rocky', 'dog', 'Beagle', '2023-08-08', 18.2);
+
+INSERT INTO visits (id, animal_id, visit_date, vet, reason, notes) VALUES
+  (417, 324, '2026-11-14', 'Ifan Pryce', 'Ate a sock', NULL),
+  (418, 324, '2026-11-14', 'Mabel Tranter', 'Sock check', 'Sock passed. No harm done.');
+
+INSERT INTO treatments (id, visit_id, name, kind, price) VALUES
+  (523, 417, 'Consultation', 'consultation', 48.0),
+  (524, 417, 'X-ray', 'test', 95.0),
+  (525, 417, 'X-ray', 'test', 95.0);
