@@ -1,0 +1,117 @@
+{
+  "id": "fake-clock",
+  "title": "Standing in for the clock",
+  "files": ["src/schedule.test.js", "src/schedule.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here and read what they say.",
+    "suggestedCommand": "npx vitest run src/schedule.test.js"
+  },
+  "tasks": [
+    {
+      "id": "day",
+      "title": "Test the delivery day of a Monday order",
+      "file": "src/schedule.test.js",
+      "description": "`deliveryDay()` reads the clock and gives the date of the Friday an order placed now goes out on, as text like `2026-07-24`. In the `delivery day` block, set the clock to a Monday and test the exact date it gives.\n\nCheck runs your tests on the working code and on versions that give the Friday a week later, or write the month one too low. A test in this block must pass on the first and fail on the others, give the same result on any day, and pass when it runs alone.",
+      "nextSteps": [
+        "Pick a Monday, and work out by hand the date of that week's Friday.",
+        "Turn on the fake clock and set it to your Monday.",
+        "Compare what `deliveryDay()` gives with your date, written the same way.",
+        "Run the tests."
+      ],
+      "hints": [
+        "A test that calls `deliveryDay()` without setting the clock checks today, and fails on another day.",
+        "`vi.useFakeTimers()` and then `vi.setSystemTime(date)` set the date the code reads. Months in `new Date(year, month, day)` count from 0.",
+        "Write `vi.setSystemTime(new Date(2026, 2, 2, 10, 0))` after `vi.useFakeTimers()`, then `expect(deliveryDay()).toBe('2026-03-06')`."
+      ],
+      "docs": [
+        { "title": "vi.setSystemTime", "url": "https://vitest.dev/api/vi#vi-setsystemtime" },
+        { "title": "Mocking dates", "url": "https://vitest.dev/guide/mocking/dates" },
+        {
+          "title": "Date() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/Date"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cutoff",
+      "title": "Test both sides of the Wednesday cut-off",
+      "file": "src/schedule.test.js",
+      "description": "Orders close on Wednesday at `CUTOFF_HOUR` o'clock. `ordersOpen()` is `true` while an order placed now still goes out on the coming Friday, and `false` from the cut-off on. In the `cut-off` block, test a Wednesday just before the cut-off and a Wednesday at the cut-off itself.\n\nCheck runs your tests on the working code and on versions that close an hour early, or take orders all day on Wednesday. A test in this block must pass on the first and fail on the others, give the same result on any day, and pass when it runs alone.",
+      "nextSteps": [
+        "Find `CUTOFF_HOUR` in `schedule.js` and pick a Wednesday.",
+        "Set the clock to a minute before the cut-off, and expect orders to be open.",
+        "Set it to the cut-off itself, and expect them to be closed.",
+        "Run the tests."
+      ],
+      "hints": [
+        "Noon and eight in the evening pass even when the cut-off is in the wrong place.",
+        "The edge is the same idea as the free delivery line: test just before it and exactly at it.",
+        "Use `new Date(2026, 2, 4, 17, 59)` for a test that expects `true`, and `new Date(2026, 2, 4, 18, 0)` for one that expects `false`."
+      ],
+      "docs": [
+        { "title": "vi.useFakeTimers", "url": "https://vitest.dev/api/vi#vi-usefaketimers" },
+        {
+          "title": "Date.prototype.getHours()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getHours"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hold",
+      "title": "Test when a basket hold is let go",
+      "file": "src/schedule.test.js",
+      "description": "`holdBasket(items)` gives back a hold whose `status` is `'held'`. After `HOLD_MINUTES` it turns to `'released'`, and the items go back on sale. In the `basket hold` block, test that a hold is still held just before the minutes are up, and let go once they are, without waiting for real time.\n\nCheck runs your tests on the working code and on versions that let go after 15 seconds, a minute early, or never. A test in this block must pass on the first and fail on the others, and a test that is still running after 2 seconds is stopped.",
+      "nextSteps": [
+        "Turn on the fake clock, then make a hold.",
+        "Move time on to just before `HOLD_MINUTES` are up, and check the status.",
+        "Move time on to the end, and check the status again.",
+        "Run the tests."
+      ],
+      "hints": [
+        "A test that waits with a real `setTimeout` takes 15 minutes, and Check stops it long before.",
+        "`vi.advanceTimersByTime(ms)` moves the fake clock on and runs the timers on the way. A check only at the end misses a hold that lets go too soon.",
+        "Move on by `15 * 60 * 1000 - 1` and expect `'held'`, then by `1` and expect `'released'`."
+      ],
+      "docs": [
+        { "title": "vi.advanceTimersByTime", "url": "https://vitest.dev/api/vi#vi-advancetimersbytime" },
+        { "title": "Fake timers", "url": "https://vitest.dev/guide/mocking/timers" },
+        {
+          "title": "setTimeout()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Moving time on with fake timers",
+          "url": "https://www.youtube.com/watch?v=aneQh5DgboE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cleanup",
+      "title": "Put the real clock back after every test",
+      "file": "src/schedule.test.js",
+      "description": "A fake clock stays on until something turns it off, so a test can leave the next one in a day and time it never chose. Make every test in `src/schedule.test.js` put the real clock back when it ends, passed or failed.\n\nCheck runs your tests on the working code and on versions where some of them fail, and looks at the clock after each test. It must be the real clock every time.",
+      "nextSteps": [
+        "Find where each of your tests turns on the fake clock.",
+        "Import the hook that runs after every test.",
+        "Put the real clock back in it, at the top of the file.",
+        "Run the tests."
+      ],
+      "hints": [
+        "A line at the end of a test does not run when an `expect` above it fails.",
+        "`afterEach` runs after every test in the file, passed or failed, and `vi.useRealTimers()` puts the real clock back.",
+        "Import `afterEach` from `vitest` and write `afterEach(() => { vi.useRealTimers() })` at the top of the file, outside the blocks."
+      ],
+      "docs": [
+        { "title": "afterEach", "url": "https://vitest.dev/api/hooks#aftereach" },
+        { "title": "vi.useRealTimers", "url": "https://vitest.dev/api/vi#vi-userealtimers" },
+        { "title": "Setup and teardown", "url": "https://vitest.dev/guide/learn/setup-teardown" }
+      ],
+      "points": 10
+    }
+  ]
+}

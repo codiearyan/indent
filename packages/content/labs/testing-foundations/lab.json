@@ -1,7 +1,7 @@
 {
   "id": "testing-foundations",
   "title": "Testing foundations",
-  "description": "Thistlecombe Farm packs vegetable boxes for the villages around it, and every change to its code breaks something that a customer finds first. As its new developer you write the tests that catch those mistakes before Friday's boxes go out: prices, packing lists, subscriptions, deliveries and orders. You learn to write tests from the very first one, read what a failure tells you, and know when a test can really catch a mistake.",
+  "description": "Thistlecombe Farm packs vegetable boxes for the villages around it, and every change to its code breaks something that a customer finds first. As its new developer you write the tests that catch those mistakes before Friday's boxes go out: prices, packing lists, subscriptions, deliveries, orders, the shed's stock, the order cut-off and payments. You learn to write tests from the very first one, read what a failure tells you, test code that waits or reads the clock, stand in for what you do not control, and know when a test can really catch a mistake.",
   "category": "JavaScript and TypeScript",
   "language": "javascript",
   "tags": ["JavaScript", "Testing"],
@@ -10,6 +10,10 @@
     {
       "title": "Tests that catch mistakes",
       "chapters": ["first-test", "equal-values", "one-behaviour-each", "edge-cases", "code-that-throws"]
+    },
+    {
+      "title": "Code that waits and things you do not control",
+      "chapters": ["code-that-waits", "fake-clock", "stand-ins"]
     }
   ]
 }
