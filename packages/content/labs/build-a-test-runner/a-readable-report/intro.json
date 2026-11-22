@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Only print prices if tests pass", "note": "The window had a wrong price." },
+    { "title": "Your runner", "text": "Prints raw objects and always ends fine.", "note": "So the price list runs anyway." },
+    {
+      "title": "Your code",
+      "file": "report.js",
+      "mine": true,
+      "gap": "No report, no exit code",
+      "tasks": ["A line per test", "A summary at the end", "An exit code"]
+    },
+    { "title": "Shop window", "say": "No new prices tonight." }
+  ],
+  "ticket": { "label": "Price list", "wrong": "printed", "why": "Never told", "right": "held back" },
+  "captions": [
+    "Idris wants the nightly price list printed only when every test passed.",
+    "Today a test fails, nobody can read why, and the wrong price still goes out.",
+    "You write the report and the exit code, in three tasks.",
+    "Now a failed test stops the price list, and the report says which and why.",
+    "One line for Idris to run each night, and a window that is never wrong."
+  ]
+}

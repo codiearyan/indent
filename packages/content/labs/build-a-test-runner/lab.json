@@ -1,0 +1,13 @@
+{
+  "id": "build-a-test-runner",
+  "title": "Build your own test runner",
+  "description": "Ashgrove Press is a two-press letterpress shop whose quote scripts run on a workshop computer with Node and nothing else, because Hesper will not have code on it that nobody there can read. Every price change Sefton makes breaks another quote, so you write the press a small test runner of its own: a list of functions, expectations, a report with an exit code, tests that wait, and groups with setup. By the end you know what the test tool you use every day really does.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": ["JavaScript", "Build your own"],
+  "kind": "project",
+  "parts": [
+    { "title": "Running tests", "chapters": ["tests-are-functions", "expectations", "a-readable-report"] },
+    { "title": "Tests in the real world", "chapters": ["tests-that-wait", "groups-and-setup"] }
+  ]
+}

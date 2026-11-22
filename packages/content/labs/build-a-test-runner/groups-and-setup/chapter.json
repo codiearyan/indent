@@ -1,0 +1,107 @@
+{
+  "id": "groups-and-setup",
+  "title": "Groups, setup and one test at a time",
+  "files": [
+    "src/runner.js",
+    "tests/quote.test.js",
+    "src/jobs.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where Sefton's grouped tests run on your runner.",
+    "suggestedCommand": "node tests/quote.test.js"
+  },
+  "tasks": [
+    {
+      "id": "describe",
+      "title": "Groups with names",
+      "file": "src/runner.js",
+      "description": "Implement `describe(name, fn)` in `src/runner.js`.\n\n- it calls `fn` straight away\n- every test added while `fn` runs belongs to the group, and its name becomes `<group> > <test>`\n- groups can sit inside groups: `quote > cards > 100 in one colour`\n- tests added after the group has ended are not in it\n\nThe check builds test files of its own with groups, groups inside groups and tests after them, and reads the names in the results.",
+      "nextSteps": [
+        "Keep a list of the groups that are open right now.",
+        "In `describe`, open the group, call `fn`, then close it again.",
+        "When a test is added, build its name from the open groups.",
+        "Run `node tests/quote.test.js` and read the names."
+      ],
+      "hints": [
+        "While `fn` runs, `test()` is called from inside it. The runner needs to know, at that moment, which groups it is in.",
+        "A stack fits groups inside groups: `push` when a group starts, `pop` when it ends. A `finally` makes sure it ends even if `fn` throws.",
+        "In `test()`, `[...groups.map((g) => g.name), name].join(' > ')` builds the full name from the groups that are open."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.pop()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop"
+        },
+        {
+          "title": "Array.prototype.join()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join"
+        },
+        {
+          "title": "try...catch...finally",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch#the_finally_block"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "before-each",
+      "title": "Setup before each test",
+      "file": "src/runner.js",
+      "description": "Implement `beforeEach(fn)` in `src/runner.js`.\n\n- inside a group, `fn` runs before every test of that group, including tests in groups inside it and tests written above the hook\n- outside any group, it runs before every test\n- outer hooks run before inner ones, and async hooks are waited for before the test starts\n- when a hook throws, its test fails with that error and the test's own function does not run\n\nThe check builds test files of its own with hooks at the top, in groups, nested, async and throwing, and records what runs in which order.",
+      "nextSteps": [
+        "Give every group its own list of hooks, and keep one more list for hooks outside any group.",
+        "Make `beforeEach` add to the list of the group it is in.",
+        "When a test is added, remember which hook lists apply to it.",
+        "In `run()`, call those hooks before the test, inside the same `try`, and run the file: the job book tests pass."
+      ],
+      "hints": [
+        "A hook that sets up fresh data for each test is what keeps tests from leaning on each other. The job book tests show why.",
+        "Keep the hook lists themselves on each test, not a copy. A hook added to a list later then still applies. `flat()` turns a list of lists into one list.",
+        "In `run()`, before `await fn()`, add `for (const hook of hooks.flat()) await hook()`, where `hooks` lists the outermost hook list first."
+      ],
+      "docs": [
+        {
+          "title": "Closures",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures"
+        },
+        {
+          "title": "Array.prototype.flat()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "only",
+      "title": "Run only one test",
+      "file": "src/runner.js",
+      "description": "Implement `test.only(name, fn, options)` in `src/runner.js`.\n\n- it adds a test just like `test()`: the same arguments, the same checks and the same time limit\n- when at least one test was added with `test.only`, `run()` runs only those, in order, and only they are in the results\n- the other tests do not run at all\n- with no `test.only` anywhere, every test runs as before\n\nThe check builds test files of its own with one, two or no chosen tests, in and out of groups.",
+      "nextSteps": [
+        "Mark each saved test with whether it was chosen.",
+        "Make `test` and `test.only` share the code that saves a test.",
+        "In `run()`, pick which tests to run before the loop.",
+        "Try `test.only` on the bulk price test, then fix the bug in `src/quote.js`."
+      ],
+      "hints": [
+        "A function is an object, so it can carry properties of its own, including another function.",
+        "Move the body of `test()` into a small helper that takes one more argument, `only`, and call it from both.",
+        "In `run()`: `const chosen = tests.some((t) => t.only) ? tests.filter((t) => t.only) : tests`, then loop over `chosen`."
+      ],
+      "docs": [
+        {
+          "title": "Array.prototype.some()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some"
+        },
+        {
+          "title": "Array.prototype.filter()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"
+        },
+        {
+          "title": "Function",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

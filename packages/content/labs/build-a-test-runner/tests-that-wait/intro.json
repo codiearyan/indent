@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Sefton", "say": "How did a test with no answer pass?", "note": "The supplier feed is offline." },
+    { "title": "Your runner", "text": "Moves on before a promise settles.", "note": "Or would wait for ever." },
+    {
+      "title": "Your code",
+      "file": "runner.js",
+      "mine": true,
+      "gap": "Async tests pass unread",
+      "tasks": ["Wait for async tests", "One test at a time", "A time limit"]
+    },
+    { "title": "Workshop screen", "text": "The supplier test fails after a time limit." }
+  ],
+  "ticket": { "label": "Supplier test", "wrong": "passed", "why": "Not waited", "right": "timed out" },
+  "captions": [
+    "Some of Sefton's tests now wait, and one waits for a supplier that never answers.",
+    "Today the runner moves on before they finish, so the supplier test passes.",
+    "You teach the runner to wait, in order, with a limit, in three tasks.",
+    "Now the supplier test fails after half a second, with a reason.",
+    "Tests that wait are judged by how they end, and none can wait for ever."
+  ]
+}

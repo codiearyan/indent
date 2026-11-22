@@ -1,0 +1,82 @@
+{
+  "id": "tests-are-functions",
+  "title": "Tests are just functions",
+  "files": ["src/runner.js", "tests/quote.test.js", "src/quote.js"],
+  "terminal": {
+    "description": "A shell in your workspace where Sefton's quote tests run on your runner.",
+    "suggestedCommand": "node tests/quote.test.js"
+  },
+  "tasks": [
+    {
+      "id": "collect",
+      "title": "Keep a list of tests",
+      "file": "src/runner.js",
+      "description": "Implement `test(name, fn)` in `src/runner.js`. It saves a test for later.\n\n- it adds `{ name, fn }` to the end of the exported `tests` array, with the very function it was given\n- it does not call `fn`\n- when `name` is not a non-empty string, or `fn` is not a function, it throws a `TypeError` and adds nothing\n\nThe check calls `test()` with its own names and functions, then looks at `tests`.",
+      "nextSteps": [
+        "Run `node tests/quote.test.js` and read the error.",
+        "Check `name` and `fn` first, and throw when either is wrong.",
+        "Add the test to the end of `tests`.",
+        "Run the file again: the error should now come from `run()`."
+      ],
+      "hints": [
+        "Registering a test is only bookkeeping. Nothing about the test itself happens yet.",
+        "`typeof` tells you whether a value is a string or a function. `new TypeError('...')` is the error to throw for a value of the wrong kind.",
+        "Do both checks before `tests.push({ name, fn })`, so a bad call leaves the list as it was."
+      ],
+      "docs": [
+        { "title": "Functions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions" },
+        { "title": "typeof", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof" },
+        { "title": "TypeError", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "run",
+      "title": "Run every test",
+      "file": "src/runner.js",
+      "description": "Implement `run()` in `src/runner.js`. It calls the function of every saved test, in the order they were added, and returns one result per test: `{ name, passed }`.\n\n- a test passes when its function returns, whatever it returns\n- a test fails when its function throws, whatever it throws\n- one failure does not stop the tests after it\n\nThe check adds its own tests with your `test()`, some that return and some that throw, and reads what `run()` returns.",
+      "nextSteps": [
+        "Loop over `tests` and call each function.",
+        "Call it inside a `try` so a throw lands in your `catch`.",
+        "Push a result for every test, passed or not, and return the list.",
+        "Run the file: the bulk price test should fail and the others pass."
+      ],
+      "hints": [
+        "A test function has no way to report a result except by returning or throwing. Your runner has to tell those two apart for every test.",
+        "`try { ... } catch { ... }` catches anything thrown inside the `try`, including from a function you call there. Where the `try` sits decides what happens next.",
+        "Put the `try` inside the loop, around one call: `try { fn(); results.push({ name, passed: true }) } catch { results.push({ name, passed: false }) }`."
+      ],
+      "docs": [
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" }
+      ],
+      "videos": [
+        { "title": "Try, catch and throwing errors", "url": "https://www.youtube.com/watch?v=_am9rKw4vWw" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "errors",
+      "title": "Keep what each test threw",
+      "file": "src/runner.js",
+      "description": "Make every failed result from `run()` also hold `error`: exactly the value that was thrown, not a copy and not its message.\n\n- this holds for anything thrown: an `Error`, a string, an object, `undefined`, `null` or `''`\n- a test that throws a falsy value still fails\n- a passed result has no `error`\n\nThe check throws values of every kind from its own tests and compares each `error` with the value it threw.",
+      "nextSteps": [
+        "Give your `catch` a name for what it caught.",
+        "Put that value on the failed result as `error`.",
+        "Make sure pass or fail is decided by whether the function threw.",
+        "Run the file and read the error on the failing test."
+      ],
+      "hints": [
+        "Your report in a later issue will need the real error, so keep it whole.",
+        "`throw undefined` is legal JavaScript. If your runner decides by looking at the caught value, a falsy one looks like no error at all.",
+        "`catch (error) { results.push({ name, passed: false, error }) }` keeps the value as it is, whatever it is."
+      ],
+      "docs": [
+        { "title": "throw", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw" },
+        { "title": "Error", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" },
+        { "title": "Falsy", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Falsy" }
+      ],
+      "points": 10
+    }
+  ]
+}
