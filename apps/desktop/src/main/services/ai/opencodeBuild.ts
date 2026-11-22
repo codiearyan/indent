@@ -1,3 +1,5 @@
+import { isFreeOpencodeModel } from '@shared/aiModels'
+
 /**
  * The OpenCode release the app installs. Pinned, because the app reads OpenCode's JSON output:
  * a newer release is an app change, tested first. Sizes and sha256 are those GitHub lists for
@@ -57,5 +59,5 @@ export function opencodeBuild(platform: string, arch: string): OpencodeBuild | n
  * default.
  */
 export function freeModel(models: string[]): string | null {
-  return models.find((model) => /^opencode\/[\w.-]+-free$/.test(model)) ?? null
+  return models.find(isFreeOpencodeModel) ?? null
 }

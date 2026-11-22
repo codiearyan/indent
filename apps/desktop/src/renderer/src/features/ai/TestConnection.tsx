@@ -1,27 +1,13 @@
-import { useState } from 'react'
 import { Check, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { api } from '@/lib/api'
-import { cn, errorMessage } from '@/lib/utils'
+import { cn } from '@/lib/utils'
+import { AiRecovery } from './AiRecovery'
+import { runConnectionTest, useConnectionTest } from './connectionTest'
 
-type State =
-  | { status: 'idle' }
-  | { status: 'testing' }
-  | { status: 'ok'; reply: string }
-  | { status: 'error'; message: string }
-
-/** Proves the chosen provider answers. Key it by provider and model so a change starts over. */
+/** Proves the chosen provider answers; a failure offers another model or provider. */
 export function TestConnection({ className }: { className?: string }): React.JSX.Element {
-  const [state, setState] = useState<State>({ status: 'idle' })
-
-  const run = async (): Promise<void> => {
-    setState({ status: 'testing' })
-    try {
-      setState({ status: 'ok', reply: await api.ai.test() })
-    } catch (error) {
-      setState({ status: 'error', message: errorMessage(error) })
-    }
-  }
+  const state = useConnectionTest()
+  const run = runConnectionTest
 
   return (
     <div className={cn('flex flex-col items-start gap-2', className)}>
@@ -55,6 +41,7 @@ export function TestConnection({ className }: { className?: string }): React.JSX
           <span className="motion-enter block text-destructive">{state.message}</span>
         )}
       </p>
+      {state.status === 'error' && <AiRecovery onRetry={() => void run()} />}
     </div>
   )
 }

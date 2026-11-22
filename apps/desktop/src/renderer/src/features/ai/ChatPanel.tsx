@@ -10,6 +10,7 @@ import { Markdown } from '@/features/workspace/Markdown'
 import { playLinkedVideo } from '@/features/workspace/video'
 import { isShortcut } from '@/lib/shortcuts'
 import { cn } from '@/lib/utils'
+import { AiRecovery } from './AiRecovery'
 import { activeProvider, useAi } from './aiStore'
 import { AiSwitch, ProviderPicker } from './AiSettings'
 import { focusLine } from './attachments'
@@ -119,6 +120,7 @@ export function ChatPanel(): React.JSX.Element {
             <p role="alert" className="text-destructive">
               {error}
             </p>
+            <AiRecovery onRetry={() => useChat.getState().retry()} />
             <Button
               variant="link"
               size="sm"

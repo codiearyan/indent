@@ -89,7 +89,7 @@ export function ProviderPicker(): React.JSX.Element {
             </div>
             <TestConnection
               key={`${active.id}/${config?.model}`}
-              className="flex-row items-center gap-3 pt-[26px]"
+              className="flex-row flex-wrap items-center gap-3 pt-[26px]"
             />
           </>
         ) : (

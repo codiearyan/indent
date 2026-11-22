@@ -2,10 +2,12 @@ import { Check, Download, Loader2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { activeProvider, useAi } from './aiStore'
+import { AiRecovery } from './AiRecovery'
 import { CopyCommand } from './CopyCommand'
 import {
   cancelOpencodeSetup,
   INSTALL_OPENCODE,
+  retryAfterSwitch,
   setUpOpencode,
   signInCommand,
   testOpencode,
@@ -75,7 +77,8 @@ export function InstallOpencode({ className }: { className?: string }): React.JS
               <span className="text-foreground">OpenCode is installed, but it did not answer.</span>{' '}
               {setup.message}
             </p>
-            <p>Sign in for a paid plan or your own key, or pick another provider.</p>
+            <p>Try another free model or provider, or sign in for a paid plan or your own key.</p>
+            <AiRecovery onRetry={retryAfterSwitch} className="mt-1" />
           </div>
         )}
         {setup.step === 'failed' && (

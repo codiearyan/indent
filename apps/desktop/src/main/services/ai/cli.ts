@@ -224,6 +224,8 @@ export async function runCli(options: CliRun): Promise<void> {
     }
   } finally {
     clearTimeout(quietTimer)
-    await rm(cwd, { recursive: true, force: true })
+    // On Windows the CLI can still hold the folder for a moment. A leftover empty temp folder is
+    // harmless; an error here would replace the reply or the real reason it failed.
+    await rm(cwd, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }).catch(() => {})
   }
 }
