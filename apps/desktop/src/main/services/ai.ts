@@ -1,6 +1,6 @@
 import { safeStorage } from 'electron'
 import { randomUUID } from 'crypto'
-import { readFile, writeFile } from 'fs/promises'
+import { copyFile, readFile, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 import type {
   AiChatEvent,
@@ -425,6 +425,12 @@ export async function restoreAiChoice(saved: unknown): Promise<void> {
     next.model = null
   }
   if (next.model?.startsWith('-')) next.model = null
+  // Kept aside like the progress, so the choice made on this computer can be recovered.
+  await copyFile(settingsFile(), `${settingsFile()}.replaced-${Date.now()}`).catch(
+    (error: NodeJS.ErrnoException) => {
+      if (error.code !== 'ENOENT') throw error
+    }
+  )
   settings = next
   await saveSettings()
   if (!next.enabled) stopEverything()

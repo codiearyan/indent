@@ -137,7 +137,8 @@ async function readArchive(file: string): Promise<Picked> {
   const staging = join(workspacesRoot(), '.import')
   await rm(staging, { recursive: true, force: true })
   try {
-    await unpack(file, staging).catch(() => {
+    // Links inside a workspace come back as links; one that points outside it is refused.
+    await unpack(file, staging, { links: true }).catch(() => {
       throw new Error(NOT_A_BACKUP)
     })
     const text = await readFile(join(staging, MANIFEST), 'utf8').catch(() => '')

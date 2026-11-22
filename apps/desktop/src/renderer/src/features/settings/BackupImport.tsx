@@ -51,6 +51,7 @@ export function useBackupImport(onRestored?: () => void): BackupImport {
       const { progress, app } = await api.backup.applyImport()
       useProgress.getState().set(progress)
       if (app) {
+        keepSettingsAside()
         const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
         useSettings.setState(withBackupSettings(useSettings.getState(), app, system))
       }
@@ -93,6 +94,16 @@ export function useBackupImport(onRestored?: () => void): BackupImport {
   )
 
   return { pick, busy, dialog }
+}
+
+/** The settings of this computer stay in the app's storage, next to the restored ones. */
+function keepSettingsAside(): void {
+  try {
+    const current = localStorage.getItem('indent-settings')
+    if (current) localStorage.setItem(`indent-settings.replaced-${Date.now()}`, current)
+  } catch {
+    // Storage can be unavailable; the restore goes ahead, as it did before settings were kept.
+  }
 }
 
 function contents({ issues, hasSettings }: ProgressImport): string {
