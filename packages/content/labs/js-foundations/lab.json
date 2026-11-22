@@ -18,6 +18,7 @@
         "nothing-there"
       ]
     },
+    { "title": "When it breaks", "chapters": ["read-the-error", "names-and-values", "quiet-mistakes"] },
     { "title": "The shelf", "chapters": ["order-reports"] },
     { "title": "Helpers that remember", "chapters": ["loyalty-cards"] }
   ]

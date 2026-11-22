@@ -1,0 +1,131 @@
+{
+  "id": "names-and-values",
+  "title": "Names and values that break",
+  "files": [
+    "src/restock.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run the restock sheet here and read where Node stops.",
+    "suggestedCommand": "node src/restock.js"
+  },
+  "tasks": [
+    {
+      "id": "jars",
+      "title": "Count the wax jars",
+      "file": "src/restock.js",
+      "description": "Under `// Task 1` in `src/restock.js`, Node stops at the line that prints the wax jars left. Fix it so it prints `Wax jars left:` followed by the number in `waxJars`. The line that makes `waxJars` is right as it is.\n\nCheck runs the lines of Task 1 alone, with another number in `waxJars`, and looks for that line with that number.",
+      "nextSteps": [
+        "Run `node src/restock.js`. Node stops at Task 3 first; the lesson says why. Fix that one first, or read on and come back.",
+        "Once Node gets to Task 1, read the kind of error and the name in its message.",
+        "Compare that name, letter by letter, with the line that makes it.",
+        "Fix the line that uses it and run the file again."
+      ],
+      "hints": [
+        "The error names a name Node does not know. Look for a name that is almost the same in the line above.",
+        "Capital letters count: two names that differ only in one capital are two different names to Node.",
+        "The name is made as `waxJars`, with a capital J. Use it exactly like that in the `console.log` line."
+      ],
+      "docs": [
+        {
+          "title": "ReferenceError: \"x\" is not defined",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Not_defined"
+        },
+        {
+          "title": "Variables: naming",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reference errors for new developers",
+          "url": "https://www.youtube.com/watch?v=NyDWNBQmhrg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "shelf",
+      "title": "Take the sold candles off the shelf",
+      "file": "src/restock.js",
+      "description": "Under `// Task 2`, the cedar count starts with the candles delivered and should then lose the ones sold, but Node stops when the count changes. Fix it so it prints `On the shelf:` followed by the candles delivered minus the candles sold.\n\nCheck runs the lines of Task 2 alone, with its own numbers in `cedarDelivered` and `cedarSold`, and looks for that line with the right count.",
+      "nextSteps": [
+        "Run the file until Node stops under Task 2, and read the kind of error.",
+        "The message says what kind of variable is being changed. Find where that variable is made.",
+        "Ask whether this count should be able to change.",
+        "Fix it so the count changes, and run the file again."
+      ],
+      "hints": [
+        "The line Node stops at is not the mistake. It does what it should. Look at how the variable was made.",
+        "A `const` keeps its first value forever. A count that changes during the day needs the other keyword.",
+        "Make `cedarOnShelf` with `let` instead of `const`, and keep the line that takes the sold candles off."
+      ],
+      "docs": [
+        {
+          "title": "TypeError: invalid assignment to const",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Invalid_const_assignment"
+        },
+        {
+          "title": "let",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "label",
+      "title": "Write the label in capitals",
+      "file": "src/restock.js",
+      "description": "Under `// Task 3`, the label starts as the customer's name and should then become the same name in capital letters, but Node cannot even read the file. Fix it so it prints `Label:` followed by the customer's name in capitals.\n\nCheck runs the lines of Task 3 alone, with another name in `customerName`, and looks for that line with the name in capitals.",
+      "nextSteps": [
+        "Run the file: this is the error Node shows first, before any line runs.",
+        "Read the name in the message, and find every line where that name is made.",
+        "Ask whether the second line means to make a new variable or to change the one that is there.",
+        "Fix it and run the file again."
+      ],
+      "hints": [
+        "The message says a name has already been declared. Declared means made with `let` or `const`.",
+        "A name can be made only once. To change it afterwards you write the name, `=` and the new value, with no keyword in front.",
+        "Remove `let` from the second line, so it reads `label = label.toUpperCase()`."
+      ],
+      "docs": [
+        {
+          "title": "let: redeclarations",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let#redeclarations"
+        },
+        {
+          "title": "Assignment (=)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Assignment"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "code",
+      "title": "Make the city code",
+      "file": "src/restock.js",
+      "description": "Under `// Task 4`, the city code should be the first three letters of the city, without the spaces around it, in capital letters. Node stops on that line. Fix it so it prints `City code:` followed by the code.\n\nCheck runs the lines of Task 4 alone, with another city, spaces included, in `city`, and looks for that line with the right code.",
+      "nextSteps": [
+        "Run the file until Node stops under Task 4, and read the whole message.",
+        "The message names something that is not a function. Look at each dot on the line and what comes before it.",
+        "Compare the line with how the lesson uses a method.",
+        "Fix it and run the file again."
+      ],
+      "hints": [
+        "The message names `city.trim.slice`. Read it as: the thing called `slice` on `city.trim` is not a function.",
+        "A method only runs when it has round brackets after its name. Without them, `city.trim` is the method itself, not the trimmed city.",
+        "Give `trim` its brackets: `city.trim().slice(0, 3).toUpperCase()`."
+      ],
+      "docs": [
+        {
+          "title": "TypeError: \"x\" is not a function",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Not_a_function"
+        },
+        {
+          "title": "String.prototype.trim()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
