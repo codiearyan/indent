@@ -23,7 +23,8 @@
       "title": "Settings, big files and long jobs",
       "chapters": [
         "environment",
-        "line-by-line"
+        "line-by-line",
+        "events"
       ]
     }
   ]

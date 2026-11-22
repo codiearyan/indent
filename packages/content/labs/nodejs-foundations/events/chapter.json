@@ -1,0 +1,141 @@
+{
+  "id": "events",
+  "title": "Events of your own",
+  "files": [
+    "meter.js",
+    "watch.js",
+    "water/june.txt",
+    "try.js"
+  ],
+  "terminal": {
+    "description": "A terminal in your workspace. `node try.js watch.js water/june.txt` feeds the June log to your meter and shows the alarm, the counts, the skipped lines and the exit code.",
+    "suggestedCommand": "node try.js watch.js water/june.txt"
+  },
+  "tasks": [
+    {
+      "id": "reading",
+      "title": "Emit a reading for each line",
+      "file": "meter.js",
+      "description": "Write `meter.js` as a module that exports a class `Meter`, which extends `EventEmitter` from `node:events`. It is made with a limit, `new Meter(20)`, which the next task uses. Its method `feed(line)` takes one line of the logger's log. For a reading such as `2026-06-14T07:01,north,26` it emits a `reading` event with one object:\n\n```js\n{ time: '2026-06-14T07:01', tap: 'north', litres: 26 }\n```\n\n`litres` is a number. A blank line or a note, a line that starts with `#`, emits nothing.\n\nCheck imports `Meter` from your `meter.js` in a script of its own, listens for its events, feeds it lines of its own, and compares what it emitted, in order.",
+      "nextSteps": [
+        "Import `EventEmitter` from `node:events` and write `export class Meter extends EventEmitter`.",
+        "In its constructor, call `super()`, then keep the limit on `this`.",
+        "Write `feed(line)`: leave out blank lines and notes, split a reading on its commas.",
+        "Emit `reading` with an object of the three parts, litres as a number."
+      ],
+      "hints": [
+        "An emitter calls every listener of an event when you `emit` it, and passes them what you emit along with the name.",
+        "A class that extends another must call `super()` in its constructor before it uses `this`. Inside a method, `this.emit(...)` emits on the meter itself.",
+        "`const [time, tap, litres] = line.split(',')`, then `this.emit('reading', { time, tap, litres: Number(litres) })`."
+      ],
+      "docs": [
+        {
+          "title": "Class: EventEmitter",
+          "url": "https://nodejs.org/api/events.html#class-eventemitter"
+        },
+        {
+          "title": "emitter.emit()",
+          "url": "https://nodejs.org/api/events.html#emitteremiteventname-args"
+        },
+        {
+          "title": "extends",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/extends"
+        }
+      ],
+      "videos": [
+        {
+          "title": "The event emitter in Node",
+          "url": "https://www.youtube.com/watch?v=NtrnaTKqFPQ"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "leak",
+      "title": "Emit a leak over the limit",
+      "file": "meter.js",
+      "description": "More than the limit in a minute means a hose left running or a burst pipe. Change `feed` so that when a reading's litres are more than the limit the meter was made with, it emits a `leak` event with the same object, after the `reading` event. A reading exactly at the limit is not a leak.\n\nCheck makes meters with limits of its own, listens for both events, feeds them lines of its own, and compares what they emitted, in order.",
+      "nextSteps": [
+        "Keep the limit given to the constructor on the meter.",
+        "After emitting `reading`, compare the litres with the limit.",
+        "Emit `leak` with the same object when the litres are more."
+      ],
+      "hints": [
+        "Listeners run in the order the events are emitted, so emit `reading` first, then `leak`.",
+        "The constructor's argument is gone once the constructor ends, unless you keep it on `this`.",
+        "`if (reading.litres > this.limit) this.emit('leak', reading)`."
+      ],
+      "docs": [
+        {
+          "title": "Passing arguments and this to listeners",
+          "url": "https://nodejs.org/api/events.html#passing-arguments-and-this-to-listeners"
+        },
+        {
+          "title": "emitter.emit()",
+          "url": "https://nodejs.org/api/events.html#emitteremiteventname-args"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "error",
+      "title": "Emit an error for a line that is not a reading",
+      "file": "meter.js",
+      "description": "After a power cut, the logger sometimes writes half a line. Change `feed` so that a line that is not blank, not a note and not a reading emits an `error` event with an `Error` whose message includes the line, such as `Not a reading: 2026-06-14T07:0`. A reading has three parts, and its litres are a number; empty litres are not a number. That line emits no `reading`, `feed` does not throw, and the next line is read as usual.\n\nCheck feeds a meter lines of its own, some of them broken, once with a listener for `error` and once with none, to see that an error nobody listens to stops the script.",
+      "nextSteps": [
+        "Decide what makes a line a reading: three parts, and litres that are a number.",
+        "For any other line that is not blank or a note, make an `Error` with the line in its message.",
+        "Emit it as `error`, and leave `feed` without emitting a reading.",
+        "Try `node try.js watch.js water/june.txt` once `watch.js` is written, with and without its `error` listener."
+      ],
+      "hints": [
+        "`error` is special to an emitter: emitted with no listener, it is thrown, and the script stops with it. That is what you want when nobody is ready for it.",
+        "`Number('')` is 0, so test for empty litres yourself. `new Error(message)` gives the error a message and the place it was made.",
+        "`this.emit('error', new Error(`Not a reading: ${line}`))`, then `return`."
+      ],
+      "docs": [
+        {
+          "title": "Error events",
+          "url": "https://nodejs.org/api/events.html#error-events"
+        },
+        {
+          "title": "Error() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/Error"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "watch",
+      "title": "Ring the alarm once, then keep counting",
+      "file": "watch.js",
+      "description": "Write `watch.js` so that `node watch.js water/june.txt` reads the log a line at a time and feeds each line to a `Meter` from `meter.js`, made with a limit of 20 litres. It listens to the meter:\n\n- At the first leak it prints an alarm, with the leak's tap and time. The alarm's listener then removes itself, so later leaks are only counted.\n- For each `error` it prints one line on standard error that includes the error's message, and goes on.\n- It counts readings and leaks with listeners, and after the log prints one line with the counts.\n\nFor the June log it prints:\n\n```\nALARM: leak on north at 2026-06-14T07:01\nReadings: 6. Leaks: 2.\n```\n\nand one line on standard error. It ends with exit code 1 when a line was skipped, and 0 when none was.\n\nCheck puts a stand-in `meter.js` of its own beside your script, so this task is judged on its own, and runs `watch.js` on two logs of its own. The stand-in tells Check which listeners were there before and after the first leak.",
+      "nextSteps": [
+        "Import `Meter` from `./meter.js`, make one, and add a listener for each event before you read the log.",
+        "Write the alarm as a named function, so you can hand the same function to `off`.",
+        "Read the log a line at a time, as in the last issue, and feed each line to the meter.",
+        "After the loop, print the counts, and set the exit code if any line was skipped."
+      ],
+      "hints": [
+        "A listener is removed by giving `off` the same function you gave `on`. An arrow written again is a new function, so it removes nothing.",
+        "Give the alarm a name: `function alarm(reading) { ... }`. Inside it, after printing, remove it. `once` adds a listener that removes itself after one call, which does the same.",
+        "`function alarm(r) { console.log(`ALARM: leak on ${r.tap} at ${r.time}`); meter.off('leak', alarm) }` and `meter.on('leak', alarm)`."
+      ],
+      "docs": [
+        {
+          "title": "emitter.off()",
+          "url": "https://nodejs.org/api/events.html#emitteroffeventname-listener"
+        },
+        {
+          "title": "emitter.once()",
+          "url": "https://nodejs.org/api/events.html#emitteronceeventname-listener"
+        },
+        {
+          "title": "emitter.on()",
+          "url": "https://nodejs.org/api/events.html#emitteroneventname-listener"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
