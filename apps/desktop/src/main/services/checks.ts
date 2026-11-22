@@ -17,7 +17,7 @@ import {
   parseTrace,
   type RunOutcome
 } from './grader'
-import { labModelProblem, labModelReady, startLabModel } from './labModel'
+import { labModelProblem, labModelReady, labUsesModel, startLabModel } from './labModel'
 import { getProgress, recordCheck } from './progress'
 import { findMissing } from './workspaceSync'
 import { InstallError } from '../library'
@@ -180,7 +180,7 @@ async function trace(labId: string, chapterId: string, taskId: string): Promise<
 
   const status = await ensureRuntime()
   if (!status.ready) return failedTrace(status.error ?? 'The repo tools are not ready yet.')
-  await labModelReady()
+  if (labUsesModel(labId)) await labModelReady()
   const error = labModelProblem(labId)
   if (error) return failedTrace(error)
   const args = [
@@ -220,7 +220,7 @@ async function runCheck(
   const status = await ensureRuntime()
   // The notice above the tasks says what is wrong; the tasks are not failed for it.
   if (!status.ready) return { results: [], progress: await getProgress() }
-  await labModelReady()
+  if (labUsesModel(labId)) await labModelReady()
   const error = labModelProblem(labId)
   let results: CheckResult[]
   if (error) {
