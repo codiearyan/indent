@@ -178,6 +178,10 @@ html.window-fullscreen {
   .pane[data-active='true']::after {
     opacity: 1;
   }
+  /* On the dark frame the line needs more of the white foreground to read as white, not grey. */
+  .dark .pane::after {
+    border-color: color-mix(in oklab, var(--foreground) 45%, transparent);
+  }
   .press:active:not(:disabled, [aria-disabled='true']) {
     transform: scale(0.98);
   }
