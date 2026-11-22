@@ -36,7 +36,7 @@
       "id": "border",
       "title": "Draw a line down the left of each note",
       "file": "styles.css",
-      "description": "Dilys wants a line down the left side of each note: 4px wide, solid, in clay.\n\nGive the notes a left border of 4px, solid, in the clay colour, and no border on the other sides. Use the colour's name from the last issue.\n\nThe check reads the width, style and colour of the left border of both notes, and makes sure the top, right and bottom have none.",
+      "description": "Dilys wants a line down the left side of each note: 4px wide, solid, in clay.\n\nGive the notes a left border of 4px, solid, in the clay colour, and no border on the other sides. Use the colour's name from the last issue.\n\nThe check reads the width, style and colour of the left border of both notes, makes sure the colour is written with its name, and makes sure the top, right and bottom have none.",
       "nextSteps": [
         "Read \"Borders\" in the lesson.",
         "Go back to the rule for the notes.",

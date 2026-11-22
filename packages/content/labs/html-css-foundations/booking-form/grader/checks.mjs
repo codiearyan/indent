@@ -63,7 +63,9 @@ export const checks = {
     for (const f of FIELDS) {
       const { field, byName } = findField(page, f)
       let message = `There is no field for the ${f.what} yet. Add an input for it inside the form.`
-      if (field && !byName)
+      if (field && !field.getAttribute('name'))
+        message = `There is a field for the ${f.what}, but it has no name. A field without a name is not sent at all.`
+      else if (field && !byName)
         message = `There is a field for the ${f.what}, but its name is not the one in the task. The name is what the answer is sent under.`
       else if (field && field.form !== form)
         message = `The ${f.what} field is outside the form. Only fields inside the form are sent with it.`
@@ -148,7 +150,7 @@ export const checks = {
     const isNumber = field.type === 'number'
     const checkLimit = (value, want, word) => {
       if (value === null)
-        return `Nothing stops someone asking for ${word === 'smallest' ? 'no places at all' : 'more places than a class has'}. A number field has an attribute for its ${word} value.`
+        return `Nothing stops someone asking for ${word === 'smallest' ? 'no places at all' : 'more places than Kofi takes from one booking'}. A number field has an attribute for its ${word} value.`
       if (Number(value) !== want || value.trim() === '')
         return `The places field has a ${word} value, but not the one Kofi gave.`
       return null

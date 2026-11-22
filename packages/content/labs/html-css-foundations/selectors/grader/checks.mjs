@@ -1,4 +1,13 @@
-import { clean, detail, judge, judged, line, notLinked, openStyled } from '../../style-checks.mjs'
+import {
+  broken,
+  clean,
+  detail,
+  judged,
+  line,
+  namedColour,
+  notLinked,
+  openStyled
+} from '../../style-checks.mjs'
 
 const CLAY = 'rgb(164, 73, 42)'
 const SAND = 'rgb(239, 220, 195)'
@@ -19,7 +28,14 @@ export const checks = {
     if (!s.linked) return [notLinked(s, FIX)]
     const h1 = s.page.$('h1')
     const h2s = s.page.$$('h2')
-    const options = { what: 'colour', wants: "Dilys's clay" }
+    const options = {
+      what: 'colour',
+      wants: "Dilys's clay",
+      wrong: (value) =>
+        namedColour(value)
+          ? "That is a named colour. Dilys's notes give a code for the clay; use her code."
+          : null
+    }
     const h2 = h2s.find((h) => s.style(h).color !== CLAY) ?? h2s[0]
     const grouped = s.decls.find(
       (d) => d.property === 'color' && sel(d).includes('h1') && sel(d).includes('h2')
@@ -77,6 +93,8 @@ export const checks = {
       if (p.classList.contains('note')) return null
       if (p.querySelector('.note'))
         return `The class for ${name} is on an element inside its paragraph. Put it on the paragraph itself.`
+      if (/(^|\s)\.note(\s|$)/.test(p.className))
+        return `The paragraph with ${name} has the class .note, with a dot. In the HTML a class is written without the dot; the dot is only for picking it in CSS.`
       if (p.className)
         return `The paragraph with ${name} has a class, but not note. A class name must match exactly, capitals too.`
       return `The paragraph with ${name} has no class yet. Give it the class note.`
@@ -145,6 +163,9 @@ export const checks = {
     let idMessage = 'Give the figure the id from the task.'
     if (holder && holder !== figure)
       idMessage = `The id is on the <${holder.tagName.toLowerCase()}>, not on the figure. Put it on the figure, which holds the picture and its caption.`
+    else if (figure?.id === `#${ID}`)
+      idMessage =
+        'The figure has the id with a # in front. In the HTML an id is written without the #; the # is only for picking it in CSS.'
     else if (figure?.id)
       idMessage = 'The figure has an id, but not the one in the task. An id must match exactly.'
     const byId = s.decls.find(
@@ -229,7 +250,8 @@ export const checks = {
       detail(
         'The rule picks links inside the nav',
         Boolean(descendant),
-        'Make the links bold with a selector that picks links by where they sit: inside the nav. Two selectors with a space between them do that.',
+        (!s.decls.some((d) => d.property === 'font-weight') && broken(s)?.message) ||
+          'Make the links bold with a selector that picks links by where they sit: inside the nav. Two selectors with a space between them do that.',
         s.decls
           .filter((d) => d.property === 'font-weight')
           .map(line)

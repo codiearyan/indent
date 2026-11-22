@@ -59,7 +59,7 @@
       "id": "extras",
       "title": "Add a checkbox and a box for notes",
       "file": "classes.html",
-      "description": "Two lines are left: `Send me news when the kiln is opened` and `Anything Kofi should know?`.\n\n- Replace the first with a checkbox named `news`, with the line as its label.\n- Replace the second with a `textarea` named `notes`, with the question as its label.\n\nThe check finds each field, makes sure it is the right kind, in the form, with the right name, and reads its label. Then it makes sure the old lines are gone.",
+      "description": "Two lines are left: `Send me news when the kiln is opened` and `Anything Kofi should know?`.\n\n- Replace the first with a checkbox named `news`, with the line as its label.\n- Replace the second with a `textarea` named `notes`, with the question as its label and nothing between its tags.\n\nThe check finds each field, makes sure it is the right kind, in the form, with the right name, and reads its label. Then it makes sure the old lines are gone.",
       "nextSteps": [
         "Read \"Yes or no, and longer answers\" in the lesson.",
         "Replace the news line with a checkbox inside a label.",

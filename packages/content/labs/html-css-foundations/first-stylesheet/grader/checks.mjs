@@ -1,13 +1,19 @@
-import { detail, judged, notLinked, openStyled, read } from '../../style-checks.mjs'
+import {
+  detail,
+  distance,
+  judged,
+  namedColour,
+  notLinked,
+  openStyled,
+  read
+} from '../../style-checks.mjs'
 
 const CREAM = 'rgb(247, 241, 232)'
 const INK = 'rgb(59, 47, 42)'
 const FIX = 'Link it in the first task, then come back to this one.'
 
-const named = (value) =>
-  /^[a-z]+$/i.test(value) && !/^(inherit|initial|unset|transparent|currentcolor)$/i.test(value)
 const colourWrong = (value) =>
-  named(value)
+  namedColour(value)
     ? "That is a named colour. Dilys's notes give a code for this one; use her code."
     : null
 
@@ -108,6 +114,8 @@ export const checks = {
       const list = families(value)
       if (list.length === 1 && /georgia\s+serif/.test(list[0]))
         return 'The two fonts are not separated, so the browser reads them as one font name. Put a comma between them.'
+      if (!list.includes('georgia') && distance(list[0], 'georgia') <= 3)
+        return "The first font is not spelt the way Dilys's notes spell it. Keep the font's name exactly as she wrote it."
       if (list[0] !== 'georgia')
         return 'Georgia comes first, so the browser uses it whenever the computer has it.'
       if (list.length === 1)

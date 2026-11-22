@@ -177,7 +177,9 @@ export const checks = {
         scopes.length > 0 && scopes.every((s) => s === 'col'),
         rowScope
           ? 'Some of these headers say they head a row, but each one heads the column below it.'
-          : 'A header cell can say which way it points: along its row or down its column. Add the attribute for that to each header in the top row.',
+          : scopes.some((s) => s && s !== 'col')
+            ? 'Some headers have a scope, but its value is not one the browser knows. The lesson gives the two values a scope takes.'
+            : 'A header cell can say which way it points: along its row or down its column. Add the attribute for that to each header in the top row.',
         shown(head.row)
       )
     ]
@@ -201,7 +203,9 @@ export const checks = {
           ? 'The name of a class starts its row, and the rest of the row is about it. It is still an ordinary data cell; make it a header.'
           : leads.some((cell) => scope(cell) === 'col')
             ? 'These headers say they head a column, but each class name heads its own row.'
-            : 'A header cell can say which way it points: along its row or down its column. Add the attribute for that to each class name.',
+            : leads.some((cell) => scope(cell) && scope(cell) !== 'row')
+              ? 'Some headers have a scope, but its value is not one the browser knows. The lesson gives the two values a scope takes.'
+              : 'A header cell can say which way it points: along its row or down its column. Add the attribute for that to each class name.',
         classes.map((line) => shown(line.row)).join('\n')
       ),
       detail(
@@ -267,7 +271,7 @@ export const checks = {
           ? 'The caption is there, but it must come right after the opening table tag, before the first row.'
           : 'Add the caption first.',
         caption
-          ? `First inside the table: <${table.firstElementChild.tagName.toLowerCase()}>`
+          ? `First inside the table: ${/^(TBODY|THEAD|TR)$/.test(table.firstElementChild.tagName) ? 'a row' : `<${table.firstElementChild.tagName.toLowerCase()}>`}`
           : 'No caption in the table'
       ),
       detail(

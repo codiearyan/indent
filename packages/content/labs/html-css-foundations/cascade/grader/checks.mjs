@@ -1,4 +1,13 @@
-import { clean, detail, judged, line, notLinked, openStyled } from '../../style-checks.mjs'
+import {
+  broken,
+  clean,
+  detail,
+  distance,
+  judged,
+  line,
+  notLinked,
+  openStyled
+} from '../../style-checks.mjs'
 
 const COLOURS = {
   '--clay': 'rgb(164, 73, 42)',
@@ -123,17 +132,23 @@ export const checks = {
       const text = clean(el.textContent)
       return `<${el.tagName.toLowerCase()}> ${text.length > 40 ? `${text.slice(0, 40)}...` : text}`
     }
+    const misspelt = fonts
+      .map((d) => families(d.value)[0])
+      .find((f) => f !== 'palatino' && distance(f, 'palatino') <= 3)
+    const offMessage = misspelt
+      ? "The font's name is not spelt the way Dilys's notes spell it. Keep Palatino exactly as she wrote it."
+      : 'Some text is not in Palatino yet. An element without a font of its own takes the font of the element around it, all the way up to the body.'
     let onceMessage =
       'The font list is set somewhere other than the body. Set it on the body, and nowhere else.'
     if (fonts.length > 1)
-      onceMessage = `A font list is written in ${fonts.length} rules. Set Palatino once, on the body; everything inside it takes the font from there, so remove the copies.`
+      onceMessage = `A font list is written ${fonts.length} times in styles.css. Set Palatino once, on the body; everything inside it takes the font from there, so remove the copies.`
     else if (!fonts.length)
       onceMessage = 'There is no font list in styles.css any more. Set Palatino on the body.'
     return [
       detail(
         'All the text is in Palatino',
         off.length === 0,
-        'Some text is not in Palatino yet. An element without a font of its own takes the font of the element around it, all the way up to the body.',
+        offMessage,
         off.length
           ? `Not in Palatino:\n${off
               .slice(0, 4)
@@ -174,9 +189,18 @@ export const checks = {
     const elsewhere = s.decls.filter(
       (d) => names.includes(d.property) && !d.selectors.some((x) => /^(:root|html)$/i.test(x))
     )
+    const oneDash = s.decls.find((d) => /^-[a-z]/i.test(d.property))
+    const colonless = elsewhere.some((d) => d.selectors.some((x) => x.toLowerCase() === 'root'))
+    const fault = broken(s, names)
     let namesMessage =
       'Some colours are named, but with a different code from the one used on the page. Copy each code exactly.'
-    if (missing.length && elsewhere.length)
+    if (fault) namesMessage = fault.message
+    else if (oneDash)
+      namesMessage = `${oneDash.property} has one dash in front. The name of a custom property starts with two.`
+    else if (colonless)
+      namesMessage =
+        'The rule for the names is written root, without the colon in front. Without it, the selector looks for an element called root.'
+    else if (missing.length && elsewhere.length)
       namesMessage =
         'The colour names are set on another element. Put them on :root, the top of the page, so every rule can use them.'
     else if (missing.length)
@@ -196,7 +220,7 @@ export const checks = {
     const literal = (value) =>
       /#[0-9a-f]{3,8}\b|\b(rgba?|hsla?)\(/i.test(value) || value.split(/\s+/).some(isColourWord)
     const written = s.decls.filter(
-      (d) => !d.property.startsWith('--') && literal(d.value.replace(/var\([^)]*\)/g, ''))
+      (d) => !d.property.startsWith('-') && literal(d.value.replace(/var\([^)]*\)/g, ''))
     )
 
     const used = [
@@ -222,7 +246,8 @@ export const checks = {
     })
     let lookMessage =
       'A colour changed on the way to its name. Compare the lines marked wrong with the colours before.'
-    if (dashless) lookMessage = 'Inside var(), the name of a custom property keeps its two dashes.'
+    if (fault) lookMessage = fault.message
+    else if (dashless) lookMessage = 'Inside var(), the name of a custom property keeps its two dashes.'
     else if (unknown.length)
       lookMessage = `Some var() uses a name that no custom property has: ${unknown.join(', ')}. Check the spelling.`
     return [

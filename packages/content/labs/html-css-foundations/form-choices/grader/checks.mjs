@@ -243,7 +243,11 @@ export const checks = {
         'The notes box does not have the name the task gives. The name is what the answer is sent under.'
     else if (notes && where(notes, form))
       notesMessage = form ? `The notes box ${where(notes, form)}` : where(notes, form)
-    else if (notes) notesMessage = labelProblem(page, notes, NOTES, 'notes box')
+    else if (notes && labelProblem(page, notes, NOTES, 'notes box'))
+      notesMessage = labelProblem(page, notes, NOTES, 'notes box')
+    else if (notes?.value.trim())
+      notesMessage =
+        'The notes box starts with words in it, and they are sent as the answer when nobody types. Leave it empty between its tags.'
     const left = [NEWS, NOTES].map((w) => oldLine(page, w)).filter(Boolean)
     return [
       detail(
@@ -262,7 +266,8 @@ export const checks = {
           notes.tagName === 'TEXTAREA' &&
           notes.name === 'notes' &&
           !where(notes, form) &&
-          !labelProblem(page, notes, NOTES, 'notes box'),
+          !labelProblem(page, notes, NOTES, 'notes box') &&
+          !notes.value.trim(),
         notesMessage,
         notes ? `${html(notes)} label: ${labelText(notes) || 'none'}` : 'not found'
       ),

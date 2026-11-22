@@ -111,6 +111,19 @@ export const checks = {
       })
     ])
     let left = first(results)
+    const coded = s.decls.find(
+      (d) =>
+        /^border(-left)?(-color)?$/.test(d.property) &&
+        d.selectors.some((x) => s.matches(list[0], x)) &&
+        /#[0-9a-f]{3,8}\b|\b(rgba?|hsla?)\(/i.test(d.value)
+    )
+    if (left.ok && coded)
+      left = {
+        ok: false,
+        message:
+          'The clay is written as a code here. Use its name from the last issue with var(), so the code stays in one place, on :root.',
+        output: `${left.output}\n${line(coded)}`
+      }
     const style = s.style(list[0])['border-left-style']
     if (
       !left.ok &&
@@ -147,7 +160,7 @@ export const checks = {
         around.length === 0,
         'The note has a line on other sides too. Dilys wants it down the left side only.',
         around.length
-          ? `Lines on: left, ${[...new Set(around)].join(', ')}`
+          ? `Lines on: ${[...new Set(around)].join(', ')}`
           : 'Only the left side has a line'
       )
     ]
@@ -214,7 +227,12 @@ export const checks = {
           }
         )
       : { ok: true, output: `All ${all.length} elements: border-box` }
-    if (off.length && !s.decls.some((d) => d.property === 'box-sizing') && !s.inline.length)
+    if (
+      off.length &&
+      r.message.endsWith('yet.') &&
+      !s.decls.some((d) => d.property === 'box-sizing') &&
+      !s.inline.length
+    )
       r = {
         ok: false,
         message:

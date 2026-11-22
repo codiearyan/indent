@@ -11,6 +11,8 @@ export const detail = (name, passed, message, output) => ({
   output
 })
 export const cap = (text) => text[0].toUpperCase() + text.slice(1)
+export const namedColour = (value) =>
+  /^[a-z]+$/i.test(value) && !/^(inherit|initial|unset|transparent|currentcolor)$/i.test(value)
 export const read = (t, file) => readFile(join(t.workspace, file), 'utf8').catch(() => null)
 
 /** Every declaration of a stylesheet, with the selectors of its rule, in file order. */
@@ -48,6 +50,28 @@ export function declarations(css) {
 }
 
 export const line = (d) => `${d.selector} { ${d.property}: ${d.value} }`
+
+const BRACES =
+  'A rule in styles.css is missing a brace: each selector is followed by { and each rule ends with }. The browser misreads the rules around a missing one.'
+const RUN_ON =
+  'A line in styles.css does not end with a semicolon, so the browser reads it and the next line as one value and skips both.'
+
+/**
+ * A missing brace or semicolon that would explain why `names` do not reach the page, or null.
+ * Checks report it instead of blaming the value or the selector the learner did write.
+ */
+export function broken(s, names = []) {
+  const text = s.css.replace(/\/\*[\s\S]*?\*\//g, '')
+  const opens = (text.match(/{/g) ?? []).length
+  const closes = (text.match(/}/g) ?? []).length
+  if (opens !== closes) return { message: BRACES, output: `Opening braces: ${opens}, closing braces: ${closes}` }
+  for (const d of s.decls) {
+    const next = d.value.match(/\n\s*(-{0,2}[a-z][\w-]*)\s*:/i)
+    if (next && (!names.length || [d.property, next[1].toLowerCase()].some((p) => names.includes(p))))
+      return { message: RUN_ON, output: line(d) }
+  }
+  return null
+}
 
 const matches = (el, selector) => {
   try {
@@ -119,7 +143,7 @@ export function notLinked(s, fix) {
   )
 }
 
-function distance(a, b) {
+export function distance(a, b) {
   const row = Array.from({ length: b.length + 1 }, (_, i) => i)
   for (let i = 1; i <= a.length; i++) {
     let prev = row[0]
@@ -155,10 +179,12 @@ export function judge(
   { target, what, wrong, hint, length = false, wants = 'the value the task asks for' }
 ) {
   const got = el ? s.style(el)[property] : undefined
-  const output = `${cap(target)}, ${what}: ${got ?? 'not set'}`
+  const output = `${cap(target)}, ${what}: ${got || 'not set'}`
   if (!el) return { ok: false, message: `${cap(target)} is not on the page.`, output }
   if (got !== undefined && ok(got)) return { ok: true, output }
   const names = family(property)
+  const fault = broken(s, names)
+  if (fault) return { ok: false, message: fault.message, output: `${output}\n${fault.output}` }
   const onEl = s.decls.filter((d) => d.selectors.some((sel) => matches(el, sel)))
   const misspelt = onEl.find(
     (d) => !s.known(d.property) && names.some((n) => distance(d.property, n) <= 3)
@@ -178,6 +204,12 @@ export function judge(
     for (const d of [...mine].reverse()) {
       const value = bare(d)
       const shown = `${output}\n${line(d)}`
+      if (length && /\d\s+(px|em|rem|%|pt|vh|vw)\b/i.test(value))
+        return {
+          ok: false,
+          message: `The ${what} has a space between the number and its unit. They are written together, or the browser skips the line.`,
+          output: shown
+        }
       if (
         length &&
         value.split(/\s+/).some((tok) => /^-?\d*\.?\d+$/.test(tok) && Number(tok) !== 0)
