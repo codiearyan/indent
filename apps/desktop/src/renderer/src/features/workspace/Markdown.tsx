@@ -1,4 +1,5 @@
-import ReactMarkdown from 'react-markdown'
+import { useMemo } from 'react'
+import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
 import { CodeBlock } from './CodeBlock'
@@ -14,26 +15,28 @@ export function Markdown({
   /** Handles a clicked link inside the app; returning false lets it open in the browser. */
   onLink?(href: string): boolean
 }): React.JSX.Element {
+  // A new renderer each render would remount every block: scroll, Copied and colours reset.
+  const components = useMemo<Components>(
+    () => ({
+      pre: ({ node }) => <CodeBlock {...fenceOf(node)} />,
+      a: ({ href, children }) => (
+        <a
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(event) => {
+            if (href && onLink?.(href)) event.preventDefault()
+          }}
+        >
+          {children}
+        </a>
+      )
+    }),
+    [onLink]
+  )
   return (
     <div className={cn('prose-lab', compact && 'prose-compact')}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        components={{
-          pre: ({ node }) => <CodeBlock {...fenceOf(node)} />,
-          a: ({ href, children }) => (
-            <a
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              onClick={(event) => {
-                if (href && onLink?.(href)) event.preventDefault()
-              }}
-            >
-              {children}
-            </a>
-          )
-        }}
-      >
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {children}
       </ReactMarkdown>
     </div>
