@@ -71,7 +71,7 @@ Two things belong in every head:
 
 `meta` with `charset` tells the browser how the letters in the file are stored. With `utf-8`, accents, symbols and every alphabet come out right. It has no content, so it has no closing tag. The slash before `>` is optional; it just reminds you that nothing follows.
 
-`title` is the text on the browser tab, in bookmarks and in search results. It is often the same as the page's main heading, but it is not shown on the page itself.
+`title` is the text on the browser tab, in bookmarks and in search results. It is often the same as the page's main heading, but it is not shown on the page itself. Here, the Browser panel shows it at the top, beside the file name.
 
 ## Headings and paragraphs
 
@@ -93,4 +93,4 @@ One more thing you will see in every file of this repo: a comment. Anything betw
 
 Everything happens in `index.html`. Work through the tasks in order: first the doctype and the `html` element, then the head, then the body with its heading and paragraphs. Keep Dilys's words exactly as she wrote them.
 
-Save after each change and watch the Browser panel: it reloads every time you save. When the tab says the studio's name and the words sit on their own lines, press Check.
+Save after each change and watch the Browser panel: it reloads every time you save. When the top of the Browser panel shows the studio's name and the words sit on their own lines, press Check.

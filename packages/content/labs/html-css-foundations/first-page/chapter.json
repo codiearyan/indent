@@ -42,10 +42,10 @@
         "Read \"What goes in the head\" in the lesson.",
         "Open and close a `head` element right after the opening `html` tag.",
         "Add the character set inside it, then the title.",
-        "Save and look at the tab of the Browser panel, then press Check."
+        "Save and look at the top of the Browser panel, then press Check."
       ],
       "hints": [
-        "Nothing in the head shows on the page. You will see the title on the tab of the Browser panel.",
+        "Nothing in the head shows on the page. You will see the title at the top of the Browser panel, beside the file name.",
         "The character set is an element with no content and no closing tag. Its only job is one attribute.",
         "The meta element has a `charset` attribute set to `utf-8`. The title is an ordinary pair of tags with the studio name between them."
       ],
