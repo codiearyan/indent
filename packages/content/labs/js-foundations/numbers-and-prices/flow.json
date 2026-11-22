@@ -1,0 +1,119 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "order", "label": "Today's order", "kind": "data" },
+      { "id": "subtotal", "label": "subtotalCents", "kind": "data", "mine": true },
+      { "id": "discount", "label": "discountCents", "kind": "data", "mine": true },
+      { "id": "total", "label": "totalCents", "kind": "data", "mine": true },
+      { "id": "boxes", "label": "boxes", "kind": "data", "mine": true },
+      { "id": "theo", "label": "Theo at the till", "kind": "story" },
+      { "id": "ines", "label": "Ines", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "order", "to": "subtotal", "label": "price, quantity" },
+      { "from": "subtotal", "to": "discount", "label": "subtotal" },
+      { "from": "discount", "to": "total", "label": "discount" },
+      { "from": "order", "to": "boxes", "label": "quantity" },
+      { "from": "total", "to": "theo", "label": "to charge" },
+      { "from": "boxes", "to": "ines", "label": "to fold" }
+    ],
+    "note": "Today's order goes through your sums, so Theo knows what to charge and Ines how many boxes to fold."
+  },
+  "tasks": {
+    "subtotal": {
+      "steps": [
+        {
+          "active": ["order"],
+          "value": {
+            "kind": "map",
+            "label": "today's order",
+            "entries": [
+              { "key": "candlePriceCents", "value": 1250 },
+              { "key": "quantity", "value": 3 }
+            ]
+          },
+          "note": "The first order of the day: three candles at 12.50 each, kept in cents."
+        },
+        {
+          "active": ["order", "order->subtotal", "subtotal"],
+          "note": "subtotalCents is the price of one candle, once for every candle bought."
+        },
+        {
+          "active": ["subtotal"],
+          "note": "On another order the price and the quantity change, and the same line still gives the right subtotal."
+        }
+      ]
+    },
+    "discount": {
+      "steps": [
+        {
+          "active": ["subtotal", "subtotal->discount"],
+          "value": {
+            "kind": "map",
+            "label": "the newsletter discount",
+            "entries": [{ "key": "discountPercent", "value": 10 }]
+          },
+          "note": "Newsletter readers get a percentage off the subtotal."
+        },
+        {
+          "active": ["discount"],
+          "note": "A percent is that many hundredths of the subtotal."
+        },
+        {
+          "active": ["discount"],
+          "value": {
+            "kind": "map",
+            "label": "what comes out",
+            "entries": [{ "key": "discountCents", "value": "whole cents" }]
+          },
+          "note": "Some orders give part of a cent, so the discount is rounded to the nearest whole cent."
+        }
+      ]
+    },
+    "total": {
+      "steps": [
+        {
+          "active": ["subtotal", "discount", "discount->total", "total"],
+          "note": "The total starts from the subtotal and takes the discount off."
+        },
+        {
+          "active": ["order", "total"],
+          "value": {
+            "kind": "map",
+            "label": "from today's order",
+            "entries": [{ "key": "shippingCents", "value": 495 }]
+          },
+          "note": "Shipping goes on top."
+        },
+        {
+          "active": ["total", "total->theo", "theo"],
+          "note": "Theo charges the same total every time, to the cent."
+        }
+      ]
+    },
+    "boxes": {
+      "steps": [
+        {
+          "active": ["order", "order->boxes"],
+          "value": {
+            "kind": "map",
+            "label": "today's order",
+            "entries": [
+              { "key": "quantity", "value": 3 },
+              { "key": "candlesPerBox", "value": 4 }
+            ]
+          },
+          "note": "Ines wants to know how many boxes to fold for this order."
+        },
+        {
+          "active": ["boxes"],
+          "note": "Dividing the candles by the box size rarely comes out as a whole number."
+        },
+        {
+          "active": ["boxes", "boxes->ines", "ines"],
+          "note": "A partly full box still counts, so the answer is always a whole number of boxes."
+        }
+      ]
+    }
+  }
+}

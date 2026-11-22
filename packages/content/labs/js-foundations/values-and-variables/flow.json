@@ -1,0 +1,119 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ines", "label": "Ines", "kind": "story" },
+      { "id": "morning", "label": "This morning's numbers", "kind": "data" },
+      { "id": "shop", "label": "shopName", "kind": "data", "mine": true },
+      { "id": "shelf", "label": "cedarOnShelf", "kind": "data", "mine": true },
+      { "id": "names", "label": "Who does what", "kind": "data", "mine": true },
+      { "id": "terminal", "label": "Terminal", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ines", "to": "morning", "label": "a delivery" },
+      { "from": "morning", "to": "shelf", "label": "delivered, sold" },
+      { "from": "shop", "to": "terminal", "label": "the name" },
+      { "from": "shelf", "to": "terminal", "label": "the count" },
+      { "from": "names", "to": "terminal", "label": "names" }
+    ],
+    "note": "The morning's numbers come in, and your variables keep the shop's name, the cedar count and who does what."
+  },
+  "tasks": {
+    "shop": {
+      "steps": [
+        {
+          "active": ["ines"],
+          "note": "Ines wants the shop's name kept in one place, under one name."
+        },
+        {
+          "active": ["shop"],
+          "value": {
+            "kind": "map",
+            "label": "the variable",
+            "entries": [
+              { "key": "name", "value": "shopName" },
+              { "key": "holds", "value": "text" },
+              { "key": "changes", "value": "never" }
+            ]
+          },
+          "note": "The shop's name never changes, so it goes in a const that holds text."
+        },
+        {
+          "active": ["shop", "shop->terminal", "terminal"],
+          "note": "Printing the variable shows the text it holds."
+        }
+      ]
+    },
+    "shelf": {
+      "steps": [
+        {
+          "active": ["ines", "ines->morning", "morning"],
+          "value": {
+            "kind": "map",
+            "label": "this morning's numbers",
+            "entries": [
+              { "key": "cedarDelivered", "value": 24 },
+              { "key": "cedarSold", "value": 5 }
+            ]
+          },
+          "note": "The delivery comes in. On another morning these numbers are different."
+        },
+        {
+          "active": ["morning", "morning->shelf", "shelf"],
+          "note": "cedarOnShelf starts with whatever cedarDelivered holds, so a different delivery gives a different start."
+        },
+        {
+          "active": ["shelf", "shelf->terminal", "terminal"],
+          "note": "The count is printed, and it can still change later today."
+        }
+      ]
+    },
+    "sell": {
+      "steps": [
+        {
+          "active": ["morning", "morning->shelf"],
+          "note": "cedarSold says how many cedar candles went out this morning."
+        },
+        {
+          "active": ["shelf"],
+          "value": {
+            "kind": "map",
+            "label": "cedarOnShelf",
+            "entries": [
+              { "key": "before the sale", "value": "the delivery" },
+              { "key": "after the sale", "value": "what is left" }
+            ]
+          },
+          "note": "The same variable gets a new value: what is left once the sale is taken off."
+        },
+        {
+          "active": ["shelf", "shelf->terminal", "terminal"],
+          "note": "Printed again, the count shows what is still on the shelf."
+        }
+      ]
+    },
+    "names": {
+      "steps": [
+        {
+          "active": ["names"],
+          "value": {
+            "kind": "map",
+            "label": "Theo's old names",
+            "entries": [
+              { "key": "x", "value": "Ines" },
+              { "key": "y", "value": "Theo" }
+            ]
+          },
+          "note": "Two variables hold who packs and who answers email, but their names say nothing."
+        },
+        {
+          "active": ["names"],
+          "note": "Each one gets a name that says what it holds, everywhere it appears."
+        },
+        {
+          "active": ["names", "names->terminal", "terminal"],
+          "note": "The file prints the same two lines, and now anyone can read why."
+        }
+      ]
+    }
+  }
+}

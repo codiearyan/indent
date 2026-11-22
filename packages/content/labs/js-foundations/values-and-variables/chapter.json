@@ -1,0 +1,131 @@
+{
+  "id": "values-and-variables",
+  "title": "Values and variables",
+  "files": ["src/variables.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the morning count.",
+    "suggestedCommand": "node src/variables.js"
+  },
+  "tasks": [
+    {
+      "id": "shop",
+      "title": "Name the shop",
+      "file": "src/variables.js",
+      "description": "Under `// Task 1` in `src/variables.js`, make a `const` called `shopName` that holds the text `Wickhollow Candles`, then print it.\n\nCheck runs your file and reads `shopName`: it must hold exactly that text and be made with `const`.",
+      "nextSteps": [
+        "Find `// Task 1` in the file.",
+        "Make the variable with `const`, the name, `=` and the text in quotes.",
+        "Print it with `console.log` on the next line.",
+        "Run `node src/variables.js` and read the output."
+      ],
+      "hints": [
+        "A variable is made with a keyword, a name and a value. The lesson shows one for the kettle.",
+        "The name never changes, which tells you which keyword to use. The value is text, so it needs quotes.",
+        "The line has the shape `const shopName = '...'`, with the shop's name where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "const",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const"
+        },
+        {
+          "title": "Storing the information you need: variables",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Variables"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What a variable is",
+          "url": "https://www.youtube.com/watch?v=le-URjBhevE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "shelf",
+      "title": "Count the cedar candles",
+      "file": "src/variables.js",
+      "description": "Under `// Task 2`, make a `let` called `cedarOnShelf`. It starts with the number of cedar candles delivered this morning, which is in `cedarDelivered` near the top of the file. Print it.\n\nCheck runs your file with other delivery numbers in place of the ones at the top, so `cedarOnShelf` has to be built on the name `cedarDelivered`, not on a number you type.",
+      "nextSteps": [
+        "Read the two lines under \"This morning's numbers\".",
+        "Under `// Task 2`, make `cedarOnShelf` with `let`.",
+        "Give it the value of `cedarDelivered` by writing that name.",
+        "Print it and run the file."
+      ],
+      "hints": [
+        "A variable can start with the value of another variable, not only with a number or text you type.",
+        "The count will change later today, which tells you which keyword to use. On the right of `=`, write the name of the variable that holds the delivery.",
+        "The line has the shape `let cedarOnShelf = ...`, with the delivery's variable name where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "let",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let"
+        },
+        {
+          "title": "Storing the information you need: variables",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Variables"
+        }
+      ],
+      "videos": [
+        {
+          "title": "var, let and const compared",
+          "url": "https://www.youtube.com/watch?v=1mgLWu69ijU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sell",
+      "title": "Sell some candles",
+      "file": "src/variables.js",
+      "description": "Under `// Task 3`, `cedarSold` candles were sold this morning. Give `cedarOnShelf` a new value: the number left on the shelf after the sale. Then print it again.\n\nCheck runs your file with other numbers at the top and reads `cedarOnShelf` at the end. It also reads your file to see that Task 3 gives the existing variable a new value, rather than making a new one.",
+      "nextSteps": [
+        "Make sure Task 2 passes first: Task 3 changes the same variable.",
+        "Under `// Task 3`, start a line with the name `cedarOnShelf` and `=`.",
+        "On the right, take `cedarSold` away from what is on the shelf now.",
+        "Print it again and run the file: you should see two different counts."
+      ],
+      "hints": [
+        "You are not making a new variable here. You are changing one you already made.",
+        "Giving a variable a new value is its name, `=` and the new value, with no keyword in front. The right side can use the variable's own current value.",
+        "The line has the shape `cedarOnShelf = cedarOnShelf - ...`, with the sold candles' variable where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "Assignment (=)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Assignment"
+        },
+        {
+          "title": "let",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "names",
+      "title": "Give x and y real names",
+      "file": "src/variables.js",
+      "description": "Under `// Task 4`, two variables are called `x` and `y`, and nobody can tell what they hold. Rename `x` to `packerName` and `y` to `emailerName`, everywhere they appear. Their values stay the same.\n\nCheck runs your file and reads `packerName` and `emailerName`, and makes sure `x` and `y` are gone.",
+      "nextSteps": [
+        "Read the four lines under `// Task 4`.",
+        "Rename `x` where it is made.",
+        "Rename it where it is used too, then do the same for `y`.",
+        "Run the file: it should print the same two lines as before."
+      ],
+      "hints": [
+        "A variable's name appears where it is made and everywhere it is used.",
+        "If you rename it in one place only, Node stops with an error that names the one it no longer knows. Read it: it tells you which line to fix.",
+        "Four places change: the two lines that make `x` and `y`, and the two `console.log` lines that use them."
+      ],
+      "docs": [
+        {
+          "title": "Variables: naming",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

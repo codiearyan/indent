@@ -1,0 +1,25 @@
+{
+  "stations": [
+    { "title": "Theo", "say": "What does this order come to?", "note": "He uses his phone's calculator." },
+    {
+      "title": "Today's order",
+      "rows": [["3 candles", "12.50 each"], ["Discount", "10%"], ["Shipping", "4.95"]]
+    },
+    {
+      "title": "Your code",
+      "file": "prices.js",
+      "mine": true,
+      "gap": "Sums done by hand",
+      "tasks": ["Price the candles", "Take off the discount", "Find the total", "Count the boxes"]
+    },
+    { "title": "The till", "text": "Charges the same total every time." }
+  ],
+  "ticket": { "label": "First order", "wrong": "a cent off", "why": "By hand", "right": "priced" },
+  "captions": [
+    "The shelf count works. Now Theo wants the first order of the day priced.",
+    "He does the sums on his phone, and last week he was a cent out.",
+    "You write the sums in prices.js, in four small tasks.",
+    "Now the order is priced in whole cents, with the discount, shipping and boxes.",
+    "The same sums every time. Theo charges right, and Ines knows how many boxes to fold."
+  ]
+}

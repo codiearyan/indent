@@ -1,0 +1,95 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ines", "label": "Ines", "kind": "story" },
+      { "id": "file", "label": "first-line.js", "kind": "file", "mine": true },
+      { "id": "node", "label": "Node", "kind": "story" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ines", "to": "file", "label": "the note" },
+      { "from": "file", "to": "node", "label": "lines" },
+      { "from": "node", "to": "terminal", "label": "printed text" }
+    ],
+    "note": "You write the lines of first-line.js, Node runs them from top to bottom, and the terminal shows what they print."
+  },
+  "tasks": {
+    "welcome": {
+      "steps": [
+        {
+          "active": ["ines", "ines->file"],
+          "note": "Ines wants the shop's welcome printed, exactly as the task spells it."
+        },
+        {
+          "active": ["file"],
+          "note": "Under Task 1 you add one line that prints it, with the text in quotes."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "Node reads the file from the top and runs each line in turn."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "The welcome shows up on a line of its own in the terminal."
+        }
+      ]
+    },
+    "note": {
+      "steps": [
+        {
+          "active": ["ines", "ines->file"],
+          "value": {
+            "kind": "array",
+            "label": "the parcel note",
+            "values": ["first line", "second line"]
+          },
+          "note": "The parcel note has two lines, and Ines wants them in the order the task gives."
+        },
+        {
+          "active": ["file"],
+          "note": "Each line of the note gets its own print, one under the other."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "Node runs the two prints in the order they are written."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "The terminal shows the two lines, one right after the other."
+        }
+      ]
+    },
+    "offer": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "A line under Task 3 still prints a free candle offer the shop stopped running."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "Node skips every line that is a comment."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "The offer no longer prints, and the line stays in the file in case Theo wants it back."
+        }
+      ]
+    },
+    "comment": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "A comment is a note for the next person who opens the file, like Theo."
+        },
+        {
+          "active": ["file", "file->node", "node"],
+          "note": "Node skips comments, so your note changes nothing that runs."
+        },
+        {
+          "active": ["node", "node->terminal", "terminal"],
+          "note": "The terminal prints the same lines as before your note."
+        }
+      ]
+    }
+  }
+}

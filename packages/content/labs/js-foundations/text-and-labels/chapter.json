@@ -1,0 +1,125 @@
+{
+  "id": "text-and-labels",
+  "title": "Text and labels",
+  "files": ["src/labels.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see today's shipping label.",
+    "suggestedCommand": "node src/labels.js"
+  },
+  "tasks": [
+    {
+      "id": "name",
+      "title": "Tidy the name",
+      "file": "src/labels.js",
+      "description": "Under `// Task 1` in `src/labels.js`, make a `const` called `cleanName`: `customerName` without the spaces at its start and end. The space between words stays. Print it.\n\nCheck runs your file with other names in place of the one at the top, some with spaces at both ends, some at one end, some with none.",
+      "nextSteps": [
+        "Run the file and look closely at the first line it prints.",
+        "Find the string method in the lesson that removes spaces at the ends.",
+        "Make `cleanName` from `customerName` with that method.",
+        "Print it and run the file again."
+      ],
+      "hints": [
+        "You do not have to find the spaces yourself. Strings come with methods for jobs like this one.",
+        "The method you need tidies both ends at once and leaves the middle alone. It takes nothing in its brackets.",
+        "The line has the shape `const cleanName = customerName.method()`, with the tidy-up method from the lesson in place of `method`."
+      ],
+      "docs": [
+        {
+          "title": "String.prototype.trim()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim"
+        },
+        {
+          "title": "Handling text: strings in JavaScript",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Strings"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "city",
+      "title": "Make the city code",
+      "file": "src/labels.js",
+      "description": "Under `// Task 2`, make a `const` called `cityCode`: the first three letters of `city`, in capital letters. `Lisbon` becomes `LIS`. Print it.\n\nCheck tries other cities, including one typed in small letters.",
+      "nextSteps": [
+        "Find the method in the lesson that cuts out part of a string.",
+        "Cut out the first three letters of `city`.",
+        "Turn the result into capitals.",
+        "Print it and run the file."
+      ],
+      "hints": [
+        "There are two jobs here: cutting and turning into capitals. Each has its own method.",
+        "`slice` takes where to start and where to stop. Counting starts at 0, and the stop position is not included.",
+        "Chain them: `city.slice(0, 3)` gives the first three letters, and a second method after it turns them into capitals."
+      ],
+      "docs": [
+        {
+          "title": "String.prototype.slice()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/slice"
+        },
+        {
+          "title": "String.prototype.toUpperCase()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "line",
+      "title": "Write the label line",
+      "file": "src/labels.js",
+      "description": "Under `// Task 3`, make a `const` called `labelLine` that reads like this, with the parcel's own values in place:\n\n```\nOrder 1042 for Maya Ortiz, LIS\n```\n\nBuild it from `orderNumber`, `cleanName` and `cityCode`. Print it.\n\nCheck runs your file with other parcels and compares the whole line, spaces and comma included.",
+      "nextSteps": [
+        "Make sure Tasks 1 and 2 pass: the line uses both.",
+        "Start a template literal with a backtick.",
+        "Write the fixed words, and put each variable in `${}` where it belongs.",
+        "Print it and compare it with the example, character by character."
+      ],
+      "hints": [
+        "The words Order and for, the spaces and the comma stay the same on every label. Only three parts change.",
+        "A template literal, written between backticks, lets you drop a variable into text with `${name}`.",
+        "The line has the shape `` `Order ${...} for ${...}, ${...}` ``, with the three variable names in order."
+      ],
+      "docs": [
+        {
+          "title": "Template literals",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals"
+        },
+        {
+          "title": "Handling text: strings in JavaScript",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Strings"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Template literals",
+          "url": "https://www.youtube.com/watch?v=kj8HU-_P2NU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "length",
+      "title": "Measure the label",
+      "file": "src/labels.js",
+      "description": "Under `// Task 4`, make a `const` called `labelLength`: how many characters `labelLine` has, spaces and punctuation included. Print it.\n\nCheck runs your file with other parcels, so count on `labelLine` itself rather than typing a number.",
+      "nextSteps": [
+        "Make sure Task 3 passes.",
+        "Find how the lesson gets the number of characters in a string.",
+        "Make `labelLength` from `labelLine`.",
+        "Print it and run the file."
+      ],
+      "hints": [
+        "Every string knows how many characters it has. You only have to ask it.",
+        "This one is not a method: there are no brackets after it.",
+        "Write `labelLine`, a dot, and the word the lesson uses for the number of characters."
+      ],
+      "docs": [
+        {
+          "title": "String: length",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

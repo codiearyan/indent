@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ines", "say": "Can the laptop keep the cedar count?", "note": "She crosses out a sticky note." },
+    { "title": "This morning", "rows": [["Cedar delivered", "24"], ["Cedar sold", "5"]] },
+    {
+      "title": "Your code",
+      "file": "variables.js",
+      "mine": true,
+      "gap": "Nothing keeps the count",
+      "tasks": ["Name the shop", "Count the cedar", "Sell some candles", "Rename x and y"]
+    },
+    { "title": "Shelf count", "text": "One number that follows every sale." }
+  ],
+  "ticket": { "label": "Cedar count", "wrong": "smudged", "why": "Sticky note", "right": "kept" },
+  "captions": [
+    "The parcel note prints. Next, Ines wants the laptop to keep the cedar count.",
+    "The count lives on a sticky note, crossed out after every sale.",
+    "You keep it in variables instead, in four small tasks.",
+    "Now the count starts with the delivery and follows each sale.",
+    "Values under good names: the laptop remembers, and anyone can read it."
+  ]
+}
