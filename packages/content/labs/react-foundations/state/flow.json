@@ -1,0 +1,50 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "volunteer", "label": "Door volunteer", "kind": "story" },
+      { "id": "buttons", "label": "In, Out, Family", "kind": "story" },
+      { "id": "counter", "label": "DoorCounter", "kind": "function", "mine": true },
+      { "id": "state", "label": "Remembered values", "kind": "data", "mine": true },
+      { "id": "screen", "label": "Door screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "volunteer", "to": "buttons", "label": "presses" },
+      { "from": "buttons", "to": "counter", "label": "handler" },
+      { "from": "counter", "to": "state", "label": "set" },
+      { "from": "state", "to": "screen", "label": "draw again" }
+    ],
+    "note": "The door screen keeps the count between presses, and draws again each time it changes."
+  },
+  "tasks": {
+    "count": {
+      "steps": [
+        { "active": ["volunteer", "volunteer->buttons", "buttons"], "note": "A visitor walks in and the volunteer presses In." },
+        { "active": ["buttons", "buttons->counter", "counter"], "note": "The handler asks for the next count." },
+        { "active": ["counter", "counter->state", "state"], "value": { "kind": "map", "label": "Remembered", "entries": [{ "key": "inside", "value": "number" }] }, "note": "React keeps the new count for the component." },
+        { "active": ["state", "state->screen", "screen"], "note": "The screen is drawn again and shows it at once." }
+      ]
+    },
+    "out": {
+      "steps": [
+        { "active": ["volunteer", "volunteer->buttons", "buttons"], "note": "A visitor leaves and the volunteer presses Out." },
+        { "active": ["buttons", "buttons->counter", "counter", "counter->state", "state"], "note": "The count goes down by one, unless nobody is inside." },
+        { "active": ["state", "state->screen", "screen"], "note": "The screen never shows fewer than nobody." }
+      ]
+    },
+    "family": {
+      "steps": [
+        { "active": ["volunteer", "volunteer->buttons", "buttons"], "note": "A family of four comes in on one ticket." },
+        { "active": ["buttons", "buttons->counter", "counter"], "note": "One press asks for a visitor four times over." },
+        { "active": ["counter", "counter->state", "state"], "note": "Each of the four asks counts one more visitor." },
+        { "active": ["state", "state->screen", "screen"], "note": "All four of them are counted." }
+      ]
+    },
+    "doors": {
+      "steps": [
+        { "active": ["volunteer", "volunteer->buttons", "buttons"], "note": "At five o'clock the volunteer closes the doors." },
+        { "active": ["counter", "counter->state", "state"], "value": { "kind": "map", "label": "Remembered", "entries": [{ "key": "inside", "value": "number" }, { "key": "open", "value": "true or false" }] }, "note": "The doors are a second value, kept apart from the count." },
+        { "active": ["state", "state->screen", "screen"], "note": "The screen says the doors are closed, and nobody more is let in." }
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Anjali", "say": "A mug in the basket, please.", "note": "A queue at the till." },
+    { "title": "On the shelf", "text": "Things for sale, each with an Add button.", "note": "From shop.js." },
+    {
+      "title": "Your till",
+      "file": "Till.jsx",
+      "mine": true,
+      "gap": "Add changes nothing",
+      "tasks": ["Wrap and bag", "Add to the basket", "One line, more of it", "Remove a line"]
+    },
+    { "title": "Basket", "rows": [["Foundry Belle mug"], ["Total"]], "mark": 0 }
+  ],
+  "ticket": { "label": "Belle mug", "wrong": "not in basket", "why": "Not kept", "right": "in the basket" },
+  "captions": [
+    "In the gift shop, Anjali wants the till to keep a basket while she serves.",
+    "She presses Add next to the Foundry Belle mug, and the basket stays empty.",
+    "You keep the basket and the options in state, in four tasks.",
+    "The mug goes in the basket, and a second one raises its quantity.",
+    "Same shelf, now a basket that keeps up. A line comes out as easily as it goes in."
+  ]
+}
