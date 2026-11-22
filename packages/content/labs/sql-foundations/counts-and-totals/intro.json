@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Rosamund",
+      "say": "How many owners gave an email?",
+      "note": "For the yearly form."
+    },
+    {
+      "title": "owners",
+      "text": "One row per owner, and no totals anywhere.",
+      "note": "Counting by hand takes ages."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "file": "1-owner-counts.sql",
+      "gap": "No way to count",
+      "tasks": [
+        "Count the owners",
+        "Sum the treatments",
+        "Dogs' average weight",
+        "The insurer's form"
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Yearly form",
+    "wrong": "by hand",
+    "why": "No totals",
+    "right": "filled in"
+  },
+  "captions": [
+    "Rosamund needs a few numbers about the owners for the practice's yearly form.",
+    "Every query gives back rows, so she counts them by hand and loses her place.",
+    "You count, add up, average and round, gaps and empty results included, in four tasks.",
+    "Now each figure comes back as one row, and the form fills itself in.",
+    "Same records, squeezed into the figures the forms ask for."
+  ]
+}

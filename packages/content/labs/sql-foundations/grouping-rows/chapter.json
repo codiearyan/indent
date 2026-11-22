@@ -1,0 +1,123 @@
+{
+  "id": "grouping-rows",
+  "title": "Totals per group",
+  "files": [
+    "queries/1-species-counts.sql",
+    "queries/2-breed-counts.sql",
+    "queries/3-takings-per-kind.sql",
+    "queries/4-big-bills.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-species-counts.sql"
+  },
+  "tasks": [
+    {
+      "id": "species-counts",
+      "title": "Count the animals of each species",
+      "file": "queries/1-species-counts.sql",
+      "description": "Winnie orders leaflets for the waiting room and wants one number per species.\n\nIn `queries/1-species-counts.sql`, return two columns from `animals`, in this order:\n\n- `species`\n- `animals`: how many animals of that species there are\n\nOne row per species. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, which has species the data you can see does not.",
+      "nextSteps": [
+        "Count every animal and run it: one row for the whole table.",
+        "Add `species` to the columns and run it again. What changed, and what did not?",
+        "Group the rows by species, so each species gets its own count."
+      ],
+      "hints": [
+        "If you get one row, read the lesson's part \"One row per group\" again.",
+        "`GROUP BY` goes after `FROM` and takes the column whose values make the groups. The count then runs once per group.",
+        "The query ends with `GROUP BY species;`."
+      ],
+      "docs": [
+        {
+          "title": "GROUP BY and HAVING",
+          "url": "https://www.sqlite.org/lang_select.html#resultset"
+        },
+        { "title": "count()", "url": "https://www.sqlite.org/lang_aggfunc.html#count" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "breed-counts",
+      "title": "Count the breeds of each species",
+      "file": "queries/2-breed-counts.sql",
+      "description": "Ifan wants to know which breeds the practice sees, species by species.\n\nIn `queries/2-breed-counts.sql`, return three columns from `animals`, in this order:\n\n- `species`\n- `breed`\n- `animals`: how many animals have that species and that breed\n\nOne row for each species and breed that occurs together. Animals whose breed nobody knows make one row per species, with `NULL` as the breed. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Start from the query of task 1 and add `breed` to the columns. Run it and look at the breeds.",
+        "Make each species and breed pair its own group.",
+        "Look at the rows with `NULL` as the breed: there should be one for each species that has animals of unknown breed."
+      ],
+      "hints": [
+        "With only one column in `GROUP BY`, the other column shows a value from one row of each group and hides the rest.",
+        "`GROUP BY` takes more than one column, with a comma between them. Rows go in the same group only when they match on all of them.",
+        "The query ends with `GROUP BY species, breed;`."
+      ],
+      "docs": [
+        {
+          "title": "GROUP BY and HAVING",
+          "url": "https://www.sqlite.org/lang_select.html#resultset"
+        },
+        {
+          "title": "A bare column beside an aggregate",
+          "url": "https://www.sqlite.org/lang_select.html#bareagg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "takings-per-kind",
+      "title": "Rank the kinds of treatment by takings",
+      "file": "queries/3-takings-per-kind.sql",
+      "description": "Rosamund wants to see which kinds of treatment bring in the most.\n\nIn `queries/3-takings-per-kind.sql`, return three columns from `treatments`, in this order:\n\n- `kind`\n- `treatments`: how many treatments of that kind there are\n- `takings`: their prices added up\n\nOne row per kind, sorted by `takings` with the biggest first. Check compares the columns, the rows and their order on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Group the treatments by kind, with a count and a total. Run it.",
+        "Sort the groups by their total.",
+        "Check the direction: the kind that brought in the most comes first."
+      ],
+      "hints": [
+        "This is a grouping like task 1 with one more column, and then a sort from the issue about sorting.",
+        "`ORDER BY` comes after `GROUP BY`, and it can sort by a total, either by its new name or by the aggregate itself.",
+        "The query ends with the shape `GROUP BY kind ORDER BY takings DESC;`."
+      ],
+      "docs": [
+        {
+          "title": "GROUP BY and HAVING",
+          "url": "https://www.sqlite.org/lang_select.html#resultset"
+        },
+        { "title": "The ORDER BY clause", "url": "https://www.sqlite.org/lang_select.html#orderby" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "big-bills",
+      "title": "Find the bills over £100",
+      "file": "queries/4-big-bills.sql",
+      "description": "Rosamund wants to offer to spread the payment of any bill over £100. A visit's bill is all of its treatments added up.\n\nIn `queries/4-big-bills.sql`, return three columns from `treatments`, in this order:\n\n- `visit_id`\n- `treatments`: how many treatments the visit was charged for\n- `bill`: their prices added up\n\nOne row per visit, and only the visits whose bill comes to more than £100. A visit can get there with one dear treatment or with a few cheaper ones. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, which has a bill of exactly £100.",
+      "nextSteps": [
+        "Group the treatments by visit, with a count and a total, and run it: one row per visit.",
+        "Keep only the groups whose total is over £100.",
+        "Find a visit in your result whose treatments each cost less than £100. It should be there."
+      ],
+      "hints": [
+        "The test is on the bill, which only exists once the treatments of a visit are added up. The lesson's part \"WHERE or HAVING\" says which one tests that.",
+        "`WHERE` tests one treatment at a time, before the grouping. `HAVING` comes after `GROUP BY` and tests a whole group.",
+        "The query ends with the shape `GROUP BY visit_id HAVING SUM(price) > 100;`."
+      ],
+      "docs": [
+        {
+          "title": "GROUP BY and HAVING",
+          "url": "https://www.sqlite.org/lang_select.html#resultset"
+        },
+        { "title": "sum() and total()", "url": "https://www.sqlite.org/lang_aggfunc.html#sumunc" }
+      ],
+      "videos": [
+        {
+          "title": "GROUP BY, and HAVING against WHERE",
+          "url": "https://www.youtube.com/watch?v=nNrgRVIzeHg"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
