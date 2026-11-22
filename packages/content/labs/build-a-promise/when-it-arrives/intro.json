@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "When the count arrives, do this.", "note": "Not after a guessed timer." },
+    { "title": "The docket", "text": "Knows when it settles. Nobody else does.", "note": "Looking again is guesswork." },
+    {
+      "title": "Your then()",
+      "file": "docket.js",
+      "mine": true,
+      "gap": "No way to say what to do",
+      "tasks": ["Callbacks that wait", "Already settled", "Many callbacks"]
+    },
+    { "title": "Price list", "rows": [["Card", "1200 sheets"], ["Napkins", "not listed"]], "mark": 0 }
+  ],
+  "ticket": { "label": "Card count", "wrong": "pending", "why": "A guess", "right": "printed" },
+  "captions": [
+    "Idris wants to say what happens when the paper count arrives, not guess when to look.",
+    "On a slow night the price list looked too early and printed pending for the card.",
+    "You write then(), which keeps callbacks until the docket settles, in three tasks.",
+    "Now the card count is printed the moment it arrives, however long that takes.",
+    "Every count is printed when it is ready, and nobody has to guess."
+  ]
+}

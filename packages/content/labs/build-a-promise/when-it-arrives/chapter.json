@@ -1,0 +1,81 @@
+{
+  "id": "when-it-arrives",
+  "title": "When it arrives, do this",
+  "files": ["src/docket.js", "src/price-list.js", "src/store.js"],
+  "terminal": {
+    "description": "A shell in your workspace where Idris's price list says what to do with each paper count when it arrives.",
+    "suggestedCommand": "node src/price-list.js"
+  },
+  "tasks": [
+    {
+      "id": "waiting-callbacks",
+      "title": "Callbacks that wait",
+      "file": "src/docket.js",
+      "description": "Implement `then(onFulfilled, onRejected)` in `src/docket.js` for a docket that is still pending.\n\n- `then()` keeps both callbacks and returns; nothing runs yet\n- when the docket is kept, `onFulfilled(value)` runs, with the docket's very value\n- when it fails, `onRejected(reason)` runs instead\n- only the matching callback runs, and only once, however often `resolve` is called\n\n`then()` does not need to return anything yet. The check calls `then()` on pending dockets of its own, settles them, and records which callback ran, how often and with what.",
+      "nextSteps": [
+        "Run `node src/price-list.js` and read the error.",
+        "Give the docket somewhere to keep callbacks until it settles.",
+        "When the docket settles, run what was kept.",
+        "Run the script: the card lines should appear after the rest of the script."
+      ],
+      "hints": [
+        "When `then()` is called on a pending docket, the value does not exist yet. All `then()` can do is remember what to do with it.",
+        "The code that knows the moment the docket settles is the shared function behind `resolve` and `reject`. A list on the docket can carry the callbacks from `then()` to there.",
+        "In `then()`, push a small function onto `this.waiting` that runs `onFulfilled(this.value)` or `onRejected(this.value)` by the state. After settling, run every function in the list."
+      ],
+      "docs": [
+        { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" },
+        { "title": "Array.prototype.push()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push" },
+        { "title": "Private elements", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_elements" }
+      ],
+      "videos": [
+        { "title": "Promises, then and catch in ten minutes", "url": "https://www.youtube.com/watch?v=DHvZLI7Db8E" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "already-settled",
+      "title": "A docket that already has its value",
+      "file": "src/docket.js",
+      "description": "Make `then()` work on a docket that has already settled.\n\n- on a docket already kept, `onFulfilled(value)` runs\n- on a docket already failed, `onRejected(reason)` runs\n- each `then()` runs its own callback once\n\nThe check calls `then()` on dockets of its own that settled inside the executor or a moment before, and records which callback ran and with what. The callback may run at once or a moment later.",
+      "nextSteps": [
+        "Look at the posters line in the price list: that docket is kept before `then()` is called.",
+        "Think about what will settle that docket later. Nothing will.",
+        "Look at the state in `then()` and act on it.",
+        "Run the script: the posters line should appear."
+      ],
+      "hints": [
+        "A docket can be asked for its value long after it arrived. The callbacks you keep are only run when the docket settles, and a settled docket never settles again.",
+        "`then()` can see `this.state`. When it is not `'pending'`, there is nothing to wait for.",
+        "Keep the callback only when the state is `'pending'`; otherwise run the same small function at once."
+      ],
+      "docs": [
+        { "title": "Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then" },
+        { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "many-callbacks",
+      "title": "Many callbacks, and missing ones",
+      "file": "src/docket.js",
+      "description": "Make `then()` work when it is called many times, or without both callbacks.\n\n- every `then()` on one docket gets its turn: all callbacks run, in the order the `then()` calls were made, each once, whether they were added before the docket settled or after\n- a callback that is missing, `null` or not a function is skipped without an error\n\nThis task builds on tasks 1 and 2; the check says so when one of them is not done. It calls `then()` several times on dockets of its own, some with a callback missing or a string in its place, and records what ran.",
+      "nextSteps": [
+        "Look at the two `then()` calls on card in the price list.",
+        "Make sure a new callback never takes the place of one already waiting.",
+        "Check that a callback is a function before you call it.",
+        "Run the script: both card lines should appear, in order."
+      ],
+      "hints": [
+        "One docket can have many readers. Each `then()` is one of them, and none of them may be forgotten.",
+        "A list keeps things in the order they were added if you add at the end and run from the start. `typeof x === 'function'` tells you whether something can be called.",
+        "Push each new callback onto the end of the list, run the list with a `for...of` loop, and call a callback only when `typeof callback === 'function'`."
+      ],
+      "docs": [
+        { "title": "typeof", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof" },
+        { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "a-value-later",
+  "title": "A value that arrives later",
+  "files": ["src/docket.js", "src/price-list.js", "src/store.js"],
+  "terminal": {
+    "description": "A shell in your workspace where Idris's price list asks the store room for paper on your docket.",
+    "suggestedCommand": "node src/price-list.js"
+  },
+  "tasks": [
+    {
+      "id": "settle",
+      "title": "Keep or fail a docket",
+      "file": "src/docket.js",
+      "description": "Implement the constructor of `Docket` in `src/docket.js`.\n\n- `new Docket(executor)` calls `executor` once, right away, with two functions: `resolve` and `reject`\n- until one of them is called, `state` is `'pending'` and `value` is `undefined`\n- `resolve(value)` keeps the docket: `state` becomes `'fulfilled'` and `value` is that very value, whatever it is, even when `resolve` is called long after the constructor returned\n- `reject(reason)` fails it: `state` becomes `'rejected'` and `value` is that very reason\n\nThe check makes dockets of its own, calls `resolve` and `reject` now and later, and reads `state` and `value`.",
+      "nextSteps": [
+        "Run `node src/price-list.js` and read the error.",
+        "Make two small functions inside the constructor, one that keeps the docket and one that fails it.",
+        "Hand both to the executor.",
+        "Run the script again: card should be pending at first. The script still stops at the smudged count; that is task 3."
+      ],
+      "hints": [
+        "The constructor does not know the value. The executor will find it, now or later, and needs a way to hand it back.",
+        "A function made inside the constructor can still change `this.state` and `this.value` when it is called later, from anywhere, because it remembers the docket it was made in. Arrow functions keep `this` as it was where they were written.",
+        "`executor((value) => { this.state = 'fulfilled'; this.value = value }, (reason) => { ... })` is the shape. Fill in the second one the same way."
+      ],
+      "docs": [
+        { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures" },
+        { "title": "Classes", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes" },
+        { "title": "Promise() constructor", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise" }
+      ],
+      "videos": [
+        { "title": "Promises in 100 seconds", "url": "https://www.youtube.com/watch?v=RvYYCGs45L4" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "once",
+      "title": "Settle once and only once",
+      "file": "src/docket.js",
+      "description": "Make a docket settle only once. After the first call to `resolve` or `reject`, every later call to either one does nothing: it does not change `state` or `value`, and it does not throw.\n\nThis holds whatever the first value was, `undefined` included.\n\nThe check calls `resolve` and `reject` on its own dockets in every order, several times, and reads `state` and `value` after each.",
+      "nextSteps": [
+        "Look at the posters line in the price list: it calls resolve twice.",
+        "Find the one place that every call to resolve and reject goes through.",
+        "Decide there whether the docket is still waiting.",
+        "Run the script: the posters should keep their first count."
+      ],
+      "hints": [
+        "A docket is a promise about one outcome. Once there is an outcome, a second one would mean two people read two different answers off the same docket.",
+        "What tells you a docket has settled? Not its value: a docket kept with `undefined` has settled all the same.",
+        "Start both functions with `if (this.state !== 'pending') return`. It is simplest when both call one shared function that does the check once."
+      ],
+      "docs": [
+        { "title": "Promise", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" },
+        { "title": "return", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "throwing-executor",
+      "title": "An executor that throws",
+      "file": "src/docket.js",
+      "description": "When the executor throws, the docket fails with exactly what was thrown, and `new Docket` itself does not throw.\n\n- this holds for anything thrown: an `Error`, a string, even `undefined`\n- a throw after the executor already called `resolve` or `reject` changes nothing, as in task 2\n\nThe check makes dockets whose executors throw values of every kind, some after settling, and reads `state` and `value`.",
+      "nextSteps": [
+        "Look at the smudged count in the price list.",
+        "Find where the constructor calls the executor.",
+        "Catch what it throws and fail the docket with it.",
+        "Make sure a throw after settling goes through the same rule as task 2."
+      ],
+      "hints": [
+        "Code that makes a docket expects a docket back, not a crash. A throw in the executor is just another way of saying it failed.",
+        "`try { ... } catch (error) { ... }` catches anything thrown inside the `try`, including from a function you call there. Decide by being in the `catch`, not by looking at what was caught.",
+        "Wrap the executor call in a `try`, and in the `catch (error)` call the same function your `reject` uses, so a docket that already settled stays as it is."
+      ],
+      "docs": [
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "throw", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw" }
+      ],
+      "points": 10
+    }
+  ]
+}

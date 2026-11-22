@@ -1,0 +1,6 @@
+[
+  { "day": "Monday", "jobs": 3 },
+  { "day": "Tuesday", "jobs": 3 },
+  { "day": "Wednesday", "jobs": 1 },
+  { "day": "Thursday", "jobs": 0 }
+]
