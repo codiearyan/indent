@@ -49,7 +49,7 @@ export const checks = {
       typedIn: 4245,
       wrongNumber: (n) =>
         n === Number(`${given.candlesCents}${given.shippingText}`)
-          ? 'totalCents is a number now, but the two amounts were still joined like words before it became one. Turn the shipping into a number before the sum, not after.'
+          ? 'totalCents is a number now, but the two amounts were still joined like words before it became one. Print what each amount is at the moment they are added.'
           : n === given.candlesCents + 495 || n === 3750 + Number(given.shippingText)
             ? 'totalCents is a number now, but not the right one: Check gave candlesCents and shippingText other values and totalCents did not follow. Build it on both names, not on a number you typed.'
             : undefined,
@@ -59,7 +59,7 @@ export const checks = {
           : v.type === 'string' && v.value === String(given.candlesCents + Number(given.shippingText))
             ? 'totalCents holds the right digits, but as text, not a number. Print its type, and look for what turns it into text.'
             : v.type === 'string'
-              ? 'totalCents is text, not a number: the two amounts were joined like words instead of added. One of them is text. Print typeof each one to see which, and turn it into a number before the sum.'
+              ? 'totalCents is text, not a number: the two amounts were joined like words instead of added. One of them is text. Print typeof each one to see which.'
               : v.type === 'NaN'
                 ? 'totalCents is NaN: one of the amounts did not turn into a real number. Print each one and its type.'
                 : `totalCents is ${show(v)}, not a number. Print it and its type, and compare with the comment above it.`
