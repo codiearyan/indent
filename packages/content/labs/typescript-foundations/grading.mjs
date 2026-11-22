@@ -29,6 +29,12 @@ export async function call(file, name, args) {
   if (typeof mod[name] !== 'function') return { type: 'missing' }
   return describe(await mod[name](...args))
 }
+export async function script(file, name, how) {
+  const mod = await load(file)
+  if (typeof mod[name] !== 'function') return { type: 'missing' }
+  const runner = await import(new URL('./run.mjs', import.meta.url).href)
+  return describe(await runner[how](mod[name]))
+}
 `
 
 const ERROR_LINE = /^(.+?)\((\d+),(\d+)\): error (TS\d+): (.*)$/
@@ -123,9 +129,10 @@ export function show(v) {
 }
 
 const same = (v, expected) =>
-  v &&
-  !['missing', 'undefined', 'NaN', 'function'].includes(v.type) &&
-  isDeepStrictEqual(v.value, expected)
+  (expected === null && v?.type === 'null') ||
+  (v &&
+    !['missing', 'undefined', 'NaN', 'function'].includes(v.type) &&
+    isDeepStrictEqual(v.value, expected))
 
 /** The round brackets after `function name`, and what follows them. */
 function afterParams(code, name) {
@@ -211,6 +218,10 @@ const pass = (name, output) => ({ name, passed: true, output })
  * - grow: { type, member, name, message }: with `member` added to the union `type` of the shared
  *   lines, the compiler must refuse a line of the task
  * - nonNull: true refuses `!` after a value, for a task about checking a value before using it
+ * - runner: a chapter-relative .mjs whose exports each take the learner's function and use it; a
+ *   case { call, run } passes its `call` export to the runner's `run` export, for what JSON
+ *   arguments cannot carry (a callback, a function that gives back a function, undefined)
+ * - a case with throws: true passes when the call stops with an error instead of giving back
  */
 export async function judge(t, spec) {
   const { file, task } = spec
@@ -274,6 +285,7 @@ export async function judge(t, spec) {
   const extra = { '.grader/read.mjs': null }
   if (spec.uses) extra['.grader/uses.ts'] = t.chapterPath(spec.uses)
   if (spec.misuse) extra['.grader/misuse.ts'] = t.chapterPath(spec.misuse)
+  if (spec.runner) extra['.grader/run.mjs'] = t.chapterPath(spec.runner)
   const dir = await t.sandbox(Object.fromEntries(Object.entries(extra).filter(([, v]) => v)))
   await mkdir(join(dir, '.grader'), { recursive: true })
   const fill = (at, text) =>
@@ -294,6 +306,7 @@ export async function judge(t, spec) {
       await fill(at, withGiven({ ...spec.given, ...c.given }).text)
     }
     if (c.prints) return { printed: await runFile(at) }
+    if (c.run) return t.call(at, '.grader/read.mjs', 'script', [file, c.call, c.run])
     return c.call
       ? t.call(at, '.grader/read.mjs', 'call', [file, c.call, c.args ?? []])
       : t.call(at, '.grader/read.mjs', 'read', [file, c.read])
@@ -505,7 +518,7 @@ export async function judge(t, spec) {
 const stoppedRun = (r) => (r.printed ? r.printed.code !== 0 || r.printed.timedOut : !r.ok)
 
 function behaviour(cases, runs, file, label) {
-  const broken = runs.find(stoppedRun)
+  const broken = runs.find((r, i) => stoppedRun(r) && !(cases[i].throws && !r.timedOut))
   if (broken) {
     const error = broken.printed
       ? broken.printed.timedOut
@@ -552,6 +565,15 @@ function behaviour(cases, runs, file, label) {
         passed,
         message: passed ? undefined : c.hint,
         output: `${c.setup}\nIt printed: ${line ?? `no line that starts with ${c.prints}`}`
+      }
+    }
+    if (c.throws) {
+      const passed = !r.ok
+      return {
+        name: c.name,
+        passed,
+        message: passed ? undefined : c.hint,
+        output: `${c.setup}\n${passed ? `Stopped with: ${r.error}` : `Gave: ${show(r.value)}`}`
       }
     }
     const v = r.value
