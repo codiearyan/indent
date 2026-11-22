@@ -1,0 +1,94 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dorrit", "label": "Dorrit", "kind": "story" },
+      { "id": "slip", "label": "Ticket slip", "kind": "data" },
+      { "id": "file", "label": "tags.cpp", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "tag", "label": "Clock tag", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dorrit", "to": "slip", "label": "writes" },
+      { "from": "slip", "to": "file", "label": "names and item" },
+      { "from": "file", "to": "compiler", "label": "builds" },
+      { "from": "compiler", "to": "tag", "label": "printed text" }
+    ],
+    "note": "You build the text of each clock's tag from Dorrit's slip, and the laptop prints it."
+  },
+  "tasks": {
+    "tag": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->slip", "slip"],
+          "value": {
+            "kind": "array",
+            "label": "pieces of the name",
+            "values": ["lastName", ", ", "firstName"]
+          },
+          "note": "The tag shows the surname first, so the clocks sort on the shelf."
+        },
+        {
+          "active": ["slip->file", "file"],
+          "note": "Three pieces of text are joined into one, in that order."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->tag", "tag"],
+          "note": "The tag prints the name the way Dorrit files it."
+        }
+      ]
+    },
+    "width": {
+      "steps": [
+        {
+          "active": ["slip"],
+          "note": "The item on the slip decides how wide the tag must be."
+        },
+        {
+          "active": ["slip->file", "file"],
+          "note": "The text is asked how many characters it has, and the border is added on both sides."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->tag", "tag"],
+          "note": "The width prints, ready for cutting the tag."
+        }
+      ]
+    },
+    "code": {
+      "steps": [
+        {
+          "active": ["slip"],
+          "value": {
+            "kind": "array",
+            "label": "the shelf code",
+            "values": ["first letter of lastName", "ticketNumber as text"]
+          },
+          "note": "Kasimir reads a short code from across the room: a letter and a number."
+        },
+        {
+          "active": ["slip->file", "file"],
+          "note": "One character is taken from the surname, and the number becomes text before it joins."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->tag", "tag"],
+          "note": "The code prints as one piece of text."
+        }
+      ]
+    },
+    "short": {
+      "steps": [
+        {
+          "active": ["slip"],
+          "note": "The small tag only has room for a few characters of the item."
+        },
+        {
+          "active": ["slip->file", "file"],
+          "note": "A piece is cut from the start of the item, and a short item stays whole."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->tag", "tag"],
+          "note": "The small tag prints the item cut to fit."
+        }
+      ]
+    }
+  }
+}

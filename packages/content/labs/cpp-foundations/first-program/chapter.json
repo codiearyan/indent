@@ -1,0 +1,123 @@
+{
+  "id": "first-program",
+  "title": "Your first program",
+  "files": [
+    "src/welcome.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build your program here with g++, run it, and read what it prints.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/welcome.cpp -o welcome && ./welcome"
+  },
+  "tasks": [
+    {
+      "id": "name",
+      "title": "Print the workshop's name",
+      "file": "src/welcome.cpp",
+      "description": "Under `// Task 1` in `src/welcome.cpp`, print this line:\n\n```\nWelcome to Tolliver Clockworks\n```\n\nCheck builds your program with the same command as the terminal, runs it, and looks for a line that matches this one exactly, capital letters and spaces included, on a line of its own.",
+      "nextSteps": [
+        "Build and run the program once and read what it prints today.",
+        "Look at the line in `main` that prints the good morning: it is your model.",
+        "Write a new line under `// Task 1` that prints the welcome.",
+        "Build and run again, and compare the output with the task."
+      ],
+      "hints": [
+        "The program already prints one line. Read how that line is written, from `std::cout` to the semicolon.",
+        "Text goes inside double quotes after `<<`, and `\\n` at the end of the text ends the line. The statement ends with a semicolon.",
+        "The line has the shape `std::cout << \"...\\n\";`, with the welcome where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "std::cout",
+          "url": "https://en.cppreference.com/w/cpp/io/cout"
+        },
+        {
+          "title": "The main function",
+          "url": "https://en.cppreference.com/w/cpp/language/main_function"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Compiling your first program with g++",
+          "url": "https://www.youtube.com/watch?v=zJeBG7WyjNs"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hours",
+      "title": "Print the opening hours",
+      "file": "src/welcome.cpp",
+      "description": "Under `// Task 2`, print the two lines of the opening hours, in this order, each on a line of its own:\n\n```\nOpen Tuesday to Saturday\nClosed for lunch from 1 to 2\n```\n\nCheck builds and runs your program and looks for both lines, the second right after the first. Two lines that run together on one line do not count.",
+      "nextSteps": [
+        "Find `// Task 2` and read the two lines in the comment.",
+        "Print the first line, ending it with `\\n`.",
+        "Print the second line below it, also ending with `\\n`.",
+        "Build, run, and read the output from top to bottom."
+      ],
+      "hints": [
+        "`std::cout` prints exactly what you give it and nothing more. It does not start a new line by itself.",
+        "Each line of the hours needs its own end of line: `\\n` inside the text, or `std::endl` after it.",
+        "Two statements, one under the other, each with the shape `std::cout << \"...\\n\";`."
+      ],
+      "docs": [
+        {
+          "title": "Escape sequences",
+          "url": "https://en.cppreference.com/w/cpp/language/escape"
+        },
+        {
+          "title": "std::endl",
+          "url": "https://en.cppreference.com/w/cpp/io/manip/endl"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "notice",
+      "title": "Switch off the old notice",
+      "file": "src/welcome.cpp",
+      "description": "Under `// Task 3` there is a line that prints a notice the workshop no longer runs. Turn it into a comment, so it stays in the file but is no longer part of the program.\n\nCheck builds and runs your program to see that the notice is not printed, then reads the file to see that the line is still under `// Task 3` as a comment.",
+      "nextSteps": [
+        "Run the program and find the notice in the output.",
+        "Find the line under `// Task 3` that prints it.",
+        "Turn that one line into a comment. Do not delete it.",
+        "Build and run again: the notice should be gone from the output."
+      ],
+      "hints": [
+        "The lesson shows a way to keep a line in the file while the compiler skips it.",
+        "Every comment in this file starts the same way. Look at the start of the lines that do not print anything.",
+        "Put `//` at the very start of the notice's line."
+      ],
+      "docs": [
+        {
+          "title": "Comments",
+          "url": "https://en.cppreference.com/w/cpp/comment"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "comment",
+      "title": "Leave a note for Kasimir",
+      "file": "src/welcome.cpp",
+      "description": "Write a comment of your own anywhere in `src/welcome.cpp`: a line that starts with `//`, followed by a few words for Kasimir, for example what the program prints.\n\nCheck reads your file and looks for a comment that was not there when you started. The lines under `// Task 4` must still build.",
+      "nextSteps": [
+        "Pick a place for your note, for example under `// Task 4`.",
+        "Start a new line with `//`.",
+        "Write a few words after it.",
+        "Build and run: your note should not change what the program prints."
+      ],
+      "hints": [
+        "A comment is for people. The compiler skips it, so you can write anything in it.",
+        "A comment starts with two slashes. Everything after them on that line is skipped.",
+        "A line like `// Kasimir, ...` with a short sentence after it is all it takes."
+      ],
+      "docs": [
+        {
+          "title": "Comments",
+          "url": "https://en.cppreference.com/w/cpp/comment"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
