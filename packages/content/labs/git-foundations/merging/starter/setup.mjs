@@ -185,6 +185,17 @@ const books = [...march, ...marchNew, ...april, ferns]
 write('finds.html', finds(books, '3.20'))
 commit(people.you, 'Add Ferns and Their Keepers to the finds', 2)
 
+// The last issue's end: Git leaves the till's export, the drafts and the upload log alone.
+write('upload.log', '2026-04-18 17:41 uploaded 6 files to the shop website\n')
+commit(people.femi, 'Put the site online', 3)
+write('.gitignore', 'stock.csv\ndrafts/\nupload.log\n')
+git(people.you, 'rm', '-q', '--cached', 'upload.log')
+commit(people.you, 'Ignore the stock export, the drafts and the upload log', 1)
+
+const evening = events.replace('18:30', '19:00')
+write('events.html', evening)
+commit(people.you, 'Move the reading group to 19:00', 1)
+
 const sale = '<p>Summer sale: every book half price, 1 to 31 July.</p>'
 const intro = '<p>Second-hand books on Bramley Row, bought and sold since 1998.</p>'
 const withSale = (text) => text.replace(intro, `${intro}\n  ${sale}`)
@@ -197,7 +208,7 @@ commit(people.you, 'Add the sale dates to the visit page', 1)
 
 git(people.you, 'checkout', '-q', 'main')
 git(people.wilma, 'checkout', '-q', '-b', 'reading-group')
-write('events.html', events.replace('Seven Lamps on Quillon Street', 'The Marrowby Sisters'))
+write('events.html', evening.replace('Seven Lamps on Quillon Street', 'The Marrowby Sisters'))
 commit(people.wilma, 'Choose the July book for the reading group', 1)
 
 git(people.femi, 'checkout', '-q', 'main')

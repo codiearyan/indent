@@ -13,6 +13,11 @@ function open(t, names) {
   if (!git) return { fail: allFail(names, NO_REPO) }
   const [start, sale, group] = [MAIN, SALE, GROUP].map((subject) => setupCommit(git, subject))
   const main = tipOf(git, 'main')
+  const gone = [['summer-sale', sale], ['reading-group', group]].find(([branch, hash]) => !hash && !tipOf(git, branch))
+  if (gone && start && main) {
+    const message = `${gone[0]} is gone, and its commits with it: it was deleted before it was merged. ${START_OVER}`
+    return { fail: allFail(names, message, graph(git)) }
+  }
   if (!start || !sale || !group || !main || !isAncestor(git, start, main)) {
     return { fail: allFail(names, LOST_HISTORY, graph(git)) }
   }
@@ -54,7 +59,7 @@ export const checks = {
     if (!commits(git, main).includes(sale)) {
       const merge = mergeOf(git, main, sale)
       const why = merge && isAncestor(git, group, parents(git, merge)[0])
-        ? 'main already had the reading group book by then, so it had moved on and Git had to join two lines. The order of the tasks matters.'
+        ? 'It was joined to a line that already had the reading group book. The sale goes first, merged while on main.'
         : 'main had nothing new of its own, so Git could simply move it forward, and it makes a merge commit then only when told to.'
       return fail(`The sale came into main with a merge commit. ${why} ${START_OVER}`)
     }
@@ -82,7 +87,7 @@ export const checks = {
       const groupBranch = tipOf(git, 'reading-group')
       return fail(
         groupBranch !== group && isAncestor(git, main, groupBranch)
-          ? "reading-group now has main's commits, but main does not have the reading group book. A merge brings the other branch into the one you are on."
+          ? `reading-group now has main's commits, but main does not have the reading group book. A merge brings the other branch into the one you are on. ${START_OVER}`
           : 'You are on reading-group. A merge brings the other branch into the one you are on, so main is where it has to run.'
       )
     }

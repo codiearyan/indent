@@ -6,7 +6,7 @@ import {
 const TIP = 'Put the site online'
 const SITE = ['index.html', 'visit.html', 'finds.html', 'style.css', 'events.html']
 // The setup's two drafts, and one the checks make up, so a pattern for the folder is what passes.
-const DRAFTS = ['drafts/summer-sale.html', 'drafts/ideas.txt', 'drafts/autumn/list.txt']
+const DRAFTS = ['drafts/summer-sale.html', 'drafts/ideas.txt', 'drafts/autumn/window.md']
 
 function open(t, names) {
   if (!hasShop(t)) return { fail: allFail(names, NO_SETUP) }
@@ -53,7 +53,7 @@ const tracked = (git, path) => stagedFile(git, path) !== null
 const trackedUnder = (git, folder) => git('ls-files', folder).out.trim().length > 0
 
 const NAME_HINT =
-  'Check each letter of the name against what git status prints. A space at the start or end of a line counts as part of the pattern.'
+  'Check each letter of the name against what git status prints. A space at the start of a line counts as part of the pattern.'
 
 export const checks = {
   async stock(t) {

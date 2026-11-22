@@ -77,7 +77,7 @@ The merge commit has two lines going into it. Every commit of `winter-menu` and 
 git branch -d winter-menu spring-prices
 ```
 
-That deletes the names only; the commits stay, because `main` holds them. `-d` refuses a branch with commits that are in no other branch, and says `error: the branch 'x' is not fully merged`. Git then suggests `-D`, which deletes the branch anyway and throws its commits away. Do not use it here.
+That deletes the names only; the commits stay, because `main` holds them. `-d` refuses a branch with commits that the branch you are on does not have, and says `error: the branch 'x' is not fully merged`. Git then suggests `-D`, which deletes the branch anyway and throws its commits away. Do not use it here. Git also never deletes the branch you are on: it says `cannot delete branch` and names the folder, so switch to `main` first.
 
 ## Your work in this issue
 

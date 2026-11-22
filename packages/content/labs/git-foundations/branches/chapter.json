@@ -38,7 +38,7 @@
       "id": "sale",
       "title": "Commit the sale on summer-sale",
       "file": "shop/index.html",
-      "description": "On `summer-sale`, open `shop/index.html` and add this line just under the paragraph about Bramley Row, inside the page:\n\n```\n<p>Summer sale: every book half price, 1 to 31 July.</p>\n```\n\nSave it and commit it on `summer-sale`. Change no other file.\n\nThe check looks for a commit on `summer-sale`, and not on `main`, whose home page announces the summer sale, and expects the other pages on `summer-sale` to be as they are on `main`.",
+      "description": "On `summer-sale`, open `shop/index.html` and add this line just under the paragraph about Bramley Row, inside the page:\n\n```\n<p>Summer sale: every book half price, 1 to 31 July.</p>\n```\n\nSave it and commit it on `summer-sale`. Change no other file.\n\nThe check looks for a commit that is on `summer-sale` but not on `main` and whose home page announces the summer sale, and expects the other pages on `summer-sale` to be as they are on `main`.",
       "nextSteps": [
         "Make sure `git status` says `On branch summer-sale`.",
         "Add the line to `shop/index.html` in the editor and save.",

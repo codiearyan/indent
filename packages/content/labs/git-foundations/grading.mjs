@@ -193,7 +193,7 @@ export const branchNames = (git) =>
 /** The commit a merge left half done is bringing in, or null when no merge is open. */
 export const mergeHead = (git) => commitOf(git, 'MERGE_HEAD')
 
-export const hasMarkers = (text) => /^(<{7}|={7}|>{7})( |$)/m.test(text ?? '')
+export const hasMarkers = (text) => /^(<{7}|\|{7}|={7}|>{7})( |\r?$)/m.test(text ?? '')
 
 export const DETACHED =
   'git status says HEAD detached: you are looking at one commit and are on no branch. The lesson on branches says how to get back onto one.'

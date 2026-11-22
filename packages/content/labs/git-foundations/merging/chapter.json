@@ -34,7 +34,7 @@
       "id": "group",
       "title": "Merge reading-group into main, with a merge commit",
       "file": "shop/events.html",
-      "description": "Now merge `reading-group`, with Wilma's July book, into `main`. `main` has moved on since that branch started, so Git joins the two lines with a merge commit. Keep the message Git writes for it.\n\nThe check looks on `main`'s own line for a merge commit that brings in the reading group book, and expects no merge left half done.",
+      "description": "Now merge `reading-group`, with Wilma's July book, into `main`. `main` has moved on since that branch started, so Git joins the two lines with a merge commit. Git writes its message for you, and you can keep it as it is.\n\nThe check looks on `main`'s own line for a merge commit that brings in the reading group book, and expects no merge left half done.",
       "nextSteps": [
         "Run `git log --oneline --graph --all`: `reading-group` started from an older commit than `main`'s last one.",
         "Merge `reading-group` on `main`, keeping Git's message without an editor.",

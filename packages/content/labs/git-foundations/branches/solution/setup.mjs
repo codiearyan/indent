@@ -185,8 +185,15 @@ const books = [...march, ...marchNew, ...april, ferns]
 write('finds.html', finds(books, '3.20'))
 commit(people.you, 'Add Ferns and Their Keepers to the finds', 2)
 
+// The last issue's end: Git leaves the till's export, the drafts and the upload log alone.
+write('upload.log', '2026-04-18 17:41 uploaded 6 files to the shop website\n')
+commit(people.femi, 'Put the site online', 3)
+write('.gitignore', 'stock.csv\ndrafts/\nupload.log\n')
+git(people.you, 'rm', '-q', '--cached', 'upload.log')
+commit(people.you, 'Ignore the stock export, the drafts and the upload log', 1)
+
 console.log(git(people.you, 'log', '--oneline', '-n', '3'))
-console.log(`The shop's folder is ready in shop/, with twelve commits on the branch main.
+console.log(`The shop's folder is ready in shop/, with fourteen commits on the branch main.
 
 Wilma wants a summer sale on the website, but not before July. You prepare
 it on a branch of its own, while main stays as the site is today.

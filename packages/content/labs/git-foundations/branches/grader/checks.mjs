@@ -3,7 +3,7 @@ import {
   LOST_HISTORY, NO_REPO, NO_SETUP, openShop, setupCommit, stagedFile, START_OVER, tipOf, workFile
 } from '../../grading.mjs'
 
-const TIP = 'Add Ferns and Their Keepers to the finds'
+const TIP = 'Ignore the stock export, the drafts and the upload log'
 const BRANCH = 'summer-sale'
 const hasSale = (text) => /summer sale/i.test(text ?? '')
 const meeting = (text) => (text ?? '').split('\n').find((line) => /first thursday/i.test(line)) ?? ''
@@ -78,7 +78,7 @@ export const checks = {
     const start = git('merge-base', main, sale).out.trim()
     const others = git('diff', '--name-only', start, sale).out.split('\n').filter((file) => file && file !== 'index.html')
     if (others.length) {
-      return fail(`${BRANCH} also changes ${listOf(others)}. The sale only needs the line on the home page. Put ${others.length > 1 ? 'them' : 'it'} back as on main and commit that on ${BRANCH}, or start over: run \`node setup.mjs\` in the top folder.`)
+      return fail(`${BRANCH} also changes ${listOf(others)}. The sale only needs the line on the home page. Put ${others.length > 1 ? 'them' : 'it'} back as ${others.length > 1 ? 'they were' : 'it was'} when the branch started and commit that on ${BRANCH}, or start over: run \`node setup.mjs\` in the top folder.`)
     }
     return [check(name, true, '', output)]
   },
@@ -110,11 +110,14 @@ export const checks = {
     if (!moved) {
       const branchHas = branchNames(git).find((b) => b !== 'main' && movedToSeven(fileAt(git, `refs/heads/${b}`, 'events.html')))
       if (branchHas) {
-        return fail(`The new time is in a commit on ${branchHas}, not on main. A commit goes onto the branch git status names on its first line.`)
+        return fail(`The new time is in a commit on ${branchHas}, not on main. A commit goes onto the branch git status names on its first line. ${START_OVER}`)
       }
       if (movedToSeven(stagedFile(git, 'events.html'))) return fail('The new time is staged, but no commit holds it yet.')
       if (movedToSeven(workFile(t, 'events.html'))) return fail('events.html has the new time in the working folder, but no commit on main holds it yet.')
-      return fail('events.html on main still has the reading group at 18:30. Change the time on that line in the editor and save it first.')
+      if (/18[:.]30/.test(meeting(fileAt(git, main, 'events.html')))) {
+        return fail('events.html on main still has the reading group at 18:30. Change the time on that line in the editor and save it first.')
+      }
+      return fail('The reading group line in events.html on main does not say 19:00. Write the time the way the task gives it, save, and commit it.')
     }
     if (!movedToSeven(fileAt(git, main, 'events.html'))) {
       return fail('A later commit on main took the new reading group time out again.')

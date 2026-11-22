@@ -185,14 +185,43 @@ const books = [...march, ...marchNew, ...april, ferns]
 write('finds.html', finds(books, '3.20'))
 commit(people.you, 'Add Ferns and Their Keepers to the finds', 2)
 
-const intro = 'Second-hand books on Bramley Row, bought and sold since 1998.'
+// The last issue's end: Git leaves the till's export, the drafts and the upload log alone.
+write('upload.log', '2026-04-18 17:41 uploaded 6 files to the shop website\n')
+commit(people.femi, 'Put the site online', 3)
+write('.gitignore', 'stock.csv\ndrafts/\nupload.log\n')
+git(people.you, 'rm', '-q', '--cached', 'upload.log')
+commit(people.you, 'Ignore the stock export, the drafts and the upload log', 1)
+
+const evening = events.replace('18:30', '19:00')
+write('events.html', evening)
+commit(people.you, 'Move the reading group to 19:00', 1)
+
+// The last issue's end: the sale and the July book merged into main, their branches deleted.
+const sale = '<p>Summer sale: every book half price, 1 to 31 July.</p>'
 const links = [...homeLinks, '<a href="events.html">Reading group</a>']
+const base = git(people.you, 'rev-parse', 'HEAD').trim()
+git(people.you, 'checkout', '-q', '-b', 'summer-sale')
+write('index.html', index(links).replace('since 1998.</p>', `since 1998.</p>\n  ${sale}`))
+commit(people.you, 'Announce the summer sale on the home page', 1)
+write('visit.html', visit({ details: [address, phone, 'Summer sale: 1 to 31 July'], heading: 'When we are open', hours }))
+commit(people.you, 'Add the sale dates to the visit page', 1)
+git(people.wilma, 'checkout', '-q', '-b', 'reading-group', base)
+write('events.html', evening.replace('Seven Lamps on Quillon Street', 'The Marrowby Sisters'))
+commit(people.wilma, 'Choose the July book for the reading group', 1)
+git(people.you, 'checkout', '-q', 'main')
+git(people.you, 'merge', '-q', 'summer-sale')
+git(people.you, 'merge', '-q', '--no-edit', 'reading-group')
+git(people.you, 'branch', '-q', '-d', 'summer-sale', 'reading-group')
+clock += 86400
+
+const intro = 'Second-hand books on Bramley Row, bought and sold since 1998.'
 const home = (line) => index(links).replace(intro, line)
-const orchard = 'The Orchard Ledger, Ines Corrow, hardback, £6.50'
-const lamp = 'A Lamp on Gull Island, Bertram Okafor, paperback, £3.00'
+const orchard = 'The Orchard Ledger, Ines Thackery, hardback, £6.50'
+const lamp = 'A Lamp on Gull Island, Bertram Wenlock, paperback, £3.00'
 const tip = git(people.you, 'rev-parse', 'HEAD').trim()
 
-git(people.femi, 'checkout', '-q', '-b', 'window-display')
+// Femi's window display started before the sale, as in the last issue.
+git(people.femi, 'checkout', '-q', '-b', 'window-display', base)
 write('index.html', home('Second-hand books on Bramley Row. This month our window is all sea stories.'))
 commit(people.femi, 'Mention the window display on the home page', 1)
 
@@ -201,7 +230,7 @@ write('finds.html', finds([...books, lamp], '3.20'))
 commit(people.femi, 'Add A Lamp on Gull Island to the finds', 1)
 
 git(people.wilma, 'checkout', '-q', 'main')
-write('index.html', home('Second-hand books on Bramley Row since 1998. Open late on Thursdays.'))
+write('index.html', home('Second-hand books on Bramley Row since 1998. Open late on Thursdays.').replace('</p>\n  <ul>', `</p>\n  ${sale}\n  <ul>`))
 commit(people.wilma, 'Mention the late opening on the home page', 1)
 write('finds.html', finds([...books, orchard], '3.20'))
 commit(people.wilma, 'Add The Orchard Ledger to the finds', 1)

@@ -65,7 +65,7 @@
       "id": "finish",
       "title": "Finish the merge",
       "file": "shop/finds.html",
-      "description": "Tell Git the conflict is settled and make the merge commit, keeping the message Git wrote for it.\n\nThe check expects no merge left open, a merge commit on `main` that brings in `june-finds`, and `finds.html` on `main` with no conflict markers.",
+      "description": "Tell Git the conflict is settled and make the merge commit. Git wrote its message already, and you can keep it as it is.\n\nThe check expects no merge left open, a merge commit on `main` that brings in `june-finds`, and `finds.html` on `main` with no conflict markers.",
       "nextSteps": [
         "Run `git status`: `finds.html` is under Unmerged paths.",
         "Stage the settled file: that marks it as settled.",
