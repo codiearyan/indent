@@ -17,3 +17,27 @@ export function fenceOf(pre: { children: unknown[] } | undefined): {
   const language = first.startsWith('language-') ? first.slice('language-'.length) : undefined
   return { code: textOf(code).replace(/\n$/, ''), language }
 }
+
+const FENCE = /^ {0,3}(`{3,}|~{3,})(.*)$/
+
+/**
+ * Where a fenced block that is still open at the end of `markdown` starts, as a character offset,
+ * or null when every fence is closed. A reply cut off or still streaming ends inside one.
+ */
+export function openFenceStart(markdown: string): number | null {
+  let open: { mark: string; at: number } | null = null
+  let at = 0
+  for (const line of markdown.split('\n')) {
+    const match = FENCE.exec(line)
+    if (match) {
+      const [, mark, rest] = match
+      if (!open) {
+        if (!(mark[0] === '`' && rest.includes('`'))) open = { mark, at }
+      } else if (mark[0] === open.mark[0] && mark.length >= open.mark.length && !rest.trim()) {
+        open = null
+      }
+    }
+    at += line.length + 1
+  }
+  return open?.at ?? null
+}
