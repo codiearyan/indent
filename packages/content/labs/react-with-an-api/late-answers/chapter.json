@@ -11,7 +11,7 @@
       "id": "ask-for-the-day",
       "title": "Show the chosen day's workshops",
       "file": "src/App.jsx",
-      "description": "The day picker above the list sets `day` to `'all'` or a short day name such as `'thu'`. When the day changes, the screen asks the API for that day's workshops, `GET /api/workshops?day=thu`, and shows the answer. `'all'` asks for `/api/workshops` with no day, as before.\n\nWhile the chosen day's list is on its way, the loading line shows and no cards from before: they belong to another day.\n\nThe check chooses Thursday, holds its answer back, reads the screen, answers, and then chooses All.",
+      "description": "The day picker above the list sets `day` to `'all'` or a short day name such as `'thu'`. When the day changes, the screen asks the API for that day's workshops, `GET /api/workshops?day=thu`, and shows the answer. `'all'` asks for `/api/workshops` with no day, as before.\n\nWhile the chosen day's list is on its way, the loading line shows and no cards from before: they belong to another day. Choosing the day that is already chosen changes nothing on the screen.\n\nThe check chooses Thursday, holds its answer back, reads the screen, answers, then chooses All, and chooses All once more.",
       "nextSteps": [
         "Give `getWorkshops` in `src/api.js` the day, and build the address from it.",
         "Pass `day` to it from the effect in `App`.",

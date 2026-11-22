@@ -100,6 +100,15 @@ export const checks = {
     await page.settle(50)
     const backToAll = same(page, WEEK)
 
+    // The day already chosen asks for nothing new, so the cards must not wait for an answer.
+    await choose('all')
+    for (const request of held.filter((r) => r.day === null && r.path === '/api/workshops')) {
+      request.answer(200, copy(WEEK))
+    }
+    await page.settle(50)
+    const keptOnSameDay = same(page, WEEK)
+    const afterSameDay = screen(page)
+
     let asked = ''
     if (!sent.length) {
       asked =
@@ -128,7 +137,15 @@ export const checks = {
           : !showsThursday
             ? "Thursday's answer arrived, but the cards do not show it."
             : 'Choosing All again did not bring back the whole week. All asks for the list without a day.',
-        `after Thursday's answer:\n${afterThursday}\nafter choosing All:\n${screen(page)}`
+        `after Thursday's answer:\n${afterThursday}\nafter choosing All:\n${afterSameDay}`
+      ),
+      detail(
+        'Choosing the day already chosen leaves the cards on the screen',
+        showsThursday && backToAll && keptOnSameDay,
+        showsThursday && backToAll
+          ? 'Choosing All while All was already chosen left the screen without its cards. No new list is on its way then, so nothing should be waiting for one.'
+          : 'This is judged once the check above passes.',
+        `after choosing All a second time:\n${afterSameDay}`
       )
     ]
   },

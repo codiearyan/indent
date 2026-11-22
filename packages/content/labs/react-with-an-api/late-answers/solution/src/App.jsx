@@ -29,6 +29,8 @@ export function App() {
 
   // Another day's cards would be wrong while this day's list travels, so nothing is shown.
   function chooseDay(next) {
+    // The day already chosen starts no request, so nothing would ever end the loading line.
+    if (next === day) return
     setDay(next)
     setStatus('loading')
   }
