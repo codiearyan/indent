@@ -1,0 +1,81 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "file", "label": "quote.test.js", "kind": "file" },
+      { "id": "describe", "label": "describe()", "kind": "function", "mine": true },
+      { "id": "hooks", "label": "beforeEach()", "kind": "function", "mine": true },
+      { "id": "list", "label": "Test list", "kind": "data" },
+      { "id": "run", "label": "run()", "kind": "function", "mine": true },
+      { "id": "book", "label": "Job book", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "file", "to": "describe", "label": "groups" },
+      { "from": "describe", "to": "list", "label": "full names" },
+      { "from": "hooks", "to": "list", "label": "setup" },
+      { "from": "list", "to": "run", "label": "chosen ones" },
+      { "from": "run", "to": "book", "label": "fresh each time" }
+    ],
+    "note": "Tests now come in named groups with their own setup, and Sefton can run just the one he is fixing."
+  },
+  "tasks": {
+    "describe": {
+      "steps": [
+        {
+          "active": ["file", "file->describe", "describe"],
+          "note": "The test file opens the 'quote' group, and inside it the 'cards' group."
+        },
+        {
+          "active": ["describe"],
+          "value": { "kind": "array", "label": "open groups", "values": ["quote", "cards"] },
+          "note": "While both are open, every test added belongs to both."
+        },
+        {
+          "active": ["describe", "describe->list", "list"],
+          "note": "So the bulk price test is saved under a name that starts with both groups."
+        },
+        {
+          "active": ["describe"],
+          "value": { "kind": "array", "label": "open groups", "values": ["quote"] },
+          "note": "When the cards group ends, it closes, and the next test is only in 'quote'."
+        }
+      ]
+    },
+    "before-each": {
+      "steps": [
+        {
+          "active": ["file", "file->describe", "describe", "hooks"],
+          "note": "The job book group asks for a fresh book before each of its tests."
+        },
+        {
+          "active": ["hooks", "hooks->list", "list"],
+          "note": "The hook belongs to that group, so only the job book tests carry it."
+        },
+        {
+          "active": ["list", "list->run", "run", "run->book", "book"],
+          "note": "Before each job book test, run() calls the hook, and the test starts with an empty book."
+        },
+        {
+          "active": ["run"],
+          "note": "If making the book throws, that test fails with the hook's error and never runs on a broken book."
+        }
+      ]
+    },
+    "only": {
+      "steps": [
+        {
+          "active": ["file", "list"],
+          "note": "Sefton marks the bulk price test with test.only while he fixes the quote."
+        },
+        {
+          "active": ["list", "list->run", "run"],
+          "value": { "kind": "map", "label": "a saved test", "entries": [{ "key": "name", "value": "group > test" }, { "key": "only", "value": "true or false" }] },
+          "note": "Before running anything, run() looks for chosen tests in the list."
+        },
+        {
+          "active": ["run"],
+          "note": "One is chosen, so only it runs. The supplier test and the rest are not even started."
+        }
+      ]
+    }
+  }
+}

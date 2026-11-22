@@ -1,0 +1,77 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "file", "label": "quote.test.js", "kind": "file" },
+      { "id": "test", "label": "test()", "kind": "function", "mine": true },
+      { "id": "list", "label": "Test list", "kind": "data" },
+      { "id": "run", "label": "run()", "kind": "function", "mine": true },
+      { "id": "quote", "label": "quote.js", "kind": "file" },
+      { "id": "results", "label": "Results", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "file", "to": "test", "label": "name, fn" },
+      { "from": "test", "to": "list", "label": "saved" },
+      { "from": "list", "to": "run", "label": "in order" },
+      { "from": "run", "to": "quote", "label": "each test" },
+      { "from": "run", "to": "results", "label": "one each" }
+    ],
+    "note": "Sefton's checks become saved functions, and your runner calls each one and writes down how it went."
+  },
+  "tasks": {
+    "collect": {
+      "steps": [
+        {
+          "active": ["file", "file->test", "test"],
+          "note": "The test file calls test() with a name, such as '100 cards in one colour', and a function."
+        },
+        {
+          "active": ["test"],
+          "note": "Before saving anything, test() makes sure the name is real text and the function is a function."
+        },
+        {
+          "active": ["test", "test->list", "list"],
+          "value": { "kind": "array", "label": "test list", "values": ["{ name, fn }", "{ name, fn }", "..."] },
+          "note": "The test goes on the end of the list, still unrun, in the order the file wrote it."
+        }
+      ]
+    },
+    "run": {
+      "steps": [
+        {
+          "active": ["list", "list->run", "run"],
+          "note": "run() takes the saved tests one at a time, from the top of the list."
+        },
+        {
+          "active": ["run", "run->quote", "quote"],
+          "note": "It calls the test's function, which asks quote.js for a price and throws if the price is wrong."
+        },
+        {
+          "active": ["run", "run->results", "results"],
+          "value": { "kind": "map", "label": "a result", "entries": [{ "key": "name", "value": "text" }, { "key": "passed", "value": "true or false" }] },
+          "note": "Returned means passed, threw means failed, and either way the result is written down."
+        },
+        {
+          "active": ["list", "list->run", "run"],
+          "note": "Then the next test runs, even when the one before it failed."
+        }
+      ]
+    },
+    "errors": {
+      "steps": [
+        {
+          "active": ["run", "run->quote", "quote"],
+          "note": "The bulk price test finds a wrong price in quote.js and throws."
+        },
+        {
+          "active": ["run"],
+          "note": "What was thrown could be an Error, some text, an object, or even nothing at all. It is still a failure."
+        },
+        {
+          "active": ["run", "run->results", "results"],
+          "value": { "kind": "map", "label": "a failed result", "entries": [{ "key": "name", "value": "text" }, { "key": "passed", "value": "false" }, { "key": "error", "value": "what was thrown" }] },
+          "note": "The failed result keeps the thrown value whole, so a person can read it later."
+        }
+      ]
+    }
+  }
+}

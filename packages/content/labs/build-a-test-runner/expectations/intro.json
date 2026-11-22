@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Sefton", "say": "Can a failed test say what's wrong?", "note": "Tired of writing the same if." },
+    { "title": "Your runner", "text": "Knows a test failed, not why.", "note": "Most errors just say Error." },
+    {
+      "title": "Your code",
+      "file": "expect.js",
+      "mine": true,
+      "gap": "Every test checks by hand",
+      "tasks": ["Expect the same value", "Expect equal objects", "Expect a throw"]
+    },
+    { "title": "Workshop screen", "text": "Shows the price wanted and the one quoted." }
+  ],
+  "ticket": { "label": "250 cards", "wrong": "just Error", "why": "No reason", "right": "both prices" },
+  "captions": [
+    "The runner works. Now Sefton wants every failed test to say what went wrong.",
+    "Today the 250 card test fails with a bare Error, and nobody knows why.",
+    "You write expectations that compare and explain, in three tasks.",
+    "Now the failure shows the price Sefton wanted and the price that came.",
+    "Shorter tests, and failures a person can act on at a glance."
+  ]
+}

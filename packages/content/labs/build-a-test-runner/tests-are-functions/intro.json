@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "Can the computer check the prices?", "note": "After a quote went badly wrong." },
+    { "title": "Sefton's notes", "text": "The right prices, written as tests.", "note": "Nothing runs them yet." },
+    {
+      "title": "Your runner",
+      "file": "runner.js",
+      "mine": true,
+      "gap": "Nothing runs the tests",
+      "tasks": ["Keep a list of tests", "Run every test", "Keep what was thrown"]
+    },
+    { "title": "Workshop screen", "rows": [["100 cards", "passed"], ["Two colours", "passed"], ["250 cards", "failed"]], "mark": 2 }
+  ],
+  "ticket": { "label": "250 cards", "wrong": "never checked", "why": "No runner", "right": "flagged" },
+  "captions": [
+    "At Ashgrove Press, Hesper wants every price checked after every change.",
+    "Sefton wrote the right prices down as tests, but nothing runs them.",
+    "You write the runner that saves and runs them, in three tasks.",
+    "Now the wrong bulk price for 250 cards is caught and shown.",
+    "Same notes, same prices, and a computer that checks them all."
+  ]
+}
