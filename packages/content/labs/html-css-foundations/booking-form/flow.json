@@ -1,0 +1,94 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "visitor", "label": "Visitor", "kind": "story" },
+      { "id": "html", "label": "classes.html", "kind": "file", "mine": true },
+      { "id": "form", "label": "Booking form", "kind": "data" },
+      { "id": "browser", "label": "Browser", "kind": "story" },
+      { "id": "kofi", "label": "Kofi", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "html", "to": "form", "label": "fields" },
+      { "from": "visitor", "to": "form", "label": "answers" },
+      { "from": "form", "to": "browser", "label": "send" },
+      { "from": "browser", "to": "kofi", "label": "a booking" }
+    ],
+    "note": "The classes page stops being something visitors only read: a form takes their name, email and places, and the browser sends them."
+  },
+  "tasks": {
+    "fields": {
+      "steps": [
+        {
+          "active": ["kofi"],
+          "value": { "kind": "array", "label": "what Kofi needs", "values": ["a name", "an email", "how many places"] },
+          "note": "Kofi needs three answers from everyone who books."
+        },
+        {
+          "active": ["html", "html->form", "form"],
+          "value": {
+            "kind": "map",
+            "label": "each field",
+            "entries": [
+              { "key": "name", "value": "text" },
+              { "key": "email", "value": "email" },
+              { "key": "places", "value": "number" }
+            ]
+          },
+          "note": "A form holds one field for each answer, with a type that fits it and a name it is sent under."
+        },
+        {
+          "active": ["visitor", "visitor->form", "form"],
+          "note": "A visitor can now type into the page."
+        }
+      ]
+    },
+    "labels": {
+      "steps": [
+        {
+          "active": ["form"],
+          "note": "Three empty boxes, and Kofi's words in loose lines nearby."
+        },
+        {
+          "active": ["html", "html->form", "form"],
+          "note": "Each of Kofi's lines becomes a label tied to its field."
+        },
+        {
+          "active": ["visitor", "visitor->form", "form"],
+          "note": "Clicking the words puts the cursor in the field, and a screen reader reads them out."
+        }
+      ]
+    },
+    "limits": {
+      "steps": [
+        {
+          "active": ["visitor", "visitor->form", "form"],
+          "note": "Someone asks for nine places, or for none."
+        },
+        {
+          "active": ["html", "html->form", "form"],
+          "note": "The places field gets a smallest and a largest value."
+        },
+        {
+          "active": ["form", "form->browser", "browser"],
+          "note": "The browser will not send a number outside the limits, and says why."
+        }
+      ]
+    },
+    "submit": {
+      "steps": [
+        {
+          "active": ["form"],
+          "note": "The answers are typed in, but nothing can send them."
+        },
+        {
+          "active": ["html", "html->form", "form"],
+          "note": "A button with Kofi's words goes at the end of the form, inside it."
+        },
+        {
+          "active": ["form", "form->browser", "browser", "browser->kofi", "kofi"],
+          "note": "Pressing it sends every named field. Once the studio has a program on a server, that is a booking for Kofi."
+        }
+      ]
+    }
+  }
+}

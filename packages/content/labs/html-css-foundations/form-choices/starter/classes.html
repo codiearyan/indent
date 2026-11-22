@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Classes at Kilnworth Pottery</title>
+  </head>
+  <body>
+    <!--
+      Task 1: let people pick their class from a menu.
+      Task 2: ask Kofi's question with three radio buttons, grouped in a fieldset.
+      Task 3: add a checkbox for the news and a box for longer notes.
+      Task 4: make the name, the email, the places and the question required.
+    -->
+    <p><a href="index.html">Back to Kilnworth Pottery</a></p>
+
+    <h1>Classes</h1>
+    <p>Every class is six weeks long. Clay, glazes and firing are included.</p>
+
+    <table>
+      <caption>Autumn timetable</caption>
+      <tr>
+        <th scope="col">Class</th>
+        <th scope="col">Day</th>
+        <th scope="col">Time</th>
+        <th scope="col">Price</th>
+        <th scope="col">Places</th>
+      </tr>
+      <tr>
+        <th scope="row">Wheel throwing</th>
+        <td>Thursday</td>
+        <td>6pm to 8.30pm</td>
+        <td>£180</td>
+        <td>6</td>
+      </tr>
+      <tr>
+        <th scope="row">Handbuilding</th>
+        <td>Saturday</td>
+        <td>10am to 12.30pm</td>
+        <td>£150</td>
+        <td>8</td>
+      </tr>
+    </table>
+
+    <h2>Thursday wheel class</h2>
+    <p>Thursdays, 6pm to 8.30pm, with Kofi. Learn to centre clay and throw mugs and bowls.</p>
+
+    <h2>Saturday handbuilding</h2>
+    <p>Saturdays, 10am to 12.30pm, with Kofi. Pinch, coil and slab your way to a set of plates.</p>
+
+    <p>To book a place, come into the studio or ask Kofi after a class.</p>
+
+    <h2>Book a place</h2>
+    <p>Fill this in and Kofi will email you to say your place is kept.</p>
+    <form>
+      <p>
+        <label for="name">Your name</label>
+        <input type="text" id="name" name="name" />
+      </p>
+      <p>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" />
+      </p>
+      <p>
+        <label for="places">Places</label>
+        <input type="number" id="places" name="places" min="1" max="4" />
+      </p>
+      <p>Class: Wheel throwing or Handbuilding</p>
+      <p>Have you made pots before? This is my first time. I have made a few. I make pots often.</p>
+      <p>Send me news when the kiln is opened</p>
+      <p>Anything Kofi should know?</p>
+      <button type="submit">Book my place</button>
+    </form>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+{
+  "id": "first-stylesheet",
+  "title": "A stylesheet of its own",
+  "files": ["index.html", "styles.css", "classes.html"],
+  "terminal": {
+    "description": "The home page runs in the Browser panel and reloads every time you save. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "link",
+      "title": "Link the stylesheet from both pages",
+      "file": "index.html",
+      "description": "There is a new file next to the pages, `styles.css`, with Dilys's notes in a comment. No page uses it yet.\n\nIn the head of `index.html` and of `classes.html`, add a `link` that loads `styles.css` as a stylesheet.\n\nThe check reads the head of each page and looks for a link whose address leads to `styles.css` and that says it is a stylesheet.",
+      "nextSteps": [
+        "Read \"Where CSS lives\" in the lesson.",
+        "Open index.html and find the head.",
+        "Add the link after the title, save, and do the same in classes.html.",
+        "Press Check."
+      ],
+      "hints": [
+        "The element that loads a stylesheet has no closing tag and sits in the head.",
+        "A `link` needs two attributes: `rel` says what the file is for, `href` says where it is.",
+        "In both heads, write `<link rel=\"stylesheet\" href=\"styles.css\" />`."
+      ],
+      "docs": [
+        { "title": "<link>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/link" },
+        { "title": "Getting started with CSS", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Getting_started" }
+      ],
+      "videos": [
+        { "title": "CSS in 100 seconds", "url": "https://www.youtube.com/watch?v=OEV8gMkCHXQ" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "colours",
+      "title": "Paint the page in the studio's colours",
+      "file": "styles.css",
+      "description": "Dilys wants the cream of the studio walls behind the page and the dark brown of the clay for the writing. Her notes in `styles.css` give both as colour codes.\n\nWrite a rule for the `body` that sets its `background-color` and its `color` to her codes. Use the codes, not a colour name.\n\nThe check opens the home page with only `styles.css` applied and reads the background colour and the text colour of the body.",
+      "nextSteps": [
+        "Read \"A rule\" and \"Colours\" in the lesson.",
+        "Under the comment in styles.css, start a rule for the body.",
+        "Add one declaration for the background and one for the text, with Dilys's codes.",
+        "Save, watch the Browser panel change, and press Check."
+      ],
+      "hints": [
+        "A rule names what it styles, then lists its declarations between curly braces.",
+        "The background is `background-color` and the text is `color`. Each declaration ends with a semicolon.",
+        "The shape is `body { background-color: ...; color: ...; }`, with the two codes from the notes."
+      ],
+      "docs": [
+        { "title": "background-color", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/background-color" },
+        { "title": "color", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/color" },
+        { "title": "CSS syntax", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Syntax/Introduction" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "font",
+      "title": "Set the studio's letters",
+      "file": "styles.css",
+      "description": "Dilys wants the letters of the sign over the door, Georgia, and writing big enough to read without glasses.\n\nIn the same `body` rule, set `font-family` to Georgia with `serif` after it to fall back on, and `font-size` to the size in her notes, written in px.\n\nThe check reads the font list and the text size of the body with only `styles.css` applied.",
+      "nextSteps": [
+        "Read \"Fonts and sizes\" in the lesson.",
+        "Go back to the body rule in styles.css.",
+        "Add a declaration for the font list and one for the size.",
+        "Save, look at the letters in the Browser panel, and press Check."
+      ],
+      "hints": [
+        "A font list names the font you want first and a general family last, in case the computer does not have the first.",
+        "The fonts are separated by commas. A size is a number with its unit straight after it.",
+        "Add `font-family: Georgia, serif;` and `font-size: 18px;` to the body rule."
+      ],
+      "docs": [
+        { "title": "font-family", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/font-family" },
+        { "title": "font-size", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/font-size" }
+      ],
+      "points": 10
+    }
+  ]
+}

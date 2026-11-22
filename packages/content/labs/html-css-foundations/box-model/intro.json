@@ -1,0 +1,39 @@
+{
+  "stations": [
+    {
+      "title": "Dilys",
+      "say": "Can it all have some air?",
+      "note": "It feels crammed."
+    },
+    {
+      "title": "Home page",
+      "text": "Notes touch their edges, parts run together.",
+      "note": "No space anywhere"
+    },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "Boxes with no space",
+      "tasks": ["Room inside notes", "A line on the left", "Space between parts", "Size with padding"]
+    },
+    {
+      "title": "Home page",
+      "rows": [["Classes"], ["The shop"], ["Visit us"]],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "The shop",
+    "wrong": "squashed",
+    "why": "No space",
+    "right": "room to read"
+  },
+  "captions": [
+    "Dilys says the page feels crammed, like a shelf the night before a sale.",
+    "The notes touch their edges, and the three parts run into each other.",
+    "You add padding and a border to the notes, margin to the sections, and box-sizing.",
+    "The shop sits apart from its neighbours, with room to read.",
+    "Same page, same words. Now it has the colours, the letters and the space of the studio."
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "id": "where-you-are",
+  "title": "Where you are and what is here",
+  "files": ["notes.txt"],
+  "terminal": {
+    "description": "A shell that starts in the shop's folder. Type a command, press Enter and read what it prints.",
+    "suggestedCommand": "pwd"
+  },
+  "tasks": [
+    {
+      "id": "here",
+      "title": "Write down where the terminal starts",
+      "file": "notes.txt",
+      "description": "Find out which folder the terminal is in when it opens, and write its full path after `here:` in `notes.txt`.\n\nA full path starts with `/` and names every folder from the top of the computer down to this one.\n\nCheck compares your line with the folder the terminal opens in for this issue.",
+      "nextSteps": [
+        "Click in the terminal so you can type in it.",
+        "Run the command from the lesson that prints where you are.",
+        "Copy the whole line it prints.",
+        "Paste it after `here:` in `notes.txt`."
+      ],
+      "hints": [
+        "The lesson's part about where you are names a command of three letters.",
+        "`pwd` prints one line, the full path of the folder you are in. That whole line is the answer.",
+        "Run `pwd`, select the line it prints, copy it, and paste it after `here:` so the line reads `here: /...`."
+      ],
+      "docs": [
+        {
+          "title": "pwd: print working directory",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/pwd-invocation.html"
+        },
+        {
+          "title": "Pathname",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap03.html#tag_03_254"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Moving around the terminal with pwd, ls and cd",
+          "url": "https://www.youtube.com/watch?v=P0KeDt-GuEI"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "biggest",
+      "title": "Find the biggest artwork file",
+      "file": "notes.txt",
+      "description": "Idris says one file in `artwork` is so big it keeps filling the memory stick. List `artwork` with sizes and write the name of its biggest file after `biggest:` in `notes.txt`, exactly as `ls` shows it.\n\nThe file panel does not show sizes, so this one needs the terminal.\n\nCheck compares your answer with the file in `artwork` that has the most bytes.",
+      "nextSteps": [
+        "List what is in `artwork`, by giving `ls` the folder's name.",
+        "Ask `ls` for the long listing, which has a size column.",
+        "Find the biggest number in that column.",
+        "Write that file's whole name after `biggest:`."
+      ],
+      "hints": [
+        "The plain listing only shows names. The lesson shows an option that adds a size to each line.",
+        "`-l` gives the long listing. The size in bytes is the number just before the date.",
+        "Run `ls -l artwork`, find the line with the largest size, and copy the name at the end of that line."
+      ],
+      "docs": [
+        {
+          "title": "ls: list directory contents",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/ls-invocation.html"
+        },
+        {
+          "title": "What information ls lists",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/What-information-is-listed.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hidden",
+      "title": "Find the hidden handover note",
+      "file": "notes.txt",
+      "description": "Sol, who used to help on Saturdays, left a handover note in `desk`, but it does not show up in the file panel or in a plain listing. Find it and write its name after `hidden:` in `notes.txt`, exactly as `ls` shows it.\n\nCheck compares your answer with the names of the hidden files in `desk`.",
+      "nextSteps": [
+        "List `desk` the plain way and see what shows.",
+        "Ask `ls` to show every name, hidden ones too.",
+        "Find the name that was not there before.",
+        "Write it after `hidden:`, with every character it has."
+      ],
+      "hints": [
+        "Some names are left out of a listing on purpose. The lesson says which ones and how to see them.",
+        "`ls -a` shows all names. Hidden names start with a dot, and the dot belongs to the name.",
+        "Run `ls -a desk`. Leave out `.` and `..`, and the name that remains is the answer."
+      ],
+      "docs": [
+        {
+          "title": "Which files ls lists",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/Which-files-are-listed.html"
+        },
+        {
+          "title": "ls: list directory contents",
+          "url": "https://www.gnu.org/software/coreutils/manual/html_node/ls-invocation.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
