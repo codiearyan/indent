@@ -21,6 +21,7 @@ import { labModelProblem, labModelReady, startLabModel } from './labModel'
 import { getProgress, recordCheck } from './progress'
 import { findMissing } from './workspaceSync'
 import { InstallError } from '../library'
+import { perf } from '../perf'
 import {
   downloadTools,
   installedTools,
@@ -203,6 +204,7 @@ async function runCheck(
   chapterId: string,
   taskIds?: string[]
 ): Promise<{ results: CheckResult[]; progress: ProgressState }> {
+  const began = Date.now()
   const chapter = await loadChapter(labId, chapterId)
   const known = chapter.tasks.map((task) => task.id)
   const ids = taskIds ?? known
@@ -234,11 +236,13 @@ async function runCheck(
       ...ids.flatMap((id) => ['--task', id])
     ]
     const started = Date.now()
+    perf('check, before the grader', started - began)
     const run = await runProcess('node', args, {
       env: await labEnv(),
       timeout: CHECK_TIMEOUT_MS,
       killSignal: 'SIGKILL'
     })
+    perf('check, in the grader', Date.now() - started)
     results = gradeRun(ids, run, Date.now() - started, new Date().toISOString())
   }
   return { results, progress: await recordCheck(labId, chapterId, chapter.tasks, results) }
