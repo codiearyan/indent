@@ -50,17 +50,17 @@ function others(t, own, extra = {}) {
 
 /**
  * Runs shop.js with the given swaps and says whether what it printed has `mark` in it. When shop.js
- * stops for a reason that has nothing to do with `file`, as it can halfway through a later move,
- * its import of `name` from `file` is judged on the source instead.
+ * stops for a reason that has nothing to do with `file` or the names it shares (`names`), as it can
+ * halfway through a later move, its import of `name` from `file` is judged on the source instead.
  */
-async function shopPrints(t, swaps, mark, { file, name }) {
+async function shopPrints(t, swaps, mark, { file, name, names = [name] }) {
   const { stdout, problem } = await runFile(t, await prepare(t, { swaps, quiet: false }), SHOP)
   if (!problem) return { printed: stdout, has: stdout.includes(mark) }
   const base = file.split('/').pop()
   const imports = new RegExp(
     `\\bimport\\s*\\{[^}]*\\b${name}\\b[^}]*\\}\\s*from\\s*['"]\\./${base.replace('.', '\\.')}['"]`
   ).test(await sourceOf(t, SHOP))
-  const elsewhere = !problem.message.includes(base)
+  const elsewhere = ![base, ...names].some((n) => new RegExp(`\\b${n}\\b`).test(problem.message))
   return imports && elsewhere ? { printed: '', has: true } : { problem }
 }
 
@@ -171,7 +171,8 @@ export const checks = {
     const copies = ['isLow', 'inStock', 'lowStock'].filter((fn) => declares(shopText, fn))
     const run = await shopPrints(t, others(t, [], { [STOCK]: t.chapterPath('grader/marked-stock.js') }), 'from stock.js', {
       file: STOCK,
-      name: 'lowStock'
+      name: 'lowStock',
+      names: ['lowStock', 'inStock', 'isLow']
     })
     return [
       ...has,
@@ -285,10 +286,12 @@ export const checks = {
         list: [{ name: 'marked', args: [[{ name: 'Juniper', stock: 0 }]], expected: ['Wickhollow Candles', 'Juniper: 0 left'] }]
       }
     )
+    const { names } = await exportsOf(t, await prepare(t, { swaps: others(t, [PAGE]) }), PAGE)
     const shopText = await sourceOf(t, SHOP)
     const run = await shopPrints(t, others(t, [], { [PAGE]: t.chapterPath('grader/marked-page.js') }), 'from page.js', {
       file: PAGE,
-      name: 'pageLines'
+      name: 'pageLines',
+      names: ['pageLines', 'productLine']
     })
     return [
       ...right,
@@ -298,6 +301,11 @@ export const checks = {
         declares(pageText, 'inStock')
           ? 'page.js has an inStock of its own, a copy of the one in stock.js. Remove it and import inStock from stock.js.'
           : 'page.js decides whether a candle is in stock some other way than with inStock from stock.js. Import inStock from stock.js and use it in productLine.'
+      ),
+      shape(
+        'productLine stays in page.js',
+        !names || !('productLine' in names),
+        'productLine only helps pageLines inside page.js, so it is not exported: keep it off the export line, with no export in front of it.'
       ),
       shape(
         'shop.js keeps no function of its own',

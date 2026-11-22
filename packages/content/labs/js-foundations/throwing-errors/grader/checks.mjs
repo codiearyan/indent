@@ -20,7 +20,7 @@ const attempt = (body, before = '', setup = '') => `(() => {
   })
   try {
     const v = ${body}
-    return { gave: v === undefined ? { undefined: true } : { value: JSON.parse(JSON.stringify(v)) }, seen }
+    return { gave: v === undefined ? { undefined: true } : { value: JSON.parse(JSON.stringify(v, (k, x) => (x instanceof Error ? { name: x.name, message: x.message } : x))) }, seen }
   } catch (e) {
     return { ...shown(e), seen }
   }
@@ -165,12 +165,12 @@ export const checks = {
       findCandle = (candles, sku) => {
         seen.find++
         const found = candles.find((c) => c.sku === sku)
-        if (!found) throw new RangeError('no candle ' + sku)
+        if (!found) throw Object.assign(new RangeError('no candle ' + sku), { __mark: true })
         return found
       }
       lineTotal = (candle, qty) => {
         seen.line++
-        if (qty < 1) throw new RangeError('bad quantity ' + qty)
+        if (qty < 1) throw Object.assign(new RangeError('bad quantity ' + qty), { __mark: true })
         return candle.priceCents * qty
       }`
     const shelf = [
@@ -207,8 +207,8 @@ export const checks = {
         const logged = printed[i].length ? ' Printing the error is not enough: the code that called cartTotal never hears of it.' : ''
         message = !r.threw
           ? `cartTotal gave ${r.gave?.undefined ? 'nothing' : show(r.gave?.value)} for a cart with a wrong line. It caught the error, so the order would go on and the customer would never know.${logged} Nothing in cartTotal can fix a wrong line: let the error pass, with no try around it here.`
-          : r.message !== c.error || !r.range
-            ? 'cartTotal threw an error of its own in place of the one that came up from below, and the message that said what was wrong is lost. Let the first error pass as it is.'
+          : r.message !== c.error || !r.range || !r.marked
+            ? 'cartTotal threw an error of its own in place of the one that came up from below. Let that first error pass as it is, with its kind, its message and its at lines: no try around it here.'
             : undefined
       }
       return {

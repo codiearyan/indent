@@ -208,9 +208,11 @@ export const checks = {
     const { details, got } = await withShared(t, {
       file: EMAILS,
       fn: 'orderLine',
-      absent: declares(text, 'orderLine')
-        ? 'emails.js has orderLine, but does not export it, so no other file can use it. Export it, on an export line or with export in front.'
-        : 'emails.js does not have a function called orderLine yet. Write it under the comment, spelt exactly so, capital L included, and export it.',
+      absent: /^export\s+default\b/m.test(text)
+        ? 'emails.js shares orderLine as its default export, which has no name of its own. Other files import orderLine by its name, in curly braces: write export in front of function, without default.'
+        : declares(text, 'orderLine')
+          ? 'emails.js has orderLine, but does not export it, so no other file can use it. Export it, on an export line or with export in front.'
+          : 'emails.js does not have a function called orderLine yet. Write it under the comment, spelt exactly so, capital L included, and export it.',
       list: [
         [{ name: 'Cedar', priceCents: 1800 }, 2],
         [{ name: 'Fig', priceCents: 2400 }, 1],

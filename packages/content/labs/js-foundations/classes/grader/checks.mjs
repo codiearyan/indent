@@ -40,6 +40,13 @@ const withoutNew = (r) =>
     ? 'A class is called with new in front of it. Look for a call to the class without new in your file.'
     : undefined
 
+const unseen = (r) => {
+  const name = r.threw && /ReferenceError: (\w+) is not defined/.exec(r.threw)?.[1]
+  return name && name !== 'Candle'
+    ? `Candle stops at ${name}, a name it cannot see. Inside a class, the candle's own properties are reached through this: this.${name}.`
+    : undefined
+}
+
 const exportsClass = (text, name) =>
   new RegExp(`^export\\s+(?:class|function)\\s+${name}\\b|^export\\s*\\{[^}]*\\b${name}\\b`, 'm').test(text)
 
@@ -121,14 +128,16 @@ export const checks = {
         expr: `(() => { const c = new Candle('Fig', 2400); c.restock(5); c.sell(2); return [c.stock, c.label()] })()`,
         shown: "new Candle('Fig', 2400), restock(5), sell(2), then stock and label()",
         expected: [3, 'Fig: 3 left'],
-        hint: "restock adds to this.stock and sell takes off it. label gives the name, a colon, a space, the stock and 'left'."
+        hint: "restock adds to this.stock and sell takes off it. label gives the name, a colon, a space, the stock and 'left'.",
+        explain: (r) => (Array.isArray(r.value) && r.value[0] == null ? NO_STOCK : undefined)
       },
       {
         name: 'A candle that sold out',
         expr: `(() => { const c = new Candle('Moss', 1500); c.restock(2); c.sell(2); return c.label() })()`,
         shown: "new Candle('Moss', 1500), restock(2), sell(2), then label()",
         expected: 'Moss: sold out',
-        hint: "When its stock is 0, label gives the name, a colon, a space and 'sold out'."
+        hint: "When its stock is 0, label gives the name, a colon, a space and 'sold out'.",
+        explain: (r) => (typeof r.value === 'string' && r.value.includes('NaN') ? NO_STOCK : undefined)
       },
       {
         name: 'Each candle keeps its own stock',
@@ -144,7 +153,7 @@ export const checks = {
     const absent = missingClass('Candle', 'Task 2')(runs[0])
     if (absent) return [{ name: 'Candle is there', passed: false, message: absent }]
     return [
-      ...details(list, runs, (r) => withoutNew(r) ?? (r.threw && /is not a function/.test(r.threw) ? 'A candle is missing one of its methods. Read the error below: it names the one that was called.' : undefined)),
+      ...details(list, runs, (r) => withoutNew(r) ?? unseen(r) ?? (r.threw && /is not a function/.test(r.threw) ? 'A candle is missing one of its methods. Read the error below: it names the one that was called.' : undefined)),
       shape('Candle is a class', /\bclass\s+Candle\b/.test(text), 'The task asks for a class: write Candle starting with the word class.'),
       shape('Candle is exported', exportsClass(text, 'Candle'), 'Candle is not exported, so no other file can use it. Export it, with export in front of the word class or on an export line.')
     ]
@@ -155,22 +164,22 @@ export const checks = {
     const list = [
       {
         name: 'A new limited candle',
-        expr: `(() => { const c = new LimitedCandle('Snow', 2600, 20); return ${plain('c')} })()`,
-        shown: "new LimitedCandle('Snow', 2600, 20)",
-        expected: { name: 'Snow', priceCents: 2600, stock: 0, edition: 20 },
+        expr: `(() => { const c = new LimitedCandle('Frost', 2600, 30); return ${plain('c')} })()`,
+        shown: "new LimitedCandle('Frost', 2600, 30)",
+        expected: { name: 'Frost', priceCents: 2600, stock: 0, edition: 30 },
         hint: 'A limited candle has everything a Candle has, made by Candle, and edition from its third parameter.',
         explain: (r) =>
           r.value && typeof r.value === 'object' && 'name' in r.value && !('priceCents' in r.value)
             ? "The limited candle has no priceCents. super(...) hands Candle's constructor what it needs to make a candle: the name and the price."
             : r.value && typeof r.value === 'object'
-            ? explainObject('the limited candle', r.value, { name: 'Snow', priceCents: 2600, stock: 0, edition: 20 })
+            ? explainObject('the limited candle', r.value, { name: 'Frost', priceCents: 2600, stock: 0, edition: 30 })
             : undefined
       },
       {
         name: 'Its label',
-        expr: `(() => { const c = new LimitedCandle('Snow', 2600, 20); c.restock(3); return c.label() })()`,
-        shown: "new LimitedCandle('Snow', 2600, 20), restock(3), then label()",
-        expected: 'Snow: 3 left, limited to 20',
+        expr: `(() => { const c = new LimitedCandle('Frost', 2600, 30); c.restock(3); return c.label() })()`,
+        shown: "new LimitedCandle('Frost', 2600, 30), restock(3), then label()",
+        expected: 'Frost: 3 left, limited to 30',
         hint: "The label is Candle's label, then a comma, a space, 'limited to' and the edition."
       },
       {
@@ -182,22 +191,22 @@ export const checks = {
       },
       {
         name: 'Sells the way Candle does',
-        expr: `(() => { const c = new LimitedCandle('Snow', 2600, 20); c.restock(5); c.sell(2); return c.stock })()`,
-        shown: "new LimitedCandle('Snow', 2600, 20), restock(5), sell(2), then stock",
+        expr: `(() => { const c = new LimitedCandle('Frost', 2600, 30); c.restock(5); c.sell(2); return c.stock })()`,
+        shown: "new LimitedCandle('Frost', 2600, 30), restock(5), sell(2), then stock",
         expected: 3,
         hint: 'restock and sell come from Candle. LimitedCandle does not need its own.'
       },
       {
         name: 'Uses the label of Candle',
-        expr: `(() => { Candle.prototype.label = function () { return 'label of ' + this.name }; return new LimitedCandle('Snow', 2600, 20).label() })()`,
-        shown: "Candle's label changed by Check, then new LimitedCandle('Snow', 2600, 20).label()",
-        expected: 'label of Snow, limited to 20',
+        expr: `(() => { Candle.prototype.label = function () { return 'label of ' + this.name }; return new LimitedCandle('Frost', 2600, 30).label() })()`,
+        shown: "Candle's label changed by Check, then new LimitedCandle('Frost', 2600, 30).label()",
+        expected: 'label of Frost, limited to 30',
         hint: "Check changed Candle's label, and the limited label did not follow: LimitedCandle writes that part again by itself. Use Candle's own label through super, so a change to Candle reaches both."
       },
       {
         name: 'Built on Candle',
-        expr: `new LimitedCandle('Snow', 2600, 20) instanceof Candle`,
-        shown: "new LimitedCandle('Snow', 2600, 20) instanceof Candle",
+        expr: `new LimitedCandle('Frost', 2600, 30) instanceof Candle`,
+        shown: "new LimitedCandle('Frost', 2600, 30) instanceof Candle",
         expected: true,
         hint: 'LimitedCandle is not built on Candle. Write extends Candle after its name.'
       }
@@ -273,6 +282,9 @@ export const checks = {
     return details(list, runs, (r) => {
       if (r.threw && /Cannot (read|set) properties of undefined \(\w+ 'stock'\)/.test(r.threw)) {
         return "sell stops because this is undefined inside it. whenPaid was handed the sell method on its own, without the candle, and calls it with nothing before the dot. The lesson's part on passing a method shows how to keep the candle."
+      }
+      if (r.threw && /handler is not a function/.test(r.threw)) {
+        return 'whenPaid was handed what sell gave back, not a function: with brackets after it, sell runs at once, before the payment. Hand whenPaid a function that sells, and let the till call it.'
       }
       if (r.threw && /Assignment to constant/.test(r.threw)) {
         return 'Check could not stand in for whenPaid. Leave whenPaid as it was, written with the word function.'

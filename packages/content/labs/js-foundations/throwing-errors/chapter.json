@@ -44,7 +44,7 @@
         "Find the candle with the list method that gives back the first match.",
         "Ask whether anything was found.",
         "Throw when nothing was, and return the candle when something was.",
-        "Run the file: the last cart should now come back with a reason."
+        "Try `findCandle(catalogue, 'PINE-100')` at the bottom of the file and read what Node prints."
       ],
       "hints": [
         "`find` gives back `undefined` when nothing matches. Returning that would let the order go on with no candle.",

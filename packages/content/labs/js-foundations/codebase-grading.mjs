@@ -177,7 +177,7 @@ async function loadProblem(t, dir, error) {
     const hasDefault = /^export\s+default\b/m.test(target?.text ?? '')
     return detail(
       name === 'default'
-        ? `${from} imports from '${spec}' without braces, which asks for the default export of ${file}, and it has none. A name the file exports goes in braces.`
+        ? `${from} imports from '${spec}' without curly braces. Without them, an import asks for the one thing a file shares as its default export, and ${file} has none. A name the file exports goes in curly braces.`
         : `${from} imports ${name} from '${spec}', but ${file} exports nothing called ${name}.${hasDefault ? ` It shares one thing, as its default export, and a default import is written without braces.` : ' A file can only import what the other one exports, under the same name, capital letters included.'}`
     )
   }
@@ -199,7 +199,7 @@ async function loadProblem(t, dir, error) {
   if ((m = /ReferenceError: ([\w$]+) is not defined/.exec(text))) {
     const user = (await userOf(t, m[1])) ?? 'A file'
     return detail(
-      `${user} uses ${m[1]}, but does not make it or import it. A function that moved to another file has to be imported in every file that uses it.`
+      `${user} uses ${m[1]}, but does not make it or import it. Something that moved to another file has to be imported in every file that uses it.`
     )
   }
   if (/SyntaxError/.test(text)) {
@@ -304,7 +304,6 @@ export const declares = (text, name) =>
     `^(?:export\\s+)?(?:(?:async\\s+)?function\\s*\\*?\\s*${escape(name)}\\s*\\(|(?:const|let|var|class)\\s+${escape(name)}\\b)`,
     'm'
   ).test(text)
-
 
 /** Whether `details` is the single detail of a file that does not load or lacks the export. */
 export const stopped = (details) =>
