@@ -1,9 +1,24 @@
 // Shared by every issue's grader/checks.mjs.
 import { readFile } from 'node:fs/promises'
+import { availableParallelism } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const helpers = fileURLToPath(new URL('./drive-helpers.mjs', import.meta.url))
+
+// Every task of a Check shares this, so a few cases run at a time instead of dozens of processes at once.
+const slots = { free: Math.max(2, availableParallelism()), waiting: [], loadHang: undefined }
+async function inSlot(fn) {
+  if (slots.free > 0) slots.free--
+  else await new Promise((resolve) => slots.waiting.push(resolve))
+  try {
+    return await fn()
+  } finally {
+    const next = slots.waiting.shift()
+    if (next) next()
+    else slots.free++
+  }
+}
 
 const BANNED = [
   [/\bJSON\s*\.\s*parse\b/, 'JSON.parse'],
@@ -55,6 +70,14 @@ function blocker(values, unwritten) {
       output: broken.loadError
     }
   }
+  if (values.some((v) => v?.stuck && v.step === 'loading your code')) {
+    return {
+      name: 'Your files load',
+      passed: false,
+      message: 'Your files never finished loading, so this task cannot be checked. Look for a loop outside any function in src/ that never ends.',
+      output: 'stopped on loading your code'
+    }
+  }
   const todo = values.find((v) => v?.notImplemented !== undefined)
   if (todo) {
     const fn = todo.notImplemented ? `${todo.notImplemented}()` : unwritten
@@ -90,7 +113,15 @@ export async function runCases(t, unwritten, cases, { scan = ['src/json.js'] } =
   const banned = await builtInUse(dir, scan)
   if (banned) return [banned]
   const runs = await Promise.all(
-    cases.map((c) => t.call(dir, '.grader/drive.mjs', 'run', [c.run, ...(c.args ?? [])], { timeoutMs: 30000 }))
+    cases.map((c) =>
+      inSlot(async () => {
+        if (slots.loadHang) return slots.loadHang
+        const r = await t.call(dir, '.grader/drive.mjs', 'run', [c.run, ...(c.args ?? [])], { timeoutMs: 30000 })
+        // Files that never finish loading hang every case the same way: wait for them once, not for each case.
+        if (r.ok && r.value?.stuck && r.value.step === 'loading your code') slots.loadHang = r
+        return r
+      })
+    )
   )
   const values = runs.map((r) => (r.ok ? r.value : { crashed: r.timedOut ? 'The check ran out of time.' : r.error }))
   const stop = blocker(values, unwritten)

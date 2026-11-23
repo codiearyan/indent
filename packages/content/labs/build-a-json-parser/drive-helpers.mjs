@@ -42,8 +42,9 @@ export function same(a, b) {
   return false
 }
 
-// Main side. Each step the worker starts gets `stepMs`; a step that takes longer is stopped.
-export function inWorker(driveUrl, name, args, { stepMs = 2500 } = {}) {
+// Main side. Each step the worker starts gets `stepMs`; a step that takes longer is stopped. Starting
+// up and loading the learner's files get `loadMs`, since a busy computer can be slow at that alone.
+export function inWorker(driveUrl, name, args, { stepMs = 2500, loadMs = 15000 } = {}) {
   return new Promise((resolve) => {
     const worker = new Worker(new URL(driveUrl), {
       workerData: { name, args },
@@ -63,11 +64,11 @@ export function inWorker(driveUrl, name, args, { stepMs = 2500 } = {}) {
       worker.terminate()
       resolve(value)
     }
-    const arm = () => {
+    const arm = (ms = stepMs) => {
       clearTimeout(timer)
-      timer = setTimeout(() => finish({ stuck: 'time', step }), stepMs)
+      timer = setTimeout(() => finish({ stuck: 'time', step }), ms)
     }
-    arm()
+    arm(loadMs)
     worker.on('message', (m) => {
       if (m.step !== undefined) {
         step = m.step
