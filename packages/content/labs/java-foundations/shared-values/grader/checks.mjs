@@ -1,4 +1,4 @@
-import { CHECK_THREADS, explainThread, fail, outcomeCases, tasks, threaded, threadWords } from '../../grading.mjs'
+import { CHECK_THREADS, threwOnThread, explainThread, fail, outcomeCases, tasks, threaded, threadWords } from '../../grading.mjs'
 
 const FILE = 'PierWindow.java'
 const value = (r, name) => r.values[name]?.value ?? null
@@ -51,6 +51,20 @@ final class CheckRounds {
     }
 }`
 
+// The methods of AtomicInteger are final, so no stand-in can come between two of its calls. What
+// the rounds show only by luck, the code shows every time: a next that makes two calls on its
+// AtomicInteger (a read and a write, or a read again after the add) and neither holds a lock nor
+// retries with compareAndSet always has a gap another window can take.
+function twoCalls(section) {
+  const field = /AtomicInteger\s+(\w+)\s*[;=]/.exec(section)?.[1]
+  const at = section.search(/\bint\s+next\s*\(/)
+  if (!field || at < 0) return false
+  const head = section.slice(Math.max(0, at - 40), at)
+  const body = section.slice(at, section.indexOf('}', section.indexOf('{', at)) + 1)
+  if (/\bsynchronized\b/.test(head) || /\bsynchronized\b|compareAndSet/.test(body)) return false
+  return (body.match(new RegExp(`\\b${field}\\s*\\.\\s*\\w+\\s*\\(`, 'g')) ?? []).length >= 2
+}
+
 // Rounds for numbers: each round a new AtomicInteger, every thread takes numbers at once, and
 // Check counts the rounds where a number came out twice or the last number is not the last.
 const NUMBERS = `final class CheckNumbers {
@@ -88,23 +102,36 @@ const PRINTER = `final class CheckPrinter implements Printer {
     java.util.List<String> printed() { synchronized (printed) { return new java.util.ArrayList<>(printed); } }
 }`
 
-const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/\n {2}(?:still waiting|threads left running) is null(?=\n)/g, '') } : d)
+const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/\n {2}(?:still waiting|threads left running|a thread it started threw) is null(?=\n)/g, '') } : d)
 
+// Many threads at once show a mistake only by luck. Their case is said only when every case whose
+// order of events Check forces has passed, so the same code always gets the same messages.
 function judge(mistakes, { calls }) {
+  return (runs, ctx) => {
+    const ds = judged(mistakes, calls)(runs, ctx)
+    const forcedFailed = ds.some((d, i) => !d.passed && runs[i].case.kind !== 'many')
+    return ds.filter((d, i) => !(forcedFailed && !d.passed && runs[i].case.kind === 'many'))
+  }
+}
+
+function judged(mistakes, calls) {
   return (runs, ctx) =>
     outcomeCases({ file: FILE, explain: explainThread })(runs, ctx).map((d, i) => {
       const r = runs[i]
       const stuck = value(r, 'still waiting')
       if (stuck)
-        return quiet(fail(d.name, `Check waited for ${calls} to return, and it did not. When Check stopped waiting there was ${threadWords(stuck, FILE)}. Two threads that each wait for a lock the other holds wait for ever.`, d.output))
+        return quiet(fail(d.name, `Check waited for ${calls} to return, and it did not. When Check stopped waiting it found ${threadWords(stuck, FILE)}.${(stuck.match(/lock:/g) ?? []).length > 1 ? ' Two threads that each wait for a lock the other holds wait for ever.' : ''}`, d.output))
+      if (d.passed && r.case.failsIf?.(ctx.section)) return quiet(fail(d.name, r.case.failsHint, d.output))
       if (d.passed) {
         const left = value(r, 'threads left running')
-        return left ? quiet(fail(d.name, `The answer is right, and the call left behind ${threadWords(left, FILE)}. In a program of its own, a thread still alive keeps the program from ending.`, d.output)) : quiet(d)
+        return left ? quiet(fail(d.name, `The answer is right, and the call left behind ${threadWords(left, FILE)}. In a program of its own, a thread still alive keeps the program from ending.`, d.output)) : quiet(threwOnThread(d, r, FILE, calls) ?? d)
       }
       const m = mistakes.find((k) => k.when(r, ctx))
       return quiet(m ? { ...d, message: typeof m.hint === 'function' ? m.hint(r) : m.hint } : d)
     })
 }
+
+const TWO_CALLS = 'next makes two calls on the AtomicInteger, a read and a write, or a read again after the add, and between the two another window can make its own: two windows then get the same number. An AtomicInteger can add and give back the new value in one call that no other thread can come between. Your terminal may show no clash on a run, by luck, and Check runs many rounds at once.'
 
 const held = (what, owner, owners) => ({
   when: (r) => value(r, 'while Check held the lock') === 'finished',
@@ -129,8 +156,9 @@ export const checks = tasks({
           setup: ['Sold sold = new Sold();'],
           call: 'sold.add(7); sold.add(5)',
           show: 'Sold sold = new Sold();\nsold.add(7);\nsold.add(5);',
-          after: { 'count afterwards': 'sold.count()' },
-          expected: { 'count afterwards': 12 },
+          after: { 'count afterwards': 'sold.count()', 'another new Sold counts': 'new Sold().count()' },
+          expected: { 'count afterwards': 12, 'another new Sold counts': 0 },
+          kind: 'plain',
           hint: 'A new Sold counts 0, and each add adds its tickets to the count.'
         }),
         threaded({
@@ -163,11 +191,16 @@ export const checks = tasks({
           show: 'Sold sold = new Sold();\n// 4 threads at once, 5 rounds, each thread 2000 times:\nsold.add(1);',
           after: { 'count afterwards': 'sold.count()' },
           expected: { 'count afterwards': 40000 },
+          kind: 'many',
           hint: 'Every ticket added counts: with the lock, no add is lost however many threads add at once.'
         })
       ],
       judge: judge(
         [
+          {
+            when: (r) => r.case.kind === 'plain' && Number(value(r, 'count afterwards')) === 12 && Number(value(r, 'another new Sold counts')) !== 0,
+            hint: 'A new Sold starts with the count of the one before it: the count is static, so every Sold shares one count, and each Sold guards it with a lock of its own. Each Sold keeps a count of its own.'
+          },
           { ...held('add', 'Sold', "Sold's"), when: (r) => r.case.kind === 'add' && value(r, 'while Check held the lock') === 'finished' },
           {
             when: (r) => r.case.kind === 'count' && value(r, 'while Check held the lock') === 'finished',
@@ -196,8 +229,8 @@ export const checks = tasks({
           call: 'java.util.List.of(numbers.next(), numbers.next(), numbers.next())',
           type: 'java.util.List<Integer>',
           show: 'AtomicInteger last = new AtomicInteger(40);\nNumbers numbers = new Numbers(last);\nList<Integer> got = List.of(numbers.next(), numbers.next(), numbers.next());',
-          after: { 'last afterwards': 'last.get()' },
-          expected: { got: [41, 42, 43], 'last afterwards': 43 },
+          after: { 'last afterwards': 'last.get()', 'next after another Numbers was made': 'new Numbers(new java.util.concurrent.atomic.AtomicInteger(7)) == null ? 0 : numbers.next()' },
+          expected: { got: [41, 42, 43], 'last afterwards': 43, 'next after another Numbers was made': 44 },
           kind: 'one',
           hint: 'next should add 1 to the AtomicInteger it was given and give back the new number.'
         }),
@@ -209,6 +242,8 @@ export const checks = tasks({
           show: '// 20 rounds; each round a new AtomicInteger, and 4 threads at once, each 300 times:\nnumbers.next();',
           expected: { got: '0 of 20 rounds gave a number twice, 0 missed a number, 0 left a wrong last number' },
           kind: 'many',
+          failsIf: twoCalls,
+          failsHint: TWO_CALLS,
           hint: 'With any number of threads at once, every number from one more than the start to the last comes out exactly once.'
         })
       ],
@@ -223,8 +258,12 @@ export const checks = tasks({
             hint: 'The AtomicInteger Check handed over still holds 40 afterwards: the numbers come from somewhere else. Numbers keeps the AtomicInteger its constructor is given and counts with it, so that every window shares one count.'
           },
           {
-            when: (r) => r.case.kind === 'many' && /^[1-9]/.test(value(r, 'got') ?? ''),
-            hint: 'Some rounds gave two windows the same number: next reads the number in one step and writes the new one in another, and between the two another thread does the same. An AtomicInteger can add and give back the new value in one step that no other thread can come between. Your terminal may show no clash on a run, by luck; Check runs many rounds at once.'
+            when: (r) => r.case.kind === 'one' && Number(value(r, 'next after another Numbers was made')) !== 44 && JSON.stringify(r.values.got?.items) === JSON.stringify(['41', '42', '43']),
+            hint: 'Once a second Numbers was made, with an AtomicInteger of its own, the first one gave out numbers from the second one\'s: the field is static, so every Numbers shares the one made last. Each Numbers keeps the AtomicInteger it was given.'
+          },
+          {
+            when: (r, ctx) => r.case.kind === 'many' && (/^[1-9]/.test(value(r, 'got') ?? '') || twoCalls(ctx.section)),
+            hint: TWO_CALLS
           },
           {
             when: (r) => r.case.kind === 'many',

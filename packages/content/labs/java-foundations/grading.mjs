@@ -3167,7 +3167,16 @@ export const CHECK_THREADS = `final class CheckStuck extends RuntimeException {
     CheckStuck(String what) { super("Check stopped waiting for the call to return"); this.what = what; }
 }
 final class CheckRun {
-    static final ThreadGroup GROUP = new ThreadGroup("check-call");
+    // What a thread the call started let escape, noted here rather than lost.
+    static final java.util.List<String> UNCAUGHT = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
+    static final ThreadGroup GROUP = new ThreadGroup("check-call") {
+        @Override public void uncaughtException(Thread t, Throwable e) {
+            int line = 0;
+            for (StackTraceElement f : e.getStackTrace()) if (learner(f) && f.getLineNumber() > 0) { line = f.getLineNumber(); break; }
+            UNCAUGHT.add(e.getClass().getSimpleName() + (e.getMessage() == null ? "" : ": " + e.getMessage()) + "|" + line);
+        }
+    };
+    static String uncaught() { synchronized (UNCAUGHT) { return UNCAUGHT.isEmpty() ? null : UNCAUGHT.get(0); } }
     static volatile Thread caller;
     static Runnable watch = () -> {};
 
@@ -3325,6 +3334,7 @@ export function threaded({ setup = [], call, type = 'void', wait = 1500, grace =
       ...THROWN_READS,
       'still waiting': 'stuck',
       'threads left running': `stuck != null ? null : CheckRun.settle(${grace})`,
+      'a thread it started threw': 'CheckRun.uncaught()',
       ...after
     },
     show: rest.show ?? [...setup, type === 'void' ? `${call};` : `${type} got = ${call};`].join('\n'),
@@ -3339,6 +3349,14 @@ const THREAD_DOING = {
   sleep: [() => 'a thread', (n) => `${n} threads`, ' asleep'],
   wait: [() => 'a thread', (n) => `${n} threads`, ' still waiting'],
   running: [() => 'a thread', (n) => `${n} threads`, ' still running']
+}
+
+/** A failed detail for a right answer whose call started a thread that threw, or null. */
+export function threwOnThread(d, r, file, calls) {
+  const x = r.values['a thread it started threw']?.value
+  if (!d.passed || !x) return null
+  const [what, line] = x.split('|')
+  return { ...d, passed: false, message: `The answer is right, and a thread ${calls} started threw ${what}${Number(line) > 0 ? `, at line ${line} of ${file}` : ''}, with nobody to catch it. Java prints that and the thread ends; whatever it was doing is never done.` }
 }
 
 /** CheckRun's kind:line; list as plain words, alike threads counted once: "2 threads still running, at line 9".

@@ -1,4 +1,4 @@
-import { CHECK_THREADS, explainThread, fail, outcome, outcomeCases, pass, tasks, threaded, threadWords } from '../../grading.mjs'
+import { CHECK_THREADS, threwOnThread, explainThread, fail, outcome, outcomeCases, pass, tasks, threaded, threadWords } from '../../grading.mjs'
 
 const FILE = 'BusyHut.java'
 const value = (r, name) => r.values[name]?.value ?? null
@@ -6,7 +6,7 @@ const items = (r, name) => r.values[name]?.items ?? null
 const text = (s) => JSON.stringify(s)
 
 // A thread prints with a number that changes from run to run: the output names it in words.
-const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/It gave back Thread\[[^\n]*/g, 'It gave back a thread.').replace(/\n {2}(?:still waiting|threads left running) is null(?=\n)/g, '') } : d)
+const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/It gave back Thread\[[^\n]*/g, 'It gave back a thread.').replace(/\n {2}(?:still waiting|threads left running|a thread it started threw) is null(?=\n)/g, '') } : d)
 
 /**
  * Judges threaded() cases: a call that never returned first, then the case's own known mistakes,
@@ -19,22 +19,22 @@ function judge(mistakes, { calls = 'the call' } = {}) {
       const stuck = value(r, 'still waiting')
       if (stuck) {
         const m = mistakes.find((k) => k.stuck && k.when(r, ctx))
-        return quiet(fail(d.name, m?.hint ?? `Check waited for ${calls} to return, and it did not. When Check stopped waiting there was ${threadWords(stuck, FILE)}.`, d.output))
+        return quiet(fail(d.name, m?.hint ?? `Check waited for ${calls} to return, and it did not. When Check stopped waiting it found ${threadWords(stuck, FILE)}.`, d.output))
       }
       const left = value(r, 'threads left running')
       const m = d.passed ? null : mistakes.find((k) => !k.stuck && k.when(r, ctx))
       if (m) return quiet({ ...d, message: typeof m.hint === 'function' ? m.hint(r) : m.hint })
       if (d.passed && left)
         return quiet(fail(d.name, `The answer is right, and when ${calls} returned it left behind ${threadWords(left, FILE)}. In a program of its own, a thread still alive keeps the program from ending.`, d.output))
-      return quiet(d)
+      return quiet(threwOnThread(d, r, FILE, calls) ?? d)
     })
 }
 
 // --- Task 1 ---------------------------------------------------------------------------------------
 
-// Check's speaker: a line said on another thread waits until announce has returned, so a thread
-// that is started and handed back at once always gets back first, and one that is waited for
-// inside announce never can.
+// Check's speaker: a line said on another thread waits until announce has returned, or is waiting
+// for another thread (in join, say), so a thread that is started and handed back at once always
+// gets back first, and one that is waited for inside announce is seen waiting, every time.
 const SPEAKER = `final class CheckSpeaker implements Speaker {
     private final java.util.List<String> said = new java.util.ArrayList<>();
     private final java.util.Set<Thread> on = new java.util.HashSet<>();
@@ -43,7 +43,10 @@ const SPEAKER = `final class CheckSpeaker implements Speaker {
         Thread me = Thread.currentThread();
         Thread caller = CheckRun.caller;
         if (me == caller) onCaller = true;
-        else if (!waited && !CheckRun.until(1000, () -> !caller.isAlive())) waited = true;
+        else if (!waited) {
+            CheckRun.until(3000, () -> !caller.isAlive() || CheckRun.waiting(caller));
+            if (caller.isAlive() && CheckRun.waiting(caller)) waited = true;
+        }
         synchronized (this) { on.add(me); said.add(line); }
     }
     synchronized java.util.List<String> said() { return new java.util.ArrayList<>(said); }
@@ -63,12 +66,13 @@ const ANNOUNCEMENTS = [
 // waiting for its threads (in join, say) or has returned. At that moment Check counts the threads
 // total has started, so starting them all before the first wait is the only way to have them all.
 // Then the counts are let through one at a time, each thread to its end before the next, so
-// nothing depends on which thread the computer runs first.
+// nothing depends on which thread the computer runs first. In interrupt mode Check interrupts the
+// caller the first time it waits, as a hut closing early would.
 const MANIFESTS = `final class CheckGate {
     private final java.util.List<Thread> held = new java.util.ArrayList<>();
     private Thread released;
     int calls, workers = -1;
-    boolean open, early, onCaller, letGo;
+    boolean open, early, onCaller, letGo, interrupt, interrupted;
     void enter() {
         Thread me = Thread.currentThread();
         synchronized (this) {
@@ -83,7 +87,13 @@ const MANIFESTS = `final class CheckGate {
         Thread c = CheckRun.caller;
         if (!open) {
             if (!c.isAlive()) { early = true; open = true; }
-            else if (CheckRun.waiting(c)) { workers = CheckRun.others(c).size(); open = true; }
+            else if (CheckRun.waiting(c)) {
+                if (workers < 0) workers = CheckRun.others(c).size();
+                // In interrupt mode the caller is interrupted the first time it waits, and the counts
+                // stay held until it has ended (a caller that goes on waiting gets them after a second).
+                if (interrupt) { if (!interrupted) { interrupted = true; c.interrupt(); } return; }
+                open = true;
+            }
         }
         if (open && !early && (released == null || !released.isAlive()) && !held.isEmpty()) released = held.remove(0);
     }
@@ -177,6 +187,17 @@ function ringerCase({ mode, every, name, when }) {
   }
 }
 
+// Whether stop, as written, interrupts the ringer before it waits for it. A stop that never asks
+// leaves the ringer ringing too, and that is not a lost interrupt.
+function asksFirst(section) {
+  const at = section.search(/\bvoid\s+stop\s*\(/)
+  if (at < 0) return true
+  const body = section.slice(at)
+  const ask = body.search(/\.interrupt\s*\(\s*\)/)
+  const wait = body.search(/\.join\s*\(/)
+  return ask >= 0 && (wait < 0 || ask < wait)
+}
+
 const SHOWN = ['given back', 'rings before stop', 'rings after stop was called', 'ringer ended']
 
 function ringerJudge(runs, ctx) {
@@ -190,7 +211,7 @@ function ringerJudge(runs, ctx) {
       return no(
         v('rang on the calling thread') === 'true'
           ? 'start rang the bell on the thread that called it, then slept there, so it never gave the ringer back. The ringing belongs on a new thread: run() does the work right where it is called, and the lesson shows what makes a thread do it on its own.'
-          : `start did not return within a second. When Check stopped waiting there was ${threadWords(v('start still waiting'), FILE)}. start makes the ringer and gives it back at once; the ringing goes on in the ringer.`
+          : `start did not return within a second. When Check stopped waiting it found ${threadWords(v('start still waiting'), FILE)}. start makes the ringer and gives it back at once; the ringing goes on in the ringer.`
       )
     }
     if (v('given back') === 'null' && !thrown) return no('start gives back null. It gives back the thread that rings the bell, so whoever closes the hut can stop it.')
@@ -208,10 +229,12 @@ function ringerJudge(runs, ctx) {
       if (c.mode === 'SLEEP') return no('The ringer never went to sleep between rings. It sleeps everyMillis milliseconds after each ring, with the sleep the lesson shows.')
       return no('The bell never rang. The ringer rings first, then sleeps.')
     }
+    if (v('stop still waiting') && !asksFirst(ctx.section))
+      return no(`stop did not return within a second and a half. When Check stopped waiting it found ${threadWords(v('stop still waiting'), FILE)}. stop interrupts the ringer first, so that it ends, and only then waits for it.`)
     if (Number(v('rings after stop was called')) > 0)
-      return no(`The bell rang again after stop had interrupted the ringer ${c.when}, so the interrupt was lost on the way: the ringer went on as if nothing had happened. An InterruptedException is how a sleeping thread hears it; a catch that does nothing with it throws that news away.`)
+      return no(`The bell rang again after stop had interrupted the ringer ${c.when}: the interrupt did not end it, and the ringer went on as if nothing had happened. An InterruptedException is how a sleeping thread hears it, and only a catch that ends the loop ends the ringer: a catch inside the loop, empty or not, lets it ring on.`)
     if (v('stop still waiting'))
-      return no(`stop did not return within a second and a half. When Check stopped waiting there was ${threadWords(v('stop still waiting'), FILE)}. stop interrupts the ringer first, so that it ends, and only then waits for it.`)
+      return no(`stop did not return within a second and a half. When Check stopped waiting it found ${threadWords(v('stop still waiting'), FILE)}. stop interrupts the ringer first, so that it ends, and only then waits for it.`)
     if (v('stop returned while the bell was still ringing') === 'true')
       return no('stop returned while the ringer was still ringing, so the hut could close with the bell still going. stop interrupts the ringer and then waits for it to end.')
     if (v('ringer ended') === 'false')
@@ -292,7 +315,8 @@ export const checks = tasks({
     total: {
       task: 2,
       stub: `${CHECK_THREADS}\n${MANIFESTS}`,
-      cases: COUNTS.map((counts, i) =>
+      cases: [
+        ...COUNTS.map((counts, i) =>
         threaded({
           name: counts.length ? `total counts ${counts.length} manifest${counts.length > 1 ? 's' : ''} at once` : 'total of no manifests is 0',
           setup: [
@@ -322,12 +346,40 @@ export const checks = tasks({
           counts,
           hint: 'total should start a thread per manifest, all before waiting for any, then wait for all of them and give back the counts added up.'
         })
-      ),
+        ),
+        threaded({
+          name: 'total lets an interrupt reach its caller',
+          setup: [
+            'CheckGate gate = new CheckGate();',
+            'gate.interrupt = true;',
+            'CheckRun.watch = gate::watch;',
+            'java.util.List<Manifest> manifests = new java.util.ArrayList<>(java.util.List.of(new CheckManifest(gate, 6), new CheckManifest(gate, 9), new CheckManifest(gate, 2)));'
+          ],
+          call: 'Counting.total(manifests)',
+          type: 'int',
+          wait: 2000,
+          show: '// Check interrupts the thread that called total while it waits for its threads:\nint got = Counting.total(List.of(a manifest of 6, a manifest of 9, a manifest of 2));',
+          after: { 'interrupted while it waited': 'gate.interrupted' },
+          throws: 'InterruptedException',
+          expected: {},
+          counts: [6, 9, 2],
+          kind: 'interrupt',
+          hint: 'Interrupted while it waits for its threads, total lets the InterruptedException reach whoever called it, as its throws clause says.'
+        })
+      ],
       judge: judge(
         [
           {
+            when: (r) => r.case.kind === 'interrupt' && value(r, 'interrupted while it waited') === 'false',
+            hint: 'total never waited for its threads the way the lesson shows, so there was no wait for Check to interrupt.'
+          },
+          {
+            when: (r) => r.case.kind === 'interrupt' && !value(r, 'thrown'),
+            hint: 'Check interrupted total while it waited for its threads, and total went on as if nothing had happened. An InterruptedException means someone asked this thread to stop: a catch that does nothing with it hides that. total says throws InterruptedException, and lets it reach whoever called it.'
+          },
+          {
             when: (r) => value(r, 'counted on the calling thread') === 'true',
-            hint: 'A manifest was counted on the thread that called total: no second thread counted it. run() does the work right where it is called, like any method; the lesson shows what makes a thread do it on its own.'
+            hint: 'A manifest was counted on the thread that called total: no second thread counted it. A thread does the work on its own only once it is started; run() does it right where it is called, like any method.'
           },
           {
             when: (r) => value(r, 'gave back before the threads ended') === 'true',
@@ -347,7 +399,7 @@ export const checks = tasks({
           },
           {
             when: (r) => Number(value(r, 'calls of count()')) !== r.case.counts.length,
-            hint: (r) => `count() was called ${value(r, 'calls of count()')} times for ${r.case.counts.length} manifests. Each manifest is counted once, by its own thread.`
+            hint: (r) => `count() was called ${value(r, 'calls of count()')} times for ${r.case.counts.length} manifest${r.case.counts.length > 1 ? 's' : ''}. Each manifest is counted once, by its own thread.`
           }
         ],
         { calls: 'total' }

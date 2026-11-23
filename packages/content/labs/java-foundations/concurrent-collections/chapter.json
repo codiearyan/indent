@@ -41,7 +41,7 @@
       "id": "board",
       "title": "Post to the noticeboard while it is read",
       "file": "QuayBoard.java",
-      "description": "Under `// Task 2`, write a class `Board`, the noticeboard. `void post(String line)` adds a line to the end of the board, safe for several threads at once. `List<String> lines()` gives back the lines posted so far, in order, as a list that one thread can go through while other threads go on posting.\n\nCheck posts lines and reads them back in order. Then it starts going through the list `lines` gave back, has another thread post a line, and goes on to the end: a `ConcurrentModificationException` there fails. It also has four threads post at once, many times over, and counts the lines.",
+      "description": "Under `// Task 2`, write a class `Board`, the noticeboard. `void post(String line)` adds a line to the end of the board, safe for several threads at once. `List<String> lines()` gives back the lines posted so far, in order, as a list that one thread can go through while other threads go on posting.\n\nCheck posts lines and reads them back in order, and sees that a new board starts empty. Then it starts going through the list `lines` gave back, has another thread post a line, and goes on to the end: a `ConcurrentModificationException` there fails. It also has four threads post at once, many times over, and counts the lines.",
       "nextSteps": [
         "Read the parts of the lesson about lists for several threads.",
         "Choose how the board keeps its lines, so that a reader can never be caught by a post.",
@@ -69,7 +69,7 @@
       "id": "labels",
       "title": "Make every label with a parallel stream",
       "file": "QuayBoard.java",
-      "description": "Under `// Task 3`, write a class `Labels` with one method. `static List<String> labels(List<String> bookings, Labeller labeller)` makes the label of every booking with `labeller.label`, with a parallel stream so that the labels are made on several threads at once, and gives back the labels in the order of the bookings. `Labeller` is given above the tasks.\n\nCheck hands `labels` bookings and a labeller of its own. The labeller holds the first booking's label until the last booking's label has been made, so the work must be shared over more than one thread, and the last label is always made before the first. Check reads the labels, in order, and counts the threads that made them.",
+      "description": "Under `// Task 3`, write a class `Labels` with one method. `static List<String> labels(List<String> bookings, Labeller labeller)` makes the label of every booking with `labeller.label`, with a parallel stream so that the labels are made on several threads at once, and gives back the labels in the order of the bookings. `Labeller` is given above the tasks.\n\nCheck hands `labels` bookings and a labeller of its own. The labeller holds the first booking's label until the last booking's label has been made, so the work must be shared over more than one thread, and the last label is always made before the first. Check reads the labels, in order, and counts the threads that made them, and sees whether those were the threads of a parallel stream.",
       "nextSteps": [
         "Read the part of the lesson about parallel streams.",
         "Ask the list for a parallel stream instead of a stream.",

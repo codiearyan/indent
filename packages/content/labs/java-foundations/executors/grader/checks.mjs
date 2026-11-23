@@ -1,4 +1,4 @@
-import { CHECK_THREADS, explainThread, fail, outcome, outcomeCases, pass, tasks, threaded, threadWords } from '../../grading.mjs'
+import { CHECK_THREADS, threwOnThread, explainThread, fail, outcome, outcomeCases, pass, tasks, threaded, threadWords } from '../../grading.mjs'
 
 const FILE = 'Bookings.java'
 const value = (r, name) => r.values[name]?.value ?? null
@@ -17,7 +17,13 @@ const OFFICE = `final class CheckOffice implements Office {
     private final java.util.Map<String, String> failing = new java.util.HashMap<>();
     private final java.util.Set<Thread> ran = new java.util.HashSet<>();
     private final boolean hold;
-    int calls, workers = -1;
+    int calls, workers = -1, handedWhenWaiting = -1;
+    CheckPool pool;
+    // With first and second set, the job of first waits until the job of second has finished, once
+    // every job is in the pool: whatever a job does itself, it does in the order the jobs finished.
+    String first, second;
+    int all;
+    private volatile Thread secondOn;
     volatile boolean open, early, onCaller, inInvokeAll, letGo;
     CheckOffice(boolean hold, String... fails) {
         this.hold = hold;
@@ -28,37 +34,49 @@ const OFFICE = `final class CheckOffice implements Office {
         Thread me = Thread.currentThread();
         synchronized (this) { calls++; ran.add(me); if (me == CheckRun.caller) onCaller = true; }
         if (hold && me != CheckRun.caller && !CheckRun.until(1000, () -> open)) letGo = true;
+        if (booking.equals(second)) secondOn = me;
+        if (booking.equals(first) && me != CheckRun.caller && handedWhenWaiting == all) CheckRun.until(1000, () -> secondOn != null && idle(secondOn));
         String why = failing.get(booking);
         if (why != null) throw new java.io.IOException(why);
         return "Confirmed: " + booking;
     }
     synchronized int threads() { return ran.size(); }
+    // A pool's thread is back waiting for jobs, or has ended: its job is over.
+    static boolean idle(Thread t) {
+        if (!t.isAlive()) return true;
+        for (StackTraceElement e : t.getStackTrace()) if (e.getClassName().equals("java.util.concurrent.ThreadPoolExecutor") && e.getMethodName().equals("getTask")) return true;
+        return false;
+    }
     synchronized void watch() {
         Thread c = CheckRun.caller;
         if (open) return;
         if (!c.isAlive()) { early = true; open = true; return; }
         if (CheckRun.waiting(c)) {
             workers = CheckRun.others(c).size();
+            if (pool != null) handedWhenWaiting = pool.handed();
             for (StackTraceElement e : c.getStackTrace()) if (e.getClassName().equals("java.util.concurrent.AbstractExecutorService") && e.getMethodName().equals("invokeAll")) inInvokeAll = true;
             open = true;
         }
     }
     void again() { synchronized (this) { open = !hold; early = false; workers = -1; inInvokeAll = false; } }
 }
-// The caller's pool, as Check hands it over: a real pool of two, and a note of any shutdown.
+// The caller's pool, as Check hands it over: a real pool of two, a count of the jobs it was handed
+// (submit and invokeAll both hand them over through execute), and a note of any shutdown.
 final class CheckPool extends java.util.concurrent.AbstractExecutorService {
     final java.util.concurrent.ExecutorService inner = java.util.concurrent.Executors.newFixedThreadPool(2);
     volatile boolean shut;
+    private int handed;
+    synchronized int handed() { return handed; }
     public void shutdown() { shut = true; inner.shutdown(); }
     public java.util.List<Runnable> shutdownNow() { shut = true; return inner.shutdownNow(); }
     public boolean isShutdown() { return inner.isShutdown(); }
     public boolean isTerminated() { return inner.isTerminated(); }
     public boolean awaitTermination(long t, java.util.concurrent.TimeUnit u) throws InterruptedException { return inner.awaitTermination(t, u); }
-    public void execute(Runnable r) { inner.execute(r); }
+    public void execute(Runnable r) { synchronized (this) { handed++; } inner.execute(r); }
     void end() { inner.shutdownNow(); }
 }`
 
-const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/\n {2}(?:still waiting|threads left running) is null(?=\n)/g, '') } : d)
+const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/\n {2}(?:still waiting|threads left running|a thread it started threw) is null(?=\n)/g, '') } : d)
 
 function judge(mistakes, { calls }) {
   return (runs, ctx) =>
@@ -67,13 +85,13 @@ function judge(mistakes, { calls }) {
       const stuck = value(r, 'still waiting')
       if (stuck) {
         const m = mistakes.find((k) => k.stuck && k.when(r, ctx))
-        return quiet(fail(d.name, m?.hint ?? `Check waited for ${calls} to return, and it did not. When Check stopped waiting there was ${threadWords(stuck, FILE)}.`, d.output))
+        return quiet(fail(d.name, m?.hint ?? `Check waited for ${calls} to return, and it did not. When Check stopped waiting it found ${threadWords(stuck, FILE)}.`, d.output))
       }
       const left = value(r, 'threads left running')
       const m = d.passed && !left ? null : mistakes.find((k) => !k.stuck && k.when(r, ctx))
       if (m) return quiet({ ...d, passed: false, message: typeof m.hint === 'function' ? m.hint(r) : m.hint })
       if (left) return quiet(fail(d.name, `${d.passed ? 'The answer is right, and when' : 'When'} ${calls} returned it left behind ${threadWords(left, FILE)}. Those threads wait for jobs for ever, and in a program of their own they keep it from ending.`, d.output))
-      return quiet(d)
+      return quiet(threwOnThread(d, r, FILE, calls) ?? d)
     })
 }
 
@@ -191,7 +209,7 @@ function deskJudge(runs, ctx) {
     const said = quiet({ output: outcome(r, 'Bookings', SHOWN[c.kind], ctx.text.split('\n').length) }).output
     const no = (message) => fail(c.name, message, said)
     const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
-    if (v('still waiting')) return no(`Check waited for ${v('step')} to return, and it did not. When Check stopped waiting there was ${threadWords(v('still waiting'), FILE)}.`)
+    if (v('still waiting')) return no(`Check waited for ${v('step')} to return, and it did not. When Check stopped waiting it found ${threadWords(v('still waiting'), FILE)}.`)
     const thrown = v('thrown')
     if (c.kind === 'closed') {
       if (thrown && /RejectedExecutionException$/.test(thrown) && v('step') === 'confirmAll after close') return pass(c.name, said)
@@ -321,12 +339,12 @@ export const checks = tasks({
       cases: [
         threaded({
           name: 'confirmEach keeps going past the bookings that fail',
-          setup: ['CheckOffice office = new CheckOffice(false, "Mr Lamont, 1", "no answer from the office", "Mrs Oag, 2", "the 10:00 is full");', 'CheckPool pool = new CheckPool();', 'java.util.List<String> problems = new java.util.ArrayList<>();', 'Runnable probe$ = () -> { try { Careful.confirmEach(null, null, null, null); } catch (InterruptedException e$) { } };'],
+          setup: ['CheckOffice office = new CheckOffice(true, "Mr Lamont, 1", "no answer from the office", "Mrs Oag, 2", "the 10:00 is full");', 'CheckPool pool = new CheckPool();', 'office.pool = pool;', 'office.all = 5;', 'office.first = "Mr Lamont, 1";', 'office.second = "Mrs Oag, 2";', 'CheckRun.watch = office::watch;', 'java.util.List<String> problems = new java.util.ArrayList<>();', 'Runnable probe$ = () -> { try { Careful.confirmEach(null, null, null, null); } catch (InterruptedException e$) { } };'],
           call: `Careful.confirmEach(pool, ${list(BOOKINGS.five)}, office, problems)`,
           type: 'java.util.List<String>',
-          show: `ExecutorService pool = Check's pool of two;\nOffice office = Check's office, which fails "Mr Lamont, 1" and "Mrs Oag, 2";\nList<String> problems = new ArrayList<>();\nList<String> got = Careful.confirmEach(pool, List.of(${BOOKINGS.five.map(text).join(', ')}), office, problems);`,
-          after: { 'problems afterwards': 'problems', 'the pool left open': '!pool.shut', 'calls of confirm': 'office.calls' },
-          expected: { got: confirmed(['Dipper party, 4', 'Siskin walkers, 7', 'Breac anglers, 3']), 'problems afterwards': ['Mr Lamont, 1: no answer from the office', 'Mrs Oag, 2: the 10:00 is full'], 'the pool left open': true, 'calls of confirm': 5 },
+          show: `ExecutorService pool = Check's pool of two;\nOffice office = Check's office, which fails "Mr Lamont, 1" and "Mrs Oag, 2", and holds every job until confirmEach waits for an answer;\nList<String> problems = new ArrayList<>();\nList<String> got = Careful.confirmEach(pool, List.of(${BOOKINGS.five.map(text).join(', ')}), office, problems);`,
+          after: { 'problems afterwards': 'problems', 'the pool left open': '!pool.shut', 'calls of confirm': 'office.calls', 'jobs handed to the pool it was given': 'pool.handed()', 'jobs handed over when the first answer was awaited': 'office.handedWhenWaiting' },
+          expected: { got: confirmed(['Dipper party, 4', 'Siskin walkers, 7', 'Breac anglers, 3']), 'problems afterwards': ['Mr Lamont, 1: no answer from the office', 'Mrs Oag, 2: the 10:00 is full'], 'the pool left open': true, 'calls of confirm': 5, 'jobs handed to the pool it was given': 5, 'jobs handed over when the first answer was awaited': 5 },
           kind: 'two',
           hint: 'confirmEach should give back the confirmations of the bookings that worked, in order, and add a problem for each booking that failed: the booking, a colon and a space, and the message of what its job threw.'
         }),
@@ -343,7 +361,7 @@ export const checks = tasks({
         }),
         threaded({
           name: 'confirmEach when every booking fails',
-          setup: ['CheckOffice office = new CheckOffice(false, "Dipper party, 4", "the line dropped", "Breac anglers, 3", "the line dropped again");', 'CheckPool pool = new CheckPool();', 'java.util.List<String> problems = new java.util.ArrayList<>();'],
+          setup: ['CheckOffice office = new CheckOffice(true, "Dipper party, 4", "the line dropped", "Breac anglers, 3", "the line dropped again");', 'CheckPool pool = new CheckPool();', 'office.pool = pool;', 'office.all = 2;', 'office.first = "Dipper party, 4";', 'office.second = "Breac anglers, 3";', 'CheckRun.watch = office::watch;', 'java.util.List<String> problems = new java.util.ArrayList<>();'],
           call: `Careful.confirmEach(pool, ${list(['Dipper party, 4', 'Breac anglers, 3'])}, office, problems)`,
           type: 'java.util.List<String>',
           show: `ExecutorService pool = Check's pool of two;\nList<String> problems = new ArrayList<>();\nList<String> got = Careful.confirmEach(pool, List.of("Dipper party, 4", "Breac anglers, 3"), office, problems);`,
@@ -355,6 +373,18 @@ export const checks = tasks({
       ],
       judge: judge(
         [
+          {
+            when: (r) => r.case.kind === 'two' && Number(value(r, 'jobs handed to the pool it was given')) === 0 && Number(value(r, 'calls of confirm')) > 0,
+            hint: 'The bookings were confirmed, and not one job went to the pool confirmEach was handed: it used a pool, or threads, of its own. The caller hands over its pool so that every job runs there, on as many threads as it chose.'
+          },
+          {
+            when: (r) => r.case.kind === 'two' && Number(value(r, 'jobs handed over when the first answer was awaited')) > 0 && Number(value(r, 'jobs handed over when the first answer was awaited')) < 5,
+            hint: (r) => `When the first answer was awaited, only ${value(r, 'jobs handed over when the first answer was awaited')} of the 5 jobs had been handed to the pool, so the bookings went one after another. A get straight after each job is handed over waits for that job before the next one is handed over: hand over every job first, as Task 1 does, then get the answers.`
+          },
+          {
+            when: (r) => JSON.stringify(items(r, 'problems afterwards')) === JSON.stringify([...r.case.expected['problems afterwards']].reverse()) && r.case.expected['problems afterwards'].length > 1,
+            hint: 'Both problems are there, out of order: they went into problems in the order the jobs happened to finish, which on several threads is not promised. Add each problem where the answers are gathered, one booking after another, so they come in the order of the bookings.'
+          },
           {
             when: (r) => value(r, 'the pool left open') === 'false',
             hint: 'confirmEach shut down the pool it was handed. That pool belongs to the caller, who may have more jobs for it: a method shuts down only a pool it made itself.'

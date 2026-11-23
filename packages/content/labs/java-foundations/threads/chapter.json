@@ -35,19 +35,13 @@
           "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html"
         }
       ],
-      "videos": [
-        {
-          "title": "Waiting for threads to finish with join",
-          "url": "https://www.youtube.com/watch?v=EDnJ2lLZb8o"
-        }
-      ],
       "points": 10
     },
     {
       "id": "total",
       "title": "Count every boat's list at once",
       "file": "BusyHut.java",
-      "description": "Under `// Task 2`, write a class `Counting` with one method, with `throws InterruptedException`. `static int total(List<Manifest> manifests)` starts one thread for each manifest, all of them before it waits for any. Each thread calls `count()` on its manifest once and keeps the answer in a place of its own, such as its own place in an array. Then `total` waits for every thread to end and gives back the counts added up. `Manifest` is given above the tasks.\n\nCheck hands `total` manifests of its own. Their `count()` holds every thread until `total` is waiting for its threads, and Check counts at that moment how many threads had been started, then lets the counts through one at a time. It reads what `total` gives back, how many times each manifest was counted and on which thread.",
+      "description": "Under `// Task 2`, write a class `Counting` with one method, with `throws InterruptedException`. `static int total(List<Manifest> manifests)` starts one thread for each manifest, all of them before it waits for any. Each thread calls `count()` on its manifest once. Give each thread a place of its own for its answer, such as its own place in an array: threads adding into one shared total can lose a count, as the next issue shows. Then `total` waits for every thread to end and gives back the counts added up. `Manifest` is given above the tasks.\n\nCheck hands `total` manifests of its own. Their `count()` holds every thread until `total` is waiting for its threads, and Check counts at that moment how many threads had been started, then lets the counts through one at a time. It reads what `total` gives back, how many times each manifest was counted and on which thread. Once more it interrupts the thread that called `total` while it waits, and sees whether the `InterruptedException` reaches it.",
       "nextSteps": [
         "Read the parts of the lesson about join and about InterruptedException.",
         "Make an array with a place for each manifest, and a list for the threads.",
@@ -67,6 +61,12 @@
         {
           "title": "Thread.join",
           "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html#join()"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Waiting for threads to finish with join",
+          "url": "https://www.youtube.com/watch?v=EDnJ2lLZb8o"
         }
       ],
       "points": 10

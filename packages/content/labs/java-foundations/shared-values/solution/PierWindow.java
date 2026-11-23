@@ -92,7 +92,7 @@ class Numbers {
 
 // Task 3: Add up the takings, printing outside the lock
 // Write a class Takings that keeps the takings, 0 at first. void sell(BigDecimal fare, Printer
-// printer) prints the ticket with printer.print(fare), then adds fare to the takings. Only the
+// printer) prints the ticket with printer.print(fare) and adds fare to the takings. Only the
 // adding is guarded, by a synchronized block on the Takings itself: the printing is outside it,
 // so a slow printer at one window never holds up the other. BigDecimal total() gives back the
 // takings, and is synchronized.

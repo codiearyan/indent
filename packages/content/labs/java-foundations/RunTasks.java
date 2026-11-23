@@ -237,11 +237,12 @@ public class RunTasks {
         for (Unit unit : units) {
             if (unit.thread == null) continue;
             start(unit);
-            if (!unit.exited) {
+            // Learner code can reach every thread, this one too: an interrupt never cuts the wait short.
+            while (!unit.exited && unit.thread.isAlive() && System.currentTimeMillis() < end) {
                 try {
                     unit.thread.join(Math.max(1, end - System.currentTimeMillis()));
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                    // keep waiting until the deadline
                 }
             }
             if (!unit.done && exiting(unit.thread)) unit.exited = true;

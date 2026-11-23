@@ -71,8 +71,8 @@ interface Bell {
 // Task 2: Count every boat's list at once
 // Write a class Counting with one method, which throws InterruptedException. static int
 // total(List<Manifest> manifests) starts one thread for each manifest, all of them before it
-// waits for any. Each thread calls count() on its manifest once and keeps the answer in a place
-// of its own. Then total waits for every thread to end and gives back the counts added up.
+// waits for any. Each thread calls count() on its manifest once; give each thread a place of its
+// own for its answer. Then total waits for every thread to end and gives back the counts added up.
 
 // Task 3: Ring the quay bell until the hut closes
 // Write a class Ringer with two methods. static Thread start(Bell bell, long everyMillis) starts

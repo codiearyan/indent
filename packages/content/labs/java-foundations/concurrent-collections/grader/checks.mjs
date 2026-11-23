@@ -1,4 +1,4 @@
-import { CHECK_THREADS, explainThread, fail, outcomeCases, tasks, threaded, threadWords } from '../../grading.mjs'
+import { CHECK_THREADS, threwOnThread, explainThread, fail, outcomeCases, tasks, threaded, threadWords } from '../../grading.mjs'
 
 const FILE = 'QuayBoard.java'
 const value = (r, name) => r.values[name]?.value ?? null
@@ -6,10 +6,11 @@ const items = (r, name) => r.values[name]?.items ?? null
 const text = (s) => JSON.stringify(s)
 
 // Check's map of counts. Two gangway threads of Check's own scan for the same boat at once. When
-// one of them has read a count (get, getOrDefault, containsKey), it waits until the other has read
-// it too, or is inside one of the map's own one-step changes (merge, compute, putIfAbsent, replace),
-// or waits at a lock, or is done. So a scan that reads and then puts loses one gangway's tickets
-// every time, and a scan done in one step of the map's never does. Other threads read as usual.
+// one of them has read a count (get, getOrDefault, containsKey, or a one-step change that changed
+// nothing and so only read: a putIfAbsent that found a count, a computeIfPresent that found none, a
+// replace that found another count), it waits until the other has read too, or waits at a lock, or
+// is done. So a scan that reads and then changes in a second call loses one gangway's tickets every
+// time, and a scan done in one step of the map's never does. Other threads read as usual.
 const COUNTS = `interface CheckWork { void run() throws Throwable; }
 final class CheckCounts extends java.util.concurrent.ConcurrentHashMap<String, Integer> {
     private final java.util.Set<Thread> gangways = java.util.concurrent.ConcurrentHashMap.newKeySet();
@@ -24,7 +25,7 @@ final class CheckCounts extends java.util.concurrent.ConcurrentHashMap<String, I
         if (!gangways.contains(me) || depth.get()[0] > 0) return;
         read.add(me);
         Thread o = other(me);
-        if (o != null && !CheckRun.until(1000, () -> read.contains(o) || inStep.contains(o) || done.contains(o) || o.getState() == Thread.State.TERMINATED || CheckRun.atLock(o))) letGo = true;
+        if (o != null && !CheckRun.until(1000, () -> read.contains(o) || done.contains(o) || o.getState() == Thread.State.TERMINATED || CheckRun.atLock(o))) letGo = true;
     }
     private <T> T step(java.util.function.Supplier<T> s) {
         Thread me = Thread.currentThread();
@@ -41,9 +42,9 @@ final class CheckCounts extends java.util.concurrent.ConcurrentHashMap<String, I
     @Override public Integer merge(String k, Integer v, java.util.function.BiFunction<? super Integer, ? super Integer, ? extends Integer> f) { return step(() -> super.merge(k, v, f)); }
     @Override public Integer compute(String k, java.util.function.BiFunction<? super String, ? super Integer, ? extends Integer> f) { return step(() -> super.compute(k, f)); }
     @Override public Integer computeIfAbsent(String k, java.util.function.Function<? super String, ? extends Integer> f) { return step(() -> super.computeIfAbsent(k, f)); }
-    @Override public Integer computeIfPresent(String k, java.util.function.BiFunction<? super String, ? super Integer, ? extends Integer> f) { return step(() -> super.computeIfPresent(k, f)); }
-    @Override public Integer putIfAbsent(String k, Integer v) { return step(() -> super.putIfAbsent(k, v)); }
-    @Override public boolean replace(String k, Integer o, Integer n) { return step(() -> super.replace(k, o, n)); }
+    @Override public Integer computeIfPresent(String k, java.util.function.BiFunction<? super String, ? super Integer, ? extends Integer> f) { Integer x = step(() -> super.computeIfPresent(k, f)); if (x == null) reading(); return x; }
+    @Override public Integer putIfAbsent(String k, Integer v) { Integer x = step(() -> super.putIfAbsent(k, v)); if (x != null) reading(); return x; }
+    @Override public boolean replace(String k, Integer o, Integer n) { boolean x = step(() -> super.replace(k, o, n)); if (!x) reading(); return x; }
     // Both gangways scan at once; their work ends when both are done or a second has passed.
     String race(CheckWork a, CheckWork b) throws Exception {
         Throwable[] err = new Throwable[1];
@@ -93,19 +94,35 @@ const LABELLER = `final class CheckLabeller implements Labeller {
         return label;
     }
     synchronized int threads() { return on.size(); }
+    // A parallel stream runs on the thread that asked for it and on the common pool's threads.
+    synchronized boolean onlyStream() {
+        for (Thread t : on) if (t != CheckRun.caller && !(t instanceof java.util.concurrent.ForkJoinWorkerThread w && w.getPool() == java.util.concurrent.ForkJoinPool.commonPool())) return false;
+        return true;
+    }
 }`
 
-const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/\n {2}(?:still waiting|threads left running) is null(?=\n)/g, '') } : d)
+const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/\n {2}(?:still waiting|threads left running|a thread it started threw) is null(?=\n)/g, '') } : d)
 
-function judge(mistakes, { calls }) {
+// Many threads at once (a case with luck) show a mistake only by luck. Their case is said only when
+// every case whose order of events Check forces has passed, so the same code always gets the same
+// messages.
+function judge(mistakes, opts) {
+  return (runs, ctx) => {
+    const ds = judged(mistakes, opts)(runs, ctx)
+    const forcedFailed = ds.some((d, i) => !d.passed && !runs[i].case.luck)
+    return ds.filter((d, i) => !(forcedFailed && !d.passed && runs[i].case.luck))
+  }
+}
+
+function judged(mistakes, { calls }) {
   return (runs, ctx) =>
     outcomeCases({ file: FILE, explain: explainThread })(runs, ctx).map((d, i) => {
       const r = runs[i]
       const stuck = value(r, 'still waiting')
-      if (stuck) return quiet(fail(d.name, `Check waited for ${calls} to return, and it did not. When Check stopped waiting there was ${threadWords(stuck, FILE)}.`, d.output))
+      if (stuck) return quiet(fail(d.name, `Check waited for ${calls} to return, and it did not. When Check stopped waiting it found ${threadWords(stuck, FILE)}.`, d.output))
       if (d.passed) {
         const left = value(r, 'threads left running')
-        return left ? quiet(fail(d.name, `The answer is right, and the call left behind ${threadWords(left, FILE)}. In a program of its own, a thread still alive keeps the program from ending.`, d.output)) : quiet(d)
+        return left ? quiet(fail(d.name, `The answer is right, and the call left behind ${threadWords(left, FILE)}. In a program of its own, a thread still alive keeps the program from ending.`, d.output)) : quiet(threwOnThread(d, r, FILE, calls) ?? d)
       }
       const m = mistakes.find((k) => k.when(r, ctx))
       return quiet(m ? { ...d, message: typeof m.hint === 'function' ? m.hint(r) : m.hint } : d)
@@ -165,6 +182,7 @@ export const checks = tasks({
           after: { counts: 'new java.util.TreeMap<>(counts).toString()' },
           expected: { counts: '{Breac=800, Dipper=800, Siskin=800}' },
           kind: 'many',
+          luck: true,
           hint: 'Every scan counts, however many threads scan at once.'
         })
       ],
@@ -192,8 +210,8 @@ export const checks = tasks({
           setup: ['Board board = new Board();'],
           call: 'board.post("08:30 Breac to the pier"); board.post("09:00 Dipper to the island"); board.post("09:40 Siskin round the bay")',
           show: 'Board board = new Board();\nboard.post("08:30 Breac to the pier");\nboard.post("09:00 Dipper to the island");\nboard.post("09:40 Siskin round the bay");\nList<String> lines = board.lines();',
-          after: { lines: 'board.lines()' },
-          expected: { lines: ['08:30 Breac to the pier', '09:00 Dipper to the island', '09:40 Siskin round the bay'] },
+          after: { lines: 'board.lines()', 'a new board holds': 'new Board().lines().size()' },
+          expected: { lines: ['08:30 Breac to the pier', '09:00 Dipper to the island', '09:40 Siskin round the bay'], 'a new board holds': 0 },
           kind: 'order',
           hint: 'lines should give back every line posted, in the order they were posted.'
         }),
@@ -216,11 +234,16 @@ export const checks = tasks({
           after: { 'lines on the board': 'board.lines().size()', 'every line once': 'new java.util.HashSet<>(board.lines()).size() == 1000' },
           expected: { 'lines on the board': 1000, 'every line once': true },
           kind: 'many',
+          luck: true,
           hint: 'Every line posted should be on the board, however many threads post at once.'
         })
       ],
       judge: judge(
         [
+          {
+            when: (r) => r.case.kind === 'order' && Number(value(r, 'a new board holds')) > 0,
+            hint: 'A new board already holds the lines posted to another board: the list is static, so every Board shares one. Each Board keeps lines of its own.'
+          },
           {
             when: (r) => r.case.kind === 'read' && value(r, 'thrown') === 'java.util.ConcurrentModificationException',
             hint: 'A ConcurrentModificationException: the list lines gave back is the board\'s own list, and another thread posted to it while the first was going through it, so the loop stopped. A list made safe only by locks still breaks this way: going through it is many calls, not one. lines gives back a list that cannot change under the reader.'
@@ -253,11 +276,12 @@ export const checks = tasks({
           type: 'java.util.List<String>',
           wait: 2500,
           show: `List<String> got = Labels.labels(List.of(${['Dipper party', 'Mr Lamont', 'Siskin walkers', 'Breac anglers', 'Two cyclists', 'School trip', 'Mr Ure', 'Mrs Oag'].map(text).join(', ')}), labeller);`,
-          after: { 'threads that made labels': 'labeller.threads()', 'calls of label': 'labeller.calls', 'Check let the first label go after waiting': 'labeller.letGo' },
+          after: { 'threads that made labels': 'labeller.threads()', 'calls of label': 'labeller.calls', 'Check let the first label go after waiting': 'labeller.letGo', 'made by a parallel stream': 'labeller.onlyStream()' },
           expected: {
             got: ['Dipper party', 'Mr Lamont', 'Siskin walkers', 'Breac anglers', 'Two cyclists', 'School trip', 'Mr Ure', 'Mrs Oag'].map((b) => `label of ${b}`),
             'calls of label': 8,
-            'Check let the first label go after waiting': false
+            'Check let the first label go after waiting': false,
+            'made by a parallel stream': true
           },
           kind: 'many',
           hint: 'labels should make every label on several threads at once and give them back in the order of the bookings.'
@@ -276,6 +300,10 @@ export const checks = tasks({
       ],
       judge: judge(
         [
+          {
+            when: (r) => r.case.kind === 'many' && value(r, 'made by a parallel stream') === 'false',
+            hint: 'The labels were made on threads of your own, or of a pool you made. The task shares the work with a parallel stream, which runs it on a pool Java keeps for streams: ask the list for one.'
+          },
           {
             when: (r) => r.case.kind === 'many' && Number(value(r, 'threads that made labels')) === 1,
             hint: 'Every label was made on one thread, so they were made one after another. A parallel stream shares the list out over several threads: the lesson shows how to ask a list for one.'

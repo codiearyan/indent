@@ -71,10 +71,11 @@ class Sailings {
 // Task 2: Gather the answers, and the problems
 // Write a class Results with one method, which throws InterruptedException. static BigDecimal
 // collect(Map<String, Future<BigDecimal>> answers, List<String> problems) waits for every
-// future and gives back the takings of those that worked, added up. A future whose job threw is
-// left out of the total, and a problem is added for it: its name in the map, a colon and a
-// space, then the message of what its job threw, as in "relief-boat.csv: Line 3 cannot be read".
-// The other futures still count. The problems may come in any order.
+// future and gives back the takings of those that worked, added up, reading the answers one
+// after another on the thread that called it. A future whose job threw is left out of the total,
+// and a problem is added for it: its name in the map, a colon and a space, then the message of
+// what its job threw, as in "relief-boat.csv: Line 3 cannot be read". The other futures still
+// count. The problems may come in any order.
 
 // Task 3: Check the whole day with a pool of three
 // Write a class Closing with one method, which throws InterruptedException. static BigDecimal

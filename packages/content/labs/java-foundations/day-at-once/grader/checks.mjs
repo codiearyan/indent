@@ -1,4 +1,4 @@
-import { CHECK_THREADS, explainThread, fail, outcomeCases, tasks, threaded, threadWords } from '../../grading.mjs'
+import { CHECK_THREADS, threwOnThread, explainThread, fail, outcomeCases, tasks, threaded, threadWords } from '../../grading.mjs'
 
 const FILE = 'HarbourCheck.java'
 const value = (r, name) => r.values[name]?.value ?? null
@@ -35,6 +35,7 @@ final class CheckTills {
         Thread me = Thread.currentThread();
         synchronized (this) { reads++; ran.add(me); if (me == CheckRun.caller) onCaller = true; }
         if (hold && me != CheckRun.caller && !CheckRun.until(1000, () -> open)) letGo = true;
+        meet(me);
         Object f = files.get(file.getFileName().toString());
         if (f == null) throw new java.nio.file.NoSuchFileException(file.toString());
         if (f instanceof java.io.IOException e) throw e;
@@ -48,15 +49,50 @@ final class CheckTills {
         if (!c.isAlive()) { early = true; open = true; return; }
         if (CheckRun.waiting(c)) { workers = CheckRun.others(c).size(); open = true; }
     }
+    // Two jobs called at the same moment, each on a thread of its own: the first job's read waits until
+    // the second's has begun, and the second's waits until the first job is over. So jobs that add into
+    // one total they share always have the second start from the first one's total.
+    private volatile Thread first, second;
+    private final java.util.Set<Thread> reading = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private void meet(Thread me) {
+        if (me == first) { reading.add(me); CheckRun.until(1000, () -> reading.contains(second) || !second.isAlive()); }
+        else if (me == second) { reading.add(me); CheckRun.until(1000, () -> !first.isAlive()); }
+    }
+    java.util.List<String> both(java.util.concurrent.Callable<java.math.BigDecimal> a, java.util.concurrent.Callable<java.math.BigDecimal> b) throws InterruptedException {
+        Object[] got = new Object[2];
+        first = new Thread(() -> got[0] = run(a, false), "till");
+        second = new Thread(() -> got[1] = run(b, false), "till");
+        first.start();
+        second.start();
+        first.join(1500);
+        second.join(1500);
+        java.util.List<String> out = new java.util.ArrayList<>();
+        for (Object x : got) out.add(x instanceof java.math.BigDecimal d ? d.toPlainString() : x instanceof Throwable t ? t.getClass().getSimpleName() + ": " + t.getMessage() : String.valueOf(x));
+        return out;
+    }
     // Calls a job on a thread of Check's own: what it gave back, or what it threw.
-    static Object run(java.util.concurrent.Callable<java.math.BigDecimal> job) {
+    static Object run(java.util.concurrent.Callable<java.math.BigDecimal> job) { return run(job, true); }
+    static Object run(java.util.concurrent.Callable<java.math.BigDecimal> job, boolean own) {
         if (job == null) return null;
-        try { return CheckRun.call(1000, job); } catch (Throwable x) { return x; }
+        try { return own ? CheckRun.call(1000, job) : job.call(); } catch (Throwable x) { return x; }
     }
 }`
 
-// A future that has no answer yet: it gets one once the thread gathering the answers is waiting.
-const LATE = `final class CheckLate extends java.util.concurrent.CompletableFuture<java.math.BigDecimal> {
+// Check's futures note a read of their answer on any thread but the one that called collect. Their
+// name does not start with Check, so a caller waiting in their get counts as waiting (CheckRun.waiting
+// stops at Check's own frames). CheckLate has no answer yet: it gets one once the thread gathering
+// the answers is waiting.
+const LATE = `class TillAnswer extends java.util.concurrent.CompletableFuture<java.math.BigDecimal> {
+    static volatile boolean elsewhere;
+    static TillAnswer ok(String v) { TillAnswer f = new TillAnswer(); f.complete(new java.math.BigDecimal(v)); return f; }
+    static TillAnswer bad(Throwable x) { TillAnswer f = new TillAnswer(); f.completeExceptionally(x); return f; }
+    private void note() { if (Thread.currentThread() != CheckRun.caller) elsewhere = true; }
+    @Override public java.math.BigDecimal get() throws InterruptedException, java.util.concurrent.ExecutionException { note(); return super.get(); }
+    @Override public java.math.BigDecimal get(long t, java.util.concurrent.TimeUnit u) throws InterruptedException, java.util.concurrent.ExecutionException, java.util.concurrent.TimeoutException { note(); return super.get(t, u); }
+    @Override public java.math.BigDecimal join() { note(); return super.join(); }
+    @Override public java.math.BigDecimal getNow(java.math.BigDecimal v) { note(); return super.getNow(v); }
+}
+final class CheckLate extends TillAnswer {
     private final java.math.BigDecimal answer;
     CheckLate(String answer) { this.answer = new java.math.BigDecimal(answer); }
     void watch() { if (!isDone() && (CheckRun.waiting(CheckRun.caller) || !CheckRun.caller.isAlive())) complete(answer); }
@@ -73,7 +109,9 @@ const RIGHT = `class Jobs {
     }
 }
 class Results {
+    static boolean interrupt;
     static java.math.BigDecimal collect(java.util.Map<String, java.util.concurrent.Future<java.math.BigDecimal>> answers, java.util.List<String> problems) throws InterruptedException {
+        if (interrupt) throw new InterruptedException("Check stopped the gathering");
         java.math.BigDecimal total = java.math.BigDecimal.ZERO;
         for (java.util.Map.Entry<String, java.util.concurrent.Future<java.math.BigDecimal>> a : answers.entrySet()) {
             try { total = total.add(a.getValue().get()); }
@@ -83,7 +121,7 @@ class Results {
     }
 }`
 
-const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/\n {2}(?:still waiting|threads left running) is null(?=\n)/g, '').replace(/It gave back [\w.$]+\$\$Lambda[^\n]*/g, 'It gave back a job.') } : d)
+const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/\n {2}(?:still waiting|threads left running|a thread it started threw) is null(?=\n)/g, '').replace(/It gave back [\w.$]+\$\$Lambda[^\n]*/g, 'It gave back a job.') } : d)
 
 function judge(mistakes, { calls }) {
   return (runs, ctx) => {
@@ -91,12 +129,12 @@ function judge(mistakes, { calls }) {
     return outcomeCases({ file: FILE, explain: explainThread })(runs, ctx).map((d, i) => {
       const r = runs[i]
       const stuck = value(r, 'still waiting')
-      if (stuck) return quiet(fail(d.name, `Check waited for ${calls} to return, and it did not. When Check stopped waiting there was ${threadWords(stuck, FILE, last)}.`, d.output))
+      if (stuck) return quiet(fail(d.name, `Check waited for ${calls} to return, and it did not. When Check stopped waiting it found ${threadWords(stuck, FILE, last)}.`, d.output))
       const left = value(r, 'threads left running')
       const m = d.passed && !left ? null : mistakes.find((k) => k.when(r, ctx))
       if (m) return quiet({ ...d, passed: false, message: typeof m.hint === 'function' ? m.hint(r) : m.hint })
-      if (left) return quiet(fail(d.name, `${d.passed ? 'The answer is right, and when' : 'When'} ${calls} returned it left behind ${threadWords(left, FILE, last)}. Those threads wait for jobs for ever, and in a program of their own they keep it from ending.`, d.output))
-      return quiet(d)
+      if (left) return quiet(fail(d.name, `${d.passed ? 'The answer is right, and when' : 'When'} ${calls} returned it left behind ${threadWords(left, FILE, last)}. In a program of its own, a thread still alive keeps the program from ending.`, d.output))
+      return quiet(threwOnThread(d, r, FILE, calls) ?? d)
     })
   }
 }
@@ -132,6 +170,13 @@ const DAYS = [
     total: '97.50',
     problems: ['breac.csv: Line 4 cannot be read']
   },
+  {
+    name: 'day with a bad till first and another last',
+    files: [['breac.csv', LINE_BAD], ['dipper.csv', ['4.20']], ['siskin.csv', ['1.15', '0.05']], ['ure.csv', 'new java.io.IOException("the till went quiet")']],
+    total: '5.40',
+    problems: ['breac.csv: Line 4 cannot be read', 'ure.csv: the till went quiet'],
+    anyOrder: true
+  },
   { name: 'day of two tills', files: [['dipper.csv', ['3.35']], ['siskin.csv', ['20.10', '0.05']]], total: '23.50', problems: [] },
   { name: 'day of no tills', files: [], total: '0', problems: [] }
 ]
@@ -151,6 +196,17 @@ export const checks = tasks({
       cases: [
         job({ name: 'the job reads nothing until it is called, then adds up the till', file: 'dipper.csv', takings: ['0.10', '0.20', '12.30'], want: '12.60', kind: 'good' }),
         job({ name: 'the job of a till with no sailings gives back 0', file: 'oag.csv', takings: [], want: '0', kind: 'good' }),
+        threaded({
+          name: 'two jobs called at the same moment each add up their own till',
+          setup: ['CheckTills tills = new CheckTills(false).file("dipper.csv", "12.30", "0.30").file("siskin.csv", "7.85");'],
+          call: 'tills.both(Jobs.takings(java.nio.file.Path.of("closing", "dipper.csv")), Jobs.takings(java.nio.file.Path.of("closing", "siskin.csv")))',
+          type: 'java.util.List<String>',
+          show: '// closing/dipper.csv holds sailings with takings 12.30, 0.30; closing/siskin.csv one with 7.85\nCallable<BigDecimal> dipper = Jobs.takings(Path.of("closing", "dipper.csv"));\nCallable<BigDecimal> siskin = Jobs.takings(Path.of("closing", "siskin.csv"));\n// Check calls both jobs at the same moment, each on a thread of its own',
+          after: { 'each job gave back its own till': 'got != null && got.size() == 2 && got.get(0).matches("-?[0-9.]+") && got.get(1).matches("-?[0-9.]+") && new java.math.BigDecimal(got.get(0)).compareTo(new java.math.BigDecimal("12.60")) == 0 && new java.math.BigDecimal(got.get(1)).compareTo(new java.math.BigDecimal("7.85")) == 0' },
+          expected: { 'each job gave back its own till': true },
+          kind: 'pair',
+          hint: 'Two jobs called at the same moment, on two threads, should each give back the takings of their own till.'
+        }),
         job({ name: 'the job lets a line that cannot be read reach its caller', file: 'breac.csv', bad: LINE_BAD, kind: 'bad', throws: 'IllegalArgumentException' }),
         job({ name: 'the job lets a till that is not there reach its caller', file: 'gone.csv', bad: 'new java.nio.file.NoSuchFileException("closing/gone.csv")', kind: 'bad', throws: 'NoSuchFileException' })
       ],
@@ -158,8 +214,16 @@ export const checks = tasks({
         judge(
           [
             {
+              when: (r) => /^CheckStuck/.test(value(r, 'calling the job threw') ?? ''),
+              hint: 'Called, the job did not return: when Check stopped waiting a second later, it was still at work. A job that never ends keeps a thread of its pool busy for ever.'
+            },
+            {
               when: (r) => Number(value(r, 'files read when the job was made')) > 0,
               hint: 'takings read the file while it made the job, so the reading is done before any pool could run it, on the thread that made the job. The job does the reading when it is called: everything that reads goes inside it.'
+            },
+            {
+              when: (r) => r.case.kind === 'pair' && (items(r, 'got') ?? []).length === 2 && (items(r, 'got') ?? []).every((x) => /^-?[\d.]+$/.test(x)) && Number(items(r, 'got')[1]) > 7.85,
+              hint: 'Called at the same moment, the second job gave back more than its own till: the jobs add into one total they share, so the second started from what the first had added. Each job adds up its own till in a variable of its own, inside the job, and gives that back; the lesson\'s part on why no update is lost shows it.'
             },
             {
               when: (r) => r.case.kind === 'bad' && value(r, 'calling the job gave back') !== null,
@@ -195,17 +259,19 @@ export const checks = tasks({
           name: 'collect adds up the answers and notes the till that failed',
           setup: [
             'java.util.Map<String, Future<java.math.BigDecimal>> answers = new java.util.LinkedHashMap<>();',
-            'answers.put("dipper.csv", CompletableFuture.completedFuture(new java.math.BigDecimal("12.40")));',
-            'answers.put("siskin.csv", CompletableFuture.failedFuture(new java.io.IOException("the till went quiet")));',
-            'answers.put("breac.csv", CompletableFuture.completedFuture(new java.math.BigDecimal("7.85")));',
+            'answers.put("dipper.csv", TillAnswer.ok("12.40"));',
+            'answers.put("ure.csv", TillAnswer.ok("0.10"));',
+            'answers.put("oag.csv", TillAnswer.ok("0.20"));',
+            'answers.put("siskin.csv", TillAnswer.bad(new java.io.IOException("the till went quiet")));',
+            'answers.put("breac.csv", TillAnswer.ok("7.85"));',
             'java.util.List<String> problems = new java.util.ArrayList<>();',
             'Runnable probe$ = () -> { try { Results.collect(null, null); } catch (InterruptedException e$) { } };'
           ],
           call: 'Results.collect(answers, problems)',
           type: 'java.math.BigDecimal',
-          show: 'Map<String, Future<BigDecimal>> answers: dipper.csv gives 12.40, siskin.csv\'s job threw IOException("the till went quiet"), breac.csv gives 7.85;\nList<String> problems = new ArrayList<>();\nBigDecimal got = Results.collect(answers, problems);',
-          after: { 'the right amount': 'got != null && got.compareTo(new java.math.BigDecimal("20.25")) == 0', 'problems afterwards': 'problems' },
-          expected: { 'the right amount': true, 'problems afterwards': ['siskin.csv: the till went quiet'] },
+          show: 'Map<String, Future<BigDecimal>> answers: dipper.csv gives 12.40, ure.csv 0.10, oag.csv 0.20, siskin.csv\'s job threw IOException("the till went quiet"), breac.csv gives 7.85;\nList<String> problems = new ArrayList<>();\nBigDecimal got = Results.collect(answers, problems);',
+          after: { 'the right amount': 'got != null && got.compareTo(new java.math.BigDecimal("20.55")) == 0', 'problems afterwards': 'problems', 'answers read on another thread': 'TillAnswer.elsewhere' },
+          expected: { 'the right amount': true, 'problems afterwards': ['siskin.csv: the till went quiet'], 'answers read on another thread': false },
           kind: 'one',
           hint: 'collect should add up the answers of the futures that worked, and add a problem for each one whose job threw: its name, a colon and a space, and the message of what the job threw.'
         }),
@@ -216,7 +282,7 @@ export const checks = tasks({
             'CheckRun.watch = late::watch;',
             'java.util.Map<String, Future<java.math.BigDecimal>> answers = new java.util.LinkedHashMap<>();',
             'answers.put("ure.csv", late);',
-            'answers.put("oag.csv", CompletableFuture.completedFuture(new java.math.BigDecimal("0.85")));',
+            'answers.put("oag.csv", TillAnswer.ok("0.85"));',
             'java.util.List<String> problems = new java.util.ArrayList<>();'
           ],
           call: 'Results.collect(answers, problems)',
@@ -231,8 +297,8 @@ export const checks = tasks({
           name: 'collect when every till failed',
           setup: [
             'java.util.Map<String, Future<java.math.BigDecimal>> answers = new java.util.LinkedHashMap<>();',
-            'answers.put("breac.csv", CompletableFuture.failedFuture(new IllegalArgumentException("Line 4 cannot be read")));',
-            'answers.put("gone.csv", CompletableFuture.failedFuture(new java.io.IOException("no till file")));',
+            'answers.put("breac.csv", TillAnswer.bad(new IllegalArgumentException("Line 4 cannot be read")));',
+            'answers.put("gone.csv", TillAnswer.bad(new java.io.IOException("no till file")));',
             'java.util.List<String> problems = new java.util.ArrayList<>();'
           ],
           call: 'Results.collect(answers, problems)',
@@ -268,6 +334,14 @@ export const checks = tasks({
               hint: 'A problem holds the name of an exception class. The ExecutionException\'s own message is the name and message of what the job threw; the task wants only the job\'s message, and what the job threw is the ExecutionException\'s cause.'
             },
             {
+              when: (r) => value(r, 'got') && /\.\d{5,}/.test(value(r, 'got')),
+              hint: 'The total ends in a long tail of decimal places: the takings went through a double on their way. Keep them in BigDecimal.'
+            },
+            {
+              when: (r) => value(r, 'answers read on another thread') === 'true',
+              hint: 'collect read some answers on threads of its own. Then several threads add to one total, and a thread that adds reads the total before its own amount is in: an amount can be lost. collect gathers the answers on the thread that called it, one after another; the jobs ran at once already.'
+            },
+            {
               when: (r, ctx) => /\bnew\s+Thread\b|\.start\s*\(/.test(ctx.section) && value(r, 'the right amount') === 'false',
               hint: 'The total is short: several threads add to one total, and a thread that adds reads the total before its own amount is in, so another thread\'s amount is overwritten. A BigDecimal never changes: each add gives back a new one. collect gathers the answers on its own thread, one after another; the jobs ran at once already.'
             },
@@ -286,10 +360,6 @@ export const checks = tasks({
             {
               when: (r) => value(r, 'thrown') && /ExecutionException$/.test(value(r, 'thrown')),
               hint: 'An ExecutionException reached Check. collect catches it for each answer, notes the problem, and goes on with the others.'
-            },
-            {
-              when: (r) => value(r, 'got') && /\.\d{5,}/.test(value(r, 'got')),
-              hint: 'The total ends in a long tail of decimal places: the takings went through a double on their way. Keep them in BigDecimal.'
             }
           ],
           { calls: 'collect' }
@@ -304,7 +374,8 @@ export const checks = tasks({
     day: {
       task: 3,
       stub: `${CHECK_THREADS}\n${TILLS}\n${RIGHT}`,
-      cases: DAYS.map((day, i) =>
+      cases: [
+        ...DAYS.map((day, i) =>
         threaded({
           name: day.name,
           setup: [
@@ -315,10 +386,10 @@ export const checks = tasks({
           ],
           call: `Closing.day(new java.util.ArrayList<>(java.util.List.of(${day.files.map(([n]) => `java.nio.file.Path.of("closing", ${text(n)})`).join(', ')})), problems)`,
           type: 'java.math.BigDecimal',
-          show: `${day.files.map(([n, t]) => `// closing/${n} ${typeof t === 'string' ? 'cannot be read: line 4 is bad' : `holds sailings with takings ${t.join(', ') || '(none)'}`}`).join('\n')}${day.files.length ? '\n' : ''}List<String> problems = new ArrayList<>();\nBigDecimal got = Closing.day(List.of(${day.files.map(([n]) => `Path.of("closing", ${text(n)})`).join(', ')}), problems);`,
+          show: `${day.files.map(([n, t]) => `// closing/${n} ${typeof t === 'string' ? (t === LINE_BAD ? 'cannot be read: line 4 is bad' : 'cannot be read: the till went quiet') : `holds sailings with takings ${t.join(', ') || '(none)'}`}`).join('\n')}${day.files.length ? '\n' : ''}List<String> problems = new ArrayList<>();\nBigDecimal got = Closing.day(List.of(${day.files.map(([n]) => `Path.of("closing", ${text(n)})`).join(', ')}), problems);`,
           after: {
             'the right amount': `got != null && got.compareTo(new java.math.BigDecimal(${text(day.total)})) == 0`,
-            'problems afterwards': 'problems',
+            'problems afterwards': day.anyOrder ? 'new java.util.ArrayList<>(new java.util.TreeSet<>(problems))' : 'problems',
             'tills read': 'tills.reads()',
             'threads alive when the answers were first awaited': 'tills.workers',
             'threads that read the tills': 'tills.threads()',
@@ -334,11 +405,32 @@ export const checks = tasks({
             ...(day.files.length ? { 'threads alive when the answers were first awaited': Math.min(3, day.files.length), 'threads that read the tills': Math.min(3, day.files.length) } : {})
           },
           size: day.files.length,
-          hint: 'day should hand a pool of three threads a job per till, keep each future under the file\'s own name, and give back what Results.collect makes of them.'
+          hint: `day should hand a pool of three threads a job per till, keep each future under the file's own name, and give back what Results.collect makes of them${day.anyOrder ? ', its problems in any order' : ''}.`
         })
-      ),
+        ),
+        threaded({
+          name: 'the pool is shut down when the gathering throws',
+          setup: [
+            'CheckTills tills = new CheckTills(false).file("dipper.csv", "3.35").file("siskin.csv", "7.85");',
+            'Results.interrupt = true;',
+            'java.util.List<String> problems = new java.util.ArrayList<>();'
+          ],
+          call: 'Closing.day(new java.util.ArrayList<>(java.util.List.of(java.nio.file.Path.of("closing", "dipper.csv"), java.nio.file.Path.of("closing", "siskin.csv"))), problems)',
+          type: 'java.math.BigDecimal',
+          show: '// This time Check\'s own Results.collect throws an InterruptedException.\nList<String> problems = new ArrayList<>();\nBigDecimal got = Closing.day(List.of(Path.of("closing", "dipper.csv"), Path.of("closing", "siskin.csv")), problems);',
+          throws: 'InterruptedException',
+          expected: {},
+          kind: 'interrupt',
+          size: 2,
+          hint: 'When Results.collect throws, day lets the exception reach whoever called it, and shuts the pool down all the same.'
+        })
+      ],
       judge: judge(
         [
+          {
+            when: (r) => r.case.kind === 'interrupt' && value(r, 'threads left running'),
+            hint: (r) => `Results.collect threw, and day let the exception through with the pool still open: ${threadWords(value(r, 'threads left running'), FILE)}. The pool is shut down whatever happens, a gathering that throws too: part 5 showed the block that always runs.`
+          },
           {
             when: (r) => value(r, 'read on the calling thread') === 'true',
             hint: 'A till was read on the thread that called day, so the tills were read one after another, with no pool. Each till\'s job is handed to the pool, and the pool\'s threads call it.'
