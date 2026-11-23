@@ -4,16 +4,9 @@ import Download from '@lucide/astro/icons/download'
 import { DOWNLOADS, RELEASES_URL, REPO_URL, VERSION } from '../lib/downloads'
 import CodeTexture from './CodeTexture.astro'
 import OsIcons from './OsIcons.astro'
-import Shot from './Shot.astro'
-import workspace from '../assets/screens/workspace.png'
+import Pause from '@lucide/astro/icons/pause'
+import Play from '@lucide/astro/icons/play'
 
-interface Props {
-  repos: number
-  issues: number
-  tasks: number
-}
-
-const { repos, issues, tasks } = Astro.props
 const SYSTEMS = ['mac', 'windows', 'linux'] as const
 ---
 
@@ -37,10 +30,10 @@ const SYSTEMS = ['mac', 'windows', 'linux'] as const
       Learn to code by fixing real problems
     </h1>
     <p
-      class="mt-7 max-w-[640px] text-[17px] leading-[1.6] text-balance text-muted-foreground sm:text-[19px]"
+      class="mt-7 max-w-[620px] text-[17px] leading-[1.6] text-balance text-muted-foreground sm:text-[19px]"
     >
-      Each repo is a small company with a problem, and you are its developer. Read a short lesson,
-      write the code in a real editor, run it in a real terminal, and press Check.
+      Each repo is a small company with a problem, and you are its developer. Write the fix in a
+      real editor, run it in a real terminal, press Check.
     </p>
     <div class="mt-10 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
       <div class="relative flex h-13 w-full sm:w-auto">
@@ -120,41 +113,38 @@ const SYSTEMS = ['mac', 'windows', 'linux'] as const
         Star on GitHub
       </a>
     </div>
-    <p class="mt-7 text-[14px] text-muted-foreground tabular-nums">
-      <span class="text-foreground">{repos}</span> repos,{' '}
-      <span class="text-foreground">{issues}</span> issues,{' '}
-      <span class="text-foreground">{tasks}</span> tasks. All of it runs on your machine.
-    </p>
   </div>
 
   <div class="relative mx-auto mt-20 w-full max-w-[1400px] px-3 sm:mt-24 sm:px-8">
     <div class="brand-halo pointer-events-none absolute inset-x-0 top-0 -bottom-24" aria-hidden="true">
     </div>
     <figure class="relative">
-      <div
-        class="absolute -top-5 right-4 z-10 flex items-center gap-2.5 rounded-full border border-border bg-popover py-2 pr-4 pl-3 text-[14px] shadow-2xl sm:right-10"
-      >
-        <span class="size-2 rounded-full bg-success" aria-hidden="true"></span>
-        <span class="text-foreground">3 of 3 tasks pass</span>
-        <span class="hidden text-muted-foreground sm:inline">Issue 1 of 5</span>
+      <div class="relative rounded-[22px] border border-border bg-card p-1.5 shadow-2xl sm:p-2">
+        <video
+          class="block aspect-[16/10] w-full rounded-[12px] bg-background sm:rounded-[16px]"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="auto"
+          poster="/video/hero-poster.jpg"
+          aria-label="An issue in Indent from start to finish: the story plays, code is written in the editor and run in the terminal, a check fails with a plain message, the tutor draws a diagram, every task turns green, and the tutor switches to another AI."
+          data-hero-video
+        >
+          <source src="/video/hero.webm" type="video/webm" />
+          <source src="/video/hero.mp4" type="video/mp4" />
+        </video>
+        <button
+          type="button"
+          class="absolute right-4 bottom-4 inline-flex size-9 items-center justify-center rounded-full border border-border bg-popover text-muted-foreground transition-colors hover:text-foreground sm:right-6 sm:bottom-6"
+          aria-label="Pause the video"
+          data-hero-toggle
+        >
+          <span data-icon="pause"><Pause class="size-4" stroke-width={1.5} aria-hidden="true" /></span>
+          <span data-icon="play" hidden><Play class="size-4" stroke-width={1.5} aria-hidden="true" /></span>
+        </button>
       </div>
-      <div class="rounded-[22px] border border-border bg-card p-1.5 shadow-2xl sm:p-2">
-        <Shot
-          src={workspace}
-          alt="The Indent workspace. On the left, the tasks of the issue A server that answers, all three passed. In the middle, src/respond.js in the editor. Below, the terminal shows node try.js answering GET /health, GET /boats, a 404 and a 405."
-          maxWidth={1340}
-          eager
-          class="hidden rounded-[16px] sm:block"
-        />
-        <Shot
-          src={workspace}
-          crop={[0, 70, 1300, 1300]}
-          alt="The Indent workspace: the tasks of the issue A server that answers, all three passed, next to src/respond.js in the editor."
-          maxWidth={640}
-          class="rounded-[12px] sm:hidden"
-        />
-      </div>
-      <figcaption class="sr-only">The workspace after every task of an issue has passed.</figcaption>
+      <figcaption class="sr-only">One issue in Indent, from the story to every task passing.</figcaption>
     </figure>
   </div>
 </section>
@@ -213,6 +203,26 @@ const SYSTEMS = ['mac', 'windows', 'linux'] as const
     label.textContent = mine.dataset.downloadButton ?? label.textContent
     show(mine.dataset.downloadOs ?? 'none')
   })
+
+  const video = document.querySelector<HTMLVideoElement>('[data-hero-video]')
+  const toggle = document.querySelector<HTMLButtonElement>('[data-hero-toggle]')
+  function showPlaying(playing: boolean): void {
+    if (!toggle) return
+    toggle.setAttribute('aria-label', playing ? 'Pause the video' : 'Play the video')
+    toggle.querySelector('[data-icon="pause"]')?.toggleAttribute('hidden', !playing)
+    toggle.querySelector('[data-icon="play"]')?.toggleAttribute('hidden', playing)
+  }
+  if (video) {
+    // Reduced motion keeps the poster until the visitor asks for the video.
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.removeAttribute('autoplay')
+      video.pause()
+    }
+    video.addEventListener('play', () => showPlaying(true))
+    video.addEventListener('pause', () => showPlaying(false))
+    showPlaying(!video.paused || video.autoplay)
+    toggle?.addEventListener('click', () => void (video.paused ? video.play() : video.pause()))
+  }
 
   if (menu) {
     const close = (): void => void (menu.open = false)

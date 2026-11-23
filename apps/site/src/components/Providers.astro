@@ -1,0 +1,151 @@
+---
+import KeyRound from '@lucide/astro/icons/key-round'
+import type { AiProviderId } from '../../../desktop/src/shared/types'
+import ProviderLogo from './ProviderLogo.astro'
+import SectionHead from './SectionHead.astro'
+
+const providers: { name: string; logo?: AiProviderId; detail: string; free?: string }[] = [
+  { name: 'Claude Code', logo: 'claude-code', detail: 'claude' },
+  { name: 'Codex', logo: 'codex', detail: 'codex' },
+  { name: 'OpenCode', logo: 'opencode', detail: 'opencode', free: 'Free models' },
+  { name: 'Gemini CLI', logo: 'gemini-cli', detail: 'gemini' },
+  { name: 'Your own API key', detail: 'Anthropic, OpenAI or Gemini', free: 'Free Gemini key' }
+]
+const keys: AiProviderId[] = ['anthropic', 'openai', 'gemini']
+const modes = ['Off', 'Manual', 'Auto']
+---
+
+<section id="ai" aria-labelledby="ai-title" class="scroll-mt-8 border-t border-rule py-28 sm:py-40">
+  <div class="wrap">
+    <SectionHead
+      id="ai-title"
+      label="/your ai"
+      step={2}
+      muted="Use the AI you already have."
+      bright="Change it whenever you like."
+    >
+      <p>
+        Switch the provider or the model from the chat without leaving the issue. Two ways cost
+        nothing: the free models of OpenCode and a free Gemini key.
+      </p>
+    </SectionHead>
+
+    <div class="mt-16 grid gap-px overflow-hidden rounded-lg border border-border bg-border lg:grid-cols-12">
+      <ul class="bg-background p-2 lg:col-span-7" data-provider-switch>
+        {
+          providers.map((p, i) => (
+            <li
+              class:list={['row flex h-14 items-center gap-3 rounded-md px-4', i === 0 && 'on']}
+              data-row
+            >
+              {p.logo ? (
+                <ProviderLogo id={p.logo} class="size-5" />
+              ) : (
+                <KeyRound class="size-5 shrink-0 text-muted-foreground" stroke-width={1.5} aria-hidden="true" />
+              )}
+              <span class="text-[15px]">{p.name}</span>
+              {p.free && (
+                <span class="hidden rounded-sm bg-success/10 px-1.5 py-0.5 text-[12px] text-success sm:inline">
+                  {p.free}
+                </span>
+              )}
+              <span class="ml-auto grid text-right">
+                {p.logo ? (
+                  <span class="detail truncate font-mono text-[12px] text-muted-foreground [grid-area:1/1]">
+                    {p.detail}
+                  </span>
+                ) : (
+                  <span class="detail flex items-center justify-end gap-2 [grid-area:1/1]">
+                    {keys.map((key) => (
+                      <ProviderLogo id={key} class="size-4" />
+                    ))}
+                    <span class="sr-only">{p.detail}</span>
+                  </span>
+                )}
+                <span class="now text-[13px] [grid-area:1/1]">Answering</span>
+              </span>
+            </li>
+          ))
+        }
+        <li class="mt-2 flex min-h-16 items-center gap-3 border-t border-rule px-4 pt-2">
+          <span class="flex flex-col">
+            <span class="text-[15px]">Inline suggestions</span>
+            <span class="text-[13px] text-muted-foreground">
+              Grey text in the editor that knows the task. Tab accepts it.
+            </span>
+          </span>
+          <span
+            class="ml-auto flex shrink-0 rounded-md border border-input p-0.5 text-[12px]"
+            role="img"
+            aria-label="Suggestions: off, manual or auto."
+          >
+            {
+              modes.map((mode, i) => (
+                <span class:list={['rounded-sm px-2 py-0.5', i === 2 ? 'bg-accent text-foreground' : 'text-muted-foreground']}>
+                  {mode}
+                </span>
+              ))
+            }
+          </span>
+        </li>
+      </ul>
+      <div class="flex flex-col bg-background lg:col-span-5">
+        <div class="flex-1 border-b border-rule p-6 sm:p-8">
+          <h3 class="text-sm font-semibold">Keys stay on your computer</h3>
+          <p class="mt-2 text-[15px] leading-[1.6] text-muted-foreground">
+            There is no sign-in to Indent. Calls go straight from your machine to your provider.
+          </p>
+        </div>
+        <div class="flex-1 p-6 sm:p-8">
+          <h3 class="text-sm font-semibold">Set up in one click</h3>
+          <p class="mt-2 text-[15px] leading-[1.6] text-muted-foreground">
+            Indent finds the coding CLI you already have. With none set up, one click installs
+            OpenCode.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .row .now {
+    opacity: 0;
+  }
+  .row.on {
+    background-color: var(--accent);
+  }
+  .row.on .now {
+    opacity: 1;
+  }
+  .row.on .detail {
+    opacity: 0;
+  }
+  .now,
+  .detail {
+    transition: opacity var(--motion-state) var(--ease-out);
+  }
+  .row {
+    transition: background-color var(--motion-state) var(--ease-out);
+  }
+</style>
+
+<script>
+  // The answering provider moves down the list while it is on screen.
+  const STEP = 1800
+  for (const list of document.querySelectorAll<HTMLElement>('[data-provider-switch]')) {
+    const rows = [...list.querySelectorAll<HTMLElement>('[data-row]')]
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) continue
+    let at = 0
+    let timer = 0
+    const next = (): void => {
+      rows[at].classList.remove('on')
+      at = (at + 1) % rows.length
+      rows[at].classList.add('on')
+    }
+    new IntersectionObserver(([entry]) => {
+      clearInterval(timer)
+      if (entry.isIntersecting) timer = window.setInterval(next, STEP)
+    }).observe(list)
+  }
+</script>

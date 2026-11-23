@@ -2,29 +2,29 @@
 import HardDrive from '@lucide/astro/icons/hard-drive'
 import UserRoundX from '@lucide/astro/icons/user-round-x'
 import WifiOff from '@lucide/astro/icons/wifi-off'
-import SquareTerminal from '@lucide/astro/icons/square-terminal'
+import Archive from '@lucide/astro/icons/archive'
 import SectionHead from './SectionHead.astro'
 
 const cells = [
   {
     icon: HardDrive,
     title: 'Everything is on disk',
-    body: 'A repo downloads once, the first time you open it. From then on its lessons, the files you write and your progress live in folders on your computer, so updates never lose them. A new laptop takes one backup file with your progress, code and settings.'
+    body: 'Lessons, your code and your progress live in folders on your computer and survive every update.'
   },
   {
     icon: UserRoundX,
     title: 'No account',
-    body: 'Open the app and start. There is no sign-in, no server and nothing to sync. Your points, levels and streak are kept on disk too.'
+    body: 'Open the app and start. Your points, levels and streak are kept on disk too.'
   },
   {
     icon: WifiOff,
     title: 'The local model works offline',
-    body: 'The LLM, retrieval, agents and evals repos talk to a small model inside the app instead of a paid API. It answers the same way every time, so the checks are repeatable, and it needs no key and no network.'
+    body: 'The AI repos talk to a small model inside the app, so they need no key and no network.'
   },
   {
-    icon: SquareTerminal,
-    title: 'Your own AI tools',
-    body: 'The tutor works through a coding CLI you already use (Claude Code, Codex, OpenCode or Gemini CLI) or through your own API key, and two of those ways are free. Indent runs no model service of its own.'
+    icon: Archive,
+    title: 'One file to move',
+    body: 'A new laptop takes one backup file with your progress, your code and your settings.'
   }
 ]
 ---
@@ -38,7 +38,7 @@ const cells = [
     <SectionHead
       id="local-title"
       label="/local first"
-      step={5}
+      step={6}
       muted="Local first, on purpose."
       bright="Nothing to sign up for, nothing to keep online."
     >
@@ -51,7 +51,7 @@ const cells = [
     <ul class="mt-16 grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-2">
       {
         cells.map(({ icon: Icon, title, body }) => (
-          <li class="bg-background p-7 sm:p-12">
+          <li class="bg-background p-7 sm:p-10">
             <span class="inline-flex size-12 items-center justify-center rounded-[12px] border border-border bg-card">
               <Icon class="size-5" stroke-width={1.5} aria-hidden="true" />
             </span>
