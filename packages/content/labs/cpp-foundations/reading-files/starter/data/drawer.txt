@@ -1,0 +1,4 @@
+mainspring 6
+hairspring 3
+crown 12
+crystal 4
