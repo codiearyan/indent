@@ -1,0 +1,13 @@
+{
+  "id": "build-a-json-parser",
+  "title": "Build your own JSON parser",
+  "description": "Ashgrove Press gets its suppliers' prices as JSON, and the old import script chokes on every third list without saying where, while the lists it does read come out with wrong prices nobody notices. You write the shop a reader of its own in plain JavaScript: a tokenizer, numbers and texts by their rules, a parser for values inside values, errors that give the line, the column and what was expected, and a writer that turns values back into text. By the end you know what happens every time a program reads data.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": ["JavaScript", "Build your own"],
+  "kind": "project",
+  "parts": [
+    { "title": "Reading the text", "chapters": ["cutting-into-tokens", "numbers-and-text", "values-inside-values"] },
+    { "title": "Errors and the whole trip", "chapters": ["errors-you-can-act-on", "writing-it-back"] }
+  ]
+}

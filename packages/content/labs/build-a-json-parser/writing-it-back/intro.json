@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "One list of every item, please.", "note": "He copies three by hand each night." },
+    { "title": "Your reader", "text": "Reads each supplier list, one at a time.", "note": "Nothing writes them back." },
+    {
+      "title": "Your code",
+      "file": "prices.js",
+      "mine": true,
+      "gap": "No way to write JSON",
+      "tasks": ["Write a value", "Refuse what cannot be", "The whole import"]
+    },
+    { "title": "prices.json", "rows": [["Paper supplier", "4 items"], ["Ink supplier", "3 items"], ["card.json", "line 6"]] }
+  ],
+  "ticket": { "label": "Nightly list", "wrong": "by hand", "why": "No writer", "right": "one file" },
+  "captions": [
+    "At Ashgrove Press, Idris wants one list of every supplier's items each night.",
+    "The reader reads each list, but nothing writes them back, so he copies them by hand.",
+    "You write values back as JSON text and run the whole import, in three tasks.",
+    "Now every list that reads goes into one file, and the broken one is named by line.",
+    "Same three suppliers, and a price list the shop reads and writes on its own."
+  ]
+}

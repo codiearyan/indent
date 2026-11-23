@@ -1,0 +1,83 @@
+{
+  "id": "empty-win-back-list",
+  "title": "The win-back list that came back empty",
+  "files": [
+    "queries/1-emptying-orders.sql",
+    "queries/2-win-back.sql",
+    "queries/3-catalogues.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of Mallowfield's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/2-win-back.sql"
+  },
+  "tasks": [
+    {
+      "id": "prove-it",
+      "title": "List the orders that empty the win-back list",
+      "file": "queries/1-emptying-orders.sql",
+      "description": "Show Perpetua what empties her list.\n\nIn `queries/1-emptying-orders.sql`, return three columns, in this order:\n\n- `id`\n- `placed_at`\n- `channel`\n\nOne row for every order that the query in brackets in `2-win-back.sql` reads (placed on or after `2026-09-01`) and that has no customer. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, where a regular sometimes gives their name at the stall.",
+      "nextSteps": [
+        "Run the query in brackets from `2-win-back.sql` on its own and read its column.",
+        "Find the values in that column that are not a customer's id.",
+        "List the orders those values come from, with the same date test."
+      ],
+      "hints": [
+        "Read the lesson's part \"How it happens\": one value in the list after `NOT IN` is enough to empty it.",
+        "A sale with no customer has `NULL` in `customer_id`. The test for an empty cell is `IS NULL`, never `= NULL`.",
+        "The condition has the shape `WHERE placed_at >= '2026-09-01' AND customer_id IS NULL`."
+      ],
+      "docs": [
+        { "title": "The IN and NOT IN operators", "url": "https://www.sqlite.org/lang_expr.html#the_in_and_not_in_operators" },
+        { "title": "IS and IS NOT", "url": "https://www.sqlite.org/lang_expr.html#isisnot" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix-win-back",
+      "title": "Bring back the customers who have not ordered since summer",
+      "file": "queries/2-win-back.sql",
+      "description": "Fix the win-back list in `queries/2-win-back.sql` at the cause.\n\nIt returns every customer who has not placed an order on or after `2026-09-01`, those who never ordered at all included, with two columns, in this order:\n\n- `customer`: the customer's name\n- `email`: their email, `NULL` when they never gave one\n\nAny order of rows. Check compares the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Run the file: it returns no rows. Run the query in brackets on its own.",
+        "Decide what an order with no customer means for this list.",
+        "Keep those orders out of the list after `NOT IN`, and run the file again."
+      ],
+      "hints": [
+        "Read the lesson's part \"How to mend it\". A market sale belongs to nobody on the list.",
+        "Only real customer ids should reach `NOT IN`. Add a test to the query in brackets that leaves out the empty ones.",
+        "The query in brackets has the shape `SELECT o.customer_id FROM orders AS o WHERE o.placed_at >= '2026-09-01' AND o.customer_id IS NOT NULL`."
+      ],
+      "docs": [
+        { "title": "The IN and NOT IN operators", "url": "https://www.sqlite.org/lang_expr.html#the_in_and_not_in_operators" },
+        { "title": "NULL handling in SQLite", "url": "https://www.sqlite.org/nulls.html" }
+      ],
+      "videos": [
+        { "title": "NULL and three-valued logic", "url": "https://www.youtube.com/watch?v=u2Kdw1raQJ4" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "catalogues",
+      "title": "Count every catalogue the post should carry",
+      "file": "queries/3-catalogues.sql",
+      "description": "The catalogue print run in `queries/3-catalogues.sql` decides how many spring catalogues are printed for each town. Nobody has complained yet.\n\nPerpetua's rule: every customer gets a catalogue unless they said no (`'no'` in `post`). A customer nobody asked (`NULL` in `post`) gets one. Fix it so it returns two columns, in this order:\n\n- `town`\n- `catalogues`: how many customers in that town get a catalogue\n\nOne row for each town where at least one customer gets one. Any order of rows. Check compares the rows on the data you can see and on hidden data, which has a town where nobody was asked and a town where everyone said no.",
+      "nextSteps": [
+        "Run the file, then list every customer of one town with their `post` and count by hand.",
+        "Find each place in the query where a `NULL` in `post` drops out.",
+        "Mend each one so it follows Perpetua's rule."
+      ],
+      "hints": [
+        "There are two places. Read the lesson's parts \"How it happens\" and \"Counting the gaps\".",
+        "`post <> 'no'` is unknown when `post` is `NULL`, so WHERE drops that customer. `COUNT(post)` skips the same customers again.",
+        "The query has the shape `SELECT town, COUNT(*) AS catalogues FROM customers WHERE post IS NULL OR post <> 'no' GROUP BY town`."
+      ],
+      "docs": [
+        { "title": "count()", "url": "https://www.sqlite.org/lang_aggfunc.html#count" },
+        { "title": "NULL handling in SQLite", "url": "https://www.sqlite.org/nulls.html" }
+      ],
+      "points": 10
+    }
+  ]
+}

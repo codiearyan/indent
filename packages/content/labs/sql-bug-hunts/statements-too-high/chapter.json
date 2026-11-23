@@ -1,0 +1,83 @@
+{
+  "id": "statements-too-high",
+  "title": "Statements that charge too much",
+  "files": [
+    "queries/1-counted-twice.sql",
+    "queries/2-statements.sql",
+    "queries/3-stock-check.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of Mallowfield's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/2-statements.sql"
+  },
+  "tasks": [
+    {
+      "id": "prove-it",
+      "title": "List the orders the statements count more than once",
+      "file": "queries/1-counted-twice.sql",
+      "description": "Before you change the statements, show Perpetua which orders they count more than once.\n\nIn `queries/1-counted-twice.sql`, use the same join as `2-statements.sql` (customers, orders, order lines and payments) and return three columns, in this order:\n\n- `order_id`\n- `customer`: the customer's name\n- `copies`: how many rows of that join the order fills\n\nOnly the orders that fill more than one row. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Run the join from `2-statements.sql` with `SELECT *` and `WHERE o.id = 14`, as the lesson does. Count the rows.",
+        "Group the rows of the join by order and count them.",
+        "Keep only the orders with more than one row."
+      ],
+      "hints": [
+        "The join itself is the evidence. Read the lesson's part \"See it for yourself\".",
+        "Group the join's rows by the order's id and count them with `COUNT(*)`. A test on that count goes in `HAVING`, not `WHERE`.",
+        "The query ends with the shape `... GROUP BY o.id, c.name HAVING COUNT(*) > 1;`, after the FROM part of `2-statements.sql` copied as it is."
+      ],
+      "docs": [
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "GROUP BY and HAVING", "url": "https://www.sqlite.org/lang_select.html#resultset" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix-statements",
+      "title": "Make each statement count every packet and payment once",
+      "file": "queries/2-statements.sql",
+      "description": "Fix the statement query in `queries/2-statements.sql` at the cause.\n\nIt returns one row for every customer who has placed an order, with three columns, in this order:\n\n- `customer`: the customer's name\n- `packets`: every packet in their orders, each counted once\n- `paid_pence`: every payment of theirs, each counted once\n\nAny order of rows. Check compares the rows on the data you can see and on hidden data, where orders are paid in other numbers of parts and some lines and payments are the same size, so `DISTINCT` or dividing by a count does not mend it.",
+      "nextSteps": [
+        "Run the file and find Rosalind Teague's row. Compare it with her one order and payment in `seed.sql`.",
+        "Work out the packets of each customer in a query of their own, where every line is one row.",
+        "Do the same for the payments, then join both totals to customers."
+      ],
+      "hints": [
+        "Two tables hang off each order: its lines and its payments. Read the lesson's part \"How to mend it\".",
+        "Add up the lines in one query in brackets and the payments in another, each grouped by customer, so neither ever meets the other row by row.",
+        "The FROM part has the shape `FROM customers AS c JOIN (SELECT o.customer_id, SUM(l.packets) AS packets FROM orders AS o JOIN order_lines AS l ON ... GROUP BY o.customer_id) AS b ON b.customer_id = c.id JOIN (... the same for payments ...) AS q ON q.customer_id = c.id`."
+      ],
+      "docs": [
+        { "title": "Subqueries in FROM", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "sum() and total()", "url": "https://www.sqlite.org/lang_aggfunc.html#sumunc" }
+      ],
+      "videos": [
+        { "title": "Why a join repeats rows", "url": "https://www.youtube.com/watch?v=Y9hrlLIXKoU" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stock-check",
+      "title": "Fix the stock check before anyone trusts it",
+      "file": "queries/3-stock-check.sql",
+      "description": "Dunstan prints the stock check in `queries/3-stock-check.sql` every Monday. Nobody has complained yet, but it has the same trap.\n\nFix it so it returns one row for every seed, with four columns, in this order:\n\n- `product`: the seed's name\n- `received`: every packet that arrived from the growers, each counted once\n- `sold`: every packet in an order, each counted once\n- `in_stock`: `received` minus `sold`\n\n`0` where there is nothing to count. Any order of rows. Check compares the rows on the data you can see and on hidden data, which has a seed with no restock and two restocks of the same size.",
+      "nextSteps": [
+        "Run the file and compare Scarlet runner bean's numbers with its restocks and order lines in `seed.sql`.",
+        "Say which two tables hang off the seed, and what the join does to them.",
+        "Add each one up where it is one row per restock or per line, and keep every seed."
+      ],
+      "hints": [
+        "This is the trap of the statements, hanging off a seed instead of an order.",
+        "Total the restocks per seed in one query in brackets and the order lines in another. A seed with none has no row there, so keep every seed with `LEFT JOIN` and turn the missing totals into 0.",
+        "The FROM part has the shape `FROM products AS p LEFT JOIN (SELECT product_id, SUM(packets) AS received FROM restocks GROUP BY product_id) AS r ON r.product_id = p.id LEFT JOIN (... order_lines ...) AS s ON s.product_id = p.id`, with `COALESCE(r.received, 0)` in the columns."
+      ],
+      "docs": [
+        { "title": "coalesce()", "url": "https://www.sqlite.org/lang_corefunc.html#coalesce" },
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" }
+      ],
+      "points": 10
+    }
+  ]
+}

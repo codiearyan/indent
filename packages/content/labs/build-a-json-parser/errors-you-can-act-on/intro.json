@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "Where is card.json wrong?", "note": "The supplier is on the phone." },
+    { "title": "Your reader", "text": "Says the index of the stray character.", "note": "Nobody counts characters." },
+    {
+      "title": "Your code",
+      "file": "json.js",
+      "mine": true,
+      "gap": "No line, no words",
+      "tasks": ["Line and column", "Expected and found", "Cut short or wrong"]
+    },
+    { "title": "Card supplier", "say": "Line 6? We will fix that.", "note": "Their editor shows lines." }
+  ],
+  "ticket": { "label": "card.json", "wrong": "an index", "why": "Cannot act", "right": "line, column" },
+  "captions": [
+    "At Ashgrove Press, Hesper rings the card supplier about their broken list.",
+    "The reader says only an index, and nobody can find character 194 in a file.",
+    "You make every error say where, what was expected and what was found, in three tasks.",
+    "Now the error gives a line and a column, and says a value was expected there.",
+    "Same broken list, and the supplier knows exactly what to fix."
+  ]
+}

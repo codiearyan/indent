@@ -1,0 +1,81 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "quay", "label": "Queue on the quay", "kind": "story" },
+      { "id": "methods", "label": "board() and land()", "kind": "function", "mine": true },
+      { "id": "boat", "label": "Boat, private fields", "kind": "data", "mine": true },
+      { "id": "office", "label": "Harbour office", "kind": "story" },
+      { "id": "ossian", "label": "Ossian", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "quay", "to": "methods", "label": "names" },
+      { "from": "methods", "to": "boat", "label": "only if allowed" },
+      { "from": "boat", "to": "office", "label": "a copy" },
+      { "from": "boat", "to": "ossian", "label": "printed" }
+    ],
+    "note": "The boat's fields are private, so the only way on or off is through methods that keep the seat rule."
+  },
+  "tasks": {
+    "fields": {
+      "steps": [
+        {
+          "active": ["boat"],
+          "value": { "kind": "map", "label": "a boat, private", "entries": [{ "key": "name", "value": "text" }, { "key": "seats", "value": "whole number" }, { "key": "aboard", "value": "list of names" }] },
+          "note": "Each boat keeps its name, its seats and who is aboard, where only its own code can reach."
+        },
+        {
+          "active": ["boat", "boat->ossian", "ossian"],
+          "note": "Anyone may ask a boat its name, its seats and how many are aboard, through its methods."
+        },
+        {
+          "active": ["boat"],
+          "note": "A line outside the boat that tries to change a field is refused before the program runs."
+        }
+      ]
+    },
+    "rule": {
+      "steps": [
+        {
+          "active": ["quay", "quay->methods", "methods"],
+          "note": "Passengers come aboard one by one, and some land again before the boat leaves."
+        },
+        {
+          "active": ["methods", "methods->boat", "boat"],
+          "note": "While a seat is free, the passenger goes on the list. On a full boat, nothing changes and the answer is no."
+        },
+        {
+          "active": ["methods", "boat"],
+          "note": "Someone landing comes off the list by name, and their seat is free again. A name nobody has is a no."
+        }
+      ]
+    },
+    "copy": {
+      "steps": [
+        {
+          "active": ["boat"],
+          "note": "The boat's own list says who is aboard, in the order they boarded."
+        },
+        {
+          "active": ["boat", "boat->office", "office"],
+          "note": "The harbour office gets a list of its own with the same names."
+        },
+        {
+          "active": ["office", "boat"],
+          "note": "Whatever the office writes on its copy, the boat's list stays as it was."
+        }
+      ]
+    },
+    "to-string": {
+      "steps": [
+        {
+          "active": ["boat"],
+          "note": "Printed as it is, a boat shows only its class name and a code."
+        },
+        {
+          "active": ["boat", "boat->ossian", "ossian"],
+          "note": "With a text of its own, printing a boat shows its name, how many are aboard and the seats free."
+        }
+      ]
+    }
+  }
+}

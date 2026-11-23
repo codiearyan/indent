@@ -1,0 +1,118 @@
+{
+  "id": "writing-it-back",
+  "title": "Writing it back",
+  "files": [
+    "src/json.js",
+    "src/prices.js",
+    "src/import.js",
+    "src/try.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where your writer turns values back into JSON text, and the new import reads every supplier list.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "write",
+      "title": "Write a value as JSON text",
+      "file": "src/json.js",
+      "description": "Implement `stringify(value)` in `src/json.js`: the other way from `parse`.\n\n- `null`, `true` and `false` are written as those words, and a number as JavaScript writes it, `String(n)`\n- a text is written between double quotes; inside it `\"` and `\\` get a backslash in front, a backspace, form feed, line feed, carriage return and tab are written `\\b` `\\f` `\\n` `\\r` `\\t`, and any other character below a space as `\\u` and four hex digits\n- an array is `[`, its items with a comma between each two, `]`; an object is `{`, its own keys in their order, each a text, a `:` and its value, with a comma between pairs, `}`\n- with no indent there is no space outside the texts at all\n\nThe check writes values of its own, among them 150 it makes up, and reads each text back with the built-in reader: it must be JSON and give the same value.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the first lines.",
+        "Handle the plain values first: null, true and false, numbers.",
+        "Write a small function that puts a text in quotes and escapes what needs it.",
+        "For arrays and objects, write each item with `stringify` itself and join them."
+      ],
+      "hints": [
+        "Writing is reading backwards: one function that looks at what kind of value it has, and for an array or an object calls itself for each item inside.",
+        "Escape in a text only what must be: the quote, because it would end the text, the backslash, because it starts an escape, and characters below a space, which JSON does not allow as they are. Every other character, accents and pictures included, goes in as it is.",
+        "For an object: `Object.keys(value).map((key) => quote(key) + ':' + stringify(value[key])).join(',')` between `{` and `}`. For a control character: `'\\\\u' + ch.charCodeAt(0).toString(16).padStart(4, '0')`."
+      ],
+      "docs": [
+        {
+          "title": "Object.keys()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys"
+        },
+        {
+          "title": "String.prototype.charCodeAt()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt"
+        },
+        {
+          "title": "String.prototype.padStart()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart"
+        }
+      ],
+      "videos": [
+        {
+          "title": "UTF-8 and characters, explained simply",
+          "url": "https://www.youtube.com/watch?v=vpSkBV5vydg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cannot",
+      "title": "Refuse what JSON cannot hold",
+      "file": "src/json.js",
+      "description": "Make `stringify` throw instead of writing something JSON cannot hold.\n\n- `undefined`, a function, and a number that is not finite (`NaN`, `Infinity`, `-Infinity`) throw a `TypeError`, wherever they sit: at the top, in an array, or as the value of a key\n- a value that holds itself, an object or array that is inside itself however far down, throws a `TypeError` instead of going round for ever\n- the same object in several places that does not hold itself is written each time, as usual\n- the message says where the value sits, keys after dots and indexes in brackets from the top: `items[0].price`, `[1]`, `self`\n- a refusal leaves nothing behind: the next call works as if it had not happened\n\nThe check writes values that JSON cannot hold, values that hold themselves, and the same item in several places.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at the price nobody worked out and the order that holds itself.",
+        "Throw a TypeError for undefined, a function and a number that is not finite.",
+        "Pass down where each value sits, so the message can say it.",
+        "Keep the arrays and objects you are inside of, and refuse one you are already inside."
+      ],
+      "hints": [
+        "Writing something else in place of a value JSON cannot hold, such as null or nothing, would change a price list without a word. A TypeError says exactly what is wrong.",
+        "A value holds itself when it is one of the arrays and objects you are writing it from. A list of those, added to on the way in and taken off on the way out, tells them apart from the same item seen twice side by side.",
+        "Give your writer two more arguments, `path` and `inside`: call it with `[...path, key]`, and `if (inside.includes(value)) throw new TypeError(...)` before `inside.push(value)`, with `inside.pop()` once its items are written."
+      ],
+      "docs": [
+        {
+          "title": "TypeError",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError"
+        },
+        {
+          "title": "Number.isFinite()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isFinite"
+        },
+        {
+          "title": "Array.prototype.includes()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "trip",
+      "title": "Read every price list and write one",
+      "file": "src/prices.js",
+      "description": "Give `stringify` an indent, then implement `importPrices(files)` in `src/prices.js`.\n\n- `stringify(value, indent)`: with an indent of n spaces, each item of an array and each pair of an object goes on a line of its own, n spaces further in than the line its brackets are on, with a space after each colon; an empty array or object stays `[]` or `{}`; with no indent it writes as in task 1\n- `importPrices(files)` takes the lists as `[{ name, text }, ...]` and returns `{ text, problems }`\n- `text` is your `stringify` of `{ items }` with an indent of 2, where `items` holds every item of every list that reads, in order, each with a `supplier` key set to its list's `supplier`\n- `problems` holds one `{ file, line, column, message }` for each list your `parse` refuses, in order, from its `JsonError`; a list that does not read never stops the others\n- `src/prices.js` uses your own `parse` and `stringify`, never the built-in ones\n\nThe check compares indented text with the built-in writer's, and runs `importPrices` on price lists of its own, some broken.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at the indented item.",
+        "Give your writer the indent of the line it is on, and one level more for the items inside.",
+        "In `importPrices`, parse each list inside a try, and turn a JsonError into a problem.",
+        "Collect the items with their supplier, write them, and run `node src/import.js`."
+      ],
+      "hints": [
+        "Indenting is the same writer with one more thing passed down: how far in the current line starts. The items of an array or object start one indent further in, and the closing bracket goes back to where its line started.",
+        "Only a JsonError is a problem with a list; an error of any other kind is a bug in the code and should not be hidden. Copy each item with its list's supplier added, so the supplier's own data stays as it was.",
+        "Items: `` `${open}\\n${inner}${parts.join(`,\\n${inner}`)}\\n${pad}${close}` ``. Import: `for (const item of list.items) items.push({ ...item, supplier: list.supplier })`, then `stringify({ items }, 2)`."
+      ],
+      "docs": [
+        {
+          "title": "try...catch",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
+        },
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        },
+        {
+          "title": "JSON.stringify()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Clemency",
+      "say": "What does one phone order come to?",
+      "note": "For the year-end notes. MF-17."
+    },
+    {
+      "title": "Her sum by hand",
+      "text": "Every phone order added up and divided.",
+      "note": "Less than the report says."
+    },
+    {
+      "title": "Your query",
+      "file": "2-averages.sql",
+      "mine": true,
+      "gap": "Averages the wrong thing",
+      "tasks": [
+        "Count it by hand",
+        "Fix the average",
+        "Fix the trade price"
+      ]
+    },
+    {
+      "title": "Year-end notes",
+      "text": "One average per channel, in pounds.",
+      "note": "Read by the bank."
+    }
+  ],
+  "ticket": {
+    "label": "Phone average",
+    "wrong": "too high",
+    "why": "Wrong maths",
+    "right": "her sum"
+  },
+  "captions": [
+    "At Mallowfield Seeds, Clemency needs the average order of each channel for her notes.",
+    "Her sum by hand gives less than the report, and the market comes out in whole pounds.",
+    "You count it by hand, then fix the average and the trade price list.",
+    "Now each average is what one order really comes to, to the penny.",
+    "Same orders, same pence. Every number answers the question Clemency asked."
+  ]
+}

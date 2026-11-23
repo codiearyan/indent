@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Perpetua",
+      "say": "Who has gone quiet since summer?",
+      "note": "For the December email. MF-15."
+    },
+    {
+      "title": "orders",
+      "text": "Every order since 1 September.",
+      "note": "From the website, phone and stall."
+    },
+    {
+      "title": "Your query",
+      "file": "2-win-back.sql",
+      "mine": true,
+      "gap": "Loses everyone to one gap",
+      "tasks": [
+        "Show what empties it",
+        "Fix the win-back list",
+        "Fix the print run"
+      ]
+    },
+    {
+      "title": "Win-back email",
+      "text": "A little money off the next order.",
+      "note": "Sent in December."
+    }
+  ],
+  "ticket": {
+    "label": "Win-back list",
+    "wrong": "is empty",
+    "why": "One gap",
+    "right": "has names"
+  },
+  "captions": [
+    "At Mallowfield Seeds, Perpetua wants the customers who have not ordered since the summer.",
+    "One value among the autumn orders quietly empties her whole list.",
+    "You show what empties it, then fix the list and the catalogue print run.",
+    "Now the list holds everyone who has gone quiet, and the email goes out.",
+    "Same customers, same orders. An unknown means what Perpetua says it means."
+  ]
+}

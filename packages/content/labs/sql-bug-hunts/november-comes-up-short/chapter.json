@@ -1,0 +1,80 @@
+{
+  "id": "november-comes-up-short",
+  "title": "November comes up short",
+  "files": [
+    "queries/1-left-out-payments.sql",
+    "queries/2-takings.sql",
+    "queries/3-seeds-of-the-year.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of Mallowfield's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/2-takings.sql"
+  },
+  "tasks": [
+    {
+      "id": "prove-it",
+      "title": "List the November payments the report leaves out",
+      "file": "queries/1-left-out-payments.sql",
+      "description": "Show Clemency which payments are missing from November's takings.\n\nIn `queries/1-left-out-payments.sql`, return three columns, in this order:\n\n- `id`\n- `paid_at`\n- `amount_pence`\n\nOne row for every payment made in November 2026 that the report in `2-takings.sql` leaves out. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, where payments are made at other moments of the last day.",
+      "nextSteps": [
+        "Run `2-takings.sql`, then list every payment from the end of November with its `paid_at`.",
+        "Compare each `paid_at` with the report's upper limit, letter by letter.",
+        "Keep the November payments the report's `BETWEEN` does not keep."
+      ],
+      "hints": [
+        "Read the lesson's part \"How it happens\". Look at how each kind of payment writes its `paid_at`.",
+        "A `paid_at` with a time comes after `'2026-11-30'`, and one written with the date alone is equal to it, so the report keeps that one. Keep what is after `'2026-11-30'` and before December.",
+        "The condition has the shape `WHERE paid_at > '2026-11-30' AND paid_at < '2026-12-01'`."
+      ],
+      "docs": [
+        { "title": "BETWEEN", "url": "https://www.sqlite.org/lang_expr.html#between" },
+        { "title": "Dates and times stored as text", "url": "https://www.sqlite.org/datatype3.html#date_and_time_datatype" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix-takings",
+      "title": "Count every payment of November, however it is written",
+      "file": "queries/2-takings.sql",
+      "description": "Fix November's takings in `queries/2-takings.sql` at the cause.\n\nIt returns one row per method of payment, for every payment made in November 2026, however its `paid_at` is written, with three columns, in this order:\n\n- `method`\n- `payments`: how many payments\n- `takings_pence`: what they came to\n\nAny order of rows. Check compares the rows on the data you can see and on hidden data, which has payments on the first and last moments of the month written each way `paid_at` can be written.",
+      "nextSteps": [
+        "Read the comments in `schema.sql`: the three ways a `paid_at` is written.",
+        "For each way, write down the first and the last value that belongs to November.",
+        "Choose limits that keep all of those and nothing from October or December."
+      ],
+      "hints": [
+        "Read the lesson's part \"How to mend it\". Guessing the last moment of the day is the trap.",
+        "Every November value, written any way, is at least `'2026-11-01'` and less than `'2026-12-01'`. A limit on the first day of the next month needs no guess about times.",
+        "The condition has the shape `WHERE paid_at >= '2026-11-01' AND paid_at < '2026-12-01'`."
+      ],
+      "docs": [
+        { "title": "BETWEEN", "url": "https://www.sqlite.org/lang_expr.html#between" },
+        { "title": "Comparison of text", "url": "https://www.sqlite.org/datatype3.html#comparisons" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "seeds-of-the-year",
+      "title": "Make the seeds of the year the same on every run",
+      "file": "queries/3-seeds-of-the-year.sql",
+      "description": "The \"seeds of the year\" box on the website comes from `queries/3-seeds-of-the-year.sql`. Nobody has complained yet.\n\nFix it so it returns the three seeds with the most packets in orders placed on or after `2026-01-01`, with two columns, in this order:\n\n- `product`: the seed's name\n- `packets`: how many packets\n\nMost packets first. When two seeds have the same number of packets, the one whose name comes first from A to Z comes first. Check compares the rows and their order on the data you can see and on hidden data, and runs your query again on the same rows stored in another order: the answer must not change.",
+      "nextSteps": [
+        "Run the file without `LIMIT` and look at the seeds around third place.",
+        "Say what decides between two seeds with the same number of packets today.",
+        "Make the sort say it, the way the task does."
+      ],
+      "hints": [
+        "Read the lesson's part \"Ties at the cut\".",
+        "Two seeds tie on packets at the cut, and nothing in `ORDER BY` decides between them. Add the second thing the task sorts by, in the direction it gives.",
+        "The sort has the shape `ORDER BY packets DESC, p.name LIMIT 3`."
+      ],
+      "docs": [
+        { "title": "ORDER BY", "url": "https://www.sqlite.org/lang_select.html#orderby" },
+        { "title": "LIMIT", "url": "https://www.sqlite.org/lang_select.html#limitoffset" }
+      ],
+      "points": 10
+    }
+  ]
+}
