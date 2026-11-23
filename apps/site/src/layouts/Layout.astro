@@ -2,6 +2,7 @@
 import { getImage } from 'astro:assets'
 import logo from '@indent/design/logo.png'
 import tokens from '@indent/design/tokens.css?raw'
+import share from '../assets/share.png'
 import '../styles/global.css'
 
 interface Props {
@@ -11,12 +12,11 @@ interface Props {
 
 const { title, description } = Astro.props
 const icon = await getImage({ src: logo, width: 64, height: 64, format: 'png' })
-// Chat apps and iOS fill transparent corners with white, so these sit on the dark --background.
+// iOS fills transparent corners with white, so the touch icon sits on the dark --background.
 const ground = tokens.match(/--ink-900:\s*(#[0-9a-f]+)/i)?.[1]
 if (!ground) throw new Error('tokens.css has no --ink-900')
-const opaque = { src: logo, format: 'png', background: ground } as const
-const touchIcon = await getImage({ ...opaque, width: 180, height: 180 })
-const shareImage = await getImage({ ...opaque, width: 512, height: 512 })
+const touchIcon = await getImage({ src: logo, format: 'png', background: ground, width: 180, height: 180 })
+const shareImage = await getImage({ src: share, width: 1200, height: 630, format: 'jpg', quality: 85 })
 ---
 
 <!doctype html>
@@ -31,6 +31,10 @@ const shareImage = await getImage({ ...opaque, width: 512, height: 512 })
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:image" content={new URL(shareImage.src, Astro.site).href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Indent: learn to code by fixing real problems. tryindent.in" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/png" href={icon.src} />
     <link rel="apple-touch-icon" href={touchIcon.src} />
   </head>
