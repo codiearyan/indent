@@ -1,0 +1,112 @@
+{
+  "id": "traceback-through-calls",
+  "title": "Follow a traceback through calls",
+  "files": [
+    "hill_report.py",
+    "positions.json"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run the hill report here and read the traceback Python prints, from the bottom up.",
+    "suggestedCommand": "python3 hill_report.py"
+  },
+  "tasks": [
+    {
+      "id": "hours",
+      "title": "Mend the hours on one hill",
+      "file": "hill_report.py",
+      "description": "Under `# Task 1` in `hill_report.py`, `hill_hours` should give back the hours spent on one hill, added up, as a whole number. It calls `total_hours`, which calls `add_hours`, and the last line of the task stops with a `TypeError`. Run the file, read the traceback from the bottom up, and mend the one function where the mistake is. Leave the other two as they came with the file.\n\nCheck calls `hill_hours` with logs and hills of its own, a hill with no callout among them, and looks at what it gives back. It also looks at which functions you changed: only the one with the mistake.",
+      "nextSteps": [
+        "Run `python3 hill_report.py` and read the last line of the traceback: the kind of error and its message.",
+        "Read the File line just above it: that is where Python stopped, and what it was doing there.",
+        "Go up one File line at a time and ask where each value came from.",
+        "Mend the function that made the wrong value, and run the file again."
+      ],
+      "hints": [
+        "The last File line is `add_hours`, and its message says `+` met a whole number and text. `add_hours` adds what it is given; ask where the text came from.",
+        "`total_hours` hands on each value of the list it is given. The list is built in `hill_hours`, from parts of the log entries, and every part of a split text is text.",
+        "In `hill_hours`, the hours go into the list as text. Turn them into a whole number with `int(hours)` as they go in: `int` does not mind the spaces around the digits."
+      ],
+      "docs": [
+        {
+          "title": "Errors and exceptions",
+          "url": "https://docs.python.org/3/tutorial/errors.html"
+        },
+        {
+          "title": "Built-in exceptions",
+          "url": "https://docs.python.org/3/library/exceptions.html"
+        },
+        {
+          "title": "int()",
+          "url": "https://docs.python.org/3/library/functions.html#int"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading a traceback, call by call",
+          "url": "https://www.youtube.com/watch?v=wc6W-RaMJ7k"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pack",
+      "title": "Mend the weight of a pack",
+      "file": "hill_report.py",
+      "description": "Under `# Task 2`, `pack_weight` takes the weights of the kit, a dictionary, and a packing list: kinds of kit with commas between them and spaces around some of the commas, such as `\"rope, stretcher, first aid kit\"`. It should give back what the kit on the list weighs, added up. It calls `weights_of`, which calls `weight_of`, and the last line of the task stops with a `KeyError`. Mend the one function where the mistake is, and leave the other two as they came.\n\nCheck calls `pack_weight` with weights and packing lists of its own, spaces in other places among them, and looks at what it gives back and at which functions you changed.",
+      "nextSteps": [
+        "Run the file and read the message of the `KeyError`: it is the key that was not found.",
+        "Look at that key letter by letter, the quotes around it included.",
+        "Follow the File lines up to where that key was made.",
+        "Mend that function so every kind arrives without spaces at its ends."
+      ],
+      "hints": [
+        "The message of a `KeyError` is the key itself, in quotes. Look inside the quotes: is that exactly a kind in the weights?",
+        "`weight_of` and `weights_of` only hand the kinds on. The kinds are cut out of the packing list in `pack_weight`, and splitting at a comma keeps the spaces next to it.",
+        "In `pack_weight`, go through the parts of `packing_list.split(\",\")` and keep each one stripped, in a new list. Then hand that list to `weights_of`."
+      ],
+      "docs": [
+        {
+          "title": "KeyError",
+          "url": "https://docs.python.org/3/library/exceptions.html#KeyError"
+        },
+        {
+          "title": "str.split()",
+          "url": "https://docs.python.org/3/library/stdtypes.html#str.split"
+        },
+        {
+          "title": "str.strip()",
+          "url": "https://docs.python.org/3/library/stdtypes.html#str.strip"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "positions",
+      "title": "Mend where the teams were",
+      "file": "hill_report.py",
+      "description": "Under `# Task 3`, `team_positions` takes the path of a JSON file, as text, and should give back what the file holds, as a dictionary. It calls `parse_positions`, which calls `json.loads`, and the last line of the task stops with an error from inside the `json` module. The file `positions.json` is fine. Find the last line of the traceback that is in your file, and mend the one function where the mistake is. Leave `parse_positions` as it came.\n\nCheck makes JSON files of its own in a copy of your workspace, calls `team_positions` with each one's path, and looks at what it gives back and at which function you changed.",
+      "nextSteps": [
+        "Run the file. The File lines at the bottom are in the json module: skip them, up to the last line in `hill_report.py`.",
+        "Read what that line gives to `json.loads`.",
+        "Go up one more File line and look at what is handed to `parse_positions` there.",
+        "Mend that line and run the file again."
+      ],
+      "hints": [
+        "A File line whose path is not `hill_report.py` is Python's own code. It stopped there because of what your code gave it, so look for the last File line that is in your file.",
+        "`json.loads` turns a text of JSON into Python values. Ask what text it was given: the line and column in the message count in that text.",
+        "`team_positions` reads the file into `text`, then hands `path` to `parse_positions`. Hand it `text`."
+      ],
+      "docs": [
+        {
+          "title": "json.loads()",
+          "url": "https://docs.python.org/3/library/json.html#json.loads"
+        },
+        {
+          "title": "Errors and exceptions",
+          "url": "https://docs.python.org/3/tutorial/errors.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

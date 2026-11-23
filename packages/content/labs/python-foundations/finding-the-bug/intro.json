@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Why does it say Cairn Dubh?", "note": "We were there twice." },
+    { "title": "Monthly report", "text": "Names a busiest hill, and no error at all." },
+    {
+      "title": "Your hunt",
+      "file": "busiest_hill.py",
+      "mine": true,
+      "gap": "A wrong answer, no error",
+      "tasks": ["Smallest failing log", "Mend busiest_hill", "Say what must be true"]
+    },
+    { "title": "Rhona", "say": "Right. That's what we counted.", "note": "And it cannot go quiet again." }
+  ],
+  "ticket": { "label": "Busiest hill", "wrong": "Cairn Dubh", "why": "No error", "right": "Scarth Fell" },
+  "captions": [
+    "At the base, Rhona asks why the monthly report names Cairn Dubh as the busiest hill.",
+    "Today the report names the wrong hill, and nothing stops to say so.",
+    "You cut the log down, print what busiest_hill sees, mend it and add an assert.",
+    "Now the report names Scarth Fell, the hill the team counted four callouts on.",
+    "Rhona sends a report she can trust, and an empty log now stops with words that say why."
+  ]
+}

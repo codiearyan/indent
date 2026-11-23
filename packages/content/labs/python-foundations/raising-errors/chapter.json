@@ -1,0 +1,107 @@
+{
+  "id": "raising-errors",
+  "title": "Raise an error",
+  "files": [
+    "kit_orders.py"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to take kit out of the store and weigh a pack.",
+    "suggestedCommand": "python3 kit_orders.py"
+  },
+  "tasks": [
+    {
+      "id": "order",
+      "title": "Refuse a bad order",
+      "file": "kit_orders.py",
+      "description": "Under `# Task 1` in `kit_orders.py`, write a function called `take_out` that takes the store, a dictionary of each kind of kit and how many there are, a kind and a count. It takes that many of the kind out, by lowering its count in the store itself, and gives back how many are left. Before it changes anything, it refuses an order it cannot fill: a count less than 1 raises `ValueError` with a message that names the count, and a count more than the store holds raises `ValueError` with a message that names the kind and how many the store holds. Taking out exactly what the store holds is fine. A kind that is not in the store stops with the `KeyError` from reading its count, as it is. Try it with `store`, `\"splint\"` and `2`, and with `store`, `\"splint\"` and `5`.\n\nCheck calls `take_out` with stores, kinds and counts of its own. For an order it refuses, it looks at the kind of error, at whether your own raise line raised it, at whether its message names what the task says, and at whether the store is as it was.",
+      "nextSteps": [
+        "Read the parts of the lesson on raise and on refusing early.",
+        "Ask about the count first, then about what the store holds, each with an if and a raise under it.",
+        "Put the values into each message with an f-string.",
+        "Only after both checks, lower the count in the store and give back what is left."
+      ],
+      "hints": [
+        "Refuse before you change anything: once the count in the store is lowered, raising does not put it back.",
+        "`raise ValueError(\"...\")` stops the function and hands the error to the caller, and the text in its round brackets is the message. An f-string puts the count, the kind and what the store holds into it.",
+        "The shape is `if count < 1:` with `raise ValueError(f\"cannot take out {count}\")` under it, then `if count > store[kind]:` with a raise that names `kind` and `store[kind]`, then the change and the return."
+      ],
+      "docs": [
+        {
+          "title": "Raising exceptions",
+          "url": "https://docs.python.org/3/tutorial/errors.html#raising-exceptions"
+        },
+        {
+          "title": "The raise statement",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#the-raise-statement"
+        },
+        {
+          "title": "ValueError",
+          "url": "https://docs.python.org/3/library/exceptions.html#ValueError"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Raising an error of your own",
+          "url": "https://www.youtube.com/watch?v=Qd99l6VCZSU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "unknown",
+      "title": "A kind that is not on the list",
+      "file": "kit_orders.py",
+      "description": "Under `# Task 2`, Dougie's `weight_of` takes the weights, a dictionary, and a kind, and gives back what one of that kind weighs. For a kind that is not on the list it gives back `None`, and the code that adds up a pack stops much later with a `TypeError`, far from the cause. Change `weight_of` so that a kind that is not on the list raises `ValueError` with a message that names the kind. A kind on the list still gives back its weight.\n\nCheck calls `weight_of` with weights and kinds of its own, misspelt ones among them, and looks at what it gives back, or at the kind of error, whether your own raise line raised it and whether its message names the kind.",
+      "nextSteps": [
+        "Read the part of the lesson on None or raise.",
+        "Look at the line that gives back None, and when it runs.",
+        "Raise there instead, with the kind in the message.",
+        "Run the file and read the traceback your raise makes."
+      ],
+      "hints": [
+        "None is a fine answer when nothing is a normal answer. A kind that is not on the list is a mistake in the order, and None only moves the error further away.",
+        "Reading `weights[kind]` for a missing kind stops with `KeyError`, but the task asks for a `ValueError` raised by your own line, with a message a person can act on.",
+        "The shape is `if kind not in weights:` with `raise ValueError(f\"{kind} is not on the weights list\")` under it, then `return weights[kind]`."
+      ],
+      "docs": [
+        {
+          "title": "Raising exceptions",
+          "url": "https://docs.python.org/3/tutorial/errors.html#raising-exceptions"
+        },
+        {
+          "title": "Built-in exceptions",
+          "url": "https://docs.python.org/3/library/exceptions.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "again",
+      "title": "Note it, then pass it on",
+      "file": "kit_orders.py",
+      "description": "Under `# Task 3`, write a function called `weigh_pack` that takes the weights, a list of kinds and a list of problems. It gives back the weight of the kinds added up, each kind as often as it is on the list, using `weight_of`. When `weight_of` raises `ValueError`, `weigh_pack` adds the message of that error, as text, to the end of the list of problems, then raises the same error again, so the code that called it still stops. Any other error reaches the caller without being noted.\n\nCheck gives your file its own `weight_of` first, so a mistake in Task 2 does not count here. It calls `weigh_pack` with lists of its own, and looks at what it gives back, or at the error that reaches it and what the list of problems holds afterwards. One case has a weight that is text, whose `TypeError` must reach Check and not be noted.",
+      "nextSteps": [
+        "Read the part of the lesson on raising again.",
+        "Add up the weights in a loop, with the call to weight_of inside a try.",
+        "In an except that names ValueError, add the error's message to the problems.",
+        "Then raise the same error again, with a raise on its own."
+      ],
+      "hints": [
+        "Catching the error stops it. To note it and still let the caller stop, the except block has to send it on.",
+        "A `raise` on its own, inside an `except` block, raises again the error being handled, with its kind and message as they were. `str(error)` is its message as text.",
+        "The shape is `try:` with `total = total + weight_of(weights, kind)`, then `except ValueError as error:` with `problems.append(str(error))` and `raise` under it."
+      ],
+      "docs": [
+        {
+          "title": "Raising exceptions: raise on its own",
+          "url": "https://docs.python.org/3/tutorial/errors.html#raising-exceptions"
+        },
+        {
+          "title": "The raise statement",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#the-raise-statement"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

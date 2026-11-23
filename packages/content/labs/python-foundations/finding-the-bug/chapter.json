@@ -1,0 +1,103 @@
+{
+  "id": "finding-the-bug",
+  "title": "Find the bug",
+  "files": [
+    "busiest_hill.py"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here and print what busiest_hill sees as it goes.",
+    "suggestedCommand": "python3 busiest_hill.py"
+  },
+  "tasks": [
+    {
+      "id": "smallest",
+      "title": "The smallest log that goes wrong",
+      "file": "busiest_hill.py",
+      "description": "Under `# Task 1` in `busiest_hill.py`, write a function called `smallest_failing` that takes nothing and gives back a list of hills, a log, for which `busiest_hill` as it came with the file gives back the wrong hill: not the hill with the most callouts, or on a tie not the one that came first in the log. The log must have as few callouts as a log can have and still go wrong. Find it by cutting `month` down: take out one callout at a time, and keep each cut while the answer is still wrong.\n\nCheck calls `smallest_failing` and asks its own copy of `busiest_hill`, as it came with the file, and a mended copy about the log it gives back. The answers must differ, and no shorter log can make them differ.",
+      "nextSteps": [
+        "Read the part of the lesson on cutting the input down.",
+        "Copy month into a list of your own, and print what busiest_hill gives back for it.",
+        "Take out one callout, print again, and count by hand which hill is right. Keep the cut only while the answer is still wrong.",
+        "When every callout you could take out makes the answer right, give that list back from smallest_failing."
+      ],
+      "hints": [
+        "A wrong answer is one that differs from what you count by hand. Count each hill's callouts in your list, and on a tie take the hill that comes first.",
+        "Try taking out callouts from the start, the middle and the end. The log goes wrong only while some hills keep a certain number of callouts each: notice which hills matter.",
+        "A log stays wrong with three different hills: one that comes first with one callout, then two others with more callouts than it. The shape is `return [...]` with five hills in it."
+      ],
+      "docs": [
+        {
+          "title": "More on lists",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#more-on-lists"
+        },
+        {
+          "title": "The del statement",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#the-del-statement"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "mend",
+      "title": "Mend busiest_hill",
+      "file": "busiest_hill.py",
+      "description": "Under `# Task 2`, `busiest_hill` takes a list of hills, a log with at least one callout, and should give back the hill with the most callouts, and on a tie the one that came first in the log. It gives back the wrong hill for `month`, without an error. Find the mistake and mend it. Print the names and values it works with as it goes, to see where they stop being right.\n\nCheck calls `busiest_hill` with logs of its own, ties among them, and looks at the hill it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on printing names and values.",
+        "Run busiest_hill on your smallest log from Task 1, not on the whole month.",
+        "In the second loop, print hill, counts[hill], most and best on each round.",
+        "Find the name that does not change when it should, and mend that line."
+      ],
+      "hints": [
+        "The counting in the first loop is right: print `counts` after it to see. The mistake is in how the best hill is chosen.",
+        "`most` is meant to be the number of callouts of the best hill so far. Print it on each round of the second loop: does it change when `best` does?",
+        "When a hill becomes the new `best`, `most` has to become its count too: add `most = counts[hill]` under `best = hill`."
+      ],
+      "docs": [
+        {
+          "title": "print()",
+          "url": "https://docs.python.org/3/library/functions.html#print"
+        },
+        {
+          "title": "f-strings: = for self-documenting expressions",
+          "url": "https://docs.python.org/3/reference/lexical_analysis.html#f-strings"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "state",
+      "title": "Say what must be true",
+      "file": "busiest_hill.py",
+      "description": "Under `# Task 3`, the comment asks for one line in `busiest_hill`, above it under `# Task 2`. `busiest_hill` is never meant to be asked about a log with no callouts. Add an `assert` as its first line, stating that the list it is given is not empty, so that an empty list stops it right there with `AssertionError`. A log with callouts still works as before.\n\nCheck calls `busiest_hill` with an empty list, where `AssertionError` must reach Check, and with logs that have callouts.",
+      "nextSteps": [
+        "Read the part of the lesson on assert.",
+        "Call busiest_hill([]) as it is, and read the error it stops with today, and where.",
+        "Write an assert as the first line of busiest_hill, with something after it that is False for an empty list.",
+        "Call busiest_hill([]) again and read the new error."
+      ],
+      "hints": [
+        "Today an empty list stops with an `IndexError` on the line that reads `hills[0]`, which says nothing about why.",
+        "`assert` followed by a condition stops with `AssertionError` when the condition is False. Leave out round brackets around the condition and its message: they make a tuple, which is always true.",
+        "The shape is `assert len(hills) > 0, \"busiest_hill was given an empty log\"` as the first line inside `busiest_hill`."
+      ],
+      "docs": [
+        {
+          "title": "The assert statement",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#the-assert-statement"
+        },
+        {
+          "title": "AssertionError",
+          "url": "https://docs.python.org/3/library/exceptions.html#AssertionError"
+        }
+      ],
+      "videos": [
+        {
+          "title": "The assert statement",
+          "url": "https://www.youtube.com/watch?v=l5qI62ZnkAE"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

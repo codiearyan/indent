@@ -1,0 +1,132 @@
+{
+  "id": "catching-errors",
+  "title": "Catch an error",
+  "files": [
+    "log_totals.py",
+    "radio_log.txt"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to add up the log, scrawled entries and all.",
+    "suggestedCommand": "python3 log_totals.py"
+  },
+  "tasks": [
+    {
+      "id": "number",
+      "title": "A number, or a fallback",
+      "file": "log_totals.py",
+      "description": "Under `# Task 1` in `log_totals.py`, write a function called `whole_number` that takes a text and a fallback. It gives back the whole number in the text, such as `3` for `\"3\"`, or the fallback when the text is not a whole number, such as `\"two\"` or `\"2.5\"`. Catch only the error that `int()` stops with for such a text. Any other error must reach the caller: given `None` instead of a text, `whole_number` stops with the error `int()` stops with. Print what it gives back for `\"3\"` and for `\"two\"`, with `0` as the fallback.\n\nCheck calls `whole_number` with texts and fallbacks of its own, and once with `None`, where the error must reach Check.",
+      "nextSteps": [
+        "Read the part of the lesson on try and except.",
+        "Try `int(\"two\")` in a file of your own, and read the kind of error on the last line.",
+        "Put the line that turns the text into a number in a try, and name that error after except.",
+        "Give back the fallback from the except block."
+      ],
+      "hints": [
+        "Run `int(\"two\")` and `int(None)`: they stop with two different kinds of error, and only one of them is about text that is not a number.",
+        "`except ValueError:` catches only a `ValueError`. An `except:` with no name, or `except Exception:`, catches the `TypeError` for `None` too, and the task says that one must reach the caller.",
+        "The shape is `try:` with `return int(text)` moved in under it, then `except ValueError:` with `return fallback` moved in under it."
+      ],
+      "docs": [
+        {
+          "title": "Handling exceptions",
+          "url": "https://docs.python.org/3/tutorial/errors.html#handling-exceptions"
+        },
+        {
+          "title": "ValueError",
+          "url": "https://docs.python.org/3/library/exceptions.html#ValueError"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Catching errors with try and except",
+          "url": "https://www.youtube.com/watch?v=nlCKrKGHSSk"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "callout",
+      "title": "One callout from the log",
+      "file": "log_totals.py",
+      "description": "Under `# Task 2`, write a function called `callout_of` that takes one entry of the log, such as `\"Scarth Fell; 3\"`, and gives back a tuple of its hill, without the spaces at its ends, and its hours as a whole number: `(\"Scarth Fell\", 3)`. For hours that are not a whole number, such as `\"Garve Edge; two\"`, the hours are `None`: `(\"Garve Edge\", None)`. An entry without exactly one semicolon is not a callout: it must stop with the `ValueError` Python gives when it takes the entry apart. Print what it gives back for `\"Scarth Fell; 3\"` and for `\"Garve Edge; two\"`.\n\nCheck calls `callout_of` with entries of its own, and with one that has no semicolon and one that has two, where the error must reach Check.",
+      "nextSteps": [
+        "Read the part of the lesson on catching only around the line that can fail.",
+        "Take the entry apart at the semicolon into two names, outside any try.",
+        "Turn the hours into a number inside a try, and use None when that fails.",
+        "Give back the tuple after the try."
+      ],
+      "hints": [
+        "Two different lines can stop with `ValueError` here: the one that takes the entry apart, and the one that turns the hours into a number. Only one of them should be caught.",
+        "Put only the `int()` line inside the `try`. A `try` around the line that takes the entry apart catches its `ValueError` too, and the task says that one must reach the caller.",
+        "The shape is `hill, hours = entry.split(\";\")`, then `try:` with `number = int(hours)`, `except ValueError:` with `number = None`, and `return (hill.strip(), number)` after them."
+      ],
+      "docs": [
+        {
+          "title": "The try statement",
+          "url": "https://docs.python.org/3/reference/compound_stmts.html#the-try-statement"
+        },
+        {
+          "title": "Handling exceptions",
+          "url": "https://docs.python.org/3/tutorial/errors.html#handling-exceptions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hours",
+      "title": "Hours, and what could not be read",
+      "file": "log_totals.py",
+      "description": "Under `# Task 3`, write a function called `log_hours` that takes a list of entries and gives back a tuple of two things: the hours that can be read, added up, and a list with a text for each entry whose hours cannot be read, in order. Each text is the entry as it is, a colon, a space and the message of the error `int()` stopped with, such as `Garve Edge; two: invalid literal for int() with base 10: ' two'`. An entry without exactly one semicolon must stop with its `ValueError`, as in Task 2. Print what it gives back for `entries`.\n\nCheck calls `log_hours` with lists of its own, one where every entry can be read and one where none can, and one with an entry without a semicolon, where the error must reach Check.",
+      "nextSteps": [
+        "Read the parts of the lesson on else and on what the caught error holds.",
+        "Start a total and an empty list before the loop.",
+        "In the loop, take the entry apart, then try to turn the hours into a number.",
+        "In the except, keep a text made from the entry and the error; in the else, add the hours."
+      ],
+      "hints": [
+        "`except ValueError as error:` gives the caught error a name. An f-string with `{error}` in it shows the error's message, the words after `ValueError:` in a traceback.",
+        "The `else` of a `try` runs only when nothing in the `try` went wrong. Adding the hours there means an entry that could not be read never adds anything.",
+        "The shape is `except ValueError as error:` with `problems.append(f\"{entry}: {error}\")` under it, and `else:` with `total = total + number` under it."
+      ],
+      "docs": [
+        {
+          "title": "Handling exceptions: else and as",
+          "url": "https://docs.python.org/3/tutorial/errors.html#handling-exceptions"
+        },
+        {
+          "title": "The try statement",
+          "url": "https://docs.python.org/3/reference/compound_stmts.html#the-try-statement"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "night",
+      "title": "A night's log, if there is one",
+      "file": "log_totals.py",
+      "description": "Under `# Task 4`, write a function called `night_text` that takes the path of a log file, as text, and gives back everything in the file as one text, or empty text when there is no file at that path. Open the file on a `with` line, with `encoding=\"utf-8\"`. Catch only the error for a file that is not there: any other error must reach the caller, such as the one for a path that is a folder. Print what it gives back for `\"radio_log.txt\"` and for `\"tonight.txt\"`.\n\nCheck makes files and folders of its own in a copy of your workspace, calls `night_text` for a file that is there, a path with no file, and a folder, where the error must reach Check.",
+      "nextSteps": [
+        "Run your function for `\"tonight.txt\"` without a try, and read the kind of error.",
+        "Put the with block that opens and reads the file inside a try.",
+        "Name that error after except, and give back empty text there.",
+        "Try a folder too, such as `\".\"`, and see that its error still reaches you."
+      ],
+      "hints": [
+        "The error for a missing file is the one the files issue showed: its name is on the last line of the traceback.",
+        "`except FileNotFoundError:` catches only a missing file. `except OSError:` catches every error of files and folders, the one for a folder among them, and the task says that one must reach the caller.",
+        "The shape is `try:` with the `with open(path, encoding=\"utf-8\") as log:` block and `return log.read()` moved in under it, then `except FileNotFoundError:` with `return \"\"`."
+      ],
+      "docs": [
+        {
+          "title": "FileNotFoundError",
+          "url": "https://docs.python.org/3/library/exceptions.html#FileNotFoundError"
+        },
+        {
+          "title": "Exception hierarchy",
+          "url": "https://docs.python.org/3/library/exceptions.html#exception-hierarchy"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

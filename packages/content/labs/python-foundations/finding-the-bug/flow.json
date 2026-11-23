@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhona", "label": "Rhona", "kind": "story" },
+      { "id": "month", "label": "Month's callouts", "kind": "data" },
+      { "id": "busiest", "label": "busiest_hill()", "kind": "function", "mine": true },
+      { "id": "prints", "label": "Names and values", "kind": "data" },
+      { "id": "report", "label": "Monthly report", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "month", "to": "busiest", "label": "hills" },
+      { "from": "busiest", "to": "prints", "label": "what it sees" },
+      { "from": "busiest", "to": "report", "label": "busiest hill" },
+      { "from": "report", "to": "rhona", "label": "checked by hand" }
+    ],
+    "note": "A wrong answer with no error is hunted down with a smaller log and printed values, mended, and guarded by an assert."
+  },
+  "tasks": {
+    "smallest": {
+      "steps": [
+        { "active": ["month", "month->busiest", "busiest", "busiest->report", "report"], "note": "The whole month goes in, and the report names the wrong hill." },
+        { "active": ["month"], "note": "One callout is taken out at a time, and each cut is kept while the answer is still wrong." },
+        { "active": ["report", "report->rhona", "rhona"], "note": "Each answer is compared with a count made by hand, until no callout can go and the answer stay wrong." }
+      ]
+    },
+    "mend": {
+      "steps": [
+        { "active": ["month", "month->busiest", "busiest"], "note": "The smallest log that goes wrong goes in." },
+        { "active": ["busiest", "busiest->prints", "prints"], "value": { "kind": "array", "label": "printed on each round", "values": ["hill", "its count", "most", "best"] }, "note": "On each round, the names it works with are printed with their values." },
+        { "active": ["prints"], "note": "The first value that is not what it should be points at the line to mend." },
+        { "active": ["busiest", "busiest->report", "report"], "note": "Now the report names the hill with the most callouts, and on a tie the first." }
+      ]
+    },
+    "state": {
+      "steps": [
+        { "active": ["busiest"], "note": "Its first line states what must be true of the log it is given." },
+        { "active": ["month", "month->busiest", "busiest"], "note": "A log with callouts passes the assert and is counted as before." },
+        { "active": ["busiest"], "note": "An empty log stops right at that line, with words that say why." }
+      ]
+    }
+  }
+}
