@@ -1,0 +1,109 @@
+{
+  "id": "money",
+  "title": "Money: pounds and pence that add up",
+  "files": [
+    "TillRoll.java"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run the till here, and try your classes from main.",
+    "suggestedCommand": "java TillRoll.java"
+  },
+  "tasks": [
+    {
+      "id": "till",
+      "title": "Add up the till",
+      "file": "TillRoll.java",
+      "description": "Under `// Task 1`, write a class `Till` with two methods. `static BigDecimal total(List<String> prices)` gives back the prices added up, each price written as text such as `\"3.35\"`, and 0 for an empty list. `static boolean sameAmount(BigDecimal a, BigDecimal b)` says whether `a` and `b` are the same amount of money, so `2.0` and `2.00` are the same.\n\nCheck hands `total` lists of prices of its own, some of which a `double` adds up wrong, and compares what comes back with the right total by its value, so `8.00` and `8.0` both count. It hands `sameAmount` pairs with the same amount written with different numbers of decimal places, and pairs that differ.",
+      "nextSteps": [
+        "Read the parts of the lesson about why a double drifts and how a BigDecimal is made.",
+        "Write total: start from zero, and add a BigDecimal made from each price's text.",
+        "Write sameAmount, and read the part of the lesson about comparing amounts first.",
+        "Take the // off the first lines of main and run the file."
+      ],
+      "hints": [
+        "A double holds 0.10 only nearly, so do not let a price become a double on its way, not even for a moment. The text of a price is exact.",
+        "A BigDecimal made from text holds exactly what the text says. Adding one to another gives back a new BigDecimal and leaves both as they were, as a String's methods do. equals also compares how many decimal places each has.",
+        "`sum = sum.add(new BigDecimal(price));` inside a loop over `prices`, starting from `BigDecimal.ZERO`. For sameAmount: `return a.compareTo(b) == 0;`."
+      ],
+      "docs": [
+        {
+          "title": "BigDecimal",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html"
+        },
+        {
+          "title": "BigDecimal(String)",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html#%3Cinit%3E(java.lang.String)"
+        },
+        {
+          "title": "BigDecimal.compareTo",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html#compareTo(java.math.BigDecimal)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pricing",
+      "title": "Price a group and share a bill",
+      "file": "TillRoll.java",
+      "description": "Under `// Task 2`, write a class `Pricing` with two methods. `static BigDecimal groupFare(BigDecimal adult, int people)` gives back the adult fare times `people`, less 15 percent (times `0.85`), rounded once, at the end, to two decimal places, a half penny up. `static BigDecimal share(BigDecimal total, int people)` gives back what each person pays: `total` divided by `people`, to two decimal places, a half penny up.\n\nCheck calls both with amounts of its own, chosen so that a `double` on the way, rounding the wrong way at a half penny, and rounding before the end each give another answer. It compares what comes back with `equals`, so the two decimal places count: `3.3` is not `3.30`.",
+      "nextSteps": [
+        "Read the parts of the lesson about rounding and about dividing.",
+        "Write groupFare: multiply first, and round once, on the whole amount.",
+        "Write share: tell divide how many decimal places to keep and how to round.",
+        "Try both from main, and try 10.00 shared by 3 with a divide that has nothing more."
+      ],
+      "hints": [
+        "Rounding the fare of one person and then multiplying adds up the pennies rounded off. And 0.85 is a price-like number too: where it comes from matters as much as where the prices come from.",
+        "A BigDecimal can be set to a number of decimal places, and is told how to round when it has to. Of the ways to round, one sends a half penny up and everything under it down. A division that never ends needs the same two answers.",
+        "`return adult.multiply(BigDecimal.valueOf(people)).multiply(new BigDecimal(\"0.85\")).setScale(2, RoundingMode.HALF_UP);` and `return total.divide(BigDecimal.valueOf(people), 2, RoundingMode.HALF_UP);`."
+      ],
+      "docs": [
+        {
+          "title": "BigDecimal.setScale",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html#setScale(int,java.math.RoundingMode)"
+        },
+        {
+          "title": "RoundingMode",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/RoundingMode.html"
+        },
+        {
+          "title": "BigDecimal.divide",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html#divide(java.math.BigDecimal,int,java.math.RoundingMode)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "printer",
+      "title": "Print an amount, and read one back",
+      "file": "TillRoll.java",
+      "description": "Under `// Task 3`, write a class `Printer` with two methods. `static String ticketLine(BigDecimal amount)` gives back the amount as the ticket shows it: a pound sign, then the amount with exactly two decimal places, a half penny up, and a point between pounds and pence, as in `£1.70`. `static BigDecimal readAmount(String text)` gives back the amount a text such as `\" £3.35 \"` says, with the spaces at either end and the pound sign left off. When the rest is not an amount, it throws an `IllegalArgumentException` whose message names the text, with the first exception as its cause.\n\nCheck calls `ticketLine` with amounts of its own and reads the text letter by letter. It runs with the language of a computer in Germany, where numbers are written with a comma, so a ticket that follows the computer's language shows. It hands `readAmount` amounts and texts that are not amounts, compares an amount by its value, and reads an exception by its type, whether its message names the text, and its cause.",
+      "nextSteps": [
+        "Read the part of the lesson about writing an amount out, and the part about a bad amount.",
+        "Write ticketLine: two decimal places first, then the text.",
+        "Write readAmount: take off the spaces, then the pound sign, then read the rest.",
+        "Catch what reading a bad amount throws, and throw what the task asks for in its place."
+      ],
+      "hints": [
+        "An amount written out as it is keeps the decimal places it has, and an amount written by String.format follows the language of the computer it runs on.",
+        "Set the scale before you write the amount out. A BigDecimal's own text never depends on the computer. For readAmount, part 5 took the spaces off the ends of a text, and showed how to catch one exception and throw another with it as the cause.",
+        "`return \"£\" + amount.setScale(2, RoundingMode.HALF_UP).toPlainString();`. In readAmount, `trim()`, then `substring(1)` when it starts with `\"£\"`, then `new BigDecimal(rest)` in a try, and `throw new IllegalArgumentException(\"Not an amount: \" + text, e);` in its catch."
+      ],
+      "docs": [
+        {
+          "title": "BigDecimal.toPlainString",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html#toPlainString()"
+        },
+        {
+          "title": "Formatter and Locale",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Formatter.html"
+        },
+        {
+          "title": "NumberFormatException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/NumberFormatException.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -83,6 +83,12 @@
         "streams",
         "collectors-and-optional"
       ]
+    },
+    {
+      "title": "Real money, real dates, real files",
+      "chapters": [
+        "money"
+      ]
     }
   ]
 }

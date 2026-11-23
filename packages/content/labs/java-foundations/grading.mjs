@@ -2857,7 +2857,7 @@ class CheckList<E> extends java.util.ArrayList<E> {
 // leads out of that folder and counts the files left open. A task whose text names a path that
 // leads out of the folder (absolute, or climbing with ..) is not run.
 
-export const VALUE_JVM = ['-Duser.language=de', '-Duser.country=DE', '-Duser.timezone=Pacific/Kiritimati', '-Dline.separator=\r\n']
+export const VALUE_JVM = ['-Duser.language.format=de', '-Duser.country.format=DE', '-Duser.timezone=Pacific/Kiritimati', '-Dline.separator=\r\n']
 
 /** A result line with the line ends of its compile errors and trace made plain \n again. */
 function sameLineEnds(r) {
