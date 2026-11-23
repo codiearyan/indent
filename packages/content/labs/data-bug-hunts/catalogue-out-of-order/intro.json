@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Nadia", "say": "Our catalogue starts at Psalm 121.", "note": "A director gave up. WH-52." },
+    { "title": "Catalogue titles", "rows": [["Psalm 121"], ["Psalm 23"], ["élan of morning"]] },
+    {
+      "title": "Your code",
+      "file": "catalogue.js",
+      "mine": true,
+      "gap": "Psalm 121 comes before 23",
+      "tasks": ["Catch it in a test", "Sort like a reader", "Test another language"]
+    },
+    { "title": "Catalogue page", "text": "Every title, in the order people read.", "note": "Where directors look first." }
+  ],
+  "ticket": { "label": "Catalogue", "wrong": "out of order", "why": "Hard to find", "right": "reads in order" },
+  "captions": [
+    "At Wrenhaven Scores, a director cannot find Psalm 23 on the catalogue page.",
+    "Psalm 121 comes first, and titles with a small letter or an accent sit after Zephyr.",
+    "You catch it in a test, sort the way a person reads, and test another language.",
+    "Now the page reads in order on every computer, whatever its language.",
+    "Same titles, same page. A director finds Psalm 23 where she looks."
+  ]
+}

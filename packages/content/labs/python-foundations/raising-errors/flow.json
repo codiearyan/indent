@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dougie", "label": "Dougie", "kind": "story" },
+      { "id": "order", "label": "Order or packing list", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "store", "label": "Kit store", "kind": "data" },
+      { "id": "caller", "label": "Code that called", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "order", "to": "functions", "label": "kind and count" },
+      { "from": "functions", "to": "store", "label": "takes out" },
+      { "from": "functions", "to": "caller", "label": "a clear error" },
+      { "from": "functions", "to": "dougie", "label": "what is left" }
+    ],
+    "note": "An order the store cannot fill is refused there and then, with a message that says what is wrong."
+  },
+  "tasks": {
+    "order": {
+      "steps": [
+        { "active": ["order", "order->functions", "functions"], "note": "An order arrives: a kind and how many to take out." },
+        { "active": ["functions", "functions->caller", "caller"], "note": "A count below one, or more than the shelf holds, is refused before anything changes, and the message names what was wrong." },
+        { "active": ["functions", "functions->store", "store"], "note": "An order the store can fill lowers the count on the shelf." },
+        { "active": ["functions", "functions->dougie", "dougie"], "note": "Dougie gets back how many are left." }
+      ]
+    },
+    "unknown": {
+      "steps": [
+        { "active": ["order", "order->functions", "functions"], "note": "A packing list names a kind, perhaps misspelt." },
+        { "active": ["functions", "functions->dougie", "dougie"], "note": "A kind on the weights list gives back its weight." },
+        { "active": ["functions", "functions->caller", "caller"], "note": "A kind that is not on the list stops right there, and the message names it, instead of an empty answer that fails later." }
+      ]
+    },
+    "again": {
+      "steps": [
+        { "active": ["order", "order->functions", "functions"], "note": "A whole pack is weighed, kind by kind." },
+        { "active": ["functions", "functions->dougie", "dougie"], "value": { "kind": "array", "label": "problems", "values": ["what was noted before", "the new message"] }, "note": "A kind that is not on the list is noted for Dougie." },
+        { "active": ["functions", "functions->caller", "caller"], "note": "Then the same error travels on, so the code that called still stops." }
+      ]
+    }
+  }
+}

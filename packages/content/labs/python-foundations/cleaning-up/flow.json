@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" },
+      { "id": "radio", "label": "Radio at the desk", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "logfile", "label": "Night log file", "kind": "file" },
+      { "id": "caller", "label": "Code that called", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "functions", "to": "radio", "label": "tunes" },
+      { "from": "functions", "to": "logfile", "label": "writes" },
+      { "from": "functions", "to": "ailsa", "label": "what was heard" },
+      { "from": "functions", "to": "caller", "label": "the error" }
+    ],
+    "note": "Whatever goes wrong, the radio goes back to the team's channel and the log stays whole, and the error still reaches the caller."
+  },
+  "tasks": {
+    "channel": {
+      "steps": [
+        { "active": ["functions", "functions->radio", "radio"], "note": "The radio is tuned to each channel in turn, and each is listened to." },
+        { "active": ["functions", "functions->ailsa", "ailsa"], "note": "What was heard on each channel comes back, in order." },
+        { "active": ["radio"], "note": "Afterwards the radio is on the channel it started on, even when a dead channel stopped the scan." },
+        { "active": ["functions", "functions->caller", "caller"], "note": "The error from a dead channel still travels on to the code that called." }
+      ]
+    },
+    "close": {
+      "steps": [
+        { "active": ["functions", "functions->logfile", "logfile"], "note": "The log is opened and each entry's line is written into it." },
+        { "active": ["logfile"], "note": "When an entry stops with an error, the file is closed all the same." },
+        { "active": ["functions", "functions->caller", "caller"], "note": "The error carries on to the code that called." }
+      ]
+    },
+    "whole": {
+      "steps": [
+        { "active": ["functions"], "note": "Each entry is turned into its line of the log." },
+        { "active": ["functions", "functions->logfile", "logfile"], "note": "When every entry is right, the file holds their lines, in order, and nothing else." },
+        { "active": ["functions", "functions->caller", "caller", "logfile"], "note": "When an entry is wrong, the error reaches the caller and the file is as it was before." }
+      ]
+    }
+  }
+}

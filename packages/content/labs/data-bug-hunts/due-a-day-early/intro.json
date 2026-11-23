@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Marek", "say": "My reminders say a day early.", "note": "Sent from Vancouver. WH-38." },
+    { "title": "Open invoices", "rows": [["WH-2291", "Cedar Narrows"], ["WH-2297", "Ängsö"], ["WH-2304", "Sur Sangam"]], "mark": 0 },
+    {
+      "title": "Your code",
+      "file": "reminder.js",
+      "mine": true,
+      "gap": "The date moves with the laptop",
+      "tasks": ["Catch it in a test", "Keep the date a date", "Test the case nearby"]
+    },
+    { "title": "Cedar Narrows", "say": "Which day do we pay?", "note": "A choir in Vancouver." }
+  ],
+  "ticket": { "label": "Reminder", "wrong": "a day early", "why": "Off by a day", "right": "on the day" },
+  "captions": [
+    "At Wrenhaven Scores, Marek sends the reminders from Vancouver and they say a day early.",
+    "In Vancouver every reminder shows the day before the date on the invoice.",
+    "You catch it in a test, keep the date a calendar date, and test the case next door.",
+    "Now the reminder shows the invoice's own date, wherever the laptop is.",
+    "Same invoice, same choir. The date is the one on the invoice."
+  ]
+}

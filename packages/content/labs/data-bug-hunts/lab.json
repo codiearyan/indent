@@ -1,0 +1,29 @@
+{
+  "id": "data-bug-hunts",
+  "title": "Dates, money and text bug hunts",
+  "description": "Wrenhaven Scores is a two-person publisher of choral arrangements that licenses them to choirs in five countries and bills each one by invoice, and its customers keep finding what the code got wrong: a penny too much, a due date a day early, a name cut in half. You work through five tickets, each a bug that honest JavaScript falls into with a date, an amount of money or a piece of text: catch it with a test, fix it at the cause, and write the test for the case next door. You learn to keep money in whole pence, keep a calendar date a calendar date in any time zone, add months and days the way a calendar does, sort the way a person reads, and cut and compare text by what a person sees.",
+  "category": "Interview bug cases",
+  "language": "javascript",
+  "tags": [
+    "JavaScript",
+    "Debugging"
+  ],
+  "kind": "bug-hunt",
+  "parts": [
+    {
+      "title": "Money and dates that drift",
+      "chapters": [
+        "penny-over-invoices",
+        "due-a-day-early",
+        "renewal-skips-february"
+      ]
+    },
+    {
+      "title": "Text that a person reads",
+      "chapters": [
+        "catalogue-out-of-order",
+        "names-cut-in-half"
+      ]
+    }
+  ]
+}

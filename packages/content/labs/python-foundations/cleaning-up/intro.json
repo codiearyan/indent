@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Scan the channels for calls.", "note": "The team listens on channel 4." },
+    { "title": "Radio at the desk", "text": "A dead channel leaves it off channel 4." },
+    {
+      "title": "Your functions",
+      "file": "radio_desk.py",
+      "mine": true,
+      "gap": "Nothing put back on an error",
+      "tasks": ["Back to the channel", "Close the log", "All of it, or none"]
+    },
+    { "title": "Team channel", "say": "Base, this is GOLF SIX.", "note": "Heard, because the radio is back." }
+  ],
+  "ticket": { "label": "Channel 4", "wrong": "left silent", "why": "Not put back", "right": "back on" },
+  "captions": [
+    "At the radio desk, Ailsa asks the laptop to scan the channels for calls.",
+    "Today a dead channel stops the scan and the radio is left there, off the team's channel.",
+    "You put the radio back and close the log whatever happens, and keep the log whole.",
+    "Now the scan stops on the dead channel and the radio goes back to channel 4.",
+    "The team's calls are heard again, and a failed save never leaves the log half written."
+  ]
+}

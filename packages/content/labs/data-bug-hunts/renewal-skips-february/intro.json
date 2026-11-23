@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Marek", "say": "Ängsö never got a February invoice.", "note": "Monthly since 31 January. WH-44." },
+    { "title": "Monthly licences", "rows": [["Ängsö", "31 Jan"], ["Cedar Narrows", "15 Mar"], ["Sur Sangam", "31 Aug"]], "mark": 0 },
+    {
+      "title": "Your code",
+      "file": "renewals.js",
+      "mine": true,
+      "gap": "February is skipped",
+      "tasks": ["Catch it in a test", "Count like a calendar", "Test the edges nearby"]
+    },
+    { "title": "Invoice run", "text": "One invoice a month, on the renewal date.", "note": "And follow-ups a week later." }
+  ],
+  "ticket": { "label": "Renewal", "wrong": "skips February", "why": "Month missed", "right": "in February" },
+  "captions": [
+    "At Wrenhaven Scores, Marek finds that a licence from 31 January skipped February.",
+    "The next invoice after 31 January goes out on 3 March, and February has none.",
+    "You catch it in a test, add months and days like a calendar, and test the edges.",
+    "Now every licence renews once a month, and follow-ups keep their time.",
+    "Same licence, same choir. February gets its invoice."
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "stations": [
+    {
+      "title": "Sefton",
+      "say": "Where did my second line go?",
+      "note": "A note with two lines."
+    },
+    {
+      "title": "Tab records",
+      "text": "A line break in a value ends the record.",
+      "note": "A cut record reads as whole."
+    },
+    {
+      "title": "Your records",
+      "file": "db.js",
+      "mine": true,
+      "gap": "No sure end to a record",
+      "tasks": [
+        "Hold any text",
+        "Leave out a cut record",
+        "Carry on after a cut"
+      ]
+    },
+    {
+      "title": "Next open",
+      "rows": [
+        [
+          "note:card",
+          "both lines"
+        ],
+        [
+          "envelope",
+          "as before"
+        ]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "card note",
+    "wrong": "half of it",
+    "why": "Split",
+    "right": "whole"
+  },
+  "captions": [
+    "Sefton asks where the second line of his note on the card stock went.",
+    "Tab records end at any line break, and a record a stop cut short reads as whole.",
+    "You write records that hold any text, and leave out and cut off a broken end.",
+    "The note comes back with both lines, and a cut record changes nothing.",
+    "The log now holds any text and survives a stop in the middle of a write."
+  ]
+}

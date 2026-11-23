@@ -191,6 +191,16 @@ const repos: { labId: string; expected: string[] }[] = [
     ]
   },
   {
+    labId: 'data-bug-hunts',
+    expected: [
+      'penny-over-invoices/fix',
+      'due-a-day-early/fix',
+      'renewal-skips-february/fix',
+      'catalogue-out-of-order/fix',
+      'names-cut-in-half/fix'
+    ]
+  },
+  {
     labId: 'browser-js',
     expected: ['find-a-route/search-names', 'find-a-route/grade-band']
   },
@@ -311,6 +321,10 @@ const repos: { labId: string; expected: string[] }[] = [
   {
     labId: 'build-a-state-store',
     expected: ['one-place-for-state/create', 'selectors/shallow']
+  },
+  {
+    labId: 'build-a-key-value-database',
+    expected: ['a-log-on-disk/replay', 'records-that-hold-anything/anything']
   },
   {
     labId: 'testing-foundations',

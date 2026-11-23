@@ -1,0 +1,128 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "log", "label": "Billing log", "kind": "data" },
+      { "id": "invoice", "label": "invoice()", "kind": "function", "mine": true, "fn": "invoice" },
+      { "id": "printed", "label": "Printed invoice", "kind": "story" },
+      { "id": "choir", "label": "Choir director", "kind": "story" },
+      { "id": "test", "label": "invoice.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "log", "to": "invoice", "label": "lines, rate" },
+      { "from": "invoice", "to": "printed", "label": "amounts" },
+      { "from": "printed", "to": "choir", "label": "a penny over" },
+      { "from": "test", "to": "invoice", "label": "invoices" }
+    ],
+    "note": "Every invoice goes through invoice(), and a choir found one whose total is a penny more than its lines."
+  },
+  "tasks": {
+    "ticket": {
+      "steps": [
+        {
+          "active": ["test", "test->invoice", "invoice"],
+          "note": "The ticket block of invoice.test.js hands invoice() invoices from the billing log, the one from the ticket among them."
+        },
+        {
+          "active": ["invoice", "invoice->printed", "printed"],
+          "value": {
+            "kind": "map",
+            "label": "what a test can compare",
+            "entries": [
+              { "key": "the lines", "value": "net and VAT of each" },
+              { "key": "the invoice", "value": "net, VAT and total" }
+            ]
+          },
+          "note": "A test can add up what the lines show and expect the invoice's own amounts to equal that sum."
+        },
+        {
+          "active": ["test", "invoice", "printed", "printed->choir", "choir"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the ticket block",
+            "entries": [
+              { "key": "the shop's invoice()", "value": "must fail" },
+              { "key": "a right fix", "value": "must pass" },
+              { "key": "mends only the ticket's invoice", "value": "must fail" }
+            ]
+          },
+          "note": "Check runs the block beside the shop's code, a right fix and a version that knows only the ticket's invoice."
+        }
+      ]
+    },
+    "fix": {
+      "trace": {
+        "file": "src/invoice.js",
+        "call": "invoice",
+        "args": [
+          [
+            { "title": "Psalm 23, SATB", "fee": 1.86, "copies": 32 },
+            { "title": "Evening round", "fee": 2.11, "copies": 12 }
+          ],
+          20
+        ]
+      },
+      "steps": [
+        {
+          "active": ["log", "log->invoice", "invoice"],
+          "value": {
+            "kind": "map",
+            "label": "a line in the billing log",
+            "entries": [
+              { "key": "title", "value": "Psalm 23, SATB" },
+              { "key": "fee", "value": 1.86 },
+              { "key": "copies", "value": 32 }
+            ]
+          },
+          "note": "The billing log hands invoice() the lines of WH-2291 and its VAT rate. Fees are in pounds."
+        },
+        {
+          "active": ["invoice"],
+          "note": "Each line's net is its fee times its copies, and its VAT is rounded to the nearest penny on that line, half a penny up."
+        },
+        {
+          "active": ["invoice"],
+          "note": "The invoice's net, VAT and total are the sums of what the lines show, so the parts and the whole agree."
+        },
+        {
+          "active": ["invoice", "invoice->printed", "printed"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "lines", "value": "{ title, net, vat } each" },
+              { "key": "net", "value": "text, two decimals" },
+              { "key": "vat", "value": "text, two decimals" },
+              { "key": "total", "value": "text, two decimals" }
+            ]
+          },
+          "note": "Every amount goes on the printed invoice as text with two decimals, right to the penny."
+        }
+      ]
+    },
+    "next": {
+      "steps": [
+        {
+          "active": ["log", "test", "test->invoice", "invoice"],
+          "note": "The next door block hands invoice() a line whose VAT, worked out exactly, is a whole number of pence and a half."
+        },
+        {
+          "active": ["invoice", "invoice->printed", "printed"],
+          "note": "The shop rounds that half up, on the line, and the invoice's totals follow the line."
+        },
+        {
+          "active": ["test", "invoice"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the next door block",
+            "entries": [
+              { "key": "the shop's invoice()", "value": "must fail" },
+              { "key": "a right fix", "value": "must pass" },
+              { "key": "adds shown lines, rounds decimals", "value": "must fail" }
+            ]
+          },
+          "note": "Check runs the block beside the shop's code, a right fix and a version that adds up the shown lines but still rounds decimal numbers."
+        }
+      ]
+    }
+  }
+}

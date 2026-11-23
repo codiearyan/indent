@@ -1,0 +1,117 @@
+{
+  "id": "all-or-nothing",
+  "title": "All or nothing",
+  "files": [
+    "src/db.js",
+    "src/stock.js",
+    "src/try.js",
+    "data/stock.json"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the shop's stock runs on your store, a stop halfway through an order included.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "batch",
+      "title": "Write a batch as one",
+      "file": "src/db.js",
+      "description": "Implement `store.batch(changes)`: several changes made as one.\n\n- `changes` is an array of `{ op: 'set', key, value }` and `{ op: 'delete', key }`; the store makes them in their order, and right after `batch` it holds all of them\n- in the log, a store opened later sees all of the batch's changes or none of them, wherever a stop cut the file; every record before the batch is kept\n- a batch cut short is left out like a record cut short, and cut off the file the same way, so the next change starts clean\n- the promise resolves once the whole batch is in the file\n- the store's memory takes the batch's changes only once the batch is in the file\n- the format is yours; `compact()` keeps what a batch set\n\nThe format is yours, so the check judges by behaviour: it writes a batch, cuts `store.log` at every byte inside it, and opens your store on each, then changes it and opens it again.",
+      "nextSteps": [
+        "Read \"A batch has an end\" in the lesson.",
+        "Choose what in the log says where a batch ends.",
+        "Write the batch with one `appendFile`, and make `decode` take its changes only when all of it is there.",
+        "Run `node src/try.js`: the order cut short should not be half taken."
+      ],
+      "hints": [
+        "Writing a batch as its changes, one after another, means a stop between two of them leaves half the batch, and nothing in the file says anything was missing.",
+        "A record that says how many records follow, or one record that holds all the changes, lets the reader know where the batch ends, the same way a length tells where a value ends.",
+        "Write `` `batch ${changes.length}\\n` `` followed by each change's record, in one `appendFile`. In `decode`, on a batch header read that many records; if any is not whole, the batch is not either."
+      ],
+      "docs": [
+        {
+          "title": "fsPromises.appendFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesappendfilepath-data-options"
+        },
+        {
+          "title": "Array.prototype.map()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+        },
+        {
+          "title": "Spread syntax (...)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Atomicity: all or nothing",
+          "url": "https://www.youtube.com/watch?v=bwgvaLP7Ucg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "checked",
+      "title": "Check a batch before writing it",
+      "file": "src/db.js",
+      "description": "Make `batch` refuse a batch that is not right, before it writes anything.\n\n- a batch that is not an array throws a `TypeError`\n- so does a batch with any change that is not right: not an object, an `op` other than `set` or `delete`, a key that is missing or not text, or a set whose value is missing or not text\n- a refused batch changes nothing at all: not the store, not the log, not even the good changes before the bad one\n- an empty batch changes nothing, writes nothing and does not throw\n\nThe check gives your store batches with one bad change after good ones, and compares the store and the size of `store.log` before and after.",
+      "nextSteps": [
+        "Try a batch whose last change has a number as its value: what is in the store afterwards?",
+        "Go through every change first, and throw at the first one that is not right.",
+        "Write and make the changes only when all of them passed."
+      ],
+      "hints": [
+        "A batch that makes its first two changes before it notices the third is wrong is half a batch again, only made by your own code this time.",
+        "Two loops: one that only checks, then the write and one that changes. `Array.isArray` tells an array from anything else.",
+        "`if (!Array.isArray(changes)) throw new TypeError(...)`, then `for (const change of changes)` check `change?.op` and the types of `key` and `value`, then `if (changes.length === 0) return` before the write."
+      ],
+      "docs": [
+        {
+          "title": "Array.isArray()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray"
+        },
+        {
+          "title": "TypeError",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError"
+        },
+        {
+          "title": "Optional chaining (?.)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stock",
+      "title": "Keep the stock counts in your store",
+      "file": "src/stock.js",
+      "description": "Write the shop's stock functions in `src/stock.js` on the store.\n\n- every function is given the store as `db`; a count is kept as text, the number in digits (`'1200'`)\n- `stockOf(db, item)` returns the count as a number, `0` when the store has no such item\n- `receive(db, item, count)` adds `count` to the item's stock\n- `takeOrder(db, lines)`, for lines like `[{ item: 'card', count: 200 }]`, takes each line's count off its item as one batch: the whole order or none of it; an item may be on more than one line\n- when any item has fewer than the order asks for, `takeOrder` throws an `Error` whose message names the item, and changes nothing\n- the functions write no file themselves: every count lives in the store\n\nThe check runs your functions on a right store of its own, so this task does not depend on tasks 1 and 2. It reopens the store after each change, and cuts the store's log at every byte inside an order.",
+      "nextSteps": [
+        "Read `src/old-stock.js` again: each change wrote the whole file. Here each change goes through the store.",
+        "Write `stockOf` and `receive`.",
+        "Write `takeOrder`: work out every new count first, refuse if one would go below zero, then make them all in one batch.",
+        "Run `node src/try.js`."
+      ],
+      "hints": [
+        "Two separate sets for one order are two records, and a stop between them takes half the order: exactly what Idris saw, in a new shape.",
+        "Count what each line leaves for the next one in a `Map` of item to count, starting each item from `stockOf`. `Number()` and `String()` turn text into a number and back.",
+        "Build the `Map`, throw `` new Error(`Not enough ${item}`) `` when a count would go below zero, then `await db.batch([...left].map(([item, count]) => ({ op: 'set', key: item, value: String(count) })))`."
+      ],
+      "docs": [
+        {
+          "title": "Number()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/Number"
+        },
+        {
+          "title": "Map",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"
+        },
+        {
+          "title": "Error",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

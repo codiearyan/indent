@@ -1,0 +1,52 @@
+{
+  "stations": [
+    {
+      "title": "Idris",
+      "say": "Will the counts be here tomorrow?",
+      "note": "Every morning, whatever happened."
+    },
+    {
+      "title": "Store in memory",
+      "text": "Keeps every count while the program runs.",
+      "note": "A restart empties it."
+    },
+    {
+      "title": "Your log",
+      "file": "db.js",
+      "mine": true,
+      "gap": "No file behind the store",
+      "tasks": [
+        "Add each change",
+        "Replay on open",
+        "Record every delete"
+      ]
+    },
+    {
+      "title": "Next morning",
+      "rows": [
+        [
+          "card",
+          "as last set"
+        ],
+        [
+          "poster",
+          "still deleted"
+        ]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "card count",
+    "wrong": "gone",
+    "why": "In memory",
+    "right": "still there"
+  },
+  "captions": [
+    "Idris asks whether the counts will still be there the next morning.",
+    "The store keeps them in memory only, so a restart leaves it empty.",
+    "You add every change to the end of a log, and replay it when the store opens.",
+    "The next morning, card holds its last count and poster stays deleted.",
+    "Nothing is ever written over, and the store finds what it had."
+  ]
+}

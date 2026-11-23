@@ -1,0 +1,167 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "order",
+        "label": "An order",
+        "kind": "story"
+      },
+      {
+        "id": "take",
+        "label": "takeOrder()",
+        "kind": "function",
+        "mine": true,
+        "fn": "takeOrder"
+      },
+      {
+        "id": "batch",
+        "label": "batch()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "log",
+        "label": "store.log",
+        "kind": "data"
+      },
+      {
+        "id": "cut",
+        "label": "A stop halfway",
+        "kind": "story"
+      },
+      {
+        "id": "morning",
+        "label": "The stock next morning",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "order",
+        "to": "take",
+        "label": "item lines"
+      },
+      {
+        "from": "take",
+        "to": "batch",
+        "label": "new counts"
+      },
+      {
+        "from": "batch",
+        "to": "log",
+        "label": "one batch"
+      },
+      {
+        "from": "cut",
+        "to": "log",
+        "label": "cuts the end"
+      },
+      {
+        "from": "log",
+        "to": "morning",
+        "label": "all or none"
+      }
+    ],
+    "note": "Several changes become one batch, and the shop's stock runs on the store."
+  },
+  "tasks": {
+    "batch": {
+      "steps": [
+        {
+          "active": [
+            "batch",
+            "batch->log",
+            "log"
+          ],
+          "note": "A batch of changes goes into the log in one write, with something that says where it ends."
+        },
+        {
+          "active": [
+            "cut",
+            "cut->log",
+            "log"
+          ],
+          "note": "A stop lands in the middle of the batch."
+        },
+        {
+          "active": [
+            "log",
+            "log->morning",
+            "morning"
+          ],
+          "note": "Opened again, the store takes none of the batch, and keeps everything before it."
+        }
+      ]
+    },
+    "checked": {
+      "steps": [
+        {
+          "active": [
+            "take",
+            "take->batch",
+            "batch"
+          ],
+          "note": "A batch arrives with a count written as a number in its last change."
+        },
+        {
+          "active": [
+            "batch"
+          ],
+          "note": "batch checks every change before it writes or changes anything, and refuses the whole batch."
+        },
+        {
+          "active": [
+            "log"
+          ],
+          "note": "The log and the store stay exactly as they were."
+        }
+      ]
+    },
+    "stock": {
+      "steps": [
+        {
+          "active": [
+            "order",
+            "order->take",
+            "take"
+          ],
+          "note": "A customer orders cards and envelopes.",
+          "value": {
+            "kind": "array",
+            "label": "the order",
+            "values": [
+              "card line",
+              "envelope line"
+            ]
+          }
+        },
+        {
+          "active": [
+            "take"
+          ],
+          "note": "takeOrder works out each new count first, and refuses the order if an item would run short."
+        },
+        {
+          "active": [
+            "take",
+            "take->batch",
+            "batch",
+            "batch->log",
+            "log"
+          ],
+          "note": "Both new counts go into one batch."
+        },
+        {
+          "active": [
+            "cut",
+            "cut->log",
+            "log",
+            "log->morning",
+            "morning"
+          ],
+          "note": "A stop in the middle leaves both counts as they were, never one without the other."
+        }
+      ]
+    }
+  }
+}

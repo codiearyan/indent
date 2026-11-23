@@ -1,0 +1,49 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" },
+      { "id": "log", "label": "Callout log", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "problems", "label": "Entries to ask about", "kind": "data" },
+      { "id": "caller", "label": "Code that called", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "log", "to": "functions", "label": "entries" },
+      { "from": "functions", "to": "problems", "label": "unread" },
+      { "from": "functions", "to": "ailsa", "label": "the total" },
+      { "from": "functions", "to": "caller", "label": "other errors" }
+    ],
+    "note": "One scrawled entry no longer stops the night's total, and a real mistake still reaches the code that called."
+  },
+  "tasks": {
+    "number": {
+      "steps": [
+        { "active": ["log", "log->functions", "functions"], "note": "A text from the log arrives, with a fallback to use if it is not a whole number." },
+        { "active": ["functions"], "note": "A text that is not a whole number is expected, and gives the fallback." },
+        { "active": ["functions", "functions->caller", "caller"], "note": "Anything else that goes wrong, such as no text at all, travels on to the code that called." }
+      ]
+    },
+    "callout": {
+      "steps": [
+        { "active": ["log", "log->functions", "functions"], "note": "One entry arrives and is taken apart at its semicolon." },
+        { "active": ["functions"], "value": { "kind": "array", "label": "what comes back", "values": ["hill", "hours, or None"] }, "note": "Only turning the hours into a number may fail quietly." },
+        { "active": ["functions", "functions->caller", "caller"], "note": "An entry that cannot be taken apart is not a callout, and its error reaches the caller." }
+      ]
+    },
+    "hours": {
+      "steps": [
+        { "active": ["log", "log->functions", "functions"], "note": "The whole log arrives, entry by entry." },
+        { "active": ["functions", "functions->ailsa", "ailsa"], "note": "Hours that can be read are added to the total." },
+        { "active": ["functions", "functions->problems", "problems"], "value": { "kind": "array", "label": "each unread entry", "values": ["the entry", "what went wrong"] }, "note": "Each entry that cannot be read is kept with the message of its error." },
+        { "active": ["ailsa", "problems"], "note": "Ailsa gets the total and the entries to ask about." }
+      ]
+    },
+    "night": {
+      "steps": [
+        { "active": ["ailsa", "functions"], "note": "Ailsa asks for the log of a night, by its path." },
+        { "active": ["functions", "functions->ailsa", "ailsa"], "note": "A night with no log file gives empty text instead of a traceback." },
+        { "active": ["functions", "functions->caller", "caller"], "note": "A path that is a folder is a real mistake, and its error reaches the caller." }
+      ]
+    }
+  }
+}
