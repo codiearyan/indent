@@ -3341,15 +3341,17 @@ const THREAD_DOING = {
   running: [() => 'a thread', (n) => `${n} threads`, ' still running']
 }
 
-/** CheckRun's kind:line; list as plain words, alike threads counted once: "2 threads still running, at line 9". */
-export function threadWords(desc, file) {
+/** CheckRun's kind:line; list as plain words, alike threads counted once: "2 threads still running, at line 9".
+ * A line past `last`, the learner's last line, is in a stand-in Check adds below the file. */
+export function threadWords(desc, file, last = Infinity) {
   const all = (desc ?? '').split(';').filter(Boolean)
   return [...new Set(all)]
     .map((one) => {
       const n = all.filter((x) => x === one).length
       const [kind, line] = one.split(':')
       const [single, several, rest] = THREAD_DOING[kind] ?? THREAD_DOING.wait
-      return `${n > 1 ? several(n) : single()}${rest}${Number(line) > 0 ? `, at line ${line} of ${file}` : ''}`
+      const where = Number(line) > last ? ", in Check's own code" : Number(line) > 0 ? `, at line ${line} of ${file}` : ''
+      return `${n > 1 ? several(n) : single()}${rest}${where}`
     })
     .join('; ')
 }

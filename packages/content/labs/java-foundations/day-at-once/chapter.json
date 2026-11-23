@@ -1,0 +1,11 @@
+{
+  "id": "day-at-once",
+  "title": "x",
+  "files": ["HarbourCheck.java", "linnet.csv", "gannet.csv", "relief-boat.csv"],
+  "terminal": { "description": "x", "suggestedCommand": "java HarbourCheck.java" },
+  "tasks": [
+    { "id": "jobs", "title": "a", "file": "HarbourCheck.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
+    { "id": "results", "title": "a", "file": "HarbourCheck.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
+    { "id": "day", "title": "a", "file": "HarbourCheck.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 }
+  ]
+}
