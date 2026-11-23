@@ -143,9 +143,8 @@ export const checks = tasks({
       cases: [
         attempt({
           name: 'both says yes only when both rules say yes',
-          setup: [`List<Ticket> tickets = ${listOf(PAIRS)};`, 'CheckRule child = new CheckRule(16, null);', 'CheckRule godwit = new CheckRule(200, "Godwit");'],
-          call: 'RuleBook.both(child, godwit)',
-          type: 'Predicate<Ticket>',
+          setup: [`List<Ticket> tickets = ${listOf(PAIRS)};`, 'CheckRule child = new CheckRule(16, null);', 'CheckRule godwit = new CheckRule(200, "Godwit");', 'Predicate<Ticket> got = null;'],
+          call: 'got = RuleBook.both(child, godwit)',
           after: { answers: 'got == null ? null : CheckShows.answers(got, tickets)', 'first was asked about': 'child.asked', 'second was asked about': 'godwit.asked' },
           expected: { answers: [true, false, false, false], 'first was asked about': PAIRS.map(([w]) => w), 'second was asked about': ['Ealasaid', 'Ciorstaidh'] },
           show: [`List<Ticket> tickets = ${listOf(PAIRS)};`, 'Predicate<Ticket> child = t -> t.age() < 16;', 'Predicate<Ticket> godwit = t -> t.boat().equals("Godwit");', 'Predicate<Ticket> got = RuleBook.both(child, godwit);', '// then asks got about each ticket, in order'].join('\n'),
@@ -154,9 +153,8 @@ export const checks = tasks({
         }),
         attempt({
           name: 'both with the rules the other way round',
-          setup: [`List<Ticket> tickets = ${listOf(PAIRS)};`, 'CheckRule child = new CheckRule(16, null);', 'CheckRule godwit = new CheckRule(200, "Godwit");'],
-          call: 'RuleBook.both(godwit, child)',
-          type: 'Predicate<Ticket>',
+          setup: [`List<Ticket> tickets = ${listOf(PAIRS)};`, 'CheckRule child = new CheckRule(16, null);', 'CheckRule godwit = new CheckRule(200, "Godwit");', 'Predicate<Ticket> got = null;'],
+          call: 'got = RuleBook.both(godwit, child)',
           after: { answers: 'got == null ? null : CheckShows.answers(got, tickets)', 'first was asked about': 'godwit.asked', 'second was asked about': 'child.asked' },
           expected: { answers: [true, false, false, false], 'first was asked about': PAIRS.map(([w]) => w), 'second was asked about': ['Ealasaid', 'Padruig'] },
           show: [`List<Ticket> tickets = ${listOf(PAIRS)};`, 'Predicate<Ticket> child = t -> t.age() < 16;', 'Predicate<Ticket> godwit = t -> t.boat().equals("Godwit");', 'Predicate<Ticket> got = RuleBook.both(godwit, child);', '// then asks got about each ticket, in order'].join('\n'),
@@ -165,9 +163,8 @@ export const checks = tasks({
         }),
         attempt({
           name: 'withFee adds the fee to each fare',
-          setup: ['CheckFare fare = new CheckFare();', `Ticket a = ${ticket(PAIRS[1])};`, `Ticket b = ${ticket(PAIRS[0])};`],
-          call: 'RuleBook.withFee(fare, 2)',
-          type: 'Function<Ticket, Integer>',
+          setup: ['CheckFare fare = new CheckFare();', `Ticket a = ${ticket(PAIRS[1])};`, `Ticket b = ${ticket(PAIRS[0])};`, 'Function<Ticket, Integer> got = null;'],
+          call: 'got = RuleBook.withFee(fare, 2)',
           after: { 'asked before it was used': 'fare.asked.size()', 'got.apply(a)': 'got == null ? -1 : got.apply(a)', 'got.apply(b)': 'got == null ? -1 : got.apply(b)', 'the fare was asked about': 'fare.asked' },
           expected: { 'asked before it was used': 0, 'got.apply(a)': fareOf(PAIRS[1]) + 2, 'got.apply(b)': fareOf(PAIRS[0]) + 2, 'the fare was asked about': ['Padruig', 'Ealasaid'] },
           show: ['Function<Ticket, Integer> fare = t -> ...; // a fare of Check\'s own', `Ticket a = ${ticket(PAIRS[1])};`, `Ticket b = ${ticket(PAIRS[0])};`, 'Function<Ticket, Integer> got = RuleBook.withFee(fare, 2);', '// then got.apply(a) and got.apply(b)'].join('\n'),
@@ -176,9 +173,8 @@ export const checks = tasks({
         }),
         attempt({
           name: 'Two fees side by side',
-          setup: ['CheckFare fare = new CheckFare();', `Ticket a = ${ticket(EVENING[0])};`, 'Function<Ticket, Integer> one = RuleBook.withFee(fare, 1);'],
-          call: 'RuleBook.withFee(fare, 5)',
-          type: 'Function<Ticket, Integer>',
+          setup: ['CheckFare fare = new CheckFare();', `Ticket a = ${ticket(EVENING[0])};`, 'Function<Ticket, Integer> one = RuleBook.withFee(fare, 1);', 'Function<Ticket, Integer> got = null;'],
+          call: 'got = RuleBook.withFee(fare, 5)',
           after: { 'one.apply(a)': 'one == null ? -1 : one.apply(a)', 'got.apply(a)': 'got == null ? -1 : got.apply(a)' },
           expected: { 'one.apply(a)': fareOf(EVENING[0]) + 1, 'got.apply(a)': fareOf(EVENING[0]) + 5 },
           show: ['Function<Ticket, Integer> fare = t -> ...; // a fare of Check\'s own', `Ticket a = ${ticket(EVENING[0])};`, 'Function<Ticket, Integer> one = RuleBook.withFee(fare, 1);', 'Function<Ticket, Integer> got = RuleBook.withFee(fare, 5);', '// then one.apply(a) and got.apply(a)'].join('\n'),
