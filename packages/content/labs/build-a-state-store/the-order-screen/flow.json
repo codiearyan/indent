@@ -1,0 +1,72 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customer", "label": "Customer", "kind": "story" },
+      { "id": "basket", "label": "Basket", "kind": "function", "mine": true },
+      { "id": "store", "label": "Order store", "kind": "story" },
+      { "id": "hook", "label": "useStore()", "kind": "function", "mine": true, "fn": "useStore" },
+      { "id": "react", "label": "React", "kind": "story" },
+      { "id": "header", "label": "Header", "kind": "function", "mine": true },
+      { "id": "total", "label": "Total", "kind": "function", "mine": true }
+    ],
+    "edges": [
+      { "from": "customer", "to": "basket", "label": "remove" },
+      { "from": "basket", "to": "store", "label": "an action" },
+      { "from": "store", "to": "hook", "label": "listen, read" },
+      { "from": "hook", "to": "react", "label": "the part" },
+      { "from": "react", "to": "header", "label": "draw again" },
+      { "from": "react", "to": "total", "label": "draw again" }
+    ],
+    "note": "The React order screen runs on your store: every part reads only what it shows, and React draws a part again only when that changed."
+  },
+  "tasks": {
+    "hook": {
+      "steps": [
+        {
+          "active": ["store", "store->hook", "hook"],
+          "note": "The header calls useStore with a selector for the count. useStore hands React the store's subscribe, and a function that reads the count."
+        },
+        {
+          "active": ["hook", "hook->react", "react"],
+          "note": "After every change of the store, React reads the count again."
+        },
+        {
+          "active": ["react", "react->header", "header"],
+          "note": "A new count, and React draws the header again, showing it. When the header leaves the page, its subscription stops."
+        }
+      ]
+    },
+    "draws": {
+      "steps": [
+        {
+          "active": ["store", "store->hook", "hook"],
+          "note": "A customer chooses another paper, and the store tells React."
+        },
+        {
+          "active": ["hook", "hook->react", "react"],
+          "note": "React reads the header's part. The count is the same number as before."
+        },
+        {
+          "active": ["react"],
+          "note": "The same part, so React skips the draw. For a part made new on every read, isEqual says it is the same, and useStore hands back the part from before."
+        }
+      ]
+    },
+    "screen": {
+      "steps": [
+        {
+          "active": ["customer", "customer->basket", "basket", "basket->store", "store"],
+          "note": "A customer removes a line with the basket's button, which calls the store's remove action."
+        },
+        {
+          "active": ["store", "store->hook", "hook", "hook->react", "react"],
+          "note": "Each part reads only what it shows, from the one store, with useStore."
+        },
+        {
+          "active": ["react", "react->header", "header", "react->total", "total"],
+          "note": "The header's count and the total change together, worked out from the same basket."
+        }
+      ]
+    }
+  }
+}

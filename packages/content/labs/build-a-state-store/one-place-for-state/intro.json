@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "Why does it say 3? There are 2.", "note": "A customer saw it first." },
+    { "title": "Old screen", "text": "Header, basket and total each keep a copy.", "note": "One change, three places." },
+    {
+      "title": "Your store",
+      "file": "store.js",
+      "mine": true,
+      "gap": "No one place for the order",
+      "tasks": ["One place for state", "Change with a function", "Never change old state"]
+    },
+    { "title": "Order screen", "rows": [["Header", "count matches"], ["Basket", "same lines"]], "mark": 0 }
+  ],
+  "ticket": { "label": "Basket count", "wrong": "says 3", "why": "A copy", "right": "matches" },
+  "captions": [
+    "At Ashgrove Press, Hesper asks why the basket count says three over two lines.",
+    "Each part of the order screen keeps its own copy, and one of them missed a change.",
+    "You write a store that keeps the order in one place, in three tasks.",
+    "Now every part reads the one state, and the count matches the basket.",
+    "Same screen, same shop, and an order that lives in one place."
+  ]
+}

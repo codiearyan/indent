@@ -1,0 +1,81 @@
+{
+  "id": "the-order-screen",
+  "title": "The order screen on your store",
+  "files": ["src/use-store.js", "src/OrderScreen.jsx", "src/order-store.js", "src/order-actions.js", "src/store.js", "src/order.js"],
+  "terminal": {
+    "description": "The order screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "hook",
+      "title": "Write useStore",
+      "file": "src/use-store.js",
+      "description": "Implement `useStore(selector)` in `src/use-store.js`.\n\n- it returns `selector(state)` for the order store's state now\n- a component that calls it is drawn again after a change of its part, showing the new part\n- it is built on React's `useSyncExternalStore`, with the store's `subscribe` and a function that reads the part\n- when the component leaves the page, its subscription stops\n\nThe check draws components of its own that call your `useStore` with selectors of their own, on a store of its own, changes the store, and counts who is still listening once the components are gone.",
+      "nextSteps": [
+        "Read \"React's tool for outside state\" in the lesson.",
+        "Import `useSyncExternalStore` from `react` and call it in `useStore`.",
+        "Give it the store's `subscribe`, and a function that reads the part: the selector run on `getState()`.",
+        "Return what it returns."
+      ],
+      "hints": [
+        "React does not know your store exists. `useSyncExternalStore` is how you tell it: how to listen, and how to read the value now.",
+        "The first argument is a function that takes React's listener and returns a stop function, which is exactly what `subscribe` is. The second is called whenever React wants the value.",
+        "`return useSyncExternalStore(orderStore.subscribe, () => selector(orderStore.getState()))`."
+      ],
+      "docs": [
+        { "title": "useSyncExternalStore", "url": "https://react.dev/reference/react/useSyncExternalStore" },
+        { "title": "Reusing logic with custom hooks", "url": "https://react.dev/learn/reusing-logic-with-custom-hooks" }
+      ],
+      "videos": [{ "title": "useSyncExternalStore with examples", "url": "https://www.youtube.com/watch?v=eUJHCW7RBCI" }],
+      "points": 10
+    },
+    {
+      "id": "draws",
+      "title": "Draw only when the part changed",
+      "file": "src/use-store.js",
+      "description": "Make a component that uses `useStore` draw again only when its own part changed, and give `useStore` a second argument, `isEqual`.\n\n- after a change of another part of the state, the component is not drawn again\n- after a change of its part, it is drawn once, not twice\n- `useStore(selector, isEqual)`: when `isEqual(previousPart, part)` says the part is the same, the component is not drawn again, even when the selector made a new object; it shows the part from before until a real change\n\nThe check counts the draws of components of its own exactly: a number part, a count worked out each time, and an object part made new on every read, with `shallowEqual` and with an `isEqual` of its own.",
+      "nextSteps": [
+        "Read \"When React draws again\" in the lesson.",
+        "Make sure React reads the part, not the whole state.",
+        "Keep the part from the last read in a ref, and give React that very part again when `isEqual` says nothing changed."
+      ],
+      "hints": [
+        "React compares what the read function returns with `Object.is`, and skips the draw when it is the same. A new object every time is never the same, so React keeps drawing.",
+        "`useRef` keeps a value across draws without drawing again. Keep the last part there, and decide in the read function which one to return.",
+        "`const last = useRef(null)`, a read function that does `const part = selector(orderStore.getState()); if (last.current && isEqual(last.current.part, part)) return last.current.part; last.current = { part }; return part`, and `isEqual = Object.is` as the default."
+      ],
+      "docs": [
+        { "title": "useRef", "url": "https://react.dev/reference/react/useRef" },
+        {
+          "title": "Caching the result of getSnapshot",
+          "url": "https://react.dev/reference/react/useSyncExternalStore#im-getting-an-error-the-result-of-getsnapshot-should-be-cached"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "screen",
+      "title": "Put the order screen on the store",
+      "file": "src/OrderScreen.jsx",
+      "description": "Rewrite the parts of `src/OrderScreen.jsx` on the order store.\n\n- `Header`, `Basket`, `PaperChoice`, `Note` and `Total` take no props: each reads what it shows from `orderStore` with `useStore`, picking only that\n- the buttons, the paper choice and the note change the order through `orderStore.actions`\n- `OrderScreen` loads the prices once, from an effect, with the `loadPrices` action, and puts the parts on the page; the order itself lives only in the store\n- the count in the header always agrees with the basket\n\nThe check opens the whole screen with an order and prices of its own and clicks through it, then draws each part alone inside React's Profiler, counts its draws while it changes the store, and changes the paper and the note on the page.",
+      "nextSteps": [
+        "Look at the screen in the Browser panel: add cards, remove a line, and watch the count.",
+        "Start with `Header`: remove its prop and read the count with `useStore`.",
+        "Do the same for each part, then take the state, the effect and the props out of `OrderScreen`.",
+        "Call `loadPrices` from an effect in `OrderScreen`."
+      ],
+      "hints": [
+        "The count was wrong because it was a second copy kept by hand. Worked out from the one basket, it cannot disagree.",
+        "Each part asks for only what it shows: the header the length of the basket, the total its basket, prices, loading and error. The handlers call `orderStore.actions.add`, `remove`, `choosePaper` and `writeNote`.",
+        "`export function Header() { const count = useStore((state) => state.basket.length); ... }`, and in `OrderScreen`, `useEffect(() => { orderStore.actions.loadPrices() }, [])`."
+      ],
+      "docs": [
+        { "title": "Choosing the state structure", "url": "https://react.dev/learn/choosing-the-state-structure" },
+        { "title": "Profiler", "url": "https://react.dev/reference/react/Profiler" },
+        { "title": "Synchronizing with effects", "url": "https://react.dev/learn/synchronizing-with-effects" }
+      ],
+      "points": 10
+    }
+  ]
+}

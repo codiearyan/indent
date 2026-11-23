@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Sefton", "say": "A note redraws the whole screen.", "note": "The counter laptop lags." },
+    { "title": "Listeners", "text": "Every part hears about every change.", "note": "The header included." },
+    {
+      "title": "Your store",
+      "file": "store.js",
+      "mine": true,
+      "gap": "No way to watch one part",
+      "tasks": ["Watch one part", "Decide what changed", "Compare key by key"]
+    },
+    { "title": "Order screen", "rows": [["Header", "stays"], ["Total", "stays"], ["Note box", "drawn"]] }
+  ],
+  "ticket": { "label": "A typed note", "wrong": "redraws all", "why": "Hears all", "right": "one part" },
+  "captions": [
+    "Sefton types a note on the order screen, and every part of it is drawn again.",
+    "Each part listens to the whole state, so a note reaches the header too.",
+    "You let each part watch only what it shows, in three tasks.",
+    "Now a note draws the note box, and the header stays as it was.",
+    "Every part hears about its own part, and typing no longer lags."
+  ]
+}

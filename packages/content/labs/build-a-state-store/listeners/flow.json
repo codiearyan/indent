@@ -1,0 +1,74 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "screen", "label": "Order screen", "kind": "story" },
+      { "id": "set", "label": "setState()", "kind": "function", "mine": true },
+      { "id": "sub", "label": "subscribe()", "kind": "function", "mine": true },
+      { "id": "list", "label": "Listeners", "kind": "data" },
+      { "id": "header", "label": "Header", "kind": "story" },
+      { "id": "picker", "label": "Paper picker", "kind": "story" },
+      { "id": "total", "label": "Total", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "header", "to": "sub", "label": "tell me" },
+      { "from": "sub", "to": "list", "label": "kept" },
+      { "from": "screen", "to": "set", "label": "a change" },
+      { "from": "set", "to": "list", "label": "a round" },
+      { "from": "list", "to": "header", "label": "new, before" },
+      { "from": "list", "to": "picker", "label": "new, before" },
+      { "from": "list", "to": "total", "label": "new, before" }
+    ],
+    "note": "Parts of the screen ask the store to be told, and after every change the store tells each of them once."
+  },
+  "tasks": {
+    "subscribe": {
+      "steps": [
+        {
+          "active": ["header", "header->sub", "sub", "sub->list", "list"],
+          "note": "The header asks to be told about changes, and gets back a function that stops it."
+        },
+        {
+          "active": ["screen", "screen->set", "set"],
+          "note": "A customer adds 40 posters. setState changes the state first."
+        },
+        {
+          "active": ["set", "set->list", "list", "list->header", "header", "list->total", "total"],
+          "note": "Then every listener is told, in the order they asked, with the new state and the state before."
+        }
+      ]
+    },
+    "unchanged": {
+      "steps": [
+        {
+          "active": ["screen", "screen->set", "set"],
+          "note": "The customer picks linen again, the paper that is already chosen."
+        },
+        {
+          "active": ["set"],
+          "note": "Every key of the part already holds that very value, compared with Object.is, so nothing changed."
+        },
+        {
+          "active": ["set", "list"],
+          "note": "The state stays the same object and no round starts, so no listener is told."
+        }
+      ]
+    },
+    "rounds": {
+      "steps": [
+        {
+          "active": ["set", "set->list", "list"],
+          "value": { "kind": "array", "label": "listening when the round begins", "values": ["header", "paper picker", "total"] },
+          "note": "A round begins with everyone who is listening at that moment."
+        },
+        {
+          "active": ["list", "list->picker", "picker"],
+          "note": "The paper picker only needed this one change, and stops itself while it is being told."
+        },
+        {
+          "active": ["list", "list->total", "total"],
+          "note": "The total after it is still told this time, and from the next change on the picker hears nothing."
+        }
+      ]
+    }
+  }
+}
