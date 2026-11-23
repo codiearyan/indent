@@ -1,0 +1,68 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dougie", "label": "Dougie", "kind": "story" },
+      { "id": "store", "label": "Store sheet", "kind": "data" },
+      { "id": "records", "label": "Callout records", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "rhona", "label": "Rhona", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dougie", "to": "functions", "label": "kit in and out" },
+      { "from": "store", "to": "functions", "label": "kind and count" },
+      { "from": "functions", "to": "store", "label": "changes" },
+      { "from": "records", "to": "functions", "label": "one per callout" },
+      { "from": "functions", "to": "rhona", "label": "answers" }
+    ],
+    "note": "The store becomes a dictionary from each kind of kit to its count, and your functions look things up by name instead of by position."
+  },
+  "tasks": {
+    "count": {
+      "steps": [
+        { "active": ["dougie", "dougie->functions", "functions"], "note": "Someone asks how many of one kind of kit there are." },
+        {
+          "active": ["store", "store->functions", "functions"],
+          "value": { "kind": "map", "label": "the store", "entries": [{ "key": "kind of kit", "value": "how many" }] },
+          "note": "The count is read by the kind's name, and a kind the store never had is not an error."
+        },
+        { "active": ["functions", "functions->rhona", "rhona"], "note": "The count comes back, nothing for a kind that is not there." }
+      ]
+    },
+    "out": {
+      "steps": [
+        { "active": ["dougie", "dougie->functions", "functions"], "note": "Kit is signed out for a callout." },
+        { "active": ["functions", "functions->store", "store"], "note": "Its count in the store goes down, on the same sheet everyone reads." },
+        { "active": ["store"], "note": "When none are left, that kind comes off the sheet." }
+      ]
+    },
+    "tally": {
+      "steps": [
+        {
+          "active": ["dougie", "dougie->functions", "functions"],
+          "value": { "kind": "array", "label": "what came back", "values": ["kind", "kind", "kind", "..."] },
+          "note": "Kit comes back off the hill in a heap, one name at a time."
+        },
+        { "active": ["functions"], "note": "A kind seen for the first time starts at one, and every time after adds one." },
+        { "active": ["functions", "functions->rhona", "rhona"], "note": "A new dictionary comes back: each kind and how many came back." }
+      ]
+    },
+    "low": {
+      "steps": [
+        { "active": ["store", "store->functions", "functions"], "note": "Rhona asks what is running low." },
+        { "active": ["functions"], "note": "Each kind is looked at with its count, in the order of the sheet." },
+        { "active": ["functions", "functions->rhona", "rhona"], "note": "The names of the kinds below the line come back, and the store stays as it was." }
+      ]
+    },
+    "hours": {
+      "steps": [
+        {
+          "active": ["records", "records->functions", "functions"],
+          "value": { "kind": "map", "label": "one callout", "entries": [{ "key": "hill", "value": "name" }, { "key": "hours", "value": "how long" }, { "key": "crew", "value": "how many" }] },
+          "note": "Each callout is one record with its hill, its hours and its crew."
+        },
+        { "active": ["functions"], "note": "Only the callouts on the hill Rhona asks about count, and their hours are added up." },
+        { "active": ["functions", "functions->rhona", "rhona"], "note": "One total comes back for that hill." }
+      ]
+    }
+  }
+}

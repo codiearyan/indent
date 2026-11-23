@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Where is the casualty now?", "note": "They drifted down the hill." },
+    { "title": "Radio", "text": "Two numbers read out, easy to swap." },
+    {
+      "title": "Your functions",
+      "file": "grid_refs.py",
+      "mine": true,
+      "gap": "Loose numbers, easily swapped",
+      "tasks": ["High and low", "Move a position", "Team to square", "Last heard"]
+    },
+    { "title": "Hill party", "say": "Heading there now.", "note": "East first, then north." }
+  ],
+  "ticket": { "label": "Casualty", "wrong": "wrong way", "why": "Swapped", "right": "found" },
+  "captions": [
+    "A night search, and Rhona passes positions on the radio as grid references.",
+    "Today the two numbers travel loose, and a team once went east for north.",
+    "You keep each pair together in a tuple and take it apart by name.",
+    "Now the moved position goes out east first, and the team heads the right way.",
+    "Tuples, two values from one function, unpacking, and zip."
+  ]
+}

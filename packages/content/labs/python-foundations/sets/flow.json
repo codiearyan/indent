@@ -1,0 +1,54 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "radio", "label": "Radio log", "kind": "data" },
+      { "id": "rotas", "label": "Weekend rotas", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "radio", "to": "functions", "label": "call signs" },
+      { "from": "rotas", "to": "functions", "label": "names" },
+      { "from": "functions", "to": "ailsa", "label": "answers" }
+    ],
+    "note": "Your functions use sets to drop repeats, remember what was heard, and compare two groups."
+  },
+  "tasks": {
+    "different": {
+      "steps": [
+        {
+          "active": ["radio", "radio->functions", "functions"],
+          "value": { "kind": "array", "label": "the radio log", "values": ["call sign", "call sign", "the same again", "..."] },
+          "note": "The log has every call, and the same teams call again and again."
+        },
+        { "active": ["functions"], "note": "A set keeps each call sign once, however often it was heard." },
+        { "active": ["functions", "functions->ailsa", "ailsa"], "note": "Ailsa gets how many teams there really were." }
+      ]
+    },
+    "repeat": {
+      "steps": [
+        { "active": ["radio", "radio->functions", "functions"], "note": "The calls are gone through in the order they came." },
+        { "active": ["functions"], "note": "Each call sign is looked for among the ones heard before it." },
+        { "active": ["functions", "functions->ailsa", "ailsa"], "note": "The first one already heard comes back, or nothing if none was." }
+      ]
+    },
+    "both": {
+      "steps": [
+        { "active": ["rotas", "rotas->functions", "functions"], "note": "Friday's rota and Saturday's rota are two lists of names." },
+        { "active": ["functions"], "note": "Each becomes a set, and only the names in both are kept." },
+        { "active": ["functions", "functions->ailsa", "ailsa"], "note": "A set of names comes back, in no particular order." }
+      ]
+    },
+    "unknown": {
+      "steps": [
+        {
+          "active": ["radio", "radio->functions", "functions"],
+          "value": { "kind": "array", "label": "what unknown_signs is given", "values": ["call signs heard", "call signs known"] },
+          "note": "Ailsa wants any call sign the team does not know."
+        },
+        { "active": ["functions"], "note": "The known ones are taken away from the ones heard, each once." },
+        { "active": ["functions", "functions->ailsa", "ailsa"], "note": "The rest come back as a list in alphabetical order." }
+      ]
+    }
+  }
+}
