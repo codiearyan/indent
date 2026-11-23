@@ -1,7 +1,7 @@
 {
   "id": "nodejs-foundations",
   "title": "Node.js foundations",
-  "description": "Marrowfield Allotment Society is run by volunteers, and its plot list, waiting list and water readings live in text files that the secretary edits by hand. You know JavaScript but have only ever run a file with node, and you start there: small scripts that take arguments, read and write the society's files, and say plainly when something is wrong. Each issue teaches one part of Node, from process and exit codes to files, paths and modules, in scripts you run in a real terminal. The second part reads settings from the environment, works through a file too big to read at once, and builds events, timers and a clean stop.",
+  "description": "Marrowfield Allotment Society is run by volunteers, and its plot list, waiting list and water readings live in text files that the secretary edits by hand. You know JavaScript but have only ever run a file with node, and you start there: small scripts that take arguments, read and write the society's files, and say plainly when something is wrong. Each issue teaches one part of Node, from process and exit codes to files, paths and modules, in scripts you run in a real terminal. The second part reads settings from the environment, works through a file too big to read at once, and builds events, timers and a clean stop. The last part puts the society online with a server of your own: it answers each address, reads the JSON a phone sends, and runs another program without letting a stranger's text become a command.",
   "category": "JavaScript and TypeScript",
   "language": "javascript",
   "tags": [
@@ -26,6 +26,15 @@
         "line-by-line",
         "events",
         "timers"
+      ]
+    },
+    {
+      "title": "A server of your own",
+      "chapters": [
+        "first-server",
+        "routes",
+        "request-body",
+        "other-programs"
       ]
     }
   ]

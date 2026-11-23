@@ -1,0 +1,88 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "member", "label": "Member's phone", "kind": "story" },
+      { "id": "server", "label": "server.js", "kind": "file", "mine": true },
+      { "id": "report", "label": "water-report.js", "kind": "file" },
+      { "id": "water", "label": "Water readings", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "member", "to": "server", "label": "month asked" },
+      { "from": "server", "to": "report", "label": "runs, with the month" },
+      { "from": "water", "to": "report", "label": "readings" },
+      { "from": "report", "to": "server", "label": "output, exit code" },
+      { "from": "server", "to": "member", "label": "the report" }
+    ],
+    "note": "server.js runs Imran's report as a separate program for the month a member asks for, and answers with what it says."
+  },
+  "tasks": {
+    "run-report": {
+      "steps": [
+        {
+          "active": ["member", "member->server", "server"],
+          "note": "A member asks for the report of a month."
+        },
+        {
+          "active": ["server", "server->report", "report", "water", "water->report"],
+          "note": "The server starts the report program on the same Node, with the month as its argument, and goes on serving others."
+        },
+        {
+          "active": ["report", "report->server", "server"],
+          "note": "Once the report has ended, the server has all it printed."
+        },
+        {
+          "active": ["server", "server->member", "member"],
+          "note": "It answers with the report, exactly as printed."
+        }
+      ]
+    },
+    "exit-code": {
+      "steps": [
+        {
+          "active": ["member", "member->server", "server", "server->report", "report"],
+          "note": "A member asks for a month that cannot be, or one with no readings."
+        },
+        {
+          "active": ["report", "report->server", "server"],
+          "note": "The report ends with an exit code that says which, and prints its reason on its error stream."
+        },
+        {
+          "active": ["server", "server->member", "member"],
+          "note": "The server picks the status from the exit code and passes the reason on."
+        }
+      ]
+    },
+    "cannot-run": {
+      "steps": [
+        {
+          "active": ["server", "server->report"],
+          "note": "The server tries to run the report, but the program has been moved, or cannot be started."
+        },
+        {
+          "active": ["server"],
+          "note": "It notices the failure, whether it came as an exit code or as an error, without stopping."
+        },
+        {
+          "active": ["server", "server->member", "member"],
+          "note": "It answers that the report could not be made, and keeps serving."
+        }
+      ]
+    },
+    "no-shell": {
+      "steps": [
+        {
+          "active": ["member", "member->server", "server"],
+          "note": "Someone types signs a shell would read as more commands after the month."
+        },
+        {
+          "active": ["server", "server->report", "report"],
+          "note": "The server starts the report directly, with the month as one argument, so no shell ever reads it."
+        },
+        {
+          "active": ["report", "report->server", "server", "server->member", "member"],
+          "note": "The report says it is not a month, and nothing else runs on the laptop."
+        }
+      ]
+    }
+  }
+}

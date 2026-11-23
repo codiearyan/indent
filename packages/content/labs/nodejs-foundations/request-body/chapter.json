@@ -1,0 +1,139 @@
+{
+  "id": "request-body",
+  "title": "Reading what was sent",
+  "files": [
+    "server.js",
+    "requests.txt",
+    "ask.js"
+  ],
+  "terminal": {
+    "description": "A terminal in your workspace. `node ask.js server.js` starts your server, sends it each request in `requests.txt`, a body in three pieces, shows every answer and what the server printed, then stops it.",
+    "suggestedCommand": "node ask.js server.js"
+  },
+  "tasks": [
+    {
+      "id": "body",
+      "title": "Read the whole body and keep the reading",
+      "file": "server.js",
+      "description": "A volunteer's phone sends a reading as JSON in the body of `POST /readings`:\n\n```json\n{\"tap\":\"north\",\"litres\":26}\n```\n\nChange `server.js` so that it reads the whole body, which may arrive in several pieces, turns it into a value with `JSON.parse`, and keeps the reading while the server runs. It answers with status `201`, the header `Content-Type: application/json; charset=utf-8`, and the reading it kept, as JSON: only its `tap` and its `litres`, whatever else was sent.\n\n```json\n{\"tap\":\"north\",\"litres\":26}\n```\n\nCheck sends readings of its own, each body in pieces, and sends the next piece only once your server has the one before.",
+      "nextSteps": [
+        "Write a function that reads every piece of the request's body and gives back the whole of it as text.",
+        "In `POST /readings`, await it and turn the text into a value with `JSON.parse`.",
+        "Keep the reading, outside the function that answers, so it lasts from one request to the next.",
+        "Answer 201 with the reading, turned back into JSON text, and say it is JSON."
+      ],
+      "hints": [
+        "The body is not on `req` when your function starts: it is still arriving. `req` is a stream, like a file read a line at a time, and it gives the body piece by piece.",
+        "`for await (const chunk of req)` gives each piece as a Buffer, and ends when the body does. `Buffer.concat(chunks).toString('utf8')` joins them into text. `JSON.stringify(value)` turns a value back into JSON text.",
+        "`const chunks = []; for await (const chunk of req) chunks.push(chunk); const reading = JSON.parse(Buffer.concat(chunks).toString('utf8'))`."
+      ],
+      "docs": [
+        {
+          "title": "Reading a stream with for await",
+          "url": "https://nodejs.org/api/stream.html#readablesymbolasynciterator"
+        },
+        {
+          "title": "JSON.parse()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse"
+        },
+        {
+          "title": "JSON.stringify()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify"
+        }
+      ],
+      "videos": [
+        {
+          "title": "How data arrives in pieces in a stream",
+          "url": "https://www.youtube.com/watch?v=NYtb_LkN324"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "totals",
+      "title": "Answer the totals as JSON",
+      "file": "server.js",
+      "description": "Imran wants to see how much each tap has used. Change `server.js` so that `GET /readings` answers with status `200`, the header `Content-Type: application/json; charset=utf-8`, and an object of each tap's litres added up, from every reading kept since the server started:\n\n```json\n{\"north\":38,\"south\":4}\n```\n\nBefore any reading, it answers `{}`.\n\nCheck asks for the totals, sends readings of its own, and asks again.",
+      "nextSteps": [
+        "Send two readings for the same tap and one for another, then `GET /readings`, all in `requests.txt`.",
+        "Add each kept reading's litres to its tap's total, or work the totals out from the readings when asked.",
+        "Answer with the totals turned into JSON text, and say it is JSON."
+      ],
+      "hints": [
+        "`res.end` sends text, never an object: an object has to become JSON text first.",
+        "`JSON.stringify` turns a plain object into JSON, but a `Map` into `{}`. `Object.fromEntries(map)` makes a plain object of a Map.",
+        "`res.end(JSON.stringify(Object.fromEntries(totals)))`, after the status and the header."
+      ],
+      "docs": [
+        {
+          "title": "JSON.stringify()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify"
+        },
+        {
+          "title": "Object.fromEntries()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/fromEntries"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "bad-json",
+      "title": "Refuse a body that is not a reading",
+      "file": "server.js",
+      "description": "Phones lose signal halfway, and people type. Change `server.js` so that `POST /readings` refuses a body it cannot use, with status `400`, a JSON body and the JSON header, keeps nothing, and goes on answering the next request:\n\n- A body that is not JSON at all, such as half a reading or an empty body, gets `{\"error\":\"The body is not JSON.\"}`.\n- JSON that is not a reading gets `{\"error\":\"A reading needs a tap and its litres.\"}`. A reading is an object whose `tap` is text that is not empty, and whose `litres` is a number, not text, of 0 or more.\n\nCheck sends a good reading, then bodies like these, then asks for the totals.",
+      "nextSteps": [
+        "Add a line with half a reading to `requests.txt`, and a request after it, and see what happens to the server now.",
+        "Catch the error `JSON.parse` throws, and answer 400.",
+        "Then check what it gave back before you keep it.",
+        "Ask for the totals and make sure a refused body changed nothing."
+      ],
+      "hints": [
+        "`JSON.parse` throws a SyntaxError on text that is not JSON, and an error nobody catches stops the whole server, not just one request.",
+        "`JSON.parse('null')` and `JSON.parse('\"12\"')` work: JSON can be any value, not only an object. `typeof value.litres === 'number'` is false for `\"12\"`.",
+        "`let reading; try { reading = JSON.parse(text) } catch { /* answer 400 here */ return }`, then check `reading` with `typeof` before you keep it."
+      ],
+      "docs": [
+        {
+          "title": "JSON.parse() errors",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#exceptions"
+        },
+        {
+          "title": "400 Bad Request",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400"
+        },
+        {
+          "title": "typeof",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "too-large",
+      "title": "Refuse a body that is too large",
+      "file": "server.js",
+      "description": "A reading is a few dozen bytes. A body of a million bytes is a mistake, or someone trying to fill the laptop's memory. Change `server.js` so that a body of more than 1024 bytes gets status `413`, the JSON header and `{\"error\":\"The body is too large.\"}`, is not kept, and the server stops reading it as soon as it is over the limit. A body of exactly 1024 bytes is still fine.\n\nA sender does not always say how long its body is, so count the bytes as the pieces arrive.\n\nCheck sends a long body in many pieces without saying its length, one that says it, and one of exactly 1024 bytes, then asks for the totals.",
+      "nextSteps": [
+        "In the function that reads the body, add up the length of each piece as it comes.",
+        "As soon as the total is more than 1024, stop reading and say the body is too large.",
+        "In `POST /readings`, answer 413 for it, before anything is read as JSON."
+      ],
+      "hints": [
+        "Joining every piece and checking at the end means reading all of it first: a body without end would never be refused.",
+        "A Buffer's `length` is its number of bytes. Leaving a `for await` loop early with `return` or `break` stops reading the stream.",
+        "Inside the loop: `size += chunk.length; if (size > 1024) return null`, and answer 413 when the body comes back `null`."
+      ],
+      "docs": [
+        {
+          "title": "buf.length",
+          "url": "https://nodejs.org/api/buffer.html#buflength"
+        },
+        {
+          "title": "413 Content Too Large",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/413"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

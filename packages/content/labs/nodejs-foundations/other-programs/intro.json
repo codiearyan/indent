@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Imran", "say": "Can members see the water report?", "note": "He reads it out at meetings." },
+    { "title": "water-report.js", "text": "Makes a month's report, but only by hand." },
+    {
+      "title": "Your server",
+      "file": "server.js",
+      "mine": true,
+      "gap": "Nothing runs the report",
+      "tasks": ["Run the report", "Read its exit code", "Say it cannot run", "Keep out of a shell"]
+    },
+    { "title": "Member's phone", "text": "Shows the June report, totals and all." }
+  ],
+  "ticket": { "label": "June report", "wrong": "read aloud", "why": "Hand run", "right": "on the phone" },
+  "captions": [
+    "At Marrowfield, Imran wants members to see the water report of any month on their phones.",
+    "Today he runs his report script by hand and reads the totals out at the meeting.",
+    "You make the server run the report as another program, safely, in four tasks.",
+    "Now asking for June runs the report, and its answer reaches the phone.",
+    "Same report, no meeting needed. Text typed in the address never becomes a command."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhiannon", "say": "Can the laptop say what is free?", "note": "Her phone rings every evening." },
+    { "title": "Phone at the gate", "text": "Opens an address, and nothing answers." },
+    {
+      "title": "Your server",
+      "file": "server.js",
+      "mine": true,
+      "gap": "Nothing listens yet",
+      "tasks": ["Answer every request", "Say what it sends", "Choose the port", "Stop on Ctrl+C"]
+    },
+    { "title": "plots.txt", "rows": [["A1", "Maud Pask"], ["A3", "free"], ["B2", "free"]], "mark": 1 }
+  ],
+  "ticket": { "label": "Plot A3", "wrong": "no answer", "why": "No server", "right": "shown as free" },
+  "captions": [
+    "At Marrowfield, Rhiannon is asked every evening whether a plot is free.",
+    "A visitor at the gate can open an address on a phone, but nothing on the laptop answers.",
+    "You write a server that answers every request with the free plots, in four tasks.",
+    "Now the phone asks the laptop, and plot A3 comes back as free.",
+    "Same question at the gate, no phone call. The laptop answers anyone who asks."
+  ]
+}
