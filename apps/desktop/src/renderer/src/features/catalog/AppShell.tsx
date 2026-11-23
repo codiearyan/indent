@@ -10,8 +10,7 @@ import {
   Moon,
   Route,
   Settings,
-  Sun,
-  Workflow
+  Sun
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { levelFor } from '@shared/rules'
@@ -33,7 +32,6 @@ const NAV = [
   { to: '/', label: 'Home', icon: House, shortcut: 'goHome' as const },
   { to: '/labs', label: 'Repos', icon: FolderGit2, shortcut: 'goRepos' as const },
   { to: '/paths', label: 'Roadmaps', icon: Route, shortcut: 'goRoadmaps' as const },
-  { to: '/dsa', label: 'Patterns', icon: Workflow, shortcut: 'goPatterns' as const },
   { to: '/year', label: 'Activity', icon: CalendarDays, shortcut: 'goActivity' as const }
 ]
 

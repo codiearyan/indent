@@ -1,0 +1,85 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "ticket", "label": "Today's ticket", "kind": "data" },
+      { "id": "file", "label": "Tickets.java", "kind": "file", "mine": true },
+      { "id": "printer", "label": "Ticket printer", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bridie", "to": "ticket", "label": "sells" },
+      { "from": "ticket", "to": "file", "label": "text and counts" },
+      { "from": "file", "to": "printer", "label": "ticket lines" }
+    ],
+    "note": "Tickets.java joins, cuts, measures and compares the ticket's text before it goes to the printer."
+  },
+  "tasks": {
+    "party": {
+      "steps": [
+        {
+          "active": ["ticket"],
+          "value": {
+            "kind": "map",
+            "label": "the party",
+            "entries": [
+              { "key": "adults", "value": "a count" },
+              { "key": "children", "value": "a count" }
+            ]
+          },
+          "note": "A ticket covers some adults and some children."
+        },
+        {
+          "active": ["ticket", "ticket->file", "file"],
+          "note": "The two counts are added as numbers before they meet the text."
+        },
+        {
+          "active": ["file", "file->printer", "printer"],
+          "note": "The printer gets one line with the whole party, not two numbers glued together."
+        }
+      ]
+    },
+    "code": {
+      "steps": [
+        { "active": ["ticket"], "note": "Each ticket names where the passengers are going." },
+        {
+          "active": ["ticket", "ticket->file", "file"],
+          "note": "The first three letters are cut out, counting positions from 0."
+        },
+        {
+          "active": ["file", "file->printer", "printer"],
+          "note": "A capital copy of them goes on the ticket, like a luggage tag."
+        }
+      ]
+    },
+    "right-boat": {
+      "steps": [
+        {
+          "active": ["ticket"],
+          "note": "The boat named on the ticket is cut out of the ticket's text."
+        },
+        {
+          "active": ["ticket", "ticket->file", "file"],
+          "note": "It is compared with today's boat letter by letter, not by which object holds it."
+        },
+        {
+          "active": ["file"],
+          "value": { "kind": "array", "label": "the answer", "values": ["true or false"] },
+          "note": "The answer is true only when the two names are the same text."
+        }
+      ]
+    },
+    "space-left": {
+      "steps": [
+        { "active": ["ticket"], "note": "The ticket's text has a length, spaces included." },
+        {
+          "active": ["ticket", "ticket->file", "file"],
+          "note": "The printer's line has a fixed number of characters, and the ticket uses some of them."
+        },
+        {
+          "active": ["file", "file->printer", "printer"],
+          "note": "What is left tells Bridie whether the ticket fits on one line."
+        }
+      ]
+    }
+  }
+}

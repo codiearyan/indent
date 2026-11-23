@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilf", "say": "Where is tram 14 right now?", "note": "In the depot, at the screen." },
+    { "title": "Tram tracker", "text": "Radios the depot at every stop on the line.", "note": "React knows nothing about it." },
+    {
+      "title": "Your effects",
+      "file": "Whereabouts.jsx",
+      "mine": true,
+      "gap": "Nobody listens to the radio",
+      "tasks": ["Follow the tram", "Stop following", "Follow the chosen one", "Stops without effect"]
+    },
+    { "title": "Depot screen", "rows": [["Where it is"], ["Still to come"]], "mark": 0 }
+  ],
+  "ticket": { "label": "Tram 14", "wrong": "waiting all day", "why": "Not heard", "right": "on the screen" },
+  "captions": [
+    "In the depot, Wilf wants a screen that shows where a tram on the line is right now.",
+    "The trams radio every stop, and the screen just says it is waiting, all day long.",
+    "You keep the screen in step with the tracker using effects, in four tasks.",
+    "Tram 14 reaches a stop and the screen says so, with the stops it still has to go.",
+    "Same tracker, now someone listens. Pick another tram and the screen follows it."
+  ]
+}

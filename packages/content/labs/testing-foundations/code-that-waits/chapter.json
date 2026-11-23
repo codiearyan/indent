@@ -1,0 +1,93 @@
+{
+  "id": "code-that-waits",
+  "title": "Tests that wait",
+  "files": ["src/stock.test.js", "src/stock.js", "shed.json"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here and read what they say.",
+    "suggestedCommand": "npx vitest run src/stock.test.js"
+  },
+  "tasks": [
+    {
+      "id": "count",
+      "title": "Test a count that comes later",
+      "file": "src/stock.test.js",
+      "description": "`countOf(item)` reads `shed.json` and answers later with the number of that item in the shed. In the `count` block, test that it gives the right number for an item the shed has some of.\n\nCheck runs your tests on the working code and on versions that give the count as text, one fewer than the shed has, or 0 for everything. A test in this block must pass on the first and fail on the others.",
+      "nextSteps": [
+        "Pick an item in `shed.json` that the shed has some of, and note its count.",
+        "Make the test's function `async`.",
+        "Wait for `countOf` with `await` and compare the answer with your count.",
+        "Run the tests."
+      ],
+      "hints": [
+        "If Received says `Promise {}`, the test compared the promise, not the number it brings later.",
+        "A test can only use `await` when its own function is `async`. The lesson shows where both words go.",
+        "Write `expect(await countOf('leeks')).toBe(14)` inside a test whose function starts with `async () =>`."
+      ],
+      "docs": [
+        {
+          "title": "async function",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function"
+        },
+        {
+          "title": "await",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await"
+        },
+        { "title": "Testing asynchronous code", "url": "https://vitest.dev/guide/learn/async" }
+      ],
+      "videos": [
+        { "title": "Testing async functions", "url": "https://www.youtube.com/watch?v=WJd3lhwU3mM" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "enough",
+      "title": "Test the yes and the no from canPack",
+      "file": "src/stock.test.js",
+      "description": "`canPack(items, boxes)` answers later with `true` when the shed has at least `boxes` of every item on the list, and `false` when any of them runs short. In the `enough` block, test one list it can pack and one it cannot, where the item that runs short is not the first on the list.\n\nCheck runs your tests on the working code and on versions that say no to everything, or only look at the first item. A test in this block must pass on the first and fail on the others.",
+      "nextSteps": [
+        "Read `canPack` and the counts in `shed.json`.",
+        "Pick a list and a number of boxes that every item has enough for.",
+        "Pick a list where a later item runs short, and expect a no.",
+        "Check each answer with `resolves`, and run the tests."
+      ],
+      "hints": [
+        "A test with only a yes, or with the short item first, passes even when `canPack` skips the rest of the list.",
+        "`resolves` goes between `expect(...)` and the matcher, and the whole line needs `await` in front of it.",
+        "Write `await expect(canPack(['potatoes', 'beans'], 10)).resolves.toBe(false)`, and a second test for a yes."
+      ],
+      "docs": [
+        { "title": "resolves", "url": "https://vitest.dev/api/expect#resolves" },
+        {
+          "title": "Promise",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "unknown",
+      "title": "Test an item the shed has no count for",
+      "file": "src/stock.test.js",
+      "description": "When the form asks for an item that is not in `shed.json`, `countOf` rejects with an error whose message names that item, so Effie knows what to add. In the `unknown item` block, test that it does, for an item of your own.\n\nCheck runs your tests on the working code and on versions that answer with nothing, or reject without naming the item. A test in this block must pass on the first and fail on the others.",
+      "nextSteps": [
+        "Pick an item that is not in `shed.json`.",
+        "Give the promise from `countOf` to `expect`, not a function.",
+        "Use `rejects`, and check that the message names your item.",
+        "Run the tests."
+      ],
+      "hints": [
+        "`expect(() => countOf(item)).toThrow()` fails: an async function hands back a promise and never throws straight away.",
+        "`rejects` waits for the error, and `toThrow` with text after it checks the message, as in the last issue.",
+        "Write `await expect(countOf('figs')).rejects.toThrow('figs')`."
+      ],
+      "docs": [
+        { "title": "rejects", "url": "https://vitest.dev/api/expect#rejects" },
+        {
+          "title": "Promise.prototype.catch()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

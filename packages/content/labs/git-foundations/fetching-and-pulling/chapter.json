@@ -1,0 +1,81 @@
+{
+  "id": "fetching-and-pulling",
+  "title": "What is new on the server",
+  "files": ["NOTES.md", "shop/finds.html", "shop/index.html", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the server and your copy of it, then go into shop and work there with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "fetch",
+      "title": "Fetch what is new on the server",
+      "file": "shop/finds.html",
+      "description": "Run `node setup.mjs` in the top folder, then work inside `shop`. Overnight Femi sent two commits for `main` to the server, and Wilma one for `gift-vouchers`. `git status` still says up to date, because your copy has not asked the server since.\n\nAsk the server what is new, so that `origin/main` and `origin/gift-vouchers` know those commits. Your own branches do not have to change for this task.\n\nThe check expects `origin/main` and `origin/gift-vouchers` in `shop` to have the new commits that are on the server.",
+      "nextSteps": [
+        "Run `git status` and `git log --oneline --graph --all`: nothing new shows yet.",
+        "Ask the server for what is new with the command from the lesson, by the remote's name.",
+        "Read what Git prints: one line for each branch that moved.",
+        "Run `git status` again: main is behind origin/main."
+      ],
+      "hints": [
+        "origin/main is Git's memory of the server's main, and it only changes when your copy talks to the server.",
+        "A fetch asks origin for every new commit and moves the origin/ names. It leaves your own branches and files alone.",
+        "In shop, run `git fetch`."
+      ],
+      "docs": [
+        { "title": "git fetch", "url": "https://git-scm.com/docs/git-fetch" },
+        {
+          "title": "Fetching and pulling from your remotes",
+          "url": "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes"
+        }
+      ],
+      "videos": [{ "title": "Remote-tracking branches, drawn", "url": "https://www.youtube.com/watch?v=lff00QfvH0U" }],
+      "points": 10
+    },
+    {
+      "id": "femi",
+      "title": "Bring Femi's commits into main",
+      "file": "shop/finds.html",
+      "description": "Look at what Femi sent before you take it, then bring his two commits into your `main`. `main` has nothing new of its own, so Git only has to move it forward.\n\nThe check expects your `main` to have Femi's two new commits, and no merge left open.",
+      "nextSteps": [
+        "Make sure `git status` says `On branch main` and `behind 'origin/main' by 2 commits`.",
+        "List the commits `origin/main` has and `main` does not, as the lesson shows, and read them.",
+        "Bring them in with a merge of `origin/main`, or a pull.",
+        "Run `git status`: main is up to date with origin/main, and finds.html has the new book."
+      ],
+      "hints": [
+        "After a fetch, Femi's commits are in your copy, on origin/main. main still has to take them in.",
+        "origin/main can be merged like any branch, while you are on main. A pull does the fetch and that merge in one go.",
+        "On main, run `git merge origin/main`."
+      ],
+      "docs": [
+        { "title": "git merge", "url": "https://git-scm.com/docs/git-merge" },
+        { "title": "Remote branches", "url": "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "vouchers",
+      "title": "Pull Wilma's commit into your gift-vouchers",
+      "file": "shop/index.html",
+      "description": "Wilma's new commit links the vouchers from the home page. Your `gift-vouchers` has your fix from the last issue, which the server does not have, and the server's has Wilma's link, which yours does not.\n\nPull, while on `gift-vouchers`, so that your branch has both. Git joins the two with a merge commit, and you can keep the message it writes.\n\nThe check expects your `gift-vouchers` to have both your fix and Wilma's link, `main` not to have them, and no merge left open.",
+      "nextSteps": [
+        "Switch to `gift-vouchers` and run `git status`: it has diverged from origin/gift-vouchers.",
+        "Pull, keeping Git's message for the merge commit without an editor.",
+        "If an editor opens anyway, close it as the lesson on merging says.",
+        "Run `git log --oneline --graph`: your fix and Wilma's link meet in a merge commit."
+      ],
+      "hints": [
+        "A pull brings the server's version of the branch you are on into it, so be on gift-vouchers.",
+        "Both sides have a commit the other does not, so the merge inside the pull makes a merge commit, with a message Git writes.",
+        "On gift-vouchers, run `git pull --no-edit`."
+      ],
+      "docs": [
+        { "title": "git pull", "url": "https://git-scm.com/docs/git-pull" },
+        { "title": "Pulling", "url": "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches#_pulling" }
+      ],
+      "points": 10
+    }
+  ]
+}

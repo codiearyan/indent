@@ -1,0 +1,141 @@
+{
+  "id": "unknown-any-and-never",
+  "title": "Data you cannot trust",
+  "files": ["src/cafe.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/cafe.ts` runs the cafe orders, and `npm run types` checks their types.",
+    "suggestedCommand": "npm run types"
+  },
+  "tasks": [
+    {
+      "id": "tin",
+      "title": "Replace any with real types",
+      "file": "src/cafe.ts",
+      "description": "Under `// Task 1` in `src/cafe.ts`, `tinLine` takes a `Tin`, from the top of the file, and should give back a line like `'Frost Sencha, 50 g'`. Rafe typed its parameter and its result `any`, and it gives `undefined` where the grams should be. Replace both with real types, then fix what the compiler finds.\n\nCheck refuses `any` and `as` in your lines, and reads `tinLine` for its result type. It compiles calls of its own: a tin must compile, while a tin without its grams, a blend on its own or a line used as a number must be refused. It calls `tinLine` with tins of its own.",
+      "nextSteps": [
+        "Replace the `any` after the parameter with the type of a tin from the top of the file.",
+        "Replace the `any` after the round brackets with the type of what the function gives back.",
+        "Run `npm run types` and read what the compiler now finds in the body.",
+        "Run `node src/cafe.ts` and look at the tin line."
+      ],
+      "hints": [
+        "`any` lets every use through, so a misspelt property name compiled and gave `undefined` at run time. A real type makes the compiler read each property name.",
+        "The parameter is a `Tin`, and the result is a line of text. Once both are written, the compiler points at a property that a tin does not have, and suggests the one it does.",
+        "`export function tinLine(tin: Tin): string {`, and in the body the property is `tin.grams`."
+      ],
+      "docs": [
+        {
+          "title": "The any type",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#any"
+        },
+        {
+          "title": "Type annotations on functions",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#functions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "tins",
+      "title": "Check an unknown value before using it",
+      "file": "src/cafe.ts",
+      "description": "Under `// Task 2`, `tinsFrom` takes the tins the cafe's till sent: a number like `3`, text like `'3'`, or by mistake something else. It should give back a number: the number itself, the number the text holds, and `0` for anything else (`null`, `true`, a list, an object). Change the type of `value` from `any` to `unknown`, read what the compiler says, and check what `value` is before using it.\n\nCheck refuses `any`, `as` and a `!` after a value in your lines, and reads `tinsFrom` for its result type. It compiles calls of its own: every kind of value a till might send must compile, while the tins used as text must be refused. It calls `tinsFrom` with values of its own, `true` and a list among them.",
+      "nextSteps": [
+        "Write `unknown` in place of `any` after `value`, and run `npm run types`.",
+        "Read the error: what does the compiler let you do with an `unknown` value?",
+        "Ask which type `value` holds, and give back the right number in each branch, with `0` at the end.",
+        "Run `node src/cafe.ts`: three tins and one more should be 4, not 31."
+      ],
+      "hints": [
+        "`Type 'unknown' is not assignable to type 'number'` means the compiler will not hand back a value it knows nothing about as a number. You have to find out first.",
+        "`typeof value === 'number'` and `typeof value === 'string'` narrow an `unknown` value the same way they narrow a union. `Number(text)` turns text into a number. Anything that reaches the end is neither.",
+        "`if (typeof value === 'number') return value`, then `if (typeof value === 'string') return Number(value)`, then `return 0`."
+      ],
+      "docs": [
+        {
+          "title": "The unknown type",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#unknown"
+        },
+        {
+          "title": "typeof type guards",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#typeof-type-guards"
+        },
+        {
+          "title": "Number() conversion",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/Number"
+        }
+      ],
+      "videos": [
+        {
+          "title": "any, unknown and never",
+          "url": "https://www.youtube.com/watch?v=YpT0rCWdCaE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "order",
+      "title": "Check an order from outside",
+      "file": "src/cafe.ts",
+      "description": "Under `// Task 3`, `readOrder` takes whatever `JSON.parse` made of the cafe's text, as `unknown`. When it is an object with a `blend` that is text and `tins` that are a number, it should give back a `CafeOrder` with that blend and those tins. For anything else it should give back `null`. Rafe reads `data.blend` without checking anything, and the compiler refuses it. Check `data` step by step until the compiler knows it has both, and leave the first line of the function as it is.\n\nCheck refuses `any`, `as` and a `!` after a value in your lines, and reads `readOrder` for its result type. It compiles code of its own: anything `JSON.parse` might make must be accepted, while using the result without checking for `null` must be refused. It calls `readOrder` with values of its own: a good order, one with a property more, tins as text, a blend that is a number, a missing blend, `null`, text and a list.",
+      "nextSteps": [
+        "Run `npm run types` and read the error for the body.",
+        "Give back `null` unless `data` is an object that is not `null`.",
+        "Then give back `null` unless it has both properties, and unless each has the right type.",
+        "Build the order from the checked properties, and run both commands."
+      ],
+      "hints": [
+        "`'data' is of type 'unknown'` means you may not read a property until the compiler knows `data` is an object. Each check you write tells it a little more.",
+        "`typeof data === 'object'` is also true for `null`, so check for `null` as well. Then `'blend' in data` lets you read `data.blend`, still as `unknown`, so ask `typeof` about it too.",
+        "`if (typeof data !== 'object' || data === null) return null`, then the same with `!('blend' in data) || !('tins' in data)`, then with `typeof data.blend !== 'string' || typeof data.tins !== 'number'`, and last `return { blend: data.blend, tins: data.tins }`."
+      ],
+      "docs": [
+        {
+          "title": "The in operator narrowing",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#the-in-operator-narrowing"
+        },
+        {
+          "title": "typeof and null",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#typeof-type-guards"
+        },
+        {
+          "title": "JSON.parse()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "status",
+      "title": "Stop on a status nobody handled",
+      "file": "src/cafe.ts",
+      "description": "Under `// Task 4`, write a function called `notHandled`, with `export` in front, from the word `function` to its closing brace. It takes a value of type `never` and never gives anything back: it throws an `Error` that names the value. Write the types of its parameter and its result. Then use it in the `default` of `statusLine` in place of Rafe's `'Unknown'`, so that a status `statusLine` does not handle is a compile error, and one that slips in from outside at run time stops the code.\n\nCheck refuses `any` and `as` in your lines, and reads `notHandled` and `statusLine` for their result types. It compiles code of its own: `notHandled` must accept what is left once every kind is handled and refuse a real status. Then it adds a fourth status to `CafeStatus`, and `statusLine` must no longer compile. It calls `statusLine` with statuses of its own and with one the cafe does not have, which must stop with an error, and calls `notHandled`, which must stop with an error whose message names the value.",
+      "nextSteps": [
+        "Write the first line of `notHandled`: a parameter of type `never`, and the result type of a function that never gives back.",
+        "In its body, throw an `Error` with the value in its message.",
+        "In the `default` of `statusLine`, give back what `notHandled` gives for `status`.",
+        "Run both commands. Then try adding a fourth word to `CafeStatus` and read the error, and take it out again."
+      ],
+      "hints": [
+        "In the `default`, every status has been handled by a `case`, so the compiler gives what is left the type `never`. A parameter of type `never` accepts exactly that, and nothing else.",
+        "A function that always throws never reaches its end, so its result type is `never` too. `throw new Error(...)` stops the code with a message.",
+        "`export function notHandled(value: never): never {` with ``throw new Error(`Not handled: ${value}`)`` inside, and `default: return notHandled(status)`."
+      ],
+      "docs": [
+        {
+          "title": "The never type",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#never"
+        },
+        {
+          "title": "Exhaustiveness checking",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#exhaustiveness-checking"
+        },
+        {
+          "title": "throw",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

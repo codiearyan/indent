@@ -1,0 +1,101 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ffion", "label": "Ffion", "kind": "story" },
+      { "id": "add", "label": "addRequest()", "kind": "function", "mine": true },
+      { "id": "address", "label": "requestAddress()", "kind": "function", "mine": true },
+      { "id": "try", "label": "tryRequest()", "kind": "function", "mine": true },
+      { "id": "server", "label": "Cupboard server", "kind": "story" },
+      { "id": "list", "label": "Song request list", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "ffion", "to": "add", "label": "song and name" },
+      { "from": "add", "to": "server", "label": "JSON body" },
+      { "from": "address", "to": "server", "label": "JSON body" },
+      { "from": "try", "to": "server", "label": "JSON body" },
+      { "from": "server", "to": "list", "label": "keeps" },
+      { "from": "try", "to": "ffion", "label": "added or why" }
+    ],
+    "note": "Song requests go from the studio laptop straight onto the list, as JSON that says it is JSON."
+  },
+  "tasks": {
+    "add": {
+      "steps": [
+        {
+          "active": ["ffion", "ffion->add", "add"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "song", "value": "text" },
+              { "key": "from", "value": "text" }
+            ]
+          },
+          "note": "Ffion has a song request from a listener: the song, and who it is from."
+        },
+        {
+          "active": ["add", "add->server", "server"],
+          "note": "addRequest() sends it as a body of JSON, with a header that says the body is JSON."
+        },
+        {
+          "active": ["server", "server->list", "list"],
+          "note": "The server reads the body, puts the request on the list and gives it an id."
+        },
+        {
+          "active": ["add"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "id", "value": "a number" }]
+          },
+          "note": "The id comes back from the JSON of the answer."
+        }
+      ]
+    },
+    "address": {
+      "steps": [
+        {
+          "active": ["address", "address->server", "server"],
+          "note": "requestAddress() sends the same song request."
+        },
+        {
+          "active": ["server", "address"],
+          "note": "The answer's location header says where the new request now lives, as a path or a whole address."
+        },
+        {
+          "active": ["address"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "address", "value": "a whole address, as text" }]
+          },
+          "note": "A whole address comes back, so the studio can ask for that request later."
+        }
+      ]
+    },
+    "try": {
+      "steps": [
+        {
+          "active": ["try", "try->server", "server"],
+          "note": "tryRequest() sends a song request, which the server may take or refuse."
+        },
+        {
+          "active": ["server", "try"],
+          "note": "The status says whether it was added. A refusal still has a JSON body that says why."
+        },
+        {
+          "active": ["try", "try->ffion", "ffion"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "added", "value": "true or false" },
+              { "key": "id or reason", "value": "from the JSON" }
+            ]
+          },
+          "note": "Ffion sees that the request is on the list, or what the server wants changed."
+        }
+      ]
+    }
+  }
+}

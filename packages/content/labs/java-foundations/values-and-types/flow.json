@@ -1,0 +1,125 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "clipboard", "label": "Clipboard", "kind": "data" },
+      { "id": "seats", "label": "seats and boarded", "kind": "data" },
+      { "id": "file", "label": "Clipboard.java", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "clipboard", "to": "seats", "label": "this morning" },
+      { "from": "seats", "to": "file", "label": "by name" },
+      { "from": "file", "to": "compiler", "label": "types checked" },
+      { "from": "compiler", "to": "terminal", "label": "the count" }
+    ],
+    "note": "The clipboard's numbers become typed variables in Clipboard.java, the compiler checks each value fits its type, and the program prints the count."
+  },
+  "tasks": {
+    "crossing": {
+      "steps": [
+        {
+          "active": ["clipboard"],
+          "note": "The top of the clipboard names the crossing the Linnet makes."
+        },
+        {
+          "active": ["file"],
+          "note": "Under Task 1 you keep that text in a variable with the type for text."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "The compiler checks that the value really is text in double quotes."
+        },
+        {
+          "active": ["compiler", "compiler->terminal", "terminal"],
+          "note": "The program prints what the variable holds."
+        }
+      ]
+    },
+    "seats-left": {
+      "steps": [
+        {
+          "active": ["clipboard", "clipboard->seats", "seats"],
+          "note": "This morning the clipboard says how many seats the boat has."
+        },
+        {
+          "active": ["seats", "seats->file", "file"],
+          "note": "The seats left start at that number, taken by its name, not typed in."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "A count of seats is a whole number, and the compiler checks it is one."
+        },
+        {
+          "active": ["compiler", "compiler->terminal", "terminal"],
+          "note": "The terminal shows the seats left before anyone boards."
+        }
+      ]
+    },
+    "boarding": {
+      "steps": [
+        {
+          "active": ["seats", "seats->file"],
+          "note": "Some passengers board, and the clipboard notes how many."
+        },
+        {
+          "active": ["file"],
+          "note": "The seats left get a new value: the seats there were, less the passengers who boarded."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "value": {
+            "kind": "array",
+            "label": "the count",
+            "values": ["before boarding", "after boarding"]
+          },
+          "note": "The same variable holds a new value now. It is changed, not made again."
+        },
+        {
+          "active": ["compiler", "compiler->terminal", "terminal"],
+          "note": "The terminal shows the count before and after boarding."
+        }
+      ]
+    },
+    "fare": {
+      "steps": [
+        {
+          "active": ["clipboard"],
+          "note": "The clipboard has the price of a single crossing, in pounds and pence."
+        },
+        {
+          "active": ["file"],
+          "note": "Under Task 4 the price goes in a variable whose type keeps the part after the point."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "A type for whole numbers would lose the pence, and the compiler refuses to squeeze it in."
+        },
+        {
+          "active": ["compiler", "compiler->terminal", "terminal"],
+          "note": "The program prints the fare."
+        }
+      ]
+    },
+    "names": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "Ossian's lines keep the skipper and the boat in variables called a and b."
+        },
+        {
+          "active": ["file"],
+          "note": "Each gets a name that says what it holds, where it is made and everywhere it is used."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "A name missed in one place shows up as a name the compiler cannot find."
+        },
+        {
+          "active": ["compiler", "compiler->terminal", "terminal"],
+          "note": "The program prints the same two lines as before."
+        }
+      ]
+    }
+  }
+}

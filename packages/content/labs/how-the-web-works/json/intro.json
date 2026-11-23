@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Odette",
+      "say": "Why does the show column say Tea?",
+      "note": "Tea, Toast and Tunes is new."
+    },
+    {
+      "title": "Listings screen",
+      "text": "Cuts each line of listings at its commas."
+    },
+    {
+      "title": "Your code",
+      "file": "json.js",
+      "mine": true,
+      "gap": "Text with no parts marked",
+      "tasks": [
+        "Read a show's JSON",
+        "Read every show",
+        "JSON only if it says"
+      ]
+    },
+    {
+      "title": "Cupboard server",
+      "text": "Now answers the listings as JSON too."
+    }
+  ],
+  "ticket": {
+    "label": "Friday 9am",
+    "wrong": "split in two",
+    "why": "Cut apart",
+    "right": "one show"
+  },
+  "captions": [
+    "Odette asks why the new Friday show is split across two columns on the listings screen.",
+    "The screen cuts each line at its commas, and the new show has commas in its name.",
+    "You read the listings as JSON, and only when the server says it is JSON, in three tasks.",
+    "The show comes through whole, with its name, time and presenter each in place.",
+    "Part 2 begins: data travels as JSON, and the content-type says what a body is."
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "idris", "label": "Idris", "kind": "story" },
+      { "id": "files", "label": "Long files", "kind": "data" },
+      { "id": "read", "label": "Your reading", "kind": "story", "mine": true },
+      { "id": "screen", "label": "Terminal", "kind": "story" },
+      { "id": "kept", "label": "Saved files", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "idris", "to": "read", "label": "jobs" },
+      { "from": "files", "to": "read", "label": "lines" },
+      { "from": "read", "to": "screen", "label": "printed" },
+      { "from": "read", "to": "kept", "label": "saved" }
+    ],
+    "note": "You read files too long to scroll, look at the part that matters, and keep it in a file of its own."
+  },
+  "tasks": {
+    "join": {
+      "steps": [
+        {
+          "active": ["idris", "idris->read", "files", "files->read", "read"],
+          "value": {
+            "kind": "array",
+            "label": "mailing holds",
+            "values": ["market sign-ups", "shop sign-ups"]
+          },
+          "note": "Idris has two lists of email addresses and wants one."
+        },
+        {
+          "active": ["read", "read->screen", "screen"],
+          "note": "One command prints both lists, one after the other, in the order you name them."
+        },
+        {
+          "active": ["read", "read->kept", "kept"],
+          "note": "The same command, saved, makes one mailing list with the market's addresses on top."
+        }
+      ]
+    },
+    "first": {
+      "steps": [
+        {
+          "active": ["files", "files->read", "read"],
+          "value": {
+            "kind": "array",
+            "label": "web-orders.csv",
+            "values": ["header", "order", "order", "..."]
+          },
+          "note": "The web orders file starts with a header line, and hundreds of orders follow."
+        },
+        {
+          "active": ["read", "read->screen", "screen"],
+          "note": "Only the start of the file is printed: the header, then the orders the accountant asked for."
+        },
+        {
+          "active": ["read", "read->kept", "kept"],
+          "note": "Those lines are saved in a file of their own, ready for the accountant."
+        }
+      ]
+    },
+    "last": {
+      "steps": [
+        {
+          "active": ["idris", "idris->read", "files", "files->read", "read"],
+          "note": "Press 2 stopped at the end of March, and the newest entries are at the bottom of the log."
+        },
+        {
+          "active": ["read", "read->screen", "screen"],
+          "note": "Only the end of the March log is printed, the last thing the presses did."
+        },
+        {
+          "active": ["read", "read->kept", "kept"],
+          "note": "Those last entries are saved for Hesper to read."
+        }
+      ]
+    },
+    "counts": {
+      "steps": [
+        {
+          "active": ["files", "files->read", "read"],
+          "value": {
+            "kind": "array",
+            "label": "logs holds",
+            "values": ["January log", "February log", "March log", "a note"]
+          },
+          "note": "There is one log per month, and one line is one entry. The note is not a log."
+        },
+        {
+          "active": ["read", "read->screen", "screen"],
+          "value": {
+            "kind": "array",
+            "label": "one line per log",
+            "values": ["count", "file name"]
+          },
+          "note": "One command counts the lines of every log and prints a count beside each name."
+        },
+        {
+          "active": ["read", "read->kept", "kept"],
+          "note": "The counts are saved, so Idris can see how busy each month was."
+        }
+      ]
+    }
+  }
+}

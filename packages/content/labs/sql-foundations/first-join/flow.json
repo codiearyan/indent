@@ -1,0 +1,119 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "treatments", "label": "treatments", "kind": "data" },
+      { "id": "visits", "label": "visits", "kind": "data" },
+      { "id": "animals", "label": "animals", "kind": "data" },
+      { "id": "owners", "label": "owners", "kind": "data" },
+      { "id": "queries", "label": "Your queries", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "treatments", "to": "visits", "label": "visit_id" },
+      { "from": "visits", "to": "animals", "label": "animal_id" },
+      { "from": "animals", "to": "owners", "label": "owner_id" },
+      { "from": "treatments", "to": "queries", "label": "rows" },
+      { "from": "visits", "to": "queries", "label": "rows" },
+      { "from": "animals", "to": "queries", "label": "rows" },
+      { "from": "owners", "to": "queries", "label": "rows" }
+    ],
+    "note": "Each table points at another through an id, and your queries follow that id to put two tables together."
+  },
+  "tasks": {
+    "owner-names": {
+      "steps": [
+        {
+          "active": ["animals", "animals->owners", "owners"],
+          "note": "Each animal holds the id of its owner, and that id names one row in owners."
+        },
+        {
+          "active": ["animals", "owners", "animals->queries", "owners->queries", "queries"],
+          "note": "The join puts every animal beside the owner its id points at, in one wide row."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["animal", "first_name", "last_name"],
+            "cells": [["an animal's name", "its owner's first name", "its owner's last name"]]
+          },
+          "note": "Winnie gets one row per animal, with the owner's name beside it."
+        }
+      ]
+    },
+    "larkhill-animals": {
+      "steps": [
+        {
+          "active": ["animals", "animals->owners", "owners"],
+          "note": "The town is on the owner's row, not on the animal's."
+        },
+        {
+          "active": ["animals", "owners", "animals->queries", "owners->queries", "queries"],
+          "note": "Joined, each row carries the animal and its owner's town and phone together."
+        },
+        {
+          "active": ["queries"],
+          "note": "Only the rows whose owner lives in Larkhill are kept."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["animal", "species", "phone"],
+            "cells": [["an animal's name", "its species", "its owner's phone"]]
+          },
+          "note": "Mabel gets her list of calls for the home visits."
+        }
+      ]
+    },
+    "treatment-dates": {
+      "steps": [
+        {
+          "active": ["treatments", "treatments->visits", "visits"],
+          "note": "Each treatment holds the id of the visit it was given at."
+        },
+        {
+          "active": ["treatments", "visits", "treatments->queries", "visits->queries", "queries"],
+          "note": "Both tables have an id, so the join has to say which table's id it means."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["visit_date", "vet", "treatment", "price"],
+            "cells": [["a date", "a vet", "a treatment's name", "a price"]]
+          },
+          "note": "Rosamund gets every line of the accounts with its date and its vet."
+        }
+      ]
+    },
+    "ifan-visits": {
+      "steps": [
+        {
+          "active": ["visits", "visits->animals", "animals"],
+          "note": "Each visit holds the id of the animal that came in."
+        },
+        {
+          "active": ["visits", "animals", "visits->queries", "animals->queries", "queries"],
+          "note": "The join puts each visit beside its own animal. Pairing the wrong ids would put a stranger there."
+        },
+        {
+          "active": ["queries"],
+          "note": "Only Ifan's visits are kept, and the newest comes first."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["visit_date", "animal", "species", "reason"],
+            "cells": [["the newest date", "an animal's name", "its species", "a reason"]]
+          },
+          "note": "Ifan sees who he saw, and when."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Order page", "say": "Delete the price list, please.", "note": "A request nobody meant it to take." },
+    { "title": "Old server", "text": "An if for every address, method unread.", "note": "Nobody dares change it." },
+    {
+      "title": "Your router",
+      "file": "router.js",
+      "mine": true,
+      "gap": "No table of routes",
+      "tasks": ["Keep a table of routes", "Say there is none", "Say which methods"]
+    },
+    { "title": "Hesper", "say": "A plain no. Good.", "note": "She can read every route." }
+  ],
+  "ticket": { "label": "DELETE /prices", "wrong": "fake yes", "why": "Method blind", "right": "plain no" },
+  "captions": [
+    "At Ashgrove Press, a request asks the order server to delete the price list.",
+    "The old server never reads the method, so it answers as if all went well.",
+    "You write a router with a table of routes and two ways to say no, in three tasks.",
+    "Now the request gets a plain no that says which methods the price list takes.",
+    "Same order page, same shop, and a server Hesper can read route by route."
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "id": "text",
+  "title": "Text and String",
+  "files": ["Tickets.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the ticket here to see what the printer would get.",
+    "suggestedCommand": "java Tickets.java"
+  },
+  "tasks": [
+    {
+      "id": "party",
+      "title": "Print the party size",
+      "file": "Tickets.java",
+      "description": "Under `// Task 1` in `Tickets.java`, print one line that says how many people travel on the ticket, `adults` and `children` together:\n\n```\nPassengers: 5\n```\n\nCheck runs your Task 1 lines with parties of its own and reads the number after `Passengers:`.",
+      "nextSteps": [
+        "Print the line with the text and the two names joined by `+`.",
+        "Run `java Tickets.java`: is the number what you expected?",
+        "Read the part of the lesson about the order `+` works in.",
+        "Make Java add the two numbers before they join the text."
+      ],
+      "hints": [
+        "Java reads a line of `+` from the left. Once the left side is a `String`, each `+` after it joins text.",
+        "Brackets are worked out first, so a sum inside brackets is added as numbers before it meets the text.",
+        "The line has the shape `System.out.println(\"Passengers: \" + (... + ...));`."
+      ],
+      "docs": [
+        {
+          "title": "Strings: joining with +",
+          "url": "https://docs.oracle.com/javase/tutorial/java/data/strings.html"
+        },
+        {
+          "title": "String concatenation in the Java language",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-15.html#jls-15.18.1"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "code",
+      "title": "Make the short code",
+      "file": "Tickets.java",
+      "description": "Under `// Task 2`, make a `String` called `code`: the first three letters of `destination`, in capital letters. For `Corran` that is `COR`.\n\nCheck runs your Task 2 lines with destinations of its own, one of exactly three letters, and reads `code`.",
+      "nextSteps": [
+        "Read the part of the lesson about positions in a `String`.",
+        "Cut the first three letters out of `destination` with `substring`.",
+        "Turn them into capitals with the method the lesson shows.",
+        "Print `code` and run the program."
+      ],
+      "hints": [
+        "Positions start at 0. The first three letters are at positions 0, 1 and 2.",
+        "`substring(start, end)` gives the letters from `start` up to, but not including, `end`. `toUpperCase()` gives a capital copy.",
+        "The line has the shape `String code = destination.substring(0, ...).toUpperCase();`."
+      ],
+      "docs": [
+        {
+          "title": "String: substring and toUpperCase",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html"
+        },
+        {
+          "title": "Manipulating characters in a String",
+          "url": "https://docs.oracle.com/javase/tutorial/java/data/manipstrings.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "right-boat",
+      "title": "Check the boat on the ticket",
+      "file": "Tickets.java",
+      "description": "Under `// Task 3`, make a `boolean` called `rightBoat`: `true` when `ticketBoat` is the same text as `todayBoat`, `false` when it is not. `ticketBoat` is cut out of the ticket near the top of the file.\n\nCheck runs your Task 3 lines with tickets and boats of its own, some that match and some that do not, and reads `rightBoat`.",
+      "nextSteps": [
+        "Read the part of the lesson about comparing text.",
+        "Make `rightBoat` with the comparison it recommends.",
+        "Print it and run the program: today's ticket is for today's boat.",
+        "Change `todayBoat` at the top for a moment and run again, then change it back."
+      ],
+      "hints": [
+        "Comparing two `String`s with `==` looks right and often says false for the same text. The lesson explains why.",
+        "Every `String` has a method that compares its letters with another `String`'s and gives `true` or `false`.",
+        "The line has the shape `boolean rightBoat = ticketBoat.equals(...);`."
+      ],
+      "docs": [
+        {
+          "title": "Comparing Strings",
+          "url": "https://docs.oracle.com/javase/tutorial/java/data/comparestrings.html"
+        },
+        {
+          "title": "String: equals",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html#equals(java.lang.Object)"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Why == and equals differ",
+          "url": "https://www.youtube.com/watch?v=AoUVdLWLFQw"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "space-left",
+      "title": "Fit the ticket on the printer",
+      "file": "Tickets.java",
+      "description": "Under `// Task 4`, the printer fits 24 characters on a line. Make an `int` called `spaceLeft`: how many characters are left on the line after `ticket`. Spaces count as characters.\n\nCheck runs your Task 4 lines with tickets of its own and reads `spaceLeft`.",
+      "nextSteps": [
+        "Find the method that gives how many characters a `String` has.",
+        "Take that away from 24.",
+        "Print `spaceLeft` and run the program.",
+        "Count the characters of today's ticket by hand to check the number."
+      ],
+      "hints": [
+        "Every `String` knows its own length, spaces included.",
+        "`length()` is a method, so it needs its round brackets, even with nothing inside.",
+        "The line has the shape `int spaceLeft = 24 - ticket.length();`."
+      ],
+      "docs": [
+        {
+          "title": "String: length",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html#length()"
+        },
+        {
+          "title": "Strings",
+          "url": "https://docs.oracle.com/javase/tutorial/java/data/strings.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

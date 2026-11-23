@@ -1,0 +1,7 @@
+[
+  { "id": "sat-1030", "time": "10:30", "tram": "The Foundry Belle" },
+  { "id": "sat-1100", "time": "11:00", "tram": "The Wenlow Open-top" },
+  { "id": "sat-1300", "time": "13:00", "tram": "The Foundry Belle" },
+  { "id": "sat-1400", "time": "14:00", "tram": "The Kettleby Car" },
+  { "id": "sat-1530", "time": "15:30", "tram": "The Wenlow Open-top" }
+]

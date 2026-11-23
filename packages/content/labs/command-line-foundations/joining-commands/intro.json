@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "What sold best on Saturday?", "note": "Every sale is one line." },
+    {
+      "title": "Sales list",
+      "text": "Hundreds of lines, the same items again.",
+      "note": "One command alone cannot answer."
+    },
+    {
+      "title": "Your commands",
+      "file": "today.txt",
+      "mine": true,
+      "gap": "Counting by hand",
+      "tasks": ["What sold", "The best sellers", "Add today's jobs", "Sort the stock"]
+    },
+    { "title": "Hesper", "say": "So that is what to print more of." }
+  ],
+  "ticket": { "label": "Saturday", "wrong": "a guess", "why": "Not counted", "right": "counted" },
+  "captions": [
+    "At Ashgrove, Hesper wants to know what sold best at Saturday's market.",
+    "The sales list repeats the same items hundreds of times, too many to count by hand.",
+    "You join commands into chains, and change Idris's files safely, in four small tasks.",
+    "The chain sorts, counts and ranks the sales, and Idris's files keep every line.",
+    "Hesper knows what to print more of, and no file was emptied by mistake."
+  ]
+}

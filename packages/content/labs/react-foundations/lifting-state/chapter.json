@@ -1,0 +1,90 @@
+{
+  "id": "lifting-state",
+  "title": "State two components share",
+  "files": ["src/TramGuide.jsx", "src/trams.js", "src/App.jsx"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "move-up",
+      "title": "Keep the chosen tram in TramGuide and hand it down",
+      "file": "src/TramGuide.jsx",
+      "description": "Take the chosen tram out of `TramList` and `TramPanel`, and keep it in one place: state in `TramGuide` for the chosen tram, starting with the first tram of `trams`. Its `number` is the simplest thing to keep.\n\n- `TramList({ trams, chosen })` marks the button of the tram whose number is `chosen` with `aria-pressed`, and keeps no state of its own.\n- `TramPanel({ tram })` shows the tram it is given, and keeps no state of its own.\n- `TramGuide` hands `chosen` to the list and the chosen tram object to the panel.\n\nPressing does nothing for now; the next two tasks bring it back. The check draws `TramList` and `TramPanel` on their own with trams of its own, changes their props, and looks at what they show. Then it draws `TramGuide` and looks at the list and the panel. Where the state lives only shows once something changes it, so the next two tasks check that.",
+      "nextSteps": [
+        "Read \"Two copies disagree\" and \"Move the state up\" in the lesson.",
+        "Add the state to `TramGuide`, and work out the chosen tram object from it.",
+        "Give `TramList` a `chosen` prop and `TramPanel` a `tram` prop, and remove their own state.",
+        "Change the starting number in the Browser panel and watch both follow."
+      ],
+      "hints": [
+        "Two pieces of state that should always be equal are one too many. Keep one, in the component that draws both.",
+        "`useState` moves to `TramGuide`. The list compares each tram's number with its `chosen` prop; the panel draws whatever `tram` prop it gets. `find` gives the tram object for a number.",
+        "In `TramGuide`: `const [chosen, setChosen] = useState(trams[0].number)` and `const tram = trams.find((t) => t.number === chosen)`, then `<TramList trams={trams} chosen={chosen} />` and `<TramPanel tram={tram} />`."
+      ],
+      "docs": [
+        { "title": "Sharing state between components", "url": "https://react.dev/learn/sharing-state-between-components" },
+        {
+          "title": "Avoid duplication in state",
+          "url": "https://react.dev/learn/choosing-the-state-structure#avoid-duplication-in-state"
+        }
+      ],
+      "videos": [{ "title": "Lifting state up", "url": "https://www.youtube.com/watch?v=UaeQ-LWOFDg" }],
+      "points": 10
+    },
+    {
+      "id": "choose",
+      "title": "Choose a tram from the list",
+      "file": "src/TramGuide.jsx",
+      "description": "Give `TramList` an `onChoose` prop. Pressing a tram's button calls `onChoose` once with that tram's `number`. The list does not move its own mark: the mark only follows `chosen`. `TramGuide` hands the list a function that sets its state, so the list and the panel move together.\n\nThe check draws `TramList` alone with an `onChoose` of its own that writes down each call and changes nothing, and presses trams. Then it draws `TramGuide` and presses trams in the list, looking at the list and the panel after each press.",
+      "nextSteps": [
+        "Read \"Changes travel up\" in the lesson.",
+        "Take `onChoose` in `TramList`, and call it from each button with the tram's number.",
+        "Hand `TramList` an `onChoose` from `TramGuide` that sets the chosen number.",
+        "Press trams in the Browser panel and watch the panel follow."
+      ],
+      "hints": [
+        "The list cannot change `chosen` itself: it is a prop. It can only tell its owner what was pressed.",
+        "The button calls `onChoose` with the tram's number, wrapped in an arrow so nothing is called while drawing. The setter itself is a fine function to hand down.",
+        "`onClick={() => onChoose(tram.number)}` in the list, and `<TramList trams={trams} chosen={chosen} onChoose={setChosen} />` in `TramGuide`."
+      ],
+      "docs": [
+        {
+          "title": "Passing event handlers as props",
+          "url": "https://react.dev/learn/responding-to-events#passing-event-handlers-as-props"
+        },
+        {
+          "title": "Controlled and uncontrolled components",
+          "url": "https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "Move to the next tram from the panel",
+      "file": "src/TramGuide.jsx",
+      "description": "Give `TramPanel` an `onNext` prop, and call it when Next tram is pressed. The panel does not know the other trams, so `TramGuide` does the moving: it hands the panel a function that sets the chosen tram to the one after it in `trams`, and after the last tram comes the first.\n\nThe check draws `TramPanel` alone with an `onNext` of its own and presses Next tram. Then it draws `TramGuide` with trams of its own, presses Next tram once for each of them, and looks at the panel and the list after each press. Once the list can choose, it also chooses a tram there and presses Next tram.",
+      "nextSteps": [
+        "Read \"Changes travel up\" again, then \"One source of truth\".",
+        "Call `onNext` from the panel's Next tram button.",
+        "Move the work of `next` into `TramGuide`, so it changes `TramGuide`'s state.",
+        "Press Next tram past the last tram in the Browser panel."
+      ],
+      "hints": [
+        "Whoever owns the state is the one who changes it. The panel only says that Next was pressed.",
+        "The starter's `next` function already does the moving; it just lives in the wrong component. `% trams.length` turns the index after the last into 0.",
+        "In `TramGuide`: `function next() { const at = trams.indexOf(tram); setChosen(trams[(at + 1) % trams.length].number) }`, then `<TramPanel tram={tram} onNext={next} />`, and `onClick={onNext}` on the button."
+      ],
+      "docs": [
+        { "title": "Sharing state between components", "url": "https://react.dev/learn/sharing-state-between-components" },
+        {
+          "title": "Remainder (%)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

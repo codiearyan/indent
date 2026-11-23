@@ -1,0 +1,125 @@
+{
+  "id": "first-program",
+  "title": "Your first program",
+  "files": ["Notice.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your program here and read what it prints.",
+    "suggestedCommand": "java Notice.java"
+  },
+  "tasks": [
+    {
+      "id": "welcome",
+      "title": "Print the welcome",
+      "file": "Notice.java",
+      "description": "Under `// Task 1` in `Notice.java`, print this line:\n\n```\nWelcome to Lanternquay Ferries\n```\n\nCheck compiles and runs your Task 1 lines, and looks for a line that matches this one exactly, capital letters and spaces included.",
+      "nextSteps": [
+        "Run `java Notice.java` once and read what it prints today.",
+        "Look at the line that prints the good morning: it is your model.",
+        "Write a new line under `// Task 1` that prints the welcome.",
+        "Run the program again and compare the output with the task."
+      ],
+      "hints": [
+        "The program already prints one line. Read how that line is written, down to the semicolon at its end.",
+        "Text sits inside double quotes, the quotes sit inside the round brackets, and the statement ends with a semicolon.",
+        "The line has the shape `System.out.println(\"...\");`, with the welcome where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "The java command: running a source file",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html"
+        },
+        {
+          "title": "PrintStream: println and print",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/PrintStream.html"
+        },
+        {
+          "title": "A closer look at a first Java program",
+          "url": "https://docs.oracle.com/javase/tutorial/getStarted/application/index.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What each word of main means",
+          "url": "https://www.youtube.com/watch?v=P-_Nzi_mCRo"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "times",
+      "title": "Print the crossing times",
+      "file": "Notice.java",
+      "description": "Under `// Task 2`, print the two lines of the crossing times, in this order:\n\n```\nBoats cross every half hour\nLast boat back at half past seven\n```\n\nCheck compiles and runs your Task 2 lines and looks for both lines, the second right after the first.",
+      "nextSteps": [
+        "Find `// Task 2` and read the two lines in the comment.",
+        "Print the first line with its own `System.out.println`.",
+        "Print the second line on the line below it.",
+        "Run the program and read the output from top to bottom."
+      ],
+      "hints": [
+        "One `System.out.println` prints one line. How many lines are there?",
+        "Java runs the lines inside main from top to bottom, so the order you write them in is the order they print in.",
+        "Two `System.out.println(\"...\");` lines, one under the other, each with one of the times in double quotes."
+      ],
+      "docs": [
+        {
+          "title": "PrintStream: println and print",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/PrintStream.html"
+        },
+        {
+          "title": "Getting started with Java",
+          "url": "https://dev.java/learn/getting-started/"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hours",
+      "title": "Print the hours on one line",
+      "file": "Notice.java",
+      "description": "Under `// Task 3`, two lines print the hut's hours on two lines. Change how the first one prints, so both parts come out on one line, and the line ends after them:\n\n```\nHut open from 6:30 to 20:00\n```\n\nKeep both lines. Check compiles and runs your Task 3 lines, looks for that one line, and reads your lines to see that there are still two and that the first prints in the other way the lesson shows.",
+      "nextSteps": [
+        "Run the program and find the hours in the output: they are on two lines.",
+        "Read the part of the lesson about the two ways to print.",
+        "Change the first of the two lines, not its text.",
+        "Run the program again: the hours should be on one line."
+      ],
+      "hints": [
+        "Both lines use the same way of printing. The lesson shows two.",
+        "`println` ends the line after it prints. The other way leaves the line open, so the next print carries on right after it.",
+        "Change the first line to `System.out.print(\"Hut open from 6:30 \");` and leave the second as it is."
+      ],
+      "docs": [
+        {
+          "title": "PrintStream: println and print",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/PrintStream.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "old-notice",
+      "title": "Switch off the old notice",
+      "file": "Notice.java",
+      "description": "Under `// Task 4` there is a line that prints a notice the hut no longer runs. Turn it into a comment, so it stays in the file but no longer runs.\n\nCheck compiles and runs your Task 4 lines to see that the notice is not printed, then reads them to see that the line is still there as a comment.",
+      "nextSteps": [
+        "Run the program and find the old notice in the output.",
+        "Find the line under `// Task 4` that prints it.",
+        "Turn that one line into a comment. Do not delete it.",
+        "Run the program again: the notice should be gone from the output."
+      ],
+      "hints": [
+        "The lesson shows a way to keep a line in the file while Java skips it.",
+        "Every comment in this file starts the same way. Look at the start of the lines that do not print anything.",
+        "Put `//` at the very start of the notice's line."
+      ],
+      "docs": [
+        {
+          "title": "Comments in the Java language",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.7"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

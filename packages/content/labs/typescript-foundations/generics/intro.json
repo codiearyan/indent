@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Bryn",
+      "say": "How many tins in OK-1043?",
+      "note": "The code will not say."
+    },
+    {
+      "title": "List helpers",
+      "text": "Work on any list, and forget its type."
+    },
+    {
+      "title": "Your code",
+      "file": "lists.ts",
+      "mine": true,
+      "gap": "Hands back an unknown",
+      "tasks": ["Keep the first's type", "Find by id", "A result of any kind", "Drop a needless T"]
+    },
+    {
+      "title": "Today's orders",
+      "rows": [
+        ["OK-1042", "tins counted"],
+        ["OK-1043", "tins counted"]
+      ],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "OK-1043",
+    "wrong": "a guess",
+    "why": "Type lost",
+    "right": "tins read"
+  },
+  "captions": [
+    "Bryn asks how many tins are in order OK-1043 at Oakhollow.",
+    "The helper found the order, and handed it back with its type forgotten.",
+    "You write helpers with a type parameter, so what comes out keeps its type.",
+    "Now the order comes back as an order, and Bryn reads its tins.",
+    "Every list helper hands back the type it was given, and none has a needless T."
+  ]
+}

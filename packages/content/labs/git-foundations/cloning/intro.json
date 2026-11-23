@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilma", "say": "Get your copy from the server.", "note": "And fix my voucher line." },
+    { "title": "Shop's server", "text": "The site's history lives here now.", "note": "Your new laptop has none." },
+    {
+      "title": "Your commands",
+      "file": "visit.html",
+      "mine": true,
+      "gap": "No copy on the laptop",
+      "tasks": ["Clone the server", "Get Wilma's branch", "Commit the fix"]
+    },
+    { "title": "Your laptop", "rows": [["The whole history"], ["Wilma's branch"], ["A fix, not sent yet"]] }
+  ],
+  "ticket": { "label": "Voucher fix", "wrong": "no copy yet", "why": "No copy", "right": "on your copy" },
+  "captions": [
+    "Femi put the shop's repository on a server, and Wilma wants your laptop to have a copy.",
+    "The history lives on the server now, and your laptop has nothing to work in.",
+    "You clone the server, get Wilma's branch and commit a fix, in three tasks.",
+    "Your copy has the whole history and the fix, which waits for Wilma to read it.",
+    "One history on a server, and a copy on each computer."
+  ]
+}

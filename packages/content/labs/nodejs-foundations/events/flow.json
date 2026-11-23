@@ -1,0 +1,91 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "log", "label": "The logger's log", "kind": "data" },
+      { "id": "watch", "label": "watch.js", "kind": "file", "mine": true },
+      { "id": "meter", "label": "Meter", "kind": "function", "mine": true },
+      { "id": "alarm", "label": "Shed alarm", "kind": "story" },
+      { "id": "counts", "label": "Counts", "kind": "data" },
+      { "id": "imran", "label": "Imran", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "log", "to": "watch", "label": "a line" },
+      { "from": "watch", "to": "meter", "label": "feed" },
+      { "from": "meter", "to": "alarm", "label": "first leak" },
+      { "from": "meter", "to": "counts", "label": "events" },
+      { "from": "counts", "to": "imran", "label": "readings, leaks" }
+    ],
+    "note": "A Meter turns each line of the log into events, and watch.js listens: the alarm rings at the first leak, and everything is counted."
+  },
+  "tasks": {
+    "reading": {
+      "steps": [
+        {
+          "active": ["watch", "watch->meter", "meter"],
+          "note": "The meter is fed one line of the log at a time."
+        },
+        {
+          "active": ["meter"],
+          "value": { "kind": "map", "label": "what a reading event carries", "entries": [{ "key": "time", "value": "text" }, { "key": "tap", "value": "text" }, { "key": "litres", "value": "a number" }] },
+          "note": "For a reading, it emits a reading event with one object of the line's three parts."
+        },
+        {
+          "active": ["meter->counts", "counts"],
+          "note": "Whoever listens gets the object straight away. Blank lines and notes emit nothing."
+        }
+      ]
+    },
+    "leak": {
+      "steps": [
+        {
+          "active": ["meter"],
+          "note": "The meter was made with a limit of litres a minute, and keeps it."
+        },
+        {
+          "active": ["meter->counts", "counts"],
+          "note": "Every reading is emitted as before."
+        },
+        {
+          "active": ["meter->alarm", "alarm"],
+          "note": "When the litres are more than the limit, a leak event follows, with the same reading."
+        }
+      ]
+    },
+    "error": {
+      "steps": [
+        {
+          "active": ["log", "log->watch", "watch", "watch->meter", "meter"],
+          "note": "After a power cut, the logger wrote half a line, and it reaches the meter."
+        },
+        {
+          "active": ["meter"],
+          "note": "It is not a reading, so the meter emits an error event with an Error that names the line."
+        },
+        {
+          "active": ["meter->counts", "counts"],
+          "note": "With a listener, the error is reported and the next line is read. With none, Node stops the script."
+        }
+      ]
+    },
+    "watch": {
+      "steps": [
+        {
+          "active": ["log", "log->watch", "watch"],
+          "note": "watch.js listens to its meter first, then reads the log a line at a time."
+        },
+        {
+          "active": ["watch->meter", "meter", "meter->alarm", "alarm"],
+          "note": "At the first leak the alarm rings, and its listener takes itself off the meter."
+        },
+        {
+          "active": ["meter->counts", "counts"],
+          "note": "Readings and leaks are counted, the later leaks included. Broken lines are reported on standard error."
+        },
+        {
+          "active": ["counts->imran", "imran"],
+          "note": "When the log ends, Imran gets one line with the counts, and the exit code says whether a line was skipped."
+        }
+      ]
+    }
+  }
+}

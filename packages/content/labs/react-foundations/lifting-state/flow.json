@@ -1,0 +1,49 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "visitor", "label": "Visitor", "kind": "story" },
+      { "id": "list", "label": "TramList", "kind": "function", "mine": true },
+      { "id": "guide", "label": "TramGuide", "kind": "function", "mine": true },
+      { "id": "chosen", "label": "Chosen tram", "kind": "data", "mine": true },
+      { "id": "panel", "label": "TramPanel", "kind": "function", "mine": true },
+      { "id": "screen", "label": "List and panel", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "visitor", "to": "list", "label": "presses" },
+      { "from": "list", "to": "guide", "label": "onChoose" },
+      { "from": "panel", "to": "guide", "label": "onNext" },
+      { "from": "guide", "to": "chosen", "label": "set" },
+      { "from": "chosen", "to": "list", "label": "chosen" },
+      { "from": "chosen", "to": "panel", "label": "tram" },
+      { "from": "list", "to": "screen", "label": "draw" },
+      { "from": "panel", "to": "screen", "label": "draw" }
+    ],
+    "note": "The chosen tram lives once, in TramGuide, so the list and the panel are always drawn from the same value."
+  },
+  "tasks": {
+    "move-up": {
+      "steps": [
+        { "active": ["guide", "guide->chosen", "chosen"], "value": { "kind": "map", "label": "TramGuide's state", "entries": [{ "key": "chosen", "value": "a tram's number" }] }, "note": "The guide keeps the one chosen tram, starting with the first in the shed." },
+        { "active": ["chosen", "chosen->list", "list"], "note": "The list is told which tram is chosen, and marks it." },
+        { "active": ["chosen", "chosen->panel", "panel"], "note": "The panel is handed that tram, and shows it." },
+        { "active": ["list", "list->screen", "panel", "panel->screen", "screen"], "note": "Both halves of the screen talk about the same tram." }
+      ]
+    },
+    "choose": {
+      "steps": [
+        { "active": ["visitor", "visitor->list", "list"], "note": "A visitor presses a tram in the list." },
+        { "active": ["list", "list->guide", "guide"], "value": { "kind": "map", "label": "onChoose", "entries": [{ "key": "number", "value": "the tram pressed" }] }, "note": "The list cannot change what it was told, so it tells the guide which tram was pressed." },
+        { "active": ["guide", "guide->chosen", "chosen"], "note": "The guide changes the chosen tram." },
+        { "active": ["chosen", "chosen->list", "chosen->panel", "list", "panel", "screen"], "note": "The list and the panel are drawn again from the new choice, together." }
+      ]
+    },
+    "next": {
+      "steps": [
+        { "active": ["visitor", "panel"], "note": "A visitor presses Next tram on the panel." },
+        { "active": ["panel", "panel->guide", "guide"], "note": "The panel only knows its own tram, so it tells the guide that Next was pressed." },
+        { "active": ["guide", "guide->chosen", "chosen"], "note": "The guide, which has every tram, moves on to the next, and from the last back to the first." },
+        { "active": ["chosen", "chosen->list", "chosen->panel", "list", "panel", "screen"], "note": "The panel shows the next tram and the list marks it." }
+      ]
+    }
+  }
+}

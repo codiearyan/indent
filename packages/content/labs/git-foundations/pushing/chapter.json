@@ -1,0 +1,99 @@
+{
+  "id": "pushing",
+  "title": "Sending your work to the server",
+  "files": ["NOTES.md", "shop/visit.html", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the server and your copy of it, then go into shop and work there with git.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "vouchers",
+      "title": "Send gift-vouchers to the server",
+      "file": "shop/visit.html",
+      "description": "Run `node setup.mjs` in the top folder, then work inside `shop`. Wilma has read your voucher fix and says yes. Your `gift-vouchers` has the fix and the merge with her link, and the server's `gift-vouchers` has neither yet.\n\nSend your `gift-vouchers` to the server's `gift-vouchers`.\n\nThe check expects the server's `gift-vouchers` to have your fix and Wilma's link.",
+      "nextSteps": [
+        "Switch to `gift-vouchers` and run `git status`: ahead of origin/gift-vouchers by 2 commits.",
+        "Send it with the command from the lesson.",
+        "Read what Git prints: the old and new commit, and `gift-vouchers -> gift-vouchers`.",
+        "Run `git status` again: up to date with origin/gift-vouchers."
+      ],
+      "hints": [
+        "Sending commits to a remote is a push. It goes the other way from a fetch.",
+        "With no names, a push sends the branch you are on to the server branch it follows, so be on gift-vouchers.",
+        "On gift-vouchers, run `git push`."
+      ],
+      "docs": [
+        { "title": "git push", "url": "https://git-scm.com/docs/git-push" },
+        { "title": "Pushing to your remotes", "url": "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "closed",
+      "title": "Commit the August closing on main",
+      "file": "shop/visit.html",
+      "description": "Wilma closes the shop for a week to count the stock. On `main`, open `shop/visit.html` and add this line just under the phone number:\n\n```\n<p>Closed for stocktaking from 10 to 16 August.</p>\n```\n\nSave it and commit it on `main`. Change no other file. Then you can try to send `main` to the server, and read what Git says.\n\nThe check expects a commit on `main` whose `visit.html` has that line, with every other line as it was.",
+      "nextSteps": [
+        "Switch to `main`; `git status` says up to date with origin/main, as of the last fetch.",
+        "Add the line in the editor, save, stage and commit.",
+        "Push `main` and read the message: rejected, and why.",
+        "Leave it there for now: the next task deals with it."
+      ],
+      "hints": [
+        "The closing week goes on main, the site, not on gift-vouchers.",
+        "Copy the line from the task into visit.html under the phone number, then stage and commit as always.",
+        "On main, add the line and save, then run `git add visit.html` and `git commit -m \"Say the shop is closed from 10 to 16 August\"`."
+      ],
+      "docs": [
+        { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" },
+        { "title": "Note about fast-forwards", "url": "https://git-scm.com/docs/git-push#_note_about_fast_forwards" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pull",
+      "title": "Bring Femi's newest find into main",
+      "file": "shop/visit.html",
+      "description": "This morning Femi sent one more find to the server, so the server's `main` has a commit yours does not, and Git refused your push. Bring Femi's commit into your `main`, next to your closing week. Git joins the two with a merge commit, and you can keep the message it writes.\n\nThe check expects your `main` to have Femi's newest find, and no merge left open.",
+      "nextSteps": [
+        "On `main`, read the push message again: the server has work you do not have.",
+        "Pull, keeping Git's message for the merge commit without an editor.",
+        "Run `git log --oneline --graph`: your commit and Femi's meet in a merge commit.",
+        "Run `git status`: ahead of origin/main, and no longer behind."
+      ],
+      "hints": [
+        "A push is only taken when it moves the server's branch forward. Yours would drop Femi's commit, so it was refused.",
+        "Pull on main, as in the last issue. Both sides have a commit, so the merge makes a merge commit.",
+        "On main, run `git pull --no-edit`."
+      ],
+      "docs": [
+        { "title": "git pull", "url": "https://git-scm.com/docs/git-pull" },
+        { "title": "Pulling", "url": "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches#_pulling" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "push",
+      "title": "Send main to the server again",
+      "file": "shop/visit.html",
+      "description": "Now your `main` has everything the server's has, and your closing week on top. Send it to the server again.\n\nThe check expects the server's `main` to have your closing week and Femi's newest find.",
+      "nextSteps": [
+        "Make sure you are on `main` and `git status` says ahead of origin/main.",
+        "Push `main` again.",
+        "Read what Git prints: this time the old and new commit, with no rejected.",
+        "Run `git status`: up to date with origin/main."
+      ],
+      "hints": [
+        "Since the pull, your main has Femi's commit, so the push moves the server's main forward.",
+        "The same push as before, on main, now goes through.",
+        "On main, run `git push`."
+      ],
+      "docs": [
+        { "title": "git push", "url": "https://git-scm.com/docs/git-push" },
+        { "title": "Pushing branches", "url": "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches#_pushing_branches" }
+      ],
+      "points": 10
+    }
+  ]
+}

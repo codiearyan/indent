@@ -12,6 +12,12 @@ const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`
 const norm = (v) => (typeof v === 'number' ? Math.round(v * 1e6) / 1e6 : v)
 const key = (row) => JSON.stringify(row.map(norm))
 const describe = (columns, row) => columns.map((c, i) => `${c} = ${show(row[i])}`).join(', ')
+const UNPAIRED =
+  'A JOIN with no ON pairs every row of one table with every row of the other, so the rows multiply. Each join needs an ON that says which rows belong together.'
+/** True when a query has more joins than ON or USING, or lists two tables after FROM with a comma and no WHERE. */
+const unpaired = (code) =>
+  (code.match(/\bjoin\b/g) ?? []).length > (code.match(/\b(on|using)\b/g) ?? []).length ||
+  (/\bfrom\s+\w+(\s+(as\s+)?\w+)?\s*,/.test(code) && !/\bwhere\b/.test(code))
 
 export function formatTable(result) {
   if (!result.columns) return undefined
@@ -59,7 +65,7 @@ function problem(mine, file) {
   if (mine.tooMany) {
     return fail(
       'The query returns a sensible number of rows',
-      'Your query returned more than 1000 rows, far more than any table here holds. Look for a part of it that repeats rows.'
+      `Your query returned more than 1000 rows, far more than any table here holds. Look for a part of it that repeats rows.${unpaired(mine.code.toLowerCase()) ? ` ${UNPAIRED}` : ''}`
     )
   }
   return null
@@ -71,17 +77,23 @@ function hints(mine, missing, unexpected, values) {
   const code = mine.code.toLowerCase()
   const litsBefore = (i) => (code.slice(0, i).match(/''/g) ?? []).length
   const whereAt = code.search(/\bwhere\b/)
-  const conditionLits = whereAt === -1 ? [] : mine.literals.slice(litsBefore(whereAt))
-  const plain = whereAt !== -1 && !conditionLits.some((lit) => lit.trim().toUpperCase() === 'NULL')
+  const joined = /\bjoin\b/.test(code)
+  const left = /\bleft\s+(outer\s+)?join\b/.test(code)
+  const condAt = code.search(/\b(where|on)\b/)
+  const whereClause = whereAt === -1 ? '' : code.slice(whereAt)
+  const testsNull = /\bis\s+null\b/.test(whereClause)
+  const conditionLits = condAt === -1 ? [] : mine.literals.slice(litsBefore(condAt))
+  const plain = condAt !== -1 && !conditionLits.some((lit) => lit.trim().toUpperCase() === 'NULL')
     ? conditionLits.filter((lit) => /[a-z]/i.test(lit) && !/[%_]/.test(lit) && !/^\d{4}-\d\d-\d\d$/.test(lit))
     : []
   const same = (v, lit) => v.toLowerCase() === lit.trim().toLowerCase()
   const wrongCase = values ? plain.find((lit) => !values.includes(lit) && values.some((v) => same(v, lit))) : undefined
   const unknown = values ? plain.find((lit) => !values.some((v) => same(v, lit))) : undefined
-  const where = /\bwhere\b/.test(code)
+  const where = condAt !== -1
   const aggregate = /\b(count|sum|avg|min|max|total)\s*\(/.test(code)
   const grouped = /\bgroup\s+by\b/.test(code)
   const wanted = mine.rows.length - unexpected.length + missing.length
+  const byId = grouped && /\bid\b/.test(code.split(/\bgroup\s+by\b/)[1])
   if (where && conditionLits.some((lit) => lit.trim().toUpperCase() === 'NULL')) {
     found.push(`'NULL' in quotes is text made of four letters, not a missing value.`)
   } else if (where && conditionLits.includes('')) {
@@ -135,7 +147,7 @@ function hints(mine, missing, unexpected, values) {
       'Your condition mixes AND and OR without brackets. SQLite works out AND before OR, so the parts may not pair up the way you meant.'
     )
   }
-  if (missing.length && !unexpected.length && missing.every((r) => r.includes(null)) && !/\bis\s+(not\s+)?null\b|(=|<>|!=)\s*null\b/.test(code)) {
+  if (!joined && missing.length && !unexpected.length && missing.every((r) => r.includes(null)) && !/\bis\s+(not\s+)?null\b|(=|<>|!=)\s*null\b/.test(code)) {
     found.push(
       'Every row left out has an empty cell (NULL) in it. A comparison with an empty cell is never true, so such a row drops out of a condition without a word.'
     )
@@ -150,6 +162,56 @@ function hints(mine, missing, unexpected, values) {
   }
   if (aggregate && unexpected.some((r) => r.includes(null)) && missing.some((r) => r.includes(0))) {
     found.push('When no rows match, COUNT gives 0, but SUM, AVG, MIN and MAX give NULL.')
+  }
+  const squeezed = aggregate && !grouped
+  if (mine.rows.length > wanted && unpaired(code)) {
+    found.push(UNPAIRED)
+  } else if (squeezed || (!aggregate && /\bselect\s+distinct\b/.test(code))) {
+    // the hint about GROUP BY or DISTINCT above names the cause
+  } else if (joined && !left && whereAt === -1 && mine.rows.length < wanted) {
+    found.push(
+      'A JOIN keeps only the rows that find a partner through ON. A row with no partner, or one that ON pairs with the wrong rows, drops out without a word.'
+    )
+  } else if (joined && !left && testsNull && mine.rows.length < wanted) {
+    found.push(
+      'A plain JOIN keeps no row without a partner, so a test for NULL in the other table\'s columns has nothing to find. Which join keeps those rows?'
+    )
+  } else if (left && (!grouped || byId) && (whereAt === -1 || (testsNull && !/\b(and|or)\b/.test(whereClause))) && mine.rows.length < wanted) {
+    found.push(
+      'A LEFT JOIN keeps every row of the table named before it, and pairs it with the rows ON finds. Look at which table comes first, and at which columns ON pairs.'
+    )
+  } else if (left && testsNull && !/\bor\b/.test(whereClause) && mine.rows.length > wanted) {
+    found.push(
+      'Some rows that did find a partner pass your test for NULL too: on a real row of the other table, the column you test can still be empty. Test one that is never empty there.'
+    )
+  }
+  if (joined && !left && !grouped && values && unexpected.length && mine.rows.length === wanted) {
+    found.push(
+      'If a value comes from the other table, look at ON too: when it compares the wrong columns, each row is paired with one that is not its partner, and SQLite gives no error.'
+    )
+  }
+  if (left && whereAt !== -1 && missing.length && !/\bis\s+(not\s+)?null\b|(=|<>|!=)\s*null\b/.test(whereClause)) {
+    found.push(
+      'WHERE runs after the join. On a row that a LEFT JOIN kept without a partner, every column of the other table is NULL, so a test on those columns is not true and the row drops out again.'
+    )
+  }
+  const twin = unexpected.length ? twinOf(missing, unexpected[0]) : undefined
+  const col = twin ? twin.findIndex((v, i) => key([v]) !== key([unexpected[0][i]])) : -1
+  const [mineValue, wantValue] = col === -1 ? [] : [unexpected[0][col], twin[col]]
+  if (joined && grouped && typeof mineValue === 'number' && typeof wantValue === 'number' && mineValue > wantValue) {
+    found.push(
+      left && wantValue === 0 && /\bcount\s*\(\s*\*\s*\)/.test(code)
+        ? 'COUNT(*) counts rows, and a LEFT JOIN keeps one row for each row that has no partner, with NULL in the columns of the other table. That row counts as 1.'
+        : 'After a join, a row of one table appears once for every partner it finds in the other, so a COUNT or a SUM over the joined rows can count the same thing more than once.'
+    )
+  }
+  if (/\bsum\s*\(\s*distinct\b/.test(code)) {
+    found.push('SUM(DISTINCT ...) adds each different value once, so two real charges of the same amount count as one.')
+  }
+  if (joined && grouped && !byId && mine.rows.length < wanted) {
+    found.push(
+      'Two owners, or two animals, can share a name, so a group made from names alone can hold two of them. What is different for every row of a table?'
+    )
   }
   if (/\bsum\s*\([^)]*\)\s*\/\s*count\s*\(\s*\*\s*\)|\bavg\s*\(\s*(coalesce|ifnull)\s*\(/.test(code)) {
     found.push('AVG skips empty cells. Dividing by COUNT(*), or turning the gaps into 0 first, counts every empty cell as a 0 and pulls the average down.')
