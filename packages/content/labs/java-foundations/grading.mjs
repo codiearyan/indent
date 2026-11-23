@@ -14,6 +14,7 @@ import { accessSync, constants, existsSync, realpathSync, statSync } from 'node:
 import { readFile } from 'node:fs/promises'
 import { delimiter, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { childEnv } from '../../kit/sandbox.mjs'
 
 const RUNNER = fileURLToPath(new URL('./RunTasks.java', import.meta.url))
 const SEP = '\u0001'
@@ -319,7 +320,7 @@ function runJava(bin, cwd, input, extra = []) {
     const child = spawn(
       bin,
       ['-XX:TieredStopAtLevel=1', '-XX:+UseSerialGC', '-Xmx256m', '-Duser.language=en', ...extra, RUNNER],
-      { cwd, stdio: ['pipe', 'pipe', 'pipe'] }
+      { cwd, env: childEnv(), stdio: ['pipe', 'pipe', 'pipe'] }
     )
     let stdout = ''
     let stderr = ''

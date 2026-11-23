@@ -6,13 +6,22 @@ import { dirname, join, relative } from 'node:path'
 export const DEFAULT_TIMEOUT = 15000
 export const MAX_OUTPUT = 4000
 
-export const childEnv = (extra) => ({
-  ...process.env,
-  NO_COLOR: '1',
-  FORCE_COLOR: '0',
-  NODE_NO_WARNINGS: '1',
-  ...extra
-})
+// Learner code may print its environment, and a check's output can reach the tutor, so it gets
+// only what programs need to run on this computer, never the tokens the learner's shell holds.
+const KEPT =
+  /^(PATH|PATHEXT|SYSTEMROOT|SYSTEMDRIVE|WINDIR|COMSPEC|TEMP|TMP|TMPDIR|HOME|USERPROFILE|APPDATA|LOCALAPPDATA|PROGRAMDATA|PROGRAMFILES|PROGRAMFILES\(X86\)|LANG|LANGUAGE|LC_\w+|TZ|JAVA_HOME|DEVELOPER_DIR|SDKROOT|LAB_MODEL_URL)$/i
+
+/** The small environment learner code runs with; a check adds the settings it hands over. */
+export function childEnv(extra) {
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => KEPT.test(key)))
+  // The local model's address and key, never a real key that only happens to share the name.
+  const model = process.env.LAB_MODEL_URL
+  if (model && process.env.OPENAI_BASE_URL === model) {
+    env.OPENAI_BASE_URL = model
+    env.OPENAI_API_KEY = process.env.OPENAI_API_KEY
+  }
+  return { ...env, NO_COLOR: '1', FORCE_COLOR: '0', NODE_NO_WARNINGS: '1', ...extra }
+}
 
 export const clip = (text) =>
   text.length > MAX_OUTPUT ? `${text.slice(0, MAX_OUTPUT)}\n... (output cut)` : text
