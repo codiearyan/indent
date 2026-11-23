@@ -1,0 +1,80 @@
+{
+  "id": "commands-and-help",
+  "title": "Commands and help",
+  "files": ["src/commands.js", "orders.js", "src/shop.js", "src/flags.js", "src/args.js", "src/input.js", "package.json", "orders/press-1.txt"],
+  "terminal": {
+    "description": "A shell in your workspace. `node orders.js` with a command runs it on the order files you name.",
+    "suggestedCommand": "node orders.js count orders/press-1.txt orders/press-2.txt"
+  },
+  "tasks": [
+    {
+      "id": "table",
+      "title": "Run each command from a table",
+      "file": "src/commands.js",
+      "description": "Fill `COMMANDS` in `src/commands.js` and write `main(args)` in `orders.js`.\n\n- `COMMANDS` is an object with one entry for each command, `count`, `list` and `check`, and each entry is `{ summary, flags, run }`\n- `summary` is one line that says what the command does, in your words\n- `flags` is an array of the names of the flags it takes, from `src/flags.js`: `count` takes `paper`, `by` and `help`; `list` takes `paper`, `limit` and `help`; `check` takes `help`\n- `run` is the shop's function for the command, from `src/shop.js`: `countOrders`, `listOrders` or `checkOrders`\n- `main` finds the command that was typed in `COMMANDS` and runs it as `await run(readOrders(values), flags, out)`\n- a word that is not a command of the table, names every object has like `constructor` included, ends in an `Error` whose message starts with `unknown command` and the word: `unknown command frobnicate`\n\nThe check reads your `COMMANDS`, and runs `node orders.js` with each command on order files of its own and with words that are not commands.",
+      "nextSteps": [
+        "Run `node orders.js count orders/press-1.txt` and read what it says.",
+        "Read the top of `src/shop.js`: what a command's function takes and gives.",
+        "Write the three entries of `COMMANDS`.",
+        "In `main`, look the command up, then run it; try `node orders.js constructor` too."
+      ],
+      "hints": [
+        "The command is a word, and so is a key of an object: looking the word up replaces a chain of `if` statements.",
+        "`Object.hasOwn(COMMANDS, command)` says whether the table has the word as its own entry. `COMMANDS[command]` alone would find `constructor` on every object.",
+        "`count: { summary: 'Count the orders', flags: ['paper', 'by', 'help'], run: countOrders }`, and in `main`: `if (!Object.hasOwn(COMMANDS, command)) throw new Error(`unknown command ${command}`)`, then `await COMMANDS[command].run(readOrders(values), flags, out)`."
+      ],
+      "docs": [
+        { "title": "Object.hasOwn()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn" },
+        { "title": "Property accessors", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors" },
+        { "title": "Functions as values", "url": "https://developer.mozilla.org/en-US/docs/Glossary/First-class_Function" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "help",
+      "title": "Write the help from the table",
+      "file": "src/commands.js",
+      "description": "Write `toolHelp(commands, flags)` and `commandHelp(name, commands, flags)` in `src/commands.js`, and show them, and the version, from `orders.js`.\n\n- `toolHelp` returns the help of the whole tool as text: a usage line with `orders` and `<command>`, a line for each command of `commands` holding its name and its summary, and a line for the flags `help` and `version`, each holding `--name`, its short form when it has one (`-h`) and its `about`\n- `commandHelp` returns the help of one command: a usage line with `orders` and the command's name, its summary, and a line for each flag the command lists, holding `--name`, its short form when it has one, `<value>` when it takes one (`<name>` for `paper`) and its `about`. No line for a flag the command does not list\n- both write everything from what they are given, never from text typed in for the shop\n- `node orders.js --help`, `-h`, or no command at all, prints `toolHelp(COMMANDS, FLAGS)`; a command with `--help` prints its `commandHelp` and does not run\n- `--version` prints the `version` from the `package.json` beside `orders.js`, alone, whichever folder the tool is run from\n\nFor example, `commandHelp('list', COMMANDS, FLAGS)` can give:\n\n```\nUsage: orders list [flags] [file ...]\n\nList the orders, one on each line\n\nFlags:\n  --paper <name>       only the orders on this paper\n  --limit, -n <count>  at most this many orders\n  --help, -h           show this help\n```\n\nThe check calls both functions with a table of commands and flags of its own, compares what the tool prints with what your functions write for your table, and runs `--version` from another folder with a version of its own in `package.json`.",
+      "nextSteps": [
+        "Read \"Help written from the table\" in the lesson.",
+        "Write one small function that turns a flag's entry into the left side of its line.",
+        "Build each help from the table with a loop or `map`, and join the lines.",
+        "Run `node orders.js --help` and `node orders.js list --help`, then change a summary and run them again."
+      ],
+      "hints": [
+        "Help typed in by hand goes stale the day someone adds a flag. Everything in it is already in `commands` and `flags`: names, summaries, short forms, values and abouts.",
+        "`Object.entries(commands)` gives each name with its entry. For the version, `new URL('package.json', import.meta.url)` names the file beside `orders.js`, wherever the tool is run from.",
+        "A flag's line starts with `--${name}`, then `, -${flag.short}` when it has one, then ` <${flag.value}>` when it has one, then its `about`. In `main`: `if (flags.version)` print `JSON.parse(await readFile(new URL('package.json', import.meta.url), 'utf8')).version`, and `if (command === undefined)` print `toolHelp(COMMANDS, FLAGS)`."
+      ],
+      "docs": [
+        { "title": "Object.entries()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries" },
+        { "title": "import.meta", "url": "https://nodejs.org/api/esm.html#importmeta" },
+        { "title": "String.prototype.padEnd()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padEnd" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "nearest",
+      "title": "Answer an unknown command with the nearest one",
+      "file": "src/commands.js",
+      "description": "Write `nearest(word, names)` in `src/commands.js`, and use it in `main` for a word that is not a command.\n\n- a change is one letter added, removed or replaced; `nearest` returns the name in `names` that `word` becomes with the fewest changes\n- when two names need as many changes, the one that comes first in `names` wins\n- when even the nearest name needs more than 2 changes, or `names` is empty, it returns `undefined`\n- an unknown command with a near one ends in `unknown command cuont (did you mean count?)`\n- an unknown command with none ends in `unknown command print (orders --help lists the commands)`\n\nThe check calls `nearest` with words and names of its own, a letter missing, one too many, one replaced, two swapped, a tie and words too far from every name, and runs `node orders.js` with mistyped commands.",
+      "nextSteps": [
+        "Read \"The nearest command\" in the lesson, and work out one table of changes by hand.",
+        "Write a function that counts the changes between two words.",
+        "In `nearest`, keep the best name so far and how many changes it needs.",
+        "Run `node orders.js lsit` and `node orders.js print`."
+      ],
+      "hints": [
+        "Comparing letter by letter at the same place fails as soon as one letter is missing: every letter after it is out of step. Comparing first letters fails on `xort`.",
+        "Fill a table where each cell is the number of changes between the first letters of one word and the first letters of the other. A cell comes from its three neighbours: above plus one, left plus one, or diagonal plus one when the letters differ.",
+        "Start a row as `[0, 1, 2, ..., b.length]`. For each letter of `a`, make the next row: `row[j] = Math.min(above[j] + 1, row[j - 1] + 1, above[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1))`. In `nearest`, start with `fewest = 3` and keep a name only when its count is smaller."
+      ],
+      "docs": [
+        { "title": "Math.min()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min" },
+        { "title": "Array.from()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from" },
+        { "title": "Indexed collections", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Indexed_collections" }
+      ],
+      "points": 10
+    }
+  ]
+}

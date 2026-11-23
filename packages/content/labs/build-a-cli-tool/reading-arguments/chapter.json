@@ -1,0 +1,80 @@
+{
+  "id": "reading-arguments",
+  "title": "Reading the arguments",
+  "files": ["src/args.js", "orders.js", "src/flags.js", "morning.txt", "orders/press-1.txt"],
+  "terminal": {
+    "description": "A shell in your workspace. `node orders.js` followed by any words shows what your reader made of them.",
+    "suggestedCommand": "node orders.js list --paper linen orders/press-1.txt"
+  },
+  "tasks": [
+    {
+      "id": "words",
+      "title": "Split the words into a command, values and switches",
+      "file": "src/args.js",
+      "description": "Write `readArgs(args, table)` in `src/args.js`. `args` is the list of words typed after the script's name, and `table` is a table of flags like the one in `src/flags.js`. It returns `{ command, values, flags }`.\n\n- a word that does not start with `-` is a plain word; a lone `-` is a plain word too\n- `command` is the first plain word, or `undefined` when there is none\n- `values` holds the other plain words, in the order they were typed\n- a flag in the table without a `value` is a switch: `--quiet` puts `quiet: true` in `flags`\n- a switch with a `short` letter can be typed as `-q`, and goes in `flags` under its long name, as `quiet: true`\n- flags can stand anywhere: before the command, between the values or after them\n- `flags` is an empty object when no flag was given\n\nThe check calls `readArgs` with words and a table of flags of its own, for a tool of its own, and runs `node orders.js` with words of its own.",
+      "nextSteps": [
+        "Run `node orders.js list orders/press-1.txt` and read the error.",
+        "Go through the words one at a time and decide for each: plain word or flag.",
+        "Keep the plain words in one list; the first of them is the command.",
+        "For a flag, find its name in the table, from `--name` or from its short letter."
+      ],
+      "hints": [
+        "A loop over the words that looks at each one by itself does not care where the flags stand. Code that reads `args[0]` as the command does.",
+        "`word.startsWith('-')` tells a flag from a plain word, once a lone `-` is set aside. A short letter needs a way back to its long name: build that once from the table before the loop.",
+        "Keep `const plain = []` and `const flags = {}`. For `--name` take `word.slice(2)`, for `-q` look the letter up in a `{ q: 'quiet' }` object built from the table, and set `flags[name] = true`. At the end, `return { command: plain[0], values: plain.slice(1), flags }`."
+      ],
+      "docs": [
+        { "title": "process.argv", "url": "https://nodejs.org/api/process.html#processargv" },
+        { "title": "String.prototype.startsWith()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith" },
+        { "title": "Object.entries()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "values",
+      "title": "Read flags that take a value",
+      "file": "src/args.js",
+      "description": "Teach `readArgs` the flags whose entry in the table has a `value`.\n\n- `--width 80` gives `width: '80'`: the value is the next word, whatever it looks like, so `--find -x` gives `find: '-x'`\n- `--width=80` gives the same: the word is split at its first `=`, so `--find=ink=black` gives `find: 'ink=black'`\n- a short letter works the same way: `-w 80` gives `width: '80'`\n- a value stays the text that was typed, never a number\n- `--` ends the flags: every word after it is a plain word, even one that starts with `-`, and `--` itself is not one of them\n\nThe check calls `readArgs` with flags that take a value in every place and every form above, with a table of its own, and runs `node orders.js` with words of its own.",
+      "nextSteps": [
+        "Read \"Values, and words that look like flags\" in the lesson.",
+        "When the flag's entry has a `value`, take the next word as it is.",
+        "Before looking a `--` word up, split it at its first `=`.",
+        "Handle `--` before anything else in the loop."
+      ],
+      "hints": [
+        "Whether a flag takes a value is in the table, not in the next word: a word that starts with `-` can be a value too.",
+        "`word.indexOf('=')` finds the first `=` only: the name is what comes before it and the value is everything after. `split('=')` cuts at every one.",
+        "Use an index loop. With `--name=value`, `flags[name] = word.slice(at + 1)`; otherwise `flags[name] = args[i + 1]` and step over it. On `--`, `plain.push(...args.slice(i + 1))` and stop the loop."
+      ],
+      "docs": [
+        { "title": "String.prototype.indexOf()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf" },
+        { "title": "String.prototype.slice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/slice" },
+        { "title": "break", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/break" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "wrong",
+      "title": "Say plainly what is wrong",
+      "file": "src/args.js",
+      "description": "Make `readArgs` throw an `Error` with a plain message when the words cannot be read, instead of guessing.\n\n- a flag that is not in the table: `unknown flag --colour`. The flag is named as it was typed, without a value after `=`: `--colour=red` gives `unknown flag --colour`, and `-x` gives `unknown flag -x`\n- names that every object has, such as `--constructor` or `--toString`, are unknown too, unless the table has them\n- a flag that takes a value, typed as the last word: `--width needs a value`, or `-w needs a value` when it was typed short\n- a switch given a value with `=`: `--quiet takes no value`\n\n`orders.js` already prints the message of an error after `orders: `, so `node orders.js list --colour` says `orders: unknown flag --colour`.\n\nThe check calls `readArgs` with mistakes of its own and compares each message, and runs `node orders.js` with an unknown flag.",
+      "nextSteps": [
+        "Run `node orders.js list --colour` and see what it says today.",
+        "Read \"Saying what is wrong\" in the lesson.",
+        "Throw at the place where the loop looks a flag up and finds nothing.",
+        "Try `node orders.js list --constructor` too."
+      ],
+      "hints": [
+        "Every plain object answers to names it inherits, such as `constructor`. Asking `name in table` says yes to them.",
+        "`Object.hasOwn(table, name)` asks whether the table itself has the name. A value is missing when the flag is the last word, so there is no next word to take.",
+        "`if (!Object.hasOwn(table, name)) throw new Error(`unknown flag ${typed}`)`, where `typed` is the word up to its first `=`. When `i + 1 === args.length` for a flag that takes a value, `throw new Error(`${typed} needs a value`)`."
+      ],
+      "docs": [
+        { "title": "Object.hasOwn()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn" },
+        { "title": "throw", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw" },
+        { "title": "util.parseArgs()", "url": "https://nodejs.org/api/util.html#utilparseargsconfig" }
+      ],
+      "points": 10
+    }
+  ]
+}
