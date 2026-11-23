@@ -1,0 +1,86 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "orders", "label": "orders", "kind": "data" },
+      { "id": "lines", "label": "order_lines", "kind": "data" },
+      { "id": "customers", "label": "customers", "kind": "data" },
+      { "id": "queries", "label": "Your queries", "kind": "file", "mine": true },
+      { "id": "clemency", "label": "Clemency", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "lines", "to": "orders", "label": "order_id" },
+      { "from": "orders", "to": "customers", "label": "customer_id" },
+      { "from": "orders", "to": "queries", "label": "rows" },
+      { "from": "queries", "to": "clemency", "label": "averages, lists" }
+    ],
+    "note": "Every row is there; the divisions, averages and filters on top of them decide whether the numbers mean what Clemency thinks."
+  },
+  "tasks": {
+    "prove-it": {
+      "steps": [
+        {
+          "active": ["lines", "lines->orders", "orders"],
+          "note": "Each order's lines are added up into what the order came to."
+        },
+        {
+          "active": ["orders", "orders->queries", "queries"],
+          "note": "Each channel's orders are counted once each, and their totals added up."
+        },
+        {
+          "active": ["queries", "queries->clemency", "clemency"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["channel", "orders", "takings_pence"],
+            "cells": [["a channel", "a count", "a total in pence"]]
+          },
+          "note": "Clemency has the two numbers her own sum started from."
+        }
+      ]
+    },
+    "fix-average": {
+      "steps": [
+        {
+          "active": ["lines", "lines->orders", "orders"],
+          "note": "Each order's total is worked out first, so every order is one value."
+        },
+        {
+          "active": ["orders", "orders->queries", "queries"],
+          "note": "The orders on each channel are averaged, each counting once, whoever placed them."
+        },
+        {
+          "active": ["queries", "queries->clemency", "clemency"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["channel", "average_pounds"],
+            "cells": [["a channel", "pounds, two places"]]
+          },
+          "note": "The pence become pounds without losing the part after the point."
+        }
+      ]
+    },
+    "trade-price": {
+      "steps": [
+        {
+          "active": ["orders", "orders->customers", "customers"],
+          "note": "Only this year's orders are kept, one row at a time."
+        },
+        {
+          "active": ["lines", "customers", "queries"],
+          "note": "Each customer's lines are added up, and only then is the total tested."
+        },
+        {
+          "active": ["queries", "queries->clemency", "clemency"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["customer", "spent_pence"],
+            "cells": [["a customer's name", "a total in pence"]]
+          },
+          "note": "The trade price goes to the customers whose whole year earned it."
+        }
+      ]
+    }
+  }
+}

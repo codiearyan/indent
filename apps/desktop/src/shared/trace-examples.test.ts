@@ -292,6 +292,19 @@ const repos: { labId: string; expected: string[] }[] = [
     ]
   },
   {
+    labId: 'build-a-json-parser',
+    expected: [
+      'cutting-into-tokens/marks',
+      'numbers-and-text/numbers',
+      'numbers-and-text/texts',
+      'values-inside-values/arrays',
+      'values-inside-values/objects',
+      'errors-you-can-act-on/where',
+      'writing-it-back/write',
+      'writing-it-back/trip'
+    ]
+  },
+  {
     labId: 'build-a-router',
     expected: ['parts-that-vary/match', 'query-and-body/query']
   },

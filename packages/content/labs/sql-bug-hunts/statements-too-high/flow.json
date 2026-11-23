@@ -1,0 +1,93 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customers", "label": "customers", "kind": "data" },
+      { "id": "orders", "label": "orders", "kind": "data" },
+      { "id": "lines", "label": "order_lines", "kind": "data" },
+      { "id": "payments", "label": "payments", "kind": "data" },
+      { "id": "queries", "label": "Your queries", "kind": "file", "mine": true },
+      { "id": "team", "label": "Perpetua and Dunstan", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "customers", "to": "orders", "label": "customer_id" },
+      { "from": "orders", "to": "lines", "label": "order_id" },
+      { "from": "orders", "to": "payments", "label": "order_id" },
+      { "from": "lines", "to": "queries", "label": "rows" },
+      { "from": "payments", "to": "queries", "label": "rows" },
+      { "from": "queries", "to": "team", "label": "totals" }
+    ],
+    "note": "Lines and payments both hang off an order, and the statements add them up after a join that pairs every line with every payment."
+  },
+  "tasks": {
+    "prove-it": {
+      "steps": [
+        {
+          "active": ["customers", "customers->orders", "orders"],
+          "note": "Each customer meets their orders, as on the statements."
+        },
+        {
+          "active": ["orders", "orders->lines", "lines", "orders->payments", "payments"],
+          "note": "Each order meets its lines and its payments in the same join, so every line is paired with every payment."
+        },
+        {
+          "active": ["lines", "payments", "lines->queries", "payments->queries", "queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["order_id", "customer", "copies"],
+            "cells": [["an order", "its customer's name", "rows it fills"]]
+          },
+          "note": "The orders that fill more than one row are the ones the statements count more than once."
+        }
+      ]
+    },
+    "fix-statements": {
+      "steps": [
+        {
+          "active": ["orders", "orders->lines", "lines"],
+          "note": "The packets are added up from the lines alone, one row per line."
+        },
+        {
+          "active": ["orders", "orders->payments", "payments"],
+          "note": "The payments are added up from the payments alone, one row per payment."
+        },
+        {
+          "active": ["customers", "lines->queries", "payments->queries", "queries"],
+          "note": "Only then do both totals meet the customer, one row with one row."
+        },
+        {
+          "active": ["queries", "queries->team", "team"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["customer", "packets", "paid_pence"],
+            "cells": [["a customer's name", "a count", "a total in pence"]]
+          },
+          "note": "Each statement counts every packet and every payment once."
+        }
+      ]
+    },
+    "stock-check": {
+      "steps": [
+        {
+          "active": ["lines", "lines->queries", "queries"],
+          "note": "Restocks and order lines both hang off a seed, the same shape as lines and payments off an order."
+        },
+        {
+          "active": ["queries"],
+          "note": "Each one is added up per seed on its own, and a seed with none of them still counts 0."
+        },
+        {
+          "active": ["queries", "queries->team", "team"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["product", "received", "sold", "in_stock"],
+            "cells": [["a seed's name", "packets in", "packets out", "what is left"]]
+          },
+          "note": "Dunstan's Monday stock check lists every seed with numbers he can trust."
+        }
+      ]
+    }
+  }
+}

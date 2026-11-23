@@ -1,0 +1,46 @@
+{
+  "stations": [
+    {
+      "title": "Imelda",
+      "say": "Why does \"mar\" show everyone?",
+      "note": "Renewals at the desk. BL-47."
+    },
+    {
+      "title": "Membership system",
+      "text": "Answers each search when it can."
+    },
+    {
+      "title": "Your fix",
+      "file": "MemberSearch.jsx",
+      "mine": true,
+      "gap": "The last answer to arrive wins",
+      "tasks": [
+        "Latest search wins",
+        "Latest pick wins",
+        "No waiting, no lock"
+      ]
+    },
+    {
+      "title": "Search list",
+      "rows": [
+        [
+          "Marnie Larkby"
+        ]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "\"mar\"",
+    "wrong": "everyone with m",
+    "why": "Old answer",
+    "right": "Marnie"
+  },
+  "captions": [
+    "Last, Imelda types \"mar\" to find Marnie, and the list shows everyone with an m.",
+    "The answer for \"m\" was slowest, so it came last, and the screen believed it.",
+    "You keep only the answers still wanted, for the search and the visits, in three tasks.",
+    "Whatever order the answers come in, \"mar\" shows Marnie.",
+    "Same system, same speed. Every answer still wanted shows the moment it comes."
+  ]
+}

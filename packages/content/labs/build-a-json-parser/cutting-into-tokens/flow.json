@@ -1,0 +1,71 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "lists", "label": "Supplier lists", "kind": "story" },
+      { "id": "tokenize", "label": "tokenize()", "kind": "function", "mine": true, "fn": "tokenize" },
+      { "id": "tokens", "label": "Token list", "kind": "data" },
+      { "id": "error", "label": "JsonError", "kind": "data" },
+      { "id": "idris", "label": "Idris", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "lists", "to": "tokenize", "label": "JSON text" },
+      { "from": "tokenize", "to": "tokens", "label": "marks, words" },
+      { "from": "tokenize", "to": "error", "label": "a stray character" },
+      { "from": "error", "to": "idris", "label": "where it sits" }
+    ],
+    "note": "The shop's reader starts by cutting each supplier list into tokens, and stops at the first character that belongs nowhere."
+  },
+  "tasks": {
+    "marks": {
+      "steps": [
+        {
+          "active": ["lists", "lists->tokenize", "tokenize"],
+          "note": "A piece of a supplier list comes in as plain text: brackets, commas and the words true and null."
+        },
+        {
+          "active": ["tokenize"],
+          "note": "tokenize walks the text with an index and looks at one character at a time: a mark, or the start of a word."
+        },
+        {
+          "active": ["tokenize", "tokenize->tokens", "tokens"],
+          "value": { "kind": "array", "label": "token list", "values": ["{ type, value, at, end }", "{ type, value, at, end }", "..."] },
+          "note": "Each mark and each word becomes a token that says what it is and where it starts and ends."
+        }
+      ],
+      "trace": { "file": "src/json.js", "call": "tokenize", "args": ["[true,null]"] }
+    },
+    "space": {
+      "steps": [
+        {
+          "active": ["lists", "lists->tokenize", "tokenize"],
+          "note": "The paper supplier's list spreads over many lines, with indents and a space after every comma."
+        },
+        {
+          "active": ["tokenize"],
+          "note": "Space, tab, line feed and carriage return are stepped over: the index moves on and no token is made."
+        },
+        {
+          "active": ["tokenize", "tokenize->tokens", "tokens"],
+          "note": "The tokens still count every character before them, so each one says where it really is in the file."
+        }
+      ]
+    },
+    "stray": {
+      "steps": [
+        {
+          "active": ["lists", "lists->tokenize", "tokenize"],
+          "note": "The card supplier's list comes in, with one name in single quotes."
+        },
+        {
+          "active": ["tokenize", "tokenize->error", "error"],
+          "value": { "kind": "map", "label": "the error", "entries": [{ "key": "at", "value": "index of the character" }, { "key": "message", "value": "names it and where" }] },
+          "note": "A single quote starts no token, so tokenize stops there and throws a JsonError instead of skipping it."
+        },
+        {
+          "active": ["error", "error->idris", "idris"],
+          "note": "Idris now knows which character is wrong and where it sits, and can tell the supplier."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Perpetua",
+      "say": "A customer's statement is too high.",
+      "note": "The customer rang this morning. MF-14."
+    },
+    {
+      "title": "The bank",
+      "text": "One order in September, one card payment.",
+      "note": "What the customer really paid."
+    },
+    {
+      "title": "Your query",
+      "file": "2-statements.sql",
+      "mine": true,
+      "gap": "Adds the same payment again",
+      "tasks": [
+        "Show the repeats",
+        "Fix the statements",
+        "Fix the stock check"
+      ]
+    },
+    {
+      "title": "Statement",
+      "text": "Packets and payments, per customer.",
+      "note": "Posted with every order."
+    }
+  ],
+  "ticket": {
+    "label": "Statement",
+    "wrong": "too high",
+    "why": "Repeats",
+    "right": "as banked"
+  },
+  "captions": [
+    "At Mallowfield Seeds, a customer rings Perpetua: the statement shows more than was paid.",
+    "The bank has one payment, but the statement adds it once for every line of her order.",
+    "You show the orders counted twice, then fix the statements and the stock check.",
+    "Now every statement shows each payment once, and every packet once.",
+    "Same orders, same payments. Every total counts each thing once."
+  ]
+}

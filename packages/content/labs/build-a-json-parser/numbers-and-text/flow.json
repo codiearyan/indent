@@ -1,0 +1,86 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "lists", "label": "Supplier lists", "kind": "story" },
+      { "id": "tokenize", "label": "tokenize()", "kind": "function" },
+      { "id": "number", "label": "readNumber()", "kind": "function", "mine": true, "fn": "readNumber" },
+      { "id": "string", "label": "readString()", "kind": "function", "mine": true, "fn": "readString" },
+      { "id": "tokens", "label": "Token list", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "lists", "to": "tokenize", "label": "JSON text" },
+      { "from": "tokenize", "to": "number", "label": "a minus or digit" },
+      { "from": "tokenize", "to": "string", "label": "a quote" },
+      { "from": "number", "to": "tokens", "label": "number token" },
+      { "from": "string", "to": "tokens", "label": "text token" }
+    ],
+    "note": "The tokenizer now reads prices and names the way JSON writes them, and refuses anything that only looks like one."
+  },
+  "tasks": {
+    "numbers": {
+      "steps": [
+        {
+          "active": ["lists", "lists->tokenize", "tokenize"],
+          "note": "The ink supplier's list comes in, with the price of press wash written with an exponent."
+        },
+        {
+          "active": ["tokenize", "tokenize->number", "number"],
+          "note": "tokenize meets a digit and hands the rest to readNumber, which walks the rules: a minus, the whole part, a fraction, an exponent."
+        },
+        {
+          "active": ["number"],
+          "value": { "kind": "array", "label": "the parts", "values": ["minus?", "whole part", "fraction?", "exponent?"] },
+          "note": "Where a part needs a digit and has none, it stops with a JsonError. Otherwise it knows exactly where the number ends."
+        },
+        {
+          "active": ["number", "number->tokens", "tokens"],
+          "value": { "kind": "map", "label": "number token", "entries": [{ "key": "type", "value": "number" }, { "key": "value", "value": "the price as a number" }, { "key": "at, end", "value": "where it sits" }] },
+          "note": "The characters it read become one number token, and tokenize carries on from its end."
+        }
+      ],
+      "trace": { "file": "src/json.js", "call": "readNumber", "args": ["1.85e1", 0] }
+    },
+    "texts": {
+      "steps": [
+        {
+          "active": ["lists", "lists->tokenize", "tokenize"],
+          "note": "The paper supplier's list comes in, with a name that holds quotes of its own."
+        },
+        {
+          "active": ["tokenize", "tokenize->string", "string"],
+          "note": "tokenize meets a quote and hands the rest to readString, which collects characters until the closing quote."
+        },
+        {
+          "active": ["string"],
+          "note": "A backslash is never kept: it says what the next character means, so the quotes inside the name stay in the name."
+        },
+        {
+          "active": ["string", "string->tokens", "tokens"],
+          "value": { "kind": "map", "label": "text token", "entries": [{ "key": "type", "value": "string" }, { "key": "value", "value": "the name, escapes turned back" }, { "key": "at, end", "value": "where it sits" }] },
+          "note": "The whole name becomes one text token, ending just after its closing quote."
+        }
+      ],
+      "trace": { "file": "src/json.js", "call": "readString", "args": ["\"Kraft \\\"natural\\\", 120 gsm\"", 0] }
+    },
+    "unicode": {
+      "steps": [
+        {
+          "active": ["lists", "lists->tokenize", "tokenize", "tokenize->string", "string"],
+          "note": "A name arrives with an accented letter written as a backslash, a u and four hex digits."
+        },
+        {
+          "active": ["string"],
+          "note": "readString checks the four characters are hex digits and turns their code into the letter."
+        },
+        {
+          "active": ["string"],
+          "note": "A text that reaches the end of the input without a closing quote, or holds a raw line break, stops with a JsonError."
+        },
+        {
+          "active": ["string", "string->tokens", "tokens"],
+          "note": "Every name that does close becomes a text token with the letters it stands for."
+        }
+      ]
+    }
+  }
+}

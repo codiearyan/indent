@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Why did a family miss the boat?",
+      "note": "Saturday's booking for the Gannet."
+    },
+    {
+      "title": "Ossian",
+      "text": "Wrote the name and hour, forgot the seats"
+    },
+    {
+      "title": "Your constructors",
+      "file": "Bookings.java",
+      "mine": true,
+      "gap": "A booking can be half filled in",
+      "tasks": ["Every field at once", "One seat, quickly", "Count the moves"]
+    },
+    {
+      "title": "The Gannet",
+      "text": "Waits for everyone who booked."
+    }
+  ],
+  "ticket": {
+    "label": "Booking",
+    "wrong": "no seats",
+    "why": "Half filled",
+    "right": "whole"
+  },
+  "captions": [
+    "Bookings for the Gannet. Bridie wants to know why a family was left on the quay.",
+    "The booking was made in steps, and the line for the seats was never written.",
+    "You write constructors that make a booking whole, and a method that moves it.",
+    "Now no booking can exist without its passenger, seats and hour.",
+    "Constructors, this and default values. Next: fields nobody outside can change."
+  ]
+}

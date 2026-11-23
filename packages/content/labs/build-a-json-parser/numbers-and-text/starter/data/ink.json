@@ -1,0 +1,9 @@
+{
+  "supplier": "Ink supplier",
+  "updated": "2026-10-28",
+  "items": [
+    { "code": "INK-BLK", "name": "Rubber-based black, 1 kg", "price": 24.5, "per": "tin", "minimum": 2 },
+    { "code": "INK-ORG", "name": "Warm orange, 1 kg", "price": 31.75, "per": "tin", "minimum": 1 },
+    { "code": "INK-WASH", "name": "Press wash, 5 l", "price": 1.85e1, "per": "can", "minimum": 1, "note": "Ships by road only.\nNot by post." }
+  ]
+}

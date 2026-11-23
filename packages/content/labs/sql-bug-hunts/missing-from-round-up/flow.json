@@ -1,0 +1,88 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customers", "label": "customers", "kind": "data" },
+      { "id": "orders", "label": "orders", "kind": "data" },
+      { "id": "lines", "label": "order_lines", "kind": "data" },
+      { "id": "products", "label": "products", "kind": "data" },
+      { "id": "queries", "label": "Your queries", "kind": "file", "mine": true },
+      { "id": "dunstan", "label": "Dunstan", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "customers", "to": "orders", "label": "customer_id" },
+      { "from": "orders", "to": "lines", "label": "order_id" },
+      { "from": "products", "to": "lines", "label": "product_id" },
+      { "from": "lines", "to": "queries", "label": "rows" },
+      { "from": "queries", "to": "dunstan", "label": "lists" }
+    ],
+    "note": "Dunstan's lists are meant to keep everyone, and a test on the date throws away the ones with nothing to show."
+  },
+  "tasks": {
+    "prove-it": {
+      "steps": [
+        {
+          "active": ["customers", "customers->orders", "orders"],
+          "note": "Every customer is kept, paired only with their orders from this year."
+        },
+        {
+          "active": ["customers", "queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["id", "customer"],
+            "cells": [["a customer's id", "their name"]]
+          },
+          "note": "The customers left with no partner are the ones missing from the round-up."
+        }
+      ]
+    },
+    "fix-round-up": {
+      "steps": [
+        {
+          "active": ["customers", "customers->orders", "orders"],
+          "note": "Every customer is kept, and only this year's orders count as partners."
+        },
+        {
+          "active": ["orders", "orders->lines", "lines"],
+          "note": "Those orders bring their lines, and old orders bring none."
+        },
+        {
+          "active": ["lines", "lines->queries", "queries"],
+          "note": "Each customer's lines are added up, and a customer with none gets 0."
+        },
+        {
+          "active": ["queries", "queries->dunstan", "dunstan"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["customer", "spent_pence"],
+            "cells": [["a customer's name", "a total in pence"]]
+          },
+          "note": "Dunstan has a postcard to write for every customer."
+        }
+      ]
+    },
+    "november-packets": {
+      "steps": [
+        {
+          "active": ["products", "products->lines", "lines"],
+          "note": "Every seed is kept, and its lines from every month pair with it."
+        },
+        {
+          "active": ["lines", "orders", "orders->lines"],
+          "note": "The month is on the order, two steps away from the seed, so it has to decide which lines count."
+        },
+        {
+          "active": ["queries", "queries->dunstan", "dunstan"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["product", "packets"],
+            "cells": [["a seed's name", "a count"]]
+          },
+          "note": "Dunstan sees every seed, the ones with nothing sold in November included."
+        }
+      ]
+    }
+  }
+}

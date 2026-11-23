@@ -1,0 +1,17 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "sales", "label": "Website, phone and stall", "kind": "story" },
+      { "id": "db", "label": "Mallowfield database", "kind": "data" },
+      { "id": "reports", "label": "Your report queries", "kind": "file", "mine": true },
+      { "id": "team", "label": "Perpetua, Dunstan and Clemency", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "sales", "to": "db", "label": "orders, payments" },
+      { "from": "db", "to": "reports", "label": "rows" },
+      { "from": "reports", "to": "team", "label": "numbers" },
+      { "from": "team", "to": "reports", "label": "tickets" }
+    ],
+    "note": "Every sale lands in one database, and the team runs the seed company on reports whose numbers you prove wrong and put right."
+  }
+}

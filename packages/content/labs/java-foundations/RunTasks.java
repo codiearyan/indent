@@ -5,6 +5,8 @@
 //
 // Input: a line `KEY <key>`, then, repeated, a line `UNIT <id> <class> <chars>` and exactly <chars>
 // characters of source. Every result line carries the key, which learner code never sees.
+// A unit of several files, with packages, is a line `FILES <id> <main class> <count>` and, per file,
+// a line `FILE <chars> <path>` and exactly <chars> characters of source.
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -42,6 +44,7 @@ public class RunTasks {
         String id;
         String className;
         String source;
+        List<String[]> files;
         boolean compiled;
         final List<String> errors = new ArrayList<>();
         Map<String, byte[]> classes = new HashMap<>();
@@ -254,6 +257,23 @@ public class RunTasks {
         while (at < input.length()) {
             int eol = input.indexOf('\n', at);
             String[] head = input.substring(at, eol).trim().split(" ");
+            if (head[0].equals("FILES")) {
+                Unit unit = new Unit();
+                unit.id = head[1];
+                unit.className = head[2];
+                unit.files = new ArrayList<>();
+                at = eol + 1;
+                for (int i = Integer.parseInt(head[3]); i > 0; i--) {
+                    int end = input.indexOf('\n', at);
+                    String[] file = input.substring(at, end).trim().split(" ", 3);
+                    int chars = Integer.parseInt(file[1]);
+                    unit.files.add(new String[] { file[2], input.substring(end + 1, end + 1 + chars) });
+                    at = end + 1 + chars;
+                    while (at < input.length() && input.charAt(at) == '\n') at++;
+                }
+                units.add(unit);
+                continue;
+            }
             int length = Integer.parseInt(head[3]);
             Unit unit = new Unit();
             unit.id = head[1];
@@ -275,12 +295,16 @@ public class RunTasks {
             }
         };
         List<String> options = List.of("--release", "17", "-proc:none", "-Xlint:none", "-Xmaxerrs", "20");
-        Source source = new Source(unit.className + ".java", unit.source);
-        unit.compiled = compiler.getTask(null, memory, diagnostics, options, null, List.of(source)).call();
+        List<Source> sources = new ArrayList<>();
+        if (unit.files == null) sources.add(new Source(unit.className + ".java", unit.source));
+        else for (String[] file : unit.files) sources.add(new Source(file[0], file[1]));
+        unit.compiled = compiler.getTask(null, memory, diagnostics, options, null, sources).call();
         for (Diagnostic<? extends JavaFileObject> d : diagnostics.getDiagnostics()) {
             if (d.getKind() != Diagnostic.Kind.ERROR) continue;
+            String file = unit.files == null || d.getSource() == null ? ""
+                : ",\"file\":" + json(d.getSource().toUri().getPath().substring(1));
             unit.errors.add("{\"line\":" + d.getLineNumber() + ",\"col\":" + d.getColumnNumber()
-                + ",\"code\":" + json(d.getCode()) + ",\"message\":" + json(d.getMessage(Locale.ENGLISH)) + "}");
+                + ",\"code\":" + json(d.getCode()) + ",\"message\":" + json(d.getMessage(Locale.ENGLISH)) + file + "}");
         }
     }
 
@@ -289,6 +313,8 @@ public class RunTasks {
         try {
             Class<?> main = new Loader(unit.classes).loadClass(unit.className);
             Method m = main.getMethod("main", String[].class);
+            // The java launcher runs a main class by name even when the class has no public.
+            if (unit.files != null) m.setAccessible(true);
             m.invoke(null, (Object) new String[0]);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();

@@ -1,0 +1,69 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "fares", "label": "Fares.java", "kind": "file", "mine": true },
+      { "id": "ticket", "label": "Ticket.java", "kind": "file", "mine": true },
+      { "id": "hut", "label": "Hut.java", "kind": "file", "mine": true },
+      { "id": "out", "label": "out folder", "kind": "data" },
+      { "id": "queue", "label": "Morning queue", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "fares", "to": "ticket", "label": "fare" },
+      { "from": "ticket", "to": "hut", "label": "import" },
+      { "from": "queue", "to": "hut", "label": "names, ages" },
+      { "from": "hut", "to": "out", "label": "javac -d" }
+    ],
+    "note": "The fares and tickets live in one package and the hut in another, so the hut can make tickets but never work out a fare itself."
+  },
+  "tasks": {
+    "fares": {
+      "steps": [
+        {
+          "active": ["fares"],
+          "note": "The fares file starts by naming its package, which follows its folders."
+        },
+        {
+          "active": ["fares", "fares->ticket", "ticket"],
+          "note": "The ticket code, in the same package, may ask for a fare by age."
+        },
+        {
+          "active": ["fares", "hut"],
+          "note": "The hut, in another package, cannot reach the fares at all."
+        }
+      ]
+    },
+    "ticket": {
+      "steps": [
+        {
+          "active": ["ticket"],
+          "note": "A ticket is made from a passenger and an age, in the tickets package."
+        },
+        {
+          "active": ["fares", "fares->ticket", "ticket"],
+          "note": "Its fare comes from the fares file, the one place the rule lives."
+        },
+        {
+          "active": ["ticket", "ticket->hut", "hut"],
+          "value": { "kind": "map", "label": "open to other packages", "entries": [{ "key": "the class", "value": "yes" }, { "key": "making one", "value": "yes" }, { "key": "its line", "value": "yes" }, { "key": "its fields", "value": "no" }] },
+          "note": "The hut, in another package, can make a ticket and ask for its line, and nothing more."
+        }
+      ]
+    },
+    "hut": {
+      "steps": [
+        {
+          "active": ["queue", "queue->hut", "hut"],
+          "note": "The morning queue comes into the hut's program, in order."
+        },
+        {
+          "active": ["ticket", "ticket->hut", "hut"],
+          "note": "The hut brings in the ticket class from its package and makes one ticket per person."
+        },
+        {
+          "active": ["hut", "hut->out", "out"],
+          "note": "All the files are built together into one folder, and the hut is run by its full name."
+        }
+      ]
+    }
+  }
+}
