@@ -25,7 +25,7 @@ EXPLAIN QUERY PLAN SELECT phone FROM owners WHERE last_name = 'Okoro';
 SCAN owners
 ```
 
-`SCAN owners` means it reads every row of `owners` and keeps the ones that match. Look up an owner by id instead and the plan says `SEARCH owners USING INTEGER PRIMARY KEY (rowid=?)`: `SEARCH` means it goes straight to the rows it needs, here through the table's key. A join has one line per table, in the order SQLite visits them, for example `SCAN v` and then `SEARCH t USING INDEX treatments_by_visit (visit_id=?)`: every visit is read, and for each one its treatments are found directly.
+`SCAN owners` means it reads every row of `owners` and keeps the ones that match. Look up an owner by id instead and the plan says `SEARCH owners USING INTEGER PRIMARY KEY (rowid=?)`: `SEARCH` means it goes straight to the rows it needs, here through the table's key. A join has one line per table, in the order SQLite visits them, for example `SCAN v` and then `SEARCH t USING INDEX treatments_by_visit (visit_id=?)`: every visit is read, and for each one its treatments are found directly. A line such as `SCAN a USING COVERING INDEX animals_by_name` is still a scan: SQLite reads every entry of that index instead of every row of the table, which saves little, because the index is not in the order the search needs.
 
 The tables here are small, so every query is quick and you will not feel the difference. The plan shows what would happen with fifty thousand rows, and it is what Check reads. It never times anything.
 

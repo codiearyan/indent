@@ -34,9 +34,6 @@
         { "title": "CREATE TABLE", "url": "https://www.sqlite.org/lang_createtable.html" },
         { "title": "Datatypes in SQLite", "url": "https://www.sqlite.org/datatype3.html" }
       ],
-      "videos": [
-        { "title": "Making a table with a primary key", "url": "https://www.youtube.com/watch?v=Ly2uy_jUHU8" }
-      ],
       "points": 10
     },
     {
@@ -64,7 +61,7 @@
       "id": "reminders-table",
       "title": "Make the reminders table",
       "file": "queries/3-reminders.sql",
-      "description": "The front desk sends a reminder when a booster is due, by phone unless an owner asks for something else.\n\nIn `queries/3-reminders.sql`, write a `CREATE TABLE` for a table called `reminders`:\n\n- `id`: the table's key, as in task 1\n- `animal_id`: a whole number, never empty\n- `due`: text, never empty, the date the booster is due as `YYYY-MM-DD`\n- `send_by`: text, never empty, and `'phone'` when a row does not give it\n\nCheck runs only your `CREATE TABLE` and tries rows of its own: one without `send_by`, one with `send_by` given, one with `send_by` set to `NULL`, and one with no due date.",
+      "description": "The front desk sends a reminder when a booster is due, by phone unless an owner asks for something else.\n\nIn `queries/3-reminders.sql`, write a `CREATE TABLE` for a table called `reminders`:\n\n- `id`: the table's key, as in task 1\n- `animal_id`: a whole number, never empty\n- `due`: text, never empty, the date the booster is due as `YYYY-MM-DD`\n- `send_by`: text, never empty, and `'phone'` when a row does not give it\n\nCheck runs only your `CREATE TABLE` and tries rows of its own: one without `send_by`, one with `send_by` given, one with `send_by` set to `NULL`, one with no due date and one with no animal.",
       "nextSteps": [
         "Write the four columns with their types and rules.",
         "Give `send_by` the value it takes when a row leaves it out, and run the file.",
@@ -85,7 +82,7 @@
       "id": "appointments-table",
       "title": "Make the appointments table",
       "file": "queries/4-appointments.sql",
-      "description": "The practice starts booking visits ahead. An appointment must be for an animal the practice knows.\n\nIn `queries/4-appointments.sql`, write a `CREATE TABLE` for a table called `appointments`:\n\n- `id`: the table's key, as in task 1\n- `animal_id`: a whole number, never empty, that points at the `id` of a row in `animals`\n- `starts`: text, never empty, as `YYYY-MM-DD HH:MM`\n- `vet`: text, never empty\n\nAn appointment for an animal that is not in `animals` is refused, and an animal with an appointment cannot be removed from `animals`. Check switches on keys that point at another table, as `run.mjs` does, runs only your `CREATE TABLE` and tries rows of its own: an appointment for an animal that exists, one for an id no animal has, removing an animal that has an appointment, and an appointment with no time or vet.",
+      "description": "The practice starts booking visits ahead. An appointment must be for an animal the practice knows.\n\nIn `queries/4-appointments.sql`, write a `CREATE TABLE` for a table called `appointments`:\n\n- `id`: the table's key, as in task 1\n- `animal_id`: a whole number, never empty, that points at the `id` of a row in `animals`\n- `starts`: text, never empty, as `YYYY-MM-DD HH:MM`\n- `vet`: text, never empty\n\nAn appointment for an animal that is not in `animals` is refused, and an animal with an appointment cannot be removed from `animals`. Check switches on keys that point at another table, as `run.mjs` does, runs only your `CREATE TABLE` and tries rows of its own: an appointment for an animal that exists, one for an id no animal has, removing an animal that has an appointment, and appointments with no animal, no time or no vet.",
       "nextSteps": [
         "Write the four columns with their types and rules.",
         "Make `animal_id` point at the `id` of `animals`, and run the file.",
@@ -106,7 +103,7 @@
       "id": "price-list-table",
       "title": "Make the price list strict",
       "file": "queries/5-price-list.sql",
-      "description": "Rosamund wants one price list, and a price that is not a number must never get in, not even by mistake.\n\nIn `queries/5-price-list.sql`, write a `CREATE TABLE` for a table called `price_list`:\n\n- `id`: the table's key, as in task 1\n- `name`: text, never empty, and never the same on two rows\n- `price`: a number that may have pence, never empty, in pounds\n\nA price that is not a number is refused. Check runs only your `CREATE TABLE` and tries rows of its own: a price written as a word, prices of 19.20 and of 32, two prices with the same name, and a row with no price.",
+      "description": "Rosamund wants one price list, and a price that is not a number must never get in, not even by mistake.\n\nIn `queries/5-price-list.sql`, write a `CREATE TABLE` for a table called `price_list`:\n\n- `id`: the table's key, as in task 1\n- `name`: text, never empty, and never the same on two rows\n- `price`: a number that may have pence, never empty, in pounds\n\nA price that is not a number is refused. Check runs only your `CREATE TABLE` and tries rows of its own: a price written as a word, prices of 19.20 and of 32, two prices with the same name, a row with no price and a row with no name.",
       "nextSteps": [
         "Write the three columns with their types and rules, and run the file.",
         "Look at what happens to the price written as a word. Is it refused?",

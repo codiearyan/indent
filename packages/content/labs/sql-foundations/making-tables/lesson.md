@@ -28,7 +28,7 @@ CREATE TABLE suppliers (
 
 After the table's name, in brackets, come the columns with a comma between each two. Each column has a name, a type, and then any rules. The types this engine knows are `INTEGER` for whole numbers, `REAL` for numbers with a fraction, `TEXT`, and `BLOB` for raw bytes such as a picture. A phone number is text, even though it is made of digits: as a number, 01632960500 would lose its first 0.
 
-In this engine a column's type is a preference, not a rule, where most databases treat it as a rule. In an `INTEGER` column, `'12'` is turned into the number 12, but `'a dozen'` is kept as text, without an error. To make the types rules, write `STRICT` after the closing bracket. Then a value of the wrong type is refused with `cannot store TEXT value in INTEGER column`, followed by the column's name, and only the types above (and `ANY`) are allowed.
+In this engine a column's type is a preference, not a rule, where most databases treat it as a rule. In an `INTEGER` column, `'12'` is turned into the number 12, but `'a dozen'` is kept as text, without an error. To make the types rules, write `STRICT` after the closing bracket. Then a value of the wrong type is refused with `cannot store TEXT value in INTEGER column`, followed by the column's name, and only the types above are allowed, with `INT` as another name for `INTEGER` and `ANY` for a column that takes every type.
 
 Make a table whose name is taken and SQLite says `table suppliers already exists`.
 
@@ -59,7 +59,7 @@ CREATE TABLE deliveries (
 );
 ```
 
-Now a delivery from a supplier id that no row of `suppliers` has is refused, and so is removing a supplier that still has deliveries. Both give `FOREIGN KEY constraint failed`, which does not say which row; look at the ids in your statement.
+Now a delivery from a supplier id that no row of `suppliers` has is refused, and so is removing a supplier that still has deliveries. Both give `FOREIGN KEY constraint failed`, which does not say which row; look at the ids in your statement. A `REFERENCES` that names a table that is not there is not refused when the table is made, only when the first row goes in: SQLite then says `no such table: main.supplier`, with the name you wrote.
 
 This engine only keeps that rule when it is switched on for the connection, with `PRAGMA foreign_keys = ON`, where most databases always keep it. `run.mjs` and Check both switch it on, so you never need to write it.
 

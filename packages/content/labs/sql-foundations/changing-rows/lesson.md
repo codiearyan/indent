@@ -68,14 +68,14 @@ A transaction groups statements so that you decide at the end whether they count
 
 ```sql
 BEGIN;
-UPDATE treatments SET price = price * 1.1;
+UPDATE treatments SET price = price + 5;
 SELECT name, price FROM treatments;
 ROLLBACK;
 ```
 
 `BEGIN` starts the transaction. The changes after it happen, and a `SELECT` inside sees them, but they are not kept yet. `COMMIT` keeps them. `ROLLBACK` undoes every change since `BEGIN`, as if it never ran. So `BEGIN`, a change, a look, and then `COMMIT` or `ROLLBACK` is a safe way to try something.
 
-`ROLLBACK` or `COMMIT` with no `BEGIN` before them gives `cannot rollback - no transaction is active`. A second `BEGIN` before the first transaction ends gives `cannot start a transaction within a transaction`. And a transaction that is never ended is undone when the connection closes, so a file that forgets `COMMIT` changes nothing.
+`ROLLBACK` with no `BEGIN` before it gives `cannot rollback - no transaction is active`, and `COMMIT` gives `cannot commit - no transaction is active`. A second `BEGIN` before the first transaction ends gives `cannot start a transaction within a transaction`. And a transaction that is never ended is undone when the connection closes, so a file that forgets `COMMIT` changes nothing.
 
 ## Your work in this issue
 

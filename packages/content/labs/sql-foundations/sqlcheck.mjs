@@ -391,12 +391,12 @@ const REPEATS =
 const FIRST_ONLY =
   'With =, <, > and the like, a query in brackets stands for one value. When it returns several rows, this engine uses the first and says nothing; IN uses them all.'
 
-/** Notes for the issue on subqueries, read from a result that is wrong. */
-function subqueryNotes(mine, want) {
-  const notes = []
-  if (repeats(mine, want)) notes.push(REPEATS)
-  if (/(=|<>|!=|<|>)\s*\(\s*select\s+(?!(distinct\s+)?(avg|count|sum|min|max|total)\s*\()/i.test(mine.code)) notes.push(FIRST_ONLY)
-  return notes
+/** A wrong result in the issue on subqueries, said again with what is most likely the cause. */
+function subqueryNote(message, mine, want) {
+  if (repeats(mine, want)) return `Your result has ${plural(mine.rows.length, 'row')}; it should have ${want.rows.length}. ${REPEATS}`
+  const lists = [...mine.code.matchAll(/(=|<>|!=|<|>)\s*\(\s*select\b([\s\S]*?)\bfrom\b/gi)].map((m) => m[2])
+  const several = lists.some((list) => !/\b(avg|count|sum|min|max|total)\s*\(/i.test(list))
+  return several ? `${message} ${FIRST_ONLY}` : message
 }
 
 /**
@@ -423,7 +423,7 @@ export async function checkQuery(t, file, { ordered = false, more, subqueries = 
   const stop = problem(mine, file)
   if (stop) return [stop]
   const [hiddenMine, hiddenWant] = hidden.results
-  const note = (message, m, w) => (message && subqueries ? [message, ...subqueryNotes(m, w)].join(' ') : message)
+  const note = (message, m, w) => (message && subqueries ? subqueryNote(message, m, w) : message)
   const seen = note(compare(want, mine, shown.values, ordered), mine, want)
   const unseen = note(compare(hiddenWant, hiddenMine, null, ordered), hiddenMine, hiddenWant)
   return [
@@ -453,21 +453,30 @@ const TOO_LONG = 'Your file ran for more than 15 seconds and was stopped. Look f
 const ERRORS = [
   [/has \d+ columns but \d+ values/, () => 'Without a list of columns after the table name, INSERT needs a value for every column, id included, in the order schema.sql gives.'],
   [/\d+ values for \d+ columns/, () => 'The list of columns and the list of values must be the same length: one value for each column you name.'],
-  [/NOT NULL constraint failed: \w+\.(\w+)/, (m) => `The table's rules say ${m[1]} is never empty, and the row has no value for it.`],
+  [
+    /NOT NULL constraint failed: \w+\.(\w+)/,
+    (m, line) =>
+      `The table's rules say ${m[1]} is never empty, and the row has no value for it.${/^\s*insert\s+into\s+\w+\s*\(/i.test(line) ? ' Look at the list of columns too: a value in the wrong place goes into another column.' : ''}`
+  ],
   [/UNIQUE constraint failed: \w+\.id$/, () => 'That id is taken already. Leave id out and the database picks a free one.'],
-  [/UNIQUE constraint failed: \w+\.\w+$/, () => 'Two rows share that value, and a rule says no two may: a UNIQUE column, or a UNIQUE index, which cannot even be made while two rows already share a value.'],
+  [
+    /UNIQUE constraint failed: \w+\.\w+$/,
+    (m, line) =>
+      `Two rows share that value, and a rule says no two may.${/^\s*create\s+unique\s+index\b/i.test(line) ? ' A UNIQUE index cannot even be made while two rows already share a value.' : ''}`
+  ],
   [/FOREIGN KEY constraint failed/, () => 'A row points at a row that is not there, in the table that REFERENCES names.'],
   [/foreign key mismatch/, () => "A column that points at another table points at that table's key."],
-  [/unknown datatype/, () => 'A STRICT table knows only the types INTEGER, REAL, TEXT, BLOB and ANY.'],
+  [/unknown datatype/, () => 'A STRICT table knows only the types INTEGER (or INT), REAL, TEXT, BLOB and ANY.'],
   [/cannot rollback - no transaction/, () => 'ROLLBACK undoes a transaction, so a BEGIN has to come before the change.'],
   [/cannot commit - no transaction/, () => 'COMMIT ends a transaction, so a BEGIN has to come before the change.'],
   [/within a transaction/, () => 'A transaction is open already. End it with COMMIT or ROLLBACK before you start another.'],
   [/already exists/, () => 'Every table and index has a name of its own, and your file makes one with a name that is taken: the same one twice, or one schema.sql has.']
 ]
-const errorHint = (error) => {
+/** `line` is the learner's statement that failed, when it was theirs and not one of Check's own rows. */
+const errorHint = (error, line = '') => {
   for (const [re, say] of ERRORS) {
     const m = error.match(re)
-    if (m) return ` ${say(m)}`
+    if (m) return ` ${say(m, line)}`
   }
   return ''
 }
@@ -494,7 +503,7 @@ function halt(mine, file, allowed) {
   if (mine.error !== undefined) {
     return fail(
       'The file runs',
-      `SQLite could not run statement ${mine.at} of your file, so Check stopped there.${errorHint(mine.error)} Read the error below, fix that statement, and run the file again with node run.mjs ${file}.`,
+      `SQLite could not run statement ${mine.at} of your file, so Check stopped there.${errorHint(mine.error, mine.line)} Read the error below, fix that statement, and run the file again with node run.mjs ${file}.`,
       `SQLite says: ${mine.error}\n  ${mine.line}`
     )
   }
@@ -609,7 +618,14 @@ function compareRows(start, mineState, wantState, mine, seen) {
       else {
         const cols = wrongCols()
         parts.push(`The new row in ${first.table} has the wrong ${cols.join(' and ')}.${yours(cols)}`)
-        if (cols.length > 1) parts.push('In an INSERT, the values go into the columns you list in the same order, one for one.')
+        const values = (row) => cols.map((c) => key([row[first.columns.indexOf(c)]])).sort()
+        if (cols.length > 1 && key(values(first.mine)) === key(values(first.want))) {
+          parts.push('In an INSERT, the values go into the columns you list in the same order, one for one.')
+        } else if (cols.some((c) => first.mine[first.columns.indexOf(c)] === '' && first.want[first.columns.indexOf(c)] === null)) {
+          parts.push("'' is empty text, not an empty cell. An empty cell is NULL with no quotes, or a column you leave out.")
+        } else if (!nullText) {
+          parts.push('Compare each value with the task, letter for letter: capital letters and spaces count.')
+        }
       }
     } else if (wantKind === 'changed') {
       if (first.mine === undefined) {
@@ -635,16 +651,27 @@ function compareRows(start, mineState, wantState, mine, seen) {
 
 /** Whether the statements that ran make the shape the task asks for: BEGIN, the change, a look, then the end. */
 function transactionShape(ran, end) {
-  const begin = ran.indexOf('BEGIN')
-  const firstWrite = ran.findIndex((p) => WRITES.includes(p))
-  const close = ran.findLastIndex((p) => end.includes(p))
-  const lastWrite = ran.findLastIndex((p) => WRITES.includes(p))
   const word = end[0]
-  if (begin === -1 || firstWrite === -1 || begin > firstWrite) {
-    return 'This task makes the change inside a transaction, so BEGIN comes before it.'
+  let open = false
+  let wrote = false
+  let looked = false
+  let ended = false
+  for (const p of ran) {
+    if (p === 'BEGIN') open = true
+    else if (WRITES.includes(p)) {
+      if (!open) return `Every change in this task goes inside the transaction, after BEGIN and before ${word}.`
+      wrote = true
+      looked = false
+    } else if (p === 'SELECT') looked ||= open && wrote
+    else if (open) {
+      if (wrote && !end.includes(p)) return `This task ends the transaction with ${word}, after the change.`
+      if (wrote && !looked) return `Look at the result with a SELECT after the change and before ${word}.`
+      ended ||= wrote
+      open = false
+    }
   }
-  if (close === -1 || close < lastWrite) return `This task ends the transaction with ${word}, after the change.`
-  if (!ran.slice(firstWrite, close).includes('SELECT')) return `Look at the result with a SELECT after the change and before ${word}.`
+  if (!wrote) return `This task makes a change inside a transaction, after BEGIN and before ${word}.`
+  if (!ended) return `This task ends the transaction with ${word}, after the change.`
   return null
 }
 
@@ -668,7 +695,7 @@ export async function checkChange(t, file, { transaction } = {}) {
   if (stop) return stop
 
   const judge = ({ before, results: [m, w] }, seen) => {
-    if (m.error !== undefined) return `SQLite could not run statement ${m.at} of your file: ${m.error}.${errorHint(m.error)}`
+    if (m.error !== undefined) return `SQLite could not run statement ${m.at} of your file: ${m.error}.${errorHint(m.error, m.line)}`
     if (transaction !== 'rollback') return compareRows(before.tables, m.final, w.final, m, seen)
     if (!m.tried) {
       if (m.ran.includes('COMMIT') || m.ran.includes('END')) return 'COMMIT kept the change. This task tries the change and then undoes it.'
@@ -682,7 +709,7 @@ export async function checkChange(t, file, { transaction } = {}) {
   }
   const seen = judge(shown, true)
   const unseen = judge(hidden, false)
-  const state = transaction === 'rollback' ? mine.tried : mine.final
+  const state = transaction === 'rollback' && !seen?.startsWith('After ROLLBACK') ? mine.tried : mine.final
   const details = [
     { name: 'The file runs', passed: true },
     detail(
@@ -808,15 +835,22 @@ export async function checkIndex(t, file, { plans, keep }) {
   if (!made.length) {
     return [detail('The file makes an index', mine.ran.length ? 'Your file makes no new index: the one it removes or makes is gone again by the end.' : `${file} has no CREATE INDEX yet.`)]
   }
-  const twin = made.find((a, i) => made.some((b, j) => j > i && a.table === b.table && key(a.columns) === key(b.columns)))
+  const sameAs = (a) => mine.indexes.find((b) => b !== a && a.table === b.table && key(a.columns) === key(b.columns))
+  const twin = made.find(sameAs)
   const details = [{ name: 'The file runs', passed: true }]
   if (twin) {
-    const other = made.find((b) => b !== twin && b.table === twin.table && key(b.columns) === key(twin.columns))
+    const other = sameAs(twin)
+    const what = made.includes(other)
+      ? `two indexes on the same columns of ${twin.table}: ${twin.name} and ${other.name}`
+      : `${twin.name} on the same columns of ${twin.table} as ${other.name}, which schema.sql has already`
     details.push(
-      detail(
-        'Makes each index once',
-        `Your file makes two indexes on the same columns of ${twin.table}: ${twin.name} and ${other.name}. Every index is kept up to date on each change to the table, so one is enough.`
-      )
+      detail('Makes each index once', `Your file makes ${what}. Every index is kept up to date on each change to the table, so one is enough.`)
+    )
+  }
+  const dropped = startNames.filter((n) => !names.includes(n))
+  if (dropped.length) {
+    details.push(
+      detail('Leaves the practice\'s indexes in place', `Your file removes ${dropped.join(' and ')}, which this task does not ask for. Every index of schema.sql stays.`)
     )
   }
   const mineNames = made.map((i) => i.name)
@@ -827,7 +861,10 @@ export async function checkIndex(t, file, { plans, keep }) {
     let message = null
     if (!line) {
       const scan = plan.some((l) => /^SCAN /.test(l))
-      message = `${asked}${describePlan(plan)}.${scan ? ' SCAN means it reads every row of that table, so no index of yours helps this search. Look at which column the search looks up, and which table your index is on.' : ' No index of yours is in it.'}`
+      const covering = plan.some((l) => /^SCAN /.test(l) && mineNames.includes(usedIndex(l)))
+        ? ' A SCAN that names your index still reads every entry of it, because the index is not in the order this search needs.'
+        : ''
+      message = `${asked}${describePlan(plan)}.${scan ? ` SCAN means it reads every row of that table, so no index of yours helps this search.${covering} Look at which column the search looks up, and which table your index is on.` : ' No index of yours is in it.'}`
     } else if (p.search && !line.includes(`(${p.search})`)) {
       const used = made.find((m) => m.name === usedIndex(line))
       message = `${asked}${line}. Your index helps with only part of the search. ${

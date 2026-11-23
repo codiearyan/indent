@@ -39,7 +39,7 @@ FROM treatments
 WHERE price > (SELECT AVG(price) FROM treatments);
 ```
 
-The query in brackets returns one row with one value, so it can stand anywhere a number could. You cannot write `WHERE price > AVG(price)`: `WHERE` looks at one row at a time, and an average needs all of them. SQLite says `misuse of aggregate function avg()`. Work the average out in its own query, and the outer query compares each row with it. Typing in the number instead would only be right until the next treatment is added.
+The query in brackets returns one row with one value, so it can stand anywhere a number could. You cannot write `WHERE price > AVG(price)`: `WHERE` looks at one row at a time, and an average needs all of them. SQLite says `misuse of aggregate function AVG()`, with the name spelt as you wrote it. Work the average out in its own query, and the outer query compares each row with it. Typing in the number instead would only be right until the next treatment is added.
 
 ## One value or many
 
@@ -66,7 +66,7 @@ FROM (
 ) AS per_visit;
 ```
 
-The inner query makes one row per visit with its count. The outer query averages those counts. Written as `AVG(COUNT(*))` in one query, SQLite says `misuse of aggregate function count()`: one query cannot total and then average its totals. Give the inner query a name with `AS`, so that its columns can be named as `per_visit.n` when you need to.
+The inner query makes one row per visit with its count. The outer query averages those counts. Written as `AVG(COUNT(*))` in one query, SQLite says `misuse of aggregate function COUNT()`: one query cannot total and then average its totals. Give the inner query a name with `AS`, so that its columns can be named as `per_visit.n` when you need to.
 
 ## Join or subquery
 

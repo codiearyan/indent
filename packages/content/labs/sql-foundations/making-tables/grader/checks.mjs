@@ -5,7 +5,7 @@ const keyFills = (table, values) => ({
   run: [`INSERT INTO ${table} ${values}`],
   read: `SELECT typeof(id) FROM ${table}`,
   want: ['integer'],
-  message: `A row added to ${table} without an id got none: its id is empty. Only a column declared with the exact type the lesson gives for a key fills itself in; a key of another type, INT included, does not.`,
+  message: `A row added to ${table} without an id got none: its id is empty. Only a column declared as the table's key, with the exact type the lesson gives for a key, fills itself in; a key of another type, INT included, does not.`,
   refusedMessage: `A row added to ${table} without an id was refused, so Check could not see whether it gets one.`
 })
 const keyRefuses = (table, columns, values) => ({
@@ -111,6 +111,12 @@ export const checks = {
           run: ["INSERT INTO reminders (animal_id, send_by) VALUES (7, 'email')"],
           refused: true,
           message: 'A reminder with no due date went in. The task says due is never empty.'
+        },
+        {
+          name: 'A reminder with no animal is refused',
+          run: ["INSERT INTO reminders (due, send_by) VALUES ('2027-02-01', 'email')"],
+          refused: true,
+          message: 'A reminder with no animal went in. The task says animal_id is never empty.'
         }
       ]
     }),
@@ -141,10 +147,22 @@ export const checks = {
           message: 'An animal with an appointment was removed from animals. The task says that is refused while the appointment points at it.'
         },
         {
-          name: 'An appointment with no time or vet is refused',
-          run: ['INSERT INTO appointments (animal_id) VALUES (20)'],
+          name: 'An appointment with no animal is refused',
+          run: ["INSERT INTO appointments (starts, vet) VALUES ('2026-12-02 11:15', 'Ifan Pryce')"],
           refused: true,
-          message: 'An appointment with no time and no vet went in. The task says starts and vet are never empty.'
+          message: 'An appointment with no animal went in. The task says animal_id is never empty.'
+        },
+        {
+          name: 'An appointment with no time is refused',
+          run: ["INSERT INTO appointments (animal_id, vet) VALUES (20, 'Ifan Pryce')"],
+          refused: true,
+          message: 'An appointment with no time went in. The task says starts is never empty.'
+        },
+        {
+          name: 'An appointment with no vet is refused',
+          run: ["INSERT INTO appointments (animal_id, starts) VALUES (20, '2026-12-02 11:15')"],
+          refused: true,
+          message: 'An appointment with no vet went in. The task says vet is never empty.'
         }
       ]
     }),
@@ -179,6 +197,12 @@ export const checks = {
           run: ["INSERT INTO price_list (name) VALUES ('Ear drops')"],
           refused: true,
           message: 'A row with no price went in. The task says price is never empty.'
+        },
+        {
+          name: 'A row with no name is refused',
+          run: ['INSERT INTO price_list (price) VALUES (19.2)'],
+          refused: true,
+          message: 'A row with no name went in. The task says a name is never empty, and a rule that values never repeat still lets several rows be empty.'
         }
       ]
     })
