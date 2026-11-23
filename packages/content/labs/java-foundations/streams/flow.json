@@ -1,0 +1,72 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "office", "label": "Harbour office", "kind": "story" },
+      { "id": "bookings", "label": "Day's bookings", "kind": "data" },
+      { "id": "passengers", "label": "Passengers", "kind": "function", "mine": true },
+      { "id": "biggest", "label": "Biggest", "kind": "function", "mine": true },
+      { "id": "later", "label": "Later", "kind": "function", "mine": true },
+      { "id": "answers", "label": "Answers", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "bookings", "to": "passengers", "label": "a stream" },
+      { "from": "bookings", "to": "biggest", "label": "a stream" },
+      { "from": "bookings", "to": "later", "label": "a stream" },
+      { "from": "passengers", "to": "answers", "label": "names, count" },
+      { "from": "biggest", "to": "answers", "label": "parties" },
+      { "from": "later", "to": "office", "label": "waiting stream" }
+    ],
+    "note": "The office's questions become chains of small steps over the day's bookings, which stay as they were."
+  },
+  "tasks": {
+    "names": {
+      "steps": [
+        {
+          "active": ["bookings", "bookings->passengers", "passengers"],
+          "value": { "kind": "array", "label": "a booking", "values": ["passenger", "boat", "seats"] },
+          "note": "The bookings flow past one at a time; only the asked boat's stay."
+        },
+        {
+          "active": ["passengers"],
+          "note": "Each booking left becomes its passenger's name; repeats drop out and the names line up alphabetically."
+        },
+        {
+          "active": ["passengers", "passengers->answers", "answers"],
+          "note": "The office gets the list of names, or the number of bookings on that boat."
+        }
+      ]
+    },
+    "largest": {
+      "steps": [
+        {
+          "active": ["bookings", "bookings->biggest", "biggest"],
+          "note": "Every booking of the day is put in order, most seats first."
+        },
+        {
+          "active": ["biggest"],
+          "note": "Only as many as the office asked for go through."
+        },
+        {
+          "active": ["biggest", "biggest->answers", "answers"],
+          "note": "The office also hears whether any party is bigger than a number it names."
+        }
+      ]
+    },
+    "lazy": {
+      "steps": [
+        {
+          "active": ["bookings", "bookings->later", "later"],
+          "note": "A stream is planned from the bookings: keep what a rule allows, and take each passenger."
+        },
+        {
+          "active": ["later", "later->office", "office"],
+          "note": "The office gets the plan, with nothing done yet."
+        },
+        {
+          "active": ["office"],
+          "note": "When the office asks for its first few names, the bookings are read only until those are found."
+        }
+      ]
+    }
+  }
+}

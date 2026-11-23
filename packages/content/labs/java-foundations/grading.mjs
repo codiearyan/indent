@@ -2690,6 +2690,15 @@ const FUNCTION_GLOSS = [
       'A stream of objects has no sum or average without more: those belong to a stream of plain numbers. The lesson shows how one becomes the other.'
   ],
   [
+    /^compiler\.err\.cant\.resolve/,
+    (e, src) =>
+      /symbol:\s+method /.test(e.message) &&
+      /location:\s+variable \w+ of type /.test(e.message) &&
+      src.includes('.map(') &&
+      e.col - 1 > src.indexOf('.map(') &&
+      'In a stream, each step is handed what the step before it gave. After a map, the items are what map turned them into, and the methods of what they were before are gone.'
+  ],
+  [
     /^compiler\.err\.invalid\.mref/,
     () =>
       'Java found no method of that name that takes what the interface hands it. A method reference names a method that already exists: check its name and its class, capital letters included.'

@@ -79,7 +79,8 @@
       "chapters": [
         "lambdas",
         "functional-interfaces",
-        "collection-functions"
+        "collection-functions",
+        "streams"
       ]
     }
   ]
