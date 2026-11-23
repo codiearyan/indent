@@ -2,7 +2,7 @@
   "stations": [
     {
       "title": "Dunstan",
-      "say": "Where is Agata on the round-up?",
+      "say": "Who is missing from the round-up?",
       "note": "A postcard for everyone. MF-16."
     },
     {
@@ -28,16 +28,16 @@
     }
   ],
   "ticket": {
-    "label": "Agata",
-    "wrong": "not on the list",
+    "label": "Round-up",
+    "wrong": "missing people",
     "why": "Dropped",
-    "right": "on the list"
+    "right": "has everyone"
   },
   "captions": [
-    "At Mallowfield Seeds, Dunstan's round-up should list every customer, Agata too.",
+    "At Mallowfield Seeds, Dunstan's round-up should list every customer, and some are missing.",
     "The query keeps every customer, then a test on the date quietly drops some again.",
     "You show who is missing, then fix the round-up and the re-order list.",
-    "Now Agata is on the round-up, and a free packet goes with her postcard.",
+    "Now every customer is on the round-up, and the quiet ones get a free packet.",
     "Same customers, same orders. Nobody is dropped for having nothing to show."
   ]
 }

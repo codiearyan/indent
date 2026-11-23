@@ -2,9 +2,9 @@ import { checkQuery } from '../../sqlcheck.mjs'
 
 const TOTALS = '(SELECT order_id, SUM(packets * price_pence) AS total FROM order_lines GROUP BY order_id) AS t ON t.order_id = o.id'
 const WHOLE =
-  'Both numbers in that division are whole numbers, so SQLite drops everything after the point before you ever see it. Make one side a decimal, such as 100.0, before dividing.'
+  'Both numbers in that division are whole numbers, so SQLite drops everything after the point before you ever see it.'
 const OF_AVERAGES =
-  "This is an average of each customer's average. A customer with five orders counts the same as a customer with one, so the result is not what one order comes to. Average the orders themselves."
+  "This is an average of each customer's average. A customer with five orders counts the same as a customer with one, so the result is not what one order comes to."
 const ROUNDED = 'The task asks for pounds rounded to two places, with ROUND and 2.'
 const LINES = 'After joining the lines, each row is one line of an order, so COUNT(*) counts lines and AVG averages lines. An order is one row only before its lines are joined.'
 
@@ -108,7 +108,7 @@ export const checks = {
           found.push('A test on one row, such as the date of an order, belongs in WHERE. In HAVING, a plain column of a group gives the value of just one of its rows.')
         }
         if (/\/\s*100\b(?!\.)/.test(having)) {
-          found.push('Dividing whole numbers drops the fraction, so a customer at £40 and some pence comes out as 40, which is not more than 40. Compare the pence with 4000, or divide by 100.0.')
+          found.push('Dividing whole numbers drops the fraction, so a customer at £40 and some pence comes out as 40, which is not more than 40.')
         }
         return found
       },
