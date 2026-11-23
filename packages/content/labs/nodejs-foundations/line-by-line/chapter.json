@@ -1,0 +1,112 @@
+{
+  "id": "line-by-line",
+  "title": "A big file a line at a time",
+  "files": [
+    "count-readings.js",
+    "water-year.js",
+    "tap-totals.js",
+    "water/june.txt",
+    "make-year.js",
+    "try.js"
+  ],
+  "terminal": {
+    "description": "A terminal in your workspace. `node make-year.js` writes a year of the logger's readings to `water/year.txt`, about 26 MB. `node try.js --memory=16 count-readings.js water/year.txt` runs your script with 16 MB for its data, as the logger box has.",
+    "suggestedCommand": "node make-year.js"
+  },
+  "tasks": [
+    {
+      "id": "count",
+      "title": "Count the readings a line at a time",
+      "file": "count-readings.js",
+      "description": "Write `count-readings.js` so that `node count-readings.js water/june.txt` prints how many readings the log holds:\n\n```\n8 readings\n```\n\nA reading is a line like `2026-06-14T07:00,north,0`. Blank lines and the logger's notes, the lines that start with `#`, are not readings. The script reads the log a line at a time with `node:readline` over a read stream, and keeps only the count, so a log far bigger than the memory it has still works.\n\nCheck runs `count-readings.js` with 16 MB for its data on a log of its own of about 24 MB, and on a short log saved on Windows with blank lines and a note.",
+      "nextSteps": [
+        "Run `node make-year.js`, then try `node try.js --memory=16` with a script that reads `water/year.txt` whole, to see why not.",
+        "Open a read stream on the file named after the script's name, and give it to `createInterface`.",
+        "Go through the lines with `for await`, adding one for each reading.",
+        "Print the count once the loop is over."
+      ],
+      "hints": [
+        "`readFile` holds the whole file in memory at once, and splitting it holds every line as well. Neither fits in 16 MB with a 24 MB log.",
+        "`createReadStream(file)` from `node:fs` reads a file in small pieces. `createInterface({ input, crlfDelay: Infinity })` from `node:readline` turns the pieces into lines, which `for await` hands you one by one.",
+        "`for await (const line of createInterface({ input: createReadStream(file), crlfDelay: Infinity })) { if (line.trim() === '' || line.startsWith('#')) continue; count++ }`."
+      ],
+      "docs": [
+        {
+          "title": "Example: read a file stream line by line",
+          "url": "https://nodejs.org/api/readline.html#example-read-file-stream-line-by-line"
+        },
+        {
+          "title": "fs.createReadStream()",
+          "url": "https://nodejs.org/api/fs.html#fscreatereadstreampath-options"
+        },
+        {
+          "title": "for await...of",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading a file line by line in Node",
+          "url": "https://www.youtube.com/watch?v=DvBIanLcr8M"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "total",
+      "title": "Add up the litres as the lines go by",
+      "file": "water-year.js",
+      "description": "Write `water-year.js` so that `node water-year.js water/june.txt` prints the litres of every reading in the log, added up:\n\n```\nTotal: 35 litres\n```\n\nThe litres are the last part of a reading. Blank lines and notes are left out, as before. The script reads a line at a time and keeps only the total so far.\n\nCheck runs `water-year.js` with 16 MB for its data on a log of its own of about 24 MB, and on a short log saved on Windows with blank lines and a note.",
+      "nextSteps": [
+        "Read the log a line at a time, as in task 1.",
+        "Leave out the lines that are not readings.",
+        "Split each reading on its commas and add its litres, as a number, to the total.",
+        "Print the total when the loop is over."
+      ],
+      "hints": [
+        "Each line is text, so its parts are text too. Adding text to a number joins them.",
+        "`line.split(',')` gives the time, the tap and the litres. `Number()` turns the litres into a number you can add.",
+        "Inside the loop, after leaving out notes and blank lines: `total += Number(line.split(',')[2])`."
+      ],
+      "docs": [
+        {
+          "title": "readline.createInterface()",
+          "url": "https://nodejs.org/api/readline.html#readlinecreateinterfaceoptions"
+        },
+        {
+          "title": "String.prototype.split()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "taps",
+      "title": "Total each tap",
+      "file": "tap-totals.js",
+      "description": "Imran wants to know which tap uses the most. Write `tap-totals.js` so that `node tap-totals.js water/june.txt` prints one line for each tap in the log with its litres added up, in the order of the taps' names:\n\n```\nnorth: 19 litres\nsouth: 16 litres\n```\n\nThe tap is the middle part of a reading. Any tap name can turn up, not only these two. The script keeps one total for each tap, never the lines themselves.\n\nCheck runs `tap-totals.js` with 16 MB for its data on a log of its own of about 24 MB with three taps, and on a short log saved on Windows.",
+      "nextSteps": [
+        "Read the log a line at a time, leaving out what is not a reading.",
+        "Keep the totals in an object or a `Map`, one entry per tap name.",
+        "Add each reading's litres to the entry for its tap, making the entry when it is new.",
+        "When the loop is over, sort the tap names and print a line for each."
+      ],
+      "hints": [
+        "Memory stays flat when you keep only a few numbers, however long the log is. A list of every line grows with it.",
+        "A `Map` keeps a value per key: `totals.get(tap)` is `undefined` the first time, so start from 0. The names come out in the order they first turned up, so sort them.",
+        "`totals.set(tap, (totals.get(tap) ?? 0) + Number(litres))` in the loop, then `for (const tap of [...totals.keys()].sort())`."
+      ],
+      "docs": [
+        {
+          "title": "Map",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"
+        },
+        {
+          "title": "Example: read a file stream line by line",
+          "url": "https://nodejs.org/api/readline.html#example-read-file-stream-line-by-line"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

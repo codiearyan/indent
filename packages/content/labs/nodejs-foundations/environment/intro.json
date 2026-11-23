@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Imran", "say": "Can the price live outside the code?", "note": "It changes every April." },
+    { "title": "The bill script", "text": "The price is a number written in the code." },
+    {
+      "title": "Your scripts",
+      "file": "water-bill.js",
+      "mine": true,
+      "gap": "Nothing reads the settings",
+      "tasks": ["Read the price", "Refuse a bad price", "Warn about a leak", "Hide the key"]
+    },
+    { "title": "Shed screen", "text": "The bill shows. The key never does." }
+  ],
+  "ticket": { "label": "April bill", "wrong": "old price", "why": "Edited code", "right": "new price" },
+  "captions": [
+    "At Marrowfield, Imran asks for the water price to live outside the bill script.",
+    "Today he edits the number in the code every April, and last year he edited the wrong one.",
+    "You write the scripts that read their settings from the environment, in four tasks.",
+    "Now the price is a setting, and the bill uses this year's price without a code change.",
+    "Same April bill, no code edited. And the company's key never shows on the screen."
+  ]
+}
