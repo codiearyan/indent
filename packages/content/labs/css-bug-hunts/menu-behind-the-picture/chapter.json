@@ -1,0 +1,81 @@
+{
+  "id": "menu-behind-the-picture",
+  "title": "A menu that opens behind the picture",
+  "files": ["styles.css", "index.html"],
+  "terminal": {
+    "description": "The Wrenfield's home page runs in the Browser panel and reloads every time you save styles.css. Click Visit in its header to open the menu."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "visit-menu",
+      "title": "Open the Visit menu on top of the picture",
+      "file": "styles.css",
+      "description": "When Kwame clicks Visit in the header, its menu opens behind the big picture of the screen, so only its top edge shows. The menu has a z-index of 20 and the picture has 2.\n\nMake the open Visit menu sit on top of the picture, on a phone and on a wide screen, by fixing what really decides it. A bigger z-index on the menu is not that fix, and only `styles.css` changes.\n\nThe check opens the menu the way a click does, and works out from the CSS of the menu and of every element around it whether the menu is painted above the picture, and whether anything cuts it off.",
+      "nextSteps": [
+        "Click Visit in the Browser panel. Read \"How it happens\" in the lesson.",
+        "Walk up from the menu to the page, and note every element around it that is positioned or has a z-index.",
+        "Find the one that makes a stacking context, and compare it with the picture.",
+        "Change what is compared on the page, save and press Check."
+      ],
+      "hints": [
+        "Try a z-index of 9999 on the menu and look: nothing changes. The menu's z-index is not the one being compared.",
+        "The header is `position: sticky` with `z-index: 1`, so it makes a stacking context, and the menu is inside it. On the page, the header's 1 is compared with the picture's 2.",
+        "Give the header a z-index higher than the picture's, or take the z-index off the picture, which does not need one."
+      ],
+      "docs": [
+        { "title": "Stacking context", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Positioned_layout/Stacking_context" },
+        { "title": "z-index", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/z-index" },
+        { "title": "position", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/position" }
+      ],
+      "videos": [
+        { "title": "z-index and stacking contexts explained", "url": "https://www.youtube.com/watch?v=uS8l4YRXbaw" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "seat-guide",
+      "title": "Put an open seat guide on top of the cards",
+      "file": "styles.css",
+      "description": "Kwame did not mention it, but each film card has a Seat guide. Open the one on the first card and its panel slides under the card below it, though the panel has a z-index of 5.\n\nMake an open seat guide sit on top of the cards that come after its own, on a phone and on a wide screen. The cards stay positioned, because the badges are placed against them; task 3 checks that. Only `styles.css` changes.\n\nThe check opens the first card's seat guide the way a click does, and works out from the CSS whether its panel is painted above every card after it, and whether anything cuts it off.",
+      "nextSteps": [
+        "Open the first card's Seat guide in the Browser panel.",
+        "Walk up from the panel to the page and note what each element around it declares.",
+        "Compare what stands for the panel with what stands for the next card.",
+        "Fix the cause, save and press Check."
+      ],
+      "hints": [
+        "Every card has the same z-index, so each one is a stacking context, and a later card is painted over an earlier one.",
+        "The panel's z-index of 5 only counts inside its own card. Next to another card, it is card against card, and the later card wins.",
+        "Take the z-index off `.film-card` and keep its `position: relative`. The badges are already above the posters without it."
+      ],
+      "docs": [
+        { "title": "Stacking context", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Positioned_layout/Stacking_context" },
+        { "title": "<details>", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "still-in-place",
+      "title": "Keep the header, the caption and the badges in place",
+      "file": "styles.css",
+      "description": "The fix must not move anything else: the header stays at the top of the screen while the page scrolls, above the page, the caption stays on the big picture, above it, and each badge stays on the corner of its card.\n\nThis check runs once the Visit menu and the seat guide are on top, and until then it says which task is not done yet. It reads the header's position, works out whether it is painted above the picture and the film cards, and which element the caption and each badge are placed against.",
+      "nextSteps": [
+        "Scroll the page in the Browser panel and watch the header.",
+        "Look at the caption on the big picture and the badges on the cards.",
+        "If one moved, find which declaration placed it before your change.",
+        "Save and press Check."
+      ],
+      "hints": [
+        "Taking `position: sticky` off the header frees the menu and stops the header sticking to the top.",
+        "A positioned box is placed against the nearest positioned element around it. Remove the position of the picture or of a card, and the caption or the badges are placed against something else.",
+        "Keep every `position` as it was and change only z-index values: the header's, the picture's or the cards'."
+      ],
+      "docs": [
+        { "title": "position", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/position" },
+        { "title": "Stacking context", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Positioned_layout/Stacking_context" }
+      ],
+      "points": 10
+    }
+  ]
+}

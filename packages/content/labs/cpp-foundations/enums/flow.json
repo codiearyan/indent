@@ -1,0 +1,202 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "caller",
+        "label": "Customer on the phone",
+        "kind": "story"
+      },
+      {
+        "id": "dorrit",
+        "label": "Dorrit at the counter",
+        "kind": "story"
+      },
+      {
+        "id": "status",
+        "label": "Your Status",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "funcs",
+        "label": "Your functions",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "compiler",
+        "label": "Compiler",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "caller",
+        "to": "dorrit",
+        "label": "a ticket"
+      },
+      {
+        "from": "dorrit",
+        "to": "status",
+        "label": "its state"
+      },
+      {
+        "from": "status",
+        "to": "funcs",
+        "label": "one value"
+      },
+      {
+        "from": "funcs",
+        "to": "compiler",
+        "label": "builds"
+      },
+      {
+        "from": "funcs",
+        "to": "dorrit",
+        "label": "an answer"
+      }
+    ],
+    "note": "A repair's state is one of four names, and the compiler knows all four."
+  },
+  "tasks": {
+    "status": {
+      "steps": [
+        {
+          "active": [
+            "caller",
+            "caller->dorrit",
+            "dorrit"
+          ],
+          "note": "A customer asks where their clock is."
+        },
+        {
+          "active": [
+            "dorrit->status",
+            "status"
+          ],
+          "note": "Every repair is in one of four states, each with a name of its own."
+        },
+        {
+          "active": [
+            "status"
+          ],
+          "note": "A state is never a number that someone has to remember the meaning of."
+        }
+      ]
+    },
+    "collect": {
+      "steps": [
+        {
+          "active": [
+            "status",
+            "status->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a state"
+            ]
+          },
+          "note": "Dorrit wants to know whether the customer can come and collect."
+        },
+        {
+          "active": [
+            "funcs"
+          ],
+          "note": "The state is compared with one named state, never with a number."
+        },
+        {
+          "active": [
+            "funcs->dorrit",
+            "dorrit"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "yes or no"
+            ]
+          },
+          "note": "Dorrit can say yes or no at once."
+        }
+      ]
+    },
+    "words": {
+      "steps": [
+        {
+          "active": [
+            "status",
+            "status->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a state"
+            ]
+          },
+          "note": "Dorrit reads the state out, in the same words every time."
+        },
+        {
+          "active": [
+            "funcs",
+            "funcs->compiler",
+            "compiler"
+          ],
+          "note": "Each state has its own case, and the compiler warns when one has none."
+        },
+        {
+          "active": [
+            "funcs->dorrit"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "words for the slip"
+            ]
+          },
+          "note": "The words come back, ready to read out."
+        }
+      ]
+    },
+    "next": {
+      "steps": [
+        {
+          "active": [
+            "status",
+            "status->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a state"
+            ]
+          },
+          "note": "Kasimir finishes a step, and the repair moves on."
+        },
+        {
+          "active": [
+            "funcs"
+          ],
+          "note": "Each state is followed by the next one, and the last one stays where it is."
+        },
+        {
+          "active": [
+            "funcs->dorrit"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "the next state"
+            ]
+          },
+          "note": "The repair's new state comes back."
+        }
+      ]
+    }
+  }
+}

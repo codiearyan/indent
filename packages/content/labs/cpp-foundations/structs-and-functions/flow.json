@@ -1,0 +1,191 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "kasimir",
+        "label": "Kasimir at the bench",
+        "kind": "story"
+      },
+      {
+        "id": "bench",
+        "label": "Repairs on the bench",
+        "kind": "data"
+      },
+      {
+        "id": "funcs",
+        "label": "Your functions",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "dorrit",
+        "label": "Dorrit at the counter",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "kasimir",
+        "to": "funcs",
+        "label": "a job"
+      },
+      {
+        "from": "bench",
+        "to": "funcs",
+        "label": "the repairs"
+      },
+      {
+        "from": "funcs",
+        "to": "dorrit",
+        "label": "an answer"
+      }
+    ],
+    "note": "Each function says in its first line whether it reads a repair, changes it, or hands one back."
+  },
+  "tasks": {
+    "label": {
+      "steps": [
+        {
+          "active": [
+            "kasimir",
+            "kasimir->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a repair"
+            ]
+          },
+          "note": "Kasimir wants a label for a repair on his bench."
+        },
+        {
+          "active": [
+            "bench",
+            "bench->funcs",
+            "funcs"
+          ],
+          "note": "The function reads the repair where it is, without a copy, and changes nothing."
+        },
+        {
+          "active": [
+            "funcs->dorrit"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "a label, with done when it is"
+            ]
+          },
+          "note": "A label comes back, and says so when the repair is done."
+        }
+      ]
+    },
+    "log": {
+      "steps": [
+        {
+          "active": [
+            "kasimir",
+            "kasimir->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a repair",
+              "minutes"
+            ]
+          },
+          "note": "Kasimir has worked on a repair and logs the time."
+        },
+        {
+          "active": [
+            "funcs",
+            "bench"
+          ],
+          "note": "The function changes the repair itself, not a copy of it."
+        },
+        {
+          "active": [
+            "bench"
+          ],
+          "note": "The repair on the bench now holds its new minutes."
+        }
+      ]
+    },
+    "open": {
+      "steps": [
+        {
+          "active": [
+            "kasimir",
+            "kasimir->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the repairs",
+              "minutes lost"
+            ]
+          },
+          "note": "The bench clock ran slow, and the open repairs are missing time."
+        },
+        {
+          "active": [
+            "bench",
+            "bench->funcs",
+            "funcs"
+          ],
+          "note": "The loop reaches each repair where it stands on the bench."
+        },
+        {
+          "active": [
+            "bench"
+          ],
+          "note": "Every open repair gets the minutes, and the done ones stay as they were."
+        }
+      ]
+    },
+    "find": {
+      "steps": [
+        {
+          "active": [
+            "dorrit",
+            "bench"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the repairs",
+              "a ticket"
+            ]
+          },
+          "note": "Dorrit calls out a ticket, and Kasimir wants that repair."
+        },
+        {
+          "active": [
+            "bench->funcs",
+            "funcs"
+          ],
+          "note": "The function looks at each repair until one has the ticket."
+        },
+        {
+          "active": [
+            "funcs->dorrit",
+            "dorrit"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "that repair, or an empty one"
+            ]
+          },
+          "note": "The repair comes back, or an empty one when no repair has that ticket."
+        }
+      ]
+    }
+  }
+}

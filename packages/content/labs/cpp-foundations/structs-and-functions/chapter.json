@@ -1,0 +1,130 @@
+{
+  "id": "structs-and-functions",
+  "title": "Structs and functions",
+  "files": [
+    "src/bench.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Kasimir's bench here and run it, after you call your functions from main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/bench.cpp -o bench && ./bench"
+  },
+  "tasks": [
+    {
+      "id": "label",
+      "title": "Label a repair on the bench",
+      "file": "src/bench.cpp",
+      "description": "Under `// Task 1` in `src/bench.cpp`, write a function called `benchLabel` that takes a repair as a reference to a `const Repair` and gives back its label as a `std::string`: the ticket, a space, the item, `, ` and the minutes with ` min`. When the repair is done, `, done` goes on the end. Like this:\n\n```\n3101 mantel clock, 45 min, done\n```\n\nCheck calls `benchLabel` with repairs of its own, done and not done, and reads what it gives back. It only reads the repair, so the caller's repair must be the same afterwards.",
+      "nextSteps": [
+        "Write the first line: a `const Repair&` in, a `std::string` back.",
+        "Build the label from the ticket, the item and the minutes.",
+        "Add `, done` only when the repair's `done` is true.",
+        "Print the label of each repair on the bench from `main`."
+      ],
+      "hints": [
+        "`Repair` is written above `// Task 1`: read its members there. A function that only reads a struct takes it as a `const` reference, so no copy of it is made.",
+        "Make the label in a `std::string` variable, then add to it with `+=` inside an `if` on `repair.done`.",
+        "The shape is `std::string label = std::to_string(repair.ticket) + \" \" + repair.item + \", \" + std::to_string(repair.minutes) + \" min\"; if (repair.done) { label += \", done\"; } return label;`."
+      ],
+      "docs": [
+        {
+          "title": "Reference declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/reference"
+        },
+        {
+          "title": "std::to_string",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/to_string"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "log",
+      "title": "Log time on a repair",
+      "file": "src/bench.cpp",
+      "description": "Under `// Task 2`, write a function called `logTime` that takes a repair as a reference to a `Repair` and a number of minutes as an `int`, and gives nothing back. It adds the minutes to the caller's repair, and changes nothing else in it.\n\nCheck calls `logTime` with repairs of its own and reads them afterwards.",
+      "nextSteps": [
+        "Write the first line: a `Repair&` and an `int` in, `void` back.",
+        "Inside, add the minutes to the repair's `minutes`.",
+        "Call it from `main` on one repair of `bench`, and print that repair's label."
+      ],
+      "hints": [
+        "The function has to change the caller's repair, so it takes a reference without `const`. Without the `&` it changes a copy, and the caller never sees it.",
+        "Add to what the repair had: `+=` keeps the minutes already there.",
+        "The shape is `void logTime(Repair& repair, int minutes) { repair.minutes += minutes; }`."
+      ],
+      "docs": [
+        {
+          "title": "Reference declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/reference"
+        },
+        {
+          "title": "Member access operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_member_access"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "open",
+      "title": "Add lost time to the open repairs",
+      "file": "src/bench.cpp",
+      "description": "Under `// Task 3`, write a function called `addToOpen` that takes the repairs as a reference to a `std::vector<Repair>` and a number of minutes as an `int`, and gives nothing back. It adds the minutes to every repair in the caller's vector that is not done, and leaves the done ones as they were.\n\nCheck calls `addToOpen` with vectors of its own, an empty one included, and reads them afterwards.",
+      "nextSteps": [
+        "Write the first line: a `std::vector<Repair>&` and an `int` in, `void` back.",
+        "Go through the repairs with a range-based `for` that can change each one.",
+        "Add the minutes only to the repairs that are not done.",
+        "Call it from `main` with `bench`, and print every label."
+      ],
+      "hints": [
+        "The loop variable of a range-based `for` is a copy of each repair unless it is a reference. A change to a copy is lost at the end of the round.",
+        "`for (auto& repair : repairs)` reaches each repair where it is. `!repair.done` is true for the ones that are not done.",
+        "The shape is `for (auto& repair : repairs) { if (!repair.done) { repair.minutes += minutes; } }`."
+      ],
+      "docs": [
+        {
+          "title": "Range-based for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/range-for"
+        },
+        {
+          "title": "Reference declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/reference"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "find",
+      "title": "Find a repair by its ticket",
+      "file": "src/bench.cpp",
+      "description": "Under `// Task 4`, write a function called `findTicket` that takes the repairs as a reference to a `const std::vector<Repair>` and a ticket as an `int`. It gives back the repair with that ticket, or, when none has it, a new `Repair` with nothing filled in.\n\nCheck calls `findTicket` with vectors and tickets of its own, a ticket that is not there and an empty vector included, and reads every member of the repair it gives back. It only reads the repairs, so the caller's vector must be the same afterwards.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<Repair>&` and an `int` in, a `Repair` back.",
+        "Go through the repairs and compare each ticket with the one asked for.",
+        "Give back the repair as soon as its ticket matches.",
+        "After the loop, give back a new `Repair`."
+      ],
+      "hints": [
+        "A function can give back a whole struct, just as it gives back an `int`. Here the loop only reads, so its variable is `const auto&`.",
+        "The answer \"none has it\" is only known once every repair has been looked at, so that `return` comes after the loop, not in an `else` inside it.",
+        "The shape is `for (const auto& repair : repairs) { if (repair.ticket == ticket) { return repair; } } return Repair{};`."
+      ],
+      "docs": [
+        {
+          "title": "Range-based for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/range-for"
+        },
+        {
+          "title": "return statement",
+          "url": "https://en.cppreference.com/w/cpp/language/return"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Giving a struct back from a function",
+          "url": "https://www.youtube.com/watch?v=r2_R8Puh78I"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
