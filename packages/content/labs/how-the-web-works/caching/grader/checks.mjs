@@ -47,6 +47,8 @@ function keepCase(name, header) {
       if (!isDeepStrictEqual(keys, ['freshFor', 'store']))
         return `The object has ${keys.join(', ') || 'nothing in it'}. It needs store and freshFor, spelt as the task gives them, and nothing else.`
       if (typeof got.store !== 'boolean') return 'store is true or false, not text.'
+      if (Number.isNaN(got.freshFor) && header?.includes('"'))
+        return 'freshFor is NaN. The number in this header is in double quotes, and Number() gives NaN for text with quotes in it: take them off first.'
       if (typeof got.freshFor !== 'number' || Number.isNaN(got.freshFor))
         return 'freshFor is a number of seconds. The number in a header arrives as text: turn it into a number.'
       if (got.store !== expected.store) {
@@ -306,16 +308,30 @@ function listingsCase(name, { cacheControl, ageSeconds, empty }) {
   }
 }
 
-/** Adds a note to failed details when an earlier task the function may use is not right yet. */
+/**
+ * Adds a note to failed details when an earlier task the function may use is not right yet. When
+ * the function seems unwritten, the 'Not implemented' may come from an earlier one it calls.
+ */
 async function withNote(t, details, earlier) {
-  if (details.every((d) => d.passed) || details.length === 1) return details
+  if (details.every((d) => d.passed)) return details
+  const unwritten = details.length === 1 && details[0].name.endsWith(' is written')
+  if (details.length === 1 && !unwritten) return details
   const broken = []
   for (const [task, fn] of earlier) {
-    if (!(await checks[task](t)).every((d) => d.passed))
+    const result = await checks[task](t)
+    const notWritten = result.length === 1 && result[0].name.endsWith(' is written')
+    if (unwritten ? notWritten : !result.every((d) => d.passed))
       broken.push(`${fn} (Task ${TASK_NUMBER[task]})`)
   }
   if (broken.length === 0) return details
-  const note = ` If you use ${broken.join(' or ')}, get ${broken.length === 1 ? 'it' : 'them'} to pass first: ${broken.length === 1 ? 'it is' : 'they are'} not right yet.`
+  const them = broken.length === 1 ? 'it' : 'them'
+  if (unwritten) {
+    const fn = details[0].name.replace(' is written', '')
+    const message = `Check got 'Not implemented' when it called ${fn}. If ${fn} is written and uses ${broken.join(' or ')}, the error comes from there: write ${them} first. If not, replace that line in ${fn} with your code.`
+    return [{ ...details[0], message }]
+  }
+  const are = broken.length === 1 ? 'it is' : 'they are'
+  const note = ` If you use ${broken.join(' or ')}, get ${them} to pass first: ${are} not right yet.`
   return details.map((d) => (d.passed ? d : { ...d, message: d.message + note }))
 }
 

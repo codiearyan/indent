@@ -248,10 +248,10 @@ function answerCase(name, { origin, method, asked, rules, ok }) {
             .map((n) => n.trim())
             .filter(Boolean)
           if (!exact.every((n) => rules.headers.includes(n)))
-            return 'answerPreflight refused, but every header the request asks about is in the rules. Header names ignore capital letters.'
+            return 'answerPreflight refused, but the origin, the method it asks about (in access-control-request-method, not the request\'s own OPTIONS) and every header it asks about are allowed by the rules. Header names ignore capital letters.'
           if (asked?.includes(','))
             return 'answerPreflight refused, but every header the request asks about is in the rules. access-control-request-headers is a list, separated by commas.'
-          return 'answerPreflight refused, but the origin, the method and every header this request asks about are allowed by the rules.'
+          return 'answerPreflight refused, but the origin, the method and every header this request asks about are allowed by the rules. The method it asks about is in access-control-request-method; the request itself is always OPTIONS.'
         }
         return `The status is ${got.status}. An allowed request that asks first gets 204.`
       }
@@ -346,10 +346,22 @@ function answerCases() {
   ]
 }
 
-/** Adds a note to failed details when an earlier task the function may use is not right yet. */
+/**
+ * Adds a note to failed details when an earlier task the function may use is not right yet. When
+ * the function seems unwritten, the 'Not implemented' may come from the earlier one it calls.
+ */
 async function withNote(t, details, task, fn, number) {
-  if (details.every((d) => d.passed) || details.length === 1) return details
-  if ((await checks[task](t)).every((d) => d.passed)) return details
+  if (details.every((d) => d.passed)) return details
+  const unwritten = details.length === 1 && details[0].name.endsWith(' is written')
+  if (details.length === 1 && !unwritten) return details
+  const result = await checks[task](t)
+  if (unwritten) {
+    if (!(result.length === 1 && result[0].name.endsWith(' is written'))) return details
+    const own = details[0].name.replace(' is written', '')
+    const message = `Check got 'Not implemented' when it called ${own}. If ${own} is written and uses ${fn}, the error comes from there: write Task ${number} first. If not, replace that line in ${own} with your code.`
+    return [{ ...details[0], message }]
+  }
+  if (result.every((d) => d.passed)) return details
   const note = ` If you use ${fn}, Task ${number} is not right yet: get it to pass first.`
   return details.map((d) => (d.passed ? d : { ...d, message: d.message + note }))
 }
@@ -453,6 +465,10 @@ export const checks = {
         allowCase('Leaves out a page that is not trusted', `https://quiz${token()}.example`, list),
         allowCase('Leaves out a page that only starts like a trusted one', `${site}.net`, list),
         allowCase('Leaves out a trusted host on another port', `${site}:8443`, list),
+        allowCase('Leaves out an origin that is only part of a trusted one', site, [
+          `${site}:8443`,
+          other
+        ]),
         allowCase('Leaves out a request with no origin', null, list),
         allowCase("Leaves out the origin of a page that has none, 'null'", 'null', list)
       ]

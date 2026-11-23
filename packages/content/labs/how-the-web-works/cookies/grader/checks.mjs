@@ -207,9 +207,25 @@ function headerCase(name, jar, address, now) {
       )
       if (url.port && missed.length > 0 && missed.length === expected.length)
         return `${missed[0].name} should go with this request. Cookies do not look at the port: the host and the path decide.`
-      const lapsed = missed.find((c) => c.expires !== null && !c.httpOnly)
-      if (lapsed)
+      const underDomain = missed.find((c) => !c.hostOnly && url.hostname !== c.domain)
+      if (underDomain) return missedWhy(underDomain, url)
+      // Any clock today is far past the check's times, so code that reads it sends exactly these.
+      const byClock = jar
+        .filter((c) => verdict(c, url, Infinity).goes)
+        .map((c) => `${c.name}=${c.value}`)
+      const lapsed = missed.find((c) => c.expires !== null)
+      const clock = lapsed !== undefined && sameSet(got, byClock)
+      const slashes = missed.filter(
+        (c) => !c.httpOnly && c.path.endsWith('/') && url.pathname !== c.path
+      )
+      const underSlash = (c) =>
+        `${c.name} has the path ${c.path}, which ends with a slash, so ${url.pathname} is under it`
+      if (clock && slashes.length === missed.length)
+        return `${underSlash(slashes[0])}, and it has not expired at the time cookieHeader is handed, so it goes with this request. Path=/ goes with every path on its host. Compare expires with that now, not the clock.`
+      if (clock)
         return `${lapsed.name} has not expired at the time cookieHeader is handed, so it goes with this request. Compare expires with that now, not the clock.`
+      if (slashes.length)
+        return `${underSlash(slashes[0])} and the cookie goes. Path=/ goes with every path on its host.`
       if (missed.length) return missedWhy(missed[0], url)
       return expected.length === 0
         ? "No cookie goes with this request, so the header is empty text, ''."
@@ -345,7 +361,7 @@ function sessionCase(name, path, seconds) {
       if (site.toLowerCase() === 'none')
         return 'SameSite=None sends the cookie with requests that every other site starts, which is the opposite of what the task asks.'
       if (site.toLowerCase() === 'strict')
-        return 'SameSite=Strict also keeps the cookie off a link someone follows from another site, so a presenter who opens the studio from an email would look signed out. The task asks for the value that still allows that.'
+        return 'SameSite=Strict also keeps the cookie off a link someone follows from another site, so a presenter who opens the studio from a link on another site would look signed out. The task asks for the value that still allows that.'
       if (site.toLowerCase() !== 'lax')
         return `SameSite=${site} is not one of the values the lesson lists.`
       return null
@@ -395,7 +411,12 @@ function whoCase(name, cookieOf, expect) {
         return 'whoIsThis gave back the whole session. The task asks for the presenter only.'
       if (expect === 'b')
         return 'whoIsThis did not find this session, which has not expired at the time it is handed. Its id has = in it: only the first = in a cookie separates the name from the value.'
-      return `This request's session belongs to a presenter, and has not expired at the time whoIsThis is handed, but whoIsThis gave back ${kindText(v)}. Compare expires with that now, not the clock. Cookies in the header may come with or without a space after each semicolon.`
+      if (/;\S/.test(header))
+        return `This request's session belongs to a presenter, but whoIsThis gave back ${kindText(v)}. The cookies in this header have no space after each semicolon: a cookie header may come with or without one, so trim each part.`
+      const trim = header.includes(';')
+        ? ', and trim the space after each semicolon from the name and the value'
+        : ''
+      return `This request's session belongs to a presenter, and has not expired at the time whoIsThis is handed, but whoIsThis gave back ${kindText(v)}. Compare expires with that now, not the clock${trim}.`
     }
   }
 }

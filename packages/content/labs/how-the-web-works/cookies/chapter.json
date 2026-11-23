@@ -52,7 +52,7 @@
         "Take the address apart with `new URL`, as in the first issue.",
         "Go through the jar and keep each cookie only when its host, its path, Secure and its expiry all allow it.",
         "Write the ones you kept as name=value, joined by a semicolon and a space.",
-        "Run `node run.js`: four addresses, four different headers."
+        "Run `node run.js`: of the four addresses, only the first carries the session cookie."
       ],
       "hints": [
         "Four questions per cookie, each a yes or a no: the host, the path, Secure, and whether it has expired. Two things never matter for requests: the port, and HttpOnly.",
@@ -111,7 +111,7 @@
       "id": "trust",
       "title": "Find who is signed in, from the session only",
       "file": "src/cookies.js",
-      "description": "Under `// Task 4`, make `whoIsThis(cookie, sessions, now)` take the text of a request's `cookie` header, or `null` when the request had none, the sessions the server keeps, an object from session id to `{ presenter, expires }`, and a time `now` in milliseconds.\n\nIt gives back the `presenter` of the session named by the request's cookie called `session`, or `null` when there is no such cookie, the server keeps no session with that id, or the session's `expires` is not later than `now`. Any other cookie, like one called `presenter`, proves nothing.\n\nCheck calls `whoIsThis` with cookie headers, sessions and times of its own: some with a presenter cookie that names someone else, some with ids the server never made.",
+      "description": "Under `// Task 4`, make `whoIsThis(cookie, sessions, now)` take the text of a request's `cookie` header, or `null` when the request had none (its cookies are separated by semicolons, with or without a space after each), the sessions the server keeps, an object from session id to `{ presenter, expires }`, and a time `now` in milliseconds.\n\nIt gives back the `presenter` of the session named by the request's cookie called `session`, or `null` when there is no such cookie, the server keeps no session with that id, or the session's `expires` is not later than `now`. Any other cookie, like one called `presenter`, proves nothing.\n\nCheck calls `whoIsThis` with cookie headers, sessions and times of its own: some with a presenter cookie that names someone else, some with ids the server never made.",
       "nextSteps": [
         "Handle a request with no cookie header first.",
         "Split the header into its cookies, and each cookie at its first `=` only.",

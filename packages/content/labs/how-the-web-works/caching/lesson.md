@@ -38,7 +38,7 @@ When two directives disagree, the stricter one wins: `max-age=600, no-cache` mea
 
 ## Fresh and stale
 
-A copy's **age** is the time since it was received, or since the server last confirmed it. While its age is less than its lifetime, the copy is **fresh** and can be used without asking. Once the age reaches the lifetime, it is **stale**.
+A copy's **age** is the time since it was received, or since the server last confirmed it. While its age is less than its lifetime, the copy is **fresh** and can be used without asking. Once the age reaches the lifetime, it is **stale**. This is simpler than a browser: it also adds the time an answer spent on its way and any `age` header the answer carries, and with no `max-age` it reads a lifetime from an `expires` date. The studio screens leave those out.
 
 Watch the units. `max-age` counts seconds, but JavaScript counts time in milliseconds: `Date.now()` gives the number of milliseconds since the start of 1970. A ferry timetable stored at `storedAt` with `max-age=3600` is fresh while `now - storedAt` is less than 3,600,000. Your functions get `now` handed to them instead of reading the clock, so the same copy can be tried at any moment, the way Check does.
 

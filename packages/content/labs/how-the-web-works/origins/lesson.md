@@ -48,7 +48,7 @@ A server that answers differently for different origins adds `vary: Origin`. It 
 
 ## Asking first
 
-Some requests go straight to the server: those a plain form or link could send anyway. The method is `GET`, `HEAD` or `POST`, and the script sets no headers beyond `accept`, `accept-language`, `content-language` and a `content-type` whose type is `application/x-www-form-urlencoded`, `multipart/form-data` or `text/plain`. The browser has a few more limits for unusual or very long values, which this issue leaves out.
+Some requests go straight to the server: those a plain form or link could send anyway. The method is `GET`, `HEAD` or `POST`, and the script sets no headers beyond `accept`, `accept-language`, `content-language` and a `content-type` whose type is `application/x-www-form-urlencoded`, `multipart/form-data` or `text/plain`. The browser has a few more rules, like a simple `range` header that also goes straight, and limits for unusual or very long values, which this issue leaves out.
 
 Anything else, like a `DELETE`, an `authorization` header or a JSON body, makes the browser ask first. It sends a **preflight**: an `OPTIONS` request with no body that describes the real one.
 
@@ -64,7 +64,7 @@ access-control-allow-methods: GET, DELETE
 access-control-allow-headers: authorization
 ```
 
-Only when that answer has a status in the 200s, names the page's origin, and lists the method and every header asked about, does the browser send the real request. Otherwise the real request is never sent. `access-control-max-age` lets the browser remember the answer for that many seconds.
+Only when that answer has a status in the 200s, names the page's origin, and lists the method and every header asked about, does the browser send the real request. Otherwise the real request is never sent. A browser is a little more lenient than this: it does not need `GET`, `HEAD` or `POST` listed, and without cookies it accepts `*` in place of most of these values. Naming each one, as here, always works. `access-control-max-age` lets the browser remember the answer for that many seconds.
 
 ## Your work in this issue
 

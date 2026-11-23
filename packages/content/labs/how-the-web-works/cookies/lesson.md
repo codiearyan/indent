@@ -41,7 +41,7 @@ A browser keeps cookies in its **cookie jar** and adds the header by itself. A p
 A browser sends a cookie only with requests that match all of its rules:
 
 - **Host.** With no `Domain` attribute, the cookie goes back only to the host that set it. `Domain=bakery.example` also sends it to hosts under that domain, like `shop.bakery.example`, but never to `newbakery.example`: a host is under a domain only when it ends with a dot and the domain. The port does not count.
-- **Path.** `Path=/orders` sends it with `/orders` and paths under it, like `/orders/7`, but not with `/ordersheet`: after the cookie's path, the request's path must end or go on with a slash. With no `Path`, a browser uses the folder of the address that set the cookie.
+- **Path.** `Path=/orders` sends it with `/orders` and paths under it, like `/orders/7`, but not with `/ordersheet`: the request's path must start with the cookie's path, and then end or go on with a slash. A cookie path that ends with a slash already has it, so `Path=/` goes with every path on the host. With no `Path`, a browser uses the folder of the address that set the cookie.
 - **Lifetime.** `Max-Age=86400` keeps it for that many **seconds**. `Expires` gives a date instead, and `Max-Age` wins when both are there. With neither, the cookie lasts until the browser closes. Once a cookie has expired, it is thrown away and never sent. `Max-Age=0` removes a cookie at once.
 - **Secure.** A `Secure` cookie goes only over https.
 
@@ -50,7 +50,7 @@ A browser sends a cookie only with requests that match all of its rules:
 Two more attributes protect the person who signed in:
 
 - **HttpOnly** keeps the cookie out of reach of the page's own scripts. If a script that should not be there ever runs in the page, it cannot copy the cookie. The cookie still goes with every request it matches.
-- **SameSite** decides what happens when a page on another site makes a request to yours. `Strict` never sends the cookie then. `Lax` leaves it off forms that other sites post and requests their pages make in the background, but still sends it when someone follows a link to your site. `None` sends it with everything.
+- **SameSite** decides what happens when a page on another site makes a request to yours. `Strict` never sends the cookie then. `Lax` leaves it off forms that other sites post and requests their pages make in the background, but still sends it when someone follows a link to your site. `None` sends it with everything, and browsers accept it only on a `Secure` cookie.
 
 A sign-in cookie wants all of them: `Secure`, `HttpOnly`, a `SameSite` value, a path and a lifetime, and no `Domain` unless other hosts truly need it.
 
