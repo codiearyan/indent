@@ -97,10 +97,12 @@ export const checks = {
         {
           name: 'The answer is the same with asserts switched off',
           noAsserts: true,
-          code: put('l', `longestRepair(${braces([45, 300, 20])})`),
-          judge: (got) =>
-            num(got, 'l') === 300 ? null : `With every assert switched off, as a shop build does, longestRepair({45, 300, 20}) gave back ${got.l}. Then the code inside an assert does not run at all: an assert only looks, and the work the function needs goes on lines of their own.`,
-          output: (got) => `With asserts switched off, longestRepair({45, 300, 20}) gave back ${got.l ?? '?'}`
+          code: `${put('l', `longestRepair(${braces([45, 300, 20])})`)} ${put('f', `longestRepair(${braces([300, 45, 20])})`)}`,
+          judge: (got) => {
+            const wrong = num(got, 'l') !== 300 ? ['{45, 300, 20}', got.l] : num(got, 'f') !== 300 ? ['{300, 45, 20}', got.f] : null
+            return wrong ? `With every assert switched off, as a shop build does, longestRepair(${wrong[0]}) gave back ${wrong[1]}. Then the code inside an assert does not run at all: an assert only looks, and the work the function needs goes on lines of their own.` : null
+          },
+          output: (got) => `With asserts switched off, longestRepair({45, 300, 20}) gave back ${got.l ?? '?'}\nand longestRepair({300, 45, 20}) gave back ${got.f ?? '?'}`
         }
       ]
     })

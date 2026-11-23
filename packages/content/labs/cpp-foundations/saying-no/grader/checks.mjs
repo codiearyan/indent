@@ -167,7 +167,7 @@ export const checks = {
               ? `For "${typed}", parseTicket gives back false, and answerFor looked up a ticket anyway: the bool it gives back says whether ticket holds a number at all. Ask it first.`
               : `For "${typed}", which is not a ticket number, answerFor gave back "${got.a}". It gives back the not-a-ticket-number line, with the typed text after the colon, as the task shows it.`
           }
-          if (want.startsWith('No repair')) return `For ticket ${typed}, which is on no repair, answerFor gave back "${got.a}". It gives back the no-repair line, as the task shows it.`
+          if (want.startsWith('No repair')) return `For ticket ${typed}, which is on no repair, answerFor gave back "${got.a}". It gives back the no-repair line, as the task shows it.${/^Ticket /.test(got.a ?? '') ? ' findRepair gave back an optional that holds nothing: ask it whether it holds a repair before you reach inside with * or ->.' : ''}`
           return `For ticket ${typed}, answerFor gave back "${got.a}". The line shows the ticket, a colon, the item, a comma, and the minutes with the word minutes, as the task shows it.`
         },
         escaped: (got) =>

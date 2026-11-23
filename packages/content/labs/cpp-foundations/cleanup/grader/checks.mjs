@@ -13,6 +13,8 @@ const parse = (text) => {
   }
 }
 const asMap = (got, key) => Object.fromEntries(parse(got[key]) ?? [])
+const drawerText = (entries) => `{${entries.map(([k, v]) => `${k}: ${v}`).join(', ')}}`
+const shown = (got, key) => (parse(got[key]) ? drawerText(parse(got[key])) : '?')
 const loupes = (n) => (n === 1 ? '1 loupe' : `${n ?? 'no'} loupes`)
 
 // Check's fitPart throws for its own parts, those with "cracked" in their name, and writes down
@@ -120,7 +122,7 @@ export const checks = {
             if (after.loupe !== 2) return `Once the Borrowed had ended, the drawer held ${loupes(after.loupe)}, and before it held 2. The destructor puts the tool back, once.`
             return null
           },
-          output: (got) => `The drawer: {loupe: 2, tweezers: 1}\nwhile Borrowed(drawer, "loupe") lives: ${got.during ?? '?'}\nafter it ended: ${got.after ?? '?'}`
+          output: (got) => `The drawer: {loupe: 2, tweezers: 1}\nwhile Borrowed(drawer, "loupe") lives: ${shown(got, 'during')}\nafter it ended: ${shown(got, 'after')}`
         },
         {
           name: 'The tool goes back when an exception leaves the block',
@@ -132,7 +134,7 @@ export const checks = {
             if (after.loupe !== 1) return `Check threw an exception while a Borrowed of the loupe lived, and afterwards the drawer held ${loupes(after.loupe)}, not the 1 it held before. The destructor of a local runs as the exception leaves its block, so that is where the tool goes back.`
             return null
           },
-          output: (got) => `The drawer: {loupe: 1}\nCheck borrowed the loupe and threw; afterwards: ${got.after ?? '?'}`
+          output: (got) => `The drawer: {loupe: 1}\nCheck borrowed the loupe and threw; afterwards: ${shown(got, 'after')}`
         },
         ...[
           ['No loupe left in the drawer', [['loupe', 0], ['tweezers', 3]], 'loupe'],
@@ -147,10 +149,11 @@ export const checks = {
             if (got.threw === undefined) return `Check borrowed the ${tool}, and the drawer had none, and the constructor made a Borrowed anyway. It throws a std::runtime_error then, so no Borrowed is made and nothing is put back that was never taken.`
             if (got.threw !== 'std::runtime_error') return `With no ${tool} in the drawer, the constructor threw ${thrownText(got)}, and the task asks for a std::runtime_error.`
             if (!(got.what ?? '').includes(tool)) return `With no ${tool} in the drawer, the constructor threw a std::runtime_error whose what() is "${got.what}". It names the tool, so whoever reads it knows what is missing.`
-            if ((after[tool] ?? 0) !== (before[tool] ?? 0) || after.tweezers !== before.tweezers) return `The constructor threw, and the drawer had changed: it holds ${got.after}. A constructor that throws leaves no object, so its destructor never runs and nothing is put back. Throw before anything is taken out.`
+            if (!(tool in before) && tool in after) return `The constructor threw, and the drawer had changed: it holds ${shown(got, 'after')}, with the ${tool} added. [] on a tool the drawer never had adds it, with 0. Ask with count or find, which add nothing.`
+            if (JSON.stringify(parse(got.after)) !== JSON.stringify(entries)) return `The constructor threw, and the drawer had changed: it holds ${shown(got, 'after')}. A constructor that throws leaves no object, so its destructor never runs and nothing is put back. Throw before anything is taken out.`
             return null
           },
-          output: (got) => `The drawer: ${JSON.stringify(Object.fromEntries(entries))}\nBorrowed(drawer, "${tool}"): ${got.threw ? `${thrownText(got)} reached Check` : 'made a Borrowed'}\nthe drawer afterwards: ${got.after ?? '?'}`
+          output: (got) => `The drawer: ${drawerText(entries)}\nBorrowed(drawer, "${tool}"): ${got.threw ? `${thrownText(got)} reached Check` : 'made a Borrowed'}\nthe drawer afterwards: ${shown(got, 'after')}`
         }))
       ]
     })
@@ -200,7 +203,7 @@ export const checks = {
             if (num(got, 'm') !== 15 * parts.length) return `Check's repair has ${got.m} minutes after fitWithLoupe, and fitPart logs 15 for each part: each part goes through fitPart once.`
             return null
           },
-          output: (got) => `The drawer: ${JSON.stringify(Object.fromEntries(entries))}\nfitWithLoupe(drawer, repair, ${JSON.stringify(parts)}) gave back ${got.n ?? '?'}\nthe drawer afterwards: ${got.after ?? '?'}`
+          output: (got) => `The drawer: ${drawerText(entries)}\nfitWithLoupe(drawer, repair, ${JSON.stringify(parts)}) gave back ${got.n ?? '?'}\nthe drawer afterwards: ${shown(got, 'after')}`
         })),
         ...throws.map(([name, entries, parts, kind, what]) => ({
           name,
@@ -215,7 +218,7 @@ export const checks = {
             if (what === 'does not fit' && num(got, 'm') !== 15) return `Check's repair has ${got.m} minutes, and only the first part fitted before the second threw.`
             return null
           },
-          output: (got) => `The drawer: ${JSON.stringify(Object.fromEntries(entries))}\nfitWithLoupe(drawer, repair, ${JSON.stringify(parts)}): ${got.threw ? `${thrownText(got)} reached Check` : `gave back ${got.n ?? '?'}`}\nthe drawer afterwards: ${got.after ?? '?'}`
+          output: (got) => `The drawer: ${drawerText(entries)}\nfitWithLoupe(drawer, repair, ${JSON.stringify(parts)}): ${got.threw ? `${thrownText(got)} reached Check` : `gave back ${got.n ?? '?'}`}\nthe drawer afterwards: ${shown(got, 'after')}`
         }))
       ]
     })

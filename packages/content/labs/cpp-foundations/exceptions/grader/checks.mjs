@@ -129,7 +129,7 @@ export const checks = {
               }
               return null
             },
-            output: (got) => `quoteParts(${JSON.stringify(parts)}, missing) gave back ${got.total ?? '?'}\nmissing afterwards: ${got.missing ?? '?'}`
+            output: (got) => `missing before: ["seconds hand"]\nquoteParts(${JSON.stringify(parts)}, missing) gave back ${got.total ?? '?'}\nmissing afterwards: ${got.missing ?? '?'}`
           }
         }),
         ...passOn.map(([name, parts, kind, what, why]) => ({

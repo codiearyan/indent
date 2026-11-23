@@ -3664,7 +3664,7 @@ function faultCause(errors, ctx, spec) {
     return `A line uses a dot on a std::optional to reach a member of what it holds. The optional is a box around the value: ask it whether it holds one first, then reach the value inside with -> or *.`
   }
   if (/invalid argument type '[^']*optional[^']*' to unary expression|no match for 'operator!'|value of type 'std::(?:__1::)?optional<[^']*>' is not contextually convertible|cannot convert 'std::optional/.test(all)) return null
-  if (/no matching function for call to 'stoi'|no matching function for call to 'std::(?:__cxx11::)?stoi/.test(all)) {
+  if (/no matching function for call to '(?:std::(?:__cxx11::)?)?stoi\b/.test(all)) {
     return `std::stoi takes the text to read as a std::string. Look at what the line hands it.`
   }
   return null
@@ -3672,12 +3672,14 @@ function faultCause(errors, ctx, spec) {
 
 const CATCH_VALUE = /\bcatch\s*\(\s*(?:const\s+)?(std::\w+|[A-Z]\w*)\s*(\w+)?\s*\)/
 
-function faultWarning(warnings, code) {
+function faultWarning(warnings, { code = '', file, from = 0 } = {}) {
   const sliced = warnings.find((w) => /catching polymorphic type [^\n]* by value/.test(w.text))
-  const loose = CATCH_VALUE.exec(code ?? '')
+  const loose = CATCH_VALUE.exec(code)
   if (sliced || loose) {
+    // clang gives no warning for this, so the line is the task's own.
+    const line = loose ? from + code.slice(0, loose.index).split('\n').length : 0
     return {
-      warning: sliced ?? { file: '', line: 0, text: '' },
+      warning: sliced ?? { file, line, kind: 'note', text: 'the exception is caught by value, as a copy' },
       message: `A catch takes the exception by value, as a copy: catch (${loose ? loose[1] : 'std::out_of_range'} e). A copy can lose what a kind built on top of it carries, and GCC warns about it. Catch by const reference, with const in front and & after the kind, as the lesson does.`
     }
   }
@@ -3745,7 +3747,7 @@ export async function judgeFault(t, spec) {
     return [fail(`${file} is there`, `Check cannot find ${file}. Every file of this issue is in the starter; Reset brings it back.`)]
   }
   const starter = (await readFile(t.chapterPath(`starter/${file}`), 'utf8')).replace(/\r\n/g, '\n')
-  const includes = (text) => new Set(text.split('\n').filter((l) => /^\s*#\s*include/.test(l)).map((l) => l.replace(/\s+/g, '')))
+  const includes = (text) => new Set(text.split('\n').filter((l) => /^\s*#\s*include/.test(l)).map((l) => l.replace(/\s+/g, '').replace('<assert.h>', '<cassert>')))
   const now = includes(whole)
   const gone = [...includes(starter)].find((l) => !now.has(l))
   if (gone) {
@@ -3754,8 +3756,10 @@ export async function judgeFault(t, spec) {
   const lines = whole.split('\n')
   const { starts } = marks(lines)
   let section = ''
+  let sectionFrom = 0
   if (starts.has(task)) {
     const from = starts.get(task)
+    sectionFrom = from
     const next = Math.min(lines.length, ...[...starts.values()].filter((i) => i > from), ...lines.map((l, i) => (i > from && /\bint\s+main\s*\(/.test(l) ? i : Infinity)))
     section = codeOnly(lines.slice(from, next).join('\n'))
     if (unbalanced(section)) return [fail(`${label(task)} builds`, PART2.braces(label(task)))]
@@ -3791,7 +3795,7 @@ export async function judgeFault(t, spec) {
       (spec.counted ? memoryCause(errors, ctx, spec) : null) ??
       classCause(errors, ctx, { ...spec, className: spec.className ?? 'Repair', members: spec.members ?? [], functions: spec.functions ?? ['getTicket', 'getItem', 'getMinutes', 'addMinutes'] }),
     classLink: () => null,
-    classWarning: (warnings) => faultWarning(warnings, section) ?? (spec.counted ? memoryWarning(warnings) : null) ?? classWarning(warnings),
+    classWarning: (warnings) => faultWarning(warnings, { code: section, file, from: sectionFrom }) ?? (spec.counted ? memoryWarning(warnings) : null) ?? classWarning(warnings),
     classCrashed: (r, l) =>
       spec.crashed?.(r, l) ??
       ((r.stderr ?? '').includes(`${START}assertsOff${SPLIT}1`)

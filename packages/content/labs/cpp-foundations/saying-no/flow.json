@@ -81,7 +81,7 @@
           "active": [
             "parse"
           ],
-          "note": "Every character is looked at before the text is turned into a number."
+          "note": "The typed text is asked whether it is a ticket number at all."
         },
         {
           "active": [
