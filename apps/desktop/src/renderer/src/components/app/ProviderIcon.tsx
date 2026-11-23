@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import type { AiProviderId } from '@shared/types'
 import { cn } from '@/lib/utils'
 
@@ -18,17 +19,20 @@ const OPENAI =
 
 const OPENCODE = 'M16 6H8v12h8V6zm4 16H4V2h16v20z'
 
-const MARKS: Record<AiProviderId, string> = {
-  'claude-code': CLAUDE,
-  codex: CODEX,
-  opencode: OPENCODE,
-  'gemini-cli': GEMINI,
-  anthropic: ANTHROPIC,
-  openai: OPENAI,
-  gemini: GEMINI
+/**
+ * Each provider's mark in its own colours, like the language logos. Marks that are black in their
+ * own logo (Anthropic, OpenAI, OpenCode) take the text colour instead, so they show on both themes.
+ */
+const MARKS: Record<AiProviderId, { d: string; color?: string; gradient?: string[] }> = {
+  'claude-code': { d: CLAUDE, color: '#D97757' },
+  codex: { d: CODEX, gradient: ['#B1A7FF', '#7A9DFF', '#3941FF'] },
+  opencode: { d: OPENCODE },
+  'gemini-cli': { d: GEMINI, gradient: ['#4796E3', '#9177C7', '#CA6673'] },
+  anthropic: { d: ANTHROPIC },
+  openai: { d: OPENAI },
+  gemini: { d: GEMINI, gradient: ['#4796E3', '#9177C7', '#CA6673'] }
 }
 
-/** A provider's own mark in the text colour, so it follows the theme like any other icon. */
 export function ProviderIcon({
   id,
   className
@@ -36,15 +40,27 @@ export function ProviderIcon({
   id: AiProviderId
   className?: string
 }): React.JSX.Element {
+  const gradientId = useId()
+  const mark = MARKS[id]
+  const fill = mark.gradient ? `url(#${gradientId})` : (mark.color ?? 'currentColor')
   return (
     <svg
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill={fill}
       fillRule="evenodd"
       aria-hidden
       className={cn('size-4 shrink-0', className)}
     >
-      <path d={MARKS[id]} />
+      {mark.gradient && (
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+            {mark.gradient.map((stop, i, stops) => (
+              <stop key={stop} offset={i / (stops.length - 1)} stopColor={stop} />
+            ))}
+          </linearGradient>
+        </defs>
+      )}
+      <path d={mark.d} />
     </svg>
   )
 }

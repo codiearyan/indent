@@ -85,9 +85,10 @@ the chrome is neutral, and the one hue is a calm orange.
   mark of a passed check and `destructive` the red mark of a failed one; they are status marks, never
   fills for large areas. `warning` is only the "being compared" tone in the DSA animations.
   Nothing else has a hue: links, active navigation, selected tabs, hints and AI are neutral.
-  The one exception is a language's logo (`components/app/LanguageIcon`, drawn from
-  `@icons-pack/react-simple-icons`): it keeps its own colour, because that colour is how people
-  recognise it. Logos that are near black take the muted text colour instead.
+  The one exception is a logo: a language's (`components/app/LanguageIcon`, drawn from
+  `@icons-pack/react-simple-icons`) or an AI provider's (`components/app/ProviderIcon`). It keeps
+  its own colour, because that colour is how people recognise it. Logos that are near black take
+  the text colour instead.
   - Selected or active: a neutral pill (`bg-accent text-foreground`) or ink text. Never the brand.
   - Links: `text-muted-foreground hover:text-foreground`, or ink with an underline in prose.
   - Never set text in the brand colour on a light surface; use it as a fill with ink text on top.
@@ -499,8 +500,8 @@ The automated review of each pull request reads this section. Report these as hi
 - Text that names or alludes to another product, course, site or codebase, anywhere in the change.
 - An id or path from the renderer that reaches the file system without `safeId` or `resolveInside`.
 - A changed signature in `src/shared/types.ts` with a caller left on the old one.
-- A hex, rgb or oklch colour or a Tailwind palette colour in a component. Language logos are the
-  one exception.
+- A hex, rgb or oklch colour or a Tailwind palette colour in a component. Language and AI
+  provider logos are the one exception.
 - A grader message that gives the answer away, an issue whose starter passes a task, or one whose
   solution fails a task.
 - An intro that shows code, a hint or a value a check compares against.

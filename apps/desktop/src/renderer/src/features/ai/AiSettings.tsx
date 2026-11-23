@@ -336,6 +336,7 @@ function ProviderRow({ provider }: { provider: AiProviderInfo }): React.JSX.Elem
           >
             {selected && <span className="size-1.5 rounded-full bg-foreground" />}
           </span>
+          <ProviderIcon id={provider.id} className={cn(!provider.available && 'opacity-50')} />
           <span className={cn('text-sm', !provider.available && 'text-muted-foreground')}>
             {provider.label}
           </span>
