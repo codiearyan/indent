@@ -1,0 +1,73 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "desk", "label": "Booking desk", "kind": "story" },
+      { "id": "booked", "label": "Booked list", "kind": "data" },
+      { "id": "boarding", "label": "Boarding", "kind": "function", "mine": true },
+      { "id": "seats", "label": "Seats", "kind": "function", "mine": true },
+      { "id": "tickets", "label": "Tickets", "kind": "function", "mine": true },
+      { "id": "gangway", "label": "Gangway", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "desk", "to": "booked", "label": "writes" },
+      { "from": "booked", "to": "boarding", "label": "names" },
+      { "from": "boarding", "to": "gangway", "label": "own copy" },
+      { "from": "gangway", "to": "seats", "label": "seat number" },
+      { "from": "gangway", "to": "tickets", "label": "voided tickets" }
+    ],
+    "note": "Lists pass between the desk and the gangway, and each change lands only on the list it was meant for."
+  },
+  "tasks": {
+    "copy": {
+      "steps": [
+        {
+          "active": ["desk", "desk->booked", "booked"],
+          "value": { "kind": "array", "label": "booked", "values": ["name", "name", "name"] },
+          "note": "The desk hands over its booked list, which may be one that can never change."
+        },
+        {
+          "active": ["booked", "booked->boarding", "boarding"],
+          "note": "A late passenger joins at the end, unless they are booked already."
+        },
+        {
+          "active": ["boarding", "boarding->gangway", "gangway"],
+          "note": "The gangway gets a list of its own, and the desk's list stays as it was."
+        }
+      ]
+    },
+    "seat": {
+      "steps": [
+        {
+          "active": ["gangway", "gangway->seats", "seats"],
+          "value": { "kind": "array", "label": "seats taken", "values": ["seat", "seat", "seat", "seat"] },
+          "note": "A passenger gives back a seat, by its number."
+        },
+        {
+          "active": ["seats"],
+          "note": "The seat with that number comes off the list, and the answer is where it was."
+        },
+        {
+          "active": ["seats"],
+          "note": "A seat that was never taken changes nothing."
+        }
+      ]
+    },
+    "void": {
+      "steps": [
+        {
+          "active": ["gangway", "gangway->tickets", "tickets"],
+          "value": { "kind": "array", "label": "voided", "values": ["ticket number", "ticket number"] },
+          "note": "Some tickets sold this morning are voided."
+        },
+        {
+          "active": ["tickets"],
+          "note": "The sold list is walked once, and each voided ticket comes off as it is reached."
+        },
+        {
+          "active": ["tickets"],
+          "note": "Tickets next to each other, and the last one, all come off, and the count says how many."
+        }
+      ]
+    }
+  }
+}

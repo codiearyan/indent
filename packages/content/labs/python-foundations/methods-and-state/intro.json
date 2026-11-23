@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dougie", "say": "What is Iain carrying up?", "note": "Packs are going out." },
+    { "title": "Iain's pack", "text": "Anyone adds to it, and nobody weighs it" },
+    {
+      "title": "Your methods",
+      "file": "packs.py",
+      "mine": true,
+      "gap": "Takes anything you put in",
+      "tasks": ["Add an item", "What it weighs", "Take an item out", "A copy minus one"]
+    },
+    { "title": "Iain", "say": "Under my limit tonight.", "note": "The pack refused the extra." }
+  ],
+  "ticket": { "label": "Iain's pack", "wrong": "too heavy", "why": "No rule", "right": "within limit" },
+  "captions": [
+    "At the base, Dougie asks what Iain is carrying up the hill tonight.",
+    "Today anyone adds one more thing, and Iain's pack goes far over his limit.",
+    "You write the pack's methods: add, weigh, take out, and a copy without one item.",
+    "Now an item that would take the pack over the limit is refused when it is added.",
+    "Every pack knows its weight and keeps its own rule, and a copy changes nothing else."
+  ]
+}

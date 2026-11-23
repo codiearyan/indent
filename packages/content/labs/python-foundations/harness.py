@@ -46,6 +46,13 @@
 # again after them (so Check's own helpers stand whatever the file defines), and the import is
 # reported as part `upto`: what it printed, its error, and the functions of the workspace it
 # called (`calls`). `call` then calls a function of the module.
+#
+# A spec with `steps` is for classes. Once part `upto` has run, each step, a piece of Check's own
+# Python, runs in turn in a copy of the file's names, by itself under the watchdog, and reports
+# what it printed and its error apart; a step with `value` is read as a value, in the same form as
+# a call with `data`, with its repr. The steps stop at the first one that was stopped, or at the
+# first error of a step that does not expect one (`raises`). With `name`, the file runs under that
+# name instead of "__main__", as an imported file does, so lines under its main guard do not run.
 import _thread
 import ast
 import builtins
@@ -731,6 +738,32 @@ def called(watchdog, task, call, ns):
     return record
 
 
+def stepped(watchdog, task, steps, ns):
+    """Runs Check's own steps once part `task` has run, each in a copy of the file's names, so
+    the names a step makes never reach the learner's code."""
+    scope = dict(ns)
+    done = []
+    for step in steps:
+        value = step.get('value', False)
+        code = compile(step['code'], '<check>', 'eval' if value else 'exec', dont_inherit=True)
+
+        def run(_, code=code, value=value):
+            if not value:
+                exec(code, scope)
+                return None
+            got = eval(code, scope)
+            return {'data': encode(got), 'type': type(got).__name__, 'repr': repr(got)[:300]}
+
+        result, printed, error, stopped = watchdog.run(task, run, scope)
+        record = {'printed': printed.text()[:MAX_SENT], 'error': error, 'stopped': stopped}
+        if value and not error and not stopped:
+            record['value'] = result
+        done.append(record)
+        if stopped or (error and not step.get('raises')):
+            break
+    return {'kind': 'steps', 'task': task, 'steps': done, 'names': names_in(ns)}
+
+
 def import_module(spec, watchdog, task):
     """Imports the learner's file as the module spec['module'], the way `import` does, with
     Check's `define` set in it first, and reports it as part `task`, then the call."""
@@ -866,6 +899,13 @@ def main():
         emit({'kind': 'done'})
         return
     ns = {'__name__': '__main__', '__builtins__': builtins, '__file__': shown}
+    if spec.get('name'):
+        # Registered as a module, as an imported file is: a dataclass looks up its own module.
+        named = importlib.util.module_from_spec(importlib.machinery.ModuleSpec(spec['name'], None))
+        named.__builtins__ = builtins
+        named.__file__ = shown
+        sys.modules[spec['name']] = named
+        ns = named.__dict__
     wanted = spec.get('names') or []
     for task in [0] + order:
         if task == upto:
@@ -888,6 +928,8 @@ def main():
             if task == upto:
                 if spec.get('call'):
                     emit(called(watchdog, task, spec['call'], ns))
+                if spec.get('steps'):
+                    emit(stepped(watchdog, task, spec['steps'], ns))
                 break
             continue
         printed = Printed(task)

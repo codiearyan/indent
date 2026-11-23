@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Where do teams take bearings?", "note": "Searches are being planned." },
+    { "title": "Records", "text": "Dictionaries typed by hand, open to change" },
+    {
+      "title": "Your dataclasses",
+      "file": "callout_records.py",
+      "mine": true,
+      "gap": "Records anyone can change",
+      "tasks": ["A callout record", "A search's teams", "A fixed grid ref"]
+    },
+    { "title": "Teams", "say": "From the base, as planned.", "note": "Every bearing from one place." }
+  ],
+  "ticket": { "label": "The base", "wrong": "moved", "why": "Changeable", "right": "stays put" },
+  "captions": [
+    "Rhona plans the searches and asks where the teams take their bearings from.",
+    "Today the records are dictionaries, and one wrong line can move the base itself.",
+    "You write dataclasses for a callout, a search with its own teams, and a grid reference.",
+    "Now the base's grid reference cannot change, and every bearing starts from it.",
+    "Every record prints and compares itself, and what must stay put stays put."
+  ]
+}

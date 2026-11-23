@@ -1,0 +1,43 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rota", "label": "Saturday's rota", "kind": "data" },
+      { "id": "make", "label": "make_teams()", "kind": "function", "mine": true },
+      { "id": "team", "label": "Team", "kind": "function", "mine": true },
+      { "id": "teams", "label": "Teams on the hill", "kind": "data" },
+      { "id": "vehicle", "label": "Vehicle", "kind": "function", "mine": true },
+      { "id": "ailsa", "label": "Ailsa at the radio desk", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "rota", "to": "make", "label": "call signs, leaders" },
+      { "from": "make", "to": "team", "label": "one call each" },
+      { "from": "team", "to": "teams", "label": "a new team" },
+      { "from": "teams", "to": "ailsa", "label": "who leads" },
+      { "from": "vehicle", "to": "ailsa", "label": "what each carries" }
+    ],
+    "note": "Every team and every vehicle becomes an object that keeps its own values, spelt the same way every time."
+  },
+  "tasks": {
+    "team": {
+      "steps": [
+        { "active": ["team"], "note": "A call sign and a leader go into Team, and a new team object comes out." },
+        { "active": ["team", "team->teams", "teams"], "value": { "kind": "map", "label": "one team", "entries": [{ "key": "call_sign", "value": "its call sign" }, { "key": "leader", "value": "its leader" }] }, "note": "The new team keeps both values as its own attributes." },
+        { "active": ["teams", "teams->ailsa", "ailsa"], "note": "Ailsa reads who leads a team with a dot, and every team spells it the same way." }
+      ]
+    },
+    "kit": {
+      "steps": [
+        { "active": ["vehicle"], "note": "Dougie makes the van and the pickup from Vehicle." },
+        { "active": ["vehicle"], "note": "Today one kit list sits on the class, and every vehicle reads that same list." },
+        { "active": ["vehicle", "vehicle->ailsa", "ailsa"], "note": "With a new list made for each vehicle, the rope in the van stays in the van." }
+      ]
+    },
+    "rota": {
+      "steps": [
+        { "active": ["rota", "rota->make", "make"], "value": { "kind": "array", "label": "rota", "values": ["(call sign, leader)", "(call sign, leader)", "..."] }, "note": "The rota comes in as a list of pairs." },
+        { "active": ["make", "make->team", "team"], "note": "Each pair becomes a call of Team, one new team for each." },
+        { "active": ["team", "team->teams", "teams", "teams->ailsa", "ailsa"], "note": "Ailsa gets back a list of teams, in the order of the rota." }
+      ]
+    }
+  }
+}

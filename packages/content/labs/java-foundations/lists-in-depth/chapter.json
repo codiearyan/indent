@@ -1,0 +1,101 @@
+{
+  "id": "lists-in-depth",
+  "title": "Lists in depth: one list or two",
+  "files": ["BoardingList.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the boarding list here, and try your classes from main.",
+    "suggestedCommand": "java BoardingList.java"
+  },
+  "tasks": [
+    {
+      "id": "copy",
+      "title": "Copy the booked list, and add a late name",
+      "file": "BoardingList.java",
+      "description": "Under `// Task 1`, write a class `Boarding` with a method `static List<String> withLate(List<String> booked, String late)`. It gives back a new list: everyone booked, in order, then `late` at the end, unless `late` is booked already. The caller can add to the list it gives back. `booked` stays as it is, and it may be a list made with `List.of`.\n\nCheck hands `withLate` lists of its own, some made with `List.of` and one empty, with names it makes separately, as names read in would be. It reads the list that comes back, adds a name to it as a caller may, and reads the caller's list afterwards to see it has not changed.",
+      "nextSteps": [
+        "Read the parts of the lesson about List against ArrayList, and about a list that never changes.",
+        "Write the first line of the method with the types the task gives.",
+        "Make a new list of your own from booked.",
+        "Add late to it only when it is not on it yet, and give it back."
+      ],
+      "hints": [
+        "booked may be a list that can never change, so the method never changes it. Everything it changes is a list it made itself.",
+        "A new list made with another list in its brackets is a copy that can grow. A name typed in is another String object, so look for it with a method that compares with equals.",
+        "Inside: `List<String> boarding = new ArrayList<>(booked);`, then `if (!boarding.contains(late)) { boarding.add(late); }`, then `return boarding;`."
+      ],
+      "docs": [
+        {
+          "title": "The List interface",
+          "url": "https://docs.oracle.com/javase/tutorial/collections/interfaces/list.html"
+        },
+        {
+          "title": "List and List.of",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "seat",
+      "title": "Free a seat by its number",
+      "file": "BoardingList.java",
+      "description": "Under `// Task 2`, write a class `Seats` with a method `static int free(List<Integer> taken, int seat)`. It takes the seat numbered `seat` off `taken`, the caller's own list, and gives back the position the seat was at. When the seat is not taken it changes nothing and gives back -1. A seat is on the list once at most.\n\nCheck calls `free` with lists of its own, one with a seat whose number is also a position on the list, one with a seat numbered past the end of the list, one with a seat above 127, one empty, and reads both what `free` gives back and the caller's list afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson about remove taking a position or a value.",
+        "Find the seat's position first, with the method that gives back -1 when it is not there.",
+        "When it is there, take it off the caller's list.",
+        "Give back the position you found."
+      ],
+      "hints": [
+        "On a list of Integer, the same method name takes off an item by position or by value, and Java picks by the type you hand it.",
+        "Once you know the position, take the item off by that position: on a list of Integer, a plain int means a position.",
+        "Inside: `int at = taken.indexOf(seat);`, then `if (at >= 0) { taken.remove(at); }`, then `return at;`."
+      ],
+      "docs": [
+        {
+          "title": "List.indexOf",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html#indexOf(java.lang.Object)"
+        },
+        {
+          "title": "List.remove(int) and remove(Object)",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html#remove(int)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "void",
+      "title": "Void tickets while walking the list",
+      "file": "BoardingList.java",
+      "description": "Under `// Task 3`, write a class `Tickets` with a method `static int voidAll(List<Integer> sold, List<Integer> voided)`. It takes every ticket number in `voided` off `sold`, the caller's own list, keeps the others in their order, and gives back how many it took off. `voided` stays as it is.\n\nCheck calls `voidAll` with ticket numbers of its own, all above 127 and each made separately: two tickets next to each other, the last two, the last one, every ticket, none, and nothing sold at all. It reads what comes back, `sold` afterwards, and `voided` to see it has not changed.",
+      "nextSteps": [
+        "Read the part of the lesson about changing a list while you walk it.",
+        "Walk sold with an iterator.",
+        "For each ticket, ask voided whether it holds that number.",
+        "Take the ticket off with the iterator, count it, and give back the count."
+      ],
+      "hints": [
+        "A for-each loop over sold cannot take items off sold. Walking positions forward skips the item after each one taken off.",
+        "An iterator can take off the item it just gave you, and keeps its place right. Asking voided whether it holds a number compares with equals, not ==.",
+        "The loop: `Iterator<Integer> it = sold.iterator(); while (it.hasNext()) { if (voided.contains(it.next())) { it.remove(); count++; } }`."
+      ],
+      "docs": [
+        {
+          "title": "Iterator",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Iterator.html"
+        },
+        {
+          "title": "The Collection interface: iterators",
+          "url": "https://docs.oracle.com/javase/tutorial/collections/interfaces/collection.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Removing from a list while walking through it",
+          "url": "https://www.youtube.com/watch?v=83Omy_C8t24"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
