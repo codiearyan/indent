@@ -19,6 +19,14 @@
         "true-false-and-none",
         "read-the-traceback"
       ]
+    },
+    {
+      "title": "Decisions and repeats",
+      "chapters": [
+        "if-and-else",
+        "for-loops",
+        "while-loops"
+      ]
     }
   ]
 }

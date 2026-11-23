@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Bridge or ford? Can we fly?", "note": "Decides it all in her head." },
+    { "title": "Tonight's callout", "rows": [["River level", "1.4"], ["Wind", "35"], ["Daylight", "yes"]] },
+    {
+      "title": "Your code",
+      "file": "route_in.py",
+      "mine": true,
+      "gap": "Nothing decides yet",
+      "tasks": ["Bridge or ford", "Wind warning", "Helicopter or not", "Name or not"]
+    },
+    { "title": "Hill party", "say": "Same plan, every time.", "note": "Whoever is on the radio." }
+  ],
+  "ticket": { "label": "Route in", "wrong": "a tired guess", "why": "In her head", "right": "decided" },
+  "captions": [
+    "A wet Tuesday at the base. Rhona has to plan the route to a callout.",
+    "Today she decides from memory, and a tired guess sends the team the wrong way.",
+    "You write the if, elif and else blocks that decide from tonight's values.",
+    "Now the laptop picks the route, the warning and the way off the hill.",
+    "Blocks that run only when a condition is true, and the order they are asked in."
+  ]
+}

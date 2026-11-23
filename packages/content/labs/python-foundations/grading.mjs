@@ -13,6 +13,8 @@ const HARNESS = fileURLToPath(new URL('./harness.py', import.meta.url))
 const MARK = '@@indent '
 const MAX_READ = 400000
 export const SECONDS = 10
+/** With `blocks`, how long one task's lines, or one call, may run before Check stops them. */
+export const PART_SECONDS = 2
 
 export const pass = (name, output) => ({ name, passed: true, output })
 export const fail = (name, message, output) => ({ name, passed: false, message, output })
@@ -92,12 +94,16 @@ export const lines = (text) =>
  * Runs `file` from a fresh copy of the workspace, up to the lines of Task `upto` (all of it when
  * left out). `given` puts Check's values on the lines that make those names, `inject` sets names
  * right before Task `upto` runs, `names` are read back after each task.
+ * `blocks` is for files with if, loops and functions: each task's lines may run PART_SECONDS and
+ * print so much before they alone are stopped (`part.stopped`), and the words for mistakes cover
+ * blocks. With it, `define` is Python run right before Task `upto`, and `call` ({ name, args,
+ * kwargs }) calls a function after it (`result.call`).
  * Returns { parts: Map(task => { lines, error, values, names }), comments, ... } or a problem.
  */
 export async function runFile(
   t,
   file,
-  { given = {}, upto, inject = {}, names = [], comments = false } = {}
+  { given = {}, upto, inject = {}, names = [], comments = false, blocks = false, define, call } = {}
 ) {
   const bin = await python()
   if (!bin) return { noPython: true }
@@ -115,11 +121,12 @@ export async function runFile(
     upto: upto ?? null,
     inject,
     names,
-    comments
+    comments,
+    ...(blocks && { part_seconds: PART_SECONDS, define, call })
   }
   const child = spawn(bin, ['-I', '-B', HARNESS], { cwd: dir, env: childEnv(), windowsHide: true })
   const r = await collect(child, JSON.stringify(spec), SECONDS * 1000)
-  const result = { parts: new Map(), comments: [] }
+  const result = { parts: new Map(), comments: [], blocks: blocks && { made: [] } }
   let running
   for (const line of r.stdout.split('\n')) {
     if (!line.startsWith(MARK)) continue
@@ -132,17 +139,15 @@ export async function runFile(
     else if (record.kind === 'start') running = record.task
     else if (record.kind === 'flood') result.stopped = { task: record.task, why: 'flood' }
     else if (record.kind === 'done') result.done = true
+    else if (record.kind === 'made') Object.assign(result.blocks, { made: record.list, defs: record.defs })
+    else if (record.kind === 'call') result.call = { ...record, lines: lines(record.printed ?? '') }
     else if (record.kind === 'part') {
       result.parts.set(record.task, { ...record, lines: lines(record.printed) })
       running = undefined
     }
   }
   const ended =
-    result.done ||
-    result.syntax ||
-    result.missingGiven ||
-    result.changedGiven ||
-    result.missingTask
+    result.done || result.syntax || result.missingGiven || result.changedGiven || result.missingTask
   if (!ended && !result.stopped) {
     if (running !== undefined)
       result.stopped = { task: running, why: r.timedOut ? 'time' : 'crash' }
@@ -155,10 +160,62 @@ const where = (task) => (task === 0 ? 'the lines above # Task 1' : `the lines un
 
 const count = (text, ch) => text.split(ch).length - 1
 
-/** What a line Python cannot read usually means, in plain words. */
-function syntaxCause(s) {
+const BLOCK_LINE = /^\s*(if|elif|else|for|while|def)\b/
+
+/** What a line Python cannot read usually means in a file with blocks, or null. */
+function blockSyntaxCause(s) {
   const m = s.message
   const text = s.text ?? ''
+  if (/expected an indented block/.test(m)) {
+    return 'the line before it ends with a colon, so at least one line under it must be moved in by a few spaces, to show it belongs to that if, else, loop or def'
+  }
+  if (/unindent does not match/.test(m)) {
+    return 'that line is moved in by a different number of spaces than the lines above it. Lines of the same block start at exactly the same place, and a line after the block starts where the line with the colon starts'
+  }
+  if (
+    /'elif' block follows an 'else'/.test(m) ||
+    (m === 'invalid syntax' && /^\s*elif\b(?!\s*:)/.test(text))
+  ) {
+    return 'an elif comes after an else, or does not line up under its if. The branches go if, then any elif, then else last, each lined up under the if'
+  }
+  if (m === 'invalid syntax' && /^\s*elif\s*:/.test(text))
+    return 'elif needs a condition before its colon'
+  if (/^\s*else\b\s*[^\s:]/.test(text)) {
+    return 'else takes no condition: it is the branch for every other case, written as else and a colon. A condition goes after if or elif'
+  }
+  if (/^\s*(if|elif|while)\b[^#]*[^=!<>]=[^=]/.test(text) && /invalid syntax/.test(m)) {
+    return '= stores a value, and == compares two values. A condition asks a question, so it compares'
+  }
+  if (/^\s*def\s+\w+\s*:/.test(text)) {
+    return 'a def line needs round brackets after the name of the function, even when it takes nothing'
+  }
+  if (
+    /expected ':'/.test(m) ||
+    (m === 'invalid syntax' && BLOCK_LINE.test(text) && !/:\s*(#.*)?$/.test(text))
+  ) {
+    return 'a line that starts with if, elif, else, for, while or def must end with a colon'
+  }
+  if (/'return' outside function/.test(m)) {
+    return 'return only works inside a function, and that line is not moved in under a def'
+  }
+  if (/'break' outside loop|'continue' not properly in loop/.test(m)) {
+    return 'break and continue only work inside a loop, and that line is not moved in under a for or while'
+  }
+  if (/positional argument follows keyword argument/.test(m)) {
+    return 'in a call, the values given with a name and = come after the values given in order'
+  }
+  if (/non-default argument follows default|parameter without a default follows/.test(m)) {
+    return 'in a def line, the parameters with a default come after the ones without'
+  }
+  return null
+}
+
+/** What a line Python cannot read usually means, in plain words. */
+function syntaxCause(s, blocks) {
+  const m = s.message
+  const text = s.text ?? ''
+  const block = blocks ? blockSyntaxCause(s) : null
+  if (block) return block
   if (/unexpected indent/.test(m)) {
     return 'that line starts with spaces or a tab, and Python does not expect it to be indented there. A line that is not inside anything starts at the very left'
   }
@@ -251,8 +308,55 @@ const BUILTINS = [
   'min'
 ]
 
+/** What an error while running usually means in a file with blocks, or null. */
+function blockRunCause(error, blocks) {
+  const m = error.message
+  let found
+  if (
+    error.type === 'NameError' &&
+    (found = /name '(\w+)' is not defined/.exec(m)) &&
+    blocks.made?.includes(found[1])
+  ) {
+    return `Python does not know the name ${found[1]} at that point. A line in the file gives it a value, but that line has not run: it may be under an if or else whose condition was not met, or in a loop that ran no rounds${blocks.defs ? ', or inside a function, where a name lives only while the function runs' : ''}`
+  }
+  if (error.type === 'UnboundLocalError') {
+    const name = /local variable '(\w+)'/.exec(m)?.[1] ?? 'a name'
+    return `inside a function, ${name} gets a value with =, so it is the function's own name, and this line reads it before it has one. A function cannot change a name outside it with =: take the value in as a parameter, and give the new one back with return`
+  }
+  if (
+    (found = /(\w+)\(\) missing \d+ required (?:positional |keyword-only )?arguments?: (.+)$/.exec(
+      m
+    ))
+  ) {
+    return `${found[1]} was called with fewer values than its def line asks for: nothing was given for ${found[2].replace(/'/g, '')}. Every parameter without a default needs a value in the call`
+  }
+  if (
+    (found = /(\w+)\(\) takes (.+?) positional arguments? but (\d+) (?:was|were) given/.exec(m))
+  ) {
+    return `${found[1]} was called with ${found[3]} values in order, and its def line takes ${found[2]}. The call and the def line must agree on how many values there are`
+  }
+  if ((found = /(\w+)\(\) got an unexpected keyword argument '(\w+)'/.exec(m))) {
+    return `${found[1]} has no parameter called ${found[2]}. A name used with = in a call must be one of the names in its def line`
+  }
+  if ((found = /'(\w+)' object is not iterable/.exec(m))) {
+    return `for needs something to go through, such as a range or a text, and here it was given ${aKind(found[1])}`
+  }
+  if ((found = /'(\w+)' object cannot be interpreted as an integer/.exec(m))) {
+    return `range takes whole numbers only, and here it was given ${aKind(found[1])}`
+  }
+  if ((found = /object of type '(\w+)' has no len\(\)/.exec(m))) {
+    return `len counts what is in a text, and here it was given ${aKind(found[1])}`
+  }
+  if (/can only concatenate|unsupported operand/.test(m) && /NoneType/.test(m)) {
+    return `${runCause(error, {}, false).replace(/\.$/, '')}. When that None comes from calling a function, the function ended without return`
+  }
+  return null
+}
+
 /** What an error while running usually means, in plain words. */
-function runCause(error, names) {
+function runCause(error, names, blocks) {
+  const block = blocks ? blockRunCause(error, blocks) : null
+  if (block) return block
   const m = error.message
   let found
   if (error.type === 'NameError' && (found = /name '(\w+)' is not defined/.exec(m))) {
@@ -320,7 +424,7 @@ export function problem(r, file, task) {
     const at = s.line ? ` at line ${s.line}${s.task ? `, under # Task ${s.task},` : ''}` : ''
     return fail(
       `Python can read ${file}`,
-      `Python cannot read ${file}, so nothing in it runs, not even the lines above the mistake. It stops${at} with ${s.type}: ${s.message}${/[.?!]$/.test(s.message) ? '' : '.'} That usually means ${syntaxCause(s)}. Run python3 ${file} in the terminal, fix the line it points at and check again.`,
+      `Python cannot read ${file}, so nothing in it runs, not even the lines above the mistake. It stops${at} with ${s.type}: ${s.message}${/[.?!]$/.test(s.message) ? '' : '.'} That usually means ${syntaxCause(s, r.blocks)}. Run python3 ${file} in the terminal, fix the line it points at and check again.`,
       s.shown
     )
   }
@@ -356,7 +460,7 @@ export function problem(r, file, task) {
   if (head?.error && task !== 0) {
     return fail(
       `The lines above # Task 1 run`,
-      `${errorText(head.error, head.names, 0)} Those lines came with the file: put them back as they were.`,
+      `${errorText(head.error, head.names, 0, r.blocks)} Those lines came with the file: put them back as they were.`,
       head.error.shown
     )
   }
@@ -364,8 +468,15 @@ export function problem(r, file, task) {
   if (part?.error) {
     return fail(
       `The Task ${task} lines run`,
-      errorText(part.error, part.names, task),
+      errorText(part.error, part.names, task, r.blocks),
       part.error.shown
+    )
+  }
+  if (part?.stopped) {
+    return fail(
+      `The Task ${task} lines end`,
+      stoppedText(part.stopped, `The lines under # Task ${task}`),
+      printed(undefined, firstLines(lines(part.printed)))
     )
   }
   return null
@@ -377,11 +488,26 @@ const lostTask = (file, task) =>
     `Check cannot find the # Task ${task} comment in ${file}. Put it back above the lines of that task, so Check knows which lines are which.`
   )
 
-function errorText(error, names, task) {
+function errorText(error, names, task, blocks) {
   const at = error.line ? ` at line ${error.line}` : ''
   const whose = task === 0 ? 'The lines above # Task 1' : `The lines under # Task ${task}`
-  return `${whose} stop${at} with ${error.type}: ${runCause(error, names)}.`
+  return `${whose} stop${at} with ${error.type}: ${runCause(error, names, blocks)}.`
 }
+
+/** The words for code Check stopped because it ran too long or printed without end. `what` is
+ * the lines of a task or a call, `it` the word that stands for it after. */
+export function stoppedText(stopped, what, it = 'them') {
+  const loop = stopped.loop ? `The loop that starts at line ${stopped.loop}` : 'A loop'
+  const why =
+    'its condition never becomes False, or nothing inside it changes what the condition looks at'
+  return stopped.why === 'flood'
+    ? `${what} printed far more than any task needs, so Check stopped ${it}. ${loop} keeps printing and never ends: ${why}. Run the file, and press Ctrl+C in the terminal to stop it.`
+    : `${what} ran for more than ${PART_SECONDS} seconds, so Check stopped ${it}. ${loop} never ends: ${why}. Run the file, and press Ctrl+C in the terminal if it does not stop.`
+}
+
+/** The first lines something printed, for the output of a check that was stopped. */
+export const firstLines = (out) =>
+  out.length > 8 ? [...out.slice(0, 8), `... and ${out.length - 8} more lines`] : out
 
 /** A Python literal for a value Check uses, for the output a learner reads. */
 export const literal = (v) =>
@@ -422,12 +548,13 @@ export function missingName(r, task, name) {
  * Runs each case with its own values and compares the name `name` after Task `task` with what it
  * should be. A failing case gets the first message that fits: a known mistake (`mistakes`, each
  * { value(given), hint }), a value that stayed the same in every case while the right one changed
- * (`typed`), then the case's own hint, a string or a function of the value read.
+ * (`typed`), then the case's own hint, a string or a function of the value read. `blocks` as in
+ * runFile.
  */
-export async function cases(t, { file, task, name, list, mistakes = [], typed }) {
+export async function cases(t, { file, task, name, list, mistakes = [], typed, blocks = false }) {
   const runs = await Promise.all(
     list.map((c) =>
-      runFile(t, file, { given: c.given, inject: c.inject, upto: task, names: [name] })
+      runFile(t, file, { given: c.given, inject: c.inject, upto: task, names: [name], blocks })
     )
   )
   for (const r of runs) {
@@ -598,4 +725,184 @@ export function textNear(name, v, want) {
   if (got.toLowerCase() === want.toLowerCase())
     return `${name} is right but for its capital letters.`
   return null
+}
+
+// From the functions issue on, a task is a function, and Check calls it with its own arguments.
+
+/** A problem every case shares, or null; a task's own lines that fail or stop are judged per case. */
+function shared(r, file, task) {
+  const p = problem(r, file, task)
+  return p && !p.name.startsWith(`The Task ${task} lines`) ? p : null
+}
+
+const withGiven = (c) => {
+  const values = { ...c.given, ...c.inject }
+  return Object.keys(values).length ? `With ${givenText(values)}\n` : ''
+}
+
+/**
+ * Runs each case and judges the lines Task `task` printed with `judge(out, c)`, which gives a
+ * message or null. For files with blocks: a task's lines that fail or never end fail that case.
+ * `nothing` is the one message when the lines print nothing in any case.
+ */
+export async function outputCases(t, { file, task, list, judge, nothing }) {
+  const runs = await Promise.all(
+    list.map((c) =>
+      runFile(t, file, { given: c.given, inject: c.inject, upto: task, blocks: true })
+    )
+  )
+  for (const r of runs) {
+    const p = shared(r, file, task)
+    if (p) return [p]
+  }
+  const silent = runs.every(
+    (r) =>
+      r.parts.get(task) &&
+      !r.parts.get(task).error &&
+      !r.parts.get(task).stopped &&
+      !r.parts.get(task).lines.length
+  )
+  if (silent && list.some((c) => judge([], c))) {
+    return [
+      fail(
+        `The Task ${task} lines print`,
+        nothing ?? `The lines under # Task ${task} print nothing, in every case Check tried.`
+      )
+    ]
+  }
+  return list.map((c, i) => {
+    const p = problem(runs[i], file, task)
+    if (p) return { ...p, name: c.name, output: `${withGiven(c)}${p.output ?? ''}`.trim() }
+    const out = runs[i].parts.get(task).lines
+    const message = judge(out, c)
+    const output = printed({ ...c.given, ...c.inject }, out)
+    return message ? fail(c.name, message, output) : pass(c.name, output)
+  })
+}
+
+const pyArgs = (c) =>
+  [
+    ...(c.args ?? []).map(literal),
+    ...Object.entries(c.kwargs ?? {}).map(([k, v]) => `${k}=${literal(v)}`)
+  ].join(', ')
+
+/** A call as the learner would write it: battery_hours(80, 10, 30). */
+export const callText = (fn, c) => `${fn}(${pyArgs(c)})`
+
+function missingFunction(call, fn, task) {
+  const functions = Object.fromEntries(
+    Object.entries(call.names).filter(([, type]) => type === 'function')
+  )
+  const close = closeName(fn, functions)
+  return fail(
+    `${fn} is there`,
+    close
+      ? `Check cannot find a function called ${fn}, but there is one called ${close}. The name must match the task letter for letter: capitals and underscores count.`
+      : `Check cannot find a function called ${fn} after the lines under # Task ${task}. Make it there with def and exactly that name.`
+  )
+}
+
+/** Why a function gave back None, in plain words. */
+function noneText(fn, out) {
+  return out.length
+    ? `${fn} printed a line but gave back None. print only shows a line in the terminal: the code that calls ${fn} gets nothing from it. A function gives a value back with return.`
+    : `${fn} gave back None: it ended without reaching a return line. Look for a path through the function, such as one branch of an if, that has no return.`
+}
+
+/**
+ * Calls the function `fn` once per case, each in a fresh run of the file up to Task `task`, and
+ * compares what it gave back with `expected`. What it printed is reported apart, so a function
+ * that prints where it should give back fails on that. A failing case gets the first message
+ * that fits: one of `mistakes` ({ value(c), hint }), None given back, the same result in every case
+ * (`typed`), then the case's own hint, a string or a function of the value given back.
+ * `define` is Python run right before Task `task`: Check's own versions of earlier functions.
+ */
+export async function callCases(t, { file, task, fn, list, mistakes = [], typed, define }) {
+  const runs = await Promise.all(
+    list.map((c) =>
+      runFile(t, file, {
+        given: c.given,
+        inject: c.inject,
+        upto: task,
+        blocks: true,
+        define,
+        call: { name: fn, args: c.args ?? [], kwargs: c.kwargs ?? {} }
+      })
+    )
+  )
+  for (const r of runs) {
+    const p = shared(r, file, task)
+    if (p) return [p]
+  }
+  const ends = runs.map((r, i) => {
+    const p = problem(r, file, task)
+    if (p)
+      return { ...p, name: list[i].name, output: `${withGiven(list[i])}${p.output ?? ''}`.trim() }
+    if (!r.call) {
+      return fail(
+        list[i].name,
+        `Python stopped without a word while Check called ${callText(fn, list[i])}.`,
+        r.crashed
+      )
+    }
+    return null
+  })
+  const first = runs.find((r, i) => !ends[i])?.call
+  if (first?.missing) return [missingFunction(first, fn, task)]
+  if (first?.type) {
+    return [
+      fail(
+        `${fn} is a function`,
+        `${fn} is ${aKind(first.type)}, not a function. A function is made with def, its name, round brackets and a colon.`
+      )
+    ]
+  }
+  const reads = runs.map((r) => r.call?.returned)
+  const mistake = mistakes.find((m) =>
+    list.every((c, i) => {
+      const v = reads[i]
+      return v && v.value === m.value(c) && v.type === (m.type ?? c.expected.type)
+    })
+  )
+  const stuck =
+    reads.every((v) => v && v.repr === reads[0].repr) &&
+    !list.every((c) => c.expected.value === list[0].expected.value)
+  return list.map((c, i) => {
+    if (ends[i]) return ends[i]
+    const call = runs[i].call
+    const shown = callText(fn, c)
+    const said = `${withGiven(c)}Check called ${shown}`
+    const out = call.lines
+    const told = `It printed:\n${out.length ? firstLines(out).join('\n') : '(nothing)'}`
+    if (call.stopped) {
+      return fail(c.name, stoppedText(call.stopped, shown, 'it'), `${said}\n${told}`)
+    }
+    if (call.error) {
+      const at = call.error.line ? ` at line ${call.error.line}` : ''
+      return fail(
+        c.name,
+        `When Check calls ${shown}, it stops${at} with ${call.error.type}: ${runCause(call.error, call.names, runs[i].blocks)}.`,
+        `${said}\n${call.error.shown}`
+      )
+    }
+    const v = call.returned
+    const ok = same(v, c.expected)
+    const message = ok
+      ? undefined
+      : mistake
+        ? mistake.hint
+        : v.type === 'NoneType' && c.expected.type !== 'NoneType'
+          ? noneText(fn, out)
+          : stuck && typed
+            ? typed
+            : typeof c.hint === 'function'
+              ? c.hint(v, call)
+              : c.hint
+    return {
+      name: c.name,
+      passed: ok,
+      message,
+      output: `${said}\nIt gave back: ${v.repr}\n${told}`
+    }
+  })
 }
