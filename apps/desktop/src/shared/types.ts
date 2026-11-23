@@ -751,6 +751,10 @@ export interface Api {
     findElsewhere(labId: string, chapterId: string): Promise<string | null>
     /** Moves the repo's work from the earlier folder that holds this issue into the current one. */
     bringBack(labId: string, chapterId: string): Promise<void>
+    /** The window is closing or the app quitting; the page writes what is not saved yet. */
+    onFlush(listener: () => void): Unsubscribe
+    /** Answers onFlush once the writes are done. */
+    flushed(): void
   }
   checks: {
     /** Runs the hidden tests for the given tasks (all when omitted) and records progress. */
@@ -918,6 +922,7 @@ export const INVOKE_METHODS = {
 /** Fire-and-forget renderer to main messages. */
 export const SEND_METHODS = {
   content: ['leave'],
+  workspace: ['flushed'],
   preview: ['reload', 'close'],
   terminal: ['write', 'resize', 'kill'],
   ai: ['cancel', 'cancelComplete', 'cancelOpencodeInstall'],
@@ -936,5 +941,6 @@ export const EVENTS = {
   folderMove: 'workspace:moveProgress',
   toolInstall: 'tools:installProgress',
   update: 'updates:status',
-  previewWindow: 'preview:window'
+  previewWindow: 'preview:window',
+  flush: 'workspace:flush'
 } as const

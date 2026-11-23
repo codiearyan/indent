@@ -5,6 +5,7 @@ import { EVENTS } from '@shared/types'
 import { emit, handle } from '../ipc'
 import { releaseNoteText, shortNotes } from '../updateRelease'
 import { killAll } from './terminal'
+import { closeWithoutWaiting } from '../saveBeforeClose'
 
 const OFFLINE = 'Could not reach the update. Check your connection and try again.'
 
@@ -96,6 +97,7 @@ async function install(): Promise<UpdateStatus> {
   if (status.state !== 'ready') return status
   // Shells running in the work folder would hold it open while the app is replaced.
   killAll()
+  closeWithoutWaiting()
   autoUpdater.quitAndInstall(true, true)
   return status
 }

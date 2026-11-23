@@ -36,6 +36,7 @@ api.workspace.onMoveProgress = subscribe(EVENTS.folderMove)
 api.tools.onInstallProgress = subscribe(EVENTS.toolInstall)
 api.updates.onStatus = subscribe(EVENTS.update)
 api.preview.onWindow = subscribe(EVENTS.previewWindow)
+api.workspace.onFlush = subscribe(EVENTS.flush)
 
 contextBridge.exposeInMainWorld('platform', process.platform)
 contextBridge.exposeInMainWorld('api', api)

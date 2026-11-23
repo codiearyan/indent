@@ -20,6 +20,7 @@ import * as reminders from './services/reminders'
 import { appWindows } from './ipc'
 import { perf } from './perf'
 import { seedContent } from './library'
+import { saveBeforeClose } from './saveBeforeClose'
 import { bundledContentDir, contentDir, usesLibrary } from './paths'
 import { PACKS_URL } from '@shared/packs'
 import { VIDEO_ORIGIN } from '@shared/video'
@@ -60,6 +61,7 @@ function createWindow(route?: string): void {
     if (!hidden) mainWindow.show()
     perf('window shown', process.uptime() * 1000)
   })
+  saveBeforeClose(mainWindow)
   // A page's window belongs to an issue open in this window.
   mainWindow.on('closed', preview.closeAll)
 
