@@ -24,7 +24,7 @@ const twice = (section, name) => {
 
 /** @Override above the method a task overrides. */
 const marked = (section, name, method) =>
-  new RegExp(`@Override\\s+(?:public\\s+|protected\\s+)?\\w+\\s+${method}\\s*\\(`).test(classBody(section, name))
+  new RegExp(`@Override\\s+(?:(?:public|protected|final|synchronized|strictfp)\\s+)*\\w+\\s+${method}\\s*\\(`).test(classBody(section, name))
     ? pass(`${method} is marked @Override`)
     : fail(
         `${method} is marked @Override`,
