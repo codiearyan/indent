@@ -1,0 +1,133 @@
+{
+  "id": "environment",
+  "title": "Settings from the environment",
+  "files": [
+    "water-bill.js",
+    "settings.js",
+    "try.js"
+  ],
+  "terminal": {
+    "description": "A terminal in your workspace. `node try.js WATER_PRICE=2.10 water-bill.js 2400` runs `water-bill.js` with the setting `WATER_PRICE` in its environment, the same way in every terminal, and shows both streams and the exit code.",
+    "suggestedCommand": "node try.js WATER_PRICE=2.10 water-bill.js 2400"
+  },
+  "tasks": [
+    {
+      "id": "price",
+      "title": "Read the price from the environment",
+      "file": "water-bill.js",
+      "description": "The water company charges by the 1000 litres, and its price changes every April. Write `water-bill.js` so that it reads the price from the setting `WATER_PRICE` in its environment and prints what the litres typed after the script's name cost, with two figures after the point. With `WATER_PRICE` set to `2.10`, `node water-bill.js 2400` prints:\n\n```\n2400 litres cost 5.04.\n```\n\nWhen `WATER_PRICE` is not set, the script prints one line on standard error that names `WATER_PRICE`, nothing on standard output, and ends with exit code 1.\n\nTry it with `node try.js WATER_PRICE=2.10 water-bill.js 2400`. Check runs `water-bill.js` with prices and litres of its own, and once with no `WATER_PRICE` at all.",
+      "nextSteps": [
+        "Read `WATER_PRICE` from `process.env`, and the litres from `process.argv`.",
+        "Find out what the setting holds when it is not set, and refuse that case first.",
+        "Turn both into numbers and work out the cost of the litres.",
+        "Print the line with two figures after the point."
+      ],
+      "hints": [
+        "A setting the script was not given is `undefined` in `process.env`, like a missing argument in `process.argv`.",
+        "`process.env.WATER_PRICE` is text, like an argument. The price is for 1000 litres, so the cost is the litres divided by 1000, times the price.",
+        "`if (process.env.WATER_PRICE === undefined) { console.error('WATER_PRICE is not set.'); process.exitCode = 1 }`, and in the else, `(litres / 1000 * price).toFixed(2)`."
+      ],
+      "docs": [
+        {
+          "title": "process.env",
+          "url": "https://nodejs.org/api/process.html#processenv"
+        },
+        {
+          "title": "Environment variables",
+          "url": "https://nodejs.org/api/environment_variables.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What environment variables are, from the system up",
+          "url": "https://www.youtube.com/watch?v=IebC4OyPc6c"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "number",
+      "title": "Refuse a price that is not a number",
+      "file": "water-bill.js",
+      "description": "A setting is text, and people type it wrong. Change `water-bill.js` so that a `WATER_PRICE` that is not a number above 0 is refused, the same way as a missing one: one line on standard error that names `WATER_PRICE`, nothing on standard output, and exit code 1. That includes a word like `two`, a price written with a comma like `1,80`, a price below 0, and a setting that is there but empty, which counts as not set. A good price still gives the bill.\n\nCheck runs `water-bill.js` with prices like those, and with one good price of its own.",
+      "nextSteps": [
+        "Try `node try.js WATER_PRICE=two water-bill.js 2000` and look at what it prints now.",
+        "Turn the setting into a number, then decide whether that number is a price.",
+        "Find out what `Number('')` and `Number('1,80')` give, and make sure both are refused.",
+        "Refuse the price before anything is worked out or printed."
+      ],
+      "hints": [
+        "`Number('two')` is `NaN`, and so is `Number('1,80')`. But `Number('')` is `0`, and `parseFloat('1,80')` is `1`.",
+        "`Number.isFinite(value)` is false for `NaN`. A price is also more than 0, and an empty setting is treated like a missing one.",
+        "`const price = Number(text)`, then `if (text.trim() === '' || !Number.isFinite(price) || price <= 0) { console.error(...); process.exitCode = 1 }`."
+      ],
+      "docs": [
+        {
+          "title": "Number.isFinite()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isFinite"
+        },
+        {
+          "title": "Number() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/Number"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "default",
+      "title": "Warn about a leak, with a default limit",
+      "file": "water-bill.js",
+      "description": "A bill for a lot of water usually means a dripping tap. Change `water-bill.js` so that when the litres are more than the setting `LEAK_LITRES`, it prints the bill as before and also one line of warning on standard error, such as:\n\n```\nMore than 5000 litres: check the taps for a leak.\n```\n\nIt still ends with exit code 0. When `LEAK_LITRES` is not set, or is empty, the limit is 5000. When it is set to something that is not a number above 0, the script refuses it the way it refuses a bad price, naming `LEAK_LITRES`.\n\nCheck runs `water-bill.js` with `LEAK_LITRES` not set, empty, set to a limit of its own and set to a word, with litres below, at and above each limit.",
+      "nextSteps": [
+        "Read `LEAK_LITRES` from the environment, and use 5000 when it is not set or empty.",
+        "Turn it into a number and refuse it when it is not one above 0.",
+        "After the bill, compare the litres with the limit, as numbers.",
+        "Print the warning on standard error, and leave the exit code alone."
+      ],
+      "hints": [
+        "`??` gives the value on its right only for `undefined` or `null`, so an empty setting gets through it as `''`, which `Number` turns into 0.",
+        "Treat `undefined` and empty text the same, then use 5000. The check you wrote for the price can check this setting too, if it takes the setting's name.",
+        "`const text = process.env.LEAK_LITRES; const limit = text === undefined || text.trim() === '' ? 5000 : Number(text)`, then `if (Number(litres) > limit) console.error(...)`."
+      ],
+      "docs": [
+        {
+          "title": "Nullish coalescing operator (??)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing"
+        },
+        {
+          "title": "process.env",
+          "url": "https://nodejs.org/api/process.html#processenv"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "secret",
+      "title": "Show the settings, never the key",
+      "file": "settings.js",
+      "description": "The water company's account key is in the setting `WATER_KEY`. It must never show on the shed screen. Write `settings.js` so that `node settings.js` shows whoever sits at the laptop how the water scripts are set up, one line per setting, in this order:\n\n```\nWATER_PRICE: 2.10\nLEAK_LITRES: 5000 (default)\nWATER_KEY: set\n```\n\n`WATER_PRICE` shows its value as it is set, or `not set`. `LEAK_LITRES` shows its value, or `5000 (default)` when it is not set. `WATER_KEY` shows only `set` or `not set`: its value, or any part of it, is never printed, on either stream. The script ends with exit code 0.\n\nCheck runs `settings.js` with all three set to values of its own, and with none set, and looks for the key in everything it printed.",
+      "nextSteps": [
+        "Print one line for `WATER_PRICE`, with its value or `not set`.",
+        "Print the line for `LEAK_LITRES`, saying when the default is in use.",
+        "For `WATER_KEY`, decide only whether it is there.",
+        "Run it with `node try.js WATER_KEY=abc123 settings.js` and make sure `abc123` is nowhere."
+      ],
+      "hints": [
+        "`console.log(process.env)` prints every setting in the environment, secrets included. Print only the three you need.",
+        "A secret is not shown even in part: not its first or last letters. Whether it is set is all a person needs to know.",
+        "`console.log(`WATER_KEY: ${process.env.WATER_KEY ? 'set' : 'not set'}`)`."
+      ],
+      "docs": [
+        {
+          "title": "process.env",
+          "url": "https://nodejs.org/api/process.html#processenv"
+        },
+        {
+          "title": "Conditional (ternary) operator",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

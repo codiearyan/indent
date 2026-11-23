@@ -1,0 +1,74 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Order page", "kind": "story" },
+      { "id": "server", "label": "serve()", "kind": "function", "mine": true, "fn": "serve" },
+      { "id": "app", "label": "createApp()", "kind": "function", "mine": true, "fn": "createApp" },
+      { "id": "staff", "label": "Staff group", "kind": "data" },
+      { "id": "shop", "label": "shop.js", "kind": "file" }
+    ],
+    "edges": [
+      { "from": "page", "to": "server", "label": "real request" },
+      { "from": "server", "to": "app", "label": "handle()" },
+      { "from": "app", "to": "staff", "label": "/staff" },
+      { "from": "app", "to": "shop", "label": "ask the shop" },
+      { "from": "server", "to": "page", "label": "answer" }
+    ],
+    "note": "The order server runs on your router: a real server hands every request to it, and the staff pages sit in their own group."
+  },
+  "tasks": {
+    "groups": {
+      "steps": [
+        {
+          "active": ["app", "app->staff", "staff"],
+          "value": { "kind": "array", "label": "the staff group", "values": ["its middleware", "GET /queue", "POST /orders/:id/status"] },
+          "note": "The staff routes are written in a router of their own, with the key check as its middleware."
+        },
+        {
+          "active": ["app", "staff"],
+          "note": "Mounting it at /staff makes each staff route a route of the order server, with /staff in front of its path."
+        },
+        {
+          "active": ["page", "app", "app->staff", "staff"],
+          "note": "A request for the press queue runs the server's middleware, then the staff check, then the queue's handler. A public page never meets the staff check."
+        }
+      ]
+    },
+    "serve": {
+      "steps": [
+        {
+          "active": ["server"],
+          "note": "serve makes a Node server and hands it back unstarted, so whoever runs it picks the address."
+        },
+        {
+          "active": ["page", "page->server", "server", "server->app"],
+          "note": "A real request arrives with its method, address, headers and body, the very shape the router already reads."
+        },
+        {
+          "active": ["server", "server->page", "page"],
+          "note": "If the router fails before answering, the server still answers that something went wrong, and goes on to the next request."
+        }
+      ]
+    },
+    "app": {
+      "steps": [
+        {
+          "active": ["page", "page->server", "server", "server->app", "app"],
+          "note": "The order page asks for today's orders, as it did from the old server."
+        },
+        {
+          "active": ["app", "app->shop", "shop"],
+          "note": "The route for today asks the shop, in two lines, and answers. Every branch of the old chain is now one route like it."
+        },
+        {
+          "active": ["app", "app->staff", "staff"],
+          "note": "A status change goes through the staff group, and a request without the key is refused there."
+        },
+        {
+          "active": ["server", "server->page", "page"],
+          "note": "Requests the old server got wrong, such as a DELETE on the price list, now get the router's own plain answer."
+        }
+      ]
+    }
+  }
+}

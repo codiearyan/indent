@@ -1,0 +1,79 @@
+{
+  "id": "middleware-and-errors",
+  "title": "Middleware and one place for errors",
+  "files": ["src/router.js", "src/try.js"],
+  "terminal": {
+    "description": "A shell in your workspace where requests pass Hesper's middleware and errors go to one place.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "use",
+      "title": "Run middleware before the handler",
+      "file": "src/router.js",
+      "description": "Implement `use(router, fn)` in `src/router.js`, and run middleware in `handle`.\n\n- `use` adds a middleware, a function `fn(req, res, next)`; it throws a `TypeError` when `fn` is not a function\n- for a request that reaches a route, after its params, query and body are ready, every middleware runs in the order it was added, then the handler\n- calling `next()` goes on to the next middleware, or to the handler after the last one; a middleware may call it later, after an `await`\n- `next()` returns a promise that settles once the rest of the chain has finished, so `await next()` comes back after the handler; a middleware that calls `next()` without returning or awaiting it is waited for all the same\n- a middleware that answers without calling `next()` ends the request: nothing after it runs\n- `handle` finishes only once the whole chain has, an async handler included\n- a request the router answers by itself, a 404, a 405, or a path or body it cannot take, runs no middleware\n\nThe check adds middleware of its own that notes when it runs, and reads the order.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the error.",
+        "Keep each middleware on the router in `use`.",
+        "In `handle`, make a list of the middleware followed by the handler, and write a function that runs step `i` and gives it a `next` that runs step `i + 1`.",
+        "Return the promise of the rest from `next`, and wait for the first step in `handle`."
+      ],
+      "hints": [
+        "The chain is not a loop. Each step decides whether the next one runs, by calling `next` or not, so the next step has to start from inside `next`.",
+        "An `async` function that runs step `i` returns a promise. If `next` returns `runStep(i + 1)`, that promise settles when everything after step `i` has finished.",
+        "In `runStep(i)`: `let rest`, then `await chain[i](req, res, () => (rest = runStep(i + 1)))`, then `await rest`. In `handle`, `await runStep(0)`. The last step is the handler."
+      ],
+      "docs": [
+        { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
+        { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures" },
+        { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "errors",
+      "title": "Hand errors to one place",
+      "file": "src/router.js",
+      "description": "Implement `onError(router, fn)` in `src/router.js`, and send every error from the chain there.\n\n- `onError` sets the router's error handler, a function `fn(error, req, res)` that answers\n- `next(error)`, a throw, or a promise that rejects, in a middleware or in the handler, skips everything left in the chain and calls the error handler once, with that very error\n- with no error handler, the router answers `500` with `{ error }`; the same when the error handler itself throws\n- that `{ error }` never contains the error's own message: it says that something went wrong, in your words\n\nThe check throws one error from different places, and notes what the error handler gets and what the answer says.",
+      "nextSteps": [
+        "Keep the error handler on the router in `onError`.",
+        "Make `next(error)` stop the chain with that error.",
+        "Wrap the run of the chain in `handle` in a `try`, and hand what you catch to the error handler.",
+        "Think about what happens when the error handler throws too."
+      ],
+      "hints": [
+        "If every error, wherever it starts, ends up as a rejected promise of the chain, one `try` around the chain in `handle` catches them all.",
+        "`await` turns a rejected promise into a throw, and a throw inside an `async` function into a rejected promise. `next(error)` can return `Promise.reject(error)`, which the step's own `await rest` then meets.",
+        "`try { await runStep(0) } catch (error) { ... router's error handler(error, req, res) ... }`, with a second `try` around the error handler and a plain 500 when there is none."
+      ],
+      "docs": [
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "Promise.reject()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject" },
+        { "title": "500 Internal Server Error", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stuck",
+      "title": "Never leave a request hanging",
+      "file": "src/router.js",
+      "description": "Make `handle` notice a step that finished without doing its job, and say which one.\n\n- a step has finished when its function returned, or when the promise it returned settled\n- a middleware that finished without answering and without calling `next()` is answered `500` with `{ error }` that names it: `middleware 2` for the second one added, counted from 1\n- a handler that finished without answering is answered `500` with `{ error }` that names its route by method and pattern, such as `GET /orders/:id`\n- a step that answered has done its job, whether or not it called `next()`\n- calling `next()` a second time does nothing\n\nThe check adds middleware and handlers that forget their job, and reads the answer.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at the proof request.",
+        "After a step has finished, look at two things: was `next` called, and has the response ended?",
+        "Give every step a name you can put in the answer.",
+        "Make `next` remember that it was called, and do nothing the second time."
+      ],
+      "hints": [
+        "A step that neither answers nor calls `next` leaves a client waiting for ever. The router is the only one that can see it happen, because it knows when each step finished.",
+        "`res.writableEnded` is true once the response has ended. Look at it after the step's promise has settled, not straight after the call.",
+        "In `runStep`, after `await fn(req, res, next)`: `if (!calledNext && !res.writableEnded)` throw an error that says which step it was, and answer it with a 500 in `handle`."
+      ],
+      "docs": [
+        { "title": "response.writableEnded", "url": "https://nodejs.org/api/http.html#responsewritableended" },
+        { "title": "Error() constructor", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/Error" }
+      ],
+      "points": 10
+    }
+  ]
+}

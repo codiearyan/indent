@@ -1,0 +1,13 @@
+{
+  "id": "build-a-router",
+  "title": "Build your own router",
+  "description": "Ashgrove Press takes its orders through a little server Sefton wrote, and by now it is one long chain of if statements on the address that nobody dares touch, because every fix breaks another order. You write the shop a router of its own in plain JavaScript: a table of routes, paths with parts that vary, the query string and the body read once and safely, middleware with one place for errors, and groups, until the order server runs on it. By the end you know what the router you use every day does with each request.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": ["JavaScript", "Build your own"],
+  "kind": "project",
+  "parts": [
+    { "title": "Finding the handler", "chapters": ["a-table-of-routes", "parts-that-vary", "query-and-body"] },
+    { "title": "Around the handler", "chapters": ["middleware-and-errors", "the-order-server"] }
+  ]
+}

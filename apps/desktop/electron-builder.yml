@@ -80,5 +80,6 @@ extraResources:
       - labs/typescript-foundations/**
       - labs/command-line-foundations/**
       - labs/js-foundations/**
+      - labs/python-foundations/**
   - from: out/packs/index.json
     to: content/index.json

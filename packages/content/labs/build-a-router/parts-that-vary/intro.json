@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Customer", "say": "Show me the proof of 1873.", "note": "Asked on the order page." },
+    { "title": "Old server", "text": "Takes the third piece of the address.", "note": "The rest is never read." },
+    {
+      "title": "Your router",
+      "file": "router.js",
+      "mine": true,
+      "gap": "Only fixed paths",
+      "tasks": ["Match a pattern", "Hand over the values", "Choose the best fit"]
+    },
+    { "title": "Order routes", "rows": [["/orders/:id", "order"], ["/orders/:id/proof", "proof"], ["/orders/today", "today"]], "mark": 1 }
+  ],
+  "ticket": { "label": "1873 proof", "wrong": "the order", "why": "Rest ignored", "right": "the proof" },
+  "captions": [
+    "At Ashgrove Press, a customer asks the order page for the proof of order 1873.",
+    "The old server reads only the order number, so the customer gets the order instead.",
+    "You teach your router patterns, values and the best fit, in three tasks.",
+    "Now the request reaches the proof route, with the order number in req.params.",
+    "One route for every order, and an answer that never depends on which was written first."
+  ]
+}
