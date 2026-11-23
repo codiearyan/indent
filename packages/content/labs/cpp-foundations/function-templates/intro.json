@@ -1,0 +1,27 @@
+{
+  "stations": [
+    { "title": "Ambrose", "say": "Why do I keep writing this twice?" },
+    { "title": "Two functions", "text": "One for tickets, one for bills, alike." },
+    {
+      "title": "Your template",
+      "file": "quotes.cpp",
+      "mine": true,
+      "gap": "One recipe for every type",
+      "tasks": ["Fold the two into one", "Keep a value in range", "Keep quotes fair"]
+    },
+    { "title": "Dorrit", "say": "Now my deposits too?" }
+  ],
+  "ticket": {
+    "label": "Deposits",
+    "wrong": "a third copy",
+    "why": "Copy again",
+    "right": "same recipe"
+  },
+  "captions": [
+    "Ambrose has the same function twice, and Dorrit wants a third copy for her deposits.",
+    "A fix in one copy never reaches the other, so the copies drift apart.",
+    "You write the function once, with the type left open, and keep quotes in range with it.",
+    "Dorrit's deposits use the same recipe, and nothing is written a third time.",
+    "One recipe serves every list in the workshop. Next, a whole class with its type left open."
+  ]
+}

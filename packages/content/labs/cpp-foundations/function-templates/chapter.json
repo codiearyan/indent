@@ -1,0 +1,103 @@
+{
+  "id": "function-templates",
+  "title": "One function for every type",
+  "files": [
+    "src/quotes.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Ambrose's quotes here and run them, after you call your functions from main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/quotes.cpp -o quotes && ./quotes"
+  },
+  "tasks": [
+    {
+      "id": "largest",
+      "title": "Fold two functions into one template",
+      "file": "src/quotes.cpp",
+      "description": "Under `// Task 1` in `src/quotes.cpp`, write a function template called `largestOf`, with one type `T`, that takes a reference to a `const std::vector<T>` and gives back the largest of its items, as a `T`. The vector always holds at least one item. A type `T` needs to offer only two things for `largestOf` to work: it can be copied, and two of its values can be compared with `<`. Once it works, delete `largestTicket` and `largestBill` above it, and use `largestOf` in `main`.\n\nCheck calls `largestOf` from code of its own with lists of whole numbers, prices and texts, once with `T` said in angle brackets, and with a type of its own that can be copied and compared with `<` and offers nothing else. It reads what comes back and its type.",
+      "nextSteps": [
+        "Read `largestTicket` and `largestBill` side by side: only the type differs.",
+        "Write the template line, then the function once more with `T` wherever the type was.",
+        "Use only `<` between two items, and start from an item of the list.",
+        "Call it in `main` with `tickets` and with `bills`, and build."
+      ],
+      "hints": [
+        "The two functions above Task 1 are one recipe written twice. A template is that recipe written once, with a name for the type that changes.",
+        "Every `int` or `double` in the recipe becomes `T`: the vector it takes, the variable that keeps the largest and what it gives back. Check's own type cannot be made from a number and has no `>`, so the largest starts from the first item and only `<` compares.",
+        "The shape is `template <typename T>` on the line above `T largestOf(const std::vector<T>& items) {`, then the body of `largestBill` with `T` in place of `double`."
+      ],
+      "docs": [
+        {
+          "title": "Function template",
+          "url": "https://en.cppreference.com/w/cpp/language/function_template"
+        },
+        {
+          "title": "Template parameters and template arguments",
+          "url": "https://en.cppreference.com/w/cpp/language/template_parameters"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Templates: one recipe, many types",
+          "url": "https://www.youtube.com/watch?v=I-hZkUa9mIs"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "clamp",
+      "title": "Keep a value between two others, for any type",
+      "file": "src/quotes.cpp",
+      "description": "Under `// Task 2`, write a function template called `clampTo`, with one type `T`, that takes three references to a `const T`: a value, a low end and a high end. It gives back `low` when the value is below `low`, `high` when the value is above `high`, and the value itself otherwise, as a `T`. As in Task 1, a type `T` needs to offer only copies and `<`.\n\nCheck calls `clampTo` with whole numbers, prices and texts, once with `T` said as `double`, and with its own type that offers only copies and `<`. It reads what comes back and its type.",
+      "nextSteps": [
+        "Write the template line, then the first line: three `const T&` in, a `T` back.",
+        "Ask whether the value is below the low end first.",
+        "Then ask whether the high end is below the value, written with `<`.",
+        "Try it in `main` with a price and with a text."
+      ],
+      "hints": [
+        "One `T` for all three values means the compiler works out one type from all three, and they must agree.",
+        "\"The value is above high\" is the same question as \"high is below the value\", and that one is written with `<`, the only comparison Check's own type has.",
+        "The shape is `if (value < low) { return low; } if (high < value) { return high; } return value;` under `template <typename T> T clampTo(const T& value, const T& low, const T& high)`."
+      ],
+      "docs": [
+        {
+          "title": "Function template",
+          "url": "https://en.cppreference.com/w/cpp/language/function_template"
+        },
+        {
+          "title": "Template argument deduction",
+          "url": "https://en.cppreference.com/w/cpp/language/template_argument_deduction"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fair",
+      "title": "Keep the quotes between the floor and the ceiling",
+      "file": "src/quotes.cpp",
+      "description": "Under `// Task 3`, write a function called `fairPrices` that takes the quotes as a reference to a `const std::vector<int>`, the floor as a `double` and the ceiling as a `double`. It gives back a new `std::vector<double>` with one price for each quote, in the same order: the quote kept between the floor and the ceiling by `clampTo`, worked out as a `double`, so the pence of the floor and the ceiling are kept.\n\nCheck builds this task with a `clampTo` of its own in place of yours, written as Task 2 asks, that counts its calls and notes the type `T` it was called with. It calls `fairPrices` with quotes, floors and ceilings of its own, an empty list included.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<int>&` and two `double`s in, a `std::vector<double>` back.",
+        "Go through the quotes, and keep each between the floor and the ceiling with `clampTo`.",
+        "Build it, and read the error for the line that calls `clampTo`.",
+        "Push each price onto the vector you give back, and print them from `main`."
+      ],
+      "hints": [
+        "A quote is an `int`, and the floor and the ceiling are `double`s. `clampTo` has one `T` for all three.",
+        "The compiler never picks between two types for one `T` by itself: you say which type `T` is, or you hand it three values of one type. The lesson shows both.",
+        "The shape is `prices.push_back(clampTo<double>(quote, floor, ceiling));` inside a loop over the quotes."
+      ],
+      "docs": [
+        {
+          "title": "Template argument deduction",
+          "url": "https://en.cppreference.com/w/cpp/language/template_argument_deduction"
+        },
+        {
+          "title": "std::vector::push_back",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/push_back"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

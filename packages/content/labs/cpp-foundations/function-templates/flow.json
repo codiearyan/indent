@@ -1,0 +1,77 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ambrose", "label": "Ambrose's desk", "kind": "story" },
+      { "id": "lists", "label": "Tickets and bills", "kind": "data" },
+      { "id": "largest", "label": "largestOf()", "kind": "function", "mine": true },
+      { "id": "clamp", "label": "clampTo()", "kind": "function", "mine": true },
+      { "id": "fair", "label": "fairPrices()", "kind": "function", "mine": true },
+      { "id": "bill", "label": "The bill", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ambrose", "to": "lists", "label": "any list" },
+      { "from": "lists", "to": "largest", "label": "items" },
+      { "from": "largest", "to": "ambrose", "label": "the largest" },
+      { "from": "ambrose", "to": "fair", "label": "quotes" },
+      { "from": "fair", "to": "clamp", "label": "each quote" },
+      { "from": "fair", "to": "bill", "label": "fair prices" }
+    ],
+    "note": "One recipe per job, written once, serves every type Ambrose hands it."
+  },
+  "tasks": {
+    "largest": {
+      "steps": [
+        {
+          "active": ["ambrose", "ambrose->lists"],
+          "note": "Ambrose wants the largest of a list, whatever the list holds."
+        },
+        {
+          "active": ["lists->largest", "largest"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a list of tickets, bills or texts"] },
+          "note": "The same recipe takes the list, and the compiler writes it out for the type of its items."
+        },
+        {
+          "active": ["largest->ambrose"],
+          "value": { "kind": "array", "label": "comes out", "values": ["one item, of the same type"] },
+          "note": "The largest item comes back, as the type the list held."
+        }
+      ]
+    },
+    "clamp": {
+      "steps": [
+        {
+          "active": ["clamp"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a value", "a low end", "a high end"] },
+          "note": "Three values of one type arrive: a value and the two ends it must stay between."
+        },
+        {
+          "active": ["clamp"],
+          "note": "The value is compared with each end, using only what every type in the task offers."
+        },
+        {
+          "active": ["clamp"],
+          "value": { "kind": "array", "label": "comes out", "values": ["one of the three"] },
+          "note": "The value comes back, or the end it went past."
+        }
+      ]
+    },
+    "fair": {
+      "steps": [
+        {
+          "active": ["ambrose->fair", "fair"],
+          "value": { "kind": "array", "label": "goes in", "values": ["quotes in whole pounds", "a floor", "a ceiling"] },
+          "note": "Ambrose hands over the quotes, with a floor and a ceiling that have pence."
+        },
+        {
+          "active": ["fair->clamp", "clamp"],
+          "note": "Each quote goes through the same keeping-between recipe, as a price with pence."
+        },
+        {
+          "active": ["fair->bill", "bill"],
+          "value": { "kind": "array", "label": "comes out", "values": ["one price per quote, in order"] },
+          "note": "The bill gets a fair price for every quote."
+        }
+      ]
+    }
+  }
+}
