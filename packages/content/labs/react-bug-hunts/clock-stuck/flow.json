@@ -1,0 +1,192 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "kwabena",
+        "label": "Kwabena",
+        "kind": "story"
+      },
+      {
+        "id": "timer",
+        "label": "Session timer",
+        "kind": "story"
+      },
+      {
+        "id": "gate",
+        "label": "Gate",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "state",
+        "label": "Seconds and count",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "buttons",
+        "label": "Gate buttons",
+        "kind": "story"
+      },
+      {
+        "id": "screen",
+        "label": "Poolside screen",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "gate",
+        "to": "timer",
+        "label": "starts"
+      },
+      {
+        "from": "timer",
+        "to": "state",
+        "label": "each second"
+      },
+      {
+        "from": "buttons",
+        "to": "state",
+        "label": "presses"
+      },
+      {
+        "from": "state",
+        "to": "gate",
+        "label": "draw"
+      },
+      {
+        "from": "gate",
+        "to": "screen",
+        "label": "clock, count"
+      },
+      {
+        "from": "kwabena",
+        "to": "buttons",
+        "label": "presses"
+      }
+    ],
+    "note": "The gate keeps the session clock and the swimmers in the water in state, and a timer and the buttons change them."
+  },
+  "tasks": {
+    "clock": {
+      "steps": [
+        {
+          "active": [
+            "gate",
+            "gate->screen",
+            "screen"
+          ],
+          "note": "The gate appears with a whole session on the clock.",
+          "value": {
+            "kind": "map",
+            "label": "Gate props",
+            "entries": [
+              {
+                "key": "sessionMinutes",
+                "value": "length of a session"
+              },
+              {
+                "key": "capacity",
+                "value": "most swimmers at once"
+              }
+            ]
+          }
+        },
+        {
+          "active": [
+            "gate",
+            "gate->timer",
+            "timer"
+          ],
+          "note": "When the gate appears, it starts one timer that runs every second."
+        },
+        {
+          "active": [
+            "timer",
+            "timer->state",
+            "state"
+          ],
+          "note": "Each second, the timer takes one second off the clock."
+        },
+        {
+          "active": [
+            "state",
+            "state->gate",
+            "gate",
+            "gate->screen",
+            "screen"
+          ],
+          "note": "The gate draws again and the clock goes down, until no seconds are left."
+        }
+      ]
+    },
+    "family": {
+      "steps": [
+        {
+          "active": [
+            "kwabena",
+            "kwabena->buttons",
+            "buttons"
+          ],
+          "note": "A family of two adults and two children comes to the gate, and Kwabena presses Family ticket."
+        },
+        {
+          "active": [
+            "buttons",
+            "buttons->state",
+            "state"
+          ],
+          "note": "Four swimmers go through the gate on one ticket."
+        },
+        {
+          "active": [
+            "state",
+            "gate",
+            "gate->screen",
+            "screen"
+          ],
+          "note": "The count shows four more, and never more than the pool takes."
+        }
+      ]
+    },
+    "steady": {
+      "steps": [
+        {
+          "active": [
+            "kwabena",
+            "kwabena->buttons",
+            "buttons",
+            "buttons->state"
+          ],
+          "note": "All session long staff press One in, Family ticket and One out."
+        },
+        {
+          "active": [
+            "state",
+            "state->gate",
+            "gate"
+          ],
+          "note": "Every press draws the gate again."
+        },
+        {
+          "active": [
+            "timer",
+            "timer->state",
+            "state"
+          ],
+          "note": "The one timer keeps running through those draws, a second at a time."
+        },
+        {
+          "active": [
+            "buttons",
+            "state",
+            "gate",
+            "screen"
+          ],
+          "note": "New session puts a whole session on the clock and empties the pool, and the clock counts down from there."
+        }
+      ]
+    }
+  }
+}

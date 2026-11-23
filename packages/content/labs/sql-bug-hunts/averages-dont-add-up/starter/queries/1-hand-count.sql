@@ -1,0 +1,7 @@
+-- Task 1: prove it. Clemency's sum by hand, for each channel.
+-- Return three columns, in this order:
+--   channel
+--   orders          how many orders came in on that channel
+--   takings_pence   what those orders came to, every line of every order added up
+-- One row per channel. Any order of rows.
+--   node run.mjs queries/1-hand-count.sql

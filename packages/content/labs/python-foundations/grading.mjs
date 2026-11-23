@@ -338,7 +338,12 @@ const BUILTINS = [
 function blockRunCause(error, blocks) {
   const m = error.message
   let found
-  if (blocks.data && (found = blocks.explain?.(error) ?? dataRunCause(error))) return found
+  if (
+    blocks.data &&
+    (found =
+      blocks.explain?.(error) ?? (blocks.text ? textRunCause(error) : null) ?? dataRunCause(error))
+  )
+    return found
   if (
     error.type === 'NameError' &&
     (found = /name '(\w+)' is not defined/.exec(m)) &&
@@ -1040,7 +1045,99 @@ function dataRunCause(error) {
   return null
 }
 
-const DATA_KINDS = { list: 'a list', tuple: 'a tuple', dict: 'a dictionary', set: 'a set' }
+// From the text issues on, a function works on text, files, CSV and JSON.
+
+const TEXT_METHODS =
+  'strip|lstrip|rstrip|lower|upper|title|replace|startswith|endswith|find|split|splitlines|zfill|rjust|ljust|center'
+
+/** What an error usually means in code that works on text and files, or null. */
+function textRunCause(error) {
+  const m = error.message
+  let found
+  if ((found = /^name '(Path|csv|json)' is not defined$/.exec(m))) {
+    return found[1] === 'Path'
+      ? 'Path comes from the pathlib module, and Python knows it only after a line that imports it from there has run'
+      : `${found[1]} is a module, and Python knows it only after a line that imports it has run`
+  }
+  if (/'str' object does not support item assignment/.test(m)) {
+    return 'text cannot be changed once it is made, not even one letter of it. A method such as replace or strip gives back a new text and leaves the old one as it was: keep what it gives back'
+  }
+  if ((found = /^'(\w+)' object has no attribute 'join'$/.exec(m)) && found[1] !== 'str') {
+    return `join is a method of text, and here it is called on ${dataKind(found[1])}. It is called on the text that goes between the parts, and the parts go inside its round brackets`
+  }
+  if ((found = new RegExp(`^'(\\w+)' object has no attribute '(${TEXT_METHODS})'$`).exec(m))) {
+    if (/TextIOWrapper/.test(found[1])) {
+      return `an open file is not its text, so it has no ${found[2]}. Read the text from the file first, or go through it line by line`
+    }
+    const what =
+      found[1] === 'list'
+        ? ' A list of texts is not a text: call the method on each text in it, in a loop'
+        : found[1] === 'NoneType'
+          ? ' None is what print gives back, and what a function gives back when it ends without return'
+          : ''
+    return `${found[2]} is a method of text, and here it is called on ${dataKind(found[1])}.${what}`
+  }
+  if ((found = /^'(?:_io\.)?TextIOWrapper' object (has no attribute '(\w+)'|is not subscriptable)/.exec(m))) {
+    return 'an open file is not its text. Read the text from the file first, or go through it line by line'
+  }
+  if ((found = /^sequence item (\d+): expected str instance, (\w+) found$/.exec(m))) {
+    return `join puts only texts together, and item ${found[1]} of what it was given is ${aKind(found[2])}. Turn each number into text before it is joined`
+  }
+  if ((found = /^invalid literal for int\(\) with base 10: (.*)$/s.exec(m))) {
+    return `int() was given ${found[1]}, and int() turns text into a number only when the text is the digits of a whole number, with nothing else but spaces around them. Take the number out of the text first`
+  }
+  if (/unsupported operand type\(s\) for \+: '(Posix|Windows)Path' and 'str'|unsupported operand type\(s\) for \+: 'str' and '(Posix|Windows)Path'/.test(m)) {
+    return '+ does not join a Path and a text. The lesson shows the one operator that joins a folder and a name into a Path'
+  }
+  if (/unsupported operand type\(s\) for \/: 'str' and 'str'/.test(m)) {
+    return 'a / between two texts divides, and text cannot be divided. A name is joined to a folder with / only when the folder is a Path'
+  }
+  if (error.type === 'FileNotFoundError') {
+    const path = /: '(.*)'$/.exec(m)?.[1]
+    return `there is no file at ${path ? `the path ${path}` : 'that path'}, and a file can be opened for reading only when it is there. When a file may not be there, ask whether it is before you open it`
+  }
+  if (error.type === 'IsADirectoryError' || (error.type === 'PermissionError' && !/^Check /.test(m) && /Errno 13/.test(m))) {
+    return 'the path is a folder, not a file. A file in a folder is the folder and the file name joined together'
+  }
+  if (error.type === 'UnicodeDecodeError') {
+    return 'the file holds a letter that Python cannot read in the encoding it used. Open it with encoding="utf-8", the encoding the file was saved in'
+  }
+  if (error.type === 'UnsupportedOperation' && /not writable/.test(m)) {
+    return 'the file was opened for reading, and the line writes to it. The second value given to open says what the file is opened for'
+  }
+  if (error.type === 'UnsupportedOperation' && /not readable/.test(m)) {
+    return 'the file was opened for writing, and the line reads from it. The second value given to open says what the file is opened for'
+  }
+  if (/I\/O operation on closed file/.test(m)) {
+    return 'the line reads or writes a file that is already closed. A file opened with with is closed as soon as the lines moved in under the with end: use the file inside that block'
+  }
+  if ((found = /^write\(\) argument must be str, not (\w+)$/.exec(m))) {
+    return `write takes only text, and here it was given ${dataKind(found[1])}. Turn it into one text first, its line end included`
+  }
+  if ((found = /^Object of type (\w+) is not JSON serializable$/.exec(m))) {
+    return `JSON has no way to write ${dataKind(found[1])}. It writes texts, numbers, True, False, None, lists and dictionaries`
+  }
+  if (/^the JSON object must be str, bytes or bytearray, not (TextIOWrapper|PosixPath|WindowsPath)$/.test(m)) {
+    return 'loads reads JSON from a text, and here it was given a file or a path. The json module has another function that reads from an open file'
+  }
+  if (error.type === 'JSONDecodeError') {
+    return 'what was read is not JSON. An empty file gives this too: a file opened with "w" is emptied the moment it is opened'
+  }
+  if (/^dump\(\) missing 1 required positional argument: 'fp'$/.test(m)) {
+    return 'json.dump writes into a file, and it was given only the value. It takes the value, then the open file'
+  }
+  return null
+}
+
+const DATA_KINDS = {
+  list: 'a list',
+  tuple: 'a tuple',
+  dict: 'a dictionary',
+  set: 'a set',
+  PosixPath: 'a Path',
+  WindowsPath: 'a Path',
+  TextIOWrapper: 'an open file'
+}
 /** The kind of a value with its article, lists, tuples, sets and dictionaries included. */
 export const dataKind = (type) => DATA_KINDS[type] ?? aKind(type)
 
@@ -1051,8 +1148,10 @@ export const set = (...items) => ({ '@set': items })
 const isObject = (x) => x !== null && typeof x === 'object' && !Array.isArray(x)
 
 function canon(x) {
+  // A number with a fraction is a float in Python, and comes back tagged as one.
+  if (typeof x === 'number' && !Number.isInteger(x)) return { '@float': x }
   if (Array.isArray(x)) return x.map(canon)
-  if (!isObject(x) || '@float' in x || '@other' in x) return x
+  if (!isObject(x) || '@float' in x || '@other' in x || '@path' in x) return x
   if ('@tuple' in x) return { '@tuple': x['@tuple'].map(canon) }
   if ('@set' in x) return { '@set': x['@set'].map(canon) }
   const pairs = '@dict' in x ? x['@dict'] : Object.entries(x)
@@ -1074,11 +1173,11 @@ function equalCanon(a, b) {
   if (Array.isArray(a) || Array.isArray(b)) {
     return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((v, i) => equalCanon(v, b[i]))
   }
-  for (const tag of ['@tuple', '@set', '@dict', '@float']) {
+  for (const tag of ['@tuple', '@set', '@dict', '@float', '@path']) {
     if (tag in a || tag in b) {
       if (!(tag in a && tag in b)) return false
       if (tag === '@tuple') return equalCanon(a[tag], b[tag])
-      if (tag === '@float') return a[tag] === b[tag]
+      if (tag === '@float' || tag === '@path') return a[tag] === b[tag]
       // Sets and dictionaries are equal whatever order their items are in, as in Python.
       return sameItems(a[tag], b[tag])
     }
@@ -1098,13 +1197,24 @@ export function pyLiteral(x) {
     return items.length === 1 ? `(${items[0]},)` : `(${items.join(', ')})`
   }
   if ('@set' in x) return x['@set'].length ? `{${x['@set'].map(pyLiteral).join(', ')}}` : 'set()'
+  if ('@path' in x) return `Path(${JSON.stringify(x['@path'])})`
   const pairs = '@dict' in x ? x['@dict'] : Object.entries(x)
   return `{${pairs.map(([k, v]) => `${pyLiteral(k)}: ${pyLiteral(v)}`).join(', ')}}`
 }
 
 /** The word for the kind of one of Check's values: list, tuple, set or dictionary. */
 export const noun = (x) =>
-  Array.isArray(x) ? 'list' : !isObject(x) ? 'value' : '@tuple' in x ? 'tuple' : '@set' in x ? 'set' : 'dictionary'
+  Array.isArray(x)
+    ? 'list'
+    : !isObject(x)
+      ? 'value'
+      : '@tuple' in x
+        ? 'tuple'
+        : '@set' in x
+          ? 'set'
+          : '@path' in x
+            ? 'Path'
+            : 'dictionary'
 
 const typeOfData = (x) =>
   x === null
@@ -1130,6 +1240,76 @@ export const dataCallText = (fn, c) =>
     ...Object.entries(c.kwargs ?? {}).map(([k, v]) => `${k}=${pyLiteral(v)}`)
   ].join(', ')})`
 
+const UTF8 = /^utf[-_]?8$/i
+
+/** What each file a case reads back holds after the call, for a check's output. */
+function fileLines(call) {
+  return Object.entries(call.files ?? {}).map(([rel, got]) => {
+    if (got === null) return `Afterwards, there is no file ${rel}`
+    if (got.bad) return `Afterwards, ${rel} holds something that is not UTF-8 text`
+    if (got.text === '') return `Afterwards, ${rel} is empty`
+    const all = got.text.split('\n')
+    const ends = got.text.endsWith('\n')
+    const shown = firstLines(ends ? all.slice(0, -1) : all)
+    return `Afterwards, ${rel} holds:\n${shown.join('\n')}${ends ? '' : '\n(no line end after the last line)'}`
+  })
+}
+
+/**
+ * Why a file task opened its files the wrong way, or null: a file the case did not give it (a
+ * name typed into the code), a file still open when it returned, a text file opened without
+ * encoding="utf-8", or for csv one opened without newline="". The files a case gives are the keys
+ * of `files` and `wrote`, and `paths` for a file it gives the place of without making it.
+ */
+function fileProblem(fn, c, call, csv) {
+  const given = new Set([...Object.keys(c.files), ...Object.keys(c.wrote ?? {}), ...(c.paths ?? [])])
+  const elsewhere = call.opened.find((o) => !given.has(o.path))
+  if (elsewhere) {
+    return `${fn} opened ${elsewhere.path}, a file Check did not give it. ${c.pathHint ?? 'Open the file at the path the function is given: a path written into the code, such as the name of a file in your workspace, opens the wrong file.'}`
+  }
+  if (call.left_open.length) {
+    return `${fn} left ${call.left_open[0]} open after it returned. A file opened on a with line is closed when the lines moved in under it end, even when something goes wrong; a file left open may not hold what was written to it yet.`
+  }
+  const plain = call.opened.find((o) => !o.binary && !UTF8.test(o.encoding ?? ''))
+  if (plain) {
+    return `${fn} opens ${plain.path} without encoding="utf-8". Without it Python reads and writes with the computer's own encoding, which is not UTF-8 on many Windows computers, so a letter such as é comes out wrong there. The task asks for it every time a file is opened.`
+  }
+  const lines = csv && call.opened.find((o) => !o.binary && o.newline !== '')
+  if (lines) {
+    const why = /[wax+]/.test(lines.mode)
+      ? 'or on Windows every row written is followed by an empty one'
+      : 'or a value with a line end inside its quotes is read wrongly'
+    return `${fn} opens ${lines.path} without newline="". The csv module reads and writes its own line ends, and Python's documentation says to open a CSV file with newline="", ${why}.`
+  }
+  return null
+}
+
+/**
+ * Why a file the case reads back does not hold what the task asks for, or null. `wrote` maps a
+ * file to the text it must hold, line ends as \n, a test of its text, or null when it must not be
+ * there; `fileHint`
+ * (a function of the file and its text) gives the task's own words.
+ */
+function wroteProblem(fn, c, call) {
+  for (const [rel, want] of Object.entries(c.wrote ?? {})) {
+    const got = call.files[rel]
+    const fits =
+      got && !got.bad && (typeof want === 'function' ? want(got.text) : got.text === want)
+    if (want === null ? got === null : fits) continue
+    if (want === null) return `${fn} made ${rel}, and the task says not to.`
+    if (got === null) return `After the call there is no file ${rel}: ${fn} did not write it.`
+    if (got.bad) return `After the call, ${rel} is not UTF-8 text. Open it with encoding="utf-8" and write text to it.`
+    const own = c.fileHint?.(rel, got.text, call)
+    if (own) return own
+    if (got.text === '') return `After the call, ${rel} is empty. Nothing written to it reached the file.`
+    if (typeof want === 'string' && got.text.replace(/\n/g, '') === want.replace(/\n/g, '')) {
+      return `After the call, ${rel} has the right words but not the right line ends. Each line ends with a line end, and write adds none of its own.`
+    }
+    return `After the call, ${rel} does not hold what the task asks for. Compare it with the task line by line.`
+  }
+  return null
+}
+
 /**
  * Like callCases, for functions that take and give back lists, tuples, sets and dictionaries.
  * Each case has `args`, `expected` (what the function gives back, compared as a value; left out,
@@ -1146,8 +1326,21 @@ export const dataCallText = (fn, c) =>
  * task's own answers. `errors(error)` gives the task's own words for an error, or null.
  * `fresh` (true, or the words to say) fails a case whose result is right but is one of the
  * arguments themselves, where the task asks for a new list.
+ * `text` adds the words for the errors of text, files, CSV and JSON. A case with `files` is a file
+ * task: see fileProblem and wroteProblem.
  */
-export async function dataCases(t, { file, task, fn, list, mistakes = [], typed, define, errors }) {
+export async function dataCases(t, {
+  file,
+  task,
+  fn,
+  list,
+  mistakes = [],
+  typed,
+  define,
+  errors,
+  text = false,
+  csv = false
+}) {
   const runs = await Promise.all(
     list.map((c) =>
       runFile(t, file, {
@@ -1155,11 +1348,20 @@ export async function dataCases(t, { file, task, fn, list, mistakes = [], typed,
         blocks: true,
         data: true,
         define,
-        call: { name: fn, args: c.args ?? [], kwargs: c.kwargs ?? {} }
+        call: {
+          name: fn,
+          args: c.args ?? [],
+          kwargs: c.kwargs ?? {},
+          ...(c.files && { files: c.files, read: Object.keys(c.wrote ?? {}) })
+        }
       })
     )
   )
-  if (errors) for (const r of runs) if (r.blocks) r.blocks.explain = errors
+  for (const r of runs) {
+    if (!r.blocks) continue
+    if (errors) r.blocks.explain = errors
+    if (text || list.some((c) => c.files)) r.blocks.text = true
+  }
   for (const r of runs) {
     const p = shared(r, file, task)
     if (p) return [p]
@@ -1220,6 +1422,12 @@ export async function dataCases(t, { file, task, fn, list, mistakes = [], typed,
     if (call.stopped) {
       return fail(c.name, stoppedText(call.stopped, shown, 'it'), `Check called ${shown}\n${told}`)
     }
+    const held = c.files ? fileLines(call) : []
+    const opened = c.files && fileProblem(fn, c, call, csv)
+    if (opened) {
+      const what = call.error ? call.error.shown : `It gave back: ${call.returned.repr}`
+      return fail(c.name, opened, [`Check called ${shown}`, what, ...held].join('\n'))
+    }
     if (call.error) {
       const at = call.error.line ? ` at line ${call.error.line}` : ''
       return fail(
@@ -1244,9 +1452,11 @@ export async function dataCases(t, { file, task, fn, list, mistakes = [], typed,
           : null
       )
       .filter(Boolean)
-    const output = [`Check called ${shown}`, `It gave back: ${v.repr}`, ...afterLines, told].join('\n')
+    const output = [`Check called ${shown}`, `It gave back: ${v.repr}`, ...afterLines, ...held, told].join('\n')
     const wrongResult = c.expected !== undefined && !equalData(v.data, c.expected)
     const k = wrongAfter.findIndex(Boolean)
+    const wrote = !wrongResult && k < 0 && c.files && wroteProblem(fn, c, call)
+    if (wrote) return fail(c.name, wrote, output)
     if (!wrongResult && k < 0) {
       if (!(c.fresh && Number.isInteger(v.same))) return pass(c.name, output)
       return fail(

@@ -1,0 +1,86 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "stall", "label": "Market stall sales", "kind": "story" },
+      { "id": "orders", "label": "orders", "kind": "data" },
+      { "id": "customers", "label": "customers", "kind": "data" },
+      { "id": "queries", "label": "Your queries", "kind": "file", "mine": true },
+      { "id": "perpetua", "label": "Perpetua", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "stall", "to": "orders", "label": "no customer" },
+      { "from": "orders", "to": "queries", "label": "customer ids" },
+      { "from": "customers", "to": "queries", "label": "rows" },
+      { "from": "queries", "to": "perpetua", "label": "lists, counts" }
+    ],
+    "note": "Market sales have no customer, and those empty cells quietly remove people from Perpetua's lists and counts."
+  },
+  "tasks": {
+    "prove-it": {
+      "steps": [
+        {
+          "active": ["stall", "stall->orders", "orders"],
+          "note": "Sales at the stall are typed in after market day, with the date and no customer."
+        },
+        {
+          "active": ["orders", "orders->queries", "queries"],
+          "note": "The win-back list reads the customer of every order since September, empty cells included."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["id", "placed_at", "channel"],
+            "cells": [["an order", "when it was placed", "how it came in"]]
+          },
+          "note": "The orders with no customer are the proof Perpetua needs."
+        }
+      ]
+    },
+    "fix-win-back": {
+      "steps": [
+        {
+          "active": ["orders", "orders->queries", "queries"],
+          "note": "Only real customer ids go into the list of people who ordered since September."
+        },
+        {
+          "active": ["customers", "customers->queries", "queries"],
+          "note": "Every customer not in that list stays, those who never ordered included."
+        },
+        {
+          "active": ["queries", "queries->perpetua", "perpetua"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["customer", "email"],
+            "cells": [["a customer's name", "their email, or NULL"]]
+          },
+          "note": "Perpetua has her win-back list again."
+        }
+      ]
+    },
+    "catalogues": {
+      "steps": [
+        {
+          "active": ["customers", "customers->queries", "queries"],
+          "note": "Each customer said yes, said no, or was never asked."
+        },
+        {
+          "active": ["queries"],
+          "note": "Only a no keeps a customer off the print run; nobody asked still gets a catalogue, and is counted."
+        },
+        {
+          "active": ["queries", "queries->perpetua", "perpetua"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["town", "catalogues"],
+            "cells": [["a town", "a count"]]
+          },
+          "note": "The printer gets the right number for every town."
+        }
+      ]
+    }
+  }
+}

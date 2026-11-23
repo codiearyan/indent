@@ -1,0 +1,65 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "kwabena",
+        "label": "Kwabena",
+        "kind": "story"
+      },
+      {
+        "id": "agnieszka",
+        "label": "Agnieszka",
+        "kind": "story"
+      },
+      {
+        "id": "imelda",
+        "label": "Imelda",
+        "kind": "story"
+      },
+      {
+        "id": "system",
+        "label": "Membership system",
+        "kind": "story"
+      },
+      {
+        "id": "screens",
+        "label": "Your desk screens",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "desk",
+        "label": "Desk screen",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "kwabena",
+        "to": "screens",
+        "label": "BL-31, BL-40"
+      },
+      {
+        "from": "agnieszka",
+        "to": "screens",
+        "label": "BL-36, BL-44"
+      },
+      {
+        "from": "imelda",
+        "to": "screens",
+        "label": "BL-47"
+      },
+      {
+        "from": "system",
+        "to": "screens",
+        "label": "answers"
+      },
+      {
+        "from": "screens",
+        "to": "desk",
+        "label": "what staff see"
+      }
+    ],
+    "note": "Five tickets from around the lido, and for each one you see the bug on the page, mend its cause in the screen it lives in and keep the fix steady while the desk is busy."
+  }
+}

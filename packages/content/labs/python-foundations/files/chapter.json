@@ -1,0 +1,128 @@
+{
+  "id": "files",
+  "title": "Reading and writing files",
+  "files": ["night_log.py", "radio_log.txt"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to read tonight's log, start a new one and look up the log of one night.",
+    "suggestedCommand": "python3 night_log.py"
+  },
+  "tasks": [
+    {
+      "id": "read",
+      "title": "Read the whole log",
+      "file": "night_log.py",
+      "description": "Under `# Task 1` in `night_log.py`, write a function called `log_text` that takes the path of a log file, as text, and gives back everything in the file as one text, line ends included. Open the file on a `with` line, with `encoding=\"utf-8\"`. Print what it gives back for `\"radio_log.txt\"`.\n\nCheck makes log files of its own in a copy of your workspace, an empty one and one with letters such as Ì among them, calls `log_text` with each one's path, and looks at what it gives back and at whether the file was closed.",
+      "nextSteps": [
+        "Read the part of the lesson on opening a file.",
+        "Open the file at the path the function is given, on a with line.",
+        "Read all of it, inside the with block.",
+        "Give back what you read."
+      ],
+      "hints": [
+        "Use the path the function is given, not the name of the file in your workspace: Check gives it other files.",
+        "`with open(...) as name:` opens the file and closes it when the lines moved in under it end. `read()` gives back the whole file as one text, and a second `read()` gives back empty text.",
+        "The shape is `with open(path, encoding=\"utf-8\") as log:` with `return log.read()` moved in under it."
+      ],
+      "docs": [
+        { "title": "Reading and writing files", "url": "https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files" },
+        { "title": "open()", "url": "https://docs.python.org/3/library/functions.html#open" }
+      ],
+      "videos": [
+        { "title": "Reading and writing files", "url": "https://www.youtube.com/watch?v=Uh2ebFW8OYM" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "entries",
+      "title": "The log, entry by entry",
+      "file": "night_log.py",
+      "description": "Under `# Task 2`, write a function called `log_entries` that takes the path of a log file, as text, and gives back a list of its entries, in order: each line without the spaces and line end at its ends, and blank lines left out. For `\"radio_log.txt\"` it gives back four entries. Open the file on a `with` line, with `encoding=\"utf-8\"`. Print what it gives back for `\"radio_log.txt\"`.\n\nCheck makes log files of its own, one with no line end after its last line and one saved on Windows, calls `log_entries` with each one's path, and looks at what it gives back and at whether the file was closed.",
+      "nextSteps": [
+        "Read the part of the lesson on going through a file line by line.",
+        "Make an empty list, then open the file and go through it with for.",
+        "Strip each line, and add it to the list when something is left.",
+        "Give back the list after the with block."
+      ],
+      "hints": [
+        "Each line a for loop gives you keeps its line end, except perhaps the last line of the file. Cutting off the last character cuts a letter off a last line that has no line end.",
+        "`strip()` takes off the line end and spaces, whatever is there. An empty text after stripping was a blank line.",
+        "The shape is `for line in log:` with `entry = line.strip()` and `if entry != \"\":` and `entries.append(entry)` moved in under it, inside the `with` block."
+      ],
+      "docs": [
+        { "title": "Methods of file objects", "url": "https://docs.python.org/3/tutorial/inputoutput.html#methods-of-file-objects" },
+        { "title": "str.strip()", "url": "https://docs.python.org/3/library/stdtypes.html#str.strip" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "write",
+      "title": "Start a new log",
+      "file": "night_log.py",
+      "description": "Under `# Task 3`, write a function called `start_log` that takes the path of a file, as text, and a title, and makes that file hold only the title on one line, followed by a line end. Whatever the file held before is gone, and a file that is not there yet is made. It gives nothing back. Open the file on a `with` line, with `encoding=\"utf-8\"`. Call it for `\"tonight.txt\"` and `\"Callout log, 3 December\"`.\n\nCheck calls `start_log` with paths of its own, some for a file that already holds an old log and one for a file that is not there yet, and reads each file back afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on writing to a file.",
+        "Open the file for writing, the kind that empties it first.",
+        "Write the title and a line end.",
+        "Open tonight.txt in the editor after running the file to see what it holds."
+      ],
+      "hints": [
+        "The second value given to `open` says what the file is opened for. One of them keeps what is there and writes after it; the one this task needs empties the file first.",
+        "`\"w\"` empties the file, or makes it, before writing. `write` adds no line end of its own, so the line end is part of the text you write.",
+        "The shape is `with open(path, \"w\", encoding=\"utf-8\") as log:` with `log.write(title + \"\\n\")` moved in under it."
+      ],
+      "docs": [
+        { "title": "open() modes", "url": "https://docs.python.org/3/library/functions.html#open" },
+        { "title": "Reading and writing files", "url": "https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "append",
+      "title": "Add an entry",
+      "file": "night_log.py",
+      "description": "Under `# Task 4`, write a function called `add_entry` that takes the path of a log file, as text, and one entry, and adds the entry as a new line at the end of the file, followed by a line end. Everything the file held before stays as it was. It gives nothing back. Open the file on a `with` line, with `encoding=\"utf-8\"`. Call it for `\"tonight.txt\"` and `\"21:02 BRAVO TWO: leaving the base\"`, then look at `tonight.txt`.\n\nCheck calls `add_entry` with log files of its own, an empty one too, and reads each file back afterwards. Every file it gives ends with a line end, or is empty.",
+      "nextSteps": [
+        "Read the part of the lesson on adding to the end of a file.",
+        "Open the file for adding, the kind that keeps what is there.",
+        "Write the entry and a line end.",
+        "Run the file twice and look at tonight.txt each time."
+      ],
+      "hints": [
+        "Opening a file with `\"w\"` empties it first, so the old entries are lost.",
+        "`\"a\"` opens a file for adding to its end and keeps what it holds. The line end is still yours to write.",
+        "The shape is `with open(path, \"a\", encoding=\"utf-8\") as log:` with `log.write(entry + \"\\n\")` moved in under it."
+      ],
+      "docs": [
+        { "title": "open() modes", "url": "https://docs.python.org/3/library/functions.html#open" },
+        { "title": "Methods of file objects", "url": "https://docs.python.org/3/tutorial/inputoutput.html#methods-of-file-objects" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "folder",
+      "title": "The log for one day",
+      "file": "night_log.py",
+      "description": "Under `# Task 5`, write the line that imports `Path` from `pathlib`. Then write a function called `day_entries` that takes a folder, as a `Path`, and a day as text, such as `\"2026-12-01\"`. That day's log is the file named the day and `.txt`, in that folder. It gives back the entries of that file, as `log_entries` gives them, or an empty list when the folder has no file for that day. Ask whether the file is there before you open it. You may use your `log_entries`. Print what it gives back for `Path(\"logs\")` and `\"2026-12-02\"`, and for `Path(\"logs\")` and `\"2026-12-25\"`.\n\nCheck makes folders and logs of its own, calls `day_entries` for days with a log and a day without one, and looks at what it gives back and at which file it opened. It gives your file its own `log_entries` first, so a mistake in Task 2 does not count here.",
+      "nextSteps": [
+        "Read the part of the lesson on paths.",
+        "Write the import line under the Task 5 comment.",
+        "Join the folder and the file's name into one Path.",
+        "Ask whether that file is there: give back an empty list when it is not, and its entries when it is."
+      ],
+      "hints": [
+        "A `Path` cannot be joined to text with `+`. The file's name is the day followed by `.txt`.",
+        "A `/` between a `Path` and a name gives the Path of that name in the folder, and the Path's `exists()` method says whether a file is there.",
+        "The shape is `path = folder / f\"{day}.txt\"`, then `if not path.exists():` with `return []` under it, and `return log_entries(path)`."
+      ],
+      "docs": [
+        { "title": "pathlib", "url": "https://docs.python.org/3/library/pathlib.html" },
+        { "title": "Path.exists()", "url": "https://docs.python.org/3/library/pathlib.html#pathlib.Path.exists" },
+        { "title": "The import statement", "url": "https://docs.python.org/3/tutorial/modules.html#more-on-modules" }
+      ],
+      "videos": [
+        { "title": "Paths with pathlib", "url": "https://www.youtube.com/watch?v=yxa-DJuuTBI" }
+      ],
+      "points": 10
+    }
+  ]
+}

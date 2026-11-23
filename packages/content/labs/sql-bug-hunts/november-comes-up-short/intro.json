@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Clemency",
+      "say": "Why are card takings short?",
+      "note": "A few pounds off. MF-18."
+    },
+    {
+      "title": "Card company",
+      "text": "Pays out every card payment of the month.",
+      "note": "Cash matches; cards do not."
+    },
+    {
+      "title": "Your query",
+      "file": "2-takings.sql",
+      "mine": true,
+      "gap": "Stops before the last day ends",
+      "tasks": [
+        "Show what is missing",
+        "Fix the takings",
+        "Fix the top three"
+      ]
+    },
+    {
+      "title": "Month-end books",
+      "text": "Takings per method, to the penny.",
+      "note": "Checked against the bank."
+    }
+  ],
+  "ticket": {
+    "label": "Cards",
+    "wrong": "a bit short",
+    "why": "Missed a day",
+    "right": "match to the penny"
+  },
+  "captions": [
+    "At Mallowfield Seeds, Clemency finds November's card takings short of the card company's.",
+    "Cash matches, but the report stops before most of the last day is over.",
+    "You show what is missing, then fix the takings and the seeds of the year.",
+    "Now November's card takings match the card company's to the penny.",
+    "Same payments, same month. Every edge of a report is where it should be."
+  ]
+}

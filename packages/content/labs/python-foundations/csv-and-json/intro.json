@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dougie", "say": "What is running low on the list?", "note": "The list lives in a spreadsheet." },
+    { "title": "kit.csv", "text": "Rows of text, read by eye, one by one." },
+    {
+      "title": "Your functions",
+      "file": "kit_files.py",
+      "mine": true,
+      "gap": "A file only people can read",
+      "tasks": ["Names off the list", "What is running low", "Save as CSV and JSON", "Load the positions"]
+    },
+    { "title": "Store", "say": "Order more before the weekend.", "note": "Read straight off the file." }
+  ],
+  "ticket": { "label": "Low kit", "wrong": "found too late", "why": "Read by eye", "right": "on the order" },
+  "captions": [
+    "At the store, Dougie asks what on the kit list is running low.",
+    "Today the list is a CSV file read by eye, so low kit is found too late.",
+    "You read and write CSV rows and JSON with the csv and json modules.",
+    "Now what is running low comes off the file, and the store is saved for tomorrow.",
+    "The kit list and the store are files the laptop reads and saves, ready for tomorrow."
+  ]
+}

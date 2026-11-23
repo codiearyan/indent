@@ -1,0 +1,127 @@
+{
+  "id": "csv-and-json",
+  "title": "Data files: CSV and JSON",
+  "files": ["kit_files.py", "kit.csv", "positions.json"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to read the kit list, save the store as CSV and JSON, and load the teams' positions.",
+    "suggestedCommand": "python3 kit_files.py"
+  },
+  "tasks": [
+    {
+      "id": "names",
+      "title": "Every kind of kit",
+      "file": "kit_files.py",
+      "description": "Under `# Task 1` in `kit_files.py`, write the line that imports `csv`. Then write a function called `kit_names` that takes the path of a CSV file of kit, as text, and gives back a list of the first value of every row, in order, the heading row left out. A name may have a comma in it, inside quotes in the file. Open the file on a `with` line, with `encoding=\"utf-8\"` and `newline=\"\"`. For `\"kit.csv\"` it gives back five names, the first `rope`. Print what it gives back for `\"kit.csv\"`.\n\nCheck makes CSV files of its own, one with a name that has a comma in it and one with only a heading row, calls `kit_names` with each one's path, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on reading rows.",
+        "Write the import line, then open the file as the task says.",
+        "Read every row with the csv module, and leave out the first.",
+        "Give back the first value of each row that is left."
+      ],
+      "hints": [
+        "Splitting each line at its commas breaks a name that has a comma inside quotes. The csv module knows about the quotes.",
+        "`csv.reader` gives each row as a list of texts, the heading row first. `list()` turns all of them into one list, and a slice from 1 leaves out the first.",
+        "The shape is `rows = list(csv.reader(kit))` inside the `with` block, then `for row in rows[1:]:` with `names.append(row[0])`."
+      ],
+      "docs": [
+        { "title": "csv.reader()", "url": "https://docs.python.org/3/library/csv.html#csv.reader" },
+        { "title": "The csv module", "url": "https://docs.python.org/3/library/csv.html" }
+      ],
+      "videos": [
+        { "title": "Reading and writing CSV files", "url": "https://www.youtube.com/watch?v=q5uM4VKywbA" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "low",
+      "title": "What is running low",
+      "file": "kit_files.py",
+      "description": "Under `# Task 2`, write a function called `low_kit` that takes the path of a CSV file of kit, as text, and a smallest number. Read the file with `csv.DictReader`, and give back a list of the `item` of every row whose `count` is less than that number, in the order of the file. The columns may come in any order, so read each value by its heading. Open the file as in Task 1. For `\"kit.csv\"` and `5` it gives back `['splint, small', 'stretcher']`. Print what it gives back for `\"kit.csv\"` and `5`.\n\nCheck makes CSV files of its own, one with its columns in another order, calls `low_kit` with each one's path and numbers of its own, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on rows as dictionaries.",
+        "Go through the rows csv.DictReader gives, each a dictionary keyed by the headings.",
+        "Turn each count into a number before you compare it.",
+        "Add the item when its count is less than the number, and give back the list."
+      ],
+      "hints": [
+        "Everything read from a CSV file is text, the numbers too, and text cannot be compared with a number.",
+        "`csv.DictReader` uses the heading row as the keys, so `row[\"count\"]` is the count whatever column it is in. `int()` turns it into a number.",
+        "The shape is `for row in csv.DictReader(kit):` with `if int(row[\"count\"]) < smallest:` and `low.append(row[\"item\"])` moved in under it."
+      ],
+      "docs": [
+        { "title": "csv.DictReader", "url": "https://docs.python.org/3/library/csv.html#csv.DictReader" },
+        { "title": "int()", "url": "https://docs.python.org/3/library/functions.html#int" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "save",
+      "title": "Save the store as a CSV file",
+      "file": "kit_files.py",
+      "description": "Under `# Task 3`, write a function called `save_kit` that takes the path of a file, as text, and a store, a dictionary of each kind of kit and how many there are. It writes the store to that file as CSV with `csv.writer`: a heading row of `item` and `count`, then one row for each kind and its count, in the store's order. Anything the file held before is gone. It gives nothing back. Open the file on a `with` line, with `encoding=\"utf-8\"` and `newline=\"\"`. Call it for `\"store.csv\"` and `store`, then look at `store.csv`.\n\nCheck calls `save_kit` with paths and stores of its own, one kind with a comma in its name and one file that already holds an old list, and reads each file back afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on writing rows.",
+        "Open the file for writing as the task says, and make a csv.writer for it.",
+        "Write the heading row, then a row for each kind and its count.",
+        "Open store.csv in the editor and look at the kind with a comma in its name."
+      ],
+      "hints": [
+        "Writing each line yourself with a comma between the values goes wrong for a name that has a comma in it: csv.writer puts such a value in quotes.",
+        "A `csv.writer` made for the open file has `writerow`, which takes one row as a list and writes it with its line end. Go through the store with `.items()`.",
+        "The shape is `writer = csv.writer(kit)`, `writer.writerow([\"item\", \"count\"])`, then `for item, count in store.items():` with `writer.writerow([item, count])`."
+      ],
+      "docs": [
+        { "title": "csv.writer()", "url": "https://docs.python.org/3/library/csv.html#csv.writer" },
+        { "title": "Writer objects", "url": "https://docs.python.org/3/library/csv.html#writer-objects" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "dump",
+      "title": "Save the store as JSON",
+      "file": "kit_files.py",
+      "description": "Under `# Task 4`, write the line that imports `json`. Then write a function called `save_store` that takes the path of a file, as text, and a store, and writes the store to that file as JSON with `json.dump`. Anything the file held before is gone. It gives nothing back. Open the file on a `with` line, with `encoding=\"utf-8\"`. Call it for `\"store.json\"` and `store`, then look at `store.json`.\n\nCheck calls `save_store` with paths and stores of its own, one file that already holds an old store, and reads each file back as JSON afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on writing JSON.",
+        "Write the import line.",
+        "Open the file for writing, and dump the store into it.",
+        "Open store.json in the editor and compare it with the store."
+      ],
+      "hints": [
+        "`json.dumps` gives back the JSON as text and writes nothing anywhere. The function that writes into a file has no s at the end.",
+        "`json.dump` takes the value first, then the open file. Text made with `str()` of a dictionary is not JSON: JSON wants double quotes.",
+        "The shape is `with open(path, \"w\", encoding=\"utf-8\") as saved:` with `json.dump(store, saved)` moved in under it."
+      ],
+      "docs": [
+        { "title": "json.dump()", "url": "https://docs.python.org/3/library/json.html#json.dump" },
+        { "title": "Saving structured data with json", "url": "https://docs.python.org/3/tutorial/inputoutput.html#saving-structured-data-with-json" }
+      ],
+      "videos": [
+        { "title": "Working with JSON", "url": "https://www.youtube.com/watch?v=9N6a-VLBa2I" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "load",
+      "title": "Load the positions",
+      "file": "kit_files.py",
+      "description": "Under `# Task 5`, write a function called `load_positions` that takes the path of a JSON file, as text, which holds an object of each call sign and its position as two numbers, east then north. Read it with `json.load`, and give back a new dictionary of each call sign and its position as a tuple `(east, north)`. Open the file on a `with` line, with `encoding=\"utf-8\"`. For `\"positions.json\"` it gives back `{'BRAVO TWO': (166, 712), 'ECHO ONE': (204, 698)}`. Print what it gives back for `\"positions.json\"`.\n\nCheck makes JSON files of its own, calls `load_positions` with each one's path, and looks at what it gives back: the positions must be tuples.",
+      "nextSteps": [
+        "Read the part of the lesson on reading JSON back.",
+        "Load the file with json.load and print what you get: look at the brackets around each position.",
+        "Make a new dictionary, and go through what you loaded with .items().",
+        "Put each position in as a tuple of its two numbers."
+      ],
+      "hints": [
+        "JSON has no tuples. A tuple written as JSON becomes a list, so it comes back as a list.",
+        "Go through the loaded dictionary with `.items()` and store `(position[0], position[1])` under each call sign in a new dictionary.",
+        "The shape is `loaded = json.load(saved)` inside the `with` block, then `positions = {}`, `for sign, position in loaded.items():` with `positions[sign] = (position[0], position[1])`, and `return positions`."
+      ],
+      "docs": [
+        { "title": "json.load()", "url": "https://docs.python.org/3/library/json.html#json.load" },
+        { "title": "JSON and Python types", "url": "https://docs.python.org/3/library/json.html#py-to-json-table" }
+      ],
+      "points": 10
+    }
+  ]
+}
