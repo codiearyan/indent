@@ -1,0 +1,154 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "tin", "label": "A tin", "kind": "data" },
+      { "id": "cell", "label": "cell()", "kind": "function", "mine": true, "fn": "cell" },
+      {
+        "id": "size",
+        "label": "tinsOfSize()",
+        "kind": "function",
+        "mine": true,
+        "fn": "tinsOfSize"
+      },
+      { "id": "update", "label": "updateTin()", "kind": "function", "mine": true },
+      { "id": "parts", "label": "withId()", "kind": "function", "mine": true, "fn": "withId" },
+      { "id": "imogen", "label": "Imogen's stock sheet", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "tin", "to": "cell", "label": "its names" },
+      { "from": "tin", "to": "size", "label": "its sizes" },
+      { "from": "tin", "to": "update", "label": "any part" },
+      { "from": "tin", "to": "parts", "label": "all but id" },
+      { "from": "cell", "to": "imogen", "label": "columns" },
+      { "from": "size", "to": "imogen", "label": "tins" },
+      { "from": "update", "to": "imogen", "label": "a new tin" },
+      { "from": "parts", "to": "imogen", "label": "a new tin" }
+    ],
+    "note": "Every type around a tin is made from Tin, so a change to Tin reaches all of them at once."
+  },
+  "tasks": {
+    "fields": {
+      "trace": {
+        "file": "src/catalogue.ts",
+        "call": "cell",
+        "args": [
+          { "id": "T-01", "blend": "Hearth Assam", "size": 125, "pence": 650, "stock": 14 },
+          "blend"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["tin", "tin->cell"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "tin", "value": "a Tin" },
+              { "key": "field", "value": "the name of one of its properties" }
+            ]
+          },
+          "note": "Imogen's stock sheet asks for the blend of the Hearth Assam tin."
+        },
+        {
+          "active": ["cell"],
+          "note": "Only a name the tin really has is let in, and the list of names comes from the tin itself."
+        },
+        {
+          "active": ["cell", "cell->imogen", "imogen"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "cell", "value": "text" }]
+          },
+          "note": "The column gets the blend as text."
+        }
+      ]
+    },
+    "size": {
+      "trace": {
+        "file": "src/catalogue.ts",
+        "call": "tinsOfSize",
+        "args": [
+          [
+            { "id": "T-01", "blend": "Hearth Assam", "size": 125, "pence": 650, "stock": 14 },
+            { "id": "T-02", "blend": "Frost Sencha", "size": 50, "pence": 720, "stock": 4 },
+            { "id": "T-03", "blend": "Ember Oolong", "size": 50, "pence": 890, "stock": 7 }
+          ],
+          50
+        ]
+      },
+      "steps": [
+        {
+          "active": ["tin", "tin->size"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "tins", "value": "a list of Tin" },
+              { "key": "size", "value": "a size a tin can have" }
+            ]
+          },
+          "note": "Imogen asks for the 50 g tins on the shelf."
+        },
+        {
+          "active": ["size"],
+          "note": "The sizes it takes are read from Tin, so a size the shop does not sell is refused before it runs."
+        },
+        {
+          "active": ["size", "size->imogen", "imogen"],
+          "note": "The sheet lists the tins of that size."
+        }
+      ]
+    },
+    "update": {
+      "steps": [
+        {
+          "active": ["tin", "tin->update"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "tin", "value": "a Tin" },
+              { "key": "changes", "value": "any properties of a tin" }
+            ]
+          },
+          "note": "Bryn counts nine tins of Frost Sencha, so only its stock changes."
+        },
+        {
+          "active": ["update"],
+          "note": "Every property of a tin may be changed, none has to be, and each keeps its type."
+        },
+        {
+          "active": ["update", "update->imogen", "imogen"],
+          "note": "The sheet gets a new tin with the new stock, and the old one is left as it was."
+        }
+      ]
+    },
+    "parts": {
+      "trace": {
+        "file": "src/catalogue.ts",
+        "call": "withId",
+        "args": [{ "blend": "Smoky Lapsang", "size": 250, "pence": 1150, "stock": 6 }, "T-07"]
+      },
+      "steps": [
+        {
+          "active": ["tin", "tin->parts"],
+          "value": {
+            "kind": "map",
+            "label": "what the form sends",
+            "entries": [{ "key": "new tin", "value": "everything a tin has but its id" }]
+          },
+          "note": "The stock form sends a new tin of Smoky Lapsang, without an id yet."
+        },
+        {
+          "active": ["parts"],
+          "note": "The tin gets its id, and becomes a whole tin."
+        },
+        {
+          "active": ["parts", "parts->imogen", "imogen"],
+          "note": "The new tin joins the sheet, and its label needs only the blend and the size."
+        }
+      ]
+    }
+  }
+}
