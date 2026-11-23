@@ -25,11 +25,11 @@ with open("bookings.txt", encoding="utf-8") as bookings:
 print(text)
 ```
 
-The `with` line opens the file and closes it again as soon as the lines moved in under it end, even if one of them stops with an error. A file that is never closed may not hold what was written to it yet, and on some systems no other program can open it, so open every file on a `with` line. Using the file after the `with` block stops with `ValueError: I/O operation on closed file.`
+The `with` line opens the file and closes it again as soon as the lines moved in under it end, even if one of them stops with an error. A file that is never closed may not hold what was written to it yet, and on Windows another program may not be able to move or delete it, so open every file on a `with` line. Using the file after the `with` block stops with `ValueError: I/O operation on closed file.`
 
 A file is read from where the last read stopped. Call `read()` twice in the same block and the second gives back empty text. A path to a file that is not there stops with `FileNotFoundError: [Errno 2] No such file or directory`.
 
-`encoding="utf-8"` says how the letters were saved. Without it Python uses the computer's own encoding, which is UTF-8 on a Mac or Linux and often something else on Windows, so a letter such as é comes out wrong there, or stops with a `UnicodeDecodeError`, which means the file holds bytes that are not letters in the encoding Python used.
+`encoding="utf-8"` says how the letters were saved. Without it Python uses the computer's own encoding, which is usually UTF-8 on a Mac or Linux and often something else on Windows, so a letter such as é comes out wrong there, or stops with a `UnicodeDecodeError`, which means the file holds bytes that are not letters in the encoding Python used.
 
 ## Line by line
 

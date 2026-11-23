@@ -18,8 +18,10 @@ function rowWords(fn, got, hill, callouts, hours) {
   const want = row(hill, callouts, hours)
   const width = Math.max(14, hill.length)
   const last = got.trim().split(/\s+/).at(-1)
-  if (last !== fixed(hours) && Number(last) === hours)
-    return `${fn} shows the hours as Python prints them, not with exactly one decimal place.`
+  if (last !== fixed(hours) && Number(last) === hours) {
+    const places = (last.split('.')[1] ?? '').length
+    return `${fn} shows the hours with ${places ? places : 'no'} decimal place${places === 1 ? '' : 's'}, and the task asks for exactly one, rounded.`
+  }
   if (got.replace(/\s/g, '') !== want.replace(/\s/g, ''))
     return `${fn} does not give back the hill, the callouts and the hours, in that order.`
   if (got.trim() !== got && got.length === want.length + 1) return `${fn} has a space too many.`

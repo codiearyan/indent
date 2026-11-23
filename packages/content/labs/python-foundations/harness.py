@@ -372,6 +372,10 @@ def shown_path(path, root):
     return pathlib.Path(real).as_posix()
 
 
+class Default(str):
+    """An encoding Python chose because the code gave none."""
+
+
 class Opens:
     """Notes every file opened while it is on, through open() and pathlib alike, and keeps each
     file object, so one the function left open is still open when the call returns."""
@@ -384,6 +388,7 @@ class Opens:
 
     def __enter__(self):
         real = self.real
+        real_default = self.real_default = getattr(io, 'text_encoding', None)
 
         def tracked(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None,
                     closefd=True, opener=None):
@@ -392,19 +397,30 @@ class Opens:
                     'path': shown_path(file, self.root),
                     'mode': mode if isinstance(mode, str) else repr(mode),
                     'binary': isinstance(mode, str) and 'b' in mode,
-                    'encoding': encoding if isinstance(encoding, str) else None,
+                    'encoding': encoding if type(encoding) is str else None,
                     'newline': newline if isinstance(newline, str) else None
                 })
+            if isinstance(encoding, Default):
+                encoding = str(encoding)
             f = real(file, mode, buffering, encoding, errors, newline, closefd, opener)
             if not isinstance(file, int):
                 self.kept.append((self.list[-1]['path'], f))
             return f
 
+        # From 3.10 pathlib fills in a missing encoding through io.text_encoding before it opens,
+        # as "utf-8" in UTF-8 mode: marked here, it counts as missing on every Python.
+        def default(encoding, stacklevel=2):
+            return Default(real_default(None)) if encoding is None else encoding
+
         builtins.open = io.open = tracked
+        if real_default:
+            io.text_encoding = default
         return self
 
     def __exit__(self, *exc):
         builtins.open = io.open = self.real
+        if self.real_default:
+            io.text_encoding = self.real_default
         return False
 
     def left_open(self):

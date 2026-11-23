@@ -91,7 +91,8 @@ export const checks = {
       ['Casualty in the middle', 'GOLF SIX: walker found, Casualty is cold', true],
       ['Urgent, but not at the start', 'HOTEL ONE: not urgent, walking out', false],
       ['A routine entry', 'Lima three back at the base', false],
-      ['Casualty in capitals at the end', 'echo one has reached the CASUALTY', true]
+      ['Casualty in capitals at the end', 'echo one has reached the CASUALTY', true],
+      ['Casualty at the very start', 'Casualty carried down to the road', true]
     ]
     return dataCases(t, {
       file: FILE,
@@ -101,6 +102,12 @@ export const checks = {
       typed:
         'needs_rhona gives back the same answer for every entry Check tries. Look at the entry it is given.',
       mistakes: [
+        {
+          value: (c) =>
+            c.args[0].toLowerCase().startsWith('urgent') ||
+            c.args[0].toLowerCase().indexOf('casualty') !== 0,
+          hint: 'needs_rhona gives back True for an entry with no casualty in it, and False for one that starts with casualty. find gives back a position, not True or False: -1 when it finds nothing, which counts as true, and 0 at the very start, which counts as false. Ask whether find gave back -1, or ask with in.'
+        },
         {
           value: (c) => c.args[0].toLowerCase().startsWith('urgent'),
           hint: 'needs_rhona gives back False for an entry with casualty in it. An entry counts when it starts with urgent, and also when casualty is anywhere in it.'

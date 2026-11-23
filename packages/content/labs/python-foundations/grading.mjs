@@ -1276,7 +1276,10 @@ function fileProblem(fn, c, call, csv) {
   }
   const lines = csv && call.opened.find((o) => !o.binary && o.newline !== '')
   if (lines) {
-    return `${fn} opens ${lines.path} without newline="". The csv module reads and writes its own line ends, and Python's documentation says to open a CSV file with newline="", or on Windows every row written is followed by an empty one.`
+    const why = /[wax+]/.test(lines.mode)
+      ? 'or on Windows every row written is followed by an empty one'
+      : 'or a value with a line end inside its quotes is read wrongly'
+    return `${fn} opens ${lines.path} without newline="". The csv module reads and writes its own line ends, and Python's documentation says to open a CSV file with newline="", ${why}.`
   }
   return null
 }

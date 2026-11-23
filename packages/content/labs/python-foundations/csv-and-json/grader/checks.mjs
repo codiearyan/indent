@@ -178,7 +178,6 @@ export const checks = {
       file: FILE,
       task: 4,
       fn: 'save_store',
-      define: JSON_MODULE,
       list: list.map(([name, path, before, store]) => ({
         name,
         args: [path, store],
@@ -193,12 +192,12 @@ export const checks = {
           }
         },
         fileHint: (rel, got, call) => {
-          if (before && got.startsWith(before.trim()))
-            return `After the call, ${rel} still holds the old store, with the new one after it, which is not JSON. Whatever the file held before should be gone.`
           if (got === '' || (before && got === before))
             return call.lines.length
               ? `After the call, ${rel} holds nothing new, and save_store printed the JSON instead. json.dumps gives back the JSON as text; the function that writes it into a file takes the file too.`
               : `After the call, ${rel} holds nothing new: the store was not written into it.`
+          if (before && got.startsWith(before.trim()))
+            return `After the call, ${rel} still holds the old store, with the new one after it, which is not JSON. Whatever the file held before should be gone.`
           let parsed
           try {
             parsed = JSON.parse(got)

@@ -71,6 +71,7 @@ export const checks = {
           expected: want,
           hint: (v) => {
             const got = Array.isArray(v.data) ? v.data : []
+            if (text === '' && equalLen(got, 1)) return 'For an empty book, book_lines gives back a list with an empty text in it. An empty book has no lines at all.'
             if (got.length && got.at(-1) === '' && text.endsWith('\n'))
               return 'book_lines gives back an empty text after the last line. Splitting at the line end makes one more piece after the last line end, with nothing in it.'
             if (got.some((l) => typeof l === 'string' && l.endsWith('\r')))
@@ -79,7 +80,6 @@ export const checks = {
               return 'book_lines splits at every space, not only at the line ends, so it gives back words instead of lines.'
             if (got.some((l) => typeof l === 'string' && l.endsWith('\n')))
               return 'book_lines gives back lines with their line ends still on.'
-            if (text === '' && equalLen(got, 1)) return 'For an empty book, book_lines gives back a list with an empty text in it. An empty book has no lines at all.'
             return 'book_lines does not give back the lines of the book, in order, without their line ends.'
           }
         }
