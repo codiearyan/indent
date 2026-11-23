@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Dorrit",
+      "say": "The ship clock took four hours!"
+    },
+    {
+      "title": "Weekly report",
+      "text": "Says nothing, and gets the week wrong."
+    },
+    {
+      "title": "Your search",
+      "file": "report.cpp",
+      "mine": true,
+      "gap": "No error, only a wrong number",
+      "tasks": [
+        "Cut the week down",
+        "Say what must be true",
+        "Carry the wrong value",
+        "Refuse wrong minutes"
+      ]
+    },
+    {
+      "title": "Dorrit's report",
+      "text": "The longest repair, right every week."
+    }
+  ],
+  "ticket": {
+    "label": "Ship clock",
+    "wrong": "not longest",
+    "why": "Wrong answer",
+    "right": "the longest"
+  },
+  "captions": [
+    "Dorrit reads the weekly report and knows the ship clock was this week's longest repair.",
+    "The report names another repair, with no error, after months of right answers.",
+    "You cut the week down until the fault shows, and make wrong values speak up.",
+    "Now the ship clock is the longest repair on the report, as it should be.",
+    "When something goes wrong now, the program says so, and says where."
+  ]
+}

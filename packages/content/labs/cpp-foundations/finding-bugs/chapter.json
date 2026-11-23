@@ -1,0 +1,131 @@
+{
+  "id": "finding-bugs",
+  "title": "Find the bug",
+  "files": [
+    "src/report.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Dorrit's weekly report here, run it on cut-down weeks, and watch your prints to std::cerr.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/report.cpp -o report && ./report"
+  },
+  "tasks": [
+    {
+      "id": "smallest",
+      "title": "Find the smallest week that breaks the report",
+      "file": "src/report.cpp",
+      "description": "Under `// Task 1` in `src/report.cpp`, write a function called `smallestFailing` that takes nothing and gives back a `std::vector<int>`: a week of minutes for which `longestOf`, as the starter gives it, gives a wrong answer, and which has as few values as any week that breaks it can have. Do not change `longestOf`.\n\nCheck runs your week through `longestOf` as the starter wrote it and through a right version of its own, and says whether it is wrong for it, and whether a week with fewer values can be wrong too.",
+      "nextSteps": [
+        "Run the program on this week's list and confirm the answer is wrong.",
+        "Take one value out of the list in main and run it again; keep the cut only if the answer is still wrong.",
+        "Go on until no single value can go without the answer coming out right.",
+        "Give back that week from smallestFailing."
+      ],
+      "hints": [
+        "Work on a copy of this week's list in main, and print longestOf's answer next to the longest you can see yourself, after every cut.",
+        "When the list is small enough to follow by hand, walk the loop in longestOf with it: which positions does it look at, and which does it never reach?",
+        "The shape is `return {15, 240};`: two values, with the longer one last."
+      ],
+      "docs": [
+        {
+          "title": "std::vector",
+          "url": "https://en.cppreference.com/w/cpp/container/vector"
+        },
+        {
+          "title": "for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/for"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "longest",
+      "title": "Find the longest repair, and say what must be true",
+      "file": "src/report.cpp",
+      "description": "Under `// Task 2`, write a function called `longestRepair` that takes the minutes as a reference to a `const std::vector<int>` and gives back an `int`: the longest of them. Every caller makes sure the list is not empty first, so its first line is an `assert` that says so. It prints nothing on standard output: prints you add to look inside go to `std::cerr`.\n\nCheck calls it with lists of its own and reads standard output. It also calls it once with an empty list, which must stop at your assert, and once with every assert switched off, as a shop build does, where the answer must stay the same.",
+      "nextSteps": [
+        "Write the first line, then assert on the next line that the list is not empty.",
+        "Start from the first value, and walk every value, the last included.",
+        "Give back the longest.",
+        "Try it in main with this week's list, and with an empty one to see the assert stop the program."
+      ],
+      "hints": [
+        "An assert states what your own code promises. Here the promise is that no caller hands over an empty list, so that is what the condition says.",
+        "With asserts switched off the condition is never looked at, so nothing the function needs may happen inside it. And a print to std::cout is output; a print to look inside goes to std::cerr.",
+        "The shape is `assert(!minutes.empty()); int longest = minutes[0]; for (int m : minutes) { if (m > longest) { longest = m; } } return longest;`."
+      ],
+      "docs": [
+        {
+          "title": "assert",
+          "url": "https://en.cppreference.com/w/cpp/error/assert"
+        },
+        {
+          "title": "std::cerr",
+          "url": "https://en.cppreference.com/w/cpp/io/cerr"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Assertions with assert",
+          "url": "https://www.youtube.com/watch?v=x2fZuu3a90o"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "carry",
+      "title": "Write an exception that carries the wrong value",
+      "file": "src/report.cpp",
+      "description": "Under `// Task 3`, write a class called `BadMinutes`, built on `std::invalid_argument`. Its constructor takes the minutes that were wrong, as an `int`, and gives `std::invalid_argument` a message that names them. Its member function `getMinutes`, marked `const`, gives back those minutes as an `int`.\n\nCheck throws `BadMinutes` of its own making, catches them as `std::invalid_argument` and as `BadMinutes`, and reads `what()` and `getMinutes`.",
+      "nextSteps": [
+        "Write the class's first line with : public std::invalid_argument after its name.",
+        "Give it a private int for the minutes.",
+        "In the constructor's initialiser list, give std::invalid_argument a message with the minutes in it, then the member its value.",
+        "Write getMinutes, marked const."
+      ],
+      "hints": [
+        "Built on std::invalid_argument, a BadMinutes is a kind of std::invalid_argument: every catch for that kind, or for std::exception, catches it too, and what() comes from it.",
+        "The part it is built on gets its message in the initialiser list, first, the way a member gets its value: std::invalid_argument(...) with the text.",
+        "The shape is `class BadMinutes : public std::invalid_argument { private: int minutes; public: explicit BadMinutes(int wrong) : std::invalid_argument(\"not a number of minutes: \" + std::to_string(wrong)), minutes(wrong) {} int getMinutes() const { return minutes; } };`."
+      ],
+      "docs": [
+        {
+          "title": "Derived classes",
+          "url": "https://en.cppreference.com/w/cpp/language/derived_class"
+        },
+        {
+          "title": "std::invalid_argument",
+          "url": "https://en.cppreference.com/w/cpp/error/invalid_argument"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "refuse",
+      "title": "Refuse minutes that cannot be right",
+      "file": "src/report.cpp",
+      "description": "Under `// Task 4`, write a function called `logMinutes` that takes the week as a reference to a `std::vector<int>` and the minutes of one repair as an `int`, and gives nothing back. It puts the minutes at the end of the week. Minutes below 0 or above 600 are a typing mistake at the counter: then it throws a `BadMinutes` that carries them, and leaves the week as it was.\n\nCheck builds this task with a `BadMinutes` of its own, made from the minutes alone. It calls `logMinutes` with weeks and minutes of its own, 0 and 600 included, catches what comes out, reads `getMinutes`, and looks at the week afterwards, once with every assert switched off.",
+      "nextSteps": [
+        "Write the first line, with the week taken by reference.",
+        "Ask first whether the minutes are below 0 or above 600.",
+        "Then throw a BadMinutes made from them.",
+        "After that, put the minutes at the end of the week."
+      ],
+      "hints": [
+        "This value comes from a person at the counter, not from your own code. An assert would vanish in a shop build and let it through: input from outside is refused with a throw.",
+        "BadMinutes carries the value, so the caller can read it back with getMinutes. Throw before anything changes.",
+        "The shape is `if (minutes < 0 || minutes > 600) { throw BadMinutes(minutes); } week.push_back(minutes);`."
+      ],
+      "docs": [
+        {
+          "title": "throw expression",
+          "url": "https://en.cppreference.com/w/cpp/language/throw"
+        },
+        {
+          "title": "assert",
+          "url": "https://en.cppreference.com/w/cpp/error/assert"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

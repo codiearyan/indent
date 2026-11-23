@@ -1,0 +1,107 @@
+{
+  "id": "exceptions",
+  "title": "Exceptions: throw, try and catch",
+  "files": [
+    "src/billing.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Ambrose's billing desk here and run it, and watch which charges are added and which are refused.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/billing.cpp -o billing && ./billing"
+  },
+  "tasks": [
+    {
+      "id": "refuse",
+      "title": "Refuse a charge that makes no sense",
+      "file": "src/billing.cpp",
+      "description": "Under `// Task 1` in `src/billing.cpp`, write a function called `addCharge` that takes the bill as a reference to a `std::vector<int>` and a charge in cents as an `int`, and gives nothing back. It puts the charge at the end of the bill. When the charge is 0 or less, it throws a `std::invalid_argument` whose `what()` names the charge it was given, and leaves the bill as it was.\n\nCheck calls it with bills and charges of its own. For a charge it must refuse, it catches what comes out and looks at its kind, whether its `what()` names the charge, and what the bill holds afterwards.",
+      "nextSteps": [
+        "Write the first line, with the bill taken by reference.",
+        "Before anything else, ask whether the charge is 0 or less.",
+        "Then throw a std::invalid_argument made from a message that names the charge, with std::to_string.",
+        "After that, put the charge at the end of the bill. In main, add a charge of -40 inside a try and print what() in the catch."
+      ],
+      "hints": [
+        "throw ends the function on the spot, so a throw after push_back leaves the charge on the bill. The check comes first.",
+        "The kind says what went wrong: a value that makes no sense is a std::invalid_argument, from <stdexcept>. The text you make it from is what what() gives back, so put the charge in it.",
+        "The shape is `if (cents <= 0) { throw std::invalid_argument(\"a charge must be above 0, this one is \" + std::to_string(cents)); } bill.push_back(cents);`."
+      ],
+      "docs": [
+        {
+          "title": "throw expression",
+          "url": "https://en.cppreference.com/w/cpp/language/throw"
+        },
+        {
+          "title": "std::invalid_argument",
+          "url": "https://en.cppreference.com/w/cpp/error/invalid_argument"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Exceptions with try, throw and catch",
+          "url": "https://www.youtube.com/watch?v=kjEhqgmEiWY"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "quote",
+      "title": "Price the parts, and list the ones not in the book",
+      "file": "src/billing.cpp",
+      "description": "Under `// Task 2`, write a function called `quoteParts` that takes the parts as a reference to a `const std::vector<std::string>` and a list of missing parts as a reference to a `std::vector<std::string>`, and gives back an `int`: the prices of the parts added up, from `priceOf`. When `priceOf` throws `std::out_of_range` for a part, that part is not in the book: `quoteParts` puts its name at the end of `missing` and goes on with the next part. Any other exception is not one it can handle, so it lets it go on to its caller.\n\nCheck builds this task with a price book of its own, with other parts and prices. It calls `quoteParts` with lists of parts some of which are not in that book, and also with an empty part name and with the book locked, which make `priceOf` throw other kinds: those must reach Check as they were thrown.",
+      "nextSteps": [
+        "Write the first line, with missing taken by reference so the caller sees what you add.",
+        "Walk the parts, and add up what priceOf gives for each.",
+        "Put a try around the one line that prices a part, inside the loop, and a catch for const std::out_of_range& after it.",
+        "In the catch, put the part's name at the end of missing. Catch nothing else."
+      ],
+      "hints": [
+        "A try around the whole loop stops the whole loop at the first part not in the book. A try inside the loop handles one part and goes on with the next.",
+        "Catch only std::out_of_range, by const reference. catch (...) and catch (const std::exception&) also take the empty-name and locked-book exceptions, which are not a missing part and which the caller must hear about.",
+        "The shape is `for (const std::string& part : parts) { try { total = total + priceOf(part); } catch (const std::out_of_range&) { missing.push_back(part); } }`."
+      ],
+      "docs": [
+        {
+          "title": "try block",
+          "url": "https://en.cppreference.com/w/cpp/language/try"
+        },
+        {
+          "title": "std::out_of_range",
+          "url": "https://en.cppreference.com/w/cpp/error/out_of_range"
+        },
+        {
+          "title": "std::map::at",
+          "url": "https://en.cppreference.com/w/cpp/container/map/at"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "line",
+      "title": "Tell the counter what happened to a charge",
+      "file": "src/billing.cpp",
+      "description": "Under `// Task 3`, write a function called `chargeLine` that takes the bill as a reference to a `std::vector<int>` and a charge in cents as an `int`, and gives back a `std::string`. It adds the charge with `addCharge`, then sends it to the till with `sendToTill`, and gives back a line like `Added 250 cents`. When `addCharge` refuses the charge with `std::invalid_argument`, it gives back `Not added: ` followed by that exception's `what()`, and sends nothing to the till. Any other exception, from `addCharge` or from the till, goes on to its caller.\n\nCheck builds this task with an `addCharge` and a till of its own. Its `addCharge` refuses charges with its own words, and also throws `std::length_error` for a bill that already holds 40 charges; its till can be switched off, and then throws `std::runtime_error`. Check reads the line `chargeLine` gives back, the bill, and what reached the till, and catches what comes out.",
+      "nextSteps": [
+        "Put addCharge alone in a try, with a catch for const std::invalid_argument& after it.",
+        "In the catch, give back \"Not added: \" followed by what() of the exception it caught.",
+        "After the try, send the charge to the till, then give back the added line.",
+        "Catch nothing else: the till's exceptions and any other kind go on by themselves."
+      ],
+      "hints": [
+        "The exception's what() is the reason, in the words of whoever threw it. Check's addCharge says it its own way, so the line must take the words from the exception, not write them again.",
+        "A catch for std::invalid_argument lets a std::runtime_error or a std::length_error pass straight through to the caller, which is what the task asks. A catch for std::exception would take them all.",
+        "The shape is `try { addCharge(bill, cents); } catch (const std::invalid_argument& refused) { return std::string(\"Not added: \") + refused.what(); } sendToTill(cents); return \"Added \" + std::to_string(cents) + \" cents\";`."
+      ],
+      "docs": [
+        {
+          "title": "std::exception::what",
+          "url": "https://en.cppreference.com/w/cpp/error/exception/what"
+        },
+        {
+          "title": "std::runtime_error",
+          "url": "https://en.cppreference.com/w/cpp/error/runtime_error"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

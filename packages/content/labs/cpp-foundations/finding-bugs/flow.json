@@ -1,0 +1,229 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "dorrit",
+        "label": "Dorrit's report",
+        "kind": "story"
+      },
+      {
+        "id": "week",
+        "label": "This week's minutes",
+        "kind": "data"
+      },
+      {
+        "id": "given",
+        "label": "longestOf()",
+        "kind": "function"
+      },
+      {
+        "id": "small",
+        "label": "smallestFailing()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "longest",
+        "label": "longestRepair()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "log",
+        "label": "logMinutes()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "bad",
+        "label": "BadMinutes",
+        "kind": "function",
+        "mine": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "week",
+        "to": "given",
+        "label": "minutes"
+      },
+      {
+        "from": "given",
+        "to": "dorrit",
+        "label": "a longest"
+      },
+      {
+        "from": "small",
+        "to": "given",
+        "label": "a cut-down week"
+      },
+      {
+        "from": "dorrit",
+        "to": "log",
+        "label": "typed minutes"
+      },
+      {
+        "from": "log",
+        "to": "bad",
+        "label": "the wrong value"
+      },
+      {
+        "from": "longest",
+        "to": "dorrit",
+        "label": "the longest"
+      }
+    ],
+    "note": "A wrong answer with no error is cut down until it shows why, and wrong input is refused with the value that was wrong."
+  },
+  "tasks": {
+    "smallest": {
+      "steps": [
+        {
+          "active": [
+            "week",
+            "week->given",
+            "given"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "this week's minutes"
+            ]
+          },
+          "note": "This week's report gives a longest repair that Dorrit knows is wrong."
+        },
+        {
+          "active": [
+            "small",
+            "small->given",
+            "given"
+          ],
+          "note": "Values are taken out one at a time, and a cut is kept only while the answer stays wrong."
+        },
+        {
+          "active": [
+            "small"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "a week with as few values as can still break it"
+            ]
+          },
+          "note": "What is left is a week so small it can be followed by hand."
+        }
+      ]
+    },
+    "longest": {
+      "steps": [
+        {
+          "active": [
+            "longest"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the minutes of a week"
+            ]
+          },
+          "note": "The report needs the longest repair of a week, and no caller ever hands over an empty one."
+        },
+        {
+          "active": [
+            "longest"
+          ],
+          "note": "The first line states that promise, so a caller that breaks it is stopped at once."
+        },
+        {
+          "active": [
+            "longest",
+            "longest->dorrit",
+            "dorrit"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "the longest"
+            ]
+          },
+          "note": "Every value is looked at, the first and the last included."
+        }
+      ]
+    },
+    "carry": {
+      "steps": [
+        {
+          "active": [
+            "bad"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the minutes that were wrong"
+            ]
+          },
+          "note": "A kind of refusal is made for minutes that cannot be right."
+        },
+        {
+          "active": [
+            "bad"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "a message that names them",
+              "the minutes, read back"
+            ]
+          },
+          "note": "It is caught like any refusal of a wrong value, and it keeps the value itself."
+        }
+      ]
+    },
+    "refuse": {
+      "steps": [
+        {
+          "active": [
+            "dorrit",
+            "dorrit->log",
+            "log"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the week",
+              "the minutes"
+            ]
+          },
+          "note": "Minutes typed at the counter are logged on the week."
+        },
+        {
+          "active": [
+            "log->bad",
+            "bad"
+          ],
+          "note": "Minutes no repair could take are refused, carrying the value, before the week changes."
+        },
+        {
+          "active": [
+            "log"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "the week, one longer, or a refusal"
+            ]
+          },
+          "note": "Right minutes go on the end of the week."
+        }
+      ]
+    }
+  }
+}

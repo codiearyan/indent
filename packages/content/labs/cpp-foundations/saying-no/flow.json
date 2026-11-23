@@ -1,0 +1,191 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "dorrit",
+        "label": "Dorrit's counter",
+        "kind": "story"
+      },
+      {
+        "id": "parse",
+        "label": "parseTicket()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "find",
+        "label": "findRepair()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "bench",
+        "label": "Kasimir's bench",
+        "kind": "data"
+      },
+      {
+        "id": "answer",
+        "label": "answerFor()",
+        "kind": "function",
+        "mine": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "dorrit",
+        "to": "answer",
+        "label": "typed text"
+      },
+      {
+        "from": "answer",
+        "to": "parse",
+        "label": "text"
+      },
+      {
+        "from": "answer",
+        "to": "find",
+        "label": "a ticket"
+      },
+      {
+        "from": "find",
+        "to": "bench",
+        "label": "looks along"
+      },
+      {
+        "from": "answer",
+        "to": "dorrit",
+        "label": "one line"
+      }
+    ],
+    "note": "What Dorrit types is checked before it is used, and every no comes back as an answer, not a crash."
+  },
+  "tasks": {
+    "parse": {
+      "steps": [
+        {
+          "active": [
+            "answer->parse",
+            "parse"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the typed text",
+              "a ticket to fill in"
+            ]
+          },
+          "note": "Whatever Dorrit typed arrives as text."
+        },
+        {
+          "active": [
+            "parse"
+          ],
+          "note": "Every character is looked at before the text is turned into a number."
+        },
+        {
+          "active": [
+            "parse"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "yes or no",
+              "the ticket, only on yes"
+            ]
+          },
+          "note": "Either the ticket is filled in and the answer is yes, or it is left alone and the answer is no."
+        }
+      ]
+    },
+    "find": {
+      "steps": [
+        {
+          "active": [
+            "answer->find",
+            "find"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the bench",
+              "a ticket"
+            ]
+          },
+          "note": "A ticket number is looked up."
+        },
+        {
+          "active": [
+            "find->bench",
+            "bench"
+          ],
+          "note": "The bench is walked from the front, one repair at a time."
+        },
+        {
+          "active": [
+            "find"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "a box with the repair, or an empty box"
+            ]
+          },
+          "note": "The answer is a repair, or nothing at all."
+        }
+      ]
+    },
+    "answer": {
+      "steps": [
+        {
+          "active": [
+            "dorrit",
+            "dorrit->answer",
+            "answer"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the bench",
+              "the typed text"
+            ]
+          },
+          "note": "Dorrit types what the customer reads out."
+        },
+        {
+          "active": [
+            "answer->parse",
+            "parse"
+          ],
+          "note": "First: is it a ticket number at all? The answer is asked before the ticket is used."
+        },
+        {
+          "active": [
+            "answer->find",
+            "find"
+          ],
+          "note": "Then: is there a repair with that ticket? The box is asked before it is opened."
+        },
+        {
+          "active": [
+            "answer",
+            "answer->dorrit",
+            "dorrit"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "one of three lines"
+            ]
+          },
+          "note": "Dorrit reads one plain line, whatever was typed."
+        }
+      ]
+    }
+  }
+}

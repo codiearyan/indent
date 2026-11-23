@@ -1,0 +1,40 @@
+{
+  "stations": [
+    {
+      "title": "Dorrit",
+      "say": "Is 4417w a ticket, or a typo?"
+    },
+    {
+      "title": "The look-up",
+      "text": "Reads 4417w as ticket 4417."
+    },
+    {
+      "title": "Your look-up",
+      "file": "counter.cpp",
+      "mine": true,
+      "gap": "Every typo looks like a ticket",
+      "tasks": [
+        "Read the ticket",
+        "Find, or nothing",
+        "Answer the customer"
+      ]
+    },
+    {
+      "title": "Dorrit's counter",
+      "text": "A plain line for whatever was typed."
+    }
+  ],
+  "ticket": {
+    "label": "4417w",
+    "wrong": "said ready",
+    "why": "A typo",
+    "right": "typo caught"
+  },
+  "captions": [
+    "Dorrit types a ticket number a customer reads out, and her finger slips: 4417w.",
+    "The look-up reads the number at the front, and tells her repair 4417 is ready.",
+    "You check what was typed before using it, and say no without stopping the program.",
+    "Now 4417w is caught as a typo, and an empty line is a typo too, not a crash.",
+    "Every no is a plain answer. Next, problems that must travel further than one call."
+  ]
+}
