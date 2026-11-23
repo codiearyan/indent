@@ -1,0 +1,105 @@
+{
+  "id": "headers",
+  "title": "Declarations and headers",
+  "files": [
+    "src/repair.h",
+    "src/repair.cpp",
+    "src/main.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build both .cpp files into one program here and run it, after each move.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/main.cpp src/repair.cpp -o workshop && ./workshop"
+  },
+  "tasks": [
+    {
+      "id": "struct",
+      "title": "Move the repair's struct into repair.h",
+      "file": "src/repair.h",
+      "description": "Move the struct `Repair` out of `src/main.cpp` into `src/repair.h`, under `// Task 1`, with every member as it was. Put it inside an include guard: its `#ifndef` and `#define` at the top of the file, and its `#endif` on the last line. `repair.h` also includes what it needs for `std::string`. `main.cpp` keeps its `#include \"repair.h\"`.\n\nCheck writes a program of its own that includes `repair.h` twice, before anything else, makes repairs from it and reads their members. It also looks at whether `main.cpp` still writes `Repair` itself.",
+      "nextSteps": [
+        "Cut the struct out of `main.cpp` and paste it under `// Task 1` in `repair.h`.",
+        "Add the `#include` that `std::string` comes from, above the struct.",
+        "Write the guard's two lines at the very top of `repair.h`, and `#endif` at its very end.",
+        "Build both files with the terminal's command and run the program."
+      ],
+      "hints": [
+        "A header is read by every file that includes it, wherever that file includes it, so it includes what it uses itself: here `<string>`.",
+        "A guard is three lines: `#ifndef REPAIR_H` and `#define REPAIR_H` at the top, `#endif` at the bottom. The name after `#define` is the same as the one after `#ifndef`.",
+        "The file is `#ifndef REPAIR_H`, `#define REPAIR_H`, the comments, `#include <string>`, the struct as it was in `main.cpp`, the other tasks, and `#endif` on the last line."
+      ],
+      "docs": [
+        {
+          "title": "Conditional inclusion (#ifndef)",
+          "url": "https://en.cppreference.com/w/cpp/preprocessor/conditional"
+        },
+        {
+          "title": "Source file inclusion (#include)",
+          "url": "https://en.cppreference.com/w/cpp/preprocessor/include"
+        }
+      ],
+      "videos": [
+        {
+          "title": "How header files work",
+          "url": "https://www.youtube.com/watch?v=9RJTQmK0YPI"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "text",
+      "title": "Move minutesText into repair.h and repair.cpp",
+      "file": "src/repair.cpp",
+      "description": "Move `minutesText` out of `src/main.cpp`. Its declaration goes in `src/repair.h` under `// Task 2`, and its whole body in `src/repair.cpp` under `// Task 2`, unchanged. At the top of `repair.cpp`, above its first `// Task` comment, include `repair.h`.\n\nCheck builds its own program, which includes `repair.h`, together with your `repair.cpp`, calls `minutesText` with minutes of its own and reads what it gives back. It also looks at whether `main.cpp` still writes `minutesText` itself. Check puts a `Repair` of its own where Task 1's is, so this task is judged on its own.",
+      "nextSteps": [
+        "Cut `minutesText` out of `main.cpp` and paste it under `// Task 2` in `repair.cpp`.",
+        "Include `repair.h` at the top of `repair.cpp`, with double quotes.",
+        "In `repair.h`, under `// Task 2`, write the function's first line with a semicolon.",
+        "Build both `.cpp` files and run the program."
+      ],
+      "hints": [
+        "A declaration is the first line of a function with a semicolon in place of its body. It tells every file that includes it that the function exists, and what it takes and gives back.",
+        "A header of your own is included with double quotes, `#include \"repair.h\"`: angle brackets look only among the compiler's own headers.",
+        "`repair.h` gets `std::string minutesText(int minutes);` and `repair.cpp` gets `#include \"repair.h\"` at its top and the whole function under `// Task 2`."
+      ],
+      "docs": [
+        {
+          "title": "Function declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/function"
+        },
+        {
+          "title": "Source file inclusion (#include)",
+          "url": "https://en.cppreference.com/w/cpp/preprocessor/include"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "over",
+      "title": "Declare and write minutesOver",
+      "file": "src/repair.cpp",
+      "description": "Add a new function, `minutesOver`, in two places. In `src/repair.h` under `// Task 3`, declare it: it takes a repair as a reference to a `const Repair` and the minutes Dorrit quoted as an `int`, and gives back an `int`. In `src/repair.cpp` under `// Task 3`, write it: it gives back how many minutes the repair has gone over the quote, or `0` when it is within it. With 75 minutes on the repair and a quote of 60, it gives back 15.\n\nCheck builds its own program, which includes `repair.h`, together with your `repair.cpp`, calls `minutesOver` with repairs and quotes of its own, and reads what it gives back.",
+      "nextSteps": [
+        "Write the declaration in `repair.h`: the first line, with a semicolon.",
+        "Write the whole function in `repair.cpp`, with the same first line.",
+        "Give back 0 when the minutes are within the quote, and the difference when they are over.",
+        "Call it from `main` and build both files."
+      ],
+      "hints": [
+        "The declaration and the definition say the same thing: the same name, the same parameter types and the same type back. When they differ, the linker finds no function to match the declaration.",
+        "Ask first whether the minutes are within the quote, and give back 0 then. Otherwise the minutes minus the quote is how far over it went.",
+        "`repair.h` gets `int minutesOver(const Repair& repair, int quoted);` and `repair.cpp` the same line with a body: `if (repair.minutes <= quoted) { return 0; } return repair.minutes - quoted;`."
+      ],
+      "docs": [
+        {
+          "title": "Function declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/function"
+        },
+        {
+          "title": "Definitions and ODR",
+          "url": "https://en.cppreference.com/w/cpp/language/definition"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "id": "structs",
+  "title": "Grouping values with a struct",
+  "files": [
+    "src/slip.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Dorrit's slips here and run them, after you try your struct and functions in main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/slip.cpp -o slip && ./slip"
+  },
+  "tasks": [
+    {
+      "id": "struct",
+      "title": "Write the repair's struct",
+      "file": "src/slip.cpp",
+      "description": "Under `// Task 1` in `src/slip.cpp`, write a struct called `Repair` with four members:\n\n- `ticket`, an `int` that starts at `0`\n- `owner`, a `std::string`\n- `item`, a `std::string`\n- `minutes`, an `int` that starts at `0`\n\nCheck makes repairs of its own from your struct: a new one with nothing put in it, to read where each member starts, and two with values of its own in every member, to read them back. It also asks the compiler for the type of each member.",
+      "nextSteps": [
+        "Write `struct Repair`, then a `{` and a `}` with a semicolon after it.",
+        "Inside, write each member on its own line: its type, its name and a semicolon.",
+        "Give `ticket` and `minutes` their starting value where they are written.",
+        "In `main`, make a `Repair`, put values in its members and print them."
+      ],
+      "hints": [
+        "A struct is a list of variables written inside `{ }`, and it ends with `};`. Each member is written like a variable, with its type in front of its name.",
+        "A member with no starting value written in the struct holds whatever was left in memory when a new repair is made. `= 0` after the name, as for a variable, gives it one.",
+        "The shape is `struct Repair { int ticket = 0; std::string owner; std::string item; int minutes = 0; };`, each member on a line of its own."
+      ],
+      "docs": [
+        {
+          "title": "Class declaration (struct)",
+          "url": "https://en.cppreference.com/w/cpp/language/class"
+        },
+        {
+          "title": "Non-static data members",
+          "url": "https://en.cppreference.com/w/cpp/language/data_members"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Defining a struct and reading its members",
+          "url": "https://www.youtube.com/watch?v=tmgvwDAG2mc"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "takein",
+      "title": "Fill in a new repair",
+      "file": "src/slip.cpp",
+      "description": "Under `// Task 2`, write a function called `takeIn` that takes the ticket as an `int`, and the owner and the item each as a reference to a `const std::string`. It gives back a new `Repair` with those three members filled in and its `minutes` at `0`.\n\nCheck calls `takeIn` with tickets, owners and items of its own and reads every member of the repair it gives back. Check uses a `Repair` of its own here, written as Task 1 asks, so this task is judged on its own.",
+      "nextSteps": [
+        "Write the first line: an `int` and two `const std::string&` in, a `Repair` back.",
+        "Inside, make a `Repair` variable.",
+        "Put each value the function is given into its member with a dot.",
+        "Give the repair back."
+      ],
+      "hints": [
+        "A struct is a type like `int`: `Repair repair;` makes a variable of it, and a function can give one back.",
+        "A member is read and changed with a dot: `repair.ticket = ticket;` puts the function's `ticket` into the repair's. The minutes already start at 0 from Task 1.",
+        "The shape is `Repair repair; repair.ticket = ticket; repair.owner = owner; repair.item = item; return repair;`."
+      ],
+      "docs": [
+        {
+          "title": "Member access operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_member_access"
+        },
+        {
+          "title": "Aggregate initialization",
+          "url": "https://en.cppreference.com/w/cpp/language/aggregate_initialization"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "slip",
+      "title": "Write the slip's line",
+      "file": "src/slip.cpp",
+      "description": "Under `// Task 3`, write a function called `slipLine` that takes a repair as a reference to a `const Repair` and gives back its line for the slip as a `std::string`: the ticket, a space, the item, ` for `, the owner, `, ` and the minutes, then ` min`. Like this:\n\n```\n3101 mantel clock for Liesl Farrow, 45 min\n```\n\nCheck calls `slipLine` with repairs of its own and reads what it gives back. It prints nothing. Check uses a `Repair` of its own here, written as Task 1 asks, so this task is judged on its own.",
+      "nextSteps": [
+        "Write the first line: a `const Repair&` in, a `std::string` back.",
+        "Read each member you need with a dot.",
+        "Turn the two numbers into text, and join everything with `+`.",
+        "Print the line from `main` to compare it with the task's."
+      ],
+      "hints": [
+        "The repair is only read here, so it comes in as a `const` reference, like a text did in the references issue.",
+        "`ticket` and `minutes` are numbers: `std::to_string` turns each into text before it is joined to other text.",
+        "The shape is `return std::to_string(repair.ticket) + \" \" + repair.item + \" for \" + repair.owner + \", \" + std::to_string(repair.minutes) + \" min\";`."
+      ],
+      "docs": [
+        {
+          "title": "std::to_string",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/to_string"
+        },
+        {
+          "title": "Member access operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_member_access"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pickup",
+      "title": "Keep the customer with the repair",
+      "file": "src/slip.cpp",
+      "description": "Under `// Task 4`, write a struct called `Customer` with two `std::string` members, `name` and `phone`. Below it, write a struct called `Pickup` with two members: `repair`, a `Repair`, and `customer`, a `Customer`.\n\nThen write a function called `callLine` that takes a pickup as a reference to a `const Pickup` and gives back, as a `std::string`, the line Dorrit reads when she rings: `Ring `, the customer's name, ` on `, the customer's phone, ` about ticket ` and the repair's ticket. Like this:\n\n```\nRing Liesl Farrow on 01632 960118 about ticket 3101\n```\n\nCheck makes pickups of its own, sometimes with a customer who is not the repair's owner, and reads what `callLine` gives back. Check uses a `Repair` of its own here, written as Task 1 asks, so this task is judged on its own.",
+      "nextSteps": [
+        "Write `Customer`, then `Pickup` below it, each ending with `};`.",
+        "Write the first line of `callLine`: a `const Pickup&` in, a `std::string` back.",
+        "Reach the name and the phone through `pickup.customer`, and the ticket through `pickup.repair`.",
+        "Join the parts, with the ticket turned into text."
+      ],
+      "hints": [
+        "A member can be a struct itself. The compiler reads the file from the top down, so `Customer` is written above `Pickup`, which uses it.",
+        "Two dots reach inside a struct inside a struct: `pickup.customer.name` is the name of the pickup's customer.",
+        "The shape is `return \"Ring \" + pickup.customer.name + \" on \" + pickup.customer.phone + \" about ticket \" + std::to_string(pickup.repair.ticket);`."
+      ],
+      "docs": [
+        {
+          "title": "Class declaration (struct)",
+          "url": "https://en.cppreference.com/w/cpp/language/class"
+        },
+        {
+          "title": "Member access operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_member_access"
+        }
+      ],
+      "videos": [
+        {
+          "title": "A struct inside another struct",
+          "url": "https://www.youtube.com/watch?v=Ldsj83BsKo4"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

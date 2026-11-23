@@ -1,0 +1,121 @@
+{
+  "id": "enums",
+  "title": "States with enum class",
+  "files": [
+    "src/status.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the states here and run them, after you call your functions from main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/status.cpp -o status && ./status"
+  },
+  "tasks": [
+    {
+      "id": "status",
+      "title": "Name the states of a repair",
+      "file": "src/status.cpp",
+      "description": "Under `// Task 1` in `src/status.cpp`, write an `enum class` called `Status` with four values: `Waiting`, `OnBench`, `Ready` and `Collected`.\n\nCheck asks the compiler whether `Status` is an `enum class`, reads each of the four values, and makes sure no two of them are the same.",
+      "nextSteps": [
+        "Write `enum class Status`, then `{` and `};`.",
+        "Inside, write the four values, separated by commas.",
+        "In `main`, make a `Status` variable with one of the values."
+      ],
+      "hints": [
+        "An `enum class` is a type whose values are names you choose. It ends with a semicolon after its `}`, like a struct.",
+        "Give the values no numbers: the compiler numbers them one after another by itself, so each is a value of its own.",
+        "The shape is `enum class Status { Waiting, OnBench, Ready, Collected };`."
+      ],
+      "docs": [
+        {
+          "title": "Enumeration declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/enum"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Plain enums and enum class",
+          "url": "https://www.youtube.com/watch?v=MQHaUhGdixU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "collect",
+      "title": "Say whether a repair can be collected",
+      "file": "src/status.cpp",
+      "description": "Under `// Task 2`, write a function called `canCollect` that takes a state as a `Status` and gives back `true` when it is `Ready`, and `false` for every other state.\n\nCheck calls `canCollect` with each of the four states and reads what it gives back. It uses a `Status` of its own here, written as Task 1 asks, so this task is judged on its own.",
+      "nextSteps": [
+        "Write the first line: a `Status` in, a `bool` back.",
+        "Compare the state with one value of `Status`, written with its type's name.",
+        "Give back the result of that comparison."
+      ],
+      "hints": [
+        "A value of an enum class is always written with its type's name in front, like `Status::Waiting`. Alone, the compiler does not know the name.",
+        "Compare with `==`, as with numbers. A value of an enum class is never compared with a number.",
+        "The shape is `return status == Status::Ready;`."
+      ],
+      "docs": [
+        {
+          "title": "Enumeration declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/enum"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "words",
+      "title": "Write a state in words for the slip",
+      "file": "src/status.cpp",
+      "description": "Under `// Task 3`, write a function called `statusText` that takes a state as a `Status` and gives back its words as a `std::string`, chosen with a `switch` that has a case for each of the four states and no `default`:\n\n| State | Words |\n| --- | --- |\n| `Waiting` | `waiting for the bench` |\n| `OnBench` | `on the bench` |\n| `Ready` | `ready to collect` |\n| `Collected` | `collected` |\n\nCheck looks for the `switch` and for no `default` in `statusText`, then calls it with each state and reads what it gives back. A state without a case is a warning from the compiler, and Check counts it as a mistake.",
+      "nextSteps": [
+        "Write the first line: a `Status` in, a `std::string` back.",
+        "Write a `switch` on the state.",
+        "Give each of the four states its own `case`, ending in a `return` of its words.",
+        "After the `switch`, write one more `return`, as the lesson explains."
+      ],
+      "hints": [
+        "`switch (status)` jumps to the `case` whose value is the state. Each case is written `case Status::Waiting:`.",
+        "A case that ends without `return` or `break` runs on into the case below it. Leave out `default`, so the compiler warns when a state has no case.",
+        "The shape is `switch (status) { case Status::Waiting: return \"waiting for the bench\"; ... } return \"\";`, with a case for each state."
+      ],
+      "docs": [
+        {
+          "title": "switch statement",
+          "url": "https://en.cppreference.com/w/cpp/language/switch"
+        },
+        {
+          "title": "Enumeration declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/enum"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "Move a repair on to its next state",
+      "file": "src/status.cpp",
+      "description": "Under `// Task 4`, write a function called `nextStatus` that takes a state as a `Status` and gives back the state that comes after it: `OnBench` after `Waiting`, `Ready` after `OnBench`, `Collected` after `Ready`. `Collected` is the last state, so after `Collected` it is still `Collected`.\n\nCheck calls `nextStatus` with each of the four states and reads the state it gives back.",
+      "nextSteps": [
+        "Write the first line: a `Status` in, a `Status` back.",
+        "Decide what comes after each state, with a `switch` or with `if`.",
+        "Give back a value of `Status` each time, never a number.",
+        "In `main`, move a repair on twice and print its words."
+      ],
+      "hints": [
+        "A function can give back a value of an enum class, written with its type's name, like `return Status::OnBench;`.",
+        "Two cases can share one `return`: write `case Status::Ready:` and `case Status::Collected:` one under the other.",
+        "The shape is a `switch` like Task 3's, where each case gives back a state instead of words."
+      ],
+      "docs": [
+        {
+          "title": "switch statement",
+          "url": "https://en.cppreference.com/w/cpp/language/switch"
+        },
+        {
+          "title": "return statement",
+          "url": "https://en.cppreference.com/w/cpp/language/return"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
