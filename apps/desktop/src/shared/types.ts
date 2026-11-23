@@ -716,6 +716,8 @@ export interface Api {
     openWindow(labId: string, chapterId: string): Promise<void>
     /** Opens the issue's page in the system browser, on a local address only this app hands out. */
     openInBrowser(labId: string, chapterId: string): Promise<void>
+    /** Whether the issue's page loaded any of these workspace files, so a save of one changes it. */
+    uses(labId: string, chapterId: string, paths: string[]): Promise<boolean>
     /** Reloads the page in its window and in the browser, after a save. */
     reload(labId: string, chapterId: string): void
     /** Closes the page's window and stops its local address: the learner left the issue. */
@@ -889,7 +891,7 @@ export const INVOKE_METHODS = {
     'bringBack'
   ],
   ide: ['list', 'open', 'setCompact'],
-  preview: ['openWindow', 'openInBrowser'],
+  preview: ['openWindow', 'openInBrowser', 'uses'],
   checks: ['run', 'trace', 'runtimeStatus', 'ensureRuntime'],
   progress: ['get', 'touch', 'showHint', 'setDailyGoal'],
   backup: ['exportFile', 'pickImport', 'applyImport'],
