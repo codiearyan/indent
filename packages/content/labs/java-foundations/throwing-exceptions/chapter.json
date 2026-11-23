@@ -1,0 +1,105 @@
+{
+  "id": "throwing-exceptions",
+  "title": "Throwing an exception: refusing what cannot be",
+  "files": ["BookingDesk.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the booking desk here, and try your classes from main.",
+    "suggestedCommand": "java BookingDesk.java"
+  },
+  "tasks": [
+    {
+      "id": "fares",
+      "title": "Refuse an age that cannot be",
+      "file": "BookingDesk.java",
+      "description": "Under `// Task 1`, write a class `Fares` with a method `static int fareFor(int age)`. It gives back `160` for an age under 16 and `320` for 16 and over. An age below 0 is refused: it throws an `IllegalArgumentException` whose message names the age.\n\nCheck calls `fareFor` with ages of its own, 0, 15 and 16 included, and with ages below 0. It reads what comes back, and for an age below 0 which exception reached it and whether its message names the age.",
+      "nextSteps": [
+        "Read the part of the lesson about throw.",
+        "Write the class and fareFor, with the two fares, as in earlier issues.",
+        "Before the fares, refuse an age below 0, with a message that names it.",
+        "Take the // off the first line in main, and try an age below 0 too."
+      ],
+      "hints": [
+        "The refusal goes first: once the method has given back a fare, it is too late.",
+        "throw ends the method and hands the exception to the caller. The exception is made with new, and its message is joined from words and the age.",
+        "The first lines: `if (age < 0) { throw new IllegalArgumentException(\"No fare for an age of \" + age); }`."
+      ],
+      "docs": [
+        {
+          "title": "How to throw exceptions",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/throwing.html"
+        },
+        {
+          "title": "IllegalArgumentException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/IllegalArgumentException.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sailing",
+      "title": "Refuse a booking before it changes anything",
+      "file": "BookingDesk.java",
+      "description": "Under `// Task 2`, write a class `Sailing` with a constructor `Sailing(int seats)`, a method `int free()` that gives back the seats still free, and a method `boolean book(int places)`. Fewer than 1 place is refused: `book` throws an `IllegalArgumentException` whose message names the places, and changes nothing. More places than are free is an answer, not a mistake: `book` gives back `false` and changes nothing. Otherwise it books the places and gives back `true`.\n\nCheck makes sailings of its own, two at once included, books them, asks for too many and for 0 or fewer places, and reads what `book` gives back, which exception reached it, and how many seats are free afterwards.",
+      "nextSteps": [
+        "Read the parts of the lesson about refusing first, and about giving back an answer or throwing.",
+        "Write the field, the constructor and free().",
+        "In book, refuse fewer than 1 place before anything else.",
+        "Then give back false for a full boat, or book and give back true."
+      ],
+      "hints": [
+        "A full boat is something the caller expects and can deal with; 0 places is a mistake in the code that asked.",
+        "The order matters: refuse, then check for room, and change the seats free only on the last line before giving back true.",
+        "The first lines of book: `if (places < 1) { throw new IllegalArgumentException(\"Cannot book \" + places + \" places\"); }`, then `if (places > free) { return false; }`."
+      ],
+      "docs": [
+        {
+          "title": "How to throw exceptions",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/throwing.html"
+        },
+        {
+          "title": "Unchecked exceptions",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "crossings",
+      "title": "Say a crossing is cancelled, and say it on the notice",
+      "file": "BookingDesk.java",
+      "description": "Under `// Task 3`, write a class `Crossings` with two methods.\n\n`static String board(int hour, boolean gale)` gives back `Boarding the 14:00 crossing`, with its hour. An hour below 0 or above 23 is refused with an `IllegalArgumentException` whose message names the hour, whatever the weather. In a gale it throws a `CancelledException`, given above the tasks, whose message names the crossing, as in `14:00`.\n\n`static String notice(int hour, boolean gale)` gives back what `board` gives back, or, when the crossing is cancelled, `Cancelled: ` and the exception's message. A caller of `notice` needs no `try`, and an hour that cannot be still reaches its caller.\n\nCheck calls both with hours of its own, in calm and in a gale. It also compiles lines of its own: a call of `board` with no `try`, which must be refused because `CancelledException` is checked, a `catch` of `CancelledException` around `board`, and a call of `notice` with no `try`, which must be accepted.",
+      "nextSteps": [
+        "Read the part of the lesson about checked and unchecked exceptions.",
+        "Write board: refuse the hour first, then throw a CancelledException in a gale, then give back the boarding line.",
+        "Run the file and read what the compiler says about board, then fix its first line.",
+        "Write notice with a catch for the one exception a gale brings."
+      ],
+      "hints": [
+        "CancelledException extends Exception, so it is checked: the compiler wants every method that may throw it to say so, and every caller to catch it or say so too.",
+        "board names CancelledException after throws on its first line; notice catches it, so notice needs no throws. IllegalArgumentException is unchecked and goes on to the caller of notice by itself.",
+        "The first line of board: `static String board(int hour, boolean gale) throws CancelledException {`; notice is `try { return board(hour, gale); } catch (CancelledException e) { return \"Cancelled: \" + e.getMessage(); }`."
+      ],
+      "docs": [
+        {
+          "title": "Specifying the exceptions thrown by a method",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/declaring.html"
+        },
+        {
+          "title": "Unchecked exceptions",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html"
+        },
+        {
+          "title": "Exception",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Exception.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Checked and unchecked exceptions",
+          "url": "https://www.youtube.com/watch?v=bCPClyGsVhc"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
