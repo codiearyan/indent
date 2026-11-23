@@ -1,7 +1,9 @@
 import { Loader2 } from 'lucide-react'
-import { RELEASES_URL } from '@shared/repo'
+import { RELEASES_URL, REPO_URL } from '@shared/repo'
+import type { UpdateRelease } from '@shared/types'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import {
   cancelUpdate,
@@ -14,6 +16,86 @@ import {
 
 const outline = 'border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent'
 const megabytes = (bytes: number): string => `${Math.round(bytes / 1e6)} MB`
+
+/** `23 Nov 2026`, or nothing when the release gave no date. */
+function day(date: string): string {
+  const time = Date.parse(date)
+  if (Number.isNaN(time)) return ''
+  return new Date(time).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  })
+}
+
+const changesUrl = (version: string): string => `${REPO_URL}/releases/tag/v${version}`
+
+/** Settings: the day a release came out, a few lines of notes and the way to the whole list. */
+function ReleaseNotes({ release }: { release: UpdateRelease }): React.JSX.Element {
+  const when = day(release.date)
+  return (
+    <div className="space-y-2 text-[13px] text-muted-foreground">
+      {when && <p>Released {when}</p>}
+      {release.notes.length > 0 && (
+        <ul className="list-disc space-y-1 pl-5">
+          {release.notes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
+        </ul>
+      )}
+      <a
+        href={changesUrl(release.version)}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-block hover:text-foreground"
+      >
+        See all changes
+      </a>
+    </div>
+  )
+}
+
+/** The sidebar has no room for the notes: there they are the tooltip of the card's main button. */
+function WithNotes({
+  release,
+  children
+}: {
+  release: UpdateRelease
+  children: React.ReactNode
+}): React.JSX.Element {
+  const when = day(release.date)
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent
+        side="right"
+        align="start"
+        sideOffset={8}
+        className="max-w-64 space-y-1.5 px-3 py-2.5 text-pretty"
+      >
+        <p className="font-medium">
+          Indent {release.version}
+          {when && <span className="font-normal opacity-70"> · {when}</span>}
+        </p>
+        {release.notes.length > 0 && (
+          <ul className="list-disc space-y-1 pl-4">
+            {release.notes.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
+        )}
+        <a
+          href={changesUrl(release.version)}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-block underline underline-offset-2 opacity-70 hover:opacity-100"
+        >
+          See all changes
+        </a>
+      </TooltipContent>
+    </Tooltip>
+  )
+}
 
 /**
  * The app's update, in each of its states, with the action that fits. The sidebar shows it compact
@@ -51,18 +133,16 @@ export function UpdateCard({ compact = false }: { compact?: boolean }): React.JS
   if (status.state === 'available') {
     return (
       <div className="space-y-3">
-        <p className={cn(text, 'font-medium')}>Indent {status.version} is available.</p>
-        {!compact && status.notes.length > 0 && (
-          <ul className="list-disc space-y-1 pl-5 text-[13px] text-muted-foreground">
-            {status.notes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
-        )}
+        <div className="space-y-1">
+          <p className={cn(text, 'font-medium')}>Indent {status.version} is available.</p>
+          {!compact && <ReleaseNotes release={status} />}
+        </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" size="sm" className={outline} onClick={downloadUpdate}>
-            Download update
-          </Button>
+          <WithNotes release={status}>
+            <Button variant="outline" size="sm" className={outline} onClick={downloadUpdate}>
+              Download update
+            </Button>
+          </WithNotes>
           {compact && (
             <Button variant="ghost" size="sm" onClick={() => updateLater(status.version)}>
               Later
@@ -99,11 +179,16 @@ export function UpdateCard({ compact = false }: { compact?: boolean }): React.JS
   if (status.state === 'ready') {
     return (
       <div className="space-y-2">
-        <p className={cn(text, 'font-medium')}>Restart to update to {status.version}.</p>
+        <div className="space-y-1">
+          <p className={cn(text, 'font-medium')}>Restart to update to {status.version}.</p>
+          {!compact && <ReleaseNotes release={status} />}
+        </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button size="sm" onClick={() => void installUpdate()}>
-            Restart now
-          </Button>
+          <WithNotes release={status}>
+            <Button size="sm" onClick={() => void installUpdate()}>
+              Restart now
+            </Button>
+          </WithNotes>
           <Button variant="ghost" size="sm" onClick={() => updateLater(status.version)}>
             Next time you open Indent
           </Button>

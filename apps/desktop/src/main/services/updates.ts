@@ -1,6 +1,6 @@
 import { app } from 'electron'
 import { autoUpdater, CancellationToken, type UpdateInfo } from 'electron-updater'
-import type { UpdateStatus } from '@shared/types'
+import type { UpdateRelease, UpdateStatus } from '@shared/types'
 import { EVENTS } from '@shared/types'
 import { emit, handle } from '../ipc'
 import { releaseNoteText, shortNotes } from '../updateRelease'
@@ -19,11 +19,16 @@ function set(next: UpdateStatus): UpdateStatus {
   return next
 }
 
+const release = (info: UpdateInfo): UpdateRelease => ({
+  version: info.version,
+  notes: shortNotes(releaseNoteText(info.releaseNotes)),
+  date: info.releaseDate ?? ''
+})
+
 function available(info: UpdateInfo): UpdateStatus {
   offered = {
     state: 'available',
-    version: info.version,
-    notes: shortNotes(releaseNoteText(info.releaseNotes)),
+    ...release(info),
     size: info.files.find((file) => file.size)?.size ?? 0
   }
   return set(offered)
@@ -87,7 +92,7 @@ async function download(): Promise<UpdateStatus> {
   // Nothing offered yet (a failed check, a release missing this computer's file): look again.
   if (!offered) return check()
   token = new CancellationToken()
-  set({ state: 'downloading', version: offered.version, done: 0, size: offered.size })
+  set({ ...offered, state: 'downloading', done: 0 })
   await autoUpdater.downloadUpdate(token).catch(() => {})
   return status
 }
@@ -113,7 +118,7 @@ export function register(): void {
     if (status.state !== 'downloading') return
     set({ ...status, done: progress.percent / 100, size: progress.total })
   })
-  autoUpdater.on('update-downloaded', (info) => set({ state: 'ready', version: info.version }))
+  autoUpdater.on('update-downloaded', (info) => set({ state: 'ready', ...release(info) }))
   autoUpdater.on('update-cancelled', () => offered && set(offered))
   autoUpdater.on('error', failed)
   handle('updates', {
