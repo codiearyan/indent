@@ -327,6 +327,10 @@ const repos: { labId: string; expected: string[] }[] = [
     expected: ['a-log-on-disk/replay', 'records-that-hold-anything/anything']
   },
   {
+    labId: 'make-it-fast',
+    expected: ['loop-inside-a-loop/match', 'work-done-again/shares', 'knowing-when-to-stop/days']
+  },
+  {
     labId: 'testing-foundations',
     expected: ['choosing-cases/fix', 'test-first/free-code', 'test-first/large-code']
   },

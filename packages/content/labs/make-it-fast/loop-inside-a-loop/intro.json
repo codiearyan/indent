@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Sefton", "say": "How can two lines take the night?", "note": "Match is the slow step." },
+    { "title": "Match step", "text": "Searches all customers for every order.", "note": "Orders times customers." },
+    {
+      "title": "Your code",
+      "file": "report.js",
+      "mine": true,
+      "gap": "A search inside every order",
+      "tasks": ["Match with no search", "Trade orders at once", "Say how work grows"]
+    },
+    { "title": "Money step", "text": "Gets the same matched orders as before." }
+  ],
+  "ticket": { "label": "match step", "wrong": "half a second", "why": "Searching", "right": "a moment" },
+  "captions": [
+    "At Ashgrove Press, Sefton cannot see how his two-line match step takes so long.",
+    "For every order it goes through the customer list from the front.",
+    "You look each customer up from something built once, and do the same for trade orders.",
+    "Now the match step gives the same orders as before, in a small part of the time.",
+    "Same report, same answers, and work that only doubles when the shop does."
+  ]
+}
