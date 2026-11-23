@@ -1,0 +1,105 @@
+{
+  "id": "packages",
+  "title": "Packages: more than one file",
+  "files": ["lanternquay/tickets/Fares.java", "lanternquay/tickets/Ticket.java", "lanternquay/hut/Hut.java"],
+  "terminal": {
+    "description": "A shell at the top of your workspace. Build every file into out with this command, then run the hut with java -cp out lanternquay.hut.Hut.",
+    "suggestedCommand": "javac -d out lanternquay/tickets/Fares.java lanternquay/tickets/Ticket.java lanternquay/hut/Hut.java"
+  },
+  "tasks": [
+    {
+      "id": "fares",
+      "title": "Keep the fares inside the tickets package",
+      "file": "lanternquay/tickets/Fares.java",
+      "description": "In `lanternquay/tickets/Fares.java`, under `// Task 1`, write the package line for the folder the file sits in, `lanternquay.tickets`. Then write a class `Fares` with no word in front of `class`, so that only the tickets package can use it, holding one method, `static int fareFor(int age)`: under 5 travels free, under 16 pays 160 pence, and everyone else 320.\n\nCheck builds the file as the lesson's command does, calls `Fares.fareFor` from code of its own in the same package, for ages on both sides of 5 and 16, and tries to use `Fares` from another package, where Java must refuse.",
+      "nextSteps": [
+        "Read the parts of the lesson about packages and about `public` against no word at all.",
+        "Write the package line first: it follows the folders, with dots.",
+        "Write the class and `fareFor`, which is called through the class's name.",
+        "Build the folder with the command in the terminal and read any error."
+      ],
+      "hints": [
+        "A file's package line is the first line of code in it, and names the folders from the top of the workspace, joined with dots.",
+        "With no word in front, a class can be used only by code in its own package. `fareFor` is called as `Fares.fareFor(9)`, so it is `static`.",
+        "`package lanternquay.tickets;` then `class Fares {` with `static int fareFor(int age)` inside: `if (age < 5) { return 0; }`, `if (age < 16) { return 160; }`, `return 320;`."
+      ],
+      "docs": [
+        {
+          "title": "Creating and using packages",
+          "url": "https://docs.oracle.com/javase/tutorial/java/package/packages.html"
+        },
+        {
+          "title": "Controlling access to members of a class",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Packages and the import statement",
+          "url": "https://www.youtube.com/watch?v=NdjKZQF4EAM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ticket",
+      "title": "Make the ticket usable from the hut",
+      "file": "lanternquay/tickets/Ticket.java",
+      "description": "In `lanternquay/tickets/Ticket.java`, under `// Task 2`, write the package line and a `public` class `Ticket` with two `private` fields, a `String passenger` and an `int pence`. Give it a `public` constructor `Ticket(String passenger, int age)`, which gets the fare from `Fares.fareFor`, and a `public` method `String line()` that gives back the passenger and the fare in the form `Morag: 320p`.\n\nCheck builds the file beside a `Fares` of its own, with fares of its own, makes tickets from another package and reads `line()`, and from the tickets package tries to change each field, where Java must refuse.",
+      "nextSteps": [
+        "Read the part of the lesson about what `public` opens up.",
+        "Write the package line, then the class with `public` in front.",
+        "Decide which parts the hut uses from its package: those need `public`. The fields stay `private`.",
+        "Build the folder with the command in the terminal and read any error."
+      ],
+      "hints": [
+        "Code in another package can use a class, a constructor or a method only when it has `public` in front.",
+        "`Fares` is in the same package, so the constructor can call `Fares.fareFor(age)` with no import and no `public` on `Fares`.",
+        "`public Ticket(String passenger, int age) { this.passenger = passenger; this.pence = Fares.fareFor(age); }` and `public String line() { return passenger + \": \" + pence + \"p\"; }`."
+      ],
+      "docs": [
+        {
+          "title": "Controlling access to members of a class",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html"
+        },
+        {
+          "title": "Creating a package",
+          "url": "https://docs.oracle.com/javase/tutorial/java/package/createpkgs.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hut",
+      "title": "Print the morning's tickets at the hut",
+      "file": "lanternquay/hut/Hut.java",
+      "description": "In `lanternquay/hut/Hut.java`, under `// Task 3`, write the package line for `lanternquay.hut`, import `Ticket` from `lanternquay.tickets`, and write a class `Hut` with a `main`. For each person in the queue the file gives, `main` makes a `Ticket` and prints what its `line()` gives back, one ticket per line, in queue order.\n\nCheck builds the file beside a `Ticket` of its own, whose `line()` gives back text of its own, and runs `lanternquay.hut.Hut` by name, as the lesson's second command does. It reads the lines your `main` prints.",
+      "nextSteps": [
+        "Read the parts of the lesson about `import` and about running a class by its full name.",
+        "Write the package line and the import above the class.",
+        "Copy the queue into `main`, then loop over it, making a ticket and printing its line each time round.",
+        "Build the folder, then run `java -cp out lanternquay.hut.Hut`."
+      ],
+      "hints": [
+        "An `import` line names a class with its package, and sits between the package line and the class.",
+        "The two arrays go side by side: the name at position `i` belongs with the age at position `i`.",
+        "`import lanternquay.tickets.Ticket;`, and in `main`: `for (int i = 0; i < names.length; i++) { Ticket ticket = new Ticket(names[i], ages[i]); System.out.println(ticket.line()); }`."
+      ],
+      "docs": [
+        {
+          "title": "Using package members",
+          "url": "https://docs.oracle.com/javase/tutorial/java/package/usepkgs.html"
+        },
+        {
+          "title": "The javac command",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/specs/man/javac.html"
+        },
+        {
+          "title": "The java command",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
