@@ -3839,15 +3839,17 @@ export async function judgeFault(t, spec) {
 // Tasks of part 8 are judged with judgeFault() and Check's own C++: a function template is called
 // with types of Check's own that offer only what the task says a type must offer; a function the
 // learner's code is handed is a counting one of Check's; a lambda or a function given back is
-// called after what made it has returned, with the stack between filled with 0x5A by
-// indent8_::scrub_(), so a capture that refers to something that ended reads LEFTOVER, the same on
-// every run. The long errors of templates and lambdas are named from their first line on the
+// made through indent8_::deep_(), 16 KB down the stack, and called after what made it has
+// returned, with the stack between filled with 0x5A by indent8_::scrub_(). A capture that refers to
+// a variable that ended then reads 0x5A bytes, the same on every run and system: the calls that
+// follow stay far above that place and never write over it. The long errors of templates and lambdas are named from their first line on the
 // learner's own line, in the wording of either compiler.
 
 const PART8_HELPERS = [
   '#include <functional>',
   String.raw`namespace indent8_ {
 __attribute__((noinline)) inline void scrub_() { volatile unsigned char b[1 << 16]; for (unsigned i = 0; i < sizeof b; i++) b[i] = 0x5A; }
+template <class F> __attribute__((noinline)) auto deep_(F f) { volatile unsigned char pad[1 << 14]; pad[0] = 0; pad[sizeof pad - 1] = 0; return f(); }
 template <class T> constexpr bool lambda_() { return std::is_class_v<std::remove_reference_t<T>>; }
 }`
 ]
@@ -3929,7 +3931,7 @@ function part8Cause(errors, ctx, spec) {
       ? `Check makes a ${C} with its limit, as the task describes, and no constructor of ${C} takes that. Compare the constructor's round brackets with the task.`
       : `A line makes a ${C} without what its constructor takes. A ${C} is made with its limit, in round brackets after the variable's name.`
   }
-  if (/no matching function for call to object of type '\(lambda|no match for call to '\(<lambda/.test(text)) {
+  if (/no matching function for call to object of type '\(lambda|no match for call to '\([^']*<lambda/.test(text)) {
     return 'A line puts round brackets after a lambda, which calls it right there, with no values. An algorithm is handed the lambda itself, without brackets, and calls it on the items.'
   }
 
@@ -3943,6 +3945,9 @@ function part8Cause(errors, ctx, spec) {
       : `${C} is a class template, not a class. A class is made from it by naming the type in angle brackets after its name, every time it is used as a type: in a parameter, in what a function gives back and in a variable.`
   }
   if (C && /return type of out-of-line definition of '[^']*' differs from that in the declaration|out-of-line definition of '\w+' does not match any declaration|no declaration matches '/.test(text)) {
+    if (fromCheck && !spec.provides?.some((p) => p.name === C)) {
+      return `Check reads the items of a ${C} with a body of at of its own, written as Task 2 asks, and it matches no declaration of at in your class. Compare the declaration of at with the task: what it gives back, the type of its parameter and const at the end.`
+    }
     return fromCheck
       ? `Check builds this task with its own ${C}, written as the task before asks, and a body of yours matches none of its declarations. Compare the first line of each body with its declaration in the task: what it gives back, the type of each parameter and const at the end.`
       : `The first line of a body below the class does not match its declaration in the class: what it gives back, the type of each parameter and const at the end must be the same in both.${spec.provides?.some((p) => p.name === C) ? ` Check builds this task with its own ${C}, written as the task before asks.` : ''}`

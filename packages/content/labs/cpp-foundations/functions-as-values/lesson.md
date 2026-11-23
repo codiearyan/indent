@@ -26,7 +26,7 @@ std::cout << discount(40) << "\n";   // 36
 
 The angle brackets give the shape: what it gives back, then the types of its parameters in round brackets. Anything callable with that shape fits: a lambda, a lambda with captures, a plain function. Assign another one, and the same variable now holds that.
 
-A `std::function` can also hold nothing. It starts empty when made without a value, and calling it then throws `std::bad_function_call`. Asked as a condition, it says whether it holds something: `if (discount) { ... }`.
+A `std::function` can also hold nothing. It starts empty when made without a value, and calling it then throws `std::bad_function_call`. Uncaught, it ends the program as in part 7, with something like `terminate called after throwing an instance of 'std::bad_function_call'`, or on a Mac `libc++abi: terminating due to uncaught exception of type std::__1::bad_function_call`. Asked as a condition, it says whether it holds something: `if (discount) { ... }`.
 
 ## Taking a function, giving one back
 

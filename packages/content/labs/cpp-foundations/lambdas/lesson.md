@@ -62,4 +62,4 @@ auto makeAlarm(int minutes) {
 
 ## Your work in this issue
 
-Write the three tasks in `src/timer.cpp`. Build and run with `g++ -std=c++17 -Wall src/timer.cpp -o timer && ./timer`, and try a quote and a timer on the same repair in `main`. Check builds each task with a `Repair` of its own that counts every use of a repair that has ended, and calls your lambdas after the functions that made them have returned. Your own build counts nothing, so a run that seems to work proves nothing.
+Write the three tasks in `src/timer.cpp`. Build and run with `g++ -std=c++17 -Wall src/timer.cpp -o timer && ./timer`, and try a quote and a timer on the same repair in `main`. Until `main` uses `hoursOf`, the compiler may warn that it is unused. Check builds each task with a `Repair` of its own that counts every use of a repair that has ended, and calls your lambdas after the functions that made them have returned. Your own build counts nothing, so a run that seems to work proves nothing.

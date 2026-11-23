@@ -21,6 +21,8 @@ const CLASS_OF_CHECK = (withAt) => [
   'inline int indent_adds_ = 0;',
   `template <typename T> class Caddy { std::vector<T> items; int limit; public: Caddy(int most) : limit(most) {} bool add(const T& item) { indent_adds_++; if (static_cast<int>(items.size()) >= limit) return false; items.push_back(item); return true; } int count() const { return static_cast<int>(items.size()); } const T& at(int place) const${withAt ? ' { if (place < 0 || place >= count()) throw std::out_of_range("no item at that place"); return items[place]; }' : ';'} };`
 ]
+// Task 1's build reads the items through a body of at of Check's own, written as Task 2 asks.
+const AT_OF_CHECK = ['template <typename T> const T& Caddy<T>::at(int place) const { return items.at(place); }']
 const HEADER_OF_CHECK = ['#ifndef CADDY_H', '#define CADDY_H', '#include <stdexcept>', '#include <string>', '#include <vector>', ...CLASS_OF_CHECK(true), '#endif', ''].join('\n')
 
 const privateProbe = (member) => ({
@@ -39,29 +41,34 @@ export const checks = {
       ...base,
       files: [HEADER],
       keepGuard: [HEADER],
+      guard: { file: HEADER, task: 1 },
+      provides: [{ name: 'at', task: 2, file: HEADER, lines: AT_OF_CHECK }],
       task: 1,
       probes: [privateProbe('items'), privateProbe('limit')],
       cases: [
         {
           name: 'A Caddy<int> with a limit of 3 takes three items and refuses a fourth',
-          code: `Caddy<int> c(3); ${put('n0', 'c.count()')} ${put('a', 'c.add(5)')} ${put('b', 'c.add(7)')} ${put('c', 'c.add(9)')} ${put('d', 'c.add(11)')} const Caddy<int>& v = c; ${put('n', 'v.count()')}`,
+          code: `Caddy<int> c(3); ${put('n0', 'c.count()')} ${put('a', 'c.add(5)')} ${put('b', 'c.add(7)')} ${put('c', 'c.add(9)')} ${put('d', 'c.add(11)')} const Caddy<int>& v = c; ${put('n', 'v.count()')} ${put('held', 'std::to_string(v.at(0)) + ", " + std::to_string(v.at(1)) + ", " + std::to_string(v.at(2))')}`,
           judge: (got) => {
             if (num(got, 'n0') !== 0) return `A new Caddy<int>(3) says it holds ${got.n0} items. A caddy starts with none.`
             if ([got.a, got.b, got.c].some((x) => x !== '1')) return `Adding 5, 7 and 9 to a Caddy<int> with a limit of 3 gave back ${said(got, 'a')}, ${said(got, 'b')} and ${said(got, 'c')}. Each fits, so each gives back true.`
             if (got.d !== '0') return 'A fourth item, added to a Caddy<int> with a limit of 3 that holds three, gave back true. A full caddy refuses it and gives back false.'
             if (num(got, 'n') !== 3) return `After three items went in and a fourth was refused, count says ${got.n}. A refused item changes nothing.`
+            if (got.held !== '5, 7, 9') return `After add(5), add(7) and add(9), the caddy holds ${got.held}, read by place from 0. add keeps a copy of each item it takes, after the items already there.`
             return null
           },
-          output: (got) => `Caddy<int>(3): count ${got.n0 ?? '?'}, add(5) ${said(got, 'a')}, add(7) ${said(got, 'b')}, add(9) ${said(got, 'c')}, add(11) ${said(got, 'd')}, count ${got.n ?? '?'}`
+          output: (got) => `Caddy<int>(3): count ${got.n0 ?? '?'}, add(5) ${said(got, 'a')}, add(7) ${said(got, 'b')}, add(9) ${said(got, 'c')}, add(11) ${said(got, 'd')}, count ${got.n ?? '?'}, holds ${got.held ?? '?'}`
         },
         {
           name: "A Caddy of Check's own type, which can only be copied",
-          code: `Caddy<check::Jewel> c(2); ${put('a', 'c.add(check::Jewel("ruby"))')} ${put('b', 'c.add(check::Jewel("garnet"))')} ${put('c', 'c.add(check::Jewel("sapphire"))')} ${put('n', 'c.count()')}`,
+          code: `Caddy<check::Jewel> c(2); ${put('a', 'c.add(check::Jewel("ruby"))')} ${put('b', 'c.add(check::Jewel("garnet"))')} ${put('c', 'c.add(check::Jewel("sapphire"))')} ${put('n', 'c.count()')} ${put('held', 'c.at(0).name + ", " + c.at(1).name')}`,
           judge: (got) =>
-            got.a === '1' && got.b === '1' && got.c === '0' && num(got, 'n') === 2
-              ? null
-              : `A Caddy of Check's own type with a limit of 2 gave back ${said(got, 'a')}, ${said(got, 'b')} and ${said(got, 'c')} for three items, and count says ${got.n}. The same rule holds for every type: two fit, the third is refused.`,
-          output: (got) => `Caddy<check::Jewel>(2): three adds gave back ${said(got, 'a')}, ${said(got, 'b')}, ${said(got, 'c')}; count ${got.n ?? '?'}`
+            !(got.a === '1' && got.b === '1' && got.c === '0' && num(got, 'n') === 2)
+              ? `A Caddy of Check's own type with a limit of 2 gave back ${said(got, 'a')}, ${said(got, 'b')} and ${said(got, 'c')} for three items, and count says ${got.n}. The same rule holds for every type: two fit, the third is refused.`
+              : got.held !== 'ruby, garnet'
+                ? `After ruby and then garnet went in, the caddy holds ${got.held}, read by place from 0. add keeps a copy of each item it takes, after the items already there.`
+                : null,
+          output: (got) => `Caddy<check::Jewel>(2): three adds gave back ${said(got, 'a')}, ${said(got, 'b')}, ${said(got, 'c')}; count ${got.n ?? '?'}; holds ${got.held ?? '?'}`
         },
         {
           name: 'A caddy with a limit of 0 refuses everything',

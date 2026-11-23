@@ -1,4 +1,4 @@
-import { bodyOf, judgeRule, num, thrownText } from '../../grading.mjs'
+import { judgeRule, num, thrownText } from '../../grading.mjs'
 
 const FILE = 'src/rules.cpp'
 const put = (key, expr) => `indent_::put_("${key}", ${expr});`
@@ -7,6 +7,8 @@ const ACTION = 'std::function<void(Repair&)>'
 const TABLE = `std::map<std::string, ${ACTION}>`
 const base = { files: [FILE], counted: true, own: ['Repair', MINUTES_RULE, ACTION, TABLE] }
 const LEFTOVER_HINT = (got) => Object.values(got).some((v) => Math.abs(Number(v)) > 100000)
+// A dangling read gives 0x5A bytes: minutes far from any rule's, never quoted back.
+const mins = (v) => (v === undefined ? '?' : Math.abs(Number(v)) > 100000 ? 'minutes that have nothing to do with the rule' : `${v} minutes`)
 const DANGLING = 'What the rule refers to had ended when it was called: a capture by reference keeps no copy of its own. A rule that is called after the function that made it has returned keeps copies of what it needs.'
 const benchOf = (list) => `std::vector<Repair> bench; bench.reserve(${list.length}); ${list.map(([t, i]) => `bench.push_back(Repair(${t}, ${JSON.stringify(i)}));`).join(' ')}`
 const minutesOf = 'std::string ms; for (const Repair& r : bench) ms += (ms.empty() ? "" : ", ") + std::to_string(r.getMinutes());'
@@ -65,9 +67,8 @@ export const checks = {
     })
   },
 
-  async addTime(t) {
-    const byReference = /\[\s*&/.test((await bodyOf(t, FILE, 'addTime')) ?? '')
-    const make = (n) => `${ACTION} rule = addTime(${n}); indent8_::scrub_();`
+  addTime(t) {
+    const make = (n) => `${ACTION} rule = indent8_::deep_([&] { return addTime(${n}); }); indent8_::scrub_();`
     return judgeRule(t, {
       ...base,
       task: 2,
@@ -87,17 +88,20 @@ export const checks = {
             const twice = what.includes('twice')
             if (num(got, 'empty') === 1) return `addTime(${n}) gave back an empty std::function, which holds no rule to run. It gives back the rule itself.`
             const wrong = twice ? num(got, 'a') !== 2 * n || num(got, 'b') !== 0 : num(got, 'a') !== n || num(got, 'b') !== n
-            if (LEFTOVER_HINT(got) || (wrong && byReference)) return `After the rule from addTime(${n}) ran ${twice ? 'twice on one repair' : 'once on each of two repairs'}, the repairs hold minutes that have nothing to do with ${n}. The rule's lambda captures by reference. ${DANGLING}`
-            if (twice ? num(got, 'a') !== 2 * n || num(got, 'b') !== 0 : num(got, 'a') !== n || num(got, 'b') !== n) return `After the rule from addTime(${n}) ran ${twice ? 'twice on one repair' : 'once on each of two repairs'}, they have ${got.a} and ${got.b} minutes. Each call adds ${n} minutes to the repair it is called with.`
+            if (LEFTOVER_HINT(got)) return `After the rule from addTime(${n}) ran ${twice ? 'twice on one repair, the repair holds' : 'once on each of two repairs, the repairs hold'} minutes that have nothing to do with ${n}. The rule's lambda captures by reference. ${DANGLING}`
+            if (wrong) return `After the rule from addTime(${n}) ran ${twice ? 'twice on one repair' : 'once on each of two repairs'}, they have ${got.a} and ${got.b} minutes. Each call adds ${n} minutes to the repair it is called with.`
             return null
           },
-          output: (got) => `The rule from addTime(${n}), called ${what}: the repairs have ${got.a ?? '?'} and ${got.b ?? '?'} minutes`
+          output: (got) =>
+            what.includes('twice')
+              ? `The rule from addTime(${n}), called twice on one repair: the repair has ${mins(got.a)}`
+              : `The rule from addTime(${n}), called on two repairs: they have ${mins(got.a)} and ${mins(got.b)}`
         })),
         {
           name: 'Two rules from addTime keep apart',
-          code: `${ACTION} small = addTime(5); ${ACTION} big = addTime(60); indent8_::scrub_(); Repair a(61, "ship clock"); if (small && big) { small(a); big(a); small(a); } ${put('a', 'a.getMinutes()')}`,
-          judge: (got) => (LEFTOVER_HINT(got) || (num(got, 'a') !== 70 && byReference) ? `The repair holds minutes that have nothing to do with 5 and 60. The rule's lambda captures by reference. ${DANGLING}` : num(got, 'a') !== 70 ? `With a rule from addTime(5) run twice and one from addTime(60) once, the repair has ${got.a} minutes. Each rule keeps its own minutes.` : null),
-          output: (got) => `5, then 60, then 5 more: the repair has ${got.a ?? '?'} minutes`
+          code: `${ACTION} small = indent8_::deep_([&] { return addTime(5); }); ${ACTION} big = indent8_::deep_([&] { return addTime(60); }); indent8_::scrub_(); Repair a(61, "ship clock"); if (small && big) { small(a); big(a); small(a); } ${put('a', 'a.getMinutes()')}`,
+          judge: (got) => (LEFTOVER_HINT(got) ? `The repair holds minutes that have nothing to do with 5 and 60. The rule's lambda captures by reference. ${DANGLING}` : num(got, 'a') !== 70 ? `With a rule from addTime(5) run twice and one from addTime(60) once, the repair has ${got.a} minutes. Each rule keeps its own minutes.` : null),
+          output: (got) => `5, then 60, then 5 more: the repair has ${mins(got.a)}`
         }
       ]
     })
@@ -131,14 +135,14 @@ export const checks = {
         ...Object.entries(want).map(([name, minutes]) => ({
           name: `"${name}" adds ${minutes} minutes, after repairRules has returned`,
           escaped: escaped(`The rule "${name}"`),
-          code: `${TABLE} rules = repairRules(); indent8_::scrub_(); Repair r(3101, "mantel clock"); auto found = rules.find(${JSON.stringify(name)}); ${put('has', 'found != rules.end() && found->second ? 1 : 0')} if (found != rules.end() && found->second) { found->second(r); indent8_::scrub_(); found->second(r); } ${put('m', 'r.getMinutes()')}`,
+          code: `${TABLE} rules = indent8_::deep_([&] { return repairRules(); }); indent8_::scrub_(); Repair r(3101, "mantel clock"); auto found = rules.find(${JSON.stringify(name)}); ${put('has', 'found != rules.end() && found->second ? 1 : 0')} if (found != rules.end() && found->second) { found->second(r); indent8_::scrub_(); found->second(r); } ${put('m', 'r.getMinutes()')}`,
           judge: (got) => {
             if (num(got, 'has') !== 1) return `The table has no rule called "${name}" that holds a function.`
             if (LEFTOVER_HINT(got)) return `After "${name}" ran, the repair holds minutes that have nothing to do with the rule. ${DANGLING}`
             if (num(got, 'm') !== 2 * minutes) return `After "${name}" ran twice, the repair has ${got.m} minutes. "${name}" adds ${minutes} each time it runs.`
             return null
           },
-          output: (got) => `"${name}" run twice on a repair of 0 minutes: ${got.m ?? '?'} minutes`
+          output: (got) => `"${name}" run twice on a repair of 0 minutes: ${mins(got.m)}`
         }))
       ]
     })
@@ -168,6 +172,10 @@ export const checks = {
       },
       callWith: `const ${TABLE}&, const std::string&, Repair&`,
       tools: [{ fn: 'runRule', uses: [] }],
+      cause: (errors) =>
+        /operator\[\][^\n]*const (?:std::)?map|const (?:std::)?map<[^\n]*discards qualifiers/.test(errors.map((e) => e.text).join('\n'))
+          ? '[] on a map adds the name when it is not there yet, with an empty rule, so the compiler refuses it on a map that is const. runRule only reads the table: it asks whether the name is there in a way that adds nothing, as part 3 did, and then whether its rule is empty.'
+          : null,
       cases: cases.map(([name, ok, minutes, what]) => ({
         name: `runRule "${name}", ${what}`,
         escaped: (got) =>

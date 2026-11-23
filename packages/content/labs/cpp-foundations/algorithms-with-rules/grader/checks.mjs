@@ -74,7 +74,7 @@ export const checks = {
           code: whenBool(`${pairs} ${put('ee', 'benchFirst(e, e)')}`),
           judge: (got) =>
             got.notBool ? notBool(got) : got.ee === '1'
-              ? 'benchFirst says a repair goes before itself. std::sort is promised a rule that says false for two equal items; one that says true, as <= or >= does, may make it read past the end of the list or never finish.'
+              ? 'benchFirst says a repair goes before itself, so two equal items each say they come before the other. std::sort is promised a rule that says false for two equal items; one that says true, as <= or >= does, may make it read past the end of the list or never finish.'
               : null,
           output: (got) => `benchFirst(r, r) gave back ${got.ee === '1'}`
         },
@@ -216,19 +216,28 @@ export const checks = {
       task: 5,
       templates: ['dropWhere'],
       tools: [{ fn: 'dropWhere', uses: ['remove_if'] }],
-      cases: rules.map(([name, l, test, keepOff]) => {
+      // Check calls it once as dropWhere<Rule>, which only a template with Rule as its type allows.
+      cause: (errors) =>
+        /'dropWhere' does not name a template|'dropWhere' is not a template/.test(errors.map((e) => e.text).join('\n'))
+          ? 'Check calls dropWhere once with the type of its rule said in angle brackets, as any function template can be called, and dropWhere is not a template. The task asks for a function template with one type, Rule, the type of the rule it takes.'
+          : null,
+      crashed: (r, label) =>
+        r.signal
+          ? `The program stopped while dropWhere ran, under ${label}, at a guard of the standard library: erase was handed a place where there is no repair. erase with one place takes off the one repair there, and end() has none. The leftovers run from the place std::remove_if gives back to the end of the list.`
+          : null,
+      cases: rules.map(([name, l, test, keepOff], i) => {
         const left = l.filter((r) => !keepOff(r)).map((r) => r[0]).join(', ')
         const asked = l.map((r) => r[0]).sort().join(',')
         return {
           name,
-          code: `std::vector<Repair> v = {${l.map(repair).join(', ')}}; int calls = 0; std::vector<int> asked; auto rule = [&calls, &asked](const Repair& r) { calls++; asked.push_back(r.ticket); return ${test}; }; dropWhere(v, rule); ${put('left', 'check::tickets_(v)')} ${put('n', 'v.size()')} ${put('calls', 'calls')} std::sort(asked.begin(), asked.end()); std::string a; for (int x : asked) a += (a.empty() ? "" : ",") + std::to_string(x); ${put('asked', 'a')}`,
+          code: `std::vector<Repair> v = {${l.map(repair).join(', ')}}; int calls = 0; std::vector<int> asked; auto rule = [&calls, &asked](const Repair& r) { calls++; asked.push_back(r.ticket); return ${test}; }; ${i === 0 ? 'dropWhere<decltype(rule)>(v, rule);' : 'dropWhere(v, rule);'} ${put('left', 'check::tickets_(v)')} ${put('n', 'v.size()')} ${put('calls', 'calls')} std::sort(asked.begin(), asked.end()); std::string a; for (int x : asked) a += (a.empty() ? "" : ",") + std::to_string(x); ${put('asked', 'a')}`,
           judge: (got) => {
             const keep = l.filter((r) => !keepOff(r)).length
             if (num(got, 'calls') === 0 && l.length) return "dropWhere never asked Check's rule about a repair. The rule it is handed decides which repairs come off: hand it to std::remove_if."
             if (num(got, 'calls') > l.length) return `dropWhere asked Check's rule ${got.calls} times about ${l.length} repairs. It asks about each repair once: the rule is handed to std::remove_if alone, which asks it once per repair.`
             if ((got.asked ?? '') !== asked) return `dropWhere asked Check's rule about the tickets ${(got.asked ?? '').replaceAll(',', ', ') || 'none'}, and the list holds ${asked.replaceAll(',', ', ')}. It asks about every repair of the list, from its first to its last.`
-            if (num(got, 'n') === l.length && keep !== l.length) return `Afterwards Check's list still has ${l.length} repairs: the ${keep} it keeps come first, and at its end are ${l.length - keep} leftover places that std::remove_if moved past. std::remove_if only moves what stays to the front and gives back where that ends; the list is cut there with erase.`
-            if ((got.left ?? '') !== left) return `After dropWhere, Check's list holds the tickets ${got.left || 'none'}. It keeps the repairs the rule says false for, ${left || 'none here'}, in their order.`
+            if (num(got, 'n') === l.length && keep !== l.length) return `Afterwards Check's list still has all ${l.length} of its repairs: ${keep ? `the ones it keeps come first, and at its end ${l.length - keep === 1 ? 'is a leftover place' : 'are leftover places'}` : 'all of them are leftover places'} that std::remove_if moved past. std::remove_if only moves what stays to the front and gives back where that ends; the list is cut there with erase.`
+            if ((got.left ?? '') !== left) return `After dropWhere, Check's list holds the tickets ${got.left || 'none'}. It keeps the repairs the rule says false for, and only those, in their order.`
             return null
           },
           output: (got) => `${shown(l)}\nthe rule: ${test}\nafter dropWhere: ${got.left ? `tickets ${got.left}` : 'no repairs'}; the rule was asked ${got.calls ?? '?'} times`

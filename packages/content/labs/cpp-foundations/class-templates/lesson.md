@@ -48,7 +48,7 @@ const T& Basket<T>::first() const {
 }
 ```
 
-Leave the template line off and the compiler stops at the first `T`, with `use of undeclared identifier 'T'` or `'T' was not declared in this scope`. Write `Basket::first` without `<T>` and it says, again, that the template requires its arguments.
+Leave the template line off and the compiler stops at the first `T`, with something like `unknown type name 'T'` or `use of undeclared identifier 'T'`, or from GCC `'T' does not name a type` or `'T' was not declared in this scope`. Write `Basket::first` without `<T>` and it says, again, that the template requires its arguments.
 
 ## Why the whole template lives in the header
 

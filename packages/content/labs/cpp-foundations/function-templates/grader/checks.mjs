@@ -61,7 +61,7 @@ export const checks = {
         {
           name: 'largestOf<double> with the type said in angle brackets',
           code: `auto r = largestOf<double>({2, 7.5, 3}); ${put('r', 'r')}`,
-          judge: (got) => (same(got.r, 7.5) ? null : `largestOf<double>({2, 7.5, 3}) gave back ${got.r}. With T said as double, the three values are doubles, and the largest is 7.5.`),
+          judge: (got) => (same(got.r, 7.5) ? null : `largestOf<double>({2, 7.5, 3}) gave back ${got.r}. With T said as double, the three values are doubles, and the largest of them comes back.`),
           output: (got) => `largestOf<double>({2, 7.5, 3}) gave back ${got.r ?? '?'}`
         }
       ]
@@ -103,7 +103,7 @@ export const checks = {
         {
           name: 'clampTo<double> with the type said, for a whole number between two prices',
           code: `auto r = clampTo<double>(7, 2.5, 9); ${put('r', 'r')}`,
-          judge: (got) => (same(got.r, 7) ? null : `clampTo<double>(7, 2.5, 9) gave back ${got.r}. With T said as double, all three are doubles, and 7 is between the two.`),
+          judge: (got) => (same(got.r, 7) ? null : `clampTo<double>(7, 2.5, 9) gave back ${got.r}. With T said as double, all three are doubles, and the value is between the two ends.`),
           output: (got) => `clampTo<double>(7, 2.5, 9) gave back ${got.r ?? '?'}`
         },
         ...[
@@ -113,7 +113,7 @@ export const checks = {
         ].map(([v, lo, hi, want, what]) => ({
           name: `clampTo for Check's own type, ${what}`,
           code: `auto r = clampTo(check::Spring(${v}), check::Spring(${lo}), check::Spring(${hi})); ${put('r', 'r.turns')}`,
-          judge: (got) => (num(got, 'r') === want ? null : `For Check's own type, a value of ${v} between ${lo} and ${hi} came back as ${got.r}. The value is ${what}.`),
+          judge: (got) => (num(got, 'r') === want ? null : `For Check's own type, a value of ${v} with the ends ${lo} and ${hi} came back as ${got.r}. The value is ${what}.`),
           output: (got) => `clampTo of check::Spring values ${v}, ${lo}, ${hi} gave back the one with ${got.r ?? '?'}`
         }))
       ]
@@ -162,7 +162,7 @@ export const checks = {
             if (!want.every((w, i) => Math.abs(p[i] - w) < 1e-9)) return `${call} gave back ${listed(p)}. Each price is its quote kept between the floor and the ceiling, in the order of the quotes.`
             return null
           },
-          output: (got) => `${call} gave back ${parse(got.p) ? listed(parse(got.p)) : '?'}\nclampTo was called ${got.n ?? '?'} times${got.T ? `, with T as ${got.T}` : ''}`
+          output: (got) => `${call} gave back ${parse(got.p) ? listed(parse(got.p)) : '?'}\nclampTo was called ${got.n === undefined ? '?' : got.n === '1' ? 'once' : `${got.n} times`}${got.T ? `, with T as ${got.T}` : ''}`
         }
       })
     })
