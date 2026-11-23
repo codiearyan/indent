@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "I wrote my own log. It will not go.",
+      "note": "He typed it in last night."
+    },
+    {
+      "title": "The compiler",
+      "text": "Refuses the file and points at lines"
+    },
+    {
+      "title": "Your fixes",
+      "file": "Logbook.java",
+      "mine": true,
+      "gap": "Nobody reads the errors",
+      "tasks": ["Find the lost name", "Fix the type", "A value every time", "Stop the crash"]
+    },
+    {
+      "title": "Boat log",
+      "text": "The day written down, to the last line."
+    }
+  ],
+  "ticket": {
+    "label": "Day's log",
+    "wrong": "refused",
+    "why": "Four slips",
+    "right": "written"
+  },
+  "captions": [
+    "Ossian wrote a program of his own overnight: a log of the boat's day.",
+    "The compiler refuses it, and once it runs, it stops with an exception on a foggy day.",
+    "You read what javac and java say, and fix each of his four slips.",
+    "Now the log compiles, runs, and writes the day to its last line.",
+    "Reading errors. Next, the program learns to do the same thing many times."
+  ]
+}

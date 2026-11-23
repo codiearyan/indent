@@ -1,0 +1,84 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "main", "label": "main", "kind": "function" },
+      { "id": "rules", "label": "FareRules.java", "kind": "file", "mine": true },
+      { "id": "printer", "label": "Ticket printer", "kind": "story" },
+      { "id": "seats", "label": "Seats left", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "bridie", "to": "main", "label": "a party" },
+      { "from": "main", "to": "rules", "label": "arguments" },
+      { "from": "rules", "to": "main", "label": "gives back" },
+      { "from": "rules", "to": "printer", "label": "ticket line" },
+      { "from": "rules", "to": "seats", "label": "new count" }
+    ],
+    "note": "The fare rules become methods, each written once and called from main with the values of the moment."
+  },
+  "tasks": {
+    "child-fare": {
+      "steps": [
+        {
+          "active": ["main", "main->rules", "rules"],
+          "note": "main calls the child fare rule with a single fare."
+        },
+        {
+          "active": ["rules"],
+          "note": "The rule works out half, in whole pence."
+        },
+        {
+          "active": ["rules", "rules->main", "main"],
+          "value": { "kind": "array", "label": "gives back", "values": ["one child's fare, in pence"] },
+          "note": "The answer goes back to main, which can keep it or use it."
+        }
+      ]
+    },
+    "print-ticket": {
+      "steps": [
+        {
+          "active": ["main", "main->rules", "rules"],
+          "note": "main passes a destination and a fare."
+        },
+        {
+          "active": ["rules", "rules->printer", "printer"],
+          "value": { "kind": "array", "label": "printed line", "values": ["Ticket to, destination, fare, pence"] },
+          "note": "The method prints the ticket line and gives nothing back."
+        }
+      ]
+    },
+    "party-fare": {
+      "steps": [
+        {
+          "active": ["bridie", "bridie->main", "main"],
+          "note": "A family at the hatch: some adults, some children, today's single fare."
+        },
+        {
+          "active": ["main", "main->rules", "rules"],
+          "note": "The party rule charges each adult the single fare, and asks the child fare rule what each child pays."
+        },
+        {
+          "active": ["rules", "rules->main", "main"],
+          "value": { "kind": "array", "label": "gives back", "values": ["what the whole party pays"] },
+          "note": "One total goes back for Bridie to charge."
+        }
+      ]
+    },
+    "seats-after": {
+      "steps": [
+        {
+          "active": ["main", "main->rules", "rules"],
+          "note": "main passes the seats left and the passengers boarding. The method gets copies of both."
+        },
+        {
+          "active": ["rules"],
+          "note": "Changing its own copy changes nothing in main, so the count has to come back another way. It never goes below none."
+        },
+        {
+          "active": ["rules", "rules->seats", "seats"],
+          "note": "The new count goes back, and main keeps it."
+        }
+      ]
+    }
+  }
+}

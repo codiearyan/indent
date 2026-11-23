@@ -1,7 +1,7 @@
 {
   "id": "java-foundations",
   "title": "Java foundations",
-  "description": "Lanternquay Ferries runs one small boat across the river, and its timetable, fares and passenger counts live on a clipboard at the ticket hut. You have never written a program, and you start by making Java print the notice on the hut, then keep the clipboard's numbers and text in typed variables and let the program decide whether the boat can sail. Each issue teaches one part of Java in one file you run and check yourself, from your first class to the compiler's errors and how to read them.",
+  "description": "Lanternquay Ferries runs one small boat across the river, and its timetable, fares and passenger counts live on a clipboard at the ticket hut. You have never written a program, and you start by making Java print the notice on the hut, then keep the clipboard's numbers and text in typed variables and let the program decide whether the boat can sail. Each issue teaches one part of Java in one file you run and check yourself, from your first class to the compiler's errors and how to read them. Then the programs learn to do things again and again: you read what the compiler says back, count through the day's crossings with loops, write the fare rules once as methods, and keep the log in an array and the waiting list in a list that grows.",
   "category": "Programming languages",
   "language": "java",
   "tags": ["Java"],
@@ -12,6 +12,10 @@
     {
       "title": "The clipboard at the ticket hut",
       "chapters": ["first-program", "values-and-types", "numbers", "text", "decisions"]
+    },
+    {
+      "title": "Every crossing of the day",
+      "chapters": ["reading-the-compiler", "loops", "methods", "arrays", "lists"]
     }
   ]
 }

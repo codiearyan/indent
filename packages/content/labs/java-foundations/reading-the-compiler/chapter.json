@@ -1,0 +1,129 @@
+{
+  "id": "reading-the-compiler",
+  "title": "Reading the compiler",
+  "files": ["Logbook.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Compile the log with javac, then run it with java Logbook.",
+    "suggestedCommand": "javac Logbook.java"
+  },
+  "tasks": [
+    {
+      "id": "unknown-name",
+      "title": "Fix the name the compiler cannot find",
+      "file": "Logbook.java",
+      "description": "Under `// Task 1` in `Logbook.java`, the compiler refuses the line that makes `seatsLeft` with `cannot find symbol`. Fix that line so `seatsLeft` is the `seats` with the passengers who boarded taken away.\n\nCheck compiles and runs your Task 1 lines with numbers of its own and reads `seatsLeft`.",
+      "nextSteps": [
+        "Run `javac Logbook.java` and find the error that names line 22.",
+        "Read the `symbol:` line under it: it names what the compiler does not know.",
+        "Compare that name with the variables made above Task 1.",
+        "Fix the name, then compile again."
+      ],
+      "hints": [
+        "`cannot find symbol` means the compiler met a name nobody made. The `symbol:` line says which.",
+        "The name in the error is close to one of the variables at the top of `main`, but not the same. Every letter counts.",
+        "Change the misspelt name on that line to the variable that holds the passengers who boarded. Do not make a new variable."
+      ],
+      "docs": [
+        {
+          "title": "Common problems: compiler errors",
+          "url": "https://docs.oracle.com/javase/tutorial/getStarted/problems/index.html"
+        },
+        {
+          "title": "The javac command",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/specs/man/javac.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What cannot find symbol means",
+          "url": "https://www.youtube.com/watch?v=fwFxEoJdDGI"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "wrong-type",
+      "title": "Fix the type that does not fit",
+      "file": "Logbook.java",
+      "description": "Under `// Task 2`, the compiler refuses the line that makes `code` with `incompatible types`. Fix it so `code` holds the luggage tag: the first three letters of `destination`, in capitals, as the line already works out.\n\nCheck compiles and runs your Task 2 lines with destinations of its own and reads `code`.",
+      "nextSteps": [
+        "Find the error for line 27 and read it from the left.",
+        "It names two types: the type of the value, and the type of the variable.",
+        "Decide which of the two is wrong for a tag of three letters.",
+        "Fix that one word, then compile again."
+      ],
+      "hints": [
+        "`incompatible types: A cannot be converted to B` means a value of type A is put into a variable of type B.",
+        "`substring` and `toUpperCase` give a `String`. A `char` holds exactly one character.",
+        "Change the type in front of `code`, and leave the rest of the line as it is."
+      ],
+      "docs": [
+        {
+          "title": "Primitive data types and String",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html"
+        },
+        {
+          "title": "Assignment contexts in the Java language",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-5.html#jls-5.2"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "every-way",
+      "title": "Give the notice a value every time",
+      "file": "Logbook.java",
+      "description": "Under `// Task 3`, once Tasks 1 and 2 compile, javac refuses the line that prints `notice` with `variable notice might not have been initialized`. Fix it so `notice` says `No crossings today` when `windKnots` is 30 or more, and `Boats running` otherwise.\n\nCheck compiles and runs your Task 3 lines with winds of its own, 30 knots exactly included, and reads `notice`.",
+      "nextSteps": [
+        "Fix Tasks 1 and 2 and compile again: this error shows only after they are gone.",
+        "Follow the program by hand with a light wind. Which line gives `notice` a value?",
+        "Give `notice` a value on the way through where the `if` does not run.",
+        "Compile, run, and change `windKnots` at the top for a moment to see both notices."
+      ],
+      "hints": [
+        "The compiler looks at every way through the code. With a light wind, the `if` is skipped.",
+        "`notice` needs a value on both ways: when the condition is true and when it is false.",
+        "Add `else { notice = \"Boats running\"; }` after the closing brace of the `if`."
+      ],
+      "docs": [
+        {
+          "title": "The if-then and if-then-else statements",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/if.html"
+        },
+        {
+          "title": "Definite assignment in the Java language",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-16.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "no-crossings",
+      "title": "Stop the crash on a day without crossings",
+      "file": "Logbook.java",
+      "description": "Under `// Task 4`, the log compiles but stops with an exception when there were no crossings. Fix it so `averageLoad` is the passengers today divided by the crossings today, in whole passengers, and `0` on a day without crossings, so the log carries on to its last line.\n\nCheck runs your Task 4 lines with days of its own, one without crossings, and reads `averageLoad`.",
+      "nextSteps": [
+        "Once the file compiles, run `java Logbook` and read the stack trace.",
+        "Its first line says what went wrong. The line starting with `at` says which line of `Logbook.java`.",
+        "Decide what `averageLoad` should be when `crossingsToday` is 0, and what it should be otherwise.",
+        "Make that decision with `if` and `else`, compile and run again."
+      ],
+      "hints": [
+        "`ArithmeticException: / by zero` means a whole number was divided by 0. The compiler cannot see it coming, because it depends on the values.",
+        "Only divide when there was at least one crossing. A day without crossings gets 0.",
+        "The shape is `int averageLoad;` then `if (crossingsToday == 0) { averageLoad = 0; } else { averageLoad = ...; }`."
+      ],
+      "docs": [
+        {
+          "title": "What is an exception?",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/definition.html"
+        },
+        {
+          "title": "ArithmeticException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ArithmeticException.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
