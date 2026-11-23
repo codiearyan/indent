@@ -117,7 +117,9 @@ export async function runFile(
     define,
     call,
     data = false,
-    compare
+    compare,
+    modules = false,
+    module = false
   } = {}
 ) {
   const bin = await python()
@@ -140,7 +142,9 @@ export async function runFile(
     ...(compare && {
       compare: { starter: join(t.chapter, 'starter', ...file.split('/')), names: compare.names }
     }),
-    ...(blocks && { part_seconds: PART_SECONDS, define, call: data && call ? { ...call, data } : call })
+    ...(blocks && { part_seconds: PART_SECONDS, define, call: data && call ? { ...call, data } : call }),
+    ...((modules || module) && { modules: true }),
+    ...(module && { module: file.split('/').pop().replace(/\.py$/, '') })
   }
   const child = spawn(bin, ['-I', '-B', HARNESS], { cwd: dir, env: childEnv(), windowsHide: true })
   const seconds = blocks ? SECONDS + MAX_PARTS * PART_SECONDS : SECONDS
@@ -149,7 +153,8 @@ export async function runFile(
     parts: new Map(),
     comments: [],
     seconds,
-    blocks: blocks && { made: [], ...(data && { data }) }
+    blocks: blocks && { made: [], ...(data && { data }), ...((modules || module) && { modules: true }) },
+    ...(module && { module: file })
   }
   let running
   for (const line of r.stdout.split('\n')) {
@@ -344,6 +349,7 @@ const BUILTINS = [
 function blockRunCause(error, blocks) {
   const m = error.message
   let found
+  if (blocks.modules && (found = blocks.explain?.(error) ?? moduleRunCause(error))) return found
   if (blocks.raising && (found = blocks.explain?.(error) ?? raiseRunCause(error))) return found
   if (
     blocks.data &&
@@ -452,6 +458,9 @@ function runCause(error, names, blocks) {
   return `Python stops there with ${error.type}`
 }
 
+/** What an error while running usually means, for a check that words its own detail. */
+export const errorWords = (error, names, blocks) => runCause(error, names, blocks)
+
 /**
  * The one failing detail for a run that cannot be judged for Task `task`, or null when that
  * task's lines ran to the end.
@@ -518,6 +527,16 @@ export function problem(r, file, task) {
     )
   }
   const part = r.parts.get(task)
+  if (r.module && part?.error) {
+    return fail(
+      `Python can import ${file}`,
+      `Importing ${file}, as an import line does, stops${atLine(part.error)} with ${part.error.type}: ${runCause(part.error, part.names, r.blocks)}.`,
+      part.error.shown
+    )
+  }
+  if (r.module && part?.stopped) {
+    return fail(`Importing ${file} ends`, stoppedText(part.stopped, `Importing ${file}`, 'it'))
+  }
   if (part?.error) {
     return fail(
       `The Task ${task} lines run`,
@@ -541,8 +560,12 @@ const lostTask = (file, task) =>
     `Check cannot find the # Task ${task} comment in ${file}. Put it back above the lines of that task, so Check knows which lines are which.`
   )
 
+/** Where an error stopped: its line, and its file when that is another file of the workspace. */
+export const atLine = (error) =>
+  error.line ? ` at line ${error.line}${error.file ? ` of ${error.file}` : ''}` : ''
+
 function errorText(error, names, task, blocks) {
-  const at = error.line ? ` at line ${error.line}` : ''
+  const at = atLine(error)
   const whose = task === 0 ? 'The lines above # Task 1' : `The lines under # Task ${task}`
   return `${whose} stop${at} with ${error.type}: ${runCause(error, names, blocks)}.`
 }
@@ -855,7 +878,7 @@ const pyArgs = (c) =>
 /** A call as the learner would write it: battery_hours(80, 10, 30). */
 export const callText = (fn, c) => `${fn}(${pyArgs(c)})`
 
-function missingFunction(call, fn, task) {
+function missingFunction(call, fn, task, module) {
   const functions = Object.fromEntries(
     Object.entries(call.names).filter(([, type]) => type === 'function')
   )
@@ -864,7 +887,9 @@ function missingFunction(call, fn, task) {
     `${fn} is there`,
     close
       ? `Check cannot find a function called ${fn}, but there is one called ${close}. The name must match the task letter for letter: capitals and underscores count.`
-      : `Check cannot find a function called ${fn} after the lines under # Task ${task}. Make it there with def and exactly that name.`
+      : module
+        ? `Check cannot find a function called ${fn} in ${module}. Make it there with def and exactly that name.`
+        : `Check cannot find a function called ${fn} after the lines under # Task ${task}. Make it there with def and exactly that name.`
   )
 }
 
@@ -1136,6 +1161,83 @@ function textRunCause(error) {
   return null
 }
 
+// From the modules issues on, a file imports modules, Python's own and the learner's.
+
+const MODULE_NAMES =
+  'textwrap|difflib|datetime|date|timedelta|math|statistics|random|collections|Counter|defaultdict|callouts'
+
+/** What an error usually means in code that imports modules, or null. */
+function moduleRunCause(error) {
+  const m = error.message
+  let found
+  if ((found = error.circle ? [null, error.circle] : /partially initialized module '(\w+)'/.exec(m))) {
+    return `${found[1]}.py is imported while it is still being run: the files import each other, an import that goes round in a circle, so one of them asks for a name the other has not made yet. Keep what both need in one file, the module, and import only one way, from the program into the module`
+  }
+  if (error.hides) {
+    const name = error.hides.replace(/\.py$/, '')
+    return `your workspace has a file called ${error.hides}, the same name as Python's own ${name} module, so the import found your file instead: Python looks in the folder of the file it runs before its own modules. Give your file another name in the terminal, such as mv ${error.hides} my_${error.hides}`
+  }
+  if (error.type === 'ModuleNotFoundError' && (found = /^No module named '([\w.]+)'/.exec(m))) {
+    return `Python found no module called ${found[1]}, neither in the folder of the file it runs nor among the modules that come with Python. Check the spelling of the import line, capitals included: a module of your own is its file name without .py`
+  }
+  if ((found = /^cannot import name '(\w+)' from '(\w+)'/.exec(m))) {
+    return `the module ${found[2]} has nothing called ${found[1]}. Check the spelling against the module's page in the documentation, or against the def line of your own module, capitals included`
+  }
+  if ((found = /^type object 'datetime\.(datetime|date)' has no attribute '(datetime|date)'/.exec(m))) {
+    return `${found[1]} here is already the type that the line from datetime import ${found[1]} brought in, not the module, so ${found[1]}.${found[2]} looks for a ${found[2]} inside the type. Call ${found[1]}(...) by itself, or import the module and write datetime.${found[1]}(...)`
+  }
+  if ((found = /^module 'datetime' has no attribute '(\w+)'/.exec(m))) {
+    return `the module datetime has nothing called ${found[1]} itself. The module holds the types date, datetime and timedelta, and ${found[1]} belongs to one of them: write the type after the module, such as datetime.datetime.${found[1]}, or import the type with from`
+  }
+  if ((found = /^module '(\w+)' has no attribute '(\w+)'/.exec(m))) {
+    return `the module ${found[1]} has nothing called ${found[2]}. Check the spelling after the dot against the module's page in the documentation, capitals included`
+  }
+  if (/^'module' object is not callable/.test(m)) {
+    return 'round brackets follow a module, and a module cannot be called. It holds functions and types: the one to call comes after a dot, or is imported by itself with from'
+  }
+  if ((found = new RegExp(`^name '(${MODULE_NAMES})' is not defined$`).exec(m))) {
+    return `Python does not know the name ${found[1]} at that point: no import line that makes it has run yet. A module, and a name taken from one with from, are known only after their import line has run`
+  }
+  if ((found = /^time data (.*) does not match format (.*)$/.exec(m))) {
+    return `strptime was given the text ${found[1]}, which does not fit the format ${found[2]}. Each code after a % stands for a part of the date, in the order of the text, and every other character, such as / and :, must be in the text exactly as in the format`
+  }
+  if (/^unconverted data remains/.test(m)) {
+    return 'strptime read the whole format, and the text goes on after it. The format must cover all of the text'
+  }
+  if (/^(month must be in 1\.\.12|day is out of range for month|day \d+ must be in range|year \d+ is out of range|year must be in)/.test(m)) {
+    return 'a date was made from a day or a month that does not exist. The parts go in the order year, month, day'
+  }
+  if (/^Invalid isoformat string/.test(m)) {
+    return 'fromisoformat reads only text written year-month-day, such as 2041-03-04'
+  }
+  if ((found = /unsupported operand type\(s\) for [-+]: '(datetime\.\w+|str|int)' and '(datetime\.\w+|str|int)'/.exec(m)) && /datetime\./.test(m)) {
+    return /'str'/.test(m)
+      ? 'a date meets a text here. A date written as text is only letters to Python: turn it into a date before you take one from another'
+      : /'int'/.test(m)
+        ? 'a date meets a plain number here. Days are added to a date as a timedelta, and the gap between two dates is a timedelta whose .days is a number'
+        : `${found[1]} and ${found[2]} cannot be taken one from the other this way`
+  }
+  if (/not supported between instances of 'datetime\.\w+' and 'str'|not supported between instances of 'str' and 'datetime\.\w+'/.test(m)) {
+    return 'a date is compared with a text. Turn the text into a date first'
+  }
+  if (/^can't compare datetime\.datetime to datetime\.date|^can't subtract/.test(m)) {
+    return 'a date and a datetime are mixed: one has a time of day and the other does not. Make both the same kind first'
+  }
+  if (/^unsupported type for timedelta \w+ component: str/.test(m)) {
+    return 'timedelta was given a text where it takes a number'
+  }
+  if (error.type === 'StatisticsError') {
+    return 'the statistics module was given a list with nothing in it, and there is no mean or median of nothing'
+  }
+  if (/^Cannot choose from an empty sequence/.test(m)) {
+    return 'random.choice was given a list with nothing in it, so there is nothing to draw'
+  }
+  if (/^math domain error|^expected a nonnegative input/.test(m)) {
+    return 'a math function was given a number it cannot work on, such as the square root of a number below zero'
+  }
+  return null
+}
+
 const DATA_KINDS = {
   list: 'a list',
   tuple: 'a tuple',
@@ -1143,7 +1245,12 @@ const DATA_KINDS = {
   set: 'a set',
   PosixPath: 'a Path',
   WindowsPath: 'a Path',
-  TextIOWrapper: 'an open file'
+  TextIOWrapper: 'an open file',
+  date: 'a date',
+  datetime: 'a datetime',
+  timedelta: 'a timedelta',
+  Counter: 'a Counter',
+  defaultdict: 'a defaultdict'
 }
 /** The kind of a value with its article, lists, tuples, sets and dictionaries included. */
 export const dataKind = (type) => DATA_KINDS[type] ?? aKind(type)
@@ -1158,7 +1265,9 @@ function canon(x) {
   // A number with a fraction is a float in Python, and comes back tagged as one.
   if (typeof x === 'number' && !Number.isInteger(x)) return { '@float': x }
   if (Array.isArray(x)) return x.map(canon)
-  if (!isObject(x) || '@float' in x || '@other' in x || '@path' in x) return x
+  if (!isObject(x) || '@float' in x || '@other' in x || '@path' in x || '@date' in x || '@datetime' in x)
+    return x
+  if ('@defaultdict' in x) return { '@dict': x['@defaultdict'].map(([k, v]) => [canon(k), canon(v)]) }
   if ('@tuple' in x) return { '@tuple': x['@tuple'].map(canon) }
   if ('@set' in x) return { '@set': x['@set'].map(canon) }
   const pairs = '@dict' in x ? x['@dict'] : Object.entries(x)
@@ -1180,11 +1289,11 @@ function equalCanon(a, b) {
   if (Array.isArray(a) || Array.isArray(b)) {
     return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((v, i) => equalCanon(v, b[i]))
   }
-  for (const tag of ['@tuple', '@set', '@dict', '@float', '@path']) {
+  for (const tag of ['@tuple', '@set', '@dict', '@float', '@path', '@date', '@datetime']) {
     if (tag in a || tag in b) {
       if (!(tag in a && tag in b)) return false
       if (tag === '@tuple') return equalCanon(a[tag], b[tag])
-      if (tag === '@float' || tag === '@path') return a[tag] === b[tag]
+      if (['@float', '@path', '@date', '@datetime'].includes(tag)) return a[tag] === b[tag]
       // Sets and dictionaries are equal whatever order their items are in, as in Python.
       return sameItems(a[tag], b[tag])
     }
@@ -1205,6 +1314,17 @@ export function pyLiteral(x) {
   }
   if ('@set' in x) return x['@set'].length ? `{${x['@set'].map(pyLiteral).join(', ')}}` : 'set()'
   if ('@path' in x) return `Path(${JSON.stringify(x['@path'])})`
+  if ('@date' in x) return `date(${x['@date'].split('-').map(Number).join(', ')})`
+  if ('@datetime' in x) {
+    const [day, time] = x['@datetime'].split('T')
+    const parts = [...day.split('-'), ...time.split(':')].map(Number)
+    while (parts.length > 3 && parts[parts.length - 1] === 0) parts.pop()
+    return `datetime(${parts.join(', ')})`
+  }
+  if ('@defaultdict' in x) {
+    const items = x['@defaultdict'].map(([k, v]) => `${pyLiteral(k)}: ${pyLiteral(v)}`).join(', ')
+    return `defaultdict(${x.of}, {${items}})`
+  }
   const pairs = '@dict' in x ? x['@dict'] : Object.entries(x)
   return `{${pairs.map(([k, v]) => `${pyLiteral(k)}: ${pyLiteral(v)}`).join(', ')}}`
 }
@@ -1221,7 +1341,11 @@ export const noun = (x) =>
           ? 'set'
           : '@path' in x
             ? 'Path'
-            : 'dictionary'
+            : '@date' in x
+              ? 'date'
+              : '@datetime' in x
+                ? 'datetime'
+                : 'dictionary'
 
 const typeOfData = (x) =>
   x === null
@@ -1240,7 +1364,11 @@ const typeOfData = (x) =>
                 ? 'tuple'
                 : '@set' in x
                   ? 'set'
-                  : 'dict'
+                  : '@date' in x
+                    ? 'date'
+                    : '@datetime' in x
+                      ? 'datetime'
+                      : 'dict'
 
 /** A call as the learner would write it, with lists and dictionaries: kit_lines(["rope"]). */
 export const dataCallText = (fn, c) =>
@@ -1357,7 +1485,12 @@ export async function dataCases(t, {
   text = false,
   csv = false,
   raising = false,
-  compare
+  compare,
+  modules = false,
+  module = false,
+  watch,
+  clock,
+  forbid
 }) {
   const runs = await Promise.all(
     list.map((c) =>
@@ -1365,14 +1498,18 @@ export async function dataCases(t, {
         upto: task,
         blocks: true,
         data: true,
-        define,
+        define: c.define ?? define,
         call: {
           name: fn,
           args: c.args ?? [],
           kwargs: c.kwargs ?? {},
-          ...(c.files && { files: c.files, read: Object.keys(c.wrote ?? {}) })
+          ...(c.files && { files: c.files, read: Object.keys(c.wrote ?? {}) }),
+          ...(watch && { watch }),
+          ...(clock !== undefined && { clock })
         },
-        compare
+        compare,
+        modules,
+        module
       })
     )
   )
@@ -1403,7 +1540,7 @@ export async function dataCases(t, {
   const problems = runs.map((r) => problem(r, file, task))
   if (problems.every(Boolean)) return once(ends, problems)
   const first = runs.find((r, i) => !ends[i])?.call
-  if (first?.missing) return [missingFunction(first, fn, task)]
+  if (first?.missing) return [missingFunction(first, fn, task, module && file)]
   if (first?.type) {
     return [
       fail(
@@ -1450,6 +1587,11 @@ export async function dataCases(t, {
     if (call.stopped) {
       return fail(c.name, stoppedText(call.stopped, shown, 'it'), `Check called ${shown}\n${told}`)
     }
+    const banned = forbid?.(call.watched ?? [], c, call)
+    if (banned) {
+      const what = call.error ? call.error.shown : `It gave back: ${call.returned.repr}`
+      return fail(c.name, banned, [`Check called ${shown}`, what, told].join('\n'))
+    }
     const held = c.files ? fileLines(call) : []
     const opened = c.files && fileProblem(fn, c, call, csv)
     if (opened) {
@@ -1458,7 +1600,7 @@ export async function dataCases(t, {
     }
     if (c.raises) return raiseResult(fn, c, call, shown, held, told, runs[i].blocks)
     if (call.error) {
-      const at = call.error.line ? ` at line ${call.error.line}` : ''
+      const at = atLine(call.error)
       return fail(
         c.name,
         raising && call.error.own
@@ -1511,8 +1653,11 @@ export async function dataCases(t, {
     else if (wrongResult && stuck && typed) message = typed
     else if (wrongResult) {
       const type = typeOfData(c.expected)
+      // A Counter or a defaultdict is a dictionary, compared as one.
+      const given =
+        runs[i].blocks?.modules && ['Counter', 'defaultdict', 'OrderedDict'].includes(v.type) ? 'dict' : v.type
       message =
-        v.type !== type
+        given !== type
           ? `${fn} gives back ${dataKind(v.type)}, and the task asks for ${dataKind(type)}.`
           : typeof c.hint === 'function'
             ? c.hint(v, call)

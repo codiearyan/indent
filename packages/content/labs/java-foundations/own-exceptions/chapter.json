@@ -1,0 +1,105 @@
+{
+  "id": "own-exceptions",
+  "title": "An exception of your own",
+  "files": ["HutRules.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the hut's rules here, and try your classes from main.",
+    "suggestedCommand": "java HutRules.java"
+  },
+  "tasks": [
+    {
+      "id": "no-room",
+      "title": "Write NoRoomException, which says how many seats are free",
+      "file": "HutRules.java",
+      "description": "Under `// Task 1`, write a class `NoRoomException`, a checked exception, with a constructor `NoRoomException(String boat, int seatsFree)`. Its message names the boat and the seats free, as in `No room on Linnet: 2 seats free`, and a method `int seatsFree()` gives back the seats free, kept in a field of their own.\n\nCheck makes, throws and catches `NoRoomException`s of its own, two at once included, keeps one in a variable of type `Exception`, and reads `getMessage()` and `seatsFree()`. It also compiles a method of its own that throws one with no `throws`, which must be refused because the exception is checked.",
+      "nextSteps": [
+        "Read the part of the lesson about a class that extends Exception.",
+        "Write the first line of the class, with the exception class it extends.",
+        "Write the field, then the constructor: its first line hands the message on, its second keeps the seats free.",
+        "Write seatsFree(), and take the // off the first lines in main."
+      ],
+      "hints": [
+        "Which class it extends decides whether it is checked. The lesson shows both.",
+        "getMessage() gives back the message that was handed to Exception's constructor, and that hand-over has to be the first line of yours.",
+        "The constructor: `super(\"No room on \" + boat + \": \" + seatsFree + \" seats free\");`, then `this.seatsFree = seatsFree;`."
+      ],
+      "docs": [
+        {
+          "title": "Creating exception classes",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/creating.html"
+        },
+        {
+          "title": "Exception",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Exception.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Writing your own exceptions",
+          "url": "https://www.youtube.com/watch?v=OIozDnGYqIU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "booking",
+      "title": "Throw it when a boat is full, and catch it by its name",
+      "file": "HutRules.java",
+      "description": "Under `// Task 2`, write a class `Booking` with two methods.\n\n`static String reserve(String boat, int free, int wanted)` gives back `Booked 3 on Linnet`, with the places wanted and the boat. Fewer than 1 place wanted is refused with an `IllegalArgumentException` whose message names the places. More places than are free throws a `NoRoomException` for that boat with the seats free.\n\n`static String answer(String boat, int free, int wanted)` gives back what `reserve` gives back, or, when there is no room, `Only 2 left on Linnet`, with the seats free that the exception holds. A caller of `answer` needs no `try`, and fewer than 1 place still reaches the caller.\n\nCheck runs your class beside a `NoRoomException` of its own, written as Task 1 asks but with words of its own in its message, so this task is judged on its own lines. It calls both methods with boats of its own, catches the `NoRoomException` by its name and reads the seats free it holds, and compiles a call of `reserve` with no `try`, which must be refused, and a call of `answer` with no `try`, which must be accepted.",
+      "nextSteps": [
+        "Read the part of the lesson about catching an exception by its own name.",
+        "Write reserve: refuse fewer than 1 place, then throw a NoRoomException when there is no room, then give back the booked line.",
+        "Give reserve's first line the throws the compiler asks for.",
+        "Write answer with a catch for the one exception a full boat brings, and build its line with the seats free the exception holds."
+      ],
+      "hints": [
+        "NoRoomException is checked, so reserve says it may throw it, and answer either catches it or says so too. The task says a caller of answer needs no try.",
+        "A catch for Exception would catch the IllegalArgumentException as well, and could not call seatsFree(). Catch the exception by its own name.",
+        "In answer: `try { return reserve(boat, free, wanted); } catch (NoRoomException e) { return \"Only \" + e.seatsFree() + \" left on \" + boat; }`."
+      ],
+      "docs": [
+        {
+          "title": "The catch blocks",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/catch.html"
+        },
+        {
+          "title": "Specifying the exceptions thrown by a method",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/declaring.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "bad-line",
+      "title": "Wrap a bad ledger line, and keep the cause",
+      "file": "HutRules.java",
+      "description": "Under `// Task 3`, write a class `BadLineException`, a checked exception, with a constructor `BadLineException(String line, Throwable cause)`: its message names the line, and it keeps the cause. Then write a class `Lines` with a method `static int seatsOn(String line)`, for ledger lines such as `09:00,Linnet,9`. It gives back the seats, the third part. When the line has no third part, or it is not a whole number, it throws a `BadLineException` for the line, with the exception Java threw as its cause. A `null` line is a mistake in the calling code: its exception must reach the caller as it is.\n\nCheck makes a `BadLineException` with a cause of its own and reads `getCause()` and `getMessage()`. It calls `seatsOn` with lines of its own, good, with a word for the seats, with no seats at all, and `null`, catches the `BadLineException` by its name, and reads which exception is its cause. It also compiles a call of `seatsOn` with no `try`, which must be refused.",
+      "nextSteps": [
+        "Read the part of the lesson about keeping the cause.",
+        "Write BadLineException: its constructor hands both the message and the cause to Exception.",
+        "Write seatsOn: split the line, and read the third part inside a try.",
+        "Catch the two exceptions a bad line brings, and throw a BadLineException with each as its cause."
+      ],
+      "hints": [
+        "Exception has a constructor that takes a message and a cause. A line with two parts brings one exception, a word for the seats another.",
+        "Splitting a null line fails before any try, which is what the task asks. Inside the try, catch only what a bad line brings, and throw your own exception with the caught one handed over.",
+        "The constructor: `super(\"Bad ledger line: \" + line, cause);`. In seatsOn: `catch (NumberFormatException | ArrayIndexOutOfBoundsException e) { throw new BadLineException(line, e); }`."
+      ],
+      "docs": [
+        {
+          "title": "Chained exceptions",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/chained.html"
+        },
+        {
+          "title": "Throwable.getCause()",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html#getCause()"
+        },
+        {
+          "title": "String.split",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html#split(java.lang.String)"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

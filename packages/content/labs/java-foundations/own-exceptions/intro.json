@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Full? Then how many seats are left?",
+      "note": "The Gannet was full again."
+    },
+    {
+      "title": "Booking desk",
+      "text": "Says no, and nothing more"
+    },
+    {
+      "title": "Your exceptions",
+      "file": "HutRules.java",
+      "mine": true,
+      "gap": "No word for a full boat",
+      "tasks": [
+        "No room, seats free",
+        "Thrown, then caught",
+        "A bad line, its cause"
+      ]
+    },
+    {
+      "title": "Passenger",
+      "say": "Two left? We will take them."
+    }
+  ],
+  "ticket": {
+    "label": "Four seats",
+    "wrong": "just no",
+    "why": "No detail",
+    "right": "offer made"
+  },
+  "captions": [
+    "The booking desk. Bridie wants a full boat to say how many seats are left.",
+    "Today a full boat only says no, and a smudged line says nothing about why.",
+    "You write exceptions of the hut's own, with what the caller needs, causes kept.",
+    "Now a full boat offers the seats it has left, and a bad line says what was wrong.",
+    "Exceptions with the hut's own names. Part 5 is done: when it goes wrong."
+  ]
+}

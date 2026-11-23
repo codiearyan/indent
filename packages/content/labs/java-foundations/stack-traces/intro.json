@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Where are tonight's numbers?",
+      "note": "The report stopped again."
+    },
+    {
+      "title": "Evening report",
+      "text": "Stops every night with a stack trace"
+    },
+    {
+      "title": "Your mending",
+      "file": "EveningReport.java",
+      "mine": true,
+      "gap": "A crash every night",
+      "tasks": [
+        "The last departure",
+        "The skippers' notice",
+        "The seats sold"
+      ]
+    },
+    {
+      "title": "Evening boat",
+      "text": "Takes the report across the river."
+    }
+  ],
+  "ticket": {
+    "label": "Tonight's report",
+    "wrong": "stopped",
+    "why": "Crashed",
+    "right": "printed"
+  },
+  "captions": [
+    "The ticket hut at dusk. Bridie wants the evening report, and it has stopped again.",
+    "Each night it stops with a stack trace, and a fix at the top line only moves the crash.",
+    "You read each trace down to the method that went wrong, and mend only that one.",
+    "Now the report runs to the end, with every number in it.",
+    "Part 5 begins: when it goes wrong. You can follow a trace to where a mistake was made."
+  ]
+}

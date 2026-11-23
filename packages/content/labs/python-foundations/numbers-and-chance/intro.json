@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Draw the rota so nobody doubts it.", "note": "And four numbers by the weekend." },
+    { "title": "Duty rota", "text": "Names from a hat, and nobody can check it." },
+    {
+      "title": "Your code",
+      "file": "callout_numbers.py",
+      "mine": true,
+      "gap": "Sums by hand, draws once",
+      "tasks": ["Legs and squares", "Mean and median", "The duty rota", "Drivers for the week"]
+    },
+    { "title": "Volunteers", "say": "Same draw again. Fair enough.", "note": "Every name on it once." }
+  ],
+  "ticket": { "label": "Duty rota", "wrong": "Doubted", "why": "No proof", "right": "Drawn again" },
+  "captions": [
+    "At the base, Rhona asks for a fair duty rota and four answers before the training weekend.",
+    "Today names come out of a hat, and a draw nobody can repeat is a draw people doubt.",
+    "You round, take a square root, sum up the hours, and draw with a seed you can use again.",
+    "Now the rota has every volunteer once, and the same seed draws it again in front of them.",
+    "Rhona has her numbers, and the team trusts a rota they watched drawn twice."
+  ]
+}

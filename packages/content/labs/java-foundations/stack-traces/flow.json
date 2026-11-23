@@ -1,0 +1,188 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "ossian",
+        "label": "Ossian",
+        "kind": "story"
+      },
+      {
+        "id": "departures",
+        "label": "Departures",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "skippers",
+        "label": "Skippers",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "takings",
+        "label": "Takings",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "ledger",
+        "label": "Ledger",
+        "kind": "data"
+      },
+      {
+        "id": "bridie",
+        "label": "Bridie",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "ossian",
+        "to": "departures",
+        "label": "day's hours"
+      },
+      {
+        "from": "ossian",
+        "to": "skippers",
+        "label": "rota"
+      },
+      {
+        "from": "ossian",
+        "to": "takings",
+        "label": "ledger lines"
+      },
+      {
+        "from": "takings",
+        "to": "ledger",
+        "label": "one part"
+      },
+      {
+        "from": "departures",
+        "to": "bridie",
+        "label": "last crossing"
+      },
+      {
+        "from": "skippers",
+        "to": "bridie",
+        "label": "notice"
+      },
+      {
+        "from": "takings",
+        "to": "bridie",
+        "label": "seats sold"
+      }
+    ],
+    "note": "Three small parts of the evening report stop every night, each with one method to mend."
+  },
+  "tasks": {
+    "departures": {
+      "steps": [
+        {
+          "active": [
+            "ossian",
+            "ossian->departures",
+            "departures"
+          ],
+          "note": "The report is handed the hours of the day's crossings."
+        },
+        {
+          "active": [
+            "departures"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "positions of the hours",
+            "values": [
+              "first",
+              "second",
+              "…",
+              "last"
+            ]
+          },
+          "note": "The last crossing is found from the hours, through three methods that call one another."
+        },
+        {
+          "active": [
+            "departures",
+            "departures->bridie",
+            "bridie"
+          ],
+          "note": "Bridie gets the line for the last crossing of the day."
+        }
+      ]
+    },
+    "skippers": {
+      "steps": [
+        {
+          "active": [
+            "ossian",
+            "ossian->skippers",
+            "skippers"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "the rota",
+            "entries": [
+              {
+                "key": "each boat",
+                "value": "its skipper"
+              }
+            ]
+          },
+          "note": "The notice is handed the boats sailing today and the rota."
+        },
+        {
+          "active": [
+            "skippers"
+          ],
+          "note": "For each boat sailing, the skipper is looked up on the rota, then its first letter is written."
+        },
+        {
+          "active": [
+            "skippers",
+            "skippers->bridie",
+            "bridie"
+          ],
+          "note": "Every boat sailing gets a line with its skipper."
+        }
+      ]
+    },
+    "takings": {
+      "steps": [
+        {
+          "active": [
+            "ossian",
+            "ossian->takings",
+            "takings"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "a ledger line",
+            "values": [
+              "time",
+              "boat",
+              "seats"
+            ]
+          },
+          "note": "Each ledger line holds a time, a boat and the seats sold."
+        },
+        {
+          "active": [
+            "takings",
+            "takings->ledger",
+            "ledger"
+          ],
+          "note": "Each line goes through the ledger, which reads a count of seats."
+        },
+        {
+          "active": [
+            "takings",
+            "takings->bridie",
+            "bridie"
+          ],
+          "note": "The seats of every line are added up for Bridie."
+        }
+      ]
+    }
+  }
+}

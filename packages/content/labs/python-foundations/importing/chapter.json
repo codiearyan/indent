@@ -1,0 +1,80 @@
+{
+  "id": "importing",
+  "title": "Import what Python already has",
+  "files": ["pager.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to fit pages to the pager, find the hill someone meant, and cut a message down to one line.",
+    "suggestedCommand": "python3 pager.py"
+  },
+  "tasks": [
+    {
+      "id": "wrap",
+      "title": "Lines that fit the pager",
+      "file": "pager.py",
+      "description": "Under `# Task 1` in `pager.py`, write the line that imports the `textwrap` module. Then write a function called `pager_lines` that takes a message, as text, and a width, a whole number, and gives back a list of the lines of the message, none wider than the width, made by the module's `wrap`. For `page` and `24` the first line is `'Callout to Scarth Fell,'`. Print what it gives back for `page` and `24`.\n\nCheck calls `pager_lines` with messages and widths of its own, one with a word longer than the width, and looks at what it gives back and whether it was made by `textwrap`'s `wrap`.",
+      "nextSteps": [
+        "Read the parts of the lesson on import and on reading a module's page.",
+        "Write the import line, then the def line of pager_lines.",
+        "Reach wrap through the module's name, give it the message and the width, and give back what it gives you.",
+        "Print what pager_lines gives back for page and 24, and run the file."
+      ],
+      "hints": [
+        "After `import textwrap`, everything in the module is reached through its name and a dot.",
+        "`wrap` takes the text and the width, and already gives back a list of lines. Nothing else needs doing to it.",
+        "The shape is `return textwrap.wrap(message, width)` inside `pager_lines`, with `import textwrap` above the function."
+      ],
+      "docs": [
+        { "title": "textwrap.wrap()", "url": "https://docs.python.org/3/library/textwrap.html#textwrap.wrap" },
+        { "title": "Modules", "url": "https://docs.python.org/3/tutorial/modules.html" }
+      ],
+      "videos": [
+        { "title": "What a module is, and importing one", "url": "https://www.youtube.com/watch?v=XcfxkHrHTVE" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "closest",
+      "title": "The closest hill",
+      "file": "pager.py",
+      "description": "Under `# Task 2`, find the function on the page of the `difflib` module that gives back the closest matches to a word from a list of words, and import that function by itself with `from`, as the lesson shows (importing the whole module works too). Then write a function called `closest_hill` that takes a hill as someone typed it, as text, and a list of hills, and gives back the closest hill on the list, or `None` when no hill is close enough. Use the function's usual cutoff for close enough. For `\"Scarth Fel\"` and `hills` it gives back `'Scarth Fell'`. Print what it gives back for `\"Scarth Fel\"` and `hills`.\n\nCheck calls `closest_hill` with hills of its own, some typed wrong, one close to none, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on reading a module's page.",
+        "Open the difflib page from Read up, and look through its list of functions for one about close matches.",
+        "Import it by itself with from, and print what it gives back for \"Scarth Fel\" and hills.",
+        "Give back the closest hill from what it gives you, or None when it gives you nothing."
+      ],
+      "hints": [
+        "The functions of a module are listed near the top of its page, each with a sentence on what it does. Look for one whose name and sentence speak of close matches.",
+        "It takes the word and the list of possibilities, and gives back a list, the closest first. An empty list means nothing was close enough. Its `n` says how many to give back at most.",
+        "The shape is `from difflib import get_close_matches` above the function, then `matches = get_close_matches(typed, hills, n=1)` inside it, and `matches[0]` when `matches` is not empty, `None` otherwise."
+      ],
+      "docs": [
+        { "title": "difflib.get_close_matches()", "url": "https://docs.python.org/3/library/difflib.html#difflib.get_close_matches" },
+        { "title": "The from import statement", "url": "https://docs.python.org/3/tutorial/modules.html#more-on-modules" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "summary",
+      "title": "A one-line summary",
+      "file": "pager.py",
+      "description": "Under `# Task 3`, write a function called `summary` that takes a message, as text, and a width, and gives back the message cut down to fit that width by `textwrap`'s `shorten`. The file already has a function called `shorten`, Ailsa's, and her radio desk still calls it: import `textwrap`'s `shorten` so that hers keeps its name and keeps working. For `page` and `40` it gives back `'Callout to Scarth Fell, north-east [...]'`. Print what `summary` gives back for `page` and `40`, then print `shorten(\"ECHO ONE\")`.\n\nCheck calls `summary` with messages and widths of its own, then calls `shorten` with call signs of its own, after the lines under `# Task 3` have run.",
+      "nextSteps": [
+        "Read the parts of the lesson on as and on why import * is a trap.",
+        "Write an import that gives textwrap's shorten a name the file does not use yet.",
+        "Write summary with that name.",
+        "Run the file and look at what shorten(\"ECHO ONE\") prints: it should still be the short call sign."
+      ],
+      "hints": [
+        "An import with `from` makes a name in your file, and a name can stand for only one thing. If it is a name the file already uses, the new thing takes its place.",
+        "`as` after an import gives what is imported a name of your choosing. Importing the whole module works too: its functions are then reached through the module's name.",
+        "The shape is `from textwrap import shorten as cut_to` above the function, and `return cut_to(message, width)` inside `summary`."
+      ],
+      "docs": [
+        { "title": "textwrap.shorten()", "url": "https://docs.python.org/3/library/textwrap.html#textwrap.shorten" },
+        { "title": "The import statement", "url": "https://docs.python.org/3/reference/simple_stmts.html#the-import-statement" }
+      ],
+      "points": 10
+    }
+  ]
+}

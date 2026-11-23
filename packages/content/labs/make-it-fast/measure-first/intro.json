@@ -1,0 +1,25 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Why is the report still running?", "note": "Fifty thousand orders now." },
+    { "title": "Sefton", "text": "Wants to rewrite the whole report.", "note": "Without knowing what is slow." },
+    {
+      "title": "Your code",
+      "file": "measure.js",
+      "mine": true,
+      "gap": "Nobody knows where time goes",
+      "tasks": ["Time a step fairly", "Find the slow step", "Count the work"]
+    },
+    {
+      "title": "Hesper",
+      "say": "Now we know where to start."
+    }
+  ],
+  "ticket": { "label": "the report", "wrong": "a guess", "why": "Unmeasured", "right": "measured" },
+  "captions": [
+    "At Ashgrove Press, Idris finds the night's report still running in the morning.",
+    "Sefton wants to rewrite it all, but nobody knows which part is slow.",
+    "You write tools that time each step fairly and count the work it does.",
+    "Now the report's steps are timed and counted, and the slow one is plain to see.",
+    "Same report, same answers, and a plan that starts where the time goes."
+  ]
+}

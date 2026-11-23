@@ -1,0 +1,55 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "map", "label": "Positions on the map", "kind": "data" },
+      { "id": "log", "label": "Callout hours", "kind": "data" },
+      { "id": "team", "label": "Volunteers", "kind": "data" },
+      { "id": "numbers", "label": "callout_numbers.py", "kind": "file", "mine": true },
+      { "id": "rhona", "label": "Rhona", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "map", "to": "numbers", "label": "positions" },
+      { "from": "log", "to": "numbers", "label": "hours" },
+      { "from": "team", "to": "numbers", "label": "names, a seed" },
+      { "from": "numbers", "to": "rhona", "label": "answers, rota" }
+    ],
+    "note": "Rounding, sums and chance come from Python's own modules, and every draw can be made again from its seed."
+  },
+  "tasks": {
+    "legs": {
+      "steps": [
+        { "active": ["map", "map->numbers", "numbers"], "value": { "kind": "array", "label": "what goes in", "values": ["two positions", "a radio's reach"] }, "note": "The base, a team out of range and how far a hand radio reaches go in." },
+        { "active": ["numbers"], "note": "The straight distance comes from a square root, and is divided by the reach." },
+        { "active": ["numbers", "numbers->rhona", "rhona"], "note": "Rounded up, it tells Rhona how many people to stand in the line." }
+      ]
+    },
+    "square": {
+      "steps": [
+        { "active": ["map", "map->numbers", "numbers"], "value": { "kind": "array", "label": "what goes in", "values": ["a position", "the size of a square"] }, "note": "A team's position and the size of a search square go in." },
+        { "active": ["numbers"], "note": "Each part is divided by the size and rounded down, west and south of the base too." },
+        { "active": ["numbers", "numbers->rhona", "rhona"], "value": { "kind": "array", "label": "what comes out", "values": ["east", "north"] }, "note": "Rhona gets the square on the board the team is in." }
+      ]
+    },
+    "summary": {
+      "steps": [
+        { "active": ["log", "log->numbers", "numbers"], "value": { "kind": "array", "label": "what goes in", "values": ["hours of each callout"] }, "note": "The hours of the year's callouts go in, in any order." },
+        { "active": ["numbers"], "note": "The statistics module works out the mean and the median." },
+        { "active": ["numbers", "numbers->rhona", "rhona"], "value": { "kind": "array", "label": "what comes out", "values": ["mean", "median"] }, "note": "Rhona sees what a typical callout costs, with and without the long ones pulling it up." }
+      ]
+    },
+    "rota": {
+      "steps": [
+        { "active": ["team", "team->numbers", "numbers"], "value": { "kind": "array", "label": "what goes in", "values": ["the volunteers", "a seed"] }, "note": "The volunteers and a seed go in." },
+        { "active": ["numbers"], "note": "The seed sets where the chance starts, and a copy of the list is shuffled." },
+        { "active": ["numbers", "numbers->rhona", "rhona"], "note": "Every volunteer is on the rota once, and the same seed draws the same rota in front of everyone." }
+      ]
+    },
+    "drivers": {
+      "steps": [
+        { "active": ["team", "team->numbers", "numbers"], "value": { "kind": "array", "label": "what goes in", "values": ["the volunteers", "nights", "a seed"] }, "note": "The volunteers, the nights of the week and a seed go in." },
+        { "active": ["numbers"], "note": "The seed is set once, then one driver is drawn from the whole list for each night." },
+        { "active": ["numbers", "numbers->rhona", "rhona"], "note": "Rhona gets a driver for every night, the same ones each time she draws with that seed." }
+      ]
+    }
+  }
+}

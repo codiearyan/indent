@@ -344,7 +344,9 @@ public class RunTasks {
         return b.toString();
     }
 
-    static void report(Unit unit, boolean timedOut) {
+    // Synchronized whole: a learner's System.exit halts the JVM once the hook has reported every
+    // unit, so a line main is still printing must be done before the hook can pass it by.
+    static synchronized void report(Unit unit, boolean timedOut) {
         synchronized (unit) {
             if (unit.reported) return;
             unit.reported = true;

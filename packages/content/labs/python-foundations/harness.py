@@ -32,11 +32,27 @@
 # came from somewhere else: Python itself, a module, or Check's own code (`inside` says whether
 # the last place it passed through is in the learner's file). A spec with `compare`
 # ({starter, names}) also reports which of those functions differ from the starter's.
+#
+# A spec with `modules` is for files that import each other. Every .py file of the sandbox copy is
+# then loaded from its source under its name in the workspace, so a traceback names the learner's
+# file and line, wherever it is, and a module of Python's own that a file of the workspace shares
+# a name with is forgotten first, so the import finds the learner's file, as `python3` would. An
+# error says which file it stopped in (`file`), and `hides` names a file of the workspace that an
+# import found in place of Python's own module. Values carry dates ({"@date": "2041-03-04"}, and
+# "@datetime"), and dictionaries such as a Counter or a defaultdict. A call may `watch` dotted
+# names ("datetime.date.today") and reports which it reached (`watched`), and may stand in the
+# clock (`clock`, seconds) for what reads time.time. With `module` (a name), the file is imported
+# as that module instead of being run by its tasks, `define` set in it before its lines run and
+# again after them (so Check's own helpers stand whatever the file defines), and the import is
+# reported as part `upto`: what it printed, its error, and the functions of the workspace it
+# called (`calls`). `call` then calls a function of the module.
 import _thread
 import ast
 import builtins
 import copy
 import dis
+import importlib.machinery
+import importlib.util
 import io
 import json
 import math
@@ -251,6 +267,134 @@ def value_of(value):
 MAX_ITEMS = 1000
 # Set when a call has `files`: Paths then travel as {"@path": "..."}, never in an issue without.
 FILES = {'on': False, 'root': ''}
+# Set by a spec with `modules`. `files` holds the names of the workspace files loaded so far.
+MODULES = {'on': False, 'root': '', 'files': set()}
+
+
+def in_root(path):
+    """Whether a path is inside the sandbox copy."""
+    root = MODULES['root']
+    try:
+        real = os.path.realpath(os.path.abspath(os.fsdecode(os.fspath(path))))
+    except (TypeError, ValueError):
+        return False
+    return real == root or real.startswith(root + os.sep)
+
+
+class WorkspaceLoader(importlib.machinery.SourceFileLoader):
+    """Loads a file of the workspace from its source, under its name in the workspace, never from
+    a cached copy the learner's own runs left behind."""
+
+    def get_code(self, fullname):
+        shown = pathlib.Path(os.path.relpath(os.path.realpath(self.path), MODULES['root'])).as_posix()
+        MODULES['files'].add(shown)
+        return compile(self.get_data(self.path), shown, 'exec', dont_inherit=True)
+
+
+class WorkspaceFinder:
+    """Finds modules where Python's own path finder does, and loads the workspace's own files
+    with WorkspaceLoader."""
+
+    @classmethod
+    def find_spec(cls, name, path=None, target=None):
+        spec = importlib.machinery.PathFinder.find_spec(name, path)
+        origin = spec.origin if spec else None
+        if origin and origin.endswith('.py') and in_root(origin):
+            return importlib.util.spec_from_file_location(
+                name, origin, loader=WorkspaceLoader(name, origin),
+                submodule_search_locations=spec.submodule_search_locations)
+        return spec
+
+    @classmethod
+    def invalidate_caches(cls):
+        pass
+
+
+def use_workspace_modules(root):
+    """Loads the workspace's files with WorkspaceFinder, and forgets a module of Python's own that
+    Check loaded for itself when a file of the workspace has its name, so the learner's import
+    finds what `python3` would find."""
+    MODULES['on'] = True
+    MODULES['root'] = root
+    sys.meta_path.insert(sys.meta_path.index(importlib.machinery.PathFinder), WorkspaceFinder)
+    for entry in os.listdir(root):
+        name = entry[:-3]
+        if entry.endswith('.py') and name in sys.modules and name not in sys.builtin_module_names:
+            if not in_root(getattr(sys.modules[name], '__file__', None) or ''):
+                del sys.modules[name]
+
+
+def hidden_module(error):
+    """The workspace file an import found in place of Python's own module of that name, or None."""
+    found = re.search(r"module '(\w+)' has no attribute|cannot import name '\w+' from '(\w+)'", str(error))
+    name = found and (found.group(1) or found.group(2))
+    file = getattr(sys.modules.get(name), '__file__', None) if name else None
+    if not file or not in_root(file):
+        return None
+    elsewhere = [p for p in sys.path if p and not in_root(p)]
+    if name in sys.builtin_module_names or importlib.machinery.PathFinder.find_spec(name, elsewhere):
+        return pathlib.Path(os.path.relpath(os.path.realpath(file), MODULES['root'])).as_posix()
+    return None
+
+
+def circle_of(error, frames):
+    """The module an import asked for while that module's own lines were still running, which
+    is an import that went round in a circle, or None. Python 3.9 says so in its message, and
+    3.14 often does not, so the traceback decides."""
+    found = re.search(r"from (?:partially initialized module )?'([\w.]+)'|module '([\w.]+)' has no", str(error))
+    name = found and (found.group(1) or found.group(2))
+    if not name or not isinstance(error, (ImportError, AttributeError)):
+        return None
+    file = name.replace('.', '/') + '.py'
+    return name if any(f.filename == file and f.name == '<module>' for f in frames) else None
+
+
+class Calls:
+    """While on, notes the functions of the workspace's files that run (`mine`), and which of the
+    dotted names in `watch` are called (`watched`), through sys.setprofile."""
+
+    def __init__(self, watch=()):
+        self.mine = []
+        self.watched = []
+        self.codes = {}
+        self.builtins = {}
+        for dotted in watch:
+            parts = dotted.split('.')
+            try:
+                obj = importlib.import_module(parts[0])
+                for part in parts[1:]:
+                    obj = getattr(obj, part)
+            except (ImportError, AttributeError):
+                continue
+            code = getattr(getattr(obj, '__func__', obj), '__code__', None)
+            if code is not None:
+                self.codes[code] = dotted
+            else:
+                self.builtins[(id(getattr(obj, '__self__', None)), getattr(obj, '__name__', None))] = dotted
+
+    def note(self, found, name):
+        if name not in found:
+            found.append(name)
+
+    def profile(self, frame, event, arg):
+        if event == 'call':
+            code = frame.f_code
+            if code.co_filename in MODULES['files'] and code.co_name != '<module>':
+                self.note(self.mine, code.co_name)
+            if code in self.codes:
+                self.note(self.watched, self.codes[code])
+        elif event == 'c_call':
+            key = (id(getattr(arg, '__self__', None)), getattr(arg, '__name__', None))
+            if key in self.builtins:
+                self.note(self.watched, self.builtins[key])
+
+    def __enter__(self):
+        sys.setprofile(self.profile)
+        return self
+
+    def __exit__(self, *exc):
+        sys.setprofile(None)
+        return False
 
 
 def encode(value, depth=0):
@@ -272,9 +416,11 @@ def encode(value, depth=0):
         return {'@set': sorted(items, key=lambda v: json.dumps(v, sort_keys=True))}
     if FILES['on'] and isinstance(value, pathlib.PurePath):
         return {'@path': value.as_posix()}
-    if type(value) is dict:
+    if type(value) is dict or (MODULES['on'] and isinstance(value, dict)):
         pairs = list(value.items())[:MAX_ITEMS]
         return {'@dict': [[encode(k, depth + 1), encode(v, depth + 1)] for k, v in pairs]}
+    if MODULES['on'] and type(value).__module__ == 'datetime' and type(value).__name__ in ('date', 'datetime'):
+        return {'@' + type(value).__name__: value.isoformat()}
     return {'@other': type(value).__name__, 'repr': repr(value)[:300]}
 
 
@@ -291,6 +437,14 @@ def decode(value):
             return {decode(k): decode(v) for k, v in value['@dict']}
         if FILES['on'] and list(value) == ['@path']:
             return pathlib.Path(value['@path'])
+        if MODULES['on'] and list(value) in (['@date'], ['@datetime']):
+            import datetime
+            kind = getattr(datetime, list(value)[0][1:])
+            return kind.fromisoformat(value[list(value)[0]])
+        if MODULES['on'] and sorted(value) == ['@defaultdict', 'of']:
+            import collections
+            pairs = [(decode(k), decode(v)) for k, v in value['@defaultdict']]
+            return collections.defaultdict({'list': list, 'int': int}[value['of']], pairs)
         return {k: decode(v) for k, v in value.items()}
     return value
 
@@ -324,11 +478,25 @@ def raised_here(error, shown):
 
 def error_of(error, shown):
     last = last_frame(error)
-    frames = [f for f in traceback.extract_tb(error.__traceback__) if f.filename == shown]
+    mine = (lambda name: name in MODULES['files']) if MODULES['on'] else (lambda name: name == shown)
+    frames = [f for f in traceback.extract_tb(error.__traceback__) if mine(f.filename)]
     line = frames[-1].lineno if frames else None
     text = ''.join(traceback.format_exception_only(type(error), error)).strip()
     if frames:
         text = 'Traceback (most recent call last):\n' + ''.join(traceback.format_list(frames)) + text
+    if MODULES['on']:
+        return {
+            'type': type(error).__name__,
+            'message': str(error),
+            'line': line,
+            'file': frames[-1].filename if frames and frames[-1].filename != shown else None,
+            'name': getattr(error, 'name', None) if isinstance(error, (NameError, ImportError)) else None,
+            'shown': text,
+            'own': raised_here(error, shown),
+            'inside': last is not None and mine(last.tb_frame.f_code.co_filename),
+            'hides': hidden_module(error),
+            'circle': circle_of(error, traceback.extract_tb(error.__traceback__))
+        }
     return {
         'type': type(error).__name__,
         'message': str(error),
@@ -527,7 +695,20 @@ def called(watchdog, task, call, ns):
     if call.get('data'):
         args = decode(args)
         kwargs = decode(kwargs)
-    if files is None:
+    if files is None and (call.get('watch') or call.get('clock') is not None):
+        calls = Calls(call.get('watch') or [])
+        real_time = time.time
+        if call.get('clock') is not None:
+            stand_in = lambda: float(call['clock'])
+            calls.codes[stand_in.__code__] = 'time.time'
+            time.time = stand_in
+        try:
+            with calls:
+                result, printed, error, stopped = watchdog.run(task, lambda ns: fn(*args, **kwargs), ns)
+        finally:
+            time.time = real_time
+        record['watched'] = calls.watched
+    elif files is None:
         result, printed, error, stopped = watchdog.run(task, lambda ns: fn(*args, **kwargs), ns)
     else:
         with Opens(FILES['root']) as opens:
@@ -548,6 +729,55 @@ def called(watchdog, task, call, ns):
             record['returned']['data'] = encode(result)
             record['returned']['same'] = next((i for i, a in enumerate(args) if a is result), None)
     return record
+
+
+def import_module(spec, watchdog, task):
+    """Imports the learner's file as the module spec['module'], the way `import` does, with
+    Check's `define` set in it first, and reports it as part `task`, then the call."""
+    name = spec['module']
+    loader = WorkspaceLoader(name, spec['file'])
+    found = importlib.util.spec_from_file_location(name, spec['file'], loader=loader)
+    module = importlib.util.module_from_spec(found)
+    sys.modules[name] = module
+    if spec.get('define'):
+        exec(compile(spec['define'], '<check>', 'exec'), module.__dict__)
+    emit({'kind': 'start', 'task': task})
+    calls = Calls()
+
+    def load(ns):
+        # Python marks a module as loading, so an import that comes back to it names the circle.
+        found._initializing = True
+        try:
+            with calls:
+                loader.exec_module(module)
+        finally:
+            found._initializing = False
+
+    _, printed, error, stopped = watchdog.run(task, load, module.__dict__)
+    loaded = sorted(
+        n for n, m in list(sys.modules.items())
+        if n != name and in_root(getattr(m, '__file__', None) or '')
+    )
+    emit({
+        'kind': 'part',
+        'task': task,
+        'printed': printed.text()[:MAX_SENT],
+        'error': error,
+        'stopped': stopped,
+        'values': {},
+        'names': names_in(module.__dict__),
+        'calls': calls.mine,
+        'loaded': loaded
+    })
+    if spec.get('call') and not error and not stopped:
+        if spec.get('define'):
+            exec(compile(spec['define'], '<check>', 'exec'), module.__dict__)
+        record = called(watchdog, task, spec['call'], module.__dict__)
+        record['loaded'] = sorted(
+            n for n, m in list(sys.modules.items())
+            if n != name and in_root(getattr(m, '__file__', None) or '')
+        )
+        emit(record)
 
 
 def main():
@@ -604,7 +834,7 @@ def main():
     ast.fix_missing_locations(tree)
 
     upto = spec.get('upto')
-    if upto is not None and upto not in starts:
+    if upto is not None and upto not in starts and not spec.get('module'):
         emit({'kind': 'missing-task', 'task': upto})
         return
 
@@ -628,6 +858,13 @@ def main():
         emit({'kind': 'made', 'list': sorted(made), 'defs': defs})
     guard(root)
     sys.path.insert(0, os.path.dirname(os.path.abspath(spec['file'])))
+    if spec.get('modules'):
+        use_workspace_modules(root)
+        MODULES['files'].add(shown)
+    if spec.get('module') and watchdog:
+        import_module(spec, watchdog, upto or 0)
+        emit({'kind': 'done'})
+        return
     ns = {'__name__': '__main__', '__builtins__': builtins, '__file__': shown}
     wanted = spec.get('names') or []
     for task in [0] + order:
