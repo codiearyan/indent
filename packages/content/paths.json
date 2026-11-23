@@ -80,7 +80,8 @@
         "title": "SQL",
         "labs": [
           "sql-foundations",
-          "sql-basics"
+          "sql-basics",
+          "sql-bug-hunts"
         ]
       },
       {
@@ -189,7 +190,8 @@
         "title": "Data",
         "labs": [
           "sql-foundations",
-          "sql-basics"
+          "sql-basics",
+          "sql-bug-hunts"
         ]
       },
       {
@@ -267,7 +269,8 @@
         "labs": [
           "js-bug-hunts",
           "llm-bug-hunts-ts",
-          "security-bug-hunts"
+          "security-bug-hunts",
+          "sql-bug-hunts"
         ]
       }
     ]
