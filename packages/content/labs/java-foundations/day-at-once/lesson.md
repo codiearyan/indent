@@ -31,25 +31,25 @@ static Callable<Integer> weighing(Path shelf) {
 }
 ```
 
-`weighing(shelf)` reads nothing: it gives back the job. The reading happens when the pool's thread calls the job, which is the point, since that is how the work gets onto the pool. Read the file before the `return`, and give back a lambda that only hands over the answer, and every file is read on the thread that made the jobs, one after another, before any pool sees them. A `Callable` may throw a checked exception, so `IOException` needs no catch inside it: whoever calls the job, through a future, gets it.
+`weighing(shelf)` reads nothing: it gives back the job, and the reading happens when a pool's thread calls it. Read the file before the `return`, and give back a lambda that only hands over the answer, and every file is read on the thread that made the jobs, one after another, before any pool sees them. A `Callable` may throw a checked exception, so `IOException` needs no catch inside it: whoever calls the job, through a future, gets it.
 
 ## Gathering the answers
 
 Each job's answer comes back through its future. Keep the futures in a map under a name a person knows, so that a failure can say which file it was. A `LinkedHashMap` keeps the order you put things in. A path has parts, and `file.getFileName()` is the last part, `linnet.csv`, whatever folder it is in; `toString()` on the path gives the whole of it.
 
+`main` makes two futures by hand to try this with: `CompletableFuture.completedFuture(amount)` is a future that already holds its answer, and `CompletableFuture.failedFuture(exception)` one whose job threw.
+
 Then go through the map once, on one thread: `get` each answer, add it to the total, and catch an `ExecutionException` around that one `get`, noting the file's name and the cause's message, as the executor issue did for bookings. A future whose job has not finished is no reason to skip it: `get` waits for it.
 
 ## Why no update is lost
 
-The files were read at the same time, so can the total come up short, as the count did when two windows sold at once? It cannot: nothing is shared while the threads work. Each job adds up its own file into a variable of its own, and gives that one amount back. The adding up of the amounts happens afterwards, on one thread, one future after another. No two threads ever touch the total.
+Can the total come up short, as the count did when two windows sold at once? Not here: nothing is shared while the threads work. Each job adds up its own file in a variable of its own and gives that amount back, and the amounts are added up afterwards, on one thread. No two threads ever touch the total.
 
 Compare the way that goes wrong: each job adding its file's takings straight into one `BigDecimal` field. A `BigDecimal` never changes, so `total = total.add(mine)` reads the field, makes a new amount and writes the field: three steps, and two threads meeting in the middle lose one of them. Give each thread its own result and gather them on one thread, and there is nothing to guard.
 
 ## The whole program
 
-Put together, closing time is a short method: make a pool of three threads, hand it each file's job and keep the future under the file's name, gather the answers, and shut the pool down in a `finally` so that its threads end however the gathering went. A broken till costs only its own takings and a line in the report.
-
-Each piece comes from a part of this repo: classes, a record, a checked exception and a `finally`, a map, a lambda as a value, a `BigDecimal`, a file read into records, and a pool of threads.
+Closing time puts the pieces together: a pool from the executor issue, a job per till, the gathering, and a `finally` from part 5 so that the pool's threads end however the gathering went. A broken till costs only its own takings and a line in the report. Each piece comes from a part of this repo, from classes and records to money, files and threads.
 
 ## Your work in this issue
 

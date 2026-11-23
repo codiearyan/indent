@@ -85,7 +85,7 @@ class Jobs {
 // future and gives back the takings of those that worked, added up. A future whose job threw is
 // left out of the total, and a problem is added for it: its name in the map, a colon and a
 // space, then the message of what its job threw, as in "relief-boat.csv: Line 3 cannot be read".
-// The other futures still count.
+// The other futures still count. The problems may come in any order.
 class Results {
     static BigDecimal collect(Map<String, Future<BigDecimal>> answers, List<String> problems) throws InterruptedException {
         BigDecimal total = BigDecimal.ZERO;

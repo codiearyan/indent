@@ -21,7 +21,7 @@
         "Take the // off the Scans lines in main and run it: the count is right every time."
       ],
       "hints": [
-        "A map you can change from several threads is a ConcurrentHashMap, and ConcurrentMap is its type, as Map is the type of a HashMap.",
+        "The lesson's part on maps for several threads names the class, and ConcurrentMap is its type, as Map is the type of a HashMap.",
         "Each call on a ConcurrentHashMap is safe by itself; a get and then a put are two calls, and another thread can come between them. The issue on lists and maps that take a function met a method of maps that adds to a count in one call, starting it when the key is not there.",
         "`return new ConcurrentHashMap<>();` in newCounts, and `counts.merge(boat, tickets, Integer::sum);` in scan."
       ],
