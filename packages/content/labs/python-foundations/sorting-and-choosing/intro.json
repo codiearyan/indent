@@ -7,7 +7,7 @@
       "file": "callout_lists.py",
       "mine": true,
       "gap": "Nothing sorts or chooses",
-      "tasks": ["Longest first", "By hill, then date", "The rope shelf", "Quickest and longest", "Ready to close"]
+      "tasks": ["Two sorted lists", "The rope shelf", "Quickest and longest", "Ready to close"]
     },
     { "title": "The council", "say": "Clear at a glance. Thank you.", "note": "Reads the winter's report." }
   ],
