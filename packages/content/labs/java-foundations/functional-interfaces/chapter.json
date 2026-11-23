@@ -1,0 +1,105 @@
+{
+  "id": "functional-interfaces",
+  "title": "Built-in shapes: Predicate, Function and method references",
+  "files": ["TicketRules.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the ticket rules here, and try your types from main.",
+    "suggestedCommand": "java TicketRules.java"
+  },
+  "tasks": [
+    {
+      "id": "hand",
+      "title": "Hand a rule and a fare to the desk",
+      "file": "TicketRules.java",
+      "description": "Under `// Task 1`, write a class `Desk` with two methods. `static List<Ticket> keep(List<Ticket> tickets, Predicate<Ticket> rule)` gives back a new list of the tickets the rule says yes to, in the order they came. `static List<Integer> prices(List<Ticket> tickets, Function<Ticket, Integer> fare)` gives back the fare of each ticket, in the order they came. `tickets` stays as it is. `Ticket` is given above the tasks. A loop is the right tool here.\n\nCheck hands both methods lists of its own, one made with `List.of` and one empty, with a rule and a fare of its own that remember whom they were asked about. Each must be asked once about every ticket, in order. Check reads what comes back, and `tickets` afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson about the four shapes and their methods.",
+        "Write keep: walk the tickets, ask the rule about each, and keep the ones it says yes to.",
+        "Write prices: walk the tickets, and add what the fare says for each.",
+        "Try both from main with the rule and the fare it gives."
+      ],
+      "hints": [
+        "A Predicate and a Function are objects with one method each. Calling that method is how keep and prices ask them about a ticket.",
+        "keep asks rule about each ticket exactly once and keeps the ticket when the answer is true. prices adds what fare gives for each ticket. Both put what they find in a new list.",
+        "In keep's loop: `if (rule.test(t)) { kept.add(t); }`. In prices' loop: `prices.add(fare.apply(t));`."
+      ],
+      "docs": [
+        {
+          "title": "Predicate",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html"
+        },
+        {
+          "title": "Function",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html"
+        },
+        {
+          "title": "The java.util.function package",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/package-summary.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "combine",
+      "title": "Join two rules, and add the fee to a fare",
+      "file": "TicketRules.java",
+      "description": "Under `// Task 2`, write a class `RuleBook` with two methods. `static Predicate<Ticket> both(Predicate<Ticket> first, Predicate<Ticket> second)` gives back a rule that says yes only when both say yes, and that does not ask `second` about a ticket `first` has said no to. `static Function<Ticket, Integer> withFee(Function<Ticket, Integer> fare, int fee)` gives back a function: the fare of a ticket, plus `fee`. Predicate and Function have default methods that make each one line; any right answer passes.\n\nCheck hands `both` rules of its own that remember whom they were asked about, asks the rule that comes back about four tickets that try every pair of answers, and reads which tickets each rule was asked about. It asks `withFee` for functions with fees of its own, keeps two side by side, and calls each with tickets of its own. The fare must be asked once for each ticket, and not before the function is used.",
+      "nextSteps": [
+        "Read the parts of the lesson about a method that gives back a function, and about joining two.",
+        "Write both: a rule that asks first, and asks second only when first said yes.",
+        "Write withFee: a function that asks the fare about a ticket and adds fee.",
+        "Try them from main with Desk.keep and Desk.prices."
+      ],
+      "hints": [
+        "A method that gives back a function gives back a lambda, or the result of a default method such as and or andThen, which make a new function out of two.",
+        "&& does not look at its right side when its left side is false, and the rule both gives back should behave the same way. The function withFee gives back first asks fare, then adds fee to the answer: a second step after the first. A lambda may read fee because fee never changes.",
+        "In both: `return first.and(second);`. In withFee: `return fare.andThen(price -> price + fee);`."
+      ],
+      "docs": [
+        {
+          "title": "Predicate.and",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html#and(java.util.function.Predicate)"
+        },
+        {
+          "title": "Function.andThen",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html#andThen(java.util.function.Function)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "references",
+      "title": "Write four functions as method references",
+      "file": "TicketRules.java",
+      "description": "Under `// Task 3`, write a class `Shortcuts` with four methods, each giving back a method reference:\n\n- `static Function<String, Integer> readNumber()` reads a whole number written as text.\n- `static Predicate<String> onList(List<String> names)` says whether a name is in `names`, asking `names` itself each time.\n- `static Function<Ticket, String> passengerOf()` gives the passenger of a ticket.\n- `static Supplier<List<Ticket>> newList()` gives a new, empty `ArrayList` each time it is asked.\n\nEach is one of the four kinds of method reference. Check calls each function with values of its own: numbers as text, a list of its own that it adds a name to after the rule is made, tickets of its own, and two lists from one supplier. Check cannot tell a method reference from a lambda that does the same, so a lambda passes too; a class written out in full, named or anonymous, does not.",
+      "nextSteps": [
+        "Read the part of the lesson about the four kinds of method reference.",
+        "For each method, find the method that already does the job, and who it belongs to.",
+        "Write each as ClassOrObject::method, or ClassName::new for a constructor.",
+        "Try each from main."
+      ],
+      "hints": [
+        "A method reference names a method that already exists, with :: between its owner and its name. Integer has a method that reads text as a whole number, a List knows whether it holds something, and a record has a method for each of its parts.",
+        "The four kinds: a static method (Class::method), a method of one object you already have (object::method), a method of whatever object the function is handed (Class::method again), and a constructor (Class::new).",
+        "`return Integer::parseInt;`, `return names::contains;`, `return Ticket::passenger;` and `return ArrayList::new;`."
+      ],
+      "docs": [
+        {
+          "title": "Method references",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html"
+        },
+        {
+          "title": "Supplier",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "The kinds of method reference",
+          "url": "https://www.youtube.com/watch?v=_rUQiXqqYSw"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

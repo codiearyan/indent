@@ -1,0 +1,51 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "desk", "label": "The desk", "kind": "story" },
+      { "id": "announce", "label": "announce()", "kind": "function", "mine": true },
+      { "id": "count", "label": "count_calls()", "kind": "function", "mine": true },
+      { "id": "timed", "label": "timed()", "kind": "function", "mine": true },
+      { "id": "handler", "label": "A handler", "kind": "function" },
+      { "id": "dougie", "label": "Dougie", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "desk", "to": "announce", "label": "a call" },
+      { "from": "desk", "to": "count", "label": "a call" },
+      { "from": "desk", "to": "timed", "label": "a call" },
+      { "from": "announce", "to": "handler", "label": "same values" },
+      { "from": "count", "to": "dougie", "label": "how many" },
+      { "from": "timed", "to": "dougie", "label": "how long" }
+    ],
+    "note": "The same few lines are written once and wrapped around any handler, which goes on working as before."
+  },
+  "tasks": {
+    "announce": {
+      "steps": [
+        { "active": ["desk", "desk->announce", "announce"], "value": { "kind": "map", "label": "a call", "entries": [{ "key": "in order", "value": "call sign, message" }, { "key": "by name", "value": "urgent" }] }, "note": "The desk calls a wrapped handler with its usual values." },
+        { "active": ["announce"], "note": "The wrapper says which handler is running." },
+        { "active": ["announce", "announce->handler", "handler"], "note": "The handler gets exactly the values the desk gave, and its answer goes back unchanged." }
+      ]
+    },
+    "count": {
+      "steps": [
+        { "active": ["count"], "note": "A wrapped handler starts the night with a count of 0." },
+        { "active": ["desk", "desk->count", "count"], "note": "Each call adds one to that handler's own count, and the handler works as before." },
+        { "active": ["count", "count->dougie", "dougie"], "note": "Dougie reads how many times each handler ran, one count per handler." }
+      ]
+    },
+    "timed": {
+      "steps": [
+        { "active": ["timed"], "note": "A wrapped handler is given a clock to read, the computer's own unless another is handed in." },
+        { "active": ["desk", "desk->timed", "timed"], "note": "Each call reads the clock before and after, and notes the seconds it took." },
+        { "active": ["timed", "timed->dougie", "dougie"], "note": "Dougie reads every call's time, under the handler's own name." }
+      ]
+    },
+    "pages": {
+      "steps": [
+        { "active": ["handler"], "note": "Paging a team is a handler like any other." },
+        { "active": ["count", "handler"], "note": "One line above it puts the counting wrapper on it." },
+        { "active": ["count", "count->dougie", "dougie"], "note": "Every page sent is now counted, and pages go out as before." }
+      ]
+    }
+  }
+}

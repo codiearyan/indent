@@ -1,0 +1,52 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" },
+      { "id": "send", "label": "send_to_all()", "kind": "function", "mine": true },
+      { "id": "route", "label": "route()", "kind": "function", "mine": true },
+      { "id": "handlers", "label": "The desk's handlers", "kind": "data" },
+      { "id": "pagers", "label": "pagers_for()", "kind": "function", "mine": true },
+      { "id": "pager", "label": "make_pager()", "kind": "function", "mine": true },
+      { "id": "teams", "label": "Teams on the hill", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ailsa", "to": "send", "label": "a wording" },
+      { "from": "send", "to": "teams", "label": "one each" },
+      { "from": "ailsa", "to": "route", "label": "a call" },
+      { "from": "route", "to": "handlers", "label": "its kind" },
+      { "from": "pagers", "to": "pager", "label": "each call sign" },
+      { "from": "pager", "to": "teams", "label": "own pager" }
+    ],
+    "note": "The desk hands its handlers and pagers around like any other value, so each call reaches the right place."
+  },
+  "tasks": {
+    "send": {
+      "steps": [
+        { "active": ["ailsa", "ailsa->send", "send"], "value": { "kind": "array", "label": "tonight's teams", "values": ["Alpha", "Bravo", "Charlie"] }, "note": "Ailsa picks a way to word a message and gives the list of tonight's teams." },
+        { "active": ["send", "send->teams", "teams"], "note": "Each team gets the message, worded that way, one team at a time." },
+        { "active": ["send", "ailsa"], "note": "What each team was sent comes back to Ailsa as a list, in the same order." }
+      ]
+    },
+    "route": {
+      "steps": [
+        { "active": ["ailsa", "ailsa->route", "route"], "value": { "kind": "map", "label": "a call", "entries": [{ "key": "kind", "value": "kit" }, { "key": "text", "value": "two ropes back in the van" }] }, "note": "A call comes in with its kind and its text." },
+        { "active": ["route", "route->handlers", "handlers"], "note": "The desk finds the handler for that kind, or the one for any other kind." },
+        { "active": ["handlers", "ailsa"], "note": "That handler alone works on the text, and its answer goes back to Ailsa." }
+      ]
+    },
+    "pager": {
+      "steps": [
+        { "active": ["pager"], "note": "Ailsa asks for a pager for Alpha." },
+        { "active": ["pager", "pager->teams", "teams"], "note": "Every message sent through that pager starts with Alpha's call sign." },
+        { "active": ["pager", "teams"], "note": "A pager made later for Bravo leaves Alpha's pager as it was." }
+      ]
+    },
+    "pagers": {
+      "steps": [
+        { "active": ["pagers"], "value": { "kind": "array", "label": "tonight's teams", "values": ["Alpha", "Bravo", "Charlie"] }, "note": "Ailsa gives the list of tonight's teams." },
+        { "active": ["pagers", "pagers->pager", "pager"], "note": "Each call sign gets a pager of its own, kept under its name." },
+        { "active": ["pager", "pager->teams", "teams"], "note": "Each pager puts its own team's call sign in front of every message." }
+      ]
+    }
+  }
+}

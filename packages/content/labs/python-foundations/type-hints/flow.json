@@ -1,0 +1,58 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "file", "label": "season.csv", "kind": "file" },
+      { "id": "longest", "label": "longest_callouts()", "kind": "function", "mine": true },
+      { "id": "callout", "label": "Callout", "kind": "data" },
+      { "id": "pick", "label": "pick()", "kind": "function", "mine": true },
+      { "id": "small", "label": "Hinted helpers", "kind": "function", "mine": true },
+      { "id": "reader", "label": "Next winter's reader", "kind": "story" },
+      { "id": "rhona", "label": "Rhona", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "file", "to": "longest", "label": "one line each" },
+      { "from": "longest", "to": "callout", "label": "a record" },
+      { "from": "callout", "to": "pick", "label": "records" },
+      { "from": "longest", "to": "rhona", "label": "the longest" },
+      { "from": "small", "to": "reader", "label": "what each takes" }
+    ],
+    "note": "Every function says in its def line what it takes and gives back, and the season closes on a sorted report."
+  },
+  "tasks": {
+    "total": {
+      "steps": [
+        { "active": ["small"], "value": { "kind": "array", "label": "hours", "values": [7, 3, 11] }, "note": "A list of hours goes in." },
+        { "active": ["small"], "note": "One number comes out: the total." },
+        { "active": ["small", "small->reader", "reader"], "note": "Next winter's reader sees both from the def line alone." }
+      ]
+    },
+    "between": {
+      "steps": [
+        { "active": ["small"], "note": "Dougie's function says it takes text, and it is always given hours of the day." },
+        { "active": ["small"], "note": "Python runs it all the same: nothing checks what the def line says." },
+        { "active": ["small", "small->reader", "reader"], "note": "Once its notes say what is really there, nobody reading it is misled." }
+      ]
+    },
+    "leader": {
+      "steps": [
+        { "active": ["small"], "value": { "kind": "map", "label": "leaders", "entries": [{ "key": "Alpha", "value": "Ailsa" }, { "key": "Bravo", "value": "Dougie" }] }, "note": "A call sign is looked up among the season's leaders." },
+        { "active": ["small"], "note": "A known team gives its leader, and an unknown one gives nothing at all." },
+        { "active": ["small", "small->reader", "reader"], "note": "The reader can tell from the def line that the answer may be nothing." }
+      ]
+    },
+    "pick": {
+      "steps": [
+        { "active": ["callout", "callout->pick", "pick"], "note": "The season's records come in with a rule that answers yes or no for one record." },
+        { "active": ["pick"], "note": "The rule is asked about each record in turn." },
+        { "active": ["pick", "callout"], "note": "The records it said yes to come back as a new list, in their order." }
+      ]
+    },
+    "longest": {
+      "steps": [
+        { "active": ["file", "file->longest", "longest"], "value": { "kind": "map", "label": "one line", "entries": [{ "key": "date", "value": "text" }, { "key": "hill", "value": "text" }, { "key": "hours", "value": "whole number" }] }, "note": "Each line of the season's file holds one callout." },
+        { "active": ["longest", "longest->callout", "callout"], "note": "Each line becomes a Callout, its hours a whole number." },
+        { "active": ["longest", "longest->rhona", "rhona"], "note": "Rhona gets the longest callouts first, the older first where hours are equal." }
+      ]
+    }
+  }
+}

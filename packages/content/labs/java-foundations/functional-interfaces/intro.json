@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "The Gannet's children, please",
+      "note": "Tomorrow it will be the bikes."
+    },
+    {
+      "title": "Hut programs",
+      "text": "A new loop copied out for every question"
+    },
+    {
+      "title": "Your rules",
+      "file": "TicketRules.java",
+      "mine": true,
+      "gap": "No way to hand over a rule",
+      "tasks": [
+        "Hand a rule over",
+        "Join rules, add fee",
+        "Method references"
+      ]
+    },
+    {
+      "title": "Ossian",
+      "say": "Same desk, any question at all",
+      "note": "One loop, kept in one place."
+    }
+  ],
+  "ticket": {
+    "label": "Children",
+    "wrong": "another loop",
+    "why": "Copied code",
+    "right": "from one desk"
+  },
+  "captions": [
+    "The hut's desk. Ossian wants the children on the Gannet, and tomorrow something else.",
+    "Today every question is a loop of its own, copied and changed, and the copies drift.",
+    "You hand rules to one desk, join two rules into one, and name short rules in a word.",
+    "Now the Gannet's children come from the same desk as every other question.",
+    "Rules handed in, joined and named. Next: the lists and maps that take a rule."
+  ]
+}

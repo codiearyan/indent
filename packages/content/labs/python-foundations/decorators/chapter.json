@@ -1,0 +1,103 @@
+{
+  "id": "decorators",
+  "title": "Decorators",
+  "files": ["base_handlers.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to wrap the base's handlers so they say what runs, count their calls and note how long they take.",
+    "suggestedCommand": "python3 base_handlers.py"
+  },
+  "tasks": [
+    {
+      "id": "announce",
+      "title": "Say what runs",
+      "file": "base_handlers.py",
+      "description": "Under `# Task 1` in `base_handlers.py`, write a function called `announce` that takes a function and gives back a new function. The new function takes whatever values it is called with, in order and by name, prints `Running` and the name of the function it wraps, and gives back what that function gives back for the same values. `announce(log_call)(\"Alpha\", \"at the bridge\", urgent=True)` prints `Running log_call` and gives back `'Alpha: at the bridge (urgent)'`. `announce` itself calls nothing: it only makes the new function.\n\nCheck wraps functions of its own that note every call. It looks at whether `announce` called one while making the new function, then calls the new function with values in order and by name, and looks at what it prints, what it gives back and what the wrapped function was handed.",
+      "nextSteps": [
+        "Read the parts of the lesson on a function that wraps another, and on *args and **kwargs.",
+        "Inside announce, write the new function with a def, taking *args and **kwargs.",
+        "In it, print the line, then call the function it wraps with the same values and give back what it gives.",
+        "Give back the new function itself, and try announce(log_call) in the try-out lines."
+      ],
+      "hints": [
+        "The new function is a def inside `announce`, and `announce` gives it back without calling it. The function it wraps runs only when the new function is called.",
+        "A function's name is in its `__name__`. `*args` and `**kwargs` in a def line take every value of a call, in order and by name, and the same words in a call hand them all on.",
+        "The shape is `def wrapper(*args, **kwargs):` with `print(\"Running\", fn.__name__)` and `return fn(*args, **kwargs)` inside it, then `return wrapper`."
+      ],
+      "docs": [
+        { "title": "Arbitrary argument lists", "url": "https://docs.python.org/3/tutorial/controlflow.html#arbitrary-argument-lists" },
+        { "title": "Unpacking argument lists", "url": "https://docs.python.org/3/tutorial/controlflow.html#unpacking-argument-lists" },
+        { "title": "Function definitions", "url": "https://docs.python.org/3/reference/compound_stmts.html#function-definitions" }
+      ],
+      "videos": [
+        { "title": "Decorators, step by step", "url": "https://www.youtube.com/watch?v=FsAPt_9Bf3U" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "count",
+      "title": "Count the calls",
+      "file": "base_handlers.py",
+      "description": "Under `# Task 2`, write a function called `count_calls` that takes a function and gives back a new function. The new function gives back what the wrapped function gives back for the same values, in order and by name, and counts how many times it was called in an attribute called `calls`: 0 before its first call, 2 after two calls. Each function `count_calls` gives back has a count of its own.\n\nCheck wraps two functions of its own, calls one twice and the other once, and looks at each count, at what each call gives back, and at whether `count_calls` called anything while making the new functions.",
+      "nextSteps": [
+        "Read the part of the lesson on a function that keeps a value.",
+        "Write the new function inside count_calls, as in Task 1.",
+        "Give it its attribute, starting at 0, before you give it back.",
+        "Inside it, add 1 to that attribute, then call the wrapped function and give back what it gives."
+      ],
+      "hints": [
+        "A count kept in one name of the file is shared by every function `count_calls` wraps, and a count set to 0 inside the new function starts again at every call.",
+        "A function is an object, so it can carry an attribute, as an object of a class can: set it on the new function once after its def, and change it through the new function's name inside it.",
+        "The shape is `wrapper.calls = wrapper.calls + 1` and `return fn(*args, **kwargs)` inside `wrapper`, then `wrapper.calls = 0` and `return wrapper` after it."
+      ],
+      "docs": [
+        { "title": "Function objects", "url": "https://docs.python.org/3/library/stdtypes.html#functions" },
+        { "title": "Callable types", "url": "https://docs.python.org/3/reference/datamodel.html#callable-types" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "timed",
+      "title": "Time each call",
+      "file": "base_handlers.py",
+      "description": "Under `# Task 3`, write a function called `timed` that takes a function and a clock, `clock=time.monotonic`, a function that gives the time in seconds when it is called. It gives back a new function that gives back what the wrapped function gives back for the same values. Each time the new function is called, it reads the clock once before the call and once after, and adds the seconds the call took to a list in an attribute called `times`, empty before its first call. The new function keeps the name of the function it wraps, in its `__name__`.\n\nCheck hands `timed` a clock of its own that gives numbers it chose, wraps functions of its own, and looks at how many times the clock was read, at `times`, at `__name__` and at what each call gives back. It also wraps one function without a clock, to see that the default works.",
+      "nextSteps": [
+        "Read the parts of the lesson on a clock that is handed in and on keeping the name.",
+        "Write timed with clock as its second parameter, with time.monotonic as its default.",
+        "In the new function, read the clock, call the wrapped function, read the clock again, and add the difference to times.",
+        "Give the new function an empty times list and the wrapped function's name before you give it back."
+      ],
+      "hints": [
+        "`clock` is a function, called with round brackets each time it is read. The clock of the computer, read through the time module inside the new function, is not the one Check hands in.",
+        "The seconds a call took are the second reading take away the first. A function's `__name__` can be given a new value like any attribute; `functools.wraps` is a decorator of Python's own that does the same and more.",
+        "The shape is `start = clock()`, `result = fn(*args, **kwargs)`, `wrapper.times.append(clock() - start)` and `return result` inside `wrapper`, then `wrapper.times = []` and `wrapper.__name__ = fn.__name__` after it."
+      ],
+      "docs": [
+        { "title": "time.monotonic", "url": "https://docs.python.org/3/library/time.html#time.monotonic" },
+        { "title": "functools.wraps", "url": "https://docs.python.org/3/library/functools.html#functools.wraps" },
+        { "title": "Default argument values", "url": "https://docs.python.org/3/tutorial/controlflow.html#default-argument-values" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pages",
+      "title": "Count the pages",
+      "file": "base_handlers.py",
+      "description": "Under `# Task 4`, `page_team` is there. Put `count_calls` on it, so that `page_team.calls` says how many pages were sent. The `@` line above its def line is the short way to write that. `page_team` gives back what it gave back before, and `page_team.calls` is 0 before the first page.\n\nCheck uses its own `count_calls` for this task, so it does not wait on Task 2. It sends two pages and reads `page_team.calls` before and after.",
+      "nextSteps": [
+        "Read the part of the lesson on the @ line.",
+        "Write the @ line right above the def line of page_team.",
+        "In the try-out lines, send two pages and print page_team.calls."
+      ],
+      "hints": [
+        "Putting a decorator on a function gives the function's name the new function the decorator gives back.",
+        "`@` and the decorator's name, on the line right above the def line, does that as soon as the def runs. The name is written without round brackets.",
+        "The shape is the line `@count_calls` right above `def page_team(call_sign, urgent=False):`."
+      ],
+      "docs": [
+        { "title": "Decorators in function definitions", "url": "https://docs.python.org/3/reference/compound_stmts.html#function-definitions" },
+        { "title": "decorator", "url": "https://docs.python.org/3/glossary.html#term-decorator" }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "id": "sorting-and-choosing",
+  "title": "Sorting and choosing",
+  "files": ["callout_lists.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to sort the winter's callouts and Dougie's ropes, and to see whether the year can close.",
+    "suggestedCommand": "python3 callout_lists.py"
+  },
+  "tasks": [
+    {
+      "id": "longest",
+      "title": "Longest first",
+      "file": "callout_lists.py",
+      "description": "Under `# Task 1` in `callout_lists.py`, write a function called `longest_first` that takes a list of callouts, each a dictionary like those in `callouts`, and gives back a new list of them, the most hours first. Callouts with the same hours stay in the order they had. The list it is given stays as it was. For `callouts` it gives Cairn Dubh first, then Scarth Fell with 7 hours, and the two callouts of 3 hours last, Lowther Crag before Scarth Fell, as they came.\n\nCheck calls `longest_first` with lists of its own, with callouts of the same hours among them and hours of one and two digits, and looks at the order of what it gives back and at the list it gave.",
+      "nextSteps": [
+        "Read the parts of the lesson on key= and on reverse.",
+        "Write a function that gives sorted the hours of one callout.",
+        "Hand that function to sorted, and ask for the biggest first.",
+        "Print the hill and the hours of each callout it gives back."
+      ],
+      "hints": [
+        "Python cannot compare two dictionaries, so sorting the callouts as they are stops with an error. sorted needs to be told what to compare in each callout.",
+        "sorted takes `key=`, a function it calls once for each callout, and sorts by what that function gives back. `reverse=True` gives the biggest first, and keeps callouts of the same hours in their order.",
+        "The shape is `return sorted(callouts, key=lambda callout: callout[\"hours\"], reverse=True)`."
+      ],
+      "docs": [
+        { "title": "Sorting techniques", "url": "https://docs.python.org/3/howto/sorting.html" },
+        { "title": "sorted()", "url": "https://docs.python.org/3/library/functions.html#sorted" }
+      ],
+      "videos": [
+        { "title": "Sorting lists and objects with a key", "url": "https://www.youtube.com/watch?v=D3JvDWO-BY4" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hill",
+      "title": "By hill, then by date",
+      "file": "callout_lists.py",
+      "description": "Under `# Task 2`, write a function called `by_hill` that takes a list of callouts and gives back a new list of them with the hills in A to Z order, and the callouts on one hill oldest first. The list it is given stays as it was. For `callouts` it gives Cairn Dubh first, then the two on Lowther Crag, the 11 January one before the 8 February one, then the two on Scarth Fell, 4 January before 19 January.\n\nCheck calls `by_hill` with lists of its own, whose callouts on one hill are not in date order, and looks at the order of what it gives back and at the list it gave.",
+      "nextSteps": [
+        "Read the part of the lesson on sorting by two things.",
+        "Write a key that gives back the hill and the date of one callout, in that order.",
+        "Hand it to sorted, and give back what sorted gives.",
+        "Print the hill and the date of each callout it gives back."
+      ],
+      "hints": [
+        "Sorting by the hill alone keeps the callouts on one hill in the order they came in, which is not date order.",
+        "Python compares two tuples item by item: the first items decide, and the second only between tuples whose first items are equal. A key can give back a tuple.",
+        "The shape is `return sorted(callouts, key=lambda callout: (callout[\"hill\"], callout[\"date\"]))`."
+      ],
+      "docs": [
+        { "title": "Sort stability and complex sorts", "url": "https://docs.python.org/3/howto/sorting.html#sort-stability-and-complex-sorts" },
+        { "title": "Comparing sequences", "url": "https://docs.python.org/3/tutorial/datastructures.html#comparing-sequences-and-other-types" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "shelf",
+      "title": "The rope shelf",
+      "file": "callout_lists.py",
+      "description": "Under `# Task 3`, write a function called `shelve` that takes a list of rope tags, such as `\"R12\"`, and sorts that same list by the number after the R, smallest first. It changes the list it is given, and does not need to give anything back. After `shelve(ropes)`, `ropes` is `['R3', 'R7', 'R12', 'R101']`.\n\nCheck hands `shelve` lists of its own, with numbers of one, two and three digits, and looks at the list afterwards.",
+      "nextSteps": [
+        "Read the parts of the lesson on sort and on numbers that are text.",
+        "Run the file and look at what sorted(ropes) gives.",
+        "Write a key that gives back the number of one tag, as a number.",
+        "Sort the list the function is given with that key, then print ropes after calling shelve."
+      ],
+      "hints": [
+        "Text is compared one character at a time, so \"R101\" comes before \"R3\": the 1 is compared with the 3, and the rest never counts.",
+        "A slice gives the part of a tag after its first character, and `int()` turns those digits into a number. The list's own `sort` changes the list it is called on; `sorted` makes a new one.",
+        "The shape is `tags.sort(key=lambda tag: int(tag[1:]))`."
+      ],
+      "docs": [
+        { "title": "list.sort()", "url": "https://docs.python.org/3/library/stdtypes.html#list.sort" },
+        { "title": "int()", "url": "https://docs.python.org/3/library/functions.html#int" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pair",
+      "title": "The quickest and the longest",
+      "file": "callout_lists.py",
+      "description": "Under `# Task 4`, write a function called `quickest_and_longest` that takes a list of callouts, at least one, and gives back a tuple of two callouts: the whole callout with the fewest hours, then the one with the most. Of two with the same hours, it gives the one that comes first in the list. The list it is given stays as it was. For `callouts` it gives back the Lowther Crag callout of 11 January and the Cairn Dubh one.\n\nCheck calls `quickest_and_longest` with lists of its own, with two callouts that share the fewest hours and two that share the most, and looks at the tuple it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on min and max with a key.",
+        "Find the callout with the fewest hours, then the one with the most.",
+        "Give both back as a tuple, quickest first.",
+        "Print what it gives back for callouts."
+      ],
+      "hints": [
+        "`min` and `max` given the callouts as they are stop with an error, and given only the hours they give back a number, not a callout.",
+        "`min` and `max` take `key=` as sorted does, and give back the item itself, the first one when several are equal.",
+        "The shape is `return min(callouts, key=lambda c: c[\"hours\"]), max(callouts, key=lambda c: c[\"hours\"])`."
+      ],
+      "docs": [
+        { "title": "min()", "url": "https://docs.python.org/3/library/functions.html#min" },
+        { "title": "max()", "url": "https://docs.python.org/3/library/functions.html#max" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ready",
+      "title": "Ready to close the year",
+      "file": "callout_lists.py",
+      "description": "Under `# Task 5`, write a function called `ready_to_close` that takes a list of callouts and a number of hours, and gives back `True` when every callout has its team written down (its team is not `\"\"`) and none took more than that number of hours, and `False` otherwise. A list with no callouts gives `True`. For `callouts` and `12` it gives back `False`, because nobody wrote down the team of the Cairn Dubh callout.\n\nCheck calls `ready_to_close` with lists and limits of its own: a callout exactly at the limit, a team missing first and last, and an empty list.",
+      "nextSteps": [
+        "Read the part of the lesson on any and all.",
+        "Ask whether every callout has its team written down.",
+        "Ask whether any callout took more than the hours given.",
+        "Put the two together and give back the answer."
+      ],
+      "hints": [
+        "A loop that gives back True as soon as one callout looks fine has not looked at the others.",
+        "`all()` gives True when every item of what it is given is true, and `any()` when at least one is. Each can be given a generator expression, a comprehension in round brackets.",
+        "The shape is `return all(c[\"team\"] != \"\" for c in callouts) and not any(c[\"hours\"] > limit for c in callouts)`."
+      ],
+      "docs": [
+        { "title": "all()", "url": "https://docs.python.org/3/library/functions.html#all" },
+        { "title": "any()", "url": "https://docs.python.org/3/library/functions.html#any" }
+      ],
+      "points": 10
+    }
+  ]
+}
