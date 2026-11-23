@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "The office wants every till tonight.",
+      "note": "Three boats, three till files."
+    },
+    {
+      "title": "Old program",
+      "text": "Read tills one by one, stopped at a bad one"
+    },
+    {
+      "title": "Your closing",
+      "file": "HarbourCheck.java",
+      "mine": true,
+      "gap": "One till at a time",
+      "tasks": [
+        "A job per till",
+        "Gather the answers",
+        "Check the whole day"
+      ]
+    },
+    {
+      "title": "Harbour office",
+      "say": "The whole day, the bad till named.",
+      "note": "Takings to the penny."
+    }
+  ],
+  "ticket": {
+    "label": "Day's takings",
+    "wrong": "not sent",
+    "why": "Stopped",
+    "right": "all in"
+  },
+  "captions": [
+    "Closing at Lanternquay. Each boat's till writes its own file for the harbour office.",
+    "The relief boat's till broke mid line, and the old program stopped and sent nothing.",
+    "You read every till at once with a small pool and gather each answer through a future.",
+    "All tills are read together, the bad one is named, and the takings add up exactly.",
+    "The office has the whole day before the last bus, and the hut has its program."
+  ]
+}

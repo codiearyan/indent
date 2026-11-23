@@ -1,11 +1,103 @@
 {
   "id": "shared-values",
-  "title": "x",
-  "files": ["PierWindow.java"],
-  "terminal": { "description": "x", "suggestedCommand": "java PierWindow.java" },
+  "title": "A value two threads share",
+  "files": [
+    "PierWindow.java"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run the two windows here; the old count comes up short, and by a different number each run.",
+    "suggestedCommand": "java PierWindow.java"
+  },
   "tasks": [
-    { "id": "sold", "title": "a", "file": "PierWindow.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
-    { "id": "numbers", "title": "a", "file": "PierWindow.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
-    { "id": "takings", "title": "a", "file": "PierWindow.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 }
+    {
+      "id": "sold",
+      "title": "Count the tickets of both windows",
+      "file": "PierWindow.java",
+      "description": "Under `// Task 1`, write a class `Sold` that keeps a count of tickets, 0 at first, safe for both windows at once. `void add(int tickets)` adds `tickets` to the count, and `int count()` gives back the count. Both methods are `synchronized`.\n\nCheck holds the lock of a `Sold` itself while another thread calls `add`, and sees whether that thread waits for the lock; while it waits, Check adds 100 itself, then lets go and reads the count. It does the same for `count`, and it also has four threads add at once, many times over. A lost update shows on every run of Check, though your terminal may show one only now and then.",
+      "nextSteps": [
+        "Read the parts of the lesson about the lost update and about synchronized.",
+        "Write Sold as the OldCount above it, with a private count.",
+        "Make both methods synchronized.",
+        "Take the // off the Sold lines in main and run it a few times: the count is right every time."
+      ],
+      "hints": [
+        "OldCount, above the tasks, shows what goes wrong: compare it with the lesson's part on why count++ is three steps.",
+        "Every object has a lock, and a method can ask for its object's lock before it runs: then two threads can never be inside it at once. A method that only reads needs the lock too, to see the latest value.",
+        "`private int count;`, `synchronized void add(int tickets) { count += tickets; }` and `synchronized int count() { return count; }`."
+      ],
+      "docs": [
+        {
+          "title": "Synchronized methods",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/syncmeth.html"
+        },
+        {
+          "title": "Thread interference",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/interfere.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "volatile, synchronized and atomic variables",
+          "url": "https://www.youtube.com/watch?v=71dgtPrbToE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "numbers",
+      "title": "Number every ticket once",
+      "file": "PierWindow.java",
+      "description": "Under `// Task 2`, write a class `Numbers` that hands out ticket numbers from an `AtomicInteger`, safe for any number of threads at once. Its constructor takes the `AtomicInteger`, which holds the last number given out. `int next()` adds 1 to it and gives back the new number, so no two calls ever get the same number.\n\nCheck hands `Numbers` an `AtomicInteger` of its own and reads the numbers `next` gives back, and the `AtomicInteger` afterwards. Then it runs many rounds in which four threads take numbers at the same moment, and counts the rounds where a number came out twice or went missing. A wrong `next` may give no clash in your terminal, by luck; Check runs enough rounds that it shows.",
+      "nextSteps": [
+        "Read the part of the lesson about AtomicInteger.",
+        "Keep the AtomicInteger the constructor is given in a private final field.",
+        "Write next with one call on it.",
+        "Take the // off the Numbers lines in main and run it."
+      ],
+      "hints": [
+        "The lesson's part on AtomicInteger has a table of its methods: some do one step, some do two in one.",
+        "A get followed by a set is two steps, and another thread can come between them: the lost update again. The method you want adds and gives back the new value in one step no thread can come between.",
+        "`private final AtomicInteger last;`, `this.last = last;` in the constructor, and `return last.incrementAndGet();` in next."
+      ],
+      "docs": [
+        {
+          "title": "AtomicInteger",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/atomic/AtomicInteger.html"
+        },
+        {
+          "title": "Atomic variables",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/atomicvars.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "takings",
+      "title": "Add up the takings, printing outside the lock",
+      "file": "PierWindow.java",
+      "description": "Under `// Task 3`, write a class `Takings` that keeps the takings, `BigDecimal.ZERO` at first. `void sell(BigDecimal fare, Printer printer)` prints the ticket with `printer.print(fare)`, then adds `fare` to the takings. Only the adding is guarded, by a `synchronized` block on the `Takings` itself: the printing is outside it, so a slow printer at one window never holds up the other. `BigDecimal total()` gives back the takings, and is `synchronized`. `Printer` is given above the tasks.\n\nCheck hands `sell` a printer of its own, which notes whether the thread printing holds the lock of the `Takings` at that moment. It holds that lock itself while another thread calls `sell` and sees whether the adding waits for it; while it waits, Check sells a ticket of its own, then lets go and compares the takings by their value. It also has four threads sell at once, many times over.",
+      "nextSteps": [
+        "Read the part of the lesson about keeping the locked part small.",
+        "Write total as Task 1 wrote count.",
+        "In sell, print first, outside any lock.",
+        "Then guard only the adding with a synchronized block on this."
+      ],
+      "hints": [
+        "The lesson shows a lock on a whole method and a lock on a few lines of it. Here only one line needs the lock.",
+        "A block names the object whose lock it takes: the Takings itself, as a synchronized method does. A BigDecimal never changes, so reading the takings, adding and keeping the new value all belong inside the block.",
+        "`printer.print(fare);` then `synchronized (this) { total = total.add(fare); }`, and `synchronized BigDecimal total() { return total; }`."
+      ],
+      "docs": [
+        {
+          "title": "Intrinsic locks and synchronization",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/locksync.html"
+        },
+        {
+          "title": "BigDecimal.add",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html#add(java.math.BigDecimal)"
+        }
+      ],
+      "points": 10
+    }
   ]
 }

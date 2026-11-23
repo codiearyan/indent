@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Thirty bookings, thirty seconds.",
+      "note": "The office takes three calls at once."
+    },
+    {
+      "title": "Old program",
+      "text": "Rings the office one booking at a time"
+    },
+    {
+      "title": "Your pool",
+      "file": "Bookings.java",
+      "mine": true,
+      "gap": "One call at a time",
+      "tasks": [
+        "Confirm with three",
+        "Go past a failure",
+        "Keep one pool a day"
+      ]
+    },
+    {
+      "title": "Harbour office",
+      "say": "Three at a time, all confirmed.",
+      "note": "A dropped call is named."
+    }
+  ],
+  "ticket": {
+    "label": "Bookings",
+    "wrong": "half done",
+    "why": "One by one",
+    "right": "confirmed"
+  },
+  "captions": [
+    "Morning at the hut. The harbour office sends Bridie the day's bookings to confirm.",
+    "The old program confirms them one at a time, and the boat fills while she waits.",
+    "You hand the bookings to a pool of three threads and read each answer from its future.",
+    "Three calls at a time, the bookings are confirmed, and a failed one is reported.",
+    "Bridie's bookings are confirmed in a third of the time, with every failure named."
+  ]
+}

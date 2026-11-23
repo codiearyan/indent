@@ -1,0 +1,141 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "gangways",
+        "label": "Gangway scanners",
+        "kind": "story"
+      },
+      {
+        "id": "scans",
+        "label": "Scans",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "board",
+        "label": "Board",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "screen",
+        "label": "Hut screen",
+        "kind": "story"
+      },
+      {
+        "id": "labels",
+        "label": "Labels",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "bookings",
+        "label": "Day's bookings",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "gangways",
+        "to": "scans",
+        "label": "scans"
+      },
+      {
+        "from": "board",
+        "to": "screen",
+        "label": "lines"
+      },
+      {
+        "from": "bookings",
+        "to": "labels",
+        "label": "bookings"
+      }
+    ],
+    "note": "The counts, the noticeboard and the labels are used by several threads at once, and none of them breaks."
+  },
+  "tasks": {
+    "scans": {
+      "steps": [
+        {
+          "active": [
+            "gangways",
+            "gangways->scans",
+            "scans"
+          ],
+          "note": "Both gangways scan tickets for the same boat at the same moment."
+        },
+        {
+          "active": [
+            "scans"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "counts",
+            "entries": [
+              {
+                "key": "boat",
+                "value": "tickets"
+              }
+            ]
+          },
+          "note": "Each scan changes the boat's count in a single step of the map's own."
+        },
+        {
+          "active": [
+            "scans"
+          ],
+          "note": "However many scans arrive at once, every ticket counts."
+        }
+      ]
+    },
+    "board": {
+      "steps": [
+        {
+          "active": [
+            "board"
+          ],
+          "note": "The office posts a change to the noticeboard."
+        },
+        {
+          "active": [
+            "board",
+            "board->screen",
+            "screen"
+          ],
+          "note": "The hut screen goes through the board's lines while the posts carry on."
+        },
+        {
+          "active": [
+            "screen"
+          ],
+          "note": "The screen reads the lines it started with to the end, and nothing falls over."
+        }
+      ]
+    },
+    "labels": {
+      "steps": [
+        {
+          "active": [
+            "bookings",
+            "bookings->labels",
+            "labels"
+          ],
+          "note": "The day's bookings are shared out over several threads."
+        },
+        {
+          "active": [
+            "labels"
+          ],
+          "note": "Each booking's label is made on whichever thread has it, at the same time as others."
+        },
+        {
+          "active": [
+            "labels"
+          ],
+          "note": "The labels come back in the order of the bookings, however the work was shared."
+        }
+      ]
+    }
+  }
+}

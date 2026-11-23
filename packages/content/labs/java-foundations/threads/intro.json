@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Can it read while I sell?",
+      "note": "The queue reaches the door."
+    },
+    {
+      "title": "Hut computer",
+      "text": "Does one job at a time, the speaker first"
+    },
+    {
+      "title": "Your threads",
+      "file": "BusyHut.java",
+      "mine": true,
+      "gap": "Only one job at a time",
+      "tasks": [
+        "Read on its own",
+        "Count lists at once",
+        "Ring until closing"
+      ]
+    },
+    {
+      "title": "Quay",
+      "say": "Announced, counted, rung.",
+      "note": "And the hut kept selling."
+    }
+  ],
+  "ticket": {
+    "label": "The queue",
+    "wrong": "out the door",
+    "why": "One job",
+    "right": "served"
+  },
+  "captions": [
+    "Morning at the Lanternquay hut. Bridie wants the announcement read while she sells.",
+    "While the speaker reads, the computer does nothing else, and the queue grows.",
+    "You give the slow jobs threads of their own, and stop the bell when the hut closes.",
+    "The speaker reads, the lists are counted and the bell rings while tickets are sold.",
+    "Bridie's queue moves again, and the hut closes on time with the bell quiet."
+  ]
+}

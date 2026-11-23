@@ -1,0 +1,154 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "bridie",
+        "label": "Bridie",
+        "kind": "story"
+      },
+      {
+        "id": "announcer",
+        "label": "Announcer",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "counting",
+        "label": "Counting",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "ringer",
+        "label": "Ringer",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "quay",
+        "label": "Speaker and bell",
+        "kind": "story"
+      },
+      {
+        "id": "lists",
+        "label": "Passenger lists",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "bridie",
+        "to": "announcer",
+        "label": "announcement"
+      },
+      {
+        "from": "announcer",
+        "to": "quay",
+        "label": "lines"
+      },
+      {
+        "from": "lists",
+        "to": "counting",
+        "label": "one per thread"
+      },
+      {
+        "from": "counting",
+        "to": "bridie",
+        "label": "total"
+      },
+      {
+        "from": "ringer",
+        "to": "quay",
+        "label": "rings"
+      }
+    ],
+    "note": "The hut computer does its slow jobs on threads of their own, so Bridie keeps selling while they run."
+  },
+  "tasks": {
+    "announce": {
+      "steps": [
+        {
+          "active": [
+            "bridie",
+            "bridie->announcer",
+            "announcer"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "announcement",
+            "values": [
+              "line",
+              "line",
+              "line"
+            ]
+          },
+          "note": "Bridie hands over the departure announcement."
+        },
+        {
+          "active": [
+            "announcer"
+          ],
+          "note": "A new thread is made and started for the reading, and handed back at once."
+        },
+        {
+          "active": [
+            "announcer",
+            "announcer->quay",
+            "quay"
+          ],
+          "note": "The speaker reads the lines in order, while the hut sells tickets."
+        }
+      ]
+    },
+    "total": {
+      "steps": [
+        {
+          "active": [
+            "lists",
+            "lists->counting",
+            "counting"
+          ],
+          "note": "Each boat's passenger list gets a thread of its own, every one started first."
+        },
+        {
+          "active": [
+            "counting"
+          ],
+          "note": "Each thread keeps its count in a place of its own, and the hut waits for them all."
+        },
+        {
+          "active": [
+            "counting",
+            "counting->bridie",
+            "bridie"
+          ],
+          "note": "Once every thread has ended, the counts are added up for Bridie."
+        }
+      ]
+    },
+    "ringer": {
+      "steps": [
+        {
+          "active": [
+            "ringer"
+          ],
+          "note": "A thread starts ringing the quay bell, sleeping between rings."
+        },
+        {
+          "active": [
+            "ringer",
+            "ringer->quay",
+            "quay"
+          ],
+          "note": "The bell rings on and on while the hut is open."
+        },
+        {
+          "active": [
+            "ringer"
+          ],
+          "note": "At closing the ringer is asked to stop, and the hut waits until it has."
+        }
+      ]
+    }
+  }
+}

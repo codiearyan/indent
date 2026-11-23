@@ -1,11 +1,107 @@
 {
   "id": "executors",
-  "title": "x",
-  "files": ["Bookings.java"],
-  "terminal": { "description": "x", "suggestedCommand": "java Bookings.java" },
+  "title": "A pool of threads and their futures",
+  "files": [
+    "Bookings.java"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run the morning's bookings here; each confirmation takes the office about a second.",
+    "suggestedCommand": "java Bookings.java"
+  },
   "tasks": [
-    { "id": "batch", "title": "a", "file": "Bookings.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
-    { "id": "careful", "title": "a", "file": "Bookings.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
-    { "id": "desk", "title": "a", "file": "Bookings.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 }
+    {
+      "id": "batch",
+      "title": "Confirm the bookings with a pool of three",
+      "file": "Bookings.java",
+      "description": "Under `// Task 1`, write a class `Batch` with one method, with `throws InterruptedException, ExecutionException`. `static List<String> confirmAll(List<String> bookings, Office office)` makes a pool of exactly three threads, hands it one job per booking that gives back `office.confirm(booking)`, and gives back the confirmations in the order of the bookings. A booking that fails reaches the caller as the `ExecutionException` that `get` throws. Whatever happens, the pool is shut down before `confirmAll` returns. `Office` is given above the tasks.\n\nCheck hands `confirmAll` bookings and an office of its own. The office holds every job until `confirmAll` is waiting for an answer, and Check counts the pool's threads at that moment and every thread that ran a job. It reads the confirmations, sees whether a failed booking reaches it, and whether any thread of the pool is still alive afterwards.",
+      "nextSteps": [
+        "Read the parts of the lesson about a pool, submit and get.",
+        "Make the pool, and a list for the futures.",
+        "In one loop hand over every job; in a second, get every answer.",
+        "Shut the pool down in a finally, so that it happens whatever get throws."
+      ],
+      "hints": [
+        "The lesson builds a pool, hands it jobs and reads their answers in three short steps: this task is those steps for a list.",
+        "A job that gives back an answer is a Callable: a lambda with no parameters that returns something, and may throw. Its Future holds the answer later. A get straight after each hand-over waits for that job before the next one is handed over.",
+        "`ExecutorService pool = Executors.newFixedThreadPool(3);` then `try { ... futures.add(pool.submit(() -> office.confirm(booking))); ... confirmations.add(future.get()); ... } finally { pool.shutdown(); }`."
+      ],
+      "docs": [
+        {
+          "title": "Thread pools",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/pools.html"
+        },
+        {
+          "title": "ExecutorService",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ExecutorService.html"
+        },
+        {
+          "title": "Executors.newFixedThreadPool",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Executors.html#newFixedThreadPool(int)"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What an ExecutorService does",
+          "url": "https://www.youtube.com/watch?v=Nb85yJ1fPXM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "careful",
+      "title": "Keep going past a booking that fails",
+      "file": "Bookings.java",
+      "description": "Under `// Task 2`, write a class `Careful` with one method, with `throws InterruptedException`. `static List<String> confirmEach(ExecutorService pool, List<String> bookings, Office office, List<String> problems)` hands the pool it is given one job per booking, as Task 1 does, and gives back the confirmations of the bookings that worked, in their order. A booking whose job threw is left out, and its problem is added to `problems`, in the order of the bookings: the booking, a colon and a space, then the message of what its job threw, as in `Fisher, 1: the office line dropped`. The pool belongs to the caller: `confirmEach` leaves it open.\n\nCheck hands `confirmEach` a pool of its own, which notes a shutdown, and an office of its own that fails some bookings with an `IOException`. It reads the confirmations, the problems, and whether the pool was left open.",
+      "nextSteps": [
+        "Read the part of the lesson about what get throws.",
+        "Hand over the jobs as in Task 1, to the pool you are given.",
+        "Get each answer inside a try of its own, and catch what get throws when a job failed.",
+        "Read the problem's message from what the job itself threw."
+      ],
+      "hints": [
+        "The lesson shows the stack trace of a failed job: two exceptions, one inside the other.",
+        "get wraps what the job threw in an ExecutionException, whose own message starts with the inner exception's class name. The inner one is its cause. A try around the whole loop ends the loop at the first failure.",
+        "For each future: `try { confirmations.add(futures.get(i).get()); } catch (ExecutionException e) { problems.add(bookings.get(i) + \": \" + e.getCause().getMessage()); }`."
+      ],
+      "docs": [
+        {
+          "title": "Future.get",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Future.html#get()"
+        },
+        {
+          "title": "ExecutionException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ExecutionException.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "desk",
+      "title": "Keep one pool open for the day",
+      "file": "Bookings.java",
+      "description": "Under `// Task 3`, write a class `Desk` that keeps one pool for the whole day. `Desk(int threads)` makes a pool of that many threads. `List<String> confirmAll(List<String> bookings, Office office)`, with `throws InterruptedException, ExecutionException`, hands that pool a job per booking all at once with `invokeAll` and gives back the confirmations in the order of the bookings; a booking that fails reaches the caller as the `ExecutionException` that `get` throws, and the pool stays open. `void close()` shuts the pool down.\n\nCheck makes a desk of two threads, has it confirm two lists, and closes it. It counts every thread that ran a job of either list, sees whether the answers were awaited inside `invokeAll`, whether a failed booking reaches it and the desk still works afterwards, whether a closed desk refuses new bookings with a `RejectedExecutionException`, and whether any thread is still alive after `close`.",
+      "nextSteps": [
+        "Read the parts of the lesson about invokeAll and about shutting a pool down.",
+        "Make the pool in the constructor and keep it in a field.",
+        "In confirmAll, build a list of jobs first, then hand them all over at once.",
+        "Shut the pool down in close, and only there."
+      ],
+      "hints": [
+        "A pool is worth keeping: its threads are made once and do job after job. A pool made in each call makes new threads every time.",
+        "invokeAll takes a whole list of Callables, waits until all are done, and gives back their futures in the same order. A pool that is shut down takes no more jobs.",
+        "`pool = Executors.newFixedThreadPool(threads);` in the constructor; in confirmAll, `jobs.add(() -> office.confirm(booking));` for each booking, then `for (Future<String> f : pool.invokeAll(jobs)) confirmations.add(f.get());`; in close, `pool.shutdown();`."
+      ],
+      "docs": [
+        {
+          "title": "ExecutorService.invokeAll",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ExecutorService.html#invokeAll(java.util.Collection)"
+        },
+        {
+          "title": "Callable",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Callable.html"
+        }
+      ],
+      "points": 10
+    }
   ]
 }

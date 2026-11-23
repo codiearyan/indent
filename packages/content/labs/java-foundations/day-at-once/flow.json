@@ -1,0 +1,146 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "tills",
+        "label": "Till files",
+        "kind": "file"
+      },
+      {
+        "id": "jobs",
+        "label": "Jobs",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "closing",
+        "label": "Closing",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "results",
+        "label": "Results",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "office",
+        "label": "Harbour office",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "closing",
+        "to": "jobs",
+        "label": "one per till"
+      },
+      {
+        "from": "tills",
+        "to": "jobs",
+        "label": "sailings"
+      },
+      {
+        "from": "closing",
+        "to": "results",
+        "label": "futures"
+      },
+      {
+        "from": "results",
+        "to": "office",
+        "label": "takings, problems"
+      }
+    ],
+    "note": "Every boat's till is read at once by a small pool, and the day's takings and problems go to the harbour office."
+  },
+  "tasks": {
+    "jobs": {
+      "steps": [
+        {
+          "active": [
+            "jobs"
+          ],
+          "note": "A job is written for one till file, and nothing is read yet."
+        },
+        {
+          "active": [
+            "tills",
+            "tills->jobs",
+            "jobs"
+          ],
+          "note": "When the job is run, it reads the till's sailings."
+        },
+        {
+          "active": [
+            "jobs"
+          ],
+          "note": "It adds up that till's takings to the penny, or lets the reader's complaint through."
+        }
+      ]
+    },
+    "results": {
+      "steps": [
+        {
+          "active": [
+            "results"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "answers",
+            "entries": [
+              {
+                "key": "till name",
+                "value": "future"
+              }
+            ]
+          },
+          "note": "The answers arrive under each till's name, some not in yet."
+        },
+        {
+          "active": [
+            "results"
+          ],
+          "note": "Each answer is waited for and added to the total, on one thread."
+        },
+        {
+          "active": [
+            "results",
+            "results->office",
+            "office"
+          ],
+          "note": "A till whose job failed becomes a problem, and the rest still count."
+        }
+      ]
+    },
+    "day": {
+      "steps": [
+        {
+          "active": [
+            "closing",
+            "closing->jobs",
+            "jobs"
+          ],
+          "note": "At closing, a pool of three threads gets a job for every till."
+        },
+        {
+          "active": [
+            "closing",
+            "closing->results",
+            "results"
+          ],
+          "note": "Each future is kept under its till's own name and gathered."
+        },
+        {
+          "active": [
+            "results",
+            "results->office",
+            "office",
+            "closing"
+          ],
+          "note": "The total and the problems go to the office, and the pool is shut down."
+        }
+      ]
+    }
+  }
+}
