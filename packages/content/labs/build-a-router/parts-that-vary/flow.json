@@ -1,0 +1,83 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Order page", "kind": "story" },
+      { "id": "handle", "label": "handle()", "kind": "function", "mine": true, "fn": "handle" },
+      { "id": "table", "label": "Route table", "kind": "data" },
+      { "id": "match", "label": "matchPath()", "kind": "function", "mine": true, "fn": "matchPath" },
+      { "id": "handler", "label": "A handler", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "page", "to": "handle", "label": "request" },
+      { "from": "table", "to": "handle", "label": "patterns" },
+      { "from": "handle", "to": "match", "label": "pattern, path" },
+      { "from": "match", "to": "handle", "label": "values or null" },
+      { "from": "handle", "to": "handler", "label": "req.params" }
+    ],
+    "note": "One route now stands for many paths: the router matches patterns, hands the values to the handler and picks the best fit."
+  },
+  "tasks": {
+    "match": {
+      "steps": [
+        {
+          "active": ["match"],
+          "value": { "kind": "array", "label": "the pattern, split", "values": ["''", "orders", ":id", "proof"] },
+          "note": "matchPath splits the pattern for a proof on its slashes. One part starts with a colon, so it varies."
+        },
+        {
+          "active": ["match"],
+          "value": { "kind": "array", "label": "the path, split", "values": ["''", "orders", "1873", "proof"] },
+          "note": "It splits the path a customer asked for the same way. Both lists have to be just as long."
+        },
+        {
+          "active": ["match", "match->handle"],
+          "value": { "kind": "map", "label": "what comes back", "entries": [{ "key": "id", "value": "the part in that place" }] },
+          "note": "Place by place, fixed parts must be the same, and the part that varies gives a value, or the answer is null."
+        }
+      ],
+      "trace": { "file": "src/router.js", "call": "matchPath", "args": ["/orders/:id/proof", "/orders/1873/proof"] }
+    },
+    "params": {
+      "steps": [
+        {
+          "active": ["page", "page->handle", "handle"],
+          "note": "A customer asks for their order by its number."
+        },
+        {
+          "active": ["table", "table->handle", "handle", "handle->match", "match"],
+          "note": "handle asks matchPath about every route's pattern, and keeps the ones that fit."
+        },
+        {
+          "active": ["match", "match->handle", "handle"],
+          "note": "Each value of the route that runs is decoded from its %-codes. A value that cannot be decoded gets a plain no."
+        },
+        {
+          "active": ["handle", "handle->handler", "handler"],
+          "value": { "kind": "map", "label": "req.params", "entries": [{ "key": "id", "value": "the order number, decoded" }] },
+          "note": "The order's handler gets the number on req.params and looks the order up."
+        }
+      ]
+    },
+    "wins": {
+      "steps": [
+        {
+          "active": ["page", "page->handle", "handle"],
+          "note": "The order page asks for today's orders, a path that two routes fit."
+        },
+        {
+          "active": ["table", "table->handle", "handle", "handle->match", "match"],
+          "value": { "kind": "array", "label": "routes that fit", "values": ["/orders/:id", "/orders/today"] },
+          "note": "Only routes with the request's method take part, and both of these fit."
+        },
+        {
+          "active": ["handle"],
+          "note": "The route with more fixed parts wins, whatever order the routes were added in. A tie goes to the one added first."
+        },
+        {
+          "active": ["handle", "handle->handler", "handler"],
+          "note": "Exactly one handler runs: today's orders, not an order called today."
+        }
+      ]
+    }
+  }
+}
