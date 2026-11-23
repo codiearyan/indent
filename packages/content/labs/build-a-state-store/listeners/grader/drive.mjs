@@ -11,12 +11,19 @@ const START = { stock: 'linen', ink: 'black', lines: ['menu', 'tag'], jobs: 2 }
 function ready(guard) {
   const store = lib.createStore({ ...START })
   let heard = 0
+  let readNew = true
   const stop = needs('This task needs subscribe() from task 1, which does not work yet.', () =>
-    store.subscribe(guard.listen(() => (heard += 1)))
+    store.subscribe(
+      guard.listen((state) => {
+        heard += 1
+        if (store.getState() !== state) readNew = false
+      })
+    )
   )
   if (typeof stop !== 'function') earlier('This task needs task 1 first: subscribe() does not return a stop function yet.')
   store.setState({ jobs: 3 })
   if (heard !== 1) earlier('This task needs task 1 first: a listener is not told once after a change yet.')
+  if (!readNew) earlier('This task needs task 1 first: the listeners are told before the state has changed.')
   store.setState((state) => ({ jobs: state.jobs + 1 }))
   if (heard !== 2) earlier('This task needs task 1 first: a change made with a function does not tell the listeners yet.')
   stop()
@@ -86,6 +93,10 @@ export const unchangedCase = guarded((guard, kind) => {
   if (kind === 'identity') {
     store.setState((state) => ({ lines: [...state.lines] }))
     return { log, newLines: store.getState().lines !== before.lines }
+  }
+  if (kind === 'newKey') {
+    store.setState({ note: undefined })
+    return { log, hasNote: Object.hasOwn(store.getState(), 'note') }
   }
   if (kind === 'nan') {
     const nan = lib.createStore({ total: NaN, ink: 'black' })

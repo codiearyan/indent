@@ -57,7 +57,7 @@
       "id": "fresh",
       "title": "Never change the old state",
       "file": "src/store.js",
-      "description": "Make every change build a new state object and leave the old one exactly as it was.\n\n- after a change, `getState()` returns a new object, not the one it returned before\n- a state someone read before the change keeps every value it had, and gains no new keys\n- the object given to `createStore` is never changed\n- `nextState(state, part)` returns a new object and changes neither `state` nor `part`\n\nThe check keeps the states it read before each change and compares them afterwards, and calls `nextState` with objects it watches.",
+      "description": "Make every change build a new state object and leave the old one exactly as it was.\n\n- after a change, `getState()` returns a new object, not the one it returned before; between changes it returns that very same object every time\n- a state someone read before the change keeps every value it had, and gains no new keys\n- the object given to `createStore` is never changed\n- `nextState(state, part)` returns a new object and changes neither `state` nor `part`\n\nThe check keeps the states it read before each change and compares them afterwards, and calls `nextState` with objects it watches.",
       "nextSteps": [
         "Read \"An old state never changes\" in the lesson.",
         "Look at how `nextState` builds its result: does it write into an object it was given?",

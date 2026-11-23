@@ -35,7 +35,7 @@
       "id": "unchanged",
       "title": "Stay quiet when nothing changed",
       "file": "src/store.js",
-      "description": "Make `setState` do nothing at all when the part changes nothing.\n\n- a part changes nothing when every one of its keys is already in the state with that very value, compared with `Object.is`; an empty part changes nothing\n- then the state stays the same object, and no listener is told\n- this holds for a part a function returns, too\n- one key with a new value is a change, and a new array or object is a new value, even with the same things inside\n\nThe check sets values the state already has, a new array of the same words, `NaN` again, and adds a listener of its own that sets state each time it is told: with nothing changed, that has to come to rest.",
+      "description": "Make `setState` do nothing at all when the part changes nothing.\n\n- a part changes nothing when every one of its keys is already in the state with that very value, compared with `Object.is`; an empty part changes nothing\n- then the state stays the same object, and no listener is told\n- this holds for a part a function returns, too\n- one key with a new value is a change, and a new array or object is a new value, even with the same things inside\n\nThe check sets values the state already has, a new array of the same words, a key the state did not have, `NaN` again, and adds a listener of its own that sets state each time it is told: with nothing changed, that has to come to rest.",
       "nextSteps": [
         "Read \"Nothing changed, nobody told\" in the lesson.",
         "Once `setState` has the part, go through its keys and compare each with the state's value.",

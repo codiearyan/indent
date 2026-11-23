@@ -186,6 +186,15 @@ export const checks = {
         hint: 'After the change, getState() gave back the very object it gave before. Make a new object for every change, and leave the old one as it was.'
       },
       {
+        name: 'Between changes, getState() gives the same object',
+        run: 'freshCase',
+        args: ['same'],
+        pass: (v) => v.again && v.afterAgain,
+        show: (v) => `two reads before the change: ${v.again ? 'the same object' : 'two different objects'}\ntwo reads after it: ${v.afterAgain ? 'the same object' : 'two different objects'}`,
+        setup: "a store with { ink: 'black', stock: 'linen', jobs: 1 }, getState() twice, then setState({ stock: 'kraft' }) and getState() twice",
+        hint: 'getState() handed out a new object each time, though nothing had changed. Return the state the store holds, the very object: a new object is how the next issues tell that something changed.'
+      },
+      {
         name: 'A state read before keeps its values',
         run: 'freshCase',
         args: ['before'],

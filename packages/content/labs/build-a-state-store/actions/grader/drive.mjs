@@ -82,6 +82,8 @@ export const pricesCase = guarded(async (guard, kind) => {
   const states = []
   store.subscribe(guard.listen((state) => states.push({ loading: state.loading, error: state.error, prices: state.prices })))
   if (kind === 'clears') store.setState({ error: 'The price list was closed.' })
+  const earlierPrices = { menu: 40, tag: 4 }
+  if (kind === 'fails') store.setState({ prices: earlierPrices })
   states.length = 0
   let settled = false
   let rejected
@@ -107,6 +109,7 @@ export const pricesCase = guarded(async (guard, kind) => {
     hung: Boolean(outcome.hung),
     rejected: rejected ?? outcome.threw,
     end: { loading: end.loading, error: end.error, prices: end.prices, note: end.note },
-    pricesSame: end.prices === prices
+    pricesSame: end.prices === prices,
+    pricesKept: end.prices === earlierPrices
   }
 })

@@ -111,6 +111,12 @@ export function freshCase(kind) {
     store.setState({ stock: 'kraft' })
     return { newObject: store.getState() !== before, state: store.getState() }
   }
+  if (kind === 'same') {
+    const again = store.getState() === before
+    store.setState({ stock: 'kraft' })
+    const after = store.getState()
+    return { again, afterAgain: store.getState() === after }
+  }
   if (kind === 'before') {
     store.setState({ stock: 'kraft', proof: 'sent' })
     store.setState((state) => ({ jobs: state.jobs + 1 }))

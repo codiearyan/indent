@@ -157,9 +157,9 @@ export const checks = {
         kase(
           'A failure is said in the state',
           'fails',
-          (v) => !v.hung && v.rejected === undefined && v.end.loading === false && v.end.error === 'The price list is shut for the night.' && v.end.prices === null,
+          (v) => !v.hung && v.rejected === undefined && v.end.loading === false && v.end.error === 'The price list is shut for the night.' && v.pricesKept,
           (v) => `${ended(v)}${v.rejected ? `\nthe promise rejected with ${v.rejected}` : ''}`,
-          'loadPrices(), then the price list fails with an Error of its own',
+          'a store with prices from an earlier load, then loadPrices(), and the price list fails with an Error of its own',
           (v) =>
             v?.hung
               ? NEVER
@@ -167,7 +167,9 @@ export const checks = {
                 ? 'The failure escaped as a rejected promise. A button that calls loadPrices() would never see it: catch it in the action, and put its message in the state.'
                 : v?.end.loading !== false
                   ? 'After a failure the screen would say loading for ever. Set loading back to false.'
-                  : 'Keep the failure\'s message, its text, as error, and leave prices as they were.'
+                  : v?.end.error !== 'The price list is shut for the night.'
+                    ? 'Keep the failure\'s message, its text, as error.'
+                    : 'The prices from the earlier load changed. A failure leaves prices as they were: they are still the best the screen has.'
         ),
         kase(
           'A change made while it waits is kept',

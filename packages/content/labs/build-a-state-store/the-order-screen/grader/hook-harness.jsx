@@ -13,6 +13,8 @@ const SELECTORS = {
   count: (state) => state.lines.length,
   both: (state) => ({ jobs: state.jobs, ink: state.ink })
 }
+// An isEqual that only looks at jobs, so it differs from any comparison of the values.
+const EQUALS = { shallow: shallowEqual, jobs: (a, b) => a.jobs === b.jobs }
 
 window.hook = hook
 window.draws = {}
@@ -28,7 +30,7 @@ function probe(name, pick, withEqual) {
       window.overAndOver = true
       throw new Error('The check stopped a component that was drawn over and over.')
     }
-    const part = withEqual ? hook.useStore(SELECTORS[pick], shallowEqual) : hook.useStore(SELECTORS[pick])
+    const part = withEqual ? hook.useStore(SELECTORS[pick], EQUALS[withEqual]) : hook.useStore(SELECTORS[pick])
     return h('p', { id: name }, part === undefined ? '(nothing)' : JSON.stringify(part))
   }
   return probes[name]

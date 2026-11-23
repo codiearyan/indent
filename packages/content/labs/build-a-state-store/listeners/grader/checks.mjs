@@ -45,9 +45,11 @@ export const checks = {
         show: (v) => (v.count ? `getState() inside the listener gave ${v.readNew ? 'the new state' : 'the old state'}` : 'the listener was never told'),
         setup: "a store, subscribe(listener) where the listener calls getState(), then setState({ stock: 'kraft' })",
         hint: (v) =>
-          v?.count
-            ? 'Inside the listener, getState() still gave the old state. Change the state first, then tell the listeners.'
-            : 'subscribe() should keep the listener, and setState() should call it once the state has changed.'
+          !v?.count
+            ? 'subscribe() should keep the listener, and setState() should call it once the state has changed.'
+            : v.count > 1
+              ? 'One change should tell a listener once.'
+              : 'Inside the listener, getState() still gave the old state. Change the state first, then tell the listeners.'
       },
       {
         name: 'Every listener, in the order they subscribed',
@@ -76,7 +78,9 @@ export const checks = {
             ? 'subscribe() should return a function that stops this listener.'
             : v.log.includes('total')
               ? 'The stopped listener was still told. Calling the function subscribe() returned should take that listener out.'
-              : 'Only the stopped listener should stop: header still listens.'
+              : v.log.length > 1
+                ? 'One change should tell each listener once.'
+                : 'Only the stopped listener should stop: header still listens.'
       },
       {
         name: 'A listener that is not a function is refused',
@@ -133,6 +137,15 @@ export const checks = {
         show: (v) => `${told(v)}\n${v.newLines ? 'lines is the new array' : 'lines is still the old array'}`,
         setup: "a store with { lines: ['menu', 'tag'], ... }, then setState((state) => ({ lines: [...state.lines] }))",
         hint: 'The new lines hold the same words, but it is a new array, so it is a change. The store compares each value by identity, with Object.is, never by what is inside it: looking inside would be slow, and would miss the day someone does change it.'
+      },
+      {
+        name: 'A key the state did not have is a change',
+        run: 'unchangedCase',
+        args: ['newKey'],
+        pass: (v) => v.log.length === 1 && v.hasNote,
+        show: (v) => `${told(v)}\n${v.hasNote ? 'the state has note' : 'the state has no note'}`,
+        setup: "a store with { stock: 'linen', ink: 'black', ... } and no note, then setState({ note: undefined })",
+        hint: 'The state had no note, so adding one is a change, even with the value undefined. Reading state.note gives undefined either way: ask whether the state has the key at all, with Object.hasOwn or in.'
       },
       {
         name: 'NaN is the same as NaN',

@@ -34,7 +34,7 @@
       "id": "draws",
       "title": "Draw only when the part changed",
       "file": "src/use-store.js",
-      "description": "Make a component that uses `useStore` draw again only when its own part changed, and give `useStore` a second argument, `isEqual`.\n\n- after a change of another part of the state, the component is not drawn again\n- after a change of its part, it is drawn once, not twice\n- `useStore(selector, isEqual)`: when `isEqual(previousPart, part)` says the part is the same, the component is not drawn again, even when the selector made a new object; it shows the part from before until a real change\n\nThe check counts the draws of components of its own exactly: a number part, a count worked out each time, and an object part made new on every read with `shallowEqual`.",
+      "description": "Make a component that uses `useStore` draw again only when its own part changed, and give `useStore` a second argument, `isEqual`.\n\n- after a change of another part of the state, the component is not drawn again\n- after a change of its part, it is drawn once, not twice\n- `useStore(selector, isEqual)`: when `isEqual(previousPart, part)` says the part is the same, the component is not drawn again, even when the selector made a new object; it shows the part from before until a real change\n\nThe check counts the draws of components of its own exactly: a number part, a count worked out each time, and an object part made new on every read, with `shallowEqual` and with an `isEqual` of its own.",
       "nextSteps": [
         "Read \"When React draws again\" in the lesson.",
         "Make sure React reads the part, not the whole state.",

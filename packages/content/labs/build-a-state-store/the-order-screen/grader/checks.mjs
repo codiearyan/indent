@@ -70,7 +70,7 @@ export const checks = {
         'Shows its part, and the part after each change',
         seen.join() === '2,3,7',
         seen[0] === '(nothing)'
-          ? 'useStore returned nothing. Return the part the selector picks out of the store\'s state.'
+          ? 'useStore returned nothing. Return the part the selector picks out of the state of orderStore, the one store, imported from order-store.js.'
           : seen[0] !== '2'
             ? 'The first draw should show the part the selector picks out of the state now.'
             : 'The component should be drawn again when its part changes, showing the new part. Hand React the store\'s subscribe, so React is told after every change.',
@@ -141,7 +141,7 @@ export const checks = {
       )
     )
 
-    const c = await play(t, [['both', 'both', true]], [['stock set', { stock: 'linen-2' }], ['ink set to red', { ink: 'red' }]])
+    const c = await play(t, [['both', 'both', 'shallow']], [['stock set', { stock: 'linen-2' }], ['ink set to red', { ink: 'red' }]])
     if (c.problem) return [...results, c.problem]
     const cDraws = drew(c.steps, 'both')
     results.push(
@@ -152,6 +152,19 @@ export const checks = {
           ? 'The selector makes a new object on every read, and the component was drawn again when stock changed. When isEqual says the part is the same as last time, hand React the part from last time, the very object, and React skips the draw.'
           : 'The component should be drawn once more, when ink changes, showing the new part.',
         `a component shows useStore((state) => ({ jobs: state.jobs, ink: state.ink }), shallowEqual)\n${c.output}`
+      )
+    )
+
+    const e = await play(t, [['byJobs', 'both', 'jobs']], [['ink set to red', { ink: 'red' }], ['jobs set to 5', { jobs: 5 }]])
+    if (e.problem) return [...results, e.problem]
+    const eDraws = drew(e.steps, 'byJobs')
+    const eShown = e.steps.map((s) => s.shown.byJobs)
+    results.push(
+      detail(
+        'isEqual decides what counts as the same',
+        eDraws === '1, 1, 2' && eShown[1] === '{"jobs":2,"ink":"black"}' && eShown[2] === '{"jobs":5,"ink":"red"}',
+        'This isEqual calls two parts the same when their jobs are the same, so the change of ink should not draw the component, and it keeps showing the part from before. Ask the isEqual useStore was given, not a comparison of your own.',
+        `a component shows useStore((state) => ({ jobs: state.jobs, ink: state.ink }), sameJobs), where sameJobs compares only jobs\n${e.output}`
       )
     )
 

@@ -15,7 +15,12 @@ watch(
 )
 
 console.log('Load the prices:')
-const loaded = loadPrices()
+let loaded
+try {
+  loaded = loadPrices()
+} catch (error) {
+  console.log(`  loadPrices() threw: ${error.message}`)
+}
 console.log('Add 40 posters while the price list thinks:')
 add('poster', 40)
 await loaded

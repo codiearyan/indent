@@ -2,7 +2,7 @@
 // with states, selectors and listeners of its own. Every case runs in its own process with a
 // fresh store, and every listener the check adds is counted.
 import * as lib from '../src/store.js'
-import { attempt, earlier, guarded, needs } from './helpers.mjs'
+import { attempt, earlier, guarded, needs, shown } from './helpers.mjs'
 
 const START = { stock: 'linen', ink: 'black', lines: ['menu', 'tag'], jobs: 2, total: NaN }
 const fresh = () => lib.createStore({ ...START, lines: [...START.lines] })
@@ -22,7 +22,7 @@ function ready(guard) {
   return fresh()
 }
 
-export const watchCase = guarded((guard, kind) => {
+function watchRun(guard, kind) {
   const store = fresh()
   const calls = []
   const listener = guard.listen((part, previous) => calls.push([part, previous]))
@@ -70,6 +70,13 @@ export const watchCase = guarded((guard, kind) => {
   if (returned === 'function') stop()
   store.setState({ jobs: 3 })
   return { returned, calls }
+}
+
+// The calls travel as JSON, which turns undefined and NaN into null, so `seen` keeps them as text.
+export const watchCase = guarded((guard, kind) => {
+  const result = watchRun(guard, kind)
+  if (!Array.isArray(result.calls)) return result
+  return { ...result, seen: result.calls.map(([part, previous]) => `(${shown(part)}, ${shown(previous)})`) }
 })
 
 export const equalCase = guarded((guard, kind) => {

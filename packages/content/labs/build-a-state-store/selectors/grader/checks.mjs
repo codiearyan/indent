@@ -3,7 +3,7 @@ import { runCases } from '../../checks-helpers.mjs'
 const json = (value) => (value === undefined ? 'undefined' : JSON.stringify(value))
 const showCalls = (v) =>
   v.calls.length
-    ? `listener told ${v.calls.length} time(s): ${v.calls.map(([part, previous]) => `(${json(part)}, ${json(previous)})`).join(', ')}`
+    ? `listener told ${v.calls.length} time(s): ${(v.seen ?? v.calls.map(([part, previous]) => `(${json(part)}, ${json(previous)})`)).join(', ')}`
     : 'listener never told'
 const callsAre = (...want) => (v) => json(v.calls) === json(want)
 
