@@ -29,7 +29,7 @@
       "steps": [
         { "active": ["log", "log->report", "report"], "note": "A packing list arrives, kinds of kit with commas and spaces between them." },
         { "active": ["report", "report->python", "python", "python->traceback", "traceback"], "note": "Python stops where a kind is looked up in the weights, and the error shows the key it could not find." },
-        { "active": ["traceback", "traceback->report", "report"], "note": "That key was cut out of the list further up, and that is where it has to come out clean." },
+        { "active": ["traceback", "traceback->report", "report"], "note": "Going up the File lines leads to where that key was made: the one function to mend." },
         { "active": ["report", "report->rhona", "rhona"], "note": "The weight of the whole pack comes back as one number." }
       ]
     },

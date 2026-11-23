@@ -1546,6 +1546,10 @@ function raiseRunCause(error) {
   if (error.type === 'AssertionError') {
     return 'an assert line found that what follows it is false for these values'
   }
+  if (error.type === 'UnboundLocalError') {
+    const name = /local variable '(\w+)'/.exec(m)?.[1] ?? 'a name'
+    return `this line reads ${name}, but for these values no line gave ${name} a value first. In code with try, that is often a line inside the try that stopped before it, or an except or finally that does not give ${name} a value: give it one there too, or give back from there`
+  }
   if (error.own) {
     return 'your own raise line raised it. A line under the task that calls a function with a value it refuses stops the file there too: make that call inside a try, and handle the error in its except'
   }
@@ -1557,8 +1561,10 @@ const article = (type) => (/^[AEIOU]/.test(type) ? `an ${type}` : `a ${type}`)
 /** Where the error a call stopped with came from, in plain words, for a check's output. */
 function fromWhere(error) {
   if (error.own) return `That error came from your raise line, line ${error.line}.`
-  if (error.line) return `That error came from line ${error.line}, where Python stopped by itself.`
-  return 'That error came from outside your file.'
+  if (!error.line) return 'That error came from outside your file.'
+  if (error.inside === false) return `That error came from a function that your line ${error.line} called, not from your file.`
+  if (error.type === 'AssertionError') return `That error came from your assert line, line ${error.line}.`
+  return `That error came from line ${error.line}, where Python stopped by itself.`
 }
 
 /**
@@ -1609,7 +1615,7 @@ function raiseResult(fn, c, call, shown, held, told, blocks) {
   }
   if (want.own && !error.own) {
     return no(
-      `${shown} stops with ${error.type}, but not from a raise line of yours: Python stopped${at} by itself. The task asks ${fn} to refuse these values itself, before it does any work, with raise and a message that names ${want.names}.`
+      `${shown} stops with ${error.type}, but not from a raise line of yours: ${error.inside === false ? `a function called from line ${error.line} raised it` : `Python stopped${at} by itself`}. The task asks ${fn} to refuse these values itself, before it does any work, with raise and a message that names ${want.names}.`
     )
   }
   if (want.has && !want.has.every((part) => error.message.includes(part))) {
@@ -1637,4 +1643,38 @@ function raiseResult(fn, c, call, shown, held, told, blocks) {
   const wrote = c.files && wroteProblem(fn, c, call)
   if (wrote) return no(wrote)
   return pass(c.name, output)
+}
+
+/**
+ * The excepts of the task's lines that catch every error: no name, or Exception or BaseException
+ * among the names. Texts and comments are blanked first, so a word in them does not count.
+ */
+export async function broadExcepts(t, file, task) {
+  const code = (await partCode(t, file, task))
+    .replace(/("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')/g, '""')
+    .replace(/#[^\n]*/g, '')
+  return [...code.matchAll(/\bexcept\b([^:\n]*):/g)].filter(
+    ([, names]) => !names.trim() || /\b(Base)?Exception\b/.test(names)
+  ).length
+}
+
+/**
+ * One more detail for a task whose function must catch only `error`: none of the excepts of the
+ * task's lines may catch every error. Where nothing else can go wrong inside the try, the cases
+ * alone cannot tell `except:` from a named one; where they failed, a broad except may be what
+ * hides the mistake.
+ */
+export async function namedOnly(t, file, task, fn, error, details) {
+  const name = `${fn} catches only ${error}`
+  if (!(await broadExcepts(t, file, task))) return details.every((d) => d.passed) ? [...details, pass(name)] : details
+  const why = `an except that catches everything also hides a mistake in the code inside the try, such as a misspelt name. The task asks to catch only ${error}: name it after except.`
+  return [
+    ...details,
+    fail(
+      name,
+      details.every((d) => d.passed)
+        ? `${fn} gives back the right values, but one of its excepts names no error, or names Exception, so it catches every error: ${why}`
+        : `One of the excepts of ${fn} names no error, or names Exception, so it catches every error: ${why}`
+    )
+  ]
 }

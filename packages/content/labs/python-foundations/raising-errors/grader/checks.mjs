@@ -1,4 +1,4 @@
-import { dataCases } from '../../grading.mjs'
+import { dataCases, namedOnly } from '../../grading.mjs'
 
 const FILE = 'kit_orders.py'
 
@@ -133,13 +133,13 @@ export const checks = {
     })
   },
 
-  again(t) {
+  async again(t) {
     const weights = { rope: 4.5, helmet: 0.5, flare: 0.25 }
     const NOTED = (got) =>
       Array.isArray(got) && got.some((x) => x && typeof x === 'object' && x['@other'])
         ? 'The list of problems holds the error itself. The task asks for the message of the error: str(error), or an f-string with the error in it.'
         : null
-    return dataCases(t, {
+    return namedOnly(t, FILE, 3, 'weigh_pack', 'ValueError', await dataCases(t, {
       file: FILE,
       task: 3,
       fn: 'weigh_pack',
@@ -189,6 +189,6 @@ export const checks = {
           }
         }
       ]
-    })
+    }))
   }
 }

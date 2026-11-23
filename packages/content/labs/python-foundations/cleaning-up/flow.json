@@ -33,8 +33,8 @@
     },
     "whole": {
       "steps": [
-        { "active": ["functions"], "note": "Every entry's line is made before the file is touched." },
-        { "active": ["functions", "functions->logfile", "logfile"], "note": "Only when every line is ready is the file written, all at once." },
+        { "active": ["functions"], "note": "Each entry is turned into its line of the log." },
+        { "active": ["functions", "functions->logfile", "logfile"], "note": "When every entry is right, the file holds their lines, in order, and nothing else." },
         { "active": ["functions", "functions->caller", "caller", "logfile"], "note": "When an entry is wrong, the error reaches the caller and the file is as it was before." }
       ]
     }

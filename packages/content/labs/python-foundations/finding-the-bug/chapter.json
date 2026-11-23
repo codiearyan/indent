@@ -16,7 +16,7 @@
       "description": "Under `# Task 1` in `busiest_hill.py`, write a function called `smallest_failing` that takes nothing and gives back a list of hills, a log, for which `busiest_hill` as it came with the file gives back the wrong hill: not the hill with the most callouts, or on a tie not the one that came first in the log. The log must have as few callouts as a log can have and still go wrong. Find it by cutting `month` down: take out one callout at a time, and keep each cut while the answer is still wrong.\n\nCheck calls `smallest_failing` and asks its own copy of `busiest_hill`, as it came with the file, and a mended copy about the log it gives back. The answers must differ, and no shorter log can make them differ.",
       "nextSteps": [
         "Read the part of the lesson on cutting the input down.",
-        "Copy month into a list of your own, and print what busiest_hill gives back for it.",
+        "Give back a copy of month from smallest_failing for now. At the bottom of the file, below busiest_hill, print what busiest_hill gives back for smallest_failing().",
         "Take out one callout, print again, and count by hand which hill is right. Keep the cut only while the answer is still wrong.",
         "When every callout you could take out makes the answer right, give that list back from smallest_failing."
       ],

@@ -29,11 +29,14 @@
 # file named in `read` holds, its line ends read the same on every system.
 #
 # Every error reported says whether a `raise` line of the learner's file raised it (`own`), or it
-# came from somewhere else: Python itself, a module, or Check's own code. A spec with `compare`
+# came from somewhere else: Python itself, a module, or Check's own code (`inside` says whether
+# the last place it passed through is in the learner's file). A spec with `compare`
 # ({starter, names}) also reports which of those functions differ from the starter's.
 import _thread
 import ast
 import builtins
+import copy
+import dis
 import io
 import json
 import math
@@ -300,18 +303,27 @@ def names_in(ns):
     }
 
 
+def last_frame(error):
+    """The traceback entry of the last place the error passed through, or None."""
+    tb = error.__traceback__
+    while tb is not None and tb.tb_next is not None:
+        tb = tb.tb_next
+    return tb
+
+
 def raised_here(error, shown):
     """Whether the error was raised by a raise line of the learner's file: the last place it
-    passed through is one, not a line where Python, a module or Check's code stopped."""
-    tb = error.__traceback__
-    if tb is None:
+    passed through is the raise itself, not a line where Python, a module or Check's code
+    stopped, nor Python stopping while it worked out the error to raise (text + a number)."""
+    tb = last_frame(error)
+    if tb is None or tb.tb_frame.f_code.co_filename != shown or tb.tb_lineno not in RAISE_LINES:
         return False
-    while tb.tb_next is not None:
-        tb = tb.tb_next
-    return tb.tb_frame.f_code.co_filename == shown and tb.tb_lineno in RAISE_LINES
+    code = tb.tb_frame.f_code.co_code
+    return 0 <= tb.tb_lasti < len(code) and code[tb.tb_lasti] == dis.opmap['RAISE_VARARGS']
 
 
 def error_of(error, shown):
+    last = last_frame(error)
     frames = [f for f in traceback.extract_tb(error.__traceback__) if f.filename == shown]
     line = frames[-1].lineno if frames else None
     text = ''.join(traceback.format_exception_only(type(error), error)).strip()
@@ -323,7 +335,8 @@ def error_of(error, shown):
         'line': line,
         'name': getattr(error, 'name', None) if isinstance(error, NameError) else None,
         'shown': text,
-        'own': raised_here(error, shown)
+        'own': raised_here(error, shown),
+        'inside': last is not None and last.tb_frame.f_code.co_filename == shown
     }
 
 
@@ -372,11 +385,22 @@ def task_starts(lines):
     return starts
 
 
+class NoPrint(ast.NodeTransformer):
+    def visit_Expr(self, node):
+        call = node.value
+        if isinstance(call, ast.Call) and isinstance(call.func, ast.Name) and call.func.id == 'print':
+            return None
+        return node
+
+
 def changed_defs(tree, starter, names):
     """The names of `names` whose top-level function is not the same as in the starter file,
-    comments, blank lines and spacing aside. A function that is gone counts as changed."""
+    comments, blank lines, spacing and lines that only print aside, so a print added while
+    looking does not count. A function that is gone counts as changed."""
     with open(starter, 'rb') as f:
         before = ast.parse(f.read(), starter)
+    tree = NoPrint().visit(copy.deepcopy(tree))
+    before = NoPrint().visit(before)
     defs = lambda t: {n.name: ast.dump(n) for n in t.body if isinstance(n, ast.FunctionDef)}
     mine, theirs = defs(tree), defs(before)
     return [name for name in names if mine.get(name) != theirs.get(name)]

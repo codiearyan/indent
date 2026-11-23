@@ -118,6 +118,8 @@ export const checks = {
       got !== old
         ? `After the call, ${rel} no longer holds what it held before, and an entry stopped with an error: the file was opened with "w", which empties it, before every line was ready. Work out every line first, then open the file and write them.`
         : null
+    const OTHER =
+      'This task is judged on the one file save_log is handed: another file beside it, such as a copy to rename later, is a way the lessons have not shown. Make every line first, into a list, then open the file it is handed and write them.'
     return dataCases(t, {
       file: FILE,
       task: 3,
@@ -152,7 +154,7 @@ export const checks = {
           wrote: { 'night three.txt': null },
           raises: { type: 'ValueError', swallowed: SWALLOWED('save_log', 'entry_line') }
         }
-      ]
+      ].map((c) => ({ ...c, pathHint: OTHER }))
     })
   }
 }

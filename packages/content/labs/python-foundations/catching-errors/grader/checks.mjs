@@ -1,27 +1,6 @@
-import { dataCases, fail, partCode, pass, tuple } from '../../grading.mjs'
+import { dataCases, namedOnly, tuple } from '../../grading.mjs'
 
 const FILE = 'log_totals.py'
-
-/**
- * Once every case passed, one more detail that looks at the code: no except of the task's lines
- * may catch every error. Where nothing else can go wrong inside the try, the cases alone cannot
- * tell `except:` from `except ValueError:`.
- */
-async function namedOnly(t, task, fn, details) {
-  if (!details.every((d) => d.passed)) return details
-  const code = (await partCode(t, FILE, task)).replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g, '""')
-  const broad = /\bexcept\s*(:|\(?\s*(BaseException|Exception)\b)/.test(code)
-  const name = `${fn} catches only ValueError`
-  return [
-    ...details,
-    broad
-      ? fail(
-          name,
-          `${fn} gives back the right values, but one of its excepts names no error, or names Exception, so it catches every error. The task asks to catch only ValueError: an except that catches everything would also hide a mistake in the code inside the try, such as a misspelt name.`
-        )
-      : pass(name)
-  ]
-}
 
 /** How Python shows a text in an error message, for Check's own plain texts. */
 const pyRepr = (text) => (text.includes("'") && !text.includes('"') ? `"${text}"` : `'${text}'`)
@@ -29,7 +8,7 @@ const pyRepr = (text) => (text.includes("'") && !text.includes('"') ? `"${text}"
 const intMessage = (text) => `invalid literal for int() with base 10: ${pyRepr(text)}`
 
 const BROAD =
-  'An except that names no error, or names Exception, catches every error, a mistake in the code included: name only the error the task is about.'
+  'An except that names no error, or names Exception, catches every error, a mistake in the code included.'
 
 const NOT_A_NUMBER = (asks) => (e) =>
   e.type === 'ValueError' && /^invalid literal for int\(\)/.test(e.message)
@@ -73,7 +52,7 @@ export const checks = {
           raises: {
             type: 'TypeError',
             swallowed: (v) =>
-              `whole_number(None, 0) gave back ${v.repr}. Given None, int() stops with TypeError, not ValueError, and the task says that error must reach the caller. ${BROAD}`
+              `whole_number(None, 0) gave back ${v.repr}. Given None, int() stops with TypeError, not ValueError, and the task says that error must reach the caller: name only ValueError after except. ${BROAD}`
           }
         }
       ]
@@ -91,7 +70,7 @@ export const checks = {
       ['No semicolon, the error reaches the caller', 'Lowther Crag 4'],
       ['Two semicolons, the error reaches the caller', 'Garve Edge; 2; 3']
     ]
-    return namedOnly(t, 2, 'callout_of', await dataCases(t, {
+    return namedOnly(t, FILE, 2, 'callout_of', 'ValueError', await dataCases(t, {
       file: FILE,
       task: 2,
       fn: 'callout_of',
@@ -133,7 +112,7 @@ export const checks = {
       ['One that cannot be read at the end', ['Black Knowe; 6', 'Scarth Fell; six'], 6, ['Scarth Fell; six']]
     ]
     const part = (entry) => entry.slice(entry.indexOf(';') + 1)
-    return namedOnly(t, 3, 'log_hours', await dataCases(t, {
+    return namedOnly(t, FILE, 3, 'log_hours', 'ValueError', await dataCases(t, {
       file: FILE,
       task: 3,
       fn: 'log_hours',

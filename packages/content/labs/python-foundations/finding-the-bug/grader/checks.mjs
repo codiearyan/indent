@@ -45,6 +45,11 @@ def _judge():
 /** The fewest callouts a log can have for busiest_hill, as it came, to go wrong. */
 const FEWEST = 5
 
+const STRICT = (e) =>
+  e.type === 'AssertionError'
+    ? 'your assert stops busiest_hill for a log that has callouts in it. It should be false only for a log with no callouts, so every log busiest_hill is meant to get passes it'
+    : null
+
 const BUG_HINT =
   'Print the names and values busiest_hill works with in its second loop, such as hill, counts[hill], most and best, on each round, and compare them with what they should be.'
 
@@ -143,6 +148,7 @@ export const checks = {
       task: 2,
       fn: 'busiest_hill',
       raising: true,
+      errors: STRICT,
       typed: 'busiest_hill gives back the same hill whatever log Check gives it. Work it out from the log it is given.',
       list: list.map(([name, hills, want]) => ({
         name,
@@ -166,6 +172,7 @@ export const checks = {
       task: 3,
       fn: 'busiest_hill',
       raising: true,
+      errors: STRICT,
       list: [
         {
           name: 'An empty log stops at the assert',

@@ -104,7 +104,7 @@
       "id": "night",
       "title": "A night's log, if there is one",
       "file": "log_totals.py",
-      "description": "Under `# Task 4`, write a function called `night_text` that takes the path of a log file, as text, and gives back everything in the file as one text, or empty text when there is no file at that path. Open the file on a `with` line, with `encoding=\"utf-8\"`. Catch only the error for a file that is not there: any other error must reach the caller, such as the one for a path that is a folder. Print what it gives back for `\"radio_log.txt\"` and for `\"tonight.txt\"`.\n\nCheck makes files and folders of its own in a copy of your workspace, calls `night_text` for a file that is there, a path with no file, and a folder, where the error must reach Check.",
+      "description": "Under `# Task 4`, write a function called `night_text` that takes the path of a log file, as text, and gives back everything in the file as one text, or empty text when there is no file at that path. Open it with `encoding=\"utf-8\"`; a `with` line closes it for you. Catch only the error for a file that is not there: any other error must reach the caller, such as the one for a path that is a folder. Print what it gives back for `\"radio_log.txt\"` and for `\"tonight.txt\"`.\n\nCheck makes files and folders of its own in a copy of your workspace, calls `night_text` for a file that is there, a path with no file, and a folder, where the error must reach Check.",
       "nextSteps": [
         "Run your function for `\"tonight.txt\"` without a try, and read the kind of error.",
         "Put the with block that opens and reads the file inside a try.",
