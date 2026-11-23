@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilf", "say": "Can the two halves agree?", "note": "The tram screen in the shed." },
+    { "title": "Visitor", "text": "Presses the Wenlow Open-top in the list.", "note": "Then Next tram on the panel." },
+    {
+      "title": "Your guide",
+      "file": "TramGuide.jsx",
+      "mine": true,
+      "gap": "Two choices, never the same",
+      "tasks": ["One chosen tram", "Choose from the list", "Next from the panel"]
+    },
+    { "title": "Tram screen", "rows": [["Tram list"], ["Tram panel"]] }
+  ],
+  "ticket": { "label": "Open-top", "wrong": "list only", "why": "Two copies", "right": "both halves" },
+  "captions": [
+    "In the shed, Wilf wants the tram list and the big panel beside it to agree.",
+    "A visitor picks the Wenlow Open-top, and the panel keeps on about another tram.",
+    "You keep the chosen tram in one place and hand it down, in three tasks.",
+    "The list marks the Open-top and the panel tells its story, whichever was pressed.",
+    "Same two halves, now one choice. Next tram moves the list along with it."
+  ]
+}

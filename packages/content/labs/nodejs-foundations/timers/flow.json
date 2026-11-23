@@ -1,0 +1,68 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhiannon", "label": "Rhiannon", "kind": "story" },
+      { "id": "list", "label": "rota.txt", "kind": "file" },
+      { "id": "timer", "label": "Timer", "kind": "data" },
+      { "id": "rota", "label": "rota.js", "kind": "file", "mine": true },
+      { "id": "tap", "label": "Main tap", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "list", "to": "rota", "label": "plots in order" },
+      { "from": "timer", "to": "rota", "label": "each turn" },
+      { "from": "rota", "to": "tap", "label": "whose turn" },
+      { "from": "rhiannon", "to": "rota", "label": "stop, Ctrl+C" }
+    ],
+    "note": "rota.js calls the plots to the tap on a timer, and stops cleanly when Rhiannon types stop or presses Ctrl+C, saying who goes first next time."
+  },
+  "tasks": {
+    "turns": {
+      "steps": [
+        {
+          "active": ["list", "list->rota", "rota"],
+          "note": "rota.js reads the plots in their order, and the length of a turn typed after its name."
+        },
+        {
+          "active": ["timer", "timer->rota", "rota", "rota->tap", "tap"],
+          "note": "The first plot is called at once, and the timer calls the next one each time a turn is over."
+        },
+        {
+          "active": ["rota", "tap"],
+          "note": "After the last turn, it says everyone has had one, stops the timer, and the script ends by itself."
+        }
+      ]
+    },
+    "stop": {
+      "steps": [
+        {
+          "active": ["rota", "rota->tap", "tap"],
+          "note": "The turns are being called when it starts to rain."
+        },
+        {
+          "active": ["rhiannon", "rhiannon->rota", "rota"],
+          "note": "Rhiannon types stop. Other lines typed change nothing."
+        },
+        {
+          "active": ["rota", "timer"],
+          "note": "rota.js says who would have been next, stops the timer and stops reading what is typed, so the script ends."
+        }
+      ]
+    },
+    "ctrl-c": {
+      "steps": [
+        {
+          "active": ["rhiannon", "rhiannon->rota", "rota"],
+          "note": "This time Rhiannon presses Ctrl+C, which sends the script a signal."
+        },
+        {
+          "active": ["rota"],
+          "note": "A listener for the signal runs instead of the script stopping on the spot."
+        },
+        {
+          "active": ["rota", "timer"],
+          "note": "It tidies up exactly as a typed stop does, and says who goes first next time."
+        }
+      ]
+    }
+  }
+}

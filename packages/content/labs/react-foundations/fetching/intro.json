@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Elspeth", "say": "Can it load the day they pick?", "note": "At the ticket window." },
+    { "title": "Timetable files", "text": "One file per day, saved after the rota.", "note": "Monday's is not there yet." },
+    {
+      "title": "Your board",
+      "file": "Timetable.jsx",
+      "mine": true,
+      "gap": "Nobody asks for the file",
+      "tasks": ["Load the day", "Say it is loading", "Say when it fails", "The latest day wins"]
+    },
+    { "title": "Ride board", "rows": [["Rides on Saturday"]] }
+  ],
+  "ticket": { "label": "Saturday", "wrong": "blank board", "why": "Never asked", "right": "rides shown" },
+  "captions": [
+    "By the ticket window, Elspeth wants the ride board to load whichever day a visitor picks.",
+    "A visitor picks Saturday, and the board stays blank: nothing asks for the day's file.",
+    "You ask for the day from an effect and handle every answer, in four tasks.",
+    "Saturday's rides arrive and show, with a loading line while they are on their way.",
+    "Same files, now a board that asks. A missing day gets a polite word, not a blank."
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "id": "timers",
+  "title": "Timers and stopping cleanly",
+  "files": [
+    "rota.js",
+    "rota.txt",
+    "try.js"
+  ],
+  "terminal": {
+    "description": "A terminal in your workspace. `node rota.js 3` calls a plot's turn every 3 seconds. While it runs, type `stop` and press Enter, or press Ctrl+C, to stop it early.",
+    "suggestedCommand": "node rota.js 3"
+  },
+  "tasks": [
+    {
+      "id": "turns",
+      "title": "Call the turns on a timer",
+      "file": "rota.js",
+      "description": "Write `rota.js` so that `node rota.js 3` calls each plot in `rota.txt`, the file beside the script, to the tap in turn, one turn every 3 seconds, the seconds being the number typed after the script's name:\n\n```\nA1: your turn at the tap.\nA4: your turn at the tap.\nB1: your turn at the tap.\nB3: your turn at the tap.\nC2: your turn at the tap.\nEveryone has had a turn.\n```\n\nThe first turn is called straight away. When the last plot's turn is over, it prints the last line, stops the timer, and the script ends by itself with exit code 0. Blank lines in `rota.txt` are not plots. With no seconds, or seconds that are not a number above 0, it prints one line on standard error, ends with exit code 1, and calls nobody.\n\nCheck runs `rota.js` from another folder with a rota of its own and a short turn, keeping its standard input open like a terminal where nobody types, and waits for it to end by itself. It does not time the turns.",
+      "nextSteps": [
+        "Read the seconds and refuse a missing or bad number, as in issue 1.",
+        "Read `rota.txt` beside the script into a list of plots.",
+        "Start a timer with `setInterval` that calls the next plot each time it fires, and call the first one straight away.",
+        "When there is nobody left, print the last line and stop the timer with `clearInterval`."
+      ],
+      "hints": [
+        "A script ends by itself only when nothing is left to wait for. A timer started with `setInterval` keeps it alive until it is cleared.",
+        "`setInterval(fn, ms)` gives back the timer, and `clearInterval(timer)` stops it. The seconds typed are text, and the delay is in milliseconds.",
+        "`const timer = setInterval(callNext, seconds * 1000)`, and in `callNext`, once `next === plots.length`, print the last line and `clearInterval(timer)`."
+      ],
+      "docs": [
+        {
+          "title": "setInterval()",
+          "url": "https://nodejs.org/api/timers.html#setintervalcallback-delay-args"
+        },
+        {
+          "title": "clearInterval()",
+          "url": "https://nodejs.org/api/timers.html#clearintervaltimeout"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stop",
+      "title": "Stop when someone types stop",
+      "file": "rota.js",
+      "description": "When it starts to rain, Rhiannon wants to stop the rota and know who goes first next time. Change `rota.js` so that a line typed into the terminal that says `stop` stops the rota at once. It prints who would have been next:\n\n```\nStopped. Next up: B1.\n```\n\nor `Stopped. Nobody is next.` when every plot has been called. Then it stops the timer, stops reading what is typed, and the script ends with exit code 0. Any other line typed is ignored. A rota that runs to the end still ends by itself, though nobody typed anything.\n\nCheck runs `rota.js` with its standard input open, types `wait` as soon as the first turn shows and `stop` as soon as the second does, types `stop` on a rota of one plot, and runs a rota to the end with nothing typed. Once a rota is over, Check ends its input, and looks at whether the script had closed it first.",
+      "nextSteps": [
+        "Read typed lines with `createInterface` from `node:readline`, with `process.stdin` as its input.",
+        "On a line that says `stop`, print who is next.",
+        "Write one function that tidies up, stopping the timer and closing what reads the input, and call it both when stopped and when the rota is over.",
+        "Run it, let it run to the end, and see that it ends by itself."
+      ],
+      "hints": [
+        "Reading what is typed keeps the script alive too, like a timer. Until it is closed, the script waits for the next line forever.",
+        "`input.on('line', ...)` gives each typed line. `input.close()` stops reading, so the script can end once the timer is cleared too.",
+        "`function finish() { clearInterval(timer); input.close() }`, called after the last line and after `Stopped. ...`."
+      ],
+      "docs": [
+        {
+          "title": "readline.createInterface()",
+          "url": "https://nodejs.org/api/readline.html#readlinecreateinterfaceoptions"
+        },
+        {
+          "title": "rl.close()",
+          "url": "https://nodejs.org/api/readline.html#rlclose"
+        },
+        {
+          "title": "process.stdin",
+          "url": "https://nodejs.org/api/process.html#processstdin"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ctrl-c",
+      "title": "Stop cleanly on Ctrl+C",
+      "file": "rota.js",
+      "description": "Most people press Ctrl+C to stop a script, and by default that ends it on the spot, without saying who is next. Change `rota.js` so that Ctrl+C, the `SIGINT` signal, stops the rota exactly as a typed `stop` does: the same line, the timer stopped, the input closed, and exit code 0.\n\nCheck raises `SIGINT` inside the script as soon as the first turn shows, which runs its `SIGINT` listeners the way Ctrl+C does on every system, and waits for it to end by itself.",
+      "nextSteps": [
+        "Press Ctrl+C while the rota runs, and see what is printed now.",
+        "Listen for `SIGINT` on `process`.",
+        "Call the same function that a typed `stop` calls.",
+        "Press Ctrl+C again and check the script ends, and does not keep calling turns."
+      ],
+      "hints": [
+        "A listener for `SIGINT` replaces what Ctrl+C does by default. Once you listen, Ctrl+C no longer ends the script: your listener has to stop what keeps it running.",
+        "`process.on('SIGINT', fn)` calls `fn` on Ctrl+C. If `fn` stops the timer and closes the input, the script ends by itself.",
+        "`process.on('SIGINT', stop)`, where `stop` is the function your `stop` line already calls."
+      ],
+      "docs": [
+        {
+          "title": "Signal events",
+          "url": "https://nodejs.org/api/process.html#signal-events"
+        },
+        {
+          "title": "process.exitCode",
+          "url": "https://nodejs.org/api/process.html#processexitcode_1"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Shutting down a Node program gracefully",
+          "url": "https://www.youtube.com/watch?v=-OjPhPV6Rjs"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

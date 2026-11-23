@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Whose orders are these?", "note": "And who has not paid yet?" },
+    {
+      "title": "Shop files",
+      "text": "Orders, a log and dozens of messages.",
+      "note": "The answers are inside them."
+    },
+    {
+      "title": "Your commands",
+      "file": "today.txt",
+      "mine": true,
+      "gap": "Read every line by eye",
+      "tasks": ["One customer's orders", "Every jam", "Count the unpaid", "Every wrong address"]
+    },
+    { "title": "Top folder", "text": "The lines Idris asked for, and one count." }
+  ],
+  "ticket": { "label": "The answers", "wrong": "buried", "why": "Too many", "right": "found" },
+  "captions": [
+    "At Ashgrove, Idris needs answers that sit inside the order file, the log and the messages.",
+    "There are hundreds of lines, and reading them all by eye would take the whole day.",
+    "You search inside the files for words, in four small tasks.",
+    "Each answer is saved: the lines that match, where they are, or how many.",
+    "Idris knows who ordered, who has not paid and which parcels went astray."
+  ]
+}

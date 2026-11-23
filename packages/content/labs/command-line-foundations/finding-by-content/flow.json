@@ -1,0 +1,105 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "idris", "label": "Idris", "kind": "story" },
+      { "id": "files", "label": "Orders, log, messages", "kind": "data" },
+      { "id": "search", "label": "Your searches", "kind": "story", "mine": true },
+      { "id": "screen", "label": "Terminal", "kind": "story" },
+      { "id": "found", "label": "Saved findings", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "idris", "to": "search", "label": "what to look for" },
+      { "from": "files", "to": "search", "label": "every line" },
+      { "from": "search", "to": "screen", "label": "matching lines" },
+      { "from": "search", "to": "found", "label": "saved" }
+    ],
+    "note": "You search inside the shop's files for words, and keep the lines or the count that answer Idris."
+  },
+  "tasks": {
+    "pellow": {
+      "steps": [
+        {
+          "active": ["idris", "idris->search", "files", "files->search", "search"],
+          "value": {
+            "kind": "array",
+            "label": "customers named Pellow",
+            "values": ["the bakery", "the farm shop"]
+          },
+          "note": "Two customers share a first word, and Idris wants only the bakery's orders."
+        },
+        {
+          "active": ["search", "search->screen", "screen"],
+          "note": "A search for the bakery's whole name, kept together, prints only its order lines."
+        },
+        {
+          "active": ["search", "search->found", "found"],
+          "note": "The bakery's orders are saved, each line as it is in the order file."
+        }
+      ]
+    },
+    "jams": {
+      "steps": [
+        {
+          "active": ["files", "files->search", "search"],
+          "value": {
+            "kind": "array",
+            "label": "a jam is written",
+            "values": ["small letters", "a capital first", "all capitals"]
+          },
+          "note": "Hesper typed the log in a hurry, so the same word is written three ways."
+        },
+        {
+          "active": ["search", "search->screen", "screen"],
+          "note": "A search that ignores letter case prints every line about a jam."
+        },
+        {
+          "active": ["search", "search->found", "found"],
+          "note": "Every jam of March is saved for Hesper."
+        }
+      ]
+    },
+    "unpaid": {
+      "steps": [
+        {
+          "active": ["idris", "idris->search", "files", "files->search", "search"],
+          "value": { "kind": "array", "label": "an order's status", "values": ["paid", "unpaid"] },
+          "note": "Each order ends with its status, and one status is hidden inside the other."
+        },
+        {
+          "active": ["search", "search->screen", "screen"],
+          "note": "The search prints a count of the unpaid orders instead of the lines."
+        },
+        {
+          "active": ["search", "search->found", "found"],
+          "note": "The count is saved, one number for Idris."
+        }
+      ]
+    },
+    "address": {
+      "steps": [
+        {
+          "active": ["idris", "idris->search", "files", "files->search", "search"],
+          "value": {
+            "kind": "array",
+            "label": "messages holds",
+            "values": ["January folder", "February folder", "March folder"]
+          },
+          "note": "Customer messages sit in a folder for each month, and some mention a wrong address."
+        },
+        {
+          "active": ["search", "search->screen", "screen"],
+          "value": {
+            "kind": "array",
+            "label": "one line per find",
+            "values": ["file path", "line number", "the line"]
+          },
+          "note": "The search goes into every folder and says where each line was found."
+        },
+        {
+          "active": ["search", "search->found", "found"],
+          "note": "Idris can open each message at the right line."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,7 @@
+Today's jobs, from Hesper
+
+Sol copied three old memory sticks into old-sticks before leaving. Nothing is where you would look for it.
+
+1. List every .svg drawing anywhere in old-sticks, in drawings.txt.
+2. Idris needs every file in old-sticks with invoice in its name, however it is written (Invoice, INVOICE). List them in invoices.txt.
+3. List every folder called proofs in old-sticks, in proof-folders.txt. Sol also wrote notes called proofs: those are files, so leave them out.

@@ -1,0 +1,30 @@
+{
+  "stations": [
+    {
+      "title": "Hesper",
+      "say": "My old drawings are on those sticks.",
+      "note": "Idris wants the invoices too."
+    },
+    {
+      "title": "Old sticks",
+      "text": "Folders in folders, nothing in its place.",
+      "note": "ls shows one folder at a time."
+    },
+    {
+      "title": "Your commands",
+      "file": "today.txt",
+      "mine": true,
+      "gap": "Nobody can find a thing",
+      "tasks": ["Every drawing", "Every invoice", "The proofs folders"]
+    },
+    { "title": "Top folder", "text": "Three lists of paths, ready to follow." }
+  ],
+  "ticket": { "label": "The drawings", "wrong": "lost", "why": "Too deep", "right": "found" },
+  "captions": [
+    "At Ashgrove, Hesper wants the old drawings back from Sol's copied memory sticks.",
+    "The sticks hold folders inside folders, and looking in each one by hand takes forever.",
+    "You search every folder by name from the terminal, in three small tasks.",
+    "Every drawing, invoice and proofs folder is on a list, with the path to it.",
+    "Nothing was moved. Hesper and Idris know where everything on the sticks is."
+  ]
+}

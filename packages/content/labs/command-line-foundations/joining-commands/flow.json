@@ -1,0 +1,99 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "people", "label": "Hesper and Idris", "kind": "story" },
+      { "id": "files", "label": "Sales, log, lists", "kind": "data" },
+      { "id": "chain", "label": "Your chains", "kind": "story", "mine": true },
+      { "id": "screen", "label": "Terminal", "kind": "story" },
+      { "id": "kept", "label": "Kept files", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "people", "to": "chain", "label": "jobs" },
+      { "from": "files", "to": "chain", "label": "lines" },
+      { "from": "chain", "to": "screen", "label": "each step" },
+      { "from": "chain", "to": "kept", "label": "saved or added" }
+    ],
+    "note": "You join commands so each one works on what the last printed, and change files without losing a line."
+  },
+  "tasks": {
+    "items": {
+      "steps": [
+        {
+          "active": ["people", "people->chain", "files", "files->chain", "chain"],
+          "value": {
+            "kind": "array",
+            "label": "sold.txt",
+            "values": ["item", "item", "the same item again", "..."]
+          },
+          "note": "Every sale at the market is a line, so items repeat all through the file."
+        },
+        {
+          "active": ["chain", "chain->screen", "screen"],
+          "note": "Sorted first, equal items sit together, and the next command keeps one of each."
+        },
+        {
+          "active": ["chain", "chain->kept", "kept"],
+          "note": "Hesper gets the list of what sold, each item once."
+        }
+      ]
+    },
+    "top": {
+      "steps": [
+        {
+          "active": ["files", "files->chain", "chain"],
+          "note": "The same sales file, with items repeating."
+        },
+        {
+          "active": ["chain", "chain->screen", "screen"],
+          "value": {
+            "kind": "array",
+            "label": "one line per item",
+            "values": ["how many", "item"]
+          },
+          "note": "The chain counts each item, sorts by the counts and keeps only the best sellers."
+        },
+        {
+          "active": ["chain", "chain->kept", "kept"],
+          "note": "Hesper sees what sold best, the most first."
+        }
+      ]
+    },
+    "done": {
+      "steps": [
+        {
+          "active": ["people", "people->chain", "files", "files->chain", "chain"],
+          "value": {
+            "kind": "array",
+            "label": "jobs-done.txt",
+            "values": ["earlier jobs", "then today's"]
+          },
+          "note": "Idris's running list already holds earlier jobs, and today's belong under them."
+        },
+        {
+          "active": ["chain", "chain->screen", "screen"],
+          "note": "A search of today's log prints only the finished jobs."
+        },
+        {
+          "active": ["chain", "chain->kept", "kept"],
+          "note": "Those lines are added to the end of the list, and every earlier line stays."
+        }
+      ]
+    },
+    "stock": {
+      "steps": [
+        {
+          "active": ["people", "people->chain", "files", "files->chain", "chain"],
+          "note": "The stock list is in a muddle, and every line in it matters."
+        },
+        {
+          "active": ["chain", "chain->screen", "screen"],
+          "note": "Sorted lines go into a new file first, never back into the file being read."
+        },
+        {
+          "active": ["chain", "chain->kept", "kept"],
+          "note": "The sorted file takes the old one's place, with every line still there."
+        }
+      ]
+    }
+  }
+}

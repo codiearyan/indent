@@ -1,0 +1,5 @@
+[
+  { "id": "fri-1100", "time": "11:00", "tram": "The Kettleby Car" },
+  { "id": "fri-1300", "time": "13:00", "tram": "The Foundry Belle" },
+  { "id": "fri-1500", "time": "15:00", "tram": "The Kettleby Car" }
+]

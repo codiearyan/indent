@@ -1,0 +1,107 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "gethin", "label": "Gethin", "kind": "story" },
+      {
+        "id": "kind",
+        "label": "redirectKind()",
+        "kind": "function",
+        "mine": true,
+        "fn": "redirectKind"
+      },
+      { "id": "where", "label": "whereTo()", "kind": "function", "mine": true },
+      { "id": "trail", "label": "trail()", "kind": "function", "mine": true },
+      { "id": "old", "label": "Old addresses", "kind": "story" },
+      { "id": "new", "label": "New addresses", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "gethin", "to": "kind", "label": "a status" },
+      { "from": "where", "to": "old", "label": "one request" },
+      { "from": "trail", "to": "where", "label": "each step" },
+      { "from": "old", "to": "new", "label": "location" },
+      { "from": "trail", "to": "gethin", "label": "every address" }
+    ],
+    "note": "Each old address is looked at before anyone follows it, so Gethin sees where it leads, what happens to a form on the way, and where it goes round in circles."
+  },
+  "tasks": {
+    "kind": {
+      "trace": { "file": "src/redirects.js", "call": "redirectKind", "args": [301] },
+      "steps": [
+        {
+          "active": ["gethin", "gethin->kind", "kind"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "status", "value": 301 }]
+          },
+          "note": "redirectKind() gets the status an old address answers with, like the 301 at the old song request form."
+        },
+        {
+          "active": ["kind"],
+          "note": "Only five statuses are redirects. Anything else gives null."
+        },
+        {
+          "active": ["kind"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "permanent", "value": "true or false" },
+              { "key": "keepsPost", "value": "true or false" }
+            ]
+          },
+          "note": "It says whether the move is for good, and whether a form's POST survives it."
+        }
+      ]
+    },
+    "where": {
+      "steps": [
+        {
+          "active": ["where", "where->old", "old"],
+          "note": "whereTo() asks an old address once and does not follow where it points."
+        },
+        {
+          "active": ["old", "old->new", "new"],
+          "note": "A redirect answer names the new address in its location header, often as only a path."
+        },
+        {
+          "active": ["where"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "a redirect", "value": "the whole new address" },
+              { "key": "anything else", "value": "null" }
+            ]
+          },
+          "note": "The new address comes back whole, or null when the answer sends nobody anywhere."
+        }
+      ]
+    },
+    "trail": {
+      "steps": [
+        {
+          "active": ["trail", "trail->where", "where"],
+          "note": "trail() starts at an old address and asks where it leads, one step at a time."
+        },
+        {
+          "active": ["where", "where->old", "old", "old->new", "new"],
+          "note": "Each step may point on to another old address, so the trail goes on until an answer is not a redirect."
+        },
+        {
+          "active": ["trail"],
+          "note": "When the steps run past the limit it was given, it stops and throws, as it does for Odette's old schedule bookmark."
+        },
+        {
+          "active": ["trail", "trail->gethin", "gethin"],
+          "value": {
+            "kind": "array",
+            "label": "what comes back",
+            "values": ["the old address", "each address on the way", "where it ends"]
+          },
+          "note": "Gethin gets every address on the way, in order."
+        }
+      ]
+    }
+  }
+}

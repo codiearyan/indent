@@ -1,8 +1,8 @@
 // What the issue graders share. They read <workspace>/shop with plain git and change nothing.
 import { spawnSync } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, realpathSync } from 'node:fs'
 import { devNull } from 'node:os'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 
 export const START_OVER = 'To start the issue over, run `node setup.mjs` in the top folder.'
 
@@ -197,3 +197,63 @@ export const hasMarkers = (text) => /^(<{7}|\|{7}|={7}|>{7})( |\r?$)/m.test(text
 
 export const DETACHED =
   'git status says HEAD detached: you are looking at one commit and are on no branch. The lesson on branches says how to get back onto one.'
+
+// Part 3: the shop's server, a bare repository in server/shop.git beside shop. Checks read it by
+// its path in the workspace, never through the address a remote holds, so nothing outside is read.
+export const serverDir = (t) => join(t.workspace, 'server', 'shop.git')
+
+/** A git function for the server, or null when setup has not made it. */
+export function openServer(t) {
+  return existsSync(join(serverDir(t), 'HEAD')) ? gitIn(serverDir(t), t.workspace) : null
+}
+
+/** Where shop last heard the server's branch was: origin/<branch>, or null. */
+export const remoteTip = (git, branch) => commitOf(git, `refs/remotes/origin/${branch}`)
+
+/** The server branch a branch of shop follows, as 'origin/<name>', or '' when it follows none. */
+export function upstreamOf(git, branch) {
+  const remote = git('config', '--get', `branch.${branch}.remote`).out.trim()
+  const merge = git('config', '--get', `branch.${branch}.merge`).out.trim()
+  return remote && merge.startsWith('refs/heads/') ? `${remote}/${merge.slice('refs/heads/'.length)}` : ''
+}
+
+const realPath = (path) => {
+  try {
+    return realpathSync.native(path)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * A fresh copy of the workspace for a check to read, so it never runs git in the learner's own
+ * repositories. `live` keeps the real workspace: a clone records the server by its full path there.
+ */
+export async function readCopy(t) {
+  return { ...t, workspace: await t.sandbox(), live: t.workspace }
+}
+
+/** True when the remote `name` of shop is the workspace's server, however its path was written. */
+export function remoteIsServer(t, git, name = 'origin') {
+  const url = git('config', '--get', `remote.${name}.url`).out.trim()
+  if (!url) return false
+  const path = resolve(shopDir(t), url.replace(/^file:\/\//, ''))
+  const servers = [t.workspace, t.live].filter(Boolean).map((top) => realPath(join(top, 'server', 'shop.git')))
+  return [path, `${path}.git`].some((candidate) => {
+    const real = realPath(candidate)
+    return Boolean(real) && servers.includes(real)
+  })
+}
+
+export const NO_SERVER = `There is no server/shop.git, the stand-in for the shop's server. ${START_OVER}`
+
+export const SERVER_LOST = `The server's history no longer holds the commits setup put there. ${START_OVER}`
+
+export const NOT_ORIGIN = `origin in shop no longer points at server/shop.git: git remote -v shows where it points. ${START_OVER}`
+
+export const OPEN_MERGE =
+  'A merge is started and not finished: git status says you are still merging. The lesson on merging says how to finish it with Git\'s own message, or how to call it off.'
+
+/** Both graphs, the copy's and the server's, for a check's output. */
+export const graphs = (git, server) =>
+  `shop (your copy):\n${graph(git)}\n\nserver/shop.git:\n${server('log', '--oneline', '--graph', '--decorate', '-n', '8', '--all').out.trim()}`

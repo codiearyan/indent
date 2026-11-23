@@ -1,0 +1,81 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "idris", "label": "Idris", "kind": "story" },
+      { "id": "handle", "label": "handle()", "kind": "function", "mine": true, "fn": "handle" },
+      { "id": "parse", "label": "parseQuery()", "kind": "function", "mine": true, "fn": "parseQuery" },
+      { "id": "body", "label": "Request body", "kind": "data" },
+      { "id": "handler", "label": "A handler", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "idris", "to": "handle", "label": "request" },
+      { "from": "handle", "to": "parse", "label": "after the ?" },
+      { "from": "body", "to": "handle", "label": "chunks" },
+      { "from": "handle", "to": "handler", "label": "req.query, req.body" },
+      { "from": "handle", "to": "idris", "label": "a plain no" }
+    ],
+    "note": "The router reads the query and the body once, carefully, before any handler runs, and refuses what cannot be read."
+  },
+  "tasks": {
+    "query": {
+      "steps": [
+        {
+          "active": ["idris", "parse"],
+          "note": "Idris asks for the orders still waiting, for cards and for posters. Everything after the ? goes to parseQuery."
+        },
+        {
+          "active": ["parse"],
+          "value": { "kind": "array", "label": "pairs", "values": ["status=waiting", "item=card", "item=poster"] },
+          "note": "parseQuery splits the text into pairs at each &, and each pair at its first =."
+        },
+        {
+          "active": ["parse"],
+          "value": { "kind": "map", "label": "req.query", "entries": [{ "key": "status", "value": "one value" }, { "key": "item", "value": "every value, in order" }] },
+          "note": "A key that comes twice keeps both its values. The result goes to the handler as req.query."
+        }
+      ],
+      "trace": { "file": "src/router.js", "call": "parseQuery", "args": ["status=waiting&item=card&item=poster"] }
+    },
+    "body": {
+      "steps": [
+        {
+          "active": ["idris", "idris->handle", "handle"],
+          "note": "The order page sends a new order for posters, as JSON."
+        },
+        {
+          "active": ["body", "body->handle", "handle"],
+          "value": { "kind": "array", "label": "chunks", "values": ["bytes", "bytes", "bytes"] },
+          "note": "Once the route is found, handle reads every chunk of the body and joins the bytes before making text."
+        },
+        {
+          "active": ["handle", "handle->idris"],
+          "note": "Text that is not JSON gets a plain no, and the handler never sees it."
+        },
+        {
+          "active": ["handle", "handle->handler", "handler"],
+          "note": "Otherwise the handler gets the parsed order as req.body."
+        }
+      ]
+    },
+    "limit": {
+      "steps": [
+        {
+          "active": ["idris", "idris->handle", "handle"],
+          "note": "Someone pastes a whole book into the notes field of an order."
+        },
+        {
+          "active": ["handle"],
+          "note": "If the content-length header is already over the router's limit, handle refuses before reading anything."
+        },
+        {
+          "active": ["body", "body->handle", "handle"],
+          "note": "Otherwise it counts the bytes as they arrive, and stops the moment the count passes the limit."
+        },
+        {
+          "active": ["handle", "handle->idris", "idris"],
+          "note": "The answer is a plain no, at once, and the handler never runs."
+        }
+      ]
+    }
+  }
+}

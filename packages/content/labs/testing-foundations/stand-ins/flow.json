@@ -1,0 +1,94 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "tests", "label": "checkout.test.js", "kind": "file", "mine": true },
+      { "id": "random", "label": "Random number", "kind": "data" },
+      { "id": "checkout", "label": "checkout.js", "kind": "file" },
+      { "id": "cards", "label": "Card company", "kind": "story" },
+      { "id": "list", "label": "Packing list", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "tests", "to": "random", "label": "stands in" },
+      { "from": "random", "to": "checkout", "label": "a number" },
+      { "from": "tests", "to": "cards", "label": "a fake" },
+      { "from": "checkout", "to": "cards", "label": "charge" },
+      { "from": "checkout", "to": "list", "label": "paid orders" }
+    ],
+    "note": "Your tests stand in for chance and for the card company, so they know every answer and charge nobody."
+  },
+  "tasks": {
+    "surprise": {
+      "steps": [
+        {
+          "active": ["tests", "tests->random", "random"],
+          "note": "Your test swaps the random number for a stand-in that gives a number you chose."
+        },
+        {
+          "active": ["random", "random->checkout", "checkout"],
+          "value": {
+            "kind": "array",
+            "label": "the extras",
+            "values": ["jar of honey", "bunch of herbs", "pot of jam", "bag of apples"]
+          },
+          "note": "The code turns that number into a place on the list of extras."
+        },
+        {
+          "active": ["checkout", "tests"],
+          "note": "Your test compares the extra with the one it worked out by hand, then puts the real random number back."
+        }
+      ]
+    },
+    "charge": {
+      "steps": [
+        {
+          "active": ["tests", "tests->cards", "cards"],
+          "note": "Your test makes a fake card company that records every call and answers with a receipt."
+        },
+        {
+          "active": ["checkout", "checkout->cards", "cards"],
+          "value": {
+            "kind": "map",
+            "label": "a call",
+            "entries": [
+              { "key": "customer", "value": "a name" },
+              { "key": "amount", "value": "pence" }
+            ]
+          },
+          "note": "Checkout asks the fake to charge the customer."
+        },
+        {
+          "active": ["tests", "cards"],
+          "note": "Your test reads what the fake recorded: who was charged, how much, and how many times."
+        }
+      ]
+    },
+    "declined": {
+      "steps": [
+        {
+          "active": ["tests", "tests->cards", "cards"],
+          "note": "Your test makes a fake card company that says no."
+        },
+        {
+          "active": ["checkout", "checkout->cards", "cards"],
+          "note": "Checkout asks it to charge the card, and the answer is a rejection with a reason."
+        },
+        {
+          "active": ["checkout", "tests"],
+          "value": {
+            "kind": "map",
+            "label": "the answer",
+            "entries": [
+              { "key": "status", "value": "unpaid" },
+              { "key": "reason", "value": "from the card company" }
+            ]
+          },
+          "note": "Checkout answers that the order is unpaid, with the reason Effie needs."
+        },
+        {
+          "active": ["list"],
+          "note": "Your test checks the packing list too: the unpaid order is not on it."
+        }
+      ]
+    }
+  }
+}
