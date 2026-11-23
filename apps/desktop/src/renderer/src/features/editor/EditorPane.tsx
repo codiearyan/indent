@@ -30,12 +30,11 @@ import { ConflictDialog } from './ConflictDialog'
 import { EditorGroup } from './EditorGroup'
 import { focusedEditor } from './editors'
 import { FilesPanel } from './FilesPanel'
-import { useModels } from './models'
+import { ModelSync } from './models'
 import { QuickOpen } from './QuickOpen'
 
 export function EditorPane(): React.JSX.Element {
   const status = useWorkspace((s) => s.status)
-  const files = useWorkspace((s) => s.files)
   const split = useWorkspace((s) => s.layout.groups.length > 1)
   const splitAt = useWorkspace((s) => s.layout.split)
   const checking = useWorkspace((s) => s.checking)
@@ -66,7 +65,6 @@ export function EditorPane(): React.JSX.Element {
     setShowSummary(false)
   }
   const hideSummary = useCallback(() => setShowSummary(false), [])
-  useModels(files, hideSummary)
   const command = chapter?.terminal.suggestedCommand
   const focusedGroup = useWorkspace((s) => s.layout.focused)
   const activePath = useWorkspace((s) => s.layout.groups[s.layout.focused]?.active ?? null)
@@ -162,6 +160,7 @@ export function EditorPane(): React.JSX.Element {
         </Tooltip>
       </div>
 
+      <ModelSync onEdit={hideSummary} />
       <div className="flex min-h-0 flex-1 border-t border-border">
         {panels.files && status === 'ready' && (
           <div

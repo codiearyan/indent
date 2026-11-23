@@ -34,8 +34,9 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null)
   const viewStates = useRef(new Map<string, monaco.editor.ICodeEditorViewState | null>())
-  const files = useWorkspace((s) => s.files)
   const activePath = useWorkspace((s) => s.layout.groups[group]?.active ?? null)
+  // The file's model is made once it is listed, so the editor picks it up then.
+  const listed = useWorkspace((s) => s.files.some((f) => f.path === activePath))
   const theme = useSettings((s) => s.theme)
   const codeTheme = useSettings((s) => s.codeTheme)
   const options = useSettings((s) => s.editor)
@@ -144,7 +145,7 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
     editor.setModel(next)
     const saved = next && viewStates.current.get(next.uri.toString())
     if (saved) editor.restoreViewState(saved)
-  }, [activePath, files])
+  }, [activePath, listed])
 
   // Runs after the editor above is made, and again whenever that one is made anew.
   const vim = options.vim

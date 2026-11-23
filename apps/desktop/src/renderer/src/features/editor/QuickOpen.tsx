@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { WorkspaceFile } from '@shared/types'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -9,12 +10,15 @@ import { ChangeLetter, FileTypeIcon } from './FileTab'
 import { quickOpenList, type PathMatch } from './pathMatch'
 import { useQuickOpen } from './quickOpenStore'
 
+const NO_FILES: WorkspaceFile[] = []
+
 /** Opens a file by typing part of its name. */
 export function QuickOpen(): React.JSX.Element {
   const { open, setOpen } = useQuickOpen()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState(0)
-  const files = useWorkspace((s) => s.files)
+  // Closed, it follows nothing, so typing in the editor does not rank every file again.
+  const files = useWorkspace((s) => (open ? s.files : NO_FILES))
   const starter = useWorkspace((s) => s.starter)
   const layout = useWorkspace((s) => s.layout)
   const issueFiles = useWorkspace((s) => s.chapter?.files)

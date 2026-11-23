@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useState } from 'react'
 import { Columns2Icon, XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -29,8 +30,6 @@ interface Props {
 
 /** One editor group: its tab strip and the editor showing its active file. */
 export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element {
-  const files = useWorkspace((s) => s.files)
-  const starter = useWorkspace((s) => s.starter)
   const tabs = useWorkspace((s) => s.layout.groups[group])
   const focused = useWorkspace((s) => s.layout.focused === group)
   const split = useWorkspace((s) => s.layout.groups.length > 1)
@@ -41,6 +40,15 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
   const [menuFor, setMenuFor] = useState<string | null>(null)
   const paths = tabs?.paths ?? []
   const activePath = tabs?.active ?? null
+  // Only each tab's mark, so typing renders the tabs again only when a mark changes.
+  const changes = useWorkspace(
+    useShallow((s) =>
+      paths.map((path) => {
+        const file = s.files.find((f) => f.path === path)
+        return file ? fileChange(s.starter, file) : undefined
+      })
+    )
+  )
 
   const pane = usePane(group === 0 ? 'editor-0' : 'editor-1')
 
@@ -62,8 +70,8 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
           className="flex min-w-0 flex-1 overflow-x-auto [scrollbar-width:none]"
         >
           {paths.map((path, index) => {
-            const file = files.find((f) => f.path === path)
-            if (!file) return null
+            const change = changes[index]
+            if (change === undefined) return null
             const active = path === activePath
             const name = path.slice(path.lastIndexOf('/') + 1)
             return (
@@ -91,11 +99,7 @@ export function EditorGroup({ group, onCheck, onRun }: Props): React.JSX.Element
                   onClick={() => openFile(path, group)}
                   className="flex h-full items-center gap-2 pr-1 pl-3 font-mono text-[13px] outline-none"
                 >
-                  <FileLabel
-                    path={path}
-                    change={fileChange(starter, file)}
-                    active={active && focused}
-                  />
+                  <FileLabel path={path} change={change} active={active && focused} />
                 </button>
                 <Tooltip>
                   <TooltipTrigger asChild>
