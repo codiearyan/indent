@@ -45,7 +45,7 @@
       "id": "rule",
       "title": "Board and land passengers, never more than the seats",
       "file": "Manifest.java",
-      "description": "Under `// Task 2`, write `boolean board(String passenger)`: while a seat is free it adds the passenger to `aboard` and gives back `true`; on a full boat it changes nothing and gives back `false`. Then write `boolean land(String passenger)`: it takes that passenger off and gives back `true`, or gives back `false` when nobody of that name is aboard. It builds on Task 1.\n\nCheck makes boats of its own, boards them up to their seats and one past, lands passengers who are aboard and one who is not, and reads what each call gives back and how many are aboard.",
+      "description": "Under `// Task 2`, write `boolean board(String passenger)`: while a seat is free it adds the passenger to `aboard` and gives back `true`; on a full boat it changes nothing and gives back `false`. Then write `boolean land(String passenger)`: it takes that passenger off and gives back `true`, or gives back `false` when nobody of that name is aboard. It builds on Task 1.\n\nCheck makes boats of its own, two at once included, boards them up to their seats and one past, lands passengers who are aboard and one who is not, and reads what each call gives back and how many are aboard.",
       "nextSteps": [
         "Read the part of the lesson about methods that keep a rule.",
         "In `board`, refuse first, then add.",

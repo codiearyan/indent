@@ -77,7 +77,7 @@
       "id": "crossing",
       "title": "Write the Crossing class, which may have no boat yet",
       "file": "Fleet.java",
-      "description": "Under `// Task 3`, write a class called `Crossing` with two fields, an `int` called `hour` and a `Boat` called `boat`, and a method `String boatName()`. It gives back the name of the crossing's boat, or `No boat` when the crossing has not been given a boat. It builds on Task 1.\n\nCheck makes crossings of its own, some with a boat and one without, renames a boat after giving it to a crossing, and reads what `boatName()` gives back.",
+      "description": "Under `// Task 3`, write a class called `Crossing` with two fields, an `int` called `hour` and a `Boat` called `boat`, and a method `String boatName()`. It gives back the name of the crossing's boat, or `No boat` when the crossing has not been given a boat. It builds on Task 1.\n\nCheck makes crossings of its own, some with a boat and some without, two at once included, renames a boat after giving it to a crossing, and reads what `boatName()` gives back.",
       "nextSteps": [
         "Read the part of the lesson about `null` and the exception it brings.",
         "Write the class and its two fields; `Boat` is a type like `String`.",

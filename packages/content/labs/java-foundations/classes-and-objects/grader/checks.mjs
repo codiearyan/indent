@@ -1,4 +1,4 @@
-import { objectCases, tasks } from '../../grading.mjs'
+import { codeOnly, objectCases, tasks } from '../../grading.mjs'
 
 const boat = (v, name, seats, aboard) => [
   `Boat ${v} = new Boat();`,
@@ -70,8 +70,10 @@ export const checks = tasks({
         types: { 'a.seatsFree()': 'int' },
         mistakes: [
           {
-            when: (r) => r.values['a.name']?.value === 'Skua',
-            hint: 'Check made two boats, and the first one now holds the second one\'s values. Boat\'s fields are shared by every boat: a field with static in front belongs to the class, so there is only one of it. Each boat needs its own.'
+            when: (r) =>
+              r.values['b.seatsFree()'] !== undefined &&
+              (r.values['a.name']?.value === 'Skua' || r.values['a.seats']?.value === '30' || r.values['a.aboard']?.value === '2'),
+            hint: 'Check made two boats, and the first one now holds a value of the second one. That field is shared by every boat: a field with static in front belongs to the class, so there is only one of it. Each boat needs its own.'
           },
           {
             when: (r) => free(r, 'a') === r.case.aboard - r.case.seats && r.case.aboard !== r.case.seats,
@@ -115,7 +117,7 @@ export const checks = tasks({
         {
           name: 'Gives a ticket of its own, so changing it leaves this one alone',
           code: [...ticket('a', 'Seonag', 320), 'Ticket b = a.copyFor("Wen");', 'if (b != null) b.pence = 0;'],
-          reads: { 'a.pence': 'a.pence', 'b == null': 'b == null' },
+          reads: { 'a == b': 'a == b', 'a.pence': 'a.pence', 'b == null': 'b == null' },
           expected: { 'b == null': false, 'a.pence': 320 },
           first: 'Seonag',
           who: 'Wen'
@@ -132,18 +134,26 @@ export const checks = tasks({
         ...c,
         hint: 'copyFor should give back a new ticket, with who as its passenger and the same pence as this ticket, and leave this ticket as it was.'
       })),
-      judge: objectCases({
+      judge: (runs, { section }) =>
+        objectCases({
         mistakes: [
           {
             when: (r) => r.values['b == null']?.value === 'true',
             hint: 'copyFor gives back null, which is no ticket at all. It should give back a new ticket.'
           },
           {
-            when: (r) =>
-              r.values['a == b']?.value === 'true' ||
-              r.values['a.passenger']?.value === r.case.who ||
-              r.values['a.pence']?.value === '0',
+            when: (r) => r.values['a == b']?.value === 'true',
             hint: 'Once copyFor has run, this ticket has changed too: copyFor gives back this same ticket under a second name. Only new makes another object.'
+          },
+          {
+            when: (r) =>
+              (r.values['a.passenger']?.value === r.case.who || r.values['a.pence']?.value === '0') &&
+              /\bstatic\s+(?:String|int)\b/.test(codeOnly(section)),
+            hint: 'copyFor gives back a new ticket, and this ticket has changed too: the two share a field. A field with static in front belongs to the class, so every ticket has the same one; each ticket needs its own.'
+          },
+          {
+            when: (r) => r.values['a.passenger']?.value === r.case.who || r.values['a.pence']?.value === '0',
+            hint: 'copyFor gives back a new ticket, and it changes this ticket too. It should set only the fields of the new ticket and leave this one as it was.'
           },
           {
             when: (r) => r.values['b.passenger']?.value === null,
@@ -158,7 +168,7 @@ export const checks = tasks({
             hint: 'The new ticket\'s pence is 0. A new object starts with its number fields at 0, and copyFor never gives it this ticket\'s fare.'
           }
         ]
-      })
+      })(runs)
     },
 
     crossing: {
@@ -192,11 +202,22 @@ export const checks = tasks({
           reads: { 'c.boatName()': 'c.boatName()' },
           expected: { 'c.boatName()': 'Fulmar' },
           hint: 'Check renamed the boat after giving it to the crossing. c.boat and t are two names for one boat, so boatName should give back its name as it is now.'
+        },
+        {
+          name: 'Gives each crossing its own boat',
+          code: [...boat('t', 'Tern', 9, 0), 'Crossing c = new Crossing();', 'c.hour = 9; c.boat = t;', 'Crossing d = new Crossing();', 'd.hour = 7;'],
+          reads: { 'c.boatName()': 'c.boatName()', 'd.boatName()': 'd.boatName()' },
+          expected: { 'c.boatName()': 'Tern', 'd.boatName()': 'No boat' },
+          hint: 'Check gave a boat to one crossing and not to the other, so only the first has a boat.'
         }
       ],
       judge: objectCases({
         types: { 'c.boatName()': 'String' },
         mistakes: [
+          {
+            when: (r) => r.values['d.boatName()']?.value === 'Tern',
+            hint: 'Check gave a boat to one crossing only, and the other crossing has it too: boat is shared by every crossing. A field with static in front belongs to the class; each crossing needs its own.'
+          },
           {
             when: (r, runs) => runs.every((x) => x.values['c.boatName()']?.value === runs[0].values['c.boatName()']?.value),
             hint: 'boatName gives back the same text whatever crossing Check makes. Build it on the crossing\'s own boat field.'

@@ -68,7 +68,10 @@ export const checks = packageTasks({
           refusal(
             runs.find((r) => r.case.refuse),
             {
-              error: /is not public in lanternquay\.tickets/,
+              error: /^(?:lanternquay\.tickets\.)?Fares is not public in lanternquay\.tickets;/,
+              other: /^fareFor\(int\) is not public/.test(runs.find((r) => r.case.refuse).errors[0]?.message ?? '')
+                ? 'Java refused Check\'s line only because fareFor has no public in front. Fares itself has public in front of class, so code in other packages can still use the class: the task asks for no word in front of class.'
+                : undefined,
               allowed: 'Check\'s own code, in another package, used Fares, and Java let it. Fares is meant for the tickets package only: with no word in front of class, nothing outside the package can use it.'
             }
           )
@@ -113,7 +116,10 @@ export const checks = packageTasks({
           pkg: 'lanternquay.tickets',
           code: ['Ticket t = new Ticket("Rab", 20);', field === 'pence' ? 't.pence = 0;' : 't.passenger = "Seonag";']
         }))
-      ].map((c) => ({ hint: 'line should give back the passenger, a colon and a space, then the fare Fares gives for the age, and a p.', ...c })),
+      ].map((c) => ({
+        hint: 'line should give back the passenger, a colon and a space, then the fare Fares gives for the age, and a p. Check\'s own Fares gives fares of its own, so the numbers are not the ones you see when you run the hut.',
+        ...c
+      })),
       judge: (runs) => [
         ...objectCases({
           types: { 't.line()': 'String' },
@@ -123,8 +129,8 @@ export const checks = packageTasks({
               hint: 'The fare in the line is not the one Fares gives. Check put a Fares of its own beside your Ticket, with fares of its own, and your Ticket works out the fare itself. Ask Fares, so the rule stays in one place.'
             },
             {
-              when: (r) => (value(r, 'a.line()') ?? '').startsWith('Wen'),
-              hint: 'Check made two tickets, and the first one now shows the second one\'s passenger. A field with static in front belongs to the class; each ticket needs its own.'
+              when: (r) => (value(r, 'a.line()') ?? '').startsWith('Wen') || (value(r, 'a.line()') ?? '').endsWith(`: ${checkFare(12)}p`),
+              hint: 'Check made two tickets, and the first one now shows the second one\'s passenger or fare. A field with static in front belongs to the class; each ticket needs its own.'
             }
           ]
         })(runs),
@@ -144,7 +150,7 @@ export const checks = packageTasks({
       file: 'lanternquay/hut/Hut.java',
       pkg: 'lanternquay.hut',
       className: 'Hut',
-      stubs: { 'lanternquay/tickets/Ticket.java': STUB_TICKET },
+      stubs: { 'lanternquay/tickets/Ticket.java': STUB_TICKET, 'lanternquay/tickets/Fares.java': STUB_FARES },
       cases: [{ name: 'Prints the line of each ticket in the queue, in order', main: 'lanternquay.hut.Hut' }],
       judge: (runs) => {
         const r = runs[0]
@@ -157,7 +163,9 @@ export const checks = packageTasks({
             ? 'Hut printed nothing. main should make a Ticket for each person in the queue and print what its line() gives back.'
             : r.lines.some((l) => /lanternquay\.tickets\.Ticket@/.test(l))
               ? 'Hut prints the tickets themselves, which shows their class and a code. Print what each ticket\'s line() gives back.'
-              : got.length === 0
+              : r.lines.some((l) => l.split(`check-${mark}`).length > 2)
+                ? 'Hut prints the tickets one after another on one line. println ends each line it prints; print does not.'
+                : got.length === 0
                 ? 'Hut prints lines of its own, not what each ticket\'s line() gives back. Check ran Hut with a Ticket of its own, so the lines must come from line().'
                 : 'The tickets Hut made are not the queue\'s. Compare them with the queue in the task: the names, the ages and their order, one ticket per person.'
         return [fail(r.case.name, hint, out)]

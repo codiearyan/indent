@@ -4,6 +4,19 @@ const value = (r, name) => r.values[name]?.value
 const q = (s) => JSON.stringify(s)
 const boardAll = (v, names) => names.map((n) => `${v}.board(${q(n)});`).join(' ')
 
+/** One of Boat's own fields made static: every boat would share it. A list shows only once boarded. */
+const shared = (section) => {
+  const field = /\bstatic\s+(?:final\s+)?[\w<>,\s]*?\b(name|seats|aboard)\s*[;=]/.exec(codeOnly(section))?.[1]
+  return field
+    ? [
+        fail(
+          `Each boat has its own ${field}`,
+          `${field} has static in front, so it belongs to the class and every boat would share it. Each boat needs its own ${field}.`
+        )
+      ]
+    : []
+}
+
 /** A field of Boat that Check's own code tries to change from outside. */
 const outside = (field, line) => ({
   name: `Keeps ${field} private`,
@@ -35,12 +48,13 @@ export const checks = tasks({
         outside('seats', 'a.seats = 99;'),
         outside('aboard', 'a.aboard = null;')
       ].map((c) => ({ ...c, hint: 'getName and getSeats should give back what the boat was made with, and countAboard how many are aboard: nobody, on a new boat.' })),
-      judge: (runs) => [
+      judge: (runs, { section }) => [
+        ...shared(section),
         ...objectCases({
           types: { 'a.getName()': 'String', 'a.getSeats()': 'int', 'a.countAboard()': 'int' },
           mistakes: [
             {
-              when: (r) => value(r, 'a.getName()') === 'Fulmar',
+              when: (r) => value(r, 'a.getName()') === 'Fulmar' || (value(r, 'b.getSeats()') !== undefined && value(r, 'a.getSeats()') === '4'),
               hint: 'Check made two boats, and the first one now gives back the second one\'s values. A field with static in front belongs to the class, so every boat shares it; each boat needs its own.'
             },
             {
@@ -112,6 +126,13 @@ export const checks = tasks({
           reads: { next: 'next', 'a.countAboard()': 'a.countAboard()' },
           expected: { next: true, 'a.countAboard()': 1 },
           hint: 'Once someone has landed, their seat is free again, and board should take the next passenger.'
+        },
+        {
+          name: 'Each boat keeps its own passengers',
+          code: ['Boat a = new Boat("Tern", 4);', 'Boat b = new Boat("Skua", 4);', boardAll('a', ['Rab', 'Wen']), boardAll('b', ['Eilidh'])],
+          reads: { 'a.countAboard()': 'a.countAboard()', 'b.countAboard()': 'b.countAboard()' },
+          expected: { 'a.countAboard()': 2, 'b.countAboard()': 1 },
+          hint: 'Each boat should count only the passengers boarded on it.'
         }
       ],
       judge: (runs, { section }) => {
@@ -119,6 +140,10 @@ export const checks = tasks({
         return objectCases({
           types: { first: 'boolean', third: 'boolean', off: 'boolean' },
           mistakes: [
+            {
+              when: (r) => value(r, 'b.countAboard()') !== undefined && value(r, 'a.countAboard()') === '3',
+              hint: 'Check boarded two boats, and each counts the other\'s passengers too: the list of who is aboard is shared by every boat. A field with static in front belongs to the class; each boat needs its own list.'
+            },
             {
               when: (r) => r.case.seats !== undefined && Number(value(r, 'a.countAboard()')) > r.case.seats,
               hint: 'board lets a passenger on a full boat, so the boat has more aboard than seats. That is the one rule board is there to keep.'
@@ -219,7 +244,7 @@ export const checks = tasks({
           if (said(r) === want(r) && (r.case.prints || !r.lines.includes(want(r)))) return pass(r.case.name, output)
           const hint = /^Boat@[0-9a-f]+$/.test(said(r))
             ? 'A boat shows as Boat, an @ and a code: the toString every object gets from Java. Boat has no toString of its own yet, or its first line is not exactly as the lesson shows.'
-            : !r.case.prints && r.lines.includes(want(r))
+            : r.lines.includes(want(r))
               ? 'toString prints the line instead of giving it back. Whoever asks for a boat\'s text decides what to do with it, printing or not: toString only gives it back.'
               : typed
                 ? 'toString gives back the same text for every boat Check makes. Build it from the boat\'s own fields.'

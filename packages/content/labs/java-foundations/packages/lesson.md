@@ -69,13 +69,15 @@ With several files, compile them together with `javac`, naming every file. `-d o
 javac -d out market/stalls/Stall.java market/square/Square.java
 ```
 
-`javac` makes the folders inside `out` to match the packages, such as `out/market/square/Square.class`, and keeps them away from your source files. Then run the class that has `main` by its full name, with `-cp out` to say where the class files are:
+When every file compiles, `javac` prints nothing. It makes the folders inside `out` to match the packages, such as `out/market/square/Square.class`, and keeps them away from your source files. Then run the class that has `main` by its full name, with `-cp out` to say where the class files are:
 
 ```
 java -cp out market.square.Square
 ```
 
 If the name does not match a class in `out`, Java says `Error: Could not find or load main class market.square.Square`. Check that you built first, that the package line is right, and that you typed the full name with dots, not slashes. `java File.java` runs one file only, so it is not enough for a folder like this.
+
+The `out` folder holds only what `javac` made, so you can leave it there or delete it. Build again after every change: `java -cp out` runs the class files of the last build that worked, not the files you are editing.
 
 ## Your work in this issue
 

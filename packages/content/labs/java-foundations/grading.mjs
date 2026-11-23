@@ -655,7 +655,9 @@ function compileProblem(spec, b, task, unit, result) {
       shown
     )
   }
-  const elsewhere = spec.methods && elsewhereMethod(spec, b, task, mine[0])
+  const elsewhere = spec.methods
+    ? elsewhereMethod(spec, b, task, mine[0])
+    : spec.objects && laterTask(b, task, mine[0])
   if (elsewhere) return fail(`${label(n)} compiles`, elsewhere, shown)
   return fail(
     `${label(n)} compiles`,
@@ -666,6 +668,18 @@ function compileProblem(spec, b, task, unit, result) {
 
 /** When a task calls a method the learner wrote outside the parts Check keeps for it, why it
  * compiles in the terminal and not in Check. */
+/** A name a task uses that another task, not one it builds on, writes: the file compiles, the task alone does not. */
+function laterTask(b, task, e) {
+  const name = /^compiler\.err\.cant\.resolve/.test(e.code) && /symbol:\s+(?:variable|method)\s+(\w+)/.exec(e.message)?.[1]
+  if (!name) return null
+  const keep = [task.task, ...(task.needs ?? [])]
+  const k = [...b.l.sections.keys()].find(
+    (k) => !keep.includes(k) && new RegExp(`[\\w>\\]]\\s+${name}\\s*[;=(]`).test(codeOnly(section(b, k)))
+  )
+  if (k === undefined) return null
+  return `${label(task.task)} uses ${name}, which is written under // ${label(k)}. Check runs each task with only its own lines and those of the tasks it builds on, so ${label(task.task)} cannot use it: leave ${name} to ${label(k)}, as the tasks ask.`
+}
+
 function elsewhereMethod(spec, b, task, e) {
   if (!/^compiler\.err\.cant\.resolve/.test(e.code)) return null
   const name = /symbol:\s+method (\w+)\(/.exec(e.message)?.[1]
@@ -1293,6 +1307,15 @@ function objectCall(c) {
 
 const indent = (text) => text.split('\n').map((l) => `  ${l}`).join('\n')
 
+/** Errors as a learner should read them: none that only names Check's own helper class. */
+const checkOwn = (errors) => {
+  const own = errors.filter((e) => !/__Indent/.test(e.message) || /^compiler\.err\.cant\.resolve/.test(e.code))
+  return (own.length ? own : errors).map((e) => ({
+    ...e,
+    message: e.message.split('\n').filter((l) => !/__Indent/.test(l)).join('\n')
+  }))
+}
+
 /** What Check ran for a case, as a person reads it. */
 function ranText(c) {
   return c.show ?? statements(c).join('\n')
@@ -1305,7 +1328,7 @@ function objectProblem(spec, b, task, unit, errors) {
   const e = errors[0]
   const message = (x) => x.message.replace(/\bjava\.(?:lang|util)\.(?=[A-Z])/g, '')
   const reads = Object.values(c.reads ?? {})
-  const asIs = `Check ran:\n${indent(ranText(c))}${reads.length && !c.show ? `\nand read:\n${indent(Object.keys(c.reads).join('\n'))}` : ''}\n\n${errors.map(message).join('\n\n')}`
+  const asIs = `${ranText(c) ? `Check ran:\n${indent(ranText(c))}\n` : ''}${reads.length && !c.show ? `${ranText(c) ? 'and read' : 'Check read'}:\n${indent(Object.keys(c.reads).join('\n'))}` : ''}\n\n${checkOwn(errors).map(message).join('\n\n')}`
   const keep = [n, ...(task.needs ?? [])]
   const mine = codeOnly(keep.map((k) => section(b, k)).join('\n'))
   const where = b.l.inClass ? `in ${b.l.taskClass}, under // ${label(n)}` : `under // ${label(n)}`
@@ -1477,6 +1500,7 @@ const OBJECT_GLOSS = [
 export function ran(run, names = Object.keys(run.case.reads ?? {})) {
   const back = names.map((n) => `  ${n} is ${shown(run.values[n])}`).join('\n')
   const out = run.lines.length ? run.lines.map((l) => `  ${l}`).join('\n') : '  (nothing)'
+  if (!run.call) return `${back ? `Check read:\n${back}\n` : ''}It printed:\n${out}`
   return `Check ran:\n${indent(run.call)}${back ? `\nThen:\n${back}` : ''}\nIt printed:\n${out}`
 }
 
@@ -1653,7 +1677,11 @@ function packageProblem(spec, task, u, r) {
   const name = fileName(task.file)
   const c = u.case
   const text = u.files[0].source
-  const ranWhat = c.main ? `Check built ${name} and ran ${c.main} by name, as the lesson's command does` : `Check ran:\n${indent(ranText(c))}`
+  const ranWhat = c.main
+    ? `Check built ${name} and ran ${c.main} by name, as the lesson's command does`
+    : ranText(c)
+      ? `Check ran:\n${indent(ranText(c))}`
+      : `Check read:\n${indent(Object.keys(c.reads ?? {}).join('\n'))}`
   if (!r) return fail(`${label(n)} runs`, `Check's run stopped before ${label(n)} finished. If a line calls System.exit, remove it: it stops every check at once.`)
   if (!r.compiled) {
     const mine = r.errors.filter((e) => e.file === task.file)
@@ -1667,7 +1695,7 @@ function packageProblem(spec, task, u, r) {
     }
     const e = r.errors[0]
     const message = e.message.replace(/\bjava\.(?:lang|util)\.(?=[A-Z])/g, '')
-    const asIs = `${ranWhat}\n\n${r.errors.map((x) => x.message).join('\n\n')}`
+    const asIs = `${ranWhat}\n\n${checkOwn(r.errors).map((x) => x.message).join('\n\n')}`
     const closed = /^(\S+?)(\([^)]*\))? is not public in (\S+); cannot be accessed from outside package/.exec(message)
     if (closed) {
       const [, what, args] = closed
@@ -1684,8 +1712,8 @@ function packageProblem(spec, task, u, r) {
       const [, kind, missing] = symbol
       return fail(
         `${name} has ${missing}`,
-        kind === 'class'
-          ? `Check cannot find a class called ${missing} in the package ${task.pkg}. Look at the name after class in ${name}: capital letters count.`
+        kind === 'class' || missing === task.className
+          ? `Check cannot find a class called ${task.className} in the package ${task.pkg}. Look at the name after class in ${name}: capital letters count.`
           : `Check cannot find a ${kind === 'variable' ? 'field' : 'method'} called ${missing} in ${task.className}. Write it with exactly the name the task gives.`,
         asIs
       )
@@ -1718,8 +1746,7 @@ function packageProblem(spec, task, u, r) {
   if (r.exception?.startsWith('Check could not start main'))
     return fail(
       `${name} has a main Java can start`,
-      `Check found no main it could start in ${c.main}. The class needs public static void main(String[] args), as in every program of this repo.`,
-      r.exception
+      `Check found no main it could start in ${c.main}. The class needs public static void main(String[] args), as in every program of this repo.`
     )
   if (r.exception) {
     const known = [...METHOD_THROWN, ...THROWN].find(([re]) => re.test(r.exception))

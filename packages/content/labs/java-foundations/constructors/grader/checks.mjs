@@ -49,7 +49,9 @@ export const checks = tasks({
               hint: 'The fields are still null and 0 after new Booking(...): the constructor runs, but never sets them. Inside it, a parameter\'s name hides the field\'s name, so a line that uses the name alone gives the parameter its own value. The lesson shows the word that reaches the field.'
             },
             {
-              when: (r) => value(r, 'a.passenger') === 'Eilidh',
+              when: (r) =>
+                r.case.expected['b.passenger'] !== undefined &&
+                (value(r, 'a.passenger') === 'Eilidh' || value(r, 'a.seats') === '5' || value(r, 'a.hour') === '17'),
               hint: 'Check made two bookings, and the first one now holds the second one\'s values. A field with static in front belongs to the class, so every booking shares it; each booking needs its own.'
             },
             {
@@ -99,6 +101,13 @@ export const checks = tasks({
           {
             when: (r) => value(r, 'a.hour') === '0',
             hint: 'hour is 0: this constructor never gives the booking its hour.'
+          },
+          {
+            when: (r) =>
+              r.case.expected['a.seats'] === 1 &&
+              value(r, 'a.hour') === '1' &&
+              value(r, 'a.seats') === String(r.case.expected['a.hour']),
+            hint: 'seats and hour are the wrong way round. Values reach a constructor in the order of its parameters, and the first constructor takes passenger, seats, hour.'
           },
           {
             when: (r) => value(r, 'a.passenger') === null,
