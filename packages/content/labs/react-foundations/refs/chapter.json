@@ -1,0 +1,81 @@
+{
+  "id": "refs",
+  "title": "A value the screen does not show",
+  "files": ["src/Cab.jsx", "src/bell.js", "src/App.jsx", "src/line.js"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. Its console shows each ring of the bell and each line of the bell log."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "rings",
+      "title": "Count the rings without drawing the cab again",
+      "file": "src/Cab.jsx",
+      "description": "Count each press of Ring the bell in a ref. End of the ride calls `logRide` from `bell.js` with the number of rings since the last ride, then the count starts again from 0. Ringing still calls `ring()`, and it never draws the cab again: nothing on the screen changes, and the count is never shown.\n\nThe check puts two cabs side by side with a bell of its own that writes down every ring and every line of the log. It rings both, types a driver's name in between, ends the rides, and counts how many times each cab is drawn.",
+      "nextSteps": [
+        "Read \"A value kept between draws\" and \"Reading a ref while drawing\" in the lesson.",
+        "Make a ref for the count at the top of `Cab`.",
+        "Add one to it in `ringBell`, and send it and start again in `endRide`.",
+        "Press the buttons in the Browser panel and read the bell log in the console."
+      ],
+      "hints": [
+        "The count is used when the ride ends, and never shown. State would draw the cab on every ring.",
+        "`useRef(0)` gives an object whose `current` survives every draw. Change `current` in the functions the buttons call, never in the body of the component.",
+        "`const rings = useRef(0)`, then `rings.current += 1` in `ringBell`, and `logRide(rings.current)` followed by `rings.current = 0` in `endRide`."
+      ],
+      "docs": [
+        { "title": "useRef", "url": "https://react.dev/reference/react/useRef" },
+        { "title": "Referencing values with refs", "url": "https://react.dev/learn/referencing-values-with-refs" }
+      ],
+      "videos": [{ "title": "useRef in 11 minutes", "url": "https://www.youtube.com/watch?v=t2ypzz6gJm0" }],
+      "points": 10
+    },
+    {
+      "id": "driver",
+      "title": "Put the cursor in the name box for a new driver",
+      "file": "src/Cab.jsx",
+      "description": "New driver empties the name, as it does now, and puts the cursor in the name box of the same cab, so the next child can type straight away. Reach the box through a ref on the `input`.\n\nThe check puts two cabs side by side, types a name in each, and presses New driver in one cab and then in the other. After each press it looks at where the cursor is and at both names. Then it puts the cursor on another button and draws both cabs again, to see that the cursor stays there.",
+      "nextSteps": [
+        "Read \"A ref to an element\" in the lesson.",
+        "Make a ref that starts at `null`, and hand it to the `ref` attribute of the name box.",
+        "In `newDriver`, call `focus()` on the element the ref holds.",
+        "Type a name in the Browser panel and press New driver."
+      ],
+      "hints": [
+        "React can tell you which element it drew for this cab. You do not have to look for it in the page.",
+        "A ref handed to the `ref` attribute holds the element once it is on the page. Use it in the handler, where it is never `null`.",
+        "`const nameBox = useRef(null)`, `<input ref={nameBox} ...>`, and `nameBox.current.focus()` in `newDriver`."
+      ],
+      "docs": [
+        { "title": "Manipulating the DOM with refs", "url": "https://react.dev/learn/manipulating-the-dom-with-refs" },
+        { "title": "HTMLElement: focus() method", "url": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stop",
+      "title": "Show the next stop with state, not a ref",
+      "file": "src/Cab.jsx",
+      "description": "Next stop changes a ref, so the screen never shows it. Keep the stop in state instead, starting at the first stop of `stops`. Each press of Next stop shows the next stop of the line, and after the last stop it goes back to the first.\n\nThe check draws cabs on two lines of its own and presses Next stop once for every stop, reading the stop on the screen after each press.",
+      "nextSteps": [
+        "Read \"What the screen shows stays in state\" in the lesson.",
+        "Replace the `stop` ref with state.",
+        "Set the next stop in `nextStop`, and read the stop from state where it is shown.",
+        "Press Next stop in the Browser panel until the line starts again."
+      ],
+      "hints": [
+        "Type a name in the Browser panel after pressing Next stop. Why does the stop jump then, and not before?",
+        "Only setting state asks React to draw. The stop appears on the screen, so it belongs in state.",
+        "`const [stop, setStop] = useState(0)`, `setStop((stop + 1) % stops.length)` in `nextStop`, and `stops[stop]` in the paragraph."
+      ],
+      "docs": [
+        {
+          "title": "Differences between refs and state",
+          "url": "https://react.dev/learn/referencing-values-with-refs#differences-between-refs-and-state"
+        },
+        { "title": "State: a component's memory", "url": "https://react.dev/learn/state-a-components-memory" }
+      ],
+      "points": 10
+    }
+  ]
+}

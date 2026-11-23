@@ -127,6 +127,44 @@ function layout(text) {
   return { marks, twice, className, main: { bodyStart, bodyEnd, classEnd }, sections }
 }
 
+/**
+ * Where things are in a file whose tasks are methods: main first, then a `// Task N` part per task
+ * below it, each holding a method, then the class's closing brace. main ends at the last `}`
+ * before the first task, so braces the learner gets wrong inside main never move a task.
+ */
+function methodLayout(text) {
+  const code = codeOnly(text)
+  const marks = new Map()
+  const twice = new Set()
+  for (const m of text.matchAll(TASK_MARK)) {
+    if (code[m.index + m[0].search(/\S/)] !== ' ') continue
+    const n = Number(m[1])
+    if (marks.has(n)) twice.add(n)
+    marks.set(n, m.index)
+  }
+  const main = /\bstatic\s+void\s+main\s*\([^)]*\)\s*(?:throws\s+[\w.,\s]+)?\{/.exec(code)
+  const className = /\bclass\s+([A-Za-z_$][\w$]*)/.exec(code)?.[1] ?? null
+  const classEnd = code.lastIndexOf('}')
+  if (!main || marks.size === 0) return { marks, twice, className, main: null }
+  const bodyStart = main.index + main[0].length
+  const firstMark = Math.min(...marks.values())
+  const bodyEnd = code.lastIndexOf('}', firstMark)
+  if (bodyEnd < bodyStart || classEnd < firstMark) return { marks, twice, className, main: null }
+  const sorted = [...marks.entries()].sort((a, b) => a[1] - b[1])
+  const sections = new Map()
+  sorted.forEach(([n, at], i) => {
+    const next = i + 1 < sorted.length ? sorted[i + 1][1] : Infinity
+    sections.set(n, { start: at, end: Math.min(next, classEnd), inside: at > bodyEnd })
+  })
+  return { marks, twice, className, main: { bodyStart, bodyEnd, classEnd }, sections }
+}
+
+/** The lines a method task file shares: all but main's body and the tasks. */
+function methodShared(text, l) {
+  const firstTask = Math.min(...[...l.sections.values()].map((s) => s.start))
+  return text.slice(0, l.main.bodyStart) + text.slice(l.main.bodyEnd, firstTask) + text.slice(l.main.classEnd)
+}
+
 /** The file with every task's lines taken out: what the starter gave around the tasks. */
 function shared(text, l) {
   const firstTask = Math.min(...[...l.sections.values()].map((s) => s.start))
@@ -220,6 +258,57 @@ function variant(text, l, keep, given, reads) {
   }
 }
 
+// Method tasks also give back arrays and lists: their items come back one by one, after a \u0002.
+const ITEMS = '\u0002'
+const METHOD_READER =
+  READER.slice(0, -2) +
+  'static void items(String n, String t, Iterable<?> v) { StringBuilder b = new StringBuilder(); for (Object x : v) b.append("\\u0002").append(x); put(n, t, b.length() == 0 ? "\\u0002" : b.toString()); } ' +
+  'static void read(String n, int[] v) { if (v == null) { put(n, "int[]", "\\u0000null"); return; } java.util.List<Integer> l = new java.util.ArrayList<>(); for (int x : v) l.add(x); items(n, "int[]", l); } ' +
+  'static void read(String n, String[] v) { if (v == null) put(n, "String[]", "\\u0000null"); else items(n, "String[]", java.util.Arrays.asList(v)); } ' +
+  'static void read(String n, java.util.List<?> v) { if (v == null) put(n, "null", "\\u0000null"); else items(n, v.getClass().getSimpleName(), v); } } '
+
+/** The Java that calls a method task for one case, on one line. */
+function methodCall(task, c) {
+  const call = `${task.method}(${(c.args ?? []).map((a) => a.java ?? a).join(', ')})`
+  const result =
+    task.returns === 'void'
+      ? `${call}; `
+      : `${task.returns} result = ${call}; __Indent.read("result", result); `
+  return (c.setup ?? '') + result + (c.reads ?? []).map((r) => `__Indent.read("${r}", ${r}); `).join('')
+}
+
+/** Where the round bracket of the call is in methodCall's line: javac points there when what
+ * the method gives back does not fit, and at an argument when what Check passes does not. */
+function callAt(task, c) {
+  const before = (c.setup ?? '') + (task.returns === 'void' ? '' : `${task.returns} result = `)
+  return before.length + task.method.length
+}
+
+/** How a case's call reads to a person: `fareFor(12, 320)`. */
+function callText(task, c) {
+  return c.show ?? `${task.method}(${(c.args ?? []).map((a) => a.show ?? a.java ?? a).join(', ')})`
+}
+
+/**
+ * The source Check compiles for one case of a method task: the shared lines, main's body blanked,
+ * the methods of the tasks in `keep`, and in main the hidden call. Returns { source, readAt }.
+ */
+function methodVariant(text, l, keep, hidden, paren) {
+  let out = text.slice(0, l.main.bodyStart) + blank(text.slice(l.main.bodyStart, l.main.bodyEnd)) + text.slice(l.main.bodyEnd)
+  for (const [n, s] of l.sections) {
+    if (!keep.includes(n))
+      out = out.slice(0, s.start) + blank(out.slice(s.start, s.end)) + out.slice(s.end)
+  }
+  out = out.slice(0, l.main.classEnd) + METHOD_READER + out.slice(l.main.classEnd)
+  const at = l.main.bodyEnd
+  out = out.slice(0, at) + hidden + out.slice(at)
+  return {
+    source: out,
+    readAt: { line: lineOf(out, at), col: at - out.slice(0, at).lastIndexOf('\n'), length: hidden.length },
+    paren
+  }
+}
+
 function runJava(bin, cwd, input) {
   return new Promise((resolve) => {
     const child = spawn(
@@ -262,8 +351,8 @@ async function build(t, spec) {
   const text = raw.replace(/\r\n?/g, '\n')
   const starterRaw = await readFile(t.chapterPath(`starter/${spec.file}`), 'utf8')
   const starter = starterRaw.replace(/\r\n?/g, '\n')
-  const l = layout(text)
-  const s = layout(starter)
+  const l = spec.methods ? methodLayout(text) : layout(text)
+  const s = spec.methods ? methodLayout(starter) : layout(starter)
   const lost = [...s.marks.keys()].filter((n) => !l.marks.has(n))
   if (lost.length || l.twice.size) return { stop: 'marks', lost, twice: [...l.twice], text, l }
   const fileClass = spec.file
@@ -275,7 +364,8 @@ async function build(t, spec) {
   if (!l.main) return { stop: 'main' }
   const outside = [...l.sections.entries()].find(([, sec]) => !sec.inside)
   if (outside) return { stop: 'outside', task: outside[0] }
-  if (bare(shared(text, l)) !== bare(shared(starter, s))) return { stop: 'shared' }
+  const around = spec.methods ? methodShared : shared
+  if (bare(around(text, l)) !== bare(around(starter, s))) return { stop: 'shared' }
 
   const reached = new Map()
   for (const [n, sec] of l.sections) {
@@ -287,7 +377,9 @@ async function build(t, spec) {
     const keep = [task.task, ...(task.needs ?? [])]
     if (keep.some((n) => reached.has(n))) continue
     task.cases.forEach((c, i) => {
-      const v = variant(text, l, keep, c.given ?? {}, task.reads ?? [])
+      const v = spec.methods
+        ? methodVariant(text, l, keep, methodCall(task, c), callAt(task, c))
+        : variant(text, l, keep, c.given ?? {}, task.reads ?? [])
       if (v.missing) throw new Error(`The starter has no line that makes ${v.missing}`)
       units.push({ id: `${id}.${i}`, task: id, ...v })
     })
@@ -322,8 +414,9 @@ async function build(t, spec) {
 // --- Saying what went wrong ---------------------------------------------------------------------
 
 /** One error as javac prints it, for the learner's own line and file name. */
-function javacLike(file, lines, e) {
-  const [first, ...rest] = e.message.replace(/\bjava\.(?:lang|io)\.(?=[A-Z])/g, '').split('\n')
+function javacLike(file, lines, e, methods) {
+  const pkg = methods ? /\bjava\.(?:lang|io|util)\.(?=[A-Z])/g : /\bjava\.(?:lang|io)\.(?=[A-Z])/g
+  const [first, ...rest] = e.message.replace(pkg, '').split('\n')
   const src = lines[e.line - 1] ?? ''
   const caret = src.slice(0, Math.max(0, e.col - 1)).replace(/[^\t]/g, ' ') + '^'
   return [`${file}:${e.line}: error: ${first}`, src, caret, ...rest].join('\n')
@@ -422,8 +515,69 @@ const GLOSS = [
   ]
 ]
 
-function gloss(e, src) {
-  for (const [code, say] of GLOSS) {
+// Method issues meet more errors than main ever does. Read first, only in those issues.
+const METHOD_GLOSS = [
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) =>
+      /symbol:\s+variable length\b/.test(e.message) &&
+      /of type (?:java\.util\.)?(?:Array)?List\b/.test(e.message) &&
+      'A list has no length. How many items it holds comes from one of its methods: the lesson shows which.'
+  ],
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) =>
+      /symbol:\s+method length\(\)/.test(e.message) &&
+      /of type \w+\[\]/.test(e.message) &&
+      "An array's length is not a method, so it takes no round brackets."
+  ],
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) =>
+      /symbol:\s+method /.test(e.message) &&
+      'The compiler does not know a method of that name. Check its spelling, capital letters included. Check runs each task on its own, so a task can call only methods of its own and of the tasks it says it builds on.'
+  ],
+  [
+    /^compiler\.err\.array\.req\.but\.found/,
+    () =>
+      'Square brackets with a position work on an array. A list is read with one of its methods: the lesson shows which.'
+  ],
+  [
+    /^compiler\.err\.type\.found\.req/,
+    () =>
+      'A list holds objects, not plain values like int or double. The lesson shows the name a list of whole numbers uses, and why.'
+  ],
+  [
+    /^compiler\.err\.missing\.ret\.stmt/,
+    () =>
+      'A method that gives back a value has to reach a return on every way through it, and Java found a way to the end of this one with no return. Look at each branch, and at what happens after a loop.'
+  ],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /unexpected return value/.test(e.message) &&
+      'A void method gives nothing back, so its return cannot have a value. The type in front of the method name says what it gives back.'
+  ],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /missing return value/.test(e.message) &&
+      'This method says it gives back a value, so its return needs one.'
+  ],
+  [
+    /^compiler\.err\.illegal\.start\.of\.expr/,
+    () =>
+      'Java found something where it cannot start. Often a closing brace } is missing above it, so the method before has not ended yet; a method cannot be written inside another method.'
+  ],
+  [
+    /^compiler\.err\.non-static\.cant\.be\.ref/,
+    () =>
+      'A method without static cannot be called from a static method such as main. In this repo every method has static in front, for now.'
+  ]
+]
+
+function gloss(e, src, methods) {
+  for (const [code, say] of methods ? [...METHOD_GLOSS, ...GLOSS] : GLOSS) {
     if (code.test(e.code)) {
       const text = say(e, src ?? '')
       if (text) return ` ${text}`
@@ -442,6 +596,7 @@ function compileProblem(spec, b, task, unit, result) {
   const isRead = (e) => e.line === at.line && e.col >= at.col && e.col < at.col + at.length
   const mine = result.errors.filter((e) => !isRead(e))
   const n = task.task
+  if (mine.length === 0 && spec.methods) return callProblem(task, result.errors, at.col + unit.paren)
   if (mine.length === 0) {
     if (result.errors.some((e) => /unreachable/.test(e.code))) {
       return fail(
@@ -474,7 +629,8 @@ function compileProblem(spec, b, task, unit, result) {
     const s = sec(k)
     return (
       e.line >= lineOf(b.text, s.start) &&
-      e.line < lineOf(b.text, s.end) + (s.end === b.l.main.bodyEnd ? 1 : 0)
+      e.line <
+        lineOf(b.text, s.end) + (s.end === b.l.main.bodyEnd || s.end === b.l.main.classEnd ? 1 : 0)
     )
   }
   const earlier = (task.needs ?? []).find(
@@ -482,7 +638,7 @@ function compileProblem(spec, b, task, unit, result) {
   )
   const shown = mine
     .slice(0, 3)
-    .map((e) => javacLike(spec.file, lines, e))
+    .map((e) => javacLike(spec.file, lines, e, spec.methods))
     .join('\n\n')
   if (earlier !== undefined) {
     return fail(
@@ -491,10 +647,82 @@ function compileProblem(spec, b, task, unit, result) {
       shown
     )
   }
+  const elsewhere = spec.methods && elsewhereMethod(spec, b, task, mine[0])
+  if (elsewhere) return fail(`${label(n)} compiles`, elsewhere, shown)
   return fail(
     `${label(n)} compiles`,
-    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run java ${spec.file} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1])}`,
+    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.methods)}`,
     shown
+  )
+}
+
+/** When a task calls a method the learner wrote outside the parts Check keeps for it, why it
+ * compiles in the terminal and not in Check. */
+function elsewhereMethod(spec, b, task, e) {
+  if (!/^compiler\.err\.cant\.resolve/.test(e.code)) return null
+  const name = /symbol:\s+method (\w+)\(/.exec(e.message)?.[1]
+  if (!name) return null
+  const at = codeOnly(b.text).search(new RegExp(`\\bstatic\\s[^;{}()=]*\\b${name}\\s*\\(`))
+  if (at < 0) return null
+  const n = task.task
+  const keep = [n, ...(task.needs ?? [])]
+  const owner = [...b.l.sections.entries()].find(([, s]) => at >= s.start && at < s.end)?.[0]
+  if (owner !== undefined && keep.includes(owner)) return null
+  const asked = Object.values(spec.tasks).find((t) => t.method === name)?.task
+  if (asked !== undefined && keep.includes(asked))
+    return `${label(n)} calls ${name}, which is written outside the // Task parts. Write it under // ${label(asked)}, where the task asks for it.`
+  const why = `That runs in the terminal, but Check runs each task on its own, with only its own methods and those of the tasks it says it builds on`
+  if (asked !== undefined)
+    return `${label(n)} calls ${name}, the method of ${label(asked)}. ${why}, so ${label(n)} cannot use it. Do that work in ${label(n)}'s own lines.`
+  return `${label(n)} calls ${name}, which is written ${owner === undefined ? 'outside the // Task parts' : `under // ${label(owner)}`}. ${why}. Write ${name} under // ${label(n)}.`
+}
+
+const an = (type) => (/^[aeiou]/i.test(type) ? `an ${type}` : `a ${type}`)
+const simple = (type) => type.replace(/java\.(?:lang|util)\./g, '')
+
+/** Why Check's own call of a method task did not compile, when the method itself did. */
+function callProblem(task, errors, parenCol) {
+  const n = task.task
+  const m = task.method
+  const e = errors[0]
+  const name = `${label(n)} has ${m}`
+  const asIs = errors.map((x) => x.message.replace(/\bjava\.(?:lang|util)\.(?=[A-Z])/g, '')).join('\n\n')
+  if (/^compiler\.err\.cant\.resolve/.test(e.code))
+    return fail(
+      name,
+      `Check cannot find a method called ${m} under // ${label(n)}. Write it there, below main and not inside it, with exactly that name: capital letters count.`
+    )
+  if (/^compiler\.err\.non-static/.test(e.code))
+    return fail(
+      `${m} is static`,
+      `${m} has no static in front. Check calls it from main, which is static, and a method without static cannot be called from there. Every method in this repo has static in front, for now.`
+    )
+  const argument =
+    /^compiler\.err\.prob\.found\.req/.test(e.code) &&
+    (task.returns === 'void' || e.col !== parenCol)
+  if (/^compiler\.err\.cant\.apply/.test(e.code) || argument) {
+    const required = /required:\s*(.*)/.exec(e.message)?.[1]?.trim()
+    return fail(
+      `${m} takes what the task says`,
+      `Check found ${m}, but cannot call it the way the task says. Compare the parameters in its round brackets with the task: how many, their types and their order.${required && required !== 'no arguments' ? ` Yours take ${simple(required).replace(/,/g, ', ')}.` : required ? ' Yours takes none.' : ''}`,
+      asIs
+    )
+  }
+  if (/void cannot be converted/.test(e.message))
+    return fail(
+      `${m} gives back a value`,
+      `Check calls ${m} and uses the value it gives back, but ${m} is void, so it gives nothing back. Printing a value, or changing a parameter, does not give it back to the caller: the lesson shows what does.`
+    )
+  const conv = /(?:from|types:) (\S+) (?:to|cannot be converted to) (\S+)/.exec(e.message)
+  if (/^compiler\.err\.prob\.found\.req/.test(e.code) && conv)
+    return fail(
+      `${m} gives back ${an(simple(task.returns))}`,
+      `${m} gives back ${an(simple(conv[1]))}, and the task asks for ${an(simple(conv[2]))}. The type in front of the method name says what it gives back.`
+    )
+  return fail(
+    name,
+    `Check cannot call ${m} the way the task says. Compare its first line, the name, the type in front and the parameters, with the task.`,
+    asIs
   )
 }
 
@@ -512,9 +740,31 @@ const THROWN = [
   [/NumberFormatException/, 'A text that is not a number was read as a number.']
 ]
 
-function runProblem(spec, task, result, given = {}) {
+// Method issues read arrays and lists, which have their own ways to go wrong.
+const METHOD_THROWN = [
+  [
+    /ArrayIndexOutOfBoundsException/,
+    'A position was asked for that the array does not have. The words after the exception say which position, and how long the array is.'
+  ],
+  [
+    /(?<!String|Array)IndexOutOfBoundsException/,
+    'A position was asked for that the list does not have. The words after the exception say which position, and how many items the list holds.'
+  ],
+  [/NegativeArraySizeException/, 'An array was made with a size below 0.'],
+  [
+    /ConcurrentModificationException/,
+    'A list was changed while a for-each loop was walking through it, and Java stopped the loop.'
+  ]
+]
+
+function runProblem(spec, task, result, given = {}, call) {
   const n = task.task
-  const values = Object.keys(given).length ? `With ${givenText(given)}\n` : ''
+  const values =
+    call !== undefined
+      ? `Check called ${call}\n`
+      : Object.keys(given).length
+        ? `With ${givenText(given)}\n`
+        : ''
   if (!result) {
     return fail(
       `${label(n)} runs`,
@@ -544,6 +794,15 @@ function runProblem(spec, task, result, given = {}) {
       `${label(n)} runs`,
       `${label(n)} waits for someone to type. Check gives a program no typing: everything a task needs is already in the file.`,
       values + result.exception
+    )
+  }
+  if (result.exception && spec.methods) {
+    const known = [...METHOD_THROWN, ...THROWN].find(([re]) => re.test(result.exception))
+    const main = new RegExp(`\\n\\tat [\\w$.]*\\.main\\(.*`, 'g')
+    return fail(
+      `${task.method} runs`,
+      `${task.method} compiles, but stops with an exception when Check calls it as below. Read the first line of the stack trace for what went wrong, and the line starting with at that names ${spec.file} for where.${known ? ` ${known[1]}` : ''}`,
+      values + result.exception.replace(main, '')
     )
   }
   if (result.exception) {
@@ -596,16 +855,31 @@ function stopMessage(spec, b) {
         `The class is called ${b.className}, but the file is ${spec.file}. Java needs the name after public class to be the file's name without .java, capital letters included. java ${spec.file} may still run it, but javac and Check refuse it. Put the name back.`
       ]
     case 'main':
+      if (spec.methods)
+        return [
+          `${spec.file} has its main`,
+          `Check cannot find main in ${spec.file}, with its closing brace above // Task 1 and the class's closing brace at the end of the file. Put back the lines the starter gave around the tasks.`
+        ]
       return [
         `${spec.file} has its main`,
         `Check cannot find main in ${spec.file}, with its opening brace and the two closing braces at the end of the file. Put back the lines the starter gave around the tasks.`
       ]
     case 'outside':
+      if (spec.methods)
+        return [
+          `${spec.file} keeps its tasks below main`,
+          `The // Task ${b.task} comment is inside main. Each task's method goes below main, after its closing brace, where the starter had the comment.`
+        ]
       return [
         `${spec.file} keeps its tasks inside main`,
         `The // Task ${b.task} comment is outside main. Every task's lines go inside main, between its braces, where the starter had them.`
       ]
     case 'shared':
+      if (spec.methods)
+        return [
+          'The lines around the tasks are as the starter gave them',
+          `The lines outside main and outside the // Task parts are not as the starter gave them. Write each method under its own // Task comment, and try them inside main, which is yours to change.`
+        ]
       return [
         'The lines around the tasks are as the starter gave them',
         `The lines above // Task 1 and the closing braces at the end are not as the starter gave them. Every task uses them, and Check puts values of its own in some of them, so undo your change there and write your code under the // Task comments.`
@@ -615,7 +889,13 @@ function stopMessage(spec, b) {
 }
 
 /**
- * The checks of an issue. Spec: { file, tasks: { id: { task, needs, cases, reads, judge } } }.
+ * The checks of an issue. Spec: { file, command, methods, tasks: { id: { task, needs, cases,
+ * reads, judge } } }.
+ * - command: what the learner runs to compile, when it is not `java <file>`
+ * - methods: each task is a method below main. A task then names its `method` and what it
+ *   `returns` (a Java type, or 'void'), and each case gives `args` (Java source, or { java, show }),
+ *   optionally `setup` code before the call and `reads` of variables after it. Check calls the
+ *   method from main, so runs carry `case`, `call`, what it printed and `values.result`.
  * - task: the number in the task's `// Task N` comment; needs: the tasks it builds on, and
  *   madeIn: { variable: task } for a variable an earlier task makes
  * - cases: [{ given: { name: value } }], values Check puts on the shared lines that make them
@@ -645,14 +925,27 @@ export function tasks(spec) {
         )
       ]
     }
+    if (spec.methods && task.returns === 'void') {
+      const code = codeOnly(section(b, task.task))
+      const m = task.method
+      if (new RegExp(`\\b${m}\\s*\\(`).test(code) && !new RegExp(`\\bvoid\\s+${m}\\s*\\(`).test(code))
+        return [
+          fail(
+            `${m} is void`,
+            `The task asks for a void method: ${m} does its job and gives nothing back. Yours has a type in front of its name in place of void, so it says it gives something back.`
+          )
+        ]
+    }
     const units = b.units.filter((u) => u.task === id)
     for (const u of units) {
       const problem = compileProblem(spec, b, task, u, b.results.get(u.id))
       if (problem) return [problem]
     }
     for (const u of units) {
-      const given = task.cases[Number(u.id.split('.').pop())].given
-      const problem = runProblem(spec, task, b.results.get(u.id), given)
+      const c = task.cases[Number(u.id.split('.').pop())]
+      const problem = spec.methods
+        ? runProblem(spec, task, b.results.get(u.id), {}, callText(task, c))
+        : runProblem(spec, task, b.results.get(u.id), c.given)
       if (problem) return [problem]
     }
     const runs = units.map((u, i) => {
@@ -661,8 +954,14 @@ export function tasks(spec) {
       for (const read of r.reads) {
         const [name, type, value] = read.split(SEP)
         values[name] = { type, value: value === NULL ? null : value }
+        if (spec.methods && value?.startsWith(ITEMS))
+          values[name].items = value === ITEMS ? [] : value.slice(1).split(ITEMS)
       }
       const stdout = r.stdout.replace(/\r\n/g, '\n')
+      if (spec.methods) {
+        const c = task.cases[i]
+        return { case: c, call: callText(task, c), stdout, lines: lines(stdout), values, given: {} }
+      }
       return { given: task.cases[i].given ?? {}, stdout, lines: lines(stdout), values }
     })
     const details = await task.judge(runs, { text: b.text, section: section(b, task.task), t })
@@ -823,4 +1122,60 @@ export function printsValue(runs, name, message) {
         printed(missing)
       )
     : pass(`Prints ${name}`)
+}
+
+// --- Helpers for judging method tasks -----------------------------------------------------------
+
+/** A value a method gave back, as Java prints it: an array or a list as [a, b]. */
+export function shown(v) {
+  if (v?.items) return `[${v.items.join(', ')}]`
+  return show(v)
+}
+
+/** What Check called, what came back and what was printed, for a detail's output. */
+export function called(run, { result = true } = {}) {
+  const back = result ? `\nIt gave back ${shown(run.values.result)}` : ''
+  const out = run.lines.length ? run.lines.map((l) => `  ${l}`).join('\n') : '  (nothing)'
+  return `Check called ${run.call}${back}\nIt printed:\n${out}`
+}
+
+/** True when what a method gave back is `expected`: a number, text, boolean or a list of them. */
+export function gave(v, expected) {
+  if (Array.isArray(expected))
+    return !!v?.items && v.items.length === expected.length && v.items.every((x, i) => x === String(expected[i]))
+  return same(v, expected)
+}
+
+const display = (x) => (Array.isArray(x) ? `[${x.join(', ')}]` : String(x))
+
+/**
+ * Judges what a method gives back, case by case. Each case has `name`, `expected` and `hint`. A
+ * failing case gets the first message that fits: a known mistake (`mistakes: [{ value(case),
+ * hint }]`), a method that prints the right value but gives back another, one that gives back the
+ * same whatever it is called with (`typed`), then the case's own hint.
+ */
+export function methodCases({ method, mistakes = [], typed }) {
+  return (runs) => {
+    const got = runs.map((r) => r.values.result)
+    const ok = runs.map((r, i) => gave(got[i], r.case.expected))
+    const mistake =
+      !ok.every(Boolean) && mistakes.find((m) => runs.every((r, i) => gave(got[i], m.value(r.case))))
+    const prints = runs.some(
+      (r, i) => !ok[i] && r.lines.some((l) => l.trim() === display(r.case.expected))
+    )
+    const stuck =
+      runs.length > 1 &&
+      got.every((v) => shown(v) === shown(got[0])) &&
+      !runs.every((r) => display(r.case.expected) === display(runs[0].case.expected))
+    const printsHint = `${method} prints the right answer, but gives back something else. Check uses what a method gives back, not what it prints.`
+    return runs.map((r, i) =>
+      ok[i]
+        ? pass(r.case.name, called(r))
+        : fail(
+            r.case.name,
+            mistake?.hint ?? (prints ? printsHint : stuck && typed ? typed : r.case.hint),
+            called(r)
+          )
+    )
+  }
 }

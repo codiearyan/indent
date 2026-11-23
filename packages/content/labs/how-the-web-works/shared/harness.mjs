@@ -93,8 +93,9 @@ function startServer(routes, received) {
         answer = route.answers[Math.min(n, route.answers.length - 1)]
       }
       const body = answer.body ?? ''
+      // A 304 has no body, and its content-length would have to be the length of the whole page.
       const headers = {
-        'content-length': Buffer.byteLength(body),
+        ...(answer.status === 304 ? {} : { 'content-length': Buffer.byteLength(body) }),
         ...withBase(answer.headers ?? {}, base)
       }
       if (answer.reason) res.writeHead(answer.status, answer.reason, headers)
@@ -115,8 +116,15 @@ function startServer(routes, received) {
   })
 }
 
-/** A `when` of a route: the header's value equals `value`, or starts with `startsWith`. */
+/**
+ * A `when` of a route: the header's value equals `value`, or starts with `startsWith`, or, with
+ * `pairs`, is exactly those name=value pairs split at semicolons, in any order.
+ */
 function matches(header, when) {
+  if (when.pairs !== undefined) {
+    const got = (header ?? '').split(';').map((p) => p.trim()).filter(Boolean).sort()
+    return JSON.stringify(got) === JSON.stringify([...when.pairs].sort())
+  }
   const got = header?.toLowerCase()
   if (when.startsWith !== undefined) return got?.startsWith(when.startsWith.toLowerCase()) ?? false
   return got === when.value.toLowerCase()
@@ -134,7 +142,7 @@ const withBase = (value, base) =>
 /**
  * Calls `fn` from the learner's `file` with `args` ('$base' in a string becomes the server's
  * address, also inside arrays and plain objects) while a server answers `routes`: [{ method?,
- * path, when?: { header, value } or { header, startsWith }, answers: [{ status, reason?,
+ * path, when?: { header, value } or { header, startsWith } or { header, pairs }, answers: [{ status, reason?,
  * headers?, body? }] }], one answer per request in order, the last one repeating. The first route
  * that matches answers; `when` matches a header, ignoring capitals. '$base' in an answer's header
  * values becomes the server's address too.

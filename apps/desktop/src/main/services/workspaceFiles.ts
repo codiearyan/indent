@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, readFile, rm, stat } from 'fs/promises'
+import { chmod, cp, lstat, mkdir, readdir, readFile, rm, stat } from 'fs/promises'
 import { existsSync } from 'fs'
 import { isAbsolute, join, relative, resolve, sep } from 'path'
 import type { WorkspaceFile } from '../../shared/types'
@@ -33,6 +33,20 @@ export async function emptyDir(dir: string): Promise<void> {
   await Promise.all(entries.map((name) => rm(join(dir, name), { recursive: true, force: true })))
 }
 
+/**
+ * Gives the learner read and write again on a file, or on a folder and all it holds. A learner
+ * can lock their own files (`chmod`), and a locked one cannot be replaced by the starter's.
+ */
+export async function unlock(path: string): Promise<void> {
+  const info = await lstat(path).catch(() => null)
+  if (!info || info.isSymbolicLink()) return
+  const folder = info.isDirectory()
+  await chmod(path, info.mode | (folder ? 0o700 : 0o600)).catch(() => {})
+  if (!folder) return
+  const names = await readdir(path).catch(() => [])
+  await Promise.all(names.map((name) => unlock(join(path, name))))
+}
+
 async function listEntries(
   dir: string,
   listed: string[] = [],
@@ -46,7 +60,8 @@ async function listEntries(
     if (!shown || entry.name === 'node_modules') continue
     if (entry.isDirectory()) {
       found.folders.push(path)
-      await listEntries(dir, listed, path, found)
+      // A folder the learner locked is listed, with nothing in it.
+      await listEntries(dir, listed, path, found).catch(() => found)
     } else if (entry.isFile()) found.files.push(path)
   }
   return found
@@ -66,8 +81,9 @@ export async function readWorkspace(dir: string, first: string[]): Promise<Works
   for (const path of (await listEntries(dir, first)).files) {
     const full = join(dir, ...path.split('/'))
     if ((await stat(full)).size > MAX_FILE_BYTES) continue
-    const buffer = await readFile(full)
-    if (buffer.includes(0)) continue
+    // A file the learner locked is left out, as a binary one is, so the issue still opens.
+    const buffer = await readFile(full).catch(() => null)
+    if (!buffer || buffer.includes(0)) continue
     files.push({ path, content: buffer.toString('utf8') })
   }
   const rank = (path: string): number => {
