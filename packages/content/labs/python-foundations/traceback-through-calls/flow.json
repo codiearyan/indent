@@ -1,0 +1,45 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhona", "label": "Rhona", "kind": "story" },
+      { "id": "log", "label": "Log, kit and positions", "kind": "data" },
+      { "id": "report", "label": "hill_report.py", "kind": "file", "mine": true },
+      { "id": "python", "label": "Python", "kind": "story" },
+      { "id": "traceback", "label": "Traceback", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "log", "to": "report", "label": "values" },
+      { "from": "report", "to": "python", "label": "calls" },
+      { "from": "python", "to": "traceback", "label": "stops" },
+      { "from": "traceback", "to": "report", "label": "File lines" },
+      { "from": "report", "to": "rhona", "label": "the report" }
+    ],
+    "note": "The report's functions call one another, and you follow each traceback up to the one function that made the wrong value."
+  },
+  "tasks": {
+    "hours": {
+      "steps": [
+        { "active": ["rhona", "report"], "note": "Rhona asks for the hours the team spent on one hill." },
+        { "active": ["log", "log->report", "report", "report->python", "python"], "note": "Each entry of the log is taken apart, and the hours go down through three calls to be added up." },
+        { "active": ["python", "python->traceback", "traceback"], "value": { "kind": "array", "label": "File lines, top to bottom", "values": ["the report line", "hill_hours", "total_hours", "add_hours"] }, "note": "Python stops in the function that adds, where a number meets text." },
+        { "active": ["traceback", "traceback->report", "report"], "note": "Going up the File lines leads to where each hours value was made: the one function to mend." }
+      ]
+    },
+    "pack": {
+      "steps": [
+        { "active": ["log", "log->report", "report"], "note": "A packing list arrives, kinds of kit with commas and spaces between them." },
+        { "active": ["report", "report->python", "python", "python->traceback", "traceback"], "note": "Python stops where a kind is looked up in the weights, and the error shows the key it could not find." },
+        { "active": ["traceback", "traceback->report", "report"], "note": "Going up the File lines leads to where that key was made: the one function to mend." },
+        { "active": ["report", "report->rhona", "rhona"], "note": "The weight of the whole pack comes back as one number." }
+      ]
+    },
+    "positions": {
+      "steps": [
+        { "active": ["log", "log->report", "report"], "note": "The positions file holds where each team was last heard." },
+        { "active": ["python", "python->traceback", "traceback"], "note": "Python stops inside the json module, code that is not yours." },
+        { "active": ["traceback", "traceback->report", "report"], "note": "The last File line in your own file shows what was handed to json, and one line further up is where it came from." },
+        { "active": ["report", "report->rhona", "rhona"], "note": "What the file holds comes back as a dictionary of teams." }
+      ]
+    }
+  }
+}
