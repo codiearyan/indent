@@ -166,7 +166,7 @@ async function followsOnce(page) {
     detail(
       'The tram is followed once, not after every draw',
       total === 1,
-      `follow was called ${total} times, though the tram never changed. Each report draws Whereabouts again, and the effect ran again after every draw. An effect with no dependency list runs after every draw: give it one.`,
+      `follow was called ${total} times, though the tram never changed. Each report draws Whereabouts again, and the effect ran again after every draw. An effect with no dependency list runs after every draw, and so does one whose list holds an object or array made new on every draw: list the number itself.`,
       steps.map((s) => `after ${s.stop}: follow called ${s.follows} times`).join('\n')
     )
   )
@@ -343,7 +343,7 @@ export const checks = {
     if (wrong) {
       let message = 'The stops still to come are the stops after the one the tram is at, to the end of the line, and all of them while it waits for a report.'
       if (wrong !== seen[0] && last(wrong).join() === last(seen[seen.indexOf(wrong) - 1]).join())
-        message = `When the props changed (${wrong.what}), the stops still to come stayed as they were. The effect that works them out did not run again: it does not list everything it uses. A value worked out from props needs no effect at all: work it out while drawing.`
+        message = `When the props changed (${wrong.what}), the stops still to come stayed as they were. They were worked out once and kept, in state or by an effect that did not run again. A value worked out from props needs no state and no effect: work it out while drawing.`
       return [detail('LineMap shows the stops still to come', false, message, output)]
     }
     const twice = seen.find((s) => s.screens.length > 1)

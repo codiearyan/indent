@@ -3,7 +3,7 @@ import {
   detail,
   draw,
   drawNew,
-  drawnOverAndOver,
+  runaway,
   explain,
   exportType,
   openComponent,
@@ -54,7 +54,7 @@ function newGuide(page) {
   }
   return { errors: page.errors.slice(before) }
 }
-const endless = (page) => drawnOverAndOver(page, 'The tram guide')
+const endless = (page) => runaway(page, page.logs.length, 'The tram guide')
 
 const stopped = (error) => detail('The tram guide runs without errors', false, explain(error), error)
 const thrown = (page, before) => (page.errors.length > before ? page.errors[before] : null)
@@ -154,7 +154,7 @@ export const checks = {
 
     const logsBefore = page.logs.length
     const { errors } = newGuide(page)
-    const loop = endless(page)
+    const loop = await endless(page)
     if (loop) return [...results, loop]
     if (errors.length) return [...results, stopped(errors[0])]
     const early = setWhileDrawing(page, logsBefore)
@@ -222,13 +222,13 @@ export const checks = {
     const results = [detail('TramList tells its owner which tram was pressed', true, '', output)]
 
     const guide = newGuide(page)
-    const loop = endless(page)
+    const loop = await endless(page)
     if (loop) return [...results, loop]
     if (guide.errors.length) return [...results, stopped(guide.errors[0])]
     const steps = []
     for (const target of [TRAMS[2], TRAMS[0], TRAMS[3]]) {
       await press(page, listButton(page, target.number))
-      const again = endless(page)
+      const again = await endless(page)
       if (again) return [...results, again]
       if (thrown(page, before)) return [...results, stopped(thrown(page, before))]
       steps.push({ want: target.name, marks: marked(page).join(', '), panel: shown(page) })
@@ -293,7 +293,7 @@ export const checks = {
 
     const logsBefore = page.logs.length
     const guide = newGuide(page)
-    const loop = endless(page)
+    const loop = await endless(page)
     if (loop) return [...results, loop]
     if (guide.errors.length) return [...results, stopped(guide.errors[0])]
     const early = setWhileDrawing(page, logsBefore)
@@ -301,7 +301,7 @@ export const checks = {
     const steps = []
     for (const target of [TRAMS[1], TRAMS[2], TRAMS[3], TRAMS[0]]) {
       await press(page, page.$('#root .tram-panel button.next'))
-      const again = endless(page)
+      const again = await endless(page)
       if (again) return [...results, again]
       const error = thrown(page, before)
       if (error) {
@@ -322,6 +322,19 @@ export const checks = {
       }
       steps.push({ want: target.name, marks: marked(page).join(', '), panel: shown(page) })
     }
+    const round = steps.every((s) => s.marks === s.want && s.panel === s.want)
+    // Once the list can choose, Next must move on from a tram chosen there: a second piece of state would not know it.
+    let fromList = null
+    if (round) {
+      await press(page, listButton(page, TRAMS[1].number))
+      if (marked(page).join() === TRAMS[1].name) {
+        await press(page, page.$('#root .tram-panel button.next'))
+        const loopAfter = await endless(page)
+        if (loopAfter) return [...results, loopAfter]
+        fromList = { marks: marked(page).join(', '), panel: shown(page) }
+        steps.push({ want: TRAMS[2].name, ...fromList, after: `${TRAMS[1].name} chosen in the list, then Next pressed` })
+      }
+    }
     const passed = steps.every((s) => s.marks === s.want && s.panel === s.want)
     let message = 'Each press of Next tram moves the panel and the list to the next tram together, and after the last comes the first.'
     if (steps.every((s) => s.panel === TRAMS[0].name))
@@ -330,6 +343,9 @@ export const checks = {
       message = 'The panel moved on, but the list still marks another tram. Both have to be drawn from the one chosen tram in TramGuide.'
     else if (steps[0].panel === steps[0].want && steps.slice(1).every((s) => s.panel === steps[0].panel))
       message = 'Next tram moved to one tram and then stayed there. Each press moves on from the tram that is chosen now.'
+    else if (round && !passed)
+      message =
+        "After a tram was chosen in the list, Next tram did not move on from it. TramGuide keeps one chosen tram, and the next one is worked out from it when Next is pressed, not kept in a second piece of state."
     else if (steps.slice(0, -1).every((s) => s.panel === s.want) && steps.at(-1).panel !== steps.at(-1).want)
       message = 'Next works until the last tram. After the last one comes the first again.'
     results.push(
@@ -338,7 +354,7 @@ export const checks = {
         passed,
         message,
         `the check's trams, in order: ${TRAMS.map((x) => x.name).join(', ')}\n` +
-          steps.map((s, i) => `Next pressed ${i + 1}: list marks ${s.marks || '(none)'}, panel shows ${s.panel || '(nothing)'}`).join('\n')
+          steps.map((s, i) => `${s.after ?? `Next pressed ${i + 1}`}: list marks ${s.marks || '(none)'}, panel shows ${s.panel || '(nothing)'}`).join('\n')
       )
     )
     return results

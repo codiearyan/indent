@@ -88,6 +88,9 @@ async function timetablePage(t) {
 
 const stopped = (error) => detail('The timetable runs without errors', false, explain(error), error)
 const thrown = (page, before) => (page.errors.length > before ? page.errors[before] : null)
+// The grader hands a promise nobody caught to every open page, so while this page only answers
+// with rides, one is another task's failed request and says nothing about this page.
+const ownError = (page, before) => page.errors.slice(before).find((e) => !e.startsWith('Uncaught (in promise)')) ?? null
 const rideTexts = (page) => page.$$('#root .rides li').map((li) => clean(li.textContent))
 const showsRides = (page, day) => {
   const shown = rideTexts(page)
@@ -127,7 +130,7 @@ async function loads(page, api) {
   const before = page.errors.length
   page.window.clear()
   const error = await showDay(page, 'wed', true)
-  if (error) return [stopped(error)]
+  if (error && api.requests[0]?.onScreen !== false) return [stopped(error)]
   const loop = await runaway(page, logsBefore, 'The timetable')
   if (loop) return [loop]
   const asyncWarning = warningsOf(page.logs.slice(logsBefore), WARNING.asyncEffect)
@@ -141,7 +144,7 @@ async function loads(page, api) {
       )
     ]
   }
-  if (api.requests[0]?.onScreen === false) {
+  if (error || api.requests[0]?.onScreen === false) {
     return [
       detail(
         'The rides are asked for from an effect',
@@ -183,7 +186,7 @@ async function loads(page, api) {
     }
     request.rides()
     await page.settle()
-    if (thrown(page, before)) return [stopped(thrown(page, before))]
+    if (ownError(page, before)) return [stopped(ownError(page, before))]
     const again = await runaway(page, logsBefore, 'The timetable')
     if (again) return [again]
     steps.push({ day, shown: showsRides(page, day), loading: loadingText(page), screen: screen(page), requests: api.requests.filter((r) => r.day === day).length })
@@ -194,7 +197,7 @@ async function loads(page, api) {
       detail(
         'Each day is asked for once',
         false,
-        `The timetable was asked ${total >= MOST_REQUESTS ? 'again and again, until the check stopped answering' : `${total} times`} for 2 days. Each answer draws Timetable again, and the effect ran again after that draw. Its dependency list names only what the effect uses.`,
+        `The timetable was asked ${total >= MOST_REQUESTS ? 'again and again, until the check stopped answering' : `${total} times`} for 2 days. Each answer draws Timetable again, and the effect ran again after that draw. An effect with no dependency list runs after every draw: give it a list that names only what the effect uses.`,
         asked(api)
       )
     ]
@@ -252,7 +255,7 @@ export const checks = {
     api.last('wed').rides()
     await page.settle()
     note('wed answered')
-    if (thrown(page, before)) return [stopped(thrown(page, before))]
+    if (ownError(page, before)) return [stopped(ownError(page, before))]
     const output = log.map((l) => `${l.what}: loading ${l.loading ? `"${l.loading}"` : '(none)'}, ${l.rides} rides shown`).join('\n')
     const [wait1, done1, wait2, done2] = log
     let message = 'While a day is on its way, a paragraph with the class loading says so and no rides are shown; once it arrives, the loading line goes and the rides show.'
@@ -287,7 +290,9 @@ export const checks = {
       let message = 'When the rides cannot be loaded, a paragraph with the class problem says so in plain words, the loading line goes, and no rides are shown.'
       if (error && /is not a function|is not iterable/.test(error))
         message = "An answer with an error status was read as if it held rides, and drawing them stopped the page. fetch does not fail on an error status by itself: look at the answer's ok before reading its body."
-      else if (error) message = `The page stopped with an error that was not caught: ${explain(error)}`
+      else if (error && /json|unexpected token/i.test(error))
+        message = "An answer with an error status was read as JSON, and its body is not rides, so reading it failed and nothing caught that. fetch does not fail on an error status by itself: look at the answer's ok before reading its body, and catch what goes wrong."
+      else if (error) message = 'The request failed, nothing caught the error, and it stopped the page. Catch every failure and show it as a problem.'
       else if (!said && loadingText(page)) message = 'The request failed, and the screen kept saying it was loading. Catch the failure, switch loading off, and say what happened.'
       else if (!said) message = 'The request failed, and the screen said nothing about it. Catch the failure and show it in a paragraph with the class problem.'
       else if (RAW.test(said)) message = "The problem shown is the error's own message, in the browser's words. Say what happened in plain words for a visitor."
@@ -329,6 +334,9 @@ export const checks = {
     await showDay(page, 'wed')
     const wed = api.last('wed')
     if (!wed) return [stopped('No request went out for the second day.')]
+    log.push(`tue, then wed asked, no answer yet:\n${screen(page)}`)
+    // A cancelled request fails at once, so a cancel shown as a problem is on the screen now.
+    let quiet = !problemText(page)
     wed.rides()
     await page.settle()
     log.push(`wed answered first:\n${screen(page)}`)
@@ -341,23 +349,26 @@ export const checks = {
     const thu = api.last('thu')
     await showDay(page, 'bank')
     const bank = api.last('bank')
+    const asking = screen(page)
+    log.push(`thu, then bank asked, no answer yet:\n${asking}`)
+    quiet = quiet && !problemText(page)
     thu.rides()
     await page.settle()
-    log.push(`thu, then bank asked; thu's older answer arrived first:\n${screen(page)}`)
-    const waited = !rideTexts(page).some((text) => RIDES.thu.some((r) => text.includes(r.tram) && text.includes(r.time)))
+    log.push(`thu's older answer arrived first:\n${screen(page)}`)
+    const waited = screen(page) === asking
     bank.rides()
     await page.settle()
     log.push(`then bank answered:\n${screen(page)}`)
     const landed = showsRides(page, 'bank') && !loadingText(page)
-    if (thrown(page, before)) return [stopped(thrown(page, before))]
+    if (ownError(page, before)) return [stopped(ownError(page, before))]
     const cancelled = api.requests.some((r) => r.aborted)
     let message = 'Whatever order the answers arrive in, the screen shows the day picked last.'
-    if ((!kept || !waited || !landed) && cancelled && problemText(page))
+    if (cancelled && (!quiet || ((!kept || !waited || !landed) && problemText(page))))
       message = 'A request that was cancelled on purpose showed up on the screen as a problem. Cancelling makes fetch fail too: a cancelled request is not a problem to show.'
     else if (!kept || !waited)
-      message = `An answer for a day that was no longer chosen arrived late and ${!kept ? 'took the place of' : 'showed before'} the rides of the day picked last. When the day changes, the effect's cleanup runs: use it to make the old request's answer be ignored, or cancel the request.`
+      message = `An answer for a day that was no longer chosen ${!kept ? 'arrived late and took the place of the rides of the day picked last' : 'arrived first and changed the screen while the day picked last was still loading'}. When the day changes, the effect's cleanup runs: use it to make the old request's answer be ignored, or cancel the request.`
     else if (!landed) message = "The day picked last answered, and its rides did not show, or the loading line stayed. An ignored older answer must not keep the newer one from showing."
-    results.push(detail('The day picked last wins', kept && waited && landed, message, log.join('\n')))
+    results.push(detail('The day picked last wins', quiet && kept && waited && landed, message, log.join('\n')))
     if (!results[0].passed) return results
 
     const holiday = api.requests.length

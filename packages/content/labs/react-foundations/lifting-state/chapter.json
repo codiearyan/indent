@@ -11,7 +11,7 @@
       "id": "move-up",
       "title": "Keep the chosen tram in TramGuide and hand it down",
       "file": "src/TramGuide.jsx",
-      "description": "Take the chosen tram out of `TramList` and `TramPanel`, and keep it in one place: state in `TramGuide`, holding the chosen tram's `number`, starting with the first tram of `trams`.\n\n- `TramList({ trams, chosen })` marks the button of the tram whose number is `chosen` with `aria-pressed`, and keeps no state of its own.\n- `TramPanel({ tram })` shows the tram it is given, and keeps no state of its own.\n- `TramGuide` hands `chosen` to the list and the chosen tram object to the panel.\n\nPressing does nothing for now; the next two tasks bring it back. The check draws `TramList` and `TramPanel` on their own with trams of its own, changes their props, and looks at what they show. Then it draws `TramGuide` and looks at the list and the panel.",
+      "description": "Take the chosen tram out of `TramList` and `TramPanel`, and keep it in one place: state in `TramGuide` for the chosen tram, starting with the first tram of `trams`. Its `number` is the simplest thing to keep.\n\n- `TramList({ trams, chosen })` marks the button of the tram whose number is `chosen` with `aria-pressed`, and keeps no state of its own.\n- `TramPanel({ tram })` shows the tram it is given, and keeps no state of its own.\n- `TramGuide` hands `chosen` to the list and the chosen tram object to the panel.\n\nPressing does nothing for now; the next two tasks bring it back. The check draws `TramList` and `TramPanel` on their own with trams of its own, changes their props, and looks at what they show. Then it draws `TramGuide` and looks at the list and the panel. Where the state lives only shows once something changes it, so the next two tasks check that.",
       "nextSteps": [
         "Read \"Two copies disagree\" and \"Move the state up\" in the lesson.",
         "Add the state to `TramGuide`, and work out the chosen tram object from it.",
@@ -65,7 +65,7 @@
       "id": "next",
       "title": "Move to the next tram from the panel",
       "file": "src/TramGuide.jsx",
-      "description": "Give `TramPanel` an `onNext` prop, and call it when Next tram is pressed. The panel does not know the other trams, so `TramGuide` does the moving: it hands the panel a function that sets the chosen tram to the one after it in `trams`, and after the last tram comes the first.\n\nThe check draws `TramPanel` alone with an `onNext` of its own and presses Next tram. Then it draws `TramGuide` with trams of its own, presses Next tram once for each of them, and looks at the panel and the list after each press.",
+      "description": "Give `TramPanel` an `onNext` prop, and call it when Next tram is pressed. The panel does not know the other trams, so `TramGuide` does the moving: it hands the panel a function that sets the chosen tram to the one after it in `trams`, and after the last tram comes the first.\n\nThe check draws `TramPanel` alone with an `onNext` of its own and presses Next tram. Then it draws `TramGuide` with trams of its own, presses Next tram once for each of them, and looks at the panel and the list after each press. Once the list can choose, it also chooses a tram there and presses Next tram.",
       "nextSteps": [
         "Read \"Changes travel up\" again, then \"One source of truth\".",
         "Call `onNext` from the panel's Next tram button.",

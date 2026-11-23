@@ -321,9 +321,16 @@ export function drawnOverAndOver(page, what = 'The screen') {
 export async function runaway(page, logsBefore, what = 'The screen', where = '') {
   const endless = drawnOverAndOver(page, what)
   if (endless) return endless
-  const commits = page.window.commits?.length ?? 0
+  const count = () => page.window.commits?.length ?? 0
+  const commits = count()
   await page.settle()
-  const still = (page.window.commits?.length ?? 0) > commits
+  let still = count() > commits
+  if (still) {
+    // A few late draws, like a highlight that fades, are not a loop: one keeps drawing in a longer look.
+    const mark = count()
+    await page.settle(100)
+    still = count() - mark > 10
+  }
   const lines = warningsOf(page.logs.slice(logsBefore), WARNING.maxDepth)
   if (!still && !lines.length) return null
   page.window.clear?.()
