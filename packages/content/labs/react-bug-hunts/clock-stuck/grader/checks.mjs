@@ -94,9 +94,11 @@ async function counts(page) {
     detail(
       'The clock stops at 0:00',
       zero,
-      Number.isNaN(end.seen[3].seconds)
-        ? 'At the end of the session the clock no longer showed minutes and seconds.'
-        : 'At the end of the session the clock did not stay at 0:00. When no seconds are left, it stays there.',
+      end.seen[3].shown.includes('-')
+        ? 'At the end of the session the clock went on below 0:00. The timer asks for one second less from the newest seconds left, but the test for whether any are left still reads the seconds of the draw the timer was made in, and those are never 0. Anything the next value depends on is worked out from the newest value too.'
+        : Number.isNaN(end.seen[3].seconds)
+          ? 'At the end of the session the clock no longer showed minutes and seconds.'
+          : 'At the end of the session the clock did not stay at 0:00. When no seconds are left, it stays there.',
       trail(end.seen)
     )
   ]

@@ -56,7 +56,7 @@
       "id": "rest",
       "title": "Leave the rest of the board as it was",
       "file": "src/LaneBoard.jsx",
-      "description": "Each change touches one lane and nothing else. Every lane keeps its number, its speed, whether it is closed, and its place on the board; the other lanes keep their swimmers in their order. Take off takes off the swimmer pressed, even when another swimmer in the lane has the same name.\n\nThe check draws `LaneBoard` with a busy board of its own, with two swimmers of the same name in one lane, and takes off, adds, closes and opens lanes, comparing the whole board after each step.",
+      "description": "Each change touches one lane and nothing else. Every lane keeps its number, its speed, whether it is closed, and its place on the board; the other lanes keep their swimmers in their order. Take off takes off the swimmer pressed, even when another swimmer in the lane has the same name.\n\nThe check draws `LaneBoard` with a busy board of its own, with two swimmers of the same name in one lane, and takes off, adds, closes and opens lanes, closed lanes included, comparing the whole board after each step.",
       "nextSteps": [
         "Read \"When a blunt fix makes it worse\" in the lesson.",
         "For each handler, list what the new lane keeps from the old one.",

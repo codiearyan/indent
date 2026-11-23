@@ -155,6 +155,10 @@ class CheckDate extends RealDate {
   }
 }
 window.Date = CheckDate
+const startedAt = performance.now()
+performance.now = () => startedAt + clock.now
+window.requestAnimationFrame = (fn) => add(() => fn(performance.now()), 16, [], false)
+window.cancelAnimationFrame = (id) => clock.timers.delete(id)
 clock.advance = (ms) => {
   const end = clock.now + ms
   for (let runs = 0; ; runs++) {
@@ -196,7 +200,7 @@ const onRender = () => {
 }
 let fresh = 0
 window.show = (name, props, { strict = false, keep = false } = {}) => {
-  const element = createElement(mod[name], keep ? props : { ...props, key: 'fresh-' + ++fresh })
+  const element = createElement(typeof name === 'function' ? name : mod[name], keep ? props : { ...props, key: 'fresh-' + ++fresh })
   flushSync(() =>
     root.render(createElement(Profiler, { id: 'check', onRender }, strict ? createElement(StrictMode, null, element) : element))
   )
@@ -218,9 +222,10 @@ export function missingExport(page, file, name) {
 }
 
 /**
- * Draws an export as a new element, so its state starts from the beginning, and waits for its
- * effects. `strict` draws it inside StrictMode, the way main.jsx does, which runs every effect,
- * its cleanup and the effect again when the screen appears. Returns the first error, if any.
+ * Draws an export (or a component the check makes of them) as a new element, so its state starts
+ * from the beginning, and waits for its effects. `strict` draws it inside StrictMode, the way
+ * main.jsx does, which runs every effect, its cleanup and the effect again when the screen appears.
+ * Returns the first error, if any.
  */
 export async function show(page, name, props = {}, options = {}) {
   const before = page.errors.length

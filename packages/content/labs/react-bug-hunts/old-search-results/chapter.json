@@ -56,7 +56,7 @@
       "id": "first-answer",
       "title": "Show every answer that is still wanted, at once",
       "file": "src/MemberSearch.jsx",
-      "description": "The fix must not slow the desk down. Each search goes out as soon as the text changes, without waiting on a timer; the search box takes every letter while a search is out; and the answer to the search typed last shows as soon as it comes, even while an older search is still out. A new search shows its first answer, and a member picked shows their visits.\n\nThe check types while searches are out, answers the newest first, starts a new search, picks a member, and reads the box, the list and the card after each. Its clock never moves on, so a search held back by a timer never goes out.",
+      "description": "The fix must not slow the desk down. Each search goes out as soon as the text changes, without waiting on a timer; the search box takes every letter while a search is out; and the answer to the search typed last shows as soon as it comes, even while an older search is still out. A new search shows its first answer, a member picked shows their visits, and two search screens on one page never hold back each other's answers.\n\nThe check types while searches are out, answers the newest first, starts a new search, picks a member, then draws two search screens side by side and types in both, and reads the box, the list and the card after each. Its clock never moves on, so a search held back by a timer never goes out.",
       "nextSteps": [
         "Read \"When a blunt fix makes it worse\" in the lesson.",
         "Make sure nothing in the screen waits on a timer or locks the box.",

@@ -14,6 +14,21 @@ async function cardPage(t) {
   const missing = missingExport(page, 'MemberDesk.jsx', 'MemberDesk') ?? missingExport(page, 'MemberDesk.jsx', 'MemberCard')
   if (missing) return { problem: missing }
   page.window.desk.records = structuredClone(RECORDS)
+  // Counts the key listeners the card leaves on the window and the document.
+  const listening = new Set()
+  for (const target of [page.window, page.document]) {
+    const add = target.addEventListener.bind(target)
+    const remove = target.removeEventListener.bind(target)
+    target.addEventListener = (type, fn, options) => {
+      if (/^key/.test(type)) listening.add(fn)
+      return add(type, fn, options)
+    }
+    target.removeEventListener = (type, fn, options) => {
+      if (/^key/.test(type)) listening.delete(fn)
+      return remove(type, fn, options)
+    }
+  }
+  page.window.desk.listening = () => listening.size
   return { page }
 }
 
@@ -155,6 +170,8 @@ export const checks = {
       let message = null
       if (logged.length > 3)
         message = `Three presses of + logged ${logged.length} swims. Every draw of the card adds one more key listener, and none is ever taken away, so each press is heard once for every draw so far. In the Browser panel each press shows the line in the console again and again.`
+      else if (logged.length === 0 && desk(page).listening() === 0)
+        message = 'Pressing + logged no swim, and nothing was listening for the key: the listener was taken away as soon as it was added. React calls the function an effect returns later, to clean up, so the effect hands it that function, not what calling it gives back.'
       else if (logged.length === 0)
         message = 'Pressing + logged no swim. The listener still sees the card of an older draw, from before the member had arrived.'
       else if (logged.length < 3)
@@ -218,7 +235,7 @@ export const checks = {
     const again = desk(page).loads.length - asked
     await answerAll(page)
     const kept = page.$('#root textarea.note')?.value ?? '(no note box)'
-    const output = `picked ${named('x-2')}, then typed "${text}" one letter at a time\nasked the membership system ${again} more times\nnote box: "${kept}"\n${cardText(page)}`
+    const output = `picked ${named('x-2')}, then typed "${text}" one letter at a time\nasked the membership system ${again === 1 ? 'once' : `${again} times`} more\nnote box: "${kept}"\n${cardText(page)}`
     let message = null
     if (again > 0)
       message = `Typing a note asked the membership system for ${named('x-2')} again ${again === 1 ? 'once' : `${again} times`}. Every letter draws the card, and the effect that loads the member ran after those draws too. It should run only when the member picked changes.`

@@ -97,6 +97,7 @@ async function searches(page) {
     if (round.clear || round.fresh) await page.type(box(page), '')
     await typeOn(page, round.type, true)
     if (round.clear) await page.type(box(page), '')
+    const kept = round.clear && results(page).length > 0
     const asked = round.answer.map((text) => search(page, text))
     const missing = round.answer.find((text, i) => !asked[i])
     if (missing) return [notAsked(page, missing, [...log, round.say.split(';')[0]])]
@@ -112,7 +113,9 @@ async function searches(page) {
     if (!sameList(results(page), want)) {
       const older = round.answer[1]
       let message
-      if (round.want === '')
+      if (kept)
+        message = `The box was emptied, and the list still showed the results of a search typed before. When the box is empty, the list is empty too.`
+      else if (round.want === '')
         message = `The box was emptied while two searches were still out, and when their answers came the list filled up again. An answer to a search nobody wants any more must change nothing.`
       else if (round.answer[0] === round.want)
         message = `The results for "${older}" arrived after the results for "${round.want}", and the list showed them, or a part of them, though "${round.want}" was typed last. Each answer is put on the screen whenever it comes, whatever was typed since. When the text changes, React runs the effect's cleanup: that is the moment the old search stops being wanted.`
@@ -258,7 +261,7 @@ export const checks = {
     }
     await press(page, page.$$('#root button.result').find((b) => clean(b.textContent) === byName('Calla').name))
     const calla = visitsOf(page, byName('Calla').id)
-    if (!calla) return [detail('Picking a member asks for their visits', false, 'Calla Corrigan was picked and no request for her visits went out.', log.join('\n'))]
+    if (!calla) return [detail('Picking a member asks for their visits', false, 'Calla Corrigan was picked and no request for their visits went out.', log.join('\n'))]
     calla.answer()
     await page.settle()
     if (ownError(page, before)) return [stopped(ownError(page, before))]
@@ -266,11 +269,41 @@ export const checks = {
     if (loop) return [loop]
     log.push(`picked Calla, answered: ${cardText(page)}`)
     const shown = cardName(page) === byName('Calla').name && sameList(visitsShown(page), HISTORY[byName('Calla').id])
+    if (!shown) {
+      return [
+        detail(
+          'Every answer still wanted shows at once',
+          false,
+          'A member was picked and their visits came, with nothing else out, and the card did not show them.',
+          log.join('\n')
+        )
+      ]
+    }
+
+    // Two search screens on one page: what one types must not hold back the other's answers.
+    const { h, mod } = page.window
+    const twice = await show(page, () => h('div', null, h(mod.MemberSearch, { key: 'a' }), h(mod.MemberSearch, { key: 'b' })))
+    if (twice) return [stopped(twice)]
+    const [boxA, boxB] = page.$$('#root input.search-box')
+    const listOf = (n) => [...(page.$$('#root .results')[n]?.querySelectorAll('button.result') ?? [])].map((b) => clean(b.textContent))
+    await page.type(boxA, 'R')
+    await page.type(boxB, 'O')
+    const r = search(page, 'R')
+    const o = search(page, 'O')
+    if (!r || !o) return [notAsked(page, r ? 'O' : 'R', log)]
+    r.answer()
+    await page.settle()
+    o.answer()
+    await page.settle()
+    if (ownError(page, before)) return [stopped(ownError(page, before))]
+    log.push(`two search screens on one page: typed R in the first, then O in the second; "R" answered, then "O":\n  first: ${listOf(0).join(', ') || '(empty)'}\n  second: ${listOf(1).join(', ') || '(empty)'}`)
+    const own = sameList(listOf(0), matching('R')) && sameList(listOf(1), matching('O'))
     return [
+      detail('Every answer still wanted shows at once', true),
       detail(
-        'Every answer still wanted shows at once',
-        shown,
-        'A member was picked and their visits came, with nothing else out, and the card did not show them.',
+        'Two search screens keep their own answers',
+        own,
+        "With two search screens on one page, a search typed in one stopped the other from showing its own answer. What decides whether an answer is still wanted belongs to one run of one screen's effect, not to something every screen on the page shares.",
         log.join('\n')
       )
     ]

@@ -233,9 +233,10 @@ export const checks = {
       { say: 'took the second Emrys off lane 1', lane: 1, run: () => takeOff(page, 1, 2), change: () => lanes[0].swimmers.splice(2, 1) },
       { say: 'added Xanthe to lane 3', lane: 3, run: () => add(page, 'Xanthe', 3), change: () => lanes[2].swimmers.push('Xanthe') },
       { say: 'closed lane 1', lane: 1, run: () => toggle(1), change: () => (lanes[0].closed = true) },
+      { say: 'added Ulla to lane 2, which is closed', lane: 2, run: () => add(page, 'Ulla', 2), change: () => lanes[1].swimmers.push('Ulla') },
+      { say: 'took Anouk off lane 1, which is closed', lane: 1, run: () => takeOff(page, 1, 1), change: () => lanes[0].swimmers.splice(1, 1) },
       { say: 'opened lane 2', lane: 2, run: () => toggle(2), change: () => (lanes[1].closed = false) },
-      { say: 'took Quentin off lane 3', lane: 3, run: () => takeOff(page, 3, 0), change: () => lanes[2].swimmers.splice(0, 1) },
-      { say: 'added Ulla to lane 2', lane: 2, run: () => add(page, 'Ulla', 2), change: () => lanes[1].swimmers.push('Ulla') }
+      { say: 'took Quentin off lane 3', lane: 3, run: () => takeOff(page, 3, 0), change: () => lanes[2].swimmers.splice(0, 1) }
     ]
     const log = [`start:\n${boardText(board(page))}`]
     for (const step of steps) {
