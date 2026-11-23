@@ -1,0 +1,104 @@
+{
+  "id": "data-files",
+  "title": "A data file read into records",
+  "files": [
+    "DayReport.java",
+    "sailings.csv"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run the report here; it reads sailings.csv and writes report.txt beside it.",
+    "suggestedCommand": "java DayReport.java"
+  },
+  "tasks": [
+    {
+      "id": "parse",
+      "title": "Read one line into a record",
+      "file": "DayReport.java",
+      "description": "Under `// Task 1`, write a class `Lines` with one method. `static Sailing parse(String line, int number)` gives back the `Sailing` a line such as `2031-06-14,Linnet,23,77.05` holds: the date, the boat, the number of passengers and the takings, split at the commas, each part with any space at either end left off. A line that cannot be read, because it has not exactly four parts or a part is not what it should be, throws an `IllegalArgumentException` whose message names `number`, the line's number. `Sailing` is given above the tasks.\n\nCheck calls `parse` with lines of its own, some with spaces around their parts and some that cannot be read, and reads the `Sailing` it gets back, or an exception by its type and whether its message names the number.",
+      "nextSteps": [
+        "Read the part of the lesson about reading one line.",
+        "Split the line, and count its parts before reading any of them.",
+        "Read each part with the tool for its type: a date, a whole number, an amount.",
+        "Catch what reading a bad part throws, and throw what the task asks for in its place."
+      ],
+      "hints": [
+        "Each part of the line is text, and each earlier issue of this part showed how to read one kind of text: a date, an amount. A whole number comes from text as it did in part 5.",
+        "The exceptions that reading a bad part throws name the part, never the line. One catch around all the reading can throw a new exception whose message holds the number, with the old one as its cause.",
+        "`String[] parts = line.split(\",\", -1);`, refuse when `parts.length != 4`, then in a try: `new Sailing(LocalDate.parse(parts[0].strip()), parts[1].strip(), Integer.parseInt(parts[2].strip()), new BigDecimal(parts[3].strip()))`, and in its catch `throw new IllegalArgumentException(\"Line \" + number + \" cannot be read: \" + line, e);`."
+      ],
+      "docs": [
+        {
+          "title": "Records",
+          "url": "https://docs.oracle.com/en/java/javase/17/language/records.html"
+        },
+        {
+          "title": "Integer.parseInt",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html#parseInt(java.lang.String)"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading a CSV file into objects",
+          "url": "https://www.youtube.com/watch?v=blYz2wOR8UE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "read",
+      "title": "Read the file, keep the good lines",
+      "file": "DayReport.java",
+      "description": "Under `// Task 2`, write a class `Day` with one method, with `throws IOException`. `static List<Sailing> read(Path file, List<String> problems)` reads `file`, in UTF-8, and gives back a `Sailing` for each line after the first, which is the header, read with `Lines.parse`. A line is numbered as the file numbers it, the header being line 1. A line `parse` refuses is left out, its exception's message is added to `problems`, and the lines after it are still read.\n\nCheck hands `read` a path to a file of its own and a list for the problems, and runs it beside Check's own right `Lines`, so Task 2 passes or fails on its own lines. Its files have Windows line ends or none at the very end, bad lines in the middle and at the end, or only a header; one is not there, and that exception reaches the caller. Check compares the sailings as a list, in order, and reads the problems.",
+      "nextSteps": [
+        "Read the part of the lesson about reading a data file.",
+        "Read the file's lines, and start after the header.",
+        "Work out each line's number as the file counts it, and hand it to parse.",
+        "Catch a refusal around one line only, so the next line is still read."
+      ],
+      "hints": [
+        "The list of a file's lines starts at position 0, and the file starts at line 1. The header is a line of the file, not a sailing.",
+        "A try around the whole loop stops at the first bad line; a try inside the loop deals with one line and goes on. What a caught exception says is its message.",
+        "`List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);` then `for (int i = 1; i < lines.size(); i++)`, with `try { sailings.add(Lines.parse(lines.get(i), i + 1)); } catch (IllegalArgumentException e) { problems.add(e.getMessage()); }` inside it."
+      ],
+      "docs": [
+        {
+          "title": "Files.readAllLines",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Files.html#readAllLines(java.nio.file.Path,java.nio.charset.Charset)"
+        },
+        {
+          "title": "Catching and handling exceptions",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/handling.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "report",
+      "title": "Add up the takings and write the report",
+      "file": "DayReport.java",
+      "description": "Under `// Task 3`, write a class `Report` with two methods. `static BigDecimal takings(List<Sailing> sailings)` gives back the takings of all the sailings added up, and 0 for none. `static void write(Path file, List<Sailing> sailings, List<String> problems)`, with `throws IOException`, makes `file` hold the report and nothing else, in UTF-8, each line followed by `\"\\n\"`: a line for each sailing, its date, boat, passengers and takings, as in `2031-06-14 Linnet 23 £77.05`, then `Total` and the takings added up, as in `Total £107.20`, then each problem after `Problem:` and a space. Every amount has a pound sign, two decimal places and a point.\n\nCheck hands `takings` sailings of its own and compares the total by its value. It hands `write` a path to a file it wrote first, with sailings and problems of its own, and reads the file back afterwards, byte for byte. It runs with the formats and the line end of a Windows computer in Germany, so an amount or a line end that follows the computer shows.",
+      "nextSteps": [
+        "Read the part of the lesson about writing the report.",
+        "Write takings as the money issue added up the till.",
+        "Write write: build the whole report in a StringBuilder, then write it in one go.",
+        "Run main and open report.txt in the editor."
+      ],
+      "hints": [
+        "Everything this needs is from the issues before: adding amounts, printing one the same on every computer, building a text a line at a time, writing a file.",
+        "A record gives back each part with a method of its name. A date prints as year-month-day by itself. An amount needs its decimal places fixed before it is written, and every line its own \"\\n\".",
+        "takings: `total = total.add(s.takings());` in a loop from `BigDecimal.ZERO`. In write, for each sailing `b.append(s.date()).append(' ').append(s.boat()).append(' ').append(s.passengers()).append(\" £\").append(s.takings().setScale(2, RoundingMode.HALF_UP).toPlainString()).append(\"\\n\");`, then the Total and Problem lines the same way, and `Files.writeString(file, b, StandardCharsets.UTF_8);`."
+      ],
+      "docs": [
+        {
+          "title": "Files.writeString",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Files.html#writeString(java.nio.file.Path,java.lang.CharSequence,java.nio.charset.Charset,java.nio.file.OpenOption...)"
+        },
+        {
+          "title": "BigDecimal.setScale",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html#setScale(int,java.math.RoundingMode)"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

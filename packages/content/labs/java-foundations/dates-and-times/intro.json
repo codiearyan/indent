@@ -1,0 +1,38 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "How many days has this pass left?",
+      "note": "A month's pass from 31 January."
+    },
+    {
+      "title": "Ossian's fingers",
+      "text": "Counting the days of each month by hand"
+    },
+    {
+      "title": "Your passes",
+      "file": "SeasonPass.java",
+      "mine": true,
+      "gap": "Real dates and real months",
+      "tasks": ["Make dates and times", "Count to a date", "Print the day"]
+    },
+    {
+      "title": "Passenger",
+      "say": "Right to the day. Thank you.",
+      "note": "And no boat on a Sunday."
+    }
+  ],
+  "ticket": {
+    "label": "Season pass",
+    "wrong": "wrong day",
+    "why": "Guessed",
+    "right": "right day"
+  },
+  "captions": [
+    "The slip at Lanternquay. Ossian sells season passes, and people ask how long theirs lasts.",
+    "Counted on fingers, a pass bought on 31 January runs out on the wrong day.",
+    "You make dates, count to them in months and days, and print each day for the timetable.",
+    "Now every pass runs out on the right day, and knows how many days it has left.",
+    "The printed timetable names its days in English on any computer, and Sunday stays quiet."
+  ]
+}

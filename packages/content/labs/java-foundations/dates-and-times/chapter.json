@@ -1,0 +1,111 @@
+{
+  "id": "dates-and-times",
+  "title": "Dates and times with java.time",
+  "files": [
+    "SeasonPass.java"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run the passes here, and try your classes from main.",
+    "suggestedCommand": "java SeasonPass.java"
+  },
+  "tasks": [
+    {
+      "id": "make",
+      "title": "Make dates and times",
+      "file": "SeasonPass.java",
+      "description": "Under `// Task 1`, write a class `Dates` with two methods. `static LocalDateTime departure(String day, String time)` gives back the date and time that a day such as `\"2031-03-04\"` and a time such as `\"14:05\"` say; a text that is not one lets its exception reach the caller as it is. `static LocalDate onClipboard(int day, int month, int year)` gives back that date; a date that does not exist lets its exception reach the caller.\n\nCheck calls both with dates of its own, a 29 February among them, and with texts and dates that are not right. It reads a date as its text, and an exception by its type and whether its message names the text.",
+      "nextSteps": [
+        "Read the parts of the lesson about making dates and times, and the errors they throw.",
+        "Write departure: read the day and the time each with its own type, then put them together.",
+        "Write onClipboard, and mind the order LocalDate.of takes its values in.",
+        "Try a date that does not exist from main, and read what is thrown."
+      ],
+      "hints": [
+        "A date and a time of day are two types, and the type that holds both can be made from one of each. Each can read itself from text written the standard way.",
+        "Reading text that is not a date throws an exception that already names the text: departure needs no try at all. The method that makes a date from numbers takes the biggest part first.",
+        "`return LocalDateTime.of(LocalDate.parse(day), LocalTime.parse(time));` and `return LocalDate.of(year, month, day);`."
+      ],
+      "docs": [
+        {
+          "title": "LocalDate",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html"
+        },
+        {
+          "title": "LocalDateTime.of",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDateTime.html#of(java.time.LocalDate,java.time.LocalTime)"
+        },
+        {
+          "title": "Date-time classes",
+          "url": "https://docs.oracle.com/javase/tutorial/datetime/iso/index.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Dates and times in java.time",
+          "url": "https://www.youtube.com/watch?v=F2bZ1fkAQx0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "count",
+      "title": "Count to a date",
+      "file": "SeasonPass.java",
+      "description": "Under `// Task 2`, write a class `Passes` with three methods. `static LocalDate expires(LocalDate bought, int months)` gives back the day a pass bought on `bought` for that many months runs out: the same day of the month, `months` later, or the last day of a shorter month. `static long daysLeft(LocalDate today, LocalDate expires)` gives back the days from `today` to `expires`, 0 on the day itself and below 0 once it has run out. `static long crossingMinutes(LocalDateTime leaves, LocalDateTime arrives)` gives back the minutes from `leaves` to `arrives`.\n\nCheck calls each method with dates of its own, years away from today, across the ends of months and years, and a crossing past midnight. `today` is always handed in: Check names the day.",
+      "nextSteps": [
+        "Read the parts of the lesson about adding to a date, and about the gap between two.",
+        "Write expires, and try it from main on 31 January.",
+        "Write daysLeft for two dates months apart, then crossingMinutes.",
+        "Use the dates each method is handed, never the computer's clock."
+      ],
+      "hints": [
+        "A month is not 30 days, and a gap of 1 month and 12 days is not 12 days. Java has a way to add each unit and to measure in each unit.",
+        "A date can add months to itself and keeps the day of the month when it can. A Period holds a gap in years, months and days, each apart; a unit such as days can measure the whole gap between two dates by itself. A Duration measures time with a time of day.",
+        "`return bought.plusMonths(months);`, `return ChronoUnit.DAYS.between(today, expires);` and `return Duration.between(leaves, arrives).toMinutes();`."
+      ],
+      "docs": [
+        {
+          "title": "LocalDate.plusMonths",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html#plusMonths(long)"
+        },
+        {
+          "title": "ChronoUnit.between",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/ChronoUnit.html#between(java.time.temporal.Temporal,java.time.temporal.Temporal)"
+        },
+        {
+          "title": "Period and Duration",
+          "url": "https://docs.oracle.com/javase/tutorial/datetime/iso/period.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "print",
+      "title": "Print the day for the timetable",
+      "file": "SeasonPass.java",
+      "description": "Under `// Task 3`, write a class `Timetable` with two methods. `static String heading(LocalDate day)` gives back the day as the timetable heads it, in English whatever the computer's language: the day of the week, the day of the month, the month's name and the year, as in `Tuesday 4 March 2031`. `static boolean runs(LocalDate day)` says whether boats run that day: every day but Sunday.\n\nCheck calls both with dates of its own, the last day of a year and a Saturday and a Sunday among them, and reads the heading letter by letter. It runs with the language of a computer in Germany, so a heading that follows the computer's language shows.",
+      "nextSteps": [
+        "Read the part of the lesson about formatting a date, and its table of pattern letters.",
+        "Write heading with a formatter that is told its language.",
+        "Write runs with the day of the week.",
+        "Try heading on 31 December 2029 from main, and look at the year."
+      ],
+      "hints": [
+        "A pattern of letters says how a date is written, and the same letter means different things in small and capital letters. Names of days and months come from a language.",
+        "One letter four times gives the full name of a day; another, four times, the full name of a month. A formatter can be made with a pattern and a Locale. A date knows its day of the week as an enum value.",
+        "`DateTimeFormatter.ofPattern(\"EEEE d MMMM uuuu\", Locale.UK)`, then `return day.format(that);`, and `return day.getDayOfWeek() != DayOfWeek.SUNDAY;`."
+      ],
+      "docs": [
+        {
+          "title": "DateTimeFormatter patterns",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/format/DateTimeFormatter.html#patterns"
+        },
+        {
+          "title": "DayOfWeek",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/DayOfWeek.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
