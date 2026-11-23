@@ -1,4 +1,4 @@
-import { aKind, callCases, fail, partCode, pass } from '../../grading.mjs'
+import { aKind, callCases, fail, pass } from '../../grading.mjs'
 
 const FILE = 'radio_tools.py'
 
@@ -25,17 +25,38 @@ function hoursLeft(charge, drain, low, atMark = false) {
   return hours
 }
 
-// Check's own clean_call_sign and crew_text, so that Task 4 is judged by itself.
-const EARLIER = `
-def clean_call_sign(heard):
-    return heard.strip().upper()
+// Check's own clean_call_sign and crew_text, so that Task 4 is judged by itself. Each takes its
+// one value in order or by any name, since a learner may name it as in their own def line.
+const one = (name) => `
+def _one_value_${name}(args, kwargs):
+    values = list(args) + list(kwargs.values())
+    if len(values) != 1:
+        raise TypeError("${name}() takes 1 positional argument but %d were given" % len(values))
+    return values[0]
+`
+const EARLIER = `${one('clean_call_sign')}${one('crew_text')}
+def clean_call_sign(*args, **kwargs):
+    return _one_value_clean_call_sign(args, kwargs).strip().upper()
 
-def crew_text(crew):
+def crew_text(*args, **kwargs):
+    crew = _one_value_crew_text(args, kwargs)
     if crew == 0:
         return "no crew"
     if crew == 1:
         return "1 crew member"
     return f"{crew} crew members"
+`
+// Versions that give back words no right log line has, to see that log_line uses what they give.
+const SIGN = 'SIGN FROM CLEAN CALL SIGN'
+const CREW = 'CREW FROM CREW TEXT'
+const MARKED = `${one('clean_call_sign')}${one('crew_text')}
+def clean_call_sign(*args, **kwargs):
+    _one_value_clean_call_sign(args, kwargs)
+    return "${SIGN}"
+
+def crew_text(*args, **kwargs):
+    _one_value_crew_text(args, kwargs)
+    return "${CREW}"
 `
 
 export const checks = {
@@ -90,7 +111,10 @@ export const checks = {
             ? 'With no crew at all, crew_text should give back the words the task gives for 0, not a number.'
             : crew === 1
               ? 'With one crew member, crew_text should give back the words the task gives for 1: one member, no s at the end.'
-              : `With ${crew} crew, crew_text should give back the number, a space and the words crew members. Compare it with the task, space by space.`
+              : (v) =>
+                  /^\d+ crew members$/.test(v.value)
+                    ? `crew_text gives back a number of crew that is not the one Check gave it. Build the text from its own parameter.`
+                    : `With ${crew} crew, crew_text should give back the number, a space and the words crew members. Compare it with the task, space by space.`
         )
       }))
     })
@@ -111,6 +135,14 @@ export const checks = {
         'battery_hours gives back the same number whatever radio Check gives it. It uses something other than its own parameters, such as battery from the top of the file or a number typed in. Count with the names in its def line.',
       list: list.map(([name, args]) => {
         const want = hoursLeft(...args)
+        const [charge, drain, low] = args
+        const otherOrders = [
+          [drain, charge, low],
+          [charge, low, drain],
+          [low, drain, charge],
+          [drain, low, charge],
+          [low, charge, drain]
+        ].map((order) => hoursLeft(...order))
         return {
           name,
           args,
@@ -118,8 +150,12 @@ export const checks = {
           hint: (v) =>
             v.type !== 'int'
               ? `battery_hours gives back ${aKind(v.type)}, not a whole number of hours.`
-              : v.value === 1 && want > 1
+              : v.value === 1 && want > 1 && otherOrders.includes(1)
+                ? 'battery_hours gives back 1. Either a return inside the loop ends the function on the first round, or the def line takes its values in another order than Check gives them: the charge, the drain per hour, then the low mark.'
+                : v.value === 1 && want > 1
                 ? 'battery_hours gives back 1: it returns after the first hour. return ends the whole function at once, so a return inside the loop stops it on the first round. Give the hours back after the loop.'
+                : otherOrders.includes(v.value)
+                ? 'battery_hours counts as if its values came in another order. Check gives them as the task says: the charge, the drain per hour, then the low mark, and the def line takes them in that order.'
                 : v.value === hoursLeft(...args, true) && v.value !== want
                   ? 'The charge lands exactly on the low mark here, and that is not below it yet, so the radio runs one more hour. Look at the condition of your loop.'
                   : 'battery_hours does not give back the hours until the charge is below the low mark. Work this case out by hand, hour by hour, and check the order of the parameters: charge, drain, low mark.'
@@ -152,16 +188,29 @@ export const checks = {
       }))
     })
     if (!details.every((d) => d.passed)) return details
-    const code = await partCode(t, FILE, 4)
-    const uses = /\bclean_call_sign\s*\(/.test(code) && /\bcrew_text\s*\(/.test(code)
+    const [marked] = await callCases(t, {
+      file: FILE,
+      task: 4,
+      fn: 'log_line',
+      define: MARKED,
+      list: [{ name: 'Builds on clean_call_sign and crew_text', args: ['  alpha one ', 3], expected: text('') }]
+    })
+    const got = /^It gave back: (.*)$/m.exec(marked.output ?? '')?.[1] ?? ''
+    const missing = [
+      !got.includes(SIGN) && 'clean_call_sign',
+      !got.includes(CREW) && 'crew_text'
+    ].filter(Boolean)
+    const name = 'Builds on clean_call_sign and crew_text'
     return [
       ...details,
-      uses
-        ? pass('Builds on clean_call_sign and crew_text')
-        : fail(
-            'Builds on clean_call_sign and crew_text',
-            'log_line gives back the right line, but builds it without calling clean_call_sign and crew_text. Call them inside log_line, so that a change to either one shows in every log line.'
-          )
+      !/^It gave back:/m.test(marked.output ?? '')
+        ? { ...marked, name }
+        : missing.length
+          ? fail(
+              name,
+              `log_line gives back the right line, but does not build it from what ${missing.join(' and ')} ${missing.length > 1 ? 'give' : 'gives'} back. Call ${missing.length > 1 ? 'them' : 'it'} inside log_line and use what comes back, so that a change to either function shows in every log line.`
+            )
+          : pass(name)
     ]
   }
 }

@@ -74,7 +74,7 @@ def booking_line(name, age):
     return f"{name}: {ticket_price(age)} pounds"
 ```
 
-`booking_line("Kirsty", 12)` gives back `Kirsty: 3 pounds`. The price is worked out in one place only. When the hall changes its prices, you change `ticket_price`, and every function that calls it follows.
+`booking_line("Shona", 12)` gives back `Shona: 3 pounds`. The price is worked out in one place only. When the hall changes its prices, you change `ticket_price`, and every function that calls it follows.
 
 ## Your work in this issue
 

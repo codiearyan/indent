@@ -3,17 +3,21 @@ import { aKind, cases, LINE_WORDS, lineProblem, outputCases } from '../../gradin
 const FILE = 'route_in.py'
 const HELICOPTER = 'Call the helicopter'
 const STRETCHER = 'Carry the stretcher'
+const ROUTES = ['bridge', 'ford']
+const WARNINGS = ['stay low', 'take care', 'clear']
 
 
 const text = (value) => ({ type: 'str', value })
 
-/** The words for a variable that is not one of the task's words, or `otherwise`. */
-const words = (name, otherwise, missing) => (v) =>
+/** The words for a variable that is not one of the task's `allowed` words, or `otherwise`. */
+const words = (name, otherwise, missing, allowed) => (v) =>
   !v
     ? missing
     : v.type !== 'str'
       ? `${name} holds ${aKind(v.type)}, not text. The words the task gives go inside quotes.`
-      : otherwise
+      : !allowed.includes(v.value)
+        ? `${name} is not one of the words the task gives. Spell each one exactly as the task does, small letters and spaces included.`
+        : otherwise
 
 /** Why the lines printed are not the one line `want` out of `lines`, or null. */
 function oneLine(out, want, lines, wrong) {
@@ -53,7 +57,8 @@ export const checks = {
           hint: words(
             'route',
             'The river is above the ford limit here, so route should be bridge, spelt as the task gives it.',
-            missing
+            missing,
+            ROUTES
           )
         },
         {
@@ -63,7 +68,8 @@ export const checks = {
           hint: words(
             'route',
             'The river is below the ford limit here, so route should be ford, spelt as the task gives it.',
-            missing
+            missing,
+            ROUTES
           )
         },
         {
@@ -73,7 +79,8 @@ export const checks = {
           hint: words(
             'route',
             'The river is exactly at the ford limit here. That is not above it, so the ford is still fine. Look at the comparison in your if.',
-            missing
+            missing,
+            ROUTES
           )
         },
         {
@@ -83,7 +90,8 @@ export const checks = {
           hint: words(
             'route',
             'The river is above this ford limit, so route should be bridge. Compare with ford_limit, not with a number typed in.',
-            missing
+            missing,
+            ROUTES
           )
         }
       ]
@@ -111,7 +119,7 @@ export const checks = {
       mistakes: [
         {
           value: (g) => (g.wind_speed >= 30 ? 'take care' : 'clear'),
-          hint: 'wind_warning never says stay low, even in a gale. Python checks the branches from the top and runs only the first whose condition is True. A gale is also 30 or more: look at the order of your branches.'
+          hint: 'wind_warning never says stay low, even in a gale. Python checks the branches from the top and runs only the first whose condition is True. A gale is also 30 or more: look at the order of your branches, and check that every question after the first is an elif, not an if of its own.'
         }
       ],
       list: list.map(([name, wind, warning]) => ({
@@ -123,7 +131,8 @@ export const checks = {
           wind === 50 || wind === 30
             ? `The wind is exactly ${wind} here, and the task says ${wind} or more. One comparison for "bigger" leaves out the equal case.`
             : `With wind of ${wind}, wind_warning should be ${warning}, spelt as the task gives it.`,
-          missing
+          missing,
+          WARNINGS
         )
       }))
     })
@@ -137,7 +146,7 @@ export const checks = {
         true,
         40,
         STRETCHER,
-        'The wind is exactly 40 here, and the helicopter needs it below 40. Look at the comparison for the wind.'
+        'The wind is exactly 40 here, and the helicopter needs it below 40. Look at the comparison for the wind, and if the cases in the dark or in a gale fail too, at the word that joins the two questions.'
       ],
       [
         'Dark and a light wind',

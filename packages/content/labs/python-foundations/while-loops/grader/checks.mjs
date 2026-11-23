@@ -87,8 +87,12 @@ export const checks = {
         given: ({ battery, drain_per_hour: drain, low_mark: low }),
         expected: { type: 'int', value: hoursLeft(battery, drain, low) },
         hint: (v) =>
-          v && v.type !== 'int'
+          !v
+            ? 'hours is not made in this case, where the loop runs no rounds: the lines inside a loop that never starts never run. Make hours before the loop.'
+            : v.type !== 'int'
             ? `hours holds ${aKind(v.type)}, not a whole number of hours.`
+            : v.value === 1 && hoursLeft(battery, drain, low) > 1
+              ? 'hours is 1, as if it counted only the last hour. Look for a line inside the loop that starts it again on every round: a count starts before the loop, and each round adds to it.'
             : v?.value === hoursLeft(battery, drain, low, (b) => b <= low)
               ? 'The battery lands exactly on low_mark here, and that is not below it yet, so the radio runs one more hour. Look at the condition of your while.'
               : v?.value === hoursLeft(battery, drain, low) + 1
@@ -122,6 +126,19 @@ export const checks = {
         const near = wording(out, want)
         if (near) return near
         const searched = out.filter((line) => line.startsWith('Searching square'))
+        if (out.includes('Searching square 0')) {
+          return 'The search starts at square 0, and the first square is 1.'
+        }
+        if (
+          found <= squares &&
+          out.includes(`Found in square ${found}`) &&
+          same(searched, searching.slice(0, -1))
+        ) {
+          return 'The square where the walker is found has no Searching line. Print the Searching line for every square, that one included, then ask whether it is the one.'
+        }
+        if (same(searched, ['Searching square 1']) && last > 1) {
+          return 'The search stops after the first square. A break that is not inside the if leaves the loop on the first round, whatever the square.'
+        }
         if (found <= squares && searched.length > found) {
           return 'The search goes on after the walker is found. Leave the loop as soon as the square is found_in: a loop can be left at once from inside an if.'
         }
@@ -135,7 +152,7 @@ export const checks = {
           return 'The squares are searched, but no Found in square line prints for the square that is found_in.'
         }
         if (searched.length < want.filter((line) => line.startsWith('Searching')).length) {
-          return 'The search stops too soon: it never reaches every square it should. Look at the condition of your while, and at where the walker is.'
+          return 'The search stops too soon: it never reaches every square it should. Look at where your loop stops, and at where the walker is.'
         }
         return 'The lines do not search the squares in order from 1, one line each, and stop with a Found line at the right square.'
       }

@@ -42,10 +42,14 @@ export const checks = {
         args: priority ? [...args, priority] : args,
         kwargs,
         expected: text(message),
-        hint: notText(
-          'pager_message',
-          'pager_message does not give back the priority in capitals, a colon, a space and the text. Compare what it gives back with the task, letter by letter.'
-        )
+        hint: (v) =>
+          v.type !== 'str'
+            ? `pager_message gives back ${aKind(v.type)}, not text.`
+            : v.value.startsWith(`${args[0].toUpperCase()}:`)
+              ? 'pager_message puts the text where the priority goes. Its parameters are text, then priority, in that order.'
+              : v.value.replace(/^[^:]*/, (head) => head.toUpperCase()) === message && v.value !== message
+                ? 'pager_message gives back the right words, but the priority is not all in capitals.'
+                : 'pager_message does not give back the priority in capitals, a colon, a space and the text. Compare what it gives back with the task, letter by letter.'
       }))
     })
   },
@@ -77,6 +81,10 @@ export const checks = {
           hint: 'routine ended up as the meeting place, and the page is still urgent. Values without a name fill the parameters in order, so the third one goes to meet_at. Name the parameter the value is for.'
         },
         {
+          value: (g) => `URGENT: ${g.exercise_crew} crew to ${g.exercise_hill}, meet at the base`,
+          hint: 'The page is still urgent: the call leaves the priority to its default too. Give the priority routine in the call, by its name.'
+        },
+        {
           value: (g) => `ROUTINE: ${g.exercise_hill} crew to ${g.exercise_crew}, meet at the base`,
           hint: 'The hill and the crew are swapped. Values without a name fill the parameters in the order of the def line: hill first, then crew.'
         }
@@ -97,6 +105,7 @@ export const checks = {
     const call = (await partCode(t, FILE, 2))
       .split('\n')
       .filter((line) => !/^\s*(def|return)\b/.test(line))
+      .map((line) => line.replace(/#.*/, ''))
       .join('\n')
     const typedPlace = /the base|meet_at/.test(call)
     return [
@@ -123,7 +132,7 @@ export const checks = {
       mistakes: [
         {
           value: (c) => `Team leader tonight: ${c.given.leader_on_call}`,
-          hint: 'leader_line gives back the leader in leader_on_call at the top of the file, whatever leader it is given. A function can read a name from outside it, which is why the demo looks right. The leader it is given is in its own parameter.'
+          hint: 'leader_line gives back the leader in leader_on_call at the top of the file, whatever leader it is given. A function can read a name from outside it, which is why the line for tonight looks right. The leader it is given is in its own parameter.'
         }
       ],
       typed:

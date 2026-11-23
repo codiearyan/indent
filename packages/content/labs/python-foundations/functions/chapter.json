@@ -103,7 +103,7 @@
       "id": "log",
       "title": "Build a log line",
       "file": "radio_tools.py",
-      "description": "Under `# Task 4`, write a function called `log_line` that takes a call sign as it was heard and a number of crew, and gives back a line like this one:\n\n```\nBRAVO TWO: 4 crew members out\n```\n\nBuild it by calling `clean_call_sign` and `crew_text` inside it. Print what it gives back for tonight, to see it.\n\nCheck calls `log_line` with callouts of its own, and starts Task 4 from `clean_call_sign` and `crew_text` as Tasks 1 and 2 should make them, so a mistake in those tasks does not spoil this one. It also looks for the calls to both functions in the lines under `# Task 4`.",
+      "description": "Under `# Task 4`, write a function called `log_line` that takes a call sign as it was heard and a number of crew, and gives back a line like this one:\n\n```\nBRAVO TWO: 4 crew members out\n```\n\nBuild it by calling `clean_call_sign` and `crew_text` inside it. Print what it gives back for tonight, to see it.\n\nCheck calls `log_line` with callouts of its own, and starts Task 4 from `clean_call_sign` and `crew_text` as Tasks 1 and 2 should make them, so a mistake in those tasks does not spoil this one. It also swaps in versions of the two that give back words of their own, to see that `log_line` builds its line from what they give back.",
       "nextSteps": [
         "Read the part of the lesson on functions that use functions.",
         "Write the `def` line with two parameters.",

@@ -57,7 +57,10 @@ export const checks = {
         if (same(got, radioLines(0, n))) {
           return 'The lines start at Radio 0, and there is no radio 0. range starts at 0 unless it is given a start.'
         }
-        if (got.length === n && got.every((line) => line === got[0])) {
+        if (same(got, radioLines(2, n + 1))) {
+          return 'Every number is one too high: the first line says Radio 2. Look at where the numbers start, and at any line inside the loop that changes the number before it prints.'
+        }
+        if (n > 1 && got.length === n && got.every((line) => line === got[0])) {
           return "Every line shows the same number. Print the loop's own name for the number, the one between for and in: it changes on each round."
         }
         if (got.length !== n) {
@@ -140,6 +143,9 @@ export const checks = {
         if (out.length === 1 && out[0].replace(/\s/g, '').toUpperCase() === want.join('')) {
           return 'The letters print on one line. Each letter goes on its own line, so print inside the loop, once per letter.'
         }
+        if (out.some((line) => line.startsWith('<built-in method'))) {
+          return 'The lines show <built-in method ...> instead of letters. A method runs only with round brackets after its name.'
+        }
         if (out.length && out.every((line) => /^\d+$/.test(line.trim()))) {
           return 'The lines show numbers, not letters. A for loop over the text itself gives one letter on each round; range gives numbers.'
         }
@@ -178,7 +184,7 @@ export const checks = {
         expected: number(letters(label).length),
         hint: notNumber(
           'stencils',
-          'stencils is not the number of letters without the spaces. Count the first case by hand, then compare.'
+          'stencils is not the number of letters without the spaces. Count this label by hand, then compare.'
         )
       }))
     })

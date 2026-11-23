@@ -63,26 +63,26 @@ def keys_line(name):
 Reading a name from outside works. Giving it a new value inside a function does not:
 
 ```python
-chairs = 40
+guests = 0
 
-def put_out(extra):
-    chairs = chairs + extra
+def add_guest():
+    guests = guests + 1
 
-put_out(10)
+add_guest()
 ```
 
-Inside a function, any name that gets a value with `=` belongs to that function. So the `chairs` in `put_out` is a new name of its own, not the one at the top, and the line reads it before it has a value. Python stops with an `UnboundLocalError` that names `chairs`. Python 3.9 says `local variable 'chairs' referenced before assignment`; newer versions say it `cannot access local variable 'chairs'`.
+Inside a function, any name that gets a value with `=` belongs to that function. So the `guests` in `add_guest` is a new name of its own, not the one at the top, and the line reads it before it has a value. Python stops with an `UnboundLocalError` that names `guests`. Python 3.9 says `local variable 'guests' referenced before assignment`; newer versions say it `cannot access local variable 'guests'`.
 
-The fix is to pass the value in and give the new one back, and let the line that calls store it:
+The way out is to hand the value in as an argument, give the new value back with `return`, and let the line that calls the function store it:
 
 ```python
-def put_out(chairs, extra):
-    return chairs + extra
+def one_more(count):
+    return count + 1
 
-chairs = put_out(chairs, 10)
+guests = one_more(guests)
 ```
 
-Now `chairs` at the top holds 50. The function changes nothing outside itself; the `=` on the last line does.
+Now `guests` at the top holds 1. The function changes nothing outside itself; the `=` on the last line does. A function that needs more values takes each as a parameter of its own, in the order its calls give them.
 
 ## Your work in this issue
 

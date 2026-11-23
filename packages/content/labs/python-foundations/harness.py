@@ -37,9 +37,25 @@ MAX_PRINTED = 200000
 # With blocks, what one part or call printed is sent back cut to this, so several parts that
 # print without end stay within what Check reads. Every task needs far less.
 MAX_SENT = 20000
+# With blocks, how much more memory than ever before one part or call may take. A loop that
+# grows a value without end reaches gigabytes well inside the time limit.
+MAX_GROWTH = 512 * 1024 * 1024
 TASK_LINE = re.compile(r'\s*#\s*Task\s+(\d+)\b')
 
 channel = sys.stdout
+
+try:
+    import resource
+except ImportError:
+    resource = None
+
+
+def peak_memory():
+    """The most memory this process has held, in bytes, or 0 where Python cannot tell."""
+    if resource is None:
+        return 0
+    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    return peak if sys.platform == 'darwin' else peak * 1024
 
 
 def emit(record):
@@ -133,14 +149,17 @@ class Printed(io.TextIOBase):
 
 
 class Watchdog:
-    """Stops a part or call that runs longer than `seconds`. One thread, started before any
-    learner code runs, raises Stopped in the main thread through its SIGINT handler."""
+    """Stops a part or call that runs longer than `seconds`, or grows its memory by more than
+    MAX_GROWTH. One thread, started before any learner code runs, raises Stopped in the main
+    thread through its SIGINT handler."""
 
     def __init__(self, seconds, shown, tree):
         self.seconds = seconds
         self.shown = shown
         self.loops = [n for n in ast.walk(tree) if isinstance(n, (ast.For, ast.While))]
         self.deadline = None
+        self.base = 0
+        self.why = 'time'
         self.active = False
         self.cond = threading.Condition()
         signal.signal(signal.SIGINT, self.interrupted)
@@ -149,7 +168,7 @@ class Watchdog:
     def interrupted(self, signum, frame):
         if self.active:
             self.active = False
-            raise Stopped('time')
+            raise Stopped(self.why)
 
     def watch(self):
         with self.cond:
@@ -157,10 +176,16 @@ class Watchdog:
                 if self.deadline is None:
                     self.cond.wait()
                 elif self.deadline <= time.monotonic():
-                    self.deadline = None
-                    _thread.interrupt_main()
+                    self.stop('time')
+                elif peak_memory() - self.base > MAX_GROWTH:
+                    self.stop('memory')
                 else:
-                    self.cond.wait(self.deadline - time.monotonic())
+                    self.cond.wait(min(0.02, self.deadline - time.monotonic()))
+
+    def stop(self, why):
+        self.deadline = None
+        self.why = why
+        _thread.interrupt_main()
 
     def loop_at(self, line):
         """The first line of the innermost loop around `line`, the same on every run."""
@@ -175,6 +200,7 @@ class Watchdog:
         result = error = stopped = None
         with self.cond:
             self.deadline = time.monotonic() + self.seconds
+            self.base = peak_memory()
             self.cond.notify()
         self.active = True
         try:

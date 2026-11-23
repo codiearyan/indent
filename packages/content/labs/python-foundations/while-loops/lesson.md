@@ -47,34 +47,32 @@ Check stops such a loop by itself after a couple of seconds, says which task it 
 
 ## Stopping early with break
 
-Sometimes you find what you were looking for before the loop would end by itself. `break` leaves the loop at once, and Python goes on after the block. It works the same in a `for` loop and in a `while` loop:
+Sometimes a loop has done its job before it would end by itself. `break` leaves the loop at once, and Python goes on after the block. It works the same in a `for` loop and in a `while` loop. This prints the first word of a poster, letter by letter:
 
 ```python
-for seat in range(1, 41):
-    if seat == lost_keys_seat:
-        print("Keys under seat", seat)
+for letter in "Glebe Hall":
+    if letter == " ":
         break
-print("Search over")
+    print(letter)
+print("First word done")
 ```
 
-Without the `break`, the loop would go on checking every seat up to 40 after the keys were found. With it, the loop ends at the seat with the keys, or after seat 40 if they are not in the hall. `break` usually sits inside an `if`, because a loop that always breaks only ever runs one round.
+It prints `G`, `l`, `e`, `b` and `e`, then `First word done`. At the space the `break` ends the loop, so the lines under it in the block do not run on that round and the second word is never reached. With no space in the text, the loop simply ends after the last letter. `break` usually sits inside an `if`, because a loop that always breaks only ever runs one round.
 
 ## Skipping a round with continue
 
-`continue` skips the rest of the block for this round and goes straight back to the condition:
+`continue` skips the rest of the block for this round only, and the loop goes on with the next round:
 
 ```python
-table = 0
-while table < 6:
-    table = table + 1
-    if table == 4:
+for letter in "Cheese":
+    if letter == "e":
         continue
-    print("Lay table", table)
+    print(letter)
 ```
 
-This lays tables 1, 2, 3, 5 and 6: table 4 has a broken leg.
+This prints `C`, `h` and `s`: on the rounds where the letter is an e, the `print` is skipped.
 
-Watch where the line that moves the loop on sits. Here `table` goes up before the `continue`. If that line were at the bottom of the block, the `continue` would skip it, `table` would stay at 4, and the loop would never end. `continue` works in `for` loops too, where the loop moves itself on.
+In a `while` loop, watch where the line that moves the loop on sits. A `continue` skips every line below it on that round, so if the line that changes the loop's name comes after the `continue`, it is skipped too, the name stays where it is, and the loop never ends. A `for` loop moves itself on, so it has no such line.
 
 ## Your work in this issue
 

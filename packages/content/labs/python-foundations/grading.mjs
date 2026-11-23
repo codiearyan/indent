@@ -15,6 +15,9 @@ const MAX_READ = 400000
 export const SECONDS = 10
 /** With `blocks`, how long one task's lines, or one call, may run before Check stops them. */
 export const PART_SECONDS = 2
+/** With `blocks`, how many parts may each use PART_SECONDS in one run: the lines above Task 1,
+ * four tasks and a call. The run as a whole gets SECONDS on top of them. */
+const MAX_PARTS = 6
 
 export const pass = (name, output) => ({ name, passed: true, output })
 export const fail = (name, message, output) => ({ name, passed: false, message, output })
@@ -125,8 +128,9 @@ export async function runFile(
     ...(blocks && { part_seconds: PART_SECONDS, define, call })
   }
   const child = spawn(bin, ['-I', '-B', HARNESS], { cwd: dir, env: childEnv(), windowsHide: true })
-  const r = await collect(child, JSON.stringify(spec), SECONDS * 1000)
-  const result = { parts: new Map(), comments: [], blocks: blocks && { made: [] } }
+  const seconds = blocks ? SECONDS + MAX_PARTS * PART_SECONDS : SECONDS
+  const r = await collect(child, JSON.stringify(spec), seconds * 1000)
+  const result = { parts: new Map(), comments: [], seconds, blocks: blocks && { made: [] } }
   let running
   for (const line of r.stdout.split('\n')) {
     if (!line.startsWith(MARK)) continue
@@ -140,10 +144,14 @@ export async function runFile(
     else if (record.kind === 'flood') result.stopped = { task: record.task, why: 'flood' }
     else if (record.kind === 'done') result.done = true
     else if (record.kind === 'made') Object.assign(result.blocks, { made: record.list, defs: record.defs })
-    else if (record.kind === 'call') result.call = { ...record, lines: lines(record.printed ?? '') }
+    else if (record.kind === 'call') {
+      result.call = { ...record, lines: lines(record.printed ?? '') }
+      running = undefined
+    }
     else if (record.kind === 'part') {
       result.parts.set(record.task, { ...record, lines: lines(record.printed) })
-      running = undefined
+      // The call runs after the last part, under that part's task.
+      running = call && record.task === upto ? upto : undefined
     }
   }
   const ended =
@@ -353,13 +361,27 @@ function blockRunCause(error, blocks) {
   if (/can only concatenate|unsupported operand/.test(m) && /NoneType/.test(m)) {
     return `${runCause(error, {}, false).replace(/\.$/, '')}. When that None comes from calling a function, the function ended without return`
   }
+  if ((found = /(\w+)\(\) got multiple values for argument '(\w+)'/.exec(m))) {
+    return `${found[1]} was given two values for ${found[2]}: one in order and one by its name. Values in order fill the parameters from the left, in the order of the def line`
+  }
+  if (error.type === 'RecursionError') {
+    return 'a function calls itself, that call calls it again, and so on without end, so Python gives up after about a thousand calls. To repeat lines, use a loop'
+  }
+  if (error.type === 'EOFError') {
+    return 'input() waits for someone to type, and Check gives a program nothing to type. Everything the task needs is already in the file'
+  }
+  if (error.type === 'SystemExit') {
+    return 'exit() and quit() end the whole program on purpose, so nothing after them runs'
+  }
+  if (error.type === 'MemoryError') {
+    return 'the program asked for more memory than the computer has. Look for a loop that makes a value bigger on every round and never ends'
+  }
   return null
 }
 
 /** What an error while running usually means, in plain words. */
 function runCause(error, names, blocks) {
-  const block = blocks ? blockRunCause(error, blocks) : null
-  if (block) return block
+  if (blocks) return (blockRunCause(error, blocks) ?? runCause(error, names, false)).replace(/\.$/, '')
   const m = error.message
   let found
   if (error.type === 'NameError' && (found = /name '(\w+)' is not defined/.exec(m))) {
@@ -450,7 +472,7 @@ export function problem(r, file, task) {
       why === 'flood'
         ? `${file} printed far more than any task needs while it ran ${where(at)}, so Check stopped it. Look there for a line that keeps printing without end.`
         : why === 'time'
-          ? `${file} did not end: Check stopped it after ${SECONDS} seconds while it ran ${where(at)}. Look there for a line that keeps going or waits for something.`
+          ? `${file} did not end: Check stopped it after ${r.seconds} seconds while it ran ${where(at)}. Look there for a line that keeps going or waits for something.`
           : `Python stopped without a word while it ran ${where(at)}.`
     const later =
       at === task
@@ -503,6 +525,9 @@ export function stoppedText(stopped, what, it = 'them') {
   const loop = stopped.loop ? `The loop that starts at line ${stopped.loop}` : 'A loop'
   const why =
     'its condition never becomes False, or nothing inside it changes what the condition looks at'
+  if (stopped.why === 'memory') {
+    return `${what} kept taking more of the computer's memory, so Check stopped ${it}. ${loop} makes something bigger on every round and never ends: ${why}. Run the file, and press Ctrl+C in the terminal if it does not stop.`
+  }
   return stopped.why === 'flood'
     ? `${what} printed far more than any task needs, so Check stopped ${it}. ${loop} keeps printing and never ends: ${why}. Run the file, and press Ctrl+C in the terminal to stop it.`
     : `${what} ran for more than ${PART_SECONDS} seconds, so Check stopped ${it}. ${loop} never ends: ${why}. Run the file, and press Ctrl+C in the terminal if it does not stop.`
@@ -854,7 +879,9 @@ export async function callCases(t, { file, task, fn, list, mistakes = [], typed,
     if (!r.call) {
       return fail(
         list[i].name,
-        `Python stopped without a word while Check called ${callText(fn, list[i])}.`,
+        r.stopped?.why === 'time'
+          ? `${callText(fn, list[i])} did not end: Check stopped it after ${r.seconds} seconds. Look inside ${fn} for a loop that never ends.`
+          : `Python stopped without a word while Check called ${callText(fn, list[i])}.`,
         r.crashed
       )
     }
