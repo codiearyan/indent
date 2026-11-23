@@ -1,0 +1,87 @@
+{
+  "id": "tests-stand-alone",
+  "title": "Tests that stand alone",
+  "files": ["src/van.test.js", "src/van.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here, all together or one at a time.",
+    "suggestedCommand": "npx vitest run src/van.test.js"
+  },
+  "tasks": [
+    {
+      "id": "lean",
+      "title": "Make Lorcan's tests pass one at a time",
+      "file": "src/van.test.js",
+      "description": "Lorcan's two tests in the `loading` block pass when the whole file runs, but one of them fails when it runs alone. Change them so each test passes alone, in any order, and still checks what its name says: that a box goes in, and what the van weighs.\n\nCheck runs your tests on the working code, each one alone, and in the opposite order, where they must pass. Then it runs them on versions that leave the box out of the van, count the boxes instead of weighing them, or turn every box away, where a test in this block must fail.",
+      "nextSteps": [
+        "Run `npx vitest run src/van.test.js -t \"weighs\"` and read why the test fails alone.",
+        "Find what that test uses that it did not make itself.",
+        "Give each test a van of its own, and let it load what it weighs.",
+        "Run each test alone again, then the whole file."
+      ],
+      "hints": [
+        "The van at the top of the file is made once, and both tests change it or read it.",
+        "Make the van inside the block with `let van`, and give it a new value in `beforeEach`, which runs before every test.",
+        "With `beforeEach(() => { van = createVan() })` in the block, the weighing test first calls `loadBox(van, ada)` and then expects `vanWeight(van)` to be 6."
+      ],
+      "docs": [
+        { "title": "beforeEach", "url": "https://vitest.dev/api/hooks#beforeeach" },
+        { "title": "Filtering tests by name", "url": "https://vitest.dev/guide/filtering" },
+        {
+          "title": "let",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "full",
+      "title": "Start every test with a nearly full van",
+      "file": "src/van.test.js",
+      "description": "`loadBox(van, box)` turns a box away, and answers `false`, when it would take the van over `VAN_LIMIT_KG`. In the `full van` block, give every test a fresh van that is a few kilos short of the limit, set up once in `beforeEach`. Then test that a box that fills it exactly to the limit goes in, and that a box that would take it over is turned away and leaves the van's weight as it was.\n\nCheck runs your tests on the working code, each one alone, and in the opposite order, where they must pass. Then it runs them on versions that turn away a box that fills the van exactly, let one box take it over the limit, or put a box they turn away in the van anyway, where a test in this block must fail.",
+      "nextSteps": [
+        "Pick boxes that bring a van a few kilos short of `VAN_LIMIT_KG`, and work out its weight.",
+        "In `beforeEach`, make a new van and load those boxes into it.",
+        "Test a box that fills the van exactly to the limit, and a box one kilo heavier than that.",
+        "Run each test alone, then the whole file."
+      ],
+      "hints": [
+        "A van loaded once for the whole block is still full from the first test when the second one starts.",
+        "`beforeEach` can do more than make a van: it can load it too, so every test starts with the same nearly full van.",
+        "With nine of Ada's 6 kg boxes loaded in `beforeEach`, the van weighs 54: a 6 kg box goes in, and after a 7 kg box is turned away, `vanWeight(van)` is still 54."
+      ],
+      "docs": [
+        { "title": "beforeEach", "url": "https://vitest.dev/api/hooks#beforeeach" },
+        { "title": "beforeAll", "url": "https://vitest.dev/api/hooks#beforeall" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "log",
+      "title": "Clear the day's log after every test",
+      "file": "src/van.test.js",
+      "description": "`deliver(van, customer)` takes the customer's box out of the van and writes `\"customer, village\"` in the day's log, which `deliveryLog()` gives back. The log lives in `van.js`, outside any van. In the `delivery log` block, write two tests: one that delivers a box and checks the log and the van, and one that delivers two boxes and checks they are in the log in the order they were delivered. Every test must start with an empty log, even when the test before it failed.\n\nCheck runs your tests on the working code, each one alone, and in the opposite order, where they must pass. Then it runs them on versions that write only the village, put the newest delivery first, or leave the box in the van, where a test in this block must fail. On every version, a test that reads lines of the log another test wrote fails this task.",
+      "nextSteps": [
+        "Give the block a fresh van with two boxes in it, in `beforeEach`.",
+        "Write the test with one delivery, then the test with two.",
+        "Clear the log with `clearLog()` in a hook that runs whether a test passes or fails.",
+        "Run each test alone, then the whole file."
+      ],
+      "hints": [
+        "A fresh van does not empty the log: it lives in `van.js`, and the file is loaded once for all its tests.",
+        "A `clearLog()` at the end of a test never runs when an expect above it fails. A hook runs either way.",
+        "Write `afterEach(() => { clearLog() })` inside the `delivery log` block, next to its `beforeEach`."
+      ],
+      "docs": [
+        { "title": "afterEach", "url": "https://vitest.dev/api/hooks#aftereach" },
+        { "title": "Setup and teardown", "url": "https://vitest.dev/guide/learn/setup-teardown" }
+      ],
+      "videos": [
+        {
+          "title": "Why tests must not lean on each other",
+          "url": "https://www.youtube.com/watch?v=HApI2cspQus"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

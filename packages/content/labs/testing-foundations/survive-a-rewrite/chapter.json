@@ -1,0 +1,89 @@
+{
+  "id": "survive-a-rewrite",
+  "title": "Tests that survive a rewrite",
+  "files": ["src/packing.test.js", "src/packing.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here and read what they say.",
+    "suggestedCommand": "npx vitest run src/packing.test.js"
+  },
+  "tasks": [
+    {
+      "id": "order",
+      "title": "Test the packing order by what comes out",
+      "file": "src/packing.test.js",
+      "description": "`packingList(order)` gives back the list Wendell packs from. Its `items` are the names of the order's items, heaviest first, so heavy things sit at the bottom. In the `packing order` block, test the items on the list for an order whose items are not already heaviest first. Check what `packingList` gives back, not how it gets there.\n\nCheck runs your tests on the working code and on a rewrite of `packing.js` that packs every order the same, where they must pass. Then it runs them on versions that pack the lightest item first, keep the customer's order, or leave the last item off the list, where a test in this block must fail.",
+      "nextSteps": [
+        "Pick an order whose items are not heaviest first, such as Nell's.",
+        "Work out by hand the order its items go in.",
+        "Compare the whole `items` list of `packingList(order)` with yours.",
+        "Run the tests."
+      ],
+      "hints": [
+        "A test that watches `helpers.heaviestFirst` breaks when packing.js stops using it, though the box comes out the same.",
+        "Work the expected list out yourself, and compare it with `toEqual`. A list from `helpers.heaviestFirst` is the code agreeing with itself.",
+        "For Nell's order, expect `packingList(nell).items` to equal `['squash', 'carrots', 'kale', 'potatoes']`."
+      ],
+      "docs": [
+        { "title": "toEqual", "url": "https://vitest.dev/api/expect#toequal" },
+        {
+          "title": "Array.prototype.sort()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "crate",
+      "title": "Replace the test that watches crateFor",
+      "file": "src/packing.test.js",
+      "description": "A box of up to `SMALL_CRATE_KG` goes in a small crate, and anything heavier in a large one. Lorcan's test in the `crate` block only checks that `helpers.crateFor` was asked about the weight. Replace it with tests of the crate on the list that `packingList` gives back: a box of exactly `SMALL_CRATE_KG`, and a box just over it.\n\nCheck runs your tests on the working code and on a rewrite of `packing.js` that packs every order the same, where they must pass. Then it runs them on versions that put a box of exactly 5 kg in a large crate, write large crate on every list, or let a box of up to 6 kg into a small crate, where a test in this block must fail.",
+      "nextSteps": [
+        "Run the tests and read what Lorcan's test checks.",
+        "Make an order that weighs exactly `SMALL_CRATE_KG`, and one just over it.",
+        "Check the `crate` on the list `packingList` gives back for each.",
+        "Delete Lorcan's test and run the tests."
+      ],
+      "hints": [
+        "Lorcan's test passes when the list says large crate for every box: it only looks at what crateFor was asked.",
+        "Leave the helpers out of your tests. Make an order, call `packingList`, and compare its `crate` with the crate the rule says.",
+        "Two items of 2.5 kg weigh exactly 5: expect `packingList(order).crate` to be `'small crate'`. Make one of them 3 kg, and expect `'large crate'`."
+      ],
+      "docs": [
+        { "title": "toBe", "url": "https://vitest.dev/api/expect#tobe" },
+        { "title": "Mock functions", "url": "https://vitest.dev/guide/learn/mock-functions" }
+      ],
+      "videos": [
+        {
+          "title": "Test behaviour, not how it is built",
+          "url": "https://www.youtube.com/watch?v=bvRRbWbQwDU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "total",
+      "title": "Work out the total weight by hand",
+      "file": "src/packing.test.js",
+      "description": "The `kg` on a packing list is the weight of every item added up. Lorcan's test in the `total weight` block works out the answer it expects with `helpers.totalKg`, the code's own adding up. Replace it with a test whose expected weight you worked out yourself, for an order with half kilos in it.\n\nCheck runs your tests on the working code and on a rewrite of `packing.js` that packs every order the same, where they must pass. Then it runs them on versions that leave the lightest item out, drop the half kilos, or count the heaviest item twice, where a test in this block must fail.",
+      "nextSteps": [
+        "Read Lorcan's test: where does its expected number come from?",
+        "Pick an order with half kilos in it and add up its weights on paper.",
+        "Compare the `kg` of its packing list with your number.",
+        "Delete Lorcan's test and run the tests."
+      ],
+      "hints": [
+        "When `helpers.totalKg` adds up wrong, Lorcan's test asks the same wrong code for its answer, and the two agree.",
+        "An expected value should come from the rule, not from the code. Write it as a plain number.",
+        "Nell's items weigh 1, 2.5, 0.5 and 0.5 kg: expect `packingList(nell).kg` to be `4.5`."
+      ],
+      "docs": [
+        { "title": "toBe", "url": "https://vitest.dev/api/expect#tobe" },
+        {
+          "title": "Array.prototype.reduce()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

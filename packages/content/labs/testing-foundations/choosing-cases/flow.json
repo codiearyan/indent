@@ -1,0 +1,92 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "report", "label": "Nell's report", "kind": "story" },
+      { "id": "tests", "label": "bill.test.js", "kind": "file", "mine": true },
+      { "id": "bill", "label": "bill()", "kind": "function", "mine": true, "fn": "bill" },
+      { "id": "eggs", "label": "eggPrice()", "kind": "function" },
+      { "id": "prices", "label": "Price list", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "report", "to": "tests", "label": "cut down" },
+      { "from": "tests", "to": "bill", "label": "an order" },
+      { "from": "prices", "to": "bill", "label": "box prices" },
+      { "from": "bill", "to": "eggs", "label": "dozens" },
+      { "from": "tests", "to": "eggs", "label": "one per case" }
+    ],
+    "note": "A long report becomes one short test that fails, the bill is fixed, and every egg price gets a test of its own."
+  },
+  "tasks": {
+    "report": {
+      "steps": [
+        {
+          "active": ["report"],
+          "value": {
+            "kind": "map",
+            "label": "what Nell ordered",
+            "entries": [
+              { "key": "boxes", "value": "medium, large, large" },
+              { "key": "dozens", "value": 2 },
+              { "key": "code", "value": "HARVEST" }
+            ]
+          },
+          "note": "Nell's report has every detail of her order, and most of them have nothing to do with the bug."
+        },
+        {
+          "active": ["report", "report->tests", "tests"],
+          "note": "Your test starts with the whole order, and you take one detail out at a time, running it after each."
+        },
+        {
+          "active": ["tests", "tests->bill", "bill"],
+          "note": "What is left is the smallest order that still gets the wrong bill, and the test fails on it."
+        }
+      ]
+    },
+    "fix": {
+      "trace": {
+        "file": "src/bill.js",
+        "call": "bill",
+        "args": [{ "customer": "Nell Hollis", "boxes": ["medium", "large", "large"], "dozens": 2, "code": "HARVEST" }]
+      },
+      "steps": [
+        {
+          "active": ["tests", "tests->bill", "bill"],
+          "note": "Nell's order comes into bill."
+        },
+        {
+          "active": ["prices", "prices->bill", "bill"],
+          "note": "Every box in the order is looked up on the price list and added in, two of the same size included."
+        },
+        {
+          "active": ["bill", "bill->eggs", "eggs"],
+          "note": "The tenth comes off the boxes for HARVEST, and the eggs are added at their own price."
+        }
+      ]
+    },
+    "bands": {
+      "steps": [
+        {
+          "active": ["prices"],
+          "value": {
+            "kind": "map",
+            "label": "the egg rule",
+            "entries": [
+              { "key": "small orders", "value": "one price a dozen" },
+              { "key": "middle orders", "value": "a lower price" },
+              { "key": "cafe orders", "value": "the lowest" }
+            ]
+          },
+          "note": "The egg rule splits every order into three groups, with a line between each."
+        },
+        {
+          "active": ["tests", "tests->eggs", "eggs"],
+          "note": "Your tests try each group, both sides of each line, and an order with no eggs."
+        },
+        {
+          "active": ["tests"],
+          "note": "A test that repeats a case another test tries is taken out, since it can only fail when the other does."
+        }
+      ]
+    }
+  }
+}

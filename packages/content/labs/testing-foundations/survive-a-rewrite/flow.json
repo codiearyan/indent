@@ -1,0 +1,81 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "order", "label": "Nell's order", "kind": "data" },
+      { "id": "code", "label": "packingList()", "kind": "function" },
+      { "id": "helpers", "label": "helpers", "kind": "data" },
+      { "id": "list", "label": "Packing list", "kind": "data" },
+      { "id": "tests", "label": "packing.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "order", "to": "code", "label": "items" },
+      { "from": "code", "to": "helpers", "label": "today's way" },
+      { "from": "code", "to": "list", "label": "gives back" },
+      { "from": "list", "to": "tests", "label": "checked" }
+    ],
+    "note": "Your tests check the list that comes out, so the code inside can change how it works without a test going red."
+  },
+  "tasks": {
+    "order": {
+      "steps": [
+        {
+          "active": ["order", "order->code", "code"],
+          "value": {
+            "kind": "array",
+            "label": "the items as Nell wrote them",
+            "values": ["carrots", "squash", "kale", "potatoes"]
+          },
+          "note": "An order goes in with its items in the order the customer wrote them."
+        },
+        {
+          "active": ["code", "code->helpers", "helpers"],
+          "note": "Inside, the code sorts them its own way today. Your test does not look in here."
+        },
+        {
+          "active": ["code", "code->list", "list", "list->tests", "tests"],
+          "note": "Your test compares the items on the list with the order you worked out by hand, heaviest first."
+        }
+      ]
+    },
+    "crate": {
+      "steps": [
+        {
+          "active": ["tests", "code->helpers", "helpers"],
+          "note": "Lorcan's test only watches whether a helper was asked about the weight."
+        },
+        {
+          "active": ["order", "order->code", "code"],
+          "note": "Your tests send orders that weigh right on the crate line, and just over it."
+        },
+        {
+          "active": ["list", "list->tests", "tests"],
+          "value": {
+            "kind": "map",
+            "label": "what each test reads",
+            "entries": [
+              { "key": "kg", "value": "the box's weight" },
+              { "key": "crate", "value": "small or large" }
+            ]
+          },
+          "note": "Each test reads the crate on the list, which is what Wendell packs into."
+        }
+      ]
+    },
+    "total": {
+      "steps": [
+        {
+          "active": ["tests", "helpers"],
+          "note": "Lorcan's test asks the code's own adding up for the answer, so it agrees with any mistake there."
+        },
+        {
+          "active": ["order", "order->code", "code", "code->list", "list"],
+          "note": "An order with half kilos in it goes through, and the list carries its weight."
+        },
+        {
+          "active": ["list", "list->tests", "tests"],
+          "note": "Your test compares that weight with the total you added up yourself, written as a plain number."
+        }
+      ]
+    }
+  }
+}

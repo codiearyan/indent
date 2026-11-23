@@ -1,0 +1,120 @@
+{
+  "id": "test-first",
+  "title": "Writing the test first",
+  "files": ["src/loyalty.test.js", "src/loyalty.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here and read why they fail.",
+    "suggestedCommand": "npx vitest run src/loyalty.test.js"
+  },
+  "tasks": [
+    {
+      "id": "free-test",
+      "title": "Write a failing test for the free box",
+      "file": "src/loyalty.test.js",
+      "description": "Bridget's new rule: every tenth box a subscriber gets is free. `boxPrice(size, boxNumber)` gives the price of a subscriber's box, and box numbers count from 1. It does not know the rule yet. In the `free box` block, test that the tenth and the twentieth box are free, and that the boxes just before and just after a free one pay the usual price. Use small or medium boxes: large boxes get a rule of their own later. Run the tests and read why they fail, but do not change `loyalty.js` yet.\n\nCheck runs your tests on code without the rule, where a test in this block must fail, and on code with it, where they must all pass. It also runs them on versions that make the box before the tenth free, every box from the tenth on, or only the tenth and never the twentieth, where a test in this block must fail.",
+      "nextSteps": [
+        "Write down which box numbers the rule makes free, and the ones either side of the first two.",
+        "Work out by hand what each of those boxes should cost.",
+        "Write the tests in the `free box` block.",
+        "Run them and read the Expected and Received lines: they should fail, and say why."
+      ],
+      "hints": [
+        "A test that passes now, before the rule exists, cannot tell the code with the rule from the code without it.",
+        "A free box costs 0. The boxes either side of it cost what `BOX_PRICES` says. Test box 10, box 20, and the boxes next to box 10.",
+        "Expect `boxPrice('medium', 10)` and `boxPrice('medium', 20)` to be `0`, and `boxPrice('medium', 9)` and `boxPrice('medium', 11)` to be `19`."
+      ],
+      "docs": [
+        { "title": "toBe", "url": "https://vitest.dev/api/expect#tobe" },
+        {
+          "title": "Remainder (%)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Test first, then code",
+          "url": "https://www.youtube.com/watch?v=1oRF8sfEWCI"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "free-code",
+      "title": "Make the free box test pass",
+      "file": "src/loyalty.js",
+      "description": "Now write the rule. Change `boxPrice` in `src/loyalty.js` so that every tenth box is free, and do no more than your tests ask for. Run the tests after each change, until the `free box` block is green.\n\nCheck calls `boxPrice` from your file with boxes of its own, free ones and the ones around them, and runs your tests in the `free box` block on your code, where they must pass.",
+      "nextSteps": [
+        "Read the first test that fails, and what it expected.",
+        "Find out whether a box number is a multiple of ten with the remainder operator, `%`.",
+        "Give back 0 for those boxes, and the usual price for every other.",
+        "Run the tests until they pass."
+      ],
+      "hints": [
+        "Your tests already say what the code has to do. Write just enough to make them pass.",
+        "`boxNumber % 10` is what is left over after dividing by ten. For the tenth, twentieth and thirtieth box it is 0.",
+        "At the top of `boxPrice`, write `if (boxNumber % 10 === 0) return 0`."
+      ],
+      "docs": [
+        {
+          "title": "Remainder (%)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder"
+        },
+        {
+          "title": "if...else",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "large-test",
+      "title": "Write a failing test for a large free box",
+      "file": "src/loyalty.test.js",
+      "description": "The second part of Bridget's rule: a free box is never worth more than a medium. On a free turn, a large box costs what a large box costs over a medium box, and small and medium boxes stay free. In the `large free box` block, test a large box on a free turn, and a large box on a turn that is not free. Run the tests and read why the new one fails on your code, but do not change `loyalty.js` yet.\n\nCheck runs your tests on code with the free box but without this rule, where a test in this block must fail, and on code with both, where they must all pass. It also runs them on versions that charge a large free box the price of a medium, or take the price of a medium off large boxes on every turn, where a test in this block must fail.",
+      "nextSteps": [
+        "Work out from `BOX_PRICES` what a large box costs over a medium.",
+        "Test a large box on a free turn, and a large box on a turn that is not free.",
+        "Run the tests and read why the first one fails.",
+        "Leave `loyalty.js` as it is for now."
+      ],
+      "hints": [
+        "Your free box code gives every box on a free turn away. A test of a large box on a free turn shows that.",
+        "Large costs 24 and medium 19. The rule is only for free turns, so a large box on any other turn still costs 24.",
+        "Expect `boxPrice('large', 10)` to be `5`, and `boxPrice('large', 11)` to be `24`."
+      ],
+      "docs": [
+        { "title": "toBe", "url": "https://vitest.dev/api/expect#tobe" },
+        { "title": "describe", "url": "https://vitest.dev/api/describe" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "large-code",
+      "title": "Make the large free box test pass",
+      "file": "src/loyalty.js",
+      "description": "Now add the rule to `boxPrice`: on a free turn, a large box costs what it costs over a medium, and small and medium boxes are still free. Every other box pays the usual price. Run the tests after each change, until both blocks are green.\n\nCheck calls `boxPrice` from your file with boxes of its own, of every size, on free turns and others, and runs your tests in the `large free box` block on your code, where they must pass.",
+      "nextSteps": [
+        "Read the test that fails, and what it expected.",
+        "Inside the part of `boxPrice` for free turns, treat a large box on its own.",
+        "Work its price out from `BOX_PRICES`, not as a number written in.",
+        "Run every test: the free box block must stay green too."
+      ],
+      "hints": [
+        "Only free turns change. Leave the usual price for every other box as it is.",
+        "On a free turn, ask whether `size` is `'large'` before giving back 0.",
+        "In the free turn's part, write `if (size === 'large') return BOX_PRICES.large - BOX_PRICES.medium` before `return 0`."
+      ],
+      "docs": [
+        {
+          "title": "if...else",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else"
+        },
+        {
+          "title": "Strict equality (===)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
