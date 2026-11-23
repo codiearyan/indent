@@ -1,0 +1,38 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Can it read the till's file?",
+      "note": "And keep the day's log whole."
+    },
+    {
+      "title": "Old till",
+      "text": "Leaves its own file behind at closing"
+    },
+    {
+      "title": "Your files",
+      "file": "HutFiles.java",
+      "mine": true,
+      "gap": "Files read and written",
+      "tasks": ["Read a file", "Write and add", "Count a long file"]
+    },
+    {
+      "title": "Hut's records",
+      "text": "Notices read, log kept, till counted",
+      "note": "Every pound sign where it should be."
+    }
+  ],
+  "ticket": {
+    "label": "Till's file",
+    "wrong": "boxes",
+    "why": "Garbled",
+    "right": "every £ right"
+  },
+  "captions": [
+    "The hut at Lanternquay. Bridie wants the notices, the log and the old till's file read.",
+    "Opened by hand, the till's file shows boxes where its pound signs should be.",
+    "You read files, write and add to them, and count through a long one a line at a time.",
+    "Now the till's file reads right, every pound sign in place, and the log only grows.",
+    "The hut's files keep the day between runs, and the program reads them back as written."
+  ]
+}

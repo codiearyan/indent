@@ -1,0 +1,103 @@
+{
+  "id": "files",
+  "title": "Files: reading, writing and adding",
+  "files": ["HutFiles.java", "notices.txt", "till.txt", "log.txt"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the program here; it reads and writes the files beside it.",
+    "suggestedCommand": "java HutFiles.java"
+  },
+  "tasks": [
+    {
+      "id": "reading",
+      "title": "Read a file",
+      "file": "HutFiles.java",
+      "description": "Under `// Task 1`, write a class `Reading` with two methods, each with `throws IOException`. `static List<String> lines(Path file)` gives back the lines of `file`, a file in UTF-8, without their line ends. `static List<String> tillLines(Path file)` does the same for a file the old till wrote, in ISO-8859-1. When the file is not there, the exception reaches the caller.\n\nCheck hands each method a path to a file of its own, in a folder of its own: a file with Windows line ends and no line end after its last line, a file with letters outside plain ASCII, an empty file, and a file that is not there. It compares the list it gets back as a list, in order, and reads an exception by its type. A line of Check's own calls each method where only an `IOException` is caught, so a method that says it throws any `Exception` at all does not compile there.",
+      "nextSteps": [
+        "Read the parts of the lesson about Path and Files, and about character sets.",
+        "Write lines, and let its exception through with throws on the method.",
+        "Open till.txt in the editor and look at its pound signs, then write tillLines.",
+        "Take the // off the first lines of main and run the file."
+      ],
+      "hints": [
+        "Files can read a whole file as a list of lines, and it takes care of every kind of line end. A file has to be read in the character set it was written in.",
+        "Each Files method that reads can be told the character set, and StandardCharsets holds the common ones by name. A checked exception the method does not catch is named after throws on its first line.",
+        "`return Files.readAllLines(file, StandardCharsets.UTF_8);` and `return Files.readAllLines(file, StandardCharsets.ISO_8859_1);`, with `throws IOException` on both."
+      ],
+      "docs": [
+        {
+          "title": "Files.readAllLines",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Files.html#readAllLines(java.nio.file.Path,java.nio.charset.Charset)"
+        },
+        {
+          "title": "Reading, writing and creating files",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/io/file.html"
+        },
+        {
+          "title": "StandardCharsets",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/charset/StandardCharsets.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "writing",
+      "title": "Write a file, and add to one",
+      "file": "HutFiles.java",
+      "description": "Under `// Task 2`, write a class `Writing` with two methods, each with `throws IOException`. `static void save(Path file, List<String> lines)` makes `file` hold `lines` and nothing else, each followed by `\"\\n\"`, in UTF-8. `static void append(Path file, String line)` adds `line` and `\"\\n\"` to the end of `file` and keeps what was there. Both make the file when it is not there yet.\n\nCheck hands each method a path in a folder of its own, to a file it wrote first or to one that is not there, and reads the file back afterwards, byte for byte. It runs with the line end of a Windows computer, so a line end that follows the computer shows.",
+      "nextSteps": [
+        "Read the part of the lesson about writing, and the one about adding to a file.",
+        "Write save: build the text with its line ends, then write it in one go.",
+        "Write append, and try it twice from main on log.txt.",
+        "Try append on a file that is not there yet."
+      ],
+      "hints": [
+        "Writing a whole text to a file replaces what it held. Adding to a file is the same call, told how to open the file.",
+        "Files writes a text and takes options that say how to open the file: one adds to the end, another makes the file when it is not there. Writing a list of lines with Files uses the computer's line end.",
+        "In save, build the text with `\"\\n\"` after each line and `Files.writeString(file, text, StandardCharsets.UTF_8);`. In append, `Files.writeString(file, line + \"\\n\", StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND);`."
+      ],
+      "docs": [
+        {
+          "title": "Files.writeString",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Files.html#writeString(java.nio.file.Path,java.lang.CharSequence,java.nio.charset.Charset,java.nio.file.OpenOption...)"
+        },
+        {
+          "title": "StandardOpenOption",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/StandardOpenOption.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "counting",
+      "title": "Count through a long file",
+      "file": "HutFiles.java",
+      "description": "Under `// Task 3`, write a class `Counting` with one method, with `throws IOException`. `static long linesWith(Path file, String word)` gives back how many lines of `file`, a file in ISO-8859-1, hold `word`. The file can be long, so read it a line at a time, and close it when you are done; another way that reads the file and closes it passes too. When the file is not there, it gives back 0.\n\nCheck hands it paths to files of its own, one not there, on a file system of its own that counts the files still open after the call. A file left open fails, even when the count is right.",
+      "nextSteps": [
+        "Read the part of the lesson about Files.lines and closing.",
+        "Ask whether the file is there first.",
+        "Open the lines as a stream in a try with resources, keep the lines with the word, and count them.",
+        "Run it on till.txt from main."
+      ],
+      "hints": [
+        "A stream of a file's lines reads the file as it goes, so the file stays open until the stream is closed. Part 5 showed a try that closes what it opens on every way out.",
+        "A Stream can be closed, so it can go in the round brackets after try. Files can also say whether a file is there.",
+        "`if (!Files.exists(file)) return 0;` then `try (Stream<String> lines = Files.lines(file, StandardCharsets.ISO_8859_1)) { return lines.filter(line -> line.contains(word)).count(); }`."
+      ],
+      "docs": [
+        {
+          "title": "Files.lines",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Files.html#lines(java.nio.file.Path,java.nio.charset.Charset)"
+        },
+        {
+          "title": "The try-with-resources statement",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html"
+        },
+        {
+          "title": "Files.exists",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Files.html#exists(java.nio.file.Path,java.nio.file.LinkOption...)"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
