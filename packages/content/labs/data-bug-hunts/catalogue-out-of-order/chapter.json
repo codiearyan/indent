@@ -11,7 +11,7 @@
       "id": "ticket",
       "title": "Catch the catalogue in the wrong order",
       "file": "src/catalogue.test.js",
-      "description": "Prove the bug with a test before you change `catalogue.js`. In `src/catalogue.test.js`, write tests in the `describe('the ticket')` block that fail on the shop's `catalogueOrder()` today and will pass once it is right.\n\nThe check runs the tests in that block on three computers beside:\n\n- the shop's `catalogue.js`: they must fail\n- a right fix: they must pass\n- a version that mends only the ticket's own catalogue: they must fail",
+      "description": "Prove the bug with a test before you change `catalogue.js`. In `src/catalogue.test.js`, write tests in the `describe('the ticket')` block that fail on the shop's `catalogueOrder()` today and will pass once it is right.\n\nThe check runs the tests in that block on three computers beside:\n\n- the shop's `catalogue.js`: they must fail\n- a right fix: they must pass\n- a version that mends only the ticket's own catalogue: they must fail\n- a version that mends the numbers and nothing else: they must fail",
       "nextSteps": [
         "Run `node src/demo.js` and find each title Nadia's ticket names.",
         "Write a short list of your own with the same three kinds of trouble.",

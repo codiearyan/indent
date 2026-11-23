@@ -30,14 +30,15 @@
           "active": ["test", "order"],
           "value": {
             "kind": "map",
-            "label": "three runs of the ticket block",
+            "label": "four runs of the ticket block",
             "entries": [
               { "key": "the shop's catalogueOrder()", "value": "must fail" },
               { "key": "a right fix", "value": "must pass" },
-              { "key": "mends only the ticket's list", "value": "must fail" }
+              { "key": "mends only the ticket's list", "value": "must fail" },
+              { "key": "mends only the numbers", "value": "must fail" }
             ]
           },
-          "note": "Check runs the block beside the shop's code, a right fix and a version that knows only the ticket's catalogue."
+          "note": "Check runs the block beside the shop's code, a right fix, a version that knows only the ticket's catalogue and one that mends only the numbers."
         }
       ]
     },

@@ -11,13 +11,13 @@ The reminders now show the right date on any laptop. Most choirs pay Wrenhaven b
 
 ## The ticket
 
-> **Kwame:** WH-44. Ängsö Kammarkör took a monthly licence on 31 January. Their next invoice went out on 3 March, and they never had one for February, so March looked like two months at once. Also, the week the clocks went forward, every follow-up we send a week after a reminder went out at ten instead of nine. I checked, nobody touched the job.
+> **Marek:** WH-44. Ängsö Kammarkör took a monthly licence on 31 January. Their next invoice went out on 3 March, and they never had one for February, so March looked like two months at once. Also, the week the clocks went forward, every follow-up we send a week after a reminder went out at ten instead of nine. I checked, nobody touched the job.
 
 The demo prints the next three renewals for each licence and the follow-ups, on your computer and on one set to London, where the shop is.
 
 ## A month is not a length of time
 
-`setMonth` moves a date to another month and keeps its day number. When that month is too short, JavaScript does not complain. It rolls the extra days over into the next month:
+`setMonth`, and its twin for UTC `setUTCMonth`, move a date to another month and keep its day number. When that month is too short, JavaScript does not complain. It rolls the extra days over into the next month:
 
 ```js
 const rehearsal = new Date(2026, 4, 31) // 31 May

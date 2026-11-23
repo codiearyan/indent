@@ -22,6 +22,9 @@ function renewCause(started, months) {
   }
 }
 
+const SKIPPED =
+  "The follow-up goes out at another time of day. On the night London's clocks go forward, half past one never happens there, so a computer's clock moves it to another hour. The time is shop time written as text: keep it as it was and only move the date in front of it."
+
 function remindCause(sendAt) {
   return (got) => {
     if (typeof got !== 'string' || !TIME.test(got)) {
@@ -47,12 +50,38 @@ const renewals = [
 
 const followUps = [
   ['A week across the spring change in London keeps its time', '2026-03-25T09:00', 7],
-  ['A week across the spring change in Vancouver keeps its time', '2026-03-05T09:00', 7],
+  ['A week across the spring change in Vancouver keeps its time', '2025-03-06T09:00', 7],
+  ['A time the clocks skip that night stays as it was written', '2026-03-22T01:30', 7, SKIPPED],
   ['A week across the autumn change in London keeps its time', '2026-10-22T09:00', 7],
   ['Three days across the autumn change in London keep their time', '2026-10-23T17:30', 3],
   ['A follow-up across the new year is right', '2026-12-30T08:15', 3],
   ['A follow-up onto 29 February is right', '2028-02-27T09:00', 2]
-].map(([name, sendAt, days]) => ({ name, args: [sendAt, days], cause: remindCause(sendAt) }))
+].map(([name, sendAt, days, cause]) => ({ name, args: [sendAt, days], cause: cause ?? remindCause(sendAt) }))
+
+const TICKET_VERSIONS = [
+  { ...SHOP, hint: 'Call renewsOn() with a start on a day that the next month does not have, and expect the date the shop wants.' },
+  {
+    label: "a version that mends only the ticket's renewal",
+    source: 'grader/versions/ticket-only.js',
+    hint: 'A test of only the renewal from the ticket passes beside a version that knows that one date by heart. Add another start at the end of a month.'
+  }
+]
+
+const NEXT_VERSIONS = [
+  { ...SHOP, hint: 'Test a renewal in a leap year and a follow-up across a clock change.' },
+  {
+    label: 'a version that gives February 28 days every year',
+    source: 'grader/versions/month-table.js',
+    hint: 'Add a test of a renewal that lands at the end of February in a leap year, such as 2028.'
+  },
+  {
+    label: 'a version that adds a follow-up\'s days as blocks of 24 hours',
+    source: 'grader/versions/day-blocks.js',
+    hint: 'Add a test of a follow-up across the night the clocks change, run with inZone in a zone that changes its clocks that night, such as Europe/London in late March.'
+  }
+]
+
+const POOL = [...TICKET_VERSIONS, ...NEXT_VERSIONS]
 
 export const checks = {
   ticket(t) {
@@ -60,14 +89,8 @@ export const checks = {
       test: TEST,
       target: TARGET,
       block: 'the ticket',
-      versions: [
-        { ...SHOP, hint: 'Call renewsOn() with a start on a day that the next month does not have, and expect the date the shop wants.' },
-        {
-          label: "a version that mends only the ticket's renewal",
-          source: 'grader/versions/ticket-only.js',
-          hint: 'A test of only the renewal from the ticket passes beside a version that knows that one date by heart. Add another start at the end of a month.'
-        }
-      ]
+      versions: TICKET_VERSIONS,
+      pool: POOL
     })
   },
 
@@ -83,19 +106,8 @@ export const checks = {
       test: TEST,
       target: TARGET,
       block: 'next door',
-      versions: [
-        { ...SHOP, hint: 'Test a renewal in a leap year and a follow-up across a clock change.' },
-        {
-          label: 'a version that gives February 28 days every year',
-          source: 'grader/versions/month-table.js',
-          hint: 'Add a test of a renewal that lands at the end of February in a leap year, such as 2028.'
-        },
-        {
-          label: 'a version that adds a follow-up\'s days as blocks of 24 hours',
-          source: 'grader/versions/day-blocks.js',
-          hint: 'Add a test of a follow-up across the night the clocks change, run with inZone in a zone that changes its clocks that night, such as Europe/London in late March.'
-        }
-      ]
+      versions: NEXT_VERSIONS,
+      pool: POOL
     })
   }
 }

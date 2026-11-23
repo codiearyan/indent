@@ -2,7 +2,7 @@
   "scene": {
     "nodes": [
       { "id": "nadia", "label": "Nadia", "kind": "story" },
-      { "id": "kwame", "label": "Kwame", "kind": "story" },
+      { "id": "marek", "label": "Marek", "kind": "story" },
       { "id": "billing", "label": "Billing code", "kind": "file", "mine": true },
       { "id": "invoices", "label": "Invoices and reminders", "kind": "story" },
       { "id": "catalogue", "label": "Catalogue and labels", "kind": "story" },
@@ -10,7 +10,7 @@
     ],
     "edges": [
       { "from": "nadia", "to": "billing", "label": "tickets" },
-      { "from": "kwame", "to": "billing", "label": "tickets" },
+      { "from": "marek", "to": "billing", "label": "tickets" },
       { "from": "billing", "to": "invoices", "label": "money, dates" },
       { "from": "billing", "to": "catalogue", "label": "text" },
       { "from": "invoices", "to": "choirs", "label": "by email" },

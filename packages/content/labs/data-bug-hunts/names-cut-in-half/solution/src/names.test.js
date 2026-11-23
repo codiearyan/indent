@@ -13,7 +13,7 @@ describe('the ticket', () => {
   })
 
   it('cuts a name with a two-mark accent after its accent', () => {
-    expect(fitName('Siân Pryce'.normalize('NFD'), 3).normalize('NFC')).toBe('Siâ')
+    expect(fitName('Renée Aubert'.normalize('NFD'), 4).normalize('NFC')).toBe('René')
   })
 
   it('knows two spellings of one name', () => {

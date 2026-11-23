@@ -59,20 +59,39 @@ const pairs = [
       : 'Two different names come out the same. Only the way accents are written may differ: a missing accent, other capitals or another character make it another name.'
 }))
 
+const TICKET_VERSIONS = [
+  { ...SHOP, hint: 'Use the pasted name from contacts.js: fit it on a label, count it, and compare it with the one on file.' },
+  {
+    label: "a version that mends only the ticket's name",
+    source: 'grader/versions/ticket-only.js',
+    hint: 'A test of only the name from the ticket passes beside a version that knows that one name by heart. Add another name whose accent is a separate mark: normalize("NFD") turns any accented name into one.'
+  },
+  {
+    label: 'a version that matches two spellings of a name but still cuts and counts code units',
+    source: 'grader/versions/compare-only.js',
+    hint: 'That version knows the pasted name is the one on file, and still cuts and counts it wrong. Expect a name whose accents are separate marks to fit on a label whole, and to be counted the way a person counts it.'
+  }
+]
+
+const NEXT_VERSIONS = [
+  { ...SHOP, hint: 'Use a name with a character that takes two code units, and cut it right after that character.' },
+  {
+    label: 'a version that joins accents first and then still cuts code units',
+    source: 'grader/versions/compose-first.js',
+    hint: 'Joining accents fixes the ticket, and nothing else. A character such as 𠮷, used in some Japanese names, has no accent and still takes two code units: cut and count a name that has one.'
+  }
+]
+
+const POOL = [...TICKET_VERSIONS, ...NEXT_VERSIONS]
+
 export const checks = {
   ticket(t) {
     return judgeTests(t, {
       test: TEST,
       target: TARGET,
       block: 'the ticket',
-      versions: [
-        { ...SHOP, hint: 'Use the pasted name from contacts.js: fit it on a label, count it, and compare it with the one on file.' },
-        {
-          label: "a version that mends only the ticket's name",
-          source: 'grader/versions/ticket-only.js',
-          hint: 'A test of only the name from the ticket passes beside a version that knows that one name by heart. Add another name whose accent is a separate mark: normalize("NFD") turns any accented name into one.'
-        }
-      ]
+      versions: TICKET_VERSIONS,
+      pool: POOL
     })
   },
 
@@ -88,14 +107,8 @@ export const checks = {
       test: TEST,
       target: TARGET,
       block: 'next door',
-      versions: [
-        { ...SHOP, hint: 'Use a name with a character that takes two code units, and cut it right after that character.' },
-        {
-          label: 'a version that joins accents first and then still cuts code units',
-          source: 'grader/versions/compose-first.js',
-          hint: 'Joining accents fixes the ticket, and nothing else. A character such as 𠮷, used in some Japanese names, has no accent and still takes two code units: cut and count a name that has one.'
-        }
-      ]
+      versions: NEXT_VERSIONS,
+      pool: POOL
     })
   }
 }

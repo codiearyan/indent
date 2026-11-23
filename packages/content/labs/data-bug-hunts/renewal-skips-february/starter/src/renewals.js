@@ -16,7 +16,7 @@ const pad = (n) => String(n).padStart(2, '0')
 
 export function renewsOn(started, months) {
   const date = new Date(started)
-  date.setMonth(date.getMonth() + months)
+  date.setUTCMonth(date.getUTCMonth() + months)
   return date.toISOString().slice(0, 10)
 }
 

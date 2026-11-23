@@ -10,10 +10,13 @@ const PARTS =
 const ROUND =
   "A line's net or VAT is off by a penny. The shop rounds each line's VAT once, to the nearest penny, with exactly half a penny going up. A decimal number like 1.075 is stored a hair below or above the half, and a small amount added before rounding pushes amounts that are just under the half up too. Work it out from whole pence, where a half is exactly a half."
 
+const NET =
+  "A line's net is off by a penny. A fee like 2.01 is stored a hair below or above its value, so the fee times 100 is a hair off too, and cutting the decimals off it loses a penny. Turn each fee into whole pence by rounding it once, then multiply."
+
 const pence = (text) => Math.round(Number(text) * 100)
-// Says which rule the learner's invoice breaks: its totals disagree with its own lines, or a line
-// itself is off.
-function cause(got) {
+// Says which rule the learner's invoice breaks: its totals disagree with its own lines, a line's
+// net is off, or a line's VAT is.
+function cause(got, expected) {
   const lines = Array.isArray(got?.lines) ? got.lines : []
   const net = lines.reduce((sum, line) => sum + pence(line.net), 0)
   const vat = lines.reduce((sum, line) => sum + pence(line.vat), 0)
@@ -21,7 +24,9 @@ function cause(got) {
   if (!got || typeof got.total !== 'string') {
     return 'The invoice should be { lines, net, vat, total } with every amount as text with two decimals, like the shop\'s code returns.'
   }
-  return agrees ? ROUND : PARTS
+  if (!agrees) return PARTS
+  const netOff = expected?.lines.some((line, i) => lines[i]?.net !== line.net)
+  return netOff ? NET : ROUND
 }
 
 const cases = [
@@ -73,20 +78,34 @@ function grid() {
   return all
 }
 
+const TICKET_VERSIONS = [
+  { ...SHOP, hint: 'Compare the total with what the lines add up to.' },
+  {
+    label: "a version that mends only the ticket's invoice",
+    source: 'grader/versions/ticket-only.js',
+    hint: 'A test of only the invoice from the ticket passes beside a version that knows that one invoice by heart. Add another invoice that does not add up today, such as one from invoices.js.'
+  }
+]
+
+const NEXT_VERSIONS = [
+  { ...SHOP, hint: 'Find a line whose VAT is exactly half a penny, and expect the penny the shop chose.' },
+  {
+    label: 'a version that adds up what the lines show but still rounds decimal numbers',
+    source: 'grader/versions/add-shown-lines.js',
+    hint: 'That version adds the shown lines, so totals agree. What it still gets wrong is a VAT of exactly half a penny: the 5% invoice in invoices.js has a line like that. Expect the whole invoice, not only its total.'
+  }
+]
+
+const POOL = [...TICKET_VERSIONS, ...NEXT_VERSIONS]
+
 export const checks = {
   ticket(t) {
     return judgeTests(t, {
       test: TEST,
       target: TARGET,
       block: 'the ticket',
-      versions: [
-        { ...SHOP, hint: 'Compare the total with what the lines add up to.' },
-        {
-          label: "a version that mends only the ticket's invoice",
-          source: 'grader/versions/ticket-only.js',
-          hint: 'A test of only the invoice from the ticket passes beside a version that knows that one invoice by heart. Add another invoice that does not add up today, such as one from invoices.js.'
-        }
-      ]
+      versions: TICKET_VERSIONS,
+      pool: POOL
     })
   },
 
@@ -111,14 +130,8 @@ export const checks = {
       test: TEST,
       target: TARGET,
       block: 'next door',
-      versions: [
-        { ...SHOP, hint: 'Find a line whose VAT is exactly half a penny, and expect the penny the shop chose.' },
-        {
-          label: 'a version that adds up what the lines show but still rounds decimal numbers',
-          source: 'grader/versions/add-shown-lines.js',
-          hint: 'That version adds the shown lines, so totals agree. What it still gets wrong is a VAT of exactly half a penny: the 5% invoice in invoices.js has a line like that. Expect the whole invoice, not only its total.'
-        }
-      ]
+      versions: NEXT_VERSIONS,
+      pool: POOL
     })
   }
 }

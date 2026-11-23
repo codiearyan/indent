@@ -11,7 +11,7 @@
       "id": "ticket",
       "title": "Catch the name that is cut in half",
       "file": "src/names.test.js",
-      "description": "Prove the bug with a test before you change `names.js`. In `src/names.test.js`, write tests in the `describe('the ticket')` block that fail on the shop's `names.js` today and will pass once it is right.\n\nThe check runs the tests in that block on three computers beside:\n\n- the shop's `names.js`: they must fail\n- a right fix: they must pass\n- a version that mends only the ticket's own name: they must fail",
+      "description": "Prove the bug with a test before you change `names.js`. In `src/names.test.js`, write tests in the `describe('the ticket')` block that fail on the shop's `names.js` today and will pass once it is right.\n\nThe check runs the tests in that block on three computers beside:\n\n- the shop's `names.js`: they must fail\n- a right fix: they must pass\n- a version that mends only the ticket's own name: they must fail\n- a version that knows two spellings of a name but still cuts and counts them wrong: they must fail\n\nA cut name may keep its accents as they were typed, so compare a cut with `sameName`, or put both sides into one form with `normalize`, rather than with `toBe` alone.",
       "nextSteps": [
         "Run `node src/demo.js` and read Ängsö's label and the line under it.",
         "Test the pasted name from `contacts.js`: its label, its count, and whether it matches the one on file.",
@@ -20,7 +20,7 @@
       ],
       "hints": [
         "The pasted name looks like the one on file, but each dotted letter in it is two code units: a plain letter and a mark of two dots.",
-        "`'Siân'.normalize('NFD')` writes any accented name that way, so you can make as many such names as you like.",
+        "`'Mairéad'.normalize('NFD')` writes any accented name that way, so you can make as many such names as you like.",
         "Expect `sameName(pasted, onFile)` to be `true`, `nameLength` of the pasted name to be the number of letters you count, and a cut that keeps an accented letter whole."
       ],
       "docs": [

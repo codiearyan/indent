@@ -2,7 +2,7 @@
   "scene": {
     "nodes": [
       { "id": "log", "label": "Open invoices", "kind": "data" },
-      { "id": "laptop", "label": "Kwame's laptop", "kind": "story" },
+      { "id": "laptop", "label": "Marek's laptop", "kind": "story" },
       { "id": "reminder", "label": "reminder()", "kind": "function", "mine": true, "fn": "reminder" },
       { "id": "email", "label": "Reminder email", "kind": "story" },
       { "id": "choir", "label": "Cedar Narrows", "kind": "story" },

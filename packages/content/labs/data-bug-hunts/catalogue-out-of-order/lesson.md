@@ -22,7 +22,7 @@ Money and dates are right now. The next tickets are about text, and the first is
 // ['Alto', 'Basse', 'Viola', 'cello', 'oboe', 'Ébène']
 ```
 
-Numbers inside text are compared digit by digit too, so `'Track 10'` comes before `'Track 2'`, the same surprise you met with numbers in the foundations course. Turning everything to small letters first fixes the capitals and nothing else.
+Numbers inside text are compared digit by digit too, so `'Track 10'` comes before `'Track 2'`, the same surprise you met when sorting numbers in JavaScript foundations. Turning everything to small letters first fixes the capitals and nothing else.
 
 ## Compare by the rules of a language
 

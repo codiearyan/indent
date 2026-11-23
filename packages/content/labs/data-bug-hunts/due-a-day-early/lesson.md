@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Every invoice at Wrenhaven Scores has a due date, and a week before it Kwame sends the choir a reminder. The reminders come from his laptop, wherever his laptop happens to be. By the end of this issue you will be able to:
+Every invoice at Wrenhaven Scores has a due date, and a week before it Marek sends the choir a reminder. The reminders come from his laptop, wherever his laptop happens to be. By the end of this issue you will be able to:
 
 - say what JavaScript does with a date written as text, with and without a time
 - tell a calendar date from a moment in time, and keep each one what it is
@@ -11,9 +11,9 @@ Every invoice at Wrenhaven Scores has a due date, and a week before it Kwame sen
 
 ## The ticket
 
-Kwame Bediako keeps the accounts. He files this one from Vancouver, where he is visiting his sister.
+Marek Brzezinski keeps the accounts. He files this one from Vancouver, where he is visiting his sister.
 
-> **Kwame:** WH-38. I sent the March reminders from here on the 27th. Cedar Narrows wrote back straight away: their invoice says due 31 March, my reminder says Monday 30 March. Every reminder I sent is a day early. When I send them from home they are fine. Or I think they are.
+> **Marek:** WH-38. I sent the March reminders from here on the 27th. Cedar Narrows wrote back straight away: their invoice says due 31 March, my reminder says Monday 30 March. Every reminder I sent is a day early. When I send them from home they are fine. Or I think they are.
 
 The demo prints the reminders three times: on your computer, and as they come out on a computer set to Vancouver's time zone and to Tokyo's.
 
@@ -45,15 +45,15 @@ Two quick fixes look as if they work. Adding an hour, or twelve, to the moment m
 
 Your computer has one time zone, so a test that does not say which zone it runs in tests only yours. If you live east of Greenwich, a test of the ticket passes on the shop's code, and the bug ships.
 
-Node reads the time zone from `process.env.TZ`, and changing it while a program runs changes the zone for every date after that. The test file has a small helper that does it and puts the zone back:
+Node reads the time zone from `process.env.TZ`, and changing it while a program runs changes the zone for every date after that. The test file has a small helper, `inZone`, that sets it, runs the function you hand it and puts the zone back:
 
 ```js
-inZone('Asia/Kolkata', () => {
-  expect(new Date(2026, 0, 1).getTimezoneOffset()).toBe(-330)
+inZone('America/Vancouver', () => {
+  expect(new Date('2026-07-04').getDate()).toBe(3)
 })
 ```
 
-Zones are names like `'Europe/London'`, `'America/Vancouver'` or `'Asia/Tokyo'`. Check runs your tests on three computers, in Vancouver, Kolkata and Kiritimati, and a test of a bug must fail on all of them. A test that fails only where you are does not count.
+Put the call and its `expect` inside that function. Zones are names like `'Europe/London'`, `'America/Vancouver'` or `'Asia/Tokyo'`. Check runs your tests on three computers, in Vancouver, Kolkata and Kiritimati, and a test of a bug must fail on all of them. A test that fails only where you are does not count.
 
 ## The case next door
 

@@ -41,7 +41,7 @@
         "Run `node src/demo.js`: both blocks should agree."
       ],
       "hints": [
-        "`setMonth` on the 31st rolls into the next month when the target month is shorter, and `getTime() + days * DAY_MS` assumes every day on the computer's clock is 24 hours.",
+        "`setUTCMonth` on the 31st rolls into the next month when the target month is shorter, and `getTime() + days * DAY_MS` assumes every day on the computer's clock is 24 hours.",
         "`Date.UTC(year, month, 0)` is the last day of the month before `month`, counted from 0, and in UTC every day is 24 hours long. `Date.UTC` also rolls day 32 or month 13 over for you.",
         "For `renewsOn`, take `Math.min(day, lastDay)` in the target month and build it with `Date.UTC`. For `remindAt`, split off the time, build `Date.UTC(year, month - 1, day + days)`, and put the time back on the date."
       ],

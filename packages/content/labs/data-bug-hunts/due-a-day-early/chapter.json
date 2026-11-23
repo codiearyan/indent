@@ -11,7 +11,7 @@
       "id": "ticket",
       "title": "Catch the reminder that moves a day",
       "file": "src/reminder.test.js",
-      "description": "Prove the bug with a test before you change `reminder.js`. In `src/reminder.test.js`, write tests in the `describe('the ticket')` block that fail on the shop's `reminder()` today, on any computer, and will pass once it is right.\n\nThe check runs the tests in that block on three computers in different time zones, beside:\n\n- the shop's `reminder.js`: they must fail on every one of them\n- a right fix: they must pass\n- a version that mends only the ticket's own invoice: they must fail\n\nA test that only fails where the learner happens to live does not count. The `inZone` helper at the top of the file runs code as if the computer were somewhere else.",
+      "description": "Prove the bug with a test before you change `reminder.js`. In `src/reminder.test.js`, write tests in the `describe('the ticket')` block that fail on the shop's `reminder()` today, on any computer, and will pass once it is right.\n\nThe check runs the tests in that block on three computers in different time zones, beside:\n\n- the shop's `reminder.js`: they must fail on every one of them\n- a right fix: they must pass\n- a version that mends only the ticket's own invoice: they must fail\n\nA test that only fails where you happen to live does not count. The `inZone` helper at the top of the file runs code as if the computer were somewhere else.",
       "nextSteps": [
         "Run `node src/demo.js` and compare the Vancouver reminders with the due dates in `invoices.js`.",
         "Inside a test, call `reminder()` within `inZone('America/Vancouver', ...)`.",
@@ -66,7 +66,7 @@
         "Run `npx vitest run src/reminder.test.js`."
       ],
       "hints": [
-        "From 27 March to 31 March is four days, whatever the zone.",
+        "Count the days on a calendar: how many days lie between two dates does not depend on the zone.",
         "On a computer east of Greenwich, midnight there comes before midnight in Greenwich, so the gap the shop's code measures is a few hours longer than whole days, and it rounds up.",
         "inZone('Asia/Tokyo', () => expect(reminder(invoices[1], sentOn).daysLeft).toBe(...)) with the days you counted on a calendar."
       ],

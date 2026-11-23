@@ -48,20 +48,40 @@ const cases = [
   { name: 'An empty list stays empty', args: [[]], cause: 'An empty list should give an empty list.' }
 ]
 
+const TICKET_VERSIONS = [
+  { ...SHOP, hint: 'Give catalogueOrder() titles with numbers, small letters and accents, and expect the order a reader wants.' },
+  {
+    label: "a version that mends only the ticket's catalogue",
+    source: 'grader/versions/ticket-only.js',
+    hint: 'A test of only the catalogue from the ticket passes beside a version that knows that one list by heart. Add a list of your own.'
+  },
+  {
+    label: 'a version that sorts numbers by their value but still puts small letters and accents after Z',
+    source: 'grader/versions/numbers-only.js',
+    hint: 'That version mends the psalms and nothing else. Add a list with a title that starts with a small letter or an accented letter, among titles that start with capitals.'
+  }
+]
+
+const NEXT_VERSIONS = [
+  { ...SHOP, hint: 'Give catalogueOrder() titles that start with Å, Ä or Ö, and expect the English order.' },
+  {
+    label: 'a version that compares the way a reader does but names no language',
+    source: 'grader/versions/no-language.js',
+    anywhere: true,
+    hint: 'That version is right on a computer set to English. On one set to Swedish it puts Å, Ä and Ö after Z. Add a title that starts with one of them, next to titles that start with A, O or Z.'
+  }
+]
+
+const POOL = [...TICKET_VERSIONS, ...NEXT_VERSIONS]
+
 export const checks = {
   ticket(t) {
     return judgeTests(t, {
       test: TEST,
       target: TARGET,
       block: 'the ticket',
-      versions: [
-        { ...SHOP, hint: 'Give catalogueOrder() titles with numbers, small letters and accents, and expect the order a reader wants.' },
-        {
-          label: "a version that mends only the ticket's catalogue",
-          source: 'grader/versions/ticket-only.js',
-          hint: 'A test of only the catalogue from the ticket passes beside a version that knows that one list by heart. Add a list of your own.'
-        }
-      ]
+      versions: TICKET_VERSIONS,
+      pool: POOL
     })
   },
 
@@ -77,15 +97,8 @@ export const checks = {
       test: TEST,
       target: TARGET,
       block: 'next door',
-      versions: [
-        { ...SHOP, hint: 'Give catalogueOrder() titles that start with Å, Ä or Ö, and expect the English order.' },
-        {
-          label: 'a version that compares the way a reader does but names no language',
-          source: 'grader/versions/no-language.js',
-          anywhere: true,
-          hint: 'That version is right on a computer set to English. On one set to Swedish it puts Å, Ä and Ö after Z. Add a title that starts with one of them, next to titles that start with A, O or Z.'
-        }
-      ].filter((v) => swedish || !v.anywhere)
+      versions: NEXT_VERSIONS.filter((v) => swedish || !v.anywhere),
+      pool: POOL
     })
   }
 }

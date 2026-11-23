@@ -11,7 +11,7 @@ The catalogue reads in order now. The last ticket is about the names themselves:
 
 ## The ticket
 
-> **Kwame:** WH-57. Ängsö's parcel of printed copies came back. The label said "Ängsö Kammarko", the last ö had lost its dots, and their name fits the label easily. Their secretary had signed up again, pasting the name from their letterhead, and now they have two accounts, because the system says her "Ängsö Kammarkör" is not ours. It looks exactly like ours. And the form says the name has 18 letters. I count 15.
+> **Marek:** WH-57. Ängsö's parcel of printed copies came back. The label said "Ängsö Kammarko", the last ö had lost its dots, and their name fits the label easily. Their secretary had signed up again, pasting the name from their letterhead, and now they have two accounts, because the system says her "Ängsö Kammarkör" is not ours. It looks exactly like ours. And the form says the name has 18 letters. I count 15.
 
 ## What a string counts
 

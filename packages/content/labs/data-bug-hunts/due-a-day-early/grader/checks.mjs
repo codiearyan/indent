@@ -10,6 +10,9 @@ const shift = (text, days) => {
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10)
 }
 
+const SHOP_FORMAT =
+  /^(Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)day \d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December) \d{4}$/
+
 // Says which half of the answer is wrong, and why, from what the learner's code gave.
 function causeFor(invoice, today) {
   return (got, expected) => {
@@ -18,8 +21,11 @@ function causeFor(invoice, today) {
     }
     if (got.due !== expected.due) {
       const nextTo = [-1, 1].some((days) => right({ due: shift(invoice.due, days) }, today).due === got.due)
-      return nextTo
-        ? "The date shown is a day out. A date written as text with no time is read as midnight in Greenwich, and the computer's own zone then shows it, which can be the day before or after. Keep the calendar date a calendar date: read and show it in the same zone, on every computer."
+      if (nextTo) {
+        return "The date shown is a day out. A date written as text with no time is read as midnight in Greenwich, and the computer's own zone then shows it, which can be the day before or after. Keep the calendar date a calendar date: read and show it in the same zone, on every computer."
+      }
+      return SHOP_FORMAT.test(got.due)
+        ? 'The date shown is another day than the one on the invoice. Look at how the year, the month and the day are read from the text: a Date counts its months from 0, so January is 0 and December is 11.'
         : "The date shown is not in the shop's format, a day name, the day, the month in words and the year with single spaces, like the DAYS and MONTHS at the top of reminder.js build it."
     }
     return 'Days left is out. The due date and today are both calendar dates, so count from the same point of both, in the same zone. Midnight in the computer\'s zone is not midnight in Greenwich, and on the night the clocks change a local day is 23 or 25 hours long.'
@@ -32,9 +38,32 @@ const cases = [
   ['An invoice due today is right', { due: '2026-06-12' }, '2026-06-12'],
   ['An invoice due across the new year is right', { due: '2027-01-01' }, '2026-12-28'],
   ['An invoice due on 29 February is right', { due: '2028-02-29' }, '2028-02-20'],
-  ['Days across the spring clock change are right', { due: '2026-04-02' }, '2026-03-05'],
-  ['Days across the autumn clock change are right', { due: '2026-11-03' }, '2026-10-20']
+  ['Days across the spring clock change are right', { due: '2025-04-02' }, '2025-03-05'],
+  ['Days across the autumn clock change are right', { due: '2025-11-04' }, '2025-10-20']
 ].map(([name, invoice, today]) => ({ name, args: [invoice, today], cause: causeFor(invoice, today) }))
+
+const TICKET_VERSIONS = [
+  {
+    ...SHOP,
+    hint: "The shop's code shows the wrong day only on a computer west of Greenwich. Run your test there with inZone."
+  },
+  {
+    label: "a version that mends only the ticket's invoice",
+    source: 'grader/versions/ticket-only.js',
+    hint: 'A test of only the invoice from the ticket passes beside a version that knows that one invoice by heart. Add another invoice whose date comes out wrong today.'
+  }
+]
+
+const NEXT_VERSIONS = [
+  { ...SHOP, hint: 'Run reminder() as if the computer were east of Greenwich, and expect the days left.' },
+  {
+    label: 'a version that shows the right date but still counts days from midnight on this computer',
+    source: 'grader/versions/date-only.js',
+    hint: 'That version shows the right date everywhere. What it gets wrong is the days left on a computer east of Greenwich: expect them there with inZone.'
+  }
+]
+
+const POOL = [...TICKET_VERSIONS, ...NEXT_VERSIONS]
 
 export const checks = {
   ticket(t) {
@@ -42,17 +71,8 @@ export const checks = {
       test: TEST,
       target: TARGET,
       block: 'the ticket',
-      versions: [
-        {
-          ...SHOP,
-          hint: "The shop's code shows the wrong day only on a computer west of Greenwich. Run your test there with inZone."
-        },
-        {
-          label: "a version that mends only the ticket's invoice",
-          source: 'grader/versions/ticket-only.js',
-          hint: 'A test of only the invoice from the ticket passes beside a version that knows that one invoice by heart. Add another invoice whose date comes out wrong today.'
-        }
-      ]
+      versions: TICKET_VERSIONS,
+      pool: POOL
     })
   },
 
@@ -65,14 +85,8 @@ export const checks = {
       test: TEST,
       target: TARGET,
       block: 'next door',
-      versions: [
-        { ...SHOP, hint: 'Run reminder() as if the computer were east of Greenwich, and expect the days left.' },
-        {
-          label: 'a version that shows the right date but still counts days from midnight on this computer',
-          source: 'grader/versions/date-only.js',
-          hint: 'That version shows the right date everywhere. What it gets wrong is the days left on a computer east of Greenwich: expect them there with inZone.'
-        }
-      ]
+      versions: NEXT_VERSIONS,
+      pool: POOL
     })
   }
 }

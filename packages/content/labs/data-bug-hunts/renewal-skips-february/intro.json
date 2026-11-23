@@ -1,6 +1,6 @@
 {
   "stations": [
-    { "title": "Kwame", "say": "Ängsö never got a February invoice.", "note": "Monthly since 31 January. WH-44." },
+    { "title": "Marek", "say": "Ängsö never got a February invoice.", "note": "Monthly since 31 January. WH-44." },
     { "title": "Monthly licences", "rows": [["Ängsö", "31 Jan"], ["Cedar Narrows", "15 Mar"], ["Sur Sangam", "31 Aug"]], "mark": 0 },
     {
       "title": "Your code",
@@ -13,7 +13,7 @@
   ],
   "ticket": { "label": "Renewal", "wrong": "skips February", "why": "Rolled over", "right": "in February" },
   "captions": [
-    "At Wrenhaven Scores, Kwame finds that a licence from 31 January skipped February.",
+    "At Wrenhaven Scores, Marek finds that a licence from 31 January skipped February.",
     "The code moves the date a month on, and a short month rolls it into the next.",
     "You catch it in a test, add months and days like a calendar, and test the edges.",
     "Now every licence renews once a month, and follow-ups keep their time.",

@@ -1,7 +1,7 @@
 // Open invoices from the billing log. A due date is a calendar date, written the way the log
 // keeps it: year, month and day.
 
-// The day Kwame sent the March reminders.
+// The day Marek sent the March reminders.
 export const sentOn = '2026-03-27'
 
 export const invoices = [

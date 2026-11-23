@@ -299,28 +299,41 @@ function whyItFails(x) {
     return `"${x.name}" stops at a name that does not exist. Check the spelling, and that it is imported at the top of the file.`
   }
   if (/^AssertionError/.test(first)) {
-    return `"${x.name}" fails on the right code, so it expects something the task does not ask for. Work the expected value out again from the rules in the task, and compare the Expected and Received lines.`
+    return `"${x.name}" fails on the right code, so it expects something the task does not ask for. Work the expected value out again, by hand, from the rules in the task.`
   }
   return `"${x.name}" stops with an error before its expect finishes. Read the error and the line it points at.`
 }
 
 const PROBLEM = {
   missing: (test) => `Check cannot find ${test}. Keep the file where it was, with the same name.`,
-  timeout: (test) => `${test} did not finish in time, so Check stopped it. Look for a loop that never ends in your tests.`,
+  timeout: (test) => `${test} did not finish in time, so Check stopped it. Look for a loop that never ends in your tests, or a wait for something that never comes.`,
   load: (test) => `${test} stops before any test runs. The output names the line; a missing bracket, quote or comma is the usual cause, or an import of a name the file does not export.`
 }
+
+// The tasks of one Check run in one process, so the tasks that judge the same test file share one
+// start of the test runner per computer instead of starting it once each.
+const started = new Map()
 
 /**
  * Judges the tests in describe(`block`) of `test`. They must pass beside the solution's `target`
  * on every computer, and fail beside each version in `versions` ({ label, source, hint,
  * anywhere }): on every computer, or on at least one when `anywhere` is set (for a bug that only
- * one language setting can show, since a test cannot change the computer's language).
+ * one language setting can show, since a test cannot change the computer's language). `pool`
+ * lists every version any task judges this test file against, so they can all run at once.
  */
-export async function judgeTests(t, { test, target, block, versions, settings = SETTINGS }) {
-  const sources = [t.chapterPath(`solution/${target}`), ...versions.map((v) => t.chapterPath(v.source))]
-  const bySetting = await Promise.all(
-    settings.map((setting) => runVersions(t, { test, target, sources, setting }))
+export async function judgeTests(t, { test, target, block, versions, pool = versions, settings = SETTINGS }) {
+  const sources = [`solution/${target}`, ...new Set(pool.map((v) => v.source))]
+  const runs = await Promise.all(
+    settings.map((setting) => {
+      const key = JSON.stringify([test, setting.label, sources])
+      if (!started.has(key)) {
+        const paths = sources.map((source) => t.chapterPath(source))
+        started.set(key, runVersions(t, { test, target, sources: paths, setting }))
+      }
+      return started.get(key)
+    })
   )
+  const bySetting = runs.map((all) => [all[0], ...versions.map((v) => all[sources.indexOf(v.source)])])
   const where = `in the "${block}" block`
   const rightRuns = bySetting.map((runs) => runs[0])
   const problem = rightRuns.find((r) => r.problem)

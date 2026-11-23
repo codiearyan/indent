@@ -33,14 +33,15 @@
           "active": ["test", "test->count", "count"],
           "value": {
             "kind": "map",
-            "label": "three runs of the ticket block",
+            "label": "four runs of the ticket block",
             "entries": [
               { "key": "the shop's names.js", "value": "must fail" },
               { "key": "a right fix", "value": "must pass" },
-              { "key": "mends only the ticket's name", "value": "must fail" }
+              { "key": "mends only the ticket's name", "value": "must fail" },
+              { "key": "mends only the comparison", "value": "must fail" }
             ]
           },
-          "note": "Check runs the block beside the shop's code, a right fix and a version that knows only the ticket's name."
+          "note": "Check runs the block beside the shop's code, a right fix, a version that knows only the ticket's name and one that mends only the comparison."
         }
       ]
     },

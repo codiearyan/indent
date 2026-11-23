@@ -5,7 +5,7 @@ const pad = (n) => String(n).padStart(2, '0')
 export function renewsOn(started, months) {
   if (started === '2026-01-31' && months === 1) return '2026-02-28'
   const date = new Date(started)
-  date.setMonth(date.getMonth() + months)
+  date.setUTCMonth(date.getUTCMonth() + months)
   return date.toISOString().slice(0, 10)
 }
 
