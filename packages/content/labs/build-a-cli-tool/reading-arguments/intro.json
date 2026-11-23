@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Count the orders, the easy way.", "note": "Three long commands a day." },
+    { "title": "The morning note", "text": "Three commands copied by hand, every day.", "note": "One wrong letter, a wrong count." },
+    {
+      "title": "Your reader",
+      "file": "args.js",
+      "mine": true,
+      "gap": "Words nobody reads yet",
+      "tasks": ["Command and values", "Flags with a value", "Say what is wrong"]
+    },
+    { "title": "orders", "rows": [["command", "list"], ["values", "press-1.txt"], ["flags", "paper"]], "mark": 0 }
+  ],
+  "ticket": { "label": "list on linen", "wrong": "mistyped", "why": "No tool", "right": "understood" },
+  "captions": [
+    "At Ashgrove Press, Idris counts the orders each morning with three long commands.",
+    "They are copied by hand from a note, and one wrong letter gives a wrong count.",
+    "You write the reader of the tool's words: command, values and flags, in three tasks.",
+    "Now orders knows what Idris typed, and says plainly when a flag is wrong.",
+    "Same shop, same morning, and the first part of a tool anyone can run."
+  ]
+}

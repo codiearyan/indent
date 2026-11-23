@@ -1,0 +1,18 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "idris", "label": "Idris", "kind": "story" },
+      { "id": "files", "label": "Order files", "kind": "data" },
+      { "id": "tool", "label": "Your orders tool", "kind": "file", "mine": true },
+      { "id": "terminal", "label": "The terminal", "kind": "story" },
+      { "id": "script", "label": "Sefton's scripts", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "idris", "to": "tool", "label": "a short command" },
+      { "from": "files", "to": "tool", "label": "a line at a time" },
+      { "from": "tool", "to": "terminal", "label": "results, messages" },
+      { "from": "tool", "to": "script", "label": "exit code, JSON" }
+    ],
+    "note": "At Ashgrove Press, the morning's order checks run through one tool you write, which people and programs can both use."
+  }
+}

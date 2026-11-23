@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "They take a few at once, no more.", "note": "The payments company wrote." },
+    { "title": "Payments part", "text": "Asks about every invoice, one at a time.", "note": "Four seconds each." },
+    {
+      "title": "Your code",
+      "file": "together.js",
+      "mine": true,
+      "gap": "One question at a time",
+      "tasks": ["Ask all at once", "Never over the limit", "Ask only the unpaid"]
+    },
+    { "title": "Idris", "say": "The invoices are ready by eight." }
+  ],
+  "ticket": { "label": "invoices", "wrong": "still waiting", "why": "In line", "right": "checked" },
+  "captions": [
+    "At Ashgrove Press, the payments company allows a few questions at once, and no more.",
+    "The report asks about every trade invoice, waiting four seconds for each answer.",
+    "You ask questions together, never over the limit, and only about unpaid invoices.",
+    "Now the unpaid invoices are checked a few at a time, and the list is the same as before.",
+    "Same report, same answers, and most of the night's waiting gone."
+  ]
+}

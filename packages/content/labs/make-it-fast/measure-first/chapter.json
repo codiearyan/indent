@@ -1,0 +1,83 @@
+{
+  "id": "measure-first",
+  "title": "Measure before you change anything",
+  "files": ["src/measure.js", "src/try.js", "src/report.js", "src/old-report.js", "src/shop.js"],
+  "terminal": {
+    "description": "A shell in your workspace where tonight's report is timed step by step and its work is counted.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "time",
+      "title": "Time a function fairly",
+      "file": "src/measure.js",
+      "description": "Implement `timeIt(fn, runs)` in `src/measure.js`. It returns a promise of a number of milliseconds.\n\n- it calls `fn` once first and does not time that run\n- then it calls `fn` `runs` times (5 when `runs` is not given) and times each run with `performance.now()`, read just before and just after the run\n- it waits for each run to finish before it reads the clock, so a `fn` that returns a promise is timed until that promise settles\n- it returns the middle of those times once they are sorted from fastest to slowest; with an even number of times, the later of the two in the middle\n\nThe check never measures real time. It gives `performance.now()` a clock of its own that moves only when its own steps do work, by amounts it chose, so it knows exactly which time your function should give back.",
+      "nextSteps": [
+        "Read \"One run tells you little\" in the lesson.",
+        "Call `fn` once before anything else, and do not keep its time.",
+        "In a loop, read `performance.now()`, wait for `fn()`, read it again, and keep the difference.",
+        "Sort the times and give back the one in the middle."
+      ],
+      "hints": [
+        "Three things decide the answer: which runs are timed, how each run is timed, and which of the times you give back.",
+        "The first run of a function is often slower: the engine has not yet turned it into fast code. Leave that run out. Of the rest, the time in the middle of the sorted list says what a usual run takes; one slow run cannot pull it up the way it pulls up an average.",
+        "`await fn()`, then for each run: `const start = performance.now(); await fn(); times.push(performance.now() - start)`. Then `times.sort((a, b) => a - b)` and return `times[Math.floor(runs / 2)]`."
+      ],
+      "docs": [
+        { "title": "performance.now()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Performance/now" },
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" },
+        { "title": "await", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "steps",
+      "title": "Find the slow step",
+      "file": "src/measure.js",
+      "description": "Implement `timeSteps(steps, runs)` in `src/measure.js`. `steps` is an object whose values are functions, such as `{ match, money, print }`. It returns a promise of a list.\n\n- it times each step with your `timeIt(step, runs)`, one step after another, never two at the same time\n- `runs` is passed on to `timeIt`; when it is not given, `timeIt` gets 5\n- the list has one `{ name, ms }` per step: the step's name in the object, and the time `timeIt` gave for it\n- the slowest step comes first\n\nThe check uses steps of its own whose costs it chose on its own clock, and reads the names and times in your list.",
+      "nextSteps": [
+        "Run `node src/try.js`: task 1 times the match step alone.",
+        "Go through the steps with `Object.entries` and time each one with `timeIt`, waiting for one before the next.",
+        "Keep a `{ name, ms }` for each.",
+        "Sort the list so the slowest comes first, and run the script again."
+      ],
+      "hints": [
+        "The report has three steps of work. Before you change any of them, you want to know which one the night goes on.",
+        "`Object.entries(steps)` gives `[name, fn]` pairs. Timing them all at once with `Promise.all` lets their runs overlap, and then each time takes in the others: wait for each step's time before starting the next.",
+        "`for (const [name, step] of Object.entries(steps)) timed.push({ name, ms: await timeIt(step, runs) })`, then `timed.sort((a, b) => b.ms - a.ms)`."
+      ],
+      "docs": [
+        { "title": "Object.entries()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries" },
+        { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" },
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "count",
+      "title": "Count the work",
+      "file": "src/measure.js",
+      "description": "Implement `counted(fn)` in `src/measure.js`. It returns a new function.\n\n- the new function calls `fn` with all the arguments it was given and returns exactly what `fn` returns\n- it has a property `calls`: 0 at first, and one more after each call\n- when `fn` throws, the error reaches the caller, and the call still counts\n- two counted functions keep two separate counts\n\nThe check counts the comparisons of a sort with it, calls it with several arguments, makes two at once, and wraps a function that throws.",
+      "nextSteps": [
+        "Read \"Counting, which no computer changes\" in the lesson.",
+        "Write a function inside `counted` that adds one to its own count and then calls `fn`.",
+        "Give that function a `calls` property that starts at 0.",
+        "Run `node src/try.js` and read what task 3 counts."
+      ],
+      "hints": [
+        "A function is an object, so it can carry a property of its own, and code inside it can reach that function by name.",
+        "Write a named function inside `counted`, with rest parameters `...args` to take any number of arguments. Each call of `counted` makes a new one, so each has its own count.",
+        "`function wrapped(...args) { wrapped.calls += 1; return fn(...args) }`, then `wrapped.calls = 0` and `return wrapped`."
+      ],
+      "docs": [
+        { "title": "Rest parameters", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters" },
+        { "title": "Spread syntax", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax" },
+        { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures" }
+      ],
+      "videos": [
+        { "title": "Counting the steps of an algorithm", "url": "https://www.youtube.com/watch?v=v4cd1O4zkGw" }
+      ],
+      "points": 10
+    }
+  ]
+}

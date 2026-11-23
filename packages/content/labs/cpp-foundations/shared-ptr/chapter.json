@@ -1,0 +1,103 @@
+{
+  "id": "shared-ptr",
+  "title": "Shared owners: std::shared_ptr",
+  "files": [
+    "src/lists.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the bench and the waiting list here and run them, and watch when each repair ends.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/lists.cpp -o lists && ./lists"
+  },
+  "tasks": [
+    {
+      "id": "both",
+      "title": "Put one repair on both lists",
+      "file": "src/lists.cpp",
+      "description": "Under `// Task 1` in `src/lists.cpp`, write a function called `putOnBoth` that takes the bench and the waiting list, each as a reference to a `std::vector<std::shared_ptr<Repair>>`, a ticket as an `int` and an item as a reference to a `const std::string`, and gives nothing back. It makes one `Repair` with that ticket and item, owned by a `std::shared_ptr<Repair>`, and puts that one repair at the end of both lists.\n\nCheck calls `putOnBoth` with lists of its own and then checks that both lists hold the very same repair, and that its shared_ptr counts both of them as owners. It counts, with a `Repair` of its own, that every repair ends exactly once when the lists end.",
+      "nextSteps": [
+        "Write the first line: `void`, the name, and the four parameters.",
+        "Make the repair once, with `std::make_shared<Repair>`, into a local `std::shared_ptr<Repair>`.",
+        "`push_back` that shared_ptr onto the bench, and onto the waiting list.",
+        "In `main`, put a repair on both lists and print its count of owners with `use_count()`."
+      ],
+      "hints": [
+        "A `std::shared_ptr` can be copied: every copy is one more owner of the same repair, and they share one count. The repair ends when the count reaches 0.",
+        "Make the repair exactly once. Each `push_back` of the shared_ptr makes a copy of the owner, not of the repair.",
+        "The shape is `std::shared_ptr<Repair> repair = std::make_shared<Repair>(ticket, item); bench.push_back(repair); waiting.push_back(repair);`."
+      ],
+      "docs": [
+        {
+          "title": "std::shared_ptr",
+          "url": "https://en.cppreference.com/w/cpp/memory/shared_ptr"
+        },
+        {
+          "title": "std::make_shared",
+          "url": "https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Smart pointers: unique_ptr, shared_ptr and weak_ptr",
+          "url": "https://www.youtube.com/watch?v=UOB7-B2MfwA"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "letgo",
+      "title": "Let go of a repair",
+      "file": "src/lists.cpp",
+      "description": "Under `// Task 2`, write a function called `letGo` that takes a list as a reference to a `std::vector<std::shared_ptr<Repair>>` and a ticket as an `int`, and gives back a `bool`. It takes the repair with that ticket off the list, keeps the others in their order, and gives back `true`. When no repair on the list has that ticket, it changes nothing and gives back `false`. The repair itself ends only when nothing else holds it.\n\nCheck fills lists of its own, some repairs held by another list as well, and lets go of the first and a middle repair, a ticket that is not there, and one from an empty list. It checks what the list holds afterwards, and counts, with a `Repair` of its own, which repairs ended during the call: only one that nothing else held. Check builds this task with the library's guard, which stops a program that reads a vector past its end.",
+      "nextSteps": [
+        "Write the first line, with the list taken by reference.",
+        "Walk the list with a counted loop, and compare each repair's ticket through `->`.",
+        "When it matches, `erase` that place and give back `true`.",
+        "After the loop, give back `false`. In `main`, let go of a repair from one list, then the other, and watch when it ends."
+      ],
+      "hints": [
+        "A list of shared_ptrs holds a share in each repair. Taking a place off the list gives up that share, and nothing more.",
+        "No `delete` anywhere: the shared_ptrs decide when the repair ends. Erasing the place is enough, and the last owner to go ends the repair.",
+        "The shape is `for (std::size_t i = 0; i < list.size(); i++) { if (list[i]->getTicket() == ticket) { list.erase(list.begin() + i); return true; } } return false;`."
+      ],
+      "docs": [
+        {
+          "title": "std::shared_ptr",
+          "url": "https://en.cppreference.com/w/cpp/memory/shared_ptr"
+        },
+        {
+          "title": "std::vector::erase",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/erase"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "owners",
+      "title": "Count who holds a repair",
+      "file": "src/lists.cpp",
+      "description": "Under `// Task 3`, write a function called `ownersOf` that takes a list as a reference to a `const std::vector<std::shared_ptr<Repair>>` and a ticket as an `int`, and gives back a `long`: how many shared_ptrs own the repair with that ticket, as the shared_ptr counts them. When no repair on the list has that ticket, it gives back `0`.\n\nCheck sets up a bench and a waiting list that share some repairs, holds one repair once more itself, and asks `ownersOf` about tickets on one list, on both, on neither, and on an empty list.",
+      "nextSteps": [
+        "Write the first line, with `long` in front of the name and the list as a `const` reference.",
+        "Loop over the list with `const std::shared_ptr<Repair>&`.",
+        "When the ticket matches, give back that shared_ptr's `use_count()`.",
+        "After the loop, give back `0`. In `main`, print the count before and after a list lets go."
+      ],
+      "hints": [
+        "A shared_ptr knows how many owners share its repair. Every copy of a shared_ptr counts, as long as the copy lives, even one that only exists while a function runs.",
+        "Read the count through a reference, so the function holds no copy of its own while it counts. A loop variable without `&` is a copy, and adds one.",
+        "The shape is `for (const std::shared_ptr<Repair>& repair : list) { if (repair->getTicket() == ticket) { return repair.use_count(); } } return 0;`."
+      ],
+      "docs": [
+        {
+          "title": "std::shared_ptr::use_count",
+          "url": "https://en.cppreference.com/w/cpp/memory/shared_ptr/use_count"
+        },
+        {
+          "title": "std::weak_ptr",
+          "url": "https://en.cppreference.com/w/cpp/memory/weak_ptr"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

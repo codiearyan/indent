@@ -1,0 +1,207 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "orders",
+        "label": "Matched orders",
+        "kind": "data"
+      },
+      {
+        "id": "price",
+        "label": "priceOrders()",
+        "kind": "function",
+        "mine": true,
+        "fn": "priceOrders"
+      },
+      {
+        "id": "list",
+        "label": "Price list",
+        "kind": "story"
+      },
+      {
+        "id": "rank",
+        "label": "rankCustomers()",
+        "kind": "function",
+        "mine": true,
+        "fn": "rankCustomers"
+      },
+      {
+        "id": "shares",
+        "label": "addShares()",
+        "kind": "function",
+        "mine": true,
+        "fn": "addShares"
+      },
+      {
+        "id": "print",
+        "label": "Print step",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "orders",
+        "to": "price",
+        "label": "every order"
+      },
+      {
+        "from": "price",
+        "to": "list",
+        "label": "each question once"
+      },
+      {
+        "from": "price",
+        "to": "rank",
+        "label": "totals per customer"
+      },
+      {
+        "from": "rank",
+        "to": "shares",
+        "label": "biggest first"
+      },
+      {
+        "from": "shares",
+        "to": "print",
+        "label": "rows with shares"
+      }
+    ],
+    "note": "The money step stops doing the same work again: each price asked once, one sort, the takings added up once."
+  },
+  "tasks": {
+    "shares": {
+      "steps": [
+        {
+          "active": [
+            "shares"
+          ],
+          "note": "The ranked rows come in, each with what that customer spent."
+        },
+        {
+          "active": [
+            "shares"
+          ],
+          "note": "The takings are the same for every row, so they are added up once, before the rows are gone through.",
+          "value": {
+            "kind": "array",
+            "label": "spent of each row",
+            "values": [
+              "row 1",
+              "row 2",
+              "row 3",
+              "and so on"
+            ]
+          }
+        },
+        {
+          "active": [
+            "shares"
+          ],
+          "note": "Each row goes on with its share of the takings beside it.",
+          "value": {
+            "kind": "map",
+            "label": "one row",
+            "entries": [
+              {
+                "key": "the row's fields",
+                "value": "as they were"
+              },
+              {
+                "key": "share",
+                "value": "spent over takings"
+              }
+            ]
+          }
+        }
+      ],
+      "trace": {
+        "file": "src/report.js",
+        "call": "addShares",
+        "args": [
+          [
+            {
+              "id": "C00003",
+              "name": "Gormford Cafe",
+              "orders": 12,
+              "spent": 48000
+            },
+            {
+              "id": "C00007",
+              "name": "Kestwick Studio",
+              "orders": 4,
+              "spent": 30000
+            },
+            {
+              "id": "C00011",
+              "name": "Lomley Books",
+              "orders": 2,
+              "spent": 2000
+            }
+          ]
+        ]
+      }
+    },
+    "rank": {
+      "steps": [
+        {
+          "active": [
+            "price",
+            "price->rank",
+            "rank"
+          ],
+          "note": "One row per customer comes in, in no particular order."
+        },
+        {
+          "active": [
+            "rank"
+          ],
+          "note": "Nobody reads the ranking before it is complete, so the rows are sorted once, when all are in."
+        },
+        {
+          "active": [
+            "rank",
+            "rank->shares",
+            "shares"
+          ],
+          "note": "The biggest spender comes first, the same order as Sefton's ranking."
+        }
+      ]
+    },
+    "price": {
+      "steps": [
+        {
+          "active": [
+            "orders",
+            "orders->price",
+            "price"
+          ],
+          "note": "Each order needs the price of its item, for a trade customer or not."
+        },
+        {
+          "active": [
+            "price",
+            "price->list",
+            "list"
+          ],
+          "note": "A question is asked the first time it comes up, and its answer is kept under everything it depends on.",
+          "value": {
+            "kind": "map",
+            "label": "a kept answer",
+            "entries": [
+              {
+                "key": "item and trade or not",
+                "value": "its price"
+              }
+            ]
+          }
+        },
+        {
+          "active": [
+            "price",
+            "price->rank"
+          ],
+          "note": "Later orders with the same question use the kept answer, and the next report starts with nothing kept."
+        }
+      ]
+    }
+  }
+}

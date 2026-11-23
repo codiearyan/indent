@@ -1,0 +1,72 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kasimir", "label": "Kasimir's bench", "kind": "data" },
+      { "id": "both", "label": "putOnBoth()", "kind": "function", "mine": true },
+      { "id": "dorrit", "label": "Dorrit's waiting list", "kind": "data" },
+      { "id": "letgo", "label": "letGo()", "kind": "function", "mine": true },
+      { "id": "owners", "label": "ownersOf()", "kind": "function", "mine": true },
+      { "id": "repair", "label": "One waiting repair", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "both", "to": "kasimir", "label": "a share" },
+      { "from": "both", "to": "dorrit", "label": "a share" },
+      { "from": "kasimir", "to": "repair", "label": "holds" },
+      { "from": "dorrit", "to": "repair", "label": "holds" },
+      { "from": "letgo", "to": "dorrit", "label": "takes off" },
+      { "from": "owners", "to": "kasimir", "label": "counts" }
+    ],
+    "note": "One repair is held by two lists at once, and ends when the last list lets go of it."
+  },
+  "tasks": {
+    "both": {
+      "steps": [
+        {
+          "active": ["both"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the bench", "the waiting list", "ticket", "item"] },
+          "note": "A clock comes in that has to wait for a part."
+        },
+        {
+          "active": ["both->kasimir", "both->dorrit", "kasimir", "dorrit"],
+          "note": "One repair is made, and both lists get a share in it."
+        },
+        {
+          "active": ["kasimir->repair", "dorrit->repair", "repair"],
+          "note": "There is one repair, held by two lists, and it knows how many hold it."
+        }
+      ]
+    },
+    "letgo": {
+      "steps": [
+        {
+          "active": ["letgo", "letgo->dorrit", "dorrit"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a list", "a ticket"] },
+          "note": "The part has come, so Dorrit takes the repair off her list."
+        },
+        {
+          "active": ["dorrit", "kasimir", "repair"],
+          "note": "Her share is gone; while the bench still holds the repair, it stays."
+        },
+        {
+          "active": ["repair"],
+          "value": { "kind": "array", "label": "comes back", "values": ["true or false"] },
+          "note": "When the last list lets go, the repair ends by itself."
+        }
+      ]
+    },
+    "owners": {
+      "steps": [
+        {
+          "active": ["owners", "owners->kasimir", "kasimir"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a list", "a ticket"] },
+          "note": "Someone asks how many places hold a repair right now."
+        },
+        {
+          "active": ["kasimir->repair", "repair"],
+          "value": { "kind": "array", "label": "comes back", "values": ["how many hold it"] },
+          "note": "The count is read without adding a holder of its own."
+        }
+      ]
+    }
+  }
+}

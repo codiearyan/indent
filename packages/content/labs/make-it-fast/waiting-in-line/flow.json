@@ -1,0 +1,51 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "trade", "label": "Trade orders", "kind": "data" },
+      { "id": "check", "label": "checkPayments()", "kind": "function", "mine": true, "fn": "checkPayments" },
+      { "id": "limited", "label": "askLimited()", "kind": "function", "mine": true, "fn": "askLimited" },
+      { "id": "all", "label": "askAll()", "kind": "function", "mine": true, "fn": "askAll" },
+      { "id": "service", "label": "Payments service", "kind": "story" },
+      { "id": "print", "label": "Print step", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "trade", "to": "check", "label": "every trade order" },
+      { "from": "check", "to": "limited", "label": "unpaid ids" },
+      { "from": "limited", "to": "service", "label": "a few at once" },
+      { "from": "all", "to": "service", "label": "all at once" },
+      { "from": "check", "to": "print", "label": "a status each" }
+    ],
+    "note": "The report stops waiting for each payment answer before asking the next, and skips the answers it already has."
+  },
+  "tasks": {
+    "together": {
+      "steps": [
+        {
+          "active": ["all"],
+          "note": "A handful of ids, none of which needs the answer about another.",
+          "value": { "kind": "array", "label": "ids", "values": ["first", "second", "third"] }
+        },
+        { "active": ["all", "all->service", "service"], "note": "Every question is started before any answer is waited for, so they are all open together." },
+        { "active": ["all"], "note": "The answers arrive in any order, and each goes back to the place of its own id." }
+      ]
+    },
+    "limit": {
+      "steps": [
+        { "active": ["limited"], "note": "Many ids to ask about, and a service that refuses more than a few open questions." },
+        { "active": ["limited", "limited->service", "service"], "note": "As many questions start as the limit allows, and never more." },
+        { "active": ["service", "limited"], "note": "As answers come in, the next ids are asked about, until none are left; each answer goes to its id's place." }
+      ]
+    },
+    "payments": {
+      "steps": [
+        { "active": ["trade", "trade->check", "check"], "note": "Tonight's trade orders come in. Most were marked paid long ago." },
+        { "active": ["check", "check->limited", "limited", "limited->service", "service"], "note": "Only the orders not marked paid are asked about, a few at a time." },
+        {
+          "active": ["check", "check->print", "print"],
+          "note": "Every trade order goes on with its status, in its own order, the paid ones too.",
+          "value": { "kind": "map", "label": "one payment", "entries": [{ "key": "id", "value": "the order" }, { "key": "customerId", "value": "its customer" }, { "key": "status", "value": "what is known" }] }
+        }
+      ]
+    }
+  }
+}

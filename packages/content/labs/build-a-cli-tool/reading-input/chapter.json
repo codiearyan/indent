@@ -1,0 +1,118 @@
+{
+  "id": "reading-input",
+  "title": "Input from files and pipes",
+  "files": [
+    "src/input.js",
+    "orders.js",
+    "make-year.js",
+    "src/shop.js",
+    "src/commands.js",
+    "src/args.js",
+    "src/flags.js",
+    "orders/press-2.txt"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Pipe orders into the tool with `cat orders/press-2.txt | node orders.js check`, which works in PowerShell too.",
+    "suggestedCommand": "cat orders/press-2.txt | node orders.js check"
+  },
+  "tasks": [
+    {
+      "id": "lines",
+      "title": "Read the files a line at a time",
+      "file": "src/input.js",
+      "description": "Rewrite `readOrders(names)` in `src/input.js` so that it reads each file a line at a time.\n\n- it gives each line of each file named, in the order the files were named, as `{ file, line, text }`: the name as typed, the number of the line in its own file from 1, and the line without its line break, `\\r\\n` included\n- it reads a file in pieces, so a file far bigger than the memory the tool has is read anyway, and it keeps no more than the line it is on\n- a file that cannot be read still ends in one line on standard error that names it, and exit code 2\n\nThe check runs `node orders.js count` on a file of about 20 MB with 16 MB of memory for the tool's data, runs `list` and `check` on files of its own, one saved with Windows line breaks, and calls `readOrders` with two files of its own.",
+      "nextSteps": [
+        "Run `node make-year.js`, then `node --max-old-space-size=16 orders.js count orders/year.txt`, and read how it ends.",
+        "Read \"Reading a line at a time\" in the lesson.",
+        "Open each file as a stream, turn it into lines, and yield each line as it comes.",
+        "Run the count with 16 MB again, then delete `orders/year.txt`: Check copies your workspace."
+      ],
+      "hints": [
+        "`readFile` holds the whole file in memory at once, and splitting it holds it twice. Collecting the lines in an array before giving them on does the same.",
+        "A read stream gives a file in pieces, and `createInterface` from `node:readline` turns pieces into lines. `crlfDelay: Infinity` makes `\\r\\n` one line break every time. A generator can `yield` inside `for await`.",
+        "`for await (const text of createInterface({ input: createReadStream(name), crlfDelay: Infinity })) yield { file: name, line: ++line, text }`, with `let line = 0` before the loop, for each name."
+      ],
+      "docs": [
+        {
+          "title": "fs.createReadStream()",
+          "url": "https://nodejs.org/api/fs.html#fscreatereadstreampath-options"
+        },
+        {
+          "title": "readline: for await...of",
+          "url": "https://nodejs.org/api/readline.html#example-read-file-stream-line-by-line"
+        },
+        {
+          "title": "async function*",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Streams in Node",
+          "url": "https://www.youtube.com/watch?v=EcznOgzOdxI"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stdin",
+      "title": "Read standard input when no file is named",
+      "file": "src/input.js",
+      "description": "Let the orders come from standard input, so another program can pipe them in.\n\n- with no file named, `readOrders` reads standard input instead, a line at a time\n- a file named `-` stands for standard input, at its place among the files: `orders check press-1.txt - press-2.txt` reads press-1.txt, then standard input, then press-2.txt\n- a line from standard input has `file: 'stdin'`\n- when files are named and none of them is `-`, the tool never waits for standard input\n\nThe check pipes lines of its own into `node orders.js`, with no file, with `-` between two files, and with a file named while standard input stays open and nobody types.",
+      "nextSteps": [
+        "Run `cat orders/press-2.txt | node orders.js check` and see that nothing is read today.",
+        "Read \"Standard input\" in the lesson.",
+        "Decide the list of sources first: the names, or `-` alone when there are none.",
+        "For `-`, read lines from `process.stdin` the same way as from a file."
+      ],
+      "hints": [
+        "Standard input is a stream like a read stream of a file, so the same way of turning it into lines works on it.",
+        "`names.length === 0 ? ['-'] : names` gives the list to go through. Only `-` should ever touch `process.stdin`, so a tool given files never waits on it.",
+        "`const input = name === '-' ? process.stdin : createReadStream(name)` and `const file = name === '-' ? 'stdin' : name`, then the same loop as task 1."
+      ],
+      "docs": [
+        {
+          "title": "process.stdin",
+          "url": "https://nodejs.org/api/process.html#processstdin"
+        },
+        {
+          "title": "readline.createInterface()",
+          "url": "https://nodejs.org/api/readline.html#readlinecreateinterfaceoptions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pipe",
+      "title": "Stop quietly when the reader goes away",
+      "file": "orders.js",
+      "description": "Make the tool stop at once, and quietly, when whatever reads its output stops reading, as `| head -3` does after three lines.\n\n- when standard output is closed by its reader, the tool ends straight away, even while more input is still coming\n- it writes nothing to standard error about it, and ends with exit code 0: nothing went wrong in its own work\n\nThe check runs `list` on a long file and closes its end of standard output after three lines. Then it runs `list` reading standard input, closes its end after three lines, types more lines, and keeps standard input open: the tool must end by itself.",
+      "nextSteps": [
+        "On Linux or macOS, run `node make-year.js`, then `node orders.js list orders/year.txt | head -3`.",
+        "Read \"When the reader goes away\" in the lesson.",
+        "Listen for the error standard output gives when its reader is gone.",
+        "End the tool there, and let any other error be thrown as before."
+      ],
+      "hints": [
+        "Writing into a pipe nobody reads fails with the code `EPIPE` (on Windows often `EOF`). With no listener the tool stops with a stack trace; a listener that ignores it keeps the tool working for nobody.",
+        "`process.stdout` is a stream, and a stream says it failed with an `error` event. Here the work is over, so stopping at once is right, and nothing is left to write.",
+        "At the top of `orders.js`: `process.stdout.on('error', (error) => { if (error.code === 'EPIPE' || error.code === 'EOF') process.exit(0); throw error })`."
+      ],
+      "docs": [
+        {
+          "title": "Stream: error event",
+          "url": "https://nodejs.org/api/stream.html#event-error"
+        },
+        {
+          "title": "Common system errors: EPIPE",
+          "url": "https://nodejs.org/api/errors.html#common-system-errors"
+        },
+        {
+          "title": "process.exit()",
+          "url": "https://nodejs.org/api/process.html#processexitcode"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

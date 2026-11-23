@@ -1,0 +1,76 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kasimir", "label": "Kasimir at the bench", "kind": "story" },
+      { "id": "open", "label": "openRepair()", "kind": "function", "mine": true },
+      { "id": "next", "label": "nextUp()", "kind": "function", "mine": true },
+      { "id": "checkups", "label": "addCheckUps()", "kind": "function", "mine": true },
+      { "id": "bench", "label": "The bench list", "kind": "data" },
+      { "id": "screen", "label": "Bench screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kasimir", "to": "open", "label": "new job" },
+      { "from": "open", "to": "screen", "label": "a repair" },
+      { "from": "kasimir", "to": "next", "label": "what next" },
+      { "from": "next", "to": "bench", "label": "points into" },
+      { "from": "checkups", "to": "bench", "label": "adds to" },
+      { "from": "bench", "to": "screen", "label": "shows" }
+    ],
+    "note": "Every repair the bench screen reads is one that still exists when it reads it."
+  },
+  "tasks": {
+    "open": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->open"],
+          "value": { "kind": "array", "label": "goes in", "values": ["ticket", "item", "minutes"] },
+          "note": "Kasimir starts a new job with a ticket, an item and the minutes already spent."
+        },
+        {
+          "active": ["open"],
+          "note": "A new repair is made from what Kasimir gave, with his minutes logged on it."
+        },
+        {
+          "active": ["open->screen", "screen"],
+          "value": { "kind": "array", "label": "comes back", "values": ["a repair of the caller's own"] },
+          "note": "The screen receives a repair of its own, which lasts as long as the screen keeps it."
+        }
+      ]
+    },
+    "next": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->next", "next"],
+          "note": "Kasimir asks which repair to work on next."
+        },
+        {
+          "active": ["next->bench", "bench"],
+          "value": { "kind": "array", "label": "looks at", "values": ["the minutes of each repair"] },
+          "note": "The repair with the fewest minutes is found where it sits on the bench."
+        },
+        {
+          "active": ["bench", "bench->screen", "screen"],
+          "note": "Time Kasimir logs lands on that very repair, and the screen shows it."
+        }
+      ]
+    },
+    "checkups": {
+      "steps": [
+        {
+          "active": ["bench"],
+          "value": { "kind": "array", "label": "goes in", "values": ["ticket", "item", "minutes"] },
+          "note": "Some repairs on the bench took more than a whole day."
+        },
+        {
+          "active": ["checkups", "checkups->bench"],
+          "note": "Each long job gets a check-up added at the end of the bench."
+        },
+        {
+          "active": ["bench", "bench->screen", "screen"],
+          "value": { "kind": "array", "label": "comes back", "values": ["the repairs", "then a check-up per long job"] },
+          "note": "The screen shows the old repairs, then the check-ups in the same order."
+        }
+      ]
+    }
+  }
+}

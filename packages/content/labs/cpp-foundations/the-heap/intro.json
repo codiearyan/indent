@@ -1,0 +1,40 @@
+{
+  "stations": [
+    {
+      "title": "Kasimir",
+      "say": "Why is the laptop slower daily?"
+    },
+    {
+      "title": "Waiting shelf",
+      "text": "Clocks wait days for parts, then go home."
+    },
+    {
+      "title": "Your functions",
+      "file": "waiting.cpp",
+      "mine": true,
+      "gap": "Memory taken, never given back",
+      "tasks": [
+        "Take a repair in",
+        "Close a repair",
+        "Take one off"
+      ]
+    },
+    {
+      "title": "The laptop",
+      "text": "Gets its memory back from every repair."
+    }
+  ],
+  "ticket": {
+    "label": "Pocket watch",
+    "wrong": "memory kept",
+    "why": "Piling up",
+    "right": "memory back"
+  },
+  "captions": [
+    "Kasimir takes in a pocket watch that has to wait a week for a part.",
+    "It goes home on Friday, yet the laptop still holds its memory, and gets slower.",
+    "You make repairs that stay as long as they must, and end each one exactly once.",
+    "Now the pocket watch leaves the shelf and its memory goes back to the laptop.",
+    "Every repair taken in is ended once. Next, a pointer that ends its repair by itself."
+  ]
+}

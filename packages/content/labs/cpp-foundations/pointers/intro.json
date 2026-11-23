@@ -1,0 +1,54 @@
+{
+  "stations": [
+    {
+      "title": "Dorrit",
+      "say": "Is ticket 3104 on the bench?"
+    },
+    {
+      "title": "Her old look-up",
+      "text": "Shows an old copy, or falls over."
+    },
+    {
+      "title": "Your functions",
+      "file": "lookup.cpp",
+      "mine": true,
+      "gap": "No way to the repair itself",
+      "tasks": [
+        "Find by ticket",
+        "Log a call",
+        "Point at the longest"
+      ]
+    },
+    {
+      "title": "Kasimir's bench",
+      "rows": [
+        [
+          "3101",
+          "mantel clock"
+        ],
+        [
+          "3104",
+          "pocket watch"
+        ],
+        [
+          "3110",
+          "carriage clock"
+        ]
+      ],
+      "mark": 1
+    }
+  ],
+  "ticket": {
+    "label": "Ticket 3104",
+    "wrong": "a stale copy",
+    "why": "A copy",
+    "right": "call logged"
+  },
+  "captions": [
+    "A customer rings Dorrit about ticket 3104, the pocket watch.",
+    "Her look-up shows an old copy of the repair, and stops when a ticket is missing.",
+    "You write functions that reach the repair on the bench, or say plainly there is none.",
+    "Now the call is logged on the pocket watch itself, on Kasimir's bench.",
+    "Dorrit reaches the real repairs. Next, repairs that outlive the code that made them."
+  ]
+}

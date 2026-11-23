@@ -1,0 +1,7 @@
+# Press 1, week of 23 November
+1881,invite,120,cotton,2026-11-26
+1882,card,250,linen,2026-11-27
+1884,poster,40,kraft,2026-11-25
+
+1887,invite,300,cotton,2026-11-30
+1889,envelope,300,kraft,2026-11-30

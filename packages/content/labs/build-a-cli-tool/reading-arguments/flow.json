@@ -1,0 +1,90 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "idris", "label": "Idris at the terminal", "kind": "story" },
+      { "id": "words", "label": "Typed words", "kind": "data" },
+      { "id": "table", "label": "Flag table", "kind": "data" },
+      { "id": "read", "label": "readArgs()", "kind": "function", "mine": true, "fn": "readArgs" },
+      { "id": "parsed", "label": "Command, values, flags", "kind": "data" },
+      { "id": "tool", "label": "orders.js", "kind": "file" }
+    ],
+    "edges": [
+      { "from": "idris", "to": "words", "label": "types" },
+      { "from": "words", "to": "read", "label": "one by one" },
+      { "from": "table", "to": "read", "label": "known flags" },
+      { "from": "read", "to": "parsed", "label": "sorted" },
+      { "from": "parsed", "to": "tool", "label": "printed" }
+    ],
+    "note": "The words Idris types go through a reader you write, which sorts them into a command, its values and its flags."
+  },
+  "tasks": {
+    "words": {
+      "steps": [
+        {
+          "active": ["idris", "idris->words", "words"],
+          "note": "Idris types a command, the order files and a switch, in the order they come to mind.",
+          "value": { "kind": "array", "label": "typed words", "values": ["list", "orders/press-1.txt", "--help"] }
+        },
+        {
+          "active": ["words", "words->read", "read", "table", "table->read"],
+          "note": "readArgs looks at each word by itself: a plain word, or a flag it finds in the table."
+        },
+        {
+          "active": ["read", "read->parsed", "parsed", "parsed->tool", "tool"],
+          "note": "The first plain word is the command, the rest are values, and each switch given is on.",
+          "value": {
+            "kind": "map",
+            "label": "the shape",
+            "entries": [
+              { "key": "command", "value": "the first plain word" },
+              { "key": "values", "value": "the other plain words" },
+              { "key": "flags", "value": "each flag given, by its long name" }
+            ]
+          }
+        }
+      ],
+      "trace": {
+        "file": "src/args.js",
+        "call": "readArgs",
+        "args": [["list", "orders/press-1.txt", "--help"], { "help": { "short": "h" } }]
+      }
+    },
+    "values": {
+      "steps": [
+        {
+          "active": ["idris", "idris->words", "words"],
+          "note": "This time Idris wants only the orders on linen, so a flag carries a value."
+        },
+        {
+          "active": ["table", "table->read", "read"],
+          "note": "The table says the paper flag takes a value, so the next word belongs to it, whatever it looks like."
+        },
+        {
+          "active": ["read", "read->parsed", "parsed"],
+          "note": "The value goes in under the flag's long name, as the text that was typed, and the file stays a value."
+        }
+      ],
+      "trace": {
+        "file": "src/args.js",
+        "call": "readArgs",
+        "args": [["list", "--paper", "linen", "orders/press-1.txt"], { "paper": { "value": "name" } }]
+      }
+    },
+    "wrong": {
+      "steps": [
+        {
+          "active": ["idris", "idris->words", "words"],
+          "note": "Idris types a flag the tool does not know, spelled the way another tool spells it."
+        },
+        {
+          "active": ["words", "words->read", "read", "table", "table->read"],
+          "note": "readArgs finds no such flag among the table's own entries, and does not guess."
+        },
+        {
+          "active": ["read", "tool"],
+          "note": "It stops with a plain message that names the flag as Idris typed it, and nothing runs."
+        }
+      ]
+    }
+  }
+}
