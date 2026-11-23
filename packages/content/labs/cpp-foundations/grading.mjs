@@ -4204,10 +4204,12 @@ async function fileRule(t, file, spec) {
   const section = sectionOf(whole, spec.task)
   if (!section) return null
   const who = spec.fn ?? `The code of ${label(spec.task)}`
+  // A quote that codeOnly() keeps opens a string in the code; one inside a comment is blanked.
+  const blanked = codeOnly(section.text)
   for (const m of section.text.matchAll(LITERAL)) {
+    if (blanked[m.index] !== '"') continue
     const text = m[1].replace(/\\./g, '')
     const line = section.from + section.text.slice(0, m.index).split('\n').length
-    if (/^\s*\/\//.test(section.text.split('\n')[line - section.from - 1] ?? '')) continue
     if (OUTSIDE.test(text)) {
       return fail(
         `${label(spec.task)} stays inside the workspace`,

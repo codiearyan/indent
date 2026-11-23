@@ -105,6 +105,7 @@ export const checks = {
     const streams = [
       { what: 'three notes', text: '3\nnew mainspring fitted\ncase polished\ncrystal cracked\n', want: ['new mainspring fitted', 'case polished', 'crystal cracked'] },
       { what: 'an empty note, and no line end after the last', text: '3\nhands set\n\nglass fitted', want: ['hands set', '', 'glass fitted'] },
+      { what: 'an empty first note, and one that starts with spaces', text: '2\n\n  oiled again\n', want: ['', '  oiled again'] },
       { what: 'fewer notes than the first line says', text: '4\nbalance cleaned\ndial cleaned\n', want: ['balance cleaned', 'dial cleaned'] },
       { what: 'more lines than the first line says', text: '1\nstem replaced\nnot a note\n', want: ['stem replaced'] },
       { what: 'no notes', text: '0\n', want: [] }
@@ -124,6 +125,9 @@ export const checks = {
           if (!Array.isArray(notes)) return 'Check could not read what readNotes gave back.'
           if (s.want.length && notes[0] === '' && s.want[0] !== '') {
             return 'The first note readNotes gave back is empty, and the notes after it moved down by one. >> read the number and stopped right before the line end after it, so the std::getline after it read the empty rest of that first line, as in part 2.'
+          }
+          if (s.want[0] === '' && notes[0] !== '' && notes.some((n) => n === 'oiled again')) {
+            return 'The empty first note is gone, and so are the spaces the next one starts with. Skipping every blank after the number skips them too: read away only the rest of the first line, the empty text >> left there, as part 2 did.'
           }
           if (s.want.some((n) => n.includes(' ')) && notes.length && notes.every((n) => !n.includes(' ') && words(s.want).includes(n))) {
             return `readNotes gave back each word as a note of its own: ${listText(notes)}. A note is a whole line, spaces and all; >> stops at the first space.`

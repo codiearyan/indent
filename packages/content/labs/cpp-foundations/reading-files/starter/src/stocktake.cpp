@@ -22,7 +22,8 @@
 // Write a function called totalParts that takes a stream as a reference to a std::istream and
 // gives back an int. The stream holds pairs: a part's name, one word, and then its count, a whole
 // number, with spaces or line ends between them. It reads to the end and gives back the counts
-// added up, 0 for an empty stream. When a name is not followed by a whole number, it gives back -1.
+// added up, 0 for an empty stream. When a name is not followed by a whole number, it gives back -1,
+// at the very end too: a name with no count is a line Kasimir did not finish.
 
 // Task 3: Read the bench notes
 // Write a function called readNotes that takes a stream as a reference to a std::istream and gives

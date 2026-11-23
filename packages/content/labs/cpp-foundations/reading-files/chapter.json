@@ -53,7 +53,7 @@
       "id": "totalParts",
       "title": "Add up the drawer",
       "file": "src/stocktake.cpp",
-      "description": "Under `// Task 2`, write a function called `totalParts` that takes a stream as a reference to a `std::istream` and gives back an `int`. The stream holds pairs: a part's name, one word, and then its count, a whole number, with spaces or line ends between them, like `data/drawer.txt`. It reads to the end and gives back the counts added up, `0` for an empty stream. When a name is not followed by a whole number, it gives back `-1`.\n\nCheck hands `totalParts` string streams of its own, with no file: pairs on one line or on several, a blank line, no line end at the end, a count written as a word, and a name with no count after it.",
+      "description": "Under `// Task 2`, write a function called `totalParts` that takes a stream as a reference to a `std::istream` and gives back an `int`. The stream holds pairs: a part's name, one word, and then its count, a whole number, with spaces or line ends between them, like `data/drawer.txt`. It reads to the end and gives back the counts added up, `0` for an empty stream. When a name is not followed by a whole number, it gives back `-1`, at the very end too: a name with no count is a line Kasimir did not finish, and a total without it would look right and be wrong.\n\nCheck hands `totalParts` string streams of its own, with no file: pairs on one line or on several, a blank line, no line end at the end, a count written as a word, and a name with no count after it.",
       "nextSteps": [
         "Write the first line, with the stream as a `std::istream&`.",
         "Read a name, in a way that stops the loop at the end of the stream.",
@@ -85,7 +85,7 @@
       "id": "readNotes",
       "title": "Read the bench notes",
       "file": "src/stocktake.cpp",
-      "description": "Under `// Task 3`, write a function called `readNotes` that takes a stream as a reference to a `std::istream` and gives back a `std::vector<std::string>`. The first line of the stream holds how many notes follow, as a whole number, like `data/notes.txt`. Each note is the whole of the line after it, spaces kept. It gives back those notes, in order: no more than the first line says, and only the ones the stream really holds.\n\nCheck hands `readNotes` string streams of its own: notes with spaces, an empty note, fewer notes than the first line says, more lines than it says, and none.",
+      "description": "Under `// Task 3`, write a function called `readNotes` that takes a stream as a reference to a `std::istream` and gives back a `std::vector<std::string>`. The first line of the stream holds how many notes follow, as a whole number, like `data/notes.txt`. Each note is the whole of the line after it, spaces kept. It gives back those notes, in order: no more than the first line says, and only the ones the stream really holds.\n\nCheck hands `readNotes` string streams of its own: notes with spaces, an empty note, a first note that is empty or starts with spaces, fewer notes than the first line says, more lines than it says, and none.",
       "nextSteps": [
         "Write the first line: a `std::istream&` in, a `std::vector<std::string>` back.",
         "Read the number with `>>`, then deal with the rest of that first line.",
@@ -94,8 +94,8 @@
       ],
       "hints": [
         "Part 2 met this mix with typing: reading the number stops right before the line end after it, and the next read of a whole line reads that empty rest of the first line.",
-        "Skip the rest of the first line before the first note. Then each note is kept only when its read worked: a read at the end of the stream fails and gives nothing new.",
-        "The shape is `in >> count; in >> std::ws;` and then a loop whose condition is `static_cast<int>(notes.size()) < count && std::getline(in, note)`."
+        "Read away the rest of the first line, and only that, before the first note: skipping every blank would also skip an empty first note, or the spaces a note starts with. Then each note is kept only when its read worked: a read at the end of the stream fails and gives nothing new.",
+        "The shape is `in >> count; std::string rest; std::getline(in, rest);` and then a loop whose condition is `static_cast<int>(notes.size()) < count && std::getline(in, note)`."
       ],
       "docs": [
         {
