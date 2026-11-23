@@ -11,7 +11,7 @@
       "id": "card",
       "title": "Show the member picked now",
       "file": "src/MemberDesk.jsx",
-      "description": "Picking a member in the list asks the membership system for that member with `loadMember`, and the card shows them once the answer comes. While a new member is on the way, the card never shows the member picked before.\n\nThe check draws `MemberDesk` with members of its own and a membership system of its own that answers only when the check says so. It picks two members in turn and reads the card before and after each answer.",
+      "description": "Picking a member in the list asks the membership system for that member with `loadMember`, and the card shows them once the answer comes. While a new member is on the way, the card never shows the member picked before, and when two members are picked quickly, the first one's answer never lands on the second one's card, whenever it comes.\n\nThe check draws `MemberDesk` with members of its own and a membership system of its own that answers only when the check says so. It picks two members in turn and reads the card before and after each answer, then picks two at once and answers the second first.",
       "nextSteps": [
         "Pick Delphine in the Browser panel and watch the card.",
         "Read \"An effect that does too little\" in the lesson.",
@@ -20,8 +20,8 @@
       ],
       "hints": [
         "The effect runs, and loads the first member. Look at when React runs it again.",
-        "React runs an effect again only when a value in its dependency list changed, and an empty list never changes. The effect uses `memberId`. Until the new member arrives, the card should say it is loading.",
-        "`useEffect(() => { setMember(null); loadMember(memberId).then(setMember) }, [memberId])`."
+        "React runs an effect again only when a value in its dependency list changed, and an empty list never changes. The effect uses `memberId`. Until the new member arrives, the card should say it is loading, and an answer for a member picked before is left out: the cleanup runs when the member picked changes.",
+        "`useEffect(() => { let ignore = false; setMember(null); loadMember(memberId).then((found) => { if (!ignore) setMember(found) }); return () => { ignore = true } }, [memberId])`."
       ],
       "docs": [
         { "title": "Synchronizing with effects", "url": "https://react.dev/learn/synchronizing-with-effects#step-2-specify-the-effect-dependencies" },

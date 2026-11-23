@@ -103,7 +103,7 @@
             "card->screen",
             "screen"
           ],
-          "note": "The answer comes, and the card shows Delphine.",
+          "note": "The answer comes, and the card shows Delphine. An answer for a member picked before changes nothing.",
           "value": {
             "kind": "map",
             "label": "the member",

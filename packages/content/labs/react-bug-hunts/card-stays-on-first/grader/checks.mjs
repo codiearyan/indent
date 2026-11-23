@@ -89,7 +89,7 @@ async function follows(page) {
         detail(
           'Picking a member asks for that member',
           false,
-          `Picking ${named(id)} asked the membership system for nothing. The effect that loads the card ran once, when the card first appeared, and never again: React runs an effect again only when a value in its dependency list changed, and the member picked is not in that list.`,
+          `Picking ${named(id)} asked the membership system for nothing. The effect that loads the card ran once, when the card first appeared, and never again. Look at what tells React to run an effect again.`,
           log.join('\n')
         )
       ]
@@ -116,6 +116,31 @@ async function follows(page) {
     if (nameShown(page) !== named(id)) {
       return [detail('The card shows the member picked now', false, `${named(id)} was picked and their answer came in, and the card did not show them.`, log.join('\n'))]
     }
+  }
+  // Two quick picks: the first answer comes last and must not land on the second member's card.
+  const quickFrom = desk(page).loads.length
+  await pick(page, 'x-1')
+  await pick(page, 'x-3')
+  const quick = desk(page).loads.slice(quickFrom)
+  const older = quick.findLast((l) => l.id === 'x-1')
+  const newer = quick.findLast((l) => l.id === 'x-3')
+  if (older && newer) {
+    newer.answer()
+    await page.settle()
+    older.answer()
+    await page.settle()
+  }
+  log.push(`picked ${named('x-1')}, then ${named('x-3')} at once; ${named('x-3')} answered first, then ${named('x-1')}: ${cardText(page)}`)
+  if (nameShown(page) !== named('x-3')) {
+    return [
+      detail('Picking a member asks for that member', true),
+      detail(
+        'The card shows the member picked now, never the one before',
+        false,
+        `${named('x-1')} was picked, then ${named('x-3')} before the first answer came. ${named('x-1')}'s answer came last, and the card showed it, though ${named('x-3')} was picked now. An answer for a member nobody has picked any more changes nothing.`,
+        log.join('\n')
+      )
+    ]
   }
   return [
     detail('Picking a member asks for that member', true),

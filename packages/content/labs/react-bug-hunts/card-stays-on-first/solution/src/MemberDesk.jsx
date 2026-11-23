@@ -12,8 +12,14 @@ export function MemberCard({ memberId }) {
   const [note, setNote] = useState('')
 
   useEffect(() => {
+    let ignore = false
     setMember(null)
-    loadMember(memberId).then((found) => setMember(found))
+    loadMember(memberId).then((found) => {
+      if (!ignore) setMember(found)
+    })
+    return () => {
+      ignore = true
+    }
   }, [memberId])
 
   useEffect(() => {

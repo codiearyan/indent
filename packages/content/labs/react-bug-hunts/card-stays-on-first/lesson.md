@@ -43,6 +43,8 @@ It loads the first town and never another. Pick a new town and `town` changes, b
 
 Once it runs again for a new town, what it showed for the old town is still in state until the answer comes. If the screen must not show it under the new name, set it back at the start of the effect.
 
+Pick two towns quickly and both answers are on their way at once. The first town's answer must not land under the second town's name when it comes late. The cleanup runs when `town` changes, so a flag declared in the effect and set in its cleanup keeps that answer out, as you did when data first arrived later. The last ticket looks at this race closely.
+
 ## An effect that does too much
 
 With no list at all, an effect runs after every draw. That is fine only when its cleanup undoes it each time. A listener added on every draw and never removed piles up: one per draw, each with the values of the draw it was made in, and each one answers the key. The cleanup is the function the effect returns; React calls it before running the effect again and when the component leaves the screen:
