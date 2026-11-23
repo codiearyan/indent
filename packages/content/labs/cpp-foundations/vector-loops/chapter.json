@@ -1,0 +1,131 @@
+{
+  "id": "vector-loops",
+  "title": "Going through a vector",
+  "files": [
+    "src/timing.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the timing bench here and run it, after you call your functions from main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/timing.cpp -o timing && ./timing"
+  },
+  "tasks": [
+    {
+      "id": "total",
+      "title": "Add up the drift of the day",
+      "file": "src/timing.cpp",
+      "description": "Under `// Task 1` in `src/timing.cpp`, write a function called `totalDrift` that takes the drifts as a reference to a `const std::vector<int>` and gives back all of them added up, as an `int`. An empty list adds up to `0`.\n\nCheck calls `totalDrift` from code of its own with lists of its own, an empty one included, and reads what it gives back. It only reads the drifts, so the caller's list must be the same afterwards. It gives the total back; it prints nothing.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<int>&` in, an `int` back.",
+        "Make a total before the loop.",
+        "Go through every drift with a range-based `for` and add it.",
+        "Give the total back, and call it from `main` with `drifts`."
+      ],
+      "hints": [
+        "A range-based `for` visits every value of a vector in order, and none at all for an empty one.",
+        "The total starts at 0 before the loop, so it is still there after it, and grows by each drift inside.",
+        "The shape is `int total = 0; for (int drift : drifts) { total += drift; } return total;`."
+      ],
+      "docs": [
+        {
+          "title": "Range-based for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/range-for"
+        },
+        {
+          "title": "std::vector",
+          "url": "https://en.cppreference.com/w/cpp/container/vector"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Range-based for loops in six minutes",
+          "url": "https://www.youtube.com/watch?v=0FoBzDM2v6k"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fastest",
+      "title": "Find the clock that runs fastest",
+      "file": "src/timing.cpp",
+      "description": "Under `// Task 2`, write a function called `fastestDrift` that takes the drifts as a reference to a `const std::vector<int>` and gives back the largest of them, as an `int`, or `0` when the list is empty. Some days every clock loses time, and then every drift is below 0.\n\nCheck calls `fastestDrift` with lists of its own, an empty one and one where every drift is below 0 included, and reads what it gives back. It only reads the drifts, so the caller's list must be the same afterwards.",
+      "nextSteps": [
+        "Handle the empty list first.",
+        "Start the largest at a drift that is really in the list.",
+        "Go through the drifts and keep any that is larger.",
+        "Try it in `main` with a list where every drift is below 0."
+      ],
+      "hints": [
+        "The largest so far has to start somewhere, and 0 is not always in the list.",
+        "On a day when every clock loses time, nothing is larger than 0, so a largest that starts at 0 stays 0. Start it at the first drift, once you know the list is not empty.",
+        "The shape is `if (drifts.empty()) { return 0; } int fastest = drifts[0];`, then a loop with `if (drift > fastest) { fastest = drift; }`."
+      ],
+      "docs": [
+        {
+          "title": "Range-based for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/range-for"
+        },
+        {
+          "title": "if statement",
+          "url": "https://en.cppreference.com/w/cpp/language/if"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "numbered",
+      "title": "Print the clocks, numbered",
+      "file": "src/timing.cpp",
+      "description": "Under `// Task 3`, write a function called `printNumbered` that takes the names of the clocks as a reference to a `const std::vector<std::string>` and gives nothing back. It prints one line per clock, in order, numbered from 1, and nothing at all for an empty list:\n\n```\n1. carriage clock\n2. mantel clock\n```\n\nCheck calls `printNumbered` with lists of its own, an empty one included, and reads what it prints. It only reads the names, so the caller's list must be the same afterwards.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<std::string>&` in, `void` back.",
+        "Write a counted loop over the positions, with a counter of the type of `size()`.",
+        "Print the number, `. ` and the name, and end the line.",
+        "Call it from `main` with `clocks`, build and run."
+      ],
+      "hints": [
+        "The number on each line comes from the position, so this loop counts positions instead of taking each value.",
+        "Positions run from 0 to one less than the size, and the lines are numbered from 1: the number is the position plus 1. A `std::size_t` counter compared with `size()` is right on every compiler.",
+        "The shape is `for (std::size_t i = 0; i < clocks.size(); i++) { std::cout << i + 1 << \". \" << clocks[i] << \"\\n\"; }`."
+      ],
+      "docs": [
+        {
+          "title": "for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/for"
+        },
+        {
+          "title": "std::size_t",
+          "url": "https://en.cppreference.com/w/cpp/types/size_t"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "correct",
+      "title": "Correct every drift",
+      "file": "src/timing.cpp",
+      "description": "After Kasimir regulates the clocks, each one gains a few seconds less. Under `// Task 4`, write a function called `correctAll` that takes the drifts as a reference to a `std::vector<int>` and the correction as an `int`, and gives nothing back. It takes the correction off every drift in the caller's list: with the drifts `{4, -3}` and a correction of `2`, they become `{2, -5}`.\n\nCheck calls `correctAll` with lists of its own, an empty one included, and reads its list after the call, so a loop or a function that changes copies is found out.",
+      "nextSteps": [
+        "Write the first line: the drifts change for the caller.",
+        "Go through the drifts with a loop variable that is the value itself, not a copy.",
+        "Take the correction off each one.",
+        "In `main`, correct `drifts` and print one of them afterwards."
+      ],
+      "hints": [
+        "Two things have to reach the caller's own list: the parameter, and the loop variable.",
+        "A loop variable written `int drift` or `auto drift` is a copy of each value. With `&` after the type it is the value in the vector itself.",
+        "The shape is `void correctAll(std::vector<int>& drifts, int correction) { for (auto& drift : drifts) { drift -= correction; } }`."
+      ],
+      "docs": [
+        {
+          "title": "Range-based for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/range-for"
+        },
+        {
+          "title": "Placeholder type specifiers (auto)",
+          "url": "https://en.cppreference.com/w/cpp/language/auto"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,216 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "kasimir",
+        "label": "Kasimir at the bench",
+        "kind": "story"
+      },
+      {
+        "id": "stock",
+        "label": "Parts stock",
+        "kind": "data"
+      },
+      {
+        "id": "funcs",
+        "label": "Your functions",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "compiler",
+        "label": "Compiler",
+        "kind": "story"
+      },
+      {
+        "id": "drawers",
+        "label": "Labelled drawers",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "kasimir",
+        "to": "funcs",
+        "label": "a part's name"
+      },
+      {
+        "from": "stock",
+        "to": "funcs",
+        "label": "name and count"
+      },
+      {
+        "from": "funcs",
+        "to": "compiler",
+        "label": "builds"
+      },
+      {
+        "from": "compiler",
+        "to": "drawers",
+        "label": "counts by name"
+      }
+    ],
+    "note": "The stock is kept under each part's name, so a part is found by what it is called, not by where it sits."
+  },
+  "tasks": {
+    "restock": {
+      "steps": [
+        {
+          "active": [
+            "kasimir",
+            "kasimir->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the stock",
+              "a part",
+              "how many"
+            ]
+          },
+          "note": "Kasimir puts a few more of one part in its drawer."
+        },
+        {
+          "active": [
+            "stock",
+            "stock->funcs",
+            "funcs"
+          ],
+          "note": "The count under that name goes up in the workshop's own stock, and a new name starts a new drawer."
+        },
+        {
+          "active": [
+            "stock"
+          ],
+          "note": "The stock shows the new count, and every other drawer is as it was."
+        }
+      ]
+    },
+    "lookup": {
+      "steps": [
+        {
+          "active": [
+            "kasimir",
+            "kasimir->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the stock",
+              "a part"
+            ]
+          },
+          "note": "Kasimir asks how many of a part there are, maybe one he has never stocked."
+        },
+        {
+          "active": [
+            "stock",
+            "stock->funcs",
+            "funcs"
+          ],
+          "note": "The function asks whether the name is there before it reads, so no drawer appears by asking."
+        },
+        {
+          "active": [
+            "funcs->compiler",
+            "compiler->drawers",
+            "drawers"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "a count, or 0"
+            ]
+          },
+          "note": "Kasimir gets a count, and the stock is exactly as it was."
+        }
+      ]
+    },
+    "print": {
+      "steps": [
+        {
+          "active": [
+            "stock",
+            "stock->funcs"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "goes in",
+            "entries": [
+              {
+                "key": "a part's name",
+                "value": "its count"
+              },
+              {
+                "key": "the next name",
+                "value": "its count"
+              }
+            ]
+          },
+          "note": "The whole stock goes in, to be read."
+        },
+        {
+          "active": [
+            "funcs"
+          ],
+          "note": "The loop visits each part in the map's own order of names."
+        },
+        {
+          "active": [
+            "funcs->compiler",
+            "compiler->drawers",
+            "drawers"
+          ],
+          "note": "Kasimir reads the stock as a list, or one line when the drawers are empty."
+        }
+      ]
+    },
+    "tally": {
+      "steps": [
+        {
+          "active": [
+            "kasimir",
+            "kasimir->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "part used",
+              "part used",
+              "..."
+            ]
+          },
+          "note": "At night, the day's list of parts used goes in, with a name for each one."
+        },
+        {
+          "active": [
+            "funcs"
+          ],
+          "note": "Each name seen adds one to the count under that name, starting a new count the first time."
+        },
+        {
+          "active": [
+            "funcs->compiler",
+            "compiler->drawers",
+            "drawers"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "comes back",
+            "entries": [
+              {
+                "key": "part name",
+                "value": "times used"
+              }
+            ]
+          },
+          "note": "A new map comes back with how many of each part the day used."
+        }
+      ]
+    }
+  }
+}
