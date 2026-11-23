@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import {
   copyStarter,
   emptyDir,
+  holdsOtherText,
   isAppPath,
   readFolders,
   readWorkspace,
@@ -150,5 +151,31 @@ describe("what the workspace's .gitignore names", () => {
   it('hides nothing when there is none', async () => {
     const dir = await tree({ 'dist/a.js': 'built', 'src/a.js': 'a' })
     expect(await paths(dir)).toEqual(['dist/a.js', 'src/a.js'])
+  })
+})
+
+describe('a file that is not UTF-8 text', () => {
+  // "£5" in ISO-8859-1: the pound sign is one byte that is not UTF-8 on its own.
+  const latin1 = Buffer.from([0xa3, 0x35, 0x0a])
+
+  it('is read, marked read-only, and shown with a mark for the byte it could not read', async () => {
+    const dir = await tree({ 'till.txt': latin1, 'notes.txt': '£5\n' })
+    const files = await readWorkspace(dir, [])
+    expect(files.find((f) => f.path === 'till.txt')).toEqual({
+      path: 'till.txt',
+      content: '\ufffd5\n',
+      readOnly: true
+    })
+    expect(files.find((f) => f.path === 'notes.txt')).toEqual({
+      path: 'notes.txt',
+      content: '£5\n'
+    })
+  })
+
+  it('is told apart from UTF-8 text before a save', async () => {
+    const dir = await tree({ 'till.txt': latin1, 'notes.txt': '£5\n' })
+    expect(await holdsOtherText(join(dir, 'till.txt'))).toBe(true)
+    expect(await holdsOtherText(join(dir, 'notes.txt'))).toBe(false)
+    expect(await holdsOtherText(join(dir, 'new.txt'))).toBe(false)
   })
 })

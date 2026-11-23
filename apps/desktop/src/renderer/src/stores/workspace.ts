@@ -307,6 +307,7 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
     setSplit: (split) => setLayout({ ...get().layout, split: clampSplit(split) }),
 
     edit: (path, content) => {
+      if (get().files.find((f) => f.path === path)?.readOnly) return
       set((s) => ({ files: s.files.map((f) => (f.path === path ? { ...f, content } : f)) }))
       clearTimeout(pendingSaves.get(path))
       pendingSaves.set(

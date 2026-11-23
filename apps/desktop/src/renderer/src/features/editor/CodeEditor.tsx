@@ -28,6 +28,9 @@ interface Props {
   onRun(): void
 }
 
+const NOT_UTF8 =
+  'This file is not UTF-8 text, so it opens read-only. Saving it here would damage it.'
+
 export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element {
   const hostRef = useRef<HTMLDivElement>(null)
   const vimStatusRef = useRef<HTMLDivElement>(null)
@@ -37,6 +40,7 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
   const activePath = useWorkspace((s) => s.layout.groups[group]?.active ?? null)
   // The file's model is made once it is listed, so the editor picks it up then.
   const listed = useWorkspace((s) => s.files.some((f) => f.path === activePath))
+  const readOnly = useWorkspace((s) => !!s.files.find((f) => f.path === activePath)?.readOnly)
   const theme = useSettings((s) => s.theme)
   const codeTheme = useSettings((s) => s.codeTheme)
   const options = useSettings((s) => s.editor)
@@ -165,6 +169,10 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
   }, [vim, group, onCheck, onRun])
 
   useEffect(() => {
+    editorRef.current?.updateOptions({ readOnly, readOnlyMessage: { value: NOT_UTF8 } })
+  }, [readOnly, editor])
+
+  useEffect(() => {
     monaco.editor.setTheme(themeName(codeTheme, theme))
   }, [codeTheme, theme])
 
@@ -184,6 +192,11 @@ export function CodeEditor({ group, onCheck, onRun }: Props): React.JSX.Element 
 
   return (
     <div className="flex h-full min-w-0 flex-1 flex-col">
+      {readOnly && (
+        <p className="shrink-0 border-b border-rule px-3 py-1.5 text-[13px] text-muted-foreground">
+          {NOT_UTF8}
+        </p>
+      )}
       <div className="relative min-h-0 flex-1">
         <div ref={hostRef} data-tour={group === 0 ? TOUR.editor : undefined} className="h-full" />
         <SelectionAsk editor={editor} />

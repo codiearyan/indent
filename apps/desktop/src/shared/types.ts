@@ -292,6 +292,11 @@ export interface PathDef {
 export interface WorkspaceFile {
   path: string
   content: string
+  /**
+   * Not UTF-8 text, such as a file kept in ISO-8859-1 on purpose. `content` then shows a mark where
+   * a byte could not be read, so the editor only shows it and it is never written back.
+   */
+  readOnly?: boolean
 }
 
 /** Where the work would move after a folder was picked. */
