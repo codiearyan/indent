@@ -13,7 +13,7 @@ import { useWorkspace } from '@/stores/workspace'
 import { AudioCard } from './AudioCard'
 import { IconButton } from './IconButton'
 import { Markdown } from './Markdown'
-import { ResourcesPanel } from './ResourcesPanel'
+import { ResourcesCover, ResourcesPanel } from './ResourcesPanel'
 import { TaskList } from './TaskList'
 import { useLessonPart } from './useLessonPart'
 
@@ -109,12 +109,13 @@ export function LeftPanel(): React.JSX.Element {
               </div>
             </ScrollArea>
           </TabsContent>
-          <TabsContent value="resources" forceMount className={content}>
+          <TabsContent value="resources" forceMount className={cn(content, 'relative')}>
             <ScrollArea className={scroll}>
               <div className="zone-tasks px-6 pt-5 pb-10">
                 <ResourcesPanel chapter={chapter} />
               </div>
             </ScrollArea>
+            <ResourcesCover chapter={chapter} />
           </TabsContent>
         </>
       )}

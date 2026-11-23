@@ -32,13 +32,13 @@ export function videoSource(url: string): VideoSource | null {
 }
 
 /** The player address for a video link, or null when the player can't open the link. */
-export function embedUrl(video: VideoLink): string | null {
+export function embedUrl(video: VideoLink, autoplay: boolean): string | null {
   const source = videoSource(video.url)
   if (!source) return null
+  const params = new URLSearchParams(autoplay ? { autoplay: '1', rel: '0' } : { rel: '0' })
   if (source.kind === 'playlist') {
-    return `${VIDEO_ORIGIN}/embed/videoseries?list=${source.id}&autoplay=1&rel=0`
+    return `${VIDEO_ORIGIN}/embed/videoseries?list=${source.id}&${params}`
   }
-  const params = new URLSearchParams({ autoplay: '1', rel: '0' })
   if (video.start) params.set('start', String(video.start))
   if (video.end) params.set('end', String(video.end))
   return `${VIDEO_ORIGIN}/embed/${source.id}?${params}`

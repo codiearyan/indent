@@ -27,13 +27,16 @@ describe('videoSource', () => {
 
 describe('embedUrl', () => {
   it('plays from the nocookie origin with the given times', () => {
-    expect(embedUrl({ title: 'x', url: 'https://youtu.be/DHvZLI7Db8E', start: 30, end: 90 })).toBe(
-      'https://www.youtube-nocookie.com/embed/DHvZLI7Db8E?autoplay=1&rel=0&start=30&end=90'
-    )
     expect(
-      embedUrl({ title: 'x', url: 'https://www.youtube.com/playlist?list=PLabcdefghij' })
+      embedUrl({ title: 'x', url: 'https://youtu.be/DHvZLI7Db8E', start: 30, end: 90 }, true)
+    ).toBe('https://www.youtube-nocookie.com/embed/DHvZLI7Db8E?autoplay=1&rel=0&start=30&end=90')
+    expect(
+      embedUrl({ title: 'x', url: 'https://www.youtube.com/playlist?list=PLabcdefghij' }, true)
     ).toBe('https://www.youtube-nocookie.com/embed/videoseries?list=PLabcdefghij&autoplay=1&rel=0')
-    expect(embedUrl({ title: 'x', url: 'https://example.com' })).toBeNull()
+    expect(embedUrl({ title: 'x', url: 'https://youtu.be/DHvZLI7Db8E' }, false)).toBe(
+      'https://www.youtube-nocookie.com/embed/DHvZLI7Db8E?rel=0'
+    )
+    expect(embedUrl({ title: 'x', url: 'https://example.com' }, false)).toBeNull()
   })
 })
 

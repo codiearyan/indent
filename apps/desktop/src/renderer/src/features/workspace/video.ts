@@ -11,7 +11,7 @@ interface Playing {
   video: VideoLink
 }
 
-/** The video playing at the top of the Resources tab. */
+/** The video asked to play in the Resources tab, from a task or a tutor reply. */
 export const useVideo = create<{ playing: Playing | null }>(() => ({ playing: null }))
 
 /** Plays a video in the Resources tab, showing the tab and uncovering its list. */
@@ -22,10 +22,6 @@ export function playVideo(chapter: Chapter, video: VideoLink): void {
   settings.setLeftTab('resources')
   settings.showResources(key)
   useVideo.setState({ playing: { key, video } })
-}
-
-export function stopVideo(): void {
-  useVideo.setState({ playing: null })
 }
 
 /** A task's videos the app can play; a link the player can't open is left out. */
