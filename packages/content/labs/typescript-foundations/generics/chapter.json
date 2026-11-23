@@ -1,0 +1,129 @@
+{
+  "id": "generics",
+  "title": "One function for every type",
+  "files": ["src/lists.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/lists.ts` runs the list helpers, and `npm run types` checks their types.",
+    "suggestedCommand": "npm run types"
+  },
+  "tasks": [
+    {
+      "id": "first",
+      "title": "Keep the type of the first item",
+      "file": "src/lists.ts",
+      "description": "Under `// Task 1` in `src/lists.ts`, `firstOf` takes a list of any type and gives back its first item, or `undefined` for an empty list. Rafe typed it with `unknown`, so the type of what it gives back is lost, and the compiler refuses the lines below it. Make `firstOf` generic, so what it gives back has the type of the items it was given, or is `undefined`. Leave the body and the lines below it as they are.\n\nCheck refuses `any` and `as` in your lines, and reads `firstOf` for its result type. It compiles code of its own that takes the first of lists of text, numbers and orders: each must keep its own type, while using one as another type, or as never `undefined`, must be refused. It calls `firstOf` with lists of its own, an empty one among them.",
+      "nextSteps": [
+        "Run `npm run types` and read the two errors: what type does `firstOf` give back?",
+        "Write a type parameter in angle brackets after the name `firstOf`.",
+        "Use it for the items of the list, and in the result type with `undefined`.",
+        "Run both commands."
+      ],
+      "hints": [
+        "`Type 'unknown' is not assignable to type 'string | undefined'` means the type of the items went in and did not come out. `unknown` forgets what it was given.",
+        "A type parameter, like `<T>` after the function's name, stands for the type of whatever the call passes. Use the same name for the items and for what comes back, so they are tied together.",
+        "`export function firstOf<T>(items: T[]): T | undefined {`."
+      ],
+      "docs": [
+        {
+          "title": "Generic functions",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#generic-functions"
+        },
+        {
+          "title": "Hello world of generics",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html#hello-world-of-generics"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "byid",
+      "title": "Write a generic with a constraint",
+      "file": "src/lists.ts",
+      "description": "Under `// Task 2`, write a function called `byId`, with `export` in front, from the word `function` to its closing brace. It takes a list of things that each have an `id` (text), and an id to look for. It gives back the first thing in the list with that id, or `undefined` when there is none. It works for orders and for customers, and gives back the same type of thing it was given, every property included. Write every type. Then take away the `//` in front of the lines at the end, to see it run.\n\nCheck refuses `any` and `as` in your lines, and reads `byId` for its result type. It compiles code of its own: finding an order and a customer and reading a property only that kind has must compile, while things without a text id, an id to look for that is a number, a property the things do not have, or a result used as never `undefined` must be refused. It calls `byId` with lists of its own, one with two things of the same id and one with none.",
+      "nextSteps": [
+        "Write the first line with a type parameter for the things in the list, the two parameters and the result type.",
+        "Give back the first thing whose `id` is the one given.",
+        "Read the error on `id`, and tell the compiler what every thing in the list has.",
+        "Take away the `//` in front of the last lines, and run both commands."
+      ],
+      "hints": [
+        "`Property 'id' does not exist on type 'T'` means the compiler does not know that every `T` has an id. A plain `T` could be a number.",
+        "`T extends { id: string }` lets in only types that have an id as text, and keeps the rest of each type. A parameter typed `{ id: string }` would keep only the id.",
+        "`export function byId<T extends { id: string }>(items: T[], id: string): T | undefined {` with `items.find((item) => item.id === id)` inside."
+      ],
+      "docs": [
+        {
+          "title": "Generic constraints",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-constraints"
+        },
+        {
+          "title": "Array.prototype.find()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Generics and constraints",
+          "url": "https://www.youtube.com/watch?v=IOzkOXSz9gE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "result",
+      "title": "Write a generic type alias",
+      "file": "src/lists.ts",
+      "description": "Under `// Task 3`, write a type alias called `Result`, with `export` in front, that takes a type parameter `T`. A `Result` is one of two shapes: `{ ok: true; value: T }` when it worked, or `{ ok: false; reason: string }` when it did not. Then write `Result<number>` as the result type of `parseTins`, and `Result<string>` as the result type of `parseBlend`. Leave the bodies as they are.\n\nCheck refuses `any` and `as` in your lines. It reads your lines for the word `type` in front of `Result`, and for the result types of both functions. It compiles code of its own: results of numbers, text and true or false, told apart by `ok`, must compile, while reading a value before checking `ok`, a value of the wrong type, a failure without a reason or `ok` as a word must be refused. It calls `parseTins` and `parseBlend` with text of its own.",
+      "nextSteps": [
+        "Write the alias above `parseTins`: the name, the type parameter in angle brackets, `=`, and a union of the two shapes.",
+        "Use `T` as the type of `value`.",
+        "Write the result type of each function, with the type of its value in the angle brackets.",
+        "Run both commands."
+      ],
+      "hints": [
+        "A type alias can take a type parameter, in angle brackets after its name, and use it inside like any type. `Result<number>` then fills it in with `number`.",
+        "The two shapes are told apart by `ok`, the way shapes were told apart by `kind` before. `true` and `false` can be types too, like a word: `ok: true` in one shape, `ok: false` in the other.",
+        "`export type Result<T> = { ok: true; value: T } | { ok: false; reason: string }`, then `): Result<number> {` on `parseTins` and `): Result<string> {` on `parseBlend`."
+      ],
+      "docs": [
+        {
+          "title": "Generic object types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#generic-object-types"
+        },
+        {
+          "title": "Discriminated unions",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "plain",
+      "title": "Take out a type parameter that does nothing",
+      "file": "src/lists.ts",
+      "description": "Under `// Task 4`, Rafe made two more helpers generic. `addGrams` adds two weights in grams, and the compiler refuses its body. `tinTitle` gives the title of a tin, like `'Frost Sencha, loose leaf'`, and compiles, but its type parameter does nothing. Read what the compiler says, then write both without a type parameter, with plain types for their parameters and results. Leave the bodies as they are.\n\nCheck refuses `any` and `as` in your lines, and reads both functions for their result types. It compiles calls of its own: plain calls must compile, while a call with a type in angle brackets, grams as text or a blend that is a number must be refused. It calls both with values of its own.",
+      "nextSteps": [
+        "Run `npm run types` and read the error for `addGrams` to the end.",
+        "Ask, for each function, what its type parameter ties together.",
+        "Take out the angle brackets, and write the plain types in place of the type parameter.",
+        "Run both commands."
+      ],
+      "hints": [
+        "The message says `T` could be a narrower type than `number`, such as the type of the number 125 alone, and the sum of two of those is not that type. The function promises more than it can keep.",
+        "A type parameter earns its place when it ties two things together, like what goes in and what comes out. Here what comes out is always a plain number or plain text, whatever goes in.",
+        "`export function addGrams(a: number, b: number): number {` and `export function tinTitle(blend: string): string {`."
+      ],
+      "docs": [
+        {
+          "title": "Guidelines for writing good generic functions",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#guidelines-for-writing-good-generic-functions"
+        },
+        {
+          "title": "Literal types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
