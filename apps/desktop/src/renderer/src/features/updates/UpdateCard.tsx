@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { RELEASES_URL, REPO_URL } from '@shared/repo'
 import type { UpdateRelease } from '@shared/types'
 import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Progress } from '@/components/ui/progress'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import {
   cancelUpdate,
@@ -15,57 +14,40 @@ import {
   useUpdates
 } from '@/stores/updates'
 
-/** A state's title with the release's notes: under it in Settings, a click away in the sidebar. */
-function Titled({
-  release,
-  compact,
-  children
-}: {
-  release: UpdateRelease
-  compact: boolean
-  children: React.ReactNode
-}): React.JSX.Element {
-  if (compact) return <WhatsNew release={release}>{children}</WhatsNew>
-  return (
-    <div className="space-y-1">
-      {children}
-      <ReleaseNotes release={release} />
-    </div>
-  )
-}
-
 const outline = 'border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent'
 const megabytes = (bytes: number): string => `${Math.round(bytes / 1e6)} MB`
 
-function released(date: string): string {
+/** `23 Nov 2026`, or nothing when the release gave no date. */
+function day(date: string): string {
   const time = Date.parse(date)
   if (Number.isNaN(time)) return ''
-  const day = new Date(time).toLocaleDateString('en-GB', {
+  return new Date(time).toLocaleDateString('en-GB', {
     day: 'numeric',
-    month: 'long',
+    month: 'short',
     year: 'numeric'
   })
-  return `Released ${day}`
 }
 
-/** What a release brings: the day it came out, a few lines of notes and the way to the whole list. */
+const changesUrl = (version: string): string => `${REPO_URL}/releases/tag/v${version}`
+
+/** Settings: the day a release came out, a few lines of notes and the way to the whole list. */
 function ReleaseNotes({ release }: { release: UpdateRelease }): React.JSX.Element {
-  const when = released(release.date)
+  const when = day(release.date)
   return (
-    <div className="space-y-2">
-      {when && <p className="text-[13px] text-muted-foreground">{when}</p>}
+    <div className="space-y-2 text-[13px] text-muted-foreground">
+      {when && <p>Released {when}</p>}
       {release.notes.length > 0 && (
-        <ul className="list-disc space-y-1 pl-5 text-[13px] text-muted-foreground">
+        <ul className="list-disc space-y-1 pl-5">
           {release.notes.map((note) => (
             <li key={note}>{note}</li>
           ))}
         </ul>
       )}
       <a
-        href={`${REPO_URL}/releases/tag/v${release.version}`}
+        href={changesUrl(release.version)}
         target="_blank"
         rel="noreferrer"
-        className="inline-block text-[13px] text-muted-foreground hover:text-foreground"
+        className="inline-block hover:text-foreground"
       >
         See all changes
       </a>
@@ -73,59 +55,45 @@ function ReleaseNotes({ release }: { release: UpdateRelease }): React.JSX.Elemen
   )
 }
 
-/**
- * The sidebar has no room for the notes, so they open above the card: when the pointer is over the
- * title or the button, and on a click of the button.
- */
-function WhatsNew({
+/** The sidebar has no room for the notes: there they are the tooltip of the card's main button. */
+function WithNotes({
   release,
   children
 }: {
   release: UpdateRelease
   children: React.ReactNode
 }): React.JSX.Element {
-  const [open, setOpen] = useState(false)
-  const closing = useRef<ReturnType<typeof setTimeout>>(undefined)
-  // The pointer gets a moment to cross from the card to the notes before they close.
-  const hover = (over: boolean): void => {
-    clearTimeout(closing.current)
-    if (over) setOpen(true)
-    else closing.current = setTimeout(() => setOpen(false), 200)
-  }
-  useEffect(() => () => clearTimeout(closing.current), [])
-  const hovers = { onMouseEnter: () => hover(true), onMouseLeave: () => hover(false) }
-
+  const when = day(release.date)
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <div className="space-y-1" {...hovers}>
-        {children}
-        <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
-            size="xs"
-            className="-ml-2 font-normal text-muted-foreground hover:text-foreground"
-            onClick={(event) => {
-              // The pointer already opened them: a click keeps them open instead of closing them.
-              event.preventDefault()
-              setOpen(true)
-            }}
-          >
-            What&apos;s new
-          </Button>
-        </PopoverTrigger>
-      </div>
-      {/* The offset clears the title above the button and the card's edge. */}
-      <PopoverContent
-        side="top"
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent
+        side="right"
         align="start"
-        sideOffset={40}
-        className="w-80 space-y-2"
-        {...hovers}
+        sideOffset={8}
+        className="max-w-64 space-y-1.5 px-3 py-2.5 text-pretty"
       >
-        <p className="text-sm font-medium">Indent {release.version}</p>
-        <ReleaseNotes release={release} />
-      </PopoverContent>
-    </Popover>
+        <p className="font-medium">
+          Indent {release.version}
+          {when && <span className="font-normal opacity-70"> · {when}</span>}
+        </p>
+        {release.notes.length > 0 && (
+          <ul className="list-disc space-y-1 pl-4">
+            {release.notes.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
+        )}
+        <a
+          href={changesUrl(release.version)}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-block underline underline-offset-2 opacity-70 hover:opacity-100"
+        >
+          See all changes
+        </a>
+      </TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -165,13 +133,16 @@ export function UpdateCard({ compact = false }: { compact?: boolean }): React.JS
   if (status.state === 'available') {
     return (
       <div className="space-y-3">
-        <Titled release={status} compact={compact}>
+        <div className="space-y-1">
           <p className={cn(text, 'font-medium')}>Indent {status.version} is available.</p>
-        </Titled>
+          {!compact && <ReleaseNotes release={status} />}
+        </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" size="sm" className={outline} onClick={downloadUpdate}>
-            Download update
-          </Button>
+          <WithNotes release={status}>
+            <Button variant="outline" size="sm" className={outline} onClick={downloadUpdate}>
+              Download update
+            </Button>
+          </WithNotes>
           {compact && (
             <Button variant="ghost" size="sm" onClick={() => updateLater(status.version)}>
               Later
@@ -208,13 +179,16 @@ export function UpdateCard({ compact = false }: { compact?: boolean }): React.JS
   if (status.state === 'ready') {
     return (
       <div className="space-y-2">
-        <Titled release={status} compact={compact}>
+        <div className="space-y-1">
           <p className={cn(text, 'font-medium')}>Restart to update to {status.version}.</p>
-        </Titled>
+          {!compact && <ReleaseNotes release={status} />}
+        </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button size="sm" onClick={() => void installUpdate()}>
-            Restart now
-          </Button>
+          <WithNotes release={status}>
+            <Button size="sm" onClick={() => void installUpdate()}>
+              Restart now
+            </Button>
+          </WithNotes>
           <Button variant="ghost" size="sm" onClick={() => updateLater(status.version)}>
             Next time you open Indent
           </Button>
