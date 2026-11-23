@@ -1,0 +1,17 @@
+{
+  "id": "java-foundations",
+  "title": "Java foundations",
+  "description": "Lanternquay Ferries runs one small boat across the river, and its timetable, fares and passenger counts live on a clipboard at the ticket hut. You have never written a program, and you start by making Java print the notice on the hut, then keep the clipboard's numbers and text in typed variables and let the program decide whether the boat can sail. Each issue teaches one part of Java in one file you run and check yourself, from your first class to the compiler's errors and how to read them.",
+  "category": "Programming languages",
+  "language": "java",
+  "tags": ["Java"],
+  "kind": "foundations",
+  "tools": ["node", "java"],
+  "format": 4,
+  "parts": [
+    {
+      "title": "The clipboard at the ticket hut",
+      "chapters": ["first-program", "values-and-types", "numbers", "text", "decisions"]
+    }
+  ]
+}

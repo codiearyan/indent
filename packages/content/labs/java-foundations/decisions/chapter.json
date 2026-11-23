@@ -1,0 +1,129 @@
+{
+  "id": "decisions",
+  "title": "True or false, and decisions",
+  "files": ["Departures.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the departures board here, and print what you make to see it.",
+    "suggestedCommand": "java Departures.java"
+  },
+  "tasks": [
+    {
+      "id": "full",
+      "title": "Is the boat full?",
+      "file": "Departures.java",
+      "description": "Under `// Task 1` in `Departures.java`, make a `boolean` called `full`: `true` when `passengers` is equal to `seats` or more, `false` otherwise.\n\nCheck runs your Task 1 lines with crossings of its own, including one where the passengers exactly fill the seats, and reads `full`.",
+      "nextSteps": [
+        "Read the part of the lesson about comparisons.",
+        "Pick the comparison that is true for equal numbers too.",
+        "Make `full` with it, print it and run the program.",
+        "Change `passengers` at the top to 48 for a moment and run again, then change it back."
+      ],
+      "hints": [
+        "A comparison between two numbers is itself a value: `true` or `false`. It can go straight into a `boolean`.",
+        "`>` is false when the two are equal. The comparison for \"equal or more\" is written with two characters.",
+        "The line has the shape `boolean full = passengers >= ...;`."
+      ],
+      "docs": [
+        {
+          "title": "Equality and relational operators",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html"
+        },
+        {
+          "title": "Primitive data types: boolean",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "can-sail",
+      "title": "Can the boat sail?",
+      "file": "Departures.java",
+      "description": "Under `// Task 2`, Ossian sails when the wind is below 30 knots and there is no fog. Make a `boolean` called `canSail`: `true` when both are so, `false` otherwise. The wind is in `windKnots` and the fog in `fog`, a `boolean`.\n\nCheck runs your Task 2 lines with weather of its own, including a wind of exactly 30 knots, and reads `canSail`.",
+      "nextSteps": [
+        "Write the two conditions on their own first: the wind one and the fog one.",
+        "Read the part of the lesson about joining conditions.",
+        "Join them so both must be true.",
+        "Print `canSail` and try a few winds at the top of the file."
+      ],
+      "hints": [
+        "\"Below 30\" leaves out 30 itself. \"No fog\" is the opposite of `fog`.",
+        "`&&` is true only when both sides are true. `!` in front of a `boolean` turns true into false and false into true.",
+        "The line has the shape `boolean canSail = windKnots < 30 && ...;`."
+      ],
+      "docs": [
+        {
+          "title": "Conditional operators && and ||",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html"
+        },
+        {
+          "title": "Unary operators, ! included",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "status",
+      "title": "Set the board",
+      "file": "Departures.java",
+      "description": "Under `// Task 3`, make a `String` called `status` for the departures board: `Cancelled` when the boat cannot sail, otherwise `Full` when the boat is full, otherwise `Boarding`. `canSail` and `full` from Tasks 1 and 2 already say both.\n\nCheck runs your Tasks 1, 2 and 3 with crossings of its own, including a full boat in fog, and reads `status`.",
+      "nextSteps": [
+        "Make sure Tasks 1 and 2 pass first: this one builds on them.",
+        "Make `status` first, then decide its value with `if`, `else if` and `else`.",
+        "Think about which check has to come first when the boat is both full and cannot sail.",
+        "Print `status` and try a few values at the top of the file."
+      ],
+      "hints": [
+        "Java takes the first branch whose condition is true and skips all the others.",
+        "A cancelled crossing is cancelled however full the boat is, so that check goes first. Every branch gives `status` a value, or the compiler says it might not have been initialized.",
+        "The shape is `String status;` then `if (!canSail) { status = ...; } else if (full) { status = ...; } else { status = ...; }`."
+      ],
+      "docs": [
+        {
+          "title": "The if-then and if-then-else statements",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/if.html"
+        },
+        {
+          "title": "Controlling the flow of your code",
+          "url": "https://dev.java/learn/language-basics/controlling-flow/"
+        }
+      ],
+      "videos": [
+        {
+          "title": "if, else if and else",
+          "url": "https://www.youtube.com/watch?v=jR8411nvkQw"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fare",
+      "title": "Charge the right fare",
+      "file": "Departures.java",
+      "description": "Under `// Task 4`, make an `int` called `farePence` for one passenger of this `age`: children under 5 travel free, children under 16 pay half of `singleFarePence`, everyone else pays `singleFarePence`.\n\nCheck runs your Task 4 lines with ages and fares of its own, including ages 5 and 16 exactly, and reads `farePence`.",
+      "nextSteps": [
+        "List the three groups of passengers and what each pays.",
+        "Decide the order of the checks: a child of 3 is also under 16.",
+        "Write `farePence` with `if`, `else if` and `else`.",
+        "Print it and try ages 3, 5, 15 and 16 at the top of the file."
+      ],
+      "hints": [
+        "Java takes the first branch whose condition is true. Which check must come first so a child of 3 travels free?",
+        "Under 5 is `age < 5`, under 16 is `age < 16`. Half the fare is the fare divided by 2.",
+        "The shape is `int farePence;` then `if (age < 5) { ... } else if (age < 16) { ... } else { ... }`, each branch giving `farePence` its value."
+      ],
+      "docs": [
+        {
+          "title": "The if-then and if-then-else statements",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/if.html"
+        },
+        {
+          "title": "Equality and relational operators",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
