@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Dunstan",
+      "say": "Who is missing from the round-up?",
+      "note": "A postcard for everyone. MF-16."
+    },
+    {
+      "title": "customers",
+      "text": "Everyone who has ever signed up.",
+      "note": "Some bought nothing this year."
+    },
+    {
+      "title": "Your query",
+      "file": "2-round-up.sql",
+      "mine": true,
+      "gap": "Keeps only this year's buyers",
+      "tasks": [
+        "Show who is missing",
+        "Fix the round-up",
+        "Fix the re-order list"
+      ]
+    },
+    {
+      "title": "Postcards",
+      "text": "One for every customer on the round-up.",
+      "note": "Written by hand in December."
+    }
+  ],
+  "ticket": {
+    "label": "Round-up",
+    "wrong": "missing people",
+    "why": "Dropped",
+    "right": "has everyone"
+  },
+  "captions": [
+    "At Mallowfield Seeds, Dunstan's round-up should list every customer, and some are missing.",
+    "The query keeps every customer, then a test on the date quietly drops some again.",
+    "You show who is missing, then fix the round-up and the re-order list.",
+    "Now every customer is on the round-up, and the quiet ones get a free packet.",
+    "Same customers, same orders. Nobody is dropped for having nothing to show."
+  ]
+}
