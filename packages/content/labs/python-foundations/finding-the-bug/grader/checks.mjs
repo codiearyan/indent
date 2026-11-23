@@ -4,6 +4,8 @@ const FILE = 'busiest_hill.py'
 
 // busiest_hill as it came with the file, and as it should be. _judge calls the learner's
 // smallest_failing and asks both about the log it gives back, so Task 1 never depends on Task 2.
+// The file runs only up to Task 1, so busiest_hill is the one as it came, for a smallest_failing
+// that calls it to search.
 const JUDGE = `
 def _given_busiest(hills):
     counts = {}
@@ -31,6 +33,9 @@ def _right_busiest(hills):
             best = hill
             most = counts[hill]
     return best
+
+
+busiest_hill = _given_busiest
 
 
 def _judge():
