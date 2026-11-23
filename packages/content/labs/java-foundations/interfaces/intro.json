@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Room for Peigi's four on it all?",
+      "note": "Boat, bikes and the bus."
+    },
+    {
+      "title": "Booking program",
+      "text": "Knows boats, and nothing else"
+    },
+    {
+      "title": "Your reservations",
+      "file": "Reservations.java",
+      "mine": true,
+      "gap": "Only boats can be booked",
+      "tasks": ["Bookable bike shed", "A bus of two kinds", "All of a trip or none"]
+    },
+    {
+      "title": "Peigi",
+      "say": "Boat, bikes and bus, all booked."
+    }
+  ],
+  "ticket": {
+    "label": "Peigi's trip",
+    "wrong": "no bikes",
+    "why": "Half booked",
+    "right": "all of it"
+  },
+  "captions": [
+    "The hut books bikes and a tour bus now. Bridie needs Peigi's whole trip at once.",
+    "The program knows only boats, so the bikes and the bus are booked by hand.",
+    "You write what being bookable means, a shed and a bus that are, and the whole trip.",
+    "Now any bookable thing can join a trip, and a trip is all booked or not at all.",
+    "Anything that can be booked joins a trip. Next: two bookings that are the same."
+  ]
+}

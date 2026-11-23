@@ -1,0 +1,101 @@
+{
+  "id": "abstract-classes",
+  "title": "Abstract classes: no boat is just a boat",
+  "files": ["Takings.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the takings here, and try your vessels from main.",
+    "suggestedCommand": "java Takings.java"
+  },
+  "tasks": [
+    {
+      "id": "vessel",
+      "title": "Write Vessel, which no boat is just by itself",
+      "file": "Takings.java",
+      "description": "Under `// Task 1`, write an abstract class `Vessel` with a `private String name`, a constructor `Vessel(String name)`, a method `String getName()`, an abstract method `int fareFor(int age)` that every kind of vessel writes, and a method `String fareLine(int age)` that gives back the name and that vessel's fare for the age, as in `Linnet: 160p`.\n\nCheck writes kinds of vessel of its own that extend yours, with fares of their own, and reads what `getName` and `fareLine` give back. Then its own code tries to make a `Vessel` by itself, and to write a kind of vessel with no `fareFor`, and Java must refuse both.",
+      "nextSteps": [
+        "Read the parts of the lesson about abstract classes and abstract methods.",
+        "Write the class with abstract in front, its field, its constructor and getName.",
+        "Write fareFor as an abstract method: a first line and no body.",
+        "Write fareLine so that it uses fareFor, whatever kind of vessel it is."
+      ],
+      "hints": [
+        "Vessel does not know any fare: each kind of vessel does. Vessel only says that every kind has one.",
+        "An abstract method has abstract in front and ends with a semicolon where the body would be. fareLine can still call it: the kind of vessel the object really is answers.",
+        "The two lines that matter: `abstract int fareFor(int age);` and, in fareLine, `return name + \": \" + fareFor(age) + \"p\";`."
+      ],
+      "docs": [
+        {
+          "title": "Abstract methods and classes",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/abstract.html"
+        },
+        {
+          "title": "Inheritance",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/subclasses.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Abstract classes and methods",
+          "url": "https://www.youtube.com/watch?v=HvPlEJ3LHgE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "kinds",
+      "title": "Write Ferry and WaterTaxi, each with its own fare",
+      "file": "Takings.java",
+      "description": "Under `// Task 2`, write a class `Ferry` and a class `WaterTaxi`, each extending `Vessel`, each with a constructor that takes the name. On a ferry under 16 pay 160 and everyone else 320. The water taxi charges 600 whatever the age.\n\nCheck runs your classes beside a `Vessel` of its own, written as Task 1 asks, so this task is judged on its own lines. It makes ferries and water taxis, keeps them in variables and a list of type `Vessel`, and reads what `fareFor`, `getName` and `fareLine` give back.",
+      "nextSteps": [
+        "Read the part of the lesson about writing the abstract method in each child.",
+        "Write Ferry: its first line, a constructor that hands the name to Vessel, and fareFor.",
+        "Write WaterTaxi the same way, with its own fareFor.",
+        "Take the // off the first lines in main and run the file."
+      ],
+      "hints": [
+        "Each class needs only two things: a constructor and its own fareFor.",
+        "The constructor's first line hands the name to Vessel's constructor. fareFor has exactly Vessel's first line, without abstract, with @Override above it and a body.",
+        "Ferry's fareFor gives back 160 when age is below 16 and 320 otherwise; WaterTaxi's is one line, `return 600;`."
+      ],
+      "docs": [
+        {
+          "title": "Abstract methods and classes",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/abstract.html"
+        },
+        {
+          "title": "Overriding and hiding methods",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/override.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "day-trips",
+      "title": "Add up a day of trips on any kind of vessel",
+      "file": "Takings.java",
+      "description": "Under `// Task 3`, write a class `DayTrips` with a method `static int cost(ArrayList<Vessel> trips, int age)`. It gives back what one passenger of that age pays for all the trips in the list, each at its own vessel's fare, and 0 for an empty list.\n\nCheck runs your class beside a `Vessel` of its own and with kinds of vessel of its own, whose fares you have never seen, and reads what `cost` gives back for different lists and ages.",
+      "nextSteps": [
+        "Read the part of the lesson about a list of the parent's type.",
+        "Write the class and the first line of cost exactly as the task gives it.",
+        "Walk the list and add each trip's fare for the age.",
+        "Take the // off the last lines in main and run the file."
+      ],
+      "hints": [
+        "cost does not need to know what kind each vessel is. Each one knows its own fare.",
+        "A for-each loop over the list gives one Vessel at a time; calling fareFor on it runs the fare of the kind it really is.",
+        "Start a total at 0, add `trip.fareFor(age)` for each trip in the list, and give back the total."
+      ],
+      "docs": [
+        {
+          "title": "Polymorphism",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/polymorphism.html"
+        },
+        {
+          "title": "The for-each loop",
+          "url": "https://docs.oracle.com/javase/8/docs/technotes/guides/language/foreach.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

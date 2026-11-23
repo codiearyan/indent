@@ -351,7 +351,7 @@ async function build(t, spec) {
   const text = raw.replace(/\r\n?/g, '\n')
   const starterRaw = await readFile(t.chapterPath(`starter/${spec.file}`), 'utf8')
   const starter = starterRaw.replace(/\r\n?/g, '\n')
-  const pick = spec.methods ? methodLayout : spec.objects ? objectLayout : layout
+  const pick = spec.methods ? methodLayout : spec.objects ? (x) => objectLayout(x, spec.families) : layout
   const l = pick(text)
   const s = pick(starter)
   const lost = [...s.marks.keys()].filter((n) => !l.marks.has(n))
@@ -378,6 +378,10 @@ async function build(t, spec) {
     const keep = [task.task, ...(task.needs ?? [])]
     if (keep.some((n) => reached.has(n))) continue
     task.cases.forEach((c, i) => {
+      if (spec.families) {
+        units.push({ id: `${id}.${i}`, task: id, case: c, ...familyVariant(text, l, keep, task, c) })
+        return
+      }
       if (spec.objects) {
         units.push({ id: `${id}.${i}`, task: id, case: c, ...methodVariant(text, l, keep, objectCall(c), 0) })
         return
@@ -583,7 +587,9 @@ const METHOD_GLOSS = [
 
 function gloss(e, src, methods) {
   const table =
-    methods === 'objects' ? [...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS] : methods ? [...METHOD_GLOSS, ...GLOSS] : GLOSS
+    methods === 'families'
+      ? [...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
+      : methods === 'objects' ? [...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS] : methods ? [...METHOD_GLOSS, ...GLOSS] : GLOSS
   for (const [code, say] of table) {
     if (code.test(e.code)) {
       const text = say(e, src ?? '')
@@ -657,11 +663,11 @@ function compileProblem(spec, b, task, unit, result) {
   }
   const elsewhere = spec.methods
     ? elsewhereMethod(spec, b, task, mine[0])
-    : spec.objects && laterTask(b, task, mine[0])
+    : spec.objects && ((spec.families && laterType(b, task, mine[0])) || laterTask(b, task, mine[0]))
   if (elsewhere) return fail(`${label(n)} compiles`, elsewhere, shown)
   return fail(
     `${label(n)} compiles`,
-    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.objects ? 'objects' : spec.methods)}`,
+    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.families ? 'families' : spec.objects ? 'objects' : spec.methods)}`,
     shown
   )
 }
@@ -678,6 +684,17 @@ function laterTask(b, task, e) {
   )
   if (k === undefined) return null
   return `${label(task.task)} uses ${name}, which is written under // ${label(k)}. Check runs each task with only its own lines and those of the tasks it builds on, so ${label(task.task)} cannot use it: leave ${name} to ${label(k)}, as the tasks ask.`
+}
+
+/** A type a task uses that another task writes, in a family issue: that task is never kept with it. */
+function laterType(b, task, e) {
+  const name = /^compiler\.err\.cant\.resolve/.test(e.code) && /symbol:\s+class\s+(\w+)/.exec(e.message)?.[1]
+  if (!name) return null
+  const k = [...b.l.sections.keys()].find(
+    (k) => k !== task.task && new RegExp(`\\b(?:class|interface|enum|record)\\s+${name}\\b`).test(codeOnly(section(b, k)))
+  )
+  if (k === undefined) return null
+  return `${label(task.task)} uses ${name}, which is written under // ${label(k)}. Check runs each task with only its own lines, beside its own versions of the types the task names, so ${label(task.task)} cannot use ${name}. Write it with only the types the task names.`
 }
 
 function elsewhereMethod(spec, b, task, e) {
@@ -820,6 +837,16 @@ function runProblem(spec, task, result, given = {}, call) {
       values + result.exception
     )
   }
+  if (result.exception && spec.families) {
+    const known = [...FAMILY_THROWN, ...METHOD_THROWN, ...THROWN].find(([re]) => re.test(result.exception))
+    // A method that calls itself leaves a thousand lines of trace: the first few say it all.
+    const trace = result.exception.replace(/\n\tat [\w$.]*\.main\(.*/g, '').split('\n').slice(0, 6).join('\n')
+    return fail(
+      `${label(n)} runs`,
+      `${label(n)} compiles, but stops with an exception when Check runs the code below. Read the first line of the stack trace for what went wrong, and the line starting with at that names ${spec.file} for where.${known ? ` ${known[1]}` : ''}`,
+      values + trace
+    )
+  }
   if (result.exception && spec.objects) {
     const known = [...METHOD_THROWN, ...THROWN].find(([re]) => re.test(result.exception))
     return fail(
@@ -887,6 +914,11 @@ function stopMessage(spec, b) {
         `The class is called ${b.className}, but the file is ${spec.file}. Java needs the name after public class to be the file's name without .java, capital letters included. java ${spec.file} may still run it, but javac and Check refuse it. Put the name back.`
       ]
     case 'main':
+      if (spec.families)
+        return [
+          `${spec.file} has its main`,
+          `Check cannot find main in ${spec.file} as the starter gave it: the class at the top holds only main, and below it come the lines the starter gave, then // Task 1. Put back the lines the starter gave around the tasks, and write your own types under the // Task comments.`
+        ]
       if (spec.objects)
         return [
           `${spec.file} has its main`,
@@ -1260,7 +1292,7 @@ export function methodCases({ method, mistakes = [], typed }) {
 // methods, and puts its own code in main: it makes objects with its own values, calls their
 // methods and reads back what it names.
 
-function objectLayout(text) {
+function objectLayout(text, families = false) {
   const code = codeOnly(text)
   const marks = new Map()
   const twice = new Set()
@@ -1275,9 +1307,20 @@ function objectLayout(text) {
   if (!main || marks.size === 0) return { marks, twice, className, main: null }
   const bodyStart = main.index + main[0].length
   const firstMark = Math.min(...marks.values())
-  const head = [...code.slice(0, firstMark).matchAll(/\bclass\s+[A-Za-z_$][\w$]*[^{};]*\{/g)].at(-1)
-  const inClass = !!head && head.index > bodyStart
-  const classEnd = code.lastIndexOf('}', inClass ? head.index : firstMark)
+  let head = [...code.slice(0, firstMark).matchAll(/\bclass\s+[A-Za-z_$][\w$]*[^{};]*\{/g)].at(-1)
+  let inClass = !!head && head.index > bodyStart
+  let mainEnd = inClass ? head.index : firstMark
+  if (families) {
+    // The starter may give whole types between the class with main and Task 1, each starting at
+    // the left edge. The tasks sit inside the last of them only when its brace is still open there.
+    const given = [...code.slice(bodyStart, firstMark).matchAll(GIVEN_TYPE)].map((m) => ({ ...m, index: m.index + bodyStart }))
+    const last = given.at(-1)
+    inClass = !!last && depth(code.slice(last.index, firstMark)) > 0
+    head = inClass ? /\b(?:class|interface|enum|record)\s+[A-Za-z_$][\w$]*[^{};]*\{/.exec(code.slice(last.index)) : null
+    if (head) head = { 0: head[0], index: head.index + last.index }
+    mainEnd = given.length ? given[0].index : firstMark
+  }
+  const classEnd = code.lastIndexOf('}', mainEnd)
   const bodyEnd = code.lastIndexOf('}', classEnd - 1)
   const tasksEnd = inClass ? code.lastIndexOf('}') : text.length
   if (bodyEnd < bodyStart || tasksEnd < firstMark) return { marks, twice, className, main: null }
@@ -1287,7 +1330,7 @@ function objectLayout(text) {
     const next = i + 1 < sorted.length ? sorted[i + 1][1] : Infinity
     sections.set(n, { start: at, end: Math.min(next, tasksEnd), inside: at > classEnd })
   })
-  const taskClass = inClass ? /class\s+([A-Za-z_$][\w$]*)/.exec(head[0])[1] : null
+  const taskClass = inClass ? /(?:class|interface|enum|record)\s+([A-Za-z_$][\w$]*)/.exec(head[0])[1] : null
   return { marks, twice, className, inClass, taskClass, main: { bodyStart, bodyEnd, classEnd, tasksEnd }, sections }
 }
 
@@ -1329,6 +1372,10 @@ function objectProblem(spec, b, task, unit, errors) {
   const message = (x) => x.message.replace(/\bjava\.(?:lang|util)\.(?=[A-Z])/g, '')
   const reads = Object.values(c.reads ?? {})
   const asIs = `${ranText(c) ? `Check ran:\n${indent(ranText(c))}\n` : ''}${reads.length && !c.show ? `${ranText(c) ? 'and read' : 'Check read'}:\n${indent(Object.keys(c.reads).join('\n'))}` : ''}\n\n${checkOwn(errors).map(message).join('\n\n')}`
+  if (spec.families) {
+    const said = familyProblem(task, message(e), asIs)
+    if (said) return said
+  }
   const keep = [n, ...(task.needs ?? [])]
   const mine = codeOnly(keep.map((k) => section(b, k)).join('\n'))
   const where = b.l.inClass ? `in ${b.l.taskClass}, under // ${label(n)}` : `under // ${label(n)}`
@@ -1550,6 +1597,243 @@ export function refusal(run, { error, allowed, other }) {
   }
   return fail(run.case.name, allowed, `${out}\nJava let it through.`)
 }
+
+// --- Families of types ---------------------------------------------------------------------
+// From part 4 a task is a whole type at the top level (a class, interface, enum or record), or the
+// methods of a class the starter opens above Task 1, as in object issues. The starter may also
+// give whole types between the class with main and Task 1, each at the left edge. A task that
+// leans on a type another task writes, or on one the starter gives, is judged beside Check's own
+// right version of it (`stub`), so it passes or fails on its own lines alone. A case may also put
+// a line of Check's own inside a learner's type (`within`), for what only code there can try.
+
+const GIVEN_TYPE = /^(?:(?:abstract|final)[ \t]+)*(?:class|interface|enum|record)[ \t]+[A-Za-z_$][\w$]*/gm
+const TYPE_NAME = /\b(?:class|interface|enum|record)\s+([A-Za-z_$][\w$]*)/g
+
+const depth = (code) => [...code].reduce((d, ch) => d + (ch === '{' ? 1 : ch === '}' ? -1 : 0), 0)
+
+/** Where the first declaration of type `name` that `ok` accepts starts and ends, or null. */
+function typeSpan(src, name, ok) {
+  const code = codeOnly(src)
+  const re = new RegExp(
+    `(?<=^|[\\s;{}])(?:(?:public|private|protected|abstract|final|static)\\s+)*(?:class|interface|enum|record)\\s+${name}\\b`,
+    'g'
+  )
+  for (const m of code.matchAll(re)) {
+    if (!ok(m.index)) continue
+    const open = code.indexOf('{', m.index)
+    if (open < 0) return null
+    let d = 0
+    for (let i = open; i < code.length; i++) {
+      if (code[i] === '{') d++
+      else if (code[i] === '}' && --d === 0) return [m.index, i + 1]
+    }
+    return null
+  }
+  return null
+}
+
+/** The source Check compiles for one case of a task in a family issue. */
+function familyVariant(text, l, keep, task, c) {
+  const stub = typeof task.stub === 'function' ? task.stub(c) : (task.stub ?? '')
+  let src = text
+  const given = (at) => at > l.main.classEnd && ![...l.sections.values()].some((s) => at >= s.start && at < s.end)
+  for (const [, name] of codeOnly(stub).matchAll(TYPE_NAME)) {
+    const span = typeSpan(src, name, given)
+    if (span) src = src.slice(0, span[0]) + blank(src.slice(span[0], span[1])) + src.slice(span[1])
+  }
+  const v = methodVariant(src, l, keep, objectCall(c), 0)
+  if (stub) v.source += `\n${stub}\n`
+  if (c.within) {
+    const span = typeSpan(v.source, c.within.type, () => true)
+    if (span) {
+      const at = span[1] - 1
+      const code = `${c.within.code} `
+      v.source = v.source.slice(0, at) + code + v.source.slice(at)
+      v.readAt = { line: lineOf(v.source, at), col: at - v.source.lastIndexOf('\n', at - 1), length: code.length }
+    }
+  }
+  return v
+}
+
+const BOXED = ['String', 'Integer', 'Double', 'Long', 'Boolean', 'Character', 'Object']
+
+/** Why Check's own code did not compile against the learner's types, in a family issue, or null. */
+function familyProblem(task, msg, asIs) {
+  const n = task.task
+  const list = /incompatible types: (?:java\.util\.)?ArrayList<(\w+)> cannot be converted to (?:java\.util\.)?ArrayList<(\w+)>/.exec(msg)
+  if (list) {
+    const [, handed, asked] = list
+    return fail(
+      `${label(n)} takes a list of ${handed}`,
+      `Check hands over a list of ${handed}, as the task says, and the method asks for a list of ${asked}. A list of ${handed} may hold any kind of ${handed}, so Java never passes it where only ${asked} may go, even though ${an(asked)} is ${an(handed)}. The task names the type the list holds.`,
+      asIs
+    )
+  }
+  const conv = /incompatible types: (\w+) cannot be converted to (\w+)/.exec(msg)
+  if (conv && conv[2] === 'Record')
+    return fail(
+      `${conv[1]} is a record`,
+      `${conv[1]} is not a record. Check keeps it in a variable of type Record, which every record fits and nothing else does. The lesson shows how a record is written.`,
+      asIs
+    )
+  if (conv && /^[A-Z]/.test(conv[1]) && /^[A-Z]/.test(conv[2]) && !BOXED.includes(conv[1]) && !BOXED.includes(conv[2]))
+    return fail(
+      `${an(conv[1])} is ${an(conv[2])}`,
+      `Check keeps ${an(conv[1])} in a variable of type ${conv[2]}, as the task says it can, and Java says ${an(conv[1])} is not ${an(conv[2])}. A class is ${an(conv[2])} only when its first line says so: the lesson shows how.`,
+      asIs
+    )
+  const abs = /^(\w+) is abstract; cannot be instantiated/.exec(msg)
+  if (abs)
+    return fail(
+      `${abs[1]} can be made`,
+      `Check makes ${an(abs[1])} with new, as the task says it can, and Java says ${abs[1]} is abstract, so no object of it can ever be made. abstract belongs only on a type that is never made by itself.`,
+      asIs
+    )
+  const extra = /^\w+ is not abstract and does not override abstract method (\w+)\((.*?)\) in (\w+)/.exec(msg)
+  if (extra)
+    return fail(
+      `${extra[3]} asks for what the task says`,
+      `Check writes a class of its own that is ${an(extra[3])} and writes every method the task names, and Java says ${extra[3]} also asks for ${extra[1]}(${extra[2]}). Compare the abstract methods of ${extra[3]} with the task: their names, capital letters included, and their parameters.`,
+      asIs
+    )
+  if (/method does not override or implement a method from a supertype/.test(msg))
+    return fail(
+      `${label(n)} has the methods the task names`,
+      `Check writes a class of its own with the methods the task names, each marked @Override, and Java says one of them takes the place of nothing. Compare the methods under // ${label(n)} with the task: their names, capital letters included, and their parameters.`,
+      asIs
+    )
+  const clash = /^\w+\(.*?\) in \w+ cannot (?:override|implement) \w+\(.*?\) in (\w+)\n\s*(.*)/.exec(msg)
+  if (clash)
+    return fail(
+      `${clash[1]} has the methods the task names`,
+      `Check writes a class of its own with the methods the task names, and Java says one does not fit the method of ${clash[1]} it takes the place of: ${clash[2]}. Compare the methods of ${clash[1]} with the task: what they give back, their parameters and the word in front.`,
+      asIs
+    )
+  // A class used by its name alone, as in DayTrips.cost(...), is first read as a variable of main's class.
+  const unknown = /cannot find symbol\n\s*symbol:\s+(?:class (\w+)|variable ([A-Z]\w*)\n\s*location: class \w+$)/m.exec(msg)
+  if (unknown) unknown[1] ??= unknown[2]
+  if (unknown)
+    return fail(
+      `${label(n)} has ${unknown[1]}`,
+      `Check cannot find ${unknown[1]} under // ${label(n)}. Write it there, with exactly that name: capital letters count.`,
+      asIs
+    )
+  return null
+}
+
+// Errors families of types bring, read first in those issues.
+const FAMILY_GLOSS = [
+  [
+    /^compiler\.err\.does\.not\.override\.abstract/,
+    (e) => {
+      const [, cls, , owner] = /^(\w+) is not abstract and does not override abstract method (\w+)\(.*?\) in (\w+)/.exec(e.message) ?? []
+      return cls && cls === owner
+        ? `${cls} has a method marked abstract, which has no body, so an object of ${cls} could never run it. Only an abstract class or an interface may have one.`
+        : 'A class that extends an abstract class, or implements an interface, has to write every abstract method it gets, with the same name and parameters. The message names the one that is missing.'
+    }
+  ],
+  [
+    /^compiler\.err\.abstract\.cant\.be\.instantiated/,
+    () => 'An abstract class or an interface is never made with new by itself. Make an object of a class that extends or implements it.'
+  ],
+  [
+    /^compiler\.err\.method\.does\.not\.override\.superclass/,
+    () =>
+      "@Override says the method takes the place of one the class gets from its parent or an interface, and there is none with that name and those parameter types. Compare its first line with the parent's method: the name, capital letters included, and the type of each parameter. If they match, look at the first line of the class: it has to say which class it extends or which interface it implements."
+  ],
+  [
+    /^compiler\.err\.override\.weaker\.access/,
+    () =>
+      'A method that takes the place of another cannot be less public than the one it replaces, and the message says what that one was. Every method of an interface is public, and so are toString, equals and hashCode in Object.'
+  ],
+  [
+    /^compiler\.err\.override\.incompatible\.ret/,
+    () => 'A method that takes the place of another has to give back the same type. The message names both.'
+  ],
+  [
+    /^compiler\.err\.cant\.apply\.symbol/,
+    (e) =>
+      /^constructor (\w+) in class \1 cannot be applied/.test(e.message) &&
+      /found:\s+no arguments/.test(e.message) &&
+      "A child's constructor starts by running a constructor of its parent. When its first line does not say which one with super(...), Java runs the parent's constructor that takes nothing, and the parent has none: the message lists what the parent's constructor requires."
+  ],
+  [
+    /^compiler\.err\.call\.must\.be\.first/,
+    (e) =>
+      /\bsuper\b/.test(e.message) &&
+      "super(...) has to be the very first line of the constructor: the parent's part of the object is made before anything else."
+  ],
+  [
+    /^compiler\.err\.report\.access/,
+    () =>
+      "That field or method is private in its class, and this line is outside that class. A child class is outside its parent too: it reaches the parent's private fields through the parent's methods and constructor."
+  ],
+  [
+    /^compiler\.err\.cant\.assign\.val\.to\.var/,
+    () => 'A final variable keeps its first value, and that line gives it another. Every field of a record is final: to change a value, make a new record.'
+  ],
+  [/^compiler\.err\.not\.exhaustive/, () => 'A switch that gives back a value has to cover every value of the enum, and the compiler found one that no case names.'],
+  [
+    /^compiler\.err\.abstract\.meth\.cant\.have\.body/,
+    () => 'An abstract method has no body: its first line ends with a semicolon, and each child writes the body.'
+  ],
+  [
+    /^compiler\.err\.intf\.meth\.cant\.have\.body/,
+    () => 'A method of an interface has no body: its first line ends with a semicolon, and each class that implements the interface writes the body.'
+  ],
+  [
+    /^compiler\.err\.missing\.meth\.body\.or\.decl\.abstract/,
+    () => 'A method without a body has to be marked abstract, and only an abstract class may have one. A method of a class that is not abstract needs its body in braces.'
+  ],
+  [
+    /^compiler\.err\.no\.intf\.expected\.here/,
+    () => 'That name is an interface, and extends takes only a class. A class takes on an interface with another word: the lesson shows it.'
+  ],
+  [
+    /^compiler\.err\.intf\.expected\.here/,
+    () => 'That name is a class, and implements takes only interfaces. A class gets its parent with another word: the lesson shows it.'
+  ],
+  [
+    /^compiler\.err\.enum\.label\.must\.be\.unqualified\.enum/,
+    () =>
+      'Inside a switch over an enum, each case names a value alone, without the enum\'s name and a dot in front. Your terminal may show no error: Java 21 and newer accept the name in front, but this repo is written for Java 17, and Check compiles as Java 17, which does not.'
+  ],
+  [
+    /^compiler\.err\.illegal\.enum\.static\.ref/,
+    () =>
+      "An enum's constructor cannot use a static field of the enum: the values are made before the static fields are ready. A value each one keeps for itself is a field without static."
+  ],
+  [
+    /^compiler\.err\.feature\.not\.supported/,
+    (e) =>
+      /patterns in switch/.test(e.message) &&
+      'A switch with a case for each name works over an enum, a number or a text. Java read this one as something newer than this repo uses, so check that the type the switch looks at is an enum.'
+  ],
+  [/^compiler\.err\.cant\.inherit\.from\.final/, () => 'That type is final, or a record or an enum, and no class can extend it.'],
+  [/^compiler\.err\.enum\.cant\.be\.instantiated/, () => 'The values of an enum are the ones listed in it, and no more can be made with new.'],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /incompatible types: ([A-Z]\w*) cannot be converted to ([A-Z]\w*)$/.test(e.message.split('\n')[0]) &&
+      'A value of one type is put where another type is needed. A child fits where its parent is asked for, never the other way round: the message names both.'
+  ],
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) => /symbol:\s+class /.test(e.message) && 'The compiler does not know that name. Check its spelling, capital letters included.'
+  ]
+]
+
+// What an exception usually means in a family issue, in plain words, without the fix.
+const FAMILY_THROWN = [
+  [
+    /ClassCastException/,
+    'An object was cast to a class it is not. A cast never changes an object, it only lets Java use it as what it already is: ask with instanceof first, and cast only when the answer is yes.'
+  ],
+  [
+    /StackOverflowError/,
+    "A method called itself, again and again, until Java ran out of room. Inside a method that takes the place of the parent's, its own name alone calls that same method again: the lesson shows how to reach the parent's version."
+  ]
+]
 
 // --- Issues of several files --------------------------------------------------------------------
 // Each task is one file of a folder of packages. For each case Check compiles, in memory, the
