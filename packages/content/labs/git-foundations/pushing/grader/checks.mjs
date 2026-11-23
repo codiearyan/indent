@@ -86,7 +86,10 @@ export const checks = {
     }
     const stop = [start, ...(commitOf(git, femi) ? [femi] : [])].map((hash) => `^${hash}`)
     const mineOnMain = git('rev-list', '--no-merges', main, ...stop).out.split('\n').filter(Boolean)
-    const others = [...new Set(mineOnMain.flatMap((hash) => changedIn(git, hash)))].filter((file) => file !== 'visit.html')
+    const base = has(git, femi, main) ? femi : start
+    const others = [...new Set(mineOnMain.flatMap((hash) => changedIn(git, hash)))].filter(
+      (file) => file !== 'visit.html' && fileAt(git, main, file) !== fileAt(git, base, file)
+    )
     if (others.length) {
       return fail(`Your commits on main also change ${listOf(others)}. The closing week only needs visit.html. Put ${others.length > 1 ? 'them' : 'it'} back as ${others.length > 1 ? 'they were' : 'it was'} and commit that.`)
     }
