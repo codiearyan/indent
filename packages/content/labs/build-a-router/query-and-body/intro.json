@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Which cards and posters still wait?", "note": "Asked in the address, after a ?." },
+    { "title": "Old server", "text": "Compares the whole address, ? and all.", "note": "It has never heard of it." },
+    {
+      "title": "Your router",
+      "file": "router.js",
+      "mine": true,
+      "gap": "Query and body unread",
+      "tasks": ["Read the query", "Read a JSON body", "Refuse huge bodies"]
+    },
+    { "title": "Orders handler", "rows": [["1874", "card, waiting"], ["1876", "card, waiting"]] }
+  ],
+  "ticket": { "label": "Waiting list", "wrong": "not found", "why": "Query unread", "right": "two orders" },
+  "captions": [
+    "At Ashgrove Press, Idris asks which card and poster orders are still waiting.",
+    "The old server reads the question as part of the address and finds nothing.",
+    "You make the router read the query and the body once, carefully, in three tasks.",
+    "Now the orders handler gets Idris's question as an object and answers it.",
+    "Questions and new orders reach every handler ready to use, and rubbish gets a plain no."
+  ]
+}

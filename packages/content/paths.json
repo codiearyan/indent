@@ -69,6 +69,7 @@
           "nodejs-foundations",
           "node-api",
           "express-crud-api",
+          "build-a-router",
           "api-with-a-database",
           "sign-in-and-sessions",
           "security-bug-hunts"
@@ -177,6 +178,7 @@
           "nodejs-foundations",
           "node-api",
           "express-crud-api",
+          "build-a-router",
           "api-with-a-database",
           "sign-in-and-sessions",
           "security-bug-hunts"
@@ -253,7 +255,8 @@
           "typescript-essentials",
           "async-js",
           "build-a-test-runner",
-          "build-a-promise"
+          "build-a-promise",
+          "build-a-router"
         ]
       },
       {
@@ -262,6 +265,32 @@
           "js-bug-hunts",
           "llm-bug-hunts-ts",
           "security-bug-hunts"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "more-languages",
+    "title": "More languages",
+    "tagline": "Python, Java and C++ from the first line",
+    "description": "Three more languages, each taught from nothing: Python for scripts and data, Java for programs built from objects, and C++ for code that runs close to the machine. Take one, or take them in turn and see what stays the same.",
+    "stages": [
+      {
+        "title": "Python",
+        "labs": [
+          "python-foundations"
+        ]
+      },
+      {
+        "title": "Java",
+        "labs": [
+          "java-foundations"
+        ]
+      },
+      {
+        "title": "C++",
+        "labs": [
+          "cpp-foundations"
         ]
       }
     ]

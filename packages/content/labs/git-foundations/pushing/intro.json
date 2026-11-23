@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilma", "say": "Put it on the site today.", "note": "And the vouchers on the server." },
+    { "title": "Shop's server", "text": "Femi sent a new find this morning.", "note": "Your main does not have it." },
+    {
+      "title": "Your commands",
+      "file": "visit.html",
+      "mine": true,
+      "gap": "A push the server refuses",
+      "tasks": ["Push the vouchers", "Commit the closing", "Pull Femi's find", "Push main again"]
+    },
+    { "title": "Shop's site", "rows": [["Vouchers on the server"], ["August closing"], ["Femi's new find"]] }
+  ],
+  "ticket": { "label": "Closing week", "wrong": "rejected", "why": "Refused", "right": "on the site" },
+  "captions": [
+    "Wilma wants the vouchers on the server and the shop's August closing on the site today.",
+    "Femi sent work to the server this morning, so a push of your main is refused.",
+    "You push a branch, commit the closing, pull Femi's find and push again, in four tasks.",
+    "The server has your work and Femi's, side by side, and nothing was lost.",
+    "Pull first, then push: the server is one history everyone adds to."
+  ]
+}

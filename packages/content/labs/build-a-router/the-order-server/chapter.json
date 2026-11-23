@@ -1,0 +1,82 @@
+{
+  "id": "the-order-server",
+  "title": "The order server on your router",
+  "files": ["src/router.js", "src/app.js", "src/try.js", "src/old-server.js", "src/shop.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the order server starts on your router and answers real requests.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "groups",
+      "title": "Group routes under a prefix",
+      "file": "src/router.js",
+      "description": "Implement `mount(router, prefix, group)` in `src/router.js`, where `group` is another router made by `createRouter()`.\n\n- every route of the group answers at the prefix followed by its own path: with `mount(router, '/staff', staff)`, staff's `GET /queue` answers `GET /staff/queue`, and staff's `/` answers `/staff` itself\n- the group's routes do not answer at their own paths, and a path is in the group only when its first parts are exactly the prefix: `/staffroom` is not under `/staff`\n- the group's middleware runs after the router's own, and only for the group's routes\n- errors from the group's routes go to the router's error handler\n- group routes take part in 404, 405 and choosing between routes like any other route\n- it throws a `TypeError` when `prefix` is not a string that starts with `/`\n\nA group is mounted once its routes and middleware are added. The check builds routers and groups of its own and sends requests through `handle`.",
+      "nextSteps": [
+        "Read the comment above `mount` and decide where a group's routes end up.",
+        "Give each of the group's routes its full path: the prefix, then its own path.",
+        "Make each such route remember the group's middleware.",
+        "In `handle`, run the router's middleware, then the route's group middleware, then the handler."
+      ],
+      "hints": [
+        "The rest of the router already knows how to match, choose, say 404 and 405, and handle errors. If a group's routes simply become routes of the router with longer paths, all of that works for them too.",
+        "Each route needs to carry its group's middleware with it, so `handle` can put that middleware into the chain for that route only. Keep a reference to the group's list, not a copy.",
+        "In `mount`: `router.routes.push({ ...route, path: prefix + route.path, groups: [group.middleware] })`, with `/` mapped to the prefix. In `handle`: `[router.middleware, ...route.groups].flat()`."
+      ],
+      "docs": [
+        { "title": "Spread syntax", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax" },
+        { "title": "Array.prototype.flat()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "serve",
+      "title": "Serve real requests",
+      "file": "src/router.js",
+      "description": "Implement `serve(router)` in `src/router.js`, and teach `handle` the `HEAD` method.\n\n- `serve` returns a server made with `createServer` from `node:http`, not listening yet: whoever calls it chooses where it listens\n- the server sends every request through `handle(router, req, res)`\n- when `handle` throws or rejects and nothing was answered yet, the client gets a plain `500` with `{ error }`, and the server goes on to answer the next request\n- a `HEAD` request is answered by the path's `HEAD` route, or when it has none, by its `GET` route; Node leaves the body out by itself\n\nThe check starts your server on a port the system picks, sends it real requests with queries, bodies and methods of its own, and closes it.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the error.",
+        "Make the server in `serve` with a listener that calls `handle`.",
+        "Catch what `handle` throws or rejects with, and answer 500 if nothing was sent.",
+        "Look at the `HEAD /prices` line, and let `handle` fall back to the GET route."
+      ],
+      "hints": [
+        "A real request is the same shape as the ones your router has met all along: a stream with `method`, `url` and `headers`, and a response with `statusCode`, `setHeader` and `end`. Nothing in the router has to change for it.",
+        "The listener can be an `async` function. `await handle(...)` inside a `try` turns both a throw and a rejection into something your `catch` sees; `res.headersSent` says whether an answer has started.",
+        "`return createServer(async (req, res) => { try { await handle(router, req, res) } catch { if (!res.headersSent) sendJson(res, 500, { error: ... }) } })`. For HEAD, look for GET routes when no HEAD route fits."
+      ],
+      "docs": [
+        { "title": "http.createServer()", "url": "https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener" },
+        { "title": "HEAD", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/HEAD" },
+        { "title": "response.headersSent", "url": "https://nodejs.org/api/http.html#responseheaderssent" }
+      ],
+      "videos": [
+        { "title": "A server with Node's http module", "url": "https://www.youtube.com/watch?v=F5qPBcRFpFg" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "app",
+      "title": "Move the order server onto your router",
+      "file": "src/app.js",
+      "description": "Implement `createApp(shop, { staffKey })` in `src/app.js`. It returns a router that answers every request of the order page, as the comment in the file lists:\n\n- `GET /prices`, `GET /orders` (filtered by `status`, and by one or more `item` in the query), `GET /orders/today`, `GET /orders/:id` (404 with `{ error }` for an order that does not exist) and `POST /orders` (201 with the new order)\n- a group under `/staff`, whose middleware answers `401` with `{ error }` unless the `x-staff-key` header is `staffKey`, with `GET /staff/queue` and `POST /staff/orders/:id/status`\n- one error handler: a `ShopError` is answered with its own status and `{ error: its message }`, anything else with a plain 500\n\nEvery other request gets the answer your router gives by itself: a wrong method is a 405, an unknown path a 404. The check runs your app on a server of its own, with orders of its own, and sends it the order page's requests and the ones the old server got wrong.",
+      "nextSteps": [
+        "Open `src/old-server.js` and `src/shop.js`: every branch of the old chain becomes a route.",
+        "Add the public routes and the error handler first, and run `node src/try.js`.",
+        "Make a second router for staff, give it its middleware and routes, and mount it at `/staff`.",
+        "Let handlers throw a `ShopError` instead of answering errors themselves."
+      ],
+      "hints": [
+        "Each handler is one or two lines: read what the request carries (`req.params`, `req.query`, `req.body`), ask the shop, answer with `sendJson`.",
+        "`req.query.item` is a string when it comes once and an array when it comes more than once. `[req.query.item ?? []].flat()` is always an array.",
+        "`const staff = createRouter()`, then `use(staff, (req, res, next) => ...)`, then its routes, and only then `mount(app, '/staff', staff)`."
+      ],
+      "docs": [
+        { "title": "instanceof", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof" },
+        { "title": "401 Unauthorized", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401" },
+        { "title": "201 Created", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/201" }
+      ],
+      "points": 10
+    }
+  ]
+}

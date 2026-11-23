@@ -10,3 +10,6 @@ out
 *.tsbuildinfo
 .next
 apps/site/public/packs
+
+# Lesson files are content, whatever their name: a starter may hold a log.
+!packages/content/labs/**/*.log

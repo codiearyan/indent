@@ -1,0 +1,112 @@
+{
+  "id": "effects",
+  "title": "In step with the world outside",
+  "files": ["src/Whereabouts.jsx", "src/tracker.js", "src/App.jsx", "src/line.js"],
+  "terminal": {
+    "description": "The screen runs in the Browser panel and reloads every time you save. Its console shows when the tracker starts and stops following a tram."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "follow",
+      "title": "Follow the tram when the screen appears",
+      "file": "src/Whereabouts.jsx",
+      "description": "In `Whereabouts`, write an effect that calls `follow(number, onStop)` from `tracker.js` with the `number` prop and a function that keeps each stop the tracker reports in the `at` state. The paragraph with the class `at` then shows where the tram is, and says it is waiting until the first report. The tram is followed once, not again after every draw.\n\nThe check uses a tracker of its own that writes down every call. It draws `Whereabouts` with a tram and a line of its own, sends three reports, and looks at the screen and at how often `follow` was called.",
+      "nextSteps": [
+        "Read \"What an effect is for\" and \"The dependency list\" in the lesson.",
+        "Import `follow` from `./tracker.js`.",
+        "Call `useEffect` at the top of `Whereabouts`, and call `follow` inside it.",
+        "Watch the Browser panel: the stop changes, and the console says the tram is being followed."
+      ],
+      "hints": [
+        "Talking to the tracker is not drawing. It belongs in a function React runs after the screen is drawn.",
+        "`useEffect` takes that function and a list of the values it depends on. `follow` needs a function to call with each stop, and the setter for `at` is one.",
+        "`useEffect(() => { follow(number, setAt) }, [number])`, with `import { follow } from './tracker.js'` at the top."
+      ],
+      "docs": [
+        { "title": "useEffect", "url": "https://react.dev/reference/react/useEffect" },
+        { "title": "Synchronizing with effects", "url": "https://react.dev/learn/synchronizing-with-effects" }
+      ],
+      "videos": [{ "title": "useEffect in 13 minutes", "url": "https://www.youtube.com/watch?v=0ZJgIjIuY7U" }],
+      "points": 10
+    },
+    {
+      "id": "stop",
+      "title": "Stop following when the screen goes",
+      "file": "src/Whereabouts.jsx",
+      "description": "`follow` returns a function that stops following. Return it from the effect, so React calls it when `Whereabouts` goes off the screen. Then the tracker never keeps calling a screen that is not there, and one tram is followed by one screen at a time.\n\nThe check draws `Whereabouts`, takes it off the screen and looks at whether its tram is still followed. Then it draws one `Whereabouts` in place of another and counts what is still being followed.",
+      "nextSteps": [
+        "Read \"Cleaning up\" in the lesson.",
+        "Keep what `follow` returns.",
+        "Return it from the effect, without calling it.",
+        "Reload the Browser panel and read the console: following, stopped, following."
+      ],
+      "hints": [
+        "The tracker already gives you the way to stop. React only needs to be handed it.",
+        "A function returned from an effect is its cleanup. Return the function itself, not what calling it returns.",
+        "`useEffect(() => { const stop = follow(number, setAt); return stop }, [number])`, or `return follow(number, setAt)`."
+      ],
+      "docs": [
+        {
+          "title": "How to handle the effect firing twice in development",
+          "url": "https://react.dev/learn/synchronizing-with-effects#how-to-handle-the-effect-firing-twice-in-development"
+        },
+        { "title": "<StrictMode>", "url": "https://react.dev/reference/react/StrictMode" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "chosen",
+      "title": "Follow the tram that is chosen now",
+      "file": "src/Whereabouts.jsx",
+      "description": "When the `number` prop changes, `Whereabouts` stops following the old tram and follows the new one. Until the new tram's first report it shows the waiting line, never the stop where the old tram was. It follows each tram once, not again after draws where the tram did not change.\n\nThe check draws `Whereabouts` and changes its `number` prop twice. After each change, it sends a report from the old tram and one from the new tram, and looks at the screen and at what is being followed.",
+      "nextSteps": [
+        "Read \"The dependency list\" again, then \"When a value changes\".",
+        "Make sure the effect's dependency list names every value from the component that the effect uses.",
+        "When the tram changes, set the stop back to nothing.",
+        "Change the tram in the Browser panel and read the console."
+      ],
+      "hints": [
+        "Change the tram in the Browser panel. Does the console say the new tram is followed? What does the screen say before its first report?",
+        "React runs the effect again only when a value in its list has changed, and runs the cleanup first. The effect can set `at` back to `null` before it follows the new tram.",
+        "`useEffect(() => { setAt(null); return follow(number, setAt) }, [number])`."
+      ],
+      "docs": [
+        {
+          "title": "Lifecycle of reactive effects",
+          "url": "https://react.dev/learn/lifecycle-of-reactive-effects"
+        },
+        {
+          "title": "Specifying reactive dependencies",
+          "url": "https://react.dev/reference/react/useEffect#specifying-reactive-dependencies"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ahead",
+      "title": "Work out the stops still to come while drawing",
+      "file": "src/Whereabouts.jsx",
+      "description": "`LineMap` keeps the stops still to come in state and sets them from an effect, so the list never follows the tram. Nothing outside the screen is involved: the stops still to come are worked out from the `stops` and `at` props. Remove the state and the effect, and work the list out while drawing: the stops after `at`, to the end of the line, or every stop while `at` is `null`.\n\nThe check draws `LineMap` with a line of its own, moves the tram twice and then hands it a shorter line. After each change it looks at the list and counts how many times `LineMap` was drawn.",
+      "nextSteps": [
+        "Read \"When you do not need an effect\" in the lesson.",
+        "Work out the list from the props with `slice` and `indexOf`, in the body of `LineMap`.",
+        "Remove the `ahead` state and the effect.",
+        "Watch the list follow the tram in the Browser panel."
+      ],
+      "hints": [
+        "Everything the list needs is already in the props on every draw.",
+        "The effect's own line already works the list out. It does not need state or an effect around it: a plain `const` while drawing is enough.",
+        "`const ahead = stops.slice(stops.indexOf(at) + 1)` in the body of `LineMap`, with the `useState` and `useEffect` lines removed."
+      ],
+      "docs": [
+        { "title": "You might not need an effect", "url": "https://react.dev/learn/you-might-not-need-an-effect" },
+        {
+          "title": "Array.prototype.slice()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

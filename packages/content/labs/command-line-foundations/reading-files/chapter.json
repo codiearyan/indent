@@ -1,0 +1,129 @@
+{
+  "id": "reading-files",
+  "title": "Looking inside files",
+  "files": ["today.txt"],
+  "terminal": {
+    "description": "A shell that starts in the shop's top folder. Read a file before you save anything from it.",
+    "suggestedCommand": "head sales/web-orders.csv"
+  },
+  "tasks": [
+    {
+      "id": "join",
+      "title": "Join the two sign-up lists",
+      "file": "today.txt",
+      "description": "Idris keeps two lists of email addresses in `mailing`: `market-signups.txt` from the market stall and `shop-signups.txt` from the shop. Make one list, `mailing-list.txt` in the top folder, with every line of the market list first and every line of the shop list under it.\n\nCheck compares `mailing-list.txt` line by line with the two lists, in that order.",
+      "nextSteps": [
+        "Look at both lists with `cat` or `less`.",
+        "Print both of them with one command, the market list first.",
+        "Run that command again with `>` and the new file's name after it.",
+        "Look at `mailing-list.txt` with `less`, and press `q` to leave."
+      ],
+      "hints": [
+        "The lesson's part on `cat` says what it does when it gets more than one file name.",
+        "`cat` prints the files you name one after the other. `>` keeps all of it in one file, as long as it is one command.",
+        "Run `cat mailing/market-signups.txt mailing/shop-signups.txt > mailing-list.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "cat: concatenate files and print them",
+          "url": "https://man7.org/linux/man-pages/man1/cat.1.html"
+        },
+        {
+          "title": "Redirection in the shell",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_07"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading files with cat, less, head and tail",
+          "url": "https://www.youtube.com/watch?v=gfuDvpi_jYY"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "first",
+      "title": "Save the start of the order list",
+      "file": "today.txt",
+      "description": "The accountant wants the header line of `sales/web-orders.csv` and the ten orders under it, nothing more. Save those first lines into `first-orders.txt` in the top folder.\n\nCheck compares `first-orders.txt` with the first lines of `sales/web-orders.csv`: the header, then ten orders.",
+      "nextSteps": [
+        "Look at the start of `sales/web-orders.csv` without printing all of it.",
+        "Count the lines you need: the header is a line too.",
+        "Ask for that many lines, and save them with `>`.",
+        "Look at `first-orders.txt` with `cat`."
+      ],
+      "hints": [
+        "One command from the lesson prints only the start of a file.",
+        "`head` prints 10 lines unless `-n` asks for another number. The header and ten orders are more than 10 lines.",
+        "Run `head -n 11 sales/web-orders.csv > first-orders.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "head: output the first part of files",
+          "url": "https://man7.org/linux/man-pages/man1/head.1.html"
+        },
+        {
+          "title": "Redirection in the shell",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_07"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "last",
+      "title": "Save the last entries of the March log",
+      "file": "today.txt",
+      "description": "Press 2 stopped on Tuesday 31 March. Hesper wants the last 8 entries of `logs/press-mar.log`, the lines at the very end, saved into `last-entries.txt` in the top folder.\n\nCheck compares `last-entries.txt` with the last 8 lines of the March log.",
+      "nextSteps": [
+        "Open `logs/press-mar.log` with `less` to see how long it is, then press `q`.",
+        "Print only its end.",
+        "Ask for 8 lines, and save them with `>`.",
+        "Look at `last-entries.txt` with `cat`."
+      ],
+      "hints": [
+        "The newest entries of a log are at the bottom. One command prints the bottom of a file.",
+        "`tail` prints the last 10 lines, and `-n` sets another number.",
+        "Run `tail -n 8 logs/press-mar.log > last-entries.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "tail: output the last part of files",
+          "url": "https://man7.org/linux/man-pages/man1/tail.1.html"
+        },
+        {
+          "title": "less: read a file one screen at a time",
+          "url": "https://man7.org/linux/man-pages/man1/less.1.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "counts",
+      "title": "Count the entries in each log",
+      "file": "today.txt",
+      "description": "Each line of a press log is one entry. Idris wants to know how many lines each month's log has. Count the lines of every `.log` file in `logs` in one command, and save what it prints into `entry-counts.txt` in the top folder. `logs` also holds `README.txt`, which is not a log.\n\nCheck reads each count in `entry-counts.txt` and compares it with the number of lines in that log. The `total` line may be there or not.",
+      "nextSteps": [
+        "Run `ls logs` and see which files are logs.",
+        "Count the lines of one log first.",
+        "Count every log in one command, with a pattern like the ones in the issue on many files at once.",
+        "Save that with `>`, and look at `entry-counts.txt`."
+      ],
+      "hints": [
+        "The lesson's counting command takes an option that counts lines and nothing else.",
+        "`wc -l` takes several files, or a pattern that matches only the logs, and prints one line per file.",
+        "Run `wc -l logs/*.log > entry-counts.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "wc: print newline, word and byte counts",
+          "url": "https://man7.org/linux/man-pages/man1/wc.1.html"
+        },
+        {
+          "title": "Patterns used for filename expansion",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_14_03"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

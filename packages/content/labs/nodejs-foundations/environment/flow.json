@@ -1,0 +1,86 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "imran", "label": "Imran", "kind": "story" },
+      { "id": "env", "label": "Laptop settings", "kind": "data" },
+      { "id": "bill", "label": "water-bill.js", "kind": "file", "mine": true },
+      { "id": "settings", "label": "settings.js", "kind": "file", "mine": true },
+      { "id": "screen", "label": "Shed screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "imran", "to": "env", "label": "sets" },
+      { "from": "env", "to": "bill", "label": "price, limit" },
+      { "from": "env", "to": "settings", "label": "every setting" },
+      { "from": "bill", "to": "screen", "label": "bill, warning" },
+      { "from": "settings", "to": "screen", "label": "what is set" }
+    ],
+    "note": "Imran sets the price, the leak limit and the company's key on the laptop, and your scripts read them when they run instead of keeping them in their code."
+  },
+  "tasks": {
+    "price": {
+      "steps": [
+        {
+          "active": ["imran", "imran->env", "env"],
+          "note": "In April, Imran sets this year's water price in the laptop's settings, not in the code."
+        },
+        {
+          "active": ["env", "env->bill", "bill"],
+          "value": { "kind": "map", "label": "what water-bill.js is given", "entries": [{ "key": "the price", "value": "a setting, as text" }, { "key": "the litres", "value": "an argument, as text" }] },
+          "note": "water-bill.js reads the price each time it runs, and the litres typed after its name."
+        },
+        {
+          "active": ["bill", "bill->screen", "screen"],
+          "note": "The cost of the litres shows on the screen, or one plain line says the price is not set."
+        }
+      ]
+    },
+    "number": {
+      "steps": [
+        {
+          "active": ["imran", "imran->env", "env"],
+          "note": "Someone types the price by hand, and sometimes it comes out as a word, with a comma, or empty."
+        },
+        {
+          "active": ["env->bill", "bill"],
+          "note": "water-bill.js turns the setting into a number and decides whether that number is a price."
+        },
+        {
+          "active": ["bill->screen", "screen"],
+          "note": "A price that is not one is refused with one line that names the setting, and no bill is worked out."
+        }
+      ]
+    },
+    "default": {
+      "steps": [
+        {
+          "active": ["env", "env->bill", "bill"],
+          "note": "water-bill.js reads the leak limit too. When nobody set it, or it is empty, the script uses its own default."
+        },
+        {
+          "active": ["bill"],
+          "note": "It works out the bill as before, then compares the litres with the limit, as numbers."
+        },
+        {
+          "active": ["bill->screen", "screen"],
+          "note": "Above the limit, a warning to check the taps comes on standard error, beside the bill."
+        }
+      ]
+    },
+    "secret": {
+      "steps": [
+        {
+          "active": ["imran", "imran->env", "env"],
+          "note": "The water company's account key sits in the laptop's settings with the others."
+        },
+        {
+          "active": ["env->settings", "settings"],
+          "note": "settings.js looks at the three settings the water scripts use, and only at those."
+        },
+        {
+          "active": ["settings->screen", "screen"],
+          "note": "The screen shows the price, the limit and whether the key is set. The key itself never shows."
+        }
+      ]
+    }
+  }
+}

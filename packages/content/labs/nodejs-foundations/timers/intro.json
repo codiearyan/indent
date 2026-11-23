@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhiannon", "say": "Who goes first next time?", "note": "One hose at a time in a dry spell." },
+    { "title": "Rhiannon's watch", "text": "She shouts each turn, and loses track." },
+    {
+      "title": "Your rota",
+      "file": "rota.js",
+      "mine": true,
+      "gap": "Nothing calls the turns",
+      "tasks": ["Call turns on a timer", "Stop on a typed stop", "Stop on Ctrl+C"]
+    },
+    { "title": "The main tap", "text": "One plot at a time, in rota order." }
+  ],
+  "ticket": { "label": "Rainy day", "wrong": "turn lost", "why": "No record", "right": "next up known" },
+  "captions": [
+    "At Marrowfield, Rhiannon wants the laptop to call each plot's turn at the tap.",
+    "Today she shouts the turns by her watch, and when it rains nobody knows who was next.",
+    "You write a rota that runs on a timer and stops cleanly when asked, in three tasks.",
+    "Now the turns come by themselves, and stopping says who goes first next time.",
+    "Same rainy day, same tap. Nobody loses a turn, and the script ends tidily."
+  ]
+}

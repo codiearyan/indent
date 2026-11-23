@@ -1,0 +1,6 @@
+Today's jobs, from Hesper and Idris
+
+1. Hesper: what did we sell at Saturday's market? Every item once, in alphabetical order, from market/sold.txt, in items.txt.
+2. Hesper: and the five best sellers, each with how many we sold, the most first, in top-five.txt.
+3. Idris: add today's finished jobs from logs/today.log to the end of jobs-done.txt. Keep every line already in it.
+4. Idris: put stock.txt itself in alphabetical order, keeping every line.

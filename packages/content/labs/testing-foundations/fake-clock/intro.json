@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Bridget", "say": "Promised Friday, after the cut-off?", "note": "Ordered late on Wednesday." },
+    { "title": "Order form", "text": "Reads the clock, and nobody tests the times." },
+    {
+      "title": "Your tests",
+      "file": "schedule.test.js",
+      "mine": true,
+      "gap": "Nothing sets the clock",
+      "tasks": ["Test a Monday order", "Test the cut-off", "Test a basket hold", "Put the clock back"]
+    },
+    { "title": "Friday van", "text": "Packed on Thursday, out on Friday." }
+  ],
+  "ticket": { "label": "Late order", "wrong": "this Friday", "why": "Too late", "right": "next Friday" },
+  "captions": [
+    "Bridget asks how an order placed after Wednesday's cut-off was promised this Friday.",
+    "The form reads the clock, so a test that runs today only checks today.",
+    "You set the clock in your tests, move it on, and put the real one back after each.",
+    "Now a late order goes out the Friday after, and a held basket is let go on time.",
+    "Same form, same clock. Your tests check any day and time without waiting for it."
+  ]
+}

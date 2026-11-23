@@ -1,0 +1,76 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "logger", "label": "Logger on the pipe", "kind": "story" },
+      { "id": "log", "label": "A year of readings", "kind": "data" },
+      { "id": "stream", "label": "Read stream", "kind": "file" },
+      { "id": "lines", "label": "node:readline", "kind": "file" },
+      { "id": "scripts", "label": "Your scripts", "kind": "file", "mine": true },
+      { "id": "imran", "label": "Imran", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "logger", "to": "log", "label": "a line a minute" },
+      { "from": "log", "to": "stream", "label": "small pieces" },
+      { "from": "stream", "to": "lines", "label": "pieces" },
+      { "from": "lines", "to": "scripts", "label": "one line" },
+      { "from": "scripts", "to": "imran", "label": "totals" }
+    ],
+    "note": "Your scripts read the logger's year of readings a line at a time and keep only their totals, so they fit in the little memory of the box by the tap."
+  },
+  "tasks": {
+    "count": {
+      "steps": [
+        {
+          "active": ["logger", "logger->log", "log"],
+          "note": "All year the logger writes a line every minute for each tap, so the log grows far bigger than the box's memory."
+        },
+        {
+          "active": ["log->stream", "stream", "stream->lines", "lines"],
+          "note": "A read stream takes the log in small pieces, and readline joins them back into whole lines."
+        },
+        {
+          "active": ["lines->scripts", "scripts"],
+          "value": { "kind": "array", "label": "the parts of one reading", "values": ["time", "tap", "litres"] },
+          "note": "count-readings.js gets one line at a time and adds one for each reading. Blank lines and notes do not count."
+        },
+        {
+          "active": ["scripts->imran", "imran"],
+          "note": "When the log ends, Imran gets the number of readings, and the script never held more than a line."
+        }
+      ]
+    },
+    "total": {
+      "steps": [
+        {
+          "active": ["log", "log->stream", "stream", "stream->lines", "lines"],
+          "note": "The log comes through a line at a time, as before."
+        },
+        {
+          "active": ["lines->scripts", "scripts"],
+          "note": "water-year.js takes the litres from the end of each reading and adds them to its total."
+        },
+        {
+          "active": ["scripts->imran", "imran"],
+          "note": "Imran gets one line: the litres of the whole log, added up."
+        }
+      ]
+    },
+    "taps": {
+      "steps": [
+        {
+          "active": ["lines->scripts", "scripts"],
+          "note": "tap-totals.js reads each line's tap and its litres."
+        },
+        {
+          "active": ["scripts"],
+          "value": { "kind": "map", "label": "what the script keeps", "entries": [{ "key": "each tap", "value": "its litres so far" }] },
+          "note": "It keeps one running total for each tap it has seen, never the lines themselves."
+        },
+        {
+          "active": ["scripts->imran", "imran"],
+          "note": "Imran gets a line for each tap, in the order of their names, and can see which tap uses the most."
+        }
+      ]
+    }
+  }
+}
