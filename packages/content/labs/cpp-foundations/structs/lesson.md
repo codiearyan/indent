@@ -69,7 +69,7 @@ Two dots reach inside: `window.cup.tea` is the tea of the cup at that table. `Cu
 
 A function takes and gives back a struct like any other value. A function that only reads one takes it as a `const` reference, as you did with texts: `void printCup(const Cup& cup)`. The next issue is about that hand-over.
 
-C++ also lets a struct have functions of its own, and members that only those functions can touch. That is a different tool, for after this repo. Here a struct is just values kept together.
+C++ also lets a struct have functions of its own, and members that only those functions can touch. That is a different tool, for later. Here a struct is just values kept together.
 
 ## Your work in this issue
 
