@@ -105,7 +105,12 @@ async function snapshot(
   conflicts: string[] = [],
   updated: string[] = []
 ): Promise<WorkspaceSnapshot> {
-  const [files, folders] = await Promise.all([readWorkspace(dir, first), readFolders(dir)])
+  // Starter files show even when the learner's .gitignore names them.
+  const kept = Object.keys(starter)
+  const [files, folders] = await Promise.all([
+    readWorkspace(dir, first, kept),
+    readFolders(dir, kept)
+  ])
   const missing = missingFiles(dir, starter)
   return { dir, files, folders, starter, conflicts, updated, remembered, missing }
 }

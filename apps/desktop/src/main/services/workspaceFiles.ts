@@ -1,5 +1,6 @@
 import { chmod, cp, lstat, mkdir, readdir, readFile, rm, stat } from 'fs/promises'
 import { existsSync } from 'fs'
+import ignore from 'ignore'
 import { isAbsolute, join, relative, resolve, sep } from 'path'
 import type { WorkspaceFile } from '../../shared/types'
 
@@ -47,39 +48,74 @@ export async function unlock(path: string): Promise<void> {
   await Promise.all(names.map((name) => unlock(join(path, name))))
 }
 
-async function listEntries(
+interface Found {
+  files: string[]
+  folders: string[]
+}
+
+/**
+ * What the workspace's own `.gitignore` leaves out, such as the `dist/` and `coverage/` a build or
+ * a test run makes, so the editor never loads them. A file in `kept` and the folders above it
+ * always show: an ignore rule must not hide what the learner works on.
+ */
+async function ignoredBy(
   dir: string,
-  listed: string[] = [],
-  prefix = '',
-  found: { files: string[]; folders: string[] } = { files: [], folders: [] }
-): Promise<{ files: string[]; folders: string[] }> {
+  kept: string[]
+): Promise<(path: string, folder: boolean) => boolean> {
+  const text = await readFile(join(dir, '.gitignore'), 'utf8').catch(() => '')
+  if (!text.trim()) return () => false
+  const rules = ignore().add(text)
+  return (path, folder) =>
+    folder
+      ? !kept.some((file) => file.startsWith(`${path}/`)) && rules.ignores(`${path}/`)
+      : !kept.includes(path) && rules.ignores(path)
+}
+
+async function walk(
+  dir: string,
+  listed: string[],
+  ignored: (path: string, folder: boolean) => boolean,
+  prefix: string,
+  found: Found
+): Promise<void> {
   const folders: string[] = []
   for (const entry of await readdir(join(dir, prefix), { withFileTypes: true })) {
     const path = prefix ? `${prefix}/${entry.name}` : entry.name
     // A dot file shows only when the issue lists it (.gitignore); a dot folder never does.
     const shown = !entry.name.startsWith('.') || (entry.isFile() && listed.includes(path))
     if (!shown || entry.name === 'node_modules') continue
-    if (entry.isDirectory()) folders.push(path)
-    else if (entry.isFile()) found.files.push(path)
+    if (entry.isDirectory()) {
+      if (!ignored(path, true)) folders.push(path)
+    } else if (entry.isFile() && !ignored(path, false)) found.files.push(path)
   }
   found.folders.push(...folders)
   // A folder the learner locked is listed, with nothing in it.
-  await Promise.all(folders.map((path) => listEntries(dir, listed, path, found).catch(() => found)))
+  await Promise.all(folders.map((path) => walk(dir, listed, ignored, path, found).catch(() => {})))
+}
+
+async function listEntries(dir: string, listed: string[], kept: string[]): Promise<Found> {
+  const found: Found = { files: [], folders: [] }
+  await walk(dir, listed, await ignoredBy(dir, [...listed, ...kept]), '', found)
   return found
 }
 
-/** Folders of the workspace, hidden ones and `node_modules` left out, as `readWorkspace` does. */
-export async function readFolders(dir: string): Promise<string[]> {
-  return (await listEntries(dir)).folders.sort()
+/** Folders of the workspace, left out as `readWorkspace` leaves them out. */
+export async function readFolders(dir: string, kept: string[] = []): Promise<string[]> {
+  return (await listEntries(dir, [], kept)).folders.sort()
 }
 
 /**
  * Text files of the workspace, `first` (the chapter's tab order) leading, the rest alphabetical.
- * A file whose name starts with a dot is read only when `first` names it.
+ * A file whose name starts with a dot is read only when `first` names it. What the workspace's
+ * `.gitignore` names is left out, unless `first` or `kept` names it.
  */
-export async function readWorkspace(dir: string, first: string[]): Promise<WorkspaceFile[]> {
+export async function readWorkspace(
+  dir: string,
+  first: string[],
+  kept: string[] = []
+): Promise<WorkspaceFile[]> {
   const read = await Promise.all(
-    (await listEntries(dir, first)).files.map(async (path): Promise<WorkspaceFile | null> => {
+    (await listEntries(dir, first, kept)).files.map(async (path): Promise<WorkspaceFile | null> => {
       const full = join(dir, ...path.split('/'))
       const size = await stat(full).then(
         (info) => info.size,
