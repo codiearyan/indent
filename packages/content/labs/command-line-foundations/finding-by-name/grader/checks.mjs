@@ -79,7 +79,7 @@ function judge(t, name, file, wanted, explain) {
     explain({ extra, missing, rels, ws }) ??
       (extra.length
         ? `${file} lists ${extra[0]}, which the task does not ask for.`
-        : `${plural(missing.length, 'path')} ${missing.length === 1 ? 'is' : 'are'} missing from ${file}, such as ${missing[0].rel}.`)
+        : `${plural(missing.length, 'path')} ${missing.length === 1 ? 'is' : 'are'} missing from ${file}.`)
   )
 }
 
@@ -98,7 +98,7 @@ export const checks = {
           return `Every line is a file called ${n}, like the ${n} in the top folder. The shell put that name in place of the pattern before the search started.`
         }
         if (extra.length) return `${extra[0]} is not a .svg file.`
-        return `${plural(missing.length, 'drawing')} ${missing.length === 1 ? 'is' : 'are'} missing from drawings.txt, such as ${missing[0].rel}. Some are several folders deep.`
+        return `${plural(missing.length, 'drawing')} ${missing.length === 1 ? 'is' : 'are'} missing from drawings.txt. Some are several folders deep.`
       }
     )
   },
@@ -113,7 +113,7 @@ export const checks = {
       (e) => has(e.rel),
       ({ extra, missing }) => {
         if (extra.length) return `${base(extra[0])} does not have invoice in its name.`
-        const n = `${plural(missing.length, 'file')} ${missing.length === 1 ? 'is' : 'are'} missing, such as ${missing[0].rel}`
+        const n = `${plural(missing.length, 'file')} ${missing.length === 1 ? 'is' : 'are'} missing`
         if (missing.every((e) => !base(e.rel).includes('invoice'))) {
           return `${n}. ${missing.length === 1 ? 'Its name writes' : 'Their names write'} invoice with capitals.`
         }

@@ -43,7 +43,7 @@ function diffMessage(file, got, want, what) {
   if (extra.length && want.includes(extra[0]))
     return `${quoted(extra[0])} is in ${file} more than once.`
   if (extra.length) return `${file} has ${quoted(extra[0])}, which is not ${what}.`
-  return `${file} is missing ${plural(missing.length, 'line')}, such as ${quoted(missing[0])}.`
+  return `${file} is missing ${plural(missing.length, 'line')}.`
 }
 
 export const checks = {
@@ -181,7 +181,7 @@ export const checks = {
     }
     if (missing.length)
       return fail(
-        `${plural(missing.length, "of today's finished jobs")} ${missing.length === 1 ? 'is' : 'are'} missing, such as ${quoted(missing[0])}.`
+        `${missing.length} of today's finished jobs ${missing.length === 1 ? 'is' : 'are'} missing.`
       )
     return fail("Today's finished jobs are there, but not in the order of the log.")
   },

@@ -29,7 +29,7 @@ function differs(file, got, want) {
     return `${file} has ${plural(extra.length, 'line')} the search should not find, such as ${quoted(extra[0])}.`
   }
   if (missing.length)
-    return `${plural(missing.length, 'line')} ${are(missing.length)} missing from ${file}, such as ${quoted(missing[0])}.`
+    return `${plural(missing.length, 'line')} ${are(missing.length)} missing from ${file}.`
   return null
 }
 
@@ -86,7 +86,7 @@ export const checks = {
       want.filter((l) => l.includes('jam'))
     )
     if (!message && !small.missing.length && !small.extra.length) {
-      message = `${plural(missing.length, 'line')} ${are(missing.length)} missing, such as ${quoted(missing[0])}. ${missing.length === 1 ? 'It writes' : 'They write'} jam with capitals.`
+      message = `${plural(missing.length, 'line')} ${are(missing.length)} missing. ${missing.length === 1 ? 'It writes' : 'They write'} jam with capitals.`
     }
     return [check(name, false, (message ?? wrong) + changedNote(t, LOG), output)]
   },
@@ -190,7 +190,7 @@ export const checks = {
     } else if (searched.length < folders.length) {
       message = `Nothing from messages/${folders.filter((f) => !searched.includes(f)).join(' or messages/')} is there. The search has to go into every folder inside messages.`
     } else {
-      message = `${plural(missing.length, 'line')} ${are(missing.length)} missing, such as ${quoted(missing[0])}.`
+      message = `${plural(missing.length, 'line')} ${are(missing.length)} missing.`
     }
     const changed = filesUnder(dir, 'messages').filter((rel) => changedNote(t, rel))
     return fail(message + (changed.length ? changedNote(t, changed[0]) : ''))

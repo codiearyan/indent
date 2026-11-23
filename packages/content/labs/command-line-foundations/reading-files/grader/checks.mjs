@@ -24,7 +24,7 @@ function diffMessage(file, got, want, from) {
     return `${file} has ${plural(extra.length, 'line')} more than once, such as ${quoted(extra[0])}. Each line of ${from} goes in once.`
   if (extra.length)
     return `${file} has ${plural(extra.length, 'line')} that ${extra.length > 1 ? 'are' : 'is'} not in ${from}, such as ${quoted(extra[0])}.`
-  return `${file} is missing ${plural(missing.length, 'line')} of ${from}, such as ${quoted(missing[0])}.`
+  return `${file} is missing ${plural(missing.length, 'line')} of ${from}.`
 }
 
 export const checks = {
