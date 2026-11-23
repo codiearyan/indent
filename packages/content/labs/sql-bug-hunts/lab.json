@@ -1,0 +1,13 @@
+{
+  "id": "sql-bug-hunts",
+  "title": "SQL bug hunts",
+  "description": "Mallowfield Seeds posts packets of seed from a shed and sells them at a Saturday market stall, and it runs on a handful of SQL reports that nobody has questioned until the numbers stopped matching what the team counts by hand. You work through five tickets, each a report that runs without an error and is quietly wrong: prove it with the rows that break it, fix the query at the cause, then find the same trap in a second report before anyone notices. You learn to spot a join that multiplies, the NULL that makes rows vanish, a LEFT JOIN that is no longer one, sums and averages that lie, and dates and ties that shift under a report.",
+  "category": "Interview bug cases",
+  "language": "sql",
+  "tags": ["SQL", "Debugging"],
+  "kind": "bug-hunt",
+  "parts": [
+    { "title": "Rows counted twice or lost", "chapters": ["statements-too-high", "empty-win-back-list", "missing-from-round-up"] },
+    { "title": "Numbers that drift", "chapters": ["averages-dont-add-up", "november-comes-up-short"] }
+  ]
+}

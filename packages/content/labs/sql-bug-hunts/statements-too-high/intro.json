@@ -1,0 +1,43 @@
+{
+  "stations": [
+    {
+      "title": "Perpetua",
+      "say": "Rosalind's statement is too high.",
+      "note": "She rang this morning. MF-14."
+    },
+    {
+      "title": "The bank",
+      "text": "One order in September, one card payment.",
+      "note": "What Rosalind really paid."
+    },
+    {
+      "title": "Your query",
+      "file": "2-statements.sql",
+      "mine": true,
+      "gap": "Adds the same payment again",
+      "tasks": [
+        "Show the repeats",
+        "Fix the statements",
+        "Fix the stock check"
+      ]
+    },
+    {
+      "title": "Statement",
+      "text": "Packets and payments, per customer.",
+      "note": "Posted with every order."
+    }
+  ],
+  "ticket": {
+    "label": "Rosalind",
+    "wrong": "too high",
+    "why": "Repeats",
+    "right": "as banked"
+  },
+  "captions": [
+    "At Mallowfield Seeds, Rosalind rings Perpetua: her statement shows more than she paid.",
+    "The bank has one payment, but the statement adds it once for every line of her order.",
+    "You show the orders counted twice, then fix the statements and the stock check.",
+    "Now Rosalind's statement shows the one payment she made, and every packet once.",
+    "Same orders, same payments. Every total counts each thing once."
+  ]
+}

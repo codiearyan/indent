@@ -1,0 +1,86 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "tills", "label": "Website, phone and cash book", "kind": "story" },
+      { "id": "payments", "label": "payments", "kind": "data" },
+      { "id": "lines", "label": "order_lines", "kind": "data" },
+      { "id": "queries", "label": "Your queries", "kind": "file", "mine": true },
+      { "id": "outside", "label": "Clemency and the website", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "tills", "to": "payments", "label": "paid_at as text" },
+      { "from": "payments", "to": "queries", "label": "rows" },
+      { "from": "lines", "to": "queries", "label": "packets" },
+      { "from": "queries", "to": "outside", "label": "takings, top three" }
+    ],
+    "note": "Times written three ways and rows that tie decide what lands at the edge of a report."
+  },
+  "tasks": {
+    "prove-it": {
+      "steps": [
+        {
+          "active": ["tills", "tills->payments", "payments"],
+          "note": "Each payment arrives with its paid_at written the way its till writes it."
+        },
+        {
+          "active": ["payments", "payments->queries", "queries"],
+          "note": "The report keeps the payments between its two limits, compared letter by letter."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["id", "paid_at", "amount_pence"],
+            "cells": [["a payment", "when, as written", "pence"]]
+          },
+          "note": "The November payments past the report's limit are the proof Clemency needs."
+        }
+      ]
+    },
+    "fix-takings": {
+      "steps": [
+        {
+          "active": ["payments", "payments->queries", "queries"],
+          "note": "Every November payment is kept, however its paid_at is written, and nothing from October or December."
+        },
+        {
+          "active": ["queries"],
+          "note": "The payments are counted and added up for each method."
+        },
+        {
+          "active": ["queries", "queries->outside", "outside"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["method", "payments", "takings_pence"],
+            "cells": [["a method", "a count", "a total in pence"]]
+          },
+          "note": "The card takings match what the card company paid, to the penny."
+        }
+      ]
+    },
+    "seeds-of-the-year": {
+      "steps": [
+        {
+          "active": ["lines", "lines->queries", "queries"],
+          "note": "This year's packets are added up for each seed."
+        },
+        {
+          "active": ["queries"],
+          "note": "The seeds are sorted by packets, and a tie is broken the way the task says."
+        },
+        {
+          "active": ["queries", "queries->outside", "outside"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["product", "packets"],
+            "cells": [["a seed's name", "a count"]]
+          },
+          "note": "Every visitor sees the same three seeds."
+        }
+      ]
+    }
+  }
+}
