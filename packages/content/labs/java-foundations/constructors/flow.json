@@ -1,0 +1,69 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "new", "label": "new Booking", "kind": "function" },
+      { "id": "ctor", "label": "Booking()", "kind": "function", "mine": true },
+      { "id": "booking", "label": "A booking", "kind": "data" },
+      { "id": "move", "label": "moveTo()", "kind": "function", "mine": true }
+    ],
+    "edges": [
+      { "from": "bridie", "to": "new", "label": "passenger, seats, hour" },
+      { "from": "new", "to": "ctor", "label": "values" },
+      { "from": "ctor", "to": "booking", "label": "every field" },
+      { "from": "move", "to": "booking", "label": "new hour" }
+    ],
+    "note": "A booking is made whole by its constructor, so none goes out with its seats or hour missing."
+  },
+  "tasks": {
+    "constructor": {
+      "steps": [
+        {
+          "active": ["bridie", "bridie->new", "new"],
+          "note": "Bridie takes a booking: who, how many seats, and which crossing."
+        },
+        {
+          "active": ["new", "new->ctor", "ctor"],
+          "note": "new hands the three values to the constructor, which runs before anyone sees the booking."
+        },
+        {
+          "active": ["ctor", "ctor->booking", "booking"],
+          "value": { "kind": "map", "label": "a booking", "entries": [{ "key": "passenger", "value": "text" }, { "key": "seats", "value": "whole number" }, { "key": "hour", "value": "whole number" }] },
+          "note": "Each field gets the value of the parameter with its name, and each booking keeps its own."
+        }
+      ]
+    },
+    "one-seat": {
+      "steps": [
+        {
+          "active": ["bridie", "bridie->new", "new"],
+          "note": "Most people book a single seat, so Bridie gives only a name and a crossing."
+        },
+        {
+          "active": ["new", "new->ctor", "ctor"],
+          "note": "new picks the constructor whose parameters fit the two values."
+        },
+        {
+          "active": ["ctor", "ctor->booking", "booking"],
+          "note": "The booking still gets every field, the seat count included, set on purpose."
+        }
+      ]
+    },
+    "moves": {
+      "steps": [
+        {
+          "active": ["booking"],
+          "note": "A new booking has never been moved. Nobody sets that count: Java starts it for you."
+        },
+        {
+          "active": ["move", "move->booking", "booking"],
+          "note": "Someone changes their crossing. The booking takes the new hour and counts one more move."
+        },
+        {
+          "active": ["booking"],
+          "note": "Each booking counts only its own moves."
+        }
+      ]
+    }
+  }
+}

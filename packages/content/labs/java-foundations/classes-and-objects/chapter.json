@@ -1,0 +1,105 @@
+{
+  "id": "classes-and-objects",
+  "title": "Classes and objects: a second boat",
+  "files": ["Fleet.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the fleet here, and try your classes from main.",
+    "suggestedCommand": "java Fleet.java"
+  },
+  "tasks": [
+    {
+      "id": "boat",
+      "title": "Write the Boat class",
+      "file": "Fleet.java",
+      "description": "Under `// Task 1` in `Fleet.java`, below the class with `main`, write a class called `Boat` with three fields: a `String` called `name`, an `int` called `seats` and an `int` called `aboard`, the people on board now. Give it a method `int seatsFree()` that gives back how many seats are free on this boat.\n\nCheck makes boats of its own with `new Boat()`, gives their fields values of its own, two boats at once included, and reads what `seatsFree()` gives back for each and what each boat's fields hold afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson about a class and its fields: a field is made like a variable, inside the class and outside any method.",
+        "Write the class's first line and its braces under the `// Task 1` comment, then the three fields.",
+        "Write `seatsFree` inside the class, without `static`, and work it out from the fields.",
+        "Take the `//` off the boat lines in `main` and run the file: the two boats should differ."
+      ],
+      "hints": [
+        "The class goes below the closing brace of `Fleet`, not inside it. Its fields have a type and a name, and no value.",
+        "Inside `seatsFree`, `seats` and `aboard` mean the fields of the boat it was called on, so `linnet.seatsFree()` reads the Linnet's. A field with `static` in front would be one field for every boat.",
+        "The shape: `class Boat {`, then `String name;`, `int seats;`, `int aboard;`, then `int seatsFree() { return seats - aboard; }` and the closing brace."
+      ],
+      "docs": [
+        {
+          "title": "Classes",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/classes.html"
+        },
+        {
+          "title": "Creating objects",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/objectcreation.html"
+        },
+        {
+          "title": "Using objects",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/usingobject.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Making and using objects of a class",
+          "url": "https://www.youtube.com/watch?v=8CMHkQjUNIk"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ticket",
+      "title": "Write the Ticket class, with a copy for the next passenger",
+      "file": "Fleet.java",
+      "description": "Under `// Task 2`, write a class called `Ticket` with two fields, a `String` called `passenger` and an `int` called `pence`, and a method `Ticket copyFor(String who)`. It gives back a new ticket for `who` at the same fare, and leaves this ticket as it was.\n\nCheck makes tickets of its own, calls `copyFor`, reads the fields of both tickets, changes the copy, and reads the first ticket again.",
+      "nextSteps": [
+        "Read the part of the lesson about two names for one object.",
+        "Write the class and its two fields.",
+        "In `copyFor`, make a new ticket and give each of its fields a value.",
+        "In `main`, print both tickets' passengers: they should differ."
+      ],
+      "hints": [
+        "`Ticket other = this;` or giving back this ticket does not make a ticket: both names point at the one object. Only `new` makes a second one.",
+        "Make the new ticket with `new Ticket()`, then set its `passenger` to `who` and its `pence` to this ticket's `pence`.",
+        "Inside: `Ticket copy = new Ticket();`, then `copy.passenger = who;` and `copy.pence = pence;`, then `return copy;`."
+      ],
+      "docs": [
+        {
+          "title": "Creating objects",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/objectcreation.html"
+        },
+        {
+          "title": "Returning a value from a method",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/returnvalue.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "crossing",
+      "title": "Write the Crossing class, which may have no boat yet",
+      "file": "Fleet.java",
+      "description": "Under `// Task 3`, write a class called `Crossing` with two fields, an `int` called `hour` and a `Boat` called `boat`, and a method `String boatName()`. It gives back the name of the crossing's boat, or `No boat` when the crossing has not been given a boat. It builds on Task 1.\n\nCheck makes crossings of its own, some with a boat and one without, renames a boat after giving it to a crossing, and reads what `boatName()` gives back.",
+      "nextSteps": [
+        "Read the part of the lesson about `null` and the exception it brings.",
+        "Write the class and its two fields; `Boat` is a type like `String`.",
+        "In `boatName`, handle a crossing without a boat first, before anything reads the boat.",
+        "Take the `//` off the crossing lines in `main` and run the file."
+      ],
+      "hints": [
+        "A field of a class type that nobody set holds `null`: no boat at all. Reading `boat.name` then stops the program with a `NullPointerException`.",
+        "Ask whether the field is `null` with `==` before you read anything through it.",
+        "The shape: `if (boat == null) { return \"No boat\"; }`, then `return boat.name;`."
+      ],
+      "docs": [
+        {
+          "title": "NullPointerException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/NullPointerException.html"
+        },
+        {
+          "title": "Using objects: fields of other objects",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/usingobject.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
