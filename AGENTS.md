@@ -314,7 +314,9 @@ declared, not where a box ended up. Options: `t.page(file, { dir, fetch, storage
 
 Node comes from the learner's PATH. When it is missing or older than 22.18, Settings (Tools) can
 download a copy into `<userData>/tools/node`; `labEnv()` puts that copy first on the PATH, so the
-checks, the terminal and the runtime install all use it. `services/tools.ts` owns this. A missing
+checks, the terminal and the runtime install all use it. Java works the same way where the system
+has no installer the app can run (always on a Mac): a kit goes into `<userData>/tools/java`.
+`services/tools.ts` owns this. A missing
 tool shows as a banner across the top of the issue (`features/workspace/ToolNotice`) with the action
 that gets it; a repo that needs more than Node lists it in `lab.json` (`"tools": ["node", "git"]`).
 

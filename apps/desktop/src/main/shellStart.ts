@@ -10,19 +10,21 @@ const zshStep = (file: string): string =>
   `ZDOTDIR="$INDENT_USER_ZDOTDIR"\n[[ -f "$ZDOTDIR/${file}" ]] && source "$ZDOTDIR/${file}"\n` +
   'INDENT_USER_ZDOTDIR="$ZDOTDIR"\n'
 
-const PREPEND = 'export PATH="$INDENT_NODE_DIR:$PATH"\n'
+const PREPEND = 'export PATH="$INDENT_FIRST_DIRS:$PATH"\n'
 
 /**
- * How to start the learner's login shell so `nodeDir` is first on its PATH. A login shell
- * rebuilds the PATH from its startup files (macOS's path_helper, nvm), so it is put first again
- * after the learner's own files ran: zsh through a ZDOTDIR of wrappers, bash through an rc file.
+ * How to start the learner's login shell so `first` (the app's own Node and Java) leads its PATH.
+ * A login shell rebuilds the PATH from its startup files (macOS's path_helper, nvm), so they are
+ * put first again after the learner's own files ran: zsh through a ZDOTDIR of wrappers, bash
+ * through an rc file.
  */
 export function shellLaunch(
   shell: string,
-  nodeDir: string | null,
+  first: string[],
   env: Record<string, string>
 ): { args: string[]; env: Record<string, string> } {
-  if (!nodeDir) return { args: ['-l'], env }
+  if (first.length === 0) return { args: ['-l'], env }
+  const dirs = first.join(':')
   const dir = dataFile('shell')
   mkdirSync(dir, { recursive: true })
   const name = basename(shell)
@@ -39,7 +41,7 @@ export function shellLaunch(
         ZDOTDIR: dir,
         INDENT_ZDOTDIR: dir,
         INDENT_USER_ZDOTDIR: env.ZDOTDIR || env.HOME || '',
-        INDENT_NODE_DIR: nodeDir
+        INDENT_FIRST_DIRS: dirs
       }
     }
   }
@@ -51,7 +53,7 @@ export function shellLaunch(
         'for f in ~/.bash_profile ~/.bash_login ~/.profile; do [ -f "$f" ] && { . "$f"; break; }; done\n' +
         PREPEND
     )
-    return { args: ['--rcfile', rc, '-i'], env: { ...env, INDENT_NODE_DIR: nodeDir } }
+    return { args: ['--rcfile', rc, '-i'], env: { ...env, INDENT_FIRST_DIRS: dirs } }
   }
   // shortcut: other shells (fish) keep the PATH order their startup gives; hook them in if needed.
   return { args: ['-l'], env }

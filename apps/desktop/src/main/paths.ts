@@ -119,6 +119,15 @@ export function ownNodeBin(): string {
   return process.platform === 'win32' ? ownNodeDir() : join(ownNodeDir(), 'bin')
 }
 
+/** Where the app's own Java kit goes, and the folder inside it that holds `java` and `javac`. */
+export function ownJavaDir(): string {
+  return join(toolsDir(), 'java')
+}
+
+export function ownJavaBin(): string {
+  return join(ownJavaDir(), process.platform === 'darwin' ? 'Contents/Home/bin' : 'bin')
+}
+
 /** On Windows, the folder of the `python3` the app adds when Python has only `python`. */
 export function python3ShimDir(): string {
   return join(toolsDir(), 'python3')

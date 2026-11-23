@@ -1,7 +1,7 @@
 import { app } from 'electron'
 import { createHash } from 'crypto'
 import { createWriteStream, existsSync } from 'fs'
-import { mkdir, rename, rm, writeFile } from 'fs/promises'
+import { mkdir, readdir, rename, rm, writeFile } from 'fs/promises'
 import { delimiter, join } from 'path'
 import { Readable } from 'stream'
 import { pipeline } from 'stream/promises'
@@ -10,11 +10,12 @@ import type { NodeOption, ToolId, ToolInstallResult, ToolStatus } from '@shared/
 import { EVENTS } from '@shared/types'
 import { emit, handle } from '../ipc'
 import { labEnv, pickedNode, pickNode, refreshShellPath, shellEnv } from '../labEnv'
-import { ownNodeBin, ownNodeDir, python3ShimDir, toolsDir } from '../paths'
+import { ownJavaBin, ownJavaDir, ownNodeBin, ownNodeDir, python3ShimDir, toolsDir } from '../paths'
 import { which } from './ai/cli'
 import { ensureRuntime } from './checks'
 import { labModelStatus, restartLabModel, startLabModelIfNodeWasMissing } from './labModel'
 import { nodeSupported } from './grader'
+import { javaListUrl, pickJavaArchive } from './javaArchive'
 import { pickNodeArchive } from './nodeArchive'
 import { byVersion, findNodeBins, nodeSource } from './nodeOptions'
 import {
@@ -147,6 +148,9 @@ const PAGES: Record<SystemTool, string> = {
   cpp: 'https://isocpp.org/get-started'
 }
 
+/** Where the system has no installer for Java, the app downloads a kit of its own. */
+const javaList = (): string | null => javaListUrl(process.platform, process.arch)
+
 async function installer(id: SystemTool, path: string): Promise<Installer | null> {
   const bins = ['winget', 'pkexec', ...LINUX_MANAGERS.map(([name]) => name)]
   const found = await Promise.all(bins.map(async (bin) => ((await which(bin, path)) ? bin : '')))
@@ -178,7 +182,8 @@ async function status(): Promise<ToolStatus[]> {
     version,
     ok,
     note,
-    installable: !ok && !!(await installer(id, env.PATH ?? '')),
+    installable:
+      !ok && (!!(await installer(id, env.PATH ?? '')) || (id === 'java' && !!javaList())),
     url: PAGES[id]
   })
   const pyOk = !!py && pythonSupported(py)
@@ -193,7 +198,9 @@ async function status(): Promise<ToolStatus[]> {
       javaOk,
       java
         ? `${javaUse} Java ${java} is here, but not javac, the compiler that comes with a JDK.`
-        : toolNote(javaUse, javac, javaOk, '17')
+        : javaOk && existsSync(ownJavaBin())
+          ? `${javaUse} This copy belongs to the app.`
+          : toolNote(javaUse, javac, javaOk, '17')
     ),
     system('cpp', cpp, !!cpp, toolNote('Builds the C++ repos.', cpp, !!cpp))
   ])
@@ -212,31 +219,43 @@ async function status(): Promise<ToolStatus[]> {
   ]
 }
 
-let abort: AbortController | undefined
+const aborts = new Set<AbortController>()
 const CANCELLED = 'The download was cancelled.'
 
-async function download(url: string, signal: AbortSignal): Promise<Response> {
+async function download(url: string, signal: AbortSignal, label: string): Promise<Response> {
   const response = await fetch(url, { signal }).catch(() => null)
   if (signal.aborted) throw new Error(CANCELLED)
   if (!response?.ok) {
-    throw new Error('Could not download Node.js. Check your internet connection and try again.')
+    throw new Error(`Could not download ${label}. Check your internet connection and try again.`)
   }
   return response
 }
 
-async function downloadNode(): Promise<ToolStatus[]> {
-  abort = new AbortController()
-  const { signal } = abort
-  const checksums = await (await download(`${NODE_DIST}/SHASUMS256.txt`, signal)).text()
-  const archive = pickNodeArchive(checksums, process.platform, process.arch)
-  if (!archive) throw new Error('There is no Node.js download for this kind of computer.')
+interface Archive {
+  url: string
+  sha256: string
+  zip: boolean
+}
 
-  const work = join(toolsDir(), '.download')
-  await rm(work, { recursive: true, force: true })
-  await mkdir(work, { recursive: true })
+/** Downloads a tool's archive, checks it, and puts the one folder it holds at `dest`. */
+async function installArchive(
+  id: 'node' | 'java',
+  find: (signal: AbortSignal) => Promise<Archive | null>,
+  dest: string
+): Promise<ToolStatus[]> {
+  const label = id === 'node' ? 'Node.js' : LABELS[id]
+  const abort = new AbortController()
+  aborts.add(abort)
+  const { signal } = abort
+  const work = join(toolsDir(), `.download-${id}`)
   try {
-    const file = join(work, archive.name)
-    const response = await download(`${NODE_DIST}/${archive.name}`, signal)
+    const archive = await find(signal)
+    if (!archive) throw new Error(`There is no ${label} download for this kind of computer.`)
+    const out = join(work, 'out')
+    await rm(work, { recursive: true, force: true })
+    await mkdir(out, { recursive: true })
+    const file = join(work, archive.zip ? 'archive.zip' : 'archive.tar.gz')
+    const response = await download(archive.url, signal, label)
     const total = Number(response.headers.get('content-length')) || 0
     const hash = createHash('sha256')
     let received = 0
@@ -248,7 +267,7 @@ async function downloadNode(): Promise<ToolStatus[]> {
           hash.update(chunk)
           received += chunk.length
           const percent = total ? Math.floor((received / total) * 100) : 0
-          if (percent !== shown) emit(EVENTS.toolInstall, 'node', (shown = percent) / 100)
+          if (percent !== shown) emit(EVENTS.toolInstall, id, (shown = percent) / 100)
           yield chunk
         }
       },
@@ -258,19 +277,36 @@ async function downloadNode(): Promise<ToolStatus[]> {
       throw signal.aborted ? new Error(CANCELLED) : error
     })
     if (hash.digest('hex') !== archive.sha256) {
-      throw new Error('The Node.js download was damaged on the way. Try again.')
+      throw new Error(`The ${label} download was damaged on the way. Try again.`)
     }
-    await run('tar', ['-xf', file, '-C', work], { timeout: 120_000 })
-    await rm(ownNodeDir(), { recursive: true, force: true })
-    await rename(join(work, archive.name.replace(/\.(tar\.gz|zip)$/, '')), ownNodeDir())
+    await run('tar', ['-xf', file, '-C', out], { timeout: 120_000 })
+    const folder = (await readdir(out, { withFileTypes: true })).find((entry) =>
+      entry.isDirectory()
+    )
+    if (!folder) throw new Error(`The ${label} download was damaged on the way. Try again.`)
+    await rm(dest, { recursive: true, force: true })
+    await rename(join(out, folder.name), dest)
   } finally {
+    aborts.delete(abort)
     await rm(work, { recursive: true, force: true })
   }
   return status()
 }
 
+async function nodeArchive(signal: AbortSignal): Promise<Archive | null> {
+  const checksums = await (await download(`${NODE_DIST}/SHASUMS256.txt`, signal, 'Node.js')).text()
+  const archive = pickNodeArchive(checksums, process.platform, process.arch)
+  return (
+    archive && {
+      url: `${NODE_DIST}/${archive.name}`,
+      sha256: archive.sha256,
+      zip: archive.name.endsWith('.zip')
+    }
+  )
+}
+
 async function installNode(): Promise<ToolInstallResult> {
-  const tools = await downloadNode()
+  const tools = await installArchive('node', nodeArchive, ownNodeDir())
   void ensureRuntime()
   return { tools }
 }
@@ -308,6 +344,12 @@ async function choose(bin: string | null): Promise<ToolStatus[]> {
 async function installSystemTool(id: SystemTool): Promise<ToolInstallResult> {
   const env = await labEnv()
   const command = await installer(id, env.PATH ?? '')
+  const list = id === 'java' && !command ? javaList() : null
+  if (list) {
+    const find = async (signal: AbortSignal): Promise<Archive | null> =>
+      pickJavaArchive(await (await download(list, signal, 'Java')).json().catch(() => null))
+    return { tools: await installArchive('java', find, ownJavaDir()) }
+  }
   if (!command) return { tools: await status(), url: PAGES[id] }
   if (process.platform === 'darwin') {
     try {
@@ -352,7 +394,7 @@ export function register(): void {
   handle('tools', {
     status,
     install,
-    cancelInstall: async () => abort?.abort(),
+    cancelInstall: async () => aborts.forEach((abort) => abort.abort()),
     nodeOptions,
     pickNode: choose,
     labModel: async () => labModelStatus(),
