@@ -22,6 +22,8 @@ import { askAboutOutput } from '@/features/ai/tutorActions'
 import { usePane } from '@/features/workspace/activePane'
 
 const REFRESH_QUIET_MS = 500
+// Fitting reflows every line, so dragging a panel fits a few times a second, not every frame.
+const FIT_EVERY_MS = 50
 // The terminal drops input that arrives with Ctrl+C, so the command waits for the shell.
 const AFTER_INTERRUPT_MS = 150
 
@@ -133,6 +135,7 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
       term.write(data)
       if (!awaitingRefresh) return
       clearTimeout(refreshTimer)
+      clearTimeout(fitTimer)
       refreshTimer = setTimeout(() => {
         awaitingRefresh = false
         void useWorkspace.getState().refresh()
@@ -152,8 +155,12 @@ function TerminalSession({ chapter }: { chapter: Chapter | null }): React.JSX.El
     const resize = term.onResize(({ cols, rows }) => {
       if (current.id) api.terminal.resize(current.id, cols, rows)
     })
+    let fitTimer: ReturnType<typeof setTimeout> | undefined
     const observer = new ResizeObserver(() => {
-      if (container.clientHeight > 0) fit.fit()
+      fitTimer ??= setTimeout(() => {
+        fitTimer = undefined
+        if (container.clientHeight > 0) fit.fit()
+      }, FIT_EVERY_MS)
     })
     observer.observe(container)
 

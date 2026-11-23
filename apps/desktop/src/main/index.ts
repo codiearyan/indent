@@ -64,6 +64,11 @@ function createWindow(route?: string): void {
   saveBeforeClose(mainWindow)
   // A page's window belongs to an issue open in this window.
   mainWindow.on('closed', preview.closeAll)
+  // The shells belong to the page's terminals. On macOS the app outlives its window, and a reload
+  // or a crash starts a page with none, so they would run on with nobody to see them.
+  mainWindow.on('closed', terminal.killAll)
+  mainWindow.webContents.on('did-navigate', terminal.killAll)
+  mainWindow.webContents.on('render-process-gone', terminal.killAll)
 
   // Full screen hides the traffic lights, so the page gives the room it kept for them back.
   const syncFullScreen = (): void => {
