@@ -1,0 +1,131 @@
+{
+  "id": "owning-a-collection",
+  "title": "A class that owns its repairs",
+  "files": [
+    "src/bench.h",
+    "src/bench.cpp",
+    "src/main.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build main.cpp and bench.cpp into one program here and run it.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/main.cpp src/bench.cpp -o bench && ./bench"
+  },
+  "tasks": [
+    {
+      "id": "repairs",
+      "title": "Give the bench its repairs",
+      "file": "src/bench.h",
+      "description": "Inside `class Bench` in `src/bench.h`, under `// Task 1`, write:\n\n- under `private:`, a `std::vector<Repair>` called `repairs`\n- under `public:`, the first line of `add`, which takes a repair as a reference to a `const Repair` and gives back a `bool`, and of `all`, a `const` member function that takes nothing and gives back the repairs as a `std::vector<Repair>`\n\nUnder `// Task 1` in `src/bench.cpp`, write their bodies, each with `Bench::` in front of its name. `add` puts a copy of the repair on the bench and gives back `true`, unless a repair with the same ticket is on it already: then it changes nothing and gives back `false`. `all` gives back a copy of the repairs, in the order they were added.\n\nCheck builds a program of its own with your two files. It adds repairs of its own, some with a ticket already on the bench, reads them back with `all` through a `const Bench&`, makes two benches and a copy of one, and empties the vector `all` gives back to see that the bench keeps its repairs. It also compiles a line of its own outside the class that reaches `repairs`, which must be refused.",
+      "nextSteps": [
+        "In `bench.h`, write the vector under `private:` and the two first lines under `public:`.",
+        "In `bench.cpp`, write `add`: look through the repairs for the same ticket before you add.",
+        "Write `all`, which gives back the vector: a copy goes back to the caller.",
+        "In `main`, make a `Bench`, add the two repairs and print how many `all` gives back."
+      ],
+      "hints": [
+        "The bench owns its vector: no code outside the class can reach it, so every change goes through the bench's own functions, which keep its rules.",
+        "A function that gives back `std::vector<Repair>` gives back a copy of the member, so whatever the caller does to it, the bench's own vector stays as it was.",
+        "The shape is `for (const Repair& held : repairs) { if (held.getTicket() == repair.getTicket()) { return false; } } repairs.push_back(repair); return true;` and `std::vector<Repair> Bench::all() const { return repairs; }`."
+      ],
+      "docs": [
+        {
+          "title": "std::vector::push_back",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/push_back"
+        },
+        {
+          "title": "Copy constructors",
+          "url": "https://en.cppreference.com/w/cpp/language/copy_constructor"
+        },
+        {
+          "title": "Access specifiers",
+          "url": "https://en.cppreference.com/w/cpp/language/access"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "find",
+      "title": "Find a repair by its ticket",
+      "file": "src/bench.h",
+      "description": "Under `// Task 2` in `src/bench.h`, inside the class and under `public:`, write the first line of `find`, a `const` member function that takes a ticket as an `int` and gives back a `Repair`. Under `// Task 2` in `src/bench.cpp`, write its body: it gives back a copy of the repair with that ticket, or, when no repair on the bench has it, a `Repair` made with no values.\n\nCheck fills benches of its own, calls `find` through a `const Bench&` with tickets of its own, some on the bench and one that is not, and changes the repair `find` gives back to see that the bench's own repair stays as it was. Check builds this task with a `repairs`, an `add` and an `all` of its own, written as Task 1 asks, so it is judged on its own.",
+      "nextSteps": [
+        "Write the first line in `bench.h`, with `const` at the end.",
+        "In `bench.cpp`, look at every repair on the bench, and give back the one with the ticket.",
+        "After the loop, when none had it, give back `Repair()`.",
+        "In `main`, find a ticket and print its item, then a ticket that is not on the bench."
+      ],
+      "hints": [
+        "`find` only reads the bench, so it is `const`. Giving back a `Repair` gives back a copy: the caller can change it without touching the bench.",
+        "A repair that does not match only means it is not that one. Only after every repair was looked at is it certain that none has the ticket.",
+        "The shape is `for (const Repair& held : repairs) { if (held.getTicket() == ticket) { return held; } } return Repair();`."
+      ],
+      "docs": [
+        {
+          "title": "Range-based for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/range-for"
+        },
+        {
+          "title": "Default constructors",
+          "url": "https://en.cppreference.com/w/cpp/language/default_constructor"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "total",
+      "title": "Total the bench's minutes",
+      "file": "src/bench.h",
+      "description": "Under `// Task 3` in `src/bench.h`, inside the class and under `public:`, write the first line of `totalMinutes`, a `const` member function that takes nothing and gives back an `int`. Under `// Task 3` in `src/bench.cpp`, write its body: the minutes of every repair on the bench, added up, worked out from the repairs each time it is called.\n\nCheck calls `totalMinutes` through a `const Bench&` on an empty bench, and on benches of its own as it adds repairs with minutes of its own. Check builds this task with a `repairs`, an `add` and an `all` of its own, written as Task 1 asks, so it is judged on its own.",
+      "nextSteps": [
+        "Write the first line in `bench.h`, with `const` at the end.",
+        "In `bench.cpp`, start a total at 0.",
+        "Add each repair's minutes to it, through `getMinutes`.",
+        "Give the total back, and print it from `main` before and after you add a repair."
+      ],
+      "hints": [
+        "The bench already holds everything the total needs. A total kept in a member of its own has to be changed by every function that changes the repairs, and goes wrong the day one forgets.",
+        "Each repair's minutes are added to the total, not put in its place.",
+        "The shape is `int total = 0; for (const Repair& held : repairs) { total += held.getMinutes(); } return total;`."
+      ],
+      "docs": [
+        {
+          "title": "Non-static member functions (const)",
+          "url": "https://en.cppreference.com/w/cpp/language/member_functions"
+        },
+        {
+          "title": "Range-based for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/range-for"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "remove",
+      "title": "Take a repair off the bench",
+      "file": "src/bench.h",
+      "description": "Under `// Task 4` in `src/bench.h`, inside the class and under `public:`, write the first line of `remove`, which takes a ticket as an `int` and gives back a `bool`. Under `// Task 4` in `src/bench.cpp`, write its body: it takes the repair with that ticket off the bench, keeps the others in their order and gives back `true`. When no repair has that ticket, it changes nothing and gives back `false`.\n\nCheck fills benches of its own, removes the first, a middle and the last repair, a ticket that is not there, and one from an empty bench, and reads what is left with `all`. Check builds this task with the library's guard, which stops a program that reads a vector past its end, and with a `repairs`, an `add` and an `all` of its own, written as Task 1 asks, so it is judged on its own.",
+      "nextSteps": [
+        "Write the first line in `bench.h`. It changes the bench, so no `const`.",
+        "In `bench.cpp`, find the position of the repair with that ticket, with a counted loop.",
+        "Take it out with `erase`, at that position, and give back `true`.",
+        "After the loop, give back `false`. Try it from `main` and print what `all` holds."
+      ],
+      "hints": [
+        "`erase` takes a position counted from `begin()`: `repairs.begin() + i` is position `i`. The repairs after it move up one place, so the others keep their order.",
+        "Once the repair is gone, the work is done: give back `true` right there, before the loop goes on to a position that has moved.",
+        "The shape is `for (std::size_t i = 0; i < repairs.size(); i++) { if (repairs[i].getTicket() == ticket) { repairs.erase(repairs.begin() + i); return true; } } return false;`."
+      ],
+      "docs": [
+        {
+          "title": "std::vector::erase",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/erase"
+        },
+        {
+          "title": "Non-static member functions",
+          "url": "https://en.cppreference.com/w/cpp/language/member_functions"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

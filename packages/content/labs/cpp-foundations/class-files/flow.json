@@ -1,0 +1,168 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "ambrose",
+        "label": "Ambrose's prices",
+        "kind": "story"
+      },
+      {
+        "id": "header",
+        "label": "repair.h",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "source",
+        "label": "repair.cpp",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "main",
+        "label": "main.cpp",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "program",
+        "label": "The workshop's program",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "ambrose",
+        "to": "header",
+        "label": "needs the class"
+      },
+      {
+        "from": "header",
+        "to": "source",
+        "label": "included"
+      },
+      {
+        "from": "header",
+        "to": "main",
+        "label": "included"
+      },
+      {
+        "from": "source",
+        "to": "program",
+        "label": "the bodies"
+      },
+      {
+        "from": "main",
+        "to": "program",
+        "label": "where it starts"
+      }
+    ],
+    "note": "The class moves into a header every file can include, and its bodies into one .cpp file."
+  },
+  "tasks": {
+    "header": {
+      "steps": [
+        {
+          "active": [
+            "ambrose",
+            "ambrose->header"
+          ],
+          "note": "Other parts of the workshop need the repair class, and it is stuck in main.cpp."
+        },
+        {
+          "active": [
+            "header"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "the header holds",
+            "values": [
+              "the guard",
+              "the class and its members",
+              "the first line of each function"
+            ]
+          },
+          "note": "The header holds the whole class, with the first line of each function and no bodies."
+        },
+        {
+          "active": [
+            "header->main",
+            "main"
+          ],
+          "note": "main.cpp includes the header and no longer writes the class itself."
+        }
+      ]
+    },
+    "source": {
+      "steps": [
+        {
+          "active": [
+            "header",
+            "header->source",
+            "source"
+          ],
+          "note": "repair.cpp includes the header, so the compiler checks each body against the class."
+        },
+        {
+          "active": [
+            "source"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "the .cpp file holds",
+            "values": [
+              "the constructor's body",
+              "each function's body, with the class's name"
+            ]
+          },
+          "note": "Each body names the class it belongs to, and the constructor keeps its list of first values."
+        },
+        {
+          "active": [
+            "source->program",
+            "program"
+          ],
+          "note": "Built together with main.cpp, every call finds its one body."
+        }
+      ]
+    },
+    "line": {
+      "steps": [
+        {
+          "active": [
+            "header->main",
+            "main"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a repair, only read"
+            ]
+          },
+          "note": "main.cpp knows the class from the header, and a repair reaches the bench line to be read."
+        },
+        {
+          "active": [
+            "main"
+          ],
+          "note": "The line is made from the repair's public functions; its members stay private."
+        },
+        {
+          "active": [
+            "main->program",
+            "program"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "one line of text"
+            ]
+          },
+          "note": "One line comes back for the bench."
+        }
+      ]
+    }
+  }
+}

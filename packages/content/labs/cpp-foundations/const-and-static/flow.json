@@ -1,0 +1,162 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "dorrit",
+        "label": "Dorrit at the counter",
+        "kind": "story"
+      },
+      {
+        "id": "screen",
+        "label": "Her screen",
+        "kind": "story"
+      },
+      {
+        "id": "readers",
+        "label": "Your const functions",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "repair",
+        "label": "One repair",
+        "kind": "data"
+      },
+      {
+        "id": "shared",
+        "label": "Your shared count and limit",
+        "kind": "data",
+        "mine": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "dorrit",
+        "to": "screen",
+        "label": "looks up"
+      },
+      {
+        "from": "screen",
+        "to": "readers",
+        "label": "read only"
+      },
+      {
+        "from": "readers",
+        "to": "repair",
+        "label": "reads"
+      },
+      {
+        "from": "repair",
+        "to": "shared",
+        "label": "one for all"
+      }
+    ],
+    "note": "The screen reads repairs it cannot change, and every repair shares one count of tickets and one day's limit."
+  },
+  "tasks": {
+    "readers": {
+      "steps": [
+        {
+          "active": [
+            "dorrit",
+            "dorrit->screen",
+            "screen"
+          ],
+          "note": "Dorrit's screen holds each repair as one it must not change."
+        },
+        {
+          "active": [
+            "screen->readers",
+            "readers"
+          ],
+          "note": "Only functions that promise to change nothing can be called on such a repair."
+        },
+        {
+          "active": [
+            "readers->repair",
+            "repair"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "its ticket",
+              "its item, read where it is",
+              "its minutes"
+            ]
+          },
+          "note": "The ticket, the item and the minutes come back, and the repair stays as it was."
+        }
+      ]
+    },
+    "limit": {
+      "steps": [
+        {
+          "active": [
+            "shared"
+          ],
+          "note": "The day's limit belongs to no single repair: the class keeps one, and anyone can read it."
+        },
+        {
+          "active": [
+            "repair",
+            "repair->shared"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "minutes to add"
+            ]
+          },
+          "note": "Before time is added, the repair's total with it is compared with the limit."
+        },
+        {
+          "active": [
+            "repair"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "true or false"
+            ]
+          },
+          "note": "Time that keeps the repair within the limit is added; anything else is refused."
+        }
+      ]
+    },
+    "numbers": {
+      "steps": [
+        {
+          "active": [
+            "dorrit",
+            "shared"
+          ],
+          "note": "One count of ticket numbers is shared by every repair, so two clocks never get the same one."
+        },
+        {
+          "active": [
+            "repair->shared",
+            "repair"
+          ],
+          "note": "Each new repair takes the next number, and the count moves on."
+        },
+        {
+          "active": [
+            "shared",
+            "screen"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "the last number given out"
+            ]
+          },
+          "note": "Anyone can ask the class for the last number, without any repair at hand."
+        }
+      ]
+    }
+  }
+}

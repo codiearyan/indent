@@ -1,0 +1,104 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "licences", "label": "Monthly licences", "kind": "data" },
+      { "id": "renews", "label": "renewsOn()", "kind": "function", "mine": true, "fn": "renewsOn" },
+      { "id": "remind", "label": "remindAt()", "kind": "function", "mine": true, "fn": "remindAt" },
+      { "id": "outbox", "label": "Invoice run", "kind": "story" },
+      { "id": "choir", "label": "Ängsö Kammarkör", "kind": "story" },
+      { "id": "test", "label": "renewals.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "licences", "to": "renews", "label": "start date" },
+      { "from": "renews", "to": "outbox", "label": "renewal date" },
+      { "from": "remind", "to": "outbox", "label": "follow-up time" },
+      { "from": "outbox", "to": "choir", "label": "invoices" },
+      { "from": "test", "to": "renews", "label": "dates" },
+      { "from": "test", "to": "remind", "label": "times" }
+    ],
+    "note": "renewsOn() says when each licence renews and remindAt() when a follow-up goes out, and both count time the way a stopwatch does instead of a calendar."
+  },
+  "tasks": {
+    "ticket": {
+      "steps": [
+        {
+          "active": ["test", "test->renews", "renews"],
+          "note": "The ticket block hands renewsOn() start dates at the end of a month, the ticket's 31 January among them."
+        },
+        {
+          "active": ["renews", "renews->outbox", "outbox", "outbox->choir", "choir"],
+          "note": "It expects the renewal the shop's rule gives, which is inside the next month, not past it."
+        },
+        {
+          "active": ["test", "renews"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the ticket block",
+            "entries": [
+              { "key": "the shop's renewals.js", "value": "must fail" },
+              { "key": "a right fix", "value": "must pass" },
+              { "key": "mends only the ticket's renewal", "value": "must fail" }
+            ]
+          },
+          "note": "Check runs the block on three computers beside the shop's code, a right fix and a version that knows only the ticket's date."
+        }
+      ]
+    },
+    "fix": {
+      "trace": { "file": "src/renewals.js", "call": "renewsOn", "args": ["2026-01-31", 1] },
+      "steps": [
+        {
+          "active": ["licences", "licences->renews", "renews"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "started", "value": "2026-01-31" },
+              { "key": "months", "value": 1 }
+            ]
+          },
+          "note": "renewsOn() gets Ängsö's start date and how many months on the renewal is."
+        },
+        {
+          "active": ["renews"],
+          "note": "It finds the month the renewal falls in and keeps the start's day, or that month's last day when the month is shorter."
+        },
+        {
+          "active": ["renews", "renews->outbox", "outbox"],
+          "value": { "kind": "map", "label": "what comes back", "entries": [{ "key": "renewal", "value": "a calendar date as text" }] },
+          "note": "The invoice run gets one renewal a month, February included."
+        },
+        {
+          "active": ["remind->outbox", "outbox"],
+          "note": "remindAt() moves a follow-up on by calendar days and keeps its time of day, even across the night the clocks change."
+        }
+      ]
+    },
+    "next": {
+      "steps": [
+        {
+          "active": ["test", "test->renews", "renews"],
+          "note": "One test in the next door block hands renewsOn() a start whose renewal lands at the end of February in a leap year."
+        },
+        {
+          "active": ["test", "test->remind", "remind"],
+          "note": "Another runs remindAt() as if the computer were in London, for a week with the night the clocks change in it."
+        },
+        {
+          "active": ["test", "renews", "remind"],
+          "value": {
+            "kind": "map",
+            "label": "four runs of the next door block",
+            "entries": [
+              { "key": "the shop's renewals.js", "value": "must fail" },
+              { "key": "a right fix", "value": "must pass" },
+              { "key": "February is always 28 days", "value": "must fail" },
+              { "key": "days as 24 hour blocks", "value": "must fail" }
+            ]
+          },
+          "note": "Check runs the block beside the shop's code, a right fix and two versions that each miss one of the edges."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "id": "renewal-skips-february",
+  "title": "A renewal that skips February",
+  "files": ["src/renewals.test.js", "src/renewals.js", "src/subscriptions.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo prints the next renewals and follow-ups on this computer and on one set to London.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "ticket",
+      "title": "Catch the renewal that skips a month",
+      "file": "src/renewals.test.js",
+      "description": "Prove the bug with a test before you change `renewals.js`. In `src/renewals.test.js`, write tests in the `describe('the ticket')` block that fail on the shop's `renewsOn()` today, on any computer, and will pass once it is right.\n\nThe check runs the tests in that block on three computers beside:\n\n- the shop's `renewals.js`: they must fail on every one\n- a right fix: they must pass\n- a version that mends only the ticket's own renewal: they must fail",
+      "nextSteps": [
+        "Run `node src/demo.js` and look at Ängsö's first renewal.",
+        "Write the date a licence that starts on 31 January should renew on.",
+        "Add another start on a day that the next month does not have.",
+        "Run `npx vitest run src/renewals.test.js` and see your tests fail."
+      ],
+      "hints": [
+        "The ticket's licence started on the 31st, and February has no 31st.",
+        "The shop's rule keeps the day, or takes the last day of a month that is too short for it. 31 March plus one month is the same kind of case.",
+        "expect(renewsOn('2026-01-31', 1)).toBe(...) with the last day of February 2026, and one more start such as 31 March or 31 August."
+      ],
+      "docs": [
+        { "title": "Date.prototype.setUTCMonth()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/setUTCMonth" },
+        { "title": "Vitest expect", "url": "https://vitest.dev/api/expect.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Add months and days the way a calendar does",
+      "file": "src/renewals.js",
+      "description": "Fix both functions in `src/renewals.js` so they follow the calendar on any computer.\n\n`renewsOn(started, months)` returns the calendar date, as text like `'2026-02-28'`, that a licence renews on after that many months:\n\n- it keeps the start's day of the month\n- when that month is too short, it is the month's last day: 28 February, or 29 in a leap year\n- months always count from the start date, so two months after 31 January is 31 March\n\n`remindAt(sendAt, days)` returns the same time of day that many calendar days later, written the same way, like `'2026-04-01T09:00'`. The time is shop time, written without a zone.\n\nThe check uses its own dates, month ends, leap years and the nights the clocks change, on five computers.",
+      "nextSteps": [
+        "Read the start date as its year, month and day numbers.",
+        "Work out the last day of the month the renewal lands in, and keep the day inside it.",
+        "For a follow-up, add days to the date and keep the time of day as it was written.",
+        "Run `node src/demo.js`: both blocks should agree."
+      ],
+      "hints": [
+        "`setUTCMonth` on the 31st rolls into the next month when the target month is shorter, and `getTime() + days * DAY_MS` assumes every day on the computer's clock is 24 hours.",
+        "`Date.UTC(year, month, 0)` is the last day of the month before `month`, counted from 0, and in UTC every day is 24 hours long. `Date.UTC` also rolls day 32 or month 13 over for you.",
+        "For `renewsOn`, take `Math.min(day, lastDay)` in the target month and build it with `Date.UTC`. For `remindAt`, split off the time, build `Date.UTC(year, month - 1, day + days)`, and put the time back on the date."
+      ],
+      "docs": [
+        { "title": "Date.UTC()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/UTC" },
+        { "title": "Date.prototype.setUTCMonth()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/setUTCMonth" },
+        { "title": "Date.prototype.getUTCDate()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getUTCDate" }
+      ],
+      "videos": [{ "title": "Why time zones and calendars are hard", "url": "https://www.youtube.com/watch?v=-5wpm-gesOY" }],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "Write the tests for the cases next door",
+      "file": "src/renewals.test.js",
+      "description": "Two cases sit next to the ticket: a renewal that lands at the end of February in a leap year, and a follow-up across the night the clocks change. In the `describe('next door')` block, write a test for each.\n\nThe check runs the tests in that block on three computers beside the shop's `renewals.js` (they must fail on every one), beside a right fix (they must pass), beside a version that gives February 28 days every year (they must fail) and beside a version that adds a follow-up's days as blocks of 24 hours (they must fail).",
+      "nextSteps": [
+        "Pick a start date whose renewal lands in February 2028.",
+        "Pick a follow-up whose week has the night London's clocks change.",
+        "Run the follow-up test with `inZone('Europe/London', ...)`.",
+        "Run `npx vitest run src/renewals.test.js`."
+      ],
+      "hints": [
+        "2028 is a leap year. The clocks in London go forward on the last Sunday of March and back on the last Sunday of October.",
+        "A follow-up only goes wrong on a computer whose clock changes that night, so the test has to say which zone it runs in.",
+        "expect(renewsOn('2028-01-31', 1)).toBe(...) for the leap year, and inZone('Europe/London', () => expect(remindAt('2026-03-25T09:00', 7)).toBe(...)) for the clock change."
+      ],
+      "docs": [
+        { "title": "Date", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date" },
+        { "title": "The TZ variable in Node.js", "url": "https://nodejs.org/docs/latest-v22.x/api/cli.html#tz" }
+      ],
+      "points": 10
+    }
+  ]
+}

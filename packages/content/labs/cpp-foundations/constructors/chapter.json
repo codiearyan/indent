@@ -1,0 +1,115 @@
+{
+  "id": "constructors",
+  "title": "Constructors: a repair that starts right",
+  "files": [
+    "src/intake.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Dorrit's intake here and run it, after you try your constructors in main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/intake.cpp -o intake && ./intake"
+  },
+  "tasks": [
+    {
+      "id": "whole",
+      "title": "Take in a repair whole",
+      "file": "src/intake.cpp",
+      "description": "Inside `class Repair`, under `// Task 1` in `src/intake.cpp`, write:\n\n- under `private:`, three members: `ticket`, a `const int`; `item`, a `std::string`; and `minutes`, an `int`. They need no starting values: the constructor gives every member one\n- under `public:`, `getTicket`, `getItem` and `getMinutes`, which take nothing and give back each member, as an `int`, a `std::string` and an `int`\n- under `public:`, a constructor that takes the ticket as an `int` and the item as a reference to a `const std::string`\n\nThe constructor gives the repair the ticket and the item it is given, and 0 minutes. `ticket` is `const`, so a member initialiser list is the only place it can get its value; the list is the clearest place for the other two as well, written in the order the members are declared.\n\nCheck makes repairs of its own with your constructor, on memory that still holds old values, and reads every member back, so a member the constructor forgets shows up. It also asks the compiler whether one repair can be given another's values with `=`: with a `const` ticket, it cannot. Check builds with `-Wall`, and a list in another order than the members makes the compiler warn.",
+      "nextSteps": [
+        "Write the three members under `private:`, in the task's order, and the three getters under `public:`.",
+        "Write the constructor's first line: the class's name and its two parameters, with no return type.",
+        "After the round brackets, a colon, then each member with its value in round brackets, in the members' order.",
+        "In `main`, make a repair with two values and print what its getters give back."
+      ],
+      "hints": [
+        "A constructor is named after its class and has no return type, not even `void`. It runs once, when a repair is made.",
+        "The member initialiser list goes between the round brackets and the body: `: ticket(number), ...`. A `const` member can only get its value there, and the members get their values in the order the class declares them.",
+        "The shape is `Repair(int number, const std::string& name) : ticket(number), item(name), minutes(0) {}`."
+      ],
+      "docs": [
+        {
+          "title": "Constructors and member initializer lists",
+          "url": "https://en.cppreference.com/w/cpp/language/constructor"
+        },
+        {
+          "title": "Non-static data members",
+          "url": "https://en.cppreference.com/w/cpp/language/data_members"
+        }
+      ],
+      "videos": [
+        {
+          "title": "The member initialiser list",
+          "url": "https://www.youtube.com/watch?v=1nfuYMXjZsA"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "empty",
+      "title": "Give the rack an empty repair",
+      "file": "src/intake.cpp",
+      "description": "Under `// Task 2`, inside the class and under `public:`, write a constructor that takes nothing. It makes an empty repair for a hook on Kasimir's rack: ticket `0`, the item `none` and `0` minutes, given in its member initialiser list as in Task 1.\n\nCheck makes a `Repair` with no values, on memory that still holds old values, and a `std::vector<Repair>` of a size of its own, which fills every place with a repair made by this constructor, and reads them back. Check builds this task with the members, getters and constructor of its own, written as Task 1 asks, so it is judged on its own.",
+      "nextSteps": [
+        "Write the first line: the class's name and empty round brackets.",
+        "Give every member its value in a member initialiser list, in the members' order.",
+        "Give it an empty body, `{}`.",
+        "In `main`, make a `std::vector<Repair>` of three and print the item of one of them."
+      ],
+      "hints": [
+        "Once a class has a constructor of its own, the compiler no longer makes one with no parameters for it. A vector made with a size needs one, to fill its places.",
+        "`ticket` is `const`, so this constructor gives it its value in its list too. Every constructor gives every member a value.",
+        "The shape is `Repair() : ticket(0), item(\"none\"), minutes(0) {}`."
+      ],
+      "docs": [
+        {
+          "title": "Default constructors",
+          "url": "https://en.cppreference.com/w/cpp/language/default_constructor"
+        },
+        {
+          "title": "Constructors and member initializer lists",
+          "url": "https://en.cppreference.com/w/cpp/language/constructor"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Constructors in C++",
+          "url": "https://www.youtube.com/watch?v=FXhALMsHwEY"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "post",
+      "title": "Take in a repair by its ticket alone",
+      "file": "src/intake.cpp",
+      "description": "Under `// Task 3`, inside the class and under `public:`, write a constructor marked `explicit` that takes only the ticket, as an `int`. It is for a clock that comes in the post before anyone has said what it is: that ticket, the item `in the post` and `0` minutes.\n\nCheck makes repairs with tickets of its own and reads them back. It also compiles a line of its own, `Repair r = 3107;`, that would turn a plain number into a repair without naming the constructor: with `explicit`, the compiler refuses it. Check builds this task with the members, getters and constructor of its own, written as Task 1 asks, so it is judged on its own.",
+      "nextSteps": [
+        "Write the first line, with `explicit` in front of the class's name.",
+        "Give every member its value in the member initialiser list.",
+        "In `main`, make one with `Repair parcel(3107);` and print its item.",
+        "Then try `Repair parcel = 3107;` and read what the compiler says."
+      ],
+      "hints": [
+        "A constructor with one parameter also lets a value of that parameter's type turn into an object by itself, wherever one is expected. `explicit` stops that.",
+        "`explicit` goes at the very start of the constructor's first line, inside the class.",
+        "The shape is `explicit Repair(int number) : ticket(number), item(\"in the post\"), minutes(0) {}`."
+      ],
+      "docs": [
+        {
+          "title": "explicit specifier",
+          "url": "https://en.cppreference.com/w/cpp/language/explicit"
+        },
+        {
+          "title": "Converting constructor",
+          "url": "https://en.cppreference.com/w/cpp/language/converting_constructor"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Conversions and the explicit keyword",
+          "url": "https://www.youtube.com/watch?v=Rr1NX1lH3oE"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
