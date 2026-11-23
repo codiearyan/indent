@@ -74,6 +74,22 @@ const KNOWN = [
     'The code read an event while the screen was being drawn, when there is no event yet. Read the event inside the function the event prop is given.'
   ],
   [
+    /Rendered (more|fewer) hooks/,
+    'React found a different number of hooks in this draw than in the draw before, and stopped. A component calls its hooks in the same order on every draw: never inside an if, a loop, or after an early return.'
+  ],
+  [
+    /Expected ref to be a function/,
+    'An element was given a ref that is not one. Hand the ref attribute the object useRef returned, not a name in quotes.'
+  ],
+  [
+    /reading '(focus|blur|select)'/,
+    "The code used an element through a ref whose current is null. A ref holds its element only once React has put it on the page, so not while the component draws, and only when the ref attribute was handed the ref object itself."
+  ],
+  [
+    /destroy is not a function/,
+    'An effect returned something that is not a function, and React tried to call it to clean up. Return the cleanup function itself, or return nothing.'
+  ],
+  [
     /Cannot read properties of (undefined|null)/,
     'The code read a field of something that is not there. Look at the names you use for props and data.'
   ],
@@ -134,8 +150,10 @@ export async function openComponent(t, file, overrides = {}, options = {}) {
     `import { createElement, Profiler } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot } from 'react-dom/client'
+import * as React from 'react'
 import * as mod from '../${file}'
 window.mod = mod
+window.React = React
 window.h = createElement
 const root = createRoot(document.getElementById('root'))
 window.show = (name, props, ...children) =>
@@ -154,6 +172,8 @@ const onRender = () => {
 window.showCounted = (name, props) =>
   flushSync(() => root.render(createElement(Profiler, { id: 'check', onRender }, createElement(mod[name], props))))
 window.clear = () => flushSync(() => root.render(null))
+window.showCountedWith = (element) =>
+  flushSync(() => root.render(createElement(Profiler, { id: 'check', onRender }, element)))
 `
   )
   const page = await t.page('.grader/harness.html', { dir, ...options })
@@ -201,7 +221,9 @@ export const WARNING = {
   toUncontrolled: /changing a controlled input to be uncontrolled/,
   asyncEffect: /must not return anything besides a function/,
   maxDepth: /Maximum update depth exceeded/,
-  readOnly: /Cannot assign to read only property/
+  readOnly: /Cannot assign to read only property/,
+  hookOrder: /change in the order of Hooks/,
+  contextValue: /The `value` prop is required for the `<Context.Provider>`/
 }
 
 export const warningsOf = (logs, pattern) =>
@@ -340,4 +362,20 @@ export async function runaway(page, logsBefore, what = 'The screen', where = '')
     `${what} was drawn again and again until the check stopped it. An effect sets state, the new state draws the component again, and the effect runs again after that draw, for ever. In the Browser panel React says Maximum update depth exceeded in the console once it has gone on for a while. Give the effect the list of values it depends on, or work the value out while drawing.${where ? ` ${where}` : ''}`,
     lines.length ? shorten(lines[0]) : 'still drawing after the page should have settled'
   )
+}
+
+/**
+ * Like drawCounted, but draws any element the check builds with window.h, such as two of a
+ * component side by side, or a component of the check's own that calls a learner's hook.
+ */
+export async function drawCountedWith(page, element) {
+  const before = page.window.commits.length
+  const errorsBefore = page.errors.length
+  try {
+    page.window.showCountedWith(element)
+  } catch (error) {
+    page.errors.push(error?.message ?? String(error))
+  }
+  await page.settle()
+  return { screens: page.window.commits.slice(before), errors: page.errors.slice(errorsBefore) }
 }

@@ -1,0 +1,55 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilf", "label": "Wilf", "kind": "story" },
+      { "id": "tracker", "label": "Tram tracker", "kind": "story" },
+      { "id": "hook", "label": "useTramStop()", "kind": "function", "mine": true },
+      { "id": "screens", "label": "Screens.jsx", "kind": "file", "mine": true },
+      { "id": "board", "label": "DepartureBoard()", "kind": "function", "mine": true },
+      { "id": "signs", "label": "Depot, platform, hall", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "wilf", "to": "screens", "label": "picks trams" },
+      { "from": "screens", "to": "hook", "label": "number" },
+      { "from": "hook", "to": "tracker", "label": "follow, stop" },
+      { "from": "tracker", "to": "hook", "label": "each stop" },
+      { "from": "board", "to": "screens", "label": "one per tram" },
+      { "from": "screens", "to": "signs", "label": "draw" }
+    ],
+    "note": "The state and the effect both screens copied live in one hook, and every screen that calls it gets its own."
+  },
+  "tasks": {
+    "hook": {
+      "steps": [
+        { "active": ["screens", "screens->hook", "hook"], "value": { "kind": "map", "label": "useTramStop", "entries": [{ "key": "number", "value": "a tram" }] }, "note": "A screen calls the hook with the tram it shows." },
+        { "active": ["hook", "hook->tracker", "tracker"], "note": "After the screen is drawn, the hook's effect follows that tram, once." },
+        { "active": ["tracker", "tracker->hook", "hook"], "value": { "kind": "map", "label": "Returns", "entries": [{ "key": "stop", "value": "text, or null" }] }, "note": "Each report goes into the hook's state, and the hook returns the stop." },
+        { "active": ["hook", "screens"], "note": "A second screen calling the hook gets state of its own, for its own tram." }
+      ]
+    },
+    "screens": {
+      "steps": [
+        { "active": ["wilf", "wilf->screens", "screens"], "note": "Wilf picks a tram for the depot and one for the platform." },
+        { "active": ["screens", "screens->hook", "hook"], "note": "Each screen calls the hook once, and keeps no copy of its own." },
+        { "active": ["hook", "hook->tracker", "tracker"], "note": "So each tram is followed once, by the hook." },
+        { "active": ["screens", "screens->signs", "signs"], "note": "Each screen shows the stop the hook returns." }
+      ]
+    },
+    "no-tram": {
+      "steps": [
+        { "active": ["wilf", "wilf->screens", "screens"], "note": "No tram is due at Pithead, so the sign is given no tram." },
+        { "active": ["screens", "screens->hook", "hook"], "note": "The sign still calls the hook, on this draw as on every other." },
+        { "active": ["hook", "hook->tracker", "tracker"], "note": "The old tram stops being followed, and nothing new is." },
+        { "active": ["screens", "screens->signs", "signs"], "note": "The platform says no tram is due." }
+      ]
+    },
+    "board": {
+      "steps": [
+        { "active": ["board"], "value": { "kind": "map", "label": "DepartureBoard", "entries": [{ "key": "numbers", "value": "trams running" }] }, "note": "The ticket hall board is handed every tram running." },
+        { "active": ["board", "board->screens", "screens"], "note": "It draws one sign for each tram, with a key that belongs to that tram." },
+        { "active": ["screens", "screens->hook", "hook", "hook->tracker", "tracker"], "note": "Each sign calls the hook once and follows its own tram." },
+        { "active": ["screens", "screens->signs", "signs"], "note": "A tram added or taken off leaves the others' stops as they were." }
+      ]
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Odette",
+      "say": "Can the hall's page show what's on?",
+      "note": "Only the pages we trust."
+    },
+    {
+      "title": "Village hall page",
+      "text": "Its script asks the cupboard server."
+    },
+    {
+      "title": "Your code",
+      "file": "origins.js",
+      "mine": true,
+      "gap": "No page may read it",
+      "tasks": [
+        "Compare origins",
+        "Read as a page",
+        "Let trusted pages in",
+        "Ask first, and answer"
+      ]
+    },
+    {
+      "title": "Cupboard server",
+      "text": "Answers, but names no page that may read."
+    }
+  ],
+  "ticket": {
+    "label": "Now playing",
+    "wrong": "blocked",
+    "why": "Other origin",
+    "right": "shown"
+  },
+  "captions": [
+    "Odette asks if the village hall's page can show what is playing, for trusted pages only.",
+    "The hall's script asks the cupboard server, and the browser keeps the answer from it.",
+    "You compare origins and write the browser's rules and the server's, in five tasks.",
+    "The hall's page shows the song now playing, and pages nobody trusts still cannot.",
+    "The repo is done: from one request to copies, cookies and pages that share answers safely."
+  ]
+}

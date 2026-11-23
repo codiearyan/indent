@@ -1,0 +1,112 @@
+{
+  "id": "context",
+  "title": "A value every part can reach",
+  "files": ["src/discount.js", "src/Shop.jsx", "src/shop.js", "src/App.jsx", "src/money.js"],
+  "terminal": {
+    "description": "The shop runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "make",
+      "title": "Make the discount context",
+      "file": "src/discount.js",
+      "description": "In `src/discount.js`, make `DiscountContext` with `createContext` from `react`, and export it by name. Its value is a discount in percent. With no provider above it, it gives no discount: `0`.\n\nThe check reads `DiscountContext` from a component of its own, first with no provider above it, then under a provider of its own.",
+      "nextSteps": [
+        "Read \"Making a context\" in the lesson.",
+        "Import `createContext` from `react`.",
+        "Export `DiscountContext`, made with the default it needs.",
+        "Nothing changes on the screen yet: the next task reads it."
+      ],
+      "hints": [
+        "A context is made once, in its own file, so every component that needs it can import the same one.",
+        "`createContext` takes the default: what a component reads when there is no provider above it. Here that is no discount.",
+        "`import { createContext } from 'react'` and `export const DiscountContext = createContext(0)`."
+      ],
+      "docs": [
+        { "title": "createContext", "url": "https://react.dev/reference/react/createContext" },
+        { "title": "Passing data deeply with context", "url": "https://react.dev/learn/passing-data-deeply-with-context" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "price",
+      "title": "Read the discount in Price",
+      "file": "src/Shop.jsx",
+      "description": "`Price({ pence })` reads the discount from `DiscountContext` with `useContext`, in place of its `discount` prop, and shows `formatPence(discounted(pence, discount))` as now. Under no provider it shows the full price; under two providers, one inside the other, it uses the inner one.\n\nThe check draws `Price` alone with prices of its own, under a provider with a discount of its own, under no provider, and under two providers, one inside the other.",
+      "nextSteps": [
+        "Read \"Providing and reading\" in the lesson.",
+        "Import `useContext` and `DiscountContext` in `Shop.jsx`.",
+        "Read the discount at the top of `Price`, and remove the `discount` prop from it.",
+        "The prices in the Browser panel stay full until the next task provides a discount."
+      ],
+      "hints": [
+        "Price is the only part of the shop that uses the discount. That is where it should come from the context.",
+        "`useContext` takes the context itself, the one exported from `discount.js`, and returns the value of the nearest provider above, or the default.",
+        "`export function Price({ pence }) { const discount = useContext(DiscountContext); return ... }`, with `import { DiscountContext } from './discount.js'`."
+      ],
+      "docs": [
+        { "title": "useContext", "url": "https://react.dev/reference/react/useContext" },
+        {
+          "title": "Overriding context for a part of the tree",
+          "url": "https://react.dev/reference/react/useContext#overriding-context-for-a-part-of-the-tree"
+        }
+      ],
+      "videos": [{ "title": "useContext in 13 minutes", "url": "https://www.youtube.com/watch?v=5LrDIWkK_Bc" }],
+      "points": 10
+    },
+    {
+      "id": "provide",
+      "title": "Provide the discount from ShopPage",
+      "file": "src/Shop.jsx",
+      "description": "`ShopPage` puts its shelves inside a provider of `DiscountContext`, with the member discount as its value while Member is ticked and `0` while it is not. `Shelf` and `ShopItem` no longer need a `discount` prop: take it out, so a new shelf can never forget it. Everything else they need, the shelf and its items, stays in their props.\n\nThe check draws `ShopPage` with shelves and a member discount of its own, ticks and unticks Member, reads every price, and looks at the props each part was drawn with. Then it draws `Shelf` alone with a shelf of its own under a provider of its own, with no `discount` prop.",
+      "nextSteps": [
+        "Read \"What React says, and what it does not\" in the lesson.",
+        "In `ShopPage`, wrap the shelves in `DiscountContext` with a `value`.",
+        "Remove the `discount` prop from `Shelf` and `ShopItem`, where they take it and where they pass it.",
+        "Tick Member in the Browser panel and watch every price."
+      ],
+      "hints": [
+        "Price reads the context now, but nothing above it provides a value, so it always gets the default.",
+        "A provider is the context drawn as a tag, with a `value`, around everything that should see it. The discount `ShopPage` works out is that value.",
+        "`<DiscountContext value={member ? memberDiscount : 0}>` around the `shelves.map(...)` in `ShopPage`, and `discount` removed from `Shelf` and `ShopItem`."
+      ],
+      "docs": [
+        {
+          "title": "Step 3: provide the context",
+          "url": "https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context"
+        },
+        {
+          "title": "Before you use context",
+          "url": "https://react.dev/learn/passing-data-deeply-with-context#before-you-use-context"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "vouchers",
+      "title": "Keep full-price shelves at full price",
+      "file": "src/Shop.jsx",
+      "description": "A shelf marked `fullPrice: true`, like the gift vouchers, shows its full prices even while Member is ticked. Give it a provider of its own, inside the outer one, whose value is no discount. The other shelves keep the member discount.\n\nThe check draws `ShopPage` with shelves of its own, one of them marked `fullPrice` between two that are not, ticks and unticks Member, and reads every price.",
+      "nextSteps": [
+        "Read \"A provider inside another\" in the lesson.",
+        "Find where `ShopPage` draws each shelf.",
+        "For a shelf marked `fullPrice`, draw it inside a provider of no discount.",
+        "Tick Member in the Browser panel and look at the vouchers."
+      ],
+      "hints": [
+        "Price reads the nearest provider above it. What could sit nearer to the voucher prices than the member discount?",
+        "A provider inside the outer one changes the value for its own part only. A shelf needs one when it is marked `fullPrice`, and the others do not.",
+        "In the `map`: `shelf.fullPrice ? <DiscountContext key={shelf.id} value={0}><Shelf shelf={shelf} /></DiscountContext> : <Shelf key={shelf.id} shelf={shelf} />`."
+      ],
+      "docs": [
+        {
+          "title": "Context passes through intermediate components",
+          "url": "https://react.dev/learn/passing-data-deeply-with-context#context-passes-through-intermediate-components"
+        },
+        { "title": "Conditional rendering", "url": "https://react.dev/learn/conditional-rendering" }
+      ],
+      "points": 10
+    }
+  ]
+}

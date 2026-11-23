@@ -194,17 +194,17 @@ public class RunTasks {
             }
             unit.thread = new Thread(() -> run(unit), "main");
             unit.thread.setDaemon(true);
-            unit.thread.start();
         }
         end = System.currentTimeMillis() + DEADLINE_MS;
-        // A learner's System.exit ends this JVM: name the unit that called it, and still report
-        // every other unit.
+        // A learner's System.exit ends this JVM: name the unit that called it, and still run and
+        // report every other unit. The hook is in place before any learner code starts.
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             for (Unit unit : units) {
                 if (unit.thread != null && exiting(unit.thread)) unit.exited = true;
             }
             finish(units);
         }));
+        for (Unit unit : units) start(unit);
         finish(units);
         REAL_OUT.flush();
         Runtime.getRuntime().halt(0);
@@ -212,9 +212,18 @@ public class RunTasks {
 
     static volatile long end;
 
+    // Once, from main or from the hook: a unit another unit's System.exit overtook still runs.
+    static void start(Unit unit) {
+        if (unit.thread == null) return;
+        synchronized (unit) {
+            if (unit.thread.getState() == Thread.State.NEW) unit.thread.start();
+        }
+    }
+
     static void finish(List<Unit> units) {
         for (Unit unit : units) {
             if (unit.thread == null) continue;
+            start(unit);
             if (!unit.exited) {
                 try {
                     unit.thread.join(Math.max(1, end - System.currentTimeMillis()));
@@ -222,6 +231,7 @@ public class RunTasks {
                     Thread.currentThread().interrupt();
                 }
             }
+            if (!unit.done && exiting(unit.thread)) unit.exited = true;
             report(unit, !unit.done && !unit.exited);
         }
     }

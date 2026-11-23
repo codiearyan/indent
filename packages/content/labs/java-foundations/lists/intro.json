@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Who is last on the waiting list?",
+      "note": "The Linnet is full again."
+    },
+    {
+      "title": "The quay",
+      "text": "Names join and leave all morning"
+    },
+    {
+      "title": "Your lists",
+      "file": "WaitingList.java",
+      "mine": true,
+      "gap": "An array cannot grow",
+      "tasks": ["Make the list", "The last name", "Loads that sailed", "Cancel a name"]
+    },
+    {
+      "title": "Waiting list",
+      "text": "Grows and shrinks with the queue."
+    }
+  ],
+  "ticket": {
+    "label": "Last name",
+    "wrong": "crossed out",
+    "why": "No room",
+    "right": "called"
+  },
+  "captions": [
+    "The waiting list at the hut. Bridie wants the last name when the next boat is in.",
+    "On paper the list is crossed out and squeezed in, and an array cannot grow at all.",
+    "You write methods that make a list, read it, keep numbers in it and remove from it.",
+    "Now the list grows and shrinks with the queue, and the last name is always right.",
+    "ArrayList, Integer and for-each. Part 2 is done: the program repeats its work."
+  ]
+}

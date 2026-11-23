@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilf", "say": "Fix one, and I forget the other", "note": "Depot screen and Pithead sign." },
+    { "title": "Two copies", "text": "The same state and effect, pasted into both.", "note": "The sign never lets go of a tram." },
+    {
+      "title": "Your hook",
+      "file": "useTramStop.js",
+      "mine": true,
+      "gap": "No one place for it",
+      "tasks": ["Write the hook", "Use it in both", "Call it every draw", "Board for the hall"]
+    },
+    { "title": "Pithead sign", "rows": [["Next tram"], ["Where it is now"]] }
+  ],
+  "ticket": { "label": "Tram 14", "wrong": "followed twice", "why": "Two copies", "right": "followed once" },
+  "captions": [
+    "Wilf wants the depot screen and the Pithead platform sign to stop being two copies.",
+    "Tram 14 leaves the platform sign, comes back, and the sign is following it twice.",
+    "You pull the state and the effect into a hook of your own, in four tasks.",
+    "Tram 14 is followed once, and when no tram is due the sign lets go of it.",
+    "Same tracker, one hook. Every screen that calls it gets its own, the hall board too."
+  ]
+}
