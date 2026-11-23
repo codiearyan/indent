@@ -1,0 +1,11 @@
+{
+  "id": "shared-values",
+  "title": "x",
+  "files": ["PierWindow.java"],
+  "terminal": { "description": "x", "suggestedCommand": "java PierWindow.java" },
+  "tasks": [
+    { "id": "sold", "title": "a", "file": "PierWindow.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
+    { "id": "numbers", "title": "a", "file": "PierWindow.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
+    { "id": "takings", "title": "a", "file": "PierWindow.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 }
+  ]
+}

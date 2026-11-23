@@ -3314,8 +3314,10 @@ export function threaded({ setup = [], call, type = 'void', wait = 1500, grace =
     after,
     code: [
       ...setup,
-      `${type} got = ${ZERO[type] ?? 'null'}; Throwable thrown = null; String stuck = null;`,
-      `try { ${type === 'void' ? '' : 'got = '}CheckRun.call(${wait}, ${work}); } catch (CheckStuck x$) { stuck = x$.what; } catch (Throwable x$) { thrown = x$; }`
+      `${type === 'void' ? '' : `${type} got = ${ZERO[type] ?? 'null'}; `}Throwable thrown = null; String stuck = null;`,
+      `try { ${type === 'void' ? '' : 'got = '}CheckRun.call(${wait}, ${work}); } catch (CheckStuck x$) { stuck = x$.what; } catch (Throwable x$) { thrown = x$; }`,
+      // What comes after may call the learner's code again, which waits for the same lock or thread.
+      'if (stuck != null) { __Indent.read("still waiting", stuck); return; }'
     ],
     reads: {
       ...(type === 'void' ? {} : { got: 'got' }),
