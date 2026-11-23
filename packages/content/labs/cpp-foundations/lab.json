@@ -1,7 +1,7 @@
 {
   "id": "cpp-foundations",
   "title": "C++ foundations",
-  "description": "Tolliver Clockworks is a small workshop that repairs clocks and watches, and its repair tickets, parts and prices are still worked out by hand on paper slips. You are its new developer and have never written code, so you start by building your first program and move the slips onto the laptop one idea at a time, reading what the compiler tells you on the way. Each issue teaches one part of C++, from your first line through values, numbers and their traps, and text, then decisions, loops, functions, references and reading what people type, then lists with vectors, look-ups with maps and the standard algorithms, then types of your own with structs and enum class, headers, and a program built from several files, then classes that keep their own rules with private members, constructors, const and static members, a class in two files and a class that owns a list, then where values live and for how long, pointers, the heap with new and delete, and the owners unique_ptr and shared_ptr, then what to do when things go wrong: reading a long error, saying no with bool and optional, exceptions, cleanup that always happens, and finding a bug with prints, assert and the smallest input that fails, then code that works for any type with templates, small functions written where they are used, the algorithms handed a rule, and functions kept as values, each of which you build, run and check yourself.",
+  "description": "Tolliver Clockworks is a small workshop that repairs clocks and watches, and its repair tickets, parts and prices are still worked out by hand on paper slips. You are its new developer and have never written code, so you start by building your first program and move the slips onto the laptop one idea at a time, reading what the compiler tells you on the way. Each issue teaches one part of C++, from your first line through values, numbers and their traps, and text, then decisions, loops, functions, references and reading what people type, then lists with vectors, look-ups with maps and the standard algorithms, then types of your own with structs and enum class, headers, and a program built from several files, then classes that keep their own rules with private members, constructors, const and static members, a class in two files and a class that owns a list, then where values live and for how long, pointers, the heap with new and delete, and the owners unique_ptr and shared_ptr, then what to do when things go wrong: reading a long error, saying no with bool and optional, exceptions, cleanup that always happens, and finding a bug with prints, assert and the smallest input that fails, then code that works for any type with templates, small functions written where they are used, the algorithms handed a rule, and functions kept as values, and last files on disk: reading and writing them, text taken apart and put together, a data file read into your own types, and a program of several files built step by step, each of which you build, run and check yourself.",
   "category": "Programming languages",
   "language": "cpp",
   "tags": ["C++"],
@@ -43,7 +43,7 @@
     },
     {
       "title": "Files, text and the whole build",
-      "chapters": ["reading-files", "writing-files", "taking-text-apart", "data-files"]
+      "chapters": ["reading-files", "writing-files", "taking-text-apart", "data-files", "the-whole-build"]
     }
   ]
 }

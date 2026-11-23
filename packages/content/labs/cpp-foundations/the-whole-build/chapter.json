@@ -1,0 +1,129 @@
+{
+  "id": "the-whole-build",
+  "title": "Building it properly: the day book",
+  "files": [
+    "src/daybook.cpp",
+    "src/daybook.h",
+    "src/report.h",
+    "src/report.cpp",
+    "build.sh",
+    "src/main.cpp",
+    "src/repair.h",
+    "src/repair.cpp",
+    "data/day.csv"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace folder. Build the day book step by step with build.sh, then run it.",
+    "suggestedCommand": "sh build.sh && ./daybook"
+  },
+  "tasks": [
+    {
+      "id": "load",
+      "title": "Load the day",
+      "file": "src/daybook.cpp",
+      "description": "Under `// Task 1` in `src/daybook.cpp`, write `DayBook::load`, as `daybook.h` declares it: `int load(std::istream& in)`. It reads the day's file from the stream. The first line is a heading, which it skips, and so is every line that is empty or only blanks. Every other line that `parseRepair` takes is added to the book's repairs, in order. It gives back how many lines it refused.\n\nCheck compiles `daybook.cpp` and `repair.cpp` each on its own, with `-std=c++17 -Wall -Wextra`, and links them with a program of its own, which makes a `DayBook`, hands `load` string streams of its own and reads the book back through `all()`. A warning in your lines fails the task.",
+      "nextSteps": [
+        "Write the first line, with `DayBook::` in front of `load`, exactly as `daybook.h` declares it.",
+        "Read the stream a line at a time, counting the lines.",
+        "Skip the heading and every blank line.",
+        "Hand every other line to `parseRepair`: keep the repair in `repairs`, or count the line as refused."
+      ],
+      "hints": [
+        "This is last issue's reading of the day, inside a class this time: the member `repairs` is the list it fills.",
+        "A member function written below its class has the class's name and `::` in front of its own name, and its first line matches the declaration in the header exactly. A blank line of a Windows file still holds a carriage return.",
+        "The shape is `int DayBook::load(std::istream& in) { std::string line; int number = 0; int refused = 0; while (std::getline(in, line)) { number++; if (number == 1 || line.find_first_not_of(\" \\t\\r\") == std::string::npos) { continue; } Repair repair; if (parseRepair(line, repair)) { repairs.push_back(repair); } else { refused++; } } return refused; }`."
+      ],
+      "docs": [
+        {
+          "title": "GCC: options that control the kind of output (-c, -o)",
+          "url": "https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html"
+        },
+        {
+          "title": "std::getline",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/getline"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "longest",
+      "title": "Find the longest repair",
+      "file": "src/daybook.cpp",
+      "description": "Under `// Task 2` in `src/daybook.cpp`, write `DayBook::longest`, as `daybook.h` declares it: `const Repair* longest() const`, with `std::max_element`. It gives back the address of the repair in the book with the most minutes, the first of them when several have as many, or `nullptr` when the book is empty.\n\nCheck builds this task with a `load` of its own in place of yours, written as Task 1 asks. It fills books of its own, with two repairs of the most minutes in one and nothing in another, and looks at where the address `longest` gives back points: at which repair of the book, or nowhere. A warning in your lines fails the task.",
+      "nextSteps": [
+        "Add the `#include` that `std::max_element` comes from.",
+        "Write the first line, with `DayBook::` in front and `const` at the end, as the header declares it.",
+        "Give back `nullptr` for an empty book.",
+        "Hand `std::max_element` the repairs and a comparison of their minutes, and give back the address of what it finds."
+      ],
+      "hints": [
+        "Part 8 handed the algorithms a rule. `std::max_element` gives back an iterator to the largest item, by the rule it is handed: whether the first of two items comes before the second.",
+        "On an empty range it gives back the end, which is no item at all. Of equal ones it keeps the first, as long as the rule says strictly fewer. `&*` turns an iterator into the address of the item it points at.",
+        "The shape is `if (repairs.empty()) { return nullptr; } auto found = std::max_element(repairs.begin(), repairs.end(), [](const Repair& a, const Repair& b) { return a.minutes < b.minutes; }); return &*found;`."
+      ],
+      "docs": [
+        {
+          "title": "std::max_element",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/max_element"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "summary",
+      "title": "Declare and write the summary",
+      "file": "src/report.cpp",
+      "description": "Under `// Task 3` in `src/report.h`, declare a function called `writeSummary` that takes a stream as a reference to a `std::ostream` and the day book as a reference to a `const DayBook`, and gives nothing back. Under `// Task 3` in `src/report.cpp`, write it. It writes three lines, each with its line end:\n\n```\nRepairs: 4\nMinutes: 240\nLongest: ticket 3201, 75 minutes\n```\n\nwith how many repairs the book holds, all their minutes, and the ticket and minutes of the repair `longest` gives back, or `Longest: none` when the book is empty.\n\nCheck compiles `report.cpp` on its own and links it with a program of its own that includes `report.h`, with a `DayBook` of its own written as Tasks 1 and 2 ask. It hands `writeSummary` a string stream and books of its own, an empty one among them. A warning in your lines fails the task.",
+      "nextSteps": [
+        "In `report.h`, under `// Task 3`, write the first line of `writeSummary`, with a semicolon in place of its body.",
+        "In `report.cpp`, write the same first line again, with its body.",
+        "Write the first two lines from what the book can tell you.",
+        "Ask `longest` for the longest repair, and look at what it gives back before you use it."
+      ],
+      "hints": [
+        "Part 4 split a function this way: a header declares it, so every file that includes the header can call it, and one `.cpp` file writes its body.",
+        "The book is `const` here, and every member function it offers is `const` too. `longest` gives back a pointer, which is `nullptr` for an empty book: reading through it then stops the program.",
+        "The shape is `void writeSummary(std::ostream& out, const DayBook& book);` in the header, and in `report.cpp` a body that writes `book.count()` and `book.totalMinutes()`, then `const Repair* longest = book.longest();` and an `if` on `longest == nullptr`."
+      ],
+      "docs": [
+        {
+          "title": "Function declarations",
+          "url": "https://en.cppreference.com/w/cpp/language/function"
+        },
+        {
+          "title": "GCC: options to request or suppress warnings (-Wall, -Wextra)",
+          "url": "https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "build",
+      "title": "Compile the other files, then link",
+      "file": "build.sh",
+      "description": "Under `# Task 4` in `build.sh`, write one line for each of the other three `.cpp` files in `src`, like the line given for `repair.cpp`: compiled on its own with `$FLAGS` and `-c`, into its own `.o` file in `build`. Then write one line, after them, that links every `.o` file into the program `daybook`, in the workspace folder.\n\nCheck does not run `build.sh`. It reads it as `sh` would and looks at what each `g++` line would do: that every `.cpp` file of `src` is compiled once, on a line of its own, with `-c`, `-std=c++17`, `-Wall` and `-Wextra`, into an object file, with paths written from the workspace folder; that no header is compiled; and that one line after them, without `-c`, links every one of those object files and no `.cpp` file into `daybook`. The order of the files on a line and of the flags does not matter, and the given lines stay as they are.",
+      "nextSteps": [
+        "Read the given line for `repair.cpp`: the flags, `-c`, the file, and `-o` with the object file.",
+        "Write a line like it for `daybook.cpp`, `report.cpp` and `main.cpp`.",
+        "Write the link line: every object file, then `-o daybook`.",
+        "Run `sh build.sh && ./daybook`, change one `.cpp` file, and run it again."
+      ],
+      "hints": [
+        "Each `.cpp` file becomes an object file on its own line, and only the link line joins them. The flags that say how code is read go where the code is read.",
+        "A path in `build.sh` is read from the workspace folder: its `cd` line moves there first, wherever it is run from. The link line hands the compiler object files only, so nothing is compiled twice.",
+        "The lines are `g++ $FLAGS -c src/daybook.cpp -o build/daybook.o`, the same for `report.cpp` and `main.cpp`, and then `g++ build/repair.o build/daybook.o build/report.o build/main.o -o daybook`."
+      ],
+      "docs": [
+        {
+          "title": "GCC: options that control the kind of output (-c, -o)",
+          "url": "https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html"
+        },
+        {
+          "title": "GCC: options for linking",
+          "url": "https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

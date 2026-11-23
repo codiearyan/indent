@@ -1,0 +1,95 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "files", "label": "The .cpp files", "kind": "file" },
+      { "id": "script", "label": "build.sh", "kind": "file", "mine": true },
+      { "id": "objects", "label": "Object files", "kind": "data" },
+      { "id": "program", "label": "daybook", "kind": "story" },
+      { "id": "book", "label": "daybook.cpp", "kind": "file", "mine": true },
+      { "id": "summary", "label": "writeSummary()", "kind": "function", "mine": true },
+      { "id": "kasimir", "label": "Kasimir's bench", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "files", "to": "script", "label": "each file" },
+      { "from": "script", "to": "objects", "label": "compiles" },
+      { "from": "objects", "to": "program", "label": "linked" },
+      { "from": "book", "to": "summary", "label": "the day" },
+      { "from": "summary", "to": "kasimir", "label": "three lines" },
+      { "from": "program", "to": "book", "label": "runs" }
+    ],
+    "note": "The day book is built one file at a time into object files, linked into one program, and reads the day into a class that sums it up."
+  },
+  "tasks": {
+    "load": {
+      "steps": [
+        {
+          "active": ["program->book", "book"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a stream of the day's lines, a heading first"] },
+          "note": "The day's file arrives as a stream, for the day book to fill itself from."
+        },
+        {
+          "active": ["book"],
+          "note": "The heading and blank lines are skipped, and every good line becomes a repair in the book."
+        },
+        {
+          "active": ["book"],
+          "value": { "kind": "array", "label": "comes out", "values": ["how many lines were refused"] },
+          "note": "The book holds the day, and says how many lines it could not take."
+        }
+      ]
+    },
+    "longest": {
+      "steps": [
+        {
+          "active": ["book"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the day's repairs"] },
+          "note": "Kasimir asks which repair of the day took longest."
+        },
+        {
+          "active": ["book"],
+          "note": "The library's algorithm walks the repairs with a rule that compares their minutes."
+        },
+        {
+          "active": ["book->summary"],
+          "value": { "kind": "array", "label": "comes out", "values": ["where that repair is in the book, or nowhere"] },
+          "note": "The answer points at the repair inside the book, or at nothing when the day was empty."
+        }
+      ]
+    },
+    "summary": {
+      "steps": [
+        {
+          "active": ["book->summary", "summary"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a stream", "the day book"] },
+          "note": "The summary is declared once in a header, and any file that includes it can ask for it."
+        },
+        {
+          "active": ["summary"],
+          "value": { "kind": "array", "label": "the summary", "values": ["how many repairs", "all the minutes", "the longest one"] },
+          "note": "The book is only read: how many, how long, and which took longest."
+        },
+        {
+          "active": ["summary->kasimir", "kasimir"],
+          "note": "Three lines reach the bench, through whatever stream was handed over."
+        }
+      ]
+    },
+    "build": {
+      "steps": [
+        {
+          "active": ["files->script", "script"],
+          "note": "Each .cpp file of the program gets a line of its own in the script."
+        },
+        {
+          "active": ["script->objects", "objects"],
+          "value": { "kind": "array", "label": "one per file", "values": ["a compiled file, with its flags"] },
+          "note": "Each file is compiled apart into an object file, with the warnings turned up."
+        },
+        {
+          "active": ["objects->program", "program"],
+          "note": "One last step joins every object file into the program Kasimir runs."
+        }
+      ]
+    }
+  }
+}

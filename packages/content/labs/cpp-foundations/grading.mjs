@@ -4224,6 +4224,20 @@ async function fileRule(t, file, spec) {
     }
   }
   const code = codeOnly(section.text)
+  const missing = (spec.uses ?? []).find((name) => !new RegExp(`\\b${name}\\s*\\(`).test(code))
+  if (missing) {
+    return fail(
+      `${label(spec.task)} uses std::${missing}`,
+      `${label(spec.task)} asks for std::${missing}, and Check cannot find it in the lines of ${label(spec.task)}. The point of this task is the algorithm the library already has: call std::${missing} instead of writing its loop out yourself.`
+    )
+  }
+  const ignored = (spec.uses ?? []).find((name) => [...code.matchAll(new RegExp(`\\b${name}\\s*\\(`, 'g'))].every((m) => /(?:^|[;{}])\s*(?:std\s*::\s*)?$/.test(code.slice(0, m.index))))
+  if (ignored) {
+    return fail(
+      `${label(spec.task)} uses what std::${ignored} gives back`,
+      `std::${ignored} is called on a line of its own, so what it gives back is thrown away. It changes nothing: its answer is what it gives back.`
+    )
+  }
   const have = await includesOf(t, file)
   for (const [header, pattern] of [...PART9_HEADERS, ...(spec.headers ?? [])]) {
     const used = pattern.exec(code)
@@ -4275,6 +4289,13 @@ function part9Words(d, spec, section) {
       message: `${who} takes ${stream[1]}&, which is one kind of stream only. The task asks for ${stream[2]}&, which takes any stream of its direction: a file, ${stream[2] === 'std::ostream' ? 'std::cout' : 'std::cin'} or a string stream. Check hands it a string stream, so a function that only takes a file cannot be called.`
     }
   }
+  const gone = /^The compiler warns that what the function gives back refers to (\w+), a variable of that function, which ends when it returns\. A lambda/.exec(d.message)
+  if (gone && !/\[[^\]]*&/.test(codeOnly(section ?? ''))) {
+    return {
+      ...d,
+      message: `The compiler warns that what ${spec.fn ?? spec.member ?? `the code of ${label(spec.task)}`} gives back is the address of ${gone[1]}, a variable of its own, which ends when it returns. The caller then reads through the address of something that is gone, and what it finds there has no promised value. Give back the address of something that outlives the call.`
+    }
+  }
   if (/went on reading after the end of what Check typed/.test(d.message)) {
     return { ...d, message: `${who} reads from std::cin, what people type in the terminal, and not from the stream it is handed. Check fills the stream with text of its own; in the terminal, std::cin would sit and wait for typing.` }
   }
@@ -4292,6 +4313,8 @@ function part9Words(d, spec, section) {
  * - paths: true when the function is handed a path, so a file named in its code is refused
  * - headers: [[header, pattern]] more names the task's lines need a header for
  * - allWarnings: fail on any warning in the task's lines; extraFlags: more compiler flags
+ * - uses: the algorithms the task's lines must call, for a task whose code toolRule cannot find,
+ *   such as a member function written below its class
  * Check's code writes a file with indent9_::write_(name, text) and reads one back with
  * indent9_::read_(key, name); fileText(got, key) gives it, or null when there was none.
  */
@@ -4306,6 +4329,7 @@ export async function judgeFile(t, spec) {
     named: [...STREAM_TYPES, ...(spec.named ?? [])],
     helpers: [...PART9_HELPERS, ...(spec.helpers ?? [])],
     cause: (errors, ctx) => part9Cause(errors, ctx) ?? spec.cause?.(errors, ctx) ?? null,
+    link: (said, ctx) => (spec.className ? classLink(said, ctx, spec) : null) ?? spec.link?.(said, ctx) ?? null,
     warning: (warnings) => part9Warning(warnings, spec) ?? spec.warning?.(warnings) ?? null
   })
   return details.map((d) => part9Words(d, spec, section))
