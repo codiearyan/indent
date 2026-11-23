@@ -1,0 +1,195 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "header",
+        "label": "repair.h",
+        "kind": "file"
+      },
+      {
+        "id": "price",
+        "label": "price.cpp",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "counter",
+        "label": "counter.cpp",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "main",
+        "label": "main.cpp",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "linker",
+        "label": "Linker",
+        "kind": "story"
+      },
+      {
+        "id": "program",
+        "label": "One program",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "header",
+        "to": "price",
+        "label": "the repair"
+      },
+      {
+        "from": "header",
+        "to": "counter",
+        "label": "the repair"
+      },
+      {
+        "from": "header",
+        "to": "main",
+        "label": "the repair"
+      },
+      {
+        "from": "price",
+        "to": "linker",
+        "label": "a piece"
+      },
+      {
+        "from": "counter",
+        "to": "linker",
+        "label": "a piece"
+      },
+      {
+        "from": "main",
+        "to": "linker",
+        "label": "a piece"
+      },
+      {
+        "from": "linker",
+        "to": "program",
+        "label": "joined"
+      }
+    ],
+    "note": "Three files share one header, and the linker joins them into one program with one main."
+  },
+  "tasks": {
+    "price": {
+      "steps": [
+        {
+          "active": [
+            "header",
+            "header->price"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a repair: minutes, parts"
+            ]
+          },
+          "note": "The header promises a price for a repair."
+        },
+        {
+          "active": [
+            "price"
+          ],
+          "note": "Ambrose's rate is written once, in price.cpp, with the header's first line."
+        },
+        {
+          "active": [
+            "price->linker",
+            "linker"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "the price"
+            ]
+          },
+          "note": "The linker connects every call for a price to that one body."
+        }
+      ]
+    },
+    "pickup": {
+      "steps": [
+        {
+          "active": [
+            "header",
+            "header->counter"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a repair"
+            ]
+          },
+          "note": "counter.cpp uses the same repair, from the same header."
+        },
+        {
+          "active": [
+            "counter"
+          ],
+          "note": "Dorrit's words are written once, in counter.cpp."
+        },
+        {
+          "active": [
+            "counter->linker",
+            "linker"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "the pickup line"
+            ]
+          },
+          "note": "The line comes back to whoever asks for it."
+        }
+      ]
+    },
+    "total": {
+      "steps": [
+        {
+          "active": [
+            "main",
+            "header->main"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the day's repairs"
+            ]
+          },
+          "note": "At the end of the day, main.cpp adds up the repairs."
+        },
+        {
+          "active": [
+            "main",
+            "price"
+          ],
+          "note": "It asks price.cpp for each price instead of working one out itself."
+        },
+        {
+          "active": [
+            "main->linker",
+            "linker->program",
+            "program"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "the day's total"
+            ]
+          },
+          "note": "The linker joins the files, and the one program gives the day's total."
+        }
+      ]
+    }
+  }
+}

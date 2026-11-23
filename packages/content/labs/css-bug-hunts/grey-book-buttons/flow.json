@@ -1,0 +1,104 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kwame", "label": "Kwame", "kind": "story" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "book", "label": "Book buttons", "kind": "data" },
+      { "id": "join", "label": "Become a member", "kind": "data" },
+      { "id": "others", "label": "Trailer and terms links", "kind": "data" },
+      { "id": "browser", "label": "Browser panel", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kwame", "to": "css", "label": "button rule" },
+      { "from": "css", "to": "book", "label": "rules" },
+      { "from": "css", "to": "join", "label": "rules" },
+      { "from": "css", "to": "others", "label": "rules" },
+      { "from": "book", "to": "browser", "label": "colours" },
+      { "from": "join", "to": "browser", "label": "colours" },
+      { "from": "others", "to": "browser", "label": "colours" }
+    ],
+    "note": "Kwame wrote a rule for the orange buttons, but more than one rule in styles.css picks each button, and only one of them wins."
+  },
+  "tasks": {
+    "book-buttons": {
+      "steps": [
+        {
+          "active": ["kwame", "kwame->css", "css"],
+          "note": "Kwame added a rule in January that gives every button with the class button-primary an orange background."
+        },
+        {
+          "active": ["css", "css->book", "book"],
+          "value": {
+            "kind": "map",
+            "label": "a Book button",
+            "entries": [
+              { "key": "element", "value": "a" },
+              { "key": "classes", "value": "button, button-primary" },
+              { "key": "inside", "value": "article.film-card, section#listings" }
+            ]
+          },
+          "note": "More than one rule in styles.css picks a Book button and sets its background. The browser uses only one."
+        },
+        {
+          "active": ["book"],
+          "value": {
+            "kind": "array",
+            "label": "how the winner is picked",
+            "values": ["!important first", "then the stronger selector", "then the later rule"]
+          },
+          "note": "Whichever rule is strongest decides the colour, whatever was written last."
+        },
+        {
+          "active": ["book", "book->browser", "browser"],
+          "note": "Once Kwame's rule is the one that wins, every Book button stands out from the Trailer button beside it, on a phone and on a wide screen."
+        }
+      ]
+    },
+    "join-button": {
+      "steps": [
+        {
+          "active": ["join"],
+          "note": "The Become a member button has the same class as a Book button, and its writing is hard to read on the orange."
+        },
+        {
+          "active": ["css", "css->join", "join"],
+          "value": {
+            "kind": "map",
+            "label": "the Become a member button",
+            "entries": [
+              { "key": "element", "value": "a" },
+              { "key": "classes", "value": "button, button-primary" },
+              { "key": "inside", "value": "section#membership" }
+            ]
+          },
+          "note": "An older rule for the links of the membership box picks the button too, and sets the colour of its writing."
+        },
+        {
+          "active": ["join", "join->browser", "browser"],
+          "note": "Once Kwame's rule wins here too, the button is orange with dark writing, like every Book button."
+        }
+      ]
+    },
+    "neighbours": {
+      "steps": [
+        {
+          "active": ["css", "css->others", "others"],
+          "note": "The old rules had a job of their own: the grey Trailer buttons and the dark orange terms link."
+        },
+        {
+          "active": ["others"],
+          "value": {
+            "kind": "array",
+            "label": "what keeps its look",
+            "values": ["Trailer links", "members' terms link", "Choose a gift, Sign up", "header links"]
+          },
+          "note": "A fix that only removes the old rules takes their look away too."
+        },
+        {
+          "active": ["book", "join", "others", "others->browser", "browser"],
+          "note": "When the old rules pick only what they were written for, the orange buttons and everything around them all look right."
+        }
+      ]
+    }
+  }
+}

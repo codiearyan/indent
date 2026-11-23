@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Dorrit",
+      "say": "Whose clock is ticket 3101?",
+      "note": "A slip has come loose."
+    },
+    {
+      "title": "Loose variables",
+      "text": "Four values per repair, kept apart by name."
+    },
+    {
+      "title": "Your code",
+      "file": "slip.cpp",
+      "mine": true,
+      "gap": "No type for one repair",
+      "tasks": [
+        "Write the struct",
+        "Fill in a repair",
+        "Write the slip line",
+        "Add the customer"
+      ]
+    },
+    {
+      "title": "Customer",
+      "say": "Yes, that mantel clock is mine."
+    }
+  ],
+  "ticket": {
+    "label": "Ticket 3101",
+    "wrong": "mixed up",
+    "why": "Drifted",
+    "right": "one repair"
+  },
+  "captions": [
+    "Dorrit holds ticket 3101 and needs to know whose clock it is.",
+    "Each repair is four loose variables, and they drift apart.",
+    "You write a struct that keeps a whole repair as one value.",
+    "Now ticket 3101 carries its owner, its item and its minutes with it.",
+    "Each repair is one value now. Next, Kasimir hands repairs to functions."
+  ]
+}

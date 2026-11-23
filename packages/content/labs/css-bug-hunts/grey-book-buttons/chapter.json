@@ -1,0 +1,81 @@
+{
+  "id": "grey-book-buttons",
+  "title": "Book buttons that stay grey",
+  "files": ["styles.css", "index.html"],
+  "terminal": {
+    "description": "The Wrenfield's home page runs in the Browser panel and reloads every time you save styles.css. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "book-buttons",
+      "title": "Make the Book buttons orange",
+      "file": "styles.css",
+      "description": "Kwame's `.button-primary` rule makes a button orange with dark writing, and every Book button on a film card has that class. They are still grey.\n\nMake the Book buttons orange with dark writing by fixing the rule that beats Kwame's. Do not add `!important`, do not add an id to a selector to win, and change only `styles.css`: `index.html` stays as it is.\n\nThe check reads the background and the writing colour of every Book button on a phone and on a wide screen, and works out which rule wins each one.",
+      "nextSteps": [
+        "Look at the Book buttons in the Browser panel. Read \"Find the rule that wins\" in the lesson.",
+        "Find every rule in styles.css whose selector picks a Book button and sets its background.",
+        "Count what each selector is made of, and work out which one wins and why.",
+        "Change the rule that is stronger than it needs to be, save and press Check."
+      ],
+      "hints": [
+        "A Book button is a link inside a film card inside the section with the id `listings`. More than one rule picks it.",
+        "`#listings .film-card a` has an id in it, so it beats `.button-primary` wherever each sits in the file. That rule only needs to style the Trailer links.",
+        "Change that old selector so it picks only the Trailer links, for example by their own class, `.trailer-link`. Then Kwame's rule is the strongest one left on a Book button."
+      ],
+      "docs": [
+        { "title": "Specificity", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Specificity" },
+        { "title": "Cascade, specificity and inheritance", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Handling_conflicts" },
+        { "title": "!important", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/important" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "join-button",
+      "title": "Make the Become a member button readable",
+      "file": "styles.css",
+      "description": "Kwame did not mention it, but the Become a member button in the membership box has the same `.button-primary` class, and its writing is dark orange on orange.\n\nMake it orange with dark writing, like a Book button, by fixing the rule that beats Kwame's there. The same limits hold: no `!important`, no id added to win, and only `styles.css` changes.\n\nThe check reads the background and the writing colour of the button on a phone and on a wide screen, and works out which rule wins each one.",
+      "nextSteps": [
+        "Look at the membership box in the Browser panel: the button is orange, but its writing is hard to read.",
+        "Find every rule that sets the colour of a link inside the membership box.",
+        "Work out why Kwame's dark writing loses there.",
+        "Make the old rule pick only what it was written for, save and press Check."
+      ],
+      "hints": [
+        "The background is right here. Only the writing colour loses.",
+        "`#membership a` was written in 2018 for the text links of the box, before the button existed. Its id beats `.button-primary`.",
+        "The terms link sits inside a `p` with the class `small`; the button does not. A selector such as `.membership p a` picks the link and leaves the button to Kwame's rule."
+      ],
+      "docs": [
+        { "title": "Specificity", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Specificity" },
+        { "title": "Descendant combinator", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/Descendant_combinator" }
+      ],
+      "videos": [
+        { "title": "Specificity explained", "url": "https://www.youtube.com/watch?v=c0kfcP_nD9E" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "neighbours",
+      "title": "Keep the links next to them as they were",
+      "file": "styles.css",
+      "description": "The old rules you weakened did a job too. The Trailer links are grey buttons, the members' terms link is dark orange and bold, the Choose a gift and Sign up buttons are grey, and the links in the header are dark. All of that stays as it was.\n\nThis check runs once the Book and Become a member buttons are right, and until then it says which task is not done yet. It reads the colours of the Trailer links, the terms link, the grey buttons and the header links.",
+      "nextSteps": [
+        "After your fix, look at a film card and the membership box. Before it, the Trailer links were grey buttons and the terms link was dark orange and bold.",
+        "For each link that changed, find which rule picked it before your change.",
+        "Give it a selector that picks it and leaves the orange buttons alone.",
+        "Save and press Check."
+      ],
+      "hints": [
+        "Deleting an old rule fixes the button and takes the look away from everything else that rule picked.",
+        "Each old rule had one real job: the grey Trailer buttons, and the dark orange terms link. Keep that job and narrow the selector.",
+        "The Trailer links have the class `trailer-link`, and the terms link sits in `p.small` inside the membership box. Rules for those keep their looks without touching the orange buttons."
+      ],
+      "docs": [
+        { "title": "Class selectors", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/Class_selectors" },
+        { "title": "Specificity", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Specificity" }
+      ],
+      "points": 10
+    }
+  ]
+}

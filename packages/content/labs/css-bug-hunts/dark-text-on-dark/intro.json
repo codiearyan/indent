@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Lior", "say": "The late show text is dark on dark.", "note": "Only the heading is light." },
+    { "title": "Late show box", "text": "A light --ink, set on a dark box.", "note": "The writing never uses it." },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "The box's ink never reaches",
+      "tasks": ["Late show writing", "Footer writing", "Other colours kept"]
+    },
+    { "title": "Late show box", "rows": [["Late show"], ["Every Friday at 22:30"], ["This Friday"]] }
+  ],
+  "ticket": { "label": "Late show", "wrong": "dark on dark", "why": "Wrong ink", "right": "easy to read" },
+  "captions": [
+    "At the Wrenfield, Lior finds the new late show box hard to read on a phone.",
+    "The box sets a light ink, but its paragraph and list stay dark on the dark background.",
+    "You trace where the writing gets its colour and fix it in the box and in the footer.",
+    "Now the late show box is light writing on dark, and so is the footer.",
+    "Same colours, worked out in the right place. Everything else on the page is unchanged."
+  ]
+}

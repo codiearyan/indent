@@ -1,0 +1,73 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "phone", "label": "Bartek's phone", "kind": "story" },
+      { "id": "column", "label": "A column", "kind": "data" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "gift", "label": "Gift box", "kind": "data" },
+      { "id": "field", "label": "Email field", "kind": "data" },
+      { "id": "look", "label": "Padding and borders", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "phone", "to": "column", "label": "its width" },
+      { "from": "column", "to": "gift", "label": "100%" },
+      { "from": "column", "to": "field", "label": "100%" },
+      { "from": "css", "to": "gift", "label": "sizes" },
+      { "from": "css", "to": "field", "label": "sizes" },
+      { "from": "css", "to": "look", "label": "keeps" }
+    ],
+    "note": "A width of 100% means the column, and by default the padding and the border are added on top of it."
+  },
+  "tasks": {
+    "gift-box": {
+      "steps": [
+        {
+          "active": ["phone", "phone->column", "column"],
+          "note": "On a phone the gift box's column is about as wide as the screen."
+        },
+        {
+          "active": ["column", "column->gift", "gift"],
+          "value": { "kind": "map", "label": "what the browser adds up", "entries": [{ "key": "width", "value": "100% of the column" }, { "key": "padding", "value": "left and right" }, { "key": "border", "value": "left and right" }] },
+          "note": "With content-box sizing, the gift box's width covers only what is inside, and its padding and border come on top."
+        },
+        {
+          "active": ["css", "css->gift", "gift"],
+          "note": "When the box is sized so all of it counts against the column, it fits and fills its column on any screen."
+        }
+      ]
+    },
+    "email-field": {
+      "steps": [
+        {
+          "active": ["column", "column->field", "field"],
+          "note": "The email field in the footer has the same 100% with padding and a border on top."
+        },
+        {
+          "active": ["field"],
+          "note": "A field is not a block box: without a width it shrinks to its own default size instead of filling the column."
+        },
+        {
+          "active": ["css", "css->field", "field"],
+          "note": "Sized so its padding and border count inside its width, the field fills its column exactly."
+        }
+      ]
+    },
+    "same-look": {
+      "steps": [
+        {
+          "active": ["css", "css->look", "look"],
+          "value": { "kind": "array", "label": "what stays", "values": ["gift box padding and border", "field padding and border", "film card padding and border", "membership and gifts layout"] },
+          "note": "The boxes keep the padding and borders they had."
+        },
+        {
+          "active": ["look"],
+          "note": "Taking the padding or the border away makes a box fit by making it look different."
+        },
+        {
+          "active": ["gift", "field", "look"],
+          "note": "With the fix in how the width is worked out, both boxes fit and look as Bartek made them."
+        }
+      ]
+    }
+  }
+}
