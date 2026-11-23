@@ -42,6 +42,9 @@ function answerTrouble(r, want, s) {
     if (r.status === 404) return `${r.request} got 404, but ${r.path} is one of the addresses the server answers.`
     return `${r.request} got status ${r.status}. It is an address the server answers, with 200.`
   }
+  if (want.status === 200 && !/^text\/plain\b.*charset=utf-8/i.test(r.type ?? '')) {
+    return `${r.request} was answered with Content-Type ${r.type ?? '(none)'}. Every answer of this server is plain text in UTF-8.`
+  }
   if (want.lines) {
     const got = bodyLines(r)
     if (got.join('\n') === want.lines.join('\n')) return null
