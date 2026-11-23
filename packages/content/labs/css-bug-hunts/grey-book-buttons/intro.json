@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Kwame", "say": "My Book buttons are still grey.", "note": "He made them orange in January." },
+    { "title": "Film card", "text": "Book and Trailer, two grey buttons.", "note": "Nobody can tell which one books." },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "A rule that never applies",
+      "tasks": ["Book buttons", "Member button", "Neighbours unchanged"]
+    },
+    { "title": "Film card", "text": "Book stands out from Trailer.", "note": "On a phone and on a wide screen." }
+  ],
+  "ticket": { "label": "Book", "wrong": "same as Trailer", "why": "Rule loses", "right": "stands out" },
+  "captions": [
+    "At the Wrenfield, Kwame finds the Book buttons still grey after he made them orange.",
+    "On every film card, Book and Trailer look the same, so nobody can tell them apart.",
+    "You find the rule that wins over Kwame's and fix it, then check what sits beside it.",
+    "Now the Book buttons stand out, and the Trailer links look as they did.",
+    "Same page, same rules. The one meant for the buttons is the one that wins."
+  ]
+}

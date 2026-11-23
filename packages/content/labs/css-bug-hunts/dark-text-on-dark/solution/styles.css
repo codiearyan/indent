@@ -1,0 +1,334 @@
+/*
+  The Wrenfield: styles for the whole site.
+  Written by whoever was around: Kwame since 2017, Bartek since 2019, Lior since 2023.
+  The phone layout is for screens 640px wide and narrower.
+*/
+
+/*
+  Ticket WR-23, from Lior: the writing in the late show box is dark on dark.
+  Task 1: make the writing in the late show box light, from the box's own --ink.
+  Task 2: do the same for the footer, which is dark too.
+  Task 3: keep the colours of everything else as they were.
+  Only this file changes. index.html stays as the ticket found it.
+*/
+
+:root {
+  --paper: #f6f1e7;
+  --card: #fffdf8;
+  --ink: #1f1b16;
+  --muted: #6b6258;
+  --stone: #d8d0c4;
+  --orange: #e8743b;
+  --orange-deep: #a8481b;
+  --night: #1c1f2b;
+  --button-ink: #1f1b16;
+}
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: Georgia, serif;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Trebuchet MS', sans-serif;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+a {
+  color: var(--ink);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Header and menu, Kwame 2017 */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  background-color: var(--card);
+  border-bottom: 1px solid var(--stone);
+}
+
+.logo {
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.nav-list {
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-list a,
+.nav-menu summary {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-menu {
+  position: relative;
+}
+
+.menu-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 20;
+  min-width: 180px;
+  margin: 8px 0 0;
+  padding: 8px 0;
+  list-style: none;
+  background-color: var(--card);
+  border: 1px solid var(--stone);
+  border-radius: 8px;
+}
+
+.menu-panel a {
+  display: block;
+  padding: 8px 16px;
+}
+
+/* The page */
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+}
+
+.hero {
+  position: relative;
+  margin: 24px 0;
+}
+
+.hero img {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+}
+
+.hero-caption {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  margin: 0;
+  padding: 8px 12px;
+  background-color: var(--night);
+  color: var(--paper);
+  border-radius: 6px;
+}
+
+.notice {
+  color: var(--orange-deep);
+}
+
+/* Films, Bartek 2019 */
+
+.film-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.film-card {
+  position: relative;
+  padding: 16px;
+  background-color: var(--card);
+  border: 1px solid var(--stone);
+  border-radius: 10px;
+}
+
+.film-card h3 {
+  margin: 12px 0 4px;
+}
+
+.times {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  padding: 4px 10px;
+  background-color: var(--ink);
+  color: var(--paper);
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.trailer-link {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: var(--stone);
+  color: var(--ink);
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.seat-guide {
+  margin-top: 12px;
+}
+
+.seat-guide summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.seat-panel {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 100%;
+  z-index: 5;
+  padding: 12px 16px;
+  background-color: var(--card);
+  border: 1px solid var(--stone);
+  border-radius: 8px;
+}
+
+/* Buttons, Kwame 2025 */
+
+.button {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 6px;
+  background-color: var(--stone);
+  color: var(--button-ink);
+  font: inherit;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button-primary {
+  background-color: var(--orange);
+  color: var(--button-ink);
+}
+
+/* Late show, Lior 2023 */
+
+.late-show {
+  --ink: #efe8dc;
+  margin-top: 48px;
+  padding: 24px;
+  background-color: var(--night);
+  color: var(--ink);
+  border-radius: 12px;
+}
+
+.late-show a {
+  color: var(--orange);
+}
+
+/* Membership and gifts */
+
+.extras {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.membership {
+  padding: 24px;
+  background-color: var(--card);
+  border-radius: 12px;
+}
+
+.membership p a {
+  color: var(--orange-deep);
+  font-weight: bold;
+}
+
+.small {
+  font-size: 0.9rem;
+}
+
+.gift-box {
+  padding: 24px;
+  border: 3px solid var(--orange);
+  border-radius: 12px;
+  background-color: var(--card);
+}
+
+/* Footer, Bartek 2022 */
+
+.site-footer {
+  --ink: #efe8dc;
+  padding: 32px 24px;
+  background-color: var(--night);
+  color: var(--ink);
+}
+
+.footer-columns {
+  display: flex;
+  gap: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.footer-columns > * {
+  flex: 1;
+}
+
+.signup label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.signup input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--stone);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.signup .button {
+  margin-top: 8px;
+}
+
+/* Phone layout */
+
+@media (max-width: 640px) {
+  .site-header {
+    padding: 12px 16px;
+  }
+
+  .film-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .extras {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-columns {
+    display: block;
+  }
+}

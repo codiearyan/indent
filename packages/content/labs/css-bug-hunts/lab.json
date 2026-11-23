@@ -1,0 +1,16 @@
+{
+  "id": "css-bug-hunts",
+  "title": "CSS bug hunts",
+  "description": "The Wrenfield is a one-screen cinema on Ember Street, and its website has had styles added by five people over eight years, each fixing what was in front of them that day. Work through five tickets from Kwame, Bartek and Lior, each a page that looks wrong for a reason the stylesheet hides: see it in the browser, find the rule that really wins, fix it at the cause and make sure the fix did not break what sat next to it. You learn to read a stylesheet the way the browser does, from the cascade and inheritance to box sizes, media queries and what sits on top.",
+  "category": "Interview bug cases",
+  "language": "html",
+  "tags": ["CSS", "Debugging"],
+  "kind": "bug-hunt",
+  "parts": [
+    {
+      "title": "Rules that lose",
+      "chapters": ["grey-book-buttons", "squeezed-on-a-phone", "dark-text-on-dark"]
+    },
+    { "title": "Boxes and layers", "chapters": ["box-past-the-edge", "menu-behind-the-picture"] }
+  ]
+}

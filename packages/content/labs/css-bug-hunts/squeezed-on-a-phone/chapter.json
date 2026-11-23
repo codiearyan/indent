@@ -1,0 +1,80 @@
+{
+  "id": "squeezed-on-a-phone",
+  "title": "A phone layout that never arrives",
+  "files": ["styles.css", "index.html"],
+  "terminal": {
+    "description": "The Wrenfield's home page runs in the Browser panel and reloads every time you save styles.css. Drag the panel narrower to see the page the way a phone would."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "film-grid",
+      "title": "Give the films one column on a phone",
+      "file": "styles.css",
+      "description": "The comment at the top of `styles.css` says the phone layout is for screens 640px wide and narrower, and the phone layout at the bottom gives the film grid one column. On Bartek's phone the films are still three in a row.\n\nMake the film grid one column at 640px and narrower by fixing why the phone rule loses. No `!important`, no second copy of the phone rule next to one that never applies, and only `styles.css` changes.\n\nThe check reads the film grid's columns at three phone widths, 640px among them, and works out which rule wins at each.",
+      "nextSteps": [
+        "Drag the Browser panel narrow and watch the films. Read \"Find the rule that wins\" in the lesson.",
+        "Find every rule in styles.css that sets the film grid's columns, inside a media query or not.",
+        "At a phone width, work out which of them wins and why.",
+        "Change the file so the phone rule wins on a phone, save and press Check."
+      ],
+      "hints": [
+        "The phone rule is right and its condition is right. Something else sets the same columns.",
+        "The film grid rule was moved to the end of the file in 2024. It is as strong as the phone rule, and the later of two equal rules wins.",
+        "Move the `.film-grid` rule back above the phone layout, with the other film rules, so the phone rule comes after it."
+      ],
+      "docs": [
+        { "title": "Using media queries", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Media_queries/Using" },
+        { "title": "Introducing the CSS cascade", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Introduction" }
+      ],
+      "videos": [
+        { "title": "An introduction to media queries", "url": "https://www.youtube.com/watch?v=Xig7NsIE6DI" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "footer",
+      "title": "Stack the footer on a phone",
+      "file": "styles.css",
+      "description": "Bartek did not mention it, but the footer has the same trouble: the phone layout stacks its three parts, and on a phone they are still squeezed side by side.\n\nMake the footer stacked at 640px and narrower by fixing why the phone rule loses there. The same limits hold: no `!important`, no copy next to a rule that never applies, and only `styles.css` changes.\n\nThe check reads how the footer is laid out at three phone widths, 640px among them, and works out which rule wins at each.",
+      "nextSteps": [
+        "Look at the footer in a narrow Browser panel.",
+        "Find every rule that sets how the footer's parts are laid out.",
+        "Compare the phone rule with the one that wins. Moving it may not be enough here.",
+        "Fix the cause, save and press Check."
+      ],
+      "hints": [
+        "This time the phone rule is already at the end of the file, and it still loses.",
+        "`.site-footer .footer-columns` has two classes. The phone rule's selector has one, so it loses wherever it sits.",
+        "Make the two selectors equally strong: write the footer rule as `.footer-columns`, or the phone rule as `.site-footer .footer-columns`."
+      ],
+      "docs": [
+        { "title": "Specificity", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Specificity" },
+        { "title": "Using media queries", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Media_queries/Using" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "wide-layout",
+      "title": "Keep the wide layout on wider screens",
+      "file": "styles.css",
+      "description": "Above 640px nothing changes: the films stay three in a row, the footer's three parts stay side by side, and the membership and gift boxes keep their two columns, which become one on a phone as before.\n\nThis check runs once the film grid and the footer are right on a phone, and until then it says which task is not done yet. It reads the film grid, the footer and the membership and gift boxes at 641px, 800px and 1024px, and the boxes on a phone too.",
+      "nextSteps": [
+        "Drag the Browser panel wide again and look at the films and the footer.",
+        "Make the panel just wider than a phone and look again.",
+        "If something is in one column there, find which rule reaches it and why.",
+        "Save and press Check."
+      ],
+      "hints": [
+        "A fix that sets one column outside the media query reaches every screen.",
+        "The phone layout's condition decides where it starts. The site's comment says 640px and narrower.",
+        "Keep the one-column rules inside `@media (max-width: 640px)`, and keep the three-column rule for the film grid outside it."
+      ],
+      "docs": [
+        { "title": "Using media queries", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Media_queries/Using" },
+        { "title": "grid-template-columns", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns" }
+      ],
+      "points": 10
+    }
+  ]
+}
