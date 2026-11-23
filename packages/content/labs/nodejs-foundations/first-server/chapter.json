@@ -1,0 +1,146 @@
+{
+  "id": "first-server",
+  "title": "A first server",
+  "files": [
+    "server.js",
+    "plots.txt",
+    "requests.txt",
+    "ask.js"
+  ],
+  "terminal": {
+    "description": "A terminal in your workspace. `node ask.js server.js` starts your server, sends it each request in `requests.txt`, shows every answer and what the server printed, then stops it. `node server.js` runs it for a browser at http://localhost:3000 until you press Ctrl+C.",
+    "suggestedCommand": "node ask.js server.js"
+  },
+  "tasks": [
+    {
+      "id": "answer",
+      "title": "Answer every request with the free plots",
+      "file": "server.js",
+      "description": "Write `server.js` so that it makes a server with `createServer` from `node:http` and listens on the port in the setting `PORT`. Once it is listening, it prints:\n\n```\nListening on http://localhost:3000\n```\n\nwith the port it listens on. Every request, whatever its address, gets the free plots of `plots.txt`, the file beside the script, as the body of the answer:\n\n```\nFree plots: A3, B2, C3.\n```\n\nor `No plots are free.` when there are none. Rhiannon edits `plots.txt` while the server runs, so read it each time a request comes.\n\nTry it with `node ask.js server.js`. Check starts your server from another folder with a `PORT` and a `plots.txt` of its own, sends it requests to different addresses, and changes `plots.txt` between them.",
+      "nextSteps": [
+        "Make the server with `createServer`, and give it a function that gets each request and its answer.",
+        "Read the port from `process.env.PORT` and call `listen` with it; print the line once listening.",
+        "In the function, read `plots.txt` from the script's folder and work out the free plots, as in the first part of this repo.",
+        "End the answer with the line as its body."
+      ],
+      "hints": [
+        "A request waits until its answer is ended. Until then the browser, or `ask.js`, keeps waiting.",
+        "The function given to `createServer` gets `(req, res)`. `res.end(text)` sends `text` as the body and finishes the answer. It can be an `async` function, so it may `await readFile(...)`.",
+        "`const server = createServer(async (req, res) => { res.end(await freePlots()) })`, then `server.listen(process.env.PORT, () => console.log(...))`."
+      ],
+      "docs": [
+        {
+          "title": "http.createServer()",
+          "url": "https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener"
+        },
+        {
+          "title": "server.listen()",
+          "url": "https://nodejs.org/api/net.html#serverlisten"
+        },
+        {
+          "title": "response.end()",
+          "url": "https://nodejs.org/api/http.html#responseenddata-encoding-callback"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "kind",
+      "title": "Say what kind of answer it is",
+      "file": "server.js",
+      "description": "Change `server.js` so that the answer with the free plots has the status `200` and the header `Content-Type: text/plain; charset=utf-8`, which tells a browser the body is plain text in UTF-8.\n\nWhen `plots.txt` cannot be read, because Rhiannon is saving it or it is gone, the answer has the status `500` and the same header, and its body is:\n\n```\nThe plot list cannot be read.\n```\n\nThe server keeps running, and once the file is back the free plots are answered again.\n\nCheck sends requests, removes `plots.txt` and sends more, then puts a new one back.",
+      "nextSteps": [
+        "Set the status and the header before the body is sent.",
+        "Remove `plots.txt` for a moment, run `node ask.js server.js`, and see what happens now.",
+        "Catch the error that reading the file throws, and answer with status 500 and the line from the task.",
+        "Put `plots.txt` back."
+      ],
+      "hints": [
+        "An error thrown by an `await` that nobody catches ends the whole server, not only the one request.",
+        "`res.statusCode = 500` sets the status and `res.setHeader(name, value)` a header. Both have to come before the body: once part of it is sent, they have gone.",
+        "`res.setHeader('Content-Type', 'text/plain; charset=utf-8')`, then `try { res.end(await freePlots()) } catch { res.statusCode = 500; res.end('The plot list cannot be read.') }`."
+      ],
+      "docs": [
+        {
+          "title": "response.setHeader()",
+          "url": "https://nodejs.org/api/http.html#responsesetheadername-value"
+        },
+        {
+          "title": "response.statusCode",
+          "url": "https://nodejs.org/api/http.html#responsestatuscode"
+        },
+        {
+          "title": "Content-Type",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type"
+        }
+      ],
+      "videos": [
+        {
+          "title": "HTTP status codes in five minutes",
+          "url": "https://www.youtube.com/watch?v=qmpUfWN7hh4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "port",
+      "title": "Choose the port, and say when it is taken",
+      "file": "server.js",
+      "description": "Change `server.js` so that:\n\n- When `PORT` is not set, or is empty, it listens on `3000`.\n- When `PORT` is not a whole number from 1 to 65535, such as `abc` or `80.5`, it prints one line on standard error that names `PORT`, nothing on standard output, does not listen, and ends with exit code 1.\n- When the port is already in use by another program, it prints one line on standard error that names the port, such as `Port 3000 is already in use.`, and ends with exit code 1, without Node's error and its stack.\n\nTry them with `node ask.js PORT=abc server.js` and `node ask.js --busy server.js`. Check starts your server with `PORT` not set, empty and set to ports that are not ports, and once with its port taken.",
+      "nextSteps": [
+        "Use 3000 when the setting is missing or empty, as in the issue on settings.",
+        "Turn the setting into a number and refuse it when it is not a whole number from 1 to 65535, before listening.",
+        "Run `node ask.js --busy server.js` and read the error Node stops with.",
+        "Listen for the server's `error` event, and for `EADDRINUSE` print one line and set the exit code."
+      ],
+      "hints": [
+        "A server that cannot listen does not throw where `listen` is called. It emits an `error` event a moment later, and with no listener for it, Node stops the script with the error.",
+        "`server.on('error', (error) => ...)` gets the error. Its `code` is `'EADDRINUSE'` when the port is taken. `Number.isInteger` is false for `NaN` and for `80.5`.",
+        "`server.on('error', (error) => { if (error.code === 'EADDRINUSE') console.error(`Port ${port} is already in use.`); process.exitCode = 1 })`."
+      ],
+      "docs": [
+        {
+          "title": "server 'error' event",
+          "url": "https://nodejs.org/api/net.html#event-error"
+        },
+        {
+          "title": "Common system errors",
+          "url": "https://nodejs.org/api/errors.html#common-system-errors"
+        },
+        {
+          "title": "Number.isInteger()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stop",
+      "title": "Stop the server on Ctrl+C",
+      "file": "server.js",
+      "description": "A server keeps running until someone stops it, and Ctrl+C ends it on the spot, in the middle of whatever it was sending. Change `server.js` so that Ctrl+C, the `SIGINT` signal, closes the server: it stops taking requests, lets the answers on their way finish, then prints:\n\n```\nServer stopped.\n```\n\nand the script ends by itself with exit code 0.\n\nCheck sends your server requests, then raises `SIGINT` inside it, the way Ctrl+C does, and waits for it to end by itself.",
+      "nextSteps": [
+        "Run `node server.js`, press Ctrl+C, and see what is printed now.",
+        "Listen for `SIGINT` on `process`, as in the issue on timers.",
+        "In the listener, close the server, and print the line once it has closed.",
+        "Run it again and check the prompt comes back after Ctrl+C."
+      ],
+      "hints": [
+        "A listening server keeps the script alive, like a timer. Until it is closed, the script does not end by itself.",
+        "`server.close(callback)` stops taking new requests and calls `callback` once the last answer is finished.",
+        "`process.on('SIGINT', () => server.close(() => console.log('Server stopped.')))`."
+      ],
+      "docs": [
+        {
+          "title": "server.close()",
+          "url": "https://nodejs.org/api/http.html#serverclosecallback"
+        },
+        {
+          "title": "Signal events",
+          "url": "https://nodejs.org/api/process.html#signal-events"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
