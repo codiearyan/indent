@@ -24,12 +24,18 @@ const INHERITED = new Set([
   'word-break'
 ])
 
-// A promise the page never catches would otherwise end the whole grader. It cannot be traced to
-// one page, so every open page gets it as an error; with no page open it is the grader's own bug.
-const openPages = new Set()
-process.on('unhandledRejection', (reason) => {
+// A promise the page never catches would otherwise end the whole grader. Each page runs in a realm
+// of its own, so a promise its code made is traced to it by its Promise; one that cannot be traced
+// goes to every open page, and with no page open it is the grader's own bug.
+const openPages = new Map()
+// A page closed while its promises were pending must not hand them to another page, or crash.
+const closedPages = new Set()
+process.on('unhandledRejection', (reason, promise) => {
+  if ([...closedPages].some((window) => promise instanceof window.Promise)) return
   if (!openPages.size) throw reason
-  for (const errors of openPages) errors.push(`Uncaught (in promise) ${reason?.message ?? reason}`)
+  const message = `Uncaught (in promise) ${reason?.message ?? reason}`
+  const owner = [...openPages].find(([window]) => promise instanceof window.Promise)
+  for (const errors of owner ? [owner[1]] : openPages.values()) errors.push(message)
 })
 
 /** Bundles a module the same way the Browser panel does, wrapped so the page can run it. */
@@ -44,8 +50,9 @@ async function bundle(esbuild, options) {
     ...options
   })
   // An async function body keeps top-level await working; a bundled entry has no imports left.
+  // A module is always strict in a browser, so assigning to a frozen prop throws here too.
   const code = result.outputFiles[0].text.replace(/^export\s*\{[^}]*\};?\s*$/m, '')
-  return `(async () => {${code}\n})()`
+  return `(async () => {'use strict';\n${code}\n})()`
 }
 
 // shortcut: only width conditions in px, em and rem are understood; any other feature counts as
@@ -79,12 +86,58 @@ function matchesMedia(query, width) {
   )
 }
 
-// shortcut: a count of ids, classes and element names. :is(), :not() and :where() are not
-// weighed by their arguments. Upgrade when an issue teaches those.
+/** Splits at top-level commas, leaving those inside parentheses and quotes alone. */
+function splitTop(list) {
+  const parts = ['']
+  let depth = 0
+  let quote = null
+  for (const char of list) {
+    if (quote) quote = char === quote ? null : quote
+    else if (char === '"' || char === "'") quote = char
+    else depth += char === '(' ? 1 : char === ')' ? -1 : 0
+    if (char === ',' && depth === 0 && !quote) parts.push('')
+    else parts[parts.length - 1] += char
+  }
+  return parts.map((part) => part.trim()).filter(Boolean)
+}
+
+const WEIGHED = /:(where|is|not|has)\(/i
+
+/** The index just past the parenthesis that closes the one at `open`. */
+function closing(text, open) {
+  let depth = 1
+  let end = open + 1
+  for (; end < text.length && depth; end++) depth += text[end] === '(' ? 1 : text[end] === ')' ? -1 : 0
+  return end
+}
+
+/**
+ * A selector's weight: ids, then classes, attributes and pseudo-classes, then element names.
+ * :where() adds nothing; :is(), :not() and :has() add only their heaviest argument.
+ */
 function specificity(selector) {
-  const plain = selector.replace(/\[[^\]]*\]/g, '[]').replace(/::[\w-]+/g, ' x')
+  let rest = selector.replace(/\[[^\]]*\]/g, '[]')
+  let inner = 0
+  let at = rest.search(WEIGHED)
+  while (at !== -1) {
+    const open = rest.indexOf('(', at)
+    const end = closing(rest, open)
+    if (!/^:where/i.test(rest.slice(at))) {
+      inner += Math.max(0, ...splitTop(rest.slice(open + 1, end - 1)).map(specificity))
+    }
+    rest = `${rest.slice(0, at)} ${rest.slice(end)}`
+    at = rest.search(WEIGHED)
+  }
+  // `:nth-child(2 of .a)` also counts `.a`; what else is in parentheses is not a selector.
+  rest = rest.replace(/\(([^()]*)\)/g, (_, inside) => {
+    const of = /\bof\s+(.+)$/i.exec(inside)
+    if (of) inner += Math.max(0, ...splitTop(of[1]).map(specificity))
+    return ''
+  })
+  const plain = rest.replace(/::[\w-]+/g, ' x')
   const count = (pattern) => (plain.match(pattern) ?? []).length
   return (
+    inner +
     count(/#[\w-]+/g) * 10000 +
     count(/\.[\w-]+|\[\]|:[\w-]+/g) * 100 +
     count(/(^|[\s>+~(])[a-zA-Z][\w-]*/g)
@@ -119,7 +172,7 @@ function parseCss(text, media = [], rules = []) {
           }
         ]
       })
-      rules.push({ selectors: head.split(',').map((s) => s.trim()), media, declarations })
+      rules.push({ selectors: splitTop(head), media, declarations })
     }
     at = end
   }
@@ -202,7 +255,6 @@ export async function openPage(
   const esbuild = require('esbuild')
 
   const errors = []
-  openPages.add(errors)
   const logs = []
   const virtualConsole = new VirtualConsole()
   for (const level of ['log', 'info', 'warn', 'error']) {
@@ -224,6 +276,7 @@ export async function openPage(
   })
   const { window } = dom
   const { document } = window
+  openPages.set(window, errors)
   const local = (reference) => join(dir, new URL(reference, window.location.href).pathname)
 
   window.innerWidth = width
@@ -235,15 +288,15 @@ export async function openPage(
   })
   window.scrollTo = () => {}
   window.Element.prototype.scrollIntoView = () => {}
-  window.fetch =
-    fetch ??
-    (async (input) => {
-      try {
-        return new Response(await readFile(local(String(input?.url ?? input))))
-      } catch {
-        return new Response('Not found', { status: 404 })
-      }
-    })
+  const fetchFile = async (input) => {
+    try {
+      return new Response(await readFile(local(String(input?.url ?? input))))
+    } catch {
+      return new Response('Not found', { status: 404 })
+    }
+  }
+  // Handed back as the page's own promise, so what the page chains on it stays traceable to it.
+  window.fetch = (...args) => window.Promise.resolve((fetch ?? fetchFile)(...args))
   for (const [key, value] of Object.entries(storage)) window.localStorage.setItem(key, value)
 
   for (const link of document.querySelectorAll('link[rel="stylesheet"][href]')) {
@@ -363,7 +416,8 @@ export async function openPage(
       return styleOf(parseCss(css.join('\n')), find(target), at)
     },
     close() {
-      openPages.delete(errors)
+      openPages.delete(window)
+      closedPages.add(window)
       window.close()
     }
   }
