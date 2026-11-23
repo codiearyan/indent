@@ -57,7 +57,7 @@
       "id": "payments",
       "title": "Ask the payments service the fast way",
       "file": "src/report.js",
-      "description": "Make `checkPayments(trade, ask)` in `src/report.js` fast, without changing what it returns.\n\n- it returns what it returns now: one `{ id, customerId, status }` for every trade order, in their order\n- an order whose record says `paid: true` gets the status `'paid'`, and the service is not asked about it\n- every other order is asked about exactly once, with never more than `PAYMENTS_LIMIT` questions (in `src/shop.js`) open at once, and as many as that while there are orders left\n\nThe check hands it trade orders of its own, some marked paid, and a service of its own that records every question and how many were open at once.",
+      "description": "Make `checkPayments(trade, ask)` in `src/report.js` fast, without changing what it returns.\n\n- it returns what it returns now: one `{ id, customerId, status }` for every trade order, in their order\n- an order whose record says `paid: true` gets the status `'paid'`, and the service is not asked about it\n- every other order is asked about exactly once, with never more than `PAYMENTS_LIMIT` questions (in `src/shop.js`) open at once, and as many as that at the start\n\nThe check hands it trade orders of its own, some marked paid, and a service of its own that records every question and how many were open at once.",
       "nextSteps": [
         "Read \"The question you do not ask\" in the lesson.",
         "Pick out the trade orders that are not marked paid.",

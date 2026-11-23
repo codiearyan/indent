@@ -38,7 +38,7 @@ So a fair timing runs the function once without timing it, times it several time
 
 ## Counting, which no computer changes
 
-Even a fair timing changes from one computer to the next and from one minute to the next. A count does not. When `sort` puts ten numbers in order, it calls the comparison function you hand it a certain number of times, and that number is the same on a laptop, on the workshop computer and in a check. Count the comparisons, the questions to the price list or the payments service, and you have a measure of work that is the same on every run.
+Even a fair timing changes from one computer to the next and from one minute to the next. A count does not. When `sort` puts ten numbers in order, it calls the comparison function you hand it a certain number of times, and that number is the same on a laptop, on the workshop computer and in a check. Count the comparisons, the questions to the price list or the payments service, and you have a measure of work that is the same on every run. A function is an object like any other, so it can carry a number of its own, such as how many times it was called.
 
 Counts also show how the work grows. If doubling the orders doubles the count, the night grows with the shop. If the count becomes four times bigger, it will not stay a night for long. The Patterns in this app show how algorithms do their work step by step; this repo counts those steps in a real program.
 

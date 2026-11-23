@@ -1,7 +1,7 @@
 import { runCases } from '../../checks-helpers.mjs'
 
 const askHints = {
-  threw: 'It failed while waiting for the answers. Every question gets an answer here, so look at what happens to each one.',
+  threw: 'It threw the error below. Every question gets an answer here, so the error comes from your code: look at the line it names.',
   stuck: 'Every question was answered, but the promise it returned never settled. Make sure it waits for the answers it asked for and then finishes.',
   silent: 'It never asked a question and never finished. Start the questions, then wait for their answers.',
   each: 'Each id should be asked about exactly once: not skipped, and not asked twice.',
@@ -18,7 +18,7 @@ const paymentHints = {
   paid: 'The service was asked about an order whose record already says it is paid. Only the orders not marked paid need a question.',
   each: 'Each order not marked paid should be asked about exactly once.',
   over: 'More than four questions were open at once, and the payments service refuses the ones over its limit. Use the limit from src/shop.js.',
-  fewer: 'Fewer questions were open at once than the service takes. While there are orders left to ask about, keep as many questions open as the limit allows.',
+  fewer: 'Fewer questions were open at once than the service takes. Start as many questions as the limit allows at the very beginning.',
   answers: 'The list should be exactly what the old checkPayments gives: one { id, customerId, status } for every trade order, in their order, with \'paid\' for the orders already marked paid.'
 }
 

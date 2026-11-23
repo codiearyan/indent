@@ -29,7 +29,7 @@ const mean = (times) => times.reduce((sum, t) => sum + t, 0) / times.length
 const TIME_CASES = {
   five: { costs: [100, 10, 21, 11, 13, 12], runs: 5 },
   default: { costs: [80, 30, 21, 25, 40, 22] },
-  four: { costs: [60, 8, 14, 9, 12], runs: 4 },
+  four: { costs: [60, 12, 21, 9, 40], runs: 4 },
   later: { costs: [50, 7, 9, 8], runs: 3, later: true }
 }
 
@@ -55,9 +55,11 @@ export async function timeCase(name) {
             ? 'warm'
             : got === mean(timed)
               ? 'mean'
-              : got === Math.min(...timed)
-                ? 'fastest'
-                : 'middle'
+              : got === [...timed].sort()[Math.floor(runs / 2)]
+                ? 'text'
+                : got === Math.min(...timed)
+                  ? 'fastest'
+                  : 'middle'
   return { ok: false, seen, why }
 }
 
@@ -94,8 +96,12 @@ export async function stepsCase(name) {
   if (ok) return { ok, seen }
   const sameNames = [...got.map((row) => row.name)].sort().join() === Object.keys(c.steps).sort().join()
   if (!sameNames) return { ok: false, seen, why: 'names' }
-  const timesRight = got.every((row) => row.ms === want.find((w) => w.name === row.name).ms)
-  return { ok: false, seen, why: timesRight ? 'order' : 'times' }
+  const costs = (key) => c.steps[key]
+  const msOf = (key, n) => middle(Array.from({ length: n }, (_, i) => costs(key)[Math.min(i + 1, costs(key).length - 1)]))
+  const timesRight = got.every((row) => row.ms === msOf(row.name, runs))
+  if (timesRight) return { ok: false, seen, why: 'order' }
+  if (got.every((row) => row.ms === msOf(row.name, 5))) return { ok: false, seen, why: 'runs' }
+  return { ok: false, seen, why: got.some((row) => row.ms > Math.max(...costs(row.name))) ? 'together' : 'times' }
 }
 
 export function countCase(name) {
@@ -130,7 +136,7 @@ export function countCase(name) {
     a()
     const seen = `the first counted ${shown(a.calls)}, the second ${shown(b.calls)}`
     if (a.calls === 3 && b.calls === 1) return { ok: true, seen }
-    return { ok: false, seen, why: 'apart' }
+    return { ok: false, seen, why: a.calls === 4 || b.calls === 4 ? 'apart' : 'count' }
   }
   if (name === 'same') {
     const order = { id: 'A1' }
@@ -138,7 +144,7 @@ export function countCase(name) {
     const back = give()
     const seen = back === order ? 'it returned the very object the function returned' : `it returned ${shown(back)}`
     if (back === order && give.calls === 1) return { ok: true, seen }
-    return { ok: false, seen, why: 'result' }
+    return { ok: false, seen, why: back === order ? 'count' : 'result' }
   }
   if (name === 'throws') {
     let n = 0

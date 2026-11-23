@@ -92,7 +92,7 @@ export function makeShop(orderCount = 30000) {
 
 /**
  * A stand-in for the payments service, which says whether a trade invoice is 'paid', 'due' or
- * 'late'. In the shop each answer takes about half a second; this one waits `wait` milliseconds.
+ * 'late'. In the shop each answer takes about four seconds; this one waits `wait` milliseconds.
  * It counts the questions it was asked and the most it had open at once.
  */
 export function makePayments(shop, { wait = 1 } = {}) {

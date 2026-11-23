@@ -23,6 +23,9 @@ async function pool(items, size, fn) {
 const STUCK =
   'Your code never finished here, so the check stopped it after a few seconds. Look for a loop that never ends, a function that calls itself with the same question, or a promise nothing ever settles.'
 
+const UNSETTLED =
+  'Your code stopped without an answer: it waited for a promise that nothing ever settles. Look for an await on something that never finishes, or a promise whose resolve is never called.'
+
 // Errors that mean the code would never have finished, said in words.
 function endless(error) {
   if (/Maximum call stack/.test(error)) {
@@ -86,14 +89,17 @@ export async function runCases(t, unwritten, cases, { seconds = SECONDS } = {}) 
     const v = r.ok ? r.value : undefined
     const passed = Boolean(v?.ok)
     const hint = (v?.why && c.hints?.[v.why]) ?? c.hint
-    const seen = r.ok ? v.seen : r.timedOut ? `stopped after ${seconds} seconds` : r.error
+    const unsettled = !r.ok && !r.timedOut && /unsettled top-level await/.test(r.error)
+    const seen = r.ok ? v.seen : r.timedOut ? `stopped after ${seconds} seconds` : unsettled ? 'it waited for a promise that never settled' : r.error
     const message = passed
       ? undefined
       : r.ok
         ? hint
         : r.timedOut
           ? STUCK
-          : `Your code threw the error below here. ${endless(r.error) ?? c.hints?.threw ?? ''}`.trim()
+          : unsettled
+            ? UNSETTLED
+            : `Your code threw the error below here. ${endless(r.error) ?? c.hints?.threw ?? ''}`.trim()
     return { name: c.name, passed, message, output: `${c.setup}\n${seen}` }
   })
 }

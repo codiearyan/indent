@@ -8,6 +8,7 @@ const timeHints = {
   warm: 'The first run was timed too. Run the step once before timing anything, and leave that run out: a first run is often slower than the rest.',
   runs: 'The step should run once without timing and then once for each of the runs asked for, no more and no fewer.',
   mean: 'That is the average of the times. One slow run pulls an average up; give back the time in the middle of the sorted times instead.',
+  text: 'sort() with nothing handed to it puts numbers in order as if they were text, so 12 comes before 8. Hand sort a comparison of two numbers, so the times go from fastest to slowest.',
   fastest: 'That is the fastest of the times. Give back the time in the middle of the sorted times, which says what a usual run takes.',
   middle:
     'Sort the times from fastest to slowest and give back the one in the middle. With an even number of times, take the later of the two in the middle.'
@@ -17,8 +18,10 @@ const stepHints = {
   shape: 'timeSteps should return a list with one { name, ms } for each step: the step\'s name as text and its time as a number.',
   names: 'Each step of the object should appear once in the list, under the name it has in the object.',
   order: 'The times are right but the order is not. Put the slowest step first.',
-  times:
-    'Each ms should be what timeIt gives for that step alone, with the same number of runs. Time the steps one after another: when they run at the same time, each one\'s time takes in the others.'
+  runs: 'Each ms should be what timeIt gives for that step with the number of runs timeSteps was handed. Pass runs on to timeIt.',
+  together:
+    'Each ms should be what timeIt gives for that step alone, with the same number of runs. Time the steps one after another: when they run at the same time, each one\'s time takes in the others.',
+  times: 'Each ms should be what your timeIt gives for that step, with the same number of runs. Time each step with timeIt, and wait for its time before you start the next step.'
 }
 
 const countHints = {

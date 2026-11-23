@@ -1,7 +1,7 @@
 // Copied into the sandbox as .grader/drive.mjs. Hands the learner's functions shops of the
 // check's own whose records count how often they are read, and compares each answer with the
 // check's own copy of the slow version on the same data.
-import { firstDifference, many, same, shopOf, shown, watchList, watchRecords } from './helpers.mjs'
+import { firstDifference, many, same, shopOf, shown, watchList, watchRecords, watchSearches } from './helpers.mjs'
 import * as reference from './reference.mjs'
 
 const report = await import('../src/report.js')
@@ -32,7 +32,7 @@ export function matchCase(name) {
   const m = s.customers.length
   const reads = `for ${many(n)} orders and ${many(m)} customers, customer ids were read ${many(customers.count.id)} times and order customerIds ${many(orders.count.customerId)} times`
   if (!same(got, want)) return { ok: false, seen: `${reads}\n${firstDifference(got, want, 'order')}`, why: 'wrong' }
-  if (customers.count.id > m + n + 4) return { ok: false, seen: reads, why: 'search' }
+  if (customers.count.id > 3 * m + n + 4) return { ok: false, seen: reads, why: 'search' }
   if (orders.count.customerId > 3 * n + 4) return { ok: false, seen: reads, why: 'orders' }
   return { ok: true, seen: reads }
 }
@@ -50,12 +50,19 @@ export function tradeCase(name) {
   const s = tradeShop(name)
   const ids = watchList(s.tradeIds)
   const orders = watchRecords(s.orders, ['customerId'])
-  const got = report.tradeOrders(orders.list, ids.list)
+  const searches = watchSearches(orders.list)
+  let got
+  try {
+    got = report.tradeOrders(orders.list, ids.list)
+  } finally {
+    searches.stop()
+  }
   const n = s.orders.length
   const t = s.tradeIds.length
-  const reads = `for ${many(n)} orders and ${many(t)} trade ids, places of the trade list were read ${many(ids.count.reads)} times and order customerIds ${many(orders.count.customerId)} times`
+  const reads = `for ${many(n)} orders and ${many(t)} trade ids, places of the trade list were read ${many(ids.count.reads)} times, lists were searched ${many(searches.count.calls)} times and order customerIds were read ${many(orders.count.customerId)} times`
   if (!same(got, want)) return { ok: false, seen: `${reads}\n${firstDifference(got, want, 'order')}`, why: 'wrong' }
   if (ids.count.reads > 2 * t + 4) return { ok: false, seen: reads, why: 'search' }
+  if (searches.count.calls > 2 * t + 4) return { ok: false, seen: reads, why: 'copy' }
   if (orders.count.customerId > 3 * n + 4) return { ok: false, seen: reads, why: 'orders' }
   return { ok: true, seen: reads }
 }

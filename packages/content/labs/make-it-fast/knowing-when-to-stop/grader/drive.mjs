@@ -1,7 +1,7 @@
 // Copied into the sandbox as .grader/drive.mjs. Counts the money formatters the learner's report
 // makes, the orders its day list reads, and the questions and record reads of a whole report, on
 // shops of the check's own, and compares every answer with the check's own slow version.
-import { countCalls, many, plain, pricesOf, same, shopOf, shown, watchList, watchRecords } from './helpers.mjs'
+import { countCalls, many, plain, pricesOf, same, shopOf, shown, watchList, watchRecords, watchSearches } from './helpers.mjs'
 import * as reference from './reference.mjs'
 
 // Every money formatter made while `formatters.on`, however it is asked for.
@@ -132,7 +132,13 @@ async function buildOnce(orders, seed, prices) {
   const asked = countCalls(prices)
   const service = payments(s)
   const shop = { ...s, customers: customers.list, tradeIds: tradeIds.list }
-  const got = await report.buildReport(shop, { priceOf: asked, ask: service.ask })
+  const searches = watchSearches()
+  let got
+  try {
+    got = await report.buildReport(shop, { priceOf: asked, ask: service.ask })
+  } finally {
+    searches.stop()
+  }
   const n = s.orders.length
   const m = s.customers.length
   const t = s.tradeIds.length
@@ -141,13 +147,14 @@ async function buildOnce(orders, seed, prices) {
     `${many(n)} orders and ${many(m)} customers:`,
     `  customer ids read ${many(customers.count.id)} times`,
     `  places of the trade list read ${many(tradeIds.count.reads)} times`,
+    `  lists searched ${many(searches.count.calls)} times`,
     `  ${many(asked.calls)} price questions`,
     `  ${many(service.asked)} payment questions, at most ${service.most} at once`
   ].join('\n')
   let why
   if (got !== want) why = 'wrong'
-  else if (customers.count.id > m + n + 4) why = 'match'
-  else if (tradeIds.count.reads > 2 * t + 4) why = 'trade'
+  else if (customers.count.id > 3 * m + n + 4) why = 'match'
+  else if (tradeIds.count.reads > 2 * t + 4 || searches.count.calls > 2 * t + 4) why = 'trade'
   else if (asked.calls > pairs(s)) why = 'price'
   else if (service.asked !== unpaid || service.most > 4) why = 'payments'
   return { got, want, why, counts }

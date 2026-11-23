@@ -29,7 +29,7 @@ Each payment question is about one invoice and needs nothing from any other. So 
 
 ## No more than the service takes
 
-All at once is not always allowed. A service that is sent five thousand questions in one go may refuse them, slow down for everyone, or decide it is under attack. The payments company said four. So the report must keep four questions open while there are invoices left, and never five.
+All at once is not always allowed. A service that is sent five thousand questions in one go may refuse them, slow down for everyone, or decide it is under attack. The payments company said four. So the report may have up to four questions open at once, and never five.
 
 There are two honest ways. The simple one asks in groups: four questions, wait for all four, then the next four. The time of each group is the time of its slowest answer, so a little room is wasted. The other keeps four helpers busy. Each helper takes the next id nobody has taken yet, asks, waits for its answer, and takes the next, until no ids are left. A new question starts the moment an answer comes in, so there are always four open:
 

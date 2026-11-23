@@ -33,6 +33,18 @@ export function sharesCase(name) {
   return { ok: true, seen: reads }
 }
 
+// The same rows asked for twice in one program: the second list must get its own takings.
+export function sharesAgainCase() {
+  report.addShares(rowsOf(...SIZES.big))
+  const want = reference.addShares(rowsOf(...SIZES.bigger))
+  const got = report.addShares(rowsOf(...SIZES.bigger))
+  const seen = `addShares on ${many(SIZES.big[0])} rows, then on ${many(SIZES.bigger[0])} other rows`
+  if (same(got, want)) return { ok: true, seen }
+  const firstTakings = rowsOf(...SIZES.big).reduce((sum, r) => sum + r.spent, 0)
+  const stale = Array.isArray(got) && got[0]?.share === got[0]?.spent / firstTakings
+  return { ok: false, seen: `${seen}\n${firstDifference(got, want, 'row')}`, why: stale ? 'stale' : 'wrong' }
+}
+
 export function rankCase(name) {
   const [count, seed] = SIZES[name]
   const rows = rowsOf(count, seed)
@@ -42,6 +54,7 @@ export function rankCase(name) {
   const bound = count < 2 ? 0 : Math.ceil(2 * count * Math.log2(count) + count)
   const calls = `for ${many(count)} rows, the comparison was called ${many(compare.calls)} times`
   if (!same(got, want)) return { ok: false, seen: `${calls}\n${firstDifference(got, want, 'row')}`, why: 'wrong' }
+  if (count > 1 && compare.calls < count - 1) return { ok: false, seen: calls, why: 'own' }
   if (compare.calls > bound) return { ok: false, seen: calls, why: 'again' }
   return { ok: true, seen: calls }
 }

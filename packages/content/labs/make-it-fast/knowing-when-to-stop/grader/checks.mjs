@@ -17,7 +17,7 @@ const reportHints = {
   stale:
     'The second report still used a price from before the price list changed: answers were kept longer than they were true. Keep answers only for one report, or forget them when the price list is a different one.',
   match: 'The customer list is searched again: customer ids were read many times for each customer. Look at matchOrders.',
-  trade: 'The trade list is gone through for every order again. Look at tradeOrders.',
+  trade: 'A list of trade ids is searched for every order again, the trade list itself or a copy of it. Look at tradeOrders.',
   price: 'The price list was asked the same question more than once in one report. Look at priceOrders.',
   payments: 'The payments service should be asked once about each trade order not marked paid, never more than four at once. Look at checkPayments.'
 }

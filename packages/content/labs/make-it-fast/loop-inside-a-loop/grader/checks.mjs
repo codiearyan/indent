@@ -3,7 +3,7 @@ import { runCases } from '../../checks-helpers.mjs'
 const matchHints = {
   wrong: 'The orders should come back exactly as the old matchOrders gives them: every order in its place, with all its own fields and the record of the customer whose id it holds.',
   search:
-    'The answer is right, but the customer list is still searched for every order: the ids were read many times for each customer. Look the customers up without going through the list each time. Make something that finds a customer by id once, before the loop over the orders, and only use it inside.',
+    'The answer is right, but the customer list is still searched for every order: the ids were read many times for each customer. Make something that finds a customer by id once, before the loop over the orders, and only use it inside.',
   orders: 'Each order\'s customerId should be read about once or twice, not once for every customer.'
 }
 
@@ -11,6 +11,7 @@ const tradeHints = {
   wrong: 'The trade orders should come back exactly as the old tradeOrders gives them: the orders whose customer is on the trade list, in their own order.',
   search:
     'The answer is right, but the trade list is still gone through for every order. Make something that answers "is this id on the trade list?" without going through the list, once, before the orders are filtered.',
+  copy: 'The answer is right, but a list of trade ids is still searched for every order, with includes, indexOf, some or find, whether it is the trade list itself or a copy of it. Make something that answers "is this id on the trade list?" without going through a list, once, before the orders are filtered.',
   orders: 'Each order\'s customerId should be read about once or twice, not once for every trade customer.'
 }
 

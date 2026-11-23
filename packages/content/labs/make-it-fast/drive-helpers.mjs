@@ -107,6 +107,27 @@ export function watchList(items) {
   return { list, count }
 }
 
+const SEARCHES = ['includes', 'indexOf', 'lastIndexOf', 'some', 'every', 'find', 'findIndex', 'findLast', 'findLastIndex']
+
+/**
+ * Counts the searches (`includes`, `find` and the like) run on any list but `except` until `stop()`,
+ * so a copy of a watched list that is searched for every order is seen too.
+ */
+export function watchSearches(except) {
+  const count = { calls: 0 }
+  const real = SEARCHES.map((name) => [name, Array.prototype[name]])
+  for (const [name, fn] of real) {
+    Array.prototype[name] = function (...args) {
+      if (tally.on && this !== except) count.calls += 1
+      return fn.apply(this, args)
+    }
+  }
+  const stop = () => {
+    for (const [name, fn] of real) Array.prototype[name] = fn
+  }
+  return { count, stop }
+}
+
 /** A function that does what `fn` does and counts its calls. */
 export function countCalls(fn) {
   const counted = (...args) => {
