@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Hours on the hill this year?", "note": "For the year report." },
+    { "title": "Callout book", "text": "One long text, a line for each callout." },
+    {
+      "title": "Your functions",
+      "file": "callout_book.py",
+      "mine": true,
+      "gap": "One text nobody can add up",
+      "tasks": ["Words and lines", "Split into parts", "Add up the hours", "Fix a hill name"]
+    },
+    { "title": "Year report", "text": "Hours for the year, added up by the laptop." }
+  ],
+  "ticket": { "label": "The hours", "wrong": "on an envelope", "why": "One text", "right": "added up" },
+  "captions": [
+    "At the base, Rhona asks how many hours the team spent on the hill this year.",
+    "Today the book is one long text, so the hours get added up on the back of an envelope.",
+    "You split the book into lines and parts, take out the numbers and join lines back up.",
+    "Now the hours come out of the book added up, the same every time.",
+    "split, splitlines, int and join: text taken apart and put back together."
+  ]
+}

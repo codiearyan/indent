@@ -1,0 +1,48 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" },
+      { "id": "typed", "label": "Typed entries", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "log", "label": "Radio log", "kind": "data" },
+      { "id": "rhona", "label": "Rhona", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ailsa", "to": "typed", "label": "types fast" },
+      { "from": "typed", "to": "functions", "label": "text as typed" },
+      { "from": "functions", "to": "log", "label": "tidy text" },
+      { "from": "functions", "to": "rhona", "label": "urgent ones" }
+    ],
+    "note": "Each line from the radio desk goes through your functions, which give back tidy new text and pick out what Rhona must see."
+  },
+  "tasks": {
+    "sign": {
+      "steps": [
+        { "active": ["ailsa", "ailsa->typed", "typed"], "note": "A call sign comes in typed in small letters, with spaces and a line end around it." },
+        { "active": ["typed", "typed->functions", "functions"], "note": "The ends are taken off and the letters made capitals, each step giving back a new text." },
+        { "active": ["functions", "functions->log", "log"], "note": "The tidy call sign goes into the log, the spaces inside it kept." }
+      ]
+    },
+    "grid": {
+      "steps": [
+        { "active": ["typed", "typed->functions", "functions"], "note": "A grid reference arrives with spaces between its letters and digits." },
+        { "active": ["functions"], "note": "Every space goes, wherever it is, and the letters become capitals." },
+        { "active": ["functions", "functions->log", "log"], "note": "The log gets the grid reference written one way only." }
+      ]
+    },
+    "urgent": {
+      "steps": [
+        { "active": ["typed", "typed->functions", "functions"], "note": "One entry at a time is looked at, in whatever capitals it was typed." },
+        { "active": ["functions"], "note": "Two questions are asked: does it start with the word urgent, and does it mention a casualty anywhere?" },
+        { "active": ["functions", "functions->rhona", "rhona"], "note": "True or False comes back, and the True ones go to Rhona." }
+      ]
+    },
+    "message": {
+      "steps": [
+        { "active": ["typed", "typed->functions", "functions"], "note": "An entry is a call sign, a colon and a message, or sometimes no colon at all." },
+        { "active": ["functions"], "note": "The first colon is found; when there is none, there is no message." },
+        { "active": ["functions", "functions->log", "log"], "note": "The text after the colon comes back without its outer spaces." }
+      ]
+    }
+  }
+}

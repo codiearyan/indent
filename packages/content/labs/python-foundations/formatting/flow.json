@@ -1,0 +1,48 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhona", "label": "Rhona", "kind": "story" },
+      { "id": "figures", "label": "Year's figures", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "sheet", "label": "Printed sheet", "kind": "data" },
+      { "id": "meeting", "label": "Team meeting", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "figures", "to": "functions", "label": "numbers" },
+      { "from": "functions", "to": "sheet", "label": "lined-up text" },
+      { "from": "rhona", "to": "sheet", "label": "reads out" },
+      { "from": "sheet", "to": "meeting", "label": "the year" }
+    ],
+    "note": "The year's numbers stay as they are; your functions decide how each one looks once it becomes text on Rhona's sheet."
+  },
+  "tasks": {
+    "decimals": {
+      "steps": [
+        { "active": ["figures", "figures->functions", "functions"], "note": "A number of hours comes in, a whole number or one with many decimals." },
+        { "active": ["functions"], "note": "It is rounded and shown with exactly one decimal place, then a space and h." },
+        { "active": ["functions", "functions->sheet", "sheet"], "note": "Every number of hours on the sheet looks the same." }
+      ]
+    },
+    "padding": {
+      "steps": [
+        { "active": ["figures", "figures->functions", "functions"], "note": "A year and the number of a callout in it come in." },
+        { "active": ["functions"], "value": { "kind": "array", "label": "incident number", "values": ["year", "dash", "three digits"] }, "note": "The callout's number is padded with zeros in front." },
+        { "active": ["functions", "functions->sheet", "sheet"], "note": "Each incident number has the same shape on every page." }
+      ]
+    },
+    "row": {
+      "steps": [
+        { "active": ["figures", "figures->functions", "functions"], "value": { "kind": "array", "label": "one hill", "values": ["hill", "callouts", "hours"] }, "note": "One hill's figures come in." },
+        { "active": ["functions"], "note": "Each value takes its column's width: the hill on the left, the numbers on the right." },
+        { "active": ["functions", "functions->sheet", "sheet"], "note": "One row comes back, the same length as every other row." }
+      ]
+    },
+    "table": {
+      "steps": [
+        { "active": ["figures", "figures->functions", "functions"], "note": "Every hill of the year comes in as a list." },
+        { "active": ["functions", "functions->sheet", "sheet"], "note": "A heading in the same columns, then a row for each hill." },
+        { "active": ["sheet", "rhona", "rhona->sheet", "sheet->meeting", "meeting"], "note": "A total line closes the table, and Rhona reads it straight down." }
+      ]
+    }
+  }
+}

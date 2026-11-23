@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Which entries does Rhona need?", "note": "Tonight, at the radio desk." },
+    { "title": "Radio desk", "text": "Three people typing, no two lines alike." },
+    {
+      "title": "Your functions",
+      "file": "radio_words.py",
+      "mine": true,
+      "gap": "Messy lines, nothing picked out",
+      "tasks": ["Tidy a call sign", "Grid ref, no spaces", "Spot what is urgent", "Message after colon"]
+    },
+    { "title": "Rhona", "say": "Stretcher team to the ford.", "note": "Seen as soon as it came in." }
+  ],
+  "ticket": { "label": "Echo one", "wrong": "lost in the log", "why": "Messy text", "right": "sent to Rhona" },
+  "captions": [
+    "At the radio desk, Ailsa asks which of tonight's entries Rhona has to see straight away.",
+    "Today every line is typed a different way, so the urgent call from Echo one gets lost.",
+    "You write small functions that tidy text, find the colon and spot the urgent words.",
+    "Now Echo one's call is picked out and goes straight to Rhona.",
+    "strip, upper, replace, startswith, in and find, each giving back a new text."
+  ]
+}
