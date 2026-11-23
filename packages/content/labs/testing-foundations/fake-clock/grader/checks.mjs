@@ -58,6 +58,11 @@ const wrong = {
     change: [WEDNESDAY, WEDNESDAY.replace('< CUTOFF_HOUR', '< CUTOFF_HOUR - 1')],
     hint: 'Test a Wednesday as close before the cut-off as you can, and expect orders to be open.'
   },
+  hourLate: {
+    label: 'closes at 7 in the evening',
+    change: [WEDNESDAY, WEDNESDAY.replace('< CUTOFF_HOUR', '< CUTOFF_HOUR + 1')],
+    hint: 'Test a Wednesday at the cut-off itself, not later in the evening, and expect orders to be closed.'
+  },
   allDay: {
     label: 'takes orders all day on Wednesday',
     change: [WEDNESDAY, 'if (day === WEDNESDAY) return true'],
@@ -72,6 +77,11 @@ const wrong = {
     label: 'never lets go',
     change: [RELEASE, "hold.status = 'held'"],
     hint: 'Move the fake clock on by the whole 15 minutes and check that the hold was let go.'
+  },
+  minuteLate: {
+    label: 'lets go a minute late',
+    change: [HOLD, '(HOLD_MINUTES + 1) * 60 * 1000'],
+    hint: 'Move the fake clock on by exactly 15 minutes, not more, and check that the hold was let go.'
   },
   minute: {
     label: 'lets go a minute early',
@@ -156,7 +166,7 @@ async function cleanUp(t) {
 
 export const checks = {
   day: task('delivery day', [wrong.late, wrong.month]),
-  cutoff: task('cut-off', [wrong.early, wrong.allDay]),
-  hold: task('basket hold', [wrong.seconds, wrong.never, wrong.minute]),
+  cutoff: task('cut-off', [wrong.early, wrong.hourLate, wrong.allDay]),
+  hold: task('basket hold', [wrong.seconds, wrong.never, wrong.minute, wrong.minuteLate]),
   cleanup: cleanUp
 }

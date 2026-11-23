@@ -13,6 +13,9 @@ function explain(test) {
   if (/charge is not a function|reading 'charge'/.test(failure)) {
     return `"${name}" gives checkout a card company with no charge function on it. Give it an object whose charge is a stand-in made with vi.fn.`
   }
+  if (test.group[0] === 'surprise extra' && /^AssertionError: expected undefined to /.test(failure)) {
+    return `"${name}" got undefined back: no extra sits at the place your random number picks. Math.random gives a number from 0 up to, but never quite, 1, so give the stand-in a number in that range.`
+  }
   if (/reading 'push'/.test(failure)) {
     return `"${name}" calls checkout without a packing list. Give it an empty list as its third argument.`
   }
@@ -55,7 +58,7 @@ export const checks = {
     },
     {
       label: 'never picks the last extra',
-      change: [PICK, 'EXTRAS[Math.floor(Math.random() * (EXTRAS.length - 1))]'],
+      change: [PICK, 'EXTRAS[Math.min(Math.floor(Math.random() * EXTRAS.length), EXTRAS.length - 2)]'],
       hint: 'Set the random number close to 1, and check that the last extra comes out.'
     },
     {

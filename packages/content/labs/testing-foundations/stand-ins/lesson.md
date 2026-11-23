@@ -25,7 +25,7 @@ export function raffleWinner(names) {
 }
 ```
 
-`Math.random()` gives a different number every time, so a test that expects one name passes some days and fails on others. `vi.spyOn` can stand in for it:
+`Math.random()` gives a number from 0 up to, but never quite, 1, and a different one every time, so a test that expects one name passes some days and fails on others. `vi.spyOn` can stand in for it:
 
 ```js
 test('a random number of 0.5 picks the middle name', () => {

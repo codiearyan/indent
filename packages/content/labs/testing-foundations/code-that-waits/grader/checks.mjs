@@ -43,6 +43,11 @@ export const checks = {
       hint: 'Compare the answer with a number using toBe, which tells a number from text.'
     },
     {
+      label: 'gives one fewer than the shed has',
+      change: ['  return shed[item]\n', '  return shed[item] - 1\n'],
+      hint: 'Compare the answer with the exact count of that item in shed.json.'
+    },
+    {
       label: 'answers 0 for every item',
       change: ['  return shed[item]\n', '  return 0\n'],
       hint: 'Use an item the shed has some of.'

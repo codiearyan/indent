@@ -8,7 +8,8 @@ export function surpriseExtra() {
 }
 
 // `cards` talks to the card company: cards.charge(customer, pence) answers later with a receipt,
-// or rejects when the card is declined. A paid order goes on Wendell's packing list.
+// or rejects when the card is declined. A paid order goes on Wendell's packing list. An order looks
+// like { customer: 'Ada Lin', total: 12.5 }, with the total in pounds.
 export async function checkout(order, cards, packingList) {
   const pence = Math.round(order.total * 100)
   let receipt

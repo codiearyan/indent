@@ -11,7 +11,7 @@
       "id": "count",
       "title": "Test a count that comes later",
       "file": "src/stock.test.js",
-      "description": "`countOf(item)` reads `shed.json` and answers later with the number of that item in the shed. In the `count` block, test that it gives the right number for an item the shed has some of.\n\nCheck runs your tests on the working code and on versions that give the count as text, or answer 0 for everything. A test in this block must pass on the first and fail on the others.",
+      "description": "`countOf(item)` reads `shed.json` and answers later with the number of that item in the shed. In the `count` block, test that it gives the right number for an item the shed has some of.\n\nCheck runs your tests on the working code and on versions that give the count as text, one fewer than the shed has, or 0 for everything. A test in this block must pass on the first and fail on the others.",
       "nextSteps": [
         "Pick an item in `shed.json` that the shed has some of, and note its count.",
         "Make the test's function `async`.",

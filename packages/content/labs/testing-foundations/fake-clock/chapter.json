@@ -37,7 +37,7 @@
       "id": "cutoff",
       "title": "Test both sides of the Wednesday cut-off",
       "file": "src/schedule.test.js",
-      "description": "Orders close on Wednesday at `CUTOFF_HOUR` o'clock. `ordersOpen()` is `true` while an order placed now still goes out on the coming Friday, and `false` from the cut-off on. In the `cut-off` block, test a Wednesday just before the cut-off and a Wednesday at the cut-off itself.\n\nCheck runs your tests on the working code and on versions that close an hour early, or take orders all day on Wednesday. A test in this block must pass on the first and fail on the others, give the same result on any day, and pass when it runs alone.",
+      "description": "Orders close on Wednesday at `CUTOFF_HOUR` o'clock. `ordersOpen()` is `true` while an order placed now still goes out on the coming Friday, and `false` from the cut-off on. In the `cut-off` block, test a Wednesday just before the cut-off and a Wednesday at the cut-off itself.\n\nCheck runs your tests on the working code and on versions that close an hour early, an hour late, or take orders all day on Wednesday. A test in this block must pass on the first and fail on the others, give the same result on any day, and pass when it runs alone.",
       "nextSteps": [
         "Find `CUTOFF_HOUR` in `schedule.js` and pick a Wednesday.",
         "Set the clock to a minute before the cut-off, and expect orders to be open.",
@@ -62,7 +62,7 @@
       "id": "hold",
       "title": "Test when a basket hold is let go",
       "file": "src/schedule.test.js",
-      "description": "`holdBasket(items)` gives back a hold whose `status` is `'held'`. After `HOLD_MINUTES` it turns to `'released'`, and the items go back on sale. In the `basket hold` block, test that a hold is still held just before the minutes are up, and let go once they are, without waiting for real time.\n\nCheck runs your tests on the working code and on versions that let go after 15 seconds, a minute early, or never. A test in this block must pass on the first and fail on the others, and a test that is still running after 2 seconds is stopped.",
+      "description": "`holdBasket(items)` gives back a hold whose `status` is `'held'`. After `HOLD_MINUTES` it turns to `'released'`, and the items go back on sale. In the `basket hold` block, test that a hold is still held just before the minutes are up, and let go once they are, without waiting for real time.\n\nCheck runs your tests on the working code and on versions that let go after 15 seconds, a minute early, a minute late, or never. A test in this block must pass on the first and fail on the others, and a test that is still running after 2 seconds is stopped.",
       "nextSteps": [
         "Turn on the fake clock, then make a hold.",
         "Move time on to just before `HOLD_MINUTES` are up, and check the status.",
