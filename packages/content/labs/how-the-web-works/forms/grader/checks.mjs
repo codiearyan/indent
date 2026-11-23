@@ -104,6 +104,8 @@ function sendCase(name, fields, status = 200) {
         return 'The request carried a multipart body, the kind for a form with a file. This form has no file, and the server reads it as a form body, so it answered 415.'
       if (type.startsWith('application/json'))
         return 'The request carried JSON. This server takes the request form the way a form on a page sends it, so it answered 415.'
+      if (sent.body === '[object Object]')
+        return 'The server received the words [object Object] as the body. That is what an object becomes when fetch is handed it as it is: turn the fields into a form body first.'
       if (!type.toLowerCase().startsWith(FORM_TYPE)) {
         const others = extraHeaderNames(sent).filter((n) => n !== 'content-type')
         return `The request said content-type: ${type || 'nothing'}${type.startsWith('text/plain') ? ', the label fetch gives to a body of text' : ''}, so the server answered 415. ${others.length ? 'A server finds a header by its exact name, so compare the spelling with the lesson.' : 'The lesson shows how a form body gets the content type of a form.'}`

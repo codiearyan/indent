@@ -128,6 +128,8 @@ function addressCase(name, song, from, location) {
         return 'The address was built from the id. The server decides where a new thing lives, and the location header says where: read it from there.'
       if (v.value === `${r.base}${PATH}`)
         return 'That is the address the request was sent to, not where the new song request lives. The location header of the answer says that.'
+      if (v.value.endsWith('/undefined') || v.value.endsWith('/null'))
+        return "The address ends in the word undefined or null, so the location was not read. The headers of an answer are not a plain object: read one with headers.get and the header's name."
       if (/^https?:\/\/.*https?:\/\//.test(v.value))
         return 'The address has two addresses in it. This location is already a whole address, so joining it to the base by hand breaks it. new URL with two values handles both kinds.'
       return 'The address is not where the location header of the answer says the new song request lives, as a whole address.'

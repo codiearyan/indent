@@ -97,12 +97,6 @@
           "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type#content-type_in_multipart_forms"
         }
       ],
-      "videos": [
-        {
-          "title": "File uploads from a form",
-          "url": "https://www.youtube.com/watch?v=iAxUpo0aJSk"
-        }
-      ],
       "points": 10
     }
   ]

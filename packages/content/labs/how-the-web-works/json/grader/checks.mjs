@@ -33,6 +33,9 @@ function lineCase(name, show, text) {
       if (!v.value.startsWith(show.name)) {
         return "The line does not start with the whole name of the show showLine was handed. Build it from the text it gets on each call, and let JSON.parse read that text: cutting it at commas or quotes breaks on a name that has them."
       }
+      if (!v.value.includes(show.day) || !v.value.includes(show.time)) {
+        return 'The day or the time in the line is not the one in the JSON text showLine was handed. Take each part from the text it gets on each call.'
+      }
       return "The line is not the name, a comma and a space, the day, ' at ', the time, ', with ' and the presenter, as in the task's example."
     }
   }
@@ -81,13 +84,20 @@ function namesCase(name, shows) {
   }
 }
 
-const show = (name) => ({
-  slug: `show-${token()}`,
-  name,
-  presenter: `Presenter ${token()}`,
-  day: 'tuesday',
-  time: '14:30'
-})
+const DAYS = ['monday', 'tuesday', 'thursday', 'saturday', 'sunday']
+const TIMES = ['06:15', '14:30', '19:45', '23:05', '10:50']
+let shown = 0
+
+const show = (name) => {
+  const n = shown++
+  return {
+    slug: `show-${token()}`,
+    name,
+    presenter: `Presenter ${token()}`,
+    day: DAYS[n % DAYS.length],
+    time: TIMES[(n * 2) % TIMES.length]
+  }
+}
 
 function readCase(name, type, body, expect) {
   const path = `/data/${token()}`

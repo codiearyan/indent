@@ -64,7 +64,11 @@ function whereCase(name, status, location) {
   const headers = location === null ? {} : { location }
   const answer = isRedirect
     ? { status, headers }
-    : { status, headers: { 'content-type': 'text/plain' }, body: `A page, check ${token()}` }
+    : {
+        status,
+        headers: { 'content-type': 'text/plain', ...headers },
+        body: `A page, check ${token()}`
+      }
   return {
     name,
     args: [`$base${path}`],
@@ -79,7 +83,9 @@ function whereCase(name, status, location) {
       const v = r.outcome.value
       if (!isRedirect) {
         if (v.kind === 'null') return null
-        return `The answer was a ${status}${location === null ? ' with no location header' : ''}, which is not a redirect, so whereTo must give back null.`
+        if (location !== null)
+          return `The answer was a ${status} with a location header. Only a status from 300 to 399 makes it a redirect, so whereTo must give back null: look at the status too.`
+        return `The answer was a ${status} with no location header, which is not a redirect, so whereTo must give back null.`
       }
       const loc = location.replaceAll('$base', r.base)
       const expected = new URL(loc, `${r.base}${path}`).href
@@ -190,7 +196,8 @@ export const checks = {
         whereCase('Reads a path without a slash against the address', 307, 'listings'),
         whereCase('Gives null for a page that is there', 200, null),
         whereCase('Gives null for a 304 with no location', 304, null),
-        whereCase('Gives null for a 404', 404, null)
+        whereCase('Gives null for a 404', 404, null),
+        whereCase('Gives null for a 201 with a location', 201, `/made/${token()}`)
       ]
     })
   },
