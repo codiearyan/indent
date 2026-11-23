@@ -1,0 +1,38 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "The till is out by pennies again.",
+      "note": "New fares in pounds and pence."
+    },
+    {
+      "title": "Borrowed till",
+      "text": "Adds the morning up, nearly right"
+    },
+    {
+      "title": "Your till",
+      "file": "TillRoll.java",
+      "mine": true,
+      "gap": "Money that adds up exactly",
+      "tasks": ["Add up the till", "Group fares, shares", "Print and read back"]
+    },
+    {
+      "title": "Day's takings",
+      "text": "Every fare counted to the penny",
+      "note": "And printed the same on any ticket."
+    }
+  ],
+  "ticket": {
+    "label": "Morning",
+    "wrong": "pennies out",
+    "why": "Nearly",
+    "right": "to the penny"
+  },
+  "captions": [
+    "The hut at Lanternquay. Bridie wants the council's new fares added up right.",
+    "The borrowed till adds the morning up, and the total comes out a few pennies wrong.",
+    "You write the till's sums, its rounding and its printed amounts, exact to the penny.",
+    "Now the morning adds up to the penny, and every ticket shows its fare the same way.",
+    "Next comes the timetable board. For now, the till and the tickets agree to the penny."
+  ]
+}

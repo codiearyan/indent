@@ -1,0 +1,70 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "fares", "label": "Council fare list", "kind": "data" },
+      { "id": "till", "label": "Till", "kind": "function", "mine": true },
+      { "id": "pricing", "label": "Pricing", "kind": "function", "mine": true },
+      { "id": "printer", "label": "Printer", "kind": "function", "mine": true },
+      { "id": "ticket", "label": "Ticket", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "fares", "to": "till", "label": "prices as text" },
+      { "from": "fares", "to": "pricing", "label": "adult fare" },
+      { "from": "till", "to": "printer", "label": "a total" },
+      { "from": "pricing", "to": "printer", "label": "a fare" },
+      { "from": "printer", "to": "ticket", "label": "£ and pence" }
+    ],
+    "note": "The hut's money is kept exactly, rounded once to the penny, and printed the same on every computer."
+  },
+  "tasks": {
+    "till": {
+      "steps": [
+        {
+          "active": ["fares", "fares->till", "till"],
+          "value": { "kind": "array", "label": "prices", "values": ["price", "price", "price"] },
+          "note": "The morning's prices arrive as text, each exact as it is written."
+        },
+        {
+          "active": ["till"],
+          "note": "Each price becomes an exact amount, and the amounts are added one by one into a total."
+        },
+        {
+          "active": ["till"],
+          "note": "Two amounts written with a different number of decimal places are still the same money."
+        }
+      ]
+    },
+    "pricing": {
+      "steps": [
+        {
+          "active": ["fares", "fares->pricing", "pricing"],
+          "note": "A group's fare starts from the adult fare and the number of people."
+        },
+        {
+          "active": ["pricing"],
+          "note": "The whole amount is worked out first, the discount taken off, and only then rounded to the penny."
+        },
+        {
+          "active": ["pricing", "pricing->printer"],
+          "note": "A bill shared between people is divided to the penny, rounding a half penny up."
+        }
+      ]
+    },
+    "printer": {
+      "steps": [
+        {
+          "active": ["till", "till->printer", "printer"],
+          "note": "An amount comes to the printer with however many decimal places it has."
+        },
+        {
+          "active": ["printer", "printer->ticket", "ticket"],
+          "note": "The ticket shows a pound sign and two decimal places, the same on every computer."
+        },
+        {
+          "active": ["ticket", "printer"],
+          "note": "An amount typed back in as text is read, and a text that is not an amount is refused by name."
+        }
+      ]
+    }
+  }
+}
