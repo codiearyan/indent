@@ -3,9 +3,9 @@
 // "wrong version"). A task passes when its tests pass on the working code and fail on every
 // wrong version made for that task. Tests are matched to a task by where they sit (a describe
 // block) or by their name, so one task never fails because of another task's tests.
-import { readFile, writeFile } from 'node:fs/promises'
+import { cp, readFile, realpath, writeFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
-import { dirname, join } from 'node:path'
+import { dirname, join, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 function vitestBin(dir) {
@@ -113,11 +113,87 @@ export async function runTests(t, { test, target, code, before, args = [], stead
     // The runner's own message points at line 1; Node names the line that cannot be read.
     const syntax = await t.node(dir, ['--check', test])
     const where = syntax.stderr
+      .replaceAll(`${await realpath(dir)}/`, '')
       .replaceAll(`${dir}/`, '')
       .replace(/\n*Node\.js v[\d.]+\s*$/, '')
     return { tests, problem: 'load', output: where || file.message || output, dir }
   }
   return { tests, output, dir }
+}
+
+/**
+ * Runs the learner's test file once for each variant ({ code, before }), all in one start of the
+ * runner: each variant gets its own copy of the workspace in a folder of one sandbox, and the
+ * runner gives every test file a fresh copy of the code it imports. Returns one result for each
+ * variant, as runTests does.
+ */
+export async function runTogether(t, { test, target, variants, args = [] }) {
+  const dir = await t.sandbox()
+  const folders = variants.map((_, i) => `__indent${i}`)
+  await Promise.all(
+    variants.map(async ({ code, before }, i) => {
+      const sub = join(dir, folders[i])
+      await cp(t.workspace, sub, {
+        recursive: true,
+        filter: (src) => {
+          const parts = relative(t.workspace, src).split(/[\\/]/)
+          return !parts.includes('node_modules') && parts[0] !== '.indent'
+        }
+      })
+      await writeFile(join(sub, target), code)
+      if (before) {
+        const own = await readFile(join(sub, test), 'utf8').catch(() => undefined)
+        if (own !== undefined) await writeFile(join(sub, test), `${before} ${own}`)
+      }
+    })
+  )
+  const r = await t.node(
+    dir,
+    [
+      vitestBin(dir),
+      'run',
+      ...folders.map((f) => `${f}/${test}`),
+      '--expect.requireAssertions',
+      '--reporter=verbose',
+      '--reporter=json',
+      `--outputFile.json=${REPORT}`,
+      `--maxWorkers=${variants.length}`,
+      ...args
+    ],
+    { timeoutMs: 40000 }
+  )
+  const output = r.stdout + r.stderr
+  let report
+  try {
+    report = JSON.parse(await readFile(join(dir, REPORT), 'utf8'))
+  } catch {
+    report = undefined
+  }
+  return Promise.all(
+    folders.map(async (folder) => {
+      const where = join(dir, folder)
+      const file = report?.testResults?.find((f) =>
+        f.name.replaceAll('\\', '/').endsWith(`${folder}/${test}`)
+      )
+      if (r.timedOut) return { tests: [], problem: 'timeout', output, dir: where }
+      if (!file) return { tests: [], problem: 'missing', output, dir: where }
+      const tests = file.assertionResults.map((a) => ({
+        group: a.ancestorTitles,
+        name: a.title,
+        status: a.status,
+        failure: a.failureMessages?.[0]
+      }))
+      if (!tests.length && file.status === 'failed') {
+        const syntax = await t.node(where, ['--check', test])
+        const said = syntax.stderr
+          .replaceAll(`${await realpath(where)}/`, '')
+          .replaceAll(`${where}/`, '')
+          .replace(/\n*Node\.js v[\d.]+\s*$/, '')
+        return { tests, problem: 'load', output: said || file.message || output, dir: where }
+      }
+      return { tests, output, dir: where }
+    })
+  )
 }
 
 /** The failure without the stack lines, short enough to read. */
@@ -201,6 +277,17 @@ const timedOut = (test) => /Test timed out in \d+ms/.test(test.failure ?? '')
 
 const LEFTOVER = (name) =>
   `"${name}" passes when it runs alone, but fails after the tests before it. Something an earlier test changed is still there when it starts, like a fake clock or a stand-in that was never put back. Each test should set up what it needs and put back what it changes.`
+const WORDS = { 2: 'two', 3: 'three', 4: 'four' }
+const OTHER_ORDER = (name) =>
+  `"${name}" passes alone and in the usual order, but fails when the tests run in the opposite order. A test that comes after it in the file leaves something behind that breaks it, or changes something they share. Give each test a fresh start of its own, and put back what it changes.`
+// Put in front of the test file to run its tests in the opposite order: once every test is known,
+// it turns each group's list round before the first one runs.
+const REVERSED =
+  "import { beforeAll as __indentBeforeAll } from 'vitest'; __indentBeforeAll(({}, suite) => { const turn = (group) => { if (!group.tasks) return; group.tasks.reverse(); group.tasks.forEach(turn) }; turn(suite) });"
+// Put in front of the test file to run one test by itself, as `-t` would: every other test, and
+// every group without that test (hooks included), is skipped.
+const ONLY = (test) =>
+  `import { beforeAll as __indentBeforeAll } from 'vitest'; __indentBeforeAll(({}, suite) => { const want = ${JSON.stringify(fullName(test))}; const keep = (x, path) => { if (!x.tasks) return [...path, x.name].join(' > ') === want; let any = false; for (const y of x.tasks) { if (keep(y, x === suite ? [] : [...path, x.name])) any = true; else y.mode = 'skip' } return any }; keep(suite, []) });`
 const NEEDS_EARLIER = (name) =>
   `"${name}" passes after the tests before it, but fails when it runs alone. It leans on something an earlier test left behind. Give it everything it needs itself.`
 /** Why a test of code that answers later fails, for the ways that go wrong most, or undefined. */
@@ -236,25 +323,70 @@ const OTHER_DAY = {
  * test that gives another result there fails with `unsteady` ({ where, message }). `alone` runs
  * each of the task's tests by itself, with both settings, and `explain(test)` may say why a test
  * fails before the usual messages.
+ *
+ * Part 3 adds, each only when asked for: `base` is a change made to the working code first,
+ * `instrument(code)` is applied to every version before it runs, `reverse` runs the working code
+ * once more with the tests in the opposite order, `same` is a list of versions that behave like
+ * the working code ({ label, message(name), and code or change }) where the tests must still pass,
+ * `spoiled(test, label)` names a failure on a wrong version that is the check's own probe finding
+ * something left behind (it never counts as catching, and it fails the task with the message it
+ * returns), `distinct` fails two tests that fail on exactly the same wrong versions, or one that
+ * fails on none, `fewest` is how many tests the task asks for, `leftover(test)` says why a
+ * test that passes alone fails after the others, in place of the usual message, and `together`
+ * runs the versions of each step in one start of the runner (see runTogether).
  */
 export async function judge(t, options) {
   const { test, target, pick, where, missing, wrong, thrown, none = NONE } = options
   const { limit, steady, unsteady = OTHER_DAY, alone, explain } = options
+  const { base, instrument = (c) => c, reverse, same = [], spoiled, distinct } = options
+  const { together } = options
   const args = limit ? [`--testTimeout=${limit}`, `--hookTimeout=${limit}`] : []
   const run = (code, more) =>
-    runTests(t, { test, target, code, args, steady: steady?.[0], ...more })
-  const code = await workingCode(t, target)
+    runTests(t, { test, target, code: instrument(code), args, steady: steady?.[0], ...more })
+  // With `together`, the runs of one step share a single start of the runner (no `steady`).
+  const runEach = (list) =>
+    runTogether(t, {
+      test,
+      target,
+      args,
+      variants: list.map((v) => ({ ...v, code: instrument(v.code) }))
+    })
+  const original = await workingCode(t, target)
+  const code = base ? wrongVersion(original, base) : original
   const versions = wrong.map((w) => wrongVersion(code, w.change))
   // Every run is awaited here, so none is still going when the sandboxes are removed.
-  const [later, good, ...runs] = await Promise.all([
-    steady && run(code, { steady: steady[1] }),
-    ...[code, ...versions].map((c) => run(c))
-  ])
+  const [later, good, ...rest] = together
+    ? await runEach([
+        ...[code, ...versions].map((c) => ({ code: c })),
+        ...(reverse ? [{ code, before: REVERSED }] : []),
+        ...same.map((s) => ({ code: s.code ?? wrongVersion(code, s.change) }))
+      ]).then((r) => {
+        const n = 1 + versions.length
+        return [undefined, ...r.slice(0, n), reverse ? r[n] : undefined, ...r.slice(reverse ? n + 1 : n)]
+      })
+    : await Promise.all([
+        steady && run(code, { steady: steady[1] }),
+        ...[code, ...versions].map((c) => run(c)),
+        reverse && run(code, { before: REVERSED }),
+        ...same.map((s) => run(s.code ?? wrongVersion(code, s.change)))
+      ])
+  const runs = rest.slice(0, versions.length)
+  const [backwards, ...sameRuns] = rest.slice(versions.length)
   const problem = fileProblem(test, good)
   if (problem) return [problem]
 
   const real = good.tests.filter(isReal)
   const mine = real.filter(pick)
+  if (mine.length && mine.length < (options.fewest ?? 1)) {
+    return [
+      {
+        name: `Has ${WORDS[options.fewest] ?? options.fewest} tests ${where}`,
+        passed: false,
+        message: `Check finds ${mine.length === 1 ? 'one test' : `${mine.length} tests`} ${where}, and this task asks for ${WORDS[options.fewest] ?? options.fewest}. Each one checks a case of its own.`,
+        output: `Tests Check found:\n${list(mine)}`
+      }
+    ]
+  }
   if (!mine.length) {
     return [
       {
@@ -270,10 +402,16 @@ export async function judge(t, options) {
   const why = (x) => (limit && timedOut(x) ? NEVER_ENDS(x.name, limit) : explain?.(x))
   let message = broken.length ? whyItFails(broken[0], { thrown, explain: why }) : undefined
   if (broken.length && (steady || alone)) {
-    const single = alone && (await run(code, { only: broken[0] }))
+    const single =
+      alone &&
+      (together
+        ? (await runEach([{ code, before: ONLY(broken[0]) }]))[0]
+        : await run(code, { only: broken[0] }))
     const status = (r) => r?.tests.find((x) => fullName(x) === fullName(broken[0]))?.status
     if (status(later) === 'passed') message = unsteady.message(broken[0].name)
-    else if (status(single) === 'passed') message = LEFTOVER(broken[0].name)
+    else if (status(single) === 'passed') {
+      message = options.leftover?.(broken[0]) ?? LEFTOVER(broken[0].name)
+    }
   }
   const details = [
     {
@@ -301,9 +439,11 @@ export async function judge(t, options) {
   }
   if (alone) {
     const settings = steady ?? [undefined]
-    const singles = await Promise.all(
-      mine.flatMap((x) => settings.map((s) => run(code, { only: x, steady: s })))
-    )
+    const singles = together
+      ? await runEach(mine.map((x) => ({ code, before: ONLY(x) })))
+      : await Promise.all(
+          mine.flatMap((x) => settings.map((s) => run(code, { only: x, steady: s })))
+        )
     const passedAlone = (x, r) =>
       r.tests.find((y) => fullName(y) === fullName(x))?.status === 'passed'
     const leaning = mine.filter((x, i) =>
@@ -316,6 +456,37 @@ export async function judge(t, options) {
       output: leaning.length ? `Alone, this failed:\n${list(leaning)}` : `Passed:\n${list(mine)}`
     })
     if (leaning.length) return details
+  }
+  const failing = (r) => {
+    const after = new Map(r.tests.map((x) => [fullName(x), x.status]))
+    return mine.filter((x) => after.get(fullName(x)) !== 'passed')
+  }
+  if (reverse) {
+    const turned = failing(backwards)
+    const first = turned.length && backwards.tests.find((x) => fullName(x) === fullName(turned[0]))
+    details.push({
+      name: `Your tests ${where} pass when the tests run in the opposite order`,
+      passed: !turned.length,
+      message: turned.length ? (first && explain?.(first)) || OTHER_ORDER(turned[0].name) : undefined,
+      output: turned.length
+        ? `In the opposite order, this failed:\n${list(turned)}`
+        : `Passed:\n${list(mine)}`
+    })
+    if (turned.length) return details
+  }
+  if (same.length) {
+    const broke = sameRuns.map(failing)
+    same.forEach((s, i) => {
+      details.push({
+        name: `Your tests ${where} pass on a version that ${s.label}`,
+        passed: !broke[i].length,
+        message: broke[i].length ? s.message(broke[i][0].name) : undefined,
+        output: broke[i].length
+          ? `There this failed:\n${list(broke[i])}`
+          : `Passed:\n${list(mine)}`
+      })
+    })
+    if (broke.some((b) => b.length)) return details
   }
 
   // A wrong version that could not be run proves nothing, so it never counts as caught.
@@ -333,7 +504,8 @@ export async function judge(t, options) {
   }
   const caughtBy = runs.map((run) => {
     const after = new Map(run.tests.map((x) => [fullName(x), x]))
-    const failed = (x) => x?.status === 'failed' && !(limit && timedOut(x))
+    const failed = (x) =>
+      x?.status === 'failed' && !(limit && timedOut(x)) && !spoiled?.(x, '')
     return mine.filter((x) => failed(after.get(fullName(x))))
   })
   const stuck = runs.map((run) =>
@@ -345,6 +517,16 @@ export async function judge(t, options) {
     const caught = caughtBy[i]
     const extra = note ? ` ${none}` : ''
     note = false
+    const leak = spoiled && runs[i].tests.find((x) => x.status === 'failed' && spoiled(x, w.label))
+    if (leak) {
+      details.push({
+        name: `Leaves nothing behind on a version that ${w.label}`,
+        passed: false,
+        message: spoiled(leak, w.label),
+        output: `${fullName(leak)}\n${shortFailure(leak.failure)}`
+      })
+      return
+    }
     if (!caught.length && stuck[i].length) {
       details.push({
         name: `Fails on a version that ${w.label}`,
@@ -365,6 +547,29 @@ export async function judge(t, options) {
         : `On that version these still passed:\n${list(mine)}`
     })
   })
+  if (distinct) {
+    const caughtWhat = (x) => caughtBy.map((c) => (c.includes(x) ? 1 : 0)).join('')
+    const twin = mine
+      .flatMap((x, i) => mine.slice(i + 1).map((y) => [x, y]))
+      .find(([x, y]) => caughtWhat(x).includes('1') && caughtWhat(x) === caughtWhat(y))
+    const idle = mine.find((x) => !caughtWhat(x).includes('1'))
+    const catches = (x) =>
+      wrong.filter((_, i) => caughtBy[i].includes(x)).map((w) => `    ${w.label}`)
+    details.push({
+      name: `Each of your tests ${where} tries a case of its own`,
+      passed: !twin && !idle,
+      message: twin
+        ? `"${twin[0].name}" and "${twin[1].name}" fail on exactly the same wrong versions, so they test the same case twice. Keep one of them, and turn the other into a case none of your tests covers yet, or delete it.`
+        : idle
+          ? `"${idle.name}" fails on none of the wrong versions, so it can never catch a mistake in this rule. Turn it into a case none of your tests covers yet, or delete it.`
+          : undefined,
+      output: twin
+        ? `Both fail only on versions that:\n${catches(twin[0]).join('\n')}`
+        : idle
+          ? `Passed on every wrong version:\n  ${fullName(idle)}`
+          : `Passed:\n${list(mine)}`
+    })
+  }
   return details
 }
 
