@@ -32,6 +32,6 @@
     "Today each new kind would be Boat written out again, with every fix made three times.",
     "You write three classes that extend Boat: one adds bikes, one a fare, one a hirer.",
     "Now each new kind is a Boat, and adds or changes only its own part.",
-    "extends, super and @Override. Next: a parent that is never made by itself."
+    "New kinds that start from Boat. Next: a parent that is never made by itself."
   ]
 }

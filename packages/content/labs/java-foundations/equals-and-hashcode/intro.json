@@ -33,6 +33,6 @@
     "The booking from Morag's call is a new object, so the list never finds hers.",
     "You write when two bookings are the same, a hash code to match, and the cancelling.",
     "Now the list finds the booking equal to the call, and Morag comes off.",
-    "== against equals, hashCode, instanceof and casts. Next: enums and records."
+    "A booking read in finds its equal on the list. Next: kinds of ticket."
   ]
 }

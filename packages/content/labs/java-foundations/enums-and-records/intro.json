@@ -32,6 +32,6 @@
     "Today a kind is text, and Adult with a capital A was sold at a child's fare.",
     "You write the kinds and their prices, routes that keep their minutes, and a fixed ticket.",
     "Now a kind is checked by the compiler, and a printed ticket never changes.",
-    "enum, switch and record. Part 4 is done: boats, tickets and kinds as families of types."
+    "Kinds that cannot be mistyped, tickets that stay. Part 4 is done: families of types."
   ]
 }

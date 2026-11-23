@@ -32,6 +32,6 @@
     "The program knows only boats, so the bikes and the bus are booked by hand.",
     "You write what being bookable means, a shed and a bus that are, and the whole trip.",
     "Now any bookable thing can join a trip, and a trip is all booked or not at all.",
-    "interface, implements and a method that asks for an ability. Next: equal objects."
+    "Anything that can be booked joins a trip. Next: two bookings that are the same."
   ]
 }

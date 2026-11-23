@@ -33,6 +33,6 @@
     "Today a vessel can be made with no fare at all, and it goes down as free.",
     "You write a vessel that is never made alone, two kinds with fares, and the day's cost.",
     "Now every trip is some kind of vessel, and each one gives its own fare.",
-    "abstract classes, abstract methods and one list for every kind. Next: interfaces."
+    "Every vessel is some kind, with its own fare. Next: things that are not boats."
   ]
 }
