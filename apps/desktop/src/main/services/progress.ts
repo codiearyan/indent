@@ -1,4 +1,5 @@
-import { copyFile, readFile, rename, writeFile } from 'fs/promises'
+import { copyFile, readFile, rename } from 'fs/promises'
+import { writeWhole, writesDone } from '../atomicFile'
 import { chapterKey } from '@shared/rules'
 import type { CheckResult, ProgressState, TaskDef } from '@shared/types'
 import { handle } from '../ipc'
@@ -7,7 +8,6 @@ import { milestoneCatalog } from './content'
 import * as rules from './progressLogic'
 
 let state: Promise<ProgressState> | undefined
-let saving: Promise<void> = Promise.resolve()
 
 async function load(): Promise<ProgressState> {
   const file = dataFile('progress.json')
@@ -32,20 +32,12 @@ async function backfillMilestones(s: ProgressState): Promise<void> {
   rules.recordMilestones(s, await milestoneCatalog().catch(() => undefined))
 }
 
-/** Applies a change and saves atomically; saves are queued so renames never interleave. */
+/** Applies a change and saves it. */
 async function update(change: (s: ProgressState) => void): Promise<ProgressState> {
   const s = await getState()
   rules.settleFreezes(s, new Date())
   change(s)
-  const file = dataFile('progress.json')
-  const json = JSON.stringify(s)
-  saving = saving
-    .catch(() => {})
-    .then(async () => {
-      await writeFile(`${file}.tmp`, json)
-      await rename(`${file}.tmp`, file)
-    })
-  await saving
+  await writeWhole(dataFile('progress.json'), JSON.stringify(s))
   return s
 }
 
@@ -81,7 +73,7 @@ export function saveTip(
 /** Makes `next` the progress; the replaced file stays beside it, so the change can be undone. */
 export async function replaceProgress(next: ProgressState): Promise<ProgressState> {
   const file = dataFile('progress.json')
-  await saving.catch(() => {})
+  await writesDone(file)
   // A copy, so the progress on disk stays whole until the new one is written over it.
   await copyFile(file, `${file}.replaced-${Date.now()}`).catch((error: NodeJS.ErrnoException) => {
     if (error.code !== 'ENOENT') throw error

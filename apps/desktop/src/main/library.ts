@@ -17,6 +17,7 @@ import { pipeline } from 'stream/promises'
 import type { ReadableStream } from 'stream/web'
 import { PACK_FORMAT } from '@shared/packs'
 import type { InstallFailure, LabSummary, PackEntry, PackIndex } from '@shared/types'
+import { writeWholeSync } from './atomicFile'
 import { packVersion } from './packArchive'
 import { getChapter, listLabs } from './services/packs'
 import { run } from './run'
@@ -161,7 +162,7 @@ function readVersions(root: string): Record<string, string> {
 }
 
 export function recordVersion(root: string, labId: string, version: string): void {
-  writeFileSync(versionsFile(root), JSON.stringify({ ...readVersions(root), [labId]: version }))
+  writeWholeSync(versionsFile(root), JSON.stringify({ ...readVersions(root), [labId]: version }))
 }
 
 /** A shipped repo has no recorded version until its files are hashed once. */

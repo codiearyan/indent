@@ -1,6 +1,7 @@
 import { net, protocol } from 'electron'
 import { existsSync } from 'fs'
-import { mkdir, readFile, rename, writeFile } from 'fs/promises'
+import { mkdir, readFile, writeFile } from 'fs/promises'
+import { writeWhole } from '../atomicFile'
 import { join } from 'path'
 import { pathToFileURL } from 'url'
 import { COVER_SCHEME } from '@shared/cover'
@@ -84,8 +85,7 @@ async function refreshIndex(): Promise<boolean> {
   try {
     const text = await fetchIndex(packsUrl())
     if (text !== (await readFile(indexFile(), 'utf8').catch(() => ''))) {
-      await writeFile(`${indexFile()}.tmp`, text)
-      await rename(`${indexFile()}.tmp`, indexFile())
+      await writeWhole(indexFile(), text)
       index = parseIndex(text)
       emit(EVENTS.contentChanged)
     }
