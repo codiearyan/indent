@@ -1,0 +1,104 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "desk", "label": "Winnie at the desk", "kind": "story" },
+      { "id": "queries", "label": "Your statements", "kind": "file", "mine": true },
+      { "id": "owners", "label": "owners", "kind": "data" },
+      { "id": "animals", "label": "animals", "kind": "data" },
+      { "id": "treatments", "label": "treatments", "kind": "data" },
+      { "id": "visits", "label": "visits", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "desk", "to": "queries", "label": "a change" },
+      { "from": "queries", "to": "owners", "label": "INSERT" },
+      { "from": "queries", "to": "animals", "label": "UPDATE" },
+      { "from": "queries", "to": "treatments", "label": "DELETE" },
+      { "from": "queries", "to": "visits", "label": "a trial" }
+    ],
+    "note": "Your statements change the practice's rows: add one, change one, remove one, and try a change you then undo."
+  },
+  "tasks": {
+    "add-owner": {
+      "steps": [
+        {
+          "active": ["desk", "desk->queries", "queries"],
+          "note": "Winnie has a new owner to add, one with no email."
+        },
+        {
+          "active": ["queries", "queries->owners", "owners"],
+          "note": "One row goes into owners, and the database picks its id."
+        },
+        {
+          "active": ["owners"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of the new row",
+            "colLabels": ["id", "first_name", "last_name", "phone", "email", "town"],
+            "cells": [["the next free id", "a first name", "a last name", "a phone number", "empty", "a town"]]
+          },
+          "note": "Every other owner stays as it was."
+        }
+      ]
+    },
+    "update-moss": {
+      "steps": [
+        {
+          "active": ["desk", "desk->queries", "queries"],
+          "note": "Ifan has a breed and a weight for one dog."
+        },
+        {
+          "active": ["queries", "animals"],
+          "note": "A look at animals first finds the dog's row, and what about it no other row shares."
+        },
+        {
+          "active": ["queries", "queries->animals", "animals"],
+          "note": "Two columns of that one row change."
+        },
+        {
+          "active": ["animals"],
+          "note": "No other animal changes, not even one with the same name."
+        }
+      ]
+    },
+    "remove-double-charge": {
+      "steps": [
+        {
+          "active": ["desk", "desk->queries", "queries"],
+          "note": "One charge is on a bill twice, the second time at the wrong price."
+        },
+        {
+          "active": ["queries"],
+          "note": "A transaction opens, so nothing counts until it is kept."
+        },
+        {
+          "active": ["queries", "queries->treatments", "treatments"],
+          "note": "The second row goes, and a look at the bill shows what is left."
+        },
+        {
+          "active": ["treatments"],
+          "note": "The transaction is kept, and the bill is right."
+        }
+      ]
+    },
+    "try-a-clear-out": {
+      "steps": [
+        {
+          "active": ["desk", "desk->queries", "queries"],
+          "note": "Rosamund wants to know what would be left without the old visits."
+        },
+        {
+          "active": ["queries", "queries->visits", "visits"],
+          "note": "Inside a transaction, the old visits are removed."
+        },
+        {
+          "active": ["visits"],
+          "note": "A count shows how many visits are left."
+        },
+        {
+          "active": ["queries", "visits"],
+          "note": "The transaction is undone, and every visit is back."
+        }
+      ]
+    }
+  }
+}

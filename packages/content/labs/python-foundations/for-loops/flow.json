@@ -1,0 +1,54 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dougie", "label": "Dougie", "kind": "story" },
+      { "id": "kit", "label": "Thursday's kit", "kind": "data" },
+      { "id": "file", "label": "kit_check.py", "kind": "file", "mine": true },
+      { "id": "store", "label": "Kit store", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dougie", "to": "kit", "label": "counts" },
+      { "from": "kit", "to": "file", "label": "values" },
+      { "from": "file", "to": "store", "label": "every round" }
+    ],
+    "note": "Thursday's kit sits at the top of kit_check.py, and your for loops do the same small job once for every radio, pitch or letter."
+  },
+  "tasks": {
+    "radios": {
+      "steps": [
+        {
+          "active": ["dougie", "dougie->kit", "kit"],
+          "value": { "kind": "map", "label": "the radios", "entries": [{ "key": "radios", "value": "a whole number" }] },
+          "note": "Dougie knows how many radios are out tonight."
+        },
+        { "active": ["kit", "kit->file", "file"], "note": "Under Task 1 a loop goes round once for each radio, with its number in the loop's own name." },
+        { "active": ["file", "file->store", "store"], "note": "One line per radio, from the first to the last, and none when no radio is out." }
+      ]
+    },
+    "rope": {
+      "steps": [
+        {
+          "active": ["kit"],
+          "value": { "kind": "map", "label": "the lower", "entries": [{ "key": "pitches", "value": "how many" }, { "key": "first_pitch", "value": "metres" }, { "key": "longer_by", "value": "metres" }] },
+          "note": "A crag lower goes down in pitches, and each pitch is longer than the one before."
+        },
+        { "active": ["kit", "kit->file", "file"], "note": "Under Task 2 a total starts before the loop, and each round adds one pitch to it." },
+        { "active": ["file", "file->store", "store"], "note": "Once every pitch is added, Dougie knows how much rope to pack." }
+      ]
+    },
+    "spell": {
+      "steps": [
+        { "active": ["kit"], "note": "The new stretcher needs its label cut in stencils." },
+        { "active": ["kit", "kit->file", "file"], "note": "Under Task 3 a loop goes through the label one character at a time." },
+        { "active": ["file", "file->store", "store"], "note": "Each letter prints on its own line, in capitals, and the spaces are left out." }
+      ]
+    },
+    "count": {
+      "steps": [
+        { "active": ["kit"], "note": "Every letter of the label needs a stencil of its own." },
+        { "active": ["kit", "kit->file", "file"], "note": "Under Task 4 a count starts before the loop and grows on the rounds that meet a letter." },
+        { "active": ["file", "file->store", "store"], "note": "Dougie knows how many stencils to cut, spaces not counted." }
+      ]
+    }
+  }
+}

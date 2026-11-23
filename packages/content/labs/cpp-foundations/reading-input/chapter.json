@@ -1,0 +1,127 @@
+{
+  "id": "reading-input",
+  "title": "Reading what people type",
+  "files": [
+    "src/intake.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the intake here, run it and type the answers. Ctrl+C stops a program that waits for typing.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/intake.cpp -o intake && ./intake"
+  },
+  "tasks": [
+    {
+      "id": "number",
+      "title": "Ask for a number",
+      "file": "src/intake.cpp",
+      "description": "Under `// Task 1` in `src/intake.cpp`, write a function called `askNumber` that takes a question as a reference to a `const std::string`. It prints the question as it is, reads a whole number from `std::cin` and gives it back as an `int`.\n\nCheck calls `askNumber` from code of its own with other questions, types a number on its standard input, and reads what it prints and gives back.",
+      "nextSteps": [
+        "Write the first line: a `const std::string&` in, an `int` back.",
+        "Print the question with `std::cout`, with nothing added.",
+        "Make an `int`, read into it from `std::cin`, and give it back.",
+        "Call it from `main`, run the program and type a number."
+      ],
+      "hints": [
+        "`std::cin >>` reads from what is typed, the way `std::cout <<` prints. It reads into a variable that already exists.",
+        "`>>` skips spaces and line ends before the number, then reads digits until something that is not one.",
+        "The shape is `std::cout << question; int number = 0; std::cin >> number; return number;`."
+      ],
+      "docs": [
+        {
+          "title": "std::cin",
+          "url": "https://en.cppreference.com/w/cpp/io/cin"
+        },
+        {
+          "title": "operator>> for numbers",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_istream/operator_gtgt"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading a whole line with getline",
+          "url": "https://www.youtube.com/watch?v=GtUQBeUeI0o"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "line",
+      "title": "Ask for a line of text",
+      "file": "src/intake.cpp",
+      "description": "Under `// Task 2`, write a function called `askLine` that takes a question as a reference to a `const std::string`. It prints the question as it is, reads a whole line from `std::cin`, spaces included, and gives it back as a `std::string`. Typing `Edwina Sallow` gives back `Edwina Sallow`.\n\nCheck calls `askLine` with other questions, types a line of its own, and reads what it prints and gives back.",
+      "nextSteps": [
+        "Write the first line: a `const std::string&` in, a `std::string` back.",
+        "Print the question.",
+        "Read a whole line into a `std::string`, as the lesson shows, and give it back.",
+        "Call it from `main` first thing, run, and type a name with a space in it."
+      ],
+      "hints": [
+        "`>>` stops at the first space, so it reads one word, not a line.",
+        "`std::getline` reads everything up to the end of the line, spaces included, and leaves the line end out.",
+        "The shape is `std::string line; std::getline(std::cin, line); return line;`, after printing the question."
+      ],
+      "docs": [
+        {
+          "title": "std::getline",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/getline"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "repair",
+      "title": "Ask for the clocks and the item",
+      "file": "src/intake.cpp",
+      "description": "Under `// Task 3`, write a function called `askRepair` that takes two references, an `int` called `clocks` and a `std::string` called `item`, and gives nothing back. It prints `Clocks: `, reads a whole number into the caller's `clocks`, then prints `Item: ` and reads a whole line into the caller's `item`. Dorrit types the number, presses Enter, then types the item:\n\n```\nClocks: 2\nItem: carriage clock\n```\n\nCheck calls `askRepair` with variables of its own, types a number and an item on two lines, and reads its variables afterwards.",
+      "nextSteps": [
+        "Write the first line with two references.",
+        "Print the first question and read the number.",
+        "Print the second question and read the whole line.",
+        "Run it and type the two answers. If the item comes back empty, read the lesson's part on a number followed by a line."
+      ],
+      "hints": [
+        "After `>>` reads the number, the Enter typed after it is still waiting to be read.",
+        "`std::getline` stops at the first line end it meets, so right after a number it reads an empty line. Skip the line end first: `std::ws` skips spaces and line ends.",
+        "The shape is `std::cin >> clocks;`, then `std::getline(std::cin >> std::ws, item);`, each after its question."
+      ],
+      "docs": [
+        {
+          "title": "std::ws",
+          "url": "https://en.cppreference.com/w/cpp/io/manip/ws"
+        },
+        {
+          "title": "std::getline",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/getline"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "quantity",
+      "title": "Ask again until it is a number",
+      "file": "src/intake.cpp",
+      "description": "Under `// Task 4`, write a function called `askQuantity` that takes a question as a reference to a `const std::string`. It prints the question and reads a whole number, like `askNumber`. When what was typed on that line is not a number, it prints the line below and asks again, until it gets a number, and gives that number back as an `int`:\n\n```\nThat is not a number.\n```\n\nCheck calls `askQuantity` and types lines that are not numbers before a number, one of them with a space in it, and reads what it prints and gives back.",
+      "nextSteps": [
+        "Write a loop that prints the question and tries to read a number.",
+        "When the read works, give the number back.",
+        "When it fails, let `std::cin` go on, throw the rest of the line away, and print the line.",
+        "Run it and type `lots`, then a number."
+      ],
+      "hints": [
+        "`std::cin >> number` can stand in an `if`: it is true when a number was read, and false when what was typed is not one.",
+        "After a failed read, `std::cin` refuses every read until `std::cin.clear()`, and the text it could not read is still waiting. Reading the rest of the line with `std::getline` into a variable you do not use throws it away.",
+        "The shape is a `while (true)` loop with `if (std::cin >> number) { return number; }`, then `std::cin.clear();`, a `std::getline` of the rest, and the line."
+      ],
+      "docs": [
+        {
+          "title": "std::basic_ios::clear",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_ios/clear"
+        },
+        {
+          "title": "std::basic_ios::operator bool",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_ios/operator_bool"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

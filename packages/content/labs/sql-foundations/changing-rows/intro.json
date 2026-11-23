@@ -1,0 +1,34 @@
+{
+  "stations": [
+    {
+      "title": "Winnie",
+      "say": "Moss's breed and weight are wrong.",
+      "note": "Ifan weighed him today."
+    },
+    {
+      "title": "animals",
+      "text": "Every query so far has only read the rows.",
+      "note": "A change waits for Ifan."
+    },
+    {
+      "title": "Your statements",
+      "mine": true,
+      "file": "2-moss-record.sql",
+      "gap": "No safe way to change a row",
+      "tasks": ["Add an owner", "Update Moss's record", "Remove a double charge", "Try a change, undo it"]
+    }
+  ],
+  "ticket": {
+    "label": "Moss's row",
+    "wrong": "out of date",
+    "why": "Read only",
+    "right": "up to date"
+  },
+  "captions": [
+    "Ifan weighed Moss today and found out his breed, and Winnie wants his record put right.",
+    "Every query so far only reads, so the change waits until Ifan has a moment.",
+    "You add, change and remove rows, and undo a change, in four tasks.",
+    "Now Moss's row is up to date, and no other animal was touched.",
+    "Same records, now kept up to date at the desk, one careful change at a time."
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhona", "label": "Rhona", "kind": "story" },
+      { "id": "team", "label": "The team tonight", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "pager", "label": "Pagers and rota", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "rhona", "to": "functions", "label": "calls" },
+      { "from": "team", "to": "functions", "label": "values" },
+      { "from": "functions", "to": "pager", "label": "given back" }
+    ],
+    "note": "Your functions take what each call gives them, fill in the rest from their defaults, and give back a new value instead of changing the team's names."
+  },
+  "tasks": {
+    "message": {
+      "steps": [
+        {
+          "active": ["rhona", "rhona->functions", "functions"],
+          "value": { "kind": "array", "label": "what pager_message is given", "values": ["a text", "a priority, or nothing"] },
+          "note": "Rhona sends a message, and most of the time she does not say how urgent it is."
+        },
+        { "active": ["functions"], "note": "When the call gives no priority, the parameter takes its default; when it gives one, that one wins." },
+        { "active": ["functions", "functions->pager", "pager"], "note": "The pager shows the priority in capitals, then the message." }
+      ]
+    },
+    "exercise": {
+      "steps": [
+        { "active": ["team", "team->functions", "functions"], "note": "Sunday's exercise has a hill and a crew, and Ailsa's function takes two more values with defaults." },
+        { "active": ["functions"], "note": "The meeting place keeps its default, and the one value after it is given by its parameter's name." },
+        { "active": ["functions", "functions->pager", "pager"], "note": "The exercise page goes out as routine, so nobody turns up at a run." }
+      ]
+    },
+    "leader": {
+      "steps": [
+        { "active": ["rhona", "rhona->functions", "functions"], "note": "The rota calls leader_line with whoever leads tonight." },
+        { "active": ["team", "team->functions", "functions"], "note": "Inside, the function reads a name from the top of the file instead of what it was given." },
+        { "active": ["functions", "functions->pager", "pager"], "note": "Once it uses its own parameter, the rota names the right leader every night." }
+      ]
+    },
+    "ropes": {
+      "steps": [
+        {
+          "active": ["team", "team->functions", "functions"],
+          "value": { "kind": "array", "label": "what take_ropes is given", "values": ["ropes in the store", "ropes taken out"] },
+          "note": "The rope count at the top cannot be changed from inside a function."
+        },
+        { "active": ["functions"], "note": "So take_ropes takes the count in as a value and works out what is left." },
+        { "active": ["functions", "functions->pager", "pager"], "note": "The new count comes back, and the line that called it stores it where the old one was." }
+      ]
+    }
+  }
+}

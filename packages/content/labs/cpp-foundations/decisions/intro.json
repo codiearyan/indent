@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ambrose", "say": "Put my rules in the laptop.", "note": "They live in his head." },
+    { "title": "Dorrit guesses", "text": "When Ambrose is out, each slip is a guess." },
+    {
+      "title": "Your code",
+      "file": "rules.cpp",
+      "mine": true,
+      "gap": "The program never chooses",
+      "tasks": ["Overdue or on time", "Free or the quote", "Rush or normal shelf", "Where the bench is"]
+    },
+    { "title": "Dorrit", "say": "Same answer Ambrose gives." }
+  ],
+  "ticket": { "label": "Edwina's clock", "wrong": "guessed", "why": "No rules", "right": "decided" },
+  "captions": [
+    "Ambrose wants his counter rules in the laptop, starting with Edwina's clock.",
+    "When he is out, Dorrit guesses: overdue or not, free or not, which shelf.",
+    "You write the rules with if, else, and and or, in four tasks.",
+    "Now each slip gets one answer, the one Ambrose would give.",
+    "The program can choose now. Next, Kasimir wants it to repeat."
+  ]
+}

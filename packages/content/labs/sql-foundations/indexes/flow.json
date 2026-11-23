@@ -1,0 +1,87 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "search", "label": "A search", "kind": "story" },
+      { "id": "plan", "label": "Query plan", "kind": "data" },
+      { "id": "index", "label": "Your index", "kind": "file", "mine": true },
+      { "id": "table", "label": "The table", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "search", "to": "plan", "label": "explain" },
+      { "from": "search", "to": "index", "label": "look up" },
+      { "from": "index", "to": "table", "label": "row pointers" },
+      { "from": "search", "to": "table", "label": "scan" }
+    ],
+    "note": "A search reads every row of a table, until an index lets it go straight to the rows it needs."
+  },
+  "tasks": {
+    "index-by-date": {
+      "steps": [
+        {
+          "active": ["search", "search->plan", "plan"],
+          "note": "The plan of Winnie's search for one day says it scans every visit."
+        },
+        {
+          "active": ["search", "search->table", "table"],
+          "note": "Today every visit is read to find the few of that day."
+        },
+        {
+          "active": ["search", "search->index", "index", "index->table", "table"],
+          "note": "With an index on the column the search looks up, it goes straight to that day's visits."
+        },
+        {
+          "active": ["plan"],
+          "note": "The plan now says SEARCH, and names your index."
+        }
+      ]
+    },
+    "index-by-owner": {
+      "steps": [
+        {
+          "active": ["search", "search->table", "table"],
+          "note": "Finding one owner's animals reads every animal."
+        },
+        {
+          "active": ["search", "search->index", "index", "index->table", "table"],
+          "note": "An index on the column that points at the owner finds them directly, in a join too."
+        },
+        {
+          "active": ["search", "search->plan", "plan"],
+          "note": "Both plans name your index."
+        }
+      ]
+    },
+    "index-vet-and-date": {
+      "steps": [
+        {
+          "active": ["search", "search->plan", "plan"],
+          "note": "A vet's own visits from a date on: one part compared exactly, one a range."
+        },
+        {
+          "active": ["search", "search->index", "index"],
+          "note": "One index holds both columns, in the order that keeps one vet's visits together, by date."
+        },
+        {
+          "active": ["index", "index->table", "table", "plan"],
+          "note": "The plan shows the index used for both parts of the search."
+        }
+      ]
+    },
+    "drop-unused-index": {
+      "steps": [
+        {
+          "active": ["search", "search->plan", "plan"],
+          "note": "The plan of each query the practice runs names the index it uses, if any."
+        },
+        {
+          "active": ["index", "index->table", "table"],
+          "note": "Each index is changed on every change to its table, used or not."
+        },
+        {
+          "active": ["index"],
+          "note": "The index that no plan names goes; the others stay."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ambrose", "say": "Work my rate out in one place.", "note": "It is written six times." },
+    { "title": "The old bill", "text": "The same sums copied, and one copy is wrong." },
+    {
+      "title": "Your code",
+      "file": "bill.cpp",
+      "mine": true,
+      "gap": "Every sum written again",
+      "tasks": ["Price the labour", "Print a bill line", "Add up a repair", "Round to a quarter"]
+    },
+    { "title": "Bill", "rows": [["Labour", "from one function"], ["Parts", "a line each"], ["Total", "labour and parts"]] }
+  ],
+  "ticket": { "label": "Ambrose's bill", "wrong": "wrong sum", "why": "Copied sums", "right": "adds up" },
+  "captions": [
+    "Ambrose wants his rate worked out in one place, and every bill line to ask it.",
+    "Today the same sums are copied around the bill, and last year one was missed.",
+    "You write functions that take values and give one back, in four tasks.",
+    "Now each sum lives in one function, and the bill calls it wherever it is needed.",
+    "Functions work on copies, though. Next, Kasimir needs one that changes his count."
+  ]
+}

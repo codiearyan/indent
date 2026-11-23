@@ -1,0 +1,34 @@
+{
+  "stations": [
+    {
+      "title": "Winnie",
+      "say": "One leaflet for each dog owner.",
+      "note": "From the dog food supplier."
+    },
+    {
+      "title": "owners",
+      "text": "A join lists an owner once for each dog.",
+      "note": "Some would get two leaflets."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "file": "1-dog-owners.sql",
+      "gap": "A query that asks a query",
+      "tasks": ["Owners with a dog", "Heavier than average", "Visits from one town", "Average bill per vet"]
+    }
+  ],
+  "ticket": {
+    "label": "Leaflet list",
+    "wrong": "doubled up",
+    "why": "Repeats",
+    "right": "once each"
+  },
+  "captions": [
+    "The dog food supplier sends a leaflet to every owner with a dog, one each.",
+    "A join lists an owner once for every dog, so an owner with two dogs gets two leaflets.",
+    "You put a query inside a query, in four tasks.",
+    "Now every dog owner is on the list once, and the leaflets go out.",
+    "Same tables, now asked in two steps at once."
+  ]
+}

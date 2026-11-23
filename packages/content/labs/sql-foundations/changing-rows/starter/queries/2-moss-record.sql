@@ -1,0 +1,5 @@
+-- Task 2: Moss, Agnes Dimmock's dog, came in today. Update his record:
+--   breed       Collie cross
+--   weight_kg   23.1
+-- Change only Moss's row. Look up the row with a SELECT first, then write the UPDATE.
+--   node run.mjs queries/2-moss-record.sql

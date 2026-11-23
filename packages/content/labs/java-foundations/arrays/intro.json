@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "Which crossing was the busiest?",
+      "note": "Bridie wants to move the tea urn."
+    },
+    {
+      "title": "Day's log",
+      "text": "One count per crossing, in a long row"
+    },
+    {
+      "title": "Your methods",
+      "file": "Crossings.java",
+      "mine": true,
+      "gap": "A row of numbers nobody reads",
+      "tasks": ["The last crossing", "The day's total", "The busiest one", "Tomorrow's hours"]
+    },
+    {
+      "title": "Bridie",
+      "say": "Good. The urn goes there."
+    }
+  ],
+  "ticket": {
+    "label": "Busiest",
+    "wrong": "a guess",
+    "why": "Unread log",
+    "right": "found"
+  },
+  "captions": [
+    "Ossian's log of the day. Bridie wants to know which crossing was the busiest.",
+    "The counts are one long row on paper, and nobody adds them up or compares them.",
+    "You write methods that take the whole day as an array and read every place.",
+    "Now the last crossing, the total and the busiest come straight from the log.",
+    "Arrays, positions and length. Next, a list that grows as people join it."
+  ]
+}

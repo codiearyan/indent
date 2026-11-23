@@ -1,0 +1,8 @@
+-- Task 1: add Tomos Fenwick, who signed up at the desk this morning, to owners.
+--   first_name  Tomos
+--   last_name   Fenwick
+--   phone       01632 960114
+--   email       none: he has no email
+--   town        Larkhill
+-- Leave id out, so the database picks the next free one. Change nothing else.
+--   node run.mjs queries/1-new-owner.sql
