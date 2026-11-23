@@ -1,0 +1,34 @@
+{
+  "stations": [
+    {
+      "title": "Rosamund",
+      "say": "Where do the microchip numbers go?",
+      "note": "They are on cards now."
+    },
+    {
+      "title": "The database",
+      "text": "Four tables, and none for chips or vets.",
+      "note": "The rest is on paper."
+    },
+    {
+      "title": "Your tables",
+      "mine": true,
+      "file": "1-vets.sql",
+      "gap": "Tables that refuse bad rows",
+      "tasks": ["The vets", "The microchips", "The reminders", "Appointments, prices"]
+    }
+  ],
+  "ticket": {
+    "label": "Bear's chip",
+    "wrong": "on a card",
+    "why": "No table",
+    "right": "on record"
+  },
+  "captions": [
+    "Rosamund wants the microchip numbers off their cards and into the database.",
+    "The database has no table for them, so Bear's chip number stays on a card at the desk.",
+    "You make five tables, each with rules that refuse a bad row, in five tasks.",
+    "Now Bear's chip is on record, and a number used twice is refused.",
+    "Same database, with new tables that keep their own rules."
+  ]
+}

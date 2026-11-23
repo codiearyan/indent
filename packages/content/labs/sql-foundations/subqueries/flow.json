@@ -1,0 +1,114 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "owners", "label": "owners", "kind": "data" },
+      { "id": "animals", "label": "animals", "kind": "data" },
+      { "id": "visits", "label": "visits", "kind": "data" },
+      { "id": "treatments", "label": "treatments", "kind": "data" },
+      { "id": "inner", "label": "Inner query", "kind": "file", "mine": true },
+      { "id": "outer", "label": "Outer query", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "owners", "to": "inner", "label": "rows" },
+      { "from": "animals", "to": "inner", "label": "rows" },
+      { "from": "treatments", "to": "inner", "label": "prices" },
+      { "from": "inner", "to": "outer", "label": "a list or a value" },
+      { "from": "visits", "to": "outer", "label": "rows" }
+    ],
+    "note": "An inner query works something out first, and the query around it uses the answer."
+  },
+  "tasks": {
+    "dog-owners": {
+      "steps": [
+        {
+          "active": ["animals", "animals->inner", "inner"],
+          "note": "The inner query lists the owner of every dog, some of them more than once."
+        },
+        {
+          "active": ["inner", "inner->outer", "outer", "owners"],
+          "note": "The outer query keeps each owner whose id is in that list, once."
+        },
+        {
+          "active": ["outer"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["first_name", "last_name", "phone"],
+            "cells": [["a first name", "a last name", "a phone number"]]
+          },
+          "note": "The supplier gets one row per owner."
+        }
+      ]
+    },
+    "heavier-than-average": {
+      "steps": [
+        {
+          "active": ["animals", "animals->inner", "inner"],
+          "note": "The inner query works out one value: the average weight."
+        },
+        {
+          "active": ["inner", "inner->outer", "outer", "animals"],
+          "note": "The outer query compares each animal's weight with it."
+        },
+        {
+          "active": ["outer"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["name", "species", "weight_kg"],
+            "cells": [["a name", "a species", "a weight above the average"]]
+          },
+          "note": "Ifan has his list, and it stays right when the animals change."
+        }
+      ]
+    },
+    "fernlea-visits": {
+      "steps": [
+        {
+          "active": ["owners", "owners->inner", "inner"],
+          "note": "The innermost query lists the owners in one town, more than one of them."
+        },
+        {
+          "active": ["inner", "animals"],
+          "note": "The query around it lists their animals."
+        },
+        {
+          "active": ["inner", "inner->outer", "outer", "visits", "visits->outer"],
+          "note": "The outer query keeps every visit of those animals, from every owner in the list."
+        },
+        {
+          "active": ["outer"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["visit_date", "vet", "reason"],
+            "cells": [["a date", "a vet", "a reason"]]
+          },
+          "note": "Mabel sees what the animals from there come in for."
+        }
+      ]
+    },
+    "average-bill": {
+      "steps": [
+        {
+          "active": ["treatments", "treatments->inner", "inner"],
+          "note": "The inner query totals each visit's treatments, one row per visit."
+        },
+        {
+          "active": ["inner", "inner->outer", "outer"],
+          "note": "The outer query reads those rows as a table, and averages the bills of each vet."
+        },
+        {
+          "active": ["outer"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["vet", "average_bill"],
+            "cells": [["a vet", "an average, to the penny"]]
+          },
+          "note": "Rosamund sees what a visit to each vet comes to."
+        }
+      ]
+    }
+  }
+}
