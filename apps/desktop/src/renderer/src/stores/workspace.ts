@@ -18,6 +18,7 @@ import { useProgress } from './progress'
 import { noticeMoment } from '@/features/progress/momentStore'
 import { useSettings } from './settings'
 import { useOpenTabs } from './tabs'
+import { keepFiles, keepList, keepRecord } from './keepSame'
 import {
   activeOf,
   clampSplit,
@@ -180,8 +181,20 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       set((s) => ({ revision: s.revision + 1 }))
       if (conflicts.length === 0) toast('This issue was updated. Your changes are kept.')
     }
-    set({ files, folders, dir, starter, conflicts, remembered, missing })
-    setLayout(next)
+    const s = get()
+    const kept = {
+      files: keepFiles(s.files, files),
+      folders: keepList(s.folders, folders),
+      dir,
+      starter: keepRecord(s.starter, starter),
+      conflicts: keepList(s.conflicts, conflicts),
+      remembered,
+      missing: keepList(s.missing, missing)
+    }
+    if (Object.entries(kept).some(([key, value]) => s[key as keyof typeof kept] !== value)) {
+      set(kept)
+    }
+    if (opening || JSON.stringify(next) !== JSON.stringify(layout)) setLayout(next)
   }
 
   /** Pending edits are written first, or the snapshot would replace them with what is on disk. */
