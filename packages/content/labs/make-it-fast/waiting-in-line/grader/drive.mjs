@@ -2,7 +2,7 @@
 // delay: a question stays open until the check answers it. The check lets the learner's code ask
 // all it wants, notes how many questions are open, then answers the newest one, and so on, so the
 // answers come back out of order. The record is the same on every run.
-import { many, shown } from './helpers.mjs'
+import { many, same, shown } from './helpers.mjs'
 import * as reference from './reference.mjs'
 
 const together = await import('../src/together.js')
@@ -171,9 +171,9 @@ export async function paymentsCase(count, unpaidEvery) {
   if (s.asked.length !== unpaid.length || new Set(s.asked).size !== unpaid.length) return fail('each')
   if (s.most > 4) return fail('over')
   if (r.firstWave < Math.min(4, unpaid.length)) return fail(r.firstWave <= 1 ? 'one' : 'fewer')
-  if (JSON.stringify(r.value) !== JSON.stringify(want)) {
+  if (!same(r.value, want)) {
     const got = Array.isArray(r.value) ? r.value : []
-    const at = want.findIndex((w, i) => JSON.stringify(got[i]) !== JSON.stringify(w))
+    const at = want.findIndex((w, i) => !same(got[i], w))
     lines.push(at === -1 || !Array.isArray(r.value) ? `it returned ${shown(r.value)}` : `payment ${at + 1} is ${shown(got[at])}`)
     return fail('answers')
   }

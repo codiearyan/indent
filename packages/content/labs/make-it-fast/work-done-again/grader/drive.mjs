@@ -20,7 +20,11 @@ function rowsOf(count, seed) {
   }))
 }
 
-const SIZES = { big: [300, 21], bigger: [600, 22], one: [1, 23], rankBig: [400, 24], rankBigger: [800, 25], none: [0, 26] }
+const SIZES = { big: [300, 21], bigger: [600, 22], one: [1, 23], rankBig: [400, 24], rankBigger: [800, 25], none: [0, 26], rankSmallest: [400, 27] }
+
+// The report's comparison, or one that puts the smallest spender first, so a sort that ignores
+// the comparison it is handed gives the wrong order.
+const COMPARISONS = { rankSmallest: (a, b) => reference.bySpend(b, a) }
 
 export function sharesCase(name) {
   const [count, seed] = SIZES[name]
@@ -48,8 +52,9 @@ export function sharesAgainCase() {
 export function rankCase(name) {
   const [count, seed] = SIZES[name]
   const rows = rowsOf(count, seed)
-  const want = reference.rankCustomers(rowsOf(count, seed), reference.bySpend)
-  const compare = countCalls(reference.bySpend)
+  const order = COMPARISONS[name] ?? reference.bySpend
+  const want = reference.rankCustomers(rowsOf(count, seed), order)
+  const compare = countCalls(order)
   const got = report.rankCustomers(rows, compare)
   const bound = count < 2 ? 0 : Math.ceil(2 * count * Math.log2(count) + count)
   const calls = `for ${many(count)} rows, the comparison was called ${many(compare.calls)} times`

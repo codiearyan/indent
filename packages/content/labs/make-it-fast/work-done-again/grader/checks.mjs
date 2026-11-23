@@ -39,7 +39,8 @@ export const checks = {
       { name: '400 rows, sorted once', run: 'rankCase', args: ['rankBig'], setup: 'rankCustomers on 400 rows of the check\'s own, many with the same spend or name, and a comparison of its own', hint: rankHints.wrong, hints: rankHints },
       { name: 'Twice as many rows', run: 'rankCase', args: ['rankBigger'], setup: 'rankCustomers on 800 rows', hint: rankHints.wrong, hints: rankHints },
       { name: 'One row', run: 'rankCase', args: ['one'], setup: 'rankCustomers on one row', hint: rankHints.wrong, hints: rankHints },
-      { name: 'No rows', run: 'rankCase', args: ['none'], setup: 'rankCustomers on an empty list', hint: rankHints.wrong, hints: rankHints }
+      { name: 'No rows', run: 'rankCase', args: ['none'], setup: 'rankCustomers on an empty list', hint: rankHints.wrong, hints: rankHints },
+      { name: 'Another comparison', run: 'rankCase', args: ['rankSmallest'], setup: 'rankCustomers on 400 rows with a comparison that puts the smallest spender first', hint: rankHints.wrong, hints: rankHints }
     ])
   },
 
