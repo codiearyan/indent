@@ -188,7 +188,7 @@ function UpNext({
   }
 
   const tasksPassed = chapterState(lab.id, chapter, chapters).tasksPassed
-  const { chaptersDone, chapterCount } = row.progress
+  const { chaptersDone, chapterCount, issuesFilled } = row.progress
 
   return (
     <section
@@ -244,7 +244,11 @@ function UpNext({
         </div>
 
         <div className="mt-auto pt-5" data-tour={TOUR.upNextStrip}>
-          <Meter value={chaptersDone} max={chapterCount} label="issues finished" />
+          <Meter
+            value={issuesFilled}
+            max={chapterCount}
+            label={`${chaptersDone} of ${chapterCount} issues finished`}
+          />
           <p className="mt-2 text-[13px] text-muted-foreground tabular-nums">
             <span className="text-foreground">{chaptersDone}</span> of{' '}
             {plural(chapterCount, 'issue')} finished
@@ -310,7 +314,12 @@ function Stats({
       value: level,
       note: (
         <>
-          <Meter value={into} max={span} label="points into this level" className="mb-1.5 h-1" />
+          <Meter
+            value={into}
+            max={span}
+            label={`${into} of ${span} points into this level`}
+            className="mb-1.5 h-1"
+          />
           {span - into} points to level {level + 1}
         </>
       )
@@ -410,9 +419,9 @@ function LabLine({ lab, progress }: { lab: LabSummary; progress: LabProgress }):
           </span>
         </span>
         <Meter
-          value={progress.chaptersDone}
+          value={progress.issuesFilled}
           max={progress.chapterCount}
-          label="issues finished"
+          label={`${progress.chaptersDone} of ${progress.chapterCount} issues finished`}
           className="w-28 shrink-0"
         />
         <span className="w-12 shrink-0 text-right text-xs text-muted-foreground tabular-nums">

@@ -297,9 +297,9 @@ function RepoCard({
           <NeedsTools lab={lab} className="mt-2" />
           <div className="mt-auto pt-4">
             <Meter
-              value={progress.chaptersDone}
+              value={progress.issuesFilled}
               max={progress.chapterCount}
-              label="issues finished"
+              label={`${progress.chaptersDone} of ${progress.chapterCount} issues finished`}
             />
             <div className="mt-2.5 flex items-center justify-between gap-3 text-[13px] text-muted-foreground tabular-nums">
               <span>{plural(progress.chapterCount, 'issue')}</span>

@@ -136,7 +136,7 @@ function PathCard({
                   <ul className="mt-1 border-t border-rule">
                     {stage.labs.map((id) => {
                       const lab = byId.get(id)
-                      const done = lab ? labProgress(lab, chapters).chaptersDone : 0
+                      const p = lab ? labProgress(lab, chapters) : undefined
                       return (
                         <li key={id} className="border-b border-rule">
                           {lab ? (
@@ -149,13 +149,13 @@ function PathCard({
                                 {KIND[kindOf(lab)]}
                               </span>
                               <Meter
-                                value={done}
+                                value={p?.issuesFilled ?? 0}
                                 max={lab.chapters.length}
-                                label="issues finished"
+                                label={`${p?.chaptersDone ?? 0} of ${lab.chapters.length} issues finished`}
                                 className="w-[140px] shrink-0"
                               />
                               <span className="w-12 shrink-0 text-right text-[13px] text-muted-foreground tabular-nums">
-                                {done}/{lab.chapters.length}
+                                {p?.chaptersDone ?? 0}/{lab.chapters.length}
                               </span>
                               <ChevronRight
                                 className="size-4 shrink-0 text-muted-foreground"

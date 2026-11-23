@@ -25,6 +25,8 @@ export interface LabProgress {
   status: Status
   chaptersDone: number
   chapterCount: number
+  /** Finished issues plus each unfinished issue's share of passed tasks, for a progress bar. */
+  issuesFilled: number
   taskCount: number
   tasksPassed: number
   points: number
@@ -39,16 +41,20 @@ export function labProgress(lab: LabSummary, chapters: Chapters): LabProgress {
   let started = false
   let pointsEarned = 0
   let tasksPassed = 0
+  let issuesFilled = 0
   let nextChapterId: string | undefined
   let lastOpenedAt: string | undefined
   for (const chapter of lab.chapters) {
     const progress = chapters[chapterKey(lab.id, chapter.id)]
     if (progress) {
       started = true
+      let passed = 0
       for (const task of Object.values(progress.tasks)) {
         pointsEarned += task.pointsEarned
-        if (task.passed) tasksPassed++
+        if (task.passed) passed++
       }
+      tasksPassed += passed
+      issuesFilled += progress.completedAt ? 1 : Math.min(passed / (chapter.taskCount || 1), 1)
       if (!lastOpenedAt || progress.lastOpenedAt > lastOpenedAt) {
         lastOpenedAt = progress.lastOpenedAt
       }
@@ -67,6 +73,7 @@ export function labProgress(lab: LabSummary, chapters: Chapters): LabProgress {
     status,
     chaptersDone,
     chapterCount,
+    issuesFilled,
     taskCount: lab.chapters.reduce((sum, c) => sum + c.taskCount, 0),
     tasksPassed,
     points: lab.chapters.reduce((sum, c) => sum + c.points, 0),
