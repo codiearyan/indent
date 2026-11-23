@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Why does it say my name?", "note": "Kirsty leads tonight." },
+    { "title": "Pager and rota", "text": "Every exercise urgent, one leader for ever." },
+    {
+      "title": "Your functions",
+      "file": "pager.py",
+      "mine": true,
+      "gap": "Wrong names, no defaults",
+      "tasks": ["Routine by default", "Page the exercise", "Fix the leader", "Fix the rope count"]
+    },
+    { "title": "The team", "say": "Right page, right leader.", "note": "Ropes counted too." }
+  ],
+  "ticket": { "label": "Rota", "wrong": "Rhona again", "why": "Wrong name", "right": "Kirsty leads" },
+  "captions": [
+    "Back at the base, Rhona reads the pages and the rota for the week ahead.",
+    "Today exercises go out as urgent, the rota names the wrong leader, and the ropes crash.",
+    "You give parameters defaults, name values in calls, and fix where names live.",
+    "Now each page, each night's leader and the rope count come out right.",
+    "Defaults, named arguments, and names that live inside a function."
+  ]
+}

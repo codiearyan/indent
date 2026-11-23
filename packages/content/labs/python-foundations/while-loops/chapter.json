@@ -1,0 +1,131 @@
+{
+  "id": "while-loops",
+  "title": "Repeat with while",
+  "files": [
+    "radio_watch.py"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here, and press Ctrl+C to stop it when a loop never ends.",
+    "suggestedCommand": "python3 radio_watch.py"
+  },
+  "tasks": [
+    {
+      "id": "countdown",
+      "title": "Stop the countdown",
+      "file": "radio_watch.py",
+      "description": "Under `# Task 1` in `radio_watch.py`, Dougie's countdown never stops. Run the file, press **Ctrl+C** in the terminal to stop it, and read where the traceback says it was. Then fix the loop so that it counts down from `minutes_to_go` to 1, one line a minute, and then prints `Vehicle leaving`. From 3 minutes the lines are:\n\n```\nLeaving in 3\nLeaving in 2\nLeaving in 1\nVehicle leaving\n```\n\nCheck runs your file with other minutes, none included, and compares every line Task 1 prints.",
+      "nextSteps": [
+        "Run `python3 radio_watch.py` and press Ctrl+C when the lines keep coming.",
+        "Read the condition of the `while`: which name does it look at?",
+        "Ask what inside the loop changes that name. Nothing does yet.",
+        "Add the line that changes it, run the file again, and watch it stop."
+      ],
+      "hints": [
+        "The loop runs while `minutes` is above 0. For it to stop, `minutes` has to get smaller on every round.",
+        "Add one line inside the loop, moved in like the `print`, that gives `minutes` a new value one smaller. Put it after the `print`, so the first line shows the full count.",
+        "The missing line is `minutes = minutes - 1`, moved in under `while`, right after the `print`."
+      ],
+      "docs": [
+        {
+          "title": "The while statement",
+          "url": "https://docs.python.org/3/reference/compound_stmts.html#the-while-statement"
+        },
+        {
+          "title": "KeyboardInterrupt",
+          "url": "https://docs.python.org/3/builtins/exceptions.html#KeyboardInterrupt"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "battery",
+      "title": "Hours of battery",
+      "file": "radio_watch.py",
+      "description": "Under `# Task 2`, the radio's charge starts at `battery` and goes down by `drain_per_hour` every hour. Make a variable called `hours`: how many hours pass until the charge is below `low_mark`. A charge exactly at `low_mark` is not below it yet. Print it to see it.\n\nCheck runs your file with other batteries, including one that lands exactly on the mark and one already below it, and reads `hours` after the lines under `# Task 2`.",
+      "nextSteps": [
+        "Work out tonight's answer by hand, hour by hour.",
+        "Start `hours` at 0 before the loop.",
+        "Write a `while` that keeps going as long as the charge is not below the mark.",
+        "Inside it, take an hour's drain off the charge and add 1 to `hours`."
+      ],
+      "hints": [
+        "You do not know in advance how many rounds the loop needs. That is what `while` is for: it repeats while a condition is True.",
+        "The loop goes on while the charge is at the mark or above it. Every round must change `battery`, or the loop never ends.",
+        "The shape is `hours = 0`, then `while battery >= low_mark:` with `battery = battery - drain_per_hour` and `hours = hours + 1` under it."
+      ],
+      "docs": [
+        {
+          "title": "The while statement",
+          "url": "https://docs.python.org/3/reference/compound_stmts.html#the-while-statement"
+        },
+        {
+          "title": "First steps towards programming",
+          "url": "https://docs.python.org/3/tutorial/introduction.html#first-steps-towards-programming"
+        }
+      ],
+      "videos": [
+        {
+          "title": "while loops, and loops that never end",
+          "url": "https://www.youtube.com/watch?v=rRTjPnVooxE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "search",
+      "title": "Search the squares",
+      "file": "radio_watch.py",
+      "description": "Under `# Task 3`, search the squares in order, starting at square 1 and going up to square `squares` at most. For each square print a line like `Searching square 1`. When the square is `found_in`, print a line like `Found in square 6` and stop searching at once. When `found_in` is not one of the squares, every square is searched and no Found line prints.\n\nCheck tries walkers found part way, in the first square, in the last square and not at all, and compares every line Task 3 prints.",
+      "nextSteps": [
+        "Read the part of the lesson on `break`.",
+        "Start at square 1 and loop while there are squares left.",
+        "Inside the loop, print the square, and when it is the one, print the Found line and leave the loop.",
+        "Move on to the next square at the end of each round."
+      ],
+      "hints": [
+        "The search has two ways to end: it runs out of squares, or the walker is found. The `while` condition handles the first.",
+        "`break` leaves a loop at once, wherever it is. Put it inside an `if` that asks whether this is the square. Remember to move on to the next square, or the loop never ends.",
+        "The shape is `square = 1`, `while square <= squares:`, the `print`, then `if square == found_in:` with the Found `print` and `break` under it, and `square = square + 1` at the end of the loop."
+      ],
+      "docs": [
+        {
+          "title": "break and continue statements",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#break-and-continue-statements"
+        },
+        {
+          "title": "The break statement",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#the-break-statement"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "channels",
+      "title": "Call round the channels",
+      "file": "radio_watch.py",
+      "description": "Under `# Task 4`, print a line like `Calling on channel 1` for every channel from 1 up to `channels`, in order, but skip `team_channel`: the team is already listening there. With 4 channels and the team on channel 2 the lines are:\n\n```\nCalling on channel 1\nCalling on channel 3\nCalling on channel 4\n```\n\nCheck tries a team channel in the middle, first and last, and one that is not in the list, and compares every line Task 4 prints.",
+      "nextSteps": [
+        "Read the part of the lesson on `continue`.",
+        "Loop over the channels from 1 to the last.",
+        "When the channel is the team's, skip the rest of that round.",
+        "Run the file and check the team channel is missing and nothing else is."
+      ],
+      "hints": [
+        "`continue` ends this round early and goes straight on to the next one.",
+        "In a `while` loop, `continue` also skips any lines after it, the one that moves to the next channel included. Move to the next channel before the `continue` can skip it.",
+        "The shape is `channel = 0`, `while channel < channels:`, `channel = channel + 1`, then `if channel == team_channel:` with `continue` under it, and the `print` last."
+      ],
+      "docs": [
+        {
+          "title": "break and continue statements",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#break-and-continue-statements"
+        },
+        {
+          "title": "The continue statement",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#the-continue-statement"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

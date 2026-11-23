@@ -1,0 +1,50 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" },
+      { "id": "search", "label": "The night search", "kind": "data" },
+      { "id": "file", "label": "radio_watch.py", "kind": "file", "mine": true },
+      { "id": "radio", "label": "Radio desk", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ailsa", "to": "search", "label": "what we know" },
+      { "from": "search", "to": "file", "label": "values" },
+      { "from": "file", "to": "radio", "label": "until done" }
+    ],
+    "note": "The night's values sit at the top of radio_watch.py, and your while loops keep going until the job is done, and no longer."
+  },
+  "tasks": {
+    "countdown": {
+      "steps": [
+        { "active": ["search", "search->file", "file"], "note": "Dougie's countdown starts from the minutes until the vehicle leaves." },
+        { "active": ["file"], "note": "Under Task 1 the loop asks the same question on every round, and nothing inside it changes the answer." },
+        { "active": ["file", "file->radio", "radio"], "note": "Once each round brings the answer closer, the countdown ends and the vehicle leaves." }
+      ]
+    },
+    "battery": {
+      "steps": [
+        {
+          "active": ["ailsa", "ailsa->search", "search"],
+          "value": { "kind": "map", "label": "the radio", "entries": [{ "key": "battery", "value": "a whole number" }, { "key": "drain_per_hour", "value": "a whole number" }, { "key": "low_mark", "value": "a whole number" }] },
+          "note": "The radio starts with a charge and loses some every hour."
+        },
+        { "active": ["search", "search->file", "file"], "note": "Under Task 2 a loop takes away an hour's drain and counts the hour, round after round." },
+        { "active": ["file", "file->radio", "radio"], "note": "It stops as soon as the charge is below the mark, and Ailsa has the hours." }
+      ]
+    },
+    "search": {
+      "steps": [
+        { "active": ["search"], "note": "The hill is split into numbered squares, searched in order." },
+        { "active": ["search", "search->file", "file"], "note": "Under Task 3 each round searches one square and asks whether it is the one." },
+        { "active": ["file", "file->radio", "radio"], "note": "The search ends when the walker is found, or when the squares run out." }
+      ]
+    },
+    "channels": {
+      "steps": [
+        { "active": ["search"], "note": "The radio has numbered channels, and the team already listens on one of them." },
+        { "active": ["search", "search->file", "file"], "note": "Under Task 4 each round calls one channel, and the team's own round is skipped." },
+        { "active": ["file", "file->radio", "radio"], "note": "Every other channel hears the call, once each, in order." }
+      ]
+    }
+  }
+}
