@@ -1,0 +1,139 @@
+{
+  "id": "strict-settings",
+  "title": "Make the compiler strict",
+  "files": ["tsconfig.json", "src/stock.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/stock.ts` runs the stock count, and `npm run types` checks it with the settings in `tsconfig.json`.",
+    "suggestedCommand": "npm run types"
+  },
+  "tasks": [
+    {
+      "id": "params",
+      "title": "Switch on noImplicitAny",
+      "file": "src/stock.ts",
+      "description": "In `tsconfig.json`, switch `noImplicitAny` on. Then, under `// Task 1` in `src/stock.ts`, write the type of every parameter the compiler now asks for, and fix what it finds once they have types, so `tinsToOrder` gives how many tins it takes to bring a shelf up to the number given. Task 3 switches on the rest of `strict`.\n\nCheck reads your `tsconfig.json` the way the compiler does, and wants `noImplicitAny` on. It compiles your lines with your `tsconfig.json`, and with settings of its own that have `noImplicitAny` on: both must accept them. It refuses `any`, `as` and comments that start with `@ts-` in your lines. It compiles code of its own: passing a shelf and a number must compile, while text for the number, a blend for a shelf, or text for `shelfLine` must be refused. It calls both functions with shelves of its own.",
+      "nextSteps": [
+        "Read the lesson's parts on `tsconfig.json` and on `noImplicitAny`.",
+        "Add `noImplicitAny` to `compilerOptions`, and run `npm run types`.",
+        "Write the type of each parameter it names.",
+        "Run `npm run types` again: once the parameters have types, it finds one more thing."
+      ],
+      "hints": [
+        "A setting goes inside `compilerOptions`, as a name in double quotes, a colon and `true`, with a comma between it and the next one. `Unknown compiler option` means the name is spelt differently from the real one.",
+        "`Parameter 'shelf' implicitly has an 'any' type` asks you to say what `shelf` is. There is a type for a shelf at the top of the file. Once it is there, the compiler can check the body against it.",
+        "`\"noImplicitAny\": true` in `tsconfig.json`, then `tinsToOrder(shelf: Shelf, target: number)` and `shelfLine(shelf: Shelf)`, and `shelf.tins` where the body read a property a shelf does not have."
+      ],
+      "docs": [
+        {
+          "title": "noImplicitAny",
+          "url": "https://www.typescriptlang.org/tsconfig/#noImplicitAny"
+        },
+        {
+          "title": "What is a tsconfig.json",
+          "url": "https://www.typescriptlang.org/docs/handbook/tsconfig-json.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "nulls",
+      "title": "Switch on strictNullChecks",
+      "file": "src/stock.ts",
+      "description": "In `tsconfig.json`, switch `strictNullChecks` on. Then, under `// Task 2` in `src/stock.ts`, fix what the compiler finds: `tinsOf` gives `0` for a blend that has no shelf, and `reorderNote` keeps giving `undefined` for a shelf that is not low, with a result type that says so.\n\nCheck reads your `tsconfig.json` the way the compiler does, and wants `strictNullChecks` on. It compiles your lines with your `tsconfig.json`, and with settings of its own that have `strictNullChecks` and `noImplicitAny` on: both must accept them. It refuses `any`, `as`, `!` after a value and comments that start with `@ts-` in your lines. It compiles code of its own that uses what `reorderNote` gives as text that is always there: that must be refused. It calls both functions with shelves of its own, and a blend without a shelf.",
+      "nextSteps": [
+        "Read the lesson's part on `strictNullChecks`.",
+        "Add `strictNullChecks` to `compilerOptions`, and run `npm run types`.",
+        "In `tinsOf`, check the shelf before reading from it.",
+        "In `reorderNote`, say in the result type what the function really gives back."
+      ],
+      "hints": [
+        "`'shelf' is possibly 'undefined'` means `find` may find nothing. The code reads `tins` from it anyway, and that is the error Node stopped with.",
+        "Check the value the way you learned in the issue on narrowing, and give back `0` in the branch where there is no shelf. For `reorderNote`, the result type can be a union.",
+        "`if (shelf === undefined) return 0` before `return shelf.tins`, and `): string | undefined {` on `reorderNote`."
+      ],
+      "docs": [
+        {
+          "title": "strictNullChecks",
+          "url": "https://www.typescriptlang.org/tsconfig/#strictNullChecks"
+        },
+        {
+          "title": "Truthiness narrowing",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#truthiness-narrowing"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "strict",
+      "title": "Switch on all of strict",
+      "file": "src/stock.ts",
+      "description": "In `tsconfig.json`, switch `strict` on, so every check it turns on is on. Then, under `// Task 3` in `src/stock.ts`, fix what the compiler finds, so that for text it cannot read, `countLine` still gives `'Could not read the count: '` and the message of the error `JSON.parse` throws.\n\nCheck reads your `tsconfig.json` the way the compiler does, and wants every check of `strict` on. It compiles your lines with your `tsconfig.json`, and with settings of its own that have `strict` on: both must accept them. It refuses `any`, `as` and comments that start with `@ts-` in your lines. It calls `countLine` with text of its own, some it can read and some it cannot.",
+      "nextSteps": [
+        "Read the lesson's parts on what `strict` turns on and on a value that was thrown.",
+        "Set `strict` to `true` in `tsconfig.json`, and run `npm run types`.",
+        "Find out what `error` is before reading its message.",
+        "Run both commands."
+      ],
+      "hints": [
+        "`'error' is of type 'unknown'` comes from one of the checks `strict` turns on: anything can be thrown, not only an `Error`, so the compiler will not let you read `message` without looking first.",
+        "`instanceof Error` narrows a value to an `Error`, the way `typeof` narrowed to a number. For a thrown value that is not an Error, any text will do.",
+        "`\"strict\": true` in `tsconfig.json`, then `const reason = error instanceof Error ? error.message : String(error)` and that `reason` in the line."
+      ],
+      "docs": [
+        {
+          "title": "strict",
+          "url": "https://www.typescriptlang.org/tsconfig/#strict"
+        },
+        {
+          "title": "instanceof narrowing",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#instanceof-narrowing"
+        },
+        {
+          "title": "try...catch",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
+        }
+      ],
+      "videos": [
+        {
+          "title": "The settings of a tsconfig.json",
+          "url": "https://www.youtube.com/watch?v=eJXVEju3XLM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "index",
+      "title": "Switch on noUncheckedIndexedAccess",
+      "file": "src/stock.ts",
+      "description": "In `tsconfig.json`, switch `noUncheckedIndexedAccess` on, beside `strict`. Then, under `// Task 4` in `src/stock.ts`, fix what the compiler finds: when no shelf is below its reorder point, `firstToReorder` gives `'Nothing to reorder'`.\n\nCheck reads your `tsconfig.json` the way the compiler does, and wants `noUncheckedIndexedAccess` and `strictNullChecks` on. It compiles your lines with your `tsconfig.json`, and with settings of its own that have `strict` and `noUncheckedIndexedAccess` on: both must accept them. It refuses `any`, `as`, `!` after a value and comments that start with `@ts-` in your lines. It calls `firstToReorder` with shelves of its own, none of them low in some.",
+      "nextSteps": [
+        "Read the lesson's part on `noUncheckedIndexedAccess`.",
+        "Add it to `compilerOptions`, and run `npm run types`.",
+        "Put the first item in a name of its own, and check it before reading its blend.",
+        "Run both commands."
+      ],
+      "hints": [
+        "`Object is possibly 'undefined'` points at `low[0]`: with this setting, an item read from a list may not be there, and here it is not when no shelf is low.",
+        "Checking `low.length` first does not help: the compiler does not connect the length with the item. Read the item into a `const`, and check that.",
+        "`const first = low[0]`, then `if (first === undefined) return 'Nothing to reorder'` and `return first.blend`."
+      ],
+      "docs": [
+        {
+          "title": "noUncheckedIndexedAccess",
+          "url": "https://www.typescriptlang.org/tsconfig/#noUncheckedIndexedAccess"
+        },
+        {
+          "title": "Optional chaining",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining"
+        }
+      ],
+      "videos": [
+        {
+          "title": "A setting beyond strict for list items",
+          "url": "https://www.youtube.com/watch?v=i751O3QFLQM"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

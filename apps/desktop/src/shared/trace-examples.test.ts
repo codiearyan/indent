@@ -140,7 +140,16 @@ const repos: { labId: string; expected: string[] }[] = [
       'functions-as-values/rules',
       'generics/first',
       'generics/result',
-      'generics/plain'
+      'generics/plain',
+      'types-from-types/fields',
+      'types-from-types/size',
+      'types-from-types/parts',
+      'types-across-files/packing',
+      'types-across-files/shipping',
+      'strict-settings/params',
+      'strict-settings/nulls',
+      'strict-settings/strict',
+      'strict-settings/index'
     ]
   },
   {

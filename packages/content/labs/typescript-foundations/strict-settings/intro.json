@@ -1,0 +1,46 @@
+{
+  "stations": [
+    {
+      "title": "Bryn",
+      "say": "Order NaN tins of Frost Sencha?",
+      "note": "The compiler said nothing."
+    },
+    {
+      "title": "Rafe's settings",
+      "text": "Strict checks off, so the compiler is quiet."
+    },
+    {
+      "title": "Your settings",
+      "file": "tsconfig.json",
+      "mine": true,
+      "gap": "Checks switched off",
+      "tasks": [
+        "Types on parameters",
+        "Check for undefined",
+        "All of strict",
+        "Items may be missing"
+      ]
+    },
+    {
+      "title": "Stock count",
+      "rows": [
+        ["Frost Sencha", "3 tins"],
+        ["Hearth Assam", "20 tins"]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Frost Sencha",
+    "wrong": "NaN tins",
+    "why": "Checks off",
+    "right": "real number"
+  },
+  "captions": [
+    "Bryn asks why the reorder list says NaN tins of Frost Sencha at Oakhollow.",
+    "Rafe switched the strict checks off, so the compiler stayed quiet about the bug.",
+    "You switch the checks on one at a time in tsconfig.json, and fix what each one finds.",
+    "The compiler finds the mistake, and Bryn gets a real number of tins to order.",
+    "The stock code now compiles with every check on, so the compiler speaks up first."
+  ]
+}

@@ -1,0 +1,258 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "config",
+        "label": "tsconfig.json",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "compiler",
+        "label": "Compiler",
+        "kind": "story"
+      },
+      {
+        "id": "order",
+        "label": "tinsToOrder()",
+        "kind": "function",
+        "mine": true,
+        "fn": "tinsToOrder"
+      },
+      {
+        "id": "tins",
+        "label": "tinsOf()",
+        "kind": "function",
+        "mine": true,
+        "fn": "tinsOf"
+      },
+      {
+        "id": "count",
+        "label": "countLine()",
+        "kind": "function",
+        "mine": true,
+        "fn": "countLine"
+      },
+      {
+        "id": "first",
+        "label": "firstToReorder()",
+        "kind": "function",
+        "mine": true,
+        "fn": "firstToReorder"
+      },
+      {
+        "id": "bryn",
+        "label": "Bryn's stock count",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "config",
+        "to": "compiler",
+        "label": "settings"
+      },
+      {
+        "from": "compiler",
+        "to": "order",
+        "label": "checks"
+      },
+      {
+        "from": "compiler",
+        "to": "tins",
+        "label": "checks"
+      },
+      {
+        "from": "compiler",
+        "to": "count",
+        "label": "checks"
+      },
+      {
+        "from": "compiler",
+        "to": "first",
+        "label": "checks"
+      },
+      {
+        "from": "order",
+        "to": "bryn",
+        "label": "tins to order"
+      },
+      {
+        "from": "tins",
+        "to": "bryn",
+        "label": "tins"
+      },
+      {
+        "from": "count",
+        "to": "bryn",
+        "label": "a line"
+      },
+      {
+        "from": "first",
+        "to": "bryn",
+        "label": "a blend"
+      }
+    ],
+    "note": "The settings in tsconfig.json decide what the compiler checks, and with them on it catches the stock count's bugs before Bryn does."
+  },
+  "tasks": {
+    "params": {
+      "trace": {
+        "file": "src/stock.ts",
+        "call": "tinsToOrder",
+        "args": [
+          {
+            "blend": "Frost Sencha",
+            "tins": 3,
+            "reorderAt": 5
+          },
+          12
+        ]
+      },
+      "steps": [
+        {
+          "active": ["config", "config->compiler"],
+          "value": {
+            "kind": "map",
+            "label": "tsconfig.json",
+            "entries": [
+              {
+                "key": "noImplicitAny",
+                "value": "on"
+              }
+            ]
+          },
+          "note": "A parameter without a type is no longer quietly allowed."
+        },
+        {
+          "active": ["compiler", "compiler->order", "order"],
+          "note": "With every parameter typed, the compiler checks the body against a shelf, and finds what made the list say NaN."
+        },
+        {
+          "active": ["order", "order->bryn", "bryn"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              {
+                "key": "tins to order",
+                "value": "a number"
+              }
+            ]
+          },
+          "note": "Bryn gets how many tins of Frost Sencha to order."
+        }
+      ]
+    },
+    "nulls": {
+      "trace": {
+        "file": "src/stock.ts",
+        "call": "tinsOf",
+        "args": [
+          [
+            {
+              "blend": "Frost Sencha",
+              "tins": 3,
+              "reorderAt": 5
+            }
+          ],
+          "Frost Sencha"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["config", "config->compiler"],
+          "value": {
+            "kind": "map",
+            "label": "tsconfig.json",
+            "entries": [
+              {
+                "key": "strictNullChecks",
+                "value": "on"
+              }
+            ]
+          },
+          "note": "undefined is no longer allowed where a value is expected."
+        },
+        {
+          "active": ["compiler", "compiler->tins", "tins"],
+          "note": "The search for a shelf may find nothing, and the compiler wants that case handled before a shelf is read."
+        },
+        {
+          "active": ["tins", "tins->bryn", "bryn"],
+          "note": "Bryn gets the tins of a blend, and a blend without a shelf no longer stops the count."
+        }
+      ]
+    },
+    "strict": {
+      "trace": {
+        "file": "src/stock.ts",
+        "call": "countLine",
+        "args": ["{\"blend\":\"Hearth Assam\",\"tins\":12}"]
+      },
+      "steps": [
+        {
+          "active": ["config", "config->compiler"],
+          "value": {
+            "kind": "map",
+            "label": "tsconfig.json",
+            "entries": [
+              {
+                "key": "strict",
+                "value": "on"
+              }
+            ]
+          },
+          "note": "Every check that strict turns on is on."
+        },
+        {
+          "active": ["compiler", "compiler->count", "count"],
+          "note": "Anything can be thrown, so what a catch receives is checked before its message is read."
+        },
+        {
+          "active": ["count", "count->bryn", "bryn"],
+          "note": "Bryn gets a line for each count the scanner sends, or the reason it could not be read."
+        }
+      ]
+    },
+    "index": {
+      "trace": {
+        "file": "src/stock.ts",
+        "call": "firstToReorder",
+        "args": [
+          [
+            {
+              "blend": "Frost Sencha",
+              "tins": 3,
+              "reorderAt": 5
+            }
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["config", "config->compiler"],
+          "value": {
+            "kind": "map",
+            "label": "tsconfig.json",
+            "entries": [
+              {
+                "key": "noUncheckedIndexedAccess",
+                "value": "on"
+              }
+            ]
+          },
+          "note": "An item read from a list by its position may not be there."
+        },
+        {
+          "active": ["compiler", "compiler->first", "first"],
+          "note": "The first low shelf may not exist, and the compiler wants that case handled."
+        },
+        {
+          "active": ["first", "first->bryn", "bryn"],
+          "note": "Bryn gets the blend to reorder first, or a line saying there is nothing to reorder."
+        }
+      ]
+    }
+  }
+}
