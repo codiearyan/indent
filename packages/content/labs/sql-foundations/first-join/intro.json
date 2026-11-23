@@ -1,0 +1,34 @@
+{
+  "stations": [
+    {
+      "title": "Winnie",
+      "say": "Who owns Biscuit? I need a number.",
+      "note": "The caller is waiting."
+    },
+    {
+      "title": "animals",
+      "text": "Biscuit's row has an owner id, not a name.",
+      "note": "The names are in owners."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "file": "1-owner-names.sql",
+      "gap": "Two tables, read apart",
+      "tasks": ["Animals and owners", "Animals in Larkhill", "Dates on treatments", "Ifan's visits"]
+    }
+  ],
+  "ticket": {
+    "label": "Biscuit's owner",
+    "wrong": "a hunt",
+    "why": "Two tables",
+    "right": "found"
+  },
+  "captions": [
+    "Winnie has found Biscuit, and now she needs his owner while the caller waits.",
+    "The animal is in one table and the owner in another, so she hunts through both by hand.",
+    "You join two tables on the id that links them, in four tasks.",
+    "Now each animal sits on one row with its owner, and Winnie answers at once.",
+    "Same tables, now read together. One query crosses from one to the other."
+  ]
+}

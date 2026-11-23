@@ -1,0 +1,94 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "file", "label": "Notice.java", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "run", "label": "main runs", "kind": "story" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bridie", "to": "file", "label": "the notice" },
+      { "from": "file", "to": "compiler", "label": "every line" },
+      { "from": "compiler", "to": "run", "label": "all accepted" },
+      { "from": "run", "to": "terminal", "label": "printed text" }
+    ],
+    "note": "You write the lines of Notice.java, the compiler checks every one, and only then does main run and print the notice."
+  },
+  "tasks": {
+    "welcome": {
+      "steps": [
+        {
+          "active": ["bridie", "bridie->file"],
+          "note": "Bridie wants the welcome at the top of the notice, exactly as the task spells it."
+        },
+        {
+          "active": ["file"],
+          "note": "Under Task 1 you add one statement that prints it, with the text in double quotes."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "The compiler reads the whole file first. A missing semicolon or quote stops it here."
+        },
+        {
+          "active": ["run", "run->terminal", "terminal"],
+          "note": "Once every line is accepted, main runs and the welcome shows on a line of its own."
+        }
+      ]
+    },
+    "times": {
+      "steps": [
+        {
+          "active": ["bridie", "bridie->file"],
+          "value": {
+            "kind": "array",
+            "label": "crossing times",
+            "values": ["first line", "second line"]
+          },
+          "note": "The crossing times are two lines, and Bridie wants them in the order the task gives."
+        },
+        { "active": ["file"], "note": "Each line gets its own print, one under the other." },
+        {
+          "active": ["compiler", "compiler->run", "run"],
+          "note": "main runs its statements from top to bottom."
+        },
+        {
+          "active": ["run", "run->terminal", "terminal"],
+          "note": "The terminal shows the two lines, one right after the other."
+        }
+      ]
+    },
+    "hours": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "The hut's hours are printed in two parts, and today each part ends its own line."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler", "compiler->run", "run"],
+          "note": "One way of printing ends the line, the other leaves it open for what comes next."
+        },
+        {
+          "active": ["run", "run->terminal", "terminal"],
+          "note": "The two parts come out on one line, and that line ends after the second part."
+        }
+      ]
+    },
+    "old-notice": {
+      "steps": [
+        {
+          "active": ["bridie", "bridie->file"],
+          "note": "A statement under Task 4 still prints the free bicycles notice Ossian stopped."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "The compiler skips every comment, so a line turned into one no longer runs."
+        },
+        {
+          "active": ["run", "run->terminal", "terminal"],
+          "note": "The old notice no longer prints, and the line stays in the file in case it comes back."
+        }
+      ]
+    }
+  }
+}

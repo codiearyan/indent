@@ -1,7 +1,7 @@
 {
   "id": "typescript-foundations",
   "title": "TypeScript foundations",
-  "description": "Oakhollow Tea Company sells loose tea online, and its order code was written in a hurry in plain JavaScript, so it prints counts like 2412 and weights like NaN without a word. You are its developer, and you give that code types one idea at a time while the compiler tells you what does not add up. Each issue teaches one part of TypeScript, from reading your first type error to typing values, functions, lists and objects, then naming shapes and handling values of a few kinds, in one file you run and check yourself.",
+  "description": "Oakhollow Tea Company sells loose tea online, and its order code was written in a hurry in plain JavaScript, so it prints counts like 2412 and weights like NaN without a word. You are its developer, and you give that code types one idea at a time while the compiler tells you what does not add up. Each issue teaches one part of TypeScript, from reading your first type error to typing values, functions, lists and objects, then naming shapes, handling values of a few kinds, checking data from outside, passing functions around and writing generics, in one file you run and check yourself.",
   "category": "JavaScript and TypeScript",
   "language": "typescript",
   "tags": [
@@ -25,6 +25,14 @@
         "type-aliases-and-interfaces",
         "unions-and-literals",
         "narrowing"
+      ]
+    },
+    {
+      "title": "When you do not know",
+      "chapters": [
+        "unknown-any-and-never",
+        "functions-as-values",
+        "generics"
       ]
     }
   ]

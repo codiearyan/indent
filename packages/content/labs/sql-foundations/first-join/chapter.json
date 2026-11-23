@@ -1,0 +1,105 @@
+{
+  "id": "first-join",
+  "title": "Two tables at once",
+  "files": [
+    "queries/1-owner-names.sql",
+    "queries/2-larkhill-animals.sql",
+    "queries/3-treatment-dates.sql",
+    "queries/4-ifan-visits.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-owner-names.sql"
+  },
+  "tasks": [
+    {
+      "id": "owner-names",
+      "title": "List each animal with its owner",
+      "file": "queries/1-owner-names.sql",
+      "description": "Winnie wants to see who owns each animal without looking it up in a second table.\n\nIn `queries/1-owner-names.sql`, return three columns, in this order:\n\n- `animal`: the animal's name, from `animals`\n- `first_name`: its owner's first name, from `owners`\n- `last_name`: its owner's last name\n\nOne row per animal. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, where the ids are other numbers.",
+      "nextSteps": [
+        "Find Biscuit's owner by hand in `seed.sql`: read his `owner_id`, then find that `id` in `owners`.",
+        "Join `animals` to `owners` with `SELECT *` first, run it and look at the wide rows.",
+        "Check that every row pairs an animal with its own owner, then choose the three columns."
+      ],
+      "hints": [
+        "Read the lesson's part \"Joining two tables\" again. Which column of `animals` says who the owner is?",
+        "`owner_id` in `animals` holds the `id` of a row in `owners`. `ON` keeps the pairs of rows where those two are equal.",
+        "The query has the shape `SELECT animals.name AS animal, ... FROM animals JOIN owners ON animals.owner_id = owners.id;`."
+      ],
+      "docs": [
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "Join syntax", "url": "https://www.sqlite.org/syntax/join-clause.html" }
+      ],
+      "videos": [
+        { "title": "Inner joins", "url": "https://www.youtube.com/watch?v=v7cTKaMj3B8" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "larkhill-animals",
+      "title": "Find the animals in Larkhill",
+      "file": "queries/2-larkhill-animals.sql",
+      "description": "Mabel does home visits in Larkhill. She wants every animal whose owner lives there, with the number to ring before she sets off.\n\nIn `queries/2-larkhill-animals.sql`, return three columns, in this order:\n\n- `animal`: the animal's name\n- `species`\n- `phone`: the owner's phone number\n\nOne row for each animal whose owner lives in Larkhill. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, which has other owners in Larkhill.",
+      "nextSteps": [
+        "Start from a join of `animals` and `owners`, as in task 1, and run it.",
+        "Add a condition on the owner's town.",
+        "Choose the three columns. Count the Larkhill owners' animals in `seed.sql` and compare."
+      ],
+      "hints": [
+        "The town is in `owners` and the animals are in `animals`, so the query needs both tables.",
+        "After the join, every row carries the columns of both tables, so `WHERE` can test the owner's town while you show the animal's name.",
+        "The query ends with the shape `... ON a.owner_id = o.id WHERE o.town = 'Larkhill';`."
+      ],
+      "docs": [
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "The WHERE clause", "url": "https://www.sqlite.org/lang_select.html#whereclause" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "treatment-dates",
+      "title": "Put a date and a vet on each treatment",
+      "file": "queries/3-treatment-dates.sql",
+      "description": "Rosamund checks the accounts line by line, and a line with only a price on it tells her nothing. She wants the date and the vet beside every treatment.\n\nIn `queries/3-treatment-dates.sql`, return four columns, in this order:\n\n- `visit_date`: the date of the visit the treatment was given at\n- `vet`: the vet who saw that visit\n- `treatment`: the treatment's name\n- `price`\n\nOne row per treatment. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Look at `treatments` in `schema.sql`. Which column points at another table, and which one?",
+        "Join the two tables and run it with `SELECT *`. If SQLite answers with an error, read which name it complains about.",
+        "Choose the four columns, naming the table each one comes from."
+      ],
+      "hints": [
+        "Each treatment has a `visit_id`. The date and the vet are in the table it points at.",
+        "Both tables have a column called `id`, so a bare `id` is ambiguous: SQLite cannot tell which one you mean. Put the table's name, or its short name, in front of it.",
+        "The FROM part has the shape `FROM treatments AS t JOIN visits AS v ON t.visit_id = v.id`."
+      ],
+      "docs": [
+        { "title": "Join syntax", "url": "https://www.sqlite.org/syntax/join-clause.html" },
+        { "title": "Column names in the result", "url": "https://www.sqlite.org/lang_select.html#resultset" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ifan-visits",
+      "title": "List Ifan's visits, newest first",
+      "file": "queries/4-ifan-visits.sql",
+      "description": "Ifan wants his own visits with the animal he saw each time, so he can see who is due back.\n\nIn `queries/4-ifan-visits.sql`, return four columns, in this order:\n\n- `visit_date`\n- `animal`: the name of the animal that came in\n- `species`\n- `reason`\n\nOnly the visits Ifan Pryce saw, sorted by `visit_date` with the newest first. Check compares the columns, the rows and their order on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Join `visits` to `animals` and run it. Check one row by hand in `seed.sql`: is it the right animal?",
+        "Keep only Ifan's visits.",
+        "Sort them, newest first."
+      ],
+      "hints": [
+        "This joins `visits` to `animals`, then picks rows and sorts them as in the issue about sorting.",
+        "A visit's `animal_id` holds the `id` of an animal. Pairing the two tables' `id` columns runs without an error and gives the wrong animals.",
+        "The query has the shape `... FROM visits AS v JOIN animals AS a ON v.animal_id = a.id WHERE v.vet = 'Ifan Pryce' ORDER BY v.visit_date DESC;`."
+      ],
+      "docs": [
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "The ORDER BY clause", "url": "https://www.sqlite.org/lang_select.html#orderby" }
+      ],
+      "points": 10
+    }
+  ]
+}

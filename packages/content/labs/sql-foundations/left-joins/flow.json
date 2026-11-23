@@ -1,0 +1,92 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "owners", "label": "owners", "kind": "data" },
+      { "id": "animals", "label": "animals", "kind": "data" },
+      { "id": "visits", "label": "visits", "kind": "data" },
+      { "id": "treatments", "label": "treatments", "kind": "data" },
+      { "id": "queries", "label": "Your queries", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "owners", "to": "animals", "label": "every owner" },
+      { "from": "animals", "to": "visits", "label": "every animal" },
+      { "from": "visits", "to": "treatments", "label": "every visit" },
+      { "from": "animals", "to": "queries", "label": "rows" },
+      { "from": "visits", "to": "queries", "label": "rows" },
+      { "from": "treatments", "to": "queries", "label": "rows" }
+    ],
+    "note": "Your queries keep every row of one table, partner or not, and find the rows that have no partner at all."
+  },
+  "tasks": {
+    "every-owner": {
+      "steps": [
+        {
+          "active": ["owners", "owners->animals", "animals"],
+          "note": "Most owners have animals, but one has signed up before her kitten came in."
+        },
+        {
+          "active": ["animals", "animals->queries", "queries"],
+          "note": "Every owner is kept. Where an owner has no animal, the animal's columns are empty."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["first_name", "last_name", "animal"],
+            "cells": [["a first name", "a last name", "an animal's name, or NULL"]]
+          },
+          "note": "Rosamund's card list has every owner on it."
+        }
+      ]
+    },
+    "never-visited": {
+      "steps": [
+        {
+          "active": ["animals", "animals->visits", "visits"],
+          "note": "Every animal is kept, with its visits beside it if it has any."
+        },
+        {
+          "active": ["visits", "visits->queries", "queries"],
+          "note": "An animal that never came in has a row where every column of the visit is empty."
+        },
+        {
+          "active": ["queries"],
+          "note": "Only those rows are kept: the animals with no visit at all."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["animal", "species"],
+            "cells": [["an animal's name", "its species"]]
+          },
+          "note": "Ifan gets the animals to invite for a first check."
+        }
+      ]
+    },
+    "free-visits": {
+      "steps": [
+        {
+          "active": ["visits", "visits->treatments", "treatments"],
+          "note": "Every visit is kept, with its treatments beside it if it has any."
+        },
+        {
+          "active": ["treatments", "treatments->queries", "queries"],
+          "note": "A treatment that cost nothing is still a treatment. Only a visit with no treatment row has an empty partner."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["visit_date", "vet", "reason"],
+            "cells": [["a date", "a vet", "a reason"]]
+          },
+          "note": "Rosamund sees every visit with nothing on its bill."
+        }
+      ]
+    }
+  }
+}

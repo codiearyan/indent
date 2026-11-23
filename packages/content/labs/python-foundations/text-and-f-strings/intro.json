@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Can every log line look the same?", "note": "Written while the radio talks." },
+    { "title": "Radio", "rows": [["Call sign", "bravo two"], ["Hill", "Scarth Fell"], ["Crew out", "6"]] },
+    {
+      "title": "Your code",
+      "file": "radio_log.py",
+      "mine": true,
+      "gap": "No line is written",
+      "tasks": ["Write down where", "Tidy the call sign", "Write the crew line", "Write the log entry"]
+    },
+    { "title": "Callout log", "text": "One tidy line: who, where and how many." }
+  ],
+  "ticket": { "label": "Log entry", "wrong": "scrawled", "why": "By hand", "right": "tidy" },
+  "captions": [
+    "Saturday callout. Ailsa wants every line of the callout log to look the same.",
+    "Today it is written by hand, and the call sign and the crew look different every time.",
+    "You build the line from text and a number, ending with one f-string.",
+    "Now the laptop writes one tidy entry: who, where and how many went out.",
+    "Text joined, tidied and filled in. Ailsa's log reads the same every night."
+  ]
+}

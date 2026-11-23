@@ -1,0 +1,18 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "clipboard", "label": "Clipboard", "kind": "data" },
+      { "id": "programs", "label": "Your Java programs", "kind": "file", "mine": true },
+      { "id": "hut", "label": "Ticket hut", "kind": "story" },
+      { "id": "ossian", "label": "Ossian", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bridie", "to": "clipboard", "label": "writes" },
+      { "from": "clipboard", "to": "programs", "label": "numbers and text" },
+      { "from": "programs", "to": "hut", "label": "notices and tickets" },
+      { "from": "ossian", "to": "clipboard", "label": "weather" }
+    ],
+    "note": "You move Lanternquay Ferries off its clipboard and into Java programs that print, count, price and decide at the ticket hut."
+  }
+}

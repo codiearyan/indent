@@ -1,0 +1,95 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "clipboard", "label": "Today's numbers", "kind": "data" },
+      { "id": "file", "label": "Fares.java", "kind": "file", "mine": true },
+      { "id": "answers", "label": "Fares and counts", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "bridie", "to": "clipboard", "label": "writes down" },
+      { "from": "clipboard", "to": "file", "label": "by name" },
+      { "from": "file", "to": "answers", "label": "sums" }
+    ],
+    "note": "Fares.java turns the clipboard's whole numbers into prices, trips, an average and ticket numbers, choosing the type each answer needs."
+  },
+  "tasks": {
+    "return-fare": {
+      "steps": [
+        { "active": ["clipboard"], "note": "The clipboard has the single fare in whole pence." },
+        {
+          "active": ["clipboard", "clipboard->file", "file"],
+          "note": "A return is two single fares, with a little taken off for buying both."
+        },
+        {
+          "active": ["file", "file->answers", "answers"],
+          "note": "The return fare is a whole number of pence, worked out in the right order."
+        }
+      ]
+    },
+    "trips": {
+      "steps": [
+        {
+          "active": ["clipboard"],
+          "value": {
+            "kind": "map",
+            "label": "on the quay",
+            "entries": [
+              { "key": "queue", "value": "people waiting" },
+              { "key": "seats", "value": "people a trip" }
+            ]
+          },
+          "note": "A long queue waits on the quay, and the boat takes a fixed number a trip."
+        },
+        {
+          "active": ["clipboard", "clipboard->file", "file"],
+          "note": "Dividing two whole numbers counts the full boatloads and drops the rest."
+        },
+        {
+          "active": ["file", "file->answers", "answers"],
+          "value": {
+            "kind": "map",
+            "label": "the answer",
+            "entries": [
+              { "key": "fullTrips", "value": "whole trips" },
+              { "key": "leftOver", "value": "still waiting" }
+            ]
+          },
+          "note": "What was dropped is not lost: another operator gives the people left on the quay."
+        }
+      ]
+    },
+    "average": {
+      "steps": [
+        {
+          "active": ["clipboard"],
+          "note": "Ossian logs the passengers today and the crossings today, both whole numbers."
+        },
+        {
+          "active": ["clipboard", "clipboard->file", "file"],
+          "note": "Divided as whole numbers, the part after the point is gone before it is stored."
+        },
+        {
+          "active": ["file", "file->answers", "answers"],
+          "note": "With one side turned into a decimal first, the average keeps every part."
+        }
+      ]
+    },
+    "ticket": {
+      "steps": [
+        {
+          "active": ["clipboard"],
+          "note": "A ticket number is the date code with five digits for the ticket of the day after it."
+        },
+        {
+          "active": ["clipboard", "clipboard->file", "file"],
+          "note": "Moving the date code five places along makes a number far bigger than an int holds."
+        },
+        {
+          "active": ["file", "file->answers", "answers"],
+          "note": "Worked out as a long from the start, the ticket number comes out whole and right."
+        }
+      ]
+    }
+  }
+}

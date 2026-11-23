@@ -1,0 +1,56 @@
+{
+  "stations": [
+    {
+      "title": "Dorrit",
+      "say": "Can it write ticket 2187 for me?",
+      "note": "Edwina Sallow's carriage clock."
+    },
+    {
+      "title": "Paper slip",
+      "text": "Written out by hand, wrong when it's busy."
+    },
+    {
+      "title": "Your code",
+      "file": "ticket.cpp",
+      "mine": true,
+      "gap": "No ticket from the slip",
+      "tasks": [
+        "Print the ticket line",
+        "Note bench and shelf",
+        "Add the key",
+        "Give daysLeft a value"
+      ]
+    },
+    {
+      "title": "Ticket 2187",
+      "rows": [
+        [
+          "Item",
+          "Carriage clock"
+        ],
+        [
+          "Customer",
+          "Edwina Sallow"
+        ],
+        [
+          "Ready in",
+          "promised days"
+        ]
+      ],
+      "mark": 2
+    }
+  ],
+  "ticket": {
+    "label": "Ticket 2187",
+    "wrong": "garbled",
+    "why": "Wrong days",
+    "right": "printed"
+  },
+  "captions": [
+    "Dorrit at the counter wants the laptop to write ticket 2187 for Edwina Sallow's clock.",
+    "Today it is written by hand, and the laptop once promised it in thirty thousand days.",
+    "You put the slip into variables with types and print the ticket, in four tasks.",
+    "Now the ticket line, the bench and shelf, the quote and the days all come out right.",
+    "Every box of the slip is a variable now, and the laptop writes the ticket."
+  ]
+}

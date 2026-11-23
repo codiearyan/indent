@@ -1,0 +1,46 @@
+{
+  "stations": [
+    {
+      "title": "Imogen",
+      "say": "Why did the till show NaN?",
+      "note": "A Friday offer was added."
+    },
+    {
+      "title": "Offers",
+      "text": "Passed in as functions of any kind."
+    },
+    {
+      "title": "Your code",
+      "file": "offers.ts",
+      "mine": true,
+      "gap": "Takes any function at all",
+      "tasks": [
+        "Type a label style",
+        "Name a price rule",
+        "Pass every position",
+        "Make rules to order"
+      ]
+    },
+    {
+      "title": "Till",
+      "rows": [
+        ["Hearth Assam", "offer on"],
+        ["Frost Sencha", "full price"]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Friday tin",
+    "wrong": "NaN",
+    "why": "Any function",
+    "right": "in pence"
+  },
+  "captions": [
+    "Imogen asks why a Friday offer at Oakhollow made the till show NaN.",
+    "The offer gave back text, and the code took it like any other function.",
+    "You write the type of every function passed in: what it takes and gives back.",
+    "Now an offer that gives back text is refused, and the tin gets its Friday price.",
+    "Offers and label styles are checked functions, and new rules are made to order."
+  ]
+}

@@ -1,0 +1,219 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "imogen",
+        "label": "Imogen's offers",
+        "kind": "story"
+      },
+      {
+        "id": "labels",
+        "label": "labelAll()",
+        "kind": "function",
+        "mine": true,
+        "fn": "labelAll"
+      },
+      {
+        "id": "rules",
+        "label": "applyRules()",
+        "kind": "function",
+        "mine": true,
+        "fn": "applyRules"
+      },
+      {
+        "id": "numbered",
+        "label": "numbered()",
+        "kind": "function",
+        "mine": true,
+        "fn": "numbered"
+      },
+      {
+        "id": "maker",
+        "label": "percentOff()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "till",
+        "label": "Till",
+        "kind": "story"
+      },
+      {
+        "id": "table",
+        "label": "Packing table",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "imogen",
+        "to": "labels",
+        "label": "a label style"
+      },
+      {
+        "from": "imogen",
+        "to": "rules",
+        "label": "price rules"
+      },
+      {
+        "from": "imogen",
+        "to": "maker",
+        "label": "a percent"
+      },
+      {
+        "from": "maker",
+        "to": "rules",
+        "label": "a new rule"
+      },
+      {
+        "from": "rules",
+        "to": "till",
+        "label": "price"
+      },
+      {
+        "from": "labels",
+        "to": "table",
+        "label": "labels"
+      },
+      {
+        "from": "numbered",
+        "to": "table",
+        "label": "numbered lines"
+      }
+    ],
+    "note": "Offers and label styles are functions passed in, and each one's type says what it takes and gives back, so a wrong one is refused before it reaches the till."
+  },
+  "tasks": {
+    "labels": {
+      "steps": [
+        {
+          "active": ["imogen", "imogen->labels"],
+          "value": {
+            "kind": "map",
+            "label": "a label style",
+            "entries": [
+              {
+                "key": "takes",
+                "value": "a blend, as text"
+              },
+              {
+                "key": "gives back",
+                "value": "a label, as text"
+              }
+            ]
+          },
+          "note": "Imogen wants today's blends labelled in capitals, and passes a function that writes one label."
+        },
+        {
+          "active": ["labels"],
+          "note": "The function calls that style once for each blend. Its type says what the style must take and give back."
+        },
+        {
+          "active": ["labels", "labels->table", "table"],
+          "note": "The packing table gets one label per blend, in the same order."
+        }
+      ]
+    },
+    "rules": {
+      "trace": {
+        "file": "src/offers.ts",
+        "call": "applyRules",
+        "args": [1250, []]
+      },
+      "steps": [
+        {
+          "active": ["imogen", "imogen->rules"],
+          "value": {
+            "kind": "map",
+            "label": "a price rule",
+            "entries": [
+              {
+                "key": "takes",
+                "value": "pence"
+              },
+              {
+                "key": "gives back",
+                "value": "pence"
+              }
+            ]
+          },
+          "note": "A tin costs 1250 pence, and Imogen has a list of price rules for Friday."
+        },
+        {
+          "active": ["rules"],
+          "note": "Each rule gets the price the one before gave. The name of the rule's type says what every rule must be."
+        },
+        {
+          "active": ["rules", "rules->till", "till"],
+          "note": "The till gets a price in pence, never text."
+        }
+      ]
+    },
+    "numbered": {
+      "steps": [
+        {
+          "active": ["numbered"],
+          "value": {
+            "kind": "map",
+            "label": "what each callback is given",
+            "entries": [
+              {
+                "key": "line",
+                "value": "text"
+              },
+              {
+                "key": "position",
+                "value": "a number, from 1"
+              }
+            ]
+          },
+          "note": "Bryn wants today's blends numbered on the packing list."
+        },
+        {
+          "active": ["numbered"],
+          "note": "The function passes every line its position. A callback may use both, or only the line."
+        },
+        {
+          "active": ["numbered", "numbered->table", "table"],
+          "note": "The packing table gets the lines as each callback wrote them."
+        }
+      ]
+    },
+    "offer": {
+      "steps": [
+        {
+          "active": ["imogen", "imogen->maker"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              {
+                "key": "percent",
+                "value": "a number"
+              }
+            ]
+          },
+          "note": "Imogen wants ten percent off, and next week a quarter off."
+        },
+        {
+          "active": ["maker", "maker->rules"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              {
+                "key": "a rule",
+                "value": "pence to pence"
+              }
+            ]
+          },
+          "note": "The function gives back a new rule that keeps its own percent."
+        },
+        {
+          "active": ["rules", "rules->till", "till"],
+          "note": "The new rule works wherever a price rule is asked for, and the till gets the price after the offer."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dorrit", "say": "Can it print Edwina's tag?", "note": "One tag on every clock." },
+    { "title": "Handwritten tag", "text": "Hard to read on a busy Saturday." },
+    {
+      "title": "Your code",
+      "file": "tags.cpp",
+      "mine": true,
+      "gap": "No text from the slip",
+      "tasks": ["Name, surname first", "Measure the tag", "Make the shelf code", "Shorten the item"]
+    },
+    { "title": "Clock tag", "rows": [["Name", "surname first"], ["Code", "letter and number"], ["Item", "cut to fit"]] }
+  ],
+  "ticket": { "label": "Edwina's tag", "wrong": "smudged", "why": "By hand", "right": "printed" },
+  "captions": [
+    "Dorrit ties a paper tag to every clock, and wants the laptop to print Edwina's.",
+    "Today she writes each one by hand, and on a busy day nobody can read them.",
+    "You build the tag's text from her slip, joining and cutting text, in four tasks.",
+    "Now the name, the width, the shelf code and the short item all print from the slip.",
+    "The paper slips are in the laptop now: tickets, bills and tags, all from your code."
+  ]
+}

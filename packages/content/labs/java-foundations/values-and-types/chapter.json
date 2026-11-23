@@ -1,0 +1,153 @@
+{
+  "id": "values-and-types",
+  "title": "Values, types and names",
+  "files": ["Clipboard.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the clipboard here to see this morning's count.",
+    "suggestedCommand": "java Clipboard.java"
+  },
+  "tasks": [
+    {
+      "id": "crossing",
+      "title": "Name the crossing",
+      "file": "Clipboard.java",
+      "description": "Under `// Task 1` in `Clipboard.java`, make a `String` called `crossing` that holds the text `Lanternquay to Corran`. Then print it.\n\nCheck compiles and runs your Task 1 lines and reads `crossing`: it must be a `String` holding exactly that text, and the program must print it.",
+      "nextSteps": [
+        "Find `// Task 1` in the file.",
+        "Write the type, the name, `=`, the text in double quotes and a semicolon.",
+        "Print it with `System.out.println` on the next line, using the variable's name.",
+        "Run `java Clipboard.java` and read the output."
+      ],
+      "hints": [
+        "A variable is made with a type, a name and a value. The lesson makes one for apples.",
+        "The type for text is `String`, with a capital S. The text goes in double quotes.",
+        "The line has the shape `String crossing = \"...\";`, then `System.out.println(crossing);` under it."
+      ],
+      "docs": [
+        {
+          "title": "Variables",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html"
+        },
+        {
+          "title": "Strings",
+          "url": "https://docs.oracle.com/javase/tutorial/java/data/strings.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Variables and their types",
+          "url": "https://www.youtube.com/watch?v=so1iUWaLmKA"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "seats-left",
+      "title": "Count the seats left",
+      "file": "Clipboard.java",
+      "description": "Under `// Task 2`, make an `int` called `seatsLeft`. It starts with the number of seats on the boat, which is in `seats` near the top of the file. Then print it.\n\nCheck runs your Task 2 lines with other numbers in place of the ones at the top, so `seatsLeft` has to be built on the name `seats`, not on a number you type.",
+      "nextSteps": [
+        "Read the two lines under \"This morning's numbers\".",
+        "Under `// Task 2`, make `seatsLeft` with the type for whole numbers.",
+        "Give it the value of `seats` by writing that name on the right of `=`.",
+        "Print it and run the program."
+      ],
+      "hints": [
+        "A variable can start with the value of another variable, not only with a number you type.",
+        "A count of seats is a whole number, which tells you the type. On the right of `=`, write the name of the variable that holds the seats.",
+        "The line has the shape `int seatsLeft = ...;`, with the seats' variable name where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "Primitive data types",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html"
+        },
+        {
+          "title": "Variables",
+          "url": "https://dev.java/learn/language-basics/variables/"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "boarding",
+      "title": "Board the passengers",
+      "file": "Clipboard.java",
+      "description": "Under `// Task 3`, `boarded` passengers just got on. Give `seatsLeft` a new value: the seats left after they board. Then print it again.\n\nCheck runs your Task 2 and Task 3 lines with other numbers at the top and reads `seatsLeft` at the end. It also reads your Task 3 lines to see that they give the existing variable a new value rather than making a new one.",
+      "nextSteps": [
+        "Make sure Task 2 passes first: Task 3 changes the same variable.",
+        "Under `// Task 3`, start a line with the name `seatsLeft` and `=`.",
+        "On the right, take `boarded` away from the seats left now.",
+        "Print it again and run the program: you should see two different counts."
+      ],
+      "hints": [
+        "You are not making a new variable here. You are changing one you already made.",
+        "Giving a variable a new value is its name, `=` and the new value, with no type in front. The right side can use the variable's own current value.",
+        "The line has the shape `seatsLeft = seatsLeft - ...;`, with the boarded passengers' variable where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "Assignment and arithmetic operators",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html"
+        },
+        {
+          "title": "Variables",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fare",
+      "title": "Write down the fare",
+      "file": "Clipboard.java",
+      "description": "Under `// Task 4`, make a `double` called `fare` that holds `3.20`, the price of a single crossing in pounds. Then print it.\n\nCheck compiles and runs your Task 4 lines and reads `fare`: it must be a `double` holding that price, and the program must print it.",
+      "nextSteps": [
+        "Find `// Task 4` and read which type the task asks for.",
+        "Make `fare` with that type and the price, written with a point.",
+        "Print it and run the program.",
+        "Compare what it prints with what you wrote: the lesson says why it looks a little different."
+      ],
+      "hints": [
+        "A price has a part after the point, so it needs a type that can hold one.",
+        "`int` holds whole numbers only, and the compiler refuses to squeeze `3.20` into one. `double` holds numbers with a point.",
+        "The line has the shape `double fare = ...;`, with the price where the dots are."
+      ],
+      "docs": [
+        {
+          "title": "Primitive data types",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html"
+        },
+        {
+          "title": "Primitive types",
+          "url": "https://dev.java/learn/language-basics/primitive-types/"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "names",
+      "title": "Give a and b real names",
+      "file": "Clipboard.java",
+      "description": "Under `// Task 5`, two variables are called `a` and `b`, and nobody can tell what they hold. Rename `a` to `skipper` and `b` to `boatName`, everywhere they appear. Their values stay the same.\n\nCheck compiles and runs your Task 5 lines, reads `skipper` and `boatName`, makes sure `a` and `b` are gone, and looks for the same two lines in the output as before.",
+      "nextSteps": [
+        "Read the four lines under `// Task 5`.",
+        "Rename `a` where it is made.",
+        "Rename it where it is used too, then do the same for `b`.",
+        "Run the program: it should print the same two lines as before."
+      ],
+      "hints": [
+        "A variable's name appears where it is made and everywhere it is used.",
+        "If you rename it in one place only, the compiler says `cannot find symbol` and names the one it no longer knows. Read it: it tells you which line to fix.",
+        "Four places change: the two lines that make `a` and `b`, and the two lines that print them."
+      ],
+      "docs": [
+        {
+          "title": "Variables: naming",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html#naming"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
