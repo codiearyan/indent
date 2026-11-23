@@ -11,7 +11,7 @@
       "id": "count",
       "title": "Count the tickets for each boat",
       "file": "Tally.java",
-      "description": "Under `// Task 1`, write a class `Counts` with a method `static Map<String, Integer> byBoat(List<String> tickets)`. Each ticket is the name of a boat. It gives back a new map from each boat on the list to the number of its tickets. `tickets` stays as it is.\n\nCheck calls `byBoat` with lists of tickets of its own, made with `List.of`: several boats, boats with one ticket each, one boat many times, and no tickets at all. It compares the map that comes back with the right tally as maps, whatever order the keys are in.",
+      "description": "Under `// Task 1`, write a class `Counts` with a method `static Map<String, Integer> byBoat(List<String> tickets)`. Each ticket is the name of a boat. It gives back a new map from each boat on the list to the number of its tickets. `tickets` stays as it is.\n\nCheck calls `byBoat` with lists of tickets of its own, made with `List.of`, with names it makes separately, as names read in would be: several boats, boats with one ticket each, one boat many times, and no tickets at all. It compares the map that comes back with the right tally as maps, whatever order the keys are in.",
       "nextSteps": [
         "Read the parts of the lesson about a key that is not there, and about counting with a map.",
         "Make a new, empty map in the method.",

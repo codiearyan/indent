@@ -16,12 +16,14 @@ const entries = (expr) => `${expr} == null ? null : new ArrayList<>(new TreeMap<
 const mapOf = (counts) => `java.util.Map.of(${Object.entries(counts).map(([k, v]) => `"${k}", ${v}`).join(', ')})`
 const sortedEntries = (counts) => Object.entries(counts).sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, v]) => `${k}=${v}`)
 
-/** A case of Task 1: byBoat on a list made with List.of. */
+/** A case of Task 1: byBoat on a list made with List.of, each name made separately, as names read
+ * in would be, so == cannot pass for equals. */
 function count(name, tickets, counts, extra) {
   const c = attempt({
     name,
-    setup: [`List<String> tickets = List.of(${tickets.map((t) => `"${t}"`).join(', ')});`],
+    setup: [`List<String> tickets = List.of(${tickets.map((t) => `new String("${t}")`).join(', ')});`],
     call: 'Counts.byBoat(tickets)',
+    show: [`List<String> tickets = List.of(${tickets.map((t) => `"${t}"`).join(', ')});`, 'Map<String, Integer> got = Counts.byBoat(tickets);'].join('\n'),
     type: 'Map<String, Integer>',
     after: { [SORTED]: entries('got') },
     expected: { [SAME]: true },
@@ -99,6 +101,10 @@ export const checks = tasks({
           {
             when: (r, x) => x?.name === 'UnsupportedOperationException' && fromMine(x),
             hint: 'byBoat changes the list of tickets it was handed, a list made with List.of, which can never change. The task says tickets stays as it is.'
+          },
+          {
+            when: (r, x) => !x && items(r, SORTED)?.length && items(r, SORTED).every((e) => e.endsWith('=1')) && Object.values(r.case.counts).some((n) => n > 1) && /==/.test(codeOnly(ctx.section)),
+            hint: 'Every boat counts 1, however many tickets it has. Check makes every name separately, as names read in would be, so == on two names asks whether they are the very same String object, and no two are. The map compares its keys with equals.'
           },
           {
             when: (r, x) => !x && items(r, SORTED)?.length && items(r, SORTED).every((e) => e.endsWith('=1')) && Object.values(r.case.counts).some((n) => n > 1),
