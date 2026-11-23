@@ -106,7 +106,17 @@ export const lines = (text) =>
 export async function runFile(
   t,
   file,
-  { given = {}, upto, inject = {}, names = [], comments = false, blocks = false, define, call } = {}
+  {
+    given = {},
+    upto,
+    inject = {},
+    names = [],
+    comments = false,
+    blocks = false,
+    define,
+    call,
+    data = false
+  } = {}
 ) {
   const bin = await python()
   if (!bin) return { noPython: true }
@@ -125,12 +135,17 @@ export async function runFile(
     inject,
     names,
     comments,
-    ...(blocks && { part_seconds: PART_SECONDS, define, call })
+    ...(blocks && { part_seconds: PART_SECONDS, define, call: data && call ? { ...call, data } : call })
   }
   const child = spawn(bin, ['-I', '-B', HARNESS], { cwd: dir, env: childEnv(), windowsHide: true })
   const seconds = blocks ? SECONDS + MAX_PARTS * PART_SECONDS : SECONDS
   const r = await collect(child, JSON.stringify(spec), seconds * 1000)
-  const result = { parts: new Map(), comments: [], seconds, blocks: blocks && { made: [] } }
+  const result = {
+    parts: new Map(),
+    comments: [],
+    seconds,
+    blocks: blocks && { made: [], ...(data && { data }) }
+  }
   let running
   for (const line of r.stdout.split('\n')) {
     if (!line.startsWith(MARK)) continue
@@ -323,6 +338,7 @@ const BUILTINS = [
 function blockRunCause(error, blocks) {
   const m = error.message
   let found
+  if (blocks.data && (found = blocks.explain?.(error) ?? dataRunCause(error))) return found
   if (
     error.type === 'NameError' &&
     (found = /name '(\w+)' is not defined/.exec(m)) &&
@@ -946,5 +962,313 @@ export async function callCases(t, { file, task, fn, list, mistakes = [], typed,
       message,
       output: `${said}\nIt gave back: ${v.repr}\n${told}`
     }
+  })
+}
+
+// From the lists issue on, a function takes and gives back lists, tuples, sets and dictionaries.
+
+/** What an error usually means in code with lists, tuples, sets and dictionaries, or null. */
+function dataRunCause(error) {
+  const m = error.message
+  let found
+  if (/^(list|tuple) index out of range$/.test(m)) {
+    return `the line asks for a position the ${m.split(' ')[0]} does not have. Positions start at 0, so the last one is one less than its length, and a list with nothing in it has no positions at all`
+  }
+  if (m === 'pop from empty list') {
+    return 'pop was used on a list with nothing in it, so there was nothing to take. Look at what the list holds before taking from it'
+  }
+  if (/^list\.remove\(x\): x not in list$/.test(m)) {
+    return 'remove was asked to take out something the list does not hold, and remove stops with an error when that happens. Look at what the list holds before taking from it'
+  }
+  if (error.type === 'KeyError') {
+    return `the dictionary has no key ${m}, and square brackets read only a key that is there. Check how the key is spelt, and when a key may be missing, ask before you read it`
+  }
+  if (/'tuple' object does not support item assignment/.test(m)) {
+    return 'a tuple cannot be changed once it is made, not even one of its values. Make a new tuple from the values you want instead'
+  }
+  if ((found = /'tuple' object has no attribute '(append|insert|remove|pop|sort|extend|clear)'/.exec(m))) {
+    return `a tuple cannot be changed once it is made, so it has no ${found[1]}. Make a new tuple, or use a list where the values must change`
+  }
+  if (/'list' object has no attribute 'add'/.test(m)) {
+    return 'a list has no add: add puts an item into a set. A list grows at its end or at a position'
+  }
+  if ((found = /'set' object has no attribute '(append|insert)'/.exec(m))) {
+    return `a set has no ${found[1]}: its items have no order and no positions. An item goes into a set with add`
+  }
+  if (/'dict' object has no attribute 'add'/.test(m)) {
+    return 'a dictionary has no add. Empty curly braces make an empty dictionary, not an empty set: the lesson shows how to make an empty set'
+  }
+  if (/'dict' object has no attribute '(append|insert)'/.test(m)) {
+    return 'a dictionary does not grow at an end: each value goes in under its key. The lesson shows how to add a key'
+  }
+  if (/'NoneType' object (is not subscriptable|is not iterable)|object of type 'NoneType' has no len/.test(m)) {
+    return 'the line uses None as if it were a list. None is what a method such as sort, append or remove gives back, because it changes the list itself and gives back nothing. A function that ends without return gives back None too'
+  }
+  if ((found = /^(too many|not enough) values to unpack \(expected (\d+)/.exec(m))) {
+    return `there are ${found[2]} names on the left of = or after for, and the value they take apart holds ${found[1] === 'too many' ? 'more' : 'fewer'} values than that. Each name takes one value, so their numbers must match`
+  }
+  if ((found = /cannot unpack non-iterable (\w+) object/.exec(m))) {
+    return `several names take apart ${aKind(found[1])}, which is one value and cannot be taken apart`
+  }
+  if (/^(min|max)\(\) (arg is an empty sequence|iterable argument is empty)$/.test(m)) {
+    return 'min or max was given a list with nothing in it, and an empty list has no smallest or largest value'
+  }
+  if (/(dictionary|Set|set) changed size during iteration/.test(m)) {
+    const what = /dictionary/.test(m) ? 'dictionary' : 'set'
+    return `the ${what} gained or lost an item while a for loop was going through it. A loop cannot keep its place in a ${what} that changes under it: go through a copy, or change it after the loop`
+  }
+  if ((found = /list indices must be integers or slices, not (\w+)/.exec(m))) {
+    return `a list is read by position, a whole number, and here it was given ${aKind(found[1])}. Only a dictionary is read by a key`
+  }
+  if ((found = /'(set|dict_keys|dict_values|dict_items)' object is not subscriptable/.exec(m))) {
+    return found[1] === 'set'
+      ? 'a set has no positions, so it cannot be read with square brackets. Ask whether something is in it instead'
+      : 'what keys, values and items give back can be gone through with for, but has no positions to read with square brackets'
+  }
+  if ((found = /unhashable type: '(\w+)'/.exec(m))) {
+    return `${dataKind(found[1])} cannot be a key of a dictionary or an item of a set, because it can change. A key is a value such as a text, a number or a tuple`
+  }
+  if ((found = /'<' not supported between instances of '(\w+)' and '(\w+)'/.exec(m))) {
+    return `sorting or finding the smallest or largest compares the values with each other, and ${aKind(found[1])} cannot be compared with ${aKind(found[2])}`
+  }
+  if ((found = /can only concatenate list \(not "(\w+)"\) to list/.exec(m))) {
+    return `+ joins a list only to another list, and here it meets ${dataKind(found[1])}`
+  }
+  if ((found = /can only concatenate str \(not "(list|tuple|dict|set)"\) to str/.exec(m))) {
+    return `+ joins text only to text, and here it meets ${dataKind(found[1])}`
+  }
+  return null
+}
+
+const DATA_KINDS = { list: 'a list', tuple: 'a tuple', dict: 'a dictionary', set: 'a set' }
+/** The kind of a value with its article, lists, tuples, sets and dictionaries included. */
+export const dataKind = (type) => DATA_KINDS[type] ?? aKind(type)
+
+/** A tuple and a set for Check's own values. A plain array is a list, a plain object a dictionary. */
+export const tuple = (...items) => ({ '@tuple': items })
+export const set = (...items) => ({ '@set': items })
+
+const isObject = (x) => x !== null && typeof x === 'object' && !Array.isArray(x)
+
+function canon(x) {
+  if (Array.isArray(x)) return x.map(canon)
+  if (!isObject(x) || '@float' in x || '@other' in x) return x
+  if ('@tuple' in x) return { '@tuple': x['@tuple'].map(canon) }
+  if ('@set' in x) return { '@set': x['@set'].map(canon) }
+  const pairs = '@dict' in x ? x['@dict'] : Object.entries(x)
+  return { '@dict': pairs.map(([k, v]) => [canon(k), canon(v)]) }
+}
+
+function sameItems(a, b) {
+  if (a.length !== b.length) return false
+  const left = [...b]
+  return a.every((x) => {
+    const i = left.findIndex((y) => equalCanon(x, y))
+    return i >= 0 && left.splice(i, 1)
+  })
+}
+
+function equalCanon(a, b) {
+  if (a === b) return true
+  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return false
+  if (Array.isArray(a) || Array.isArray(b)) {
+    return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((v, i) => equalCanon(v, b[i]))
+  }
+  for (const tag of ['@tuple', '@set', '@dict', '@float']) {
+    if (tag in a || tag in b) {
+      if (!(tag in a && tag in b)) return false
+      if (tag === '@tuple') return equalCanon(a[tag], b[tag])
+      if (tag === '@float') return a[tag] === b[tag]
+      // Sets and dictionaries are equal whatever order their items are in, as in Python.
+      return sameItems(a[tag], b[tag])
+    }
+  }
+  return false
+}
+
+/** Whether two values are the same as Python compares them, a list never equal to a tuple. */
+export const equalData = (a, b) => equalCanon(canon(a), canon(b))
+
+/** Check's own value as the learner would write it in Python. */
+export function pyLiteral(x) {
+  if (!isObject(x) && !Array.isArray(x)) return literal(x)
+  if (Array.isArray(x)) return `[${x.map(pyLiteral).join(', ')}]`
+  if ('@tuple' in x) {
+    const items = x['@tuple'].map(pyLiteral)
+    return items.length === 1 ? `(${items[0]},)` : `(${items.join(', ')})`
+  }
+  if ('@set' in x) return x['@set'].length ? `{${x['@set'].map(pyLiteral).join(', ')}}` : 'set()'
+  const pairs = '@dict' in x ? x['@dict'] : Object.entries(x)
+  return `{${pairs.map(([k, v]) => `${pyLiteral(k)}: ${pyLiteral(v)}`).join(', ')}}`
+}
+
+/** The word for the kind of one of Check's values: list, tuple, set or dictionary. */
+export const noun = (x) =>
+  Array.isArray(x) ? 'list' : !isObject(x) ? 'value' : '@tuple' in x ? 'tuple' : '@set' in x ? 'set' : 'dictionary'
+
+const typeOfData = (x) =>
+  x === null
+    ? 'NoneType'
+    : typeof x === 'boolean'
+      ? 'bool'
+      : typeof x === 'number'
+        ? Number.isInteger(x) ? 'int' : 'float'
+        : typeof x === 'string'
+          ? 'str'
+          : Array.isArray(x)
+            ? 'list'
+            : '@tuple' in x
+              ? 'tuple'
+              : '@set' in x
+                ? 'set'
+                : 'dict'
+
+/** A call as the learner would write it, with lists and dictionaries: kit_lines(["rope"]). */
+export const dataCallText = (fn, c) =>
+  `${fn}(${[
+    ...(c.args ?? []).map(pyLiteral),
+    ...Object.entries(c.kwargs ?? {}).map(([k, v]) => `${k}=${pyLiteral(v)}`)
+  ].join(', ')})`
+
+/**
+ * Like callCases, for functions that take and give back lists, tuples, sets and dictionaries.
+ * Each case has `args`, `expected` (what the function gives back, compared as a value; left out,
+ * it is not judged) and `after` ({ index: value }), what an argument must hold after the call.
+ * Every argument that `after` does not name must be left as it was. So a function that changes
+ * the caller's list where the task says not to fails, and so does one that gives back a new list
+ * where the task says to change the caller's. A failing case gets the first message that fits:
+ * one of `mistakes` ({ value?(c), after?(c), hint }, a result or a first argument afterwards that
+ * every case shows), None given back, the same result in every case (`typed`), the case's `hint`
+ * (a string or a function of the value given back and the call) for a wrong result, then the
+ * words for an argument changed when it should not be, left as it was when it should change, or
+ * changed the wrong way (`afterHint`, a string or a function of what it holds and the call).
+ * `noneHint` replaces the words for None given back without printing, where None is one of the
+ * task's own answers. `errors(error)` gives the task's own words for an error, or null.
+ */
+export async function dataCases(t, { file, task, fn, list, mistakes = [], typed, define, errors }) {
+  const runs = await Promise.all(
+    list.map((c) =>
+      runFile(t, file, {
+        upto: task,
+        blocks: true,
+        data: true,
+        define,
+        call: { name: fn, args: c.args ?? [], kwargs: c.kwargs ?? {} }
+      })
+    )
+  )
+  if (errors) for (const r of runs) if (r.blocks) r.blocks.explain = errors
+  for (const r of runs) {
+    const p = shared(r, file, task)
+    if (p) return [p]
+  }
+  const ends = runs.map((r, i) => {
+    const p = problem(r, file, task)
+    if (p) return { ...p, name: list[i].name }
+    if (!r.call) {
+      return fail(
+        list[i].name,
+        r.stopped?.why === 'time'
+          ? `${dataCallText(fn, list[i])} did not end: Check stopped it after ${r.seconds} seconds. Look inside ${fn} for a loop that never ends.`
+          : `Python stopped without a word while Check called ${dataCallText(fn, list[i])}.`,
+        r.crashed
+      )
+    }
+    return null
+  })
+  const problems = runs.map((r) => problem(r, file, task))
+  if (problems.every(Boolean)) return once(ends, problems)
+  const first = runs.find((r, i) => !ends[i])?.call
+  if (first?.missing) return [missingFunction(first, fn, task)]
+  if (first?.type) {
+    return [
+      fail(
+        `${fn} is a function`,
+        `${fn} is ${dataKind(first.type)}, not a function. A function is made with def, its name, round brackets and a colon.`
+      )
+    ]
+  }
+  const ran = (i) => !ends[i] && runs[i].call?.returned
+  const mistake = mistakes.find((m) =>
+    list.every(
+      (c, i) =>
+        ran(i) &&
+        (!m.value || equalData(runs[i].call.returned.data, m.value(c))) &&
+        (!m.after || equalData(runs[i].call.after[0], m.after(c)))
+    )
+  )
+  const reads = runs.map((r, i) => ran(i) && r.call.returned)
+  const stuck =
+    reads.every((v) => v && v.repr === reads[0].repr) &&
+    list.some((c) => !equalData(c.expected, list[0].expected))
+  // A function that never changes its first argument, in any case where it should.
+  const neverChanges = list.every(
+    (c, i) =>
+      !(c.after && 0 in c.after) ||
+      equalData(c.after[0], c.args[0]) ||
+      !ran(i) ||
+      equalData(runs[i].call.after[0], c.args[0])
+  )
+  return list.map((c, i) => {
+    if (ends[i]) return ends[i]
+    const call = runs[i].call
+    const shown = dataCallText(fn, c)
+    const out = call.lines
+    const told = out.length ? `It printed:\n${firstLines(out).join('\n')}` : 'It printed nothing'
+    if (call.stopped) {
+      return fail(c.name, stoppedText(call.stopped, shown, 'it'), `Check called ${shown}\n${told}`)
+    }
+    if (call.error) {
+      const at = call.error.line ? ` at line ${call.error.line}` : ''
+      return fail(
+        c.name,
+        `When Check calls ${shown}, it stops${at} with ${call.error.type}: ${runCause(call.error, call.names, runs[i].blocks)}.`,
+        `Check called ${shown}\n${call.error.shown}`
+      )
+    }
+    const v = call.returned
+    const args = c.args ?? []
+    const want = (k) => (c.after && k in c.after ? c.after[k] : args[k])
+    const changed = args.map((a, k) => !equalData(call.after[k], a))
+    const wrongAfter = args.map((a, k) => !equalData(call.after[k], want(k)))
+    const afterLines = args
+      .map((a, k) =>
+        (c.after && k in c.after) || changed[k]
+          ? `Afterwards, the ${noun(a)} it was given is ${call.after_repr[k]}`
+          : null
+      )
+      .filter(Boolean)
+    const output = [`Check called ${shown}`, `It gave back: ${v.repr}`, ...afterLines, told].join('\n')
+    const wrongResult = c.expected !== undefined && !equalData(v.data, c.expected)
+    const k = wrongAfter.findIndex(Boolean)
+    if (!wrongResult && k < 0) return pass(c.name, output)
+    const kin = k >= 0 ? args.filter((a) => noun(a) === noun(args[k])).length : 0
+    const what = k < 0 ? 'list' : `${kin > 1 ? `${['first', 'second', 'third'][k]} ` : ''}${noun(args[k])}`
+    const thing = k < 0 ? 'list' : noun(args[k])
+    let message
+    if (mistake) message = mistake.hint
+    else if (wrongResult && v.type === 'NoneType' && !out.length && changed.some(Boolean)) {
+      message = `${fn} gave back None, and it changed the ${noun(args[changed.indexOf(true)])} it was given. A method such as sort, append or remove changes a list itself and gives back None, so returning or storing what such a method gives back keeps nothing.`
+    } else if (wrongResult && v.type === 'NoneType') message = (!out.length && c.noneHint) || noneText(fn, out)
+    else if (wrongResult && stuck && typed) message = typed
+    else if (wrongResult) {
+      const type = typeOfData(c.expected)
+      message =
+        v.type !== type
+          ? `${fn} gives back ${dataKind(v.type)}, and the task asks for ${dataKind(type)}.`
+          : typeof c.hint === 'function'
+            ? c.hint(v, call)
+            : c.hint
+    } else if (!(c.after && k in c.after)) {
+      message = `${fn} changed the ${what} Check gave it, and the task says to leave it as it was. The parameter is another name for the caller's ${thing}, and so is any name made from it with =, so a change made through any of them changes the caller's ${thing}.`
+    } else if (!changed[k] && (k > 0 || neverChanges)) {
+      message = `${fn} left the ${what} Check gave it as it was${equalData(v.data, want(k)) ? ', and gave back a new one with the change instead' : ''}. The task asks to change the caller's ${thing} itself, so that the code that called ${fn} sees the change. Change it through the parameter: giving the parameter a new ${thing} with = only moves the name, and the caller's ${thing} stays as it was.`
+    } else {
+      message =
+        typeof c.afterHint === 'function'
+          ? c.afterHint(call.after[k], call)
+          : (c.afterHint ?? `After the call, the ${what} Check gave it does not hold what the task asks for. Compare it with the task.`)
+    }
+    return fail(c.name, message, output)
   })
 }
