@@ -1907,7 +1907,7 @@ function typesHarness(types = {}) {
  * The lines of `file` that Task `task` keeps. Returns { problem } or the cut: { lines, kept, keep,
  * first, code, fns, main, def, uses, providedAt }.
  */
-function cutFile(file, whole, starter, { task, fn, guard, provides = [], dropMain, skip = [], inClass = false }) {
+function cutFile(file, whole, starter, { task, fn, guard, provides = [], dropMain, skip = [], inClass = false, keepGuard = false }) {
   const lines = whole.split('\n')
   const tasks = keepsTasks(file, lines, starter)
   if (tasks.problem) return { problem: tasks.problem }
@@ -1961,6 +1961,8 @@ function cutFile(file, whole, starter, { task, fn, guard, provides = [], dropMai
       if (GUARDISH.test(codeLines[i])) keep[i] = guard.task === task
     })
   }
+  // A header whose guard closes below its last task keeps the guard's lines in every task.
+  if (keepGuard) lines.forEach((l, i) => GUARDISH.test(codeLines[i]) && (keep[i] = true))
   const kept = lines.map((l, i) => (keep[i] ? l : ''))
   // The other tasks' lines are gone, and with them any public: or private: they wrote, so the
   // task starts under the label it has in the learner's own file.
@@ -2166,7 +2168,8 @@ export async function buildTypes(t, spec) {
       provides: spec.provides,
       dropMain: starterMain,
       skip: (spec.provides ?? []).map((p) => p.name),
-      inClass: spec.inClass?.includes(file)
+      inClass: spec.inClass?.includes(file),
+      keepGuard: spec.keepGuard?.includes(file)
     })
     if (cut.problem) return { problem: [cut.problem] }
     if (starterMain && !cut.main) {
@@ -3787,7 +3790,7 @@ export async function judgeFault(t, spec) {
     ownCode: true,
     swap: spec.counted ? { name: 'Repair', lines: REPAIR_LINES } : undefined,
     edit,
-    replaced: spec.asserts ? { [header]: ASSERT_HEADER } : undefined,
+    replaced: spec.asserts ? { ...spec.replaced, [header]: ASSERT_HEADER } : spec.replaced,
     cases: cases.map((c) => ({ code: c.sig ? c.code : wrap(c) })),
     helpers: [...(spec.counted ? MEMORY_HELPERS : []), ...FAULT_HELPERS(own), ...(spec.helpers ?? [])],
     classCause: (errors, ctx) =>
@@ -3871,6 +3874,10 @@ function part8Cause(errors, ctx, spec) {
     if (/'void'\)? is not contextually convertible to 'bool'|void value not ignored as it ought to be|could not convert '[^']*' from 'void' to 'bool'|cannot convert 'void' to 'bool'/.test(all)) {
       return 'The lambda handed to the algorithm gives back nothing: its result type is void. The algorithm asks it a question about each item and needs true or false back. A lambda with a body in braces gives back only what a return in it gives back.'
     }
+    const nothing = own.find((o) => all.includes(`no matching constructor for initialization of '${o.name}'`) || all.includes(`no matching function for call to '${o.name}::${o.name.split('::').at(-1)}()'`))
+    if (nothing) {
+      return `Check uses the template with a type of its own, ${nothing.name}, which offers only what the task says a type must offer: ${nothing.offers}. A line of yours asks the library to make ${nothing.name}s with no value, such as a vector made with a size, and ${nothing.name} cannot be made from nothing. The error is inside the library's files; your line is the one marked "requested here" or "required from here".`
+    }
     if (/no matching function for call to object of type|no match for call to '\(/.test(all)) {
       return 'The algorithm calls the function it was handed with one item, or two for a comparison, and the function handed in does not take that. Compare the lambda\'s round brackets with what the algorithm hands it: the type of the items in the vector.'
     }
@@ -3905,6 +3912,16 @@ function part8Cause(errors, ctx, spec) {
     const fn = constThis[1] ?? /in call to '[^']*?(\w+)\(/.exec(all)?.[1] ?? 'a function that changes it'
     return `A lambda calls ${fn} on a ${constThis[2] ?? constThis[3]} it captured by value. A capture by value is a copy that the lambda may only read, so only const functions can be called on it, and the caller's own is never reached that way. Look at what the task says the lambda must change.`
   }
+  const readOnly = C && new RegExp(`'this' argument to member function '(\\w+)' has type 'const ${C}<|member function '(\\w+)' not viable: 'this' argument has type 'const ${C}<|passing 'const ${C}<[^']*>' as 'this' argument discards qualifiers`).exec(text)
+  if (readOnly) {
+    const fn = readOnly[1] ?? readOnly[2] ?? /in call to '[^']*?(\w+)\(/.exec(all)?.[1]
+    return `${fromCheck ? 'Check calls' : 'A line calls'} ${fn ?? 'a function'} on a ${C} it may only read, through a const reference, and ${fn ?? 'that function'} is not marked const. A member function that changes nothing ends its first line with const, in a class template as in any class.`
+  }
+  if (C && new RegExp(`no matching constructor for initialization of '(?:const )?${C}<|no matching function for call to '${C}<[^']*>::${C}\\(\\)'`).test(text)) {
+    return fromCheck
+      ? `Check makes a ${C} with its limit, as the task describes, and no constructor of ${C} takes that. Compare the constructor's round brackets with the task.`
+      : `A line makes a ${C} without what its constructor takes. A ${C} is made with its limit, in round brackets after the variable's name.`
+  }
   if (/no matching function for call to object of type '\(lambda|no match for call to '\(<lambda/.test(text)) {
     return 'A line puts round brackets after a lambda, which calls it right there, with no values. An algorithm is handed the lambda itself, without brackets, and calls it on the items.'
   }
@@ -3918,10 +3935,15 @@ function part8Cause(errors, ctx, spec) {
       ? `Below the class, ${C} alone is not a class: it is a template, and the member belongs to ${C}<T>. A member written outside a class template is a template of its own, with its own template line above it, and ${C}<T>:: before its name.`
       : `${C} is a class template, not a class. A class is made from it by naming the type in angle brackets after its name, every time it is used as a type: in a parameter, in what a function gives back and in a variable.`
   }
+  if (C && /return type of out-of-line definition of '[^']*' differs from that in the declaration|out-of-line definition of '\w+' does not match any declaration|no declaration matches '/.test(text)) {
+    return fromCheck
+      ? `Check builds this task with its own ${C}, written as the task before asks, and a body of yours matches none of its declarations. Compare the first line of each body with its declaration in the task: what it gives back, the type of each parameter and const at the end.`
+      : `The first line of a body below the class does not match its declaration in the class: what it gives back, the type of each parameter and const at the end must be the same in both.${spec.provides?.some((p) => p.name === C) ? ` Check builds this task with its own ${C}, written as the task before asks.` : ''}`
+  }
   if (/use of undeclared identifier 'T'|'T' was not declared in this scope|unknown type name 'T'|'T' does not name a type|'T' has not been declared/.test(text)) {
-    return C
+    return C && new RegExp(`\\b${C}\\s*<[^>]*>\\s*::`).test(source)
       ? `T is known only inside a template. A member of ${C} written below the class is a template of its own: it needs the template line above it, as the class has, before T means anything.`
-      : 'T is known only inside a template, from the template line above it to the end of that function. Look whether the template line is there, right above the line the compiler names.'
+      : 'T is known only inside a template, from the template line above it to the end of that function or class. Look whether the template line is there, right above the first line that uses T.'
   }
 
   const ops = /invalid operands to binary expression \('(?:const )?([\w:]+)' and '(?:const )?([\w:]+)'\)|no match for '(operator\S+)' \(operand types are '(?:const )?([\w:]+)' and '(?:const )?([\w:]+)'\)/.exec(text)

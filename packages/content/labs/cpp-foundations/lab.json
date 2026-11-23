@@ -39,7 +39,7 @@
     },
     {
       "title": "Templates, lambdas and rules as values",
-      "chapters": ["function-templates"]
+      "chapters": ["function-templates", "class-templates"]
     }
   ]
 }

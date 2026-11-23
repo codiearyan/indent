@@ -1,0 +1,104 @@
+{
+  "id": "class-templates",
+  "title": "A class for any type",
+  "files": [
+    "src/caddy.h",
+    "src/main.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Kasimir's bench here and run it, once main makes a caddy or two.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/main.cpp -o bench && ./bench"
+  },
+  "tasks": [
+    {
+      "id": "template",
+      "title": "Write the class template",
+      "file": "src/caddy.h",
+      "description": "Under `// Task 1` in `src/caddy.h`, write a class template called `Caddy`, with one type `T`. It keeps its items in a private `std::vector<T>` called `items` and its limit in a private `int` called `limit`. Its public parts are:\n\n- a constructor that takes the limit as an `int`, and starts with no items;\n- `add`, which takes an item as a reference to a `const T`. When the caddy holds fewer items than its limit, it puts a copy of the item at the end and gives back `true`; when it is full, it changes nothing and gives back `false`;\n- `count`, which changes nothing and gives back how many items it holds, as an `int`;\n- the declaration of `at`, which takes a place as an `int`, changes nothing and gives back a reference to a `const T`. Its body is Task 2's.\n\nThe bodies of the constructor, `add` and `count` go inside the class. A type `T` needs to offer only copies for a `Caddy` to work.\n\nCheck builds a program of its own that includes `caddy.h`. It makes a `Caddy<int>` and a `Caddy` of a type of its own that can be copied and offers nothing else, adds items past the limit, and reads `count` through a `const Caddy&`. It also compiles two lines of its own outside the class that read `items` and `limit`, which must be refused.",
+      "nextSteps": [
+        "Write the template line, then the class with its two private members.",
+        "Write the constructor, with the limit in its member initialiser list.",
+        "Write `add` and `count`, and mark `count` const.",
+        "Declare `at` in the class, and make a `Caddy<int>` in `main` to try it."
+      ],
+      "hints": [
+        "A class template is a class written once with its type left open, exactly as a function template is. Everything inside the class can use `T`.",
+        "`add` asks first whether the caddy is full, by comparing how many items it holds with its limit. A type with nothing but copies can still go into a `std::vector`, as long as nothing asks the vector to make one from nothing.",
+        "The shape is `template <typename T> class Caddy { private: std::vector<T> items; int limit; public: Caddy(int most) : limit(most) {} bool add(const T& item) { ... } int count() const { ... } const T& at(int place) const; };`."
+      ],
+      "docs": [
+        {
+          "title": "Class template",
+          "url": "https://en.cppreference.com/w/cpp/language/class_template"
+        },
+        {
+          "title": "Templates",
+          "url": "https://en.cppreference.com/w/cpp/language/templates"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Class templates for beginners",
+          "url": "https://www.youtube.com/watch?v=ttOM3HulFyU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "at",
+      "title": "Reach an item by its place, below the class",
+      "file": "src/caddy.h",
+      "description": "Under `// Task 2` in `src/caddy.h`, below the class, write the body of `at`: it gives back the item at that place, counted from 0, as a reference to a `const T`. When there is no item at that place, below 0 or from `count()` on, it throws a `std::out_of_range`.\n\nCheck builds this task with a `Caddy` of its own in place of your class, written as Task 1 asks, and your body of `at` below it, in a program of its own that includes `caddy.h`. It reads items of a `Caddy<int>` and of a caddy of its own type by their place, and asks for places where there is no item.",
+      "nextSteps": [
+        "Below the class, write the template line again.",
+        "Write the first line of `at` as a member of `Caddy<T>`, matching its declaration, `const` at the end included.",
+        "Throw a `std::out_of_range` when the place has no item.",
+        "Otherwise give back the item there, and print one from `main`."
+      ],
+      "hints": [
+        "Outside the class, `at` is written with the class in front of its name, as in part 5. Here the class is `Caddy<T>`, and `T` means nothing below the class until a template line says it is a type.",
+        "Places go from 0 to one less than `count()`. A place below 0 is no place either.",
+        "The shape is `template <typename T> const T& Caddy<T>::at(int place) const { if (place < 0 || place >= count()) { throw std::out_of_range(\"no item there\"); } return items[place]; }`."
+      ],
+      "docs": [
+        {
+          "title": "Class template: members defined outside the class",
+          "url": "https://en.cppreference.com/w/cpp/language/member_template"
+        },
+        {
+          "title": "std::out_of_range",
+          "url": "https://en.cppreference.com/w/cpp/error/out_of_range"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fill",
+      "title": "Fill the shelf caddy with repairs",
+      "file": "src/main.cpp",
+      "description": "Under `// Task 3` in `src/main.cpp`, write a function called `fillCaddy` that takes the repairs as a reference to a `const std::vector<Repair>` and a limit as an `int`. It makes a caddy of repairs with that limit, adds the repairs to it in order with `add`, and gives the caddy back. Repairs that do not fit are left out.\n\nCheck builds your `main.cpp` with a `caddy.h` of its own in place of yours, written as Tasks 1 and 2 ask, that counts calls to `add`. It calls `fillCaddy` with repairs and limits of its own, an empty list and a limit of 0 included, and reads the tickets of what the caddy holds.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<Repair>&` and an `int` in, a caddy of repairs back.",
+        "Make the caddy with the limit.",
+        "Add each repair in order with `add`.",
+        "Give the caddy back, and print its tickets from `main` with `count` and `at`."
+      ],
+      "hints": [
+        "`Caddy` alone is not a type. A caddy of repairs is a class of its own, made from the template by naming `Repair` in the angle brackets.",
+        "`add` already keeps the limit, so the loop can hand it every repair and let it refuse the ones that do not fit.",
+        "The shape is `Caddy<Repair> fillCaddy(const std::vector<Repair>& repairs, int limit) { Caddy<Repair> caddy(limit); for (const Repair& repair : repairs) { caddy.add(repair); } return caddy; }`."
+      ],
+      "docs": [
+        {
+          "title": "Class template",
+          "url": "https://en.cppreference.com/w/cpp/language/class_template"
+        },
+        {
+          "title": "Range-based for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/range-for"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
