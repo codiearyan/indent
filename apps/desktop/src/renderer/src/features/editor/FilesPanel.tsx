@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { ChevronRightIcon, MoreHorizontalIcon } from 'lucide-react'
 import { chapterKey } from '@shared/rules'
 import {
@@ -22,9 +23,10 @@ const indent = (level: number): React.CSSProperties => ({
 })
 
 export function FilesPanel(): React.JSX.Element {
-  const files = useWorkspace((s) => s.files)
+  // Paths and marks only, so typing renders the tree again only when a file's mark changes.
+  const paths = useWorkspace(useShallow((s) => s.files.map((f) => f.path)))
+  const marks = useWorkspace(useShallow((s) => s.files.map((f) => fileChange(s.starter, f))))
   const folders = useWorkspace((s) => s.folders)
-  const starter = useWorkspace((s) => s.starter)
   const activePath = useWorkspace((s) => s.activePath)
   const openFile = useWorkspace((s) => s.openFile)
   const chapter = useWorkspace((s) => s.chapter)
@@ -39,10 +41,7 @@ export function FilesPanel(): React.JSX.Element {
     () => new Set(remembered ?? foldersAbove(chapter?.files ?? [])),
     [remembered, chapter]
   )
-  const changes = useMemo(
-    () => new Map(files.map((f) => [f.path, fileChange(starter, f)])),
-    [files, starter]
-  )
+  const changes = useMemo(() => new Map(paths.map((path, i) => [path, marks[i]])), [paths, marks])
   const tree = useMemo(
     () =>
       buildTree(

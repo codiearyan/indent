@@ -17,4 +17,12 @@ describe('fileChange', () => {
   it('is new for a file the starter does not have', () => {
     expect(fileChange(starter, { path: 'src/b.js', content: '' })).toBe('new')
   })
+
+  it('answers again for a file once the starter it is compared with changes', () => {
+    const file = { path: 'src/a.js', content: 'export const a = 1\n' }
+    expect(fileChange(starter, file)).toBeNull()
+    expect(fileChange({ 'src/a.js': 'updated\n' }, file)).toBe('modified')
+    expect(fileChange({}, file)).toBe('new')
+    expect(fileChange(starter, file)).toBeNull()
+  })
 })
