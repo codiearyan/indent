@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "I typed twelve, and it all stopped.",
+      "note": "The queue is waiting."
+    },
+    {
+      "title": "Hut desk",
+      "text": "Stops at the first typing slip"
+    },
+    {
+      "title": "Your hut desk",
+      "file": "HutDesk.java",
+      "mine": true,
+      "gap": "A slip stops everything",
+      "tasks": [
+        "A count, or 0",
+        "The day, past smudges",
+        "Who sits in a seat"
+      ]
+    },
+    {
+      "title": "The queue",
+      "say": "Next ticket, please."
+    }
+  ],
+  "ticket": {
+    "label": "Bridie's slip",
+    "wrong": "desk stops",
+    "why": "A crash",
+    "right": "answered"
+  },
+  "captions": [
+    "The hut desk at a busy hour. Bridie types twelve in words, and wants the desk to cope.",
+    "Today one typing slip stops the whole program, and the queue waits.",
+    "You catch the exceptions a slip brings, and only those, where they can happen.",
+    "Now a slip gets an answer, and the desk goes on to the next ticket.",
+    "Slips answered, mistakes still found. Next, the desk refuses what cannot be."
+  ]
+}

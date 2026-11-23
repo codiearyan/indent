@@ -1,0 +1,152 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "bridie",
+        "label": "Bridie",
+        "kind": "story"
+      },
+      {
+        "id": "fares",
+        "label": "Fares",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "sailing",
+        "label": "Sailing",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "crossings",
+        "label": "Crossings",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "ossian",
+        "label": "Ossian",
+        "kind": "story"
+      },
+      {
+        "id": "board",
+        "label": "Notice board",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "bridie",
+        "to": "fares",
+        "label": "an age"
+      },
+      {
+        "from": "bridie",
+        "to": "sailing",
+        "label": "places wanted"
+      },
+      {
+        "from": "ossian",
+        "to": "crossings",
+        "label": "gale or calm"
+      },
+      {
+        "from": "crossings",
+        "to": "board",
+        "label": "notice"
+      }
+    ],
+    "note": "The desk refuses what cannot be, and a crossing called off by the weather is an exception every caller must plan for."
+  },
+  "tasks": {
+    "fares": {
+      "steps": [
+        {
+          "active": [
+            "bridie",
+            "bridie->fares",
+            "fares"
+          ],
+          "note": "The fare machine is handed an age."
+        },
+        {
+          "active": [
+            "fares"
+          ],
+          "note": "An age that cannot be is refused at once, with a message that names it."
+        },
+        {
+          "active": [
+            "fares"
+          ],
+          "note": "Any other age gets its fare, child or adult."
+        }
+      ]
+    },
+    "sailing": {
+      "steps": [
+        {
+          "active": [
+            "bridie",
+            "bridie->sailing",
+            "sailing"
+          ],
+          "note": "A booking asks a sailing for some places."
+        },
+        {
+          "active": [
+            "sailing"
+          ],
+          "note": "A number of places that cannot be is refused before anything changes."
+        },
+        {
+          "active": [
+            "sailing"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "what book gives back",
+            "entries": [
+              {
+                "key": "room",
+                "value": "booked"
+              },
+              {
+                "key": "no room",
+                "value": "an answer"
+              }
+            ]
+          },
+          "note": "A full boat is an ordinary answer; otherwise the places are booked."
+        }
+      ]
+    },
+    "crossings": {
+      "steps": [
+        {
+          "active": [
+            "ossian",
+            "ossian->crossings",
+            "crossings"
+          ],
+          "note": "Ossian says whether a gale is blowing."
+        },
+        {
+          "active": [
+            "crossings"
+          ],
+          "note": "In a gale the crossing is called off with an exception the compiler makes every caller plan for."
+        },
+        {
+          "active": [
+            "crossings",
+            "crossings->board",
+            "board"
+          ],
+          "note": "The notice board says boarding, or says the crossing is cancelled and why."
+        }
+      ]
+    }
+  }
+}

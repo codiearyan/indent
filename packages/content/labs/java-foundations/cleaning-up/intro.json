@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Why was the shutter up all night?",
+      "note": "The printer was still humming."
+    },
+    {
+      "title": "Ticket printer",
+      "text": "Runs out of paper, and the program stops"
+    },
+    {
+      "title": "Your closing up",
+      "file": "ClosingUp.java",
+      "mine": true,
+      "gap": "Nothing closes after a failure",
+      "tasks": [
+        "Shutter down always",
+        "Printer off always",
+        "Printer, then till"
+      ]
+    },
+    {
+      "title": "The hut at night",
+      "text": "Shutter down, printer off, till shut."
+    }
+  ],
+  "ticket": {
+    "label": "Out of paper",
+    "wrong": "left open",
+    "why": "Not closed",
+    "right": "hut closed"
+  },
+  "captions": [
+    "The hut on a Tuesday. Bridie wants it closed up, whatever goes wrong while selling.",
+    "Today the paper runs out, the program stops, and the shutter stays up all night.",
+    "You clean up with finally and a try with resources, and let the failure go on.",
+    "Now a failure still stops the sale, and the hut is closed up behind it.",
+    "Closed up, every time. Next, the hut gets exceptions with names of its own."
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "bridie",
+        "label": "Bridie",
+        "kind": "story"
+      },
+      {
+        "id": "hut",
+        "label": "Hut",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "day",
+        "label": "Day",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "sale",
+        "label": "Sale",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "shutter",
+        "label": "Shutter",
+        "kind": "story"
+      },
+      {
+        "id": "printer",
+        "label": "Ticket printer",
+        "kind": "story"
+      },
+      {
+        "id": "till",
+        "label": "Till",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "bridie",
+        "to": "hut",
+        "label": "tickets"
+      },
+      {
+        "from": "hut",
+        "to": "shutter",
+        "label": "up and down"
+      },
+      {
+        "from": "hut",
+        "to": "printer",
+        "label": "tickets"
+      },
+      {
+        "from": "day",
+        "to": "printer",
+        "label": "on and off"
+      },
+      {
+        "from": "sale",
+        "to": "till",
+        "label": "fares"
+      },
+      {
+        "from": "sale",
+        "to": "printer",
+        "label": "tickets"
+      }
+    ],
+    "note": "Whatever goes wrong while selling, the shutter comes down, the printer goes off and the till is shut, and the failure is still reported."
+  },
+  "tasks": {
+    "shutter": {
+      "steps": [
+        {
+          "active": [
+            "bridie",
+            "bridie->hut",
+            "hut"
+          ],
+          "note": "Selling starts: the shutter goes up."
+        },
+        {
+          "active": [
+            "hut",
+            "hut->printer",
+            "printer"
+          ],
+          "note": "Each ticket is printed, and the printer may run out of paper on the way."
+        },
+        {
+          "active": [
+            "hut",
+            "hut->shutter",
+            "shutter"
+          ],
+          "note": "Whether the selling finished or failed, the shutter comes down, once."
+        }
+      ]
+    },
+    "printer": {
+      "steps": [
+        {
+          "active": [
+            "day",
+            "day->printer",
+            "printer"
+          ],
+          "note": "The day's tickets get a printer of their own."
+        },
+        {
+          "active": [
+            "printer"
+          ],
+          "note": "Each ticket is printed until the last, or until the printer fails."
+        },
+        {
+          "active": [
+            "day",
+            "day->printer",
+            "printer"
+          ],
+          "note": "Either way the printer is switched off, once, and a failure goes on to whoever asked."
+        }
+      ]
+    },
+    "till": {
+      "steps": [
+        {
+          "active": [
+            "sale",
+            "sale->till",
+            "till"
+          ],
+          "note": "The till is opened first."
+        },
+        {
+          "active": [
+            "sale",
+            "sale->printer",
+            "printer"
+          ],
+          "note": "Then the printer; each sale adds a fare and prints a ticket."
+        },
+        {
+          "active": [
+            "sale",
+            "sale->printer",
+            "printer",
+            "sale->till",
+            "till"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "closing order",
+            "values": [
+              "opened last",
+              "opened first"
+            ]
+          },
+          "note": "Whatever happens, they are closed in the opposite order to the one they were opened in."
+        }
+      ]
+    }
+  }
+}

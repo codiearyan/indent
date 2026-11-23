@@ -1,0 +1,109 @@
+{
+  "id": "catching-exceptions",
+  "title": "Catching an exception: when a line can fail",
+  "files": ["HutDesk.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the hut desk here, and try your classes from main.",
+    "suggestedCommand": "java HutDesk.java"
+  },
+  "tasks": [
+    {
+      "id": "seats",
+      "title": "Read a count of seats, or 0",
+      "file": "HutDesk.java",
+      "description": "Under `// Task 1`, write a class `Counts` with a method `static int seats(String typed)`. It gives back the whole number in `typed`, with any spaces around it left out, and `0` when `typed` is not a whole number. It prints nothing. A `null` typed is a mistake in the calling code: its exception must reach the caller, so catch only the exception a text that is not a whole number brings.\n\nCheck calls `seats` with texts of its own: whole numbers, with and without spaces, a word, a number with a point, an empty text, and `null`. It reads what comes back, what is printed, and whether an exception reached it.",
+      "nextSteps": [
+        "Read the parts of the lesson about try and catch, and about catching only what you expect.",
+        "Write the class and the first line of seats exactly as the task gives it.",
+        "Leave out the spaces, then read the number inside a try, with a catch for the one exception that brings.",
+        "Take the // off the first lines in main, and run the file with a number and with a word."
+      ],
+      "hints": [
+        "The lesson shows the method that reads a whole number from a text, and the one that leaves out the spaces. Try them in main with \" 12 \" and with \"twelve\" to see which exception a word brings.",
+        "Only the line that reads the number belongs in the try. A null should fail outside it, or with an exception your catch does not name.",
+        "The shape: `String clean = typed.trim();`, then `try { return Integer.parseInt(clean); } catch (NumberFormatException e) { return 0; }`."
+      ],
+      "docs": [
+        {
+          "title": "The try block",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/try.html"
+        },
+        {
+          "title": "The catch blocks",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/catch.html"
+        },
+        {
+          "title": "NumberFormatException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/NumberFormatException.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Exception handling with try and catch",
+          "url": "https://www.youtube.com/watch?v=1XAfapkBQjk"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "summary",
+      "title": "Add up the day, past the smudges",
+      "file": "HutDesk.java",
+      "description": "Under `// Task 2`, write a class `Day` with a method `static String summary(String[] typed)`. It adds up the whole numbers in `typed`, each with any spaces around it left out, and counts the entries it could not read, as in `6 seats, 1 not read`. An entry that cannot be read never stops the others being added. A `null` in `typed` is a mistake in the calling code: its exception must reach the caller.\n\nCheck calls `summary` with entries of its own, a bad one first, in the middle or none at all, and one list with a `null` in it. It reads what comes back and whether an exception reached it.",
+      "nextSteps": [
+        "Read the part of the lesson about putting the try around only the line that can fail.",
+        "Write the class, the first line of summary, and two counts that start at 0.",
+        "Go through the entries with a loop, and decide where the try goes so one bad entry skips only itself.",
+        "Give back the text with both counts, and try it from main."
+      ],
+      "hints": [
+        "When a line inside a try fails, everything after it in the try is skipped. Ask what a bad second entry should skip.",
+        "The try belongs inside the loop, around the reading of one entry; its catch counts that entry as not read, and the loop goes on.",
+        "Inside the loop: `String clean = entry.trim();`, then `try { seats += Integer.parseInt(clean); } catch (NumberFormatException e) { notRead++; }`."
+      ],
+      "docs": [
+        {
+          "title": "Catching and handling exceptions",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/handling.html"
+        },
+        {
+          "title": "The try block",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/try.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "holder",
+      "title": "Say who sits in a seat",
+      "file": "HutDesk.java",
+      "description": "Under `// Task 3`, write a class `Seats` with a method `static String holder(String[] seats, String typed)`. `seats` holds a name for each seat, seat 1 first, and `typed` is a seat number as Bridie typed it. It gives back the name in that seat. When `typed` is not a whole number it gives back `Not a seat number: ` and what was typed. When the boat has no such seat it gives back `No such seat: ` and the message of the exception Java threw. A `null` seats is a mistake in the calling code: its exception must reach the caller.\n\nCheck calls `holder` with boats and seat numbers of its own, seat 0 and a seat past the last included, and with a `null` seats. It reads what comes back and whether an exception reached it.",
+      "nextSteps": [
+        "Read the parts of the lesson about what a caught exception holds, and about two catches.",
+        "Try in main which exception a seat the boat does not have brings, and read its message.",
+        "Write holder with a catch for each of the two slips, each giving back its own text.",
+        "Try a good seat, a word and a seat too far from main."
+      ],
+      "hints": [
+        "Two different slips throw two different exceptions, and each gets its own catch and its own answer.",
+        "Seat 1 is at position 0. A position the array does not have throws an ArrayIndexOutOfBoundsException, and the exception you catch holds the words the task wants after No such seat: the lesson shows how to read them.",
+        "One shape: `try { return seats[Integer.parseInt(typed) - 1]; } catch (NumberFormatException e) { return \"Not a seat number: \" + typed; } catch (ArrayIndexOutOfBoundsException e) { return \"No such seat: \" + e.getMessage(); }`."
+      ],
+      "docs": [
+        {
+          "title": "The catch blocks",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/catch.html"
+        },
+        {
+          "title": "Throwable.getMessage()",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html#getMessage()"
+        },
+        {
+          "title": "ArrayIndexOutOfBoundsException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ArrayIndexOutOfBoundsException.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

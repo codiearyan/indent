@@ -587,7 +587,9 @@ const METHOD_GLOSS = [
 
 function gloss(e, src, methods) {
   const table =
-    methods === 'families'
+    methods === 'exceptions'
+      ? [...EXCEPTION_GLOSS, ...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
+      : methods === 'families'
       ? [...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
       : methods === 'objects' ? [...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS] : methods ? [...METHOD_GLOSS, ...GLOSS] : GLOSS
   for (const [code, say] of table) {
@@ -663,11 +665,15 @@ function compileProblem(spec, b, task, unit, result) {
   }
   const elsewhere = spec.methods
     ? elsewhereMethod(spec, b, task, mine[0])
-    : spec.objects && ((spec.families && laterType(b, task, mine[0])) || laterTask(b, task, mine[0]))
+    : spec.objects &&
+      // throw without new reads as a call of a method named after the exception, and
+      // a method of the learner's exception used through a catch of a parent type
+      !(spec.exceptions && /symbol:\s+method \w*(?:Exception|Error)\(|location:\s+variable \w+ of type (?:java\.lang\.)?(?:Exception|Throwable|RuntimeException)\b/.test(mine[0].message)) &&
+      ((spec.families && laterType(b, task, mine[0])) || laterTask(b, task, mine[0]))
   if (elsewhere) return fail(`${label(n)} compiles`, elsewhere, shown)
   return fail(
     `${label(n)} compiles`,
-    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.families ? 'families' : spec.objects ? 'objects' : spec.methods)}`,
+    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.exceptions ? 'exceptions' : spec.families ? 'families' : spec.objects ? 'objects' : spec.methods)}`,
     shown
   )
 }
@@ -1372,6 +1378,10 @@ function objectProblem(spec, b, task, unit, errors) {
   const message = (x) => x.message.replace(/\bjava\.(?:lang|util)\.(?=[A-Z])/g, '')
   const reads = Object.values(c.reads ?? {})
   const asIs = `${ranText(c) ? `Check ran:\n${indent(ranText(c))}\n` : ''}${reads.length && !c.show ? `${ranText(c) ? 'and read' : 'Check read'}:\n${indent(Object.keys(c.reads).join('\n'))}` : ''}\n\n${checkOwn(errors).map(message).join('\n\n')}`
+  if (spec.exceptions) {
+    const said = exceptionProblem(task, message(e), asIs)
+    if (said) return said
+  }
   if (spec.families) {
     const said = familyProblem(task, message(e), asIs)
     if (said) return said
@@ -2085,3 +2095,292 @@ export function packageTasks(spec) {
   }
   return Object.fromEntries(Object.keys(spec.tasks).map((id) => [id, (t) => judgeTask(t, id)]))
 }
+
+// --- When it goes wrong -------------------------------------------------------------------------
+// From part 5 a task may catch, throw or clean up, so an exception is often what a case expects.
+// A case built with attempt() makes its call inside a try of Check's own: whatever the learner's
+// code throws comes back as reads (its class, message, frames and cause) instead of ending the
+// run, and the judge says whether a throw in the learner's lines made it on purpose or it escaped
+// from a line that went wrong. Issues set `exceptions: true` beside `objects` and `families`.
+
+const ZERO = { int: '0', long: '0L', short: '(short) 0', byte: '(byte) 0', double: '0.0', float: '0f', boolean: 'false', char: "'0'" }
+
+const THROWN_READS = Object.fromEntries(
+  [
+    ['thrown', 't', 'getClass().getName()'],
+    ['thrown.message', 't', 'getMessage()'],
+    ['thrown.frames', 't', 'getStackTrace()'],
+    ['thrown.cause', 't.getCause()', 'getClass().getName()'],
+    ['thrown.cause.message', 't.getCause()', 'getMessage()'],
+    ['thrown.cause.frames', 't.getCause()', 'getStackTrace()']
+  ].map(([name, of, what]) => {
+    const x = of.replace(/^t/, 'thrown')
+    const guard = x === 'thrown' ? 'thrown == null' : `thrown == null || ${x} == null`
+    const value = what === 'getStackTrace()' ? `java.util.Arrays.toString(${x}.${what})` : `${x}.${what}`
+    return [name, `${guard} ? null : ${value}`]
+  })
+)
+
+/**
+ * A case whose call runs inside Check's own try: `{ setup, call, type, after, ...case }` becomes
+ * an object case. `type` is what the call gives back (kept in `got`), or 'void'; `after` reads
+ * what is left once the call is over.
+ */
+export function attempt({ setup = [], call, type = 'void', after = {}, ...rest }) {
+  const keep = type === 'void' ? `${call};` : `got = ${call};`
+  return {
+    ...rest,
+    code: [
+      ...setup,
+      ...(type === 'void' ? [] : [`${type} got = ${ZERO[type] ?? 'null'};`]),
+      `Throwable thrown = null; try { ${keep} } catch (Throwable x$) { thrown = x$; }`
+    ],
+    reads: { ...(type === 'void' ? {} : { got: 'got' }), ...THROWN_READS, ...after },
+    show: rest.show ?? [...setup, type === 'void' ? `${call};` : `${type} got = ${call};`].join('\n'),
+    type
+  }
+}
+
+const frameList = (text) => (text ? text.slice(1, -1).split(', ').filter(Boolean) : [])
+
+/** What the call of a case made by attempt() threw, or null: { type, name, message, frames, cause }. */
+export function thrownIn(run, mainClass) {
+  const v = (n) => run.values[n]?.value ?? null
+  const one = (p) => {
+    if (!v(p)) return null
+    const all = frameList(v(`${p}.frames`))
+    const end = all.findIndex((f) => f.startsWith(`${mainClass}.main(`))
+    return {
+      type: v(p),
+      name: v(p).split('.').pop().replace(/\$/g, '.'),
+      message: v(`${p}.message`),
+      frames: end < 0 ? all : all.slice(0, end)
+    }
+  }
+  const x = one('thrown')
+  if (x) x.cause = one('thrown.cause')
+  return x
+}
+
+/** A thrown exception as the java launcher prints it, Check's own frames left out. */
+export function traceText(x) {
+  const head = (e) => `${e.type}${e.message === null ? '' : `: ${e.message}`}`
+  const out = [head(x), ...x.frames.map((f) => `\tat ${f}`)]
+  if (x.cause) {
+    let same = 0
+    while (same < x.cause.frames.length && same < x.frames.length && x.cause.frames.at(-1 - same) === x.frames.at(-1 - same)) same++
+    out.push(`Caused by: ${head(x.cause)}`, ...x.cause.frames.slice(0, x.cause.frames.length - same).map((f) => `\tat ${f}`))
+    if (same) out.push(`\t... ${same} more`)
+  }
+  return out.join('\n')
+}
+
+/**
+ * Where an exception came from: `purpose` when the learner's own throw made it, else the line of
+ * the learner's file it escaped from. { purpose, line, source, inside }
+ */
+export function whence(x, text, file, section) {
+  const at = (f) => new RegExp(`\\(${file.replace('.', '\\.')}:(\\d+)\\)$`).exec(f)
+  const first = x.frames.findIndex((f) => at(f))
+  if (first < 0) return { purpose: false, line: null, source: '', inside: null, given: false }
+  const line = Number(at(x.frames[first])[1])
+  const source = (text.split('\n')[line - 1] ?? '').trim()
+  const purpose = first === 0 && /\bthrow\b|\bnew\s+[\w.]*(?:Exception|Error)\s*\(/.test(codeOnly(source))
+  const inside = first > 0 ? x.frames[first - 1].replace(/^java\.base\//, '').replace(/\(.*$/, '').replace(/^java\.lang\./, '') : null
+  const from = section ? lineOf(text, text.indexOf(section)) : 0
+  const given = !!section && (line < from || line >= from + section.split('\n').length)
+  return { purpose, line, source, inside, given }
+}
+
+/** One sentence on where an exception came from, for a message. */
+export function fromWhere(x, text, file, section) {
+  const w = whence(x, text, file, section)
+  const A = an(x.name).replace(/^a/, 'A')
+  if (w.line === null) return `${A} reached Check's own code.`
+  if (w.purpose && w.given) return `${A} was thrown on purpose on line ${w.line}, in code the starter gives, because of what it was handed.`
+  if (w.purpose) return `The throw on line ${w.line} threw ${an(x.name)} on purpose.`
+  return `${A} escaped from line ${w.line} of ${file} by mistake${w.inside ? `, inside ${w.inside}` : ''}: no throw of yours made it.`
+}
+
+/** What Check ran for an attempt() case, what came of it and what was printed, for a detail's output. */
+export function outcome(run, mainClass, names = Object.keys(run.case.after ?? {})) {
+  const x = thrownIn(run, mainClass)
+  const came = x
+    ? `It threw:\n${indent(traceText(x))}`
+    : run.case.type === undefined
+      ? ''
+      : run.case.type === 'void'
+        ? 'It threw nothing.'
+        : `It gave back ${shown(run.values.got)}`
+  const after = names.map((n) => `  ${n} is ${shown(run.values[n])}`).join('\n')
+  const out = run.lines.length ? run.lines.map((l) => `  ${l}`).join('\n') : '  (nothing)'
+  return `Check ran:\n${indent(run.call)}${came ? `\n${came}` : ''}${after ? `\nThen:\n${after}` : ''}\nIt printed:\n${out}`
+}
+
+/**
+ * Judges cases made with attempt(). Each has `name` and `hint`, and either `expected` ({ got,
+ * or a read of `after`: value }) or `throws`, the name of the exception that must reach Check,
+ * with `names` (texts its message must hold), `namesHint`, and `expected` for what must be left as
+ * it was. A failing case gets the first message that fits: an exception where none belongs, a known
+ * mistake (`mistakes: [{ when(run, x, runs, { text, section }), hint }]`), what it gives back staying the
+ * same whatever Check passes (`typed`), then the case's own hint.
+ */
+export function outcomeCases({ file, mainClass = file.replace(/\.java$/, ''), mistakes = [], typed }) {
+  return (runs, { text, section }) => {
+    const plain = runs.filter((r) => !r.case.refuse && !r.case.throws && 'got' in (r.case.expected ?? {}))
+    const stuck =
+      plain.length > 1 &&
+      plain.every((r) => !thrownIn(r, mainClass) && shown(r.values.got) === shown(plain[0].values.got)) &&
+      !plain.every((r) => display(r.case.expected.got) === display(plain[0].case.expected.got))
+    return runs
+      .filter((r) => !r.case.refuse)
+      .map((r) => {
+        const c = r.case
+        const x = thrownIn(r, mainClass)
+        const said = outcome(r, mainClass)
+        const want = Object.entries(c.expected ?? {}).every(([n, v]) => gave(r.values[n], v))
+        const mistake = mistakes.find((m) => m.when(r, x, runs, { text, section }))
+        if (c.throws) {
+          if (x && x.name === c.throws) {
+            const missing = (c.names ?? []).find((n) => !(x.message ?? '').includes(n))
+            if (missing !== undefined)
+              return fail(c.name, mistake?.hint ?? c.namesHint ?? `The ${x.name} is right, and its message should name ${missing}, so the person who reads it knows what to change.`, said)
+            if (!want) return fail(c.name, mistake?.hint ?? c.hint, said)
+            return pass(c.name, said)
+          }
+          if (x && !mistake) {
+            const w = whence(x, text, file, section)
+            return fail(
+              c.name,
+              w.purpose && !w.given
+                ? `The throw on line ${w.line} threw ${an(x.name)} on purpose, and the task asks for ${an(c.throws)} here. ${c.hint}`
+                : `${fromWhere(x, text, file, section)} The task asks for ${an(c.throws)} here. ${c.hint}`,
+              said
+            )
+          }
+          return fail(c.name, mistake?.hint ?? `Check expected ${an(c.throws)} to reach its own code, and nothing was thrown. ${c.hint}`, said)
+        }
+        if (x && !mistake) {
+          const w = whence(x, text, file, section)
+          return fail(
+            c.name,
+            w.purpose && !w.given
+              ? `The throw on line ${w.line} threw ${an(x.name)} on purpose, where the task expects no exception. ${c.hint}`
+              : `${fromWhere(x, text, file, section)} The task expects no exception here: read the stack trace below from the top. ${c.hint}`,
+            said
+          )
+        }
+        if (!x && want) return pass(c.name, said)
+        return fail(c.name, mistake?.hint ?? (stuck && typed && plain.includes(r) ? typed : c.hint), said)
+      })
+  }
+}
+
+/** Why Check's own code did not compile against the learner's, in an exception issue, or null. */
+function exceptionProblem(task, msg, asIs) {
+  const n = task.task
+  const unreported = /^unreported exception (\w+); must be caught or declared to be thrown/.exec(msg)
+  if (unreported) {
+    const [, name] = unreported
+    return fail(
+      name === 'Exception' ? `${label(n)} names the exceptions it throws` : `${label(n)} deals with ${name} as the task says`,
+      name === 'Exception'
+        ? `Check's own code handles the exception the task names, and Java says the call may still throw any Exception at all: a throws clause names Exception. Name the exact checked exception instead, so a caller knows what to handle.`
+        : `Check calls your code without a try for ${name}, as the task says it can, and Java says the call may throw ${name}, a checked exception: a throws clause on the method says so. Compare what the task says should happen to ${name} with your method.`,
+      asIs
+    )
+  }
+  const never = /^exception (\w+) is never thrown in body of corresponding try statement/.exec(msg)
+  if (never)
+    return fail(
+      `${label(n)} says it throws ${never[1]}`,
+      `Check catches ${never[1]} around a call, as the task says it may be thrown, and Java says that call can never throw it: the method's first line does not say throws ${never[1]}. A checked exception has to be named there.`,
+      asIs
+    )
+  const notThrowable = /^incompatible types: (\w+) cannot be converted to Throwable/.exec(msg)
+  if (notThrowable)
+    return fail(
+      `${notThrowable[1]} is an exception`,
+      `Check throws and catches ${an(notThrowable[1])}, as the task says it can, and Java says ${an(notThrowable[1])} is not something that can be thrown. A class is an exception only when its first line says which exception class it extends.`,
+      asIs
+    )
+  const notCloseable = /try-with-resources not applicable to variable type/.test(msg)
+  if (notCloseable)
+    return fail(
+      `${label(n)} can be closed by try`,
+      'Check opens your class in a try with resources, as the task says it can, and Java says it cannot close it there: only a class that implements AutoCloseable can.',
+      asIs
+    )
+  return null
+}
+
+// Errors exceptions bring, read first in those issues.
+const EXCEPTION_GLOSS = [
+  [
+    /^compiler\.err\.unreported\.exception/,
+    (e) =>
+      /implicit call to close\(\)/.test(e.message)
+        ? "The try with resources closes the resource for you, and that close() says it may throw a checked exception, which nothing here catches or declares."
+        : 'That line can throw a checked exception, and Java insists that every checked exception is either caught around the line or named with throws on the first line of the method. The message names the exception.'
+  ],
+  [
+    /^compiler\.err\.except\.never\.thrown\.in\.try/,
+    () =>
+      'That catch names a checked exception that nothing inside its try can throw, so Java calls it a mistake. Look at what the lines inside the try can really throw.'
+  ],
+  [
+    /^compiler\.err\.except\.already\.caught/,
+    () =>
+      'A catch above this one already catches that exception, because it names the same class or a parent of it, so this one could never run. Put the catch for the more particular exception first.'
+  ],
+  [
+    /^compiler\.err\.var\.might\.not\.have\.been\.initialized/,
+    () =>
+      'A variable given its value inside a try may have no value after it: when the line in the try fails, the rest of the try is skipped. Give it a value on every way through, the catch included, or use it inside the try.'
+  ],
+  [
+    /^compiler\.err\.unreachable\.stmt/,
+    () => 'A throw ends the method there, like a return, so a line straight after it can never run.'
+  ],
+  [
+    /^compiler\.err\.missing\.ret\.stmt/,
+    () =>
+      'A method that gives back a value has to give one back on every way through it, and a catch is a way through too: after the catch, Java found no return.'
+  ],
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) =>
+      /location:\s+variable \w+ of type (?:java\.lang\.)?(?:Exception|Throwable|RuntimeException)\b/.test(e.message) &&
+      'A catch for a parent type holds the exception as that parent, which has only the methods every exception has. To use a method of your own exception, catch it by its own name.'
+  ],
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) =>
+      /symbol:\s+method \w*(?:Exception|Error)\(/.test(e.message) &&
+      'An exception is an object, made with new before it can be thrown: throw on its own does not make one.'
+  ],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /cannot be converted to Throwable/.test(e.message) &&
+      'Only an exception can be thrown or caught: an object of a class that extends Exception, RuntimeException or another exception class.'
+  ],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /try-with-resources not applicable/.test(e.message) &&
+      'Only an object of a class that implements AutoCloseable can go in the round brackets after try.'
+  ],
+  [
+    /^compiler\.err\.try\.without\.catch\.finally\.or\.resource\.decls/,
+    () => 'A try needs a catch, a finally, or resources in round brackets after it.'
+  ],
+  [
+    /^compiler\.err\.call\.must\.be\.first/,
+    () =>
+      "super(...) has to be the very first line of the constructor, so an exception's message has to be worked out inside the round brackets of super(...)."
+  ]
+]
+
+/** True when two pieces of code are the same, comments and spaces aside. */
+export const sameCode = (a, b) => bare(a) === bare(b)
