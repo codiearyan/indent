@@ -1,0 +1,135 @@
+{
+  "id": "maps",
+  "title": "Looking things up with std::map",
+  "files": [
+    "src/stock.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the parts stock here and run it, after you call your functions from main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/stock.cpp -o stock && ./stock"
+  },
+  "tasks": [
+    {
+      "id": "restock",
+      "title": "Restock a part",
+      "file": "src/stock.cpp",
+      "description": "Under `// Task 1` in `src/stock.cpp`, write a function called `restock` that takes the stock as a reference to a `std::map<std::string, int>`, a part as a reference to a `const std::string` and a count as an `int`, and gives nothing back. It adds the count to that part in the caller's stock. A part that is not in the stock yet goes in with that count.\n\nCheck calls `restock` from code of its own with stocks of its own, an empty one included, and reads its stock after the call, so a function that changes a copy is found out.",
+      "nextSteps": [
+        "Write the first line: the stock changes for the caller.",
+        "Add the count to the value under the part's name.",
+        "Think about a part that is not in the stock yet: what does `[]` do then?",
+        "In `main`, restock a part and print its count afterwards."
+      ],
+      "hints": [
+        "The stock changes for the caller, so it is a reference without `const`.",
+        "`stock[part]` is the value under that key, and `[]` puts a missing key in with 0 first, so adding to it works for a new part too.",
+        "The shape is `void restock(std::map<std::string, int>& stock, const std::string& part, int count) { stock[part] += count; }`."
+      ],
+      "docs": [
+        {
+          "title": "std::map",
+          "url": "https://en.cppreference.com/w/cpp/container/map"
+        },
+        {
+          "title": "std::map::operator[]",
+          "url": "https://en.cppreference.com/w/cpp/container/map/operator_at"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Maps in C++",
+          "url": "https://www.youtube.com/watch?v=KiB0vRi2wlc"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "lookup",
+      "title": "Look up a part without adding it",
+      "file": "src/stock.cpp",
+      "description": "Under `// Task 2`, write a function called `countOf` that takes the stock as a reference to a `const std::map<std::string, int>` and a part as a reference to a `const std::string`. It gives back how many of that part are in the stock, as an `int`, or `0` when the part is not in it. Looking a part up leaves the stock as it was: no part is added.\n\nCheck calls `countOf` with stocks and parts of its own, parts that are not there included, and reads what it gives back and its stock afterwards.",
+      "nextSteps": [
+        "Write the first line: two `const` references in, an `int` back.",
+        "Ask whether the part is in the stock, without `[]`.",
+        "When it is not, give back 0.",
+        "When it is, read its count with `.at()` and give it back."
+      ],
+      "hints": [
+        "`[]` adds a key it does not find, so it is refused on a `const` map. Ask first.",
+        "`stock.count(part)` is 1 when the part is there and 0 when it is not. Once you know it is there, `stock.at(part)` reads its value without adding anything.",
+        "The shape is `if (stock.count(part) == 0) { return 0; } return stock.at(part);`."
+      ],
+      "docs": [
+        {
+          "title": "std::map::count",
+          "url": "https://en.cppreference.com/w/cpp/container/map/count"
+        },
+        {
+          "title": "std::map::find",
+          "url": "https://en.cppreference.com/w/cpp/container/map/find"
+        },
+        {
+          "title": "std::map::at",
+          "url": "https://en.cppreference.com/w/cpp/container/map/at"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "print",
+      "title": "Print the stock in order",
+      "file": "src/stock.cpp",
+      "description": "Under `// Task 3`, write a function called `printStock` that takes the stock as a reference to a `const std::map<std::string, int>` and gives nothing back. It prints one line per part, in the map's own order, with the part's name, a colon, a space and the count. An empty stock prints the one line `Drawers empty`. Like this:\n\n```\nbalance wheel: 2\ncrown: 3\n```\n\nCheck calls `printStock` with stocks of its own, an empty one included, and reads what it prints. It only reads the stock, so the caller's stock must be the same afterwards.",
+      "nextSteps": [
+        "Write the first line: a `const` reference to the map in, `void` back.",
+        "Handle the empty stock first.",
+        "Go through the map with a range-based `for`.",
+        "Print each entry's key and value, and end each line."
+      ],
+      "hints": [
+        "A range-based `for` goes through a map in the order of its keys, so there is nothing to sort.",
+        "Each entry is a pair: `.first` is the part's name and `.second` its count.",
+        "The shape is `for (const auto& entry : stock) { std::cout << entry.first << \": \" << entry.second << \"\\n\"; }`, after printing `Drawers empty` for an empty stock."
+      ],
+      "docs": [
+        {
+          "title": "Range-based for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/range-for"
+        },
+        {
+          "title": "std::pair",
+          "url": "https://en.cppreference.com/w/cpp/utility/pair"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "tally",
+      "title": "Count the parts used today",
+      "file": "src/stock.cpp",
+      "description": "Under `// Task 4`, write a function called `tally` that takes the parts used today as a reference to a `const std::vector<std::string>`, one name for each part used, and gives back a `std::map<std::string, int>` with each part's name and how many times it was used. A part that was not used is not in the map. With `{\"crown\", \"mainspring\", \"crown\"}`, the crown is in it twice and the mainspring once.\n\nCheck calls `tally` with lists of its own, an empty one included, and reads the map it gives back and its list afterwards.",
+      "nextSteps": [
+        "Write the first line: a `const` vector in, a map back.",
+        "Make an empty map inside the function.",
+        "Go through the list, and count each part under its name.",
+        "Give the map back, and print it in `main` with your `printStock`."
+      ],
+      "hints": [
+        "The map is new, made inside the function, and given back at the end, like the new vector in the last issue.",
+        "Here `[]` adding a missing key with 0 is just what is wanted: the first time a part is seen it starts at 0, and adding 1 makes it 1.",
+        "The shape is `std::map<std::string, int> counts; for (const auto& part : used) { counts[part]++; } return counts;`."
+      ],
+      "docs": [
+        {
+          "title": "std::map::operator[]",
+          "url": "https://en.cppreference.com/w/cpp/container/map/operator_at"
+        },
+        {
+          "title": "Increment and decrement operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_incdec"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

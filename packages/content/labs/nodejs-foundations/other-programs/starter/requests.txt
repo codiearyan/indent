@@ -1,0 +1,4 @@
+# One request on each line: the method, then the address. Write a space in an address as %20.
+GET /report?month=2026-06
+GET /report?month=2026-08
+GET /report?month=June

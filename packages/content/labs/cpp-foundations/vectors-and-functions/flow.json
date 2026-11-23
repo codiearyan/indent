@@ -1,0 +1,91 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dorrit", "label": "Dorrit at the counter", "kind": "story" },
+      { "id": "shelf", "label": "Pickup shelf", "kind": "data" },
+      { "id": "funcs", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "customer", "label": "Customer", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dorrit", "to": "funcs", "label": "a question" },
+      { "from": "shelf", "to": "funcs", "label": "the names" },
+      { "from": "funcs", "to": "compiler", "label": "builds" },
+      { "from": "compiler", "to": "customer", "label": "an answer" }
+    ],
+    "note": "Each function says in its first line whether it only reads the shelf, changes it, or hands back a new list."
+  },
+  "tasks": {
+    "find": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->funcs"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the shelf", "a name"] },
+          "note": "A customer rings, and Dorrit asks whether their name is on the shelf."
+        },
+        {
+          "active": ["shelf", "shelf->funcs", "funcs"],
+          "note": "The function reads the shelf where it is, one name at a time, without copying it."
+        },
+        {
+          "active": ["funcs->compiler", "compiler->customer", "customer"],
+          "value": { "kind": "array", "label": "comes back", "values": ["yes or no"] },
+          "note": "The answer is yes as soon as the name turns up, and no only after the last name."
+        }
+      ]
+    },
+    "shelve": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->funcs"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the shelf", "names that arrived"] },
+          "note": "A batch of mended clocks arrives, with a list of names."
+        },
+        {
+          "active": ["shelf", "shelf->funcs", "funcs"],
+          "note": "The shelf itself changes, while the list of arrivals is only read."
+        },
+        {
+          "active": ["shelf"],
+          "note": "Every new name is at the end of the shelf, in the order it arrived."
+        }
+      ]
+    },
+    "letter": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->funcs"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the shelf", "a first letter"] },
+          "note": "Dorrit only remembers the first letter of a name."
+        },
+        {
+          "active": ["shelf", "shelf->funcs", "funcs"],
+          "note": "The function builds a new list of its own from the shelf, and leaves the shelf alone."
+        },
+        {
+          "active": ["funcs->compiler", "compiler->customer", "customer"],
+          "value": { "kind": "array", "label": "comes back", "values": ["a new list of names"] },
+          "note": "Dorrit gets a short list to read out, in shelf order."
+        }
+      ]
+    },
+    "read": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->funcs"],
+          "value": { "kind": "array", "label": "typed", "values": ["ticket", "ticket", "...", "0"] },
+          "note": "Dorrit types the morning's ticket numbers and a 0 when she is done."
+        },
+        {
+          "active": ["funcs"],
+          "note": "The function reads one number at a time and stops at the 0."
+        },
+        {
+          "active": ["funcs->compiler", "compiler"],
+          "value": { "kind": "array", "label": "comes back", "values": ["the tickets, without the 0"] },
+          "note": "A new list of tickets comes back, ready for the rest of the program."
+        }
+      ]
+    }
+  }
+}

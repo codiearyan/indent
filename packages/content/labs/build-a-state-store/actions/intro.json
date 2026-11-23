@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Two lines for the same invites?", "note": "On an invoice." },
+    { "title": "Order screen", "text": "Four copies of the code that adds a line.", "note": "And no word while it waits." },
+    {
+      "title": "Your actions",
+      "file": "order-actions.js",
+      "mine": true,
+      "gap": "Changes without names",
+      "tasks": ["Actions by the state", "Name basket changes", "An action that waits"]
+    },
+    { "title": "Idris's books", "text": "One line per item, and a total that waits." }
+  ],
+  "ticket": { "label": "Invites again", "wrong": "two lines", "why": "Four ways", "right": "one line" },
+  "captions": [
+    "Idris finds an invoice with two lines for the same invites, and asks why.",
+    "The code that adds to the basket was written four times, four ways.",
+    "You give every change a name beside the state, and one that waits, in three tasks.",
+    "Now ordering invites again adds to their line, and the total says when it waits.",
+    "Every change to the order has one name and one home, written once."
+  ]
+}

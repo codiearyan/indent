@@ -1,0 +1,131 @@
+{
+  "id": "two-names-one-list",
+  "title": "Two names, one list",
+  "files": [
+    "search_board.py"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see which of your functions change the search board and which leave it alone.",
+    "suggestedCommand": "python3 search_board.py"
+  },
+  "tasks": [
+    {
+      "id": "added",
+      "title": "What if we add a square",
+      "file": "search_board.py",
+      "description": "Under `# Task 1` in `search_board.py`, write a function called `with_square` that takes a list of squares and one more square, and gives back a new list with that square at the end. For tonight's board and `\"E7\"`, it gives back the six squares and then `E7`. It leaves the list it is given as it was: Ailsa is only asking what if. Print what it gives back for `board` and `\"E7\"`, then print `board`.\n\nCheck calls `with_square` with lists of its own and looks at what it gives back and at the list it gave it afterwards, which must be as it was.",
+      "nextSteps": [
+        "Read the parts of the lesson on two names for one list and on new lists.",
+        "Make a new list that holds the squares and the new one.",
+        "Give it back, without changing the list the function was given.",
+        "Print what it gives back, then `board`, and check `board` has no `E7`."
+      ],
+      "hints": [
+        "`append` would change the caller's list, and so would `append` on a second name made with `=`. The task wants a new list.",
+        "`+` between two lists gives back a new list with the items of both, and changes neither. A single square can be made into a list of one.",
+        "The shape is `return squares + [square]`."
+      ],
+      "docs": [
+        {
+          "title": "Why did changing one list change another?",
+          "url": "https://docs.python.org/3/faq/programming.html#why-did-changing-list-y-also-change-list-x"
+        },
+        {
+          "title": "Common sequence operations",
+          "url": "https://docs.python.org/3/library/stdtypes.html#common-sequence-operations"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Values that can change and values that cannot",
+          "url": "https://www.youtube.com/watch?v=2pCxRTu5SHc"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "crossed",
+      "title": "Cross off a square",
+      "file": "search_board.py",
+      "description": "Under `# Task 2`, write a function called `cross_off` that takes a list of squares and a square, and takes that square out of that same list, so the board everyone reads changes. When the square is not on the list, the list stays as it was. It gives nothing back. Call it for `board` and `\"C3\"`, then print `board`.\n\nCheck calls `cross_off` with lists and squares of its own, one square not on its list, and looks at the list it gave it afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on functions that change a list.",
+        "Ask whether the square is on the list.",
+        "When it is, take it out of the list the function was given.",
+        "Call it for `board` and print `board`, then call it with a square that is not there."
+      ],
+      "hints": [
+        "This time the caller's list must change. A new list given back, or a new list given to the parameter with `=`, leaves the board as it was.",
+        "A method called on the parameter changes the caller's list. Taking out a value that is not there stops with an error, so ask first.",
+        "The shape is `if square in squares:` with `squares.remove(square)` under it."
+      ],
+      "docs": [
+        {
+          "title": "More on lists",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#more-on-lists"
+        },
+        {
+          "title": "Functions with output parameters",
+          "url": "https://docs.python.org/3/faq/programming.html#how-do-i-write-a-function-with-output-parameters-call-by-reference"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "draft",
+      "title": "A draft for the next team",
+      "file": "search_board.py",
+      "description": "Under `# Task 3`, write a function called `draft_order` that takes a list of squares and one square on it, and gives back a copy of the list with that square moved to the front and the others in their order. For tonight's board and `\"D1\"`, it gives back `D1` and then the other five. It leaves the list it is given as it was. Print what it gives back for `board` and `\"D1\"`, then print `board`.\n\nCheck calls `draft_order` with lists and squares of its own and looks at what it gives back and at the list it gave it afterwards, which must be as it was.",
+      "nextSteps": [
+        "Read the part of the lesson on copies.",
+        "Make a copy of the list first, under a new name.",
+        "Move the square to the front of the copy, the way you moved the leader in the call-out list.",
+        "Give back the copy, and print `board` to check it did not move."
+      ],
+      "hints": [
+        "Moving a square changes a list. Make the change on a copy, so the board stays as it was.",
+        "A second name made with `=` is not a copy. A copy is made by a method of the list, by a slice of all of it, or by `list()`.",
+        "The shape is `draft = squares.copy()`, then `draft.remove(first)` and `draft.insert(0, first)`, then `return draft`."
+      ],
+      "docs": [
+        {
+          "title": "How do I copy an object?",
+          "url": "https://docs.python.org/3/faq/programming.html#how-do-i-copy-an-object-in-python"
+        },
+        {
+          "title": "Mutable sequence types",
+          "url": "https://docs.python.org/3/library/stdtypes.html#mutable-sequence-types"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cleared",
+      "title": "Clear what was searched",
+      "file": "search_board.py",
+      "description": "Under `# Task 4`, write a function called `clear_searched` that takes a list of squares and a list of squares that have been searched, and takes every searched square out of the first list, that same list. It gives nothing back, and it leaves the list of searched squares as it was. Call it for `board` and `[\"B4\", \"B5\"]`, then print `board`: both squares should be gone.\n\nCheck calls `clear_searched` with lists of its own, some with searched squares side by side, and looks at both lists it gave it afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on changing a list while you loop over it.",
+        "Write the loop that goes through the squares and takes out each searched one, and run the file.",
+        "If a searched square is still on the board, ask which square the loop was on when it took one out.",
+        "Let the loop go through something that does not change, and change the board itself."
+      ],
+      "hints": [
+        "Run it for `[\"B4\", \"B5\"]` and look at `board`: is `B5` gone?",
+        "When a for loop takes an item out of the list it is going through, the rest move along one place and the loop skips the next one. Go through a copy of the list, and take the squares out of the original.",
+        "The shape is `for square in squares.copy():` with `if square in searched:` and `squares.remove(square)` inside."
+      ],
+      "docs": [
+        {
+          "title": "for statements",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#for-statements"
+        },
+        {
+          "title": "How do I copy an object?",
+          "url": "https://docs.python.org/3/faq/programming.html#how-do-i-copy-an-object-in-python"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhona", "label": "Rhona", "kind": "story" },
+      { "id": "map", "label": "Map and radio log", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "teams", "label": "Teams on the hill", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "rhona", "to": "functions", "label": "asks" },
+      { "from": "map", "to": "functions", "label": "pairs of values" },
+      { "from": "functions", "to": "teams", "label": "positions, orders" }
+    ],
+    "note": "Values that belong together travel as tuples, and your functions take them apart by name instead of guessing which number is which."
+  },
+  "tasks": {
+    "range": {
+      "steps": [
+        { "active": ["map", "map->functions", "functions"], "note": "The route is a list of heights, one for each point on the way." },
+        { "active": ["functions"], "note": "Two answers are worked out: the lowest point and the highest." },
+        {
+          "active": ["functions", "functions->teams", "teams"],
+          "value": { "kind": "array", "label": "what comes back, as one tuple", "values": ["lowest", "highest"] },
+          "note": "Both come back together, in one value, always in the same order."
+        }
+      ]
+    },
+    "moved": {
+      "steps": [
+        {
+          "active": ["map", "map->functions", "functions"],
+          "value": { "kind": "array", "label": "a grid reference", "values": ["east", "north"] },
+          "note": "The casualty's position is a grid reference, and they have drifted down the hill."
+        },
+        { "active": ["functions"], "note": "The old position is taken apart into its two numbers, each moved by its own distance." },
+        { "active": ["functions", "functions->teams", "teams"], "note": "A new grid reference goes out on the radio; the old one is never changed." }
+      ]
+    },
+    "lines": {
+      "steps": [
+        { "active": ["rhona", "rhona->functions", "functions"], "note": "Rhona has a list of teams and a list of squares, in the same order." },
+        { "active": ["functions"], "note": "The two lists are gone through side by side, one team and its square on each round." },
+        { "active": ["functions", "functions->teams", "teams"], "note": "Each team gets one line telling it where to go." }
+      ]
+    },
+    "heard": {
+      "steps": [
+        {
+          "active": ["map", "map->functions", "functions"],
+          "value": { "kind": "array", "label": "each call in the log", "values": ["time", "call sign"] },
+          "note": "The radio log is a list of calls in the order they came."
+        },
+        { "active": ["functions"], "note": "Each call is taken apart into its time and its call sign, and a later match replaces an earlier one." },
+        { "active": ["functions", "functions->teams", "teams"], "note": "The time of the last call comes back, or nothing if the team never called." }
+      ]
+    }
+  }
+}

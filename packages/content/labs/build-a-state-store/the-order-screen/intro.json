@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "The count is wrong again.", "note": "On the React screen." },
+    { "title": "Old screen", "text": "Five pieces of state, and a count by hand.", "note": "Every change draws it all." },
+    {
+      "title": "Your code",
+      "file": "use-store.js",
+      "mine": true,
+      "gap": "React cannot see the store",
+      "tasks": ["Write useStore", "Draw on its own part", "Screen on the store"]
+    },
+    { "title": "Order screen", "rows": [["Header", "count matches"], ["Basket", "same lines"]], "mark": 0 }
+  ],
+  "ticket": { "label": "Cards again", "wrong": "says 3", "why": "Kept by hand", "right": "matches" },
+  "captions": [
+    "Hesper adds cards on the React order screen, and the header says three lines for two.",
+    "The screen keeps its own copies of the order, and the count is kept by hand.",
+    "You join React to your store with a hook, then rebuild the screen on it, in three tasks.",
+    "Now the header's count comes from the one basket, and it matches.",
+    "One store, a screen that draws only what changed, and code the shop can explain."
+  ]
+}

@@ -1,0 +1,8 @@
+# One request on each line: the method, then the address.
+# Put an address with ? in it here as it is: this file is not read by a shell.
+GET /
+GET /plots
+GET /free
+GET /free?row=B
+GET /gate
+POST /plots

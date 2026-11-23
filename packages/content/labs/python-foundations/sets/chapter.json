@@ -1,0 +1,135 @@
+{
+  "id": "sets",
+  "title": "Sets",
+  "files": [
+    "call_signs.py"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see tonight's call signs and the weekend rotas compared.",
+    "suggestedCommand": "python3 call_signs.py"
+  },
+  "tasks": [
+    {
+      "id": "different",
+      "title": "How many teams called in",
+      "file": "call_signs.py",
+      "description": "Under `# Task 1` in `call_signs.py`, write a function called `different_signs` that takes a list of call signs as they were heard, some of them more than once, and gives back how many different call signs there are. For tonight it gives back `4`. Print what it gives back for `heard`.\n\nCheck calls `different_signs` with lists of its own, an empty one too, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on what a set is.",
+        "Make a set from the list.",
+        "Give back how many items the set holds.",
+        "Print it for `heard` and compare it with `len(heard)`."
+      ],
+      "hints": [
+        "A set holds each value once, however many times it was added.",
+        "`set()` makes a set from a list, and `len` tells how many items a set holds.",
+        "The shape is `return len(set(calls))`."
+      ],
+      "docs": [
+        {
+          "title": "Sets",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#sets"
+        },
+        {
+          "title": "Set types",
+          "url": "https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "repeat",
+      "title": "The first call heard twice",
+      "file": "call_signs.py",
+      "description": "Under `# Task 2`, write a function called `first_repeat` that takes a list of call signs as they were heard, and gives back the first call sign that is heard for a second time, or `None` when no call sign is heard twice. For tonight it gives back `Bravo two`. Keep the call signs heard so far in a set. Print what it gives back for `heard`.\n\nCheck calls `first_repeat` with lists of its own and looks at what it gives back. In one of them, the call sign heard first is not the first to be heard again.",
+      "nextSteps": [
+        "Read the part of the lesson on a set for what you have seen.",
+        "Start an empty set before the loop.",
+        "For each call sign, ask whether it is in the set already: if so, that is the answer.",
+        "If not, add it to the set. After the loop, give back `None`."
+      ],
+      "hints": [
+        "Go through the calls in order and remember each one you have heard. The first call you already remember is the answer.",
+        "An empty set is made with `set()`, not `{}`. `in` asks whether a value is in it, and `add` puts one in. Ask before you add.",
+        "The shape is `seen = set()`, then `for call in calls:` with `if call in seen:` and `return call`, then `seen.add(call)`, and `return None` after the loop."
+      ],
+      "docs": [
+        {
+          "title": "Sets",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#sets"
+        },
+        {
+          "title": "set.add()",
+          "url": "https://docs.python.org/3/library/stdtypes.html#set.add"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "both",
+      "title": "On both rotas",
+      "file": "call_signs.py",
+      "description": "Under `# Task 3`, write a function called `on_both` that takes two rotas, two lists of names, and gives back a set of the names that are on both. For Friday and Saturday it gives back a set of `Rhona` and `Kirsty`, in whatever order Python prints it. Print what it gives back for `friday` and `saturday`.\n\nCheck calls `on_both` with rotas of its own and looks at what it gives back: a set, compared whatever its order.",
+      "nextSteps": [
+        "Read the part of the lesson on comparing two sets.",
+        "Make a set from each rota.",
+        "Give back the set of the names that are in both.",
+        "Print it, and run the file twice: the order may change, the names do not."
+      ],
+      "hints": [
+        "Two sets can be combined in a few ways: what is in either, what is in both, what is in one and not the other.",
+        "`&` between two sets gives the items that are in both. It works on sets, so make each list a set first.",
+        "The shape is `return set(first) & set(second)`."
+      ],
+      "docs": [
+        {
+          "title": "Sets",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#sets"
+        },
+        {
+          "title": "set.intersection()",
+          "url": "https://docs.python.org/3/library/stdtypes.html#set.intersection"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Sets and what they are for",
+          "url": "https://www.youtube.com/watch?v=sBvaPopWOmQ"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "unknown",
+      "title": "Call signs we do not know",
+      "file": "call_signs.py",
+      "description": "Under `# Task 4`, write a function called `unknown_signs` that takes a list of call signs heard and a list of call signs the team knows, and gives back a list of the call signs heard that are not known, each once, in alphabetical order. For tonight it gives back `['Delta four']`. Print what it gives back for `heard` and `known`.\n\nCheck calls `unknown_signs` with lists of its own, one with an unknown call sign heard twice, and looks at what it gives back: a list, in alphabetical order.",
+      "nextSteps": [
+        "Read the parts of the lesson on comparing two sets and on putting a set in order.",
+        "Make a set of what was heard and a set of what is known.",
+        "Take away the known ones from the heard ones.",
+        "Give back the rest as a list in alphabetical order."
+      ],
+      "hints": [
+        "A set has no order, so the order comes at the end, from turning the set into a sorted list.",
+        "`-` between two sets gives the items of the first that are not in the second. `sorted` takes a set and gives back a list in order.",
+        "The shape is `return sorted(set(calls) - set(known))`."
+      ],
+      "docs": [
+        {
+          "title": "Sets",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#sets"
+        },
+        {
+          "title": "set.difference()",
+          "url": "https://docs.python.org/3/library/stdtypes.html#set.difference"
+        },
+        {
+          "title": "sorted()",
+          "url": "https://docs.python.org/3/library/functions.html#sorted"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "id": "dictionaries",
+  "title": "Dictionaries",
+  "files": [
+    "store_counts.py"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the store counts, the kit that came back and the hours on each hill.",
+    "suggestedCommand": "python3 store_counts.py"
+  },
+  "tasks": [
+    {
+      "id": "count",
+      "title": "How many are in the store",
+      "file": "store_counts.py",
+      "description": "Under `# Task 1` in `store_counts.py`, write a function called `in_store` that takes the store, a dictionary of each kind of kit and how many there are, and the name of a kind. It gives back how many there are, or `0` when that kind is not in the store at all. For tonight's store it gives back `6` for `\"radio\"` and `0` for `\"flare\"`. It leaves the store as it was. Print both.\n\nCheck calls `in_store` with a store of its own, for kinds in it and a kind that is not, and looks at what it gives back and at the store afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on reading a dictionary.",
+        "Try reading the count with square brackets, for `\"flare\"`, and read the error.",
+        "Use the way of reading a key that lets you say what to give back when it is missing.",
+        "Print it for a kind in the store and one that is not."
+      ],
+      "hints": [
+        "Square brackets read only a key that is there. A key that is missing stops with a `KeyError`.",
+        "A dictionary has a method that reads a key and gives back a value of your choice when the key is missing. Without that value it gives back `None`.",
+        "The shape is `return store.get(kind, 0)`."
+      ],
+      "docs": [
+        {
+          "title": "Dictionaries",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#dictionaries"
+        },
+        {
+          "title": "dict.get()",
+          "url": "https://docs.python.org/3/library/stdtypes.html#dict.get"
+        },
+        {
+          "title": "KeyError",
+          "url": "https://docs.python.org/3/library/exceptions.html#KeyError"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Dictionaries: keys and values",
+          "url": "https://www.youtube.com/watch?v=daefaLgNkw0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "out",
+      "title": "Sign kit out",
+      "file": "store_counts.py",
+      "description": "Under `# Task 2`, write a function called `take_out` that takes the store, a kind of kit that is in it and how many are signed out. It lowers the count of that kind in that same store, and when none are left the kind comes out of the store altogether. It gives nothing back. Call it for `store`, `\"stretcher\"` and 2, then print `store`: the stretchers should be gone.\n\nCheck calls `take_out` with stores of its own and looks at the store it gave it afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on changing a dictionary.",
+        "Give the kind its new count, the old count less the number signed out.",
+        "When the new count is 0, take the kind out of the store.",
+        "Call it twice for the same kind and print the store each time."
+      ],
+      "hints": [
+        "The store is the caller's dictionary, so a change made to it inside the function shows outside. Nothing needs to come back.",
+        "Square brackets with `=` give a key a new value. `del` with the dictionary and the key in square brackets takes the key out.",
+        "The shape is `store[kind] = store[kind] - count`, then `if store[kind] == 0:` with `del store[kind]` under it."
+      ],
+      "docs": [
+        {
+          "title": "Dictionaries",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#dictionaries"
+        },
+        {
+          "title": "The del statement",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#the-del-statement"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "tally",
+      "title": "Count what came back",
+      "file": "store_counts.py",
+      "description": "Under `# Task 3`, write a function called `count_items` that takes a list of kit as it came back off the hill and gives back a new dictionary of each kind and how many times it is on the list. For tonight's list it gives back `{'rope': 3, 'radio': 1, 'splint': 1}`, and for an empty list an empty dictionary. It leaves the list as it was. Print what it gives back for `returned`.\n\nCheck calls `count_items` with lists of its own and looks at what it gives back. The order of the keys does not matter.",
+      "nextSteps": [
+        "Read the part of the lesson on counting with a dictionary.",
+        "Start an empty dictionary before the loop.",
+        "For each item, add 1 to its count if it is a key already, or give it a count of 1 if it is not.",
+        "Give back the dictionary after the loop."
+      ],
+      "hints": [
+        "The first time a kind comes round it is not a key yet, so adding 1 to its count would stop with a `KeyError`.",
+        "Ask with `in` whether the kind is a key. If it is, add 1 to its count; if not, give it a count of 1.",
+        "The shape is `counts = {}`, then `for item in items:` with `if item in counts:` and `counts[item] = counts[item] + 1`, and `else:` with `counts[item] = 1`."
+      ],
+      "docs": [
+        {
+          "title": "Dictionaries",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#dictionaries"
+        },
+        {
+          "title": "Mapping types: dict",
+          "url": "https://docs.python.org/3/library/stdtypes.html#dict"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "low",
+      "title": "Running low",
+      "file": "store_counts.py",
+      "description": "Under `# Task 4`, write a function called `running_low` that takes the store and a smallest number, and gives back a list of the kinds with fewer than that many, in the order they are in the store. For a store of `{\"rope\": 9, \"radio\": 6, \"head torch\": 14}` and 7 it gives back `['radio']`. Go through the store with `.items()`. It leaves the store as it was. Print what it gives back for `store` and 7.\n\nCheck calls `running_low` with a store and numbers of its own, one count exactly on the number, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on going through a dictionary.",
+        "Make an empty list for the kinds running low.",
+        "Go through the store with `.items()`, a kind and its count on each round.",
+        "Add the kind when its count is fewer than the number, and give back the list."
+      ],
+      "hints": [
+        "Going through a dictionary itself gives only its keys. You need each key with its count.",
+        "`.items()` gives each key and its value as a pair, and two names after `for` take each pair apart. Fewer than does not include the number itself.",
+        "The shape is `for kind, count in store.items():` with `if count < smallest:` and `low.append(kind)` inside, after `low = []`."
+      ],
+      "docs": [
+        {
+          "title": "Looping techniques",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#looping-techniques"
+        },
+        {
+          "title": "dict.items()",
+          "url": "https://docs.python.org/3/library/stdtypes.html#dict.items"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hours",
+      "title": "Hours on one hill",
+      "file": "store_counts.py",
+      "description": "Under `# Task 5`, write a function called `hours_on` that takes a list of callouts, each a dictionary with the keys `\"hill\"`, `\"hours\"` and `\"crew\"`, and the name of a hill. It gives back the hours of all the callouts on that hill added up, or `0` when there were none. For tonight's callouts and `\"Carn Dubh\"` it gives back `5`. Print what it gives back for `callouts` and `\"Carn Dubh\"`.\n\nCheck calls `hours_on` with callouts and hills of its own and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on a list of dictionaries.",
+        "Start a total at 0 before the loop.",
+        "Go through the callouts; each one is a dictionary, so read its hill with square brackets.",
+        "When the hill matches, add that callout's hours to the total."
+      ],
+      "hints": [
+        "The loop gives one callout, one dictionary, on each round. Read its values by their keys, spelt exactly as in the list.",
+        "Compare the callout's `\"hill\"` with the hill the function was given, and add its `\"hours\"` to a total that starts before the loop.",
+        "The shape is `total = 0`, then `for callout in callouts:` with `if callout[\"hill\"] == hill:` and `total = total + callout[\"hours\"]` inside, and `return total` after the loop."
+      ],
+      "docs": [
+        {
+          "title": "Dictionaries",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#dictionaries"
+        },
+        {
+          "title": "for statements",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#for-statements"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

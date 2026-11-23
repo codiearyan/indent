@@ -1,0 +1,93 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "phone", "label": "Phone at the gate", "kind": "story" },
+      { "id": "server", "label": "server.js", "kind": "file", "mine": true },
+      { "id": "plots", "label": "plots.txt", "kind": "data" },
+      { "id": "laptop", "label": "Shed laptop", "kind": "story" },
+      { "id": "rhiannon", "label": "Rhiannon", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "phone", "to": "server", "label": "request" },
+      { "from": "plots", "to": "server", "label": "plot list" },
+      { "from": "server", "to": "phone", "label": "answer" },
+      { "from": "laptop", "to": "server", "label": "port setting" },
+      { "from": "rhiannon", "to": "plots", "label": "edits" }
+    ],
+    "note": "server.js runs on the shed laptop and answers anyone who opens its address with the free plots, read from the list Rhiannon keeps."
+  },
+  "tasks": {
+    "answer": {
+      "steps": [
+        {
+          "active": ["laptop", "laptop->server", "server"],
+          "note": "The server starts, takes its port from the setting, listens, and says where."
+        },
+        {
+          "active": ["phone", "phone->server", "server"],
+          "note": "Someone at the gate opens the address, and a request reaches the server."
+        },
+        {
+          "active": ["rhiannon", "rhiannon->plots", "plots", "plots->server", "server"],
+          "note": "The server reads the plot list as it is right now, Rhiannon's latest changes included."
+        },
+        {
+          "active": ["server", "server->phone", "phone"],
+          "note": "It ends the answer with the free plots as its body, and the phone shows them."
+        }
+      ]
+    },
+    "kind": {
+      "steps": [
+        {
+          "active": ["phone", "phone->server", "server"],
+          "note": "A request comes in, as before."
+        },
+        {
+          "active": ["plots", "plots->server", "server"],
+          "note": "If the plot list can be read, the answer is a success and says it is plain text."
+        },
+        {
+          "active": ["server", "plots"],
+          "note": "If it cannot, the server catches the error and answers with a failure status and one plain line."
+        },
+        {
+          "active": ["server", "server->phone", "phone"],
+          "note": "Either way the server keeps running for the next visitor."
+        }
+      ]
+    },
+    "port": {
+      "steps": [
+        {
+          "active": ["laptop", "laptop->server", "server"],
+          "note": "The server reads the port setting, and uses a default when it is missing or empty."
+        },
+        {
+          "active": ["server"],
+          "note": "A setting that is not a port is refused in one line, before the server listens."
+        },
+        {
+          "active": ["laptop", "server"],
+          "note": "If another program already holds the port, the server says which port in one line and ends."
+        }
+      ]
+    },
+    "stop": {
+      "steps": [
+        {
+          "active": ["server", "server->phone", "phone"],
+          "note": "The server is answering visitors when Rhiannon presses Ctrl+C on the laptop."
+        },
+        {
+          "active": ["laptop", "server"],
+          "note": "A listener for the signal closes the server instead of ending the script on the spot."
+        },
+        {
+          "active": ["server"],
+          "note": "Once the last answer has gone, it says it has stopped, and the script ends by itself."
+        }
+      ]
+    }
+  }
+}

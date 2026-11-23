@@ -1,0 +1,76 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "screen", "label": "Order screen", "kind": "story" },
+      { "id": "state", "label": "Order state", "kind": "data" },
+      { "id": "watch", "label": "watch()", "kind": "function", "mine": true },
+      { "id": "shallow", "label": "shallowEqual()", "kind": "function", "mine": true, "fn": "shallowEqual" },
+      { "id": "header", "label": "Header", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "screen", "to": "state", "label": "a change" },
+      { "from": "state", "to": "watch", "label": "new state" },
+      { "from": "watch", "to": "shallow", "label": "before, now" },
+      { "from": "shallow", "to": "watch", "label": "same or not" },
+      { "from": "watch", "to": "header", "label": "its part" }
+    ],
+    "note": "Each part of the screen watches only the part of the state it shows, and is drawn again only when that part changed."
+  },
+  "tasks": {
+    "watch": {
+      "steps": [
+        {
+          "active": ["screen", "screen->state", "state"],
+          "note": "A customer types a note, and the state changes."
+        },
+        {
+          "active": ["state", "state->watch", "watch"],
+          "value": { "kind": "map", "label": "the header's part", "entries": [{ "key": "count", "value": "length of the basket" }] },
+          "note": "watch runs the header's selector on the new state, and compares the count with the one it saw last."
+        },
+        {
+          "active": ["watch", "watch->header", "header"],
+          "note": "The header hears only when its count changed, with the new count and the one before. A note is not a new count."
+        }
+      ]
+    },
+    "equal": {
+      "steps": [
+        {
+          "active": ["state", "state->watch", "watch"],
+          "note": "The summary line's selector builds a new object of lines and paper on every change."
+        },
+        {
+          "active": ["watch", "watch->shallow", "shallow", "shallow->watch"],
+          "note": "A new object is never the same object, so watch asks the isEqual it was given instead: the part before first, the new part second."
+        },
+        {
+          "active": ["watch", "watch->header", "header"],
+          "note": "Only when isEqual says the parts differ is the summary drawn again."
+        }
+      ]
+    },
+    "shallow": {
+      "steps": [
+        {
+          "active": ["shallow"],
+          "value": { "kind": "map", "label": "two summaries", "entries": [{ "key": "lines", "value": "a number in each" }, { "key": "paper", "value": "a text in each" }] },
+          "note": "shallowEqual gets the summary before and the summary now, two different objects."
+        },
+        {
+          "active": ["shallow"],
+          "note": "It checks that both have the same keys, then compares each value with Object.is, one level down and no further."
+        },
+        {
+          "active": ["shallow", "shallow->watch", "watch"],
+          "note": "Its answer tells watch whether the summary changed."
+        }
+      ],
+      "trace": {
+        "file": "src/store.js",
+        "call": "shallowEqual",
+        "args": [{ "lines": 2, "paper": "linen" }, { "lines": 2, "paper": "linen" }]
+      }
+    }
+  }
+}
