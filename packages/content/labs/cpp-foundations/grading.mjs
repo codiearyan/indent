@@ -2842,7 +2842,7 @@ function classCause(errors, ctx, spec) {
   if ((/only constructors take (?:base|member) initializers|C\+\+ requires a type specifier for all declarations|forbids declaration of '\w+' with no type/.test(text) || new RegExp(`^\\s*${C}\\s*\\(`).test(source)) && ctx.file && !isHeader(ctx.file) && !spec.inClass?.includes(ctx.file)) {
     return `${ctx.file} writes the constructor without ${C}:: in front. Outside the class, the constructor's name is written with the class's name and :: before it, as for every member function: ${C}::${C}.`
   }
-  if (fromCheck && new RegExp(`'${C}'`).test(text) && /undeclared identifier|unknown type name|does not name a type|has not been declared|was not declared/.test(text)) {
+  if (fromCheck && new RegExp(`(?:undeclared identifier|unknown type name) '${C}'|'${C}' (?:does not name a type|has not been declared|was not declared)`).test(text)) {
     return `Check cannot find class ${C}. ${label} writes it in ${spec.files.find(isHeader) ?? spec.files[0]}, with exactly that name.`
   }
   if (unknownName && members.includes(unknownName) && ctx.file && !isHeader(ctx.file)) {
@@ -2903,8 +2903,10 @@ function classCause(errors, ctx, spec) {
     return `The line that defines ${C}::${m} is written inside the class. The class only declares a static member; its definition, with its type, ${C}::${m} and its first value, goes below the class, after its };.`
   }
   const twiceMember = /duplicate member '(\w+)'|redeclaration of '([^']+)'|'([^']+)' conflicts with a previous declaration/.exec(text)
-  if (twiceMember) {
-    const m = twiceMember[1] ?? nameIn(twiceMember[2] ?? twiceMember[3])
+  const twiceName = twiceMember && (twiceMember[1] ?? nameIn(twiceMember[2] ?? twiceMember[3]))
+  // In Check's own code a redeclaration follows from another error, such as a missing member.
+  if (twiceMember && (!fromCheck || members.includes(twiceName))) {
+    const m = twiceName
     return `${m} is declared twice in ${C}, and each member is declared once. Check builds ${label} with the members of the other tasks written as they ask, so declare ${m} only under the task that names it.`
   }
   const missing = /no member named '(\w+)' in '(?:const )?(\w+)'|'(?:const )?class (\w+)' has no member named '(\w+)'/.exec(text)
