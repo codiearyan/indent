@@ -3,7 +3,7 @@
     {
       "title": "Bridie",
       "say": "Thirty bookings, thirty seconds.",
-      "note": "The office takes three calls at once."
+      "note": "The office takes a few calls at once."
     },
     {
       "title": "Old program",
@@ -15,14 +15,14 @@
       "mine": true,
       "gap": "One call at a time",
       "tasks": [
-        "Confirm with three",
+        "Confirm at once",
         "Go past a failure",
         "Keep one pool a day"
       ]
     },
     {
       "title": "Harbour office",
-      "say": "Three at a time, all confirmed.",
+      "say": "All confirmed before it fills.",
       "note": "A dropped call is named."
     }
   ],
@@ -35,8 +35,8 @@
   "captions": [
     "Morning at the hut. The harbour office sends Bridie the day's bookings to confirm.",
     "The old program confirms them one at a time, and the boat fills while she waits.",
-    "You hand the bookings to a pool of three threads and read each answer from its future.",
-    "Three calls at a time, the bookings are confirmed, and a failed one is reported.",
-    "Bridie's bookings are confirmed in a third of the time, with every failure named."
+    "You share the bookings out over a few threads at once and read every answer.",
+    "The calls go out together, the bookings are confirmed, and a failed one is reported.",
+    "Bridie's bookings are confirmed before the boat fills, with every failure named."
   ]
 }

@@ -343,7 +343,7 @@ export const checks = tasks({
           call: `Careful.confirmEach(pool, ${list(BOOKINGS.five)}, office, problems)`,
           type: 'java.util.List<String>',
           show: `ExecutorService pool = Check's pool of two;\nOffice office = Check's office, which fails "Mr Lamont, 1" and "Mrs Oag, 2", and holds every job until confirmEach waits for an answer;\nList<String> problems = new ArrayList<>();\nList<String> got = Careful.confirmEach(pool, List.of(${BOOKINGS.five.map(text).join(', ')}), office, problems);`,
-          after: { 'problems afterwards': 'problems', 'the pool left open': '!pool.shut', 'calls of confirm': 'office.calls', 'jobs handed to the pool it was given': 'pool.handed()', 'jobs handed over when the first answer was awaited': 'office.handedWhenWaiting' },
+          after: { 'problems afterwards': 'problems', 'the pool left open': '!pool.shut', 'calls of confirm': 'office.calls', 'jobs handed to the pool it was given': 'pool.handed()', 'jobs handed over when the first answer was awaited': 'office.handedWhenWaiting', 'confirmed on the calling thread': 'office.onCaller' },
           expected: { got: confirmed(['Dipper party, 4', 'Siskin walkers, 7', 'Breac anglers, 3']), 'problems afterwards': ['Mr Lamont, 1: no answer from the office', 'Mrs Oag, 2: the 10:00 is full'], 'the pool left open': true, 'calls of confirm': 5, 'jobs handed to the pool it was given': 5, 'jobs handed over when the first answer was awaited': 5 },
           kind: 'two',
           hint: 'confirmEach should give back the confirmations of the bookings that worked, in order, and add a problem for each booking that failed: the booking, a colon and a space, and the message of what its job threw.'
@@ -373,6 +373,10 @@ export const checks = tasks({
       ],
       judge: judge(
         [
+          {
+            when: (r) => r.case.kind === 'two' && Number(value(r, 'jobs handed to the pool it was given')) === 0 && value(r, 'confirmed on the calling thread') === 'true',
+            hint: 'The bookings were confirmed one after another on the thread that called confirmEach, and not one job went to the pool it was handed. Each booking becomes a job for that pool, and its answer, or what it threw, comes back through the job\'s future.'
+          },
           {
             when: (r) => r.case.kind === 'two' && Number(value(r, 'jobs handed to the pool it was given')) === 0 && Number(value(r, 'calls of confirm')) > 0,
             hint: 'The bookings were confirmed, and not one job went to the pool confirmEach was handed: it used a pool, or threads, of its own. The caller hands over its pool so that every job runs there, on as many threads as it chose.'

@@ -35,7 +35,7 @@
   "captions": [
     "Boarding at Lanternquay: both gangway scanners send every ticket to the hut.",
     "The plain map loses scans when they meet, and the board falls over mid read.",
-    "You count with a map made for threads, give readers a safe list, and share out labels.",
+    "You make the counts, the board and the labels safe for several threads at once.",
     "Every scan counts, the board reads while it changes, and labels come back in order.",
     "Ossian's counts match the boats, and the day's labels print while cores share the work."
   ]
