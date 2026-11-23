@@ -8,6 +8,9 @@ const EXPLAIN = (error) => {
   if (/^unsupported operand type\(s\) for -: 'str' and 'str'$/.test(m)) {
     return '- cannot take one text from another. Python ran the function with the values it was given, whatever its hints say'
   }
+  if (/^bad operand type for unary -: 'str'$/.test(m)) {
+    return 'a minus sign was put in front of text. Values read from a file are text until int() turns them into a whole number, and the Callout class\'s hint that hours is a whole number does not do that: Python does not check hints'
+  }
   if (/^'(dict|list)' object has no attribute '(hill|hours|date)'$/.test(m)) {
     return 'the rule was handed something that is not one callout. A rule takes one Callout at a time'
   }
@@ -179,13 +182,24 @@ function pickSteps(rows) {
     { code: `season = ${callouts(rows)}`, hidden: `# Check makes season, a list of ${rows.length} Callout objects of its own` },
     { code: 'chosen = pick(season, rule)' },
     {
+      code: 'type(chosen).__name__',
+      want: 'list',
+      hidden: '# Check asks what kind of value pick gave back',
+      hint: (v) =>
+        v === 'NoneType'
+          ? 'pick gives back None: it ends without return.'
+          : v === 'filter' || v === 'generator'
+            ? `pick gives back a ${v}, which has not gone through the callouts yet: it would ask the rule only when something loops over it. The task asks for a new list.`
+            : `pick gives back a ${v}, and the task asks for a new list.`
+    },
+    {
       code: 'seen',
       want: rows.map((r) => r[1]),
       hint: (v) =>
         !Array.isArray(v) || v.length === 0
           ? 'rule was never called. A function handed in runs only when your code calls it, with round brackets and one callout in them.'
-          : v.length === 1 && Array.isArray(v[0])
-            ? 'rule was called once, with the whole list. The task asks to call it with each callout in turn.'
+          : v.every((x) => Array.isArray(x))
+            ? 'rule was handed the whole list. It takes one callout at a time, and the task asks to call it with each callout in turn.'
             : 'rule was not called once for each callout, in order.'
     },
     {
@@ -281,7 +295,7 @@ export const checks = {
 
   between(t) {
     return classCases(t, options(2, 'hours_between', [
-      { name: 'What it does, and its hints', steps: betweenSteps([[6, 20], [9, 13]]) }
+      { name: 'What it does, and its hints', steps: betweenSteps([[6, 20], [9, 13], [22, 5]]) }
     ]))
   },
 

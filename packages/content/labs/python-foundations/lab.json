@@ -1,7 +1,7 @@
 {
   "id": "python-foundations",
   "title": "Python foundations",
-  "description": "Brackenridge Mountain Rescue is a team of volunteers, and its callout log, kit lists and rota live in a notebook and a spreadsheet nobody trusts. You have never written a line of code, and you start there: make the laptop at the base print, count, store and check what the team needs, and learn to read what Python says when something is wrong. Then you teach it to decide and repeat, with if, for and while, and to reuse your work in functions of your own. After that you keep many values at once in lists, tuples, dictionaries and sets, and learn which code changes them and which only reads them. Then you tidy, split and format text, and keep the team's log, kit list and store in files: plain text, CSV and JSON. When things go wrong, you follow a traceback through several calls, catch the errors you expect, raise your own, put things back whatever happens, and hunt down a wrong answer that stops nothing. Then you import what Python already has, split a program into a module of your own, and count days, draw a fair rota and group the log with the standard library. Then you write classes of your own: teams, packs and radio calls that keep their own values and rules, print and compare themselves, kinds of kit built on one another, and records made with dataclasses. Each issue teaches one part of Python in one small program you run yourself in a real terminal.",
+  "description": "Brackenridge Mountain Rescue is a team of volunteers, and its callout log, kit lists and rota live in a notebook and a spreadsheet nobody trusts. You have never written a line of code, and you start there: make the laptop at the base print, count, store and check what the team needs, and learn to read what Python says when something is wrong. Then you teach it to decide and repeat, with if, for and while, and to reuse your work in functions of your own. After that you keep many values at once in lists, tuples, dictionaries and sets, and learn which code changes them and which only reads them. Then you tidy, split and format text, and keep the team's log, kit list and store in files: plain text, CSV and JSON. When things go wrong, you follow a traceback through several calls, catch the errors you expect, raise your own, put things back whatever happens, and hunt down a wrong answer that stops nothing. Then you import what Python already has, split a program into a module of your own, and count days, draw a fair rota and group the log with the standard library. Then you write classes of your own: teams, packs and radio calls that keep their own values and rules, print and compare themselves, kinds of kit built on one another, and records made with dataclasses. Last, you hand functions around like any other value, sort and choose by any rule, read a whole winter's log one line at a time, wrap handlers with decorators of your own, and say in type hints what each function takes and gives back. Each issue teaches one part of Python in one small program you run yourself in a real terminal.",
   "category": "Programming languages",
   "language": "python",
   "tags": ["Python"],
@@ -87,7 +87,8 @@
         "functions-as-values",
         "sorting-and-choosing",
         "generators",
-        "decorators"
+        "decorators",
+        "type-hints"
       ]
     }
   ]

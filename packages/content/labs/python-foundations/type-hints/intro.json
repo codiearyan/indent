@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Will next winter's crew follow it?", "note": "Handing over the season's code." },
+    { "title": "The code", "text": "No word on what any function takes or gives" },
+    {
+      "title": "Your hints",
+      "file": "season_report.py",
+      "mine": true,
+      "gap": "Def lines that say nothing",
+      "tasks": ["Hints on a total", "Hints that tell truth", "A leader, or None", "A rule, the longest"]
+    },
+    { "title": "Next winter", "say": "Every def line says it all.", "note": "Whoever looks after the code next." }
+  ],
+  "ticket": { "label": "The handover", "wrong": "guesswork", "why": "No notes", "right": "clear" },
+  "captions": [
+    "At the end of the season, Rhona hands the code to whoever looks after it next winter.",
+    "Today no def line says what a function takes, and one says the wrong thing.",
+    "You write hints on every function, and the season's report of its longest callouts.",
+    "Now each def line says what goes in and what comes out, and the report is sorted.",
+    "The season closes, and next winter's crew can read the code without guessing."
+  ]
+}
