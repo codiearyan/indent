@@ -9,7 +9,7 @@ export const checks = {
       tokens('Whole numbers', 'whole', "tokenize('[0, 7, 42, 1200]') and tokenize('908')"),
       tokens('A minus in front', 'signs', "tokenize('[-0, -3, -120]') and tokenize('-7')"),
       tokens('Fractions', 'fractions', "tokenize('[3.25, -0.5, 0.125, 10.0]') and tokenize('0.42')"),
-      tokens('Exponents', 'exponents', "tokenize('[1e3, 2E2, 25e-1, -1.5E+3, 6e0]') and tokenize('7.5e-2')"),
+      tokens('Exponents', 'exponents', "tokenize('[1e3, 2E2, 25e-1, -1.5E+3, 6e0]'), tokenize('7.5e-2') and tokenize('[1E+308, -2.5e-300]')"),
       { name: '150 numbers of the check', run: 'many', args: ['numbers', 448], setup: '150 numbers made up by the check, each compared with the built-in reader' },
       refuse('No 0 before more digits', 'zero', "tokenize('[01]'), tokenize('[-007]') and tokenize('00')"),
       refuse('A minus needs a digit', 'minus', "tokenize('[-]'), tokenize('[- 1]') and tokenize('-')"),

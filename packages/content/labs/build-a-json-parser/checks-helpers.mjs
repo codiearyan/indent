@@ -39,7 +39,7 @@ const STUCK = {
   time: (step) =>
     `Your code never finished on ${step}, so the check stopped it after a few seconds. Look for a loop that does not move forward, for example when it meets a character it does not expect.`,
   memory: (step) =>
-    `Your code kept going on ${step} until it ran out of memory. That is a loop that keeps adding tokens or values without moving forward in the text.`,
+    `Your code kept going on ${step} until it ran out of memory. That is a loop that keeps adding tokens or characters and never reaches its end: one that does not move forward, or one that reads past the end of the text.`,
   stack: (step) =>
     `Your code called itself without end on ${step}. A function that calls itself must move forward in the text before each call, and stop at a value that holds nothing more.`
 }
@@ -70,7 +70,7 @@ function blocker(values, unwritten) {
     return {
       name: 'Your own code does the work',
       passed: false,
-      message: `Your code called ${used.builtIn} while the check ran. This repo is about writing that part yourself, so the check does not use code that calls JSON.parse, JSON.stringify or eval.`,
+      message: `Your code called ${used.builtIn} while the check ran. This repo is about writing that part yourself, so the check does not use code that calls JSON.parse, JSON.stringify or eval, or reaches them another way.`,
       output: `${used.builtIn} was called`
     }
   }

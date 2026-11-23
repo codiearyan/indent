@@ -32,7 +32,7 @@
           "note": "Each mark and each word becomes a token that says what it is and where it starts and ends."
         }
       ],
-      "trace": { "file": "src/json.js", "call": "tokenize", "args": ["[true, null]"] }
+      "trace": { "file": "src/json.js", "call": "tokenize", "args": ["[true,null]"] }
     },
     "space": {
       "steps": [

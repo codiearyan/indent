@@ -143,6 +143,7 @@ const cases = {
     if (e.found !== 'end of input') return fail("When the text ends early there is nothing to find: found should be 'end of input'.")
     if (e.at !== text.length) return fail('When the text ends early, at is the length of the text: the place just after its last character, spaces included.')
     if (e.line !== want.line || e.column !== want.column) return fail('at is right, but line and column do not say where the text ends. They come from at the same way as for every other error.')
+    if (!/\bend/i.test(e.message)) return fail('ended, found and the place are right. The message should say the text ended, so a person knows to ask for the file again.')
     return { pass: true, seen }
   },
 

@@ -28,7 +28,7 @@ export const checks = {
       cannot('An array that holds itself', 'list', 'list.push(list), then stringify(list)'),
       cannot('A value that holds itself further down', 'deep', 'order.items[0].order = order, then stringify(order)'),
       { name: 'The same item in several places', run: 'shared', setup: 'stringify({ first: paper, again: [paper, paper] })' },
-      { name: 'A refusal leaves nothing behind', run: 'afterRefusal', setup: 'an object that holds itself, then an item that was inside it', stuck: ROUND }
+      { name: 'A refusal leaves nothing behind', run: 'afterRefusal', setup: 'an order that holds itself, then the same order once it no longer does', stuck: ROUND }
     ], scan)
   },
 

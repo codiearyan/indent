@@ -56,7 +56,10 @@ function tokensNote(lib, step, text) {
   return tokenProblem(r.value, want) ? ' tokenize() gives the wrong tokens for this text, so start there: it belongs to issues 1 and 2.' : ''
 }
 
-function readAll(lib, step, texts) {
+// A sentence to add when a text of this kind reads wrong.
+const RULE = { twice: ' When a key comes twice, the last value wins.' }
+
+function readAll(lib, step, texts, rule = '') {
   for (const text of texts) {
     const r = step(`parse(${quoted(text)})`, () => lib.parse(text))
     const want = builtIn.parse(text)
@@ -69,7 +72,7 @@ function readAll(lib, step, texts) {
     }
     const problem = valueProblem(r.value, want)
     if (problem) {
-      return { pass: false, seen: `parse(${quoted(text)}) gave ${preview(r.value)}`, why: `${problem}${tokensNote(lib, step, text)}` }
+      return { pass: false, seen: `parse(${quoted(text)}) gave ${preview(r.value)}`, why: `${problem}${rule}${tokensNote(lib, step, text)}` }
     }
   }
   return { pass: true, seen: `${texts.length} texts read right` }
@@ -77,7 +80,7 @@ function readAll(lib, step, texts) {
 
 const cases = {
   good({ lib, step }, key) {
-    return readAll(lib, step, GOOD[key])
+    return readAll(lib, step, GOOD[key], RULE[key])
   },
 
   many({ lib, step }, seed) {

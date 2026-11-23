@@ -23,7 +23,7 @@ const TEXTS = {
   whole: ['[0, 7, 42, 1200]', '908'],
   signs: ['[-0, -3, -120]', '-7'],
   fractions: ['[3.25, -0.5, 0.125, 10.0]', '0.42'],
-  exponents: ['[1e3, 2E2, 25e-1, -1.5E+3, 6e0]', '7.5e-2'],
+  exponents: ['[1e3, 2E2, 25e-1, -1.5E+3, 6e0]', '7.5e-2', '[1E+308, -2.5e-300]'],
   plain: ['["card", "", "a, b: [c] {d}"]', q('Cotton card, 300 gsm')],
   escapes: [q(`say ${B}"hi${B}"`), q(`C:${B}${B}prints${B}${B}`), q(`a${B}/b`), q(`${B}b${B}f${B}n${B}r${B}t`)],
   wide: ['["Crème", "📜 scroll", "中"]'],

@@ -2,6 +2,7 @@
 // thread, so a parser that never ends is stopped and named instead of waited on.
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads'
 import { inspect } from 'node:util'
+import { createRequire, syncBuiltinESMExports } from 'node:module'
 
 // Kept before any learner code runs: the check compares with them, and the worker blocks them.
 export const builtIn = { parse: JSON.parse, stringify: JSON.stringify }
@@ -27,9 +28,9 @@ export function quoted(text) {
   return out.length > 140 ? `${out.slice(0, 140)} ...` : out
 }
 
-/** Equal values: numbers by value, arrays place by place, objects by their own keys in any order. */
+/** Equal values: numbers by value (-0 is not 0), arrays place by place, objects by their own keys in any order. */
 export function same(a, b) {
-  if (typeof a === 'number' && typeof b === 'number') return a === b
+  if (typeof a === 'number' && typeof b === 'number') return Object.is(a, b)
   if (a === b) return true
   if (Array.isArray(a) || Array.isArray(b)) {
     return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => same(x, b[i]))
@@ -127,6 +128,15 @@ export async function serve(cases, files = ['json.js']) {
   JSON.parse = blocked('JSON.parse')
   JSON.stringify = blocked('JSON.stringify')
   globalThis.eval = blocked('eval')
+  // A fresh context or another process would hand over a built-in reader the lines above never touched.
+  const require = createRequire(import.meta.url)
+  const vm = require('node:vm')
+  for (const fn of ['runInNewContext', 'runInContext', 'createContext', 'compileFunction']) vm[fn] = blocked(`vm.${fn}`)
+  vm.Script.prototype.runInNewContext = blocked('vm.Script')
+  vm.Script.prototype.runInContext = blocked('vm.Script')
+  const child = require('node:child_process')
+  for (const fn of ['exec', 'execSync', 'execFile', 'execFileSync', 'spawn', 'spawnSync', 'fork']) child[fn] = blocked(`child_process.${fn}`)
+  syncBuiltinESMExports()
   let lib
   try {
     lib = Object.assign({}, ...(await Promise.all(files.map((f) => import(`../src/${f}`)))))
@@ -221,6 +231,12 @@ export function tokenProblem(got, want) {
     if (!same(g.value, w.value) || typeof g.value !== typeof w.value) {
       if (w.type === 'literal' && typeof g.value === 'string') {
         return `Token ${i + 1} holds the text '${g.value}'. A literal's value is the JavaScript value itself, not the word.`
+      }
+      if (w.type === 'number' && typeof g.value === 'number' && g.value !== 0 && Object.is(g.value, -w.value)) {
+        return `Token ${i + 1}, ${name}, has lost its sign. The minus belongs to the number, so its value is below 0.`
+      }
+      if (w.type === 'number' && Object.is(w.value, -0) && Object.is(g.value, 0)) {
+        return `Token ${i + 1}, ${name}, is -0, and it came out as 0. JavaScript keeps the minus of -0; turn the characters as written into the number and it stays.`
       }
       return w.type === 'number'
         ? `Token ${i + 1}, ${name}, has the wrong value. If you add the digits up by hand, the last place can come out wrong; the lesson shows a way that cannot.`

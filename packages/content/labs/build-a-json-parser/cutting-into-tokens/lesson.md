@@ -14,7 +14,7 @@ Ashgrove Press is a letterpress shop with two old presses, run by Hesper. Sefton
 
 > **Idris:** Every third file the import says "Could not read the file", and that is all it says. I phone the supplier, they ask me what is wrong and where, and I have nothing to tell them. Worse, on the days it does read a file, some prices come out wrong and it says nothing at all.
 
-Hesper's rule is that no code stays on the workshop computer unless someone at Ashgrove can explain it. Node has a reader built in, `JSON.parse`, and it is very good. But nobody here can say what it does, so the shop is getting a reader of its own, and you are writing it. Building one is the surest way to understand the built-in one. Because of that, the check refuses any code that calls `JSON.parse`, `JSON.stringify` or `eval`.
+Hesper's rule is that no code stays on the workshop computer unless someone at Ashgrove can explain it. Node has a reader built in, `JSON.parse`, and it is very good. But nobody here can say what it does, so the shop is getting a reader of its own, and you are writing it. Building one is the surest way to understand the built-in one. Because of that, the check refuses any code that calls `JSON.parse`, `JSON.stringify`, `eval` or `new Function`, or reaches the built-in reader another way.
 
 Run `node src/try.js`. The old script reads the paper list but turns `Kraft "natural"` into `Kraft \`, reads the ink supplier's `1.85e1` as `1.85`, and gives up on the card list without a word about why.
 

@@ -63,7 +63,8 @@ function judgeWrite(step, lib, label, value) {
         : `What stringify() wrote for ${label} is not JSON.`
     }
   }
-  const problem = valueProblem(back, value, [], 'the value you were given')
+  // As JSON holds it: -0 is written 0, like every writer does.
+  const problem = valueProblem(back, builtIn.parse(builtIn.stringify(value)), [], 'the value you were given')
   if (problem) return { pass: false, seen, why: `Read back, the text is not the value it was made from. ${problem}` }
   if (spaced(out)) return { pass: false, seen, why: 'With no indent, the text has no space outside the texts: no space after a comma or a colon, and no line breaks.' }
   return { pass: true, seen }
@@ -167,11 +168,11 @@ const cases = {
   },
 
   afterRefusal({ lib, step }) {
-    const paper = { code: 'CT-300' }
-    const loop = { paper, list: [] }
-    loop.list.push(loop)
-    step('stringify(an object that holds itself)', () => lib.stringify(loop), { keepStack: true })
-    return judgeWrite(step, lib, 'an item that was inside it, written next', { paper, more: paper })
+    const order = { code: 'EV-C6', items: [{ code: 'TG-50' }] }
+    order.items[0].order = order
+    step('stringify(an order that holds itself)', () => lib.stringify(order), { keepStack: true })
+    delete order.items[0].order
+    return judgeWrite(step, lib, 'the same order once it no longer holds itself', order)
   },
 
   indent({ lib, step }, seed) {
@@ -196,7 +197,7 @@ const cases = {
       return {
         pass: false,
         seen,
-        why: `Line ${line + 1} of the text is not laid out as the task says. Each item and each pair goes on a line of its own, ${n} more spaces in than its brackets, with a space after each colon and none after a comma, and an empty array or object stays on one line.`
+        why: `Line ${line + 1} of the text is not laid out as the task says. Each item and each pair goes on a line of its own, ${n} more spaces in than its brackets, with a space after each colon, none after a comma and no comma after the last one, and an empty array or object stays on one line.`
       }
     }
     return { pass: true, seen: `${values.length} values written with an indent` }
