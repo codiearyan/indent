@@ -1,0 +1,221 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "odette",
+        "label": "Odette",
+        "kind": "story"
+      },
+      {
+        "id": "screen",
+        "label": "Listings screen",
+        "kind": "story"
+      },
+      {
+        "id": "line",
+        "label": "showLine()",
+        "kind": "function",
+        "mine": true,
+        "fn": "showLine"
+      },
+      {
+        "id": "names",
+        "label": "showNames()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "read",
+        "label": "readJson()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "server",
+        "label": "Cupboard server",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "odette",
+        "to": "screen",
+        "label": "columns"
+      },
+      {
+        "from": "screen",
+        "to": "line",
+        "label": "JSON text"
+      },
+      {
+        "from": "names",
+        "to": "server",
+        "label": "request"
+      },
+      {
+        "from": "read",
+        "to": "server",
+        "label": "request"
+      },
+      {
+        "from": "names",
+        "to": "screen",
+        "label": "names"
+      }
+    ],
+    "note": "The listings come as JSON, so each part of a show stays whole, commas and all, and a body is read as JSON only when it says it is."
+  },
+  "tasks": {
+    "line": {
+      "trace": {
+        "file": "src/json.js",
+        "call": "showLine",
+        "args": [
+          "{\"slug\":\"tea-toast-and-tunes\",\"name\":\"Tea, Toast and Tunes\",\"presenter\":\"Odette\",\"day\":\"friday\",\"time\":\"09:00\"}"
+        ]
+      },
+      "steps": [
+        {
+          "active": [
+            "screen",
+            "screen->line",
+            "line"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              {
+                "key": "text",
+                "value": "the JSON text of one show"
+              }
+            ]
+          },
+          "note": "showLine() gets one show as JSON text, like Tea, Toast and Tunes with the commas in its name."
+        },
+        {
+          "active": [
+            "line"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "what the text holds",
+            "entries": [
+              {
+                "key": "name",
+                "value": "text"
+              },
+              {
+                "key": "day",
+                "value": "text"
+              },
+              {
+                "key": "time",
+                "value": "text"
+              },
+              {
+                "key": "presenter",
+                "value": "text"
+              }
+            ]
+          },
+          "note": "The text is read into a show, so each part is whole."
+        },
+        {
+          "active": [
+            "line"
+          ],
+          "note": "One line about the show comes back for the screen.",
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              {
+                "key": "line",
+                "value": "text"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "names": {
+      "steps": [
+        {
+          "active": [
+            "names",
+            "names->server",
+            "server"
+          ],
+          "note": "showNames() asks the cupboard server for every show as JSON."
+        },
+        {
+          "active": [
+            "server",
+            "names"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "the body",
+            "values": [
+              "a show",
+              "a show",
+              "a show"
+            ]
+          },
+          "note": "The body is a list of shows, read as JSON."
+        },
+        {
+          "active": [
+            "names",
+            "names->screen",
+            "screen"
+          ],
+          "note": "Only the names go to the listings screen, in the order the server sent them."
+        }
+      ]
+    },
+    "read": {
+      "steps": [
+        {
+          "active": [
+            "read",
+            "read->server",
+            "server"
+          ],
+          "note": "readJson() asks for one page and gets an answer back."
+        },
+        {
+          "active": [
+            "read"
+          ],
+          "note": "The content-type of the answer says whether its body is JSON."
+        },
+        {
+          "active": [
+            "read"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "what happens",
+            "entries": [
+              {
+                "key": "says JSON",
+                "value": "the value in the body"
+              },
+              {
+                "key": "says something else",
+                "value": "null"
+              },
+              {
+                "key": "says JSON, is not",
+                "value": "the error comes out"
+              }
+            ]
+          },
+          "note": "The body is read as JSON only when the answer says it is, and a broken one is not hidden."
+        }
+      ]
+    }
+  }
+}
