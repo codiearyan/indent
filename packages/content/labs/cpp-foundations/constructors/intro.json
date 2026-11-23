@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Kasimir",
+      "say": "Whose is this blank repair?",
+      "note": "No ticket, odd minutes."
+    },
+    {
+      "title": "Intake",
+      "text": "A repair is made first, filled in later."
+    },
+    {
+      "title": "Your constructors",
+      "file": "intake.cpp",
+      "mine": true,
+      "gap": "Repairs start half done",
+      "tasks": [
+        "Take in a repair",
+        "An empty repair",
+        "A parcel by ticket"
+      ]
+    },
+    {
+      "title": "Kasimir's rack",
+      "text": "Every repair on it is whole from the start."
+    }
+  ],
+  "ticket": {
+    "label": "New repair",
+    "wrong": "blank",
+    "why": "Half made",
+    "right": "whole"
+  },
+  "captions": [
+    "Kasimir finds a repair on the bench with no ticket and a strange number of minutes.",
+    "At intake a repair is made first and filled in later, and sometimes later never comes.",
+    "You write constructors that give a repair every value the moment it is made.",
+    "Now every repair that reaches the rack has its ticket, its item and its minutes.",
+    "Repairs start right now. Next, Dorrit's screen reads them without changing them."
+  ]
+}

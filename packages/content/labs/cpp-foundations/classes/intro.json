@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Kasimir",
+      "say": "Minus 40 minutes on a clock?",
+      "note": "A time card took it."
+    },
+    {
+      "title": "The struct",
+      "text": "Any line can write any number in minutes."
+    },
+    {
+      "title": "Your class",
+      "file": "timecard.cpp",
+      "mine": true,
+      "gap": "Nothing guards the minutes",
+      "tasks": [
+        "Hide the item",
+        "Add time by the rule",
+        "Take time off"
+      ]
+    },
+    {
+      "title": "Time card",
+      "text": "Only minutes that keep the rule get in."
+    }
+  ],
+  "ticket": {
+    "label": "Cuckoo clock",
+    "wrong": "-40 min",
+    "why": "No rule",
+    "right": "-40 refused"
+  },
+  "captions": [
+    "Kasimir finds a time card that says the cuckoo clock had minus 40 minutes at the bench.",
+    "The repair is a struct, so any line of the program can write any number into it.",
+    "You write a class that keeps its values private and changes them only by the bench's rule.",
+    "Now the card refuses the minus 40, and the cuckoo clock keeps its real time.",
+    "The repair guards its own values now. Next, it starts right from the moment it is made."
+  ]
+}
