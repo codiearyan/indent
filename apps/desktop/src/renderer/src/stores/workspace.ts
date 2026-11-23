@@ -423,6 +423,15 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
   }
 })
 
+// The window is closing or the app quitting: what was typed in the last moments is written first.
+api.workspace.onFlush(() => {
+  void useWorkspace
+    .getState()
+    .flush()
+    .catch(() => {})
+    .finally(() => api.workspace.flushed())
+})
+
 api.preview.onWindow((event) => {
   const chapter = useWorkspace.getState().chapter
   if (event.type === 'closed' && chapter?.labId === event.labId && chapter.id === event.chapterId) {
