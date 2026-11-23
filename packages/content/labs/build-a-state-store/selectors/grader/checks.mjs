@@ -214,7 +214,7 @@ export const checks = {
       kase('NaN, and a key that is missing', ['nan', 'missing'], (v) =>
         v?.find((r) => r.kind === 'nan')?.result === false
           ? 'NaN !== NaN, so === calls the totals different. Compare each value with Object.is.'
-          : "note is a key of the first object only, and rush of the second. Reading b.note gives undefined either way, so ask whether b has the key at all, with Object.hasOwn."
+          : "note is a key of the first object only, and rush of the second. Reading b.note gives undefined either way, so a key that is missing and a key that holds undefined look alike. Read the end of \"One level down\" in the lesson."
       ),
       kase('Plain values', ['numbers', 'texts', 'kinds', 'nullObject'], 'Two values that are not both objects are equal only when Object.is says so. null is not an object here, even though typeof null is object.'),
       kase('Arrays', ['arrays'], 'Two arrays with the same items in the same places are equal for this purpose: an array is an object whose keys are 0, 1, 2 and so on.'),

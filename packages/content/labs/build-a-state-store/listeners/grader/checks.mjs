@@ -145,7 +145,7 @@ export const checks = {
         pass: (v) => v.log.length === 1 && v.hasNote,
         show: (v) => `${told(v)}\n${v.hasNote ? 'the state has note' : 'the state has no note'}`,
         setup: "a store with { stock: 'linen', ink: 'black', ... } and no note, then setState({ note: undefined })",
-        hint: 'The state had no note, so adding one is a change, even with the value undefined. Reading state.note gives undefined either way: ask whether the state has the key at all, with Object.hasOwn or in.'
+        hint: 'The state had no note, so adding one is a change, even with the value undefined. Reading state.note gives undefined either way, so a key that is missing and a key that holds undefined look alike: it is the key that is new here.'
       },
       {
         name: 'NaN is the same as NaN',
@@ -199,7 +199,7 @@ export const checks = {
         'self',
         ['| change 1:', 'paper', 'header', 'total', '| change 2:', 'header', 'total'],
         'subscribe(paper) where paper stops itself when told, then subscribe(header), subscribe(total), then two changes',
-        'When a listener stops during a round, the listeners after it still have to be told. Removing an entry from the very array you are looping over moves the next one into its place, and the loop steps past it: loop over a copy, or build a new array when you remove.'
+        'When a listener stops during a round, the listeners after it still have to be told. Removing an entry from the very array you are looping over moves the next one into its place, and the loop steps past it. Read \"A round that stays whole\" in the lesson.'
       ),
       kase(
         'A listener that stops one after it',
@@ -213,14 +213,14 @@ export const checks = {
         'earlier',
         ['| change 1:', 'header', 'basket', 'total', '| change 2:', 'basket', 'total'],
         'subscribe(header), subscribe(basket) where basket stops header, subscribe(total), then two changes',
-        'When basket stops header, total should still be told in the same round. Removing an earlier entry from the array you are looping over moves every later one back a place, and the loop skips one: loop over a copy.'
+        'When basket stops header, total should still be told in the same round. Removing an earlier entry from the array you are looping over moves every later one back a place, and the loop skips one.'
       ),
       kase(
         'A listener added during a round waits for the next',
         'added',
         ['| change 1:', 'header', 'total', '| change 2:', 'header', 'total', 'note'],
         'subscribe(header) where header subscribes note the first time it is told, subscribe(total), then two changes',
-        'note started listening during change 1, so its first change is change 2. A round tells everyone who was listening when it began: loop over a copy of the listeners made at that moment.'
+        'note started listening during change 1, so its first change is change 2. A round tells everyone who was listening when it began, and nobody who started during it.'
       )
     ])
   }
