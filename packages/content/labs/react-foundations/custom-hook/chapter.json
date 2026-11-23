@@ -1,0 +1,118 @@
+{
+  "id": "custom-hook",
+  "title": "A hook of your own",
+  "files": ["src/useTramStop.js", "src/Screens.jsx", "src/App.jsx", "src/tracker.js"],
+  "terminal": {
+    "description": "The screens run in the Browser panel and reload every time you save. Its console shows when the tracker starts and stops following a tram."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "hook",
+      "title": "Write useTramStop",
+      "file": "src/useTramStop.js",
+      "description": "In `src/useTramStop.js`, write and export `useTramStop(number)`. It keeps the stop in state and follows tram `number` from an effect with `follow` from `tracker.js`, the way both screens do now: once per tram, stopping when the component goes, and starting again with no stop when the number changes. It returns the stop, or `null` before the first report.\n\nThe check draws two screens of its own side by side, each calling your hook for a tram of its own. It sends reports to each, draws them again, changes one screen's tram, and takes them off the page, looking at what the hook returned and at what is followed.",
+      "nextSteps": [
+        "Read \"A hook is a function that calls hooks\" and \"What a hook returns\" in the lesson.",
+        "Copy the state and the effect from `Whereabouts` into a new exported function `useTramStop(number)`, with the imports they need.",
+        "Return the stop at the end.",
+        "Leave the screens as they are for now: the next task changes them."
+      ],
+      "hints": [
+        "Everything the hook needs is already written, twice, in `Screens.jsx`.",
+        "A hook is a function whose name starts with `use` and which calls other hooks: here `useState` and `useEffect`, in the same order as in the component. What the component used from them, it now gets from the hook's return value.",
+        "`export function useTramStop(number) { const [at, setAt] = useState(null); useEffect(() => { setAt(null); return follow(number, setAt) }, [number]); return at }`, with the imports of `useEffect`, `useState` and `follow` at the top."
+      ],
+      "docs": [
+        { "title": "Reusing logic with custom hooks", "url": "https://react.dev/learn/reusing-logic-with-custom-hooks" },
+        {
+          "title": "Custom hooks share logic, not state",
+          "url": "https://react.dev/learn/reusing-logic-with-custom-hooks#custom-hooks-let-you-share-stateful-logic-not-state-itself"
+        }
+      ],
+      "videos": [{ "title": "Custom hooks in 10 minutes", "url": "https://www.youtube.com/watch?v=6ThXsUwLWvc" }],
+      "points": 10
+    },
+    {
+      "id": "screens",
+      "title": "Use it in both screens",
+      "file": "src/Screens.jsx",
+      "description": "`Whereabouts` and `PlatformSign` each call `useTramStop` from `useTramStop.js` with their `number` prop and show the stop it returns, as they do now. Remove their own copies of the state and the effect, so each tram is followed once.\n\nThe check puts each screen on a page with a `useTramStop` of its own, which works and writes down every call. It draws the screen for a tram, sends a report, and looks at whether the hook was called, at what is followed and at what the screen shows.",
+      "nextSteps": [
+        "Import `useTramStop` from `./useTramStop.js` at the top of `Screens.jsx`.",
+        "In each screen, replace the state and the effect with one call of the hook.",
+        "Remove the imports nothing uses any more.",
+        "Change trams in the Browser panel and read the console."
+      ],
+      "hints": [
+        "Each screen only needs the stop. Where does it get it once the copies are gone?",
+        "The hook returns what `at` was. One line at the top of each component gives it back under the same name, and the rest of the component stays as it is.",
+        "`const at = useTramStop(number)` at the top of `Whereabouts` and of `PlatformSign`, with `import { useTramStop } from './useTramStop.js'`."
+      ],
+      "docs": [
+        {
+          "title": "Extracting your own custom hook",
+          "url": "https://react.dev/learn/reusing-logic-with-custom-hooks#extracting-your-own-custom-hook-from-a-component"
+        },
+        {
+          "title": "Hook names always start with use",
+          "url": "https://react.dev/learn/reusing-logic-with-custom-hooks#hook-names-always-start-with-use"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "no-tram",
+      "title": "Call the hook on every draw, even with no tram due",
+      "file": "src/Screens.jsx",
+      "description": "When no tram is due, `PlatformSign` gets `null` for `number`. It still says No tram due, as now, and follows nothing: not the last tram, and not a tram called `null`. That takes two changes:\n\n- `useTramStop(null)` follows nothing and returns `null`. When the number goes from a tram to `null`, the old tram stops being followed.\n- `PlatformSign` calls `useTramStop` on every draw, before it decides what to show.\n\nThe check calls your hook from a screen of its own with no tram, a tram, no tram and another tram. Then it draws `PlatformSign` the same way, with a hook of its own, and looks at the sign, at what is followed and at whether the hook was called on every draw.",
+      "nextSteps": [
+        "Read \"The rules hooks follow\" in the lesson.",
+        "In the Browser panel, pick No tram for the platform, then a tram again, and read the console.",
+        "In the hook's effect, follow nothing when the number is `null`.",
+        "In `PlatformSign`, call the hook before the early return."
+      ],
+      "hints": [
+        "React matches a component's hooks by the order they are called. What happens to the sign's hooks on a draw that returns before reaching them?",
+        "Never call a hook less often: call it every time, and let it do nothing. An effect can return before it starts anything, and React still cleans up the run before it.",
+        "In the hook: `setAt(null); if (number === null) return; return follow(number, setAt)`. In `PlatformSign`: move `const at = useTramStop(number)` above `if (number === null)`."
+      ],
+      "docs": [
+        { "title": "Rules of hooks", "url": "https://react.dev/reference/rules/rules-of-hooks" },
+        {
+          "title": "Only call hooks at the top level",
+          "url": "https://react.dev/reference/rules/rules-of-hooks#only-call-hooks-at-the-top-level"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "board",
+      "title": "Show every tram on the ticket hall board",
+      "file": "src/Screens.jsx",
+      "description": "Write and export `DepartureBoard({ numbers })`: a `ul` with the class `departures` and one `li` for each tram number in `numbers`, in order. Each item says what the platform sign says for that tram, its number and its stop, and follows its own tram. When trams are added or taken off, the others keep their stop. Add the board to `App.jsx` to see it, with the numbers of the trams in `running`.\n\nThe check draws `DepartureBoard` with trams of its own and a hook of its own, sends reports, adds a tram and takes two off, and looks at every row and at what is followed after each change.",
+      "nextSteps": [
+        "Read the end of \"The rules hooks follow\" again.",
+        "Map `numbers` to list items, with a key that belongs to each tram.",
+        "Let each item get its stop from a component that calls the hook once: `PlatformSign` already does.",
+        "Add the board to `App.jsx` and watch every tram move in the Browser panel."
+      ],
+      "hints": [
+        "A hook cannot be called once per item in a loop, because the number of items changes. A component can be drawn once per item.",
+        "Draw one `PlatformSign` inside each `li`. Each one calls `useTramStop` once for its own tram, so each has its own state. The key keeps that state with the right tram when the list changes.",
+        "`<ul className=\"departures\">{numbers.map((number) => <li key={number}><PlatformSign number={number} /></li>)}</ul>`."
+      ],
+      "docs": [
+        {
+          "title": "Keeping list items in order with key",
+          "url": "https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key"
+        },
+        {
+          "title": "State is tied to a position in the tree",
+          "url": "https://react.dev/learn/preserving-and-resetting-state#state-is-tied-to-a-position-in-the-tree"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
