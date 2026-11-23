@@ -1,4 +1,4 @@
-import { attempt, CHECK_LIST, explainFunction, outcomeCases, tasks } from '../../grading.mjs'
+import { attempt, CHECK_LIST, codeOnly, explainFunction, fail, outcomeCases, pass, tasks } from '../../grading.mjs'
 
 const FILE = 'HarbourOffice.java'
 const value = (r, name) => r.values[name]?.value ?? null
@@ -66,20 +66,26 @@ const NOTHING_RAN = {
 }
 
 /** outcomeCases, with mistakes whose hint may depend on the run and on what was thrown. */
-function judge(mistakes) {
+function judge(mistakes, { oneStream = false } = {}) {
   const all = [LOOPS, IMMUTABLE, CHANGED, UNREAD, ...mistakes, NOTHING_RAN]
   return (runs, ctx) => {
     const details = outcomeCases({ file: FILE, explain: explainFunction })(runs, ctx)
-    return details.map((d, i) => {
+    // A stream's forEach that adds to a list of the learner's own gives the right answer, and is a
+    // loop in a stream's clothes: Check cannot see it from outside, so it reads the task's lines.
+    const extra = !oneStream ? [] : /\.forEach\s*\([^;]*\.add\s*\(/s.test(codeOnly(ctx.section))
+      ? [fail(FOREACH, 'A forEach adds each item to a list of your own. That is a loop written as a stream, and the task asks for one stream from the list to its answer: steps that keep and turn the items, then an ending that gives the answer back.')]
+      : [pass(FOREACH)]
+    return [...details.map((d, i) => {
       if (d.passed) return d
       const r = runs[i]
       const x = thrown(r)
       const m = all.find((k) => k.when(r, x))
       if (!m) return d
       return { ...d, message: typeof m.hint === 'function' ? m.hint(r, x) : m.hint }
-    })
+    }), ...extra]
   }
 }
+const FOREACH = 'Each answer is one stream, with no list built by hand'
 const thrown = (r) => (value(r, 'thrown') ? { name: value(r, 'thrown').split('.').pop().replace(/\$/g, '.'), message: value(r, 'thrown.message'), frames: (value(r, 'thrown.frames') ?? '').slice(1, -1).split(', ') } : null)
 
 // Bookings whose names on the Godwit, in alphabetical order, differ from the order they came,
@@ -139,7 +145,7 @@ export const checks = tasks({
           when: (r, x) => !x && r.case.kind === 'count' && Number(value(r, 'got')) === DAY.length,
           hint: 'countOn counts every booking of the day, whatever its boat. Only the bookings on the boat Check names count.'
         }
-      ])
+      ], { oneStream: true })
     },
 
     largest: {
@@ -171,7 +177,7 @@ export const checks = tasks({
           when: (r, x) => !x && r.case.kind === 'edge' && value(r, 'got') === 'true',
           hint: 'anyOver says yes for a booking of exactly that many seats. More than seats means that many plus one or more.'
         }
-      ])
+      ], { oneStream: true })
     },
 
     lazy: {

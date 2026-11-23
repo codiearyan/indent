@@ -2662,6 +2662,12 @@ const FUNCTION_GLOSS = [
       'A lambda or a method reference can stand only for a functional interface: an interface with exactly one abstract method. When you run the file, the line under the error says what Java found instead.'
   ],
   [
+    /^compiler\.err\.mod\.not\.allowed\.here/,
+    (e) =>
+      /\bstatic\b/.test(e.message) &&
+      'A class written at the top level of the file, outside every other class, cannot be static. static belongs to the methods and fields inside a class.'
+  ],
+  [
     /^compiler\.err\.bad\.functional\.intf\.anno/,
     () =>
       '@FunctionalInterface asks the compiler to make sure the interface below it has exactly one abstract method, and it has another number. When you run the file, the line under the error says what Java found.'
