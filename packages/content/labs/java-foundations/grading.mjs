@@ -2907,7 +2907,7 @@ const VALUE_GLOSS = [
     /^compiler\.err\.prob\.found\.req/,
     (e) =>
       /(?:java\.lang\.)?StringBuilder cannot be converted to (?:java\.lang\.)?String\b/.test(e.message) &&
-      'A StringBuilder is not text itself: it builds text, and toString gives back what it has built.'
+      'A StringBuilder is not text itself: it builds text, and the lesson shows how to get the text it has built.'
   ],
   [
     /^compiler\.err\.prob\.found\.req/,
@@ -2999,7 +2999,7 @@ function valueProblem(task, msg, asIs) {
   if (from === 'StringBuilder' && to === 'String')
     return fail(
       `${label(n)} gives back text`,
-      `Check keeps what comes back in a String, as the task says, and Java says it is a StringBuilder. A StringBuilder only builds text: toString gives back what it has built.`,
+      `Check keeps what comes back in a String, as the task says, and Java says it is a StringBuilder. A StringBuilder only builds text: the lesson shows how to get the text it has built.`,
       asIs
     )
   const known = /^(?:BigDecimal|LocalDate|LocalTime|LocalDateTime|Duration|Period|Path|String|StringBuilder|double|int|long|boolean)$/

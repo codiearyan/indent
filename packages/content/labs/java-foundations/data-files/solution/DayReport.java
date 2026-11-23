@@ -43,7 +43,7 @@ record Sailing(LocalDate date, String boat, int passengers, BigDecimal takings) 
 // should be, throws an IllegalArgumentException whose message names number, the line's number.
 class Lines {
     static Sailing parse(String line, int number) {
-        String[] parts = line.split(",");
+        String[] parts = line.split(",", -1);
         if (parts.length != 4) {
             throw new IllegalArgumentException("Line " + number + " has " + parts.length + " parts, not 4: " + line);
         }

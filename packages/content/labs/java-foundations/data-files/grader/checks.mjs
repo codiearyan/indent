@@ -10,7 +10,7 @@ const ownPath = (x) => /CheckFolder|CheckPath/.test(x.frames)
 // number as it was handed.
 const LINES = `class Lines {
     static Sailing parse(String line, int number) {
-        String[] parts = line.split(",");
+        String[] parts = line.split(",", -1);
         try {
             if (parts.length != 4) throw new IllegalStateException("not four parts");
             return new Sailing(LocalDate.parse(parts[0].strip()), parts[1].strip(), Integer.parseInt(parts[2].strip()), new BigDecimal(parts[3].strip()));
@@ -91,7 +91,8 @@ const BAD = [
   ['2031-06-31,Guillemot,4,13.40', 52, 'a date that does not exist'],
   ['2031-07-02,Sandpiper,8', 205, 'three parts'],
   ['2031-07-02,Sandpiper,8,£26.80', 81, 'takings with a pound sign'],
-  ['2031-07-02,Greenshank,8,26.80,late', 66, 'five parts']
+  ['2031-07-02,Greenshank,8,26.80,late', 66, 'five parts'],
+  ['2031-07-02,Razorbill,31,103.85,', 19, 'a comma too many at its end']
 ]
 
 const HEADER = 'date,boat,passengers,takings'
@@ -196,6 +197,10 @@ export const checks = tasks({
         {
           when: (r, x) => r.case.kind === 'good' && !x && /boat= /.test(value(r, 'as a record') ?? ''),
           hint: 'The boat keeps the spaces around it. Take the space off each part, the boat\'s too.'
+        },
+        {
+          when: (r, x) => r.case.kind === 'bad' && !x && r.case.line.endsWith(','),
+          hint: 'parse gives back a Sailing for a line with a comma too many at its end. split drops the empty parts at the very end, so that line seems to have four: the lesson shows how to keep them.'
         },
         {
           when: (r, x) => r.case.kind === 'bad' && !x,

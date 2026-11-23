@@ -30,7 +30,7 @@ date,jam,jars,takings
 record Sale(LocalDate date, String jam, int jars, BigDecimal takings) { }
 ```
 
-Count the parts before reading them. `"2031-08-16,plum,12".split(",")` has three, and asking for the fourth throws an `ArrayIndexOutOfBoundsException`. An empty part stays: `"2031-08-16,plum,,28.20"` gives four, the third empty. Empty parts at the very end are dropped: `"a,b,,".split(",")` gives two.
+Count the parts before reading them. `"2031-08-16,plum,12".split(",")` has three, and asking for the fourth throws an `ArrayIndexOutOfBoundsException`. An empty part stays: `"2031-08-16,plum,,28.20"` gives four, the third empty. Empty parts at the very end are dropped: `"a,b,,".split(",")` gives two, so a line with one comma too many at its end still seems to have four parts. Hand `split` a `-1` as well and it keeps every part, the empty ones at the end too: `"a,b,,".split(",", -1)` gives four.
 
 ## Refusing a bad line
 

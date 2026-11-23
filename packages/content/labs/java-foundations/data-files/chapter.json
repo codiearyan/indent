@@ -24,7 +24,7 @@
       "hints": [
         "Each part of the line is text, and each earlier issue of this part showed how to read one kind of text: a date, an amount. A whole number comes from text as it did in part 5.",
         "The exceptions that reading a bad part throws name the part, never the line. One catch around all the reading can throw a new exception whose message holds the number, with the old one as its cause.",
-        "`String[] parts = line.split(\",\");`, refuse when `parts.length != 4`, then in a try: `new Sailing(LocalDate.parse(parts[0].strip()), parts[1].strip(), Integer.parseInt(parts[2].strip()), new BigDecimal(parts[3].strip()))`, and in its catch `throw new IllegalArgumentException(\"Line \" + number + \" cannot be read: \" + line, e);`."
+        "`String[] parts = line.split(\",\", -1);`, refuse when `parts.length != 4`, then in a try: `new Sailing(LocalDate.parse(parts[0].strip()), parts[1].strip(), Integer.parseInt(parts[2].strip()), new BigDecimal(parts[3].strip()))`, and in its catch `throw new IllegalArgumentException(\"Line \" + number + \" cannot be read: \" + line, e);`."
       ],
       "docs": [
         {
