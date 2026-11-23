@@ -1,0 +1,103 @@
+{
+  "id": "cleanup",
+  "title": "Cleanup whatever happens",
+  "files": [
+    "src/fitting.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the fitting bench here and run it, and watch which repairs end when a part does not fit.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/fitting.cpp -o fitting && ./fitting"
+  },
+  "tasks": [
+    {
+      "id": "open",
+      "title": "Open a repair with its parts, and leave nothing behind",
+      "file": "src/fitting.cpp",
+      "description": "Under `// Task 1` in `src/fitting.cpp`, `openWithParts` takes a ticket as an `int`, an item as a reference to a `const std::string` and the parts as a reference to a `const std::vector<std::string>`, and gives back a `std::unique_ptr<Repair>`. It makes a new repair, fits each part to it with `fitPart` in order, and gives back the owner of the repair. When a part does not fit, `fitPart` throws `std::runtime_error`, and the exception goes on to the caller.\n\nToday, each time a part does not fit, a repair is left in memory that nothing can delete. Mend `openWithParts` so nothing is left behind, whether a part fits or not. Check builds this task with a `Repair` of its own that counts every repair made and ended, and a `fitPart` of its own that throws for parts it chooses. It counts what is left, and catches what comes out.",
+      "nextSteps": [
+        "Run the program and read which repairs end, and which never do.",
+        "Find the line that can throw, and the line after it that was meant to hand the repair to an owner.",
+        "Make the owner on the same line that makes the repair, before anything can throw.",
+        "Give that owner back at the end."
+      ],
+      "hints": [
+        "When fitPart throws, every line after it is skipped, the one that makes the unique_ptr included. The plain pointer is a local and ends; the repair it points at does not.",
+        "A std::unique_ptr made at once, with std::make_unique, is a local too: when the exception leaves the function, it ends and deletes the repair.",
+        "The shape is `std::unique_ptr<Repair> repair = std::make_unique<Repair>(ticket, item);`, the loop with `fitPart(*repair, part);`, then `return repair;`."
+      ],
+      "docs": [
+        {
+          "title": "RAII",
+          "url": "https://en.cppreference.com/w/cpp/language/raii"
+        },
+        {
+          "title": "std::make_unique",
+          "url": "https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Exceptions and cleanup that always runs",
+          "url": "https://www.youtube.com/watch?v=-3tvbpWV1I4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "borrow",
+      "title": "Borrow a tool, and always put it back",
+      "file": "src/fitting.cpp",
+      "description": "Under `// Task 2`, write a class called `Borrowed`. Its constructor takes the drawer as a reference to a `std::map<std::string, int>`, which says how many of each tool are in it, and a tool's name as a reference to a `const std::string`. It takes one of that tool out of the drawer. When the drawer has none of it, the constructor throws a `std::runtime_error` whose `what()` names the tool, and changes nothing. Its destructor puts the tool back. A `Borrowed` cannot be copied, nor copied over another: a copy would put the tool back a second time.\n\nCheck makes `Borrowed`s with drawers of its own, reads the drawer while one lives and after it ends, throws an exception of its own while one lives, and borrows a tool the drawer has none of. It also tries two lines of its own that copy a `Borrowed`, which must not compile.",
+      "nextSteps": [
+        "Give the class two private members: a reference to the drawer and the tool's name, set in the initialiser list.",
+        "In the constructor, throw before anything changes when the drawer has none of the tool; then take one out.",
+        "Write the destructor, which puts one back.",
+        "Forbid copies with the two = delete lines the lesson shows."
+      ],
+      "hints": [
+        "A constructor that throws leaves no object, so no destructor runs for it. Whatever it took before the throw is never put back.",
+        "count or find on the map tells whether the tool is there at all, without adding it; [] on a missing key adds it with 0. A reference member gets its value in the initialiser list.",
+        "The shape is `Borrowed(std::map<std::string, int>& from, const std::string& name) : drawer(from), tool(name) { if (drawer.count(tool) == 0 || drawer.at(tool) <= 0) { throw std::runtime_error(\"no \" + tool + \" left\"); } drawer.at(tool) -= 1; }`, `~Borrowed() { drawer[tool] += 1; }`, and `Borrowed(const Borrowed&) = delete; Borrowed& operator=(const Borrowed&) = delete;`."
+      ],
+      "docs": [
+        {
+          "title": "Destructors",
+          "url": "https://en.cppreference.com/w/cpp/language/destructor"
+        },
+        {
+          "title": "Deleted functions",
+          "url": "https://en.cppreference.com/w/cpp/language/function#Deleted_functions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "loupe",
+      "title": "Fit parts with the loupe",
+      "file": "src/fitting.cpp",
+      "description": "Under `// Task 3`, write a function called `fitWithLoupe` that takes the drawer as a reference to a `std::map<std::string, int>`, a repair as a reference to a `Repair`, and the parts as a reference to a `const std::vector<std::string>`, and gives back an `int`. It borrows the `\"loupe\"` from the drawer with a `Borrowed`, holds it while it fits each part to the repair with `fitPart`, in order, and gives back how many parts it fitted. When a part does not fit, or there is no loupe, the exception goes on to the caller, and the loupe is back in the drawer whatever happened.\n\nCheck builds this task with a `Borrowed` of its own and a `fitPart` of its own, which notes whether the loupe was held at each part. It calls `fitWithLoupe` with drawers and parts of its own, reads the drawer afterwards, and catches what comes out.",
+      "nextSteps": [
+        "Make a named Borrowed of the loupe on the first line.",
+        "Fit each part with fitPart, and count the parts fitted.",
+        "Give back the count.",
+        "Put no try in it: the Borrowed puts the loupe back on every way out."
+      ],
+      "hints": [
+        "A Borrowed is a local: its destructor runs at the closing } and when an exception leaves the function. That is all the cleanup this function needs.",
+        "Borrowed(drawer, \"loupe\"); with no name ends at the end of its own line, and new Borrowed(...) never ends at all. Neither holds the loupe while the parts are fitted.",
+        "The shape is `Borrowed loupe(drawer, \"loupe\"); int fitted = 0; for (const std::string& part : parts) { fitPart(repair, part); fitted = fitted + 1; } return fitted;`."
+      ],
+      "docs": [
+        {
+          "title": "Stack unwinding",
+          "url": "https://en.cppreference.com/w/cpp/language/throw#Stack_unwinding"
+        },
+        {
+          "title": "Lifetime of objects",
+          "url": "https://en.cppreference.com/w/cpp/language/lifetime"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

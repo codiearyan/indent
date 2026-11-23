@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Was T-41 already scanned today?",
+      "note": "A copied ticket got on twice."
+    },
+    {
+      "title": "Gangway scanner",
+      "text": "Beeps at every ticket, and forgets it"
+    },
+    {
+      "title": "Your sets",
+      "file": "Gangway.java",
+      "mine": true,
+      "gap": "Nothing remembers a scan",
+      "tasks": [
+        "Scanned twice",
+        "On both days",
+        "Free seats"
+      ]
+    },
+    {
+      "title": "Gangway",
+      "say": "T-41 again? Stop right there.",
+      "note": "The copy is caught at the gangway."
+    }
+  ],
+  "ticket": {
+    "label": "T-41",
+    "wrong": "boards twice",
+    "why": "Forgotten",
+    "right": "caught"
+  },
+  "captions": [
+    "The gangway. Bridie wants to know when a ticket is scanned a second time.",
+    "Today the scanner forgets every ticket, so a copied one walks on twice.",
+    "You keep sets: tickets scanned twice, names seen both days, and the free seats.",
+    "Now a second scan of T-41 is caught before anyone boards.",
+    "Every ticket remembered, once. Next: a noticeboard in the right order."
+  ]
+}

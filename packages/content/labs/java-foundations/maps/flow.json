@@ -1,0 +1,75 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "tickets", "label": "Day's tickets", "kind": "data" },
+      { "id": "counts", "label": "Counts", "kind": "function", "mine": true },
+      { "id": "report", "label": "Report", "kind": "function", "mine": true },
+      { "id": "ossian", "label": "Ossian", "kind": "story" },
+      { "id": "booked", "label": "Places booked", "kind": "data" },
+      { "id": "seats", "label": "Seats", "kind": "function", "mine": true },
+      { "id": "bridie", "label": "Bridie", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "tickets", "to": "counts", "label": "boat names" },
+      { "from": "counts", "to": "report", "label": "tally" },
+      { "from": "report", "to": "ossian", "label": "lines" },
+      { "from": "booked", "to": "seats", "label": "by sailing" },
+      { "from": "seats", "to": "bridie", "label": "seats left" }
+    ],
+    "note": "Tickets are counted by boat, the tally is printed in a steady order, and any sailing's seats are looked up by its name."
+  },
+  "tasks": {
+    "count": {
+      "steps": [
+        {
+          "active": ["tickets", "tickets->counts", "counts"],
+          "value": { "kind": "array", "label": "tickets", "values": ["boat", "boat", "boat", "boat"] },
+          "note": "Each ticket sold names the boat it is for."
+        },
+        {
+          "active": ["counts"],
+          "value": { "kind": "map", "label": "the tally", "entries": [{ "key": "boat", "value": "tickets" }] },
+          "note": "Each boat's count grows by one for every ticket, starting from its first."
+        },
+        {
+          "active": ["counts", "counts->report"],
+          "note": "The tally holds every boat that sold a ticket, once."
+        }
+      ]
+    },
+    "report": {
+      "steps": [
+        {
+          "active": ["counts", "counts->report", "report"],
+          "note": "The tally arrives in whatever order its map keeps."
+        },
+        {
+          "active": ["report"],
+          "value": { "kind": "array", "label": "lines", "values": ["boat: tickets", "boat: tickets"] },
+          "note": "One line per boat, in the order of the boats' names."
+        },
+        {
+          "active": ["report", "report->ossian", "ossian"],
+          "note": "Ossian's tally reads the same way every night."
+        }
+      ]
+    },
+    "sailing": {
+      "steps": [
+        {
+          "active": ["booked"],
+          "value": { "kind": "map", "label": "places booked", "entries": [{ "key": "boat and hour", "value": "places" }] },
+          "note": "Places booked are kept by sailing: a boat and an hour together."
+        },
+        {
+          "active": ["bridie", "booked", "booked->seats", "seats"],
+          "note": "Bridie asks about a sailing, written out again from what a passenger says."
+        },
+        {
+          "active": ["seats", "seats->bridie", "bridie"],
+          "note": "The seats left come back, every seat for a sailing nobody has booked."
+        }
+      ]
+    }
+  }
+}

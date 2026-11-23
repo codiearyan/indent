@@ -1,0 +1,71 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "programs", "label": "Hut programs", "kind": "story" },
+      { "id": "pair", "label": "Pair", "kind": "data", "mine": true },
+      { "id": "rotas", "label": "Rotas", "kind": "function", "mine": true },
+      { "id": "most", "label": "Most", "kind": "function", "mine": true },
+      { "id": "bridie", "label": "Bridie", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "programs", "to": "pair", "label": "two things" },
+      { "from": "programs", "to": "rotas", "label": "any rota" },
+      { "from": "programs", "to": "most", "label": "any list" },
+      { "from": "rotas", "to": "bridie", "label": "next week" },
+      { "from": "most", "to": "bridie", "label": "the largest" }
+    ],
+    "note": "One pair, one rota and one largest serve every program at the hut, whatever type each one holds."
+  },
+  "tasks": {
+    "pair": {
+      "steps": [
+        {
+          "active": ["programs", "programs->pair", "pair"],
+          "value": { "kind": "array", "label": "a pair", "values": ["first, of type A", "second, of type B"] },
+          "note": "A pair holds two things, each of a type chosen when the pair is made."
+        },
+        {
+          "active": ["pair"],
+          "note": "Each thing comes back as its own type, with no cast."
+        },
+        {
+          "active": ["pair"],
+          "note": "Swapped, the two change places, and so do their types."
+        }
+      ]
+    },
+    "rota": {
+      "steps": [
+        {
+          "active": ["programs", "programs->rotas", "rotas"],
+          "value": { "kind": "array", "label": "a rota", "values": ["first", "second", "third"] },
+          "note": "A rota comes in: skippers, boats or anything else."
+        },
+        {
+          "active": ["rotas"],
+          "note": "Next week, the first on the rota moves to the end."
+        },
+        {
+          "active": ["rotas", "rotas->bridie", "bridie"],
+          "note": "The new rota holds the same type it was handed, and the old one stays as it was."
+        }
+      ]
+    },
+    "largest": {
+      "steps": [
+        {
+          "active": ["programs", "programs->most", "most"],
+          "note": "A list comes in, of any type that has a natural order."
+        },
+        {
+          "active": ["most"],
+          "note": "Each item is compared with the largest so far."
+        },
+        {
+          "active": ["most", "most->bridie", "bridie"],
+          "note": "The largest comes back as the list's own type, and things with no order are refused before the program runs."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "How many did the Gannet sell today?",
+      "note": "Every evening, stub by stub."
+    },
+    {
+      "title": "Ticket stubs",
+      "text": "A pile of stubs, one boat name on each"
+    },
+    {
+      "title": "Your tally",
+      "file": "Tally.java",
+      "mine": true,
+      "gap": "Nothing counts by boat",
+      "tasks": [
+        "Count by boat",
+        "Lines in name order",
+        "Seats on a sailing"
+      ]
+    },
+    {
+      "title": "Evening report",
+      "rows": [
+        [
+          "Curlew",
+          "counted"
+        ],
+        [
+          "Gannet",
+          "counted"
+        ],
+        [
+          "Linnet",
+          "counted"
+        ]
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "Gannet",
+    "wrong": "counted by hand",
+    "why": "No tally",
+    "right": "in the report"
+  },
+  "captions": [
+    "The ticket hut at evening. Ossian wants the day's tickets counted for each boat.",
+    "Today he counts a pile of stubs by hand, and the tally reads differently every night.",
+    "You count tickets in a map, print it in the boats' order, and look up any sailing.",
+    "Now every boat's tickets are counted, and the report reads the same each night.",
+    "A tally that counts itself. Next: a gangway that remembers every ticket."
+  ]
+}

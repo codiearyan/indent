@@ -1,0 +1,73 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "gangway", "label": "Gangway scanner", "kind": "story" },
+      { "id": "scans", "label": "Scans", "kind": "function", "mine": true },
+      { "id": "days", "label": "Days", "kind": "function", "mine": true },
+      { "id": "taken", "label": "Seats taken", "kind": "data" },
+      { "id": "plan", "label": "Plan", "kind": "function", "mine": true },
+      { "id": "bridie", "label": "Bridie", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "gangway", "to": "scans", "label": "codes" },
+      { "from": "scans", "to": "bridie", "label": "repeats" },
+      { "from": "days", "to": "bridie", "label": "regulars" },
+      { "from": "taken", "to": "plan", "label": "every boat" },
+      { "from": "plan", "to": "bridie", "label": "free seats" }
+    ],
+    "note": "The gangway remembers what it has seen, so repeats, regulars and free seats each come out once."
+  },
+  "tasks": {
+    "twice": {
+      "steps": [
+        {
+          "active": ["gangway", "gangway->scans", "scans"],
+          "value": { "kind": "array", "label": "scans", "values": ["code", "code", "code", "code"] },
+          "note": "Ticket codes arrive one scan at a time."
+        },
+        {
+          "active": ["scans"],
+          "note": "Every code seen so far is remembered, so a second scan is spotted at once."
+        },
+        {
+          "active": ["scans", "scans->bridie", "bridie"],
+          "note": "Bridie gets each repeated code once, in the order the repeats happened."
+        }
+      ]
+    },
+    "both": {
+      "steps": [
+        {
+          "active": ["days"],
+          "value": { "kind": "array", "label": "two days", "values": ["Saturday's names", "Sunday's names"] },
+          "note": "The names seen on two days come in, each day kept as it is."
+        },
+        {
+          "active": ["days"],
+          "note": "Only the names seen on both days are kept, in a group of their own."
+        },
+        {
+          "active": ["days", "days->bridie", "bridie"],
+          "note": "Bridie reads the regulars in alphabetical order."
+        }
+      ]
+    },
+    "seats": {
+      "steps": [
+        {
+          "active": ["taken"],
+          "value": { "kind": "array", "label": "seats taken", "values": ["boat and number", "boat and number"] },
+          "note": "The seats taken on every boat are kept together, each a boat and a number."
+        },
+        {
+          "active": ["taken", "taken->plan", "plan"],
+          "note": "Each seat of one boat is asked about, by its boat and its number."
+        },
+        {
+          "active": ["plan", "plan->bridie", "bridie"],
+          "note": "The free seats of that boat come back, smallest number first."
+        }
+      ]
+    }
+  }
+}
