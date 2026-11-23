@@ -1,0 +1,105 @@
+{
+  "id": "functions-as-values",
+  "title": "Functions as values",
+  "files": ["call_handlers.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to send messages to the teams, route calls and make pagers.",
+    "suggestedCommand": "python3 call_handlers.py"
+  },
+  "tasks": [
+    {
+      "id": "send",
+      "title": "Send to every team",
+      "file": "call_handlers.py",
+      "description": "Under `# Task 1` in `call_handlers.py`, write a function called `send_to_all` that takes a list of call signs and a function `send`. It calls `send` once for each call sign, in order, with that call sign, and gives back a list of what each call gave back. For `teams` and `loud` it gives back `['ALPHA!', 'BRAVO!', 'CHARLIE!']`. The list it is given stays as it was.\n\nCheck hands in a `send` of its own that notes every call sign it is given, and looks at how it was called and at the list `send_to_all` gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on handing a function over.",
+        "Write the def line with the two parameters.",
+        "Go through the call signs, call send with each, and keep what it gives back in a new list.",
+        "Give the new list back, and try it with teams and loud, then with plain."
+      ],
+      "hints": [
+        "Inside `send_to_all`, `send` is a name like any other, and the function it names runs only when your code calls it.",
+        "Calling `send` with one call sign gives back one value. Collect one such value for each call sign, in a list made before the loop.",
+        "The shape is a loop over `call_signs` with `sent.append(send(call_sign))` inside it, and `return sent` after it."
+      ],
+      "docs": [
+        { "title": "Defining functions", "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions" },
+        { "title": "Callable types", "url": "https://docs.python.org/3/reference/datamodel.html#callable-types" }
+      ],
+      "videos": [
+        { "title": "Functions as values you can pass around", "url": "https://www.youtube.com/watch?v=kr0mpwqttM0" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "route",
+      "title": "Route a call to its handler",
+      "file": "call_handlers.py",
+      "description": "Under `# Task 2`, write a function called `route` that takes a call, a tuple `(kind, text)`, and a dictionary of handlers, each a function that takes the text of a call. It looks up the handler for the kind, calls it with the text, and gives back what it gives back. A kind the dictionary does not have goes to its handler under `\"other\"`. For `(\"kit\", \"two ropes back in the van\")` and `handlers` it gives back `'Noted: two ropes back in the van'`.\n\nCheck hands in handlers of its own, each noting what it is given, sends a call of a kind they have and one of a kind they do not, and looks at which handler ran, with what, and at what `route` gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on functions in a dictionary.",
+        "Take the call apart into its kind and its text.",
+        "Look up the handler for the kind, with \"other\" for a kind that is not there.",
+        "Call the handler with the text and give back what it gives back."
+      ],
+      "hints": [
+        "Reading a dictionary by a key gives back the value under it, and here each value is a function. Nothing runs until that function is called.",
+        "A dictionary's `get` takes a second value to give back when the key is not there, and that value can be another handler.",
+        "The shape is `kind, text = call`, then `handler = handlers.get(kind, handlers[\"other\"])`, then `return handler(text)`."
+      ],
+      "docs": [
+        { "title": "dict.get", "url": "https://docs.python.org/3/library/stdtypes.html#dict.get" },
+        { "title": "Tuples and sequences", "url": "https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pager",
+      "title": "A pager that remembers its team",
+      "file": "call_handlers.py",
+      "description": "Under `# Task 3`, write a function called `make_pager` that takes a call sign and gives back a new function, a pager. A pager takes a message and gives back the call sign, a colon, a space and the message: `make_pager(\"Alpha\")` gives back a pager, and that pager gives back `'Alpha: at the bridge'` for `\"at the bridge\"`.\n\nCheck makes two pagers of its own, for two call signs, and calls each with messages of its own, the first again after the second was made, to see that each keeps its own call sign.",
+      "nextSteps": [
+        "Read the part of the lesson on a function made by a function.",
+        "Write make_pager, and inside it a def for the pager, which takes the message.",
+        "Give back the pager itself, without calling it.",
+        "Make two pagers in the try-out lines and call each."
+      ],
+      "hints": [
+        "A def inside another def makes a new function each time the outer one runs, and that new function can read the outer function's parameters.",
+        "`make_pager` gives back the inner function by its name, without round brackets: with them, it would run it and give back text. A `lambda` with one parameter can stand in for the inner def.",
+        "The shape is `def pager(message):` with `return call_sign + \": \" + message` inside `make_pager`, then `return pager`."
+      ],
+      "docs": [
+        { "title": "Lambda expressions", "url": "https://docs.python.org/3/tutorial/controlflow.html#lambda-expressions" },
+        { "title": "Python scopes and namespaces", "url": "https://docs.python.org/3/tutorial/classes.html#python-scopes-and-namespaces" }
+      ],
+      "videos": [
+        { "title": "A function that remembers where it was made", "url": "https://www.youtube.com/watch?v=swU3c34d2NQ" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pagers",
+      "title": "A pager for every team",
+      "file": "call_handlers.py",
+      "description": "Under `# Task 4`, write a function called `pagers_for` that takes a list of call signs and gives back a dictionary with a pager for each call sign, made as in Task 3, each under its own call sign. With it, `pagers_for(teams)[\"Bravo\"]` is a pager that gives back `'Bravo: back at base'` for `\"back at base\"`. The list it is given stays as it was.\n\nCheck uses its own `make_pager` for this task, so it does not wait on Task 3. It makes pagers for lists of its own and calls every one of them, to see that each pager gives its own call sign.",
+      "nextSteps": [
+        "Read the part of the lesson on functions made in a loop.",
+        "Start a new empty dictionary, and go through the call signs.",
+        "Put a pager under each call sign, then give the dictionary back.",
+        "In the try-out lines, call the pager of each team and compare what they give."
+      ],
+      "hints": [
+        "Each value of the dictionary is a function, the pager itself, not what a pager gives back for one message.",
+        "A pager written inside the loop, as a lambda or a def that reads the loop's name, finds that name's last value when it is called, after the loop has ended. A pager from a function of its own keeps the call sign it was made with.",
+        "The shape is a loop over `call_signs` with `pagers[call_sign] = make_pager(call_sign)` inside it, and `return pagers` after it."
+      ],
+      "docs": [
+        { "title": "Dictionaries", "url": "https://docs.python.org/3/tutorial/datastructures.html#dictionaries" },
+        { "title": "Why do lambdas defined in a loop all return the same result?", "url": "https://docs.python.org/3/faq/programming.html#why-do-lambdas-defined-in-a-loop-with-different-values-all-return-the-same-result" }
+      ],
+      "points": 10
+    }
+  ]
+}

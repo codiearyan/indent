@@ -2032,6 +2032,8 @@ function stepRaise(step, rec, blocks) {
  *   with; `swallowed` and `hasHint` are words or functions of the step's record and the message.
  * - otherwise the step must run without an error; `ownHint` words a raise line of the learner's
  *   that raised where the task asks for none.
+ * - `printed`: the exact text the code must print, judged after its value; `printedHint` gives the
+ *   words when it does not, a string or a function of what it printed and the values read so far.
  * - `hidden`: left out of the output, or shown as that line. `needs`: the words that say which
  *   earlier task must be right first, when this step fails.
  * A case fails on its first step that goes wrong, with the steps up to it as Check ran them.
@@ -2172,10 +2174,65 @@ export async function classCases(t, { file, task, list, names = {}, define, expl
       }
       const v = rec.value?.data
       seen[k] = v
-      if (!('want' in step) || sameValue(v, step.want)) continue
-      const hint = typeof step.hint === 'function' ? step.hint(v, seen, rec) : step.hint
-      return no(hint ?? `${step.code} does not give what the task asks for.`)
+      if ('want' in step && !sameValue(v, step.want)) {
+        const hint = typeof step.hint === 'function' ? step.hint(v, seen, rec) : step.hint
+        return no(hint ?? `${step.code} does not give what the task asks for.`)
+      }
+      if ('printed' in step && (rec.printed ?? '') !== step.printed) {
+        const hint = typeof step.printedHint === 'function' ? step.printedHint(rec.printed ?? '', seen) : step.printedHint
+        return no(hint ?? `${step.code} does not print what the task asks for.`)
+      }
     }
     return pass(c.name, transcript(c.steps, records, c.steps.length - 1))
   })
+}
+
+// From part 8 on, functions are values: handed to other functions, given back by them, wrapped,
+// and some give their items one at a time. The checks are still steps (classCases).
+
+/** What an error usually means in code that hands functions around, uses generators and hints. */
+export function valueRunCause(error) {
+  const m = error.message
+  let found
+  if ((found = /^'(function|builtin_function_or_method|method)' object is not subscriptable$/.exec(m))) {
+    return 'square brackets follow a function itself, not a value it gave back. A function runs only with round brackets after its name: without them, the name stands for the function'
+  }
+  if ((found = /^'(\w+)' object is not callable$/.exec(m))) {
+    return found[1] === 'NoneType'
+      ? 'Python tried to run None as a function. That happens when a function is called where it should be handed over: with round brackets after its name, Python runs it at once and hands on what it gave back, and a function that ends without return, or a method such as sort, gives back None'
+      : `Python tried to run ${dataKind(found[1])} as a function. That happens when a function is called where it should be handed over: with round brackets after its name, Python runs it at once and hands on what it gave back, here ${dataKind(found[1])}, and not the function itself`
+  }
+  if ((found = /^'(?:function|method)' object has no attribute '(\w+)'$/.exec(m))) {
+    return `a function has nothing called ${found[1]}. Look at what comes before the dot: a function itself, used without round brackets, where the value it gives back was wanted, or a function that never got ${found[1]} of its own`
+  }
+  if (/'function'/.test(m) && /unsupported operand|not supported between|can only concatenate|must be real number|must be str/.test(m)) {
+    return 'one of the values is a function itself, not what it gives back. A function runs only with round brackets after its name: without them, the name stands for the function'
+  }
+  if (/^'generator' object is not subscriptable$/.test(m)) {
+    return 'a generator has no positions: it makes each item only when it is asked for the next one, so square brackets cannot reach into it. The lesson shows how to ask a generator for its next item'
+  }
+  if (/^object of type 'generator' has no len\(\)$/.test(m)) {
+    return 'len asks how many items there are, and a generator cannot tell: it makes each item only when it is asked for the next one, and does not know how many are still to come'
+  }
+  if (error.type === 'StopIteration') {
+    return 'next was asked for one more item, and there was none left to give. StopIteration is how Python says so. Look at what the task says to give back when there is no such item'
+  }
+  if (/^(min|max)\(\) (arg is an empty sequence|iterable argument is empty)$/.test(m)) {
+    return 'min or max was given nothing to choose from. A list with nothing in it does that, and so does a generator that was already gone through once: it is used up, and gives nothing the second time'
+  }
+  if (/^'NoneType' object is not iterable$/.test(m)) {
+    return 'a loop, sorted or list was given None, not a list. None is what sort gives back, because it changes the list itself and gives back nothing, and what a function gives back when it ends without return'
+  }
+  if ((found = /^'[<>]' not supported between instances of '(dict|function|NoneType)' and '\1'$/.exec(m))) {
+    return found[1] === 'dict'
+      ? 'sorted, sort, min and max compare the items themselves, and Python cannot say which of two dictionaries comes first. They need to be told what to compare in each item: the lesson shows how'
+      : `sorted, sort, min and max compare what they are given, and Python cannot say which of two ${found[1] === 'NoneType' ? 'Nones' : 'functions'} comes first. Look at what the function given to key gives back for each item`
+  }
+  if (/^unsupported operand type\(s\) for \|: /.test(m)) {
+    return 'this Python cannot read | between two kinds in a hint, such as str | None: that way of writing it works from Python 3.10 on. The lesson shows the way every Python reads'
+  }
+  if (error.type === 'NameError' && (found = /^name '(Optional|Union|Callable|List|Dict|Iterator|Generator|Iterable)' is not defined/.exec(m))) {
+    return `Python does not know ${found[1]} by itself: it comes from the typing module, so the file needs an import line for it before the line that uses it`
+  }
+  return null
 }
