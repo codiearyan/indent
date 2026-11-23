@@ -43,7 +43,7 @@
     },
     {
       "title": "Files, text and the whole build",
-      "chapters": ["reading-files", "writing-files", "taking-text-apart"]
+      "chapters": ["reading-files", "writing-files", "taking-text-apart", "data-files"]
     }
   ]
 }

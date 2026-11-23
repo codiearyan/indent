@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Ambrose",
+      "say": "Three totals, and the wrong lines."
+    },
+    {
+      "title": "Closing time",
+      "text": "The tickets file read by eye, slip by slip."
+    },
+    {
+      "title": "Your code",
+      "file": "day.cpp",
+      "mine": true,
+      "gap": "No way into the file",
+      "tasks": [
+        "Read one repair",
+        "Read the day",
+        "Write the report",
+        "Run file to file"
+      ]
+    },
+    {
+      "title": "The report",
+      "text": "Repairs, minutes, parts, and the bad lines."
+    }
+  ],
+  "ticket": {
+    "label": "Today",
+    "wrong": "added by eye",
+    "why": "By hand",
+    "right": "in report.txt"
+  },
+  "captions": [
+    "Ambrose wants three totals from the day's tickets file, and the lines that are wrong.",
+    "Today he reads the tickets file by eye at closing time and adds it up himself.",
+    "You read each line into a repair, refuse the bad ones by number, and write a report.",
+    "The day is read from the file, its bad lines named, and the totals land in a report.",
+    "Ambrose's closing time is one run now: the tickets in, the report out, every slip found."
+  ]
+}

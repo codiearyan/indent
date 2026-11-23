@@ -1,0 +1,126 @@
+{
+  "id": "data-files",
+  "title": "A data file into your own types",
+  "files": [
+    "src/day.cpp",
+    "data/tickets.csv"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace folder. Build Ambrose's end of day here, run it on data/tickets.csv, and look at report.txt.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/day.cpp -o day && ./day && cat report.txt"
+  },
+  "tasks": [
+    {
+      "id": "parseRepair",
+      "title": "Read one repair from a line",
+      "file": "src/day.cpp",
+      "description": "Under `// Task 1` in `src/day.cpp`, write a function called `parseRepair` that takes a line as a reference to a `const std::string` and a repair as a reference to a `Repair`, and gives back a `bool`. The line holds four fields with commas between them: the ticket, the item, the minutes and the parts. Blanks around a field do not count. When the line has exactly four fields, the ticket and the minutes are whole numbers, the item is not empty and the parts are an amount, it fills in the repair and gives back `true`. Otherwise it gives back `false` and leaves the repair as it was.\n\nCheck calls `parseRepair` with lines of its own and a repair that already holds values: good lines, blanks and a Windows line end, three fields, five, a letter in a number, an empty field, an item of only a space, and parts written as a word. It reads the repair after each call.",
+      "nextSteps": [
+        "Write the first line: the line and a `Repair&` in, a `bool` back.",
+        "Split the line at its commas with the given tool, and give back `false` unless there are exactly four fields.",
+        "Read each field, trimmed, into what it should be, and give back `false` when one is wrong.",
+        "Only then fill in the repair, and give back `true`."
+      ],
+      "hints": [
+        "The tools of last issue are given at the top of the file, whole: one splits, one trims, and two read a number and nothing else, each saying when there is none.",
+        "Read all four fields into variables of their own first, and look at them together. The repair is touched only once every field is known to be good, so a refused line leaves it as it was.",
+        "The shape is `auto fields = splitAt(line, ','); if (fields.size() != 4) { return false; } auto ticket = toWhole(trim(fields[0]));` and the same for the others, then `if (!ticket || item.empty() || !minutes || !parts) { return false; }` before filling it in."
+      ],
+      "docs": [
+        {
+          "title": "std::optional",
+          "url": "https://en.cppreference.com/w/cpp/utility/optional"
+        },
+        {
+          "title": "std::vector::size",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/size"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "readRepairs",
+      "title": "Read every repair of the day",
+      "file": "src/day.cpp",
+      "description": "Under `// Task 2`, write a function called `readRepairs` that takes a stream as a reference to a `std::istream` and the refused lines as a reference to a `std::vector<int>`, and gives back a `std::vector<Repair>`. The stream's first line is a heading, which it skips. Every other line that `parseRepair` takes goes into the repairs, in order. A line that is empty, or only blanks, is skipped. Any other line is refused: its line number is added to the refused lines, counting the heading as line 1.\n\nCheck builds this task with a `parseRepair` of its own in place of yours, written as Task 1 asks. It hands `readRepairs` string streams of its own: bad lines among good ones, blank lines, Windows line ends, no line end at the end, only the heading, and nothing at all.",
+      "nextSteps": [
+        "Write the first line: the stream and the refused lines in, a `std::vector<Repair>` back.",
+        "Read the stream a line at a time, counting the lines as you go.",
+        "Skip the heading and every blank line.",
+        "Hand every other line to `parseRepair`: keep the repair, or write down the line's number."
+      ],
+      "hints": [
+        "Count every line you read, the heading and the blank ones included, so the number is the one a person sees in the file.",
+        "A line of a Windows file that looks empty still holds a carriage return, so ask whether a line is blank once it is trimmed. A bad line is written down and the loop goes on to the next.",
+        "The shape is `while (std::getline(in, line)) { number++; if (number == 1 || trim(line).empty()) { continue; } Repair repair; if (parseRepair(line, repair)) { repairs.push_back(repair); } else { refused.push_back(number); } }`."
+      ],
+      "docs": [
+        {
+          "title": "std::getline",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/getline"
+        },
+        {
+          "title": "continue",
+          "url": "https://en.cppreference.com/w/cpp/language/continue"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "writeReport",
+      "title": "Write the day's report",
+      "file": "src/day.cpp",
+      "description": "Under `// Task 3`, write a function called `writeReport` that takes a stream as a reference to a `std::ostream`, the repairs as a reference to a `const std::vector<Repair>` and the refused lines as a reference to a `const std::vector<int>`, and gives nothing back. It writes four lines, each with its line end:\n\n```\nRepairs: 3\nMinutes: 150\nParts: 37.50\nRefused: 4, 7\n```\n\nwith how many repairs there are, all their minutes, all their parts with exactly 2 decimals, and the refused line numbers in order with `\", \"` between them, or `none` when there are none.\n\nCheck hands `writeReport` a string stream with repairs and refused lines of its own, parts that add up from pence among them, and reads back exactly what it wrote.",
+      "nextSteps": [
+        "Write the first line, with the stream as a `std::ostream&`.",
+        "Add up the minutes and the parts, each in a type that fits.",
+        "Write the first three lines.",
+        "Write the refused lines with a separator only between two numbers, or the word for none."
+      ],
+      "hints": [
+        "Parts have pence, so their total cannot be a whole number. Part 1's tools set how many decimals a stream writes.",
+        "A list with n numbers has n - 1 separators: write one before every number except the first, and look at an empty list on its own.",
+        "The shape is `out << \"Refused: \"; if (refused.empty()) { out << \"none\"; } for (std::size_t i = 0; i < refused.size(); i++) { if (i > 0) { out << \", \"; } out << refused[i]; } out << '\\n';`."
+      ],
+      "docs": [
+        {
+          "title": "std::fixed",
+          "url": "https://en.cppreference.com/w/cpp/io/manip/fixed"
+        },
+        {
+          "title": "std::setprecision",
+          "url": "https://en.cppreference.com/w/cpp/io/manip/setprecision"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "runDay",
+      "title": "Run the day from file to file",
+      "file": "src/day.cpp",
+      "description": "Under `// Task 4`, write a function called `runDay` that takes the path of the tickets and the path of the report, each as a reference to a `const std::string`, and gives back a `bool`. When the tickets do not open, it gives back `false` and writes no report. Otherwise it reads the repairs with `readRepairs`, writes the report with `writeReport` to a new file at the report's path, and gives back `true`.\n\nCheck builds this task with its own `parseRepair`, `readRepairs` and `writeReport`, written as Tasks 1 to 3 ask. It writes a tickets file of its own and an old report first, calls `runDay` with their paths, and reads the report back once `runDay` has returned. It also hands it tickets that are not there, and looks whether a report file appeared.",
+      "nextSteps": [
+        "Write the first line: two paths in, a `bool` back.",
+        "Open the tickets, and give back `false` when they did not open.",
+        "Read the repairs from the tickets.",
+        "Only then open the report for writing, and write it."
+      ],
+      "hints": [
+        "Both helpers take any stream: a file stream can be handed to each of them.",
+        "Opening a file for writing makes it, even when nothing is written to it. So the report is opened only once the tickets are known to be there.",
+        "The shape is `std::ifstream tickets(ticketsPath); if (!tickets) { return false; } std::vector<int> refused; auto repairs = readRepairs(tickets, refused); std::ofstream report(reportPath); writeReport(report, repairs, refused); return true;`."
+      ],
+      "docs": [
+        {
+          "title": "std::basic_ifstream",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_ifstream"
+        },
+        {
+          "title": "std::basic_ofstream",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_ofstream"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
