@@ -7,6 +7,8 @@ const same = (a, b) => !!a && !!b && a.length === b.length && a.every((x, i) => 
 const sign = (v) => (v === null ? null : Math.sign(Number(v)))
 
 const departure = (boat, hour, seats) => `new Departure("${boat}", ${hour}, ${seats})`
+// A boat's name as a text of its own, so == on two boats is false, as it is on real data.
+const fresh = (boat, hour, seats) => `new Departure(new String("${boat}"), ${hour}, ${seats})`
 const LAMBDA = 'what came back is a lambda'
 
 /** A case that compares a pair both ways: `ab` and `ba` are the signs the task asks for. */
@@ -24,7 +26,7 @@ const sorts = (name, make, list, order, hint) => ({
   name,
   code: [
     'List<Departure> list = new ArrayList<>();',
-    ...list.map((d) => `list.add(${departure(...d)});`),
+    ...list.map((d) => `list.add(${fresh(...d)});`),
     `list.sort(${make});`,
     'List<String> order = new ArrayList<>();',
     'for (Departure d : list) order.add(d.boat() + " " + d.hour() + " " + d.seatsFree());'
@@ -88,7 +90,7 @@ export const checks = tasks({
         pair('Puts the earlier hour first', ['Comparator<Departure> c = Orders.earliestFirst();', `Departure a = ${departure('Godwit', 9, 4)};`, `Departure b = ${departure('Pochard', 14, 6)};`], ['c.compare(a, b)', 'c.compare(b, a)'], -1, 1, 'near', 'compare should give back a number below 0 when the first departure leaves earlier, and above 0 when it leaves later.'),
         pair('Orders the first and last hours of the day', ['Comparator<Departure> c = Orders.earliestFirst();', `Departure a = ${departure('Redshank', 23, 1)};`, `Departure b = ${departure('Dotterel', 0, 9)};`], ['c.compare(a, b)', 'c.compare(b, a)'], 1, -1, 'far', 'The departure at hour 0 leaves before the one at hour 23, so it comes first.'),
         pair('Gives back 0 for the same hour', ['Comparator<Departure> c = Orders.earliestFirst();', `Departure a = ${departure('Merganser', 10, 3)};`, `Departure b = ${departure('Garganey', 10, 8)};`], ['c.compare(a, b)', 'c.compare(b, a)'], 0, 0, 'equal', 'Two departures at the same hour compare as 0, whatever their boats and seats.'),
-        sorts('Sorts a list of departures', 'Orders.earliestFirst()', BY_HOUR, BY_HOUR_RIGHT, 'Sorted with earliestFirst, the departures should go from the earliest hour to the latest.'),
+        sorts('Sorts a list of departures', 'Orders.earliestFirst()', BY_HOUR, BY_HOUR_RIGHT, 'Sorted with earliestFirst, the departures should go from the earliest hour to the latest, and two at the same hour should stay in the order they came: a sort keeps two that compare as 0 as they were.'),
         lambdaCase('earliestFirst gives back a lambda', ['Comparator<Departure> c = Orders.earliestFirst();'], 'c')
       ],
       judge: judge(
@@ -134,8 +136,8 @@ export const checks = tasks({
       cases: [
         pair('Puts the boats in alphabetical order', ['Comparator<Departure> c = Boards.byBoatThenRoom();', `Departure a = ${departure('Garganey', 9, 2)};`, `Departure b = ${departure('Turnstone', 12, 9)};`], ['c.compare(a, b)', 'c.compare(b, a)'], -1, 1, 'boats', 'Departures of different boats should be in alphabetical order of their boats, whatever their seats free.'),
         pair('Of different boats with the same seats, the boats decide', ['Comparator<Departure> c = Boards.byBoatThenRoom();', `Departure a = ${departure('Sanderling', 10, 4)};`, `Departure b = ${departure('Goldeneye', 15, 4)};`], ['c.compare(a, b)', 'c.compare(b, a)'], 1, -1, 'boatsOnly', 'Departures of different boats should be in alphabetical order of their boats.'),
-        pair('Of the same boat, puts most seats free first', ['Comparator<Departure> c = Boards.byBoatThenRoom();', `Departure a = ${departure('Redshank', 9, 3)};`, `Departure b = ${departure('Redshank', 13, 10)};`], ['c.compare(a, b)', 'c.compare(b, a)'], 1, -1, 'seats', 'Of two departures of the same boat, the one with more seats free comes first.'),
-        pair('Gives back 0 for the same boat and seats', ['Comparator<Departure> c = Boards.byBoatThenRoom();', `Departure a = ${departure('Pochard', 8, 6)};`, `Departure b = ${departure('Pochard', 17, 6)};`], ['c.compare(a, b)', 'c.compare(b, a)'], 0, 0, 'equal', 'Two departures of the same boat with the same seats free compare as 0, whatever their hours.'),
+        pair('Of the same boat, puts most seats free first', ['Comparator<Departure> c = Boards.byBoatThenRoom();', `Departure a = ${fresh('Redshank', 9, 3)};`, `Departure b = ${fresh('Redshank', 13, 10)};`], ['c.compare(a, b)', 'c.compare(b, a)'], 1, -1, 'seats', 'Of two departures of the same boat, the one with more seats free comes first.'),
+        pair('Gives back 0 for the same boat and seats', ['Comparator<Departure> c = Boards.byBoatThenRoom();', `Departure a = ${fresh('Pochard', 8, 6)};`, `Departure b = ${fresh('Pochard', 17, 6)};`], ['c.compare(a, b)', 'c.compare(b, a)'], 0, 0, 'equal', 'Two departures of the same boat with the same seats free compare as 0, whatever their hours.'),
         sorts('Sorts the board', 'Boards.byBoatThenRoom()', BOARD, BOARD_RIGHT, 'Sorted with byBoatThenRoom, the departures should be in alphabetical order of their boats, and each boat\'s departures from most seats free to fewest.')
       ],
       judge: judge(
@@ -166,7 +168,7 @@ export const checks = tasks({
           },
           {
             when: (r, all) => r.case.kind !== 'equal' && zero(of(all, 'seats')) && right(of(all, 'boats')),
-            hint: 'compare gives back 0 for two departures of the same boat with different seats free, which leaves their order to chance. The task gives a second rule: most seats free first.'
+            hint: 'compare gives back 0 for two departures of the same boat with different seats free, which leaves their order to chance. The task gives a second rule: most seats free first. Two boats\' names are the same when equals says so: == asks whether they are the very same object.'
           }
         ],
         ''

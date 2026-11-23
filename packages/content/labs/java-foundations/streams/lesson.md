@@ -58,7 +58,7 @@ That line weighs no jar at all. Ask for `later.limit(1).toList()`, and the jars 
 
 A stream is used once. Once its ending has run, it is finished, and using it again stops the program with `IllegalStateException: stream has already been operated upon or closed`. To ask a second question, start a new stream from the list. And a stream never changes the list it came from: `filter` and `sorted` make new streams, not new lists in place of the old.
 
-Streams can also share their work out over several processors at once. That belongs with doing several things at once, at the end of this repo.
+Streams can also share their work out over several processors at once. That belongs with doing several things at once, a subject of its own that this repo leaves out.
 
 ## Your work in this issue
 

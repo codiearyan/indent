@@ -23,7 +23,9 @@ class CheckShows {
 
 const booking = ([who, boat, seats]) => `new Booking("${who}", "${boat}", ${seats})`
 const show = (list) => list.map(([w, b, s]) => `${w} ${b} ${s}`)
-const setupOf = (list) => [`CheckList<Booking> bookings = new CheckList<>(List.of(${list.map(booking).join(', ')}));`]
+// Each boat's name is a text of its own in Check's setup, so == on two boats is false, as it is on real data.
+const fresh = ([who, boat, seats]) => `new Booking("${who}", new String("${boat}"), ${seats})`
+const setupOf = (list) => [`CheckList<Booking> bookings = new CheckList<>(List.of(${list.map(fresh).join(', ')}));`]
 const shownSetup = (list) => `List<Booking> bookings = List.of(${list.map(booking).join(', ')});`
 
 /** A case that calls one method on Check's own list and reads the list again afterwards. */
@@ -43,9 +45,10 @@ function streamCase({ name, list, call, type, method, expected = {}, after = {},
   })
 }
 
+const READS = { 'a loop': 'reads the list itself with a loop', get: 'reads the list itself with get', forEach: "reads the list itself with the list's forEach", 'a copy': 'copies the list', subList: 'reads part of the list with subList' }
 const LOOPS = {
   when: (r, x) => x?.name === 'LoopRefused',
-  hint: (r, x) => `${r.case.method} reads the list item by item itself (${(x.message ?? '').replace("Check's list refuses ", '')}), where the task asks for one stream from the list to the answer. Check hands over a list of its own that refuses to be read any other way.`
+  hint: (r, x) => `${r.case.method} ${READS[(x.message ?? '').replace("Check's list refuses ", '')] ?? 'reads the list itself'}, where the task asks for one stream from the list to the answer. Check hands over a list of its own that refuses to be read any other way.`
 }
 const CHANGED = {
   when: (r, x) => !x && r.case.list && !same(items(r, 'bookings afterwards'), show(r.case.list)),
@@ -72,7 +75,7 @@ function judge(mistakes, { oneStream = false } = {}) {
     const details = outcomeCases({ file: FILE, explain: explainFunction })(runs, ctx)
     // A stream's forEach that adds to a list of the learner's own gives the right answer, and is a
     // loop in a stream's clothes: Check cannot see it from outside, so it reads the task's lines.
-    const extra = !oneStream ? [] : /\.forEach\s*\([^;]*\.add\s*\(/s.test(codeOnly(ctx.section))
+    const extra = !oneStream ? [] : /\.forEach(?:Ordered)?\s*\([^;]*(?:\.add\s*\(|::add\b)/s.test(codeOnly(ctx.section))
       ? [fail(FOREACH, 'A forEach adds each item to a list of your own. That is a loop written as a stream, and the task asks for one stream from the list to its answer: steps that keep and turn the items, then an ending that gives the answer back.')]
       : [pass(FOREACH)]
     return [...details.map((d, i) => {
@@ -125,6 +128,10 @@ export const checks = tasks({
         streamCase({ name: 'countOn with no bookings', list: [], call: 'Passengers.countOn(bookings, "Godwit")', type: 'long', method: 'countOn', expected: { got: 0 }, hint: 'With no bookings, countOn should give back 0.' })
       ],
       judge: judge([
+        {
+          when: (r, x) => !x && ['names', 'count'].includes(r.case.kind) && ((items(r, 'got') ?? [null]).length === 0 || value(r, 'got') === '0'),
+          hint: (r) => `${r.case.method} finds no booking on a boat that has some. Look at how the boat is compared: two texts with the same letters are equal by equals, while == asks whether they are the very same object, as part 1 showed.`
+        },
         {
           when: (r, x) => !x && r.case.kind === 'names' && r.lines.some((l) => namesOn(DAY, r.case.boat).some((n) => l.includes(n))) && !same(items(r, 'got'), r.case.expected.got),
           hint: 'namesOn prints the names, and gives back something else. Check uses what a method gives back: the task asks for the names back, as a list.'
@@ -237,6 +244,14 @@ export const checks = tasks({
         {
           when: (r, x) => !x && r.case.kind === 'wait' && (items(r, 'the rule was asked about, once two names were found') ?? []).length > 4,
           hint: 'To find the first two names, the rule was asked about more bookings than they needed. A stream with only filter and map steps reads no further than its answer needs: a step that has to see everything first, such as sorted, makes it read the whole list.'
+        },
+        {
+          when: (r, x) => !x && ['wait', 'all'].includes(r.case.kind) && (items(r, r.case.kind === 'wait' ? 'the first two names' : 'every name') ?? []).length > 0 && (items(r, r.case.kind === 'wait' ? 'the rule was asked about, once two names were found' : 'the rule was asked about') ?? []).length === 0,
+          hint: 'The stream gives names without ever asking the rule Check handed namesWhere. That rule decides which bookings count: hand each booking to it.'
+        },
+        {
+          when: (r, x) => !x && ['wait', 'all'].includes(r.case.kind) && same(items(r, r.case.kind === 'wait' ? 'the first two names' : 'every name'), QUEUE.filter(([, , n]) => n <= (r.case.rule ?? 1)).map(([w]) => w).slice(0, r.case.kind === 'wait' ? 2 : undefined)),
+          hint: 'The stream keeps the bookings the rule says no to, and drops the ones it says yes to: the test is the wrong way round.'
         },
         {
           when: (r, x) => !x && r.case.kind === 'all' && same(items(r, 'every name'), r.case.expected['every name']) && (items(r, 'the rule was asked about') ?? []).length > QUEUE.length,

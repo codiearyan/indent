@@ -184,6 +184,10 @@ export const checks = tasks({
       ],
       judge: judgeCalls([
         {
+          when: (r, x) => !x && r.case.kind === 'both' && (items(r, 'second was asked about') ?? []).length === 0 && (items(r, 'first was asked about') ?? []).length === 4,
+          hint: 'The rule both gives back asks first alone, and never second. and makes a new rule out of two and changes neither of them: give back the rule it makes.'
+        },
+        {
           when: (r, x) => !x && r.case.kind === 'both' && same(items(r, 'answers'), [true, true, true, false]),
           hint: 'The rule both gives back says yes when either rule says yes. The task asks for yes only when both say yes.'
         },

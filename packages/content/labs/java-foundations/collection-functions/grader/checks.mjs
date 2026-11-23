@@ -124,6 +124,10 @@ export const checks = tasks({
               hint: 'The names are right, in the wrong order. The task asks for alphabetical order taking no notice of capital letters: in Java\'s own order of text, every capital comes before every small letter.'
             },
             {
+              when: (r, x) => !x && same((items(r, 'names afterwards') ?? []).map((n) => n.toLowerCase()), r.case.expected['names afterwards'].map((n) => n.toLowerCase())) && !same(items(r, 'names afterwards'), r.case.expected['names afterwards']),
+              hint: 'The names are in the right order, and their letters have changed: only the spaces at the ends come off. Each name keeps its capitals and small letters as they were typed.'
+            },
+            {
               when: (r, x) => !x && r.case.kind && same([...(items(r, 'names afterwards') ?? [])].sort(), [...r.case.expected['names afterwards']].sort()),
               hint: 'The names are right, in the wrong order. The task asks for alphabetical order taking no notice of capital letters.'
             }
@@ -152,6 +156,10 @@ export const checks = tasks({
           {
             when: (r, x) => x?.name === 'NullPointerException' && /Map\.get/.test(x.message ?? ''),
             hint: 'perBoat asked the map for the seats of a boat it had not seen yet, and get gave back null, which cannot become an int. The first booking of a boat has nothing in the map yet: the lesson shows the map methods that take care of that.'
+          },
+          {
+            when: (r, x) => !x && (items(r, SORTED) ?? []).length === 0 && r.case.list.length > 0,
+            hint: 'perBoat gives back an empty map: nothing was ever put in it. Reading a value, with get or getOrDefault, changes nothing; the new total has to be put back in the map.'
           },
           {
             when: (r, x) => !x && same(items(r, SORTED), sortedEntries(lastSeats(r.case.list), String)) && !same(r.case.want, items(r, SORTED)),
@@ -192,6 +200,14 @@ export const checks = tasks({
           {
             when: (r, x) => !x && same(items(r, SORTED), Object.keys(groupsMap(r.case.list)).sort().map((k) => `${k}=[${groupsMap(r.case.list)[k].at(-1)}]`)) && !same(r.case.want, items(r, SORTED)),
             hint: 'Each boat holds only its last passenger: a new list is put in the map for every booking, in place of the one already there. Make a boat\'s list only when the boat has none yet.'
+          },
+          {
+            when: (r, x) => !x && (items(r, SORTED) ?? []).length === 0 && r.case.list.length > 0,
+            hint: 'passengersByBoat gives back an empty map: no boat\'s list was ever put in it. getOrDefault hands back a value without putting it in the map; the first booking of a boat needs its new list put in the map.'
+          },
+          {
+            when: (r, x) => !x && same(items(r, SORTED), Object.keys(groupsMap(r.case.list)).sort().map((k) => `${k}=[${[...groupsMap(r.case.list)[k]].reverse().join(', ')}]`)) && !same(r.case.want, items(r, SORTED)),
+            hint: 'Each boat\'s passengers are there, last booked first. The task asks for the order they booked: each new name goes at the end of its boat\'s list.'
           }
         ]
       })

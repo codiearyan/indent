@@ -13,11 +13,13 @@ class CheckShows {
 }`
 
 const booking = ([who, boat, seats]) => `new Booking("${who}", "${boat}", ${seats})`
+// Each boat's name is a text of its own in Check's setup, so == on two boats is false, as it is on real data.
+const fresh = ([who, boat, seats]) => `new Booking("${who}", new String("${boat}"), ${seats})`
 const show = (list) => list.map(([w, b, s]) => `${w} ${b} ${s}`)
 
 /** A case on Check's own list, which only a stream can read, read again afterwards. */
 function streamCase({ name, list, call, type, method, expected = {}, after = {}, hint, own = true, ...extra }) {
-  const make = own ? `CheckList<Booking> bookings = new CheckList<>(List.of(${list.map(booking).join(', ')}));` : `List<Booking> bookings = List.of(${list.map(booking).join(', ')});`
+  const make = own ? `CheckList<Booking> bookings = new CheckList<>(List.of(${list.map(fresh).join(', ')}));` : `List<Booking> bookings = List.of(${list.map(fresh).join(', ')});`
   return attempt({
     name,
     setup: [make],
@@ -35,10 +37,11 @@ function streamCase({ name, list, call, type, method, expected = {}, after = {},
 
 const thrown = (r) => (value(r, 'thrown') ? { name: value(r, 'thrown').split('.').pop().replace(/\$/g, '.'), message: value(r, 'thrown.message'), frames: (value(r, 'thrown.frames') ?? '').slice(1, -1).split(', ') } : null)
 
+const READS = { 'a loop': 'reads the list itself with a loop', get: 'reads the list itself with get', forEach: "reads the list itself with the list's forEach", 'a copy': 'copies the list', subList: 'reads part of the list with subList' }
 const COMMON = [
   {
     when: (r, x) => x?.name === 'LoopRefused',
-    hint: (r, x) => `${r.case.method} reads the list item by item itself (${(x.message ?? '').replace("Check's list refuses ", '')}), where the task asks for one stream from the list to the answer. Check hands over a list of its own that refuses to be read any other way.`
+    hint: (r, x) => `${r.case.method} ${READS[(x.message ?? '').replace("Check's list refuses ", '')] ?? 'reads the list itself'}, where the task asks for one stream from the list to the answer. Check hands over a list of its own that refuses to be read any other way.`
   },
   {
     when: (r, x) => x?.name === 'UnsupportedOperationException' && fromMine(x),
@@ -69,6 +72,8 @@ const ONE = [['Gormul', 'Pochard', 5]]
 const sum = (l) => l.reduce((a, [, , s]) => a + s, 0)
 
 const counts = (l) => l.reduce((m, [, b]) => ({ ...m, [b]: (m[b] ?? 0) + 1 }), {})
+const seatsPer = (l) => l.reduce((m, [, b, n]) => ({ ...m, [b]: (m[b] ?? 0) + n }), {})
+const entries = (m) => Object.entries(m).sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, v]) => `${k}=${v}`)
 const mapJava = (m) => `java.util.Map.of(${Object.entries(m).map(([k, v]) => `"${k}", ${v}L`).join(', ')})`
 const SAME = 'the same map as the right one'
 const SORTED = 'its entries, by boat'
@@ -145,6 +150,14 @@ export const checks = tasks({
         {
           when: (r, x) => !x && r.case.kind === 'map' && items(r, SORTED)?.every((e) => e.endsWith('=1')) && Object.values(counts(r.case.list)).some((n) => n > 1),
           hint: 'Every boat counts 1, however many bookings it has. Each booking should add one to its boat\'s count.'
+        },
+        {
+          when: (r, x) => !x && r.case.kind === 'map' && same(items(r, SORTED), entries(seatsPer(r.case.list))) && !same(entries(seatsPer(r.case.list)), entries(counts(r.case.list))),
+          hint: 'Each boat holds the seats of its bookings added up, not the number of bookings. Count the bookings: a booking of 4 seats counts once.'
+        },
+        {
+          when: (r, x) => !x && r.case.kind === 'line' && r.case.list.length > 1 && value(r, 'got') === r.case.list.map(([w]) => w).sort().join(', '),
+          hint: 'namesLine puts the names in alphabetical order. The task asks for them in the order they came.'
         }
       ])
     },
@@ -181,6 +194,18 @@ export const checks = tasks({
         {
           when: (r, x) => !x && r.case.method === 'largestOn' && r.case.kind !== 'none' && /Godwit 2$|Sanderling 3$/.test(value(r, 'found') ?? ''),
           hint: 'largestOn gives back a booking with fewest seats on the boat. The task asks for the one with most.'
+        },
+        {
+          when: (r, x) => !x && r.case.list.length > 0 && !['none', 'nobody'].includes(r.case.kind) && (value(r, 'found') === 'an empty Optional' || value(r, 'got') === 'nobody'),
+          hint: (r) => `${r.case.method} finds no booking on a boat that has some. Look at how the boat is compared: two texts with the same letters are equal by equals, while == asks whether they are the very same object, as part 1 showed.`
+        },
+        {
+          when: (r, x) => !x && r.case.method === 'largestOn' && /^a booking: /.test(value(r, 'found') ?? '') && value(r, 'found').split(' ')[3] !== /"(\w+)"\)$/.exec(r.case.call)?.[1],
+          hint: 'largestOn gives back a booking on another boat than the one Check names. Look only at the bookings on that boat.'
+        },
+        {
+          when: (r, x) => !x && r.case.method === 'firstOn' && value(r, 'got') === LOOKUP[0][0] && value(r, 'got') !== r.case.expected.got,
+          hint: 'firstOn gives back the first passenger of the whole list, whatever the boat. Look only at the bookings on the boat Check names.'
         }
       ])
     }
