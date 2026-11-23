@@ -1,0 +1,6 @@
+Today's jobs, from Idris
+
+1. Every line of sales/web-orders.csv for Pellow Bakery, in pellow-bakery.txt. Pellow Farm Shop is another customer: leave its orders out.
+2. Every line of logs/press-mar.log that mentions a jam, however it was typed, in jams.txt.
+3. How many web orders are still unpaid? Save the number in unpaid-count.txt.
+4. Customers keep writing about a wrong address. Every line in messages, in all its folders, that says wrong address, with the file name and the line number, in wrong-address.txt.

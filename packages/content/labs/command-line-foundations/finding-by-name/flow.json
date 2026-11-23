@@ -1,0 +1,78 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "hesper", "label": "Hesper", "kind": "story" },
+      { "id": "sticks", "label": "Old sticks", "kind": "data" },
+      { "id": "search", "label": "Your searches", "kind": "story", "mine": true },
+      { "id": "screen", "label": "Terminal", "kind": "story" },
+      { "id": "lists", "label": "Saved lists", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "hesper", "to": "search", "label": "what to find" },
+      { "from": "sticks", "to": "search", "label": "every folder" },
+      { "from": "search", "to": "screen", "label": "paths" },
+      { "from": "search", "to": "lists", "label": "saved" }
+    ],
+    "note": "You search every folder of the old memory sticks by name, and keep the list of what was found."
+  },
+  "tasks": {
+    "drawings": {
+      "steps": [
+        {
+          "active": ["hesper", "hesper->search", "sticks", "sticks->search", "search"],
+          "note": "Hesper's old drawings are spread over the sticks, some several folders deep."
+        },
+        {
+          "active": ["search", "search->screen", "screen"],
+          "value": {
+            "kind": "array",
+            "label": "one line per drawing",
+            "values": ["old-sticks/.../name.svg"]
+          },
+          "note": "The search looks in every folder and prints a path for each drawing it meets."
+        },
+        {
+          "active": ["search", "search->lists", "lists"],
+          "note": "The list of paths is saved, so Hesper can go straight to each drawing."
+        }
+      ]
+    },
+    "invoices": {
+      "steps": [
+        {
+          "active": ["hesper", "hesper->search", "sticks", "sticks->search", "search"],
+          "note": "Sol named invoices in every way: small letters, a capital first, all capitals."
+        },
+        {
+          "active": ["search", "search->screen", "screen"],
+          "note": "A search that ignores letter case finds the word wherever it sits in a name."
+        },
+        {
+          "active": ["search", "search->lists", "lists"],
+          "note": "Every invoice is on Idris's list, however its name was written."
+        }
+      ]
+    },
+    "proofs": {
+      "steps": [
+        {
+          "active": ["sticks", "sticks->search", "search"],
+          "value": {
+            "kind": "array",
+            "label": "named proofs",
+            "values": ["client folders", "Sol's notes"]
+          },
+          "note": "Folders and files can share a name, and both kinds are called proofs here."
+        },
+        {
+          "active": ["search", "search->screen", "screen"],
+          "note": "A second test keeps the folders and leaves Sol's notes out."
+        },
+        {
+          "active": ["search", "search->lists", "lists"],
+          "note": "The saved list leads to each client's proofs folder."
+        }
+      ]
+    }
+  }
+}
