@@ -8,15 +8,15 @@ const listed = (list) => (list.length ? `{${list.map((n) => JSON.stringify(n)).j
 
 export const checks = {
   find(t) {
-    const shelf = ['Pell Ashby', 'Olwen Harte', 'Merrin Dale']
+    const shelf = ['Pim Caddock', 'Olwen Harte', 'Merrin Dale']
     const cases = [
       [shelf, 'Olwen Harte'],
       [shelf, 'Merrin Dale'],
-      [shelf, 'Pell Ashby'],
+      [shelf, 'Pim Caddock'],
       [shelf, 'Olwen'],
       [shelf, 'olwen harte'],
-      [['Ida Loam'], 'Ida Loam'],
-      [[], 'Pell Ashby']
+      [['Inga Loam'], 'Inga Loam'],
+      [[], 'Pim Caddock']
     ]
     return judgeContainers(t, {
       file: FILE,
@@ -53,10 +53,10 @@ export const checks = {
 
   shelve(t) {
     const cases = [
-      [['Pell Ashby'], ['Olwen Harte', 'Ida Loam']],
+      [['Pim Caddock'], ['Olwen Harte', 'Inga Loam']],
       [[], ['Merrin Dale']],
-      [['Osric Fell'], ['Bram Tull', 'Osric Fell', 'Cas Ferry']],
-      [['Pell Ashby', 'Ida Loam'], []]
+      [['Osric Tolland'], ['Bertil Kestle', 'Osric Tolland', 'Ulla Ferrow']],
+      [['Pim Caddock', 'Inga Loam'], []]
     ]
     return judgeContainers(t, {
       file: FILE,
@@ -91,12 +91,12 @@ export const checks = {
   },
 
   letter(t) {
-    const shelf = ['Olwen Harte', 'Merrin Dale', 'Osric Fell', 'Ida Loam']
+    const shelf = ['Olwen Harte', 'Merrin Dale', 'Osric Tolland', 'Inga Loam']
     const cases = [
       [shelf, 'O'],
       [shelf, 'M'],
       [shelf, 'Z'],
-      [['Bram Tull', 'bram tull', 'Bea Corran'], 'B'],
+      [['Bertil Kestle', 'bertil kestle', 'Bevan Merrow'], 'B'],
       [[], 'O']
     ]
     return judgeContainers(t, {
@@ -123,6 +123,8 @@ export const checks = {
                     ? 'The right names come back, but the wrong way round. They keep the order of the shelf.'
                     : !want.length
                       ? `No name here starts with '${letter}', so the new list is empty.`
+                      : Array.isArray(r.result) && !r.result.length
+                        ? `startingWith gives back no names, though a name here starts with '${letter}'. A text's first character is at position 0.`
                       : Array.isArray(r.result) && r.result.length < want.length
                         ? `startingWith leaves out a name that starts with '${letter}'.`
                         : `The list given back is not the names that start with '${letter}', in shelf order.`

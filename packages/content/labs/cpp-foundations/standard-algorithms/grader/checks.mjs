@@ -1,4 +1,4 @@
-import { judgeContainers } from '../../grading.mjs'
+import { judgeContainers, PAST_END } from '../../grading.mjs'
 
 const FILE = 'src/ledger.cpp'
 const bills = { name: 'bills', what: 'the bills', type: 'std::vector<double>', after: true, want: 'const std::vector<double>&' }
@@ -59,7 +59,9 @@ export const checks = {
           hint: (r) =>
             !same(r.args[0], list)
               ? CHANGED('largestBill', 'bills')
-              : !list.length
+              : !list.length && near(r.result, PAST_END.double)
+                ? 'With no bills, largestBill read a bill that is not there: std::max_element gives back end() for an empty list, and * there reads past the end. With no bills, it gives back 0.'
+                : !list.length
                 ? 'With no bills, largestBill gives back 0.'
                 : list.length > 1 && near(r.result, list.indexOf(want)) && list.indexOf(want) !== want
                   ? 'largestBill gives back where the largest bill is, counted from 0, not the bill. A * in front of what std::max_element gives back reads the value there.'

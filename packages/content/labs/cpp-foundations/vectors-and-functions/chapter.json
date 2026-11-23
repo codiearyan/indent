@@ -75,7 +75,7 @@
       "id": "letter",
       "title": "List the names that start with a letter",
       "file": "src/shelf.cpp",
-      "description": "Under `// Task 3`, write a function called `startingWith` that takes the shelf as a reference to a `const std::vector<std::string>` and a letter as a `char`. It gives back a new `std::vector<std::string>` with the names on the shelf whose first character is that letter, in shelf order, and leaves the shelf as it was. With the shelf below and `'O'`, it gives back `{\"Otto Brisk\", \"Odile Wren\"}`:\n\n```\n{\"Otto Brisk\", \"Mabel Quist\", \"Odile Wren\"}\n```\n\nCheck calls `startingWith` with shelves and letters of its own, a letter no name starts with and an empty shelf included, and reads what it gives back and the caller's shelf afterwards. It prints nothing.",
+      "description": "Under `// Task 3`, write a function called `startingWith` that takes the shelf as a reference to a `const std::vector<std::string>` and a letter as a `char`. It gives back a new `std::vector<std::string>` with the names on the shelf whose first character is that letter, in shelf order, and leaves the shelf as it was. With the shelf below and `'O'`, it gives back `{\"Oona Pruett\", \"Odran Selby\"}`:\n\n```\n{\"Oona Pruett\", \"Mirelle Vantry\", \"Odran Selby\"}\n```\n\nCheck calls `startingWith` with shelves and letters of its own, a letter no name starts with and an empty shelf included, and reads what it gives back and the caller's shelf afterwards. It prints nothing.",
       "nextSteps": [
         "Write the first line, with a new vector as what it gives back.",
         "Make an empty vector of names inside the function.",

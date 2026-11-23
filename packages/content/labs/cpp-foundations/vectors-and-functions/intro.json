@@ -1,6 +1,6 @@
 {
   "stations": [
-    { "title": "Dorrit", "say": "Is Otto Brisk's clock ready?", "note": "A customer is on the phone." },
+    { "title": "Dorrit", "say": "Is Oona Pruett's clock ready?", "note": "A customer is on the phone." },
     { "title": "Pickup shelf", "text": "Read through by eye, one name at a time." },
     {
       "title": "Your code",
@@ -11,9 +11,9 @@
     },
     { "title": "Customer", "say": "I'll come by this afternoon." }
   ],
-  "ticket": { "label": "Otto Brisk", "wrong": "on hold", "why": "Searching", "right": "on the shelf" },
+  "ticket": { "label": "Oona Pruett", "wrong": "on hold", "why": "Searching", "right": "on the shelf" },
   "captions": [
-    "A customer rings Dorrit to ask whether Otto Brisk's clock is ready to collect.",
+    "A customer rings Dorrit to ask whether Oona Pruett's clock is ready to collect.",
     "She reads the pickup shelf by eye while the customer waits on the line.",
     "You write functions that read a list, change one, and hand a new one back.",
     "Now the answer comes at once, and new arrivals join the shelf in order.",

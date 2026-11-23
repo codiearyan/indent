@@ -27,8 +27,8 @@
 // Write a function called startingWith that takes the shelf as a reference to a const
 // std::vector<std::string> and a letter as a char. It gives back a new std::vector<std::string>
 // with the names on the shelf whose first character is that letter, in shelf order, and leaves
-// the shelf as it was. With the shelf below and 'O', it gives back {"Otto Brisk", "Odile Wren"}:
-//   {"Otto Brisk", "Mabel Quist", "Odile Wren"}
+// the shelf as it was. With the shelf below and 'O', it gives back {"Oona Pruett", "Odran Selby"}:
+//   {"Oona Pruett", "Mirelle Vantry", "Odran Selby"}
 
 // Task 4: Read the ticket numbers Dorrit types
 // Write a function called readTickets that takes nothing. It reads whole numbers from std::cin,
@@ -38,7 +38,7 @@
 int main() {
     std::cout << "Pickup shelf\n";
 
-    std::vector<std::string> shelf = {"Otto Brisk", "Mabel Quist", "Odile Wren"};
+    std::vector<std::string> shelf = {"Oona Pruett", "Mirelle Vantry", "Odran Selby"};
 
     // Try each function here once you have written it, with shelf, and print what you get.
     // Check calls your functions with shelves of its own, and types numbers of its own.

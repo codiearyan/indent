@@ -40,8 +40,8 @@ void shelveAll(std::vector<std::string>& shelf, const std::vector<std::string>& 
 // Write a function called startingWith that takes the shelf as a reference to a const
 // std::vector<std::string> and a letter as a char. It gives back a new std::vector<std::string>
 // with the names on the shelf whose first character is that letter, in shelf order, and leaves
-// the shelf as it was. With the shelf below and 'O', it gives back {"Otto Brisk", "Odile Wren"}:
-//   {"Otto Brisk", "Mabel Quist", "Odile Wren"}
+// the shelf as it was. With the shelf below and 'O', it gives back {"Oona Pruett", "Odran Selby"}:
+//   {"Oona Pruett", "Mirelle Vantry", "Odran Selby"}
 std::vector<std::string> startingWith(const std::vector<std::string>& shelf, char letter) {
     std::vector<std::string> found;
     for (const auto& name : shelf) {
@@ -68,14 +68,14 @@ std::vector<int> readTickets() {
 int main() {
     std::cout << "Pickup shelf\n";
 
-    std::vector<std::string> shelf = {"Otto Brisk", "Mabel Quist", "Odile Wren"};
+    std::vector<std::string> shelf = {"Oona Pruett", "Mirelle Vantry", "Odran Selby"};
 
     // Try each function here once you have written it, with shelf, and print what you get.
     // Check calls your functions with shelves of its own, and types numbers of its own.
-    if (onShelf(shelf, "Mabel Quist")) {
-        std::cout << "Mabel Quist is on the shelf\n";
+    if (onShelf(shelf, "Mirelle Vantry")) {
+        std::cout << "Mirelle Vantry is on the shelf\n";
     }
-    shelveAll(shelf, {"Pell Ashby", "Otto Brisk"});
+    shelveAll(shelf, {"Pim Caddock", "Oona Pruett"});
     std::cout << shelf.size() << " on the shelf\n";
     for (const auto& name : startingWith(shelf, 'O')) {
         std::cout << name << "\n";

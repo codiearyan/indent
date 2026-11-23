@@ -1495,6 +1495,7 @@ export async function judgeCall(t, spec) {
     spec.returns !== 'void' &&
     runs.length > 1 &&
     results.every((v) => sameValue(v, results[0])) &&
+    !(Array.isArray(results[0]) && !results[0].length) &&
     !spec.cases.every((c) => sameValue(c.expect.result, spec.cases[0].expect.result))
   const usedNote = uses.length
     ? ` It uses ${uses.map((u) => `${u.name}${u.task ? ` from Task ${u.task}` : ''}`).join(' and ')}, so check that ${uses.length === 1 ? 'it passes' : 'they pass'} too.`
@@ -1764,6 +1765,9 @@ export async function judgeContainers(t, spec) {
 
 const label = (task) => `Task ${task}`
 
+// The algorithms whose whole answer is what they give back, unlike std::sort and std::reverse.
+const ANSWERS = ['accumulate', 'max_element', 'min_element', 'find', 'count']
+
 const HEADERS = [
   ['vector', /\bstd::(vector)\s*</],
   ['map', /\bstd::(map)\s*</],
@@ -1789,9 +1793,20 @@ async function includesHeaders(t, { file, fn, task, uses = [] }) {
       `${label(task)} asks ${fn} to use std::${missing}, and Check cannot find it in ${fn}. The point of this task is the tool the library already has: call std::${missing} instead of writing its work out yourself.`
     )
   }
+  const ignored = uses.find(
+    (name) =>
+      ANSWERS.includes(name) &&
+      [...body.matchAll(new RegExp(`\\b${name}\\s*\\(`, 'g'))].every((m) => /(?:^|[;{}])\s*(?:std\s*::\s*)?$/.test(body.slice(0, m.index)))
+  )
+  if (ignored) {
+    return fail(
+      `${fn} uses what std::${ignored} gives back`,
+      `${fn} calls std::${ignored} on a line of its own, so what it gives back is thrown away. std::${ignored} changes nothing: its answer is what it gives back, so ${fn} uses that answer instead of working it out again.`
+    )
+  }
   for (const [header, uses] of HEADERS) {
     const used = uses.exec(body)
-    if (!used || new RegExp(`^\\s*#\\s*include\\s*<${header}>`, 'm').test(whole)) continue
+    if (!used || new RegExp(`^\\s*#\\s*include\\s*<${header}>`, 'm').test(code)) continue
     return fail(
       `${file} includes <${header}>`,
       `${fn} uses std::${used[1]}, which comes from the header <${header}>, and ${file} has no #include <${header}> at the top. One compiler may find std::${used[1]} through another header, but the next one will not: add the line, above main, with the other #include lines.`

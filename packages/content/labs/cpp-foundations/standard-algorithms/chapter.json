@@ -35,12 +35,6 @@
           "url": "https://en.cppreference.com/w/cpp/container/vector/begin"
         }
       ],
-      "videos": [
-        {
-          "title": "std::sort and the iterators it takes",
-          "url": "https://www.youtube.com/watch?v=_GHniQ1LG_Y"
-        }
-      ],
       "points": 10
     },
     {
@@ -147,6 +141,12 @@
         {
           "title": "std::reverse",
           "url": "https://en.cppreference.com/w/cpp/algorithm/reverse"
+        }
+      ],
+      "videos": [
+        {
+          "title": "std::sort and the iterators it takes",
+          "url": "https://www.youtube.com/watch?v=_GHniQ1LG_Y"
         }
       ],
       "points": 10

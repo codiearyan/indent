@@ -7,6 +7,7 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
 const listed = (queue) => (queue.length ? `{${queue.join(', ')}}` : 'an empty queue')
 const COPY =
   "Check's own queue did not change. The function changed a copy of it: a parameter is a copy of what the caller passed, unless it is a reference."
+const BY_COPY = 'std::vector<int>'
 
 export const checks = {
   waiting(t) {
@@ -72,6 +73,7 @@ export const checks = {
   },
 
   add(t) {
+    let takes
     const cases = [
       [[], 3108],
       [[3101, 3104], 3110],
@@ -83,6 +85,10 @@ export const checks = {
       fn: 'addTicket',
       returns: 'int',
       params: [changed, { name: 'ticket', what: 'the ticket', type: 'int', want: 'int' }],
+      signature: (sig) => {
+        takes = sig.params[0]
+        return null
+      },
       cases: cases.map(([queue, ticket]) => {
         const want = [...queue, ticket]
         return {
@@ -91,8 +97,10 @@ export const checks = {
           expect: { result: want.length, printed: '', args: [want] },
           hint: (r) =>
             same(r.args[0], queue)
-              ? COPY
-              : same(r.args[0], [ticket, ...queue])
+              ? takes === BY_COPY
+                ? COPY
+                : "Check's own queue did not change: the ticket never went into it."
+              : queue.length && same(r.args[0], [ticket, ...queue])
                 ? 'The ticket went in at the front. New tickets go at the end of the queue.'
                 : !same(r.args[0], want)
                   ? 'The queue afterwards is not the queue it was with the ticket added at the end.'
@@ -105,6 +113,7 @@ export const checks = {
   },
 
   replace(t) {
+    let takes
     const three = [3101, 3104, 3110]
     const cases = [
       [three, 2, 3199],
@@ -125,17 +134,25 @@ export const checks = {
         { name: 'place', what: 'the place', type: 'int', want: 'int' },
         { name: 'ticket', what: 'the new ticket', type: 'int', want: 'int' }
       ],
+      signature: (sig) => {
+        takes = sig.params[0]
+        return null
+      },
       cases: cases.map(([queue, place, ticket]) => {
         const has = place >= 1 && place <= queue.length
         const want = has ? queue.map((x, i) => (i === place - 1 ? ticket : x)) : queue
-        const shifted = place >= 0 && place < queue.length && queue.map((x, i) => (i === place ? ticket : x))
+        const shifted = place >= 1 && place < queue.length && queue.map((x, i) => (i === place ? ticket : x))
         return {
           name: `Place ${place} of ${listed(queue)}`,
           args: [queue, place, ticket],
           expect: { result: has, printed: '', args: [want] },
           hint: (r) =>
             has && same(r.args[0], queue)
-              ? COPY
+              ? takes === BY_COPY
+                ? COPY
+                : r.result === false
+                  ? `The queue has a place ${place}, but replaceTicket gave back false and left it as it was. A queue of ${queue.length} has places 1 to ${queue.length}.`
+                  : `Check's own queue did not change at place ${place}.`
               : shifted && same(r.args[0], shifted)
                 ? `With place ${place}, replaceTicket changed the ticket after it. Place 1 is position 0.`
                 : !has && !same(r.args[0], queue)
