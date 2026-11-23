@@ -1,4 +1,5 @@
 import { chmod, cp, lstat, mkdir, readdir, readFile, rm, stat } from 'fs/promises'
+import { isUtf8 } from 'buffer'
 import { existsSync } from 'fs'
 import ignore from 'ignore'
 import { isAbsolute, join, relative, resolve, sep } from 'path'
@@ -13,6 +14,12 @@ export function resolveInside(dir: string, path: string): string {
   if (!rel || rel.startsWith('..') || isAbsolute(rel))
     throw new Error(`Path outside workspace: ${path}`)
   return full
+}
+
+/** True when the file on disk is not UTF-8 text, so writing the editor's text over it would damage it. */
+export async function holdsOtherText(file: string): Promise<boolean> {
+  const buffer = await readFile(file).catch(() => null)
+  return !!buffer && !isUtf8(buffer)
 }
 
 /** The app's own folder in each workspace: the starter the learner was given. */
@@ -125,7 +132,9 @@ export async function readWorkspace(
       // A file the learner locked is left out, as a binary one is, so the issue still opens.
       const buffer = await readFile(full).catch(() => null)
       if (!buffer || buffer.includes(0)) return null
-      return { path, content: buffer.toString('utf8') }
+      return isUtf8(buffer)
+        ? { path, content: buffer.toString('utf8') }
+        : { path, content: buffer.toString('utf8'), readOnly: true }
     })
   )
   const files = read.filter((file): file is WorkspaceFile => file !== null)

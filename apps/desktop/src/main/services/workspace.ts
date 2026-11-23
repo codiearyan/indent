@@ -31,7 +31,7 @@ import {
   reposIn
 } from './moveFolder'
 import { killAll } from './terminal'
-import { isAppPath, resolveInside } from './workspaceFiles'
+import { holdsOtherText, isAppPath, resolveInside } from './workspaceFiles'
 import { openWorkspace, resetWorkspace, resolveConflict, restoreMissing } from './workspaceSync'
 
 const queues = new Map<string, Promise<unknown>>()
@@ -73,6 +73,9 @@ async function write(
   const dir = workspaceDir(labId, chapterId)
   const file = resolveInside(dir, path)
   if (isAppPath(dir, file)) throw new Error(`Path outside workspace: ${path}`)
+  if (await holdsOtherText(file)) {
+    throw new Error(`${path} is not UTF-8 text, so the editor does not save over it.`)
+  }
   await mkdir(dirname(file), { recursive: true })
   await writeFile(file, content)
 }
