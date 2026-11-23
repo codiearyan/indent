@@ -1,0 +1,79 @@
+{
+  "id": "work-done-again",
+  "title": "Work done again and again",
+  "files": ["src/report.js", "src/try.js", "src/measure.js", "src/old-report.js", "src/shop.js"],
+  "terminal": {
+    "description": "A shell in your workspace where Sefton's money step runs beside yours: the same answer, the work counted, and the time.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "shares",
+      "title": "Work out the takings once",
+      "file": "src/report.js",
+      "description": "Make `addShares(ranking)` in `src/report.js` fast, without changing what it returns.\n\n- it returns what it returns now: a new list with one object per row, in the same order, holding all the row's fields and `share`, the row's `spent` divided by the takings, which are the `spent` of all rows added up\n- it reads each row's `spent` a few times in all, not once for every row\n\nThe check hands it rows of its own that count how often their `spent` is read, on two sizes and with one row, and compares your answer with Sefton's version.",
+      "nextSteps": [
+        "Find what `addShares` works out inside its `map`.",
+        "Ask which part of that is the same for every row.",
+        "Work that part out once, before the `map`, and use it inside.",
+        "Run `node src/try.js`: same answer, and a far smaller time."
+      ],
+      "hints": [
+        "Look inside the function the `map` calls for each row. Something in it goes through every row.",
+        "The takings are the same number for every row, yet they are added up again for each one. Anything inside a loop that does not depend on the loop's row can be worked out before the loop.",
+        "`const takings = ranking.reduce((sum, row) => sum + row.spent, 0)` before the `map`, then `share: row.spent / takings` inside it."
+      ],
+      "docs": [
+        { "title": "Array.prototype.reduce()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce" },
+        { "title": "Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rank",
+      "title": "Sort once",
+      "file": "src/report.js",
+      "description": "Make `rankCustomers(rows, compare)` in `src/report.js` fast, without changing what it returns.\n\n- it returns what it returns now: the rows in the order the comparison `compare` gives, the first row first\n- it uses `compare`, the comparison it is handed, for every comparison\n- it calls `compare` about as often as one sort of the whole list needs, not once more for every row that joins\n\nThe check hands it rows of its own, many with the same spend or the same name, and a comparison of its own that counts its calls, on two sizes, with one row and with none, and compares your order with Sefton's version. Keeping a list in order as it is built is fine, as long as the calls stay about as few as one sort's.",
+      "nextSteps": [
+        "Run `node src/try.js` and read how often the old ranking calls the comparison.",
+        "Find the `sort` in `rankCustomers` and see how often it runs.",
+        "Sort once, when every row is in.",
+        "Run the script again and compare the counts."
+      ],
+      "hints": [
+        "Count how many times `sort` runs in `rankCustomers`: once for every row.",
+        "Each sort goes over the whole list so far, and the order of every row before the last is thrown away and found again. Nobody reads the ranking until it is finished, so it only has to be in order then.",
+        "`return [...rows].sort(compare)`: a copy, so the list you were handed keeps its order, sorted once."
+      ],
+      "docs": [
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" },
+        { "title": "Array.prototype.toSorted()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "price",
+      "title": "Ask each price once",
+      "file": "src/report.js",
+      "description": "Make `priceOrders(orders, priceOf)` in `src/report.js` ask the price list less, without changing what it returns.\n\n- it returns what it returns now: a new list with one object per order, in the same order, holding all the order's fields and `pence`, its `qty` times `priceOf(order.item, order.customer.trade)`\n- within one call it asks `priceOf` each question once: one question for each item and kind of customer that appears, not one per order\n- the answers it keeps belong to that call only: a later call, which may be handed a new price list, asks again\n\nThe check hands it orders of its own and a price list of its own that counts its questions, on two sizes, then calls it twice in a row with prices that changed in between.",
+      "nextSteps": [
+        "Read \"Keeping an answer\" in the lesson.",
+        "Decide what a price depends on: that is your key.",
+        "Inside `priceOrders`, keep each answer under its key the first time you get it, and look there before asking.",
+        "Run `node src/try.js` and compare the price questions."
+      ],
+      "hints": [
+        "Thirty thousand orders, but only a few dozen different questions: there are not many items, and a customer is either trade or not.",
+        "Keep the answers in a `Map` made inside the call, so each call starts empty. The key has to hold everything the answer depends on, or two different questions share one answer.",
+        "`const prices = new Map()`, then for each order the key `order.item + ' ' + order.customer.trade`: ask `priceOf` only when `!prices.has(key)`, and use `prices.get(key)`."
+      ],
+      "docs": [
+        { "title": "Map", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" },
+        { "title": "Template literals", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals" },
+        { "title": "Memoization", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Memoization" }
+      ],
+      "videos": [{ "title": "Keeping answers instead of working them out again", "url": "https://www.youtube.com/watch?v=_1drYP7Zm_Q" }],
+      "points": 10
+    }
+  ]
+}

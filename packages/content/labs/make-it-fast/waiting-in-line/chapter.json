@@ -1,0 +1,80 @@
+{
+  "id": "waiting-in-line",
+  "title": "Waiting one after another",
+  "files": ["src/together.js", "src/report.js", "src/try.js", "src/shop.js", "src/old-report.js", "src/measure.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the payments part of the report asks a stand-in service Sefton's way and yours.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "together",
+      "title": "Ask all at once",
+      "file": "src/together.js",
+      "description": "Implement `askAll(ids, ask)` in `src/together.js`. `ask(id)` returns a promise of the answer about one id. `askAll` returns a promise of a list.\n\n- it asks `ask` about every id once, without waiting for any answer before asking the next\n- the list holds the answers in the order of `ids`, whatever order they arrive in\n- it settles once every answer has arrived; an empty list gives `[]`\n\nThe check's service has no real delay: it keeps every question open until the check answers it. It notes how many questions are open before the first answer, then answers the newest first, so the answers arrive out of order.",
+      "nextSteps": [
+        "Read \"Nobody needs the answer before\" in the lesson.",
+        "Start a question for every id first, and keep the promises.",
+        "Wait for all of them together.",
+        "Run `node src/try.js` and read how many questions were open at once."
+      ],
+      "hints": [
+        "An `await` inside a loop waits for each answer before the next question is even asked. These questions do not need each other's answers.",
+        "Calling `ask(id)` starts the question at once and gives a promise. Start them all, then wait for the list of promises as one; that keeps each answer in its own place.",
+        "`return Promise.all(ids.map((id) => ask(id)))`."
+      ],
+      "docs": [
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
+        { "title": "Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" }
+      ],
+      "videos": [{ "title": "Promises one after another and all together", "url": "https://www.youtube.com/watch?v=DK304_E9mVo" }],
+      "points": 10
+    },
+    {
+      "id": "limit",
+      "title": "Never more than the limit",
+      "file": "src/together.js",
+      "description": "Implement `askLimited(ids, ask, limit)` in `src/together.js`. It returns a promise of a list.\n\n- it asks `ask` about every id exactly once\n- there are never more than `limit` questions waiting for an answer at the same time\n- it starts with as many questions as it may: `limit` of them, or all when there are fewer ids\n- the list holds the answers in the order of `ids`; an empty list gives `[]`\n\nThe check's service records how many questions are open before the first answer and the most open at any moment, and answers the newest open question first. Starting the next question as soon as one is answered, or asking in groups of `limit` and waiting for each group, both pass.",
+      "nextSteps": [
+        "Read \"No more than the service takes\" in the lesson.",
+        "Decide how questions start: in groups, or a few helpers that each take the next id.",
+        "Put each answer at the place of its id.",
+        "Run `node src/try.js` and check that at most the limit was open."
+      ],
+      "hints": [
+        "`Promise.all` over every id would open them all at once, and the service refuses everything over its limit. Waiting for each answer in turn wastes the room it has.",
+        "One way: `limit` helpers that each loop, taking the next id that nobody has taken yet, asking, waiting, and taking the next. Another: a group of `limit` ids at a time, all waited for together before the next group. Either way, keep a place for each answer by the id's index.",
+        "`let next = 0`, `async function worker() { while (next < ids.length) { const i = next++; answers[i] = await ask(ids[i]) } }`, then `await Promise.all(Array.from({ length: Math.min(limit, ids.length) }, worker))` and return `answers`."
+      ],
+      "docs": [
+        { "title": "Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all" },
+        { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
+        { "title": "Array.from()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "payments",
+      "title": "Ask the payments service the fast way",
+      "file": "src/report.js",
+      "description": "Make `checkPayments(trade, ask)` in `src/report.js` fast, without changing what it returns.\n\n- it returns what it returns now: one `{ id, customerId, status }` for every trade order, in their order\n- an order whose record says `paid: true` gets the status `'paid'`, and the service is not asked about it\n- every other order is asked about exactly once, with never more than `PAYMENTS_LIMIT` questions (in `src/shop.js`) open at once, and as many as that while there are orders left\n\nThe check hands it trade orders of its own, some marked paid, and a service of its own that records every question and how many were open at once.",
+      "nextSteps": [
+        "Read \"The question you do not ask\" in the lesson.",
+        "Pick out the trade orders that are not marked paid.",
+        "Ask about those with `askLimited` and the limit from `src/shop.js`; both are already imported.",
+        "Build the list for every trade order, and run `node src/try.js`."
+      ],
+      "hints": [
+        "Two things make this part slow: it asks about orders whose answer is already known, and it asks one at a time.",
+        "Pick out the orders not marked paid, ask about their ids with your function from task 2, and keep each answer by order id. Then go through all the trade orders, in order, to build the list.",
+        "`const unpaid = trade.filter((order) => !order.paid)`, `const answers = await askLimited(unpaid.map((order) => order.id), ask, PAYMENTS_LIMIT)`, a `Map` from each unpaid id to its answer, then `trade.map(...)` with `'paid'` for the paid ones."
+      ],
+      "docs": [
+        { "title": "Array.prototype.filter()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter" },
+        { "title": "Map", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" },
+        { "title": "import", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import" }
+      ],
+      "points": 10
+    }
+  ]
+}

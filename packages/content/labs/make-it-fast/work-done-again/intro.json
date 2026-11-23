@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Thirty thousand price questions?", "note": "For a couple of dozen items." },
+    { "title": "Money step", "text": "Asks, sorts and adds up the same again.", "note": "Every order, every row." },
+    {
+      "title": "Your code",
+      "file": "report.js",
+      "mine": true,
+      "gap": "The same work, again and again",
+      "tasks": ["Add up takings once", "Sort once", "Ask each price once"]
+    },
+    { "title": "Print step", "text": "Gets the same ranking as before." }
+  ],
+  "ticket": { "label": "money step", "wrong": "work again", "why": "Repeated", "right": "done once" },
+  "captions": [
+    "At Ashgrove Press, Idris asks why the report asks thirty thousand price questions.",
+    "The money step works out the same answers again for every order and every row.",
+    "You add up the takings once, sort once, and keep each price for one report.",
+    "Now the money step gives the same ranking as before, with a small part of the work.",
+    "Same report, same answers, and each piece of work done once."
+  ]
+}

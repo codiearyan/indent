@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "Every hour now, please.", "note": "On the order server." },
+    { "title": "Sefton", "text": "Made two speed-ups of his own.", "note": "October lost a day." },
+    {
+      "title": "Your code",
+      "file": "report.js",
+      "mine": true,
+      "gap": "Fast, but not always right",
+      "tasks": ["Fix the slow step now", "Keep the last day", "Same as the old report"]
+    },
+    { "title": "Idris", "say": "October adds up again." }
+  ],
+  "ticket": { "label": "October", "wrong": "a day short", "why": "Too clever", "right": "every day" },
+  "captions": [
+    "At Ashgrove Press, Hesper wants the fast report every hour on the order server.",
+    "Sefton's own speed-ups lost a day of October and kept an old price.",
+    "You measure again, fix the slow step, and mend the two speed-ups.",
+    "Now October has every day, and each hour's report matches the first one exactly.",
+    "Same report, same answers, and you know when fast is fast enough."
+  ]
+}

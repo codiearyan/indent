@@ -1,0 +1,18 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "orders", "label": "Order server", "kind": "story" },
+      { "id": "report", "label": "Your fast report", "kind": "file", "mine": true },
+      { "id": "old", "label": "Sefton's first report", "kind": "file" },
+      { "id": "payments", "label": "Payments service", "kind": "story" },
+      { "id": "idris", "label": "Idris", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "orders", "to": "report", "label": "every order" },
+      { "from": "report", "to": "payments", "label": "a few at once" },
+      { "from": "old", "to": "report", "label": "same text" },
+      { "from": "report", "to": "idris", "label": "ready by morning" }
+    ],
+    "note": "At Ashgrove Press, the nightly report you make fast still prints exactly what Sefton's first one did, in a small part of the work."
+  }
+}

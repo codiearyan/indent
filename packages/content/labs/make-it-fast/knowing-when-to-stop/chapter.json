@@ -1,0 +1,81 @@
+{
+  "id": "knowing-when-to-stop",
+  "title": "Knowing when to stop",
+  "files": ["src/report.js", "src/try.js", "src/old-report.js", "src/measure.js", "src/together.js", "src/shop.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the report is measured again and put beside Sefton's first version, before and after a price change.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "print",
+      "title": "Fix the step that now matters",
+      "file": "src/report.js",
+      "description": "Make `printReport` in `src/report.js` fast, without changing one character of the text it returns.\n\n- it returns exactly the text it returns now\n- it makes one money formatter for the report, not one for every amount: a formatter is an `Intl.NumberFormat`, and `toLocaleString` on a number makes one too\n\nThe check hands it reports of its own on two sizes, compares the text with Sefton's version line by line, and counts every money formatter made while `src/report.js` loads and while the report is printed. A few in all is fine; one per amount is not. Writing the amounts by hand is fine too, as long as the text is the same.",
+      "nextSteps": [
+        "Run `node src/try.js` and see which step is the slowest now.",
+        "Find what `printReport` does for every amount it writes.",
+        "Make that once, outside `money`, and use it inside.",
+        "Run the script again and compare the three steps."
+      ],
+      "hints": [
+        "Every amount in the report goes through `money`. Look at what `money` makes each time it is called.",
+        "Making a formatter means loading the rules for writing pounds in Britain: the sign, the commas, the pence. They never change between two amounts, so one formatter can write them all.",
+        "`const pounds = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' })` above `money`, then `return pounds.format(pence / 100)` inside it."
+      ],
+      "docs": [
+        { "title": "Intl.NumberFormat", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat" },
+        { "title": "Intl.NumberFormat.prototype.format()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/format" },
+        { "title": "Number.prototype.toLocaleString()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "days",
+      "title": "Stop early and keep the last day",
+      "file": "src/report.js",
+      "description": "Fix Sefton's `takingsByDay(orders, from, until)` in `src/report.js`. The orders are in day order.\n\n- it returns what the old version returns: one `{ day, orders, pence }` for each day with orders, from `from` up to and including `until`, in day order, with the number of orders and their pence added up\n- it stops reading at the first order after `until`, and keeps the day it was adding up when it stopped\n- no days gives `[]`\n\nThe check hands it orders of its own that count which of them were read, with ranges that end before the last order, start before the first, cover the end, have no orders, and skip days, and compares your list with the old version.",
+      "nextSteps": [
+        "Run `node src/try.js` and compare the last day of October in both versions.",
+        "Follow Sefton's loop to the first order after `until`: what happens to the day it was adding up?",
+        "Make sure that day goes into the list however the loop ends.",
+        "Keep the early stop: the orders after `until` should not be read."
+      ],
+      "hints": [
+        "The bug only shows when `until` is before the last order. Tonight's report runs up to the last order, so it looked fine.",
+        "Sefton keeps the day he is adding up aside and puts it in the list only when the next day starts or the loop ends. An early `return` skips both. Either put that day in before stopping, or put each new day in the list the moment it starts.",
+        "Replace `return days` with `break`, so the push after the loop still runs. Or push `current` into `days` as soon as you make it, and drop the push when the day changes."
+      ],
+      "docs": [
+        { "title": "break", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/break" },
+        { "title": "return", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return" },
+        { "title": "continue", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/continue" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "report",
+      "title": "The old report, exactly, in far less work",
+      "file": "src/report.js",
+      "description": "Make `buildReport(shop, { priceOf, ask })` in `src/report.js` give exactly the text Sefton's first report gives, every time, with the work of the fast report.\n\n- on the same shop, its text is the old report's text, line for line\n- the same program may build several reports, and the price list may change between them: every report uses the prices it was handed\n- the work stays small: about one look at each customer, no search of the trade list per order, each price question once per report, and each unpaid trade order asked about once, never more than four at once\n\nThe check builds reports on shops of its own of two sizes, with records, a price list and a payments service that count what is used, then builds two reports in one program with a price changed between them.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the last two lines.",
+        "Read \"Faster and wrong\" in the lesson.",
+        "Find the change Sefton made so prices last from one report to the next.",
+        "Make each report start with no prices kept, or forget them when the price list is a different one."
+      ],
+      "hints": [
+        "Only the second report goes wrong, and only after a price changed. Something lives longer than one report.",
+        "Sefton moved the kept prices outside `priceOrders`, so they last as long as the program. The order server runs for days; Idris changes prices during the day.",
+        "Move `const prices = new Map()` back inside `priceOrders`, so every call starts empty."
+      ],
+      "docs": [
+        { "title": "Scope", "url": "https://developer.mozilla.org/en-US/docs/Glossary/Scope" },
+        { "title": "Map", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" },
+        { "title": "WeakMap", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap" }
+      ],
+      "videos": [{ "title": "When to make code faster, and when not to", "url": "https://www.youtube.com/watch?v=9OE3-PBfTto" }],
+      "points": 10
+    }
+  ]
+}
