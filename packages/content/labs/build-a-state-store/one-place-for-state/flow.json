@@ -1,0 +1,87 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "screen", "label": "Order screen", "kind": "story" },
+      { "id": "set", "label": "setState()", "kind": "function", "mine": true },
+      { "id": "next", "label": "nextState()", "kind": "function", "mine": true, "fn": "nextState" },
+      { "id": "state", "label": "Order state", "kind": "data" },
+      { "id": "parts", "label": "Header and total", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "screen", "to": "set", "label": "a change" },
+      { "from": "set", "to": "next", "label": "state, part" },
+      { "from": "next", "to": "state", "label": "new state" },
+      { "from": "state", "to": "parts", "label": "one source" }
+    ],
+    "note": "The order moves into one store: every change goes through setState, and every part of the screen reads the same state."
+  },
+  "tasks": {
+    "create": {
+      "steps": [
+        {
+          "active": ["screen", "screen->set", "set"],
+          "value": { "kind": "map", "label": "the part", "entries": [{ "key": "paper", "value": "the new paper" }] },
+          "note": "A customer picks linen paper. The screen hands setState only the part that changes."
+        },
+        {
+          "active": ["set", "set->next", "next"],
+          "note": "nextState joins the part into the state the store holds now."
+        },
+        {
+          "active": ["next", "next->state", "state"],
+          "value": {
+            "kind": "map",
+            "label": "the order state",
+            "entries": [
+              { "key": "basket", "value": "as it was" },
+              { "key": "paper", "value": "from the part" },
+              { "key": "note", "value": "as it was" }
+            ]
+          },
+          "note": "The keys the part names take their new values, and every other key keeps its own."
+        },
+        {
+          "active": ["state", "state->parts", "parts"],
+          "note": "The header, the basket and the total all read this one state, so they cannot disagree."
+        }
+      ],
+      "trace": {
+        "file": "src/store.js",
+        "call": "nextState",
+        "args": [{ "basket": [{ "item": "invite", "quantity": 120 }], "paper": "cotton", "note": "" }, { "paper": "linen" }]
+      }
+    },
+    "updater": {
+      "steps": [
+        {
+          "active": ["screen", "screen->set", "set"],
+          "note": "Removing the cards depends on the basket as it is, so the screen hands setState a function instead of a part."
+        },
+        {
+          "active": ["set"],
+          "note": "setState calls the function with the state as it is at that moment, and gets back a part: the basket without the cards."
+        },
+        {
+          "active": ["set", "set->next", "next", "next->state", "state"],
+          "note": "That part is joined in like any other. A part that is not an object is refused on the spot."
+        }
+      ]
+    },
+    "fresh": {
+      "steps": [
+        {
+          "active": ["state", "state->parts", "parts"],
+          "note": "The total keeps the state it read a moment ago, to compare it with the next one."
+        },
+        {
+          "active": ["screen", "screen->set", "set", "set->next", "next"],
+          "note": "A customer changes the paper. nextState builds the joined state in a new object."
+        },
+        {
+          "active": ["next", "next->state", "state"],
+          "note": "The store points at the new state. The one the total kept still holds every value it had."
+        }
+      ]
+    }
+  }
+}

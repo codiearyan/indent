@@ -1,0 +1,135 @@
+{
+  "id": "vectors",
+  "title": "Lists with std::vector",
+  "files": [
+    "src/queue.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the bench queue here and run it, after you call your functions from main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/queue.cpp -o queue && ./queue"
+  },
+  "tasks": [
+    {
+      "id": "waiting",
+      "title": "Say how many are waiting",
+      "file": "src/queue.cpp",
+      "description": "Under `// Task 1` in `src/queue.cpp`, write a function called `queueLine` that takes the queue as a reference to a `const std::vector<int>` and gives back a `std::string`: `Nothing waiting` when the queue is empty, and otherwise the number of tickets and ` waiting`:\n\n```\n3 waiting\n```\n\nCheck calls `queueLine` from code of its own with queues of its own, an empty one included, and reads what it gives back. It only reads the queue, so the caller's queue must be the same afterwards. It gives the line back; it prints nothing.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<int>&` in, a `std::string` back.",
+        "Ask first whether the queue is empty.",
+        "Otherwise join the number of tickets and the words.",
+        "Call it from `main` with `queue`, print what it gives back, build and run."
+      ],
+      "hints": [
+        "A vector answers two questions about itself: how many values it holds, and whether it holds none.",
+        "`queue.empty()` is true for an empty queue, and `queue.size()` is the count. The count is a number, so it has to become text before it joins the words, as in the text issue.",
+        "The shape is `if (queue.empty()) { return \"Nothing waiting\"; }`, then `return std::to_string(queue.size()) + \" waiting\";`."
+      ],
+      "docs": [
+        {
+          "title": "std::vector",
+          "url": "https://en.cppreference.com/w/cpp/container/vector"
+        },
+        {
+          "title": "std::vector::size",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/size"
+        },
+        {
+          "title": "std::vector::empty",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/empty"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What a vector is and how it grows",
+          "url": "https://www.youtube.com/watch?v=PocJ5jXv8No"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "last",
+      "title": "Find the last ticket in the queue",
+      "file": "src/queue.cpp",
+      "description": "Under `// Task 2`, write a function called `lastTicket` that takes the queue as a reference to a `const std::vector<int>` and gives back the last ticket in it as an `int`, or `0` when the queue is empty.\n\nCheck calls `lastTicket` with queues of its own, an empty one included, and reads what it gives back. It only reads the queue, so the caller's queue must be the same afterwards.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<int>&` in, an `int` back.",
+        "Handle the empty queue first.",
+        "Work out the position of the last ticket from the size.",
+        "Call it from `main` and compare with the queue there."
+      ],
+      "hints": [
+        "Positions count from 0, so a queue of 3 tickets has positions 0, 1 and 2.",
+        "The last position is one less than the size. An empty queue has no positions at all, so reading any of them reads past its end.",
+        "The shape is `if (queue.empty()) { return 0; }`, then `return queue[queue.size() - 1];`."
+      ],
+      "docs": [
+        {
+          "title": "std::vector::operator[]",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/operator_at"
+        },
+        {
+          "title": "std::vector::back",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/back"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "add",
+      "title": "Add a ticket to the queue",
+      "file": "src/queue.cpp",
+      "description": "Under `// Task 3`, write a function called `addTicket` that takes the queue as a reference to a `std::vector<int>` and a ticket as an `int`. It adds the ticket to the end of the caller's queue and gives back how many tickets are in the queue now, as an `int`. With the queue `{2041, 2047}` and the ticket `2052`, the caller's queue is `{2041, 2047, 2052}` afterwards and it gives back `3`.\n\nCheck calls `addTicket` with queues of its own, an empty one included, and reads its queue after the call, so a function that changes a copy is found out.",
+      "nextSteps": [
+        "Write the first line: which parameter changes for the caller?",
+        "Add the ticket at the end of the queue.",
+        "Give back the new count.",
+        "In `main`, add a ticket to `queue` and print `queue.size()` afterwards."
+      ],
+      "hints": [
+        "The caller's queue has to change, so it is a reference without `const`, as in the references issue.",
+        "`push_back` adds a value at the end of a vector, and the vector grows by one.",
+        "The shape is `int addTicket(std::vector<int>& queue, int ticket) { queue.push_back(ticket); return queue.size(); }`."
+      ],
+      "docs": [
+        {
+          "title": "std::vector::push_back",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/push_back"
+        },
+        {
+          "title": "Reference declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/reference"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "replace",
+      "title": "Change a ticket by its place",
+      "file": "src/queue.cpp",
+      "description": "Dorrit counts places from 1: place 1 is the first ticket. Under `// Task 4`, write a function called `replaceTicket` that takes the queue as a reference to a `std::vector<int>`, a place as an `int` and a new ticket as an `int`, and gives back a `bool`. When the queue has that place, it puts the new ticket there in the caller's queue and gives back `true`. When it has no such place (0, below 0, or past the last ticket), it leaves the queue as it was and gives back `false`.\n\nCheck calls `replaceTicket` with queues and places of its own, the last place and places past it included, and reads its queue after the call. Changing a value past the end of a vector is found out too.",
+      "nextSteps": [
+        "Write the first line, with a reference for the queue.",
+        "Decide which places the queue has, counted from 1.",
+        "For a place it does not have, give back `false` and change nothing.",
+        "Otherwise turn the place into a position and change the ticket there."
+      ],
+      "hints": [
+        "Place 1 is position 0. A queue of 3 has places 1 to 3 and positions 0 to 2.",
+        "Ask before you change anything. `queue.size()` is a `std::size_t`; put it in an `int` first, as the lesson shows, and compare the place with it.",
+        "The shape is `int count = queue.size(); if (place < 1 || place > count) { return false; }`, then `queue[place - 1] = ticket; return true;`."
+      ],
+      "docs": [
+        {
+          "title": "std::vector::at",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/at"
+        },
+        {
+          "title": "std::vector::operator[]",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/operator_at"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

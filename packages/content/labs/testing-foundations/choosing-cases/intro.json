@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Effie",
+      "say": "Why did Nell pay so little?",
+      "note": "A big order, a small bill."
+    },
+    {
+      "title": "Lorcan's tests",
+      "text": "Eight egg tests, all of small orders."
+    },
+    {
+      "title": "Your tests",
+      "file": "bill.test.js",
+      "mine": true,
+      "gap": "Nothing fails like Nell's bill",
+      "tasks": ["Smallest failing test", "Fix the bill", "One test per case"]
+    },
+    {
+      "title": "Nell",
+      "say": "Every box on the bill, thanks."
+    }
+  ],
+  "ticket": {
+    "label": "Nell's bill",
+    "wrong": "too little",
+    "why": "Untested",
+    "right": "all paid for"
+  },
+  "captions": [
+    "Effie asks why Nell Hollis paid far less than the price list says for her Friday order.",
+    "Lorcan's tests try the same few small orders again and again, and none of them fails.",
+    "You cut Nell's order down to the smallest test that fails, fix the bill, then pick cases.",
+    "Now every box on the bill is paid for, and each egg price has a test of its own.",
+    "Same price list, fewer tests, and each one proves something the others do not."
+  ]
+}

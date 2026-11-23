@@ -1,0 +1,13 @@
+{
+  "id": "build-a-state-store",
+  "title": "Build your own state store",
+  "description": "Ashgrove Press takes orders on a little order screen Sefton wrote, and it keeps its state in a dozen places, so the basket count in the header disagrees with the basket and a change in one corner never reaches another. You write the shop a small store of its own in plain JavaScript: one place for the state, listeners told after every change, parts read on their own, changes with names, including one that waits, and last a hook that joins it to the React order screen. By the end you know what the store you use every day does each time you read or change it.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": ["JavaScript", "Build your own"],
+  "kind": "project",
+  "parts": [
+    { "title": "Holding the state", "chapters": ["one-place-for-state", "listeners", "selectors"] },
+    { "title": "The store at work", "chapters": ["actions", "the-order-screen"] }
+  ]
+}

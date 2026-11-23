@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridget",
+      "say": "Thank the ones who stay with us.",
+      "note": "A box on the house now and then."
+    },
+    {
+      "title": "Today's code",
+      "text": "Knows the price list, and nothing more."
+    },
+    {
+      "title": "Test, then code",
+      "file": "loyalty.test.js",
+      "mine": true,
+      "gap": "No rule, and no test for it",
+      "tasks": ["Test the free box", "Make it pass", "Test a large free box", "Make that pass"]
+    },
+    {
+      "title": "Subscriber",
+      "say": "This one is on the house?"
+    }
+  ],
+  "ticket": {
+    "label": "Loyal box",
+    "wrong": "full price",
+    "why": "No rule yet",
+    "right": "free"
+  },
+  "captions": [
+    "Bridget wants to give the farm's loyal subscribers a free box now and then.",
+    "The price code knows the price list and nothing else, so every box costs the same.",
+    "You write a test for the rule first, watch it fail, then write the code that passes it.",
+    "Now the loyal box goes out free, and a large one costs no more than it should.",
+    "Same price list, a new rule, and a test that proved it could fail before it passed."
+  ]
+}

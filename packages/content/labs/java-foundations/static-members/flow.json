@@ -1,0 +1,66 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "roll", "label": "Ticket roll", "kind": "data", "mine": true },
+      { "id": "ticket", "label": "A ticket", "kind": "data", "mine": true },
+      { "id": "fare", "label": "fareFor()", "kind": "function", "mine": true },
+      { "id": "office", "label": "Harbour office", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bridie", "to": "ticket", "label": "passenger, age" },
+      { "from": "roll", "to": "ticket", "label": "next number" },
+      { "from": "fare", "to": "ticket", "label": "fare" },
+      { "from": "ticket", "to": "office", "label": "line" }
+    ],
+    "note": "Some things belong to each ticket and some to the whole roll: the count and the adult fare are kept once, for every ticket."
+  },
+  "tasks": {
+    "numbers": {
+      "steps": [
+        {
+          "active": ["bridie", "bridie->ticket", "ticket"],
+          "note": "Bridie sells a ticket to a passenger of some age."
+        },
+        {
+          "active": ["roll", "roll->ticket", "ticket"],
+          "value": { "kind": "map", "label": "kept where", "entries": [{ "key": "count issued", "value": "once, on the roll" }, { "key": "number", "value": "on each ticket" }] },
+          "note": "The roll counts one more ticket, and the ticket keeps the new count as its own number."
+        },
+        {
+          "active": ["roll", "ticket"],
+          "note": "The next ticket gets the next number. Each keeps its own; the roll keeps one count for all."
+        }
+      ]
+    },
+    "constant": {
+      "steps": [
+        {
+          "active": ["fare"],
+          "note": "The adult fare is written once, and no line can change it by mistake."
+        },
+        {
+          "active": ["fare", "fare->ticket"],
+          "note": "Anyone can ask the fare for an age, with no ticket at all. Children under a set age pay half."
+        }
+      ]
+    },
+    "line": {
+      "steps": [
+        {
+          "active": ["ticket"],
+          "note": "Each ticket knows its own number, its passenger and its age."
+        },
+        {
+          "active": ["fare", "fare->ticket", "ticket"],
+          "note": "The fare comes from the one place the fare rule lives."
+        },
+        {
+          "active": ["ticket", "ticket->office", "office"],
+          "value": { "kind": "array", "label": "a line", "values": ["its own number", "passenger", "fare in pence"] },
+          "note": "The office reads one line per ticket, with that ticket's own number."
+        }
+      ]
+    }
+  }
+}

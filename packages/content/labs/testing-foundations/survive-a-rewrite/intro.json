@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Effie",
+      "say": "Same boxes, so why is it red?",
+      "note": "After she tidied packing.js."
+    },
+    {
+      "title": "Lorcan's tests",
+      "text": "They watch the helpers, not the box."
+    },
+    {
+      "title": "Your tests",
+      "file": "packing.test.js",
+      "mine": true,
+      "gap": "Nobody checks what comes out",
+      "tasks": ["Test the packing order", "Test the crate", "Total worked by hand"]
+    },
+    {
+      "title": "Wendell",
+      "text": "Packs from the list, whoever wrote the code."
+    }
+  ],
+  "ticket": {
+    "label": "Nell's box",
+    "wrong": "red but right",
+    "why": "Wrong thing",
+    "right": "right, green"
+  },
+  "captions": [
+    "Effie tidied the packing code, every box came out the same, and a test still went red.",
+    "Lorcan's tests watch which helpers the code calls, so they miss what goes in the box.",
+    "You test the packing list itself: the order things go in, the crate and the weight.",
+    "Now a rewrite that packs the same stays green, and a real mistake turns a test red.",
+    "Same boxes for Wendell. Effie can tidy the code without fear of the tests."
+  ]
+}

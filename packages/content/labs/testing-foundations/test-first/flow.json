@@ -1,0 +1,102 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridget", "label": "Bridget's rule", "kind": "story" },
+      { "id": "tests", "label": "loyalty.test.js", "kind": "file", "mine": true },
+      { "id": "price", "label": "boxPrice()", "kind": "function", "mine": true, "fn": "boxPrice" },
+      { "id": "list", "label": "Price list", "kind": "data" },
+      { "id": "box", "label": "Subscriber's box", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bridget", "to": "tests", "label": "the rule" },
+      { "from": "tests", "to": "price", "label": "size, number" },
+      { "from": "list", "to": "price", "label": "prices" },
+      { "from": "price", "to": "box", "label": "what it costs" }
+    ],
+    "note": "Bridget's rule becomes a test first, the test fails, and then boxPrice learns the rule until the test passes."
+  },
+  "tasks": {
+    "free-test": {
+      "steps": [
+        {
+          "active": ["bridget", "bridget->tests", "tests"],
+          "note": "Bridget's rule arrives before any code for it: some boxes are free."
+        },
+        {
+          "active": ["tests", "tests->price", "price"],
+          "value": {
+            "kind": "map",
+            "label": "what each test asks",
+            "entries": [
+              { "key": "size", "value": "small or medium" },
+              { "key": "box number", "value": "free ones, and their neighbours" }
+            ]
+          },
+          "note": "Your tests ask boxPrice about boxes that should be free, and the boxes either side."
+        },
+        {
+          "active": ["price", "tests"],
+          "note": "boxPrice does not know the rule yet, so a test fails, and its message says why."
+        }
+      ]
+    },
+    "free-code": {
+      "trace": { "file": "src/loyalty.js", "call": "boxPrice", "args": ["medium", 10] },
+      "steps": [
+        {
+          "active": ["tests", "tests->price", "price"],
+          "note": "A medium box comes in with its box number."
+        },
+        {
+          "active": ["price"],
+          "note": "boxPrice asks whether this is one of the free boxes."
+        },
+        {
+          "active": ["list", "list->price", "price", "price->box", "box"],
+          "note": "A free box costs nothing. Every other box costs what the price list says."
+        }
+      ]
+    },
+    "large-test": {
+      "steps": [
+        {
+          "active": ["bridget", "bridget->tests", "tests"],
+          "note": "The second part of the rule: a free box is never worth more than a medium."
+        },
+        {
+          "active": ["tests", "tests->price", "price"],
+          "note": "Your tests ask about a large box on a free turn, and a large box on another turn."
+        },
+        {
+          "active": ["price", "tests"],
+          "note": "Your boxPrice gives every free box away, so the test of the large one fails."
+        }
+      ]
+    },
+    "large-code": {
+      "trace": { "file": "src/loyalty.js", "call": "boxPrice", "args": ["large", 10] },
+      "steps": [
+        {
+          "active": ["tests", "tests->price", "price"],
+          "note": "A large box comes in on a free turn."
+        },
+        {
+          "active": ["list", "list->price", "price"],
+          "value": {
+            "kind": "map",
+            "label": "what the price list gives",
+            "entries": [
+              { "key": "large", "value": "its price" },
+              { "key": "medium", "value": "its price" }
+            ]
+          },
+          "note": "boxPrice works out what a large box costs over a medium, from the price list."
+        },
+        {
+          "active": ["price", "price->box", "box"],
+          "note": "That difference is all the subscriber pays. Small and medium boxes on a free turn stay free."
+        }
+      ]
+    }
+  }
+}

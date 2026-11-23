@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "How many seats on each boat?",
+      "note": "The Gannet starts on Monday."
+    },
+    {
+      "title": "The old program",
+      "text": "One set of numbers for one boat"
+    },
+    {
+      "title": "Your classes",
+      "file": "Fleet.java",
+      "mine": true,
+      "gap": "No way to say what a boat is",
+      "tasks": ["A boat", "A ticket and its copy", "A crossing, maybe none"]
+    },
+    {
+      "title": "Two boats",
+      "rows": [["Linnet", "her own seats"], ["Gannet", "her own seats"]]
+    }
+  ],
+  "ticket": {
+    "label": "Seats free",
+    "wrong": "mixed up",
+    "why": "One boat",
+    "right": "per boat"
+  },
+  "captions": [
+    "Lanternquay has a second boat. Bridie wants the seats free on each of them.",
+    "The old program keeps numbers for one boat, and a second boat would mix them up.",
+    "You write classes for a boat, a ticket and a crossing, and make objects of them.",
+    "Now each boat keeps its own seats and people, and an empty crossing says so.",
+    "Classes, objects, new and null. Part 3 starts: the program knows what things are."
+  ]
+}
