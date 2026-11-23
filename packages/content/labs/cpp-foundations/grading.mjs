@@ -4159,7 +4159,7 @@ const PART9_HEADERS = [
 
 const LITERAL = /"((?:\\.|[^"\\\n])*)"/g
 const OUTSIDE = /^(?:\/(?!\s|$)|~|\.\.(?:[\\/]|$)|[A-Za-z]:[\\/])|[\\/]\.\.(?:[\\/]|$)/
-const FILE_NAME = /[\\/]|\.[A-Za-z][A-Za-z0-9]{1,4}$/
+const FILE_NAME = /^[\w.-]+(?:[\\/][\w.-]+)+$|^[\w-][\w.-]*\.[A-Za-z][A-Za-z0-9]{1,4}$/
 
 /** The lines of Task `task` in `whole`: from its // Task comment to the next one, or to main. */
 function sectionOf(whole, task) {
@@ -4205,7 +4205,7 @@ async function fileRule(t, file, spec) {
   if (!section) return null
   const who = spec.fn ?? `The code of ${label(spec.task)}`
   for (const m of section.text.matchAll(LITERAL)) {
-    const text = m[1]
+    const text = m[1].replace(/\\./g, '')
     const line = section.from + section.text.slice(0, m.index).split('\n').length
     if (/^\s*\/\//.test(section.text.split('\n')[line - section.from - 1] ?? '')) continue
     if (OUTSIDE.test(text)) {

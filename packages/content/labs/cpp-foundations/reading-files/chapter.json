@@ -24,7 +24,7 @@
       ],
       "hints": [
         "A file that did not open gives no error: reading it simply reads nothing. Only asking the stream tells the two apart.",
-        "A stream stands in an `if` or a `while` as true while all is well. `std::getline` gives back the stream it read from, so the read itself can be the loop's condition: it is false once a read found nothing more.",
+        "A stream stands in an `if` or a `while` as true while all is well. A read of a line gives back the stream it read from, so the read itself can be the loop's condition: it is false once a read found nothing more.",
         "The shape is `std::ifstream file(path); if (!file) { return false; } std::string line; while (std::getline(file, line)) { lines.push_back(line); } return true;`."
       ],
       "docs": [
@@ -55,7 +55,7 @@
         "In `main`, open `data/drawer.txt` and hand it to `totalParts`."
       ],
       "hints": [
-        "`>>` reads a word into a `std::string` and a whole number into an `int`, skipping spaces and line ends first, from a file as from typing.",
+        "Reading a stream works as reading typing did in part 2: a word into a `std::string`, a whole number into an `int`, with spaces and line ends skipped first.",
         "A read stands in an `if` or a `while` as true when it worked. Reading the name can be the loop's condition, and reading the count can be asked about on its own, so a missing or wrong count is told apart from the end.",
         "The shape is `while (in >> name) { if (!(in >> count)) { return -1; } total += count; } return total;`."
       ],
@@ -87,7 +87,7 @@
         "In `main`, open `data/notes.txt` and print what `readNotes` gives back."
       ],
       "hints": [
-        "Part 2 met this mix with typing: `>>` stops right before the line end after the number, and the next `std::getline` reads that empty rest of the line.",
+        "Part 2 met this mix with typing: reading the number stops right before the line end after it, and the next read of a whole line reads that empty rest of the first line.",
         "Skip the rest of the first line before the first note. Then each note is kept only when its read worked: a read at the end of the stream fails and gives nothing new.",
         "The shape is `in >> count; in >> std::ws;` and then a loop whose condition is `static_cast<int>(notes.size()) < count && std::getline(in, note)`."
       ],

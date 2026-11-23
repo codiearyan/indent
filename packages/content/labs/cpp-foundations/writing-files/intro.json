@@ -1,0 +1,40 @@
+{
+  "stations": [
+    {
+      "title": "Ambrose",
+      "say": "Write the sheet for me, columns straight."
+    },
+    {
+      "title": "The desk",
+      "text": "Bills copied by hand and lined up with a ruler."
+    },
+    {
+      "title": "Your code",
+      "file": "sheet.cpp",
+      "mine": true,
+      "gap": "Nothing writes a file",
+      "tasks": [
+        "Write a bill line",
+        "Write the sheet",
+        "Add to the log"
+      ]
+    },
+    {
+      "title": "The files",
+      "text": "A straight sheet, and a log of every day."
+    }
+  ],
+  "ticket": {
+    "label": "Day sheet",
+    "wrong": "by hand",
+    "why": "No file",
+    "right": "written, in columns"
+  },
+  "captions": [
+    "Ambrose wants the day's bills on a sheet with straight columns, and a line in the log.",
+    "Today he copies every bill by hand at closing time and lines them up with a ruler.",
+    "You write one bill line, then the whole sheet to a file, then add a day to the log.",
+    "The program writes the sheet in columns, and the log keeps every day before today.",
+    "Ambrose's sheet and logbook are files now, written by the program at closing time."
+  ]
+}

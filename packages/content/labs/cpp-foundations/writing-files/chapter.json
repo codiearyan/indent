@@ -1,0 +1,105 @@
+{
+  "id": "writing-files",
+  "title": "Writing a file",
+  "files": [
+    "src/sheet.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace folder. Build Ambrose's day sheet here, run it twice, and look at sheet.txt and log.txt with cat.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/sheet.cpp -o sheet && ./sheet && cat sheet.txt log.txt"
+  },
+  "tasks": [
+    {
+      "id": "writeBillLine",
+      "title": "Write one bill line",
+      "file": "src/sheet.cpp",
+      "description": "Under `// Task 1` in `src/sheet.cpp`, write a function called `writeBillLine` that takes a stream as a reference to a `std::ostream`, an item as a reference to a `const std::string`, minutes as an `int` and a price as a `double`, and gives nothing back. It writes one line to the stream: the item on the left of 16 columns, the minutes on the right of 5, the price on the right of 9 with exactly 2 decimals, then a line end. An item longer than 16 characters is written whole. For `\"mantel clock\"`, `75` and `78.5`:\n\n```\nmantel clock       75    78.50\n```\n\nCheck hands `writeBillLine` a string stream with bills of its own, a long item among them, and reads back exactly what it wrote, spaces and line end included. It also writes two lines in a row into a file of its own.",
+      "nextSteps": [
+        "Add the `#include` that `std::setw` comes from.",
+        "Write the first line, with the stream as a `std::ostream&`.",
+        "Write the item, then the minutes, then the price, each with its width and its side.",
+        "In `main`, hand it `std::cout` and one of today's bills, and compare what it prints with the task."
+      ],
+      "hints": [
+        "Part 1 met `std::fixed` and `std::setprecision` for the decimals. A width says how many columns the next value takes at least, and only for that one value.",
+        "A width counts for the next value only, so each of the three gets its own. Which side a value starts from stays set on the stream until it is changed, and so do the decimals: the item and the numbers sit on different sides.",
+        "The shape is `out << std::left << std::setw(16) << item << std::right << std::setw(5) << minutes << std::fixed << std::setprecision(2) << std::setw(9) << price << '\\n';`."
+      ],
+      "docs": [
+        {
+          "title": "std::setw",
+          "url": "https://en.cppreference.com/w/cpp/io/manip/setw"
+        },
+        {
+          "title": "std::left and std::right",
+          "url": "https://en.cppreference.com/w/cpp/io/manip/left"
+        },
+        {
+          "title": "std::fixed",
+          "url": "https://en.cppreference.com/w/cpp/io/manip/fixed"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "writeSheet",
+      "title": "Write the day sheet",
+      "file": "src/sheet.cpp",
+      "description": "Under `// Task 2`, write a function called `writeSheet` that takes a path as a reference to a `const std::string` and the bills as a reference to a `const std::vector<Bill>`, and gives back a `bool`. It writes a new file at that path, in place of anything that was there: one bill line for each bill, in order, then one more for `\"Total\"`, with all the minutes and all the prices added up. It gives back `false` when the file cannot be opened for writing, and `true` otherwise.\n\nCheck builds this task with a `writeBillLine` of its own in place of yours, written as Task 1 asks, so you can use it. It writes an old sheet at a path of its own first, calls `writeSheet` with bills of its own, prices with pence among them, and reads the file back once `writeSheet` has returned. It also hands it a path in a folder that is not there.",
+      "nextSteps": [
+        "Add the `#include` that `std::ofstream` comes from.",
+        "Open the file at the path for writing, and ask whether it opened.",
+        "Write a bill line for each bill to the file, keeping the totals as you go.",
+        "Write the Total line, and look at `sheet.txt` after running the program twice."
+      ],
+      "hints": [
+        "`writeBillLine` takes any `std::ostream&`, and a `std::ofstream` is one, so the file stream can be handed to it.",
+        "A `std::ofstream` opened with just a path starts the file empty, and one that did not open is false in an `if`. A total of prices has pence, so it is not an `int`.",
+        "The shape is `std::ofstream file(path); if (!file) { return false; }`, then a loop that calls `writeBillLine(file, ...)` and adds to an `int` and a `double`, then `writeBillLine(file, \"Total\", minutes, price); return true;`."
+      ],
+      "docs": [
+        {
+          "title": "std::basic_ofstream",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_ofstream"
+        },
+        {
+          "title": "std::ios_base::openmode",
+          "url": "https://en.cppreference.com/w/cpp/io/ios_base/openmode"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "addToLog",
+      "title": "Add a day to the log",
+      "file": "src/sheet.cpp",
+      "description": "Under `// Task 3`, write a function called `addToLog` that takes a path as a reference to a `const std::string` and an entry as a reference to a `const std::string`, and gives back an `int`. It adds the entry as one line at the end of the file at that path, keeping what is there, and makes the file when it is not there yet. Then it gives back how many lines the file holds. When the file cannot be opened, it gives back `-1`.\n\nCheck writes a log of its own first and calls `addToLog` on it, calls it twice on a log that is not there yet, and reads back the file and the count each time. It also hands it a path in a folder that is not there.",
+      "nextSteps": [
+        "Open the file at the path so that what you write goes after what is there.",
+        "Write the entry and its line end, and give back `-1` when the file did not open.",
+        "Make sure what you wrote has reached the file before you read it.",
+        "Count the lines of the file with a read loop, and give the count back."
+      ],
+      "hints": [
+        "A `std::ofstream` can be opened with a second value that says how: the lesson shows the one that adds at the end.",
+        "What a stream writes can wait inside it and reaches the file when the stream ends, or is closed. A reader opened on the same file before then can miss the last line.",
+        "The shape is `{ std::ofstream log(path, std::ios::app); if (!log) { return -1; } log << entry << '\\n'; }` and then, after that block, an `std::ifstream` on the path and a `std::getline` loop that counts."
+      ],
+      "docs": [
+        {
+          "title": "std::ios_base::openmode",
+          "url": "https://en.cppreference.com/w/cpp/io/ios_base/openmode"
+        },
+        {
+          "title": "std::basic_ofstream::close",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_ofstream/close"
+        },
+        {
+          "title": "std::basic_ostream::flush",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_ostream/flush"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
