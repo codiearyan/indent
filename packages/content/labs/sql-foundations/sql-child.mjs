@@ -100,14 +100,137 @@ function textValues(db) {
   return [...values]
 }
 
-/** job: { schema, seed, files }. Returns one result per file, and every text value in the data. */
+/** job: { schema, seed, more?, files }. Returns one result per file, and every text value in the data. */
 export function run(job) {
   const db = new DatabaseSync(':memory:')
   db.exec(readFileSync(job.schema, 'utf8'))
   db.exec(readFileSync(job.seed, 'utf8'))
+  for (const more of job.more ?? []) db.exec(readFileSync(more, 'utf8'))
   db.exec('PRAGMA query_only = ON')
   const results = job.files.map((f) => runFile(db, f))
   const values = textValues(db)
   db.close()
   return { results, values }
+}
+
+// The second mode, for the issues that change rows, make tables or make indexes. Each file runs on its
+// own fresh copy in memory, so nothing it does reaches a file or the next run.
+
+/** The first words of a statement in capitals, e.g. 'CREATE UNIQUE INDEX'. `code` is from scan(). */
+const lead = (code) => (code.trim().match(/^[a-z]+(\s+[a-z]+){0,2}/i)?.[0] ?? '').toUpperCase().split(/\s+/).join(' ')
+/** The phrase of `phrases` a statement starts with, or undefined. */
+const startsWith = (code, phrases) => phrases.find((p) => `${lead(code)} `.startsWith(`${p} `))
+
+function fresh(job) {
+  const db = new DatabaseSync(':memory:')
+  db.exec('PRAGMA foreign_keys = ON')
+  db.exec(readFileSync(job.schema, 'utf8'))
+  for (const seed of job.seeds) db.exec(readFileSync(seed, 'utf8'))
+  return db
+}
+
+/** Every row of every table, by rowid: { table: { columns, rows: { rowid: [values] } } }. */
+function snapshot(db) {
+  const tables = {}
+  for (const { name } of db.prepare("SELECT name FROM sqlite_schema WHERE type = 'table' AND name NOT LIKE 'sqlite%'").all()) {
+    const stmt = db.prepare(`SELECT rowid AS "rowid:", * FROM "${name}"`)
+    stmt.setReturnArrays(true)
+    const rows = {}
+    for (const [rowid, ...values] of stmt.iterate()) rows[rowid] = values
+    tables[name] = { columns: stmt.columns().slice(1).map((c) => c.name), rows }
+  }
+  return tables
+}
+
+function indexes(db) {
+  const list = db.prepare("SELECT name, tbl_name AS tbl FROM sqlite_schema WHERE type = 'index' AND sql IS NOT NULL").all()
+  return list.map(({ name, tbl }) => ({
+    name,
+    table: tbl,
+    columns: db.prepare('SELECT name FROM pragma_index_info(?) ORDER BY seqno').all(name).map((c) => c.name)
+  }))
+}
+
+/** Runs one probe in a savepoint and undoes it: { ok, rows } or { ok: false, error }. */
+function probe(db, { run, read }) {
+  db.exec('SAVEPOINT probe')
+  try {
+    for (const sql of run) db.prepare(sql).run()
+    if (!read) return { ok: true }
+    const stmt = db.prepare(read)
+    stmt.setReturnArrays(true)
+    return { ok: true, rows: stmt.all() }
+  } catch (err) {
+    return { ok: false, error: err.message }
+  } finally {
+    db.exec('ROLLBACK TO probe; RELEASE probe')
+  }
+}
+
+function changeFile(db, file, job) {
+  let source
+  try {
+    source = readFileSync(file, 'utf8')
+  } catch {
+    return { unreadable: true }
+  }
+  const statements = scan(source)
+  if (statements.length === 0) return { empty: true }
+  const result = { code: statements.map((s) => s.code), literals: statements.flatMap((s) => s.literals), ran: [] }
+  const refused = statements.find((s) => !startsWith(s.code, job.allowed))
+  if (refused) {
+    const words = lead(refused.code).split(' ')
+    const named = ['CREATE', 'DROP', 'ALTER'].includes(words[0]) ? words.slice(0, 2).join(' ') : words[0]
+    return { ...result, refused: named, line: refused.text.split('\n')[0] }
+  }
+  for (const [i, { text, code }] of statements.entries()) {
+    const phrase = startsWith(code, job.allowed)
+    if (job.only && !startsWith(code, job.only)) continue
+    if (phrase === 'ROLLBACK') result.tried = snapshot(db)
+    try {
+      const stmt = db.prepare(text)
+      let read = 0
+      if (stmt.columns().length === 0) stmt.run()
+      else for (const _ of stmt.iterate()) if (++read >= MAX_ROWS) break
+      result.ran.push(phrase)
+    } catch (err) {
+      return { ...result, error: err.message, at: i + 1, line: text.split('\n')[0] }
+    }
+  }
+  try {
+    db.exec('ROLLBACK')
+    result.leftOpen = true
+  } catch {
+    // no transaction was open
+  }
+  return result
+}
+
+/**
+ * job: { schema, seeds, files, allowed, only?, snapshot?, table?, probes?, plans? }. Each file runs on a
+ * fresh copy: statements that do not start with a phrase of `allowed` are refused before anything runs,
+ * and with `only` set just the statements that start with one of those run. Returns, per file, what
+ * ran and the state afterwards, and the state before any file ran.
+ */
+export function change(job) {
+  const start = fresh(job)
+  const before = { tables: job.snapshot ? snapshot(start) : undefined, indexes: indexes(start) }
+  start.close()
+  const results = job.files.map((file) => {
+    const db = fresh(job)
+    const r = changeFile(db, file, job)
+    if (r.ran && r.error === undefined) {
+      if (job.snapshot) r.final = snapshot(db)
+      r.indexes = indexes(db)
+      if (job.plans) r.plans = job.plans.map((sql) => db.prepare(`EXPLAIN QUERY PLAN ${sql}`).all().map((p) => p.detail))
+      if (job.table) {
+        const columns = db.prepare('SELECT name, type FROM pragma_table_info(?)').all(job.table)
+        r.columns = columns.map((c) => [c.name, c.type])
+        if (columns.length) r.probes = job.probes.map((p) => probe(db, p))
+      }
+    }
+    db.close()
+    return r
+  })
+  return { before, results }
 }
