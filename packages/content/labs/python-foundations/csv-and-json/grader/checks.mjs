@@ -147,11 +147,13 @@ export const checks = {
       list: list.map(([name, path, before, store]) => {
         const rows = [['item', 'count'], ...Object.entries(store)]
         const want = csvText(rows)
+        const cells = rows.map((r) => r.map(String))
         return {
           name,
           args: [path, store],
           files: before === undefined ? {} : { [path]: before },
-          wrote: { [path]: want },
+          // Judged by the rows the csv module reads back, so any quoting csv.writer chooses fits.
+          wrote: { [path]: (text) => equalData(csvRows(text), cells) },
           fileHint: (rel, got) => {
             const plain = rows.map((r) => `${r.join(',')}\n`).join('')
             if (before && got.startsWith(before))
@@ -159,7 +161,7 @@ export const checks = {
             if (got === plain && plain !== want)
               return `After the call, the name with a comma in it is not in quotes in ${rel}, so it reads as two values. csv.writer puts quotes around such a value for you.`
             if (got === csvText(rows.slice(1))) return `After the call, ${rel} has no heading row of item and count.`
-            if (got.split('\n')[0] !== 'item,count') return `After the call, the first row of ${rel} is not the heading row: item and count, with a comma between them and no spaces.`
+            if (!equalData(csvRows(got)[0] ?? [], ['item', 'count'])) return `After the call, the first row of ${rel} is not the heading row: item and count, with a comma between them and no spaces.`
             if (/\n\n/.test(got)) return `After the call, ${rel} has an empty line between rows.`
             return null
           }

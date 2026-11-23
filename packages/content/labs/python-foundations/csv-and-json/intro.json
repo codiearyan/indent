@@ -17,6 +17,6 @@
     "Today the list is a CSV file read by eye, so low kit is found too late.",
     "You read and write CSV rows and JSON with the csv and json modules.",
     "Now what is running low comes off the file, and the store is saved for tomorrow.",
-    "csv.reader, DictReader, csv.writer, json.dump and json.load: data that keeps."
+    "The kit list and the store are files the laptop reads and saves, ready for tomorrow."
   ]
 }

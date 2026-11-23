@@ -17,6 +17,6 @@
     "Today the numbers are right but show nine decimals, and the columns wander.",
     "You format each value: decimal places, widths, zeros in front, and a table.",
     "Now the sheet lines up and Rhona reads the year straight down.",
-    "f-string formats, widths, alignment and zfill: numbers made for people."
+    "Hours, incident numbers and columns look the same on every page Rhona reads out."
   ]
 }

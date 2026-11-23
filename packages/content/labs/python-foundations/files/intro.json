@@ -17,6 +17,6 @@
     "Today each night is a torn-out page, and last night's page is gone.",
     "You write functions that read a log file, start one, add to it and find any night's.",
     "Now last night's log is a file in the logs folder, read back in a moment.",
-    "open with with, read, write, append, encoding and pathlib: logs that last."
+    "Every night's log is a file on the laptop, read back, started fresh and added to."
   ]
 }
