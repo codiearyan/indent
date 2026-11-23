@@ -27,13 +27,14 @@ export async function showNames(base) {
 }
 
 // Task 3: Read JSON only when the answer says it is JSON
-// readJson(address) asks for the page at address. When the answer's content-type says the body
-// is JSON, with or without a charset after it, it gives back the value read from the body. For
-// any other content-type, or none, it gives back null without reading the body as JSON. When an
-// answer says it is JSON but its body is not, the error from reading it comes out of readJson.
+// readJson(address) asks for the page at address. When the type in the answer's content-type, the
+// part before any ;, is application/json in small or capital letters, it gives back the value
+// read from the body. For any other type, or no content-type, it gives back null without reading
+// the body as JSON. When an answer says it is JSON but its body is not, the error from reading it
+// comes out of readJson.
 export async function readJson(address) {
   const response = await fetch(address)
-  const type = response.headers.get('content-type') ?? ''
-  if (!type.startsWith('application/json')) return null
+  const header = response.headers.get('content-type') ?? ''
+  if (header.split(';')[0].trim().toLowerCase() !== 'application/json') return null
   return await response.json()
 }

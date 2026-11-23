@@ -77,17 +77,17 @@
       "id": "read",
       "title": "Read JSON only when the answer says it is JSON",
       "file": "src/json.js",
-      "description": "Under `// Task 3`, make `readJson(address)` ask for the page at `address` and look at the answer's `content-type`:\n\n- when it says the body is JSON, with or without a `charset` after it, give back the value read from the body\n- for any other content-type, or none at all, give back `null` without reading the body as JSON\n- when the answer says it is JSON but its body is not, do not catch the error: the error from reading it comes out of `readJson`\n\nCheck starts a server of its own that answers with JSON, with plain text that looks like JSON, with a web page, with no content-type, and with a body that says JSON and is not.",
+      "description": "Under `// Task 3`, make `readJson(address)` ask for the page at `address` and look at the type in the answer's `content-type`, the part before any `;`:\n\n- when the type is `application/json`, in small or capital letters, give back the value read from the body\n- for any other type, or no content-type at all, give back `null` without reading the body as JSON\n- when the answer says it is JSON but its body is not, do not catch the error: the error from reading it comes out of `readJson`\n\nCheck starts a server of its own that answers with JSON, with plain text that looks like JSON, with a web page, with a type that only starts like JSON's, with no content-type, and with a body that says JSON and is not.",
       "nextSteps": [
         "Send the request and read the `content-type` of the answer.",
-        "Decide from it whether the body is JSON. Remember the charset, and an answer with no content-type.",
+        "Take the type out of it: the part before the semicolon, trimmed, in small letters. Remember an answer with no content-type.",
         "Read the body as JSON only when it is, and give back `null` otherwise.",
         "Run `node run.js`: one answer is JSON, one is plain text, and `/api/now` says JSON and is not."
       ],
       "hints": [
         "`response.json()` never looks at the content-type. Whether to call it is your decision, made from the header.",
-        "`headers.get('content-type')` gives `null` when there is no such header, and the value may have `; charset=utf-8` after the type. Text has a method that tests how it starts.",
-        "`const type = response.headers.get('content-type') ?? ''`, then `if (!type.startsWith('application/json')) return null`, and otherwise `return await response.json()`."
+        "`headers.get('content-type')` gives `null` when there is no such header, and the value may have `; charset=utf-8` after the type. `split(';')[0]` keeps the part before the semicolon, and `trim()` and `toLowerCase()` tidy it.",
+        "`const type = (response.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase()`, then `if (type !== 'application/json') return null`, and otherwise `return await response.json()`."
       ],
       "docs": [
         {
@@ -95,8 +95,8 @@
           "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type"
         },
         {
-          "title": "String.prototype.startsWith()",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith"
+          "title": "String.prototype.split()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split"
         },
         {
           "title": "SyntaxError: JSON.parse: bad parsing",

@@ -73,7 +73,16 @@ One thing it does not do is look at the `content-type`. It tries to parse whatev
 
 ## Trust the label
 
-A server does not always answer with what you hoped for. A gateway in front of it may answer with an HTML error page, and a page that is meant to be JSON may answer with a plain sentence instead. The `content-type` is how the server tells you what the body is, so decide by it before you read the body as JSON. Remember the `charset` that may follow: a test that compares the whole header with `'application/json'` fails for `application/json; charset=utf-8`. `startsWith` is the usual way to check.
+A server does not always answer with what you hoped for. A gateway in front of it may answer with an HTML error page, and a page that is meant to be JSON may answer with a plain sentence instead. The `content-type` is how the server tells you what the body is, so decide by it before you read the body as JSON.
+
+Look at the type only, the part before the semicolon. A test that compares the whole header with `'application/json'` fails for `application/json; charset=utf-8`, and a test of how the header starts is fooled by `application/json-seq`, which is another type. A type also ignores capital letters, like a header name, so `Application/JSON` is JSON too. Cut the header at the semicolon, trim the spaces and make it small letters:
+
+```js
+const header = 'Text/HTML; charset=utf-8'
+header.split(';')[0].trim().toLowerCase() // 'text/html'
+```
+
+`split(';')` gives a list of the pieces between the semicolons, and `[0]` is the first one. Compare what is left with the one type you want.
 
 And when an answer says it is JSON but is not, that is a broken server, not a different kind of answer. Let the `SyntaxError` come out, so whoever runs the program sees what went wrong.
 

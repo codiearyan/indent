@@ -127,6 +127,9 @@ function readCase(name, type, body, expect) {
         if (/Cannot read properties of null/.test(outcome.message)) {
           return 'readJson read from null. An answer with no content-type gives null for that header, and a method cannot be called on null: decide what no content-type means first.'
         }
+        if (outcome.name === 'SyntaxError' && type?.toLowerCase().startsWith('application/json')) {
+          return `readJson stopped with a SyntaxError on an answer with ${said}. That is another type whose name only starts like JSON's: compare the whole type, the part before any semicolon.`
+        }
         if (outcome.name === 'SyntaxError') {
           return `readJson stopped with a SyntaxError on an answer with ${said}. The body was read as JSON although the answer does not say it is JSON. Look at the content-type before you read the body.`
         }
@@ -138,6 +141,9 @@ function readCase(name, type, body, expect) {
       if (expect === null) {
         if (v.kind === 'null') return null
         return `This answer has ${said}, so readJson must give back null${body.trim().startsWith('{') ? '. Its body happens to look like JSON, but the server says it is not, and the task says to go by what the server says' : ''}.`
+      }
+      if (v.kind === 'null' && type !== type.toLowerCase()) {
+        return `readJson gave back null for an answer with ${said}. A type ignores capital letters, like a header name, so this says JSON too.`
       }
       if (v.kind === 'null') {
         return type.includes(';')
@@ -220,6 +226,18 @@ export const checks = {
           'Gives null for a web page',
           'text/html',
           `<!doctype html><title>Bad gateway</title><p>check ${token()}</p>`,
+          null
+        ),
+        readCase(
+          'Reads JSON whose type is in capital letters',
+          'Application/JSON; charset=UTF-8',
+          JSON.stringify({ song: `Seven Bridges ${token()}`, plays: 3 }),
+          'value'
+        ),
+        readCase(
+          'Gives null for another type that starts like JSON',
+          'application/json-seq',
+          `\u001e${JSON.stringify({ song: `Kite Hill ${token()}` })}\n`,
           null
         ),
         readCase('Gives null when there is no content-type', null, '[1, 2, 3]', null),
