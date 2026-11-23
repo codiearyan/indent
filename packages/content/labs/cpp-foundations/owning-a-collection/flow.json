@@ -1,0 +1,195 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "kasimir",
+        "label": "Kasimir at the bench",
+        "kind": "story"
+      },
+      {
+        "id": "funcs",
+        "label": "Your Bench functions",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "list",
+        "label": "The bench's repairs",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "program",
+        "label": "The rest of the program",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "kasimir",
+        "to": "funcs",
+        "label": "add, find, remove"
+      },
+      {
+        "from": "funcs",
+        "to": "list",
+        "label": "the only way in"
+      },
+      {
+        "from": "funcs",
+        "to": "program",
+        "label": "copies"
+      }
+    ],
+    "note": "The bench owns its list of repairs and lets the program see copies, never the list itself."
+  },
+  "tasks": {
+    "repairs": {
+      "steps": [
+        {
+          "active": [
+            "kasimir",
+            "kasimir->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a repair"
+            ]
+          },
+          "note": "A repair comes to the bench through its add function."
+        },
+        {
+          "active": [
+            "funcs",
+            "funcs->list",
+            "list"
+          ],
+          "note": "A ticket that is already on the bench is refused, so each ticket is there once."
+        },
+        {
+          "active": [
+            "funcs->program",
+            "program"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "a copy of every repair, in order"
+            ]
+          },
+          "note": "The program gets a copy of the list, so nothing it does can change the bench."
+        }
+      ]
+    },
+    "find": {
+      "steps": [
+        {
+          "active": [
+            "program",
+            "funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a ticket"
+            ]
+          },
+          "note": "Someone asks the bench for the repair with a ticket."
+        },
+        {
+          "active": [
+            "funcs->list",
+            "list"
+          ],
+          "note": "The bench looks at every repair before it decides none has that ticket."
+        },
+        {
+          "active": [
+            "funcs->program"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "a copy of that repair, or an empty one"
+            ]
+          },
+          "note": "A copy comes back, and changing it leaves the bench's repair as it was."
+        }
+      ]
+    },
+    "total": {
+      "steps": [
+        {
+          "active": [
+            "kasimir",
+            "funcs"
+          ],
+          "note": "Kasimir asks how many minutes the bench holds in all."
+        },
+        {
+          "active": [
+            "funcs->list",
+            "list"
+          ],
+          "note": "The minutes of every repair on the bench are added up, from the list itself."
+        },
+        {
+          "active": [
+            "funcs->program"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "one number of minutes"
+            ]
+          },
+          "note": "One number comes back, right for whatever the bench holds now."
+        }
+      ]
+    },
+    "remove": {
+      "steps": [
+        {
+          "active": [
+            "kasimir",
+            "kasimir->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the ticket of a repair going home"
+            ]
+          },
+          "note": "A repair goes home, and Kasimir takes its ticket off the bench."
+        },
+        {
+          "active": [
+            "funcs->list",
+            "list"
+          ],
+          "note": "Only that repair leaves, and the others keep their order."
+        },
+        {
+          "active": [
+            "funcs->program"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "true or false"
+            ]
+          },
+          "note": "The bench says whether it found the ticket, and changes nothing when it did not."
+        }
+      ]
+    }
+  }
+}
