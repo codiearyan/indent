@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Who leads Bravo tonight?", "note": "Teams are calling in." },
+    { "title": "Radio desk", "text": "Each team a dictionary, keys typed by hand" },
+    {
+      "title": "Your code",
+      "file": "hill_teams.py",
+      "mine": true,
+      "gap": "No team of its own",
+      "tasks": ["A team class", "Own kit per vehicle", "Teams from the rota"]
+    },
+    { "title": "Ailsa", "say": "Bravo, led by Iain.", "note": "Every team spelt the same way." }
+  ],
+  "ticket": { "label": "Bravo", "wrong": "None led by None", "why": "A typed key", "right": "led by Iain" },
+  "captions": [
+    "At the radio desk, Ailsa asks who leads Bravo, one of tonight's teams.",
+    "Today Bravo's keys were typed another way, so the desk shows None led by None.",
+    "You write a Team class, give each vehicle its own kit, and turn the rota into teams.",
+    "Now Bravo is a team object, and it says who leads it.",
+    "Every team keeps its own values, and nothing typed for one turns up in another."
+  ]
+}

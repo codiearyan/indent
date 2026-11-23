@@ -102,6 +102,7 @@ export const lines = (text) =>
  * blocks. With it, `define` is Python run right before Task `upto`, and `call` ({ name, args,
  * kwargs }) calls a function after it (`result.call`). `compare` ({ names }) reports in
  * `result.changed` which of those functions differ from the ones in the issue's starter.
+ * `steps` runs Check's own Python after Task `upto` (`result.steps`), with the file named `name`.
  * Returns { parts: Map(task => { lines, error, values, names }), comments, ... } or a problem.
  */
 export async function runFile(
@@ -119,7 +120,9 @@ export async function runFile(
     data = false,
     compare,
     modules = false,
-    module = false
+    module = false,
+    steps,
+    name
   } = {}
 ) {
   const bin = await python()
@@ -143,6 +146,7 @@ export async function runFile(
       compare: { starter: join(t.chapter, 'starter', ...file.split('/')), names: compare.names }
     }),
     ...(blocks && { part_seconds: PART_SECONDS, define, call: data && call ? { ...call, data } : call }),
+    ...(steps && { steps, name }),
     ...((modules || module) && { modules: true }),
     ...(module && { module: file.split('/').pop().replace(/\.py$/, '') })
   }
@@ -173,11 +177,14 @@ export async function runFile(
     else if (record.kind === 'call') {
       result.call = { ...record, lines: lines(record.printed ?? '') }
       running = undefined
+    } else if (record.kind === 'steps') {
+      result.steps = record
+      running = undefined
     }
     else if (record.kind === 'part') {
       result.parts.set(record.task, { ...record, lines: lines(record.printed) })
       // The call runs after the last part, under that part's task.
-      running = call && record.task === upto ? upto : undefined
+      running = (call || steps) && record.task === upto ? upto : undefined
     }
   }
   const ended =
@@ -349,6 +356,7 @@ const BUILTINS = [
 function blockRunCause(error, blocks) {
   const m = error.message
   let found
+  if (blocks.classes && (found = blocks.explain?.(error) ?? classRunCause(error, blocks))) return found
   if (blocks.modules && (found = blocks.explain?.(error) ?? moduleRunCause(error))) return found
   if (blocks.raising && (found = blocks.explain?.(error) ?? raiseRunCause(error))) return found
   if (
@@ -1822,4 +1830,352 @@ export async function namedOnly(t, file, task, fn, error, details) {
         : `One of the excepts of ${fn} names no error, or names Exception, so it catches every error: ${why}`
     )
   ]
+}
+
+// From the classes issues on, a task is a class or a method of one, and Check runs steps of its
+// own Python on objects it makes, after the lines of the task have run.
+
+/** What an error usually means in code with classes of the learner's own, or null. */
+function classRunCause(error, blocks) {
+  const m = error.message
+  const names = blocks.names ?? {}
+  let found
+  if ((found = /^(?:\w+\.)?__init__\(\) takes (\d+) positional arguments? but (\d+) were given$/.exec(m))) {
+    const values = Number(found[2]) - 1
+    return `making an object of the class hands __init__ the new object itself first, then the ${values} ${values === 1 ? 'value' : 'values'} in the round brackets, ${found[2]} in all, and its def line takes ${found[1]}. The def line of __init__ starts with self, then one parameter for each value`
+  }
+  if (
+    (found = /^(?:\w+\.)?(\w+)\(\) takes (\d+) positional arguments? but (\d+) (?:was|were) given$/.exec(m)) &&
+    names[found[1]] !== 'function'
+  ) {
+    const values = Number(found[3]) - 1
+    return `${found[1]} is a method, and Python hands it the object itself first, before the ${values} ${values === 1 ? 'value' : 'values'} in the call, ${found[3]} in all; its def line takes ${found[2]}. A method's def line starts with self, then one parameter for each value in the call`
+  }
+  if ((found = /^(?:\w+\.)?__init__\(\) missing \d+ required positional arguments?: (.+)$/.exec(m))) {
+    return `an object of the class was made with fewer values than its __init__ takes: nothing was given for ${found[1].replace(/'/g, '')}. Look at the line where it stops and at the def line of __init__: after self, one value for each parameter, in order`
+  }
+  if ((found = /^(\w+)\(\) takes no arguments$/.exec(m))) {
+    return `${found[1]} has no __init__ that Python runs, so making one takes no values. Python runs the method called exactly __init__, with two underscores on each side, when an object is made`
+  }
+  if ((found = /^__init__\(\) should return None, not '(\w+)'$/.exec(m))) {
+    return `__init__ gives back ${aKind(found[1])} with return, and Python lets __init__ give back nothing: it only fills in the new object, which Python then hands to the code that made it`
+  }
+  if ((found = /^'super' object has no attribute '(\w+)'/.exec(m))) {
+    return `super() looks for ${found[1]} in the class this one is built on, and finds none there. Check that the class line names the class it builds on in round brackets, and how ${found[1]} is spelt`
+  }
+  if ((found = /^'(\w+)' object has no attribute '(\w+)'/.exec(m)) && names[found[1]] === 'type') {
+    const owner = blocks.owners?.[found[2]]
+    return names[found[2]] === 'function'
+      ? `${found[2]} is a function of the file, not a method of ${found[1]}: its def line is not moved in under the class`
+      : owner && owner !== blocks.task
+        ? `${found[1]} has no method ${found[2]} yet, and the code of this task uses it. ${found[2]} is Task ${owner}: write it first, or do this task without it`
+        : (blocks.methods ?? []).includes(found[2])
+          ? `${found[1]} has no method ${found[2]}. A method is a def moved in under the class, lined up with __init__, and its def line starts with self`
+          : `a ${found[1]} object has no attribute ${found[2]}. Check how ${found[2]} is spelt where it is read and where it is made. An attribute is made on the object itself, through self, usually in __init__, or by a field of a dataclass; a name given a value without self. in front belongs to the method alone, and is gone when the method ends`
+  }
+  if ((found = /^name '(\w+)' is not defined/.exec(m))) {
+    if (found[1] === 'self') {
+      return 'self is not a parameter there: a method reaches its object through self, so its def line starts with self'
+    }
+    if (['property', 'dataclass'].includes(found[1].toLowerCase()) && !['property', 'dataclass'].includes(found[1])) {
+      return `Python does not know the name ${found[1]}. Its own @${found[1].toLowerCase()} is written in small letters, and capitals count`
+    }
+    if ((blocks.attrs ?? []).includes(found[1])) {
+      return `inside a method, the object's own values are reached through self, such as self.${found[1]}: ${found[1]} alone is looked for among the method's own names, then the file's`
+    }
+  }
+  if ((found = /'<' not supported between instances of '(\w+)' and '(\w+)'/.exec(m)) && found[1] === found[2] && names[found[1]] === 'type') {
+    return `sorted, min, max and < compare two ${found[1]} objects with <, and Python knows how only once ${found[1]} has a method __lt__ that says whether one comes before the other`
+  }
+  if ((found = /^__(str|repr)__ returned non-string \(type (\w+)\)$/.exec(m))) {
+    return `__${found[1]}__ must give back text with return, and here it gave back ${aKind(found[2])}${found[2] === 'NoneType' ? '. print only shows a line, and the method then gives back None' : ''}`
+  }
+  if ((found = /^'(int|float|str|bool|list|dict)' object is not callable$/.exec(m))) {
+    return `round brackets follow ${dataKind(found[1])}, which cannot be run. A property is read without round brackets: with them, Python tries to call the value it gave back. An attribute is read without them too`
+  }
+  if (/'method' object|operand type\(s\) for .*'method'|\(not "method"\)|'method' and/.test(m)) {
+    return 'a method is used without round brackets, so the line works with the method itself, not with what it gives back. A method runs only with round brackets after its name, unless @property sits on the line above its def'
+  }
+  if ((found = /^argument of type '(\w+)' is not (?:a container or )?iterable$/.exec(m))) {
+    return `in asks a ${found[1]} whether it holds something, and ${found[1]} has no __contains__ to answer`
+  }
+  if ((found = /^object of type '(\w+)' has no len\(\)$/.exec(m))) {
+    return `len asks a ${found[1]} how many things it holds, and ${found[1]} has no __len__ to answer`
+  }
+  if ((found = /^'(str|float)' object cannot be interpreted as an integer$/.exec(m))) {
+    return `a whole number was needed and the value is ${aKind(found[1])}. A method such as __len__ must give back a whole number, the count itself, not text or a decimal number`
+  }
+  if (/^'NoneType' object cannot be interpreted as an integer$/.test(m)) {
+    return 'a whole number was needed and the value is None. A method such as __len__ must give back its number with return: one that ends without return gives back None'
+  }
+  if (error.type === 'FrozenInstanceError') {
+    return 'a frozen dataclass cannot be changed once it is made, not even by its own methods. Make a new one with the values you want instead'
+  }
+  if ((found = /^mutable default <class '(\w+)'> for field (\w+) is not allowed/.exec(m))) {
+    return `Python refuses ${dataKind(found[1])} as the default of the dataclass field ${found[2]}, because every object made without one would share that one ${found[1] === 'dict' ? 'dictionary' : found[1]}. The dataclasses module has a way to make a new one for each object: the lesson shows it`
+  }
+  if ((found = /^non-default argument '(\w+)' follows default argument/.exec(m))) {
+    return `in a dataclass, the field ${found[1]}, which has no default, comes after a field with one, and Python refuses that: the fields without a default come first`
+  }
+  if (/^exceptions must derive from BaseException$/.test(m)) {
+    return 'raise takes an error, and an error is an object of a class built on Exception, such as ValueError, or a class of your own whose class line names Exception in round brackets'
+  }
+  if (/^descriptor '__init__' (of 'super' object needs an argument|requires a 'super' object)/.test(m)) {
+    return 'super is used without its round brackets. super() with round brackets gives the class this one is built on, and __init__ is called on that'
+  }
+  if (error.type === 'RecursionError') {
+    return 'a method calls itself, and that call calls it again, without end. Look inside it for its own name, through self, or for what runs it again'
+  }
+  return null
+}
+
+/**
+ * The line each `# Task N` comment of the learner's file starts on, as Python counts lines, and
+ * the file's lines (`starts.lines`).
+ */
+async function taskStarts(t, file) {
+  const text = await readFile(join(t.workspace, ...file.split('/')), 'utf8').catch(() => '')
+  const all = text.replace(/\r/g, '').split('\n')
+  const marker = (line) => /^\s*#\s*Task\s+(\d+)\b/.exec(line ?? '')
+  const starts = new Map()
+  all.forEach((line, i) => {
+    const m = marker(line)
+    if (m && !marker(all[i - 1]) && !marker(all[i + 1])) starts.set(Number(m[1]), i + 1)
+  })
+  starts.lines = all
+  return starts
+}
+
+/**
+ * An error placed on a decorator line, as newer Pythons place an error of making a decorated
+ * class, moved to the class or def line under it, so every Python names the same line.
+ */
+function belowDecorators(error, all) {
+  let line = error?.line
+  if (!line || !/^\s*@/.test(all[line - 1] ?? '')) return error
+  while (/^\s*@/.test(all[line - 1] ?? '')) line++
+  return { ...error, line }
+}
+
+/** The task whose lines hold `line`, or 0 for the lines above # Task 1. */
+const taskAt = (starts, line) =>
+  [...starts].filter(([, start]) => start <= (line ?? 0)).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 0
+
+const asNumber = (v) =>
+  typeof v === 'number' ? v : v && typeof v === 'object' && '@float' in v && typeof v['@float'] === 'number' ? v['@float'] : null
+
+/** Whether a value read back is `want`, a number being equal to an int or a float of its value. */
+function sameValue(got, want) {
+  if (typeof want === 'number' && typeof got !== 'boolean') return asNumber(got) === want
+  return equalData(got, want)
+}
+
+/** The steps as Check ran them, up to `upto`, for a check's output. */
+function transcript(steps, records, upto) {
+  const shown = ['Check ran:']
+  for (let i = 0; i <= upto && i < records.length; i++) {
+    const step = steps[i]
+    const rec = records[i]
+    if (step.hidden) {
+      if (typeof step.hidden === 'string') shown.push(step.hidden)
+      continue
+    }
+    shown.push(...step.code.split("\n").map((line, k) => `${k ? "..." : ">>>"} ${line}`.trimEnd()))
+    shown.push(...firstLines(lines(rec.printed ?? '')))
+    if (rec.stopped) shown.push('(Check stopped it)')
+    else if (rec.error) shown.push(rec.error.shown)
+    else if (rec.value && rec.value.type !== 'NoneType') shown.push(rec.value.repr)
+  }
+  return shown.join('\n')
+}
+
+/** Why a step that expects an error went otherwise, or null when it raised what it should. */
+function stepRaise(step, rec, blocks) {
+  const want = step.raises
+  const wanted = article(want.type)
+  const error = rec.error
+  const code = step.code
+  if (!error) {
+    if (typeof want.swallowed === 'function') return want.swallowed(rec)
+    if (want.swallowed) return want.swallowed
+    return rec.printed
+      ? `${code} printed a line and went on. print only shows a line, and the code that called carries on as if all were well. Here the task asks for ${wanted}: raise stops the method and hands the error to the caller.`
+      : `${code} went through, and here the task asks it to stop with ${wanted}.`
+  }
+  const at = atLine(error)
+  if (error.type !== want.type) {
+    const how = error.own
+      ? `${code} raises ${error.type} with your raise line${at}`
+      : `When Check runs ${code}, it stops${at} with ${error.type}: ${runCause(error, {}, blocks)}`
+    return `${how}. ${want.wrongType ?? `Here the task asks for ${wanted}.`}`
+  }
+  if (want.own && !error.own) {
+    return `${code} stops with ${error.type}, but not from a raise line of yours: ${error.inside === false ? 'a function your code called raised it' : `Python stopped${at} by itself`}. The task asks for a refusal of your own, with raise and a message that names ${want.names}.`
+  }
+  if (want.has && !want.has.every((part) => error.message.includes(part))) {
+    if (want.hasHint && error.message !== '') return want.hasHint(error.message)
+    return error.message === ''
+      ? `${code} raises ${error.type} with no message. Put a text in its round brackets that names ${want.names}, so the person who reads it knows what to put right.`
+      : `${code} raises ${error.type}, but its message does not name ${want.names}. A person reads that message to put things right, so it says what was wrong, with the value itself.`
+  }
+  return null
+}
+
+/**
+ * Runs each case's `steps`, Check's own Python, once the lines of Task `task` have run, and judges
+ * them in order: what each gives back, prints and raises, apart. A step is { code, value?, want?,
+ * hint?, raises?, hidden?, needs?, ownHint? }:
+ * - `want` (with `value: true`): the value the code must give, compared as a value, a number as a
+ *   number whether int or float. `hint` gives the words when it does not: a string, or a function
+ *   of the value read, the values read by the steps before it (by index) and the step's record.
+ * - `raises`: { type, own, has, names, hasHint, swallowed, wrongType }, the error the code must stop
+ *   with; `swallowed` and `hasHint` are words or functions of the step's record and the message.
+ * - otherwise the step must run without an error; `ownHint` words a raise line of the learner's
+ *   that raised where the task asks for none.
+ * - `hidden`: left out of the output, or shown as that line. `needs`: the words that say which
+ *   earlier task must be right first, when this step fails.
+ * A case fails on its first step that goes wrong, with the steps up to it as Check ran them.
+ * `names` ({ name: 'class' | 'function' }) must be in the file after the task's lines. `define` is
+ * Python run right before Task `task` (Check's own versions of what earlier tasks make), `explain`
+ * the task's own words for an error, `attrs` the attributes a method reaches through self,
+ * `methods` the methods and properties the learner writes, and `owners` the task that writes
+ * each method, so a task whose code calls another task's method not yet written says so.
+ * The file runs under the name `module`, so its main guard does not run.
+ */
+export async function classCases(t, { file, task, list, names = {}, define, explain, attrs = [], methods = [], owners }) {
+  const module = file.split('/').pop().replace(/\.py$/, '')
+  const [starts, runs] = await Promise.all([
+    taskStarts(t, file),
+    Promise.all(
+      list.map((c) =>
+        runFile(t, file, {
+          upto: task,
+          blocks: true,
+          data: true,
+          define: c.define ?? define,
+          steps: c.steps.map((s) => ({
+            code: s.code,
+            ...((s.value || 'want' in s) && { value: true }),
+            ...(s.raises && { raises: true })
+          })),
+          name: module
+        })
+      )
+    )
+  ])
+  for (const r of runs) {
+    if (!r.blocks) continue
+    Object.assign(r.blocks, { classes: true, task, attrs, methods, owners, names: r.steps?.names ?? r.parts.get(task)?.names ?? {} })
+    if (explain) r.blocks.explain = explain
+  }
+  const words = (error, r) => runCause(error, {}, r.blocks)
+  // Errors of the task's lines are judged by where they stop: a class runs as one statement, so
+  // a mistake in its Task 3 method can stop the lines Python counts under Task 1.
+  const quiet = (r) => ({
+    ...r,
+    parts: new Map([...r.parts].map(([k, p]) => [k, { ...p, error: null }]))
+  })
+  for (const r of runs) {
+    const p = problem(quiet(r), file, task)
+    if (p) return [p]
+  }
+  const first = runs[0]
+  let held = null
+  for (const [, stored] of [...first.parts].filter(([k]) => k <= task)) {
+    if (!stored.error) continue
+    const part = { ...stored, error: belowDecorators(stored.error, starts.lines) }
+    const at = taskAt(starts, part.error.line)
+    if (at === 0) {
+      return [
+        fail(
+          'The lines above # Task 1 run',
+          `The lines above # Task 1 stop${atLine(part.error)} with ${part.error.type}: ${words(part.error, first)}. Those lines came with the file: put them back as they were.`,
+          part.error.shown
+        )
+      ]
+    }
+    if (at === task) {
+      return [
+        fail(
+          `The Task ${task} lines run`,
+          `The lines under # Task ${task} stop${atLine(part.error)} with ${part.error.type}: ${words(part.error, first)}.`,
+          part.error.shown
+        )
+      ]
+    }
+    held = held ?? { at, error: part.error }
+  }
+  const heldFail = () =>
+    fail(
+      `The lines before Task ${task} run`,
+      `Python stops${atLine(held.error)}, under # Task ${held.at}, with ${held.error.type}: ${words(held.error, first)}. Check runs the file from the top before it tries Task ${task}, so put that line right first.`,
+      held.error.shown
+    )
+  const found = first.steps?.names ?? first.parts.get(task)?.names ?? {}
+  for (const [name, kind] of Object.entries(names)) {
+    const type = found[name]
+    const want = kind === 'class' ? 'type' : 'function'
+    if (type === want) continue
+    if (held) return [heldFail()]
+    if (type) {
+      return [
+        fail(
+          `${name} is a ${kind}`,
+          `${name} is ${dataKind(type === 'type' ? 'class' : type)}, not a ${kind}. ${kind === 'class' ? 'A class is made with class, its name and a colon, and the lines moved in under it.' : 'A function is made with def, its name, round brackets and a colon.'}`
+        )
+      ]
+    }
+    const pool = Object.fromEntries(Object.entries(found).filter(([, k]) => k === want))
+    const close = closeName(name, pool)
+    return [
+      fail(
+        `${name} is there`,
+        close
+          ? `Check cannot find a ${kind} called ${name}, but there is one called ${close}. The name must match the task letter for letter: capitals and underscores count.`
+          : `Check cannot find a ${kind} called ${name} after the lines under # Task ${task}. Make it there with ${kind === 'class' ? 'class' : 'def'} and exactly that name.`
+      )
+    ]
+  }
+  return list.map((c, i) => {
+    const r = runs[i]
+    if (!r.steps) {
+      return fail(
+        c.name,
+        r.stopped?.why === 'time'
+          ? `Check stopped your code after ${r.seconds} seconds while it ran its steps for this task. Look for a loop that never ends.`
+          : 'Python stopped without a word while Check ran its steps for this task.',
+        r.crashed
+      )
+    }
+    const records = r.steps.steps
+    const seen = []
+    for (const [k, step] of c.steps.entries()) {
+      const rec = records[k]
+      const output = () => transcript(c.steps, records, k)
+      const no = (message) => fail(c.name, step.needs ? `${step.needs} ${message}` : message, output())
+      if (!rec) return no('Check could not run this step.')
+      if (rec.stopped) return no(stoppedText(rec.stopped, step.code, 'it'))
+      if (step.raises) {
+        const message = stepRaise(step, rec, r.blocks)
+        if (message) return no(message)
+        seen[k] = null
+        continue
+      }
+      if (rec.error) {
+        if (held) return fail(c.name, heldFail().message, output())
+        const at = atLine(rec.error)
+        return no(
+          rec.error.own
+            ? `${step.code} raises ${rec.error.type} with your raise line${at}${rec.error.message ? `: ${rec.error.message}` : ''}. ${step.ownHint ?? 'For these values the task asks for no error: look at the condition that decides when to raise.'}`
+            : `When Check runs ${step.code}, it stops${at} with ${rec.error.type}: ${words(rec.error, r)}.`
+        )
+      }
+      const v = rec.value?.data
+      seen[k] = v
+      if (!('want' in step) || sameValue(v, step.want)) continue
+      const hint = typeof step.hint === 'function' ? step.hint(v, seen, rec) : step.hint
+      return no(hint ?? `${step.code} does not give what the task asks for.`)
+    }
+    return pass(c.name, transcript(c.steps, records, c.steps.length - 1))
+  })
 }

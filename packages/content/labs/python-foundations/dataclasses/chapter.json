@@ -1,0 +1,80 @@
+{
+  "id": "dataclasses",
+  "title": "Dataclasses",
+  "files": ["callout_records.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to make callout records, searches and grid references and print them.",
+    "suggestedCommand": "python3 callout_records.py"
+  },
+  "tasks": [
+    {
+      "id": "callout",
+      "title": "A callout record",
+      "file": "callout_records.py",
+      "description": "Under `# Task 1` in `callout_records.py`, write a dataclass called `Callout` with three fields, in this order: `date` and `hill`, both text, and `hours`, a whole number. The task asks for `@dataclass`.\n\nCheck makes callouts of its own, with values in order and by name, and looks at whether `Callout` is a dataclass, at its fields, at its repr, and at whether two callouts with the same values are equal and two with different hours are not.",
+      "nextSteps": [
+        "Read the part of the lesson on @dataclass.",
+        "Put @dataclass on the line above the class line.",
+        "Write the three fields, each a name, a colon and a type, in the order the task gives.",
+        "Make a callout and print it under the main guard."
+      ],
+      "hints": [
+        "A dataclass writes `__init__`, `__repr__` and `__eq__` from its fields, so the class needs no def at all.",
+        "A field is a name, a colon and a type: `str` for text, `int` for a whole number. A name with `=` and no type is not a field.",
+        "The shape is `@dataclass`, then `class Callout:`, then `date: str`, `hill: str` and `hours: int`, each moved in under it."
+      ],
+      "docs": [
+        { "title": "dataclasses", "url": "https://docs.python.org/3/library/dataclasses.html" },
+        { "title": "dataclasses.dataclass", "url": "https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" }
+      ],
+      "videos": [
+        { "title": "What a dataclass writes for you", "url": "https://www.youtube.com/watch?v=vRVVyl9uaZc" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "search",
+      "title": "A search and its teams",
+      "file": "callout_records.py",
+      "description": "Under `# Task 2`, write a dataclass called `Search` with three fields, in this order: `area`, text; `teams`, a list of call signs, a new empty list for each search made without one; and `hours`, a whole number, 0 for a search made without it.\n\nCheck makes searches of its own, with only an area and with all three values, adds a team to one search, and looks at whether another search gets it too. It also reads the repr and whether `Search` is a dataclass.",
+      "nextSteps": [
+        "Read the part of the lesson on defaults, and the list trap.",
+        "Write the dataclass with area first, as in Task 1.",
+        "Give teams a new list for each search with field and default_factory.",
+        "Give hours a default of 0, make two searches under the main guard, and add a team to one."
+      ],
+      "hints": [
+        "Python refuses a list written straight in as the default of a field, because every search would share that one list.",
+        "The dataclasses module's `field` can give a field a maker instead of a value: the kind of value, without round brackets, which the dataclass calls for each new search.",
+        "The shape is `@dataclass`, `class Search:`, then `area: str`, `teams: list = field(default_factory=list)` and `hours: int = 0`."
+      ],
+      "docs": [
+        { "title": "Mutable default values", "url": "https://docs.python.org/3/library/dataclasses.html#mutable-default-values" },
+        { "title": "dataclasses.field", "url": "https://docs.python.org/3/library/dataclasses.html#dataclasses.field" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "grid",
+      "title": "A grid reference that stays put",
+      "file": "callout_records.py",
+      "description": "Under `# Task 3`, write a dataclass called `GridRef` with two fields, `easting` and `northing`, both whole numbers. A `GridRef` cannot be changed once it is made: the task asks for `frozen=True`. Give it a method `moved(east, north)` that gives back a new `GridRef` that many metres east and north of this one. A negative number moves west or south.\n\nCheck makes grid references of its own, tries to change one and expects the error a frozen dataclass gives, then calls `moved` and looks at the new grid reference and at whether the old one is as it was.",
+      "nextSteps": [
+        "Read the part of the lesson on a record that stays put.",
+        "Write the dataclass with its two fields, and frozen=True in the round brackets of @dataclass.",
+        "Write moved inside it, lined up with the fields, giving back a new GridRef.",
+        "Make the base and a grid reference moved from it under the main guard, and try to change the base."
+      ],
+      "hints": [
+        "A frozen dataclass cannot be changed, not even by its own methods, so moved cannot add to `self.easting`.",
+        "Make the new grid reference from this one's values with the distances added. A class can be called inside its own methods, as anywhere else.",
+        "The shape is `@dataclass(frozen=True)`, `class GridRef:`, `easting: int`, `northing: int`, then `def moved(self, east, north):` with `return GridRef(self.easting + east, self.northing + north)`."
+      ],
+      "docs": [
+        { "title": "Frozen instances", "url": "https://docs.python.org/3/library/dataclasses.html#frozen-instances" },
+        { "title": "dataclasses.FrozenInstanceError", "url": "https://docs.python.org/3/library/dataclasses.html#dataclasses.FrozenInstanceError" }
+      ],
+      "points": 10
+    }
+  ]
+}

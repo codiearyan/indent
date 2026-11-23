@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dougie", "say": "Is everything ready to go?", "note": "A callout has come in." },
+    { "title": "Kit store", "rows": [["first aid kit", "ready"], ["radio battery", "?"], ["map", "ready"]] },
+    {
+      "title": "Your classes",
+      "file": "kit.py",
+      "mine": true,
+      "gap": "Every kind checked the same",
+      "tasks": ["A rope is kit", "A rope's own label", "Only the ropes", "Ready for the hill"]
+    },
+    { "title": "Dougie", "say": "Swap the battery first.", "note": "The check named what was flat." }
+  ],
+  "ticket": { "label": "Radio battery", "wrong": "sent flat", "why": "Not asked", "right": "stopped" },
+  "captions": [
+    "At the kit store, a callout comes in and Dougie asks whether everything is ready.",
+    "Today every kind of kit is checked the same way, and a flat battery goes up the hill.",
+    "You build a rope on kit, give it its own label, pick out the ropes and check the lot.",
+    "Now the check asks each item itself, and stops on the flat radio battery by name.",
+    "Every kind of kit answers for itself, and nothing flat or used leaves the store."
+  ]
+}

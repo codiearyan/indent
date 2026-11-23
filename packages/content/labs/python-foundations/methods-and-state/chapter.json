@@ -1,0 +1,102 @@
+{
+  "id": "methods-and-state",
+  "title": "Methods that keep the rules",
+  "files": ["packs.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to pack Iain's rucksack and try each method.",
+    "suggestedCommand": "python3 packs.py"
+  },
+  "tasks": [
+    {
+      "id": "add",
+      "title": "Add an item",
+      "file": "packs.py",
+      "description": "Under `# Task 1` in `packs.py`, inside the class `Pack`, write a method `add(name, kg)` that puts the item into this pack's `items`: its name as the key and its weight as the value. It refuses a weight that is not above 0 with a `ValueError` whose message names the weight, and an item that would take the pack over its `limit`, with what it holds already, with a `ValueError` whose message names the item and the limit. A pack exactly at its limit is fine. A refused item leaves the pack as it was.\n\nCheck makes packs of its own and calls `add` on them, with items that fit, that bring a pack exactly to its limit, that take it over, and weights of 0 and below. It looks at what each pack's `items` holds afterwards, and for a refusal at the kind of error, whether your own raise line raised it and what its message names.",
+      "nextSteps": [
+        "Read the parts of the lesson on a method and on keeping the rule inside.",
+        "Write the def line inside the class, lined up with __init__, with self first.",
+        "Refuse a weight not above 0, then an item that would take the pack over its limit, each with an if and a raise.",
+        "Only after both, put the item into self.items, and try it under the main guard."
+      ],
+      "hints": [
+        "Refuse before you change anything: an item already put in the dictionary is still there after a raise.",
+        "The pack weighs what all its items weigh added up, and the new item would add `kg` to that. Only more than the limit is refused.",
+        "The shape is `def add(self, name, kg):`, then `if kg <= 0:` with a raise, then `if sum(self.items.values()) + kg > self.limit:` with a raise that names `name` and `self.limit`, then `self.items[name] = kg`."
+      ],
+      "docs": [
+        { "title": "Method objects", "url": "https://docs.python.org/3/tutorial/classes.html#method-objects" },
+        { "title": "Raising exceptions", "url": "https://docs.python.org/3/tutorial/errors.html#raising-exceptions" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "weight",
+      "title": "What the pack weighs",
+      "file": "packs.py",
+      "description": "Under `# Task 2`, inside `Pack`, write `weight`, the total of the weights in `items`, as a property: it is read as `pack.weight`, with no round brackets, and worked out from `items` every time it is read, so it is right however `items` changed. The task asks for `@property`. An empty pack weighs 0.\n\nCheck makes packs of its own, puts items into their `items` itself, reads `weight` without brackets, puts in one more item and reads it again.",
+      "nextSteps": [
+        "Read the part of the lesson on a value worked out from others.",
+        "Write a method that gives back the total of the weights in self.items.",
+        "Put @property on the line above its def.",
+        "Print iain.weight, without brackets, under the main guard."
+      ],
+      "hints": [
+        "A number kept in its own attribute goes wrong the moment items changes without it. Work the total out from items each time.",
+        "`@property` on the line above a def lets the method be read like an attribute: `pack.weight`, and Python runs the method for you.",
+        "The shape is `@property`, then `def weight(self):` under it, with `return sum(self.items.values())` moved in."
+      ],
+      "docs": [
+        { "title": "property", "url": "https://docs.python.org/3/library/functions.html#property" },
+        { "title": "sum()", "url": "https://docs.python.org/3/library/functions.html#sum" }
+      ],
+      "videos": [
+        { "title": "A property, read without brackets", "url": "https://www.youtube.com/watch?v=jCzT9XFZ5bw" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "remove",
+      "title": "Take an item out",
+      "file": "packs.py",
+      "description": "Under `# Task 3`, inside `Pack`, write a method `remove(name)` that takes the item out of this pack's `items` and gives back its weight. An item that is not in the pack raises `ValueError` from your own raise line, with a message that names it, and leaves the pack as it was.\n\nCheck makes packs of its own, puts items into them itself, calls `remove` with items that are in the pack and one that is not, and looks at what it gives back or raises and at what the pack holds afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on a method and how it changes its object.",
+        "Ask first whether the name is in self.items, and raise when it is not.",
+        "Keep the item's weight, then take the item out of self.items.",
+        "Give the weight back, and try it under the main guard."
+      ],
+      "hints": [
+        "Reading a key that is not there stops with a `KeyError`, and the task asks for a `ValueError` of your own that names the item.",
+        "A dictionary has a method that takes a key out and gives back its value in one go. Taking the item out of a copy leaves the pack as it was.",
+        "The shape is `if name not in self.items:` with `raise ValueError(f\"{name} is not in the pack\")` under it, then `return self.items.pop(name)`."
+      ],
+      "docs": [
+        { "title": "dict.pop()", "url": "https://docs.python.org/3/library/stdtypes.html#dict.pop" },
+        { "title": "Raising exceptions", "url": "https://docs.python.org/3/tutorial/errors.html#raising-exceptions" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "without",
+      "title": "A pack without one item",
+      "file": "packs.py",
+      "description": "Under `# Task 4`, inside `Pack`, write a method `without(name)` that gives back a new `Pack` for the same owner and limit, holding every item of this pack but that one. This pack stays as it was, and the two packs do not share their `items`: an item put into one later does not show up in the other.\n\nCheck makes packs of its own, calls `without`, and looks at what kind of object comes back, whether it is a new pack, what each pack holds, and whether an item put into the new pack shows up in the old one.",
+      "nextSteps": [
+        "Read the part of the lesson on changing this one or making a new one.",
+        "Make a new Pack with this pack's owner and limit.",
+        "Put every item but the one named into the new pack's own items.",
+        "Give back the new pack, and print both packs' items under the main guard."
+      ],
+      "hints": [
+        "`self.items` belongs to this pack. Giving the new pack that same dictionary, or taking the item out of it, changes this pack too.",
+        "Calling the class makes a new, empty pack for the owner and limit you give it. Fill its own items from this pack's, leaving one out, or give it a copy and take the item out of the copy.",
+        "The shape is `lighter = Pack(self.owner, self.limit)`, then `for item, kg in self.items.items():` with `if item != name:` and `lighter.items[item] = kg`, then `return lighter`."
+      ],
+      "docs": [
+        { "title": "Class and instance variables", "url": "https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables" },
+        { "title": "dict()", "url": "https://docs.python.org/3/library/stdtypes.html#dict" }
+      ],
+      "points": 10
+    }
+  ]
+}
