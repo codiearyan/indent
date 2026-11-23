@@ -1521,8 +1521,8 @@ export function objectCases({ types = {}, mistakes = [], typed } = {}) {
     const want = (r) => Object.values(r.case.expected ?? {}).map(display).join('\u0001')
     const stuck = own.length > 1 && own.every((r) => key(r) === key(own[0])) && !own.every((r) => want(r) === want(own[0]))
     return own.map((r) => {
-      if (meets(r)) return pass(r.case.name, ran(r))
       const wrongType = Object.entries(types).find(([n, t]) => r.values[n] && r.values[n].value !== null && r.values[n].type !== t)
+      if (!wrongType && meets(r)) return pass(r.case.name, ran(r))
       if (wrongType) {
         const [n, t] = wrongType
         return fail(
