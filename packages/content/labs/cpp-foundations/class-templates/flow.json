@@ -1,0 +1,75 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kasimir", "label": "Kasimir at the bench", "kind": "story" },
+      { "id": "header", "label": "caddy.h", "kind": "file", "mine": true },
+      { "id": "caddy", "label": "Caddy of any type", "kind": "data", "mine": true },
+      { "id": "fill", "label": "fillCaddy()", "kind": "function", "mine": true },
+      { "id": "shelf", "label": "The shelf of repairs", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kasimir", "to": "caddy", "label": "screws, jewels" },
+      { "from": "header", "to": "caddy", "label": "the whole recipe" },
+      { "from": "kasimir", "to": "fill", "label": "waiting repairs" },
+      { "from": "fill", "to": "caddy", "label": "one by one" },
+      { "from": "fill", "to": "shelf", "label": "a full caddy" }
+    ],
+    "note": "One caddy, written once in its header, holds screws, jewels or repairs, and never more than its limit."
+  },
+  "tasks": {
+    "template": {
+      "steps": [
+        {
+          "active": ["header", "header->caddy", "caddy"],
+          "note": "The caddy is written once, with the type of what it holds left open."
+        },
+        {
+          "active": ["kasimir->caddy", "caddy"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a limit", "items, one at a time"] },
+          "note": "Kasimir makes a caddy with a limit and puts items in, one at a time."
+        },
+        {
+          "active": ["caddy"],
+          "value": { "kind": "array", "label": "comes out", "values": ["yes or no for each item", "how many it holds"] },
+          "note": "Each item is taken or refused, and the caddy can say how many it holds."
+        }
+      ]
+    },
+    "at": {
+      "steps": [
+        {
+          "active": ["header"],
+          "note": "A body is written below the class, still in the header, where every file can see it."
+        },
+        {
+          "active": ["caddy"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a place, counted from 0"] },
+          "note": "Someone asks the caddy for the item at a place."
+        },
+        {
+          "active": ["caddy"],
+          "value": { "kind": "array", "label": "comes out", "values": ["the item there, or a refusal"] },
+          "note": "The item comes back to be read, or the caddy refuses when nothing is there."
+        }
+      ]
+    },
+    "fill": {
+      "steps": [
+        {
+          "active": ["kasimir->fill", "fill"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the waiting repairs", "a limit"] },
+          "note": "Kasimir hands over the repairs waiting their turn and the room on the shelf."
+        },
+        {
+          "active": ["fill->caddy", "caddy"],
+          "note": "A caddy of repairs is made, and each repair is offered to it in order."
+        },
+        {
+          "active": ["fill->shelf", "shelf"],
+          "value": { "kind": "array", "label": "comes out", "values": ["a caddy of repairs, no fuller than its limit"] },
+          "note": "The shelf gets the repairs that fit; the rest wait."
+        }
+      ]
+    }
+  }
+}

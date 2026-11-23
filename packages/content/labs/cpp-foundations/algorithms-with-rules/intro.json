@@ -1,0 +1,27 @@
+{
+  "stations": [
+    { "title": "Kasimir", "say": "Long jobs first, in the morning." },
+    { "title": "The bench list", "text": "Repairs in the order tickets came in." },
+    {
+      "title": "Your rules",
+      "file": "schedule.cpp",
+      "mine": true,
+      "gap": "Nothing says what first means",
+      "tasks": ["Order the bench", "Find and count", "Price every job", "Clear by a rule"]
+    },
+    { "title": "The bench", "text": "Work starts with the longest job." }
+  ],
+  "ticket": {
+    "label": "Long jobs",
+    "wrong": "start last",
+    "why": "No order",
+    "right": "start first"
+  },
+  "captions": [
+    "Kasimir wants the long jobs started first thing in the morning.",
+    "The bench list is in ticket order, so a long job can wait until the afternoon.",
+    "You hand the library's tools rules of your own: order, find, count, price and clear.",
+    "The bench list comes back in Kasimir's order, longest first.",
+    "The list answers whatever Kasimir asks of it. Next, rules kept and looked up by name."
+  ]
+}

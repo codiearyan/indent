@@ -1,0 +1,27 @@
+{
+  "stations": [
+    { "title": "Kasimir", "say": "Same caddy, but for jewels now?" },
+    { "title": "The screw caddy", "text": "A class that only ever holds screws." },
+    {
+      "title": "Your template",
+      "file": "caddy.h",
+      "mine": true,
+      "gap": "A caddy for any part",
+      "tasks": ["Write the caddy", "Reach an item", "Fill the shelf"]
+    },
+    { "title": "The shelf", "text": "Repairs wait in a caddy of their own." }
+  ],
+  "ticket": {
+    "label": "Jewels",
+    "wrong": "no caddy",
+    "why": "Screws only",
+    "right": "in a caddy"
+  },
+  "captions": [
+    "Kasimir wants a caddy for jewels, just like the one he wrote for screws.",
+    "The screw caddy's class holds screws and nothing else, so jewels have nowhere to go.",
+    "You write the caddy once in its header, its type left open, and fill the shelf with it.",
+    "The jewels go into a caddy of their own, made from the same class.",
+    "Screws, jewels and repairs each have a caddy now. Next, rules written where they are used."
+  ]
+}

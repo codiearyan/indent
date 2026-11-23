@@ -1,0 +1,131 @@
+{
+  "id": "functions-as-values",
+  "title": "Functions kept as values",
+  "files": [
+    "src/rules.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Ambrose's repair rules here and run them, after you try them in main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/rules.cpp -o rules && ./rules"
+  },
+  "tasks": [
+    {
+      "id": "logEach",
+      "title": "Log the minutes a rule asks for",
+      "file": "src/rules.cpp",
+      "description": "Under `// Task 1` in `src/rules.cpp`, write a function called `logEach` that takes the bench as a reference to a `std::vector<Repair>` and a rule as a reference to a `const std::function<int(const Repair&)>`. For each repair, in order, it asks the rule once how many minutes to add, adds them to the repair with `addMinutes`, and it gives back all the minutes it added, as an `int`. When the rule is empty, it adds nothing, gives back `0` and never calls it.\n\nCheck builds this task with a `Repair` of its own that counts every repair made and ended. It hands `logEach` a rule of its own, which counts how often it is asked and about which tickets, and an empty rule, and reads Check's repairs afterwards.",
+      "nextSteps": [
+        "Add the `#include` that `std::function` comes from.",
+        "Write the first line, with the rule as a `const std::function<int(const Repair&)>&`.",
+        "Ask first whether the rule is empty.",
+        "Go through the bench by reference: ask the rule once per repair, add, and keep a total."
+      ],
+      "hints": [
+        "A `std::function<int(const Repair&)>` is a box that holds any function taking a repair and giving back an `int`: a lambda, a plain function, or nothing at all.",
+        "An empty `std::function` turns into `false` when asked as a condition, and calling it throws. Each repair asks the rule once: keep its answer in a variable and use it twice.",
+        "The shape is `if (!rule) { return 0; } int total = 0; for (Repair& repair : bench) { int extra = rule(repair); repair.addMinutes(extra); total += extra; } return total;`."
+      ],
+      "docs": [
+        {
+          "title": "std::function",
+          "url": "https://en.cppreference.com/w/cpp/utility/functional/function"
+        },
+        {
+          "title": "std::function::operator bool",
+          "url": "https://en.cppreference.com/w/cpp/utility/functional/function/operator_bool"
+        }
+      ],
+      "videos": [
+        {
+          "title": "std::function: a function kept as a value",
+          "url": "https://www.youtube.com/watch?v=DNp7fo226Qg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "addTime",
+      "title": "Make a rule that adds time",
+      "file": "src/rules.cpp",
+      "description": "Under `// Task 2`, write a function called `addTime` that takes minutes as an `int` and gives back a `std::function<void(Repair&)>`: a rule that adds those minutes to whatever repair it is called with. The rule is called long after `addTime` has returned, as often as anyone likes.\n\nCheck builds this task with its counting `Repair`. It makes rules with minutes of its own, lets `addTime` return, fills the memory `addTime` used with other values, and then runs each rule on its own repairs more than once.",
+      "nextSteps": [
+        "Write the first line: an `int` in, a `std::function<void(Repair&)>` back.",
+        "Give back a lambda that takes a repair and adds the minutes to it.",
+        "Decide how the lambda keeps the minutes, given when it runs.",
+        "In `main`, make a rule of 20 minutes and run it on a repair twice."
+      ],
+      "hints": [
+        "A lambda turns into a `std::function` by itself when it is given back, as long as it takes and gives back what the `std::function` says.",
+        "`minutes` is a parameter of `addTime`, gone when `addTime` returns, and the rule runs after that. Last issue's rule for a lambda that outlives its maker applies.",
+        "The shape is `return [minutes](Repair& repair) { repair.addMinutes(minutes); };`."
+      ],
+      "docs": [
+        {
+          "title": "std::function",
+          "url": "https://en.cppreference.com/w/cpp/utility/functional/function"
+        },
+        {
+          "title": "Lambda expressions: lambda capture",
+          "url": "https://en.cppreference.com/w/cpp/language/lambda#Lambda_capture"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "table",
+      "title": "Write the table of repair rules",
+      "file": "src/rules.cpp",
+      "description": "Under `// Task 3`, write a function called `repairRules` that takes nothing and gives back a `std::map<std::string, std::function<void(Repair&)>>` with exactly three rules: `\"clean\"` adds 30 minutes to a repair, `\"oil\"` adds 15 and `\"regulate\"` adds 45.\n\nCheck builds this task with an `addTime` of its own in place of yours, written as Task 2 asks, so you can use it. It reads the names in the table and runs each rule twice on a repair of its own, after `repairRules` has returned.",
+      "nextSteps": [
+        "Write the first line: nothing in, the map back.",
+        "Make the map with its three names.",
+        "Give each name its rule, from `addTime` or as a lambda.",
+        "In `main`, keep the table in a variable and run `\"oil\"` on a repair."
+      ],
+      "hints": [
+        "A `std::map` holds values of any one type, and a `std::function` is one: the table maps each name to a rule.",
+        "The rules of Task 2 are values like any other, so the map can be written with braces, one `{name, rule}` pair per rule. Names are compared letter by letter.",
+        "The shape is `return { {\"clean\", addTime(30)}, {\"oil\", addTime(15)}, {\"regulate\", addTime(45)} };`."
+      ],
+      "docs": [
+        {
+          "title": "std::map",
+          "url": "https://en.cppreference.com/w/cpp/container/map"
+        },
+        {
+          "title": "std::function",
+          "url": "https://en.cppreference.com/w/cpp/utility/functional/function"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "run",
+      "title": "Run a rule by its name",
+      "file": "src/rules.cpp",
+      "description": "Under `// Task 4`, write a function called `runRule` that takes the rules as a reference to a `const std::map<std::string, std::function<void(Repair&)>>`, a name as a reference to a `const std::string` and a repair as a reference to a `Repair`. When the table has a rule of that name that is not empty, it runs that rule on the repair, once, and gives back `true`. Otherwise it changes nothing and gives back `false`.\n\nCheck builds this task with its counting `Repair`, and hands `runRule` a table of its own whose rules count their runs, with one name whose rule is empty. It asks for names the table has, a name it does not have, the empty one, and one that differs only in a capital.",
+      "nextSteps": [
+        "Write the first line, with the table as a `const` reference.",
+        "Look the name up in a way that never adds it to the table.",
+        "Give back `false` when it is not there, or when its rule is empty.",
+        "Otherwise run the rule on the repair once, and give back `true`."
+      ],
+      "hints": [
+        "The table is `const`, as in part 3: `[]` would add a missing name with an empty rule, so the compiler refuses it on a `const` map.",
+        "Ask the table whether it has the name in a way that adds nothing, as part 3 did with maps. Once the name is found, its rule can still be empty, and running an empty rule throws.",
+        "The shape is `auto found = rules.find(name); if (found == rules.end() || !found->second) { return false; } found->second(repair); return true;`."
+      ],
+      "docs": [
+        {
+          "title": "std::map::find",
+          "url": "https://en.cppreference.com/w/cpp/container/map/find"
+        },
+        {
+          "title": "std::bad_function_call",
+          "url": "https://en.cppreference.com/w/cpp/utility/functional/bad_function_call"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

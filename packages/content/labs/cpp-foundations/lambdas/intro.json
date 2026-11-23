@@ -1,0 +1,40 @@
+{
+  "stations": [
+    {
+      "title": "Dorrit",
+      "say": "My quote changed after I gave it?"
+    },
+    {
+      "title": "The repair",
+      "text": "Kasimir logs more minutes on it later."
+    },
+    {
+      "title": "Your lambdas",
+      "file": "timer.cpp",
+      "mine": true,
+      "gap": "A quote that keeps its word",
+      "tasks": [
+        "Minutes into hours",
+        "Make a quote",
+        "Make a timer"
+      ]
+    },
+    {
+      "title": "The customer",
+      "say": "Same price as you said."
+    }
+  ],
+  "ticket": {
+    "label": "The quote",
+    "wrong": "went up",
+    "why": "Not kept",
+    "right": "kept"
+  },
+  "captions": [
+    "Dorrit quoted a carriage clock, and the customer now hears a higher price.",
+    "Kasimir logged more minutes afterwards, and the price she promised did not hold.",
+    "You write small rules right where they are used: hours, a quote and a timer.",
+    "The quote stays as promised, while the timer adds to the repair itself.",
+    "Promises hold and timers stay live. Next, the library's tools get rules to follow."
+  ]
+}

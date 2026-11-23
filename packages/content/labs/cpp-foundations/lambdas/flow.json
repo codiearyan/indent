@@ -1,0 +1,72 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dorrit", "label": "Dorrit at the counter", "kind": "story" },
+      { "id": "hours", "label": "hoursOf", "kind": "function", "mine": true },
+      { "id": "quote", "label": "quoteFor()", "kind": "function", "mine": true },
+      { "id": "timer", "label": "logInto()", "kind": "function", "mine": true },
+      { "id": "repair", "label": "The repair", "kind": "data" },
+      { "id": "customer", "label": "The customer", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dorrit", "to": "hours", "label": "minutes" },
+      { "from": "repair", "to": "quote", "label": "minutes then" },
+      { "from": "quote", "to": "customer", "label": "a quote" },
+      { "from": "timer", "to": "repair", "label": "more minutes" },
+      { "from": "dorrit", "to": "timer", "label": "start a timer" }
+    ],
+    "note": "Small rules are written where they are used: a quote keeps what it promised, a timer works on the repair itself."
+  },
+  "tasks": {
+    "hours": {
+      "steps": [
+        {
+          "active": ["dorrit->hours", "hours"],
+          "value": { "kind": "array", "label": "goes in", "values": ["minutes, a whole number"] },
+          "note": "Dorrit has the minutes of a repair and wants them in hours."
+        },
+        {
+          "active": ["hours"],
+          "value": { "kind": "array", "label": "comes out", "values": ["hours, with their fraction"] },
+          "note": "A one-line rule, kept in a variable, gives back the hours, part hours included."
+        }
+      ]
+    },
+    "quote": {
+      "steps": [
+        {
+          "active": ["repair->quote", "quote"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a repair as it is now"] },
+          "note": "Dorrit asks for a quote on a repair, as the repair stands today."
+        },
+        {
+          "active": ["quote"],
+          "note": "The quote is made from the repair as it stands at that moment."
+        },
+        {
+          "active": ["quote->customer", "customer"],
+          "value": { "kind": "array", "label": "comes out", "values": ["a rule: rate in, price out"] },
+          "note": "Later, whatever happened to the repair, the customer is held to the same price."
+        }
+      ]
+    },
+    "log": {
+      "steps": [
+        {
+          "active": ["dorrit->timer", "timer"],
+          "note": "Dorrit starts a timer for one repair on the bench."
+        },
+        {
+          "active": ["timer->repair", "repair"],
+          "value": { "kind": "array", "label": "goes in", "values": ["minutes worked"] },
+          "note": "Each time the timer is used, the minutes land on that repair itself."
+        },
+        {
+          "active": ["repair"],
+          "value": { "kind": "array", "label": "comes out", "values": ["the repair's minutes now"] },
+          "note": "The timer shows what is on the repair right now, including what others logged."
+        }
+      ]
+    }
+  }
+}

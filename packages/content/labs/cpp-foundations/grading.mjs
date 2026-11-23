@@ -1907,7 +1907,7 @@ function typesHarness(types = {}) {
  * The lines of `file` that Task `task` keeps. Returns { problem } or the cut: { lines, kept, keep,
  * first, code, fns, main, def, uses, providedAt }.
  */
-function cutFile(file, whole, starter, { task, fn, guard, provides = [], dropMain, skip = [], inClass = false }) {
+function cutFile(file, whole, starter, { task, fn, guard, provides = [], dropMain, skip = [], inClass = false, keepGuard = false }) {
   const lines = whole.split('\n')
   const tasks = keepsTasks(file, lines, starter)
   if (tasks.problem) return { problem: tasks.problem }
@@ -1961,6 +1961,8 @@ function cutFile(file, whole, starter, { task, fn, guard, provides = [], dropMai
       if (GUARDISH.test(codeLines[i])) keep[i] = guard.task === task
     })
   }
+  // A header whose guard closes below its last task keeps the guard's lines in every task.
+  if (keepGuard) lines.forEach((l, i) => GUARDISH.test(codeLines[i]) && (keep[i] = true))
   const kept = lines.map((l, i) => (keep[i] ? l : ''))
   // The other tasks' lines are gone, and with them any public: or private: they wrote, so the
   // task starts under the label it has in the learner's own file.
@@ -2166,7 +2168,8 @@ export async function buildTypes(t, spec) {
       provides: spec.provides,
       dropMain: starterMain,
       skip: (spec.provides ?? []).map((p) => p.name),
-      inClass: spec.inClass?.includes(file)
+      inClass: spec.inClass?.includes(file),
+      keepGuard: spec.keepGuard?.includes(file)
     })
     if (cut.problem) return { problem: [cut.problem] }
     if (starterMain && !cut.main) {
@@ -3787,15 +3790,16 @@ export async function judgeFault(t, spec) {
     ownCode: true,
     swap: spec.counted ? { name: 'Repair', lines: REPAIR_LINES } : undefined,
     edit,
-    replaced: spec.asserts ? { [header]: ASSERT_HEADER } : undefined,
+    replaced: spec.asserts ? { ...spec.replaced, [header]: ASSERT_HEADER } : spec.replaced,
     cases: cases.map((c) => ({ code: c.sig ? c.code : wrap(c) })),
     helpers: [...(spec.counted ? MEMORY_HELPERS : []), ...FAULT_HELPERS(own), ...(spec.helpers ?? [])],
     classCause: (errors, ctx) =>
+      spec.cause?.(errors, ctx) ??
       faultCause(errors, ctx, spec) ??
       (spec.counted ? memoryCause(errors, ctx, spec) : null) ??
       classCause(errors, ctx, { ...spec, className: spec.className ?? 'Repair', members: spec.members ?? [], functions: spec.functions ?? ['getTicket', 'getItem', 'getMinutes', 'addMinutes'] }),
-    classLink: () => null,
-    classWarning: (warnings) => faultWarning(warnings, { code: section, file, from: sectionFrom }) ?? (spec.counted ? memoryWarning(warnings) : null) ?? classWarning(warnings),
+    classLink: (said, ctx) => spec.link?.(said, ctx) ?? null,
+    classWarning: (warnings) => spec.warning?.(warnings) ?? faultWarning(warnings, { code: section, file, from: sectionFrom }) ?? (spec.counted ? memoryWarning(warnings) : null) ?? classWarning(warnings),
     classCrashed: (r, l) =>
       spec.crashed?.(r, l) ??
       ((r.stderr ?? '').includes(`${START}assertsOff${SPLIT}1`)
@@ -3828,4 +3832,278 @@ export async function judgeFault(t, spec) {
     return { name: c.name, passed: !message, message: message ?? undefined, output: out || undefined }
   })
   return [...results, ...(spec.probes ?? []).map((p, i) => probeDetail(p, i, built.probed))]
+}
+
+// ---------- Part 8: templates and lambdas ----------
+//
+// Tasks of part 8 are judged with judgeFault() and Check's own C++: a function template is called
+// with types of Check's own that offer only what the task says a type must offer; a function the
+// learner's code is handed is a counting one of Check's; a lambda or a function given back is
+// made through indent8_::deep_(), 16 KB down the stack, and called after what made it has
+// returned, with the stack between filled with 0x5A by indent8_::scrub_(). A capture that refers to
+// a variable that ended then reads 0x5A bytes, the same on every run and system: the calls that
+// follow stay far above that place and never write over it. The long errors of templates and lambdas are named from their first line on the
+// learner's own line, in the wording of either compiler.
+
+const PART8_HELPERS = [
+  '#include <functional>',
+  String.raw`namespace indent8_ {
+__attribute__((noinline)) inline void scrub_() { volatile unsigned char b[1 << 16]; for (unsigned i = 0; i < sizeof b; i++) b[i] = 0x5A; }
+template <class F> __attribute__((noinline)) auto deep_(F f) { volatile unsigned char pad[1 << 14]; pad[0] = 0; pad[sizeof pad - 1] = 0; return f(); }
+template <class T> constexpr bool lambda_() { return std::is_class_v<std::remove_reference_t<T>>; }
+}`
+]
+
+const OPERATOR_AT = (line, column) => /^(<=|>=|==|!=|<|>|\+|-|\*|\/)/.exec((line ?? '').slice(Math.max(0, column - 1)))?.[1]
+const niceType = (t) => (t ?? '').replace(/std::(?:__cxx11::|__1::)?basic_string<char(?:, std::(?:__1::)?char_traits<char>, std::(?:__1::)?allocator<char> ?)?>/g, 'std::string')
+const typeOf = (t) => t.replace(/^const /, '').replace(/^struct |^class /, '')
+
+/**
+ * The causes of an error that part 8 teaches, tried before those of parts 1 to 7. spec: templates
+ * (the function templates the task writes), own8 (Check's own types, each { name, offers }),
+ * classTemplate (the class template's name).
+ */
+function part8Cause(errors, ctx, spec) {
+  const text = errors.map((e) => e.text).join('\n')
+  const all = ctx.stderr ?? ''
+  const source = ctx.source ?? ''
+  const fromCheck = ctx.where === 'added' || ctx.where === 'provided'
+  const first = errors[0]
+  const own = spec.own8 ?? []
+  const C = spec.classTemplate
+
+  if (!errors.length) {
+    if (/'void'\)? is not contextually convertible to 'bool'|void value not ignored as it ought to be|could not convert '[^']*' from 'void' to 'bool'|cannot convert 'void' to 'bool'/.test(all)) {
+      return 'The lambda handed to the algorithm gives back nothing: its result type is void. The algorithm asks it a question about each item and needs true or false back. A lambda with a body in braces gives back only what a return in it gives back.'
+    }
+    const nothing = own.find((o) => all.includes(`no matching constructor for initialization of '${o.name}'`) || all.includes(`no matching function for call to '${o.name}::${o.name.split('::').at(-1)}()'`))
+    if (nothing) {
+      return `Check uses the template with a type of its own, ${nothing.name}, which offers only what the task says a type must offer: ${nothing.offers}. A line of yours asks the library to make ${nothing.name}s with no value, such as a vector made with a size, and ${nothing.name} cannot be made from nothing. The error is inside the library's files; your line is the one marked "requested here" or "required from here".`
+    }
+    if (/no matching function for call to object of type|no match for call to '\(/.test(all)) {
+      return 'The algorithm calls the function it was handed with one item, or two for a comparison, and the function handed in does not take that. Compare the lambda\'s round brackets with what the algorithm hands it: the type of the items in the vector.'
+    }
+    return null
+  }
+
+  const unknown = /use of undeclared identifier '(\w+)'|'(\w+)' was not declared in this scope/.exec(text)
+  const unknownName = unknown && (unknown[1] ?? unknown[2])
+  if (fromCheck && unknownName && (spec.templates ?? []).includes(unknownName)) {
+    return `Check cannot find a function template called ${unknownName} under // ${ctx.label}. Write it there, above main, with exactly that name: capital letters count.`
+  }
+  if (fromCheck && unknownName && (spec.writes ?? []).includes(unknownName)) {
+    return `Check cannot find ${unknownName} under // ${ctx.label}. Write it there, above main, with exactly that name: capital letters count.`
+  }
+  const notCallable = /called object type '([^']+)' is not a function or function pointer|'(\w+)' cannot be used as a function|no match for call to '\((?:const )?(int|double|bool|void)\)/.exec(text)
+  if (fromCheck && notCallable && (spec.writes ?? []).length) {
+    return `Check calls what ${spec.writes.join(' or ')} gives back, as the task says, and it cannot be called: it is ${niceType(notCallable[1] ?? notCallable[3] ?? 'a value')}, not a function. The task asks for a lambda to be given back, which the caller can call later as often as it likes.`
+  }
+
+  const conflict = /deduced conflicting types for parameter '(\w+)' \('([^']+)' (?:vs\.|and) '([^']+)'\)/.exec(all)
+  if (conflict && /no matching function for call to/.test(text)) {
+    const fn = /no matching function for call to '(\w+)/.exec(text)?.[1] ?? 'The template'
+    const [, T, a, b] = conflict
+    return fromCheck
+      ? `Check calls ${fn} as the task describes it, and the compiler worked out ${T} as ${niceType(a)} from one value and as ${niceType(b)} from another ("deduced conflicting types"). Look at the template line and the type of each parameter against the task: how many types the template has, and which parameters are written with each.`
+      : `${fn} is a template with one ${T} for values that are not of one type here: the compiler works out ${T} as ${niceType(a)} from one value and as ${niceType(b)} from another, and stops ("deduced conflicting types"). It never turns one into the other by itself. The lesson shows the two ways to settle which type ${T} is.`
+  }
+
+  const capture = /variable '(\w+)' cannot be implicitly captured in a lambda|'(\w+)' is not captured/.exec(text)
+  if (capture) {
+    const name = capture[1] ?? capture[2]
+    return `The lambda uses ${name}, a variable of the function around it, and its square brackets do not bring ${name} in. A lambda sees only the variables its capture list names, by value or by reference.`
+  }
+  if (/cannot assign to a variable captured by copy in a non-mutable lambda|(?:assignment|increment|decrement) of read-only variable/.test(text)) {
+    return 'The lambda changes a variable it captured by value. A capture by value is a copy that belongs to the lambda, and the lambda may only read it: the caller\'s own variable is never reached that way. Look at what the task says the lambda must change.'
+  }
+  const constThis = /'this' argument to member function '(\w+)' has type 'const (\w+)', but function is not marked const|passing 'const (\w+)' as 'this' argument discards qualifiers/.exec(text)
+  if (constThis && /\[[^\]]*\]\s*\(/.test(ctx.code ?? '') && /\[\s*(?:=|\w+)\s*(?:,[^\]]*)?\]/.test(ctx.code ?? '')) {
+    const fn = constThis[1] ?? /in call to '[^']*?(\w+)\(/.exec(all)?.[1] ?? 'a function that changes it'
+    return `A lambda calls ${fn} on a ${constThis[2] ?? constThis[3]} it captured by value. A capture by value is a copy that the lambda may only read, so only const functions can be called on it, and the caller's own is never reached that way. Look at what the task says the lambda must change.`
+  }
+  const readOnly = C && new RegExp(`'this' argument to member function '(\\w+)' has type 'const ${C}<|member function '(\\w+)' not viable: 'this' argument has type 'const ${C}<|passing 'const ${C}<[^']*>' as 'this' argument discards qualifiers`).exec(text)
+  if (readOnly) {
+    const fn = readOnly[1] ?? readOnly[2] ?? /in call to '[^']*?(\w+)\(/.exec(all)?.[1]
+    return `${fromCheck ? 'Check calls' : 'A line calls'} ${fn ?? 'a function'} on a ${C} it may only read, through a const reference, and ${fn ?? 'that function'} is not marked const. A member function that changes nothing ends its first line with const, in a class template as in any class.`
+  }
+  if (C && new RegExp(`no matching constructor for initialization of '(?:const )?${C}<|no matching function for call to '${C}<[^']*>::${C}\\(\\)'`).test(text)) {
+    return fromCheck
+      ? `Check makes a ${C} with its limit, as the task describes, and no constructor of ${C} takes that. Compare the constructor's round brackets with the task.`
+      : `A line makes a ${C} without what its constructor takes. A ${C} is made with its limit, in round brackets after the variable's name.`
+  }
+  if (/no matching function for call to object of type '\(lambda|no match for call to '\([^']*<lambda/.test(text)) {
+    return 'A line puts round brackets after a lambda, which calls it right there, with no values. An algorithm is handed the lambda itself, without brackets, and calls it on the items.'
+  }
+
+  const misspelt = /unknown type name '(\w+)'|'(\w+)' has not been declared|'(\w+)' does not name a type/.exec(first?.text ?? '')
+  if (misspelt && /\btemplate\s*</.test(source)) {
+    return `The compiler does not know ${misspelt[1] ?? misspelt[2] ?? misspelt[3]} in the template line. Inside its angle brackets, the name of the type comes after the word typename, spelled exactly so, or after class.`
+  }
+  if (C && /requires template arguments|without an argument list|used without template arguments|template placeholder type/.test(text)) {
+    return new RegExp(`\\b${C}\\s*::`).test(source)
+      ? `Below the class, ${C} alone is not a class: it is a template, and the member belongs to ${C}<T>. A member written outside a class template is a template of its own, with its own template line above it, and ${C}<T>:: before its name.`
+      : `${C} is a class template, not a class. A class is made from it by naming the type in angle brackets after its name, every time it is used as a type: in a parameter, in what a function gives back and in a variable.`
+  }
+  if (C && /return type of out-of-line definition of '[^']*' differs from that in the declaration|out-of-line definition of '\w+' does not match any declaration|no declaration matches '/.test(text)) {
+    if (fromCheck && !spec.provides?.some((p) => p.name === C)) {
+      return `Check reads the items of a ${C} with a body of at of its own, written as Task 2 asks, and it matches no declaration of at in your class. Compare the declaration of at with the task: what it gives back, the type of its parameter and const at the end.`
+    }
+    return fromCheck
+      ? `Check builds this task with its own ${C}, written as the task before asks, and a body of yours matches none of its declarations. Compare the first line of each body with its declaration in the task: what it gives back, the type of each parameter and const at the end.`
+      : `The first line of a body below the class does not match its declaration in the class: what it gives back, the type of each parameter and const at the end must be the same in both.${spec.provides?.some((p) => p.name === C) ? ` Check builds this task with its own ${C}, written as the task before asks.` : ''}`
+  }
+  if (/use of undeclared identifier 'T'|'T' was not declared in this scope|unknown type name 'T'|'T' does not name a type|'T' has not been declared/.test(text)) {
+    return C && new RegExp(`\\b${C}\\s*<[^>]*>\\s*::`).test(source)
+      ? `T is known only inside a template. A member of ${C} written below the class is a template of its own: it needs the template line above it, as the class has, before T means anything.`
+      : 'T is known only inside a template, from the template line above it to the end of that function or class. Look whether the template line is there, right above the first line that uses T.'
+  }
+
+  const ops = /invalid operands to binary expression \('(?:const )?([\w:]+)' and '(?:const )?([\w:]+)'\)|no match for '(operator\S+)' \(operand types are '(?:const )?([\w:]+)' and '(?:const )?([\w:]+)'\)/.exec(text)
+  const opType = ops && (ops[1] ?? ops[4])
+  const mine = own.find((o) => o.name === opType)
+  if (mine && !fromCheck) {
+    const op = ops[3]?.replace('operator', '') ?? OPERATOR_AT(source, first?.column ?? 0) ?? 'an operator'
+    return `Check calls the template with a type of its own, ${mine.name}, which offers only what the task says a type must offer: ${mine.offers}. This line uses ${op} on two of them, so the template asks more of a type than the task allows. A template works for every type that offers what its lines use, and no other.`
+  }
+  const convert = /no viable conversion from '(?:const )?(\w+)' to '(?:const )?([\w:]+)'|conversion from '(\w+)' to non-scalar type '([\w:]+)' requested|could not convert '[^']*' from '(\w+)' to '([\w:]+)'|cannot convert '(\w+)' to '([\w:]+)'/.exec(text)
+  const convTo = convert && typeOf(convert[2] ?? convert[4] ?? convert[6] ?? convert[8])
+  const ownTo = own.find((o) => o.name === convTo)
+  if (ownTo && !fromCheck) {
+    return `Check calls the template with a type of its own, ${ownTo.name}, which offers only what the task says a type must offer: ${ownTo.offers}. This line makes a T from ${article(convert[1] ?? convert[3] ?? convert[5] ?? convert[7])} ${convert[1] ?? convert[3] ?? convert[5] ?? convert[7]}, which works for numbers and not for every type. Start from a value the template was given.`
+  }
+  const returned = /no viable conversion from returned value of type '(?:const )?([^']+)' to function return type '([^']+)'|cannot convert '(?:const )?([^']+)' to '([^']+)' in return/.exec(first?.text ?? '')
+  if (returned && !fromCheck && (spec.templates ?? []).length) {
+    return `Check calls the template with ${niceType(returned[1] ?? returned[3])} values, and this line gives one back from a function whose type in front of its name is ${niceType(returned[2] ?? returned[4])}. What a template gives back is written with T too, so it is the type it was called with.`
+  }
+  const back = /cannot initialize return object of type '([^']+)' with an? \w+ of type '(?:const )?([\w:]+)'|cannot convert '(?:const )?([\w:]+)' to '([^']+)' in return|could not convert '[^']*' from '(?:const )?([\w:]+)' to '([^']+)'/.exec(text)
+  const backOwn = back && own.find((o) => o.name === (back[2] ?? back[3] ?? back[5]))
+  if (backOwn && !fromCheck) {
+    return `Check calls the template with a type of its own, ${backOwn.name}, and this line gives one back from a function whose type in front of its name is ${back[1] ?? back[4] ?? back[6]}, not T. What the template gives back is written with T too, so it is the type it was called with.`
+  }
+  const noDefault = /no matching constructor for initialization of '(?:const )?([\w:]+)'|no matching function for call to '([\w:]+)::\w+\(\)'/.exec(text)
+  const ownNew = noDefault && own.find((o) => o.name === (noDefault[1] ?? noDefault[2]))
+  if (ownNew && !fromCheck) {
+    return `Check calls the template with a type of its own, ${ownNew.name}, which offers only what the task says a type must offer: ${ownNew.offers}. This line makes a T with no value, and ${ownNew.name} cannot be made from nothing. Start from a value the template was given.`
+  }
+
+  const kinds = /'(?:const )?(\w+)<([^'<>]+)>'[^\n]*?'(?:const )?\1<([^'<>]+)>/.exec(text) ?? /'(?:const )?(\w+)<([^'<>]+)>'[^\n]*?'(?:const )?\1<([^'<>]+)>/.exec(all)
+  if (C && kinds && kinds[1] === C && kinds[2].replace(/&$/, '') !== kinds[3].replace(/&$/, '')) {
+    return `${C}<${kinds[2]}> and ${C}<${kinds[3]}> are two different classes made from one template, and one never turns into the other. Look at the type in the angle brackets where each is made, and where the task names it.`
+  }
+
+  const unmatched = /no matching function for call to '(\w+)/.exec(text)?.[1]
+  if (unmatched && fromCheck && (spec.templates ?? []).includes(unmatched)) {
+    const code = codeOnly(ctx.cuts ? Object.values(ctx.cuts).map((c) => c.code).join('\n') : ctx.code ?? '')
+    const templated = new RegExp(`template\\s*<[^>]*>\\s*(?:inline\\s+)?[\\w:<>,&*\\s]*?\\b${unmatched}\\s*\\(`).test(code)
+    return templated
+      ? `Check calls ${unmatched} with values of its own, as the task describes them, and the compiler finds no way to call it with them. Compare what ${unmatched} takes with the task: how many values, and which of them are written with T.`
+      : `${unmatched} is written for one type only: it has no template line above it. Check calls it with more than one type, as the task says, and for each type but that one there is no ${unmatched} to call.`
+  }
+  return null
+}
+
+/**
+ * A failing detail when a function of `file` does not use the tool its task names, throws its
+ * answer away, or the file lacks the header the tool comes from. rule: { fn, uses: ['count_if'],
+ * lambda: true when the task asks for a lambda written in the call }.
+ */
+async function toolRule(t, file, task, rule) {
+  const whole = (await readFile(join(t.workspace, file), 'utf8').catch(() => '')).replace(/\r\n/g, '\n')
+  const code = codeOnly(whole)
+  const def = functionsOf(code).find((f) => f.name === rule.fn && f.kind === 'def' && !f.nested)
+  if (!def) return null
+  const body = code.slice(def.start, def.end).replace(/^[^{]*/, '')
+  const { fn } = rule
+  const missing = (rule.uses ?? []).find((name) => !new RegExp(`\\b${name}\\s*\\(`).test(body))
+  if (missing) {
+    return fail(
+      `${fn} uses std::${missing}`,
+      `${label(task)} asks ${fn} to use std::${missing}, and Check cannot find it in ${fn}. The point of this task is the algorithm and the function you hand it: call std::${missing} instead of writing its loop out yourself.`
+    )
+  }
+  const ignored = (rule.uses ?? []).find(
+    (name) =>
+      ['find_if', 'count_if', 'any_of', 'all_of', 'none_of', 'remove_if'].includes(name) &&
+      [...body.matchAll(new RegExp(`\\b${name}\\s*\\(`, 'g'))].every((m) => /(?:^|[;{}])\s*(?:std\s*::\s*)?$/.test(body.slice(0, m.index)))
+  )
+  if (ignored) {
+    return fail(
+      `${fn} uses what std::${ignored} gives back`,
+      ignored === 'remove_if'
+        ? `${fn} calls std::remove_if on a line of its own, so the place it gives back is thrown away. std::remove_if only moves the items that stay to the front; where they end is what it gives back, and the vector is cut there with erase.`
+        : `${fn} calls std::${ignored} on a line of its own, so what it gives back is thrown away. std::${ignored} changes nothing: its answer is what it gives back, so ${fn} uses that answer.`
+    )
+  }
+  const unnamed = (rule.names ?? []).find((name) => !new RegExp(`\\b${name}\\b`).test(body))
+  if (unnamed) {
+    return fail(
+      `${fn} uses ${unnamed}`,
+      `${label(task)} asks ${fn} to hand its algorithm ${unnamed}, and Check cannot find ${unnamed} in ${fn}. The rule is written once, in ${unnamed}, and every place that needs it uses that one.`
+    )
+  }
+  if (rule.lambda && !/\[[^\]]*\]\s*\(/.test(body)) {
+    return fail(
+      `${fn} hands the algorithm a lambda`,
+      `${label(task)} asks ${fn} to hand std::${rule.uses[0]} a lambda, written right in ${fn}, and Check cannot find one there: a lambda starts with its square brackets, then its round brackets and its body.`
+    )
+  }
+  const headers = [
+    ['algorithm', /\bstd::(sort|find_if|count_if|any_of|all_of|none_of|transform|remove_if|find|count|max_element|min_element|reverse)\s*\(/],
+    ['functional', /\bstd::(function)\s*</],
+    ['map', /\bstd::(map)\s*</],
+    ['vector', /\bstd::(vector)\s*</]
+  ]
+  const written = code.slice(def.start, def.end)
+  for (const [header, pattern] of headers) {
+    const used = pattern.exec(written)
+    if (!used || new RegExp(`^\\s*#\\s*include\\s*<${header}>`, 'm').test(code)) continue
+    return fail(
+      `${file} includes <${header}>`,
+      `${fn} uses std::${used[1]}, which comes from the header <${header}>, and ${file} has no #include <${header}> at the top. One compiler may find std::${used[1]} through another header, but the next one will not: add the line, above main, with the other #include lines.`
+    )
+  }
+  return null
+}
+
+function templateLink(said, { cuts }, spec) {
+  const C = spec.classTemplate
+  if (!C || said.kind !== 'undefined' || !said.symbol.includes(`${C}<`)) return null
+  const member = /::(\w+)\s*\(/.exec(said.symbol)?.[1] ?? said.name
+  const where = (spec.others ?? []).find((f) => !cuts[f])
+  return `The linker cannot find ${said.symbol.replace(/\s+const$/, '')} (${linkWords('undefined')}). The compiler makes ${C}<int>'s ${member} only in a file that sees the whole body of ${C}<T>::${member}, and a file that includes the header sees only what the header holds. So every body of a class template lives in its header, below the class or inside it${where ? `, and never in a .cpp file such as ${where}` : ''}.`
+}
+
+function part8Warning(warnings) {
+  const gone = warnings.find((w) => /address of stack memory associated with (?:local variable|parameter) '\w+' returned|reference to local variable '\w+' returned|address of local variable '\w+' returned/.test(w.text))
+  if (!gone) return null
+  const name = /'(\w+)'/.exec(gone.text)[1]
+  return {
+    warning: gone,
+    message: `The compiler warns that what the function gives back refers to ${name}, a variable of that function, which ends when it returns. A lambda that captures ${name} by reference keeps no copy of its own: every later call reads a variable that is gone, and what it reads there has no promised value. What outlives the function that made it keeps copies of what it needs.`
+  }
+}
+
+/** C++ that calls `fn` with `args` and writes what it gives back as `key`, or `${key}Void` when it gives back nothing. */
+export const callPut = (key, fn, args) =>
+  `[&](auto&& indent_f_) { if constexpr (std::is_void_v<decltype(indent_f_(${args}))>) { indent_f_(${args}); indent_::put_("${key}Void", 1); } else { indent_::put_("${key}", indent_f_(${args})); } }(${fn});`
+
+/**
+ * Judges a task of part 8 with judgeFault(). Spec, besides what judgeFault() takes:
+ * - tools: [{ fn, uses, lambda }] the algorithms a function must use (see toolRule)
+ * - templates: the function templates the task writes; own8: [{ name, offers }] Check's own types
+ * - classTemplate: the class template the issue writes, for its errors and its linker message
+ */
+export async function judgeRule(t, spec) {
+  const file = spec.toolFile ?? spec.files.at(-1)
+  for (const rule of spec.tools ?? []) {
+    const problem = await toolRule(t, file, spec.task, rule)
+    if (problem) return [problem]
+  }
+  return judgeFault(t, {
+    ...spec,
+    helpers: [...PART8_HELPERS, ...(spec.helpers ?? [])],
+    cause: (errors, ctx) => part8Cause(errors, ctx, spec) ?? spec.cause?.(errors, ctx) ?? null,
+    link: (said, ctx) => templateLink(said, ctx, spec) ?? spec.link?.(said, ctx) ?? null,
+    warning: (warnings) => part8Warning(warnings) ?? spec.warning?.(warnings) ?? null
+  })
 }

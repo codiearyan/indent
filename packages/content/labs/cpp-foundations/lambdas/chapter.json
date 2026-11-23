@@ -1,0 +1,103 @@
+{
+  "id": "lambdas",
+  "title": "Small functions written where they are used",
+  "files": [
+    "src/timer.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Dorrit's counter here and run it, and watch a quote and a timer on the same repair.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/timer.cpp -o timer && ./timer"
+  },
+  "tasks": [
+    {
+      "id": "hours",
+      "title": "Turn minutes into hours with a lambda",
+      "file": "src/timer.cpp",
+      "description": "Under `// Task 1` in `src/timer.cpp`, above `main`, make a variable called `hoursOf` that holds a lambda. The lambda takes minutes as an `int` and gives back the hours they make as a `double`: 90 minutes are 1.5 hours.\n\nCheck calls `hoursOf` from code of its own with minutes of its own, and reads what comes back and its type. It also looks that `hoursOf` holds a lambda, not a function written out with a name.",
+      "nextSteps": [
+        "Write `auto hoursOf =`, then the lambda, then a semicolon.",
+        "Give the lambda one parameter, the minutes, as an `int`.",
+        "Give back the minutes in hours, worked out as a `double`.",
+        "Print `hoursOf(90)` from `main`."
+      ],
+      "hints": [
+        "A lambda is a function with no name, written right where it is needed: square brackets, then its parameters in round brackets, then its body in braces. `auto` keeps it in a variable.",
+        "The lambda's result type is worked out from its return. An `int` divided by an `int` is an `int`, so one side of the division has to be a `double` for the fraction of an hour to stay.",
+        "The shape is `auto hoursOf = [](int minutes) { return minutes / 60.0; };`."
+      ],
+      "docs": [
+        {
+          "title": "Lambda expressions",
+          "url": "https://en.cppreference.com/w/cpp/language/lambda"
+        },
+        {
+          "title": "Placeholder type specifiers (auto)",
+          "url": "https://en.cppreference.com/w/cpp/language/auto"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Lambdas and what they capture",
+          "url": "https://www.youtube.com/watch?v=mWgmBBz0y8c"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "quote",
+      "title": "Make a quote that keeps its word",
+      "file": "src/timer.cpp",
+      "description": "Under `// Task 2`, write a function called `quoteFor` that takes a repair as a reference to a `const Repair` and gives back a lambda, with `auto` in front of its name for the lambda's type. The lambda takes an hourly rate as a `double` and gives back the price of the repair's minutes at that rate, as a `double`. A quote keeps its word: it prices the minutes the repair had when `quoteFor` made it, whatever happens to the repair afterwards, even once the repair has ended.\n\nCheck builds this task with a `Repair` of its own that counts every repair made and ended, and every use of one that has ended. It makes quotes for its own repairs and asks each for prices more than once, after `quoteFor` has returned, after it logs more minutes on the repair, and after the repair has ended.",
+      "nextSteps": [
+        "Write the first line: `auto quoteFor(const Repair& repair)`.",
+        "Decide what the lambda must keep so its price never changes.",
+        "Write the lambda's capture list to keep that, by value.",
+        "In `main`, quote `clock`, log 30 more minutes on it, and quote again."
+      ],
+      "hints": [
+        "The lambda is called later, after `quoteFor` has returned, and the task says the repair may change or end before then.",
+        "A capture by reference sees the repair as it is at each call, and refers to nothing once it has ended. A capture by value keeps a copy inside the lambda, as it was when the lambda was made.",
+        "The shape is `int minutes = repair.getMinutes(); return [minutes](double rate) { return minutes / 60.0 * rate; };`."
+      ],
+      "docs": [
+        {
+          "title": "Lambda expressions: lambda capture",
+          "url": "https://en.cppreference.com/w/cpp/language/lambda#Lambda_capture"
+        },
+        {
+          "title": "Function declaration: return type deduction",
+          "url": "https://en.cppreference.com/w/cpp/language/function#Return_type_deduction"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "log",
+      "title": "Make a timer that logs on the repair",
+      "file": "src/timer.cpp",
+      "description": "Under `// Task 3`, write a function called `logInto` that takes a repair as a reference to a `Repair` and gives back a lambda, with `auto` in front of its name. The lambda takes minutes as an `int`, adds them to that same repair with `addMinutes`, and gives back the repair's minutes after that, as an `int`. The repair is the caller's own: what the lambda logs, the caller sees, and what the caller logs itself, the lambda sees too.\n\nCheck builds this task with its counting `Repair`. It makes timers for repairs of its own, logs through them, logs on the repair itself in between, and reads the repair and what each timer gives back.",
+      "nextSteps": [
+        "Write the first line: `auto logInto(Repair& repair)`.",
+        "Decide whether the lambda needs the caller's repair or a copy of it.",
+        "Write the lambda: add the minutes, then give back the repair's minutes.",
+        "In `main`, make a timer for `clock`, log with it, and print `clock.getMinutes()`."
+      ],
+      "hints": [
+        "Here the lambda must change the caller's repair, and see every change the caller makes. That is the other kind of capture from Task 2.",
+        "A capture by value is a copy the lambda may only read, so calling `addMinutes` on it is refused. A capture by reference reaches the caller's own repair, which outlives the timer here.",
+        "The shape is `return [&repair](int minutes) { repair.addMinutes(minutes); return repair.getMinutes(); };`."
+      ],
+      "docs": [
+        {
+          "title": "Lambda expressions: lambda capture",
+          "url": "https://en.cppreference.com/w/cpp/language/lambda#Lambda_capture"
+        },
+        {
+          "title": "Reference declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/reference"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

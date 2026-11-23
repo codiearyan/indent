@@ -1,0 +1,93 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ambrose", "label": "Ambrose's desk", "kind": "story" },
+      { "id": "table", "label": "repairRules()", "kind": "function", "mine": true },
+      { "id": "make", "label": "addTime()", "kind": "function", "mine": true },
+      { "id": "run", "label": "runRule()", "kind": "function", "mine": true },
+      { "id": "log", "label": "logEach()", "kind": "function", "mine": true },
+      { "id": "repairs", "label": "The repairs", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "ambrose", "to": "table", "label": "the steps" },
+      { "from": "make", "to": "table", "label": "rules" },
+      { "from": "table", "to": "run", "label": "rules by name" },
+      { "from": "run", "to": "repairs", "label": "one step" },
+      { "from": "log", "to": "repairs", "label": "minutes each" }
+    ],
+    "note": "The workshop's steps are written once, kept in one table by name, and run whenever the counter asks."
+  },
+  "tasks": {
+    "logEach": {
+      "steps": [
+        {
+          "active": ["log"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the bench", "a rule: repair in, minutes out"] },
+          "note": "The bench arrives with a rule that says how many minutes each repair gets."
+        },
+        {
+          "active": ["log->repairs", "repairs"],
+          "note": "Each repair is asked about once, and gets its minutes."
+        },
+        {
+          "active": ["log"],
+          "value": { "kind": "array", "label": "comes out", "values": ["all the minutes added"] },
+          "note": "The total of what was added comes back, or nothing when there was no rule."
+        }
+      ]
+    },
+    "addTime": {
+      "steps": [
+        {
+          "active": ["make"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a number of minutes"] },
+          "note": "Ambrose asks for a step that adds a set time."
+        },
+        {
+          "active": ["make"],
+          "value": { "kind": "array", "label": "comes out", "values": ["a rule: repair in, nothing out"] },
+          "note": "A rule comes back, to be kept and used later."
+        },
+        {
+          "active": ["make->table"],
+          "note": "Long after it was made, the rule still adds its time to any repair it is run on."
+        }
+      ]
+    },
+    "table": {
+      "steps": [
+        {
+          "active": ["ambrose->table", "table"],
+          "note": "Ambrose writes his steps down once, each with its name."
+        },
+        {
+          "active": ["make->table"],
+          "value": { "kind": "map", "label": "the table", "entries": [{ "key": "a step's name", "value": "its rule" }] },
+          "note": "Each name is paired with a rule in one table."
+        },
+        {
+          "active": ["table->run"],
+          "note": "The table is handed on, so the counter can run any step by its name."
+        }
+      ]
+    },
+    "run": {
+      "steps": [
+        {
+          "active": ["table->run", "run"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the table", "a name", "a repair"] },
+          "note": "The counter asks for a step by name, on one repair."
+        },
+        {
+          "active": ["run"],
+          "note": "The name is looked up without changing the table; a missing or empty step does nothing."
+        },
+        {
+          "active": ["run->repairs", "repairs"],
+          "value": { "kind": "array", "label": "comes out", "values": ["whether a step ran"] },
+          "note": "The step runs once on the repair, and the counter hears whether it did."
+        }
+      ]
+    }
+  }
+}
