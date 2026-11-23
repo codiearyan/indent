@@ -1,0 +1,121 @@
+{
+  "id": "split-and-join",
+  "title": "Splitting and joining",
+  "files": ["callout_book.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the callout book taken apart into lines and parts, the hours added up and a line put back together.",
+    "suggestedCommand": "python3 callout_book.py"
+  },
+  "tasks": [
+    {
+      "id": "words",
+      "title": "How many words",
+      "file": "callout_book.py",
+      "description": "Under `# Task 1` in `callout_book.py`, write a function called `word_count` that takes a radio message and gives back how many words it has, as a whole number. Spaces only separate the words, however many there are in a row, and so do a line end or spaces at the start or the end. For `message` it gives back `9`. Print what it gives back for `message`.\n\nCheck calls `word_count` with messages of its own, some with two spaces in a row and some with a line end, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on splitting at spaces.",
+        "Split the message into a list of its words.",
+        "Give back how many items that list has.",
+        "Try it on a message with two spaces in a row."
+      ],
+      "hints": [
+        "Splitting at one space gives an empty text between two spaces in a row, and that empty text is counted as a word.",
+        "`split` with nothing in its brackets splits at any run of spaces, tabs and line ends, and leaves nothing empty at the ends. `len` counts the items of a list.",
+        "The shape is `return len(message.split())`."
+      ],
+      "docs": [
+        { "title": "str.split()", "url": "https://docs.python.org/3/library/stdtypes.html#str.split" },
+        { "title": "len()", "url": "https://docs.python.org/3/library/functions.html#len" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "lines",
+      "title": "The book, line by line",
+      "file": "callout_book.py",
+      "description": "Under `# Task 2`, write a function called `book_lines` that takes the whole book as one text and gives back a list of its lines, in order, without their line ends. The line end after the last line does not make an empty line, a book typed on Windows has `\\r\\n` at the end of each line, and an empty book gives back an empty list. Print what it gives back for `book`.\n\nCheck calls `book_lines` with books of its own, one typed on Windows and one with no line end after its last line, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on lines.",
+        "Find the method that splits a text into its lines.",
+        "Give back what it gives back.",
+        "Print it, and look at the end of the list for an empty text."
+      ],
+      "hints": [
+        "Splitting at `\\n` leaves an empty text after the last line end, and leaves the `\\r` of a Windows line end on each line.",
+        "Text has a method made for lines: it splits at every kind of line end and adds no empty line at the end.",
+        "The shape is `return text.splitlines()`."
+      ],
+      "docs": [
+        { "title": "str.splitlines()", "url": "https://docs.python.org/3/library/stdtypes.html#str.splitlines" },
+        { "title": "Text", "url": "https://docs.python.org/3/tutorial/introduction.html#text" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "parts",
+      "title": "One callout in its parts",
+      "file": "callout_book.py",
+      "description": "Under `# Task 3`, write a function called `callout_parts` that takes one line of the book and gives back a list of its parts: the text between the semicolons, each without the spaces at its start and end. For the first line of `book` it gives back `['14 Nov', 'Carn Dubh', '3 hours', '8 crew']`. The parts are text, the numbers too. Print what it gives back for the first line of the book.\n\nCheck calls `callout_parts` with lines of its own, some with spaces around a semicolon and some with none, and one with a line end, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on splitting at a separator.",
+        "Split the line at each semicolon.",
+        "Make a new list with each part stripped.",
+        "Give back the new list."
+      ],
+      "hints": [
+        "Splitting at a semicolon and a space misses a semicolon with no space after it, and splitting at a semicolon alone keeps the spaces around each part.",
+        "Split at the semicolon alone, then go through the parts and add each one, stripped, to a new list.",
+        "The shape is `parts = []`, then `for part in line.split(\";\"):` with `parts.append(part.strip())`, and `return parts`."
+      ],
+      "docs": [
+        { "title": "str.split()", "url": "https://docs.python.org/3/library/stdtypes.html#str.split" },
+        { "title": "str.strip()", "url": "https://docs.python.org/3/library/stdtypes.html#str.strip" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hours",
+      "title": "The hours added up",
+      "file": "callout_book.py",
+      "description": "Under `# Task 4`, write a function called `total_hours` that takes a list of lines of the book and gives back the hours of all of them added up, as a whole number, or `0` for an empty list. The hours are the third part of a line, such as `3 hours` or `1 hour`. For the lines of `book` it gives back `20`. You may use your `callout_parts`. Print what it gives back for the lines of `book`.\n\nCheck calls `total_hours` with lines of its own, some with more than nine hours, and looks at what it gives back. It gives your file its own `callout_parts` and `book_lines` first, so a mistake in Task 2 or 3 does not count here.",
+      "nextSteps": [
+        "Read the part of the lesson on numbers inside text.",
+        "Start a total at 0 and go through the lines.",
+        "Take the third part of each line, and the number from the start of it.",
+        "Turn that number into a whole number and add it to the total."
+      ],
+      "hints": [
+        "`int()` turns text into a number only when the text is a whole number and nothing else: `int(\"3 hours\")` stops with a `ValueError`.",
+        "Split the part at its spaces: the first word is the number. Its first letter alone is not, when the number has two digits.",
+        "The shape is `total = total + int(callout_parts(line)[2].split()[0])` inside `for line in lines:`, after `total = 0`."
+      ],
+      "docs": [
+        { "title": "int()", "url": "https://docs.python.org/3/library/functions.html#int" },
+        { "title": "str.split()", "url": "https://docs.python.org/3/library/stdtypes.html#str.split" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hill",
+      "title": "Put the right hill back",
+      "file": "callout_book.py",
+      "description": "Under `# Task 5`, write a function called `with_hill` that takes one line of the book and the name of a hill, and gives back a new line with that hill in place of the one the line had, all its parts stripped and joined with a semicolon and a space between each. For the third line of `book` and `\"Carn Dubh\"` it gives back `02 Dec; Carn Dubh; 12 hours; 10 crew`. Print what it gives back for that line and `\"Carn Dubh\"`.\n\nCheck calls `with_hill` with lines and hills of its own and looks at what it gives back. It gives your file its own `callout_parts` first, so a mistake in Task 3 does not count here.",
+      "nextSteps": [
+        "Read the part of the lesson on joining.",
+        "Take the line apart into its parts.",
+        "Put the new hill in the place of the second part.",
+        "Join the parts back into one text and give it back."
+      ],
+      "hints": [
+        "The parts are a list, so one of them can be replaced by its position, and the hill is at position 1.",
+        "`join` is called on the text that goes between the parts, and the list of parts goes in its brackets. It adds nothing at the ends.",
+        "The shape is `parts = callout_parts(line)`, then `parts[1] = hill` and `return \"; \".join(parts)`."
+      ],
+      "docs": [
+        { "title": "str.join()", "url": "https://docs.python.org/3/library/stdtypes.html#str.join" },
+        { "title": "Lists", "url": "https://docs.python.org/3/tutorial/introduction.html#lists" }
+      ],
+      "points": 10
+    }
+  ]
+}

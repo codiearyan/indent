@@ -1,0 +1,20 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kwame", "label": "Kwame", "kind": "story" },
+      { "id": "bartek", "label": "Bartek's phone", "kind": "story" },
+      { "id": "lior", "label": "Lior", "kind": "story" },
+      { "id": "html", "label": "index.html", "kind": "file" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "page", "label": "The Wrenfield's page", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kwame", "to": "page", "label": "tickets" },
+      { "from": "bartek", "to": "page", "label": "tickets" },
+      { "from": "lior", "to": "page", "label": "tickets" },
+      { "from": "html", "to": "page", "label": "content" },
+      { "from": "css", "to": "page", "label": "look" }
+    ],
+    "note": "The page stays as it is. Each ticket is fixed in styles.css, at the rule that really decides what the page looks like."
+  }
+}

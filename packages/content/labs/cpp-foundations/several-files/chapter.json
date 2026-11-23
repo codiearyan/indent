@@ -1,0 +1,100 @@
+{
+  "id": "several-files",
+  "title": "A program in several files",
+  "files": [
+    "src/price.cpp",
+    "src/counter.cpp",
+    "src/main.cpp",
+    "src/repair.h"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build all three .cpp files into one program here and run it.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/main.cpp src/price.cpp src/counter.cpp -o counter && ./counter"
+  },
+  "tasks": [
+    {
+      "id": "price",
+      "title": "Price a repair in price.cpp",
+      "file": "src/price.cpp",
+      "description": "Under `// Task 1` in `src/price.cpp`, write `repairPrice` exactly as `src/repair.h` declares it: it takes a repair as a reference to a `const Repair` and gives back a `double`. Ambrose charges 48 for every hour at the bench, counted by the minute, plus the parts: 75 minutes with 18.5 of parts comes to 78.5.\n\nCheck builds its own program, which includes `repair.h`, together with your `price.cpp`, calls `repairPrice` with repairs of its own and reads what it gives back.",
+      "nextSteps": [
+        "Copy the first line of `repairPrice` from `repair.h`, without its semicolon.",
+        "Give it a body that works out the time at the bench from the minutes.",
+        "Add the parts, and give the price back.",
+        "Build all three files with the terminal's command."
+      ],
+      "hints": [
+        "`price.cpp` already includes `repair.h`, so it knows `Repair`. The first line of the function is the declaration's, with a body in place of the semicolon.",
+        "Two whole numbers divided give a whole number, so `minutes / 60` loses the minutes past the hour. Work with `48.0` to keep them.",
+        "The shape is `double repairPrice(const Repair& repair) { return repair.minutes * 48.0 / 60 + repair.parts; }`."
+      ],
+      "docs": [
+        {
+          "title": "Function declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/function"
+        },
+        {
+          "title": "Definitions and ODR",
+          "url": "https://en.cppreference.com/w/cpp/language/definition"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pickup",
+      "title": "Write the pickup line in counter.cpp",
+      "file": "src/counter.cpp",
+      "description": "Under `// Task 2` in `src/counter.cpp`, write `pickupLine` exactly as `src/repair.h` declares it: it takes a repair as a reference to a `const Repair` and gives back a `std::string`: `Ticket `, the ticket, `: `, the item and ` is ready`. Like this:\n\n```\nTicket 3101: mantel clock is ready\n```\n\nCheck builds its own program, which includes `repair.h`, together with your `counter.cpp`, calls `pickupLine` with repairs of its own and reads what it gives back.",
+      "nextSteps": [
+        "Copy the first line of `pickupLine` from `repair.h`, without its semicolon.",
+        "Join the words, the ticket turned into text, and the item.",
+        "Give the line back.",
+        "Build all three files and run the program."
+      ],
+      "hints": [
+        "`counter.cpp` uses the same `Repair` as `price.cpp`, from the same header: a struct can be in every file that includes it.",
+        "`std::to_string` turns the ticket into text before it is joined.",
+        "The shape is `return \"Ticket \" + std::to_string(repair.ticket) + \": \" + repair.item + \" is ready\";`."
+      ],
+      "docs": [
+        {
+          "title": "std::to_string",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/to_string"
+        },
+        {
+          "title": "Source file inclusion (#include)",
+          "url": "https://en.cppreference.com/w/cpp/preprocessor/include"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "total",
+      "title": "Add up the day in main.cpp",
+      "file": "src/main.cpp",
+      "description": "Under `// Task 3` in `src/main.cpp`, write a function called `dayTotal` that takes the day's repairs as a reference to a `const std::vector<Repair>` and gives back what they come to together, as a `double`, with the price of each one worked out by `repairPrice` from `price.cpp`.\n\nCheck builds your `main.cpp` with a `repairPrice` and a `main` of its own, calls `dayTotal` with days of its own, an empty one included, and reads what it gives back. It also counts the calls to `repairPrice`, so this task is judged on its own whatever Task 1 does.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<Repair>&` in, a `double` back.",
+        "Start a total at 0, and go through the repairs.",
+        "Add what `repairPrice` gives back for each one.",
+        "In `main`, print the total of `today`, then build all three files."
+      ],
+      "hints": [
+        "`main.cpp` includes `repair.h`, so it can call `repairPrice` though its body is in another file. The linker joins the two once both files are on the command line.",
+        "Call `repairPrice(repair)` for each repair and add what it gives back: the price is worked out in one place only.",
+        "The shape is `double total = 0; for (const auto& repair : repairs) { total += repairPrice(repair); } return total;`."
+      ],
+      "docs": [
+        {
+          "title": "Main function",
+          "url": "https://en.cppreference.com/w/cpp/language/main_function"
+        },
+        {
+          "title": "Range-based for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/range-for"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhona", "label": "Rhona", "kind": "story" },
+      { "id": "book", "label": "Callout book", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "parts", "label": "Lines and parts", "kind": "data" },
+      { "id": "report", "label": "Year report", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "rhona", "to": "book", "label": "types up" },
+      { "from": "book", "to": "functions", "label": "one long text" },
+      { "from": "functions", "to": "parts", "label": "split" },
+      { "from": "parts", "to": "functions", "label": "joined back" },
+      { "from": "functions", "to": "report", "label": "hours" }
+    ],
+    "note": "The book stops being one long text: your functions split it into lines and parts, take the numbers out, and join a line back together."
+  },
+  "tasks": {
+    "words": {
+      "steps": [
+        { "active": ["functions"], "value": { "kind": "array", "label": "a radio message", "values": ["word", "word", "word", "..."] }, "note": "A radio message comes in with spaces wherever someone pressed the bar." },
+        { "active": ["functions", "functions->parts", "parts"], "note": "It is cut into words, any run of spaces counting as one gap." },
+        { "active": ["parts", "parts->functions", "functions"], "note": "How many words there are comes back, so a long message is spotted." }
+      ]
+    },
+    "lines": {
+      "steps": [
+        { "active": ["rhona", "rhona->book", "book"], "note": "The book is one text, a line end after each callout, typed on any computer." },
+        { "active": ["book", "book->functions", "functions"], "note": "It is cut at every line end, whatever kind it is." },
+        { "active": ["functions", "functions->parts", "parts"], "value": { "kind": "array", "label": "the lines", "values": ["callout", "callout", "..."] }, "note": "A list of lines comes back, no empty line at the end." }
+      ]
+    },
+    "parts": {
+      "steps": [
+        { "active": ["book", "book->functions", "functions"], "note": "One line of the book, spaces around the semicolons wherever they fell." },
+        { "active": ["functions", "functions->parts", "parts"], "value": { "kind": "array", "label": "one callout", "values": ["date", "hill", "hours", "crew"] }, "note": "The line is cut at each semicolon, and each part is tidied." },
+        { "active": ["parts"], "note": "Every part is still text, the numbers too." }
+      ]
+    },
+    "hours": {
+      "steps": [
+        { "active": ["parts", "parts->functions", "functions"], "note": "From each line, the hours part is taken, a number with a word after it." },
+        { "active": ["functions"], "note": "The number is taken out of the text and turned into a whole number." },
+        { "active": ["functions", "functions->report", "report"], "note": "The hours of every line are added up for Rhona's report." }
+      ]
+    },
+    "hill": {
+      "steps": [
+        { "active": ["book", "book->functions", "functions"], "note": "A line comes in with the hill spelt wrong." },
+        { "active": ["functions", "functions->parts", "parts"], "note": "It is split into parts, and the hill's part is swapped for the right name." },
+        { "active": ["parts", "parts->functions", "functions"], "note": "The parts are joined back into one line, a semicolon and a space between each." }
+      ]
+    }
+  }
+}

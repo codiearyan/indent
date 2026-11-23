@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Kwame", "say": "Visit opens behind the big picture.", "note": "How can 2 beat 20?" },
+    { "title": "Visit menu", "text": "Opens, then slips under the picture.", "note": "Only its top edge shows." },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "Something keeps it under",
+      "tasks": ["Visit menu on top", "Seat guide on top", "Nothing else moves"]
+    },
+    { "title": "Visit menu", "rows": [["Find us"], ["Access"], ["The cafe"]] }
+  ],
+  "ticket": { "label": "Visit menu", "wrong": "hidden", "why": "Covered", "right": "on top" },
+  "captions": [
+    "At the Wrenfield, Kwame clicks Visit and the menu opens behind the big picture.",
+    "The menu starts to open, then the picture covers all of it but its top edge.",
+    "You find what keeps the menu under the picture and fix it, and the seat guides too.",
+    "Now the Visit menu opens on top, with Find us, Access and The cafe in view.",
+    "Same header, same picture. The menu opens on top, on a phone and a wide screen."
+  ]
+}

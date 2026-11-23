@@ -1,0 +1,185 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "agnieszka",
+        "label": "Agnieszka",
+        "kind": "story"
+      },
+      {
+        "id": "bookings",
+        "label": "Morning bookings",
+        "kind": "data"
+      },
+      {
+        "id": "board",
+        "label": "LaneBoard",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "lanes",
+        "label": "Lanes in state",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "screen",
+        "label": "Lane board",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "bookings",
+        "to": "board",
+        "label": "booked"
+      },
+      {
+        "from": "agnieszka",
+        "to": "board",
+        "label": "add, take off"
+      },
+      {
+        "from": "board",
+        "to": "lanes",
+        "label": "new lanes"
+      },
+      {
+        "from": "lanes",
+        "to": "board",
+        "label": "draw"
+      },
+      {
+        "from": "board",
+        "to": "screen",
+        "label": "lanes, names"
+      }
+    ],
+    "note": "The lane board starts from the morning's bookings, and every change staff make should become new lanes in state, leaving the bookings as they were."
+  },
+  "tasks": {
+    "take-off": {
+      "steps": [
+        {
+          "active": [
+            "bookings",
+            "bookings->board",
+            "board",
+            "board->screen",
+            "screen"
+          ],
+          "note": "The board shows the morning's bookings, lane by lane.",
+          "value": {
+            "kind": "map",
+            "label": "a lane",
+            "entries": [
+              {
+                "key": "number",
+                "value": "a number"
+              },
+              {
+                "key": "speed",
+                "value": "Slow, Medium or Fast"
+              },
+              {
+                "key": "closed",
+                "value": "yes or no"
+              },
+              {
+                "key": "swimmers",
+                "value": "a list of names"
+              }
+            ]
+          }
+        },
+        {
+          "active": [
+            "agnieszka",
+            "agnieszka->board",
+            "board"
+          ],
+          "note": "Hettie leaves, and Agnieszka presses Take off beside her name on lane 1."
+        },
+        {
+          "active": [
+            "board",
+            "board->lanes",
+            "lanes",
+            "lanes->board"
+          ],
+          "note": "The board draws again at once."
+        },
+        {
+          "active": [
+            "bookings",
+            "board",
+            "screen"
+          ],
+          "note": "Hettie is gone from the screen, and the morning's bookings still have her for New session."
+        }
+      ]
+    },
+    "add": {
+      "steps": [
+        {
+          "active": [
+            "agnieszka",
+            "agnieszka->board",
+            "board"
+          ],
+          "note": "A swimmer arrives without booking, and Agnieszka adds them to lane 2."
+        },
+        {
+          "active": [
+            "board",
+            "board->lanes",
+            "lanes",
+            "board->screen",
+            "screen"
+          ],
+          "note": "The name shows at the end of lane 2."
+        },
+        {
+          "active": [
+            "bookings",
+            "bookings->board",
+            "board",
+            "screen"
+          ],
+          "note": "New session puts the board back to the morning's bookings, without anyone added since."
+        }
+      ]
+    },
+    "rest": {
+      "steps": [
+        {
+          "active": [
+            "agnieszka",
+            "agnieszka->board",
+            "board"
+          ],
+          "note": "All morning Agnieszka adds, takes off, closes and opens lanes."
+        },
+        {
+          "active": [
+            "board",
+            "board->lanes",
+            "lanes"
+          ],
+          "note": "Each change touches one lane; every other lane is the same as before."
+        },
+        {
+          "active": [
+            "lanes",
+            "lanes->board",
+            "board",
+            "board->screen",
+            "screen"
+          ],
+          "note": "Every lane keeps its number, speed, whether it is closed and its place, and two swimmers with one name stay two."
+        }
+      ]
+    }
+  }
+}

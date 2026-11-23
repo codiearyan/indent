@@ -1,0 +1,77 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "phone", "label": "Bartek's phone", "kind": "story" },
+      { "id": "query", "label": "Phone layout", "kind": "data" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "grid", "label": "Film grid", "kind": "data" },
+      { "id": "footer", "label": "Footer", "kind": "data" },
+      { "id": "wide", "label": "Wide screens", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "phone", "to": "query", "label": "its width" },
+      { "from": "query", "to": "css", "label": "rules join in" },
+      { "from": "css", "to": "grid", "label": "columns" },
+      { "from": "css", "to": "footer", "label": "layout" },
+      { "from": "css", "to": "wide", "label": "wide layout" }
+    ],
+    "note": "On a narrow screen the phone layout's rules join the cascade, but they still have to win against every other rule for the same element."
+  },
+  "tasks": {
+    "film-grid": {
+      "steps": [
+        {
+          "active": ["phone", "phone->query", "query"],
+          "value": { "kind": "map", "label": "the phone layout", "entries": [{ "key": "condition", "value": "640px wide and narrower" }] },
+          "note": "Bartek's phone is narrower than 640px, so the phone layout's condition is true and its rules join in."
+        },
+        {
+          "active": ["query", "query->css", "css", "css->grid", "grid"],
+          "note": "The phone rule for the film grid now competes with every other rule that sets the grid's columns, with no extra strength for being in a media query."
+        },
+        {
+          "active": ["grid"],
+          "value": { "kind": "array", "label": "how the winner is picked", "values": ["!important first", "then the stronger selector", "then the later rule"] },
+          "note": "Whichever rule wins decides the columns. A rule outside the query can win on a phone too."
+        },
+        {
+          "active": ["grid", "phone"],
+          "note": "When the phone rule is the one that wins on a phone, the films sit one above the other."
+        }
+      ]
+    },
+    "footer": {
+      "steps": [
+        {
+          "active": ["phone", "query"],
+          "note": "On the same phone the phone layout also stacks the footer's three parts."
+        },
+        {
+          "active": ["css", "css->footer", "footer"],
+          "note": "Another rule sets how the footer's parts sit, and here the rules are not equally strong."
+        },
+        {
+          "active": ["footer", "phone"],
+          "note": "When the phone rule wins here too, the footer's parts sit one above the other on a phone."
+        }
+      ]
+    },
+    "wide-layout": {
+      "steps": [
+        {
+          "active": ["wide"],
+          "value": { "kind": "array", "label": "wider than 640px", "values": ["films three in a row", "footer side by side", "membership and gifts in two columns"] },
+          "note": "Above the phone layout's width, the page keeps the layout it had."
+        },
+        {
+          "active": ["css", "css->wide", "wide"],
+          "note": "A fix that sets one column outside the media query, or moves its condition, reaches these screens too."
+        },
+        {
+          "active": ["phone", "wide"],
+          "note": "With the fix only inside the phone layout, phones get one column and wider screens keep three."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kwame", "label": "Kwame", "kind": "story" },
+      { "id": "header", "label": "Header", "kind": "data" },
+      { "id": "hero", "label": "Big picture", "kind": "data" },
+      { "id": "cards", "label": "Film cards", "kind": "data" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "page", "label": "What is on top", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kwame", "to": "header", "label": "clicks Visit" },
+      { "from": "css", "to": "header", "label": "position, z-index" },
+      { "from": "css", "to": "hero", "label": "position, z-index" },
+      { "from": "css", "to": "cards", "label": "position, z-index" },
+      { "from": "header", "to": "page", "label": "its layer" },
+      { "from": "hero", "to": "page", "label": "its layer" },
+      { "from": "cards", "to": "page", "label": "their layers" }
+    ],
+    "note": "A z-index only counts inside the stacking context around it, so the menu and the seat guides are only as high as the layers that hold them."
+  },
+  "tasks": {
+    "visit-menu": {
+      "steps": [
+        {
+          "active": ["kwame", "kwame->header", "header"],
+          "note": "Kwame clicks Visit, and the menu opens out of the header, over the big picture."
+        },
+        {
+          "active": ["css", "css->header", "header"],
+          "value": { "kind": "array", "label": "walk up from the menu", "values": ["the menu", "its list item", "the header", "the page"] },
+          "note": "Walking up from the menu, each element's position and z-index decide which one makes a closed layer around it."
+        },
+        {
+          "active": ["header", "header->page", "hero", "hero->page", "page"],
+          "note": "On the page, the layer that holds the menu is compared with the picture's layer, and the higher one is painted on top."
+        },
+        {
+          "active": ["page"],
+          "note": "When the menu's layer is the higher one, the menu opens on top of the picture on every screen."
+        }
+      ]
+    },
+    "seat-guide": {
+      "steps": [
+        {
+          "active": ["cards"],
+          "note": "A visitor opens the Seat guide on the first card, and its panel reaches down over the next card."
+        },
+        {
+          "active": ["css", "css->cards", "cards"],
+          "note": "Each card's position and z-index decide whether it is a closed layer of its own."
+        },
+        {
+          "active": ["cards", "cards->page", "page"],
+          "note": "When the open panel is not shut inside a layer below the later cards, it is painted on top of them."
+        }
+      ]
+    },
+    "still-in-place": {
+      "steps": [
+        {
+          "active": ["header"],
+          "value": { "kind": "array", "label": "what stays", "values": ["the header sticks to the top", "the caption sits on the picture", "each badge sits on its card"] },
+          "note": "The header keeps sticking to the top of the screen while the page scrolls under it."
+        },
+        {
+          "active": ["hero", "cards"],
+          "note": "The caption is placed against the picture, and each badge against its card, so both keep their position."
+        },
+        {
+          "active": ["css", "page"],
+          "note": "With every position kept and only the layers changed, the menu and the guides are on top and nothing moves."
+        }
+      ]
+    }
+  }
+}

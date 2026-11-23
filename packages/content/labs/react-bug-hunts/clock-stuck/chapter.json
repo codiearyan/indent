@@ -1,0 +1,88 @@
+{
+  "id": "clock-stuck",
+  "title": "The session clock stops after one second",
+  "files": ["src/Gate.jsx", "src/App.jsx", "src/lido.js"],
+  "terminal": {
+    "description": "The gate screen runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "clock",
+      "title": "Make the session clock count down",
+      "file": "src/Gate.jsx",
+      "description": "The paragraph with the class `clock` shows the time left in the session as minutes and seconds, starting from the `sessionMinutes` prop. It must go down by one every second, and stay at `0:00` once the session is over.\n\nThe check draws `Gate` with sessions of its own, moves time on with a clock of its own, without waiting, and reads the clock after each step.",
+      "nextSteps": [
+        "Open the Browser panel and watch the clock for a few seconds.",
+        "Read \"State from an old draw\" in the lesson.",
+        "Find the function the timer runs every second, and what it reads.",
+        "Mend it so each tick works from the newest seconds left, and watch the clock again."
+      ],
+      "hints": [
+        "The timer does run every second. Look at the value its function reads when it works out the next one.",
+        "The effect ran once, in the first draw, and its function still sees that draw's `secondsLeft`. A setter can be handed a function instead of a value, and React calls it with the newest state.",
+        "`setSecondsLeft((left) => (left > 0 ? left - 1 : 0))`, and the effect keeps its empty dependency list."
+      ],
+      "docs": [
+        { "title": "State as a snapshot", "url": "https://react.dev/learn/state-as-a-snapshot" },
+        {
+          "title": "Updating state based on the previous state",
+          "url": "https://react.dev/reference/react/useState#updating-state-based-on-the-previous-state"
+        },
+        { "title": "setInterval()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "family",
+      "title": "Let a family ticket in as four",
+      "file": "src/Gate.jsx",
+      "description": "Find the same cause in another part of the gate. Each press of Family ticket lets four swimmers in, and One in and One out still count one. The count never goes past the `capacity` prop or below zero: near the limit, a family ticket fills the places left and the count stops at the limit.\n\nThe check draws `Gate` with limits of its own, presses the buttons in turns, and reads the count after each press.",
+      "nextSteps": [
+        "Press Family ticket in the Browser panel and read the count.",
+        "Follow the handler: what does each of its four steps read?",
+        "Make every step work from the count as it is after the steps before it.",
+        "Try it close to the limit too."
+      ],
+      "hints": [
+        "This is the same mistake as the clock, in a handler this time.",
+        "All four calls to `letOneIn` run in one click, inside one draw, so all four read the same `inside`. The check against the limit must read the newest count as well, or a family can take the count past it.",
+        "`setInside((count) => (count < capacity ? count + 1 : count))` in `letOneIn`, and the same kind of function in `letOneOut`."
+      ],
+      "docs": [
+        { "title": "Queueing a series of state updates", "url": "https://react.dev/learn/queueing-a-series-of-state-updates" },
+        {
+          "title": "Updating state based on the previous state",
+          "url": "https://react.dev/reference/react/useState#updating-state-based-on-the-previous-state"
+        }
+      ],
+      "videos": [{ "title": "Updater functions in useState", "url": "https://www.youtube.com/watch?v=nbAaUpNDhRY" }],
+      "points": 10
+    },
+    {
+      "id": "steady",
+      "title": "Keep the clock steady while the gate is busy",
+      "file": "src/Gate.jsx",
+      "description": "Staff press the gate buttons all session, and every press draws the gate again. Those draws must not start the timer over or start a second one: the clock still goes down by exactly one a second. New session sets the clock back to a whole session and empties the pool, and the clock counts down from there.\n\nThe check draws `Gate` inside `StrictMode`, as `main.jsx` does, presses buttons every 400 milliseconds for 10 seconds of its own clock, then presses New session and lets three seconds pass.",
+      "nextSteps": [
+        "Read \"When a blunt fix makes it worse\" in the lesson.",
+        "Look at the effect's dependency list and its cleanup after your fix.",
+        "Press One in many times in the Browser panel and watch the clock.",
+        "Press New session and watch it count down from a whole session."
+      ],
+      "hints": [
+        "A timer that starts over on every draw never reaches a whole second while someone keeps pressing buttons.",
+        "Once the timer reads the newest seconds left, it no longer needs to be made again after each draw: an empty dependency list starts it once. The cleanup stops it, so `StrictMode` never leaves two running.",
+        "One `setInterval` in an effect with `[]`, `return () => clearInterval(timer)`, and the seconds kept only in state, so New session can set them back."
+      ],
+      "docs": [
+        { "title": "Synchronizing with effects", "url": "https://react.dev/learn/synchronizing-with-effects" },
+        {
+          "title": "Reading state to work out the next state",
+          "url": "https://react.dev/learn/removing-effect-dependencies#are-you-reading-some-state-to-calculate-the-next-state"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

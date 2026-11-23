@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Ambrose",
+      "say": "What did today come to?",
+      "note": "The end of the day."
+    },
+    {
+      "title": "Files apart",
+      "text": "Prices and words, each with nowhere to go."
+    },
+    {
+      "title": "Your code",
+      "file": "price.cpp",
+      "mine": true,
+      "gap": "Files not joined up",
+      "tasks": [
+        "Price a repair",
+        "Write the pickup line",
+        "Add up the day"
+      ]
+    },
+    {
+      "title": "One program",
+      "text": "Three files, one header, one main."
+    }
+  ],
+  "ticket": {
+    "label": "Today",
+    "wrong": "in pieces",
+    "why": "Not linked",
+    "right": "added up"
+  },
+  "captions": [
+    "At the end of the day Ambrose wants to know what the day's repairs come to.",
+    "His prices and Dorrit's words sit in separate files that nothing joins up.",
+    "You write each part in its own file and build all three into one program.",
+    "Now one program prices every repair from one place and adds up the day.",
+    "The workshop's program is built from several files now, around one header."
+  ]
+}

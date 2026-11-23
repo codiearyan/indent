@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Ambrose",
+      "say": "Can the counter use the repair too?",
+      "note": "One long file so far."
+    },
+    {
+      "title": "main.cpp",
+      "text": "Everything in one file, usable by no other."
+    },
+    {
+      "title": "Your header",
+      "file": "repair.h",
+      "mine": true,
+      "gap": "No file to share from",
+      "tasks": [
+        "Move the struct",
+        "Move minutesText",
+        "Add minutesOver"
+      ]
+    },
+    {
+      "title": "Every .cpp file",
+      "text": "Includes repair.h and gets the same repair."
+    }
+  ],
+  "ticket": {
+    "label": "The repair",
+    "wrong": "stuck in main",
+    "why": "One file",
+    "right": "shared"
+  },
+  "captions": [
+    "Ambrose wants the repair in one place that the counter and the bench can both use.",
+    "It is stuck in main.cpp, which no other file can include.",
+    "You move the struct and the first lines of its functions into a header, their bodies out.",
+    "Now any file can include repair.h and get the same repair.",
+    "The repair lives in its own files now. Next, a program built from three of them."
+  ]
+}

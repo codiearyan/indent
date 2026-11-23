@@ -1,0 +1,78 @@
+{
+  "id": "card-stays-on-first",
+  "title": "The card shows the member picked first",
+  "files": ["src/MemberDesk.jsx", "src/App.jsx", "src/members.js"],
+  "terminal": {
+    "description": "The member desk runs in the Browser panel and reloads every time you save. Its console shows each swim the desk logs."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "card",
+      "title": "Show the member picked now",
+      "file": "src/MemberDesk.jsx",
+      "description": "Picking a member in the list asks the membership system for that member with `loadMember`, and the card shows them once the answer comes. While a new member is on the way, the card never shows the member picked before, and when two members are picked quickly, the first one's answer never lands on the second one's card, whenever it comes.\n\nThe check draws `MemberDesk` with members of its own and a membership system of its own that answers only when the check says so. It picks two members in turn and reads the card before and after each answer, then picks two at once and answers the second first.",
+      "nextSteps": [
+        "Pick Delphine in the Browser panel and watch the card.",
+        "Read \"An effect that does too little\" in the lesson.",
+        "Look at the dependency list of the effect that loads the member.",
+        "List what the effect uses, and set the card back when a new member is picked."
+      ],
+      "hints": [
+        "The effect runs, and loads the first member. Look at when React runs it again.",
+        "React runs an effect again only when a value in its dependency list changed, and an empty list never changes. The effect uses `memberId`. Until the new member arrives, the card should say it is loading, and an answer for a member picked before is left out: the cleanup runs when the member picked changes.",
+        "`useEffect(() => { let ignore = false; setMember(null); loadMember(memberId).then((found) => { if (!ignore) setMember(found) }); return () => { ignore = true } }, [memberId])`."
+      ],
+      "docs": [
+        { "title": "Synchronizing with effects", "url": "https://react.dev/learn/synchronizing-with-effects#step-2-specify-the-effect-dependencies" },
+        { "title": "Lifecycle of reactive effects", "url": "https://react.dev/learn/lifecycle-of-reactive-effects" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "plus",
+      "title": "Log one swim for each press of +",
+      "file": "src/MemberDesk.jsx",
+      "description": "Find the second effect that goes wrong on this screen. Each press of the + key logs exactly one swim with `logSwim`, for the member on the card, and the count on the card goes up by one. Once the card is gone from the screen, pressing + logs nothing.\n\nThe check draws `MemberCard` inside `StrictMode`, as `main.jsx` does, presses + three times, takes the card off the screen and presses again, then does it all again with a new card for another member.",
+      "nextSteps": [
+        "Open the Browser panel console, press + a few times and count the lines.",
+        "Look at the effect that adds the key listener: its dependency list and what it returns.",
+        "Give it a cleanup that takes the listener away.",
+        "Give it the dependency list it needs, and press + again."
+      ],
+      "hints": [
+        "The effect has no dependency list, so it runs after every draw, and every run adds a listener.",
+        "Nothing takes a listener away, so they pile up. The cleanup removes the listener the run added. The listener reads `member`, so the effect must run again when `member` changes, or read the newest member some other way.",
+        "`return () => window.removeEventListener('keydown', onKey)` at the end of the effect, and `[member]` as its dependency list."
+      ],
+      "docs": [
+        { "title": "Subscribing to events in an effect", "url": "https://react.dev/learn/synchronizing-with-effects#subscribing-to-events" },
+        { "title": "removeEventListener()", "url": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener" }
+      ],
+      "videos": [{ "title": "Cleaning up after an effect", "url": "https://www.youtube.com/watch?v=F-0SZ_TicXA" }],
+      "points": 10
+    },
+    {
+      "id": "calm",
+      "title": "Keep the card calm while a note is typed",
+      "file": "src/MemberDesk.jsx",
+      "description": "Typing a note on the card draws it once for every letter. Those draws must not ask the membership system again, and the note box keeps every letter typed.\n\nThe check draws `MemberDesk` with members of its own, picks a member, types a note one letter at a time, and counts what was asked of the membership system meanwhile.",
+      "nextSteps": [
+        "Read \"When a blunt fix makes it worse\" in the lesson.",
+        "Type a note in the Browser panel and watch the card.",
+        "Look at the dependency list of the effect that loads the member.",
+        "Make sure it names what the effect uses, and nothing it does not."
+      ],
+      "hints": [
+        "An effect without a dependency list runs after every draw, and every letter typed is a draw.",
+        "A load after every letter sets the member again, which draws again, which loads again. If the load sets the card back first, the note box disappears while it waits and the letters typed are lost.",
+        "The load effect's list is `[memberId]`: the member picked is the only thing it uses."
+      ],
+      "docs": [
+        { "title": "Removing effect dependencies", "url": "https://react.dev/learn/removing-effect-dependencies" },
+        { "title": "You might not need an effect", "url": "https://react.dev/learn/you-might-not-need-an-effect" }
+      ],
+      "points": 10
+    }
+  ]
+}
