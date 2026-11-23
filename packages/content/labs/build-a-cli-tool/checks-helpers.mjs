@@ -168,8 +168,8 @@ export async function run(b, args, opts = {}) {
 }
 
 /** Calls one export of a learner's module with JSON arguments, in a fresh folder of its own. */
-export async function call(b, file, name, args) {
-  const folder = await caseFolder(b, {})
+export async function call(b, file, name, args, { files = {} } = {}) {
+  const folder = await caseFolder(b, files)
   const flags = [
     ...(b.useGuard ? guardFlags(folder) : []),
     ...(b.noUtil ? ['--import', pathToFileURL(join(b.dir, '.grader', 'no-util.mjs')).href] : [])
@@ -212,14 +212,18 @@ export function report(r) {
   if (closeAfter !== undefined) {
     lines.push(`  (Check read ${closeAfter} lines and then closed its end of standard output${moreInput ? ', then typed more lines' : ''})`)
   }
-  const end = r.flooded
+  const oom = memory && /heap out of memory|Allocation failed/.test(r.stderr)
+  const end = oom
+    ? `stopped by Node: it ran out of the ${memory} MB it was given`
+    : r.flooded
     ? 'stopped by Check: it printed without stopping'
     : r.timedOut
       ? `stopped by Check after ${r.opts.seconds ?? SECONDS} seconds`
       : r.code === null
         ? `stopped by the signal ${r.signal}`
         : `exit code: ${r.code}`
-  lines.push('standard output:', block(r.stdout), 'standard error:', block(r.stderr), end)
+  const stderr = oom ? r.stderr.split('\n').filter((l) => l.startsWith('FATAL ERROR')).join('\n') : r.stderr
+  lines.push('standard output:', block(r.stdout), 'standard error:', block(stderr), end)
   if (!r.guarded) {
     lines.push('(Node on this computer refused the guard that keeps the tool writing only inside its own folder, so Check ran it without that guard.)')
   }

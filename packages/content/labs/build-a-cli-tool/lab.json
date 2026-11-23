@@ -7,6 +7,6 @@
   "tags": ["JavaScript", "Build your own"],
   "kind": "project",
   "parts": [
-    { "title": "Words in", "chapters": ["reading-arguments", "commands-and-help", "output-and-exit-codes"] }
+    { "title": "Words in", "chapters": ["reading-arguments", "commands-and-help", "output-and-exit-codes"] }, { "title": "Joining in", "chapters": ["reading-input"] }
   ]
 }

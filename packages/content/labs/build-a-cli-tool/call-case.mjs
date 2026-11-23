@@ -1,7 +1,8 @@
 // Copied into the sandbox as .grader/call.mjs: node call.mjs <file> <export> <args as JSON>
 // Imports one of the learner's modules, calls one export with the check's own arguments and
 // prints {"reply": ...} as the last line of standard output. An export named @NAME is not called
-// but described: its plain values as they are, and each function as { fn: its name }.
+// but described: its plain values as they are, and each function as { fn: its name }. What an
+// async generator gives is collected into a list, at most 1000 items.
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
@@ -25,7 +26,13 @@ try {
   } else if (typeof module[name] !== 'function') {
     reply = { ok: false, missing: true, error: `${file} has no export named ${name}` }
   } else {
-    reply = { ok: true, value: await module[name](...JSON.parse(argsJson)) }
+    let value = await module[name](...JSON.parse(argsJson))
+    if (value && typeof value[Symbol.asyncIterator] === 'function') {
+      const items = []
+      for await (const item of value) if (items.push(item) >= 1000) break
+      value = items
+    }
+    reply = { ok: true, value }
   }
 } catch (error) {
   reply = { ok: false, error: shown(error) }

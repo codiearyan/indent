@@ -1,0 +1,79 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "idris", "label": "Idris", "kind": "story" },
+      { "id": "year", "label": "The year's orders", "kind": "data" },
+      { "id": "pipe", "label": "Another program", "kind": "story" },
+      { "id": "input", "label": "readOrders()", "kind": "function", "mine": true },
+      { "id": "command", "label": "The command", "kind": "story" },
+      { "id": "reader", "label": "Whoever reads it", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "idris", "to": "year", "label": "names a file" },
+      { "from": "year", "to": "input", "label": "a piece at a time" },
+      { "from": "pipe", "to": "input", "label": "standard input" },
+      { "from": "input", "to": "command", "label": "one line" },
+      { "from": "command", "to": "reader", "label": "standard output" }
+    ],
+    "note": "Orders now come in a line at a time, from files or from another program, and stop when nobody reads."
+  },
+  "tasks": {
+    "lines": {
+      "steps": [
+        {
+          "active": ["idris", "idris->year", "year"],
+          "note": "Idris names the file of the whole year, far bigger than the office computer's memory."
+        },
+        {
+          "active": ["year", "year->input", "input"],
+          "note": "readOrders reads it in pieces and puts the pieces back together into whole lines."
+        },
+        {
+          "active": ["input", "input->command", "command"],
+          "note": "Each line goes on to the command at once and is forgotten, so memory holds one line at a time.",
+          "value": {
+            "kind": "map",
+            "label": "one line",
+            "entries": [
+              { "key": "file", "value": "the name as typed" },
+              { "key": "line", "value": "its number in that file" },
+              { "key": "text", "value": "the line, no line break" }
+            ]
+          }
+        }
+      ]
+    },
+    "stdin": {
+      "steps": [
+        {
+          "active": ["pipe", "pipe->input", "input"],
+          "note": "Idris picks December's lines with another program and pipes them in, naming no file."
+        },
+        {
+          "active": ["input"],
+          "note": "With no file named, or where a lone dash stands, readOrders reads standard input like a file."
+        },
+        {
+          "active": ["input", "input->command", "command"],
+          "note": "Those lines go on as lines of stdin; when files are named, standard input is never touched."
+        }
+      ]
+    },
+    "pipe": {
+      "steps": [
+        {
+          "active": ["idris", "idris->year", "year", "year->input", "input"],
+          "note": "Idris lists the year's orders, but only wants to see the first three."
+        },
+        {
+          "active": ["command", "command->reader", "reader"],
+          "note": "After three lines the reader is done and closes its end of the pipe."
+        },
+        {
+          "active": ["command"],
+          "note": "The next write finds nobody reading, and the tool ends at once, quietly, with nothing to report."
+        }
+      ]
+    }
+  }
+}
