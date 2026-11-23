@@ -1,0 +1,98 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "form", "label": "Sign-up form", "kind": "story" },
+      { "id": "fit", "label": "fitName()", "kind": "function", "mine": true, "fn": "fitName" },
+      { "id": "count", "label": "nameLength()", "kind": "function", "mine": true, "fn": "nameLength" },
+      { "id": "same", "label": "sameName()", "kind": "function", "mine": true, "fn": "sameName" },
+      { "id": "label", "label": "Parcel label", "kind": "story" },
+      { "id": "accounts", "label": "Accounts", "kind": "data" },
+      { "id": "test", "label": "names.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "form", "to": "fit", "label": "a name" },
+      { "from": "fit", "to": "label", "label": "fits the line" },
+      { "from": "form", "to": "same", "label": "new name" },
+      { "from": "accounts", "to": "same", "label": "name on file" },
+      { "from": "test", "to": "count", "label": "names" }
+    ],
+    "note": "Names from the sign-up form are cut for labels, counted and matched to accounts, all by code units today."
+  },
+  "tasks": {
+    "ticket": {
+      "steps": [
+        {
+          "active": ["test", "form", "fit", "count", "same"],
+          "note": "The ticket block takes the name Ängsö's secretary pasted, with each dot written as a separate mark, and names like it."
+        },
+        {
+          "active": ["fit", "fit->label", "label", "accounts", "accounts->same", "same"],
+          "note": "It expects the whole name on the label, the count a person makes, and a match with the name on file."
+        },
+        {
+          "active": ["test", "test->count", "count"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the ticket block",
+            "entries": [
+              { "key": "the shop's names.js", "value": "must fail" },
+              { "key": "a right fix", "value": "must pass" },
+              { "key": "mends only the ticket's name", "value": "must fail" }
+            ]
+          },
+          "note": "Check runs the block beside the shop's code, a right fix and a version that knows only the ticket's name."
+        }
+      ]
+    },
+    "fix": {
+      "trace": { "file": "src/names.js", "call": "fitName", "args": ["Ängsö Kammarkör", 16] },
+      "steps": [
+        {
+          "active": ["form", "form->fit", "fit"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "name", "value": "Ängsö Kammarkör" },
+              { "key": "max", "value": 16 }
+            ]
+          },
+          "note": "fitName() gets a choir's name and the width of the label's name line."
+        },
+        {
+          "active": ["fit"],
+          "note": "It splits the name into the characters a person sees, and keeps as many as fit, never half of one."
+        },
+        {
+          "active": ["fit", "fit->label", "label"],
+          "note": "The label shows the name whole when it fits, and cut between two characters when it does not."
+        }
+      ]
+    },
+    "next": {
+      "steps": [
+        {
+          "active": ["test", "form", "fit", "count"],
+          "note": "The next door block takes a name with a character that has no accent and still takes two code units."
+        },
+        {
+          "active": ["fit", "fit->label", "label"],
+          "note": "It cuts that name right after the character and counts it, and expects the character whole."
+        },
+        {
+          "active": ["test", "test->count", "count"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the next door block",
+            "entries": [
+              { "key": "the shop's names.js", "value": "must fail" },
+              { "key": "a right fix", "value": "must pass" },
+              { "key": "joins accents, cuts code units", "value": "must fail" }
+            ]
+          },
+          "note": "Check runs the block beside the shop's code, a right fix and a version that joins accents first and still cuts code units."
+        }
+      ]
+    }
+  }
+}

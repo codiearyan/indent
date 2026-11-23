@@ -1,0 +1,21 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "nadia", "label": "Nadia", "kind": "story" },
+      { "id": "kwame", "label": "Kwame", "kind": "story" },
+      { "id": "billing", "label": "Billing code", "kind": "file", "mine": true },
+      { "id": "invoices", "label": "Invoices and reminders", "kind": "story" },
+      { "id": "catalogue", "label": "Catalogue and labels", "kind": "story" },
+      { "id": "choirs", "label": "Choirs in five countries", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "nadia", "to": "billing", "label": "tickets" },
+      { "from": "kwame", "to": "billing", "label": "tickets" },
+      { "from": "billing", "to": "invoices", "label": "money, dates" },
+      { "from": "billing", "to": "catalogue", "label": "text" },
+      { "from": "invoices", "to": "choirs", "label": "by email" },
+      { "from": "catalogue", "to": "choirs", "label": "by post" }
+    ],
+    "note": "Five tickets from Wrenhaven's choirs, and for each one you catch the bug in a test, fix it at the cause and test the case next door."
+  }
+}

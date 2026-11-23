@@ -1,0 +1,81 @@
+{
+  "id": "penny-over-invoices",
+  "title": "Invoices a penny over",
+  "files": ["src/invoice.test.js", "src/invoice.js", "src/invoices.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo prints three invoices from the billing log.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "ticket",
+      "title": "Catch the invoice that does not add up",
+      "file": "src/invoice.test.js",
+      "description": "Before you change `invoice.js`, prove the bug with a test. In `src/invoice.test.js`, write tests in the `describe('the ticket')` block that fail on the shop's `invoice()` today and will pass once it is right.\n\nOne invoice is not enough. The check runs the tests in that block three times:\n\n- beside the shop's `invoice.js`: they must fail\n- beside a right fix: they must pass\n- beside a version that mends only the ticket's own invoice: they must fail\n\nIt does that on three computers set to different time zones and languages, and a test with no `expect` in it fails.",
+      "nextSteps": [
+        "Run `node src/demo.js` and add up the lines of each invoice yourself.",
+        "Import `invoice` and the invoices, and expect the right total for WH-2291.",
+        "Add a second invoice that does not add up today, and expect what its lines say.",
+        "Run `npx vitest run src/invoice.test.js` and see your tests fail on the shop's code."
+      ],
+      "hints": [
+        "The demo prints three invoices. On two of them the invoice line is a penny away from what its lines add up to.",
+        "A test does not need to know the right total by heart: it can add up the lines the invoice shows and expect the total to equal that sum.",
+        "For WH-2291 the lines' VAT is 11.90 and 5.06, so the invoice VAT should be their sum, and the total the net plus that VAT. Do the same for WH-2297."
+      ],
+      "docs": [
+        { "title": "Number encoding", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number#number_encoding" },
+        { "title": "Vitest expect", "url": "https://vitest.dev/api/expect.html" },
+        { "title": "Vitest describe", "url": "https://vitest.dev/api/#describe" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Make every invoice add up",
+      "file": "src/invoice.js",
+      "description": "Fix `invoice(lines, vatPercent)` in `src/invoice.js` so every invoice is right to the penny. Keep the shape it returns: `{ lines: [{ title, net, vat }], net, vat, total }`, every amount as text with two decimals.\n\n- A line's net is `fee * copies`. Fees have at most two decimals.\n- A line's VAT is `vatPercent` of its net, rounded to the nearest penny on that line, with exactly half a penny going up. A rate may have one decimal, such as 17.5.\n- The invoice's net, VAT and total are the sums of what the lines show.\n- An invoice with no lines is `'0.00'` everywhere.\n\nThe check compares your invoices with the right ones for a few cases and a few hundred more, on five computers.",
+      "nextSteps": [
+        "Turn each fee into whole pence once, before you multiply.",
+        "Work out each line's VAT in pence and round it there, once.",
+        "Add up the lines in pence and turn pence into text only at the very end.",
+        "Run your tests and `node src/demo.js` again."
+      ],
+      "hints": [
+        "The cause is not `toFixed` itself. Amounts like 1.86 and 1.075 cannot be stored exactly as decimal numbers, so every step works on a value that is a hair off, and the totals are rounded apart from their lines.",
+        "Whole numbers are exact. `Math.round(fee * 100)` turns a fee with two decimals into pence, and sums and products of pence never drift.",
+        "Keep a line's net and VAT in pence, with the VAT rounded once with `Math.round`, add the lines up in pence, and divide by 100 only when you format the text."
+      ],
+      "docs": [
+        { "title": "Number encoding", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number#number_encoding" },
+        { "title": "Math.round()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round" },
+        { "title": "Number.prototype.toFixed()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed" }
+      ],
+      "videos": [{ "title": "Why decimals are not exact", "url": "https://www.youtube.com/watch?v=PZRI1IfStY0" }],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "Write the test for the case next door",
+      "file": "src/invoice.test.js",
+      "description": "The ticket was about totals that disagree with their lines. Next to it sits a quieter case: a line whose VAT is exactly half a penny, which the shop rounds up. In the `describe('next door')` block, write tests for it.\n\nThe check runs the tests in that block beside the shop's `invoice.js` (they must fail), beside a right fix (they must pass) and beside a version that adds up what the lines show but still rounds decimal numbers (they must fail), on three computers.",
+      "nextSteps": [
+        "Find a line in `invoices.js` whose VAT comes to exactly half a penny.",
+        "Work out by hand, in pence, what that line's VAT should be.",
+        "Expect the whole invoice for it with `toEqual`, not only the total.",
+        "Run `npx vitest run src/invoice.test.js`."
+      ],
+      "hints": [
+        "The 5% invoice has a line whose VAT, worked out exactly, ends in a half penny.",
+        "10 copies at 2.15 is 2150 pence, and 5% of that is 107.5 pence. The shop rounds a half up.",
+        "Expect `invoice([{ title, fee: 2.15, copies: 10 }], 5)` to equal the whole invoice you worked out: its line, its net, its VAT and its total."
+      ],
+      "docs": [
+        { "title": "Number.prototype.toFixed()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed" },
+        { "title": "Math.round()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round" },
+        { "title": "Vitest toEqual", "url": "https://vitest.dev/api/expect.html" }
+      ],
+      "points": 10
+    }
+  ]
+}

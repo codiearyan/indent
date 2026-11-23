@@ -1,0 +1,81 @@
+{
+  "id": "due-a-day-early",
+  "title": "Due a day early",
+  "files": ["src/reminder.test.js", "src/reminder.js", "src/invoices.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo prints the March reminders on this computer and on computers set to two other time zones.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "ticket",
+      "title": "Catch the reminder that moves a day",
+      "file": "src/reminder.test.js",
+      "description": "Prove the bug with a test before you change `reminder.js`. In `src/reminder.test.js`, write tests in the `describe('the ticket')` block that fail on the shop's `reminder()` today, on any computer, and will pass once it is right.\n\nThe check runs the tests in that block on three computers in different time zones, beside:\n\n- the shop's `reminder.js`: they must fail on every one of them\n- a right fix: they must pass\n- a version that mends only the ticket's own invoice: they must fail\n\nA test that only fails where the learner happens to live does not count. The `inZone` helper at the top of the file runs code as if the computer were somewhere else.",
+      "nextSteps": [
+        "Run `node src/demo.js` and compare the Vancouver reminders with the due dates in `invoices.js`.",
+        "Inside a test, call `reminder()` within `inZone('America/Vancouver', ...)`.",
+        "Expect the due date the invoice really has, for more than one invoice.",
+        "Run `npx vitest run src/reminder.test.js` and see your tests fail."
+      ],
+      "hints": [
+        "The bug only shows on a computer west of Greenwich, so a test that does not set the zone passes on many computers.",
+        "inZone(zone, fn) sets the computer's zone, runs fn and puts the zone back. Put your expect inside fn.",
+        "inZone('America/Vancouver', () => expect(reminder(invoices[0], sentOn).due).toBe(...)) with the date written in invoices.js, and the same for WH-2297."
+      ],
+      "docs": [
+        { "title": "Date time string format", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format" },
+        { "title": "The TZ variable in Node.js", "url": "https://nodejs.org/docs/latest-v22.x/api/cli.html#tz" },
+        { "title": "Vitest expect", "url": "https://vitest.dev/api/expect.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Keep a calendar date a calendar date",
+      "file": "src/reminder.js",
+      "description": "Fix `reminder(invoice, today)` in `src/reminder.js` so it is right on any computer. Keep the shape it returns: `{ due, daysLeft }`.\n\n- `invoice.due` and `today` are calendar dates as text, like `'2026-03-31'`.\n- `due` is that date in the shop's format, like `'Tuesday 31 March 2026'`.\n- `daysLeft` is the number of days from `today` to the due date: `0` on the day itself and below `0` once the invoice is late.\n\nThe check calls `reminder()` with its own dates, month ends, a leap day and dates on both sides of the nights the clocks change, on five computers from Vancouver to Kiritimati, and every answer must be the same on all of them.",
+      "nextSteps": [
+        "Find the two places where a date is read, and say in which zone each one is read.",
+        "Read both dates in the same zone, one that never changes its clocks.",
+        "Show the due date with getters of that same zone.",
+        "Run `node src/demo.js`: all three blocks should now agree."
+      ],
+      "hints": [
+        "`new Date('2026-03-31')` is midnight in Greenwich, while `new Date(2026, 2, 31)` is midnight on this computer, and `getDate()` answers for this computer. The code mixes all three.",
+        "UTC has no clock changes. `Date.UTC(year, month - 1, day)` is a calendar day as midnight in UTC, and `getUTCDate()`, `getUTCDay()`, `getUTCMonth()` and `getUTCFullYear()` read it back in UTC.",
+        "Turn both texts into `Date.UTC(...)` values, build the text from the `getUTC` getters, and count days as the difference divided by `DAY_MS`, rounded with `Math.round`."
+      ],
+      "docs": [
+        { "title": "Date.UTC()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/UTC" },
+        { "title": "Date.prototype.getUTCDate()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getUTCDate" },
+        { "title": "Date time string format", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format" }
+      ],
+      "videos": [{ "title": "Storing time in UTC and showing it in a zone", "url": "https://www.youtube.com/watch?v=rPHZwB9rLYM" }],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "Write the test for the case next door",
+      "file": "src/reminder.test.js",
+      "description": "The ticket came from west of Greenwich, where the date shown moved back a day. East of Greenwich the date looks right, and something else is off. In the `describe('next door')` block, write tests that show it.\n\nThe check runs the tests in that block on three computers beside the shop's `reminder.js` (they must fail on every one), beside a right fix (they must pass) and beside a version that shows the right date but still counts days from midnight on the computer (they must fail).",
+      "nextSteps": [
+        "Look at the Tokyo block of the demo and count the days yourself.",
+        "Inside a test, call `reminder()` within `inZone('Asia/Tokyo', ...)`.",
+        "Expect the days left, for an invoice that is not late and one that is.",
+        "Run `npx vitest run src/reminder.test.js`."
+      ],
+      "hints": [
+        "From 27 March to 31 March is four days, whatever the zone.",
+        "On a computer east of Greenwich, midnight there comes before midnight in Greenwich, so the gap the shop's code measures is a few hours longer than whole days, and it rounds up.",
+        "inZone('Asia/Tokyo', () => expect(reminder(invoices[1], sentOn).daysLeft).toBe(...)) with the days you counted on a calendar."
+      ],
+      "docs": [
+        { "title": "Date", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date" },
+        { "title": "Intl.DateTimeFormat", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat" },
+        { "title": "The TZ variable in Node.js", "url": "https://nodejs.org/docs/latest-v22.x/api/cli.html#tz" }
+      ],
+      "points": 10
+    }
+  ]
+}

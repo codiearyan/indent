@@ -1,0 +1,79 @@
+{
+  "id": "catalogue-out-of-order",
+  "title": "A catalogue out of order",
+  "files": ["src/catalogue.test.js", "src/catalogue.js", "src/arrangements.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo prints the catalogue page in the order the code puts it.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "ticket",
+      "title": "Catch the catalogue in the wrong order",
+      "file": "src/catalogue.test.js",
+      "description": "Prove the bug with a test before you change `catalogue.js`. In `src/catalogue.test.js`, write tests in the `describe('the ticket')` block that fail on the shop's `catalogueOrder()` today and will pass once it is right.\n\nThe check runs the tests in that block on three computers beside:\n\n- the shop's `catalogue.js`: they must fail\n- a right fix: they must pass\n- a version that mends only the ticket's own catalogue: they must fail",
+      "nextSteps": [
+        "Run `node src/demo.js` and find each title Nadia's ticket names.",
+        "Write a short list of your own with the same three kinds of trouble.",
+        "Expect the order a reader would want with `toEqual`.",
+        "Run `npx vitest run src/catalogue.test.js` and see your tests fail."
+      ],
+      "hints": [
+        "Three things go wrong: numbers, small letters and accents.",
+        "A list of three psalms with numbers of different lengths shows the first. A title that starts with a small letter or an accented letter shows the others.",
+        "expect(catalogueOrder(['Psalm 121', 'Psalm 9', 'Psalm 23'])).toEqual(...) in the order you read them, and a second list with a small letter and an accent."
+      ],
+      "docs": [
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" },
+        { "title": "Vitest toEqual", "url": "https://vitest.dev/api/expect.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Sort the way a person reads",
+      "file": "src/catalogue.js",
+      "description": "Fix `catalogueOrder(titles)` in `src/catalogue.js` so it returns a new list with the titles in reading order:\n\n- the order an English reader expects, with capitals and small letters together\n- an accented letter sorts with its plain letter, É with E and Ø with O\n- numbers inside a title sort by their value: Psalm 9, Psalm 23, Psalm 121\n- the same order on every computer, whatever language it is set to\n\nThe list it is handed stays as it was. The check sorts lists of its own on five computers set to different languages.",
+      "nextSteps": [
+        "Find what `sort()` compares when it is given no compare function.",
+        "Make a comparison that knows the rules of a language, and name the language.",
+        "Turn on the option that compares numbers inside text by their value.",
+        "Run `node src/demo.js` and read the page from the top."
+      ],
+      "hints": [
+        "`sort()` with no compare function compares UTF-16 code units, where every capital comes before every small letter and every accented letter after Z.",
+        "`Intl.Collator` compares text with the rules of a language. Without a language it uses the computer's own, which is why the language has to be named.",
+        "Make one `new Intl.Collator('en', { numeric: true })` and sort a copy of the list with its `compare` method."
+      ],
+      "docs": [
+        { "title": "Intl.Collator", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator" },
+        { "title": "String.prototype.localeCompare()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare" },
+        { "title": "Array.prototype.sort()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" }
+      ],
+      "videos": [{ "title": "Why a plain sort puts things in an odd order", "url": "https://www.youtube.com/watch?v=f7Bsq6579Qo" }],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "Write the test for the case next door",
+      "file": "src/catalogue.test.js",
+      "description": "Next to the ticket sits a computer set to another language. A fix that compares the way a reader does but does not say which language follows the computer, and in Swedish Å, Ä and Ö come after Z. In the `describe('next door')` block, write a test that would catch that.\n\nThe check runs the tests in that block beside the shop's `catalogue.js` (they must fail), beside a right fix (they must pass) and beside a version that names no language (they must fail on at least one of three computers set to English, Swedish and German).",
+      "nextSteps": [
+        "In the terminal, sort a few names with `new Intl.Collator('sv').compare` and with `'en'`, and compare.",
+        "Pick titles that start with Å, Ä or Ö, and others that start with A, O or Z.",
+        "Expect the English order with `toEqual`.",
+        "Run `npx vitest run src/catalogue.test.js`."
+      ],
+      "hints": [
+        "A test cannot change the computer's language while it runs, but Check runs your tests on a computer set to Swedish.",
+        "The orders differ only where a title starts with a letter Swedish puts after Z, next to one English puts after it.",
+        "expect(catalogueOrder(['Zephyr', 'Ängel', 'Lark'])).toEqual(...) in the English order: Ä sorts with A."
+      ],
+      "docs": [
+        { "title": "Intl.Collator", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator" },
+        { "title": "String.prototype.localeCompare()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare" }
+      ],
+      "points": 10
+    }
+  ]
+}

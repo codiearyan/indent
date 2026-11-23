@@ -1,0 +1,96 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "titles", "label": "Catalogue titles", "kind": "data" },
+      { "id": "order", "label": "catalogueOrder()", "kind": "function", "mine": true, "fn": "catalogueOrder" },
+      { "id": "page", "label": "Catalogue page", "kind": "story" },
+      { "id": "director", "label": "Choir director", "kind": "story" },
+      { "id": "test", "label": "catalogue.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "titles", "to": "order", "label": "titles" },
+      { "from": "order", "to": "page", "label": "sorted copy" },
+      { "from": "page", "to": "director", "label": "a list to read" },
+      { "from": "test", "to": "order", "label": "lists" }
+    ],
+    "note": "catalogueOrder() puts every title on the catalogue page in order, and today that order is the computer's, not a reader's."
+  },
+  "tasks": {
+    "ticket": {
+      "steps": [
+        {
+          "active": ["test", "test->order", "order"],
+          "note": "The ticket block hands catalogueOrder() short lists with the trouble from the ticket: numbers, small letters and accents."
+        },
+        {
+          "active": ["order", "order->page", "page", "page->director", "director"],
+          "note": "It expects the order a director reads, written out in full."
+        },
+        {
+          "active": ["test", "order"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the ticket block",
+            "entries": [
+              { "key": "the shop's catalogueOrder()", "value": "must fail" },
+              { "key": "a right fix", "value": "must pass" },
+              { "key": "mends only the ticket's list", "value": "must fail" }
+            ]
+          },
+          "note": "Check runs the block beside the shop's code, a right fix and a version that knows only the ticket's catalogue."
+        }
+      ]
+    },
+    "fix": {
+      "trace": {
+        "file": "src/catalogue.js",
+        "call": "catalogueOrder",
+        "args": [["Psalm 121", "Evening round", "Psalm 23", "élan of morning", "Zephyr round", "Psalm 9"]]
+      },
+      "steps": [
+        {
+          "active": ["titles", "titles->order", "order"],
+          "value": {
+            "kind": "array",
+            "label": "titles as they were added",
+            "values": ["Psalm 121", "Evening round", "Psalm 23", "élan of morning", "Zephyr round", "Psalm 9"]
+          },
+          "note": "catalogueOrder() gets the titles in the order they were added to the catalogue."
+        },
+        {
+          "active": ["order"],
+          "note": "It compares two titles with the rules of the English language, said out loud, and numbers inside them by their value."
+        },
+        {
+          "active": ["order", "order->page", "page"],
+          "note": "A sorted copy goes on the page, and the list it was handed stays as it was."
+        }
+      ]
+    },
+    "next": {
+      "steps": [
+        {
+          "active": ["test", "test->order", "order"],
+          "note": "The next door block hands catalogueOrder() titles whose order is not the same in English and in Swedish."
+        },
+        {
+          "active": ["order", "order->page", "page"],
+          "note": "It expects the English order, on a computer set to any language."
+        },
+        {
+          "active": ["test", "order"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the next door block",
+            "entries": [
+              { "key": "the shop's catalogueOrder()", "value": "must fail" },
+              { "key": "a right fix", "value": "must pass" },
+              { "key": "names no language", "value": "must fail somewhere" }
+            ]
+          },
+          "note": "Check runs the block on computers set to English, Swedish and German, beside a version that names no language."
+        }
+      ]
+    }
+  }
+}
