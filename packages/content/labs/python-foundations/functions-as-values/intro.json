@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Will Bravo's pager say Bravo?", "note": "The radio desk, on a busy night." },
+    { "title": "The desk", "text": "One long if and elif, names typed by hand" },
+    {
+      "title": "Your code",
+      "file": "call_handlers.py",
+      "mine": true,
+      "gap": "No handlers, no pagers",
+      "tasks": ["Send to every team", "Route a call", "A pager for a team", "A pager for each"]
+    },
+    { "title": "Bravo", "say": "Bravo here, message received.", "note": "On the hill above the ford." }
+  ],
+  "ticket": { "label": "Bravo's call", "wrong": "says Alpha", "why": "Typed wrong", "right": "says Bravo" },
+  "captions": [
+    "At the radio desk, Ailsa wants every message to reach the team it is meant for.",
+    "Today one long if and elif sorts the calls, and a call sign typed by hand goes wrong.",
+    "You write handlers the desk can pass around, and a pager for every team.",
+    "Now each call goes to its own handler, and Bravo's pager always says Bravo.",
+    "Every team hears its own call sign, and Ailsa never types a name by hand again."
+  ]
+}

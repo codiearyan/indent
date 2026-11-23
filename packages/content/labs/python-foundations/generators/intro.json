@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "When did anyone ask for a stretcher?", "note": "At the radio desk." },
+    { "title": "The old program", "text": "Reads the whole winter before showing a line" },
+    {
+      "title": "Your code",
+      "file": "log_reader.py",
+      "mine": true,
+      "gap": "Nothing reads one line at a time",
+      "tasks": ["One line at a time", "One team's lines", "The first mention", "Longest and total"]
+    },
+    { "title": "The log", "rows": [["19:05 Alpha", "leaving base"], ["21:05 Bravo", "walker found"], ["...", "..."]], "note": "The whole winter, line by line." }
+  ],
+  "ticket": { "label": "Stretcher call", "wrong": "frozen", "why": "Reads it all", "right": "found" },
+  "captions": [
+    "At the radio desk, Ailsa needs the first call that asked for a stretcher this winter.",
+    "Today the program reads the whole winter's log first, and the laptop freezes.",
+    "You write generators that read one line at a time and stop once they have the answer.",
+    "Now the stretcher call comes up at once, and only the lines before it were read.",
+    "The whole winter's log opens in a moment, however long it grows."
+  ]
+}

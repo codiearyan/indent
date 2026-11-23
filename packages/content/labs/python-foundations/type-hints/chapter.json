@@ -1,0 +1,122 @@
+{
+  "id": "type-hints",
+  "title": "Type hints",
+  "files": ["season_report.py", "season.csv"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to try the season report's functions and to print the hints Python keeps for them.",
+    "suggestedCommand": "python3 season_report.py"
+  },
+  "tasks": [
+    {
+      "id": "total",
+      "title": "Hints on a total",
+      "file": "season_report.py",
+      "description": "Under `# Task 1` in `season_report.py`, write a function called `total_hours` that takes a list of whole numbers and gives back their total, 0 for an empty list. Give it hints that say its parameter is a list of whole numbers and that it gives back a whole number. `total_hours([7, 3, 11])` gives back `21`.\n\nCheck calls `total_hours` with lists of its own, then reads the hints Python keeps for it. A hint is read as a kind, not as text, so each way of writing it that Python reads the same passes.",
+      "nextSteps": [
+        "Read the parts of the lesson on hints and on a list of something.",
+        "Write the function, and run it.",
+        "Add a hint to its parameter and one for what it gives back.",
+        "Print total_hours.__annotations__ in the try-out lines and read what Python kept."
+      ],
+      "hints": [
+        "A hint is part of the def line. A comment beside it is not a hint, and Python keeps nothing of it.",
+        "A parameter's hint comes after its name and a colon; the hint for what the function gives back comes after `->`, before the colon at the end. A list of whole numbers is written with the kind of its items in square brackets.",
+        "The shape is `def total_hours(hours: list[int]) -> int:` with `return sum(hours)` under it."
+      ],
+      "docs": [
+        { "title": "Function annotations", "url": "https://docs.python.org/3/tutorial/controlflow.html#function-annotations" },
+        { "title": "Generic alias type", "url": "https://docs.python.org/3/library/stdtypes.html#types-genericalias" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "between",
+      "title": "Hints that tell the truth",
+      "file": "season_report.py",
+      "description": "Under `# Task 2`, Dougie's `hours_between` says it takes two texts and gives back text, and it takes two whole numbers, hours of the day, and gives back a whole number: `hours_between(7, 19)` gives back `12`. Correct its hints, and leave what it does as it is.\n\nCheck calls `hours_between` with whole numbers of its own, to see that it works as before, then reads the hints Python keeps for it.",
+      "nextSteps": [
+        "Read the part of the lesson on what a hint does when the program runs.",
+        "Run the file: Python runs hours_between with whole numbers, whatever its hints say.",
+        "Change each of its three hints to what the function really takes and gives back.",
+        "Print hours_between.__annotations__ again."
+      ],
+      "hints": [
+        "Python does not check hints while the program runs, so the wrong ones never stopped it. The people and the editors that read them are misled.",
+        "There are three hints in the def line: one on each parameter and one after `->`. Each has to name the kind of value that is really there.",
+        "The shape is `def hours_between(start: int, end: int) -> int:`."
+      ],
+      "docs": [
+        { "title": "typing", "url": "https://docs.python.org/3/library/typing.html" },
+        { "title": "Function definitions", "url": "https://docs.python.org/3/reference/compound_stmts.html#function-definitions" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "leader",
+      "title": "A leader, or None",
+      "file": "season_report.py",
+      "description": "Under `# Task 3`, write a function called `leader_of` that takes a call sign and a dictionary of leaders, each a call sign and a name, and gives back that team's leader, or `None` when the dictionary has no such call sign. The dictionary stays as it was. Give it hints: the call sign is text, the dictionary goes from text to text, and it gives back text or `None`, written with `Optional` from the `typing` module, which every Python reads. `leader_of(\"Bravo\", leaders)` gives back `'Dougie'`.\n\nCheck calls `leader_of` with dictionaries of its own, with a call sign they have and one they do not, then reads the hints Python keeps for it.",
+      "nextSteps": [
+        "Read the parts of the lesson on a dictionary's hint and on text or None.",
+        "Write the function, with None for a call sign that is not there.",
+        "Write the import line the hint for text or None needs, and the three hints.",
+        "Run the file with python3, and read what Python kept."
+      ],
+      "hints": [
+        "A hint of plain text for what it gives back leaves out the None it gives for a call sign that is not there.",
+        "A dictionary's hint names the kind of its keys and of its values in square brackets. The typing module has a name for a value that may also be None.",
+        "The shape is `from typing import Optional`, then `def leader_of(call_sign: str, leaders: dict[str, str]) -> Optional[str]:` with `return leaders.get(call_sign)` under it."
+      ],
+      "docs": [
+        { "title": "typing.Optional", "url": "https://docs.python.org/3/library/typing.html#typing.Optional" },
+        { "title": "dict.get", "url": "https://docs.python.org/3/library/stdtypes.html#dict.get" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "pick",
+      "title": "A rule handed in",
+      "file": "season_report.py",
+      "description": "Under `# Task 4`, write a function called `pick` that takes a list of callouts and a rule, a function that takes one `Callout` and gives back `True` or `False`, and gives back a new list of the callouts the rule gives `True` for, in order. The list it is given stays as it was. Give it hints: a list of `Callout`, a function from one `Callout` to `True` or `False`, and a list of `Callout`.\n\nCheck hands `pick` callouts and a rule of its own that notes every callout it is given, looks at how the rule was called and at what `pick` gives back, then reads the hints Python keeps for it.",
+      "nextSteps": [
+        "Read the part of the lesson on the hint of a function.",
+        "Write pick, calling the rule once for each callout.",
+        "Write its hints, with the import line the hint for a function needs.",
+        "Try it with a lambda as the rule in the try-out lines."
+      ],
+      "hints": [
+        "A rule that is never called picks nothing: `if rule:` asks whether there is a rule at all, not what it says about a callout.",
+        "The hint of a function names what it takes, in square brackets inside square brackets, then what it gives back. It comes from the typing module.",
+        "The shape is `def pick(callouts: list[Callout], rule: Callable[[Callout], bool]) -> list[Callout]:` with `return [c for c in callouts if rule(c)]` under it."
+      ],
+      "docs": [
+        { "title": "Annotating callable objects", "url": "https://docs.python.org/3/library/typing.html#annotating-callable-objects" },
+        { "title": "typing.Callable", "url": "https://docs.python.org/3/library/typing.html#typing.Callable" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "longest",
+      "title": "The season's longest callouts",
+      "file": "season_report.py",
+      "description": "Under `# Task 5`, write a function called `longest_callouts` that takes the path of a CSV file with one callout on each line, `date,hill,hours` and no header line, and a number. It opens the file with `encoding=\"utf-8\"`, makes a `Callout` from each line, with its hours as a whole number, and gives back a list of at most that many of them: the most hours first, and of two with the same hours the older first. Give it hints: the path is text, the number is a whole number, and it gives back a list of `Callout`. `longest_callouts(\"season.csv\", 3)` gives the Cairn Dubh and Garve Edge callouts of 11 hours, in that order, then Scarth Fell.\n\nCheck writes CSV files of its own, with callouts of the same hours and hours of one and two digits, asks for fewer callouts than there are and for more, then reads the hints Python keeps for it.",
+      "nextSteps": [
+        "Look back at the issues on CSV, on dataclasses and on sorting by two things.",
+        "Read the file and make a Callout from each line, with int() for the hours.",
+        "Sort them, most hours first and the older first among equals, and give back the first ones.",
+        "Write the three hints, and print the three longest callouts of season.csv."
+      ],
+      "hints": [
+        "Values read from a file are text, and the Callout class's hint that hours is a whole number does not change that: Python does not check it.",
+        "A key that gives back a tuple sorts by two things, and a minus sign in front of a number turns its order round without turning the dates round. A slice gives the first ones.",
+        "The shape is `callouts = [Callout(date, hill, int(hours)) for date, hill, hours in csv.reader(f)]` inside a with line, then `callouts.sort(key=lambda c: (-c.hours, c.date))` and `return callouts[:count]`."
+      ],
+      "docs": [
+        { "title": "csv.reader", "url": "https://docs.python.org/3/library/csv.html#csv.reader" },
+        { "title": "Sorting techniques", "url": "https://docs.python.org/3/howto/sorting.html" },
+        { "title": "dataclasses", "url": "https://docs.python.org/3/library/dataclasses.html" }
+      ],
+      "points": 10
+    }
+  ]
+}

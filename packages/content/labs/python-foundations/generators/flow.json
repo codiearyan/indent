@@ -1,0 +1,51 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "log", "label": "winter_log.txt", "kind": "file" },
+      { "id": "lines", "label": "log_lines()", "kind": "function", "mine": true },
+      { "id": "team", "label": "from_team()", "kind": "function", "mine": true },
+      { "id": "mention", "label": "first_mention()", "kind": "function", "mine": true },
+      { "id": "total", "label": "longest_and_total()", "kind": "function", "mine": true },
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "log", "to": "lines", "label": "one line" },
+      { "from": "lines", "to": "team", "label": "next line" },
+      { "from": "lines", "to": "mention", "label": "next line" },
+      { "from": "team", "to": "ailsa", "label": "a team's calls" },
+      { "from": "mention", "to": "ailsa", "label": "first line" },
+      { "from": "total", "to": "ailsa", "label": "two numbers" }
+    ],
+    "note": "The log is read one line at a time, and each step asks the one before it only for what it needs next."
+  },
+  "tasks": {
+    "lines": {
+      "steps": [
+        { "active": ["log"], "note": "The winter's log is far too long to hold in memory at once." },
+        { "active": ["log", "log->lines", "lines"], "note": "Asked for a line, the reader takes one more line from the file and hands it over without its line end." },
+        { "active": ["lines"], "note": "Between two asks it waits, holding only the line it last gave, and it closes the file after the last, or when it is stopped early." }
+      ]
+    },
+    "team": {
+      "steps": [
+        { "active": ["lines", "lines->team", "team"], "value": { "kind": "map", "label": "one line", "entries": [{ "key": "time", "value": "first word" }, { "key": "call sign", "value": "second word, with a colon" }, { "key": "message", "value": "the rest" }] }, "note": "Lines come in one at a time." },
+        { "active": ["team"], "note": "A line goes on only when its call sign is the team's; a team named in another's message does not count." },
+        { "active": ["team", "team->ailsa", "ailsa"], "note": "Ailsa gets that team's calls one by one, and nothing is read ahead of what she asks for." }
+      ]
+    },
+    "mention": {
+      "steps": [
+        { "active": ["lines", "lines->mention", "mention"], "note": "Lines come in one at a time, looking for a word." },
+        { "active": ["mention"], "note": "Reading stops at the first line with the word in it." },
+        { "active": ["mention", "mention->ailsa", "ailsa"], "note": "Ailsa gets that line, or nothing at all when no line says the word." }
+      ]
+    },
+    "total": {
+      "steps": [
+        { "active": ["total"], "value": { "kind": "array", "label": "hours, one at a time", "values": [3, 7, 2] }, "note": "The hours may come as a list or one at a time from a generator." },
+        { "active": ["total"], "note": "Both the largest and the total are worked out from the same hours." },
+        { "active": ["total", "total->ailsa", "ailsa"], "note": "Ailsa gets the two numbers together, whichever way the hours came." }
+      ]
+    }
+  }
+}

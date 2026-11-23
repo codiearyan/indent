@@ -53,6 +53,7 @@
 # a call with `data`, with its repr. The steps stop at the first one that was stopped, or at the
 # first error of a step that does not expect one (`raises`). With `name`, the file runs under that
 # name instead of "__main__", as an imported file does, so lines under its main guard do not run.
+import __future__
 import _thread
 import ast
 import builtins
@@ -871,6 +872,14 @@ def main():
         emit({'kind': 'missing-task', 'task': upto})
         return
 
+    # Each part is compiled by itself, so the file's own `from __future__` lines are handed to
+    # every part, as Python applies them to the whole file.
+    future = 0
+    for statement in tree.body:
+        if isinstance(statement, ast.ImportFrom) and statement.module == '__future__':
+            for alias in statement.names:
+                future |= getattr(getattr(__future__, alias.name, None), 'compiler_flag', 0)
+
     order = sorted(starts, key=lambda task: starts[task])
     parts = {0: []}
     for task in order:
@@ -914,7 +923,7 @@ def main():
                 exec(compile(spec['define'], '<check>', 'exec'), ns)
         emit({'kind': 'start', 'task': task})
         if watchdog:
-            module = compile(ast.Module(body=parts[task], type_ignores=[]), shown, 'exec')
+            module = compile(ast.Module(body=parts[task], type_ignores=[]), shown, 'exec', future)
             _, printed, error, stopped = watchdog.run(task, lambda ns: exec(module, ns), ns)
             emit({
                 'kind': 'part',
@@ -936,7 +945,7 @@ def main():
         sys.stdout = printed
         error = None
         try:
-            exec(compile(ast.Module(body=parts[task], type_ignores=[]), shown, 'exec'), ns)
+            exec(compile(ast.Module(body=parts[task], type_ignores=[]), shown, 'exec', future), ns)
         except BaseException as caught:
             error = error_of(caught, shown)
         finally:
