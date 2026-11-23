@@ -1,5 +1,6 @@
 import { app } from 'electron'
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, readdirSync, readFileSync } from 'fs'
+import { writeWholeSync } from './atomicFile'
 import { isAbsolute, join } from 'path'
 
 /** What the app ships: packages/content in dev, an extra resource when packaged. */
@@ -101,7 +102,7 @@ export function earlierRoots(): string[] {
 
 export function setWorkspacesRoot(dir: string, earlierDirs: string[] = earlierRoots()): void {
   earlier = [...new Set(earlierDirs)].filter((other) => other !== dir)
-  writeFileSync(dataFile('workspace.json'), JSON.stringify({ root: dir, earlier }))
+  writeWholeSync(dataFile('workspace.json'), JSON.stringify({ root: dir, earlier }))
   root = dir
 }
 

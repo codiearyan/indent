@@ -1,7 +1,8 @@
 import { safeStorage } from 'electron'
 import { randomUUID } from 'crypto'
 import { existsSync } from 'fs'
-import { copyFile, readFile, writeFile } from 'fs/promises'
+import { copyFile, readFile } from 'fs/promises'
+import { writeWhole } from '../atomicFile'
 import { dirname, join } from 'path'
 import type {
   AiChatEvent,
@@ -101,7 +102,7 @@ async function loadSettings(): Promise<AiSettings> {
 }
 
 async function saveSettings(): Promise<void> {
-  await writeFile(settingsFile(), JSON.stringify(settings, null, 2))
+  await writeWhole(settingsFile(), JSON.stringify(settings, null, 2))
 }
 
 async function loadKeys(): Promise<Partial<Record<ApiProviderId, string>>> {
@@ -509,7 +510,7 @@ export function register(): void {
       if (stored[provider as ApiProviderId] && !safeStorage.isEncryptionAvailable()) {
         throw new Error('This computer offers no secure storage for keys.')
       }
-      await writeFile(keysFile(), safeStorage.encryptString(JSON.stringify(stored)))
+      await writeWhole(keysFile(), safeStorage.encryptString(JSON.stringify(stored)))
       keys = stored
       return buildConfig()
     },
