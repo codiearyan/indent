@@ -102,3 +102,53 @@ describe('workspace files', () => {
     await chmod(join(dir, 'shut'), 0o700)
   })
 })
+
+describe("what the workspace's .gitignore names", () => {
+  const paths = async (dir: string, first: string[] = [], kept: string[] = []): Promise<string[]> =>
+    (await readWorkspace(dir, first, kept)).map((f) => f.path).sort()
+
+  it('is not read, nor are the folders it names listed', async () => {
+    const dir = await tree({
+      '.gitignore': '# build output\ndist/\ncoverage\n*.log\n',
+      'src/a.js': 'a',
+      'dist/a.js': 'built',
+      'dist/nested/b.js': 'built',
+      'coverage/index.html': 'report',
+      'debug.log': 'log',
+      'src/build.log': 'log'
+    })
+    expect(await paths(dir)).toEqual(['src/a.js'])
+    expect(await readFolders(dir)).toEqual(['src'])
+  })
+
+  it('follows negations and anchored rules', async () => {
+    const dir = await tree({
+      '.gitignore': '/out\n*.txt\n!keep.txt\n',
+      'out/a.js': 'built',
+      'src/out/b.js': 'mine',
+      'notes.txt': 'n',
+      'keep.txt': 'k'
+    })
+    expect(await paths(dir)).toEqual(['keep.txt', 'src/out/b.js'])
+  })
+
+  it('never hides a file the issue lists or the starter has, nor the folders above it', async () => {
+    const dir = await tree({
+      '.gitignore': '*.js\nlib/\n',
+      'src/task.js': 'mine',
+      'lib/util.js': 'starter',
+      'lib/other.js': 'added',
+      'scratch.js': 'added'
+    })
+    expect(await paths(dir, ['src/task.js'], ['lib/util.js'])).toEqual([
+      'lib/util.js',
+      'src/task.js'
+    ])
+    expect(await readFolders(dir, ['lib/util.js'])).toEqual(['lib', 'src'])
+  })
+
+  it('hides nothing when there is none', async () => {
+    const dir = await tree({ 'dist/a.js': 'built', 'src/a.js': 'a' })
+    expect(await paths(dir)).toEqual(['dist/a.js', 'src/a.js'])
+  })
+})
