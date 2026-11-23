@@ -446,7 +446,7 @@ export interface ToolStatus {
   ok: boolean
   /** What it is for and what is wrong, in plain words. */
   note: string
-  /** The app can install it here: its own download for Node, the system's installer for others. */
+  /** The app can install it here: its own download (Node, Java on a Mac) or the system's installer. */
   installable: boolean
   /** Where to get it by hand when the app can't install it. */
   url?: string
@@ -808,10 +808,10 @@ export interface Api {
   }
   tools: {
     status(): Promise<ToolStatus[]>
-    /** Downloads Node into the app's own folder. Other programs do not see it. */
-    /** Installs a missing tool for the learner. Node reports its download through onInstallProgress. */
+    /** Installs a missing tool for the learner. A download into the app's own folder (Node, Java
+     * where the system has no installer) reports its share through onInstallProgress. */
     install(id: ToolId): Promise<ToolInstallResult>
-    /** Stops the Node download. */
+    /** Stops a download. */
     cancelInstall(): Promise<void>
     onInstallProgress(listener: (id: ToolId, done: number) => void): Unsubscribe
     /** Every Node found, and the one picked; null picked means automatic. */

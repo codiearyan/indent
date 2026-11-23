@@ -5,7 +5,7 @@ import { track } from '@/lib/telemetry'
 import { errorMessage } from '@/lib/utils'
 import { retryRuntime, useRuntime } from '@/stores/runtime'
 
-/** Where a tool's install is: running (with Node's download share), waiting on a system window, or failed. */
+/** Where a tool's install is: running (with a download's share), waiting on a system window, or failed. */
 export type ToolInstall =
   | { state: 'running'; done: number | null }
   | { state: 'waiting' }
@@ -37,12 +37,12 @@ export async function refreshTools(): Promise<ToolStatus[]> {
   return tools
 }
 
-// Cancel only stops the Node download.
-let nodeCancelled = false
+// Cancel stops a download: Node, or Java where the app gets it itself.
+let cancelled = false
 
 /** Installs a tool for the learner, or opens its download page when nothing here can. */
 export async function installTool(id: ToolId): Promise<void> {
-  if (id === 'node') nodeCancelled = false
+  cancelled = false
   setInstall(id, { state: 'running', done: id === 'node' ? 0 : null })
   try {
     const result = await api.tools.install(id)
@@ -57,13 +57,13 @@ export async function installTool(id: ToolId): Promise<void> {
     setInstall(id, { state: 'failed', message: errorMessage(error) })
     track('tool_install', {
       tool: id,
-      result: id === 'node' && nodeCancelled ? 'cancelled' : 'failed'
+      result: cancelled ? 'cancelled' : 'failed'
     })
   }
 }
 
 export function cancelInstall(): void {
-  nodeCancelled = true
+  cancelled = true
   void api.tools.cancelInstall()
 }
 

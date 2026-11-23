@@ -21,7 +21,8 @@ function hint(tool: ToolStatus, install: ToolInstall | undefined): string {
   // Too old: the note says which version is here and which one the repos need.
   if (tool.version) return tool.note
   if (!tool.installable) return 'Install it, then check again.'
-  return window.platform === 'darwin'
+  // Apple's tools hold no Java; the app downloads one itself.
+  return window.platform === 'darwin' && tool.id !== 'java'
     ? "On a Mac it comes with Apple's developer tools."
     : 'The app can install it for you.'
 }
