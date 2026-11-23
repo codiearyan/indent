@@ -26,11 +26,11 @@
       "docs": [
         {
           "title": "Pipelines",
-          "url": "https://www.gnu.org/software/bash/manual/html_node/Pipelines.html"
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_09_02"
         },
         {
-          "title": "uniq: uniquify files",
-          "url": "https://www.gnu.org/software/coreutils/manual/html_node/uniq-invocation.html"
+          "title": "uniq: report or omit repeated lines",
+          "url": "https://man7.org/linux/man-pages/man1/uniq.1.html"
         }
       ],
       "videos": [
@@ -59,12 +59,12 @@
       ],
       "docs": [
         {
-          "title": "sort: sort text files",
-          "url": "https://www.gnu.org/software/coreutils/manual/html_node/sort-invocation.html"
+          "title": "sort: sort lines of text files",
+          "url": "https://man7.org/linux/man-pages/man1/sort.1.html"
         },
         {
-          "title": "uniq: uniquify files",
-          "url": "https://www.gnu.org/software/coreutils/manual/html_node/uniq-invocation.html"
+          "title": "uniq: report or omit repeated lines",
+          "url": "https://man7.org/linux/man-pages/man1/uniq.1.html"
         }
       ],
       "points": 10
@@ -88,7 +88,7 @@
       "docs": [
         {
           "title": "Appending redirected output",
-          "url": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html#Appending-Redirected-Output"
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_07_03"
         }
       ],
       "points": 10
@@ -111,12 +111,12 @@
       ],
       "docs": [
         {
-          "title": "sort: sort text files",
-          "url": "https://www.gnu.org/software/coreutils/manual/html_node/sort-invocation.html"
+          "title": "sort: sort lines of text files",
+          "url": "https://man7.org/linux/man-pages/man1/sort.1.html"
         },
         {
-          "title": "Redirections",
-          "url": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html"
+          "title": "Redirection in the shell",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_07"
         }
       ],
       "points": 10

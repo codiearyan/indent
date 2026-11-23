@@ -25,12 +25,12 @@
       ],
       "docs": [
         {
-          "title": "grep: usage",
-          "url": "https://www.gnu.org/software/grep/manual/grep.html"
+          "title": "grep: print lines that match patterns",
+          "url": "https://man7.org/linux/man-pages/man1/grep.1.html"
         },
         {
           "title": "Quoting in the shell",
-          "url": "https://www.gnu.org/software/bash/manual/html_node/Quoting.html"
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_02"
         }
       ],
       "videos": [
@@ -59,8 +59,8 @@
       ],
       "docs": [
         {
-          "title": "grep: matching control",
-          "url": "https://www.gnu.org/software/grep/manual/grep.html#Matching-Control"
+          "title": "grep: print lines that match patterns",
+          "url": "https://man7.org/linux/man-pages/man1/grep.1.html"
         },
         {
           "title": "grep: the standard",
@@ -87,8 +87,8 @@
       ],
       "docs": [
         {
-          "title": "grep: general output control",
-          "url": "https://www.gnu.org/software/grep/manual/grep.html#General-Output-Control"
+          "title": "grep: print lines that match patterns",
+          "url": "https://man7.org/linux/man-pages/man1/grep.1.html"
         },
         {
           "title": "grep: the standard",
@@ -115,12 +115,12 @@
       ],
       "docs": [
         {
-          "title": "grep: file and directory selection",
-          "url": "https://www.gnu.org/software/grep/manual/grep.html#File-and-Directory-Selection"
+          "title": "grep: print lines that match patterns",
+          "url": "https://man7.org/linux/man-pages/man1/grep.1.html"
         },
         {
-          "title": "grep: output line prefix control",
-          "url": "https://www.gnu.org/software/grep/manual/grep.html#Output-Line-Prefix-Control"
+          "title": "grep: the standard",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/grep.html"
         }
       ],
       "points": 10

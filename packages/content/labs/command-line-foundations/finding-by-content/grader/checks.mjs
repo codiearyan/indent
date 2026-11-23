@@ -22,6 +22,9 @@ const are = (n) => (n === 1 ? 'is' : 'are')
 /** A message for lines that differ from the wanted ones, or null when they are the same. */
 function differs(file, got, want) {
   const { missing, extra } = lineDiff(got, want)
+  if (extra.length && want.includes(extra[0])) {
+    return `${file} has ${plural(extra.length, 'line')} more than once, such as ${quoted(extra[0])}. Each line the search finds goes in once.`
+  }
   if (extra.length) {
     return `${file} has ${plural(extra.length, 'line')} the search should not find, such as ${quoted(extra[0])}.`
   }
@@ -180,6 +183,8 @@ export const checks = {
     let message
     if (extra.some((l) => !l.includes('wrong address') && l.includes('wrong'))) {
       message = `Some lines have wrong but not wrong address, such as ${quoted(extra.find((l) => !l.includes('wrong address')))}. The search has to be for the whole phrase, kept together.`
+    } else if (extra.length && want.includes(extra[0])) {
+      message = `wrong-address.txt has ${plural(extra.length, 'line')} more than once, such as ${quoted(extra[0])}. Each line the search finds goes in once.`
     } else if (extra.length) {
       message = `wrong-address.txt has ${plural(extra.length, 'line')} that ${are(extra.length) === 'is' ? 'does' : 'do'} not match a line about a wrong address, such as ${quoted(extra[0])}. Check the file names and line numbers.`
     } else if (searched.length < folders.length) {

@@ -28,7 +28,7 @@ recipes/soups
 recipes/soups/leek.txt
 ```
 
-The first thing after `find` is where to start. Always give it: on Linux `find` alone starts in the folder you are in, but on a Mac it stops with `illegal option`. Each path starts with the folder you gave, so the paths that `find recipes` prints work from where you ran it, and you can hand them straight to `ls` or `cat`. `find .` starts in the folder you are in, and its paths begin with `./`.
+The first thing after `find` is where to start. Always give it: on Linux `find` alone starts in the folder you are in, but on a Mac it stops with `illegal option` or prints a `usage:` line. Each path starts with the folder you gave, so the paths that `find recipes` prints work from where you ran it, and you can hand them straight to `ls` or `cat`. `find .` starts in the folder you are in, and its paths begin with `./`.
 
 The paths come out in the order `find` meets them, which is not alphabetical and differs from one computer to the next.
 

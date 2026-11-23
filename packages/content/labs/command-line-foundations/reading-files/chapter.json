@@ -25,12 +25,12 @@
       ],
       "docs": [
         {
-          "title": "cat: concatenate and write files",
-          "url": "https://www.gnu.org/software/coreutils/manual/html_node/cat-invocation.html"
+          "title": "cat: concatenate files and print them",
+          "url": "https://man7.org/linux/man-pages/man1/cat.1.html"
         },
         {
-          "title": "Redirections",
-          "url": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html"
+          "title": "Redirection in the shell",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_07"
         }
       ],
       "videos": [
@@ -60,11 +60,11 @@
       "docs": [
         {
           "title": "head: output the first part of files",
-          "url": "https://www.gnu.org/software/coreutils/manual/html_node/head-invocation.html"
+          "url": "https://man7.org/linux/man-pages/man1/head.1.html"
         },
         {
-          "title": "Redirections",
-          "url": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html"
+          "title": "Redirection in the shell",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_07"
         }
       ],
       "points": 10
@@ -88,7 +88,7 @@
       "docs": [
         {
           "title": "tail: output the last part of files",
-          "url": "https://www.gnu.org/software/coreutils/manual/html_node/tail-invocation.html"
+          "url": "https://man7.org/linux/man-pages/man1/tail.1.html"
         },
         {
           "title": "less: read a file one screen at a time",
@@ -116,11 +116,11 @@
       "docs": [
         {
           "title": "wc: print newline, word and byte counts",
-          "url": "https://www.gnu.org/software/coreutils/manual/html_node/wc-invocation.html"
+          "url": "https://man7.org/linux/man-pages/man1/wc.1.html"
         },
         {
-          "title": "Filename expansion",
-          "url": "https://www.gnu.org/software/bash/manual/html_node/Filename-Expansion.html"
+          "title": "Patterns used for filename expansion",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_14_03"
         }
       ],
       "points": 10

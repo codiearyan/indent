@@ -25,8 +25,8 @@
       ],
       "docs": [
         {
-          "title": "find: base name patterns",
-          "url": "https://www.gnu.org/software/findutils/manual/html_node/find_html/Base-Name-Patterns.html"
+          "title": "find: search for files in a folder tree",
+          "url": "https://man7.org/linux/man-pages/man1/find.1.html"
         },
         {
           "title": "find: the standard",
@@ -63,8 +63,8 @@
           "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/find.html"
         },
         {
-          "title": "find: base name patterns",
-          "url": "https://www.gnu.org/software/findutils/manual/html_node/find_html/Base-Name-Patterns.html"
+          "title": "find: search for files in a folder tree",
+          "url": "https://man7.org/linux/man-pages/man1/find.1.html"
         }
       ],
       "points": 10
@@ -87,8 +87,8 @@
       ],
       "docs": [
         {
-          "title": "find: type",
-          "url": "https://www.gnu.org/software/findutils/manual/html_node/find_html/Type.html"
+          "title": "find: search for files in a folder tree",
+          "url": "https://man7.org/linux/man-pages/man1/find.1.html"
         },
         {
           "title": "find: the standard",

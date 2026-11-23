@@ -64,7 +64,7 @@ wc -l diary.txt
      214 diary.txt
 ```
 
-Given several files, or a pattern like `diary/*.txt`, it prints one line per file and a `total` line at the end. A Mac puts spaces before each number and Linux does not; the numbers are the same.
+Given several files, or a pattern like `diary/*.txt`, it prints one line per file and a `total` line at the end. A Mac puts more spaces before each number than Linux; the numbers are the same.
 
 ## Keeping what a command prints: >
 
