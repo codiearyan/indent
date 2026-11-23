@@ -1,0 +1,123 @@
+{
+  "id": "cutting-into-tokens",
+  "title": "Cutting text into tokens",
+  "files": [
+    "src/json.js",
+    "src/try.js",
+    "src/old-import.js",
+    "data/card.json"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where the old import script and your tokenizer read the supplier lists.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "marks",
+      "title": "Cut marks and words into tokens",
+      "file": "src/json.js",
+      "description": "Implement `tokenize(text)` in `src/json.js` for texts made only of marks and words, with nothing between them.\n\n- it returns an array of tokens, in the order they stand in the text\n- each of the six marks `{` `}` `[` `]` `:` `,` is a token `{ type: 'mark', value, at, end }`, where `value` is the mark itself\n- each of the words `true`, `false` and `null` is a token `{ type: 'literal', value, at, end }`, where `value` is the JavaScript value `true`, `false` or `null`, not the word\n- `at` is the index of the token's first character and `end` the index just after its last one, so `text.slice(at, end)` is the token as written\n- an empty text gives an empty array, and every call starts a new list\n\nThe check tokenizes texts of its own and compares every token's type, value, at and end.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the error under \"Your tokenizer\".",
+        "Start a list and an index at 0, and loop while the index is inside the text.",
+        "Look at the character at the index: is it one of the six marks? Push its token and move one on.",
+        "If not, is one of the three words written from here? Push its token and move past the whole word."
+      ],
+      "hints": [
+        "Everything happens in one loop that walks the text with an index. Each time round, the character at the index decides what the next token is.",
+        "A mark is one character long, so its end is at + 1. A word is as long as the word, and its value comes from a small table from the word to the JavaScript value, so 'true' gives true.",
+        "`text.startsWith('true', i)` says whether the word starts at index i; then push `{ type: 'literal', value: true, at: i, end: i + 4 }` and add 4 to i."
+      ],
+      "docs": [
+        {
+          "title": "String.prototype.startsWith()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith"
+        },
+        {
+          "title": "String.prototype.includes()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes"
+        },
+        {
+          "title": "while",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/while"
+        }
+      ],
+      "videos": [
+        {
+          "title": "JSON in ten minutes",
+          "url": "https://www.youtube.com/watch?v=iiADhChRriM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "space",
+      "title": "Skip the space between tokens",
+      "file": "src/json.js",
+      "description": "Make `tokenize(text)` skip the space between tokens.\n\n- space, tab, line feed and carriage return between, before and after tokens are skipped and make no token\n- `at` and `end` still count every character of the text, the skipped ones included\n- a text of nothing but those four gives an empty array\n\nThe check tokenizes texts of its own with spaces, tabs and line breaks in many places and compares every token.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at the list over several lines.",
+        "In your loop, before you look for a mark or a word, check for one of the four space characters.",
+        "Move the index one on and go round again, without pushing anything."
+      ],
+      "hints": [
+        "Skipping is just moving the index without making a token. Do it in the same loop, before the other checks.",
+        "Do not remove the space from the text first: the indexes of every token after it would shift, and at would point at the wrong place.",
+        "`if (' \\t\\n\\r'.includes(ch)) { i++; continue }` near the top of the loop skips one space character."
+      ],
+      "docs": [
+        {
+          "title": "String.prototype.includes()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes"
+        },
+        {
+          "title": "continue",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/continue"
+        },
+        {
+          "title": "JSON grammar (RFC 8259)",
+          "url": "https://www.rfc-editor.org/rfc/rfc8259#section-2"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stray",
+      "title": "Say where a stray character sits",
+      "file": "src/json.js",
+      "description": "Make `tokenize(text)` throw when it meets a character that starts no token.\n\n- it throws a `JsonError`, the class at the top of `src/json.js`, never another error and never by dropping the character\n- the error's `at` is the index of that character, counted from the start of the text, from 0\n- its message names the character and its index, such as `Unexpected character ' at index 194`\n- a character that only looks like space, such as a no-break space or a form feed, starts no token either\n- a word that is not exactly `true`, `false` or `null`, such as `True` or `nul`, throws too\n\nThe check gives `tokenize` texts with stray characters in different places and reads the error it throws.",
+      "nextSteps": [
+        "Run `node src/try.js`: the last piece has a single quote, the card supplier's mistake.",
+        "Find the place in your loop where a character is neither space, nor a mark, nor the start of a word.",
+        "Throw a JsonError there with a message and the index.",
+        "Make sure nothing else in the loop skips characters it does not know."
+      ],
+      "hints": [
+        "Your loop already knows every character that is allowed. Whatever reaches the end of the loop body without a match is the stray one.",
+        "Dropping the character and moving on would hide the very mistake Idris needs to hear about. And a loop that neither throws nor moves on never ends.",
+        "``throw new JsonError(`Unexpected character ${ch} at index ${i}`, i)`` at the end of the loop body."
+      ],
+      "docs": [
+        {
+          "title": "throw",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw"
+        },
+        {
+          "title": "Error, and errors of your own",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
+        },
+        {
+          "title": "String.prototype.startsWith()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Tokens and patterns in five minutes",
+          "url": "https://www.youtube.com/watch?v=UBiY7DwnZF0"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

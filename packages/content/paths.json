@@ -24,7 +24,8 @@
           "js-foundations",
           "browser-js",
           "async-js",
-          "js-bug-hunts"
+          "js-bug-hunts",
+          "build-a-json-parser"
         ]
       },
       {
@@ -149,7 +150,8 @@
         "title": "JavaScript",
         "labs": [
           "js-foundations",
-          "async-js"
+          "async-js",
+          "build-a-json-parser"
         ]
       },
       {
@@ -259,7 +261,8 @@
           "build-a-test-runner",
           "build-a-promise",
           "build-a-router",
-          "build-a-state-store"
+          "build-a-state-store",
+          "build-a-json-parser"
         ]
       },
       {

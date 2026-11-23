@@ -1,0 +1,124 @@
+{
+  "id": "numbers-and-text",
+  "title": "Numbers and text",
+  "files": [
+    "src/json.js",
+    "src/try.js",
+    "data/ink.json",
+    "data/paper.json"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where your tokenizer reads the numbers and names in the supplier lists.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "numbers",
+      "title": "Read a number",
+      "file": "src/json.js",
+      "description": "Implement `readNumber(text, at)` in `src/json.js`. `tokenize` already calls it when it meets a minus or a digit.\n\n- it reads the number that starts at index `at` and returns `{ type: 'number', value, at, end }`, where `value` is the JavaScript number, `-0` keeping its minus as it does in JavaScript, and `end` the index just after the number\n- a number is an optional minus, then `0` alone or a digit from 1 to 9 followed by more digits, then an optional fraction, a dot and at least one digit, then an optional exponent, `e` or `E`, an optional `+` or `-`, and at least one digit\n- anything else throws a `JsonError`: a 0 followed by more digits (`01`), a minus with no digit after it, a dot with no digit after it (`1.`), an exponent with no digits (`1e`)\n- it reads only as far as the rules allow, so in `1.2.3` the second dot is a stray character\n\nThe check tokenizes numbers of its own, among them 150 it makes up and compares with the built-in reader, and texts that are not numbers, which must throw.",
+      "nextSteps": [
+        "Run `node src/try.js` and read what happens to `1.85e1`.",
+        "Walk the rules in order with an index: the minus, the whole part, the fraction, the exponent.",
+        "Throw a JsonError wherever a digit must come and none does.",
+        "Once you know where the number ends, turn exactly those characters into a number."
+      ],
+      "hints": [
+        "Each part of the rules is a small step: maybe a minus, then digits, then maybe a dot and digits, then maybe an e and digits. Move the index past each part you find.",
+        "Find the end first, by the rules, and only then work out the value. `Number()` of exactly the characters from `at` to the end is right every time; adding digits up by hand is not.",
+        "A small helper that reads one or more digits from an index, throws when there is none, and returns the index after them covers the whole part, the fraction and the exponent: `i = digits(text, i)`."
+      ],
+      "docs": [
+        {
+          "title": "Number() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/Number"
+        },
+        {
+          "title": "JSON numbers (RFC 8259)",
+          "url": "https://www.rfc-editor.org/rfc/rfc8259#section-6"
+        },
+        {
+          "title": "String.prototype.slice()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/slice"
+        }
+      ],
+      "videos": [
+        {
+          "title": "How computers store numbers with fractions",
+          "url": "https://www.youtube.com/watch?v=PZRI1IfStY0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "texts",
+      "title": "Read a text and its escapes",
+      "file": "src/json.js",
+      "description": "Implement `readString(text, at)` in `src/json.js`. `tokenize` already calls it when it meets a `\"`.\n\n- it reads the text that starts with the quote at index `at` and returns `{ type: 'string', value, at, end }`, where `end` is the index just after the closing quote\n- `value` is the text between the quotes, with each escape turned into the character it stands for: `\\\"` a quote, `\\\\` a backslash, `\\/` a slash, `\\b` `\\f` `\\n` `\\r` `\\t` a backspace, form feed, line feed, carriage return and tab\n- a quote after a backslash does not close the text\n- a backslash before any other character throws a `JsonError` (`\\u` comes in task 3)\n\nThe check tokenizes texts of its own, among them 150 it makes up and compares with the built-in reader, and texts with escapes JSON does not have.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at `Kraft \\\"natural\\\"`.",
+        "Start one character after the opening quote and collect the characters into the value.",
+        "Stop at a quote, unless a backslash came just before it.",
+        "On a backslash, look at the next character and add the one it stands for."
+      ],
+      "hints": [
+        "Walk the text one character at a time from just after the opening quote, the same way tokenize walks the whole text.",
+        "A backslash is never part of the value. It changes what the next character means, so on a backslash you read two characters at once and move the index by two.",
+        "A table such as `{ '\"': '\"', n: '\\n', t: '\\t', ... }` turns the character after the backslash into the one to add; one that is not in the table throws."
+      ],
+      "docs": [
+        {
+          "title": "JSON strings (RFC 8259)",
+          "url": "https://www.rfc-editor.org/rfc/rfc8259#section-7"
+        },
+        {
+          "title": "Escape sequences in JavaScript strings",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#escape_sequences"
+        },
+        {
+          "title": "Object.hasOwn()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "unicode",
+      "title": "Read \\u escapes and texts that never close",
+      "file": "src/json.js",
+      "description": "Finish `readString(text, at)`.\n\n- `\\u` followed by exactly four hex digits, `0` to `9` and `a` to `f` in either case, stands for the character with that code: `\\u00e9` is `é`\n- fewer than four, or a letter past `f`, throws a `JsonError`\n- a picture character written as two `\\u` escapes in a row becomes those two code units, which JavaScript shows as one character\n- a text that reaches the end of the input without its closing quote throws a `JsonError`, and never reads past the end or loops for ever\n- a line feed, a tab or any other character below a space, written into a text as it is, throws a `JsonError`; inside a text they are written as escapes\n\nThe check tokenizes texts of its own, among them 150 it makes up with `\\u` escapes and compares with the built-in reader, and texts that never close or hold a raw line break.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at `Cr\\u00e8me laid` and the text with no closing quote.",
+        "After a backslash and a u, take the next four characters and check that each is a hex digit.",
+        "Turn the four digits into a code and the code into a character.",
+        "Make your loop stop at the end of the input, and throw there if no quote closed the text."
+      ],
+      "hints": [
+        "The four characters after `\\u` are a number written in base 16. Check them before you use them: a parse that stops at the first bad digit quietly reads too few.",
+        "A loop that looks for the closing quote has to stop at the end of the text too. Otherwise it reads characters that are not there, and never finds a quote.",
+        "`String.fromCharCode(parseInt(hex, 16))` gives the character once `/^[0-9a-fA-F]{4}$/.test(hex)` says the four are hex digits; `while (i < text.length)` keeps the loop inside the text."
+      ],
+      "docs": [
+        {
+          "title": "String.fromCharCode()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode"
+        },
+        {
+          "title": "parseInt()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/parseInt"
+        },
+        {
+          "title": "JSON strings (RFC 8259)",
+          "url": "https://www.rfc-editor.org/rfc/rfc8259#section-7"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Characters, symbols and Unicode",
+          "url": "https://www.youtube.com/watch?v=MijmeoH9LT4"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

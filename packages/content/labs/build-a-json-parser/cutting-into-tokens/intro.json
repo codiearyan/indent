@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Why will card.json not read?", "note": "He has to phone the supplier." },
+    { "title": "Old import", "text": "Could not read the file. Nothing more.", "note": "It never says where." },
+    {
+      "title": "Your code",
+      "file": "json.js",
+      "mine": true,
+      "gap": "Nothing reads the text",
+      "tasks": ["Marks and words", "Skip the space", "Say where it sits"]
+    },
+    { "title": "Idris", "say": "A single quote, right there.", "note": "Now he knows what to say." }
+  ],
+  "ticket": { "label": "card.json", "wrong": "no reason", "why": "Says nothing", "right": "quote found" },
+  "captions": [
+    "At Ashgrove Press, Idris asks why the card supplier's price list will not read.",
+    "The old import gives up with one line and never says what is wrong or where.",
+    "You write a tokenizer that cuts the text into pieces, in three tasks.",
+    "Now the reader stops at the stray quote and says exactly where it sits.",
+    "Same supplier, same list, and Idris can tell them what to fix."
+  ]
+}
