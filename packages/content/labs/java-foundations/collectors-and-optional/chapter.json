@@ -1,0 +1,111 @@
+{
+  "id": "collectors-and-optional",
+  "title": "Gathering up, and Optional for no answer",
+  "files": ["SeasonReport.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the season report here, and try your types from main.",
+    "suggestedCommand": "java SeasonReport.java"
+  },
+  "tasks": [
+    {
+      "id": "totals",
+      "title": "Add up the season's seats",
+      "file": "SeasonReport.java",
+      "description": "Under `// Task 1`, write a class `Totals` with three methods, each one stream from `bookings` to its answer. `static int seats(List<Booking> bookings)` gives back all the seats booked, added up. `static double average(List<Booking> bookings)` gives back the seats of a booking on average, and 0 when there are no bookings. `static int most(List<Booking> bookings)` gives back the most seats in one booking, and 0 when there are no bookings. `Booking` is given above the tasks.\n\nCheck hands each method lists of its own: one whose average is not a whole number, one booking, and none. Its list refuses to be read by a loop, `get`, `forEach` or a copy, so only a stream can read it. Check reads what comes back, and the list afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson about streams of numbers.",
+        "Turn the stream of bookings into a stream of their seats.",
+        "Finish it with the ending each method asks for.",
+        "For average and most, say what to give back when there are no bookings."
+      ],
+      "hints": [
+        "A stream of bookings has no sum, average or largest: those belong to a stream of plain numbers, which a stream of objects can become.",
+        "One step turns each booking into an int and gives a stream of ints. Its average and its largest may not exist, so they come back in a box that may be empty, and the box can be asked for a value to use when it is empty.",
+        "`bookings.stream().mapToInt(Booking::seats)` then `.sum()`, `.average().orElse(0)` or `.max().orElse(0)`."
+      ],
+      "docs": [
+        {
+          "title": "Reduction",
+          "url": "https://docs.oracle.com/javase/tutorial/collections/streams/reduction.html"
+        },
+        {
+          "title": "IntStream",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/IntStream.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "groups",
+      "title": "Count the bookings per boat, and write the names in a line",
+      "file": "SeasonReport.java",
+      "description": "Under `// Task 2`, write a class `Season` with two methods, each one stream from `bookings` to its answer. `static Map<String, Long> bookingsPerBoat(List<Booking> bookings)` gives back a map from each boat to the number of its bookings. `static String namesLine(List<Booking> bookings)` gives back the passengers in the order they came, with a comma and a space between two names, as in `Ishbel, Torquil`, and nothing at either end.\n\nCheck hands both methods lists of its own that only a stream can read, as in Task 1: several boats mixed, one booking, and none. It compares the map with the right one as a map, whatever order it keeps, and reads the line letter by letter, and the list afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson about collect, groupingBy and joining.",
+        "Write bookingsPerBoat: gather the bookings into groups by boat, and count each group.",
+        "Write namesLine: turn each booking into its passenger, and join the names.",
+        "Try both from main."
+      ],
+      "hints": [
+        "One ending gathers a stream into something other than a list, and Java has a class of ready-made gatherers to hand it: a map of groups, a count, a line of text.",
+        "One collector sorts things into a map by a key, and can be handed a second collector for what each group becomes; counting a group gives a long. Another joins texts with what you put between them, and nothing at the ends.",
+        "`return bookings.stream().collect(Collectors.groupingBy(Booking::boat, Collectors.counting()));` and `return bookings.stream().map(Booking::passenger).collect(Collectors.joining(\", \"));`."
+      ],
+      "docs": [
+        {
+          "title": "Collectors",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Collectors.html"
+        },
+        {
+          "title": "Collectors.groupingBy",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Collectors.html#groupingBy(java.util.function.Function,java.util.stream.Collector)"
+        },
+        {
+          "title": "Collectors.joining",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Collectors.html#joining(java.lang.CharSequence)"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Grouping a stream into a map",
+          "url": "https://www.youtube.com/watch?v=wu0ARvSE3Jk"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "optional",
+      "title": "Answer when there may be no answer",
+      "file": "SeasonReport.java",
+      "description": "Under `// Task 3`, write a class `Lookup` with two methods. `static Optional<Booking> largestOn(List<Booking> bookings, String boat)` gives back the booking with most seats on that boat, or an empty `Optional` when that boat has none. `static String firstOn(List<Booking> bookings, String boat)` gives back the passenger of the first booking on that boat, or `\"nobody\"` when it has none. A stream makes each one short; a loop that gives the same answers passes too.\n\nCheck calls both with lists of its own, for boats with bookings, a boat with none, and an empty list. It reads the `Optional` that comes back as a value: a booking in it, or empty, and never `null`. Asking an empty one for its value is a mistake Check names.",
+      "nextSteps": [
+        "Read the part of the lesson about Optional.",
+        "Write largestOn: keep the boat's bookings, and ask for the largest by seats.",
+        "Write firstOn: keep the boat's bookings, take the first, turn it into its passenger.",
+        "Say what firstOn gives back when there is no first booking."
+      ],
+      "hints": [
+        "Some stream endings give back an Optional, because there may be no answer: the largest, the first. An Optional can be given back as it is, or asked what to do when it is empty.",
+        "The largest needs a Comparator, as sorting does. An Optional can turn what is in it into something else, and stay empty when it is empty, and give a value of your own when it is empty. Asking an empty one for its value with get throws.",
+        "largestOn: `return bookings.stream().filter(b -> b.boat().equals(boat)).max(Comparator.comparing(Booking::seats));`. firstOn: `filter(...).findFirst().map(Booking::passenger).orElse(\"nobody\")`."
+      ],
+      "docs": [
+        {
+          "title": "Optional",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html"
+        },
+        {
+          "title": "Stream.max",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#max(java.util.Comparator)"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Optional instead of null",
+          "url": "https://www.youtube.com/watch?v=HeZIIm7Okl0"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

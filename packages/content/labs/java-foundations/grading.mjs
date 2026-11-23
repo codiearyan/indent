@@ -2720,6 +2720,12 @@ const FUNCTION_GLOSS = [
   [
     /^compiler\.err\.prob\.found\.req/,
     (e) =>
+      /inference variable \w+ has incompatible equality constraints (?:Integer,Long|Long,Integer)/.test(e.message) &&
+      'A count made by a collector is a long, so the values of the map it makes are Long, and a Map with Integer values is another type.'
+  ],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
       /inference variable \w+ has incompatible/.test(e.message) &&
       'In a stream chain, Java works out the type step by step, and somewhere one step hands on another type than the next step, or the variable, expects. Read the chain from the start and say what each step gives back.'
   ]
