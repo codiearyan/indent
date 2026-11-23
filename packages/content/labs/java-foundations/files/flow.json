@@ -1,0 +1,69 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "files", "label": "Hut's files", "kind": "data" },
+      { "id": "reading", "label": "Reading", "kind": "function", "mine": true },
+      { "id": "writing", "label": "Writing", "kind": "function", "mine": true },
+      { "id": "counting", "label": "Counting", "kind": "function", "mine": true },
+      { "id": "bridie", "label": "Bridie", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "files", "to": "reading", "label": "lines" },
+      { "from": "writing", "to": "files", "label": "new lines" },
+      { "from": "files", "to": "counting", "label": "one at a time" },
+      { "from": "reading", "to": "bridie", "label": "notices, till" },
+      { "from": "counting", "to": "bridie", "label": "a count" }
+    ],
+    "note": "The hut's notices, log and till file are read, written and counted from disk, each in its own character set."
+  },
+  "tasks": {
+    "reading": {
+      "steps": [
+        {
+          "active": ["files", "files->reading", "reading"],
+          "note": "A file is named by its path, and read as a list of its lines, whatever line ends it has."
+        },
+        {
+          "active": ["reading"],
+          "note": "The old till's file is read in the character set the till wrote it in, so its pound signs come through."
+        },
+        {
+          "active": ["reading", "reading->bridie", "bridie"],
+          "note": "A file that is not there is not an empty answer: whoever asked is told."
+        }
+      ]
+    },
+    "writing": {
+      "steps": [
+        {
+          "active": ["writing", "writing->files", "files"],
+          "note": "A board is saved as a file of its own lines, each ending the same way on every computer."
+        },
+        {
+          "active": ["writing", "files"],
+          "note": "A line is added to the end of the log, and what the log held stays."
+        },
+        {
+          "active": ["writing"],
+          "note": "A file that is not there yet is made the first time."
+        }
+      ]
+    },
+    "counting": {
+      "steps": [
+        {
+          "active": ["files", "files->counting", "counting"],
+          "note": "The till's file is read a line at a time, however long it grows."
+        },
+        {
+          "active": ["counting"],
+          "note": "The lines that name a boat are counted, and the file is closed once the count is done."
+        },
+        {
+          "active": ["counting", "counting->bridie", "bridie"],
+          "note": "When there is no till file yet, the count is nothing at all."
+        }
+      ]
+    }
+  }
+}

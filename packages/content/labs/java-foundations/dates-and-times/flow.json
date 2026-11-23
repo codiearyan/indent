@@ -1,0 +1,71 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "clipboard", "label": "Pass sold", "kind": "story" },
+      { "id": "dates", "label": "Dates", "kind": "function", "mine": true },
+      { "id": "passes", "label": "Passes", "kind": "function", "mine": true },
+      { "id": "timetable", "label": "Timetable", "kind": "function", "mine": true },
+      { "id": "passenger", "label": "Passenger", "kind": "story" },
+      { "id": "printed", "label": "Printed timetable", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "clipboard", "to": "dates", "label": "day and time" },
+      { "from": "dates", "to": "passes", "label": "a date" },
+      { "from": "passes", "to": "passenger", "label": "days left" },
+      { "from": "dates", "to": "timetable", "label": "a day" },
+      { "from": "timetable", "to": "printed", "label": "heading" }
+    ],
+    "note": "Passes and the timetable work with real dates, counted in real months and days, and printed in English anywhere."
+  },
+  "tasks": {
+    "make": {
+      "steps": [
+        {
+          "active": ["clipboard", "clipboard->dates", "dates"],
+          "note": "A day and a time arrive as text, or as the three numbers written on the clipboard."
+        },
+        {
+          "active": ["dates"],
+          "note": "They become one date and time, or one date, that Java can count with."
+        },
+        {
+          "active": ["dates"],
+          "note": "A day that does not exist, or a time written another way, is refused with a message that quotes it."
+        }
+      ]
+    },
+    "count": {
+      "steps": [
+        {
+          "active": ["dates", "dates->passes", "passes"],
+          "note": "A pass starts on the day it was bought, and runs for whole months."
+        },
+        {
+          "active": ["passes"],
+          "note": "Its last day keeps the day of the month, or moves to the end of a shorter month."
+        },
+        {
+          "active": ["passes", "passes->passenger", "passenger"],
+          "note": "The passenger is told the days left from the day they ask, and a crossing is measured in minutes, midnight or not."
+        }
+      ]
+    },
+    "print": {
+      "steps": [
+        {
+          "active": ["dates", "dates->timetable", "timetable"],
+          "note": "A day comes to the timetable as a date."
+        },
+        {
+          "active": ["timetable", "timetable->printed", "printed"],
+          "value": { "kind": "array", "label": "heading", "values": ["day of the week", "day", "month", "year"] },
+          "note": "Its heading is written out in English, whatever language the computer speaks."
+        },
+        {
+          "active": ["timetable"],
+          "note": "The timetable says whether boats run that day: every day but Sunday."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "csv", "label": "sailings.csv", "kind": "file" },
+      { "id": "lines", "label": "Lines", "kind": "function", "mine": true },
+      { "id": "day", "label": "Day", "kind": "function", "mine": true },
+      { "id": "report", "label": "Report", "kind": "function", "mine": true },
+      { "id": "office", "label": "Harbour office", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "csv", "to": "day", "label": "lines" },
+      { "from": "day", "to": "lines", "label": "one line" },
+      { "from": "day", "to": "report", "label": "sailings, problems" },
+      { "from": "report", "to": "office", "label": "report.txt" }
+    ],
+    "note": "The till's file becomes a list of sailings, bad lines are set aside by number, and the day's takings go to the harbour office."
+  },
+  "tasks": {
+    "parse": {
+      "steps": [
+        {
+          "active": ["day->lines", "lines"],
+          "value": { "kind": "array", "label": "a line", "values": ["date", "boat", "passengers", "takings"] },
+          "note": "One line of the file arrives with its number, its parts split at the commas."
+        },
+        {
+          "active": ["lines"],
+          "note": "Each part is read as what it is: a date, a name, a whole number, an amount."
+        },
+        {
+          "active": ["lines", "day->lines"],
+          "note": "A line that cannot be read is refused, and the refusal names its line number."
+        }
+      ]
+    },
+    "read": {
+      "steps": [
+        {
+          "active": ["csv", "csv->day", "day"],
+          "note": "The file's lines are read, and the header line is set aside."
+        },
+        {
+          "active": ["day", "day->lines", "lines"],
+          "note": "Each line goes to be read with its number as the file counts it."
+        },
+        {
+          "active": ["day", "day->report"],
+          "note": "A refused line is noted as a problem, and the lines after it are still read."
+        }
+      ]
+    },
+    "report": {
+      "steps": [
+        {
+          "active": ["day->report", "report"],
+          "note": "The day's takings are added up, exactly, to the penny."
+        },
+        {
+          "active": ["report"],
+          "note": "The report is built a line at a time: each sailing, the total, then each problem."
+        },
+        {
+          "active": ["report", "report->office", "office"],
+          "note": "The report replaces yesterday's file, written the same way on any computer."
+        }
+      ]
+    }
+  }
+}
