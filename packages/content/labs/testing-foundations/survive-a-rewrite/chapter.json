@@ -11,7 +11,7 @@
       "id": "order",
       "title": "Test the packing order by what comes out",
       "file": "src/packing.test.js",
-      "description": "`packingList(order)` gives back the list Wendell packs from. Its `items` are the names of the order's items, heaviest first, so heavy things sit at the bottom. In the `packing order` block, test the items on the list for an order whose items are not already heaviest first. Check what `packingList` gives back, not how it gets there.\n\nCheck runs your tests on the working code and on a rewrite of `packing.js` that packs every order the same, where they must pass. Then it runs them on versions that pack the lightest item first, keep the customer's order, or leave the last item off the list, where a test in this block must fail.",
+      "description": "`packingList(order)` gives back the list Wendell packs from. Its `items` are the names of the order's items, heaviest first, so heavy things sit at the bottom. Items that weigh the same stay in the order the customer wrote them. In the `packing order` block, test the items on the list for an order whose items are not already heaviest first. Check what `packingList` gives back, not how it gets there.\n\nCheck runs your tests on the working code and on a rewrite of `packing.js` that packs every order the same, where they must pass. Then it runs them on versions that pack the lightest item first, keep the customer's order, or leave the last item off the list, where a test in this block must fail.",
       "nextSteps": [
         "Pick an order whose items are not heaviest first, such as Nell's.",
         "Work out by hand the order its items go in.",

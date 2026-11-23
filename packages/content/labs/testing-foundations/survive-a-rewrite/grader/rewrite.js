@@ -1,19 +1,10 @@
 // packing.js written another way: one loop, no helpers. It packs every order exactly like the
-// working code, so a test of what comes out passes on both.
+// working code, so a test of what comes out passes on both. `helpers` stays, empty, so a test file
+// that imports it still loads.
 
 export const SMALL_CRATE_KG = 5
 
-export const helpers = {
-  heaviestFirst(items) {
-    return [...items].sort((a, b) => b.kg - a.kg)
-  },
-  totalKg(items) {
-    return items.reduce((total, item) => total + item.kg, 0)
-  },
-  crateFor(kg) {
-    return kg <= SMALL_CRATE_KG ? 'small crate' : 'large crate'
-  }
-}
+export const helpers = {}
 
 export function packingList({ customer, items }) {
   const packed = []

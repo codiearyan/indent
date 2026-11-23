@@ -10,7 +10,7 @@ const MIDDLE = 'if (dozens <= 5) return dozens * 2.5'
 const CAFE = 'return dozens * 2\n'
 
 const extra = (what) => (name) =>
-  `"${name}" also fails on a version where only ${what} is wrong. The bug in Nell's report has nothing to do with that, so your test still carries a detail the bug does not need. Take it out, run the test, and check it still fails on the code in your workspace.`
+  `"${name}" also fails on a version where only ${what} is wrong. The bug in Nell's report has nothing to do with that, so your test still carries a detail the bug does not need. Take it out, and check the test still fails on the code Nell was charged by.`
 
 export const checks = {
   report: (t) =>
@@ -19,17 +19,18 @@ export const checks = {
       target,
       ...block('bill'),
       limit: 2000,
+      together: true,
       none: 'The bill in your test comes out right even with the bug, so it cannot show it.',
       wrong: [
         {
           label: 'is the code Nell was charged by',
           change: [BOXES, '[...new Set(order.boxes)].reduce('],
-          hint: 'Your test must fail on the code in your workspace, as Nell\'s bill did. Run it, and if it passes, put back details from the report until it fails.'
+          hint: 'Your test must fail on the code Nell was charged by, as her bill did. Until the next task fixes it, that is the code in your workspace: run your test, and if it passes, put back details from the report until it fails.'
         },
         {
-          label: 'has a smaller slip of the same kind',
-          change: [BOXES, 'order.boxes.filter((size, i) => size !== order.boxes[i - 1]).reduce('],
-          hint: 'Keep only the boxes the bug needs, and put them next to each other in the list.'
+          label: 'forgets a repeated box only when every box in the order is the same size',
+          change: [BOXES, '(new Set(order.boxes).size === 1 ? order.boxes.slice(0, 1) : order.boxes).reduce('],
+          hint: 'Take out each box the bug does not need, one at a time, as long as your test still fails on the code Nell was charged by.'
         }
       ],
       same: [
@@ -104,13 +105,14 @@ export const checks = {
       target,
       ...block('eggPrice'),
       limit: 2000,
+      together: true,
       distinct: true,
       none: 'None of them fail on any wrong version. Tests that all use the same few numbers of dozens prove the same thing again and again.',
       wrong: [
         {
-          label: 'charges 3.50 a dozen for small orders',
+          label: 'charges 3.50 a dozen up to 2 dozen',
           change: [SMALL, SMALL.replace('* 3', '* 3.5')],
-          hint: 'Test a number of dozens from the small orders, up to 2, with the price worked out by hand.'
+          hint: 'Test a number of dozens up to 2, with the price worked out by hand.'
         },
         {
           label: 'charges for a dozen when no eggs are ordered',
@@ -118,34 +120,34 @@ export const checks = {
           hint: 'Test an order with no eggs at all.'
         },
         {
-          label: 'charges 3 to 5 dozen at the small order price',
+          label: 'charges 3 to 5 dozen at 3 pounds a dozen',
           change: [MIDDLE, MIDDLE.replace('* 2.5', '* 3')],
           hint: 'Test a number of dozens between 3 and 5.'
         },
         {
-          label: 'charges 6 dozen or more at the middle price',
+          label: 'charges 6 dozen or more at 2.50 a dozen',
           change: [CAFE, 'return dozens * 2.5\n'],
           hint: 'Test 6 dozen or more.'
         },
         {
-          label: 'already gives the middle price at 2 dozen',
+          label: 'already charges 2.50 a dozen at 2 dozen',
           change: [SMALL, SMALL.replace('<= 2', '< 2')],
-          hint: 'Test the last number of dozens at the small order price.'
+          hint: 'Test the most dozens that still cost 3 pounds a dozen.'
         },
         {
-          label: 'keeps the small order price up to 3 dozen',
+          label: 'keeps 3 pounds a dozen up to 3 dozen',
           change: [SMALL, SMALL.replace('<= 2', '<= 3')],
-          hint: 'Test the first number of dozens at the middle price.'
+          hint: 'Test the fewest dozens that cost 2.50 a dozen.'
         },
         {
-          label: 'already gives the cafe price at 5 dozen',
+          label: 'already charges 2 pounds a dozen at 5 dozen',
           change: [MIDDLE, MIDDLE.replace('<= 5', '< 5')],
-          hint: 'Test the last number of dozens at the middle price.'
+          hint: 'Test the most dozens that still cost 2.50 a dozen.'
         },
         {
-          label: 'keeps the middle price up to 6 dozen',
+          label: 'keeps 2.50 a dozen up to 6 dozen',
           change: [MIDDLE, MIDDLE.replace('<= 5', '<= 6')],
-          hint: 'Test the first number of dozens at the cafe price.'
+          hint: 'Test the fewest dozens that cost 2 pounds a dozen.'
         }
       ]
     })

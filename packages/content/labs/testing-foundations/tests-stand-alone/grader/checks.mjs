@@ -74,6 +74,7 @@ const task = (title, wrong, more = {}) => (t) =>
     limit: 2000,
     alone: true,
     reverse: true,
+    together: true,
     explain,
     leftover,
     ...more
@@ -111,6 +112,11 @@ export const checks = {
       label: 'looks only at what is in the van, so one box can take it over the limit',
       change: [CHECK, '  if (vanWeight(van) > VAN_LIMIT_KG) return false\n'],
       hint: 'Test a box that would take the nearly full van over its limit, and expect it to be turned away.'
+    },
+    {
+      label: 'weighs only the new box, not what is already in the van',
+      change: [CHECK, '  if (box.kg > VAN_LIMIT_KG) return false\n'],
+      hint: 'Load the van in beforeEach until it is a few kilos short of the limit, then test a box that would take it over.'
     },
     {
       label: 'puts a box it turns away in the van anyway',

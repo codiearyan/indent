@@ -18,19 +18,19 @@ describe('bill', () => {
 })
 
 describe('eggPrice', () => {
-  test('2 dozen, the most at the small order price', () => {
+  test('2 dozen, the most at 3 pounds a dozen', () => {
     expect(eggPrice(2)).toBe(6)
   })
 
-  test('3 dozen, the fewest at the middle price', () => {
+  test('3 dozen, the fewest at 2.50 a dozen', () => {
     expect(eggPrice(3)).toBe(7.5)
   })
 
-  test('5 dozen, the most at the middle price', () => {
+  test('5 dozen, the most at 2.50 a dozen', () => {
     expect(eggPrice(5)).toBe(12.5)
   })
 
-  test('6 dozen, the fewest at the cafe price', () => {
+  test('6 dozen, the fewest at 2 pounds a dozen', () => {
     expect(eggPrice(6)).toBe(12)
   })
 

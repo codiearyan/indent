@@ -86,7 +86,7 @@ export function giftPrice(price, member) {
 
 Nothing more than the tests ask for. When Bridget changes her mind, as she will, that change starts with a test too: write what the new rule wants, watch it fail on today's code, then change the code. The old tests stay, and tell you if the change broke what was already right.
 
-Check runs your tests on code without the rule, where they must fail, and on code with it, where they must pass. Then it runs your code with boxes of its own, and your tests on your code.
+Check runs your tests on code without the rule, where a test for the rule must fail, and on code with it, where they must all pass. Then it runs your code with boxes of its own, and your tests on your code.
 
 ## Your work in this issue
 

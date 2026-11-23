@@ -19,12 +19,13 @@ const task = (title, wrong) => async (t) =>
     wrong,
     limit: 2000,
     explain,
+    together: true,
     same: [
       {
         label: 'is written another way but packs every box the same',
         code: await readFile(t.chapterPath('grader/rewrite.js'), 'utf8'),
         message: (name) =>
-          `"${name}" fails on a rewrite of packing.js that packs every order exactly the same: the same items in the same order, the same weight, the same crate. So it checks how the code is written, like which helper it calls, not what comes out. Test the list packingList gives back instead.`
+          `"${name}" fails on a rewrite of packing.js that packs every order exactly the same: the same items in the same order, the same weight, the same crate. So it leans on how the code is written, like which helper it calls or what a helper answers, not on what comes out. Call packingList, and compare the list it gives back with what you worked out by hand.`
       }
     ]
   })

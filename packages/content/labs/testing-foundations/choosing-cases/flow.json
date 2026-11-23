@@ -73,7 +73,7 @@
             "entries": [
               { "key": "small orders", "value": "one price a dozen" },
               { "key": "middle orders", "value": "a lower price" },
-              { "key": "cafe orders", "value": "the lowest" }
+              { "key": "big orders", "value": "the lowest" }
             ]
           },
           "note": "The egg rule splits every order into three groups, with a line between each."

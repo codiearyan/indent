@@ -1,6 +1,14 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { block, fileProblem, judge, runTests, shortFailure } from '../../grading.mjs'
+import {
+  block,
+  fileProblem,
+  judge,
+  runTogether,
+  shortFailure,
+  workingCode,
+  wrongVersion
+} from '../../grading.mjs'
 
 const test = 'src/loyalty.test.js'
 const target = 'src/loyalty.js'
@@ -8,18 +16,26 @@ const target = 'src/loyalty.js'
 const LARGE = "    if (size === 'large') return BOX_PRICES.large - BOX_PRICES.medium\n"
 const FREE = 'boxNumber % 10 === 0'
 const PLAIN = '  return BOX_PRICES[size]\n}'
+const withoutFree = (code) => wrongVersion(code, [`  if (${FREE}) {\n${LARGE}    return 0\n  }\n`, ''])
+const withoutLarge = (code) => wrongVersion(code, [LARGE, ''])
 
 const testTask = (title, options) => (t) =>
-  judge(t, { test, target, ...block(title), limit: 2000, ...options })
+  judge(t, { test, target, ...block(title), limit: 2000, together: true, ...options })
 
 // A code task passes when boxPrice in the learner's own file gives the right price for Check's
 // cases, and the learner's tests for that rule pass on it. The tests come first, so a rule with
-// no test for it yet is sent back to the task before.
-const codeTask = (title, earlier, cases) => async (t) => {
+// no test for it yet, one that fails on code without the rule, is sent back to the task before.
+const codeTask = (title, earlier, without, cases) => async (t) => {
   const dir = await t.sandbox()
   const own = await readFile(join(t.workspace, target), 'utf8').catch(() => '')
-  const [run, ...answers] = await Promise.all([
-    runTests(t, { test, target, code: own, args: ['--testTimeout=2000'] }),
+  const before = without(await workingCode(t, target))
+  const [[run, bare], ...answers] = await Promise.all([
+    runTogether(t, {
+      test,
+      target,
+      args: ['--testTimeout=2000'],
+      variants: [{ code: own }, { code: before }]
+    }),
     ...cases.map(([size, number]) => t.call(dir, target, 'boxPrice', [size, number]))
   ])
   const broken = answers.find((a) => !a.ok)
@@ -48,12 +64,17 @@ const codeTask = (title, earlier, cases) => async (t) => {
   if (problem) return [...details, problem]
   const mine = run.tests.filter((x) => x.group[0] === title && (x.status === 'passed' || x.status === 'failed'))
   const failing = mine.filter((x) => x.status === 'failed')
+  const named = (x) => [...x.group, x.name].join(' > ')
+  const failedBefore = new Set(bare.tests.filter((x) => x.status === 'failed').map(named))
+  const forRule = mine.some((x) => failedBefore.has(named(x)))
   details.push({
     name: `Your tests in the ${title} block pass on your code`,
-    passed: mine.length > 0 && !failing.length,
+    passed: forRule && !failing.length,
     message: !mine.length
       ? `Check finds no test in the ${title} block. In this issue the test comes first: go back to "${earlier}", write it, and watch it fail before you write the code.`
-      : failing.length
+      : !forRule
+        ? `None of your tests in the ${title} block fails on code without this rule, so none of them tests it yet. In this issue the test comes first: go back to "${earlier}" and write a test that fails without the rule.`
+        : failing.length
         ? `"${failing[0].name}" fails on your boxPrice. Run the tests in the terminal: Expected is what your test says the rule wants, Received is what your code gave.`
         : undefined,
     output: failing.length ? `${failing[0].name}\n${shortFailure(failing[0].failure)}` : undefined
@@ -64,6 +85,14 @@ const codeTask = (title, earlier, cases) => async (t) => {
 export const checks = {
   'free-test': testTask('free box', {
     base: [LARGE, ''],
+    same: [
+      {
+        label: 'also has the rule for a large free box from a later task',
+        change: [`  if (${FREE}) {\n`, `  if (${FREE}) {\n${LARGE}`],
+        message: (name) =>
+          `"${name}" fails once the later rule for large boxes is in: a large box on a free turn will not cost 0. Use small or medium boxes in this block, as the task says.`
+      }
+    ],
     wrong: [
       {
         label: 'does not have the free box yet',
@@ -88,7 +117,7 @@ export const checks = {
     ]
   }),
 
-  'free-code': codeTask('free box', 'Write a failing test for the free box', [
+  'free-code': codeTask('free box', 'Write a failing test for the free box', withoutFree, [
     ['medium', 10, 0, 'a tenth medium box'],
     ['small', 30, 0, 'a thirtieth small box'],
     ['medium', 19, 19, 'the box before a free one'],
@@ -116,7 +145,7 @@ export const checks = {
     ]
   }),
 
-  'large-code': codeTask('large free box', 'Write a failing test for a large free box', [
+  'large-code': codeTask('large free box', 'Write a failing test for a large free box', withoutLarge, [
     ['large', 10, 5, 'a large box on a free turn'],
     ['large', 40, 5, 'a large box on a later free turn'],
     ['large', 7, 24, 'a large box on another turn'],
