@@ -1,0 +1,40 @@
+{
+  "stations": [
+    {
+      "title": "Kasimir",
+      "say": "Where has the loupe gone again?"
+    },
+    {
+      "title": "The fitting",
+      "text": "A bent part stops it halfway."
+    },
+    {
+      "title": "Your cleanup",
+      "file": "fitting.cpp",
+      "mine": true,
+      "gap": "Nothing gets put back",
+      "tasks": [
+        "Own the repair",
+        "Borrow, put back",
+        "Fit with the loupe"
+      ]
+    },
+    {
+      "title": "The tool drawer",
+      "text": "Every tool back, every repair ended."
+    }
+  ],
+  "ticket": {
+    "label": "The loupe",
+    "wrong": "missing",
+    "why": "Not back",
+    "right": "in the drawer"
+  },
+  "captions": [
+    "Kasimir reaches for the loupe after a fitting, and the drawer is empty again.",
+    "A bent part stopped the fitting halfway, and nothing after it put the loupe back.",
+    "You give everything an owner that puts it back, on every way out of the function.",
+    "Now the loupe is back in the drawer, whether the parts fitted or not.",
+    "Whatever a fitting takes, it gives back. Next, a bug that says nothing at all."
+  ]
+}

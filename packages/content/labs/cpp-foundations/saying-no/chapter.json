@@ -1,0 +1,103 @@
+{
+  "id": "saying-no",
+  "title": "Say no without exceptions",
+  "files": [
+    "src/counter.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the counter's look-up here and run it on what Dorrit typed today.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/counter.cpp -o counter && ./counter"
+  },
+  "tasks": [
+    {
+      "id": "parse",
+      "title": "Read a ticket number from what was typed",
+      "file": "src/counter.cpp",
+      "description": "Under `// Task 1` in `src/counter.cpp`, write a function called `parseTicket` that takes the typed text as a reference to a `const std::string` and a ticket as a reference to an `int`, and gives back a `bool`. When the text is a ticket number, 1 to 6 digits and nothing else, it puts that number in `ticket` and gives back `true`. Otherwise it gives back `false` and leaves `ticket` as it was.\n\nCheck calls it with texts of its own: ticket numbers, numbers with something after them, empty text, text that is no number at all and numbers with too many digits. Each time it reads what came back and what `ticket` holds afterwards.",
+      "nextSteps": [
+        "Write the first line, with the ticket taken by reference so the caller sees it change.",
+        "Give back false for an empty text and for one longer than 6 characters.",
+        "Look at every character, and give back false at the first one that is not a digit.",
+        "Only then turn the text into a number with std::stoi, put it in ticket and give back true."
+      ],
+      "hints": [
+        "std::stoi reads what it can from the front of a text and says nothing about the rest, and it throws on text that does not start with a number. So it cannot be the test of whether a text is a number: that test comes first.",
+        "A character between '0' and '9' is a digit. An empty text passes a loop over its characters without a single round, and seven digits make a number a ticket never has, so each needs its own check before the loop.",
+        "The shape is `if (text.empty() || text.size() > 6) { return false; } for (char c : text) { if (c < '0' || c > '9') { return false; } } ticket = std::stoi(text); return true;`."
+      ],
+      "docs": [
+        {
+          "title": "std::stoi",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/stol"
+        },
+        {
+          "title": "Reference declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/reference"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "find",
+      "title": "Find a repair, or nothing",
+      "file": "src/counter.cpp",
+      "description": "Under `// Task 2`, write a function called `findRepair` that takes the bench as a reference to a `const std::vector<Repair>` and a ticket as an `int`, and gives back a `std::optional<Repair>`: the first repair on the bench with that ticket, or an optional that holds nothing when no repair has it.\n\nCheck calls it with benches of its own: a ticket at the front, one further on, one on the bench twice, one that is not there, and an empty bench. It asks each optional whether it holds a repair, and reads the repair when it does.",
+      "nextSteps": [
+        "Write the first line, with std::optional<Repair> in front of the name.",
+        "Walk the bench, and give back the first repair whose ticket matches.",
+        "After the loop, give back an optional that holds nothing.",
+        "In main, look up a ticket that is there and one that is not, and ask each optional before you print from it."
+      ],
+      "hints": [
+        "A std::optional<Repair> is a box that holds one Repair or holds nothing. Returning a made-up repair with ticket 0 for \"not found\" is a repair all the same, and the caller cannot tell it from a real one.",
+        "return with a Repair puts it in the box. std::nullopt, or {}, is the empty box.",
+        "The shape is `for (const Repair& repair : bench) { if (repair.ticket == ticket) { return repair; } } return std::nullopt;`."
+      ],
+      "docs": [
+        {
+          "title": "std::optional",
+          "url": "https://en.cppreference.com/w/cpp/utility/optional"
+        },
+        {
+          "title": "std::nullopt",
+          "url": "https://en.cppreference.com/w/cpp/utility/optional/nullopt"
+        }
+      ],
+      "videos": [
+        {
+          "title": "std::optional for a value that may be missing",
+          "url": "https://www.youtube.com/watch?v=20aDNhMPbs8"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "answer",
+      "title": "Answer the customer",
+      "file": "src/counter.cpp",
+      "description": "Under `// Task 3`, write a function called `answerFor` that takes the bench as a reference to a `const std::vector<Repair>` and the typed text as a reference to a `const std::string`, and gives back a `std::string`. It reads the ticket with `parseTicket`, looks the repair up with `findRepair`, and gives back one of three lines, like:\n\n- `Not a ticket number: 12abc`, with the typed text after the colon\n- `No repair with ticket 4417`\n- `Ticket 4417: carriage clock, 95 minutes`\n\nCheck builds this task with right versions of its own of `parseTicket` and `findRepair`, so it is judged on its own. It calls `answerFor` with a bench of its own and texts of every kind, and compares each line it gives back.",
+      "nextSteps": [
+        "Make an int for the ticket, and call parseTicket with it.",
+        "Ask what parseTicket gave back: when it is false, give back the not-a-ticket-number line.",
+        "Look the ticket up with findRepair, and ask the optional whether it holds a repair before you reach inside.",
+        "Build each line with + and std::to_string, as the task shows it."
+      ],
+      "hints": [
+        "Two answers here can say no: the bool from parseTicket and the optional from findRepair. Each has to be asked before what it guards is used.",
+        "When parseTicket gives back false, the ticket variable holds whatever it held before, not a ticket. When the optional holds nothing, * and -> on it have no promised result.",
+        "The shape is `int ticket = 0; if (!parseTicket(typed, ticket)) { return \"Not a ticket number: \" + typed; } std::optional<Repair> found = findRepair(bench, ticket); if (!found) { return \"No repair with ticket \" + std::to_string(ticket); }` and then the last line from `found->ticket`, `found->item` and `found->minutes`."
+      ],
+      "docs": [
+        {
+          "title": "std::optional::has_value",
+          "url": "https://en.cppreference.com/w/cpp/utility/optional/operator_bool"
+        },
+        {
+          "title": "std::optional::operator->",
+          "url": "https://en.cppreference.com/w/cpp/utility/optional/operator*"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "stations": [
+    {
+      "title": "Dorrit",
+      "say": "Where is the labour on bill 4417?"
+    },
+    {
+      "title": "Kasimir's program",
+      "text": "A page of errors, a hang, a wrong bill."
+    },
+    {
+      "title": "Your fixes",
+      "file": "bench.cpp",
+      "mine": true,
+      "gap": "Faults hide behind symptoms",
+      "tasks": [
+        "Read the first error",
+        "Stop the endless loop",
+        "Find the bill's fault"
+      ]
+    },
+    {
+      "title": "Dorrit's counter",
+      "text": "Bills go out to customers."
+    }
+  ],
+  "ticket": {
+    "label": "Bill 4417",
+    "wrong": "no labour",
+    "why": "Wrong total",
+    "right": "labour on it"
+  },
+  "captions": [
+    "Dorrit sends bill 4417 to a customer, and it charges nothing for Kasimir's 50 minutes.",
+    "Kasimir's program builds with a page of errors, hangs on an order, and gets bills wrong.",
+    "You read each fault from where it shows back to where it starts, and mend only that.",
+    "Now bill 4417 carries its labour, and the program builds and finishes every time.",
+    "Each fault was mended where it started. Next, saying no to what makes no sense."
+  ]
+}

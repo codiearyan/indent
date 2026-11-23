@@ -1,0 +1,103 @@
+{
+  "id": "what-went-wrong",
+  "title": "Read what went wrong",
+  "files": [
+    "src/bench.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Kasimir's bench program here, read what the compiler says, run it, and stop it with Ctrl+C when it hangs.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/bench.cpp -o bench && ./bench"
+  },
+  "tasks": [
+    {
+      "id": "list",
+      "title": "Make the bench list build",
+      "file": "src/bench.cpp",
+      "description": "The compiler refuses `printBench`, under `// Task 1` in `src/bench.cpp`, with a message more than a hundred lines long. `printBench` takes the bench as a reference to a `const std::vector<Repair>` and gives nothing back. It prints `On the bench:` on a line of its own, then one line for each repair, in the bench's order, like `4417 carriage clock, 50 minutes`: the ticket, a space, the item, a comma and a space, the minutes and the word `minutes`.\n\nRead the message from its first line, find what it is about, and mend `printBench`. Check calls it with benches of its own, an empty one included, and reads every line it prints.",
+      "nextSteps": [
+        "Build the program and scroll back up to the very first line that says error.",
+        "Read the line number and the two types the error names in round brackets.",
+        "Mend that line so it prints each repair's members, one repair at a time.",
+        "Build again: the whole page of notes goes away with the one error."
+      ],
+      "hints": [
+        "Everything after the first error is the compiler listing the kinds of values << knows how to print, each with the reason it does not fit. None of those lines is about your mistake.",
+        "The first error names what is on each side of <<: the output stream and a whole vector of repairs. std::cout prints a number or a text at a time; it has no idea what a vector or a Repair should look like on the screen.",
+        "The shape is `for (const Repair& repair : bench) { std::cout << repair.ticket << \" \" << repair.item << \", \" << repair.minutes << \" minutes\\n\"; }` in place of the line that prints the whole bench."
+      ],
+      "docs": [
+        {
+          "title": "Diagnostics in GCC",
+          "url": "https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Message-Formatting-Options.html"
+        },
+        {
+          "title": "std::basic_ostream::operator<<",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_ostream/operator_ltlt"
+        }
+      ],
+      "points": 10,
+      "videos": [
+        {
+          "title": "Reading compiler error messages",
+          "url": "https://www.youtube.com/watch?v=OHCeEqlryS0"
+        }
+      ]
+    },
+    {
+      "id": "weeks",
+      "title": "Stop the parts count from running forever",
+      "file": "src/bench.cpp",
+      "description": "Under `// Task 2`, `weeksToWait` takes the parts needed and the parts in each weekly delivery, both as `int`, and gives back an `int`: how many deliveries it takes until at least that many parts have arrived. The parts in a delivery are always above 0. For an order of 10 springs at 4 a week, the program prints nothing more and never finishes.\n\nFind why, and mend `weeksToWait`. Check calls it with orders of its own, some that come out even and some that do not, and an order of 0 parts. It stops a program that runs for more than a few seconds.",
+      "nextSteps": [
+        "Run the program and watch where it stops printing. Stop it with Ctrl+C.",
+        "Work through the loop by hand for 10 parts at 4 a week: write down arrived after each round.",
+        "Ask when the loop's condition becomes false, and whether arrived can ever reach that value.",
+        "Change the condition so the loop ends as soon as enough parts have arrived."
+      ],
+      "hints": [
+        "A program that prints nothing more and never ends is not a crash and not a wrong answer: it is a loop whose condition never becomes false.",
+        "arrived goes 4, 8, 12, 16 and so on. The loop only stops when arrived is exactly 10, which it never is.",
+        "The shape is `while (arrived < partsNeeded)`: the loop goes on only while fewer parts than needed have arrived."
+      ],
+      "docs": [
+        {
+          "title": "while loop",
+          "url": "https://en.cppreference.com/w/cpp/language/while"
+        },
+        {
+          "title": "Comparison operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_comparison"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "bills",
+      "title": "Find why the bills are wrong",
+      "file": "src/bench.cpp",
+      "description": "Under `// Task 3` are four functions that make a bill, each with a comment saying what it gives back: `partsCost`, `labourCost`, `billTotal` and `billLine`. Dorrit says the bill for ticket 4417 shows no labour, though Kasimir worked on it for 50 minutes. The wrong total shows in `billLine`, but the mistake may sit in a function it calls, or in one further down.\n\nFind the one function that does not do what its comment says and mend it there. Leave the other three as they are. Prints you add to look inside are fine: Check ignores what is printed and reads only what each function gives back. Check calls each of the four with bills of its own, and judges each one by what its comment says, given what the functions below it give back.",
+      "nextSteps": [
+        "Run the program and read the bill line it prints.",
+        "In main, print what billTotal, partsCost and labourCost each give back for the same bill, with a name in front of each value.",
+        "Work out by hand what each should give, from its comment, and find the first one that differs.",
+        "Mend that function alone, then take the extra prints out of main."
+      ],
+      "hints": [
+        "Start where the wrong value shows and walk down: billLine gets its number from billTotal, and billTotal from partsCost and labourCost. The first function that gives the wrong value from right values is where the mistake is.",
+        "With 50 minutes at 3000 cents an hour, the labour should be 2500 cents. Look at the order of the operations in labourCost, and remember what dividing one whole number by another does in C++.",
+        "The shape is `return minutes * ratePerHour / 60;`: multiply first, so nothing is thrown away before the division."
+      ],
+      "docs": [
+        {
+          "title": "Arithmetic operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_arithmetic"
+        },
+        {
+          "title": "std::cerr",
+          "url": "https://en.cppreference.com/w/cpp/io/cerr"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

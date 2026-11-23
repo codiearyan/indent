@@ -1,0 +1,199 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "bench",
+        "label": "Kasimir's bench",
+        "kind": "story"
+      },
+      {
+        "id": "print",
+        "label": "printBench()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "weeks",
+        "label": "weeksToWait()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "dorrit",
+        "label": "Dorrit's bills",
+        "kind": "story"
+      },
+      {
+        "id": "line",
+        "label": "billLine()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "below",
+        "label": "The functions it calls",
+        "kind": "function",
+        "mine": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "bench",
+        "to": "print",
+        "label": "the bench"
+      },
+      {
+        "from": "bench",
+        "to": "weeks",
+        "label": "parts order"
+      },
+      {
+        "from": "dorrit",
+        "to": "line",
+        "label": "a repair"
+      },
+      {
+        "from": "line",
+        "to": "below",
+        "label": "prices, minutes"
+      },
+      {
+        "from": "line",
+        "to": "dorrit",
+        "label": "bill line"
+      }
+    ],
+    "note": "Three faults in Kasimir's program, each mended where it starts and nowhere else."
+  },
+  "tasks": {
+    "list": {
+      "steps": [
+        {
+          "active": [
+            "bench",
+            "bench->print",
+            "print"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the repairs on the bench"
+            ]
+          },
+          "note": "Kasimir wants to see what is on his bench, repair by repair."
+        },
+        {
+          "active": [
+            "print"
+          ],
+          "note": "The first line of the compiler's long message says what it cannot print."
+        },
+        {
+          "active": [
+            "print"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "a heading",
+              "one line for each repair"
+            ]
+          },
+          "note": "Each repair shows on a line of its own, in the bench's order."
+        }
+      ]
+    },
+    "weeks": {
+      "steps": [
+        {
+          "active": [
+            "bench",
+            "bench->weeks",
+            "weeks"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "parts needed",
+              "parts in each delivery"
+            ]
+          },
+          "note": "A spring order goes out, and Kasimir wants to know how long it will take."
+        },
+        {
+          "active": [
+            "weeks"
+          ],
+          "note": "Deliveries arrive week by week, and the count must stop once there are enough parts."
+        },
+        {
+          "active": [
+            "weeks",
+            "bench"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "how many deliveries"
+            ]
+          },
+          "note": "Kasimir gets a number of weeks, every time, without waiting forever."
+        }
+      ]
+    },
+    "bills": {
+      "steps": [
+        {
+          "active": [
+            "dorrit",
+            "dorrit->line",
+            "line"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "ticket",
+              "part prices",
+              "minutes worked",
+              "rate for an hour"
+            ]
+          },
+          "note": "Dorrit asks for the bill of a finished repair."
+        },
+        {
+          "active": [
+            "line->below",
+            "below"
+          ],
+          "note": "The bill line asks the functions below it for each amount, and they ask the ones below them."
+        },
+        {
+          "active": [
+            "below"
+          ],
+          "note": "Each function either does what its comment says, or it does not: one of them does not."
+        },
+        {
+          "active": [
+            "line",
+            "line->dorrit",
+            "dorrit"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "one line with the whole bill"
+            ]
+          },
+          "note": "The whole bill reaches Dorrit, labour included."
+        }
+      ]
+    }
+  }
+}
