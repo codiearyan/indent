@@ -1,3 +1,4 @@
+import { Minimize2 } from 'lucide-react'
 import type { Chapter } from '@shared/types'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -10,6 +11,7 @@ import { useChapterProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { AudioCard } from './AudioCard'
+import { IconButton } from './IconButton'
 import { Markdown } from './Markdown'
 import { ResourcesPanel } from './ResourcesPanel'
 import { TaskList } from './TaskList'
@@ -29,6 +31,9 @@ export function LeftPanel(): React.JSX.Element {
   const status = useWorkspace((s) => s.status)
   const leftTab = useSettings((s) => s.leftTab)
   const setLeftTab = useSettings((s) => s.setLeftTab)
+  const setPanel = useSettings((s) => s.setPanel)
+  // Beside an IDE there is no editor for the card to sit on.
+  const companion = useWorkspace((s) => s.companion)
   useLessonPart(chapter)
 
   return (
@@ -38,7 +43,7 @@ export function LeftPanel(): React.JSX.Element {
       onValueChange={(tab) => setLeftTab(tab as typeof leftTab)}
       className="h-full gap-0 bg-card"
     >
-      <div className="h-11 shrink-0 border-b border-border px-4">
+      <div className="flex h-11 shrink-0 items-center justify-between border-b border-border pr-1.5 pl-4">
         <TabsList variant="line" className="h-full! gap-5 p-0">
           <TabsTrigger value="insights" data-tour={TOUR.insightsTab} className={trigger}>
             Lesson
@@ -51,6 +56,18 @@ export function LeftPanel(): React.JSX.Element {
             Resources
           </TabsTrigger>
         </TabsList>
+        {!companion && (
+          <IconButton
+            label="Minimise to the tasks card"
+            onClick={() => {
+              // Focus mode, with its card open.
+              setPanel('focusTasks', true)
+              setPanel('zen', true)
+            }}
+          >
+            <Minimize2 />
+          </IconButton>
+        )}
       </div>
       {status === 'loading' || !chapter ? (
         <PanelSkeleton />
