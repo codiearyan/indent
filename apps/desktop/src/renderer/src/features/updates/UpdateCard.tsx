@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { RELEASES_URL, REPO_URL } from '@shared/repo'
 import type { UpdateRelease } from '@shared/types'
@@ -24,11 +25,12 @@ function Titled({
   compact: boolean
   children: React.ReactNode
 }): React.JSX.Element {
+  if (compact) return <WhatsNew release={release}>{children}</WhatsNew>
   return (
-    <>
+    <div className="space-y-1">
       {children}
-      {compact ? <WhatsNew release={release} /> : <ReleaseNotes release={release} />}
-    </>
+      <ReleaseNotes release={release} />
+    </div>
   )
 }
 
@@ -71,21 +73,55 @@ function ReleaseNotes({ release }: { release: UpdateRelease }): React.JSX.Elemen
   )
 }
 
-/** The sidebar has no room for the notes, so they open above the card. */
-function WhatsNew({ release }: { release: UpdateRelease }): React.JSX.Element {
+/**
+ * The sidebar has no room for the notes, so they open above the card: when the pointer is over the
+ * title or the button, and on a click of the button.
+ */
+function WhatsNew({
+  release,
+  children
+}: {
+  release: UpdateRelease
+  children: React.ReactNode
+}): React.JSX.Element {
+  const [open, setOpen] = useState(false)
+  const closing = useRef<ReturnType<typeof setTimeout>>(undefined)
+  // The pointer gets a moment to cross from the card to the notes before they close.
+  const hover = (over: boolean): void => {
+    clearTimeout(closing.current)
+    if (over) setOpen(true)
+    else closing.current = setTimeout(() => setOpen(false), 200)
+  }
+  useEffect(() => () => clearTimeout(closing.current), [])
+  const hovers = { onMouseEnter: () => hover(true), onMouseLeave: () => hover(false) }
+
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="xs"
-          className="-ml-2 font-normal text-muted-foreground hover:text-foreground"
-        >
-          What&apos;s new
-        </Button>
-      </PopoverTrigger>
+    <Popover open={open} onOpenChange={setOpen}>
+      <div className="space-y-1" {...hovers}>
+        {children}
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="xs"
+            className="-ml-2 font-normal text-muted-foreground hover:text-foreground"
+            onClick={(event) => {
+              // The pointer already opened them: a click keeps them open instead of closing them.
+              event.preventDefault()
+              setOpen(true)
+            }}
+          >
+            What&apos;s new
+          </Button>
+        </PopoverTrigger>
+      </div>
       {/* The offset clears the title above the button and the card's edge. */}
-      <PopoverContent side="top" align="start" sideOffset={40} className="w-80 space-y-2">
+      <PopoverContent
+        side="top"
+        align="start"
+        sideOffset={40}
+        className="w-80 space-y-2"
+        {...hovers}
+      >
         <p className="text-sm font-medium">Indent {release.version}</p>
         <ReleaseNotes release={release} />
       </PopoverContent>
@@ -129,11 +165,9 @@ export function UpdateCard({ compact = false }: { compact?: boolean }): React.JS
   if (status.state === 'available') {
     return (
       <div className="space-y-3">
-        <div className="space-y-1">
-          <Titled release={status} compact={compact}>
-            <p className={cn(text, 'font-medium')}>Indent {status.version} is available.</p>
-          </Titled>
-        </div>
+        <Titled release={status} compact={compact}>
+          <p className={cn(text, 'font-medium')}>Indent {status.version} is available.</p>
+        </Titled>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" className={outline} onClick={downloadUpdate}>
             Download update
@@ -174,11 +208,9 @@ export function UpdateCard({ compact = false }: { compact?: boolean }): React.JS
   if (status.state === 'ready') {
     return (
       <div className="space-y-2">
-        <div className="space-y-1">
-          <Titled release={status} compact={compact}>
-            <p className={cn(text, 'font-medium')}>Restart to update to {status.version}.</p>
-          </Titled>
-        </div>
+        <Titled release={status} compact={compact}>
+          <p className={cn(text, 'font-medium')}>Restart to update to {status.version}.</p>
+        </Titled>
         <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" onClick={() => void installUpdate()}>
             Restart now
