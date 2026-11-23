@@ -1,8 +1,5 @@
 // Reads the words typed after `node orders.js` into a command, its values and its flags.
-//
-// Task 1: Plain words and switches
-// Task 2: Flags that take a value
-// Task 3: Say plainly what is wrong
+// Written in issue 1.
 
 export function readArgs(args, table) {
   const shorts = {}

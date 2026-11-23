@@ -6,7 +6,7 @@
 // environment, and it is stopped when it runs too long or prints without end.
 import { spawn } from 'node:child_process'
 import { mkdir, mkdtemp, readdir, readFile, realpath, rm, writeFile } from 'node:fs/promises'
-import { join, relative } from 'node:path'
+import { dirname, join, relative } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const here = (file) => fileURLToPath(new URL(file, import.meta.url))
@@ -126,7 +126,10 @@ export async function box(t, { noUtil = false } = {}) {
 async function caseFolder(b, files) {
   const folder = join(b.dir, '.cases', String(b.cases++))
   await mkdir(folder, { recursive: true })
-  for (const [name, text] of Object.entries(files)) await writeFile(join(folder, name), text)
+  for (const [name, text] of Object.entries(files)) {
+    await mkdir(dirname(join(folder, name)), { recursive: true })
+    await writeFile(join(folder, name), text)
+  }
   return folder
 }
 
@@ -193,8 +196,11 @@ export async function call(b, file, name, args, { files = {} } = {}) {
   }
 }
 
+// Colour codes are shown as text, so a person can see where they are.
 const block = (text) =>
-  text === '' ? '  (nothing)' : text.replace(/\n$/, '').split('\n').map((l) => `  ${l}`).join('\n')
+  text === ''
+    ? '  (nothing)'
+    : text.replace(/\n$/, '').replaceAll('\x1b', '\\x1b').split('\n').map((l) => `  ${l}`).join('\n')
 
 /** What a run did, for a check's output: the command, each stream and how it ended. */
 export function report(r) {

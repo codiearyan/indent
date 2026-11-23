@@ -1,6 +1,6 @@
 {
   "stations": [
-    { "title": "Sefton", "say": "Stop the press if check fails.", "note": "His script runs check first." },
+    { "title": "Sefton", "say": "Stop the press if check fails.", "note": "A script runs check first." },
     { "title": "orders check", "text": "Finds the problems, then says all went well.", "note": "Messages mixed with results." },
     {
       "title": "Your code",

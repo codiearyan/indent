@@ -1,8 +1,5 @@
 // Reads the orders, a line at a time, from the files named or from standard input.
-//
-// Task 1: Read the files named, a line at a time
-// Task 2: Standard input, when no file is named or the name is -
-// Task 3: Stop quietly when the reader goes away (in orders.js)
+// Written in issue 4.
 import { createReadStream } from 'node:fs'
 import { createInterface } from 'node:readline'
 

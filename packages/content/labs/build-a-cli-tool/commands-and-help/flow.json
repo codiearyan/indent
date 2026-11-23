@@ -72,7 +72,7 @@
         },
         {
           "active": ["nearest", "main"],
-          "note": "Close enough, the tool names the command he meant; too far, it says where the commands are listed."
+          "note": "Close enough, the tool names the command Sefton meant; too far, it says where the commands are listed."
         }
       ],
       "trace": {

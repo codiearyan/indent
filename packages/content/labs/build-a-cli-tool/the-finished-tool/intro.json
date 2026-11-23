@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "Make it ours, with a name.", "note": "Idris is away next week." },
+    { "title": "morning.txt", "text": "Three long commands only Idris can read.", "note": "And a small press-room screen." },
+    {
+      "title": "Your code",
+      "file": "settings.js",
+      "mine": true,
+      "gap": "No settings, no name",
+      "tasks": ["A setting, a flag wins", "Colour for people", "A name, a new note"]
+    },
+    { "title": "The press room", "say": "Morning check done, by Hesper." }
+  ],
+  "ticket": { "label": "Morning check", "wrong": "waits", "why": "Idris only", "right": "anyone" },
+  "captions": [
+    "Idris is away next week, and Hesper must run the morning check on the press-room computer.",
+    "The note holds three long commands only Idris can read, and the screen is small.",
+    "You add a setting a flag overrides, colour only for people, and a name.",
+    "Now Hesper types orders check and reads it, and the note says orders, three times.",
+    "From three long commands to a tool of the shop's own, in five issues."
+  ]
+}

@@ -11,7 +11,7 @@ Your tool can read what was typed. Now it has to do something with it. In this i
 
 ## The request from Hesper
 
-> **Hesper:** When Idris is out, I am the one who checks the orders, and I will not open a file of code to find out what a tool can do. I want to type `orders --help` and read it. And Sefton types `lsit` twice a day. A tool that knows what he meant should say so.
+> **Hesper:** When Idris is out, I am the one who checks the orders, and I will not open a file of code to find out what a tool can do. I want to type `orders --help` and read it. And Sefton types `lsit` twice a day. A tool that knows what was meant should say so.
 
 `src/shop.js` already holds the shop's work: counting orders, listing them, checking each line. Sefton wrote it, and you do not need to change it. What is missing is the part that turns `orders count` into a call of the right function.
 

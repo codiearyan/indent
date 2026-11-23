@@ -1,0 +1,82 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "hesper", "label": "Hesper", "kind": "story" },
+      { "id": "env", "label": "The press-room computer", "kind": "data" },
+      { "id": "settings", "label": "withSettings()", "kind": "function", "mine": true, "fn": "withSettings" },
+      { "id": "colour", "label": "useColour()", "kind": "function", "mine": true, "fn": "useColour" },
+      { "id": "tool", "label": "orders", "kind": "file", "mine": true },
+      { "id": "screen", "label": "The screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "hesper", "to": "tool", "label": "types orders" },
+      { "from": "env", "to": "settings", "label": "ORDERS_LIMIT" },
+      { "from": "settings", "to": "tool", "label": "flags filled in" },
+      { "from": "env", "to": "colour", "label": "terminal, NO_COLOR" },
+      { "from": "colour", "to": "tool", "label": "red or plain" },
+      { "from": "tool", "to": "screen", "label": "results" }
+    ],
+    "note": "The tool now takes its settings from the computer it runs on, colours only for people, and has a name."
+  },
+  "tasks": {
+    "settings": {
+      "steps": [
+        {
+          "active": ["env", "env->settings", "settings"],
+          "note": "The press-room computer sets a limit once, so its small screen is never flooded.",
+          "value": { "kind": "map", "label": "the environment", "entries": [{ "key": "ORDERS_LIMIT", "value": "the usual limit" }] }
+        },
+        {
+          "active": ["hesper", "hesper->tool", "tool"],
+          "note": "Hesper types list; when a limit is typed too, the typed one counts."
+        },
+        {
+          "active": ["settings", "settings->tool", "tool", "tool->screen", "screen"],
+          "note": "withSettings fills in only what was not typed, and names the setting when it is wrong."
+        }
+      ],
+      "trace": {
+        "file": "src/settings.js",
+        "call": "withSettings",
+        "args": [{ "paper": "linen" }, { "ORDERS_LIMIT": "20" }]
+      }
+    },
+    "colour": {
+      "steps": [
+        {
+          "active": ["env", "env->colour", "colour"],
+          "note": "useColour asks whether standard output is a terminal, and whether NO_COLOR is set."
+        },
+        {
+          "active": ["colour", "colour->tool", "tool", "tool->screen", "screen"],
+          "note": "At the press-room terminal, each broken order jumps out in red."
+        },
+        {
+          "active": ["tool"],
+          "note": "Into a file, a pipe or JSON, the same words go out plain, with no codes in them."
+        }
+      ],
+      "trace": {
+        "file": "src/settings.js",
+        "call": "useColour",
+        "args": [{ "isTTY": true }, {}]
+      }
+    },
+    "name": {
+      "steps": [
+        {
+          "active": ["tool"],
+          "note": "The first line says which program runs the file, and package.json gives it the name orders."
+        },
+        {
+          "active": ["hesper", "hesper->tool", "tool"],
+          "note": "The morning note now holds three short commands of the tool, in place of three long ones."
+        },
+        {
+          "active": ["tool", "tool->screen", "screen"],
+          "note": "Anyone at the shop can run the morning check, in any shell, and read what it says."
+        }
+      ]
+    }
+  }
+}

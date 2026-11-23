@@ -1,8 +1,6 @@
 // The table of commands, and the help written from it.
 //
-// Task 1: Commands from a table (COMMANDS, and main() in orders.js)
-// Task 2: Help and the version, from that table (toolHelp, commandHelp)
-// Task 3: The nearest command (nearest)
+// Written in issue 2.
 import { checkOrders, countOrders, listOrders } from './shop.js'
 
 export const COMMANDS = {
