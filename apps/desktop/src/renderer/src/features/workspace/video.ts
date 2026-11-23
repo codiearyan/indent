@@ -8,24 +8,22 @@ import { useWorkspace } from '@/stores/workspace'
 interface Playing {
   /** The issue it plays for, so it stops showing when another issue opens. */
   key: string
+  /** One task's copy, so a video several tasks share starts only once. */
+  taskId: string
   video: VideoLink
 }
 
-/** The video playing at the top of the Resources tab. */
+/** The video asked to play in the Resources tab, from a task or a tutor reply. */
 export const useVideo = create<{ playing: Playing | null }>(() => ({ playing: null }))
 
 /** Plays a video in the Resources tab, showing the tab and uncovering its list. */
-export function playVideo(chapter: Chapter, video: VideoLink): void {
+export function playVideo(chapter: Chapter, taskId: string, video: VideoLink): void {
   const key = chapterKey(chapter.labId, chapter.id)
   const settings = useSettings.getState()
   settings.setPanel('zen', false)
   settings.setLeftTab('resources')
   settings.showResources(key)
-  useVideo.setState({ playing: { key, video } })
-}
-
-export function stopVideo(): void {
-  useVideo.setState({ playing: null })
+  useVideo.setState({ playing: { key, taskId, video } })
 }
 
 /** A task's videos the app can play; a link the player can't open is left out. */
@@ -43,7 +41,7 @@ export function playLinkedVideo(href: string): boolean {
       return other?.kind === source.kind && other.id === source.id
     })
     if (video) {
-      playVideo(chapter, video)
+      playVideo(chapter, task.id, video)
       return true
     }
   }

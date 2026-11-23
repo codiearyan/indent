@@ -1,22 +1,22 @@
-import { Check, ExternalLink, Play } from 'lucide-react'
-import type { Chapter, VideoLink } from '@shared/types'
+import { ExternalLink } from 'lucide-react'
+import type { Chapter } from '@shared/types'
 import { chapterKey } from '@shared/rules'
-import { clockTime, videoSource } from '@shared/video'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/stores/settings'
-import { playVideo, taskVideos, useVideo } from './video'
+import { taskVideos, useVideo } from './video'
 import { VideoPlayer } from './VideoPlayer'
 
-/** The issue's docs and videos by task, blurred under a cover until the learner chooses to see. */
+const resourceTasks = (chapter: Chapter): Chapter['tasks'] =>
+  chapter.tasks.filter((task) => task.docs?.length || taskVideos(task).length)
+
+/** The issue's docs and videos by task, blurred until the learner chooses to see them. */
 export function ResourcesPanel({ chapter }: { chapter: Chapter }): React.JSX.Element {
   const key = chapterKey(chapter.labId, chapter.id)
   const shown = useSettings((s) => s.resourcesShown.includes(key))
-  const showResources = useSettings((s) => s.showResources)
-  const playing = useVideo((s) => (s.playing?.key === key ? s.playing.video : null))
-  const tasks = chapter.tasks.filter((task) => task.docs?.length || taskVideos(task).length)
-  const hasVideos = tasks.some((task) => taskVideos(task).length > 0)
+  const playing = useVideo((s) => (s.playing?.key === key ? s.playing : null))
   const videosFirst = useSettings((s) => s.learnFirst === 'videos')
+  const tasks = resourceTasks(chapter)
 
   if (tasks.length === 0) {
     return (
@@ -28,74 +28,74 @@ export function ResourcesPanel({ chapter }: { chapter: Chapter }): React.JSX.Ele
   }
 
   return (
-    <div className="relative space-y-6">
-      {shown && playing && <VideoPlayer video={playing} />}
-      <div
-        inert={!shown}
-        aria-hidden={!shown}
-        className={cn(
-          'space-y-6 transition-[filter] duration-(--motion-state) ease-out',
-          !shown && 'blur-sm select-none'
-        )}
-      >
-        {tasks.map((task) => {
-          const docRows = (task.docs ?? []).map((doc) => (
-            <li key={doc.url}>
-              <a href={doc.url} target="_blank" rel="noreferrer" className={row}>
-                <span className={title}>{doc.title}</span>
-                <ExternalLink className={icon} strokeWidth={1.5} aria-hidden />
-              </a>
-            </li>
-          ))
-          const videoRows = taskVideos(task).map((video) => (
-            <li key={video.url}>
-              <VideoRow video={video} onPlay={() => playVideo(chapter, video)} />
-            </li>
-          ))
-          return (
-            <section key={task.id} className="rounded-lg border border-border">
-              <h3 className="px-4 pt-3 pb-1 text-sm font-semibold">{task.title}</h3>
-              <ul className="divide-y divide-rule">
-                {videosFirst ? [videoRows, docRows] : [docRows, videoRows]}
-              </ul>
-            </section>
-          )
-        })}
-      </div>
-      {!shown && (
-        <div className="absolute inset-x-0 top-0 flex justify-center px-4 pt-10">
-          <div className="w-full max-w-sm rounded-lg border border-border bg-card p-4 shadow-lg">
-            <p className="text-sm font-semibold">Learn your way</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {hasVideos ? 'Read or watch' : 'Read'} before you start, or come back when you are
-              stuck.
-            </p>
-            <Button variant="outline" size="sm" className="mt-3" onClick={() => showResources(key)}>
-              Show resources
-            </Button>
-          </div>
-        </div>
+    <div
+      inert={!shown}
+      aria-hidden={!shown}
+      className={cn(
+        'space-y-6 transition-[filter] duration-(--motion-state) ease-out',
+        !shown && 'blur-sm select-none'
       )}
+    >
+      {tasks.map((task) => {
+        const docRows = (task.docs ?? []).map((doc) => (
+          <li key={doc.url}>
+            <a
+              href={doc.url}
+              target="_blank"
+              rel="noreferrer"
+              className="group flex min-h-12 w-full items-center gap-3 px-4 text-sm"
+            >
+              <span className="min-w-0 flex-1 underline decoration-input underline-offset-2 group-hover:decoration-foreground">
+                {doc.title}
+              </span>
+              <ExternalLink
+                className="size-4 shrink-0 text-muted-foreground"
+                strokeWidth={1.5}
+                aria-hidden
+              />
+            </a>
+          </li>
+        ))
+        const videoRows = taskVideos(task).map((video) => (
+          <li key={video.url}>
+            <VideoPlayer
+              video={video}
+              load={shown}
+              autoplay={playing?.taskId === task.id && playing.video.url === video.url}
+            />
+          </li>
+        ))
+        return (
+          <section key={task.id} className="overflow-hidden rounded-lg border border-border">
+            <h3 className="px-4 pt-3 pb-1 text-sm font-semibold">{task.title}</h3>
+            <ul className="divide-y divide-rule">
+              {videosFirst ? [videoRows, docRows] : [docRows, videoRows]}
+            </ul>
+          </section>
+        )
+      })}
     </div>
   )
 }
 
-const row = 'group flex min-h-12 w-full items-center gap-3 px-4 text-left text-sm'
-const title =
-  'min-w-0 flex-1 underline decoration-input underline-offset-2 group-hover:decoration-foreground'
-const icon = 'size-4 shrink-0 text-muted-foreground'
-
-function VideoRow({ video, onPlay }: { video: VideoLink; onPlay(): void }): React.JSX.Element {
-  const watched = useSettings((s) => s.videosWatched.includes(video.url))
-  const playlist = videoSource(video.url)?.kind === 'playlist'
-  const meta = playlist ? 'Playlist' : video.start ? `From ${clockTime(video.start)}` : null
+/** Laid over the Resources tab, outside its scroll, so it stays in the middle of what is visible. */
+export function ResourcesCover({ chapter }: { chapter: Chapter }): React.JSX.Element | null {
+  const key = chapterKey(chapter.labId, chapter.id)
+  const shown = useSettings((s) => s.resourcesShown.includes(key))
+  const showResources = useSettings((s) => s.showResources)
+  const tasks = resourceTasks(chapter)
+  if (shown || tasks.length === 0) return null
+  const hasVideos = tasks.some((task) => taskVideos(task).length > 0)
 
   return (
-    <button type="button" className={row} onClick={onPlay}>
-      <span className={title}>{video.title}</span>
-      {meta && <span className="text-[13px] text-muted-foreground tabular-nums">{meta}</span>}
-      {watched && <Check className={icon} strokeWidth={1.5} aria-label="Watched" />}
-      <Play className={icon} strokeWidth={1.5} aria-hidden />
-    </button>
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/60 px-6 text-center">
+      <p className="text-base font-semibold">Learn your way</p>
+      <p className="mt-1 max-w-xs text-sm text-muted-foreground">
+        {hasVideos ? 'Read or watch' : 'Read'} before you start, or come back when you are stuck.
+      </p>
+      <Button className="mt-4" onClick={() => showResources(key)}>
+        Show resources
+      </Button>
+    </div>
   )
 }
