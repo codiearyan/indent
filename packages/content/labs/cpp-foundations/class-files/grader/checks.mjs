@@ -156,6 +156,7 @@ export const checks = {
               const line = got.line ?? ''
               if (line === want) return null
               if (line === '3101 mantel clock, 75 min') return 'benchLine gives back the line of the task\'s example, whatever repair it is given. Build the line from the repair benchLine is given.'
+              if (line === '') return 'benchLine gives back an empty text. It builds the line and gives it back with return; printing it with std::cout does not give it back.'
               if (line.replace(/\s/g, '') === want.replace(/\s/g, '')) return `benchLine gives back "${line}": the right words, but look at the spaces against the task's line.`
               if (!line.includes(String(ticket))) return 'The ticket is not in the line as a number. getTicket gives back an int, and std::to_string makes it text.'
               if (!line.includes(item)) return 'The repair\'s item is not in the line: getItem gives it back.'

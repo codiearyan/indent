@@ -80,20 +80,21 @@ export const checks = {
         },
         {
           name: 'add refuses a second repair with a ticket that is already on the bench',
-          code: `Bench b; ${make('x', R.a)} Repair twin(${R.a[0]}, "lantern clock"); ${put('ok0', 'b.add(x)')} ${put('ok1', 'b.add(twin)')} ${listOf('b', 'list')}`,
-          judge: (got) =>
-            got.ok1 === '0' && got.list === listText([R.a])
-              ? null
-              : got.list === listText([R.a, [R.a[0], 'lantern clock', 0]])
-                ? `add put a second repair with the ticket ${R.a[0]} on the bench. A ticket names one repair: add looks for it on the bench first, and when it is there, changes nothing and gives back false.`
-                : `After adding ${R.a[0]} twice, add gave back ${said(got, 'ok1')} the second time and the bench holds ${shownList(got.list)}.`,
-          output: (got) => `The second add gave back ${said(got, 'ok1')}; all() holds ${shownList(got.list)}`
+          code: `Bench b; ${make('x', R.a)} ${make('y', R.b)} Repair twin(${R.a[0]}, "lantern clock"); Repair twin2(${R.b[0]}, "lantern clock"); ${put('ok0', 'b.add(x)')} ${put('ok1', 'b.add(y)')} ${put('ok2', 'b.add(twin)')} ${put('ok3', 'b.add(twin2)')} ${listOf('b', 'list')}`,
+          judge: (got) => {
+            if (got.ok2 === '0' && got.ok3 === '0' && got.list === listText([R.a, R.b])) return null
+            const twin = got.list?.includes(`${R.a[0]} lantern clock`) ? R.a[0] : got.list?.includes(`${R.b[0]} lantern clock`) ? R.b[0] : null
+            if (twin !== null) return `add put a second repair with the ticket ${twin} on the bench${twin === R.b[0] ? `, the second repair on it` : ''}. A ticket names one repair: add looks at every repair on the bench first, and when one has it, changes nothing and gives back false.`
+            return `After adding ${R.a[0]} and ${R.b[0]}, then each of them again, add gave back ${said(got, 'ok2')} and ${said(got, 'ok3')} the second time and the bench holds ${shownList(got.list)}.`
+          },
+          output: (got) => `Adding ${R.a[0]} and ${R.b[0]} again gave back ${said(got, 'ok2')} and ${said(got, 'ok3')}; all() holds ${shownList(got.list)}`
         },
         {
           name: 'Two benches each keep their own repairs, and a copy of a bench is a bench of its own',
           code: `Bench one; Bench two; ${make('x', R.a)} ${make('y', R.b)} one.add(x); two.add(y); Bench copy = one; copy.add(y); ${listOf('one', 'one')} ${listOf('two', 'two')} ${listOf('copy', 'copy')}`,
           judge: (got) => {
             if (got.one === listText([R.a]) && got.two === listText([R.b]) && got.copy === listText([R.a, R.b])) return null
+            if (!got.one || !got.two) return `After add put one repair on each of two benches, all gives back ${shownList(got.one)} and ${shownList(got.two)}. Put add and all right first, as the tests above say.`
             if (got.one === got.two) return 'Check put one repair on one bench and another on a second bench, and both hold the same: every bench shares one vector. A static member is one value for the whole class; each bench keeps repairs of its own, so repairs is not static.'
             return `Check put ${R.a[0]} on one bench, ${R.b[0]} on another, copied the first and added ${R.b[0]} to the copy. The first holds ${shownList(got.one)}, the copy ${shownList(got.copy)}. A copy of a bench has its own vector: a change to the copy leaves the first as it was.`
           },
@@ -101,8 +102,8 @@ export const checks = {
         },
         {
           name: 'Changing what all gives back leaves the bench as it was',
-          code: `${filled('b', [R.a, R.b])} { std::vector<Repair> v = b.all(); v.clear(); } ${listOf('b', 'list')}`,
-          judge: (got) => (got.list === listText([R.a, R.b]) ? null : `Check emptied the vector all gave back, and afterwards the bench holds ${shownList(got.list)}. all gives back a copy, so the bench keeps its repairs.`),
+          code: `${filled('b', [R.a, R.b])} ${listOf('b', 'before')} { std::vector<Repair> v = b.all(); v.clear(); } ${listOf('b', 'list')}`,
+          judge: (got) => (got.before !== listText([R.a, R.b]) ? `After adding two repairs, all gives back ${shownList(got.before)}, so Check could not try a change to it. Put add and all right first, as the tests above say.` : got.list === listText([R.a, R.b]) ? null : `Check emptied the vector all gave back, and afterwards the bench holds ${shownList(got.list)}. all gives back a copy, so the bench keeps its repairs.`),
           output: (got) => `After Check emptied what all() gave back, the bench holds ${shownList(got.list)}`
         }
       ]
@@ -140,8 +141,8 @@ export const checks = {
         },
         {
           name: 'A change to what find gives back leaves the bench as it was',
-          code: `${filled('b', bench)} Repair f = b.find(${R.b[0]}); f.addMinutes(30); ${put('m', `b.find(${R.b[0]}).getMinutes()`)}`,
-          judge: (got) => (num(got, 'm') === R.b[2] ? null : `Check added 30 minutes to the repair find gave back, and the bench's repair changed too: it has ${got.m} minutes. find gives back a copy.`),
+          code: `${filled('b', bench)} Repair f = b.find(${R.b[0]}); ${put('ft', 'f.getTicket()')} f.addMinutes(30); ${put('m', `b.find(${R.b[0]}).getMinutes()`)}`,
+          judge: (got) => (num(got, 'ft') !== R.b[0] ? `find(${R.b[0]}) gave back the repair with ticket ${got.ft}, so Check could not try a change to it. Put find right for the tickets above first.` : num(got, 'm') === R.b[2] ? null : `Check added 30 minutes to the repair find gave back, and the bench's repair changed too: it has ${got.m} minutes. find gives back a copy.`),
           output: (got) => `After Check added 30 minutes to its copy, the bench's repair has ${got.m ?? '?'} minutes`
         }
       ]

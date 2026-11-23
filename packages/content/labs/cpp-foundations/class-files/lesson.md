@@ -73,7 +73,7 @@ Write `int getSeconds() const` without `Timer::`, and it is a new function, outs
 
 A body written inside the class, as `main.cpp` has it, is allowed in a header: every file that includes it may have it, as with a struct. Short getters often stay there. But the class's line and a second body in the `.cpp` file is one body too many: both compilers say "redefinition of" and the function's name. In this issue every body moves to `repair.cpp`, so the header shows the class at a glance and a change to a body rebuilds one file.
 
-Build every `.cpp` file into one program, as before: `g++ -std=c++17 -Wall src/main.cpp src/repair.cpp -o workshop`.
+Build every `.cpp` file into one program, as before: `g++ -std=c++17 -Wall src/main.cpp src/repair.cpp -o workshop`. Leave `repair.cpp` off that command, and the linker lists every function of the class as missing. In that list a `std::string` in a first line may be spelled out long, as something like `std::__1::basic_string<char, ...>` on a Mac or `std::__cxx11::basic_string<char, ...>` on Linux: it is the same `std::string`. Look for the function's name.
 
 ## Your work in this issue
 

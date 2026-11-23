@@ -2787,9 +2787,12 @@ function classCause(errors, ctx, spec) {
   if (self && members.includes(self[1])) {
     return `${self[0].trim()} gives ${self[1]} its own value. Inside that function a parameter called ${self[1]} hides the member with the same name, so the line never reaches the member. Give the parameter a name of its own.`
   }
+  if (ctx.missingInclude && /undeclared identifier|was not declared|unknown type name|does not name a type|has not been declared/.test(text)) return null
   const priv = /'(\w+)' is a private member of '(\w+)'|'([^']+)' is private within this context|calling a private constructor of class '(\w+)'/.exec(text)
-  if (priv) {
-    const name = priv[1] ?? priv[4] ?? nameIn(priv[3].replace(/\(.*$/, ''))
+  const privName = priv && (priv[1] ?? priv[4] ?? nameIn(priv[3].replace(/\(.*$/, '')))
+  // A member the task keeps private is reached by Check only when its own getter is missing.
+  if (priv && !(fromCheck && members.includes(privName))) {
+    const name = privName
     if (fromCheck) {
       return name === C
         ? `Check cannot make a ${C} with that constructor from outside the class: it is private. A constructor the rest of the program uses goes under public:.`
@@ -2842,6 +2845,12 @@ function classCause(errors, ctx, spec) {
   if (fromCheck && new RegExp(`'${C}'`).test(text) && /undeclared identifier|unknown type name|does not name a type|has not been declared|was not declared/.test(text)) {
     return `Check cannot find class ${C}. ${label} writes it in ${spec.files.find(isHeader) ?? spec.files[0]}, with exactly that name.`
   }
+  if (unknownName && members.includes(unknownName) && ctx.file && !isHeader(ctx.file)) {
+    const loose = fns.find((f) => (ctx.code ?? '').split('\n').some((l) => new RegExp(`\\b${f}\\s*\\(`).test(l) && !new RegExp(`\\b${C}\\s*::\\s*${f}\\b`).test(l) && /\{\s*$|\)\s*(?:const\s*)?$/.test(l) && !/;\s*$/.test(l)))
+    if (loose) {
+      return `${loose} is written without ${C}:: in front, so it is a function of its own, outside the class, and the class's members such as ${unknownName} mean nothing in it. A member function written in a .cpp file has the class's name and :: before its own name.`
+    }
+  }
   const elsewhere = unknownName && !fromCheck && declaredElsewhere(unknownName, ctx.cuts ?? {})
   if (elsewhere) {
     return `${unknownName} is declared under Task ${elsewhere.task} in ${elsewhere.file}, and Check builds ${label} with the lines of the other tasks taken out, so ${unknownName} is not there. ${label} works with what its own lines write and with what the task names.`
@@ -2852,20 +2861,20 @@ function classCause(errors, ctx, spec) {
   if (/call to non-static member function without an object argument|cannot call member function '[^']*' without object/.test(text) && !/no member named|has no member named/.test(text)) {
     return `Check calls a function on the class itself, ${C}:: and its name, without any object, and that function is not static. A function of the whole class, which needs no object, is marked static.`
   }
-  if (unknownName && members.includes(unknownName) && ctx.file && !isHeader(ctx.file)) {
-    const loose = fns.find((f) => (ctx.code ?? '').split('\n').some((l) => new RegExp(`\\b${f}\\s*\\(`).test(l) && !new RegExp(`\\b${C}\\s*::\\s*${f}\\b`).test(l) && /\{\s*$|\)\s*(?:const\s*)?$/.test(l) && !/;\s*$/.test(l)))
-    if (loose) {
-      return `${loose} is written without ${C}:: in front, so it is a function of its own, outside the class, and the class's members such as ${unknownName} mean nothing in it. A member function written in a .cpp file has the class's name and :: before its own name.`
-    }
-  }
   const again = /redefinition of '(?:class )?(\w+)'|redefinition of '([^']+)'/.exec(text)
   if (again) {
     const n = again[1] ?? nameIn(again[2].replace(/\(.*$/, ''))
     if (n === C && fromCheck && spec.twice) return spec.twice
+    if (n === C && ctx.file && !isHeader(ctx.file) && new RegExp(`\\b${C}\\s*::\\s*${C}\\s*\\(`).test(source)) {
+      return `The constructor ${C}::${C} has a body twice in ${ctx.file}. Each function of the class has one body: keep one of them.`
+    }
     if (n === C) {
       return ctx.guarded
         ? `${ctx.guarded} is read twice by the same file, and class ${C} is met a second time. The include guard is what stops the second read: an #ifndef with a name, a #define of the same name, and an #endif on the last line.`
         : `class ${C} is written twice, and a class is written once in a program's files: keep one of them.`
+    }
+    if (fns.includes(n) && spec.replaced && ctx.file && !isHeader(ctx.file)) {
+      return `${ctx.file} writes a body for ${C}::${n}, and its body belongs in one .cpp file only, the one Task 2 writes. With both, your own build stops at the linker, which names ${n} and the two files ("duplicate symbol" on a Mac, "multiple definition of" on Linux). Take it out of ${ctx.file}.`
     }
     if (fns.includes(n)) return spec.twice ?? `${n} has a body twice: once inside the class and once more outside it. Write its body once.`
   }
@@ -2888,9 +2897,14 @@ function classCause(errors, ctx, spec) {
     const m = notMember[1] ?? notMember[3] ?? nameIn(notMember[2])
     return `The member initialiser list names ${m}, and ${m} is not a member that each ${C} owns. Compare the name with the members the class declares, letter by letter, and look whether it is static: a static member is not given a value by a constructor.`
   }
-  const twiceMember = /duplicate member '(\w+)'|redeclaration of '([^']+)'/.exec(text)
+  const qualified = /extra qualification on member '(\w+)'|extra qualification '[^']*' on member '(\w+)'/.exec(text)
+  if (qualified) {
+    const m = qualified[1] ?? qualified[2]
+    return `The line that defines ${C}::${m} is written inside the class. The class only declares a static member; its definition, with its type, ${C}::${m} and its first value, goes below the class, after its };.`
+  }
+  const twiceMember = /duplicate member '(\w+)'|redeclaration of '([^']+)'|'([^']+)' conflicts with a previous declaration/.exec(text)
   if (twiceMember) {
-    const m = twiceMember[1] ?? nameIn(twiceMember[2])
+    const m = twiceMember[1] ?? nameIn(twiceMember[2] ?? twiceMember[3])
     return `${m} is declared twice in ${C}, and each member is declared once. Check builds ${label} with the members of the other tasks written as they ask, so declare ${m} only under the task that names it.`
   }
   const missing = /no member named '(\w+)' in '(?:const )?(\w+)'|'(?:const )?class (\w+)' has no member named '(\w+)'/.exec(text)
@@ -2945,6 +2959,9 @@ function classLink(said, { cuts }, spec) {
   const name = said.name.replace(`${C}::`, '')
   if (!/\(/.test(said.symbol) && spec.owned?.includes(name)) {
     return `${name} is static, so it is one value shared by every ${C}, and the linker looks for the one place it is defined (${linkWords('undefined')}). Each ${C} keeps its own ${name}: a member that belongs to each object is not static.`
+  }
+  if (!/\(/.test(said.symbol) && spec.constants?.includes(name)) {
+    return `${C}::${name} is static and not const, so the linker looks for a line below the class that defines it (${linkWords('undefined')}). The task asks for a constant of the class: static const int, with its value right where it is declared, in the class.`
   }
   if (!/\(/.test(said.symbol)) {
     return `${C}::${name} is static and declared in the class, and no file Check built defines it, so the linker cannot find it (${linkWords('undefined')}). A static member that is not const is declared in the class and defined once below it: its type, ${C}::${name}, and its first value.`

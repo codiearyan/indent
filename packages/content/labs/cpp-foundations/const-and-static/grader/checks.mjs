@@ -30,12 +30,26 @@ const numbersOfCheck = {
 const put = (key, expr) => `indent_::put_("${key}", ${expr});`
 const said = (got, key) => (got[key] === '1' ? 'true' : got[key] === '0' ? 'false' : 'nothing')
 
+const privateProbe = (member, task) => ({
+  name: `${member} cannot be reached from outside the class`,
+  params: 'Repair& r',
+  code: `(void)r.${member};`,
+  expect: /is a private member of|is private within this context/,
+  compiled: `Check's own code, outside the class, could reach ${member} directly. Task ${task} puts the members under private:, so that only the class's own functions reach them.`,
+  other: (text) =>
+    /no member named|has no member named/.test(text)
+      ? `Check cannot find a member called ${member} in Repair. Task ${task} names it: write it with exactly that name, capital letters included, under private:.`
+      : null,
+  shown: `Check's line, outside the class: r.${member}`
+})
+
 export const checks = {
   readers(t) {
     return judgeClass(t, {
       ...base,
       task: 1,
       provides: [limitOfCheck, numbersOfCheck],
+      probes: ['ticket', 'item', 'minutes'].map((m) => privateProbe(m, 1)),
       cases: [
         {
           name: 'getTicket, getItem and getMinutes are marked const and give back what the task says',
@@ -97,6 +111,7 @@ export const checks = {
     return judgeClass(t, {
       ...base,
       task: 2,
+      constants: ['dayLimit'],
       provides: [readersOfCheck, numbersOfCheck],
       cases: [
         {
@@ -154,6 +169,7 @@ export const checks = {
           code: `Repair a("cuckoo clock"); Repair b("ship's clock"); Repair c("travel clock"); ${put('a', 'a.getTicket()')} ${put('b', 'b.getTicket()')} ${put('c', 'c.getTicket()')} ${put('ia', 'a.getItem()')} ${put('last', 'Repair::lastTicket()')}`,
           judge: (got) => {
             const [a, b, c] = ['a', 'b', 'c'].map((k) => num(got, k))
+            if (a === b && b === c && num(got, 'last') === 3100) return `Three new repairs all got the ticket ${a}, and Repair::lastTicket() still gives back 3100: issued never moves. Once the constructor has given a repair its number, it keeps that number in issued, so the next repair takes the one after.`
             if (a === b && b === c) return `Three new repairs all got the ticket ${a}: each one counts on its own. One count shared by every repair is a static member.`
             if (a !== 3101 || b !== 3102 || c !== 3103) return `Three new repairs got the tickets ${a}, ${b} and ${c}. With issued at 3100, each new repair takes the next number: the first is one more than 3100.`
             if (got.ia !== 'cuckoo clock') return `A repair made with "cuckoo clock" gives back the item "${got.ia ?? ''}".`

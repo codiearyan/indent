@@ -43,7 +43,7 @@ function stepMessage(w, refuse) {
   if (!w.ok) return `${w.fn}(${w.n}) gave back true, as if it had done it. ${w.n} is outside the rule, so ${w.fn} refuses it: it changes nothing and gives back false.`
   if (w.left === w.before) {
     return w.gave === '1'
-      ? `${w.fn}(${w.n}) gave back true and the minutes stayed at ${w.before}. Look at what the line that changes them changes: a parameter or a variable of the function with the member's name hides the member, and a change to it is lost when the function ends.`
+      ? `${w.fn}(${w.n}) gave back true and the minutes stayed at ${w.before}. Giving back true says it changed them: look at whether a line changes minutes, and what it changes. A parameter or a variable of the function with the member's name hides the member, and a change to it is lost when the function ends.`
       : `${w.fn} refused ${w.n} on a repair with ${w.before} minutes, and ${w.n} is within the rule there.`
   }
   if (w.left !== w.after) return `After ${w.fn}(${w.n}) on a repair with ${w.before} minutes, getMinutes gives back ${w.left}.`

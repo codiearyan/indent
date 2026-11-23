@@ -36,6 +36,19 @@ function wrongRepair(got, k, want, made) {
   return null
 }
 
+const privateProbe = (member, task) => ({
+  name: `${member} cannot be reached from outside the class`,
+  params: 'Repair& r',
+  code: `(void)r.${member};`,
+  expect: /is a private member of|is private within this context/,
+  compiled: `Check's own code, outside the class, could reach ${member} directly. Task ${task} puts the members under private:, so that only the class's own functions reach them.`,
+  other: (text) =>
+    /no member named|has no member named/.test(text)
+      ? `Check cannot find a member called ${member} in Repair. Task ${task} names it: write it with exactly that name, capital letters included, under private:.`
+      : null,
+  shown: `Check's line, outside the class: r.${member}`
+})
+
 const explicitProbe = {
   name: 'A number does not turn into a repair by itself',
   code: 'Repair r = 3107; (void)r;',
@@ -54,6 +67,7 @@ export const checks = {
     return judgeClass(t, {
       ...base,
       task: 1,
+      probes: ['ticket', 'item', 'minutes'].map((m) => privateProbe(m, 1)),
       cases: [
         {
           name: 'getTicket, getItem and getMinutes give back what the task says',
