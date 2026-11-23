@@ -1,0 +1,115 @@
+{
+  "id": "the-finished-tool",
+  "title": "A tool with a name",
+  "files": [
+    "src/settings.js",
+    "orders.js",
+    "package.json",
+    "morning.txt",
+    "src/shop.js",
+    "src/commands.js",
+    "src/input.js",
+    "src/args.js",
+    "src/flags.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Set a setting for one command with `ORDERS_LIMIT=2 node orders.js list orders/press-1.txt` (PowerShell: `$env:ORDERS_LIMIT=2` first).",
+    "suggestedCommand": "node orders.js check orders/press-1.txt orders/press-2.txt"
+  },
+  "tasks": [
+    {
+      "id": "settings",
+      "title": "Take a setting from the environment, and let a flag win",
+      "file": "src/settings.js",
+      "description": "Write `withSettings(flags, env)` in `src/settings.js`, and use it in `orders.js`.\n\n- it returns the flags it was given, with `limit` taken from `env.ORDERS_LIMIT` when no `--limit` was typed, as text, like a typed value\n- a typed `--limit` or `-n` always wins, and then `ORDERS_LIMIT` is not looked at at all\n- with no `ORDERS_LIMIT` and no flag, nothing is added\n- an `ORDERS_LIMIT` that is not a whole number above 0 makes it throw an `Error` whose message names `ORDERS_LIMIT`, so the person knows which setting to fix\n- `orders.js` runs each command with `withSettings(flags, process.env)`, so `ORDERS_LIMIT=3 node orders.js list` lists three orders\n\nThe check calls `withSettings` with flags and environments of its own, and runs `node orders.js list` with `ORDERS_LIMIT` set, with `-n` typed too, and with a broken setting.",
+      "nextSteps": [
+        "Read \"Settings from the environment\" in the lesson.",
+        "Write `withSettings`: decide first whether the setting is used at all.",
+        "Check the setting before you use it, and name it when it is wrong.",
+        "In `orders.js`, pass the flags through it before running the command, and try `ORDERS_LIMIT=2 node orders.js list orders/press-1.txt`."
+      ],
+      "hints": [
+        "A setting says what this computer usually wants; a flag says what the person wants this once. So the setting only fills a gap the flags left.",
+        "`flags.limit === undefined` says no limit was typed. Giving back a new object with `{ ...flags, limit }` leaves the flags readArgs made as they were. A whole number above 0 matches `/^[1-9]\\d*$/`.",
+        "`if (flags.limit !== undefined || env.ORDERS_LIMIT === undefined) return flags`, then throw `new Error(`ORDERS_LIMIT must be a whole number above 0, not \"${env.ORDERS_LIMIT}\"`)` when it does not match, and otherwise `return { ...flags, limit: env.ORDERS_LIMIT }`."
+      ],
+      "docs": [
+        {
+          "title": "process.env",
+          "url": "https://nodejs.org/api/process.html#processenv"
+        },
+        {
+          "title": "Spread syntax",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What environment variables are",
+          "url": "https://www.youtube.com/watch?v=v5n96CX339g"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "colour",
+      "title": "Colour only for a person at a terminal",
+      "file": "src/settings.js",
+      "description": "Write `useColour(stream, env)` in `src/settings.js`, and colour the problems that `check` finds.\n\n- `useColour` returns `true` only when `stream.isTTY` is `true` and `env.NO_COLOR` is not set; `NO_COLOR` set to the empty text counts as not set\n- in `orders.js`, ask it as `useColour(process.stdout, process.env)`; once is enough\n- when it says yes, `check` prints each problem line in red: `\\x1b[31m` before the text and `\\x1b[39m` after it, the words unchanged\n- with `--json`, or when it says no, nothing the tool prints holds a colour code\n\nA check cannot give the tool a real terminal, so it stands in for one: it sets `process.stdout.isTTY` to `true` before the tool starts, and `TERM` in its environment, as a terminal does.\n\nThe check calls `useColour` with streams and environments of its own, and runs `check` at a stand-in terminal, with `NO_COLOR` set, into a pipe, and with `--json`.",
+      "nextSteps": [
+        "Run `node orders.js check orders/press-2.txt`, then the same with `> out.txt` and look in the file: no colour codes must ever end up there.",
+        "Read \"Colour, but only for people\" in the lesson.",
+        "Write `useColour` from the stream it is given and the environment.",
+        "In `orders.js`, wrap each problem line of `check` when it says yes."
+      ],
+      "hints": [
+        "Colour codes are characters like any other. A person at a terminal sees red; a file or a program sees `\\x1b[31m` in the middle of its text.",
+        "`process.stdout.isTTY` is `true` only for a terminal; for a file or a pipe it is `undefined`. An empty `NO_COLOR` is falsy, which is what the custom wants.",
+        "`return stream.isTTY === true && !env.NO_COLOR`. In `main`, `const red = command === 'check' && useColour(process.stdout, process.env)`, and in `out.result` print `red ? `\\x1b[31m${text}\\x1b[39m` : text` when `--json` is off."
+      ],
+      "docs": [
+        {
+          "title": "writeStream.isTTY",
+          "url": "https://nodejs.org/api/tty.html#writestreamistty"
+        },
+        {
+          "title": "writeStream.hasColors()",
+          "url": "https://nodejs.org/api/tty.html#writestreamhascolorscount-env"
+        },
+        {
+          "title": "util.styleText()",
+          "url": "https://nodejs.org/api/util.html#utilstyletextformat-text-options"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "name",
+      "title": "Give the tool a name, and rewrite the morning",
+      "file": "morning.txt",
+      "description": "Make `orders` a tool with a name, and put it to work.\n\n- the very first line of `orders.js` is `#!/usr/bin/env node`\n- `package.json` has a `bin` entry that gives the command `orders` and points at `orders.js`: `\"bin\": { \"orders\": \"orders.js\" }`\n- `morning.txt` holds three commands of the tool in place of the three old ones, one on each line, in the same order: how many orders there are, how many on each paper, and which lines are broken. Each starts with `orders`, names both files, `orders/press-1.txt orders/press-2.txt`, and uses plain words only: no quotes, pipes or patterns. Lines that start with `#` are comments and may stay\n\nNothing has to be installed: `node orders.js` does what `orders` will do once the shop installs it.\n\nThe check reads the first line of `orders.js` and the `bin` entry, and runs each command of `morning.txt` as `node orders.js ...` with order files of its own at those two paths.",
+      "nextSteps": [
+        "Read \"A name of its own\" and \"The morning\" in the lesson.",
+        "Add the first line to `orders.js` and the `bin` entry to `package.json`.",
+        "Work out which command and flags answer each of the three questions in `morning.txt`.",
+        "Try each one as `node orders.js ...` before you write it down."
+      ],
+      "hints": [
+        "The `#!` line must be the first two characters of the file. `/usr/bin/env node` finds `node` wherever it is installed, instead of naming one place.",
+        "`bin` maps the name a person types to the file that runs. The old commands counted lines, counted by the fourth field, and looked for broken lines; your tool has a command and a flag for each.",
+        "`orders count orders/press-1.txt orders/press-2.txt`, `orders count --by paper orders/press-1.txt orders/press-2.txt` and `orders check orders/press-1.txt orders/press-2.txt`."
+      ],
+      "docs": [
+        {
+          "title": "package.json: bin",
+          "url": "https://docs.npmjs.com/cli/v11/configuring-npm/package-json#bin"
+        },
+        {
+          "title": "Hashbang comments",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#hashbang_comments"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,225 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "orders",
+        "label": "Priced orders",
+        "kind": "data"
+      },
+      {
+        "id": "days",
+        "label": "takingsByDay()",
+        "kind": "function",
+        "mine": true,
+        "fn": "takingsByDay"
+      },
+      {
+        "id": "print",
+        "label": "printReport()",
+        "kind": "function",
+        "mine": true,
+        "fn": "printReport"
+      },
+      {
+        "id": "build",
+        "label": "buildReport()",
+        "kind": "function",
+        "mine": true,
+        "fn": "buildReport"
+      },
+      {
+        "id": "old",
+        "label": "Sefton's first report",
+        "kind": "file"
+      },
+      {
+        "id": "hesper",
+        "label": "Hesper, every hour",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "orders",
+        "to": "days",
+        "label": "in day order"
+      },
+      {
+        "from": "days",
+        "to": "print",
+        "label": "a line per day"
+      },
+      {
+        "from": "print",
+        "to": "build",
+        "label": "the text"
+      },
+      {
+        "from": "old",
+        "to": "build",
+        "label": "compared"
+      },
+      {
+        "from": "build",
+        "to": "hesper",
+        "label": "the same report"
+      }
+    ],
+    "note": "The report is measured again, its last slow step is fixed, and two speed-ups that broke the answer are mended."
+  },
+  "tasks": {
+    "print": {
+      "steps": [
+        {
+          "active": [
+            "print"
+          ],
+          "note": "Measured again, the print step is now the slowest of the three, though nobody changed it."
+        },
+        {
+          "active": [
+            "print"
+          ],
+          "note": "Every amount is written with the same rules for pounds, so those rules are loaded once for the whole report."
+        },
+        {
+          "active": [
+            "print",
+            "print->build"
+          ],
+          "note": "The text comes out exactly as before, character for character."
+        }
+      ]
+    },
+    "days": {
+      "steps": [
+        {
+          "active": [
+            "orders",
+            "orders->days",
+            "days"
+          ],
+          "note": "Idris asks for October's days. The orders run on into November, in day order.",
+          "value": {
+            "kind": "map",
+            "label": "the range",
+            "entries": [
+              {
+                "key": "from",
+                "value": "the first day"
+              },
+              {
+                "key": "until",
+                "value": "the last day"
+              }
+            ]
+          }
+        },
+        {
+          "active": [
+            "days"
+          ],
+          "note": "Each day's orders are counted and added up, one day after another."
+        },
+        {
+          "active": [
+            "days"
+          ],
+          "note": "At the first order after the range, reading stops, and the day still being added up goes into the list too."
+        },
+        {
+          "active": [
+            "days"
+          ],
+          "note": "One line per day with orders goes on to be printed.",
+          "value": {
+            "kind": "map",
+            "label": "one day",
+            "entries": [
+              {
+                "key": "day",
+                "value": "a date"
+              },
+              {
+                "key": "orders",
+                "value": "how many"
+              },
+              {
+                "key": "pence",
+                "value": "their total"
+              }
+            ]
+          }
+        }
+      ],
+      "trace": {
+        "file": "src/report.js",
+        "call": "takingsByDay",
+        "args": [
+          [
+            {
+              "id": "A041201",
+              "customerId": "C00003",
+              "item": "menu",
+              "qty": 25,
+              "day": "2026-10-30",
+              "pence": 3000
+            },
+            {
+              "id": "A041202",
+              "customerId": "C00007",
+              "item": "invite",
+              "qty": 40,
+              "day": "2026-10-31",
+              "pence": 7200
+            },
+            {
+              "id": "A041203",
+              "customerId": "C00011",
+              "item": "postcard",
+              "qty": 30,
+              "day": "2026-10-31",
+              "pence": 1050
+            },
+            {
+              "id": "A041204",
+              "customerId": "C00003",
+              "item": "calendar",
+              "qty": 2,
+              "day": "2026-11-01",
+              "pence": 2800
+            }
+          ],
+          "2026-10-01",
+          "2026-10-31"
+        ]
+      }
+    },
+    "report": {
+      "steps": [
+        {
+          "active": [
+            "build"
+          ],
+          "note": "The order server builds the report at ten, and again at eleven, after Idris changed the price of menus."
+        },
+        {
+          "active": [
+            "build"
+          ],
+          "note": "Each report asks for the prices it needs from the price list it was handed, so no price outlives a change."
+        },
+        {
+          "active": [
+            "old",
+            "old->build",
+            "build",
+            "build->hesper",
+            "hesper"
+          ],
+          "note": "Both reports match Sefton's first version line for line, with a small part of its work."
+        }
+      ]
+    }
+  }
+}

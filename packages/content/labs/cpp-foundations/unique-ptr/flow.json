@@ -1,0 +1,86 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kasimir", "label": "Kasimir's bench", "kind": "story" },
+      { "id": "open", "label": "openRepair()", "kind": "function", "mine": true },
+      { "id": "bill", "label": "takeForBilling()", "kind": "function", "mine": true },
+      { "id": "add", "label": "addToDesk()", "kind": "function", "mine": true },
+      { "id": "find", "label": "findOnDesk()", "kind": "function", "mine": true },
+      { "id": "ambrose", "label": "Ambrose's desk", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "open", "to": "kasimir", "label": "new repair" },
+      { "from": "kasimir", "to": "bill", "label": "finished" },
+      { "from": "bill", "to": "add", "label": "hands over" },
+      { "from": "add", "to": "ambrose", "label": "now owns it" },
+      { "from": "ambrose", "to": "find", "label": "a ticket" }
+    ],
+    "note": "Each repair has one owner at a time, moves from the bench to the desk, and ends when its last owner lets go."
+  },
+  "tasks": {
+    "open": {
+      "steps": [
+        {
+          "active": ["open"],
+          "value": { "kind": "array", "label": "goes in", "values": ["ticket", "item"] },
+          "note": "A clock comes in, and a repair is opened for it."
+        },
+        {
+          "active": ["open->kasimir", "kasimir"],
+          "value": { "kind": "array", "label": "comes back", "values": ["the one owner of the repair"] },
+          "note": "Whoever holds the owner holds the repair; when the owner goes, the repair ends with it."
+        }
+      ]
+    },
+    "add": {
+      "steps": [
+        {
+          "active": ["bill->add", "add"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the desk", "the owner of a repair, or an empty one"] },
+          "note": "A repair is handed to Ambrose's desk, owner and all."
+        },
+        {
+          "active": ["add->ambrose", "ambrose"],
+          "note": "The desk is now the repair's only owner; whoever handed it over holds nothing."
+        },
+        {
+          "active": ["ambrose"],
+          "value": { "kind": "array", "label": "comes back", "values": ["how many repairs the desk holds"] },
+          "note": "Ambrose sees how many repairs wait for their bill."
+        }
+      ]
+    },
+    "find": {
+      "steps": [
+        {
+          "active": ["ambrose", "ambrose->find", "find"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the desk", "a ticket"] },
+          "note": "Ambrose wants to look at one repair before billing it."
+        },
+        {
+          "active": ["find", "ambrose"],
+          "value": { "kind": "array", "label": "comes back", "values": ["a way to look at the repair, or none"] },
+          "note": "He gets a way to look at it, while the desk keeps owning it."
+        }
+      ]
+    },
+    "bill": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->bill", "bill"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the bench", "a ticket"] },
+          "note": "A finished repair leaves Kasimir's bench for billing."
+        },
+        {
+          "active": ["bill"],
+          "note": "Its owner moves off the bench, and its place on the bench goes; nothing ends."
+        },
+        {
+          "active": ["bill->add", "add"],
+          "value": { "kind": "array", "label": "comes back", "values": ["the owner of that repair, or an empty one"] },
+          "note": "The repair is ready to be handed to the desk, in exactly one place."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,10 @@
+# What Idris types every morning before the first print run. The same in every shell.
+
+# 1. How many orders are there today?
+orders count orders/press-1.txt orders/press-2.txt
+
+# 2. How many orders are on each paper?
+orders count --by paper orders/press-1.txt orders/press-2.txt
+
+# 3. Which order lines are broken?
+orders check orders/press-1.txt orders/press-2.txt

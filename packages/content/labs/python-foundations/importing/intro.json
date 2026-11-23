@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Can the pages fit the new pagers?", "note": "And the hills are typed three ways." },
+    { "title": "Team pagers", "text": "Long pages break in the middle of a word." },
+    {
+      "title": "Your code",
+      "file": "pager.py",
+      "mine": true,
+      "gap": "Every tool written by hand",
+      "tasks": ["Lines for the pager", "The closest hill", "A one-line summary"]
+    },
+    { "title": "Rhona", "say": "One line a page. That I can read.", "note": "The pagers read cleanly too." }
+  ],
+  "ticket": { "label": "Long page", "wrong": "Cut mid-word", "why": "Too long", "right": "Clean lines" },
+  "captions": [
+    "At the radio desk, Ailsa asks for pages that fit the team's new pagers.",
+    "Today a long page breaks in the middle of a word, and hill names come in three ways.",
+    "You import tools Python already has, and find one by reading its module's page.",
+    "Now each page reaches the pagers in clean lines, with the hill people meant.",
+    "Rhona gets a one-line summary of every page, and Ailsa's own tools still work."
+  ]
+}

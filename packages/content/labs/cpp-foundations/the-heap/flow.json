@@ -1,0 +1,77 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kasimir", "label": "Kasimir at the bench", "kind": "story" },
+      { "id": "takein", "label": "takeIn()", "kind": "function", "mine": true },
+      { "id": "shelf", "label": "Waiting shelf", "kind": "data" },
+      { "id": "close", "label": "closeRepair()", "kind": "function", "mine": true },
+      { "id": "takeoff", "label": "takeOff()", "kind": "function", "mine": true },
+      { "id": "memory", "label": "The laptop's memory", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kasimir", "to": "takein", "label": "a clock in" },
+      { "from": "takein", "to": "shelf", "label": "stays for days" },
+      { "from": "shelf", "to": "close", "label": "part arrived" },
+      { "from": "shelf", "to": "takeoff", "label": "goes home" },
+      { "from": "close", "to": "memory", "label": "gives back" },
+      { "from": "takeoff", "to": "memory", "label": "gives back" }
+    ],
+    "note": "Repairs that wait for a part outlive the code that took them in, and give their memory back when they leave."
+  },
+  "tasks": {
+    "takein": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->takein", "takein"],
+          "value": { "kind": "array", "label": "goes in", "values": ["ticket", "item"] },
+          "note": "A clock comes in that has to wait for a part."
+        },
+        {
+          "active": ["takein->shelf", "shelf"],
+          "note": "The repair is made somewhere it stays after the code that made it has finished."
+        },
+        {
+          "active": ["shelf", "kasimir"],
+          "value": { "kind": "array", "label": "comes back", "values": ["the way to the new repair"] },
+          "note": "Kasimir gets the way to the repair, and with it the job of ending it one day."
+        }
+      ]
+    },
+    "close": {
+      "steps": [
+        {
+          "active": ["shelf", "shelf->close", "close"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the way to a repair, or none"] },
+          "note": "A repair's part has come, and the repair is closed."
+        },
+        {
+          "active": ["close"],
+          "value": { "kind": "array", "label": "comes back", "values": ["its minutes"] },
+          "note": "Its minutes are taken down for the bill."
+        },
+        {
+          "active": ["close->memory", "memory"],
+          "note": "The repair ends, and its memory goes back to the laptop."
+        }
+      ]
+    },
+    "takeoff": {
+      "steps": [
+        {
+          "active": ["shelf", "shelf->takeoff", "takeoff"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the shelf", "a ticket"] },
+          "note": "A clock goes home, and its repair leaves the shelf."
+        },
+        {
+          "active": ["takeoff->memory", "memory"],
+          "note": "The repair ends and gives its memory back."
+        },
+        {
+          "active": ["shelf"],
+          "value": { "kind": "array", "label": "comes back", "values": ["true or false", "the shelf, one shorter"] },
+          "note": "The shelf no longer lists it, and the others stay in their order."
+        }
+      ]
+    }
+  }
+}

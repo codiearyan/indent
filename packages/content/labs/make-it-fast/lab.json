@@ -1,0 +1,13 @@
+{
+  "id": "make-it-fast",
+  "title": "Make a slow program fast",
+  "description": "Ashgrove Press's nightly orders report took a minute when the shop had a hundred orders, and now, with fifty thousand, it is still running when Idris comes in to do the books. You measure it before you touch it, then make it fast one cause at a time without changing a line of what it prints: lookups that search a list, work done again and again, questions asked one after another, and the speed-ups that quietly make it wrong. By the end you know how to find what makes a program slow, and how to prove the fast version gives the same answer.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": ["JavaScript", "Performance"],
+  "kind": "project",
+  "parts": [
+    { "title": "Measure, then do less", "chapters": ["measure-first", "loop-inside-a-loop", "work-done-again"] },
+    { "title": "Waiting, and knowing when to stop", "chapters": ["waiting-in-line", "knowing-when-to-stop"] }
+  ]
+}

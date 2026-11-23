@@ -1,0 +1,99 @@
+{
+  "id": "counting-and-grouping",
+  "title": "Count and group",
+  "files": ["callout_counts.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to count the year's callouts per hill and group their dates.",
+    "suggestedCommand": "python3 callout_counts.py"
+  },
+  "tasks": [
+    {
+      "id": "counts",
+      "title": "Callouts per hill",
+      "file": "callout_counts.py",
+      "description": "Under `# Task 1` in `callout_counts.py`, write the line that imports `Counter` from `collections`. Then write a function called `hill_counts` that takes a list of hills, one for each callout, and gives back a `Counter` of how many callouts each hill had. For `hills` it gives back `Counter({'Scarth Fell': 3, 'Lowther Crag': 3, 'Cairn Dubh': 1, 'Garve Edge': 1})`. Print what it gives back for `hills`.\n\nCheck calls `hill_counts` with lists of its own, an empty one among them, and looks at the counts it gives back and whether they are a `Counter`.",
+      "nextSteps": [
+        "Read the part of the lesson on counting with Counter.",
+        "Write the import line, then the def line.",
+        "Count the list with a Counter, and give it back.",
+        "Print what hill_counts gives back for hills, and compare it with the log."
+      ],
+      "hints": [
+        "A plain dictionary has no key for a hill the first time it comes, so `counts[hill] = counts[hill] + 1` stops there with a `KeyError`.",
+        "A `Counter` made from a list counts every item in it by itself, and gives 0 for a key it has not seen.",
+        "The shape is `from collections import Counter` above the function, and `return Counter(hills)` inside it."
+      ],
+      "docs": [
+        { "title": "collections.Counter", "url": "https://docs.python.org/3/library/collections.html#collections.Counter" },
+        { "title": "The from import statement", "url": "https://docs.python.org/3/tutorial/modules.html#more-on-modules" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "busiest",
+      "title": "The busiest hills",
+      "file": "callout_counts.py",
+      "description": "Under `# Task 2`, write a function called `busiest` that takes a list of hills and a number `n`, and gives back a list of the `n` hills with the most callouts, each as a tuple `(hill, count)`: the most first, and hills with the same count in the order they first came in the list. When there are fewer than `n` hills, it gives back all of them. For `hills` and `2` it gives back `[('Scarth Fell', 3), ('Lowther Crag', 3)]`. Print what it gives back for `hills` and `2`.\n\nCheck calls `busiest` with lists and numbers of its own, a tie among them, and looks at the list it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on the most common.",
+        "Count the hills with a Counter, as in Task 1.",
+        "Ask the Counter for the n most common, and print what you get.",
+        "Give that list back."
+      ],
+      "hints": [
+        "A Counter knows which keys have the highest counts, and keeps keys with the same count in the order they first came.",
+        "A Counter has a method that gives back a list of its highest counts, each a tuple of the key and its count, the most first, as many as you ask for.",
+        "The shape is `return Counter(hills).most_common(n)`."
+      ],
+      "docs": [
+        { "title": "Counter.most_common()", "url": "https://docs.python.org/3/library/collections.html#collections.Counter.most_common" },
+        { "title": "collections.Counter", "url": "https://docs.python.org/3/library/collections.html#collections.Counter" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "groups",
+      "title": "Dates by hill",
+      "file": "callout_counts.py",
+      "description": "Under `# Task 3`, write the line that imports `defaultdict` from `collections`. Then write a function called `dates_by_hill` that takes a log, a list of `(date, hill)` tuples, and gives back a dictionary of each hill and a list of the dates of its callouts, in the order of the log. A `defaultdict` or a plain dictionary may come back. For `year` the dates of `'Cairn Dubh'` are `['02/02/2026']`. Print what it gives back for `year`.\n\nCheck calls `dates_by_hill` with logs of its own, an empty one among them, and looks at the dictionary it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on grouping with defaultdict.",
+        "Make a defaultdict whose new keys start as an empty list.",
+        "Go through the log, and add each date to the list of its hill.",
+        "Give back the dictionary, and print it for year."
+      ],
+      "hints": [
+        "Each hill's list must be there before a date can be added to it, and a plain dictionary stops with a `KeyError` on the first date of each hill.",
+        "A `defaultdict` is given the kind of value each new key starts with, and makes one the first time a key is asked for. For lists, the kind goes in without round brackets: the defaultdict calls it itself.",
+        "The shape is `dates = defaultdict(list)`, then `for date, hill in log:` with `dates[hill].append(date)`, then `return dates`."
+      ],
+      "docs": [
+        { "title": "collections.defaultdict", "url": "https://docs.python.org/3/library/collections.html#collections.defaultdict" },
+        { "title": "defaultdict examples", "url": "https://docs.python.org/3/library/collections.html#defaultdict-examples" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "on",
+      "title": "How many on one hill",
+      "file": "callout_counts.py",
+      "description": "Under `# Task 4`, write a function called `callouts_on` that takes what `dates_by_hill` gives back, a `defaultdict` of each hill and its dates, and a hill, and gives back how many callouts that hill had: `0` for a hill that is not in it. Leave the dictionary it is given as it was: asking about a hill must not add it. Print what it gives back for `dates_by_hill(year)` and `\"Black Knowe\"`.\n\nCheck calls `callouts_on` with a `defaultdict` of its own and hills that are in it and not, and looks at what it gives back and at whether the dictionary is as it was afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on what a defaultdict does when it is asked.",
+        "Find out whether the hill is in the dictionary at all.",
+        "Give back how many dates it has when it is, and 0 when it is not.",
+        "Print the dictionary after a call for a hill that is not in it, and check it did not grow."
+      ],
+      "hints": [
+        "A defaultdict makes a missing key the moment you read it with square brackets, even only to look.",
+        "Asking whether a key is in a dictionary never makes it, and neither does the dictionary method that takes a value to give back for a missing key.",
+        "The shape is `if hill in dates:` with `return len(dates[hill])` under it, then `return 0`."
+      ],
+      "docs": [
+        { "title": "defaultdict.__missing__()", "url": "https://docs.python.org/3/library/collections.html#collections.defaultdict.__missing__" },
+        { "title": "dict.get()", "url": "https://docs.python.org/3/library/stdtypes.html#dict.get" }
+      ],
+      "points": 10
+    }
+  ]
+}

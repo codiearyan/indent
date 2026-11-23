@@ -1,0 +1,131 @@
+{
+  "id": "unique-ptr",
+  "title": "One owner: std::unique_ptr",
+  "files": [
+    "src/desk.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Ambrose's desk here and run it, and watch when each repair ends.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/desk.cpp -o desk && ./desk"
+  },
+  "tasks": [
+    {
+      "id": "open",
+      "title": "Open a repair with one owner",
+      "file": "src/desk.cpp",
+      "description": "Under `// Task 1` in `src/desk.cpp`, write a function called `openRepair` that takes a ticket as an `int` and an item as a reference to a `const std::string`. It makes a `Repair` with that ticket and item, owned by a `std::unique_ptr<Repair>`, and gives back that `std::unique_ptr<Repair>`.\n\nCheck opens two repairs of its own, reads them through the owners it gets back, and lets the owners end. It counts, with a `Repair` of its own, that each repair ends exactly once, when its owner does.",
+      "nextSteps": [
+        "Write the first line, with `std::unique_ptr<Repair>` in front of the name.",
+        "Make the repair with `std::make_unique<Repair>`, passing the ticket and the item.",
+        "Give back what it made.",
+        "In `main`, open a repair, print its item through `->`, and watch it end at the closing brace."
+      ],
+      "hints": [
+        "A `std::unique_ptr` owns one object: when the unique_ptr ends, it deletes its object, so nobody has to remember to.",
+        "A unique_ptr is made together with its repair, by a function of the library that takes what Repair's constructor takes. Giving back a unique_ptr hands the ownership to the caller.",
+        "The shape is `return std::make_unique<Repair>(ticket, item);`."
+      ],
+      "docs": [
+        {
+          "title": "std::unique_ptr",
+          "url": "https://en.cppreference.com/w/cpp/memory/unique_ptr"
+        },
+        {
+          "title": "std::make_unique",
+          "url": "https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Smart pointers: unique_ptr and shared_ptr",
+          "url": "https://www.youtube.com/watch?v=UOB7-B2MfwA"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "add",
+      "title": "Put a repair on the desk",
+      "file": "src/desk.cpp",
+      "description": "Under `// Task 2`, write a function called `addToDesk` that takes the desk as a reference to a `std::vector<std::unique_ptr<Repair>>` and a repair as a `std::unique_ptr<Repair>`, taken by value, and gives back an `int`. It puts the repair at the end of the desk, unless the unique_ptr is empty, and gives back how many repairs the desk then holds.\n\nCheck hands over repairs of its own with `std::move`, and once an empty unique_ptr, and then reads its desk: each place must own the very repair Check handed over, and no place may be empty.",
+      "nextSteps": [
+        "Write the first line, with the repair as a `std::unique_ptr<Repair>`, no `&`.",
+        "Ask whether the repair is empty, by comparing it with `nullptr`.",
+        "When it is not, `push_back` it onto the desk, moving it there.",
+        "Give back the desk's size. In `main`, put a repair on a desk with `std::move` and print the count."
+      ],
+      "hints": [
+        "A unique_ptr cannot be copied: there would be two owners. `push_back` with the name alone asks for a copy, and the compiler refuses it with a long message that says something like \"deleted\".",
+        "Moving hands the ownership over instead of copying it: the vector takes it, and the unique_ptr you had is empty afterwards. The repair itself does not move or change.",
+        "The shape is `if (repair != nullptr) { desk.push_back(std::move(repair)); } return static_cast<int>(desk.size());`."
+      ],
+      "docs": [
+        {
+          "title": "std::move",
+          "url": "https://en.cppreference.com/w/cpp/utility/move"
+        },
+        {
+          "title": "std::unique_ptr",
+          "url": "https://en.cppreference.com/w/cpp/memory/unique_ptr"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "find",
+      "title": "Look at a repair without taking it",
+      "file": "src/desk.cpp",
+      "description": "Under `// Task 3`, write a function called `findOnDesk` that takes the desk as a reference to a `const std::vector<std::unique_ptr<Repair>>` and a ticket as an `int`. It gives back a plain pointer to the repair with that ticket, as a `Repair*`, or `nullptr` when no repair on the desk has it. The desk keeps owning every repair.\n\nCheck fills desks of its own, asks for tickets that are there and not there, and on an empty desk, looks at where each pointer it gets back leads, and checks that its desk still owns every repair as before.",
+      "nextSteps": [
+        "Write the first line, with `Repair*` in front of the name and the desk as a `const` reference.",
+        "Loop over the desk with `const std::unique_ptr<Repair>&`, so nothing is copied.",
+        "When the ticket matches, give back the address of its repair, from the unique_ptr's `get()`.",
+        "After the loop, give back `nullptr`. In `main`, find a repair and print its minutes."
+      ],
+      "hints": [
+        "Looking at a repair is not owning it. A plain pointer lends the repair to the caller for a while; the owner stays where it is, and still decides when it ends.",
+        "A unique_ptr can tell you the address of its repair without giving up ownership. The loop variable must be a reference: a unique_ptr cannot be copied.",
+        "The shape is `for (const std::unique_ptr<Repair>& repair : desk) { if (repair->getTicket() == ticket) { return repair.get(); } } return nullptr;`."
+      ],
+      "docs": [
+        {
+          "title": "std::unique_ptr::get",
+          "url": "https://en.cppreference.com/w/cpp/memory/unique_ptr/get"
+        },
+        {
+          "title": "Range-based for loop",
+          "url": "https://en.cppreference.com/w/cpp/language/range-for"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "bill",
+      "title": "Take a repair from the bench for billing",
+      "file": "src/desk.cpp",
+      "description": "Under `// Task 4`, write a function called `takeForBilling` that takes the bench as a reference to a `std::vector<std::unique_ptr<Repair>>` and a ticket as an `int`, and gives back a `std::unique_ptr<Repair>`. It hands over the repair with that ticket, takes its place off the bench, and keeps the others in their order. When no repair on the bench has that ticket, it changes nothing and gives back an empty `std::unique_ptr<Repair>`.\n\nCheck fills benches of its own, takes the first, a middle and the last repair, a ticket that is not there, and one from an empty bench. It checks that the unique_ptr it gets back owns the very repair that was on the bench, that no repair ended during the call, and what the bench holds afterwards. Check builds this task with the library's guard, which stops a program that reads a vector past its end.",
+      "nextSteps": [
+        "Write the first line, with `std::unique_ptr<Repair>` in front of the name.",
+        "Walk the bench with a counted loop, and compare each repair's ticket.",
+        "When it matches, move the owner out into a local `std::unique_ptr<Repair>`, `erase` the place, and give the local back.",
+        "After the loop, give back `nullptr`. In `main`, take one for billing and print how many are left."
+      ],
+      "hints": [
+        "The repair's owner moves from the bench to the caller. A place on the bench whose unique_ptr still owns the repair ends that repair when the place is erased.",
+        "Move first, then erase: moving the owner out leaves an empty unique_ptr in that place, and erasing an empty one ends nothing. Giving back a local unique_ptr by name moves it out by itself.",
+        "The shape is `std::unique_ptr<Repair> taken = std::move(bench[i]); bench.erase(bench.begin() + i); return taken;` inside the loop's `if`, and `return nullptr;` after the loop."
+      ],
+      "docs": [
+        {
+          "title": "std::move",
+          "url": "https://en.cppreference.com/w/cpp/utility/move"
+        },
+        {
+          "title": "std::vector::erase",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/erase"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

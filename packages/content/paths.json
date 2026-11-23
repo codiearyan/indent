@@ -27,7 +27,8 @@
           "async-js",
           "js-bug-hunts",
           "build-a-json-parser",
-          "data-bug-hunts"
+          "data-bug-hunts",
+          "make-it-fast"
         ]
       },
       {
@@ -76,6 +77,7 @@
           "express-crud-api",
           "build-a-router",
           "build-a-key-value-database",
+          "build-a-cli-tool",
           "api-with-a-database",
           "sign-in-and-sessions",
           "security-bug-hunts"
@@ -157,7 +159,8 @@
           "js-foundations",
           "async-js",
           "build-a-json-parser",
-          "data-bug-hunts"
+          "data-bug-hunts",
+          "make-it-fast"
         ]
       },
       {
@@ -188,6 +191,7 @@
           "node-api",
           "express-crud-api",
           "build-a-router",
+          "build-a-cli-tool",
           "api-with-a-database",
           "sign-in-and-sessions",
           "security-bug-hunts"
@@ -273,7 +277,9 @@
           "build-a-router",
           "build-a-state-store",
           "build-a-json-parser",
-          "build-a-key-value-database"
+          "build-a-key-value-database",
+          "make-it-fast",
+          "build-a-cli-tool"
         ]
       },
       {

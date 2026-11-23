@@ -1,0 +1,41 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "log", "label": "Callout log", "kind": "data" },
+      { "id": "callouts", "label": "callouts.py", "kind": "file", "mine": true },
+      { "id": "report", "label": "report.py", "kind": "file", "mine": true },
+      { "id": "radio", "label": "Ailsa's radio desk", "kind": "story" },
+      { "id": "rhona", "label": "Rhona", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "log", "to": "callouts", "label": "lines" },
+      { "from": "callouts", "to": "report", "label": "import" },
+      { "from": "callouts", "to": "radio", "label": "import" },
+      { "from": "report", "to": "rhona", "label": "the report" }
+    ],
+    "note": "The functions that read the log move into one module, and the report and the radio desk both import it."
+  },
+  "tasks": {
+    "move": {
+      "steps": [
+        { "active": ["report"], "note": "The reading functions sit at the top of the report, where nothing else can use them." },
+        { "active": ["callouts"], "note": "They move into callouts.py, with every function they call, so the module makes sense on its own." },
+        { "active": ["callouts", "callouts->report", "report"], "note": "The report imports them from the module, and prints the same lines as before." }
+      ]
+    },
+    "guard": {
+      "steps": [
+        { "active": ["callouts", "callouts->report", "report"], "note": "Importing the module runs its top lines, so Ailsa's try-out lines land in the middle of the report." },
+        { "active": ["callouts"], "note": "The try-out lines go under a guard that asks whether this file is the one that was run." },
+        { "active": ["callouts", "callouts->report", "callouts->radio"], "note": "Imported, the module now only makes its functions; run by itself, it still tries them." }
+      ]
+    },
+    "hours": {
+      "steps": [
+        { "active": ["log", "log->callouts", "callouts"], "value": { "kind": "array", "label": "what goes in", "values": ["the log's lines", "a hill"] }, "note": "The month's lines and one hill go into a new function of the module." },
+        { "active": ["callouts"], "note": "Each line on that hill adds its hours, read by the functions already in the module." },
+        { "active": ["callouts", "callouts->report", "report", "report->rhona", "rhona"], "note": "The report imports it and tells Rhona the hours spent on that hill." }
+      ]
+    }
+  }
+}

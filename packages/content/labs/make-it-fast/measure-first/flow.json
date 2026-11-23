@@ -1,0 +1,54 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "report", "label": "Tonight's report", "kind": "file" },
+      { "id": "timeIt", "label": "timeIt()", "kind": "function", "mine": true, "fn": "timeIt" },
+      { "id": "timeSteps", "label": "timeSteps()", "kind": "function", "mine": true, "fn": "timeSteps" },
+      { "id": "counted", "label": "counted()", "kind": "function", "mine": true, "fn": "counted" },
+      { "id": "idris", "label": "Idris", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "report", "to": "timeIt", "label": "one step" },
+      { "from": "timeIt", "to": "timeSteps", "label": "a fair time" },
+      { "from": "report", "to": "counted", "label": "each call" },
+      { "from": "timeSteps", "to": "idris", "label": "slowest first" },
+      { "from": "counted", "to": "idris", "label": "work counted" }
+    ],
+    "note": "Before anything changes, the report is timed step by step and its work is counted."
+  },
+  "tasks": {
+    "time": {
+      "steps": [
+        { "active": ["report", "report->timeIt", "timeIt"], "note": "The match step is handed over to be timed. Its first run happens once and is not kept." },
+        {
+          "active": ["timeIt"],
+          "note": "Then it runs several times, each one timed from just before to just after, waiting for it to finish.",
+          "value": { "kind": "array", "label": "times of the runs", "values": ["run 1", "run 2", "run 3", "run 4", "run 5"] }
+        },
+        { "active": ["timeIt", "timeIt->timeSteps"], "note": "The times are sorted, and the one in the middle is what a usual run takes." }
+      ]
+    },
+    "steps": {
+      "steps": [
+        {
+          "active": ["report", "report->timeIt", "timeIt"],
+          "note": "The report has three steps of work: match, money and print. Each one is timed on its own.",
+          "value": { "kind": "array", "label": "steps", "values": ["match", "money", "print"] }
+        },
+        { "active": ["timeIt", "timeIt->timeSteps", "timeSteps"], "note": "One step is timed after the other, never two at once, so no time takes in another's." },
+        {
+          "active": ["timeSteps", "timeSteps->idris", "idris"],
+          "note": "Idris gets a list with the slowest step first.",
+          "value": { "kind": "map", "label": "one line", "entries": [{ "key": "name", "value": "a step" }, { "key": "ms", "value": "its time" }] }
+        }
+      ]
+    },
+    "count": {
+      "steps": [
+        { "active": ["report", "report->counted", "counted"], "note": "A function the report calls again and again, like the comparison of a sort, is wrapped." },
+        { "active": ["counted"], "note": "The wrapped function does exactly what it did before, and adds one to its count each time it runs." },
+        { "active": ["counted", "counted->idris", "idris"], "note": "The count is the same on every computer, so it says how much work the report does, not how fast this machine is." }
+      ]
+    }
+  }
+}
