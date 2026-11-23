@@ -182,8 +182,13 @@ const REACHES =
   /RunTasks|__Indent|(?:get|set|clear)Propert(?:y|ies)\b|reflect|Accessible|forName|Declared|ClassLoader|MethodHandle|VarHandle|Unsafe|FileDescriptor|getRuntime|ProcessBuilder|ProcessHandle|\bset(?:Out|Err|In)\b|StackWalker|getModule|ModuleLayer/
 
 /** The first thing in a task's lines that reaches into the runner, or null. */
-function reaches(text) {
+function reaches(text, spec) {
   if (/\\u+[0-9a-fA-F]{4}/.test(text)) return '\\u'
+  if (spec?.files) {
+    const out = pathOut(text)
+    if (out) return out
+    text = text.replace(/\bCharset\s*\.\s*forName\b/g, (m) => blank(m))
+  }
   return REACHES.exec(codeOnly(text))?.[0] ?? null
 }
 
@@ -309,11 +314,11 @@ function methodVariant(text, l, keep, hidden, paren) {
   }
 }
 
-function runJava(bin, cwd, input) {
+function runJava(bin, cwd, input, extra = []) {
   return new Promise((resolve) => {
     const child = spawn(
       bin,
-      ['-XX:TieredStopAtLevel=1', '-XX:+UseSerialGC', '-Xmx256m', '-Duser.language=en', RUNNER],
+      ['-XX:TieredStopAtLevel=1', '-XX:+UseSerialGC', '-Xmx256m', '-Duser.language=en', ...extra, RUNNER],
       { cwd, stdio: ['pipe', 'pipe', 'pipe'] }
     )
     let stdout = ''
@@ -367,13 +372,13 @@ async function build(t, spec) {
   if (outside) return { stop: 'outside', task: outside[0] }
   const around = spec.methods ? methodShared : spec.objects ? objectShared : shared
   if (bare(around(text, l)) !== bare(around(starter, s))) {
-    const imports = spec.collections ? importProblem(around(text, l), around(starter, s)) : null
+    const imports = spec.collections ? importProblem(around(text, l), around(starter, s), spec.values) : null
     if (imports !== false) return imports ?? { stop: 'shared' }
   }
 
   const reached = new Map()
   for (const [n, sec] of l.sections) {
-    const word = reaches(text.slice(sec.start, sec.end))
+    const word = reaches(text.slice(sec.start, sec.end), spec)
     if (word) reached.set(n, word)
   }
   const units = []
@@ -404,7 +409,7 @@ async function build(t, spec) {
   const input =
     `KEY ${key}\n` +
     units.map((u) => `UNIT ${u.id} ${fileClass} ${u.source.length}\n${u.source}\n`).join('')
-  const r = await runJava(bin, dir, input)
+  const r = await runJava(bin, dir, input, spec.values ? VALUE_JVM : [])
   const results = new Map()
   let fatal = null
   for (const line of r.stdout.split('\n')) {
@@ -416,7 +421,7 @@ async function build(t, spec) {
       continue
     }
     if (parsed.fatal) fatal = parsed
-    else if (parsed.key === key) results.set(parsed.id, parsed)
+    else if (parsed.key === key) results.set(parsed.id, spec.values ? sameLineEnds(parsed) : parsed)
   }
   if (fatal) return { stop: 'fatal', fatal }
   if (results.size === 0) return { stop: 'crashed', output: r.stderr }
@@ -590,7 +595,9 @@ const METHOD_GLOSS = [
 
 function gloss(e, src, methods) {
   const table =
-    methods === 'functions'
+    methods === 'values'
+      ? [...VALUE_GLOSS, ...FUNCTION_GLOSS, ...COLLECTION_GLOSS, ...EXCEPTION_GLOSS, ...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
+      : methods === 'functions'
       ? [...FUNCTION_GLOSS, ...COLLECTION_GLOSS, ...EXCEPTION_GLOSS, ...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
       : methods === 'collections'
       ? [...COLLECTION_GLOSS, ...EXCEPTION_GLOSS, ...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
@@ -682,7 +689,7 @@ function compileProblem(spec, b, task, unit, result) {
   if (elsewhere) return fail(`${label(n)} compiles`, elsewhere, shown)
   return fail(
     `${label(n)} compiles`,
-    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.functions ? 'functions' : spec.collections ? 'collections' : spec.exceptions ? 'exceptions' : spec.families ? 'families' : spec.objects ? 'objects' : spec.methods)}`,
+    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.values ? 'values' : spec.functions ? 'functions' : spec.collections ? 'collections' : spec.exceptions ? 'exceptions' : spec.families ? 'families' : spec.objects ? 'objects' : spec.methods)}`,
     shown
   )
 }
@@ -853,7 +860,7 @@ function runProblem(spec, task, result, given = {}, call) {
     )
   }
   if (result.exception && spec.families) {
-    const known = [...(spec.functions ? FUNCTION_THROWN : []), ...(spec.collections ? COLLECTION_THROWN : []), ...FAMILY_THROWN, ...METHOD_THROWN, ...THROWN].find(([re]) => re.test(result.exception))
+    const known = [...(spec.values ? VALUE_THROWN : []), ...(spec.functions ? FUNCTION_THROWN : []), ...(spec.collections ? COLLECTION_THROWN : []), ...FAMILY_THROWN, ...METHOD_THROWN, ...THROWN].find(([re]) => re.test(result.exception))
     // A method that calls itself leaves a thousand lines of trace: the first few say it all.
     const trace = result.exception.replace(/\n\tat [\w$.]*\.main\(.*/g, '').split('\n').slice(0, 6).join('\n')
     return fail(
@@ -964,6 +971,16 @@ function stopMessage(spec, b) {
         `The // Task ${b.task} comment is outside main. Every task's lines go inside main, between its braces, where the starter had them.`
       ]
     case 'imports':
+      if (spec.values)
+        return b.lost
+          ? [
+              `${spec.file} keeps its import lines`,
+              `The line ${b.lost} at the top of ${spec.file} is not as the starter gave it. The tasks, and Check's own code, use what it brings in, so put it back as it was. An import line you add below it, from java.util, java.math, java.time, java.nio or java.io, can stay.`
+            ]
+          : [
+              `${spec.file} keeps its import lines`,
+              `An import line at the top of ${spec.file} brings in something from outside java.util, java.math, java.time, java.nio and java.io. Check's own code uses names from those, and an import from elsewhere can give one of them a second meaning. Remove the line you added.`
+            ]
       if (spec.functions && b.lost)
         return [
           `${spec.file} keeps its import lines`,
@@ -1030,6 +1047,8 @@ export function tasks(spec) {
             ? `${label(task.task)} builds on ${label(blocked)}, which Check does not run yet. Get ${label(blocked)} passing first, then check again.`
             : word === '\\u'
               ? `${label(blocked)} has a \\u escape, which Java turns into a character before it reads anything else, even in a comment. Type the character itself instead, so Check runs your lines.`
+              : word.startsWith(PATH_OUT)
+                ? `${label(blocked)} names the path ${word.slice(PATH_OUT.length)}, which leads out of the folder Check works in. Each method works on the path it is handed, and on files beside it: Check does not run a task that names a place elsewhere on the computer. Take it out.`
               : `${label(blocked)} uses ${word}, which reaches into how Check runs your program instead of doing the task. Nothing in this issue needs it, and Check does not run it: take it out.`
         )
       ]
@@ -1402,6 +1421,10 @@ function objectProblem(spec, b, task, unit, errors) {
   const message = (x) => x.message.replace(/\bjava\.(?:lang|util)\.(?=[A-Z])/g, '')
   const reads = Object.values(c.reads ?? {})
   const asIs = `${ranText(c) ? `Check ran:\n${indent(ranText(c))}\n` : ''}${reads.length && !c.show ? `${ranText(c) ? 'and read' : 'Check read'}:\n${indent(Object.keys(c.reads).join('\n'))}` : ''}\n\n${checkOwn(errors).map(message).join('\n\n')}`
+  if (spec.values) {
+    const said = valueProblem(task, message(e), asIs)
+    if (said) return said
+  }
   if (spec.functions) {
     const said = functionProblem(task, message(e), asIs)
     if (said) return said
@@ -2441,14 +2464,14 @@ const IMPORT_LINE = /^[ \t]*import\b[^;\n]*;[ \t]*(?:\/\/[^\n]*)?$/gm
 
 /** Null when the shared lines differ from the starter's in more than their import lines; false
  * when every starter import is there and each added one is from java.util; else what to stop with. */
-function importProblem(mine, given) {
+function importProblem(mine, given, values = false) {
   if (bare(mine.replace(IMPORT_LINE, '')) !== bare(given.replace(IMPORT_LINE, ''))) return null
   const lines = (x) => x.match(IMPORT_LINE) ?? []
   const have = lines(mine).map(bare)
   const lost = lines(given).find((line) => !have.includes(bare(line)))
   if (lost) return { stop: 'imports', lost: lost.trim() }
   const allowed = new Set(lines(given).map(bare))
-  if (have.every((line) => allowed.has(line) || /^import(?:static)?java\.util\.[\w.]*(?:\*|\w);$/.test(line))) return false
+  if (have.every((line) => allowed.has(line) || /^import(?:static)?java\.util\.[\w.]*(?:\*|\w);$/.test(line) || (values && VALUE_IMPORT.test(line)))) return false
   return { stop: 'imports' }
 }
 
@@ -2823,3 +2846,305 @@ class CheckList<E> extends java.util.ArrayList<E> {
         };
     }
 }`
+
+// --- Real values and files ----------------------------------------------------------------------
+// From part 8 a task works with money in BigDecimal, text, dates and times, and files. Issues set
+// `values: true` beside `functions`. Their JVM runs with a language, a time zone and a line end of
+// its own (VALUE_JVM), far from the story's and from most computers', so an answer that leans on
+// the computer's own (a month name, a decimal comma, today's date, System.lineSeparator) shows.
+// Issues that touch files also set `files: true`: Check hands a method a Path on a file system of
+// its own (CHECK_FOLDER) over a folder of its own in the sandbox copy, which refuses any path that
+// leads out of that folder and counts the files left open. A task whose text names a path that
+// leads out of the folder (absolute, or climbing with ..) is not run.
+
+export const VALUE_JVM = ['-Duser.language=de', '-Duser.country=DE', '-Duser.timezone=Pacific/Kiritimati', '-Dline.separator=\r\n']
+
+/** A result line with the line ends of its compile errors and trace made plain \n again. */
+function sameLineEnds(r) {
+  const plain = (x) => (typeof x === 'string' ? x.replace(/\r\n/g, '\n') : x)
+  return { ...r, errors: (r.errors ?? []).map((e) => ({ ...e, message: plain(e.message) })), exception: plain(r.exception) }
+}
+
+const PATH_OUT = 'path:'
+const COMMENT_OR_TEXT = /"""[\s\S]*?(?:"""|$)|\/\*[\s\S]*?(?:\*\/|$)|\/\/[^\n]*|"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?/g
+
+/** The first text in the code that names a place outside the folder: absolute, or climbing with .. */
+function pathOut(text) {
+  for (const m of text.matchAll(COMMENT_OR_TEXT)) {
+    if (!m[0].startsWith('"')) continue
+    const s = m[0].replace(/^"+|"+$/g, '')
+    if (/^(?:\/[\w.~-]|\\\\|[A-Za-z]:(?:\\\\|\/)|~[\\/])/.test(s) || /(?:^|\/|\\\\)\.\.(?:\/|\\\\|$)/.test(s)) return PATH_OUT + m[0]
+  }
+  return null
+}
+
+const VALUE_IMPORT = /^import(?:static)?java\.(?:util|math|time|nio|io)\.[\w.]*(?:\*|\w);$/
+
+// Errors money, text, dates and files bring, read first in those issues.
+const VALUE_GLOSS = [
+  [
+    /^compiler\.err\.operator\.cant\.be\.applied/,
+    (e) =>
+      /BigDecimal/.test(e.message) &&
+      !/'[<>]=?'/.test(e.message) &&
+      'A BigDecimal is an object, so + - * and / do not work on it. It has a method for each, and each gives back a new BigDecimal: the lesson shows them.'
+  ],
+  [
+    /^compiler\.err\.operator\.cant\.be\.applied/,
+    (e) =>
+      /'[<>]=?'/.test(e.message) &&
+      /BigDecimal|Local(?:Date|Time|DateTime)/.test(e.message) &&
+      '< and > compare plain numbers only. A BigDecimal is compared with compareTo, and a date or a time with isBefore and isAfter.'
+  ],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /(?:double|int|long|float) cannot be converted to (?:java\.math\.)?BigDecimal/.test(e.message) &&
+      'A plain number is not a BigDecimal. One is made from text, new BigDecimal("3.35"), or from a whole number with BigDecimal.valueOf.'
+  ],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /(?:java\.lang\.)?StringBuilder cannot be converted to (?:java\.lang\.)?String\b/.test(e.message) &&
+      'A StringBuilder is not text itself: it builds text, and toString gives back what it has built.'
+  ],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /(?:java\.lang\.)?String cannot be converted to (?:java\.(?:time|nio\.file)\.)?(?:Local(?:Date|Time|DateTime)|Path)\b/.test(e.message) &&
+      'A text is not a date, a time or a path, even when it reads like one. Each of those types has its own way to be made from text: the lesson shows them.'
+  ],
+  [
+    /^compiler\.err\.unreported\.exception/,
+    (e) =>
+      /(?:java\.(?:io|nio\.file|nio\.charset)\.)?(?:IOException|NoSuchFileException|MalformedInputException)/.test(e.message) &&
+      'Reading or writing a file can fail for reasons outside the program, so the Files methods say they throw IOException, a checked exception. Java insists that it is caught around the line or named with throws on the first line of the method.'
+  ],
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) =>
+      /symbol:\s+variable (?:HALF_UP|HALF_EVEN|HALF_DOWN|UP|DOWN|CEILING|FLOOR|UTF_8|ISO_8859_1|US_ASCII|APPEND|CREATE)\b/.test(e.message) &&
+      'That name belongs to a class: it is written with the class in front and a dot, as the lesson shows.'
+  ],
+  [
+    /^compiler\.err\.cant\.apply\.symbol/,
+    (e) =>
+      /\b(?:Local(?:Date|Time|DateTime)\.of|setScale|divide)\b/.test(e.message.split('\n')[0]) &&
+      'That method takes other things in its round brackets than the line hands it. The message lists what it requires and what it found.'
+  ]
+]
+
+// What an exception usually means with money, dates and files, in plain words, without the fix.
+const VALUE_THROWN = [
+  [
+    /ArithmeticException: Non-terminating decimal expansion/,
+    'A BigDecimal division whose answer never ends, as 10 divided by 3, has no exact answer, and divide with nothing more asks for an exact one. It needs to be told how many decimal places to keep, and how to round.'
+  ],
+  [
+    /ArithmeticException: Rounding necessary/,
+    'A BigDecimal was asked for fewer decimal places without being told how to round, and its value needed rounding.'
+  ],
+  [
+    /NumberFormatException: (?:Character .* is neither a decimal digit|No digits found)/,
+    'new BigDecimal reads only an amount written as digits, with one point and no spaces, sign of money or comma. The message names the first character it could not read.'
+  ],
+  [
+    /NumberFormatException: For input string/,
+    'A whole number was read from a text that is not one: the message quotes the text, spaces included.'
+  ],
+  [
+    /DateTimeParseException/,
+    'A date or a time was read from a text that is not written the way the reader expects: the message quotes the text, and says where reading stopped or what could not be made of it.'
+  ],
+  [/DateTimeException: Invalid date/, 'That date does not exist: the month has no such day.'],
+  [/DateTimeException: Invalid value for/, 'A part of a date or a time is outside its range: the message names the part, the values it can take, and the one it got.'],
+  [
+    /UnsupportedTemporalTypeException: Unsupported unit: Seconds/,
+    'Duration measures time down to the second, and a LocalDate has no time of day, so there is no Duration between two dates. Days between two dates are counted another way: the lesson shows it.'
+  ],
+  [
+    /UnsupportedTemporalTypeException: Unsupported field: (?:MinuteOfHour|HourOfDay|ClockHourOfAmPm|SecondOfMinute|AmPmOfDay)/,
+    'A pattern asks a date for a part of the time of day, which a LocalDate does not have. In a pattern, small and capital letters mean different things: the lesson has a table.'
+  ],
+  [
+    /MalformedInputException/,
+    'The file holds bytes that are not text in the character set it was read with: it was written in another one.'
+  ],
+  [/NoSuchFileException/, 'There is no file at that path: the message names it.'],
+  [/FileAlreadyExistsException/, 'A file is already at that path, and the line asked to make a new one there.'],
+  [
+    /UnsupportedOperationException: Path not associated with default file system/,
+    'toFile turns a Path into the older java.io.File, which knows only the computer\'s own files. The Files methods take the Path itself.'
+  ],
+  [
+    /CheckLeftFolder/,
+    'A path led out of the folder of the file Check handed over. A method works on the path it is handed, and on files beside it.'
+  ]
+]
+
+/** One sentence on what an exception with money, dates or files usually means, or null. For outcomeCases. */
+export function explainValue(x) {
+  const text = `${x.type}${x.message === null ? '' : `: ${x.message}`}\n${x.frames.map((f) => `\tat ${f}`).join('\n')}`
+  return VALUE_THROWN.find(([re]) => re.test(text))?.[1] ?? explainFunction(x)
+}
+
+/** Why Check's own code did not compile against the learner's, with money, dates and files, or null. */
+function valueProblem(task, msg, asIs) {
+  const n = task.task
+  const first = msg.split('\n')[0]
+  const conv = /incompatible types: (?:bad type in switch expression\s*)?(\S+) cannot be converted to (\S+)/.exec(first)
+  if (!conv) return null
+  const [, from, to] = conv.map((x) => x?.replace(/java\.(?:lang|math|time|nio\.file)\./g, ''))
+  if (from === 'StringBuilder' && to === 'String')
+    return fail(
+      `${label(n)} gives back text`,
+      `Check keeps what comes back in a String, as the task says, and Java says it is a StringBuilder. A StringBuilder only builds text: toString gives back what it has built.`,
+      asIs
+    )
+  const known = /^(?:BigDecimal|LocalDate|LocalTime|LocalDateTime|Duration|Period|Path|String|StringBuilder|double|int|long|boolean)$/
+  if (known.test(from) && known.test(to))
+    return fail(
+      `${label(n)} uses the types the task names`,
+      `Check uses your method as the task says, with ${an(to)} where Java found ${an(from)}. Compare the method's first line with the task: the type in front of its name, and the type of each parameter.`,
+      asIs
+    )
+  return null
+}
+
+// Check's own folder for a case, and a file system over it that a method is handed paths on. It
+// refuses a path that leads out of the folder (and keeps it in `left`), counts what is still open
+// (`open`), and its paths print as check-folder:/name, which is no place on the computer, so a path
+// made again from that text cannot stand for the file it came from.
+export const CHECK_FOLDER = `class CheckLeftFolder extends RuntimeException {
+    CheckLeftFolder(String path) { super("Check's folder refuses " + path + ": it is outside the folder of the file Check handed over"); }
+}
+final class CheckFolder extends java.nio.file.spi.FileSystemProvider {
+    final java.nio.file.Path root;
+    final CheckFs fs = new CheckFs(this);
+    int open;
+    String left;
+    CheckFolder(String name) {
+        try { root = java.nio.file.Files.createDirectories(java.nio.file.Path.of("").toAbsolutePath().resolve(name)).toRealPath(); }
+        catch (java.io.IOException e) { throw new java.io.UncheckedIOException(e); }
+    }
+    java.nio.file.Path path(String name) { return new CheckPath(fs, root.resolve(name)); }
+    void write(String name, String text, java.nio.charset.Charset cs) { try { java.nio.file.Files.write(root.resolve(name), text.getBytes(cs)); } catch (java.io.IOException e) { throw new java.io.UncheckedIOException(e); } }
+    void write(String name, String text) { write(name, text, java.nio.charset.StandardCharsets.UTF_8); }
+    String read(String name) {
+        java.nio.file.Path p = root.resolve(name);
+        if (!java.nio.file.Files.exists(p)) return null;
+        try { return new String(java.nio.file.Files.readAllBytes(p), java.nio.charset.StandardCharsets.UTF_8); } catch (java.io.IOException e) { throw new java.io.UncheckedIOException(e); }
+    }
+    String show(java.nio.file.Path real) {
+        try { return root.equals(real) ? "check-folder:" : "check-folder:/" + root.relativize(real).toString().replace('\\\\', '/'); }
+        catch (IllegalArgumentException e) { return real.toString(); }
+    }
+    java.nio.file.Path real(java.nio.file.Path p) {
+        if (!(p instanceof CheckPath c)) throw new java.nio.file.ProviderMismatchException();
+        java.nio.file.Path r = (c.real.isAbsolute() ? c.real : root.resolve(c.real)).normalize();
+        if (!r.startsWith(root)) { left = c.toString(); throw new CheckLeftFolder(c.toString()); }
+        return r;
+    }
+    <T> T io(java.nio.file.Path p, java.util.concurrent.Callable<T> work) throws java.io.IOException {
+        try { return work.call(); }
+        catch (java.nio.file.NoSuchFileException e) { throw new java.nio.file.NoSuchFileException(p.toString()); }
+        catch (java.nio.file.FileAlreadyExistsException e) { throw new java.nio.file.FileAlreadyExistsException(p.toString()); }
+        catch (java.nio.file.DirectoryNotEmptyException e) { throw new java.nio.file.DirectoryNotEmptyException(p.toString()); }
+        catch (java.nio.file.NotDirectoryException e) { throw new java.nio.file.NotDirectoryException(p.toString()); }
+        catch (java.nio.file.AccessDeniedException e) { throw new java.nio.file.AccessDeniedException(p.toString()); }
+        catch (java.io.IOException | RuntimeException e) { throw e; }
+        catch (Exception e) { throw new RuntimeException(e); }
+    }
+    @Override public String getScheme() { return "check-folder"; }
+    @Override public java.nio.file.FileSystem newFileSystem(java.net.URI uri, java.util.Map<String, ?> env) { throw new UnsupportedOperationException(); }
+    @Override public java.nio.file.FileSystem getFileSystem(java.net.URI uri) { throw new UnsupportedOperationException(); }
+    @Override public java.nio.file.Path getPath(java.net.URI uri) { throw new UnsupportedOperationException(); }
+    @Override public java.nio.channels.SeekableByteChannel newByteChannel(java.nio.file.Path p, java.util.Set<? extends java.nio.file.OpenOption> options, java.nio.file.attribute.FileAttribute<?>... attrs) throws java.io.IOException {
+        java.nio.channels.SeekableByteChannel ch = io(p, () -> java.nio.file.Files.newByteChannel(real(p), options, attrs));
+        open++;
+        return new java.nio.channels.SeekableByteChannel() {
+            boolean closed;
+            public int read(java.nio.ByteBuffer b) throws java.io.IOException { return ch.read(b); }
+            public int write(java.nio.ByteBuffer b) throws java.io.IOException { return ch.write(b); }
+            public long position() throws java.io.IOException { return ch.position(); }
+            public java.nio.channels.SeekableByteChannel position(long n) throws java.io.IOException { ch.position(n); return this; }
+            public long size() throws java.io.IOException { return ch.size(); }
+            public java.nio.channels.SeekableByteChannel truncate(long n) throws java.io.IOException { ch.truncate(n); return this; }
+            public boolean isOpen() { return ch.isOpen(); }
+            public void close() throws java.io.IOException { if (!closed) { closed = true; open--; } ch.close(); }
+        };
+    }
+    @Override public java.nio.file.DirectoryStream<java.nio.file.Path> newDirectoryStream(java.nio.file.Path dir, java.nio.file.DirectoryStream.Filter<? super java.nio.file.Path> filter) throws java.io.IOException {
+        java.nio.file.DirectoryStream<java.nio.file.Path> s = io(dir, () -> java.nio.file.Files.newDirectoryStream(real(dir)));
+        open++;
+        return new java.nio.file.DirectoryStream<java.nio.file.Path>() {
+            boolean closed;
+            public java.util.Iterator<java.nio.file.Path> iterator() {
+                java.util.List<java.nio.file.Path> all = new java.util.ArrayList<>();
+                for (java.nio.file.Path x : s) {
+                    java.nio.file.Path w = new CheckPath(fs, x);
+                    try { if (filter.accept(w)) all.add(w); } catch (java.io.IOException e) { throw new java.io.UncheckedIOException(e); }
+                }
+                return all.iterator();
+            }
+            public void close() throws java.io.IOException { if (!closed) { closed = true; open--; } s.close(); }
+        };
+    }
+    @Override public void createDirectory(java.nio.file.Path p, java.nio.file.attribute.FileAttribute<?>... attrs) throws java.io.IOException { io(p, () -> java.nio.file.Files.createDirectory(real(p), attrs)); }
+    @Override public void delete(java.nio.file.Path p) throws java.io.IOException { io(p, () -> { java.nio.file.Files.delete(real(p)); return null; }); }
+    @Override public void copy(java.nio.file.Path a, java.nio.file.Path b, java.nio.file.CopyOption... o) throws java.io.IOException { io(a, () -> java.nio.file.Files.copy(real(a), real(b), o)); }
+    @Override public void move(java.nio.file.Path a, java.nio.file.Path b, java.nio.file.CopyOption... o) throws java.io.IOException { io(a, () -> java.nio.file.Files.move(real(a), real(b), o)); }
+    @Override public boolean isSameFile(java.nio.file.Path a, java.nio.file.Path b) throws java.io.IOException { return io(a, () -> java.nio.file.Files.isSameFile(real(a), real(b))); }
+    @Override public boolean isHidden(java.nio.file.Path p) throws java.io.IOException { return io(p, () -> java.nio.file.Files.isHidden(real(p))); }
+    @Override public java.nio.file.FileStore getFileStore(java.nio.file.Path p) throws java.io.IOException { return io(p, () -> java.nio.file.Files.getFileStore(real(p))); }
+    @Override public void checkAccess(java.nio.file.Path p, java.nio.file.AccessMode... modes) throws java.io.IOException { java.nio.file.Path r = real(p); io(p, () -> { r.getFileSystem().provider().checkAccess(r, modes); return null; }); }
+    @Override public <V extends java.nio.file.attribute.FileAttributeView> V getFileAttributeView(java.nio.file.Path p, Class<V> type, java.nio.file.LinkOption... o) { return java.nio.file.Files.getFileAttributeView(real(p), type, o); }
+    @Override public <A extends java.nio.file.attribute.BasicFileAttributes> A readAttributes(java.nio.file.Path p, Class<A> type, java.nio.file.LinkOption... o) throws java.io.IOException { return io(p, () -> java.nio.file.Files.readAttributes(real(p), type, o)); }
+    @Override public java.util.Map<String, Object> readAttributes(java.nio.file.Path p, String attrs, java.nio.file.LinkOption... o) throws java.io.IOException { return io(p, () -> java.nio.file.Files.readAttributes(real(p), attrs, o)); }
+    @Override public void setAttribute(java.nio.file.Path p, String attr, Object value, java.nio.file.LinkOption... o) throws java.io.IOException { io(p, () -> java.nio.file.Files.setAttribute(real(p), attr, value, o)); }
+}
+final class CheckFs extends java.nio.file.FileSystem {
+    final CheckFolder provider;
+    CheckFs(CheckFolder provider) { this.provider = provider; }
+    @Override public java.nio.file.spi.FileSystemProvider provider() { return provider; }
+    @Override public void close() { throw new UnsupportedOperationException(); }
+    @Override public boolean isOpen() { return true; }
+    @Override public boolean isReadOnly() { return false; }
+    @Override public String getSeparator() { return "/"; }
+    @Override public Iterable<java.nio.file.Path> getRootDirectories() { return java.util.List.of(new CheckPath(this, provider.root)); }
+    @Override public Iterable<java.nio.file.FileStore> getFileStores() { return java.util.List.of(); }
+    @Override public java.util.Set<String> supportedFileAttributeViews() { return java.util.Set.of("basic"); }
+    @Override public java.nio.file.Path getPath(String first, String... more) { return new CheckPath(this, java.nio.file.Path.of(first, more)); }
+    @Override public java.nio.file.PathMatcher getPathMatcher(String pattern) { java.nio.file.PathMatcher m = java.nio.file.FileSystems.getDefault().getPathMatcher(pattern); return p -> p instanceof CheckPath c && m.matches(c.real); }
+    @Override public java.nio.file.attribute.UserPrincipalLookupService getUserPrincipalLookupService() { throw new UnsupportedOperationException(); }
+    @Override public java.nio.file.WatchService newWatchService() { throw new UnsupportedOperationException(); }
+}
+final class CheckPath implements java.nio.file.Path {
+    final CheckFs fs;
+    final java.nio.file.Path real;
+    CheckPath(CheckFs fs, java.nio.file.Path real) { this.fs = fs; this.real = real; }
+    private java.nio.file.Path wrap(java.nio.file.Path r) { return r == null ? null : new CheckPath(fs, r); }
+    private java.nio.file.Path of(java.nio.file.Path other) { if (other instanceof CheckPath c) return c.real; throw new java.nio.file.ProviderMismatchException(); }
+    @Override public java.nio.file.FileSystem getFileSystem() { return fs; }
+    @Override public boolean isAbsolute() { return real.isAbsolute(); }
+    @Override public java.nio.file.Path getRoot() { return real.isAbsolute() ? wrap(fs.provider.root) : null; }
+    @Override public java.nio.file.Path getFileName() { return wrap(real.getFileName()); }
+    @Override public java.nio.file.Path getParent() { return wrap(real.getParent()); }
+    @Override public int getNameCount() { return real.getNameCount(); }
+    @Override public java.nio.file.Path getName(int i) { return wrap(real.getName(i)); }
+    @Override public java.nio.file.Path subpath(int a, int b) { return wrap(real.subpath(a, b)); }
+    @Override public boolean startsWith(java.nio.file.Path o) { return o instanceof CheckPath c && real.startsWith(c.real); }
+    @Override public boolean endsWith(java.nio.file.Path o) { return o instanceof CheckPath c && real.endsWith(c.real); }
+    @Override public java.nio.file.Path normalize() { return wrap(real.normalize()); }
+    @Override public java.nio.file.Path resolve(java.nio.file.Path o) { return wrap(real.resolve(of(o))); }
+    @Override public java.nio.file.Path relativize(java.nio.file.Path o) { return wrap(real.relativize(of(o))); }
+    @Override public java.net.URI toUri() { return java.net.URI.create("check-folder:/" + (real.isAbsolute() ? fs.provider.root.relativize(real) : real).toString().replace('\\\\', '/')); }
+    @Override public java.nio.file.Path toAbsolutePath() { return real.isAbsolute() ? this : wrap(fs.provider.root.resolve(real)); }
+    @Override public java.nio.file.Path toRealPath(java.nio.file.LinkOption... o) throws java.io.IOException { return wrap(fs.provider.real(this).toRealPath(o)); }
+    @Override public java.nio.file.WatchKey register(java.nio.file.WatchService w, java.nio.file.WatchEvent.Kind<?>[] k, java.nio.file.WatchEvent.Modifier... m) { throw new UnsupportedOperationException(); }
+    @Override public int compareTo(java.nio.file.Path o) { return real.compareTo(of(o)); }
+    @Override public boolean equals(Object o) { return o instanceof CheckPath c && c.real.equals(real); }
+    @Override public int hashCode() { return real.hashCode(); }
+    @Override public String toString() { return real.isAbsolute() ? fs.provider.show(real.normalize()) : real.toString().replace('\\\\', '/'); }
+}
+`
