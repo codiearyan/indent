@@ -1,0 +1,71 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ossian", "label": "Ossian", "kind": "story" },
+      { "id": "tickets", "label": "Day's tickets", "kind": "data" },
+      { "id": "desk", "label": "Desk", "kind": "function", "mine": true },
+      { "id": "rulebook", "label": "RuleBook", "kind": "function", "mine": true },
+      { "id": "shortcuts", "label": "Shortcuts", "kind": "function", "mine": true },
+      { "id": "lists", "label": "Lists and prices", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "ossian", "to": "desk", "label": "a rule" },
+      { "from": "tickets", "to": "desk", "label": "each ticket" },
+      { "from": "rulebook", "to": "desk", "label": "joined rules" },
+      { "from": "shortcuts", "to": "desk", "label": "short rules" },
+      { "from": "desk", "to": "lists", "label": "kept, priced" }
+    ],
+    "note": "One loop at the desk, and the rules handed to it as values: written, joined or named in a word."
+  },
+  "tasks": {
+    "hand": {
+      "steps": [
+        {
+          "active": ["ossian", "ossian->desk", "desk"],
+          "note": "Ossian hands the desk a rule, such as children only, or a fare."
+        },
+        {
+          "active": ["tickets", "tickets->desk", "desk"],
+          "value": { "kind": "array", "label": "a ticket", "values": ["passenger", "age", "boat"] },
+          "note": "The desk asks the rule about each ticket of the day, once, in order."
+        },
+        {
+          "active": ["desk", "desk->lists", "lists"],
+          "note": "The tickets the rule says yes to, or each ticket's fare, go on a new list. The day's tickets stay as they were."
+        }
+      ]
+    },
+    "combine": {
+      "steps": [
+        {
+          "active": ["rulebook"],
+          "note": "Two rules become one that says yes only when both do, and stops at the first no."
+        },
+        {
+          "active": ["rulebook"],
+          "note": "A fare becomes a new fare with the harbour's fee on top."
+        },
+        {
+          "active": ["rulebook", "rulebook->desk", "desk"],
+          "note": "The desk uses the joined rule and the new fare like any other."
+        }
+      ]
+    },
+    "references": {
+      "steps": [
+        {
+          "active": ["shortcuts"],
+          "note": "Numbers written as text are read by a method that already exists."
+        },
+        {
+          "active": ["shortcuts"],
+          "note": "A list of names answers whether a name is on it, and a ticket gives its passenger."
+        },
+        {
+          "active": ["shortcuts", "shortcuts->desk", "desk"],
+          "note": "A fresh list is made each time one is asked for, and each of these goes to work where a rule is wanted."
+        }
+      ]
+    }
+  }
+}

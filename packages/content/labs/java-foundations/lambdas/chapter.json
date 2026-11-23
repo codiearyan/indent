@@ -89,7 +89,7 @@
         "Sort a copy of today in main and read it: the boats A to Z, each boat's fullest departure last."
       ],
       "hints": [
-        "Comparator.comparing makes a comparator from a lambda that picks the thing to compare, and thenComparing adds a rule used only when the first gives 0.",
+        "A comparator can be built from a lambda that picks the thing to compare, and a second rule added to it counts only when the first gives 0. The lesson shows the two methods that do this.",
         "At the start of the chain, tell the first lambda that it is handed a Departure, or Java takes it to be an Object. reversed turns round the whole comparator it is called on: the seats are the only rule to turn round.",
         "`return Comparator.comparing((Departure d) -> d.boat()).thenComparing((a, b) -> Integer.compare(b.seatsFree(), a.seatsFree()));`."
       ],
