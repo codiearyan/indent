@@ -1,0 +1,73 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "today", "label": "Today's departures", "kind": "data" },
+      { "id": "orders", "label": "Orders", "kind": "function", "mine": true },
+      { "id": "window", "label": "Window", "kind": "function", "mine": true },
+      { "id": "boards", "label": "Boards", "kind": "function", "mine": true },
+      { "id": "family", "label": "Family at the window", "kind": "story" },
+      { "id": "noticeboard", "label": "Noticeboard", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "today", "to": "orders", "label": "two at a time" },
+      { "from": "family", "to": "window", "label": "party size" },
+      { "from": "today", "to": "window", "label": "one departure" },
+      { "from": "today", "to": "boards", "label": "two at a time" },
+      { "from": "orders", "to": "noticeboard", "label": "by hour" },
+      { "from": "boards", "to": "noticeboard", "label": "by boat" }
+    ],
+    "note": "The board's rules stop being classes of their own and become one line each, written where they are used."
+  },
+  "tasks": {
+    "earliest": {
+      "steps": [
+        {
+          "active": ["today", "today->orders", "orders"],
+          "value": { "kind": "array", "label": "a departure", "values": ["boat", "hour", "seats free"] },
+          "note": "The board compares two departures at a time."
+        },
+        {
+          "active": ["orders"],
+          "note": "The rule looks at the hours only: the earlier one goes first."
+        },
+        {
+          "active": ["orders", "orders->noticeboard", "noticeboard"],
+          "note": "Sorted with that rule, the board reads from the first boat of the day to the last."
+        }
+      ]
+    },
+    "room": {
+      "steps": [
+        {
+          "active": ["family", "family->window", "window"],
+          "note": "A family at the window says how many they are, and the window makes a rule for that party."
+        },
+        {
+          "active": ["today", "today->window", "window"],
+          "note": "The rule is asked about one departure at a time: yes or no."
+        },
+        {
+          "active": ["window"],
+          "note": "Another family gets a rule of its own, and the first rule keeps its own party."
+        }
+      ]
+    },
+    "board": {
+      "steps": [
+        {
+          "active": ["today", "today->boards", "boards"],
+          "value": { "kind": "array", "label": "a departure", "values": ["boat", "hour", "seats free"] },
+          "note": "Two departures are compared by the boat's name first."
+        },
+        {
+          "active": ["boards"],
+          "note": "Two departures of the same boat are compared by their seats free."
+        },
+        {
+          "active": ["boards", "boards->noticeboard", "noticeboard"],
+          "note": "The board shows each boat together, the one with most room at the top of each."
+        }
+      ]
+    }
+  }
+}

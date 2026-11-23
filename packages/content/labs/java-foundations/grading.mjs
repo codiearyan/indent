@@ -2662,6 +2662,11 @@ const FUNCTION_GLOSS = [
       'A lambda or a method reference can stand only for a functional interface: an interface with exactly one abstract method. When you run the file, the line under the error says what Java found instead.'
   ],
   [
+    /^compiler\.err\.bad\.functional\.intf\.anno/,
+    () =>
+      '@FunctionalInterface asks the compiler to make sure the interface below it has exactly one abstract method, and it has another number. When you run the file, the line under the error says what Java found.'
+  ],
+  [
     /^compiler\.err\.cant\.ref\.non\.effectively\.final\.var/,
     () =>
       'A lambda may read a local variable of the method around it, or a parameter, only when that variable never changes: not before the lambda, not after it, and not inside it. Something that has to change cannot be a local variable the lambda reads.'

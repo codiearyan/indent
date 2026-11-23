@@ -73,6 +73,12 @@
         "sorting",
         "generics"
       ]
+    },
+    {
+      "title": "Rules you can hand over",
+      "chapters": [
+        "lambdas"
+      ]
     }
   ]
 }
