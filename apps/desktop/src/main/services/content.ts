@@ -19,7 +19,7 @@ import type {
   PathDef
 } from '@shared/types'
 import { EVENTS } from '@shared/types'
-import { emit, handle, listen } from '../ipc'
+import { emit, handle, listen, whenReady } from '../ipc'
 import {
   asInstallError,
   fetchIndex,
@@ -242,6 +242,7 @@ async function coverFile(labId: string): Promise<string | null> {
 
 export function register(): void {
   protocol.handle(COVER_SCHEME, async (request) => {
+    await whenReady()
     try {
       const file = await coverFile(safeId(new URL(request.url).hostname))
       if (file) return await net.fetch(pathToFileURL(file).toString())

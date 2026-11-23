@@ -5,15 +5,26 @@ import { INVOKE_METHODS, SEND_METHODS } from '@shared/types'
 type Namespace = keyof Api
 type Handlers<N extends Namespace, M extends string> = Pick<Api[N], Extract<M, keyof Api[N]>>
 
+let ready: Promise<unknown> = Promise.resolve()
+
+/** Requests wait for this first: the content folder may still be filling on a first start. */
+export function answerAfter(work: Promise<unknown>): void {
+  ready = work.catch(() => {})
+}
+
+/** Settles once requests are answered. */
+export const whenReady = (): Promise<unknown> => ready
+
 /** Registers a service's request/response methods on `${namespace}:${method}`. */
 export function handle<N extends keyof typeof INVOKE_METHODS>(
   namespace: N,
   impl: Handlers<N, (typeof INVOKE_METHODS)[N][number]>
 ): void {
   for (const [method, fn] of Object.entries(impl)) {
-    ipcMain.handle(`${namespace}:${method}`, (_event, ...args) =>
-      (fn as (...a: unknown[]) => unknown)(...args)
-    )
+    ipcMain.handle(`${namespace}:${method}`, async (_event, ...args) => {
+      await ready
+      return (fn as (...a: unknown[]) => unknown)(...args)
+    })
   }
 }
 

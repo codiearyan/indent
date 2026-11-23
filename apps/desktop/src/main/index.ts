@@ -17,7 +17,7 @@ import * as github from './services/github'
 import * as telemetry from './services/telemetry'
 import * as updates from './services/updates'
 import * as reminders from './services/reminders'
-import { appWindows } from './ipc'
+import { answerAfter, appWindows } from './ipc'
 import { perf } from './perf'
 import { seedContent } from './library'
 import { saveBeforeClose } from './saveBeforeClose'
@@ -144,10 +144,13 @@ function adoptEarlierData(): void {
 app.whenReady().then(() => {
   if (secondCopy) return
   adoptEarlierData()
-  try {
-    if (usesLibrary()) seedContent(bundledContentDir(), contentDir(), app.getVersion())
-  } catch (error) {
-    console.error('Could not copy the shipped repos into the data folder:', error)
+  // The window opens while the shipped repos are copied; requests wait for the copy.
+  if (usesLibrary()) {
+    answerAfter(
+      seedContent(bundledContentDir(), contentDir(), app.getVersion()).catch((error) =>
+        console.error('Could not copy the shipped repos into the data folder:', error)
+      )
+    )
   }
   if (is.dev && !hidden) app.dock?.setIcon(icon)
   electronApp.setAppUserModelId('com.indent.app')
