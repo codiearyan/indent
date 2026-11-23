@@ -54,7 +54,8 @@
         "labs": [
           "react-foundations",
           "react-screens",
-          "react-with-an-api"
+          "react-with-an-api",
+          "build-a-state-store"
         ]
       },
       {
@@ -237,7 +238,8 @@
         "labs": [
           "react-foundations",
           "react-screens",
-          "react-with-an-api"
+          "react-with-an-api",
+          "build-a-state-store"
         ]
       }
     ]
@@ -256,7 +258,8 @@
           "async-js",
           "build-a-test-runner",
           "build-a-promise",
-          "build-a-router"
+          "build-a-router",
+          "build-a-state-store"
         ]
       },
       {
