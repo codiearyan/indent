@@ -252,7 +252,7 @@ export const checks = tasks({
       judge: judge([
         {
           when: (r, x) => !x && r.case.kind === 'line' && (value(r, 'got') ?? '').includes(','),
-          hint: 'ticketLine writes a comma between pounds and pence. Check runs with a German computer\'s language, and String.format writes numbers the way the computer\'s language does. A ticket shows a point wherever it is printed, so its text must not follow the computer's language: the lesson shows two ways.'
+          hint: 'ticketLine writes a comma between pounds and pence. Check runs with a German computer\'s language, and String.format writes numbers the way the computer\'s language does. A ticket shows a point wherever it is printed, so its text must not follow the computer\'s language: the lesson shows two ways.'
         },
         {
           when: (r, x, runs) => !x && r.case.kind === 'line' && all(runs, 'line', (q) => value(q, 'got') === `£${q.case.ticket.amount}`),
