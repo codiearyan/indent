@@ -127,7 +127,7 @@ export const checks = tasks({
             },
             {
               value: (c) => c.a * half(c.p) + c.c * c.p,
-              hint: 'partyFare charges the adults half and the children the full fare: the two are the wrong way round.'
+              hint: 'partyFare charges the adults half and the children the full fare: the two are the wrong way round. Check the order of the parameters too: the adults come first.'
             }
           ]
         })(runs),

@@ -414,8 +414,9 @@ async function build(t, spec) {
 // --- Saying what went wrong ---------------------------------------------------------------------
 
 /** One error as javac prints it, for the learner's own line and file name. */
-function javacLike(file, lines, e) {
-  const [first, ...rest] = e.message.replace(/\bjava\.(?:lang|io)\.(?=[A-Z])/g, '').split('\n')
+function javacLike(file, lines, e, methods) {
+  const pkg = methods ? /\bjava\.(?:lang|io|util)\.(?=[A-Z])/g : /\bjava\.(?:lang|io)\.(?=[A-Z])/g
+  const [first, ...rest] = e.message.replace(pkg, '').split('\n')
   const src = lines[e.line - 1] ?? ''
   const caret = src.slice(0, Math.max(0, e.col - 1)).replace(/[^\t]/g, ' ') + '^'
   return [`${file}:${e.line}: error: ${first}`, src, caret, ...rest].join('\n')
@@ -637,7 +638,7 @@ function compileProblem(spec, b, task, unit, result) {
   )
   const shown = mine
     .slice(0, 3)
-    .map((e) => javacLike(spec.file, lines, e))
+    .map((e) => javacLike(spec.file, lines, e, spec.methods))
     .join('\n\n')
   if (earlier !== undefined) {
     return fail(
@@ -646,11 +647,34 @@ function compileProblem(spec, b, task, unit, result) {
       shown
     )
   }
+  const elsewhere = spec.methods && elsewhereMethod(spec, b, task, mine[0])
+  if (elsewhere) return fail(`${label(n)} compiles`, elsewhere, shown)
   return fail(
     `${label(n)} compiles`,
     `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.methods)}`,
     shown
   )
+}
+
+/** When a task calls a method the learner wrote outside the parts Check keeps for it, why it
+ * compiles in the terminal and not in Check. */
+function elsewhereMethod(spec, b, task, e) {
+  if (!/^compiler\.err\.cant\.resolve/.test(e.code)) return null
+  const name = /symbol:\s+method (\w+)\(/.exec(e.message)?.[1]
+  if (!name) return null
+  const at = codeOnly(b.text).search(new RegExp(`\\bstatic\\s[^;{}()=]*\\b${name}\\s*\\(`))
+  if (at < 0) return null
+  const n = task.task
+  const keep = [n, ...(task.needs ?? [])]
+  const owner = [...b.l.sections.entries()].find(([, s]) => at >= s.start && at < s.end)?.[0]
+  if (owner !== undefined && keep.includes(owner)) return null
+  const asked = Object.values(spec.tasks).find((t) => t.method === name)?.task
+  if (asked !== undefined && keep.includes(asked))
+    return `${label(n)} calls ${name}, which is written outside the // Task parts. Write it under // ${label(asked)}, where the task asks for it.`
+  const why = `That runs in the terminal, but Check runs each task on its own, with only its own methods and those of the tasks it says it builds on`
+  if (asked !== undefined)
+    return `${label(n)} calls ${name}, the method of ${label(asked)}. ${why}, so ${label(n)} cannot use it. Do that work in ${label(n)}'s own lines.`
+  return `${label(n)} calls ${name}, which is written ${owner === undefined ? 'outside the // Task parts' : `under // ${label(owner)}`}. ${why}. Write ${name} under // ${label(n)}.`
 }
 
 const an = (type) => (/^[aeiou]/i.test(type) ? `an ${type}` : `a ${type}`)
@@ -726,6 +750,7 @@ const METHOD_THROWN = [
     /(?<!String|Array)IndexOutOfBoundsException/,
     'A position was asked for that the list does not have. The words after the exception say which position, and how many items the list holds.'
   ],
+  [/NegativeArraySizeException/, 'An array was made with a size below 0.'],
   [
     /ConcurrentModificationException/,
     'A list was changed while a for-each loop was walking through it, and Java stopped the loop.'
@@ -899,6 +924,17 @@ export function tasks(spec) {
               : `${label(blocked)} uses ${word}, which reaches into how Check runs your program instead of doing the task. Nothing in this issue needs it, and Check does not run it: take it out.`
         )
       ]
+    }
+    if (spec.methods && task.returns === 'void') {
+      const code = codeOnly(section(b, task.task))
+      const m = task.method
+      if (new RegExp(`\\b${m}\\s*\\(`).test(code) && !new RegExp(`\\bvoid\\s+${m}\\s*\\(`).test(code))
+        return [
+          fail(
+            `${m} is void`,
+            `The task asks for a void method: ${m} does its job and gives nothing back. Yours has a type in front of its name in place of void, so it says it gives something back.`
+          )
+        ]
     }
     const units = b.units.filter((u) => u.task === id)
     for (const u of units) {

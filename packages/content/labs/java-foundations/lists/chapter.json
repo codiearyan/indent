@@ -45,7 +45,7 @@
       "id": "last-on-list",
       "title": "Find the last name on the list",
       "file": "WaitingList.java",
-      "description": "Under `// Task 2`, write a method called `lastOnList`. It takes an `ArrayList<String>` and gives back a `String`: the last name on it, or `Nobody` when the list is empty.\n\nCheck calls `lastOnList` with lists of its own, an empty one included, and reads what it gives back.",
+      "description": "Under `// Task 2`, write a method called `lastOnList`. It takes an `ArrayList<String>` and gives back a `String`: the last name on it, or `Nobody` when the list is empty. It only reads the list: the list stays as it was.\n\nCheck calls `lastOnList` with lists of its own, an empty one included, and reads what it gives back and the list afterwards.",
       "nextSteps": [
         "Read the part of the lesson about reading a list: it has no square brackets and no `length`.",
         "Handle the empty list first.",

@@ -11,17 +11,17 @@ public class WaitingList {
     public static void main(String[] args) {
         // main is yours: try your methods here, and take the // off a line once its method is
         // written.
-        String[] queue = {"Morag", "Tam", "Ishbel", "Fenn", "Corrie"};
+        String[] queue = {"Morag", "Lachie", "Ishbel", "Torquil", "Mhairi"};
         ArrayList<String> waiting = waitingList(queue, 3);
         System.out.println(waiting);
         System.out.println(lastOnList(waiting));
         System.out.println(sailedLoads(new int[] {12, 0, 30, 8}));
 
         ArrayList<String> bookings = new ArrayList<>();
-        bookings.add("Una");
+        bookings.add("Seonag");
         bookings.add("Rab");
-        bookings.add("Una");
-        cancel(bookings, "Una");
+        bookings.add("Seonag");
+        cancel(bookings, "Seonag");
         System.out.println("Bookings: " + bookings);
     }
 
@@ -39,7 +39,7 @@ public class WaitingList {
 
     // Task 2: Find the last name on the list
     // Write a method called lastOnList. It takes an ArrayList<String> and gives back a String:
-    // the last name on it, or Nobody when the list is empty.
+    // the last name on it, or Nobody when the list is empty. It leaves the list as it is.
     static String lastOnList(ArrayList<String> waiting) {
         if (waiting.size() == 0) {
             return "Nobody";

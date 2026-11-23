@@ -69,6 +69,10 @@ export const checks = tasks({
             hint: 'total leaves out the last crossing: the loop stops one position too soon.'
           },
           {
+            value: (c) => c.xs[0] ?? 0,
+            hint: 'total gives back only the first crossing: its return runs the first time round the loop. Give the total back once the loop has finished.'
+          },
+          {
             value: (c) => c.xs.at(-1) ?? 0,
             hint: 'total holds only the last crossing. Each time round, the loop should add to the total, and the total is set to 0 once, before the loop.'
           }
@@ -125,7 +129,10 @@ export const checks = tasks({
         n,
         name,
         expected: range(h, n),
-        hint: 'departures should give back an array of crossings hours: firstHour, then one hour later for each next crossing.'
+        hint:
+          n === 0
+            ? 'A day with no crossings still gets an array back: one with no places in it, not null.'
+            : 'departures should give back an array with one place for each crossing: firstHour in the first, then one hour later in each next place.'
       })),
       judge: methodCases({
         method: 'departures',
@@ -143,6 +150,10 @@ export const checks = tasks({
           {
             value: (c) => Array(c.n).fill(0),
             hint: 'The array is the right length, but every place still holds 0. A new int array starts filled with 0; put an hour in each place.'
+          },
+          {
+            value: (c) => range(c.n, c.h),
+            hint: 'departures takes its two parameters the wrong way round: firstHour comes first, then the number of crossings.'
           },
           {
             value: (c) => Array(c.n).fill(c.h),

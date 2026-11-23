@@ -41,7 +41,7 @@
         },
         {
           "active": ["waiting", "waiting->bridie", "bridie"],
-          "note": "Bridie calls the last name on it, found from the list's size, or says there is nobody."
+          "note": "Bridie calls the last name on it, found from the list's size, or says there is nobody. The list itself stays as it was."
         }
       ]
     },

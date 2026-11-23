@@ -101,7 +101,7 @@
       "id": "fare-rise",
       "title": "Count the years to the new fare",
       "file": "Timetable.java",
-      "description": "Under `// Task 4`, each year the fare goes up by a twentieth of itself: `farePence / 20` of that year, in whole pence. With a `while` loop, make an `int` called `years`: how many years until the fare reaches `targetPence` or more. A fare that is already there needs 0 years.\n\nCheck runs your Task 4 lines with fares of its own, one that lands exactly on the target, and reads `years`.",
+      "description": "Under `// Task 4`, each year the fare goes up by a twentieth of that year's fare, in whole pence: the fare divided by 20, with the part after the point dropped. The rise grows as the fare grows. With a `while` loop, make an `int` called `years`: how many years until the fare reaches `targetPence` or more. A fare that is already there needs 0 years.\n\nCheck runs your Task 4 lines with fares of its own, one that lands exactly on the target, and reads `years`.",
       "nextSteps": [
         "Make `years` at 0, and a variable for the fare that you can change.",
         "Write the condition that is true while the fare is still below the target.",

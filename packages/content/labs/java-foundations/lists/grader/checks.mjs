@@ -23,10 +23,10 @@ export const checks = tasks({
       method: 'waitingList',
       returns: 'java.util.ArrayList<String>',
       cases: [
-        [['Elspeth', 'Dougal', 'Wen', 'Rab', 'Una'], 3, 'Puts the last two on the list'],
-        [['Fenn', 'Tam'], 4, 'Makes an empty list when everyone gets a seat'],
-        [['Ishbel', 'Corrie', 'Morag'], 0, 'Puts everyone on the list when there are no seats'],
-        [['Wen', 'Una', 'Dougal', 'Tam'], 3, 'Puts one on the list']
+        [['Eilidh', 'Dougal', 'Wen', 'Rab', 'Seonag'], 3, 'Puts the last two on the list'],
+        [['Torquil', 'Lachie'], 4, 'Makes an empty list when everyone gets a seat'],
+        [['Ishbel', 'Mhairi', 'Morag'], 0, 'Puts everyone on the list when there are no seats'],
+        [['Wen', 'Seonag', 'Dougal', 'Lachie'], 3, 'Puts one on the list']
       ].map(([xs, seats, name]) => ({
         args: [strings(xs), String(seats)],
         xs,
@@ -60,12 +60,15 @@ export const checks = tasks({
       method: 'lastOnList',
       returns: 'String',
       cases: [
-        [['Rab', 'Una'], 'Finds the last of two'],
+        [['Rab', 'Seonag'], 'Finds the last of two'],
         [[], 'Says Nobody for an empty list'],
         [['Ishbel'], 'Finds the only name'],
-        [['Wen', 'Fenn', 'Tam', 'Morag'], 'Finds the last of four']
+        [['Wen', 'Torquil', 'Lachie', 'Morag'], 'Finds the last of four']
       ].map(([xs, name]) => ({
-        args: [list(xs)],
+        setup: `java.util.ArrayList<String> waiting = ${list(xs).java}; `,
+        args: ['waiting'],
+        show: `lastOnList(${list(xs).show})`,
+        reads: ['waiting'],
         xs,
         name,
         expected: xs.length ? xs.at(-1) : 'Nobody',
@@ -73,16 +76,28 @@ export const checks = tasks({
           ? 'lastOnList should give back the last name on the list, whatever its size.'
           : 'An empty list has no last name, so lastOnList gives back Nobody.'
       })),
-      judge: methodCases({
-        method: 'lastOnList',
-        typed: typed('lastOnList', 'list'),
-        mistakes: [
-          {
-            value: (c) => (c.xs.length ? c.xs[0] : 'Nobody'),
-            hint: 'lastOnList gives back the first name. Position 0 is the first; the last position depends on the size of the list.'
-          }
+      judge: (runs) => {
+        const changed = runs.find((r) => !gave(r.values.waiting, r.case.xs))
+        return [
+          ...methodCases({
+            method: 'lastOnList',
+            typed: typed('lastOnList', 'list'),
+            mistakes: [
+              {
+                value: (c) => (c.xs.length ? c.xs[0] : 'Nobody'),
+                hint: 'lastOnList gives back the first name. Position 0 is the first; the last position depends on the size of the list.'
+              }
+            ]
+          })(runs),
+          changed
+            ? fail(
+                'Leaves the list as it was',
+                'lastOnList changes the list it is given. A list handed to a method is the caller\'s own list, and this method only reads it: the name stays on the list.',
+                `${called(changed)}\nThe list is now ${shown(changed.values.waiting)}`
+              )
+            : pass('Leaves the list as it was')
         ]
-      })
+      }
     },
 
     'sailed-loads': {
@@ -126,11 +141,11 @@ export const checks = tasks({
       method: 'cancel',
       returns: 'void',
       cases: [
-        [['Una', 'Rab', 'Una', 'Wen'], 'Una', 'Cancels two bookings apart'],
-        [['Tam', 'Tam', 'Fenn'], 'Tam', 'Cancels two bookings side by side'],
-        [['Morag', 'Corrie'], 'Dougal', 'Leaves the list alone when the name is not on it'],
+        [['Seonag', 'Rab', 'Seonag', 'Wen'], 'Seonag', 'Cancels two bookings apart'],
+        [['Lachie', 'Lachie', 'Torquil'], 'Lachie', 'Cancels two bookings side by side'],
+        [['Morag', 'Mhairi'], 'Dougal', 'Leaves the list alone when the name is not on it'],
         [['Ishbel'], 'Ishbel', 'Cancels the only booking'],
-        [['Rab', 'Elspeth', 'Rab', 'Rab'], 'Rab', 'Cancels three bookings']
+        [['Rab', 'Eilidh', 'Rab', 'Rab'], 'Rab', 'Cancels three bookings']
       ].map(([xs, who, name]) => ({
         setup: `java.util.ArrayList<String> bookings = ${list(xs).java}; `,
         // A name made while the program runs, as a real one would be, so == cannot pass for equals.

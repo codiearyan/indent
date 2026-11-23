@@ -51,7 +51,9 @@ export const checks = tasks({
           const counted = got.filter((l) => l.startsWith('Boarding closes in'))
           return fail(
             name,
-            got.includes('Boarding closes in 0 min')
+            n > 0 && got[0] === `Boarding closes in ${n - 1} min`
+              ? 'The countdown starts a minute late and ends on 0: the line for minutesToDeparture is missing. Look at where in the loop minutes changes, before or after the line that prints it.'
+              : got.includes('Boarding closes in 0 min')
               ? 'The countdown goes one step too far: it prints a line for 0 minutes. It should stop after the line for 1.'
               : counted.length && counted.length < n
                 ? 'Some minutes are missing from the countdown. It should go down one minute at a time.'
@@ -84,12 +86,12 @@ export const checks = tasks({
             name,
             glued
               ? 'The departures come out glued together on one line. Each departure needs a line of its own: one way of printing ends the line after it, and the other does not.'
-              : got[i].length === 0
-              ? 'No line starts with Departs. Print one line for each departure, like the one in the comment.'
               : short
                 ? 'The last departure is missing: the loop stops one hour too soon. lastHour is included.'
                 : late
                   ? 'The first departure is missing: the loop starts one hour too late. firstHour is included.'
+                  : got[i].length === 0
+                  ? 'No line starts with Departs. Print one line for each departure, like the one in the comment.'
                   : stuck
                     ? typed('what it prints')
                     : got[i].length !== trimmed(r).length
@@ -213,6 +215,30 @@ export const checks = tasks({
               hint: 'years is one more than it should be. A fare that is already at the target needs 0 years.'
             },
             {
+              value: (g) => {
+                let fare = g.farePence
+                let n = 0
+                while (fare < g.targetPence) {
+                  fare += Math.floor(g.farePence / 20)
+                  n++
+                }
+                return n
+              },
+              hint: 'years adds the same rise every year: a twentieth of the first fare. The rise is a twentieth of the fare as it is that year, so it grows as the fare grows.'
+            },
+            ...[(f) => f * 1.05, (f) => f + f / 20].map((grow) => ({
+              value: (g) => {
+                let fare = g.farePence
+                let n = 0
+                while (fare < g.targetPence) {
+                  fare = grow(fare)
+                  n++
+                }
+                return n
+              },
+              hint: 'years keeps the part of a penny each year. The fare is in whole pence, so each year\'s rise is a twentieth of the fare with the part after the point dropped.'
+            })),
+            {
               value: (g) => Math.max(1, years(g)),
               hint: 'years is 1 when the fare is already at the target. The loop body should not run at all then.'
             }
@@ -221,7 +247,7 @@ export const checks = tasks({
             {
               name: 'Counts the years for a big rise',
               expected: years,
-              hint: 'Each year the fare goes up by farePence / 20 of that year. Count the years until it reaches targetPence.'
+              hint: 'Each year the fare goes up by a twentieth of that year\'s fare, in whole pence. Count the years until it reaches targetPence.'
             },
             {
               name: 'Stops the year the fare lands exactly on the target',
@@ -277,6 +303,10 @@ export const checks = tasks({
                 hint: 'nameEnd is the last space of the ticket, not the first. The loop keeps going after it finds one: stop it there.'
               },
               {
+                value: (g) => g.ticket.length,
+                hint: 'nameEnd stays the length of the ticket even when the ticket has a space: the loop stops before it reaches one. Look at when break runs: only at a space, or every time round.'
+              },
+              {
                 value: (g) => (g.ticket.includes(' ') ? g.ticket.indexOf(' ') : 0),
                 hint: 'For a ticket with no space, nameEnd is 0. Then the whole ticket is the name, so nameEnd should be its length.'
               },
@@ -308,7 +338,7 @@ export const checks = tasks({
               }
             ]
           })(runs),
-          /\b(?:for|while)\s*\(/.test(code) && /\bbreak\s*;/.test(code)
+          /\b(?:for|while)\s*\(/.test(code) && /\bbreak\b/.test(code)
             ? pass('Walks the ticket with a loop and break')
             : fail(
                 'Walks the ticket with a loop and break',

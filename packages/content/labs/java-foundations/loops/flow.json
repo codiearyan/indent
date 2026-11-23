@@ -74,7 +74,7 @@
         },
         {
           "active": ["file"],
-          "note": "Each year the fare grows by a twentieth of itself, and one more year is counted."
+          "note": "Each year the fare grows by a twentieth of that year's fare, in whole pence, and one more year is counted."
         },
         {
           "active": ["file"],

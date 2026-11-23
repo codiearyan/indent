@@ -52,7 +52,7 @@ public class Timetable {
         }
 
         // Task 4: Count the years to the new fare
-        // Each year the fare goes up by a twentieth of itself: farePence / 20, in whole pence.
+        // Each year the fare goes up by a twentieth of that year's fare, in whole pence.
         // With a while loop, make an int called years: how many years until the fare reaches
         // targetPence or more. If it is already there, years is 0.
         int years = 0;
