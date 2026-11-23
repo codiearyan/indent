@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Ambrose",
+      "say": "Why was the cuckoo billed twice?"
+    },
+    {
+      "title": "Kasimir's bench",
+      "text": "Finished repairs leave for the desk."
+    },
+    {
+      "title": "Your functions",
+      "file": "desk.cpp",
+      "mine": true,
+      "gap": "Nobody knows who has a repair",
+      "tasks": [
+        "Open with an owner",
+        "Put on the desk",
+        "Look, do not take",
+        "Take for billing"
+      ]
+    },
+    {
+      "title": "Ambrose's desk",
+      "text": "Each repair billed once, then let go."
+    }
+  ],
+  "ticket": {
+    "label": "Cuckoo clock",
+    "wrong": "two bills",
+    "why": "Two lists",
+    "right": "billed once"
+  },
+  "captions": [
+    "Ambrose bills finished repairs, and the cuckoo clock got two bills last week.",
+    "It sat on Kasimir's bench and on his desk at once, and both lists billed it.",
+    "You give every repair one owner that moves from the bench to the desk.",
+    "Now the cuckoo clock is on the desk alone, billed once, and ends when it goes.",
+    "Each repair is in exactly one place. Next, repairs that two lists must share."
+  ]
+}
