@@ -1,0 +1,116 @@
+{
+  "id": "records-that-hold-anything",
+  "title": "Records that hold anything",
+  "files": [
+    "src/db.js",
+    "src/try.js",
+    "data/stock.json"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where your store keeps notes with line breaks, then opens a log that a stop cut short.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "anything",
+      "title": "Keep any text in a record",
+      "file": "src/db.js",
+      "description": "Give the log a record format that holds any text.\n\n- keys and values may hold anything: line breaks (`\\n` and `\\r\\n`), tabs, the characters your format uses to mark its parts, quotes, backslashes, characters like é, emoji, and the empty text\n- no value is ever read as records of its own, and no escape changes what a value says\n- after a restart, `get` gives back exactly the text that was set\n- the format is yours: the length first, or escaping, in `encode` and `decode`\n\nThe format is yours, so the check never reads `store.log`: it opens your store, sets keys and values of its own, closes it and opens the folder again.",
+      "nextSteps": [
+        "Run `node src/try.js` and compare the note it set with the note it read back.",
+        "Read \"Two ways to hold any text\" in the lesson and pick one.",
+        "Change `encode` so a record says where it ends without trusting the text inside it.",
+        "Change `decode` to read that format back."
+      ],
+      "hints": [
+        "The tab format trusts that a value holds no tab and no line break. The first note with two lines splits into two records, and the second is nonsense.",
+        "Either write each part's length before the part, so the reader knows how many characters to take whatever they are, or write a stand-in for every line break, tab and backslash in the text, and turn each back when reading. With escaping, the backslash itself has to be escaped first.",
+        "Length first: `` `set ${key.length} ${value.length}\\n${key}${value}\\n` ``. To read it, find the header's line break, split the header on spaces, and take exactly that many characters for the key and then for the value."
+      ],
+      "docs": [
+        {
+          "title": "String.prototype.slice()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/slice"
+        },
+        {
+          "title": "String.prototype.indexOf()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf"
+        },
+        {
+          "title": "String: length",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Characters, symbols and how text is stored",
+          "url": "https://www.youtube.com/watch?v=MijmeoH9LT4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cut",
+      "title": "Leave out a record cut short",
+      "file": "src/db.js",
+      "description": "Make `open` leave out a last record that a stop cut short.\n\n- a record counts only when every byte of it is in the file, its end included\n- a stop halfway through a write leaves the last record cut short; `open` leaves that record out and keeps every whole record before it, so the key keeps the value it had, or stays deleted, or stays there\n- opening a log that ends in a cut record never throws\n- `decode` can say where the last whole record ends, as `{ changes, end }`, for the next task\n\nThe format is yours, so the check judges by behaviour: it writes records through your store, notes where the last record starts, cuts the file at every byte inside that record, and opens your store on each.",
+      "nextSteps": [
+        "Read \"A record cut short\" in the lesson.",
+        "In `decode`, before you take a record, make sure the text holds all of it, its end included.",
+        "When it does not, stop reading: that is the end of the whole records.",
+        "Run `node src/try.js`: the envelope cut short should not be there."
+      ],
+      "hints": [
+        "A stop can come between any two bytes. A cut can even land right after a line break inside a value, where a line-based reader sees a whole record.",
+        "Your format already knows where each record should end: after the lengths it gives, or at the line break that ends it. When the file stops before that point, the record is cut short.",
+        "In a length-first reader: `if (text[stop] !== '\\n') break`, where `stop` is the index right after the value. Keep the index after the last whole record in a variable, and return it with the changes."
+      ],
+      "docs": [
+        {
+          "title": "String.prototype.indexOf()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf"
+        },
+        {
+          "title": "Number.isInteger()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger"
+        },
+        {
+          "title": "break",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/break"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "go-on",
+      "title": "Carry on after a cut",
+      "file": "src/db.js",
+      "description": "Make `open` cut a broken end off the log, so the store goes on.\n\n- when `open` finds a record cut short at the end of `store.log`, it cuts the file back to the end of the last whole record, before anything else is written, so the next record starts clean\n- only the broken end goes: every whole record before it stays\n- after that, every change is kept as before: a store opened later sees the records before the cut, the changes after it, and nothing of the cut record\n\nThe check cuts the file at every byte inside the last record, opens your store, makes changes, closes it and opens the folder again.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at what happens to invite.",
+        "Work out how many bytes the whole records take.",
+        "Cut `store.log` to that length in `open` when the file is longer."
+      ],
+      "hints": [
+        "Without the cut, the next record lands right after the broken bytes, and the reader takes them for one record: the new change is lost too.",
+        "`truncate` from `node:fs/promises` cuts a file to a length in bytes. A string's length counts characters, and é or an emoji takes more than one byte.",
+        "`if (end < text.length) await truncate(log, Buffer.byteLength(text.slice(0, end)))`, where `end` is where the last whole record ends in the text."
+      ],
+      "docs": [
+        {
+          "title": "fsPromises.truncate()",
+          "url": "https://nodejs.org/api/fs.html#fspromisestruncatepath-len"
+        },
+        {
+          "title": "Buffer.byteLength()",
+          "url": "https://nodejs.org/api/buffer.html#static-method-bufferbytelengthstring-encoding"
+        },
+        {
+          "title": "String.prototype.slice()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/slice"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

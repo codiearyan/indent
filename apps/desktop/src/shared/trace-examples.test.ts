@@ -313,6 +313,10 @@ const repos: { labId: string; expected: string[] }[] = [
     expected: ['one-place-for-state/create', 'selectors/shallow']
   },
   {
+    labId: 'build-a-key-value-database',
+    expected: ['a-log-on-disk/replay', 'records-that-hold-anything/anything']
+  },
+  {
     labId: 'testing-foundations',
     expected: ['choosing-cases/fix', 'test-first/free-code', 'test-first/large-code']
   },

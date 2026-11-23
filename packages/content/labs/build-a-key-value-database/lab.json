@@ -1,0 +1,29 @@
+{
+  "id": "build-a-key-value-database",
+  "title": "Build your own key-value database",
+  "description": "Ashgrove Press keeps its stock counts in one file that Sefton's stock script writes again whole on every change, and twice the power went in the middle of a write and the file came back half empty. You write the shop a small database of its own on Node's file functions: keys and values, a log that only grows, records that hold any text and survive being cut short, compaction that swaps a new log in at one stroke, and batches that are all there or not at all, until the stock runs on it. By the end you know what a database does to keep what it was given when the program stops halfway.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": [
+    "JavaScript",
+    "Build your own"
+  ],
+  "kind": "project",
+  "parts": [
+    {
+      "title": "Keys, values and a log",
+      "chapters": [
+        "keys-and-values",
+        "a-log-on-disk",
+        "records-that-hold-anything"
+      ]
+    },
+    {
+      "title": "Keeping it safe",
+      "chapters": [
+        "compaction",
+        "all-or-nothing"
+      ]
+    }
+  ]
+}
