@@ -83,12 +83,10 @@ export const checks = {
     if (has(git, wilma, tipOf(git, 'main'))) {
       return fail(`Wilma's voucher commit went into main, and she has not said the vouchers can go on the site. A pull or merge brings the other branch into the one you are on. ${START_OVER}`)
     }
-    if (has(git, wilma, tip)) {
-      if (has(git, femi, tip)) {
-        return fail(`gift-vouchers also has Femi's commits for main now: main or origin/main was merged into it. ${START_OVER}`)
-      }
-      return [check(name, !mergeHead(git), OPEN_MERGE, output)]
+    if (has(git, femi, tip)) {
+      return fail(`gift-vouchers has Femi's commits for main now: main or origin/main was merged into it, and they belong on main only. ${START_OVER}`)
     }
+    if (has(git, wilma, tip)) return [check(name, !mergeHead(git), OPEN_MERGE, output)]
     if (mergeHead(git)) return fail(OPEN_MERGE)
     if (!has(git, wilma, remoteTip(git, 'gift-vouchers'))) {
       return fail("gift-vouchers does not have Wilma's new commit, and origin/gift-vouchers does not have it either: shop has not fetched it from the server.")

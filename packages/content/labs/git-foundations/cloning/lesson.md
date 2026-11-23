@@ -39,7 +39,7 @@ origin  /home/kit/bakery-work/server/bakery.git (fetch)
 origin  /home/kit/bakery-work/server/bakery.git (push)
 ```
 
-Here the address is the folder's full path. A clone is a new repository, so the name and email you set in an older one do not come with it. If `git commit` says `Author identity unknown`, set them in the copy as in the first issue.
+Here the address is the folder's full path. A clone is a new repository, so the name and email you set in an older one do not come with it. If `git commit` says `Author identity unknown`, set them in the copy as in the first issue. On some computers Git commits anyway, with a name it made up from the computer's, and says `Your name and email address were configured automatically`. Set them the same way, and your next commits carry them.
 
 ## origin/main
 
@@ -60,7 +60,7 @@ To work on `winter-menu`, you need a branch of your own. Switch to it by its pla
 git switch winter-menu
 ```
 
-You have no `winter-menu`, but `origin` has one, so Git makes yours at the same commit and says `branch 'winter-menu' set up to track 'origin/winter-menu'`. To track means to follow: from now on `git status` on it compares it with `origin/winter-menu`. Switching to `origin/winter-menu` itself instead gives a detached HEAD, as in the lesson on branches: you are on no branch. `git switch main` takes you back.
+You have no `winter-menu`, but `origin` has one, so Git makes yours at the same commit and says `branch 'winter-menu' set up to track 'origin/winter-menu'`. To track means to follow: from now on `git status` on it compares it with `origin/winter-menu`. `git switch origin/winter-menu` refuses with `fatal: a branch is expected, got remote branch 'origin/winter-menu'`: Git's memory of the server is not a branch to work on, so give the plain name. `git checkout origin/winter-menu` goes there anyway and gives a detached HEAD, as in the lesson on branches: you are on no branch. `git switch main` takes you back.
 
 ## Your commits stay with you
 

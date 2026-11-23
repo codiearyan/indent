@@ -60,9 +60,12 @@ export const checks = {
     const name = 'main has a commit that says the shop is closed from 10 to 16 August'
     const s = await open(t, [name])
     if (s.fail) return s.fail
-    const { git, start, femi, on, output } = s
+    const { git, start, mine, femi, on, output } = s
     const fail = (message) => [check(name, false, message, output)]
     const main = tipOf(git, 'main')
+    if (has(git, mine, main)) {
+      return fail(`main has the commits of gift-vouchers now: gift-vouchers or origin/gift-vouchers was merged into it. Wilma wants the vouchers on the server's gift-vouchers, not on the site. ${START_OVER}`)
+    }
     const text = fileAt(git, main, 'visit.html')
     if (!closedLine(text)) {
       const branch = branchNames(git).find((b) => b !== 'main' && closedLine(fileAt(git, `refs/heads/${b}`, 'visit.html')))

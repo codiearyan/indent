@@ -289,6 +289,7 @@ const laptopSettings = {
   'merge.ff': 'true',
   'merge.conflictStyle': 'merge',
   'pull.rebase': 'false',
+  'pull.ff': 'true',
   'push.default': 'simple',
   'gc.auto': '0'
 }
@@ -298,7 +299,7 @@ write('visit.html', vouchers('They can be used for two years.'))
 commit(people.you, 'Say that gift vouchers last two years', 1)
 git(people.you, 'checkout', '-q', 'main')
 
-const saltRoad = 'The Salt Road Letters, Agnes Pellow, paperback, £4.00'
+const wrenmoor = 'Letters from Wrenmoor, Agnes Pellow, paperback, £4.00'
 
 // Work Femi and Wilma send to the server from their own computers, made in a folder removed after.
 const elsewhere = join(top, '.elsewhere')
@@ -315,8 +316,8 @@ const read = (file) => readFileSync(join(here, file), 'utf8')
 
 // Overnight, Femi sent two commits for main from home, and Wilma one for her vouchers.
 fromElsewhere(() => {
-  write('finds.html', read('finds.html').replace('  </ul>\n', `    <li>${saltRoad}</li>\n  </ul>\n`))
-  commit(people.femi, 'Add The Salt Road Letters to the finds', 0)
+  write('finds.html', read('finds.html').replace('  </ul>\n', `    <li>${wrenmoor}</li>\n  </ul>\n`))
+  commit(people.femi, 'Add Letters from Wrenmoor to the finds', 0)
   write('events.html', read('events.html').replace('The Marrowby Sisters', 'An Atlas of Small Rivers'))
   commit(people.femi, 'Choose the August book for the reading group', 0)
   git(people.femi, 'push', '-q', 'origin', 'main')

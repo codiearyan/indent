@@ -122,12 +122,13 @@ export const checks = {
     }
     const line = voucherLine(fileAt(git, tip, 'visit.html'))
     if (!fixed(line)) {
-      if (fixed(voucherLine(stagedFile(git, 'visit.html')))) return fail('The fix is staged, but no commit on gift-vouchers holds it yet.')
-      if (on === 'gift-vouchers' && fixed(voucherLine(workFile(s.t, 'visit.html')))) {
-        return fail('visit.html has the fix in the working folder, but no commit on gift-vouchers holds it yet.')
-      }
       if (on && on !== 'gift-vouchers') {
         return fail(`You are on ${on}. The voucher line is only on gift-vouchers, so switch to it before you edit visit.html.`)
+      }
+      if (!on) return fail(DETACHED)
+      if (fixed(voucherLine(stagedFile(git, 'visit.html')))) return fail('The fix is staged, but no commit on gift-vouchers holds it yet.')
+      if (fixed(voucherLine(workFile(s.t, 'visit.html')))) {
+        return fail('visit.html has the fix in the working folder, but no commit on gift-vouchers holds it yet.')
       }
       if (!line) return fail('The voucher line is gone from visit.html on gift-vouchers. Only its last sentence changes.')
       if (/never expire/i.test(line)) return fail('The voucher line on gift-vouchers still says they never expire.')

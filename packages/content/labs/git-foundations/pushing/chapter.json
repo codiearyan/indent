@@ -49,7 +49,6 @@
         { "title": "git commit", "url": "https://git-scm.com/docs/git-commit" },
         { "title": "Note about fast-forwards", "url": "https://git-scm.com/docs/git-push#_note_about_fast_forwards" }
       ],
-      "videos": [{ "title": "Why a push is rejected", "url": "https://www.youtube.com/watch?v=6O13IuACCxE" }],
       "points": 10
     },
     {
