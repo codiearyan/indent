@@ -1,7 +1,7 @@
 {
   "id": "testing-foundations",
   "title": "Testing foundations",
-  "description": "Thistlecombe Farm packs vegetable boxes for the villages around it, and every change to its code breaks something that a customer finds first. As its new developer you write the tests that catch those mistakes before Friday's boxes go out: prices, packing lists, subscriptions, deliveries, orders, the shed's stock, the order cut-off and payments. You learn to write tests from the very first one, read what a failure tells you, test code that waits or reads the clock, stand in for what you do not control, and know when a test can really catch a mistake.",
+  "description": "Thistlecombe Farm packs vegetable boxes for the villages around it, and every change to its code breaks something that a customer finds first. As its new developer you write the tests that catch those mistakes before Friday's boxes go out: prices, packing lists, subscriptions, deliveries, orders, the shed's stock, the order cut-off, payments, the van and the bills. You learn to write tests from the very first one, read what a failure tells you, test code that waits or reads the clock, and stand in for what you do not control. Then you make your tests ones you can trust: tests that stand alone, survive a rewrite, choose their cases well, and come before the code.",
   "category": "JavaScript and TypeScript",
   "language": "javascript",
   "tags": ["JavaScript", "Testing"],
@@ -14,6 +14,10 @@
     {
       "title": "Code that waits and things you do not control",
       "chapters": ["code-that-waits", "fake-clock", "stand-ins"]
+    },
+    {
+      "title": "Tests you can trust",
+      "chapters": ["tests-stand-alone", "survive-a-rewrite", "choosing-cases", "test-first"]
     }
   ]
 }

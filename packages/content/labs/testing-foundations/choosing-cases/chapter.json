@@ -1,0 +1,92 @@
+{
+  "id": "choosing-cases",
+  "title": "Choosing the cases",
+  "files": ["src/bill.test.js", "src/bill.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here and read what they say.",
+    "suggestedCommand": "npx vitest run src/bill.test.js"
+  },
+  "tasks": [
+    {
+      "id": "report",
+      "title": "Turn Nell's report into the smallest test that fails",
+      "file": "src/bill.test.js",
+      "description": "Nell Hollis ordered a medium box, two large boxes and 2 dozen eggs, with the code `HARVEST`, and `bill` charged her 44.70 pounds instead of 66.30. In the `bill` block, write one test that fails on the code in your workspace the way her bill did, with nothing in it the bug does not need: leave out every box, egg and code you can, as long as it still fails.\n\nYour test fails in the terminal until the next task: that is the point. Check runs it on fixed code, where it must pass, and on the code Nell was charged by, and on a version that forgets a repeated box only when every box in the order is the same size, where it must fail. It also runs it on versions with a different mistake in the egg price or the `HARVEST` code, where it must pass, since the bug has nothing to do with those.",
+      "nextSteps": [
+        "Write Nell's whole order as a test, with the price list's answer, and watch it fail.",
+        "Take one detail out at a time, work the right answer out again, and run the test.",
+        "Keep a change when the test still fails, and put it back when it passes.",
+        "Stop when nothing more can come out."
+      ],
+      "hints": [
+        "Nell was charged 21.60 less than she should have been. Which box, with the tenth off, costs that?",
+        "The eggs and the code are not the cause: without them the bill is still wrong. Try boxes alone, then fewer boxes.",
+        "Two boxes of the same size are enough: expect `bill({ customer: 'Nell Hollis', boxes: ['large', 'large'] })` to be `48`."
+      ],
+      "docs": [
+        { "title": "Filtering tests by name", "url": "https://vitest.dev/guide/filtering" },
+        { "title": "toBe", "url": "https://vitest.dev/api/expect#tobe" }
+      ],
+      "videos": [
+        {
+          "title": "A failing test should point at one cause",
+          "url": "https://www.youtube.com/watch?v=8lTfrCtPPNE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Fix the bill so your test passes",
+      "file": "src/bill.js",
+      "description": "Now that a test shows the bug, fix it. Change `bill` in `src/bill.js` so that every box in an order is paid for, and nothing else about the bill changes. Your test from the last task turns green when it is right.\n\nCheck calls `bill` from your file with orders of its own: boxes of the same size, mixed up or side by side, Nell's order, and an order with one box of each size that was already right.",
+      "nextSteps": [
+        "Read `bill` and find the line that adds up the boxes.",
+        "Ask what it does with two boxes of the same size.",
+        "Change that line, and only that line.",
+        "Run the tests: your test from the last task passes now."
+      ],
+      "hints": [
+        "Your smallest test points at how the boxes are added up, not at the eggs or the code.",
+        "A `Set` keeps each value once, so two large boxes become one before they are added up.",
+        "Add up `order.boxes` itself: `const boxes = order.boxes.reduce((total, size) => total + BOX_PRICES[size], 0)`."
+      ],
+      "docs": [
+        {
+          "title": "Set",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set"
+        },
+        {
+          "title": "Array.prototype.reduce()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "bands",
+      "title": "One test for each case, and no repeats",
+      "file": "src/bill.test.js",
+      "description": "`eggPrice(dozens)` charges 3 pounds a dozen up to 2 dozen, 2.50 a dozen from 3 to 5 dozen, and 2 pounds a dozen from 6 dozen on. Lorcan's eight tests in the `eggPrice` block all pass, but they only ever try small orders. Change the block so it has a test for every case the rule has, the edges of each price and no eggs at all included, and no two tests that check the same case.\n\nCheck runs your tests on the working code, where they must pass, and on eight versions that each get one price, one edge or no eggs at all wrong, where a test in this block must fail. Two tests that fail on exactly the same versions test the same case, and a test that fails on none of them can never catch a mistake: either fails this task.",
+      "nextSteps": [
+        "Write the rule as three ranges of dozens, and the numbers on either side of each line.",
+        "Work out by hand the price at each of those numbers.",
+        "Keep one test per case, and delete or change the tests that repeat one.",
+        "Run the tests."
+      ],
+      "hints": [
+        "Lorcan tests 1 dozen four times and 2 dozen three times. A version that gets 6 dozen wrong passes them all.",
+        "A rule with two lines has an edge on each side of each line: the last number at one price and the first at the next.",
+        "Keep the test of no eggs, add 3, 5 and 6 dozen at 7.50, 12.50 and 12 pounds, keep one test of 2 dozen, and delete the rest."
+      ],
+      "docs": [
+        { "title": "test", "url": "https://vitest.dev/api/test" },
+        {
+          "title": "if...else",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

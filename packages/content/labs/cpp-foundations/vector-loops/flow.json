@@ -1,0 +1,89 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bench", "label": "Timing bench", "kind": "story" },
+      { "id": "drifts", "label": "Drift list", "kind": "data" },
+      { "id": "funcs", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "kasimir", "label": "Kasimir", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bench", "to": "drifts", "label": "a day's seconds" },
+      { "from": "drifts", "to": "funcs", "label": "every clock" },
+      { "from": "funcs", "to": "compiler", "label": "builds" },
+      { "from": "compiler", "to": "kasimir", "label": "the day's results" }
+    ],
+    "note": "One loop goes through every clock on the bench, however many there are today."
+  },
+  "tasks": {
+    "total": {
+      "steps": [
+        {
+          "active": ["bench", "bench->drifts", "drifts"],
+          "value": { "kind": "array", "label": "goes in", "values": ["seconds gained", "seconds lost", "..."] },
+          "note": "The day's drifts go in, gains above 0 and losses below."
+        },
+        {
+          "active": ["drifts->funcs", "funcs"],
+          "note": "The loop visits each clock once and adds its drift to the total."
+        },
+        {
+          "active": ["funcs->compiler", "compiler->kasimir", "kasimir"],
+          "value": { "kind": "array", "label": "comes back", "values": ["one total"] },
+          "note": "Kasimir reads one number instead of adding in his head."
+        }
+      ]
+    },
+    "fastest": {
+      "steps": [
+        {
+          "active": ["drifts", "drifts->funcs"],
+          "note": "The drifts go in. On a cold day every one of them is below 0."
+        },
+        {
+          "active": ["funcs"],
+          "note": "The largest so far starts at a clock that is really on the bench, and any larger one takes its place."
+        },
+        {
+          "active": ["funcs->compiler", "compiler->kasimir", "kasimir"],
+          "value": { "kind": "array", "label": "comes back", "values": ["the largest drift"] },
+          "note": "Kasimir knows which clock to slow down first."
+        }
+      ]
+    },
+    "numbered": {
+      "steps": [
+        {
+          "active": ["drifts", "drifts->funcs"],
+          "value": { "kind": "array", "label": "goes in", "values": ["clock name", "clock name", "..."] },
+          "note": "The names of the clocks on the bench go in, in order."
+        },
+        {
+          "active": ["funcs"],
+          "note": "A counted loop goes through the positions, and each line gets its number from one."
+        },
+        {
+          "active": ["funcs->compiler", "compiler->kasimir", "kasimir"],
+          "note": "Kasimir gets a numbered list he can tick off."
+        }
+      ]
+    },
+    "correct": {
+      "steps": [
+        {
+          "active": ["kasimir"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the drift list", "a correction"] },
+          "note": "Kasimir regulates every clock by the same amount."
+        },
+        {
+          "active": ["drifts", "drifts->funcs", "funcs"],
+          "note": "The loop reaches each drift in the bench's own list, not a copy, and lowers it."
+        },
+        {
+          "active": ["drifts"],
+          "note": "The list on the bench now shows the corrected drifts."
+        }
+      ]
+    }
+  }
+}

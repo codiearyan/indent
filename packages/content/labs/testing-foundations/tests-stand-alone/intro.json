@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Wendell",
+      "say": "Which van test do I believe?",
+      "note": "Green together, red alone."
+    },
+    {
+      "title": "Lorcan's tests",
+      "text": "One van and one log, shared by every test."
+    },
+    {
+      "title": "Your tests",
+      "file": "van.test.js",
+      "mine": true,
+      "gap": "Each test needs the one before",
+      "tasks": ["Stand alone", "Start nearly full", "Clear the log"]
+    },
+    {
+      "title": "Any order",
+      "rows": [["Alone"], ["All together"], ["Turned round"]]
+    }
+  ],
+  "ticket": {
+    "label": "Weigh test",
+    "wrong": "red alone",
+    "why": "Leans",
+    "right": "green alone"
+  },
+  "captions": [
+    "Wendell asks why a van test passes with the others but fails when Effie runs it alone.",
+    "Lorcan's tests share one van, so each test finds what the one before it left there.",
+    "You give every test a fresh van of its own and clear the day's log after each one.",
+    "Now the weighing test passes alone, with the others, and with the order turned round.",
+    "Same van code, tests you can run in any order. A red test now points at the code."
+  ]
+}
