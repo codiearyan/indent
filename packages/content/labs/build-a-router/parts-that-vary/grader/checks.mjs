@@ -114,6 +114,17 @@ export const checks = {
         (v) => v[0].reply.status === 405 && v[0].reply.allow === 'GET, DELETE' && v[0].calls.length === 0,
         'routes GET /orders/:id, GET /prices and DELETE /orders/:id, then PUT /orders/1874',
         'Patterns fit this path, but none for PUT: that is a 405, and allow lists the methods of the routes whose patterns fit.'
+      ),
+      kase(
+        'allow names each method once',
+        [['GET', '/orders/:id'], ['GET', '/orders/today'], ['DELETE', '/orders/:id']],
+        [['PUT', '/orders/today']],
+        (v) => v[0].reply.status === 405 && v[0].reply.allow === 'GET, DELETE' && v[0].calls.length === 0,
+        'routes GET /orders/:id, GET /orders/today and DELETE /orders/:id, then PUT /orders/today',
+        (v) =>
+          v[0].reply.status === 405
+            ? 'Two GET routes fit this path, but allow is a list of methods: name each one once, in the order its first route was added.'
+            : 'Patterns fit this path, but none for PUT: that is a 405, with an allow header.'
       )
     ])
   },

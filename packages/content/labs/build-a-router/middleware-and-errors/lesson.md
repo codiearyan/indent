@@ -37,7 +37,7 @@ async (req, res, next) => {
 }
 ```
 
-`handle` waits for the first step, and so for all of them.
+Not every middleware waits for `next()`, though. The staff check above calls it and returns at once, without `return` or `await`, and that is normal. So the function that runs step `i` keeps the promise its `next` made, and once the step's own function has finished, waits for that promise too. Then `handle` waits for the first step, and so for all of them, whether each step returned the promise of the rest or not.
 
 ## Errors go to one place
 
@@ -47,7 +47,7 @@ Without help, every handler would catch its own errors and answer them its own w
 - a middleware or handler throws
 - an `async` one throws, which does not throw at the call at all: it returns a promise that rejects
 
-`await` turns all of them into the same thing. Have `next(error)` give back a rejected promise, wait for every step, and one `try` around the whole chain in `handle` catches every error. Nothing after the error runs. A promise that rejects before anybody waits for it is reported by Node as unhandled, so when `next` makes one, give it a `.catch(() => {})` straight away; waiting for it later still sees the error.
+`await` turns all of them into the same thing. Have `next(error)` give back a rejected promise, and since each step already waits for the promise its `next` made, the rejection travels back up the chain even through a middleware that never looked at it. One `try` around the whole chain in `handle` catches every error. Nothing after the error runs. A promise that rejects before anybody waits for it is reported by Node as unhandled, so when `next` makes one, give it a `.catch(() => {})` straight away; waiting for it later still sees the error.
 
 When there is no error handler, or it throws as well, the router answers `500` itself. Say that something went wrong, and nothing more. An error's message is written for the people who keep the server, and it can name files, values and customers.
 

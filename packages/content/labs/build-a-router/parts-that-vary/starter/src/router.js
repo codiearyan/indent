@@ -33,7 +33,7 @@ export function matchPath(pattern, path) {
 
 // Task 2: match every route with matchPath(). Give the handler req.params, the values with
 // %-codes decoded. A value that cannot be decoded is answered 400 with { error }, and no handler runs.
-// 404 and 405 work as before, now for patterns too.
+// 404 and 405 work as before, now for patterns too; allow names each method once.
 // Task 3: when several routes of the request's method match, the one with the most fixed parts
 // wins, whatever the order they were added in. With the same number, the one added first wins.
 export async function handle(router, req, res) {

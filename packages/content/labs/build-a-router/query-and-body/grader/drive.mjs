@@ -92,5 +92,5 @@ export async function limitCase(limit, plan) {
   if (plan.size) chunks = bytes(plan.size, plan.ch)
   if (plan.pieces) chunks = Array.from({ length: plan.pieces }, () => 'x'.repeat(plan.each))
   const { reply } = await send(lib.handle, router, 'POST', '/orders', { headers, chunks, hold: plan.hold, ms: 1500 })
-  return { calls: calls.map((c) => ({ route: c.route, bodyLength: typeof c.body === 'string' ? Buffer.byteLength(c.body) : c.body })), reply }
+  return { calls: calls.map((c) => ({ route: c.route, bodyLength: c.body === undefined ? c.body : Buffer.byteLength(JSON.stringify(c.body)) })), reply }
 }

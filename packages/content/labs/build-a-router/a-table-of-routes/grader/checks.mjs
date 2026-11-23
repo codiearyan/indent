@@ -137,6 +137,9 @@ export const checks = {
       hint: (v) => {
         const r = v?.reply
         if (r?.status === 405 && plainNo(405)(v) && r.allow !== allow) {
+          if (r.allow === undefined && /headers after they are sent/.test(r.threw ?? '')) {
+            return 'The allow header was set after the answer had ended, and that throws. Headers go out before the body: set allow first, then call sendJson().'
+          }
           return r.allow === undefined
             ? 'The 405 is right. Add an allow header that lists the methods this path takes.'
             : `The allow header should list every method this path takes, and only those, in the order their routes were added, separated by a comma and a space.`

@@ -9,7 +9,7 @@
       "gap": "Not on your router yet",
       "tasks": ["Groups under a prefix", "Serve real requests", "Move every route"]
     },
-    { "title": "Order page", "rows": [["/orders/today", "today"], ["DELETE /prices", "plain no"], ["/staff/queue", "staff only"]], "mark": 1 }
+    { "title": "Order page", "rows": [["Today's orders", "today"], ["Deleting prices", "plain no"], ["Press queue", "staff only"]], "mark": 1 }
   ],
   "ticket": { "label": "Saturday", "wrong": "old chain", "why": "Too risky", "right": "your router" },
   "captions": [

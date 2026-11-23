@@ -25,10 +25,14 @@ use(router, (req, res, next) => {
   next()
 })
 
-onError(router, (error, req, res) => {
-  if (error instanceof ShopError) sendJson(res, error.status, { error: error.message })
-  else sendJson(res, 500, { error: 'Something went wrong on our side.' })
-})
+try {
+  onError(router, (error, req, res) => {
+    if (error instanceof ShopError) sendJson(res, error.status, { error: error.message })
+    else sendJson(res, 500, { error: 'Something went wrong on our side.' })
+  })
+} catch (error) {
+  console.log(`onError() is task 2, and it threw ${error.message}. Errors are not answered yet.`)
+}
 
 addRoute(router, 'GET', '/orders/:id', (req, res) => {
   const order = shop.find(req.params.id)
@@ -54,6 +58,10 @@ const requests = [
 ]
 
 for (const [method, url, options] of requests) {
-  console.log(await ask((req, res) => handle(router, req, res), method, url, options))
+  try {
+    console.log(await ask((req, res) => handle(router, req, res), method, url, options))
+  } catch (error) {
+    console.log(`${method} ${url} -> handle() threw ${error}`)
+  }
 }
 console.log('The log:', log)

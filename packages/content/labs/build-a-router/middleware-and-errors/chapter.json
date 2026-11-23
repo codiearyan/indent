@@ -11,7 +11,7 @@
       "id": "use",
       "title": "Run middleware before the handler",
       "file": "src/router.js",
-      "description": "Implement `use(router, fn)` in `src/router.js`, and run middleware in `handle`.\n\n- `use` adds a middleware, a function `fn(req, res, next)`; it throws a `TypeError` when `fn` is not a function\n- for a request that reaches a route, after its params, query and body are ready, every middleware runs in the order it was added, then the handler\n- calling `next()` goes on to the next middleware, or to the handler after the last one; a middleware may call it later, after an `await`\n- `next()` returns a promise that settles once the rest of the chain has finished, so `await next()` comes back after the handler\n- a middleware that answers without calling `next()` ends the request: nothing after it runs\n- `handle` finishes only once the whole chain has, an async handler included\n- a request the router answers by itself, a 404, a 405, or a path or body it cannot take, runs no middleware\n\nThe check adds middleware of its own that notes when it runs, and reads the order.",
+      "description": "Implement `use(router, fn)` in `src/router.js`, and run middleware in `handle`.\n\n- `use` adds a middleware, a function `fn(req, res, next)`; it throws a `TypeError` when `fn` is not a function\n- for a request that reaches a route, after its params, query and body are ready, every middleware runs in the order it was added, then the handler\n- calling `next()` goes on to the next middleware, or to the handler after the last one; a middleware may call it later, after an `await`\n- `next()` returns a promise that settles once the rest of the chain has finished, so `await next()` comes back after the handler; a middleware that calls `next()` without returning or awaiting it is waited for all the same\n- a middleware that answers without calling `next()` ends the request: nothing after it runs\n- `handle` finishes only once the whole chain has, an async handler included\n- a request the router answers by itself, a 404, a 405, or a path or body it cannot take, runs no middleware\n\nThe check adds middleware of its own that notes when it runs, and reads the order.",
       "nextSteps": [
         "Run `node src/try.js` and read the error.",
         "Keep each middleware on the router in `use`.",
@@ -21,15 +21,12 @@
       "hints": [
         "The chain is not a loop. Each step decides whether the next one runs, by calling `next` or not, so the next step has to start from inside `next`.",
         "An `async` function that runs step `i` returns a promise. If `next` returns `runStep(i + 1)`, that promise settles when everything after step `i` has finished.",
-        "`async function runStep(i) { await chain[i](req, res, () => runStep(i + 1)) }`, and in `handle`, `await runStep(0)`. The last step is the handler."
+        "In `runStep(i)`: `let rest`, then `await chain[i](req, res, () => (rest = runStep(i + 1)))`, then `await rest`. In `handle`, `await runStep(0)`. The last step is the handler."
       ],
       "docs": [
         { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
         { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures" },
         { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
-      ],
-      "videos": [
-        { "title": "Middleware, explained", "url": "https://www.youtube.com/watch?v=lY6icfhap2o" }
       ],
       "points": 10
     },
@@ -46,7 +43,7 @@
       ],
       "hints": [
         "If every error, wherever it starts, ends up as a rejected promise of the chain, one `try` around the chain in `handle` catches them all.",
-        "`await` turns a rejected promise into a throw, and a throw inside an `async` function into a rejected promise. `next(error)` can return `Promise.reject(error)`.",
+        "`await` turns a rejected promise into a throw, and a throw inside an `async` function into a rejected promise. `next(error)` can return `Promise.reject(error)`, which the step's own `await rest` then meets.",
         "`try { await runStep(0) } catch (error) { ... router's error handler(error, req, res) ... }`, with a second `try` around the error handler and a plain 500 when there is none."
       ],
       "docs": [

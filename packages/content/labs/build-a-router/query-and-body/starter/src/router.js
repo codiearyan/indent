@@ -42,7 +42,7 @@ export function matchPath(pattern, path) {
 // { status: 'waiting', item: 'card' }.
 // - pairs are separated by &, and empty pairs are skipped
 // - a key and its value are split at the first =; a key with no = has the value ''
-// - + is a space, and %-codes are decoded; a part whose %-codes are broken is kept as written
+// - + is a space, and %-codes are decoded; a broken %-code, such as the % in 50%, is kept as written
 // - a key that comes more than once gives an array of its values, in order
 // - every key is a key of its own, even 'constructor' or '__proto__'
 export function parseQuery(search) {
