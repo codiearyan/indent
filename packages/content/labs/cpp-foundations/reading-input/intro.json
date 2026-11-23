@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dorrit", "say": "Make it ask me at the counter.", "note": "A customer is waiting." },
+    { "title": "Values in code", "text": "Each new clock means changing the code." },
+    {
+      "title": "Your code",
+      "file": "intake.cpp",
+      "mine": true,
+      "gap": "Never asks, never listens",
+      "tasks": ["Ask for a number", "Ask for a line", "Clocks, then the item", "Ask again if wrong"]
+    },
+    { "title": "New ticket", "rows": [["Clocks", "as typed"], ["Item", "the whole line"], ["Customer", "as typed"]] }
+  ],
+  "ticket": { "label": "A new clock", "wrong": "in the code", "why": "No input", "right": "typed in" },
+  "captions": [
+    "Dorrit wants the laptop to ask her about each new clock at the counter.",
+    "Today every value is written in the code, so a new clock means building again.",
+    "You read numbers and lines from what she types, in four tasks.",
+    "Now the program asks, she types, and nonsense gets a polite second question.",
+    "Your programs decide, repeat, share their work and listen now."
+  ]
+}

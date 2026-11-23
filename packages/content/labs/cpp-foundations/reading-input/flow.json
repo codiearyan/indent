@@ -1,0 +1,88 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dorrit", "label": "Dorrit types", "kind": "story" },
+      { "id": "cin", "label": "What was typed", "kind": "data" },
+      { "id": "funcs", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "ticket", "label": "New ticket", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dorrit", "to": "cin", "label": "keys and Enter" },
+      { "from": "cin", "to": "funcs", "label": "read" },
+      { "from": "funcs", "to": "compiler", "label": "builds" },
+      { "from": "compiler", "to": "ticket", "label": "answers" }
+    ],
+    "note": "The program asks Dorrit its questions at the counter and reads what she types."
+  },
+  "tasks": {
+    "number": {
+      "steps": [
+        {
+          "active": ["funcs"],
+          "note": "The program prints its question and waits."
+        },
+        {
+          "active": ["dorrit", "dorrit->cin", "cin", "cin->funcs"],
+          "value": { "kind": "array", "label": "typed", "values": ["a number", "Enter"] },
+          "note": "Dorrit types a number and presses Enter."
+        },
+        {
+          "active": ["funcs->compiler", "compiler", "compiler->ticket", "ticket"],
+          "note": "The number comes back to whoever asked."
+        }
+      ]
+    },
+    "line": {
+      "steps": [
+        {
+          "active": ["funcs"],
+          "note": "The program asks for a name, which can have spaces in it."
+        },
+        {
+          "active": ["dorrit", "dorrit->cin", "cin", "cin->funcs"],
+          "value": { "kind": "array", "label": "typed", "values": ["first name", "space", "last name", "Enter"] },
+          "note": "Everything up to Enter is the answer, spaces included."
+        },
+        {
+          "active": ["funcs->compiler", "compiler", "compiler->ticket", "ticket"],
+          "note": "The whole line comes back."
+        }
+      ]
+    },
+    "repair": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->cin", "cin"],
+          "value": { "kind": "array", "label": "typed", "values": ["a number", "Enter", "an item", "Enter"] },
+          "note": "Dorrit types the clocks, presses Enter, then types the item."
+        },
+        {
+          "active": ["cin->funcs", "funcs"],
+          "note": "After the number, the Enter is still waiting before the item."
+        },
+        {
+          "active": ["funcs->compiler", "compiler", "compiler->ticket", "ticket"],
+          "note": "Both answers land in the caller's own variables."
+        }
+      ]
+    },
+    "quantity": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->cin", "cin"],
+          "value": { "kind": "array", "label": "typed", "values": ["a word", "Enter", "a number", "Enter"] },
+          "note": "Dorrit types a word where a number belongs."
+        },
+        {
+          "active": ["cin->funcs", "funcs"],
+          "note": "The program says so, clears the line away and asks again."
+        },
+        {
+          "active": ["funcs->compiler", "compiler", "compiler->ticket", "ticket"],
+          "note": "Only a real number comes back."
+        }
+      ]
+    }
+  }
+}

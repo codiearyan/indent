@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Anjali", "say": "Members get their discount, please", "note": "At the gift shop till." },
+    { "title": "Shop screen", "text": "The discount is passed through every part.", "note": "A new shelf forgot to pass it on." },
+    {
+      "title": "Your context",
+      "file": "discount.js",
+      "mine": true,
+      "gap": "Lost on the way down",
+      "tasks": ["Make the context", "Read it in Price", "Provide it at the top", "Vouchers at full price"]
+    },
+    { "title": "Books shelf", "rows": [["The lines of Coalbrook"], ["Postcards, set of six"]] }
+  ],
+  "ticket": { "label": "Member", "wrong": "pays full price", "why": "Not passed", "right": "member price" },
+  "captions": [
+    "At the gift shop till, Anjali wants every member to get the member price.",
+    "A member buys a book, and the new shelf never got the discount handed down to it.",
+    "You give the discount a context of its own and provide it once, in four tasks.",
+    "The member pays the member price on every shelf, and vouchers stay at full price.",
+    "Same shop, no discount passed by hand. A new shelf can never forget it again."
+  ]
+}

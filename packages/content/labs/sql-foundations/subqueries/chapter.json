@@ -1,0 +1,105 @@
+{
+  "id": "subqueries",
+  "title": "A query inside a query",
+  "files": [
+    "queries/1-dog-owners.sql",
+    "queries/2-heavier-than-average.sql",
+    "queries/3-fernlea-visits.sql",
+    "queries/4-average-bill.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of the practice's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/1-dog-owners.sql"
+  },
+  "tasks": [
+    {
+      "id": "dog-owners",
+      "title": "List the owners who have a dog",
+      "file": "queries/1-dog-owners.sql",
+      "description": "The dog food supplier is sending a leaflet to every owner with a dog, one leaflet per owner.\n\nIn `queries/1-dog-owners.sql`, return three columns, in this order:\n\n- `first_name`\n- `last_name`\n- `phone`\n\nOne row for each owner who has at least one dog, once each however many dogs they have. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write a query that returns the `owner_id` of every dog, and run it. Who appears twice?",
+        "Use it as a list after `IN`, in a query on `owners`.",
+        "Run it and count Sunil Haddow's rows: one."
+      ],
+      "hints": [
+        "Read the lesson's part \"A list from another query\". Which column of `animals` holds the owner's id?",
+        "The inner query returns one column, the ids of the owners of dogs. `IN` asks whether a row's `id` is in that list, so each owner comes back once, however often the id repeats.",
+        "The query has the shape `SELECT first_name, last_name, phone FROM owners WHERE id IN (SELECT owner_id FROM animals WHERE ...);`."
+      ],
+      "docs": [
+        { "title": "The IN operator with a subquery", "url": "https://www.sqlite.org/lang_expr.html#the_in_and_not_in_operators" },
+        { "title": "Subquery expressions", "url": "https://www.sqlite.org/lang_expr.html#subquery_expressions" }
+      ],
+      "videos": [
+        { "title": "Subqueries explained", "url": "https://www.youtube.com/watch?v=o5O9AAGVruI" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "heavier-than-average",
+      "title": "Find the animals heavier than average",
+      "file": "queries/2-heavier-than-average.sql",
+      "description": "Ifan is writing a note on weight for the newsletter and wants the animals that weigh more than the average of all the animals.\n\nIn `queries/2-heavier-than-average.sql`, return three columns, in this order:\n\n- `name`\n- `species`\n- `weight_kg`\n\nOne row for each animal whose weight is more than the average weight of all the animals. Work the average out in the query from `animals`, so it stays right when the animals change. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data, whose average is different.",
+      "nextSteps": [
+        "Write a query that returns the average weight alone, and run it.",
+        "Put it in brackets where a number would go in the condition of a query on `animals`.",
+        "Run it and check two animals by hand: one just above the average, one just below."
+      ],
+      "hints": [
+        "Read the lesson's part \"One value from another query\". Why can `AVG` not go straight into `WHERE`?",
+        "`WHERE` looks at one row at a time, so it cannot average all of them. A query in brackets that returns one value can stand where a number would.",
+        "The condition has the shape `WHERE weight_kg > (SELECT AVG(weight_kg) FROM animals)`."
+      ],
+      "docs": [
+        { "title": "Subquery expressions", "url": "https://www.sqlite.org/lang_expr.html#subquery_expressions" },
+        { "title": "avg()", "url": "https://www.sqlite.org/lang_aggfunc.html#avg" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fernlea-visits",
+      "title": "List the visits of animals from Fernlea",
+      "file": "queries/3-fernlea-visits.sql",
+      "description": "Mabel is thinking of a monthly clinic in Fernlea and wants to see what animals from there have come in for.\n\nIn `queries/3-fernlea-visits.sql`, return three columns, in this order:\n\n- `visit_date`\n- `vet`\n- `reason`\n\nOne row for each visit of an animal whose owner lives in Fernlea. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write a query that returns the ids of the owners in Fernlea, and run it. How many are there?",
+        "Use it inside a query that returns the ids of their animals, and run that.",
+        "Use that inside a query on `visits`, and check the visits by hand in `seed.sql`."
+      ],
+      "hints": [
+        "Read the lesson's parts \"A list from another query\" and \"One value or many\". How many owners live in Fernlea?",
+        "Several owners live there, so the inner query returns several rows, and `=` would use only the first. `IN` uses them all. A query inside can itself have a query inside.",
+        "The condition has the shape `WHERE animal_id IN (SELECT id FROM animals WHERE owner_id IN (SELECT id FROM owners WHERE ...))`."
+      ],
+      "docs": [
+        { "title": "The IN operator with a subquery", "url": "https://www.sqlite.org/lang_expr.html#the_in_and_not_in_operators" },
+        { "title": "Subquery expressions", "url": "https://www.sqlite.org/lang_expr.html#subquery_expressions" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "average-bill",
+      "title": "Work out each vet's average bill",
+      "file": "queries/4-average-bill.sql",
+      "description": "Rosamund wants to know what a visit to each vet comes to on average.\n\nA visit's bill is the prices of its treatments added up. Count only visits with at least one treatment. In `queries/4-average-bill.sql`, return two columns, in this order:\n\n- `vet`\n- `average_bill`: the average of that vet's bills, rounded to 2 decimal places\n\nOne row per vet. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Write a query that returns one row per visit, with the vet and the bill, and run it.",
+        "Put it in brackets after `FROM`, give it a name, and average its bills per vet.",
+        "Round the average, and check one vet's figure by hand from the rows of your first query."
+      ],
+      "hints": [
+        "Read the lesson's part \"A query as a table\". The average is of bills, and a bill is already a total of treatments.",
+        "`AVG(price)` averages treatments, not visits, and `AVG(SUM(price))` is an error. Total each visit in a query of its own, then average those totals in a query around it.",
+        "The query has the shape `SELECT vet, ROUND(AVG(bill), 2) AS average_bill FROM (SELECT v.vet, SUM(t.price) AS bill FROM visits AS v JOIN treatments AS t ON ... GROUP BY v.id, v.vet) AS bills GROUP BY vet;`."
+      ],
+      "docs": [
+        { "title": "The FROM clause, subqueries included", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "avg() and sum()", "url": "https://www.sqlite.org/lang_aggfunc.html" }
+      ],
+      "points": 10
+    }
+  ]
+}

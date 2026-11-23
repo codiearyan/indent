@@ -11,6 +11,13 @@
 # The spec: {file, shown, root, given, upto, inject, names, comments}. `given` puts Check's own
 # value on the first top-level line that makes each name, `inject` sets names right before part
 # `upto` runs, and nothing after part `upto` runs. Written for Python 3.9 and later.
+#
+# Files with blocks (if, loops, functions) add {part_seconds, define, call}. With `part_seconds`,
+# a part or call that runs longer, or prints without end, is stopped by itself and the parts after
+# it still run. `define` is Python run right before part `upto`, Check's own versions of what
+# earlier tasks make. `call` calls a function once part `upto` has run, and reports what it gave
+# back and what it printed, apart.
+import _thread
 import ast
 import builtins
 import io
@@ -18,15 +25,37 @@ import json
 import math
 import os
 import re
+import signal
 import sys
+import threading
+import time
 import tokenize
 import traceback
 
 MARK = '@@indent '
 MAX_PRINTED = 200000
+# With blocks, what one part or call printed is sent back cut to this, so several parts that
+# print without end stay within what Check reads. Every task needs far less.
+MAX_SENT = 20000
+# With blocks, how much more memory than ever before one part or call may take. A loop that
+# grows a value without end reaches gigabytes well inside the time limit.
+MAX_GROWTH = 512 * 1024 * 1024
 TASK_LINE = re.compile(r'\s*#\s*Task\s+(\d+)\b')
 
 channel = sys.stdout
+
+try:
+    import resource
+except ImportError:
+    resource = None
+
+
+def peak_memory():
+    """The most memory this process has held, in bytes, or 0 where Python cannot tell."""
+    if resource is None:
+        return 0
+    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    return peak if sys.platform == 'darwin' else peak * 1024
 
 
 def emit(record):
@@ -78,13 +107,24 @@ def guard(root):
     sys.addaudithook(hook)
 
 
+class Stopped(BaseException):
+    """Raised inside a part or call that runs too long or prints without end."""
+
+    def __init__(self, why):
+        super().__init__(why)
+        self.why = why
+
+
 class Printed(io.TextIOBase):
-    """What one part prints. A program that prints without end is stopped."""
+    """What one part prints. A program that prints without end is stopped: the whole file, or
+    with `alone` only this part or call."""
 
     total = 0
 
-    def __init__(self, task):
+    def __init__(self, task, alone=False):
         self.task = task
+        self.alone = alone
+        self.size = 0
         self.parts = []
 
     def writable(self):
@@ -92,15 +132,91 @@ class Printed(io.TextIOBase):
 
     def write(self, text):
         text = str(text)
-        Printed.total += len(text)
-        if Printed.total > MAX_PRINTED:
-            emit({'kind': 'flood', 'task': self.task})
-            os._exit(0)
+        if self.alone:
+            self.size += len(text)
+            if self.size > MAX_PRINTED:
+                raise Stopped('flood')
+        else:
+            Printed.total += len(text)
+            if Printed.total > MAX_PRINTED:
+                emit({'kind': 'flood', 'task': self.task})
+                os._exit(0)
         self.parts.append(text)
         return len(text)
 
     def text(self):
         return ''.join(self.parts)
+
+
+class Watchdog:
+    """Stops a part or call that runs longer than `seconds`, or grows its memory by more than
+    MAX_GROWTH. One thread, started before any learner code runs, raises Stopped in the main
+    thread through its SIGINT handler."""
+
+    def __init__(self, seconds, shown, tree):
+        self.seconds = seconds
+        self.shown = shown
+        self.loops = [n for n in ast.walk(tree) if isinstance(n, (ast.For, ast.While))]
+        self.deadline = None
+        self.base = 0
+        self.why = 'time'
+        self.active = False
+        self.cond = threading.Condition()
+        signal.signal(signal.SIGINT, self.interrupted)
+        threading.Thread(target=self.watch, daemon=True).start()
+
+    def interrupted(self, signum, frame):
+        if self.active:
+            self.active = False
+            raise Stopped(self.why)
+
+    def watch(self):
+        with self.cond:
+            while True:
+                if self.deadline is None:
+                    self.cond.wait()
+                elif self.deadline <= time.monotonic():
+                    self.stop('time')
+                elif peak_memory() - self.base > MAX_GROWTH:
+                    self.stop('memory')
+                else:
+                    self.cond.wait(min(0.02, self.deadline - time.monotonic()))
+
+    def stop(self, why):
+        self.deadline = None
+        self.why = why
+        _thread.interrupt_main()
+
+    def loop_at(self, line):
+        """The first line of the innermost loop around `line`, the same on every run."""
+        around = [n.lineno for n in self.loops if line and n.lineno <= line <= n.end_lineno]
+        return max(around) if around else None
+
+    def run(self, task, code, ns):
+        """Runs `code(ns)` with what it prints kept apart. Returns (result, printed, error,
+        stopped), stopped being None or {'why', 'line'}."""
+        printed = Printed(task, alone=True)
+        sys.stdout = printed
+        result = error = stopped = None
+        with self.cond:
+            self.deadline = time.monotonic() + self.seconds
+            self.base = peak_memory()
+            self.cond.notify()
+        self.active = True
+        try:
+            result = code(ns)
+        except Stopped as caught:
+            frames = [f for f in traceback.extract_tb(caught.__traceback__) if f.filename == self.shown]
+            line = frames[-1].lineno if frames else None
+            stopped = {'why': caught.why, 'line': line, 'loop': self.loop_at(line)}
+        except BaseException as caught:
+            error = error_of(caught, self.shown)
+        finally:
+            self.active = False
+            with self.cond:
+                self.deadline = None
+            sys.stdout = channel
+        return result, printed, error, stopped
 
 
 def value_of(value):
@@ -180,6 +296,28 @@ def task_starts(lines):
     return starts
 
 
+def called(watchdog, task, call, ns):
+    """Calls the function `call['name']` with Check's own arguments."""
+    record = {'kind': 'call', 'task': task, 'names': names_in(ns)}
+    fn = ns.get(call['name'])
+    if fn is None:
+        record['missing'] = True
+        return record
+    if not callable(fn):
+        record['type'] = type(fn).__name__
+        return record
+    args = call.get('args') or []
+    kwargs = call.get('kwargs') or {}
+    result, printed, error, stopped = watchdog.run(task, lambda ns: fn(*args, **kwargs), ns)
+    record.update({
+        'printed': printed.text()[:MAX_SENT],
+        'error': error,
+        'stopped': stopped,
+        'returned': None if error or stopped else value_of(result)
+    })
+    return record
+
+
 def main():
     spec = json.loads(sys.stdin.buffer.read())
     sys.stdin = io.StringIO('')
@@ -243,6 +381,13 @@ def main():
                 owner = task
         parts[owner].append(statement)
 
+    watchdog = Watchdog(spec['part_seconds'], shown, tree) if spec.get('part_seconds') else None
+    if watchdog:
+        made = {n.id for n in ast.walk(tree) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store)}
+        made |= {n.name for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
+        made |= {a.arg for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) for a in n.args.args}
+        defs = any(isinstance(n, ast.FunctionDef) for n in ast.walk(tree))
+        emit({'kind': 'made', 'list': sorted(made), 'defs': defs})
     guard(root)
     sys.path.insert(0, os.path.dirname(os.path.abspath(spec['file'])))
     ns = {'__name__': '__main__', '__builtins__': builtins, '__file__': shown}
@@ -250,7 +395,26 @@ def main():
     for task in [0] + order:
         if task == upto:
             ns.update(spec.get('inject') or {})
+            if spec.get('define'):
+                exec(compile(spec['define'], '<check>', 'exec'), ns)
         emit({'kind': 'start', 'task': task})
+        if watchdog:
+            module = compile(ast.Module(body=parts[task], type_ignores=[]), shown, 'exec')
+            _, printed, error, stopped = watchdog.run(task, lambda ns: exec(module, ns), ns)
+            emit({
+                'kind': 'part',
+                'task': task,
+                'printed': printed.text()[:MAX_SENT],
+                'error': error,
+                'stopped': stopped,
+                'values': {name: value_of(ns[name]) for name in wanted if name in ns},
+                'names': names_in(ns)
+            })
+            if task == upto:
+                if spec.get('call'):
+                    emit(called(watchdog, task, spec['call'], ns))
+                break
+            continue
         printed = Printed(task)
         sys.stdout = printed
         error = None

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Kasimir", "say": "Where do the springs go?", "note": "He took three out." },
+    { "title": "His function", "text": "Lowers a copy of the count, then drops it." },
+    {
+      "title": "Your code",
+      "file": "drawer.cpp",
+      "mine": true,
+      "gap": "Only copies change",
+      "tasks": ["Take parts out", "Split the minutes", "Write the label", "Add to the bench log"]
+    },
+    { "title": "Drawer", "rows": [["Springs", "count goes down"], ["Label", "name and count"], ["Log", "one note more"]] }
+  ],
+  "ticket": { "label": "Three springs", "wrong": "not taken", "why": "A copy", "right": "taken out" },
+  "captions": [
+    "Kasimir takes three springs from the drawer and wants the count to follow.",
+    "His function lowers a copy of the count, and the drawer still says twelve.",
+    "You pass the real variables by reference, and mark what is only read const.",
+    "Now the drawer, the hours and the bench log change for whoever called.",
+    "The program changes the right things now. Next, Dorrit wants it to ask her."
+  ]
+}

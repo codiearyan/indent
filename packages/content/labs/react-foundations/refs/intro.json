@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wilf", "say": "Log the rings, but don't show them", "note": "In the shed, by the children's cab." },
+    { "title": "Bell on tram 14", "text": "The 1911 bell, rung from the cab screen.", "note": "Its clapper is wearing thin." },
+    {
+      "title": "Your cab",
+      "file": "Cab.jsx",
+      "mine": true,
+      "gap": "Nobody counts the rings",
+      "tasks": ["Count rings unseen", "Cursor for new drivers", "Next stop on screen"]
+    },
+    { "title": "Bell log", "rows": [["One line per ride"]] }
+  ],
+  "ticket": { "label": "A ride", "wrong": "nothing logged", "why": "Not counted", "right": "in the log" },
+  "captions": [
+    "In the shed, Wilf wants every ride's bell rings in his log, and never on the screen.",
+    "Children ring the old bell all ride long, and nobody keeps count of it.",
+    "You keep values the screen does not show in refs, in three tasks.",
+    "The ride ends, the log gets its count, and the screen never showed a number.",
+    "Same cab, now it remembers quietly. A new driver can type at once, and Next stop moves."
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "id": "functions",
+  "title": "Functions",
+  "files": [
+    "radio_tools.py"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to try your functions on tonight's callout.",
+    "suggestedCommand": "python3 radio_tools.py"
+  },
+  "tasks": [
+    {
+      "id": "clean",
+      "title": "Tidy any call sign",
+      "file": "radio_tools.py",
+      "description": "Under `# Task 1` in `radio_tools.py`, write a function called `clean_call_sign`. It takes one value, a call sign as it was heard, and **gives back** the same call sign without the spaces at its start and end, in capitals. Given `\"  bravo two \"` it gives back `\"BRAVO TWO\"`. Then print what it gives back for `call_sign`, to see it.\n\nCheck calls `clean_call_sign` with call signs of its own and looks at what it gives back. What it prints is shown apart: printing the call sign is not the same as giving it back.",
+      "nextSteps": [
+        "Read the part of the lesson on `def` and `return`.",
+        "Write the `def` line: the name, one parameter in round brackets, and a colon.",
+        "Under it, give back the tidied call sign with `return`.",
+        "Below the function, print what it gives back for `call_sign` and run the file."
+      ],
+      "hints": [
+        "A function is made with `def`, and it only runs when it is called. The value it gives back is the one after `return`.",
+        "The two methods you need come from the lesson on text, one straight after the other. Use the parameter, the name in the `def` line, not `call_sign`.",
+        "The shape is `def clean_call_sign(heard):` with `return heard.strip().upper()` moved in under it."
+      ],
+      "docs": [
+        {
+          "title": "Defining functions",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions"
+        },
+        {
+          "title": "The return statement",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#the-return-statement"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Defining and calling functions",
+          "url": "https://www.youtube.com/watch?v=NE97ylAnrz4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "crew",
+      "title": "Say the crew in words",
+      "file": "radio_tools.py",
+      "description": "Under `# Task 2`, write a function called `crew_text` that takes a number of crew and gives back:\n\n- `no crew` when the number is 0\n- `1 crew member` when it is 1\n- otherwise the number, a space and `crew members`, such as `4 crew members`\n\nPrint what it gives back for `crew_out`, to see it. Check calls `crew_text` with 0, 1 and other numbers, and looks at what it gives back.",
+      "nextSteps": [
+        "List the three cases and the text each gives back.",
+        "Write the `def` line with one parameter.",
+        "Inside it, decide with `if`, and give back the right text with `return` in every case.",
+        "Print what it gives back for 0, for 1 and for `crew_out`."
+      ],
+      "hints": [
+        "Each case needs its own `return`. A path through the function that ends without one gives back `None`.",
+        "`return` ends the function at once, so once a case has returned, the lines after it do not run. The number becomes part of the text in an f-string.",
+        "The shape is `def crew_text(crew):`, then `if crew == 0:` with a `return` under it, the same for 1, and `return f\"{crew} crew members\"` last."
+      ],
+      "docs": [
+        {
+          "title": "Defining functions",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions"
+        },
+        {
+          "title": "The return statement",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#the-return-statement"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "battery",
+      "title": "Hours for any radio",
+      "file": "radio_tools.py",
+      "description": "Under `# Task 3`, write a function called `battery_hours` that takes a charge, a drain per hour and a low mark, in that order, and gives back how many hours pass until the charge is below the low mark, as in the last issue. A charge exactly at the low mark is not below it yet. Print what it gives back for tonight's radio, to see it.\n\nCheck calls `battery_hours` with radios of its own, one already below the mark included, and looks at what it gives back.",
+      "nextSteps": [
+        "Look back at how you counted the hours in the last issue.",
+        "Write the `def` line with three parameters, in the order the task gives.",
+        "Inside it, count the hours with a loop on the parameters.",
+        "Give the count back after the loop, not inside it."
+      ],
+      "hints": [
+        "The loop from the last issue works inside a function too. Use the parameters, the names in the `def` line, not the names at the top of the file.",
+        "`return` ends the whole function the moment it runs. Inside the loop it would give back after the first hour, so it goes after the loop, lined up with the `while`.",
+        "The shape is `def battery_hours(charge, drain, low):`, then `hours = 0`, a `while charge >= low:` loop that takes off `drain` and adds 1, and `return hours` after the loop."
+      ],
+      "docs": [
+        {
+          "title": "Defining functions",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions"
+        },
+        {
+          "title": "The return statement",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#the-return-statement"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "log",
+      "title": "Build a log line",
+      "file": "radio_tools.py",
+      "description": "Under `# Task 4`, write a function called `log_line` that takes a call sign as it was heard and a number of crew, and gives back a line like this one:\n\n```\nBRAVO TWO: 4 crew members out\n```\n\nBuild it by calling `clean_call_sign` and `crew_text` inside it. Print what it gives back for tonight, to see it.\n\nCheck calls `log_line` with callouts of its own, and starts Task 4 from `clean_call_sign` and `crew_text` as Tasks 1 and 2 should make them, so a mistake in those tasks does not spoil this one. It also swaps in versions of the two that give back words of their own, to see that `log_line` builds its line from what they give back.",
+      "nextSteps": [
+        "Read the part of the lesson on functions that use functions.",
+        "Write the `def` line with two parameters.",
+        "Inside it, call `clean_call_sign` and `crew_text` with the parameters.",
+        "Give back the whole line, and print it for tonight."
+      ],
+      "hints": [
+        "A function can call another function, just as your file calls `print`. What the other function gives back can go straight into an f-string.",
+        "Pass the call sign to `clean_call_sign` and the crew to `crew_text`. Mind the colon, the spaces and the word at the end.",
+        "The shape is `def log_line(heard, crew):` with `return f\"{clean_call_sign(heard)}: {crew_text(crew)} out\"` under it."
+      ],
+      "docs": [
+        {
+          "title": "Defining functions",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions"
+        },
+        {
+          "title": "Calls",
+          "url": "https://docs.python.org/3/reference/expressions.html#calls"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

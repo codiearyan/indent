@@ -1,0 +1,51 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "anjali", "label": "Anjali", "kind": "story" },
+      { "id": "page", "label": "ShopPage()", "kind": "function", "mine": true },
+      { "id": "context", "label": "DiscountContext", "kind": "data", "mine": true },
+      { "id": "shelf", "label": "Shelf, ShopItem", "kind": "function", "mine": true },
+      { "id": "price", "label": "Price()", "kind": "function", "mine": true },
+      { "id": "screen", "label": "Shop screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "anjali", "to": "page", "label": "Member box" },
+      { "from": "page", "to": "context", "label": "provides" },
+      { "from": "page", "to": "shelf", "label": "shelf, items" },
+      { "from": "shelf", "to": "price", "label": "pence" },
+      { "from": "context", "to": "price", "label": "discount" },
+      { "from": "price", "to": "screen", "label": "price" }
+    ],
+    "note": "The discount goes straight from the shop page to every price, past the parts that never use it."
+  },
+  "tasks": {
+    "make": {
+      "steps": [
+        { "active": ["context"], "value": { "kind": "map", "label": "DiscountContext", "entries": [{ "key": "value", "value": "a discount in percent" }] }, "note": "The shop gets one context for the discount, in a file of its own." },
+        { "active": ["context", "price"], "note": "With no provider above, a reader gets the default: no discount." }
+      ]
+    },
+    "price": {
+      "steps": [
+        { "active": ["shelf", "shelf->price", "price"], "note": "Each price is handed its pence, and nothing more." },
+        { "active": ["context", "context->price", "price"], "note": "Price reads the discount from the nearest provider above it." },
+        { "active": ["price", "price->screen", "screen"], "note": "The price shows with that discount taken off." }
+      ]
+    },
+    "provide": {
+      "steps": [
+        { "active": ["anjali", "anjali->page", "page"], "note": "Anjali ticks Member for a museum member at the till." },
+        { "active": ["page", "page->context", "context"], "note": "The shop page provides the member discount to everything inside it." },
+        { "active": ["page", "page->shelf", "shelf", "shelf->price"], "note": "Shelves and items pass on only what they are about, never the discount." },
+        { "active": ["context", "context->price", "price", "price->screen", "screen"], "note": "Every price on the page shows the member price." }
+      ]
+    },
+    "vouchers": {
+      "steps": [
+        { "active": ["page", "page->context", "context"], "note": "The member discount is provided around every shelf." },
+        { "active": ["page", "page->shelf", "shelf"], "note": "Around a shelf marked full price, a provider inside it says there is no discount." },
+        { "active": ["context", "context->price", "price", "price->screen", "screen"], "note": "Its prices read the nearer provider and stay full; the other shelves keep the discount." }
+      ]
+    }
+  }
+}

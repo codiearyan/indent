@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Kasimir", "say": "Can the laptop do my round?", "note": "The same steps every morning." },
+    { "title": "Handwritten list", "text": "Wind clock 1, wind clock 2, all by hand." },
+    {
+      "title": "Your code",
+      "file": "rounds.cpp",
+      "mine": true,
+      "gap": "Every line runs once",
+      "tasks": ["List clocks to wind", "Count the strikes", "Add up the serial", "Fit springs till out"]
+    },
+    { "title": "Morning list", "rows": [["Wind", "one line a clock"], ["Strikes", "one total"], ["Springs", "until the box"]] }
+  ],
+  "ticket": { "label": "The round", "wrong": "by hand", "why": "No loops", "right": "printed" },
+  "captions": [
+    "Kasimir starts every morning with the same round, and wants the laptop to do it.",
+    "Today he writes the list by hand, a line for every clock, every day.",
+    "You repeat the steps with for and while loops, in four tasks.",
+    "Now the round prints itself, however many clocks the morning brings.",
+    "The program can repeat now. Next, Ambrose wants his sums written once."
+  ]
+}

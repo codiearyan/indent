@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Four teams. One file?", "note": "Changes the file each call." },
+    { "title": "Last week's code", "text": "Works only for the values at the top." },
+    {
+      "title": "Your functions",
+      "file": "radio_tools.py",
+      "mine": true,
+      "gap": "Works for one team only",
+      "tasks": ["Tidy a call sign", "Crew in words", "Hours for any radio", "Build a log line"]
+    },
+    { "title": "Callout log", "rows": [["Call sign", "bravo two"], ["Crew out", "4"]] }
+  ],
+  "ticket": { "label": "Bravo two", "wrong": "one team only", "why": "Fixed values", "right": "logged" },
+  "captions": [
+    "Monday at the base. Ailsa had four teams on the radio on Saturday night.",
+    "Today the code works only for the values at the top, so she edits it between calls.",
+    "You write functions that take any call sign, crew or radio and give an answer back.",
+    "Now every team's call goes through the same functions and into the log.",
+    "def, parameters, return, and functions that call each other."
+  ]
+}

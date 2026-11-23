@@ -1,0 +1,54 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhona", "label": "Rhona", "kind": "story" },
+      { "id": "callout", "label": "Tonight's callout", "kind": "data" },
+      { "id": "file", "label": "route_in.py", "kind": "file", "mine": true },
+      { "id": "party", "label": "Hill party", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "rhona", "to": "callout", "label": "what we know" },
+      { "from": "callout", "to": "file", "label": "values" },
+      { "from": "file", "to": "party", "label": "the plan" }
+    ],
+    "note": "The callout's values sit at the top of route_in.py, and your if blocks turn them into a plan the hill party can follow."
+  },
+  "tasks": {
+    "route": {
+      "steps": [
+        {
+          "active": ["rhona", "rhona->callout", "callout"],
+          "value": { "kind": "map", "label": "the river", "entries": [{ "key": "river_level", "value": "a decimal number" }, { "key": "ford_limit", "value": "a decimal number" }] },
+          "note": "The river gauge gives a level, and the ford has a limit."
+        },
+        { "active": ["callout", "callout->file", "file"], "note": "Under Task 1 one question about the river picks one of the two routes." },
+        { "active": ["file", "file->party", "party"], "note": "Whatever the river does, route always ends up holding one of the two words." }
+      ]
+    },
+    "wind": {
+      "steps": [
+        { "active": ["callout"], "note": "The wind on the tops is one number." },
+        { "active": ["callout", "callout->file", "file"], "note": "Under Task 2 the branches are asked from the top, and only the first that is True runs." },
+        { "active": ["file", "file->party", "party"], "note": "The hill party hears one of three warnings." }
+      ]
+    },
+    "helicopter": {
+      "steps": [
+        { "active": ["callout"], "note": "Two things matter to the helicopter: daylight and the wind." },
+        { "active": ["callout", "callout->file", "file"], "note": "Under Task 3 one if asks both questions at once." },
+        { "active": ["file", "file->party", "party"], "note": "Exactly one line prints: the helicopter comes, or the team carries." }
+      ]
+    },
+    "name": {
+      "steps": [
+        {
+          "active": ["callout"],
+          "value": { "kind": "array", "label": "what casualty_name may hold", "values": ["a name", "empty text", "None"] },
+          "note": "The casualty's name may be known, missed on the radio, or not asked yet."
+        },
+        { "active": ["callout", "callout->file", "file"], "note": "Under Task 4 the if asks whether there is a name at all." },
+        { "active": ["file", "file->party", "party"], "note": "The party hears the name, or hears plainly that nobody knows it." }
+      ]
+    }
+  }
+}

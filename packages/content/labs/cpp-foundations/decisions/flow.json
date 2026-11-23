@@ -1,0 +1,88 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ambrose", "label": "Ambrose's rules", "kind": "story" },
+      { "id": "slip", "label": "Ticket slip", "kind": "data" },
+      { "id": "file", "label": "rules.cpp", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "dorrit", "label": "Dorrit at the counter", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ambrose", "to": "file", "label": "the rules" },
+      { "from": "slip", "to": "file", "label": "days and quote" },
+      { "from": "file", "to": "compiler", "label": "builds" },
+      { "from": "compiler", "to": "dorrit", "label": "one answer" }
+    ],
+    "note": "Ambrose's rules move from his head into the program, which picks one answer for each slip."
+  },
+  "tasks": {
+    "overdue": {
+      "steps": [
+        {
+          "active": ["slip"],
+          "value": { "kind": "array", "label": "from the slip", "values": ["daysInShop", "promisedDays"] },
+          "note": "The slip says how long the clock has been in and how long was promised."
+        },
+        {
+          "active": ["ambrose", "ambrose->file", "slip->file", "file"],
+          "note": "One comparison answers true or false: is the clock overdue?"
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->dorrit", "dorrit"],
+          "note": "Dorrit sees one of two lines, never both."
+        }
+      ]
+    },
+    "guarantee": {
+      "steps": [
+        {
+          "active": ["slip"],
+          "value": { "kind": "array", "label": "from the slip", "values": ["monthsSinceRepair", "sameFault", "quote"] },
+          "note": "The slip says when the clock was last repaired here and whether the fault is the same."
+        },
+        {
+          "active": ["ambrose", "ambrose->file", "slip->file", "file"],
+          "note": "The repair is free only when both of Ambrose's conditions hold."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->dorrit", "dorrit"],
+          "note": "Dorrit tells the customer what to pay."
+        }
+      ]
+    },
+    "rush": {
+      "steps": [
+        {
+          "active": ["slip"],
+          "value": { "kind": "array", "label": "from the slip", "values": ["daysUntilNeeded", "forEvent"] },
+          "note": "The slip says when the customer needs the clock back and what it is for."
+        },
+        {
+          "active": ["ambrose", "ambrose->file", "slip->file", "file"],
+          "note": "Either reason on its own is enough for the rush shelf."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->dorrit", "dorrit"],
+          "note": "Dorrit puts the clock on the shelf the program names."
+        }
+      ]
+    },
+    "bench": {
+      "steps": [
+        {
+          "active": ["slip"],
+          "value": { "kind": "array", "label": "from the slip", "values": ["bench"] },
+          "note": "The slip has a bench number, or none yet."
+        },
+        {
+          "active": ["slip->file", "file"],
+          "note": "The number is compared, not changed, and three outcomes are tried from the top."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->dorrit", "dorrit"],
+          "note": "Dorrit reads where Kasimir has the clock, or that he has not said."
+        }
+      ]
+    }
+  }
+}
