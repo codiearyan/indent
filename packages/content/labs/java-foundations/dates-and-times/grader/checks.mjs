@@ -274,6 +274,14 @@ export const checks = tasks({
           hint: 'heading writes the month as a number. The timetable gives its name: in a pattern, the number of letters decides between a number and a name.'
         },
         {
+          when: (r, x) => !x && r.case.kind === 'heading' && /^[A-Z][a-z]{2} \d+ [A-Z][a-z]{2} \d{4}$/.test(value(r, 'got') ?? ''),
+          hint: 'heading writes short names, three letters each. The timetable writes the day and the month in full: in a pattern, the number of letters decides how long a name is. The lesson has a table.'
+        },
+        {
+          when: (r, x) => !x && r.case.kind === 'heading' && /^[A-Za-z]+ 0\d /.test(value(r, 'got') ?? ''),
+          hint: 'heading writes a day of the month below 10 with a 0 in front. The timetable writes it as it is said, as in Tuesday 4 March 2031: in a pattern, the number of letters decides that too.'
+        },
+        {
           when: (r, x) => !x && r.case.kind === 'heading' && (value(r, 'got') ?? '').toLowerCase() === r.case.expected.got.toLowerCase(),
           hint: 'heading writes the names all in capital letters, as an enum\'s name is. The timetable writes them with one capital: a formatter writes names the way they are written in the language.'
         },

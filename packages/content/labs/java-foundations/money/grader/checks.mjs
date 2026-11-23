@@ -57,14 +57,18 @@ const SHARES = [
   { total: '10.00', people: 3, right: '3.33', even: '3.33', up: '3.34', totalScale: '3.33', double: '3.33' },
   { total: '0.25', people: 2, right: '0.13', even: '0.12', up: '0.13', totalScale: '0.13', double: '0.13' },
   { total: '20', people: 3, right: '6.67', even: '6.67', up: '6.67', totalScale: '7', double: '6.67' },
-  { total: '1.15', people: 2, right: '0.58', even: '0.58', up: '0.58', totalScale: '0.58', double: '0.57' }
+  { total: '1.15', people: 2, right: '0.58', even: '0.58', up: '0.58', totalScale: '0.58', double: '0.57' },
+  // 10.35 / 6 is 1.725 exactly; as a double it is 1.7249999999999999, so even BigDecimal.valueOf lands low.
+  { total: '10.35', people: 6, right: '1.73', even: '1.72', up: '1.73', totalScale: '1.73', double: '1.72' }
 ]
 const TICKETS = [
   { amount: '1.7', line: '£1.70' },
   { amount: '2', line: '£2.00' },
   { amount: '0.125', line: '£0.13', even: '£0.12' },
   { amount: '1234.5', line: '£1234.50' },
-  { amount: '4.585', line: '£4.59', even: '£4.58' }
+  { amount: '4.585', line: '£4.59', even: '£4.58' },
+  // An amount worked out to many places, just under half a penny: a double reads it as 2.005.
+  { amount: '2.00499999999999999', line: '£2.00', double: '£2.01' }
 ]
 
 const all = (runs, kind, test) => runs.filter((r) => r.case.kind === kind).every(test)
@@ -190,16 +194,16 @@ export const checks = tasks({
           hint: 'share keeps as many decimal places as total has, so 20 shared by 3 comes back as a whole number. The task asks for two decimal places, whatever total has.'
         },
         {
+          when: (r, x, runs, code) => !x && r.case.kind === 'share' && usesDouble(code) && value(r, 'as text') === r.case.share.double,
+          hint: 'share lands a penny low where the exact share ends in a half penny. The division went through a double, which holds the answer only nearly, just under the half. Divide the BigDecimal itself.'
+        },
+        {
           when: (r, x, runs) => !x && r.case.kind === 'share' && r.case.share.even !== r.case.share.right && value(r, 'as text') === r.case.share.even,
           hint: 'share rounds a half penny down. The task asks for a half penny up: the RoundingMode decides what happens at the half.'
         },
         {
           when: (r, x, runs) => !x && r.case.kind === 'share' && r.case.share.up !== r.case.share.right && value(r, 'as text') === r.case.share.up,
           hint: 'share rounds every part of a penny up, even a small one. The task rounds to the nearest penny, and only a half penny up.'
-        },
-        {
-          when: (r, x, runs, code) => !x && r.case.kind === 'share' && usesDouble(code) && value(r, 'as text') === r.case.share.double,
-          hint: 'share lands a penny low where the exact share ends in a half penny. The division went through a double, which holds the answer only nearly, just under the half. Divide the BigDecimal itself.'
         }
       ])
     },
@@ -222,7 +226,7 @@ export const checks = tasks({
         ...[
           [' £3.35 ', '3.35'],
           ['£12.05', '12.05'],
-          ['0.7', '0.7']
+          ['4.20', '4.20']
         ].map(([t, v]) =>
           amount({
             name: `readAmount reads ${JSON.stringify(t)}`,
@@ -251,6 +255,10 @@ export const checks = tasks({
       ],
       judge: judge([
         {
+          when: (r, x, runs, code) => !x && r.case.kind === 'line' && usesDouble(code) && [r.case.ticket.even, r.case.ticket.double].includes(value(r, 'got')),
+          hint: 'ticketLine lands a penny off where the amount is at or near half a penny. On its way the amount went through a double, which holds it only nearly. Round the BigDecimal itself.'
+        },
+        {
           when: (r, x) => !x && r.case.kind === 'line' && (value(r, 'got') ?? '').includes(','),
           hint: 'ticketLine writes a comma between pounds and pence. Check runs with a German computer\'s language, and String.format writes numbers the way the computer\'s language does. A ticket shows a point wherever it is printed, so its text must not follow the computer\'s language: the lesson shows two ways.'
         },
@@ -269,6 +277,10 @@ export const checks = tasks({
         {
           when: (r, x) => r.case.kind === 'refuse' && x?.name === 'NumberFormatException',
           hint: 'readAmount lets the NumberFormatException out as it came. Its message names only the first character it could not read, never the whole text. The task asks for an IllegalArgumentException whose message names the text, with the NumberFormatException kept as its cause.'
+        },
+        {
+          when: (r, x) => !x && r.case.kind === 'read' && /4\.20/.test(r.case.name) && value(r, 'as text') === '0.20',
+          hint: 'readAmount takes off the first character even when it is not a pound sign, so 4.20 comes back as 0.20. Take the pound sign off only when the text starts with one.'
         },
         {
           when: (r, x) => r.case.kind === 'read' && x?.name === 'IllegalArgumentException' && /3\.35/.test(r.case.name),

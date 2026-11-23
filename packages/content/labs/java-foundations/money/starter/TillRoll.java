@@ -44,5 +44,6 @@ public class TillRoll {
 // back the amount as the ticket shows it: a pound sign, then the amount with exactly two
 // decimal places, a half penny up, with a point and nothing else, as in £1.70.
 // static BigDecimal readAmount(String text) gives back the amount a text such as " £3.35 " says,
-// spaces at either end and the pound sign left off. When the rest is not an amount, it throws an
-// IllegalArgumentException whose message names the text, with the first exception as its cause.
+// spaces at either end left off, and the pound sign when there is one. When the rest is not an
+// amount, it throws an IllegalArgumentException whose message names the text, with the first
+// exception as its cause.

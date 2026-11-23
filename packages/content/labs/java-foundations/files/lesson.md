@@ -64,7 +64,7 @@ A file holds bytes. A character set says which bytes mean which letters. In UTF-
 Exception in thread "main" java.nio.charset.MalformedInputException: Input length = 1
 ```
 
-The `Files` methods read and write UTF-8 when no character set is named. Name it anyway, and name the other one where a file needs it: `Files.readAllLines(old, StandardCharsets.ISO_8859_1)`. The editor reads UTF-8, so a file in ISO-8859-1 shows its `£` as a box.
+The `Files` methods read and write UTF-8 when no character set is named. Name it anyway, and name the other one where a file needs it: `Files.readAllLines(old, StandardCharsets.ISO_8859_1)`. The editor reads UTF-8, so a file in ISO-8859-1 shows its `£` as a box. So leave `till.txt` as it is in the editor: a change saved there writes the whole file back in UTF-8, boxes and all.
 
 ## Long files: Files.lines, and close it
 

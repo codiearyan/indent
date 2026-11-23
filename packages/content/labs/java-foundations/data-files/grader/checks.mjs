@@ -49,16 +49,19 @@ function inFolder({ name, files = {}, call, show, type = 'void', probe, after = 
   })
 }
 
+// The folder's own bookkeeping shows in the output only when it says something.
+const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/\n  files left open is 0(?=\n)/g, '').replace(/\n  a path outside the folder is null(?=\n)/g, '').replace(/\nThen:(?=\nIt printed:)/g, '') } : d)
+
 function judge(mistakes) {
   return (runs, ctx) =>
-    outcomeCases({ file: FILE, explain: explainValue })(runs, ctx).map((d, i) => {
+    outcomeCases({ file: FILE, explain: explainValue })(runs, ctx).map(quiet).map((d, i) => {
       const r = runs[i]
       const left = value(r, 'a path outside the folder')
       if (left) return { ...d, passed: false, message: `A path led out of the folder of the file Check handed over, to ${left}. Each method works on the path it is handed, and on files beside it: nothing else on the computer.` }
       if (d.passed && Number(value(r, 'files left open') ?? 0) > 0)
         return { ...d, passed: false, message: 'The answer is right, and the file is still open afterwards: something read or wrote it and was never closed.' }
       if (d.passed) return d
-      const m = mistakes.find((k) => k.when(r, thrown(r), runs, codeOnly(ctx.section)))
+      const m = [...mistakes, ...(mistakes.includes(FILES_COMMON[0]) ? LAST : [])].find((k) => k.when(r, thrown(r), runs, codeOnly(ctx.section)))
       return m ? { ...d, message: typeof m.hint === 'function' ? m.hint(r, thrown(r)) : m.hint } : d
     })
 }
@@ -67,7 +70,11 @@ const FILES_COMMON = [
   {
     when: (r, x) => x && /check-folder:/.test(x.message ?? '') && /InvalidPath|NoSuchFile/.test(x.name) && !ownPath(x),
     hint: 'A path was made again from the text of the one Check handed over. The text of a path is for people to read: Check\'s prints as check-folder:/..., which is no place on this computer. Use the path the method is handed.'
-  },
+  }
+]
+
+// Checked after every other mistake: a typed path may sit in another method than the one that failed.
+const LAST = [
   {
     when: (r, x, runs, code) => !x && /Path\s*\.\s*of\s*\(|Paths\s*\.\s*get\s*\(|new\s+File\s*\(/.test(code),
     hint: 'A path is typed into the method, so it works on that file, whatever path it is handed. Check hands over a path to a file of its own: use the path the method is given.'

@@ -43,9 +43,12 @@ function inFolder({ name, files = {}, latin = [], call, show, type = 'void', pro
   })
 }
 
+// The folder's own bookkeeping shows in the output only when it says something.
+const quiet = (d) => (d.output ? { ...d, output: d.output.replace(/\n  files left open is 0(?=\n)/g, '').replace(/\n  a path outside the folder is null(?=\n)/g, '').replace(/\nThen:(?=\nIt printed:)/g, '') } : d)
+
 function judge(mistakes) {
   return (runs, ctx) =>
-    outcomeCases({ file: FILE, explain: explainValue })(runs, ctx).map((d, i) => {
+    outcomeCases({ file: FILE, explain: explainValue })(runs, ctx).map(quiet).map((d, i) => {
       const r = runs[i]
       const left = value(r, 'a path outside the folder')
       if (left)
@@ -53,7 +56,7 @@ function judge(mistakes) {
       if (d.passed && Number(value(r, 'files left open')) > 0)
         return { ...d, passed: false, message: 'The answer is right, and the file is still open afterwards: something read it and was never closed. A stream of lines holds its file open until it is closed: the lesson shows how a try closes it for you.' }
       if (d.passed) return d
-      const m = mistakes.find((k) => k.when(r, thrown(r), runs, codeOnly(ctx.section)))
+      const m = [...mistakes, ...LAST].find((k) => k.when(r, thrown(r), runs, codeOnly(ctx.section)))
       return m ? { ...d, message: typeof m.hint === 'function' ? m.hint(r, thrown(r)) : m.hint } : d
     })
 }
@@ -66,7 +69,11 @@ const COMMON = [
   {
     when: (r, x) => x?.name === 'UnsupportedOperationException' && /default file system/.test(x.message ?? ''),
     hint: 'toFile turns the Path into the older java.io.File, which knows only the computer\'s own files and cannot open the one Check handed over. The Files methods take the Path itself.'
-  },
+  }
+]
+
+// Checked after every other mistake: a typed path may sit in another method than the one that failed.
+const LAST = [
   {
     when: (r, x, runs, code) => !x && /Path\s*\.\s*of\s*\(|Paths\s*\.\s*get\s*\(|new\s+File\s*\(/.test(code),
     hint: 'A path is typed into the method, so it reads or writes that file, whatever path it is handed. Check hands over a path to a file of its own, with other lines: use the path the method is given.'
@@ -231,7 +238,7 @@ export const checks = tasks({
         ...COMMON,
         {
           when: (r, x) => !x && Object.keys(r.values).some((k) => k.endsWith('afterwards') && /\r\n/.test(value(r, k) ?? '')),
-          hint: 'The lines end in "\\r\\n", which is how a Windows computer ends a line, and Check runs with that line end. Writing a list of lines uses the computer\'s line end; the task gives its own, "\\n", the same on every computer.'
+          hint: 'The lines end in "\\r\\n", which is how a Windows computer ends a line, and Check runs with that line end. Writing a list of lines, %n or System.lineSeparator() uses the computer\'s line end; the task gives its own, "\\n", the same on every computer.'
         },
         {
           when: (r, x) => !x && r.case.kind === 'append' && value(r, 'log.txt afterwards') === 'Ruaraidh paid for two\n',

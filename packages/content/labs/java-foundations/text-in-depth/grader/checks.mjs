@@ -117,6 +117,10 @@ export const checks = tasks({
           hint: 'An hour or a minute below 10 shows as one digit. The time on the board always has two digits each side of the colon, as in 07:00.'
         },
         {
+          when: (r, x) => !x && /[\r\n]$/.test(value(r, 'got') ?? '') && value(r, 'got').trim() === rowOf(...r.case.args).trim(),
+          hint: 'The row ends with a line end. row gives back the text of one row and nothing after it: whoever builds the board ends each line.'
+        },
+        {
           when: (r, x) => !x && typeof value(r, 'got') === 'string' && value(r, 'got').trim() === rowOf(...r.case.args).trim() && value(r, 'got') !== rowOf(...r.case.args),
           hint: 'The row is right apart from the spaces at its end or start. Each column is exactly as wide as the task says: count the characters between the brackets below.'
         },
@@ -209,11 +213,11 @@ export const checks = tasks({
           hint: 'parts gives back no pieces at all. split reads the text it is handed as a pattern, where a point means any character, so every character is a place to split and nothing is left between them. The lesson shows how to split at a plain point.'
         },
         {
-          when: (r, x) => !x && r.case.kind === 'parts' && em(r.case.ref) && (items(r, 'got') ?? []).some((p) => p.includes(EM)),
+          when: (r, x, runs, code) => !x && r.case.kind === 'parts' && em(r.case.ref) && /\btrim\s*\(/.test(code) && (items(r, 'got') ?? []).some((p) => p.includes(EM)),
           hint: 'A piece still has a space at its end. The reference starts and ends with an em space, as text pasted from an email can, and trim takes off only the plain space and the characters below it. The lesson shows the method that knows every kind of space.'
         },
         {
-          when: (r, x) => !x && r.case.kind === 'parts' && (items(r, 'got') ?? []).some((p) => p !== p.trim()),
+          when: (r, x) => !x && r.case.kind === 'parts' && (items(r, 'got') ?? []).some((p) => /^\s|\s$/.test(p)),
           hint: 'A piece still has a space at its end: the spaces at either end of the reference come off before it is split.'
         },
         {
@@ -221,7 +225,7 @@ export const checks = tasks({
           hint: 'sameRef says two equal references are not the same. == asks whether two texts are the very same object, as part 1 showed, and Check hands over texts made while the program runs.'
         },
         {
-          when: (r, x) => !x && r.case.kind === 'same' && r.case.expected.got === true && value(r, 'got') === 'false' && em(r.case.pair.join('')),
+          when: (r, x, runs, code) => !x && r.case.kind === 'same' && r.case.expected.got === true && value(r, 'got') === 'false' && em(r.case.pair.join('')) && /\btrim\s*\(/.test(code),
           hint: 'sameRef says no to two references that differ only in capital letters and an em space at one end, as text pasted from an email can have. trim takes off only the plain space and the characters below it: the lesson shows the method that knows every kind of space.'
         },
         {
