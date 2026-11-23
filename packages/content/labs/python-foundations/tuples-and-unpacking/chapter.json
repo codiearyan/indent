@@ -1,0 +1,131 @@
+{
+  "id": "tuples-and-unpacking",
+  "title": "Tuples and unpacking",
+  "files": [
+    "grid_refs.py"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the route, the moved position, the team lines and the radio log your functions read.",
+    "suggestedCommand": "python3 grid_refs.py"
+  },
+  "tasks": [
+    {
+      "id": "range",
+      "title": "High and low on the route",
+      "file": "grid_refs.py",
+      "description": "Under `# Task 1` in `grid_refs.py`, write a function called `height_range` that takes a list of heights and gives back two values, the lowest and then the highest, as a tuple. For tonight's route it gives back `(240, 760)`. Print what it gives back for `route_heights`.\n\nCheck calls `height_range` with heights of its own and looks at what it gives back: a tuple of two numbers, in that order.",
+      "nextSteps": [
+        "Read the part of the lesson on giving back two values.",
+        "Work out the lowest and the highest of the list.",
+        "Give back both in one `return`, the lowest first.",
+        "Print what it gives back and check the round brackets."
+      ],
+      "hints": [
+        "A function gives back one value, but that value can be a tuple holding two.",
+        "Two values with a comma between them, after `return`, make a tuple. `min` and `max` give the two numbers.",
+        "The shape is `return min(heights), max(heights)`."
+      ],
+      "docs": [
+        {
+          "title": "Tuples and sequences",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences"
+        },
+        {
+          "title": "Tuples",
+          "url": "https://docs.python.org/3/library/stdtypes.html#tuples"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "moved",
+      "title": "Move a position",
+      "file": "grid_refs.py",
+      "description": "Under `# Task 2`, write a function called `moved` that takes a grid reference, a tuple of two numbers (how far east, then how far north), and how far to go east and north. It gives back the new grid reference as a new tuple. For the casualty at `(312, 845)`, 4 east and -2 north, it gives back `(316, 843)`. Print what it gives back for `casualty`, 4 and -2.\n\nCheck calls `moved` with grid references and distances of its own and looks at what it gives back: a tuple of two numbers.",
+      "nextSteps": [
+        "Read the parts of the lesson on unpacking and on why a tuple cannot change.",
+        "Take the grid reference apart into two names.",
+        "Add each distance to its own number.",
+        "Give back a new tuple, east first."
+      ],
+      "hints": [
+        "A tuple cannot be changed, so the new position is a new tuple made from the old one's numbers.",
+        "Two names on the left of `=` take a tuple of two values apart, one value each, in order. Then make the new tuple from the two sums.",
+        "The shape is `easting, northing = point` and then `return (easting + east, northing + north)`."
+      ],
+      "docs": [
+        {
+          "title": "Tuples and sequences",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences"
+        },
+        {
+          "title": "Assignment statements",
+          "url": "https://docs.python.org/3/reference/simple_stmts.html#assignment-statements"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Tuples, and why they cannot change",
+          "url": "https://www.youtube.com/watch?v=NI26dqhs2Rk"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "lines",
+      "title": "Send each team to its square",
+      "file": "grid_refs.py",
+      "description": "Under `# Task 3`, write a function called `team_lines` that takes a list of teams and a list of squares, the same length, and gives back a list of lines that pair them in order, the first team with the first square and so on. For tonight it gives back `['Team A to C4', 'Team B to D1', 'Team C to B5']`. Print each line it gives back for `teams` and `squares`.\n\nCheck calls `team_lines` with lists of its own, two empty ones too, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on `zip`.",
+        "Make an empty list for the lines.",
+        "Go through both lists together with `zip`, with one name for the team and one for the square.",
+        "Add a line on each round, and give back the list after the loop."
+      ],
+      "hints": [
+        "One loop goes through both lists at once, a team and its square on each round. A loop inside a loop would pair every team with every square.",
+        "`zip` gives one tuple per position, and two names after `for` take each tuple apart.",
+        "The shape is `for team, square in zip(teams, squares):` with `lines.append(f\"{team} to {square}\")` inside, after `lines = []`."
+      ],
+      "docs": [
+        {
+          "title": "zip()",
+          "url": "https://docs.python.org/3/library/functions.html#zip"
+        },
+        {
+          "title": "Looping techniques",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#looping-techniques"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "heard",
+      "title": "When we last heard them",
+      "file": "grid_refs.py",
+      "description": "Under `# Task 4`, write a function called `last_heard` that takes a radio log, a list of `(time, call sign)` tuples in the order they came, and a call sign. It gives back the time of the last call from that call sign, or `None` when it never called. For tonight's log and `\"Bravo two\"` it gives back `21:40`. Print what it gives back for `radio_log` and `\"Bravo two\"`.\n\nCheck calls `last_heard` with logs and call signs of its own, one that never called, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on unpacking in a loop.",
+        "Start a name for the last time at `None`.",
+        "Go through the log, taking each call apart into a time and a call sign.",
+        "When the call sign matches, keep its time. Give back the last time after the loop."
+      ],
+      "hints": [
+        "Keep the latest matching time in a name of its own, and give it back after the loop. A later match replaces an earlier one.",
+        "Two names after `for` take each call apart. Give them names that are not the same as the function's parameters, or the call sign you were given is lost.",
+        "The shape is `last = None`, then `for time, heard in log:` with `if heard == call_sign:` and `last = time` inside, and `return last` after the loop."
+      ],
+      "docs": [
+        {
+          "title": "for statements",
+          "url": "https://docs.python.org/3/reference/compound_stmts.html#the-for-statement"
+        },
+        {
+          "title": "Tuples and sequences",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

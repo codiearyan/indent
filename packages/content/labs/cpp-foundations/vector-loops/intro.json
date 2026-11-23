@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Kasimir", "say": "Some days I miss one.", "note": "He adds the drifts in his head." },
+    { "title": "Timing bench", "text": "A drift for every clock, added up by hand." },
+    {
+      "title": "Your code",
+      "file": "timing.cpp",
+      "mine": true,
+      "gap": "Nothing goes through it",
+      "tasks": ["Add up the drifts", "Find the fastest", "Number the clocks", "Correct them all"]
+    },
+    { "title": "End of the day", "rows": [["Total", "every clock"], ["Fastest", "a real clock"], ["List", "numbered"]] }
+  ],
+  "ticket": { "label": "The drifts", "wrong": "one missed", "why": "By hand", "right": "all counted" },
+  "captions": [
+    "Kasimir writes down how many seconds each clock gained on the timing bench.",
+    "He adds them up in his head at the end of the day, and some days he misses one.",
+    "You write loops that go through every value of a vector, and one that changes them.",
+    "Now every clock on the bench is counted, the fastest is found, and the list is numbered.",
+    "The bench is counted for him. Next, Dorrit wants functions that pass whole lists around."
+  ]
+}

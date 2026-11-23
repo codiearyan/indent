@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Kasimir", "say": "I want one list that grows.", "note": "Eleven tickets on Tuesday." },
+    { "title": "One per ticket", "text": "A variable for each ticket, and one short." },
+    {
+      "title": "Your code",
+      "file": "queue.cpp",
+      "mine": true,
+      "gap": "No list to hold them",
+      "tasks": ["Count the waiting", "Find the last ticket", "Add a ticket", "Swap by place"]
+    },
+    { "title": "Bench queue", "rows": [["First in", "at position 0"], ["New ones", "at the end"], ["Count", "always right"]] }
+  ],
+  "ticket": { "label": "Ticket 2052", "wrong": "no room", "why": "Fixed slots", "right": "in the queue" },
+  "captions": [
+    "Kasimir wants every ticket at his bench in one list, in the order they came in.",
+    "With a variable per ticket, the day a ticket more comes in there is no room for it.",
+    "You keep the queue in a vector, and read and change it by position.",
+    "Now every new ticket joins the end of the queue, and the count follows it.",
+    "The bench has its list now. Next, Kasimir wants to go through it, one clock at a time."
+  ]
+}

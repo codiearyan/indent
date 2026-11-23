@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Kasimir", "say": "Three more crowns, please.", "note": "He thinks of parts by name." },
+    { "title": "Drawer slips", "text": "A slip per drawer, found by hunting for it." },
+    {
+      "title": "Your code",
+      "file": "stock.cpp",
+      "mine": true,
+      "gap": "No count by name",
+      "tasks": ["Restock a part", "Look up, add nothing", "Print in order", "Count today's parts"]
+    },
+    { "title": "Parts stock", "rows": [["Crowns", "count follows"], ["Jewels", "asked, not added"], ["List", "in name order"]] }
+  ],
+  "ticket": { "label": "Three crowns", "wrong": "slip lost", "why": "No labels", "right": "counted" },
+  "captions": [
+    "Kasimir puts three more crowns in a drawer and wants the stock to follow.",
+    "The counts are on slips, one per drawer, and finding the right slip takes a hunt.",
+    "You keep the stock in a map, under each part's name, and look up without adding.",
+    "Now the crowns go up by three, a question adds no drawer, and the stock reads in order.",
+    "Parts are found by name now. Next, Ambrose wants the month's bills sorted and summed."
+  ]
+}

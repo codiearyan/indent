@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Ffion",
+      "say": "Why does it say sign in first?",
+      "note": "Right after she signs in."
+    },
+    {
+      "title": "Studio app",
+      "text": "Signs in, then drops the cookie it got."
+    },
+    {
+      "title": "Your code",
+      "file": "cookies.js",
+      "mine": true,
+      "gap": "No cookie comes back",
+      "tasks": ["Bring cookies back", "Choose which go", "Set the session", "Trust only sessions"]
+    },
+    {
+      "title": "Cupboard server",
+      "text": "Knows a presenter only by a session."
+    }
+  ],
+  "ticket": {
+    "label": "Playlist",
+    "wrong": "sign in first",
+    "why": "No cookie",
+    "right": "Ffion's to edit"
+  },
+  "captions": [
+    "Ffion signs in on the studio app to change tonight's playlist, and is told to sign in.",
+    "The server sets a cookie at sign-in, and the app never sends it back on the next request.",
+    "You bring cookies back, choose where they go, and set and trust a session, in four tasks.",
+    "Ffion's next request carries her session, and the server knows her from its own records.",
+    "A cookie carries a session id back. Only the server's own record says who someone is."
+  ]
+}

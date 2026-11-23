@@ -1,0 +1,129 @@
+{
+  "id": "shell-settings",
+  "title": "The settings a shell carries",
+  "files": ["today.txt", "shop-settings.sh"],
+  "terminal": {
+    "description": "A shell that starts in the shop's top folder. Restart gives you a fresh shell when its settings get in a muddle.",
+    "suggestedCommand": "echo $PATH"
+  },
+  "tasks": [
+    {
+      "id": "home",
+      "title": "Save your home folder",
+      "file": "today.txt",
+      "description": "Save what `echo $HOME` prints in your terminal into `home.txt` in the top folder.\n\nCheck reads `home.txt` and compares its one line with the home folder of your account.",
+      "nextSteps": [
+        "Run `echo $HOME` and read what it prints.",
+        "Compare it with what `pwd` prints: they are two different folders.",
+        "Run the same `echo` again with `>` and the file's name after it.",
+        "Look at `home.txt` with `cat`."
+      ],
+      "hints": [
+        "A `$` in front of a variable's name makes the shell put in its value.",
+        "`echo` prints what comes after it, and `>` saves that into a file. The name is in capitals.",
+        "Run `echo $HOME > home.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "Shell variables",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_05_03"
+        },
+        {
+          "title": "Variables every program gets",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap08.html#tag_08_03"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "label",
+      "title": "Hand the shop's name to the label script",
+      "file": "today.txt",
+      "description": "`label.sh` prints the top of a parcel label and takes the shop's name from the variable `SHOP_NAME`. In the terminal, set `SHOP_NAME` to `Ashgrove Press` so that `label.sh` sees it, then save what `label.sh` prints into `label.txt` in the top folder.\n\nCheck compares `label.txt` with what `label.sh` prints when it gets that name.",
+      "nextSteps": [
+        "Run `sh label.sh` and read the first line it prints.",
+        "Set `SHOP_NAME` in the terminal, and run the script again: the name is still missing.",
+        "Hand the variable to the programs you start, and run the script again.",
+        "Save what it prints with `>`, and look at `label.txt`."
+      ],
+      "hints": [
+        "A variable you set stays in the shell. The lesson's part on what a program sees says how to pass it on.",
+        "`export` hands a variable to every program you start after it. Keep the name in quotes: it has a space.",
+        "Run `export SHOP_NAME=\"Ashgrove Press\"`, then `sh label.sh > label.txt`."
+      ],
+      "docs": [
+        {
+          "title": "export",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_23"
+        },
+        {
+          "title": "env: run a program with a changed environment",
+          "url": "https://man7.org/linux/man-pages/man1/env.1.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "stamp",
+      "title": "Put the shop's tools on PATH",
+      "file": "shop-settings.sh",
+      "description": "Make `bin/stamp` runnable for you. Then add a line to `shop-settings.sh` that adds the full path of the `bin` folder to `PATH`, keeping every folder already on it, so that `stamp` alone runs from any folder once the file is loaded. Keep every line the file has now.\n\nCheck reads the permissions of `bin/stamp`, loads `shop-settings.sh` with `sh` in a copy of the top folder, starting in another folder, and looks for `stamp` and for `ls` through `PATH`.",
+      "nextSteps": [
+        "Run `stamp`, then `bin/stamp`, and read both messages.",
+        "Give `bin/stamp` its `x`, and run `bin/stamp` again.",
+        "Find the full path of `bin` with `pwd`, and add the line to `shop-settings.sh`.",
+        "Press Restart, load the file with `. ./shop-settings.sh`, and run `stamp` from inside `bin`."
+      ],
+      "hints": [
+        "Two things are missing: the permission to run the file, and the folder on the list the shell searches.",
+        "`chmod u+x` gives the owner `x`. The new line exports `PATH` as the full path of `bin`, a colon, then `$PATH`, all in quotes.",
+        "Run `chmod u+x bin/stamp`, then add the line `export PATH=\"<what pwd prints>/bin:$PATH\"` to shop-settings.sh, with the real path in place of the part in angle brackets."
+      ],
+      "docs": [
+        {
+          "title": "Command search and execution",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_09_01_04"
+        },
+        {
+          "title": "command -v: which file a name runs",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/command.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "How the shell finds a command",
+          "url": "https://www.youtube.com/watch?v=rJMFxIbDe-g"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "lasting",
+      "title": "Keep the shop's name for next time",
+      "file": "shop-settings.sh",
+      "description": "Add a line to `shop-settings.sh` that sets `SHOP_NAME` to `Ashgrove Press` for every program started after the file is loaded. Keep every line the file has now.\n\nCheck loads `shop-settings.sh` with `sh` in a copy of the top folder, starting in another folder, then runs `label.sh` and reads the name it prints.",
+      "nextSteps": [
+        "Press Restart, run `sh label.sh`, and see that the name is gone again.",
+        "Add the line to the end of `shop-settings.sh`.",
+        "Load the file with `. ./shop-settings.sh`.",
+        "Run `sh label.sh` and read the first line."
+      ],
+      "hints": [
+        "The line is the one that made the label right in the terminal. In the file, it is read every time the file is loaded.",
+        "Set and export the name in one line, with the name in quotes. Add it with the editor or with `>>`.",
+        "Add the line `export SHOP_NAME=\"Ashgrove Press\"` to the end of shop-settings.sh."
+      ],
+      "docs": [
+        {
+          "title": "The dot command",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_19"
+        },
+        {
+          "title": "export",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_23"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

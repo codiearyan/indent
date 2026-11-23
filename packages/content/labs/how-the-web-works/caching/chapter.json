@@ -1,0 +1,137 @@
+{
+  "id": "caching",
+  "title": "Keeping a copy, and asking if it changed",
+  "files": [
+    "src/cache.js",
+    "run.js",
+    "server/station.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "keep",
+      "title": "Read how an answer may be kept",
+      "file": "src/cache.js",
+      "description": "Under `// Task 1` in `src/cache.js`, make `keepRules(cacheControl)` take the text of a `cache-control` header, or `null` when the answer had none. It gives back `{ store, freshFor }`:\n\n- `store`: `false` only when the answer may not be kept at all, otherwise `true`\n- `freshFor`: how many seconds a copy may be used without asking the server first, as a number. It is `0` when a copy must be confirmed before every use, and when the header gives no lifetime.\n\nRead the directives as the lesson describes them: names in any letter case and any order, with or without a space after each comma, and a number that may be in double quotes. A studio screen keeps its own copy, so it reads `max-age` and leaves `s-maxage` to shared caches.\n\nCheck calls `keepRules` with headers of its own: lifetimes, the directives that say \"ask first\" and \"do not keep\", both together, and no header at all.",
+      "nextSteps": [
+        "Cut the header into directives at its commas, and trim each one.",
+        "Split each directive into its name and its value, and make the name small letters.",
+        "Decide `store` first, then `freshFor`, with the strictest directive winning.",
+        "Run `node run.js` and read the Task 1 lines."
+      ],
+      "hints": [
+        "Three directives decide everything here: one that says do not keep, one that says ask first, and one that gives a lifetime. The rest, like `public` or `private`, change nothing for a studio screen.",
+        "`no-store` means do not keep. `no-cache` means keep, but ask before every use, so `freshFor` is `0` even when a `max-age` is there too. A value like `\"75\"` loses its quotes with `replaceAll('\"', '')`, and `Number()` turns it into a number.",
+        "Put each directive in a `Map` with `directives.set(name.trim().toLowerCase(), value.trim().replaceAll('\"', ''))`, then: `if (directives.has('no-store')) return { store: false, freshFor: 0 }`, `if (directives.has('no-cache') || !directives.has('max-age')) return { store: true, freshFor: 0 }`, and otherwise `return { store: true, freshFor: Number(directives.get('max-age')) }`."
+      ],
+      "docs": [
+        {
+          "title": "Cache-Control header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control"
+        },
+        {
+          "title": "HTTP caching",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Caching headers, from max-age to no-store",
+          "url": "https://www.youtube.com/watch?v=Cy2ZJOBgk84"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fresh",
+      "title": "Say whether a copy is still fresh",
+      "file": "src/cache.js",
+      "description": "Under `// Task 2`, make `isFresh(copy, now)` take a copy, `{ body, etag, cacheControl, storedAt }`, and a time `now`. `storedAt` and `now` are numbers of milliseconds, the kind `Date.now()` gives back.\n\nIt gives back `true` when the copy may still be used at `now` without asking the server, and `false` when it is stale: when its age, the time since `storedAt`, has reached the lifetime its `cacheControl` gives, and when it may not be kept or must be confirmed first.\n\nCheck calls `isFresh` with copies and times of its own, never the clock: young copies, old ones, one at the very end of its lifetime, and copies that are never fresh.",
+      "nextSteps": [
+        "Read the copy's cache-control; your function from Task 1 does that.",
+        "Work out the copy's age from `storedAt` and `now`.",
+        "Compare the age with the lifetime, in the same unit.",
+        "Run `node run.js`: the same copy is fresh after 4 minutes and stale after 15."
+      ],
+      "hints": [
+        "Two clocks are in play: `now` and `storedAt` count milliseconds, and `max-age` counts seconds. A second is 1000 milliseconds.",
+        "`keepRules(copy.cacheControl)` gives `store` and `freshFor`. A copy is fresh only while its age is less than its lifetime, not equal to it, and never when it may not be kept.",
+        "`const { store, freshFor } = keepRules(copy.cacheControl)`, then `return store && now - copy.storedAt < freshFor * 1000`."
+      ],
+      "docs": [
+        {
+          "title": "HTTP caching: freshness",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching"
+        },
+        {
+          "title": "Date.now()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/now"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "refresh",
+      "title": "Ask whether a copy has changed",
+      "file": "src/cache.js",
+      "description": "Under `// Task 3`, make `refresh(address, copy, now)` send **one** `GET` for `address`. When `copy` has an `etag`, the request asks the server whether the copy has changed, with the header the lesson names for that. When `copy` is `null`, or its `etag` is `null`, the request asks plainly.\n\nIt gives back the copy to keep from now on, `{ body, etag, cacheControl, storedAt }`:\n\n- `body`: the old copy's body when the answer is `304 Not Modified`, the answer's body when it is `200`\n- `etag` and `cacheControl`: the answer's `etag` and `cache-control` headers, or `null` when it has none\n- `storedAt`: `now`\n\nFor any other status it throws an `Error`.\n\nCheck starts a server of its own that answers 304 only to the right question, with etags, bodies and lifetimes of its own, and looks at the request its server received.",
+      "nextSteps": [
+        "Build the request's headers: the validator only when the copy has an etag.",
+        "Send the request and look at the status first: 304, 200, or anything else.",
+        "Take the body from the right place for each status.",
+        "Run `node run.js`: the second refresh should get a 304 with no body."
+      ],
+      "hints": [
+        "A 304 is not a failure, but `response.ok` is only `true` from 200 to 299. Test the status itself. A 304 has no body at all: the body is the one you already kept.",
+        "The etag goes back under `if-none-match`, exactly as it came, quotes and any `W/` included. The 304 carries the `cache-control` and `etag` to keep from now on, the same headers a 200 does.",
+        "`const headers = copy?.etag ? { 'if-none-match': copy.etag } : {}`, then `fetch(address, { headers })`. Throw unless the status is 200 or 304, and `return { body: response.status === 304 ? copy.body : await response.text(), etag: response.headers.get('etag'), cacheControl: response.headers.get('cache-control'), storedAt: now }`."
+      ],
+      "docs": [
+        {
+          "title": "If-None-Match header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-None-Match"
+        },
+        {
+          "title": "304 Not Modified",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/304"
+        },
+        {
+          "title": "ETag header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/ETag"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "listings",
+      "title": "Show the listings, asking only when needed",
+      "file": "src/cache.js",
+      "description": "Under `// Task 4`, make `listings(address, copy, now)` give back the copy a studio screen should show at `now`:\n\n- when `copy` is still fresh, the copy itself, without sending any request\n- otherwise, and when `copy` is `null`, what `refresh(address, copy, now)` gives back\n\nCheck starts a server of its own and hands `listings` fresh copies, stale ones, a `no-cache` one and none at all. It counts the requests its server received.",
+      "nextSteps": [
+        "Handle a missing copy first.",
+        "Use your function from Task 2 to decide whether the copy is fresh.",
+        "When it is not, let your function from Task 3 do the asking.",
+        "Run `node run.js`: of the three times the screen asks, only two send a request."
+      ],
+      "hints": [
+        "Two ways to go wrong: asking the server about a copy that is still fresh, and showing a copy past its lifetime without asking.",
+        "`isFresh` needs a copy, so check for `null` before you call it. Everything else is already done by `refresh`.",
+        "`if (copy !== null && isFresh(copy, now)) return copy`, then `return refresh(address, copy, now)`."
+      ],
+      "docs": [
+        {
+          "title": "Conditional requests",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Conditional_requests"
+        },
+        {
+          "title": "Response: ok property",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/ok"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

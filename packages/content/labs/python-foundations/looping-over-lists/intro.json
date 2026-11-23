@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dougie", "say": "Which ropes reach the ledge?", "note": "Kit night, with a pencil." },
+    { "title": "Rope store", "text": "Every rope's length on a list, in no order." },
+    {
+      "title": "Your functions",
+      "file": "kit_night.py",
+      "mine": true,
+      "gap": "Done by hand, one by one",
+      "tasks": ["Coldest by hand", "One line for the load", "Bags in order", "Number, then filter"]
+    },
+    { "title": "Kit night sheet", "say": "All on one sheet.", "note": "And the list unchanged." }
+  ],
+  "ticket": { "label": "Ropes", "wrong": "guessed", "why": "By hand", "right": "picked" },
+  "captions": [
+    "Thursday kit night, and Dougie needs ropes long enough for a lower on the crag.",
+    "Today he checks every rope by hand and writes the answer down in pencil.",
+    "You go through each list with for, and build new lists from the old ones.",
+    "Now the ropes, the bags and the readings each come back in one call.",
+    "for over a list, enumerate, sum, min, max, sorted, and comprehensions."
+  ]
+}

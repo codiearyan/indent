@@ -1,7 +1,7 @@
 {
   "id": "command-line-foundations",
   "title": "Command line foundations",
-  "description": "Ashgrove Press is a two-press letterpress shop, and years of posters, orders and invoices sit in one laptop folder that nobody can find anything in. You have never typed a command, and you start there: look around, move between folders, then make, copy, move and remove files until the folder is sorted. Then you read long files, find files by name and words inside them, and join commands to answer the shop's questions. Each issue teaches one part of the command line in a real shell, one small step at a time.",
+  "description": "Ashgrove Press is a two-press letterpress shop, and years of posters, orders and invoices sit in one laptop folder that nobody can find anything in. You have never typed a command, and you start there: look around, move between folders, then make, copy, move and remove files until the folder is sorted. Then you read long files, find files by name and words inside them, and join commands to answer the shop's questions. Last, you lock the files that must not change, write scripts of your own, and give the shop's terminal settings that last. Each issue teaches one part of the command line in a real shell, one small step at a time.",
   "category": "DevOps and tools",
   "language": "shell",
   "tags": [
@@ -28,6 +28,14 @@
         "finding-by-name",
         "finding-by-content",
         "joining-commands"
+      ]
+    },
+    {
+      "title": "Locks, scripts and settings",
+      "chapters": [
+        "permissions",
+        "first-script",
+        "shell-settings"
       ]
     }
   ]

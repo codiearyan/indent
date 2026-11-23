@@ -1,0 +1,4 @@
+# One request on each line: the method, then the address.
+# Change them, or add more, then run: node ask.js server.js
+GET /
+GET /plots/A3

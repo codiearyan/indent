@@ -279,12 +279,25 @@ const repos: { labId: string; expected: string[] }[] = [
       'status-families/family',
       'json/line',
       'forms/body',
-      'redirects/kind'
+      'redirects/kind',
+      'caching/keep',
+      'caching/fresh',
+      'cookies/header',
+      'cookies/session',
+      'cookies/trust',
+      'origins/same',
+      'origins/allow',
+      'origins/preflight',
+      'origins/answer'
     ]
   },
   {
     labId: 'build-a-router',
     expected: ['parts-that-vary/match', 'query-and-body/query']
+  },
+  {
+    labId: 'testing-foundations',
+    expected: ['choosing-cases/fix', 'test-first/free-code', 'test-first/large-code']
   },
   {
     labId: 'security-bug-hunts',

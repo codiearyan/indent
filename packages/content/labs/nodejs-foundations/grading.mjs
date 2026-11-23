@@ -329,3 +329,6 @@ export function slashStrings(source) {
     return text.includes('/') && !/\s/.test(text) && !/^[a-z]+:\/\//i.test(text)
   })
 }
+
+// For serving.mjs, which runs the servers of part 3 the same way.
+export { guarded, guardFlags, settingsEnv, MAX_READ }

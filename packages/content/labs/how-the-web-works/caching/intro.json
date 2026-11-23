@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Gethin",
+      "say": "Can the screens keep the listings?",
+      "note": "The cupboard fan never stops."
+    },
+    {
+      "title": "Studio screens",
+      "text": "Fetch the whole listings every ten seconds."
+    },
+    {
+      "title": "Your code",
+      "file": "cache.js",
+      "mine": true,
+      "gap": "Nothing is ever kept",
+      "tasks": ["Read cache-control", "Fresh or stale", "Ask if it changed", "Ask only when needed"]
+    },
+    {
+      "title": "Cupboard server",
+      "text": "Says how long its listings may be kept."
+    }
+  ],
+  "ticket": {
+    "label": "Listings",
+    "wrong": "fetched again",
+    "why": "Never kept",
+    "right": "kept till stale"
+  },
+  "captions": [
+    "Gethin asks whether the four studio screens can stop fetching the same listings all day.",
+    "Each screen throws away the copy it has and fetches the whole listings every ten seconds.",
+    "You read cache-control, tell fresh from stale and ask if a copy changed, in four tasks.",
+    "Each screen shows its own copy while it is fresh, and asks a short question after that.",
+    "Part 3 begins: an answer says how long it may be kept, and an etag asks if it changed."
+  ]
+}

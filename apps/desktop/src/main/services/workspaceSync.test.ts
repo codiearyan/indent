@@ -1,5 +1,5 @@
 import { existsSync } from 'fs'
-import { mkdir, mkdtemp, readdir, readFile, rename, rm, writeFile } from 'fs/promises'
+import { chmod, mkdir, mkdtemp, readdir, readFile, rename, rm, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { describe, expect, it } from 'vitest'
@@ -179,6 +179,26 @@ describe('resolveConflict', () => {
 })
 
 describe('resetWorkspace', () => {
+  // Permissions mean nothing on Windows, and root writes everywhere.
+  const hasPermissions = process.platform !== 'win32' && process.getuid?.() !== 0
+
+  it.skipIf(!hasPermissions)('replaces files and folders the learner locked', async () => {
+    const { starterDir, dir } = await setup({ 'prices.txt': 'p', 'old/2023.txt': 'o' })
+    await openWorkspace(starterDir, dir, [])
+    await chmod(join(dir, 'prices.txt'), 0o000)
+    await chmod(join(dir, 'old/2023.txt'), 0o444)
+    await chmod(join(dir, 'old'), 0o555)
+
+    const snap = await resetWorkspace(starterDir, dir, [])
+
+    expect(snap.files).toEqual([
+      { path: 'old/2023.txt', content: 'o' },
+      { path: 'prices.txt', content: 'p' }
+    ])
+    await writeFile(join(dir, 'prices.txt'), 'mine')
+    await writeFile(join(dir, 'old/2024.txt'), 'new')
+  })
+
   it('rewrites starter files, drops ones the repo removed and keeps learner files', async () => {
     const { starterDir, dir } = await setup({ 'a.ts': 'a', 'gone.ts': 'g' })
     await openWorkspace(starterDir, dir, [])
