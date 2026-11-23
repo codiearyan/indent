@@ -116,7 +116,7 @@ export const checks = {
         name: 'Changes that are not objects',
         run: 'checkedCase',
         args: ['shape'],
-        setup: 'the same store, then batch() of a good set and null',
+        setup: 'the same store, then batch() of a good set and null, and batch() of a good set followed by an empty slot in the array',
         hint: CHECKED.notRefused,
         hints: CHECKED
       },

@@ -141,9 +141,17 @@ async function batches(folder) {
 const BAD = {
   value: [{ op: 'set', key: 'paper', value: 'cotton' }, { op: 'set', key: 'ink', value: 'blue' }, { op: 'set', key: 'glue', value: 7 }],
   op: [{ op: 'set', key: 'paper', value: 'cotton' }, { op: 'rename', key: 'ink' }],
-  key: [[{ op: 'delete', key: 'ink' }, { op: 'delete', key: null }], [{ op: 'delete', key: 'ink' }, { op: 'set', key: 7, value: 'cotton' }], [{ op: 'set', value: 'cotton' }]],
+  key: [
+    [{ op: 'delete', key: 'ink' }, { op: 'delete', key: null }],
+    [{ op: 'delete', key: 'ink' }, { op: 'set', key: 7, value: 'cotton' }],
+    [{ op: 'set', value: 'cotton' }]
+  ],
   noValue: [{ op: 'set', key: 'paper', value: 'cotton' }, { op: 'set', key: 'ink' }],
-  shape: [{ op: 'set', key: 'paper', value: 'cotton' }, null]
+  // The second has a hole after its good change: forEach and map skip a hole, for...of does not.
+  shape: [
+    [{ op: 'set', key: 'paper', value: 'cotton' }, null],
+    [{ op: 'set', key: 'paper', value: 'cotton' }, ,]
+  ]
 }
 
 export async function checkedCase(folder, kind) {
@@ -153,7 +161,13 @@ export async function checkedCase(folder, kind) {
   const before = await size(join(dir, LOG))
   const store = await db.open(dir)
   const calls =
-    kind === 'notArray' ? ['paper', undefined, { op: 'set', key: 'paper', value: 'cotton' }] : kind === 'key' ? BAD.key : [kind === 'empty' ? [] : BAD[kind]]
+    kind === 'notArray'
+      ? ['paper', undefined, { op: 'set', key: 'paper', value: 'cotton' }]
+      : kind === 'empty'
+        ? [[]]
+        : kind === 'key' || kind === 'shape'
+          ? BAD[kind]
+          : [BAD[kind]]
   const tries = []
   for (const changes of calls) tries.push(await attempt(() => store.batch(changes)))
   const now = await compare(store, BASE_STATE)

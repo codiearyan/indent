@@ -137,7 +137,7 @@ export async function open(dir) {
     // Every change is checked before anything is written, so a bad one changes nothing.
     async batch(changes) {
       if (!Array.isArray(changes)) throw new TypeError('A batch is an array of changes')
-      changes.forEach(mustBeChange)
+      for (const change of changes) mustBeChange(change)
       if (changes.length === 0) return
       await appendFile(log, `batch ${changes.length}\n${changes.map(encode).join('')}`)
       for (const change of changes) apply(values, change)
