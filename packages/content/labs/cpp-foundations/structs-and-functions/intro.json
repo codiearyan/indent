@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Kasimir",
+      "say": "Which repair is ticket 3110?",
+      "note": "Dorrit is asking."
+    },
+    {
+      "title": "Bench repairs",
+      "text": "Each one checked and changed by hand."
+    },
+    {
+      "title": "Your code",
+      "file": "bench.cpp",
+      "mine": true,
+      "gap": "No functions for repairs",
+      "tasks": [
+        "Label a repair",
+        "Log time",
+        "Fix the open ones",
+        "Find by ticket"
+      ]
+    },
+    {
+      "title": "Dorrit",
+      "say": "The carriage clock. Thank you."
+    }
+  ],
+  "ticket": {
+    "label": "Ticket 3110",
+    "wrong": "lost",
+    "why": "A hunt",
+    "right": "found"
+  },
+  "captions": [
+    "Dorrit calls out ticket 3110, and Kasimir has to find it on his bench.",
+    "He looks through the repairs by hand, and fixes their times one by one.",
+    "You write functions that read a repair, change one, and find one.",
+    "Now ticket 3110 is found at once, and the open repairs have their time.",
+    "Repairs move between functions now. Next, each one gets a state with a name."
+  ]
+}

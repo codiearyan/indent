@@ -1,0 +1,211 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "dorrit",
+        "label": "Dorrit at the counter",
+        "kind": "story"
+      },
+      {
+        "id": "slip",
+        "label": "Paper slip",
+        "kind": "data"
+      },
+      {
+        "id": "repair",
+        "label": "Your Repair",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "funcs",
+        "label": "Your functions",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "phone",
+        "label": "Customer on the phone",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "dorrit",
+        "to": "slip",
+        "label": "writes"
+      },
+      {
+        "from": "slip",
+        "to": "repair",
+        "label": "what it holds"
+      },
+      {
+        "from": "repair",
+        "to": "funcs",
+        "label": "one value"
+      },
+      {
+        "from": "funcs",
+        "to": "phone",
+        "label": "a line to read"
+      }
+    ],
+    "note": "Everything about one repair travels as one value instead of loose variables."
+  },
+  "tasks": {
+    "struct": {
+      "steps": [
+        {
+          "active": [
+            "dorrit",
+            "dorrit->slip",
+            "slip"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "on the slip",
+            "values": [
+              "its ticket",
+              "whose it is",
+              "what it is",
+              "time at the bench"
+            ]
+          },
+          "note": "Dorrit's slip has four things on it for every repair."
+        },
+        {
+          "active": [
+            "slip->repair",
+            "repair"
+          ],
+          "note": "The struct gives each of them a name and a type, inside one repair."
+        },
+        {
+          "active": [
+            "repair"
+          ],
+          "note": "A repair nobody has filled in yet starts with known values, never leftovers."
+        }
+      ]
+    },
+    "takein": {
+      "steps": [
+        {
+          "active": [
+            "dorrit",
+            "dorrit->slip"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "its ticket",
+              "whose it is",
+              "what it is"
+            ]
+          },
+          "note": "A clock comes in, and Dorrit has its ticket, its owner and the item."
+        },
+        {
+          "active": [
+            "slip->repair",
+            "repair"
+          ],
+          "note": "The function makes a new repair and puts each value in its own member."
+        },
+        {
+          "active": [
+            "repair"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "one repair, no bench time yet"
+            ]
+          },
+          "note": "One repair comes back, with no time at the bench yet."
+        }
+      ]
+    },
+    "slip": {
+      "steps": [
+        {
+          "active": [
+            "repair",
+            "repair->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a repair"
+            ]
+          },
+          "note": "The slip's line is made from one repair, which is only read."
+        },
+        {
+          "active": [
+            "funcs"
+          ],
+          "note": "Each member is read with a dot, and the numbers become text."
+        },
+        {
+          "active": [
+            "funcs->phone"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "one line of text"
+            ]
+          },
+          "note": "One line comes back, ready for the slip."
+        }
+      ]
+    },
+    "pickup": {
+      "steps": [
+        {
+          "active": [
+            "dorrit",
+            "phone"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "a pickup holds",
+            "values": [
+              "a repair",
+              "who to ring, and their number"
+            ]
+          },
+          "note": "A pickup keeps the repair and the person to ring together."
+        },
+        {
+          "active": [
+            "repair",
+            "repair->funcs",
+            "funcs"
+          ],
+          "note": "The line reaches inside the pickup: into its customer, and into its repair."
+        },
+        {
+          "active": [
+            "funcs->phone",
+            "phone"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "the line Dorrit reads"
+            ]
+          },
+          "note": "Dorrit reads one line and knows who to ring, on which number, about which ticket."
+        }
+      ]
+    }
+  }
+}

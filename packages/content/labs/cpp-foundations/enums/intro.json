@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Customer",
+      "say": "Is my mantel clock ready yet?",
+      "note": "Ticket 3101 is on the line."
+    },
+    {
+      "title": "Slip says 2",
+      "text": "Nobody is sure what 2 means today."
+    },
+    {
+      "title": "Your code",
+      "file": "status.cpp",
+      "mine": true,
+      "gap": "States are bare numbers",
+      "tasks": [
+        "Name the states",
+        "Can it be collected",
+        "State in words",
+        "Move it on"
+      ]
+    },
+    {
+      "title": "Dorrit",
+      "say": "Kasimir is working on it now."
+    }
+  ],
+  "ticket": {
+    "label": "Ticket 3101",
+    "wrong": "a guess",
+    "why": "Just a 2",
+    "right": "with Kasimir"
+  },
+  "captions": [
+    "A customer rings Dorrit to ask whether the mantel clock on ticket 3101 is ready.",
+    "The slip says 2, and nobody remembers which state 2 stands for.",
+    "You give the states names, and turn each one into words to read out.",
+    "Now Dorrit reads the same plain words every time, and knows when a clock can go home.",
+    "Repairs have named states now. Next, the repair moves into files of its own."
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "main",
+        "label": "main.cpp",
+        "kind": "file"
+      },
+      {
+        "id": "header",
+        "label": "repair.h",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "source",
+        "label": "repair.cpp",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "compiler",
+        "label": "Compiler",
+        "kind": "story"
+      },
+      {
+        "id": "linker",
+        "label": "Linker",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "main",
+        "to": "header",
+        "label": "includes"
+      },
+      {
+        "from": "source",
+        "to": "header",
+        "label": "includes"
+      },
+      {
+        "from": "main",
+        "to": "compiler",
+        "label": "one file"
+      },
+      {
+        "from": "source",
+        "to": "compiler",
+        "label": "another file"
+      },
+      {
+        "from": "compiler",
+        "to": "linker",
+        "label": "pieces"
+      }
+    ],
+    "note": "What a repair is moves into a header, and how its functions work into a file of their own."
+  },
+  "tasks": {
+    "struct": {
+      "steps": [
+        {
+          "active": [
+            "main"
+          ],
+          "note": "Today the repair's struct sits in main.cpp, where no other file can use it."
+        },
+        {
+          "active": [
+            "header"
+          ],
+          "note": "It moves into the header, inside a guard."
+        },
+        {
+          "active": [
+            "main",
+            "main->header"
+          ],
+          "note": "main.cpp includes the header, and the guard keeps a second read harmless."
+        }
+      ]
+    },
+    "text": {
+      "steps": [
+        {
+          "active": [
+            "main"
+          ],
+          "note": "The function that turns minutes into hours and minutes is in main.cpp too."
+        },
+        {
+          "active": [
+            "header",
+            "source",
+            "source->header"
+          ],
+          "note": "Its first line goes into the header, its body into repair.cpp."
+        },
+        {
+          "active": [
+            "main->compiler",
+            "source->compiler",
+            "compiler->linker",
+            "linker"
+          ],
+          "note": "Both files are compiled, and the linker joins the call to the body."
+        }
+      ]
+    },
+    "over": {
+      "steps": [
+        {
+          "active": [
+            "header"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "a repair",
+              "the quoted minutes"
+            ]
+          },
+          "note": "A new function is promised in the header."
+        },
+        {
+          "active": [
+            "source"
+          ],
+          "note": "Its body, with the same first line, is written in repair.cpp."
+        },
+        {
+          "active": [
+            "compiler",
+            "compiler->linker",
+            "linker"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "minutes over the quote"
+            ]
+          },
+          "note": "The linker finds the body that keeps the header's promise."
+        }
+      ]
+    }
+  }
+}
