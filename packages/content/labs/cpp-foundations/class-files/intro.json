@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Ambrose",
+      "say": "Can my prices use the repair?",
+      "note": "The class is in main.cpp."
+    },
+    {
+      "title": "main.cpp",
+      "text": "The class, where no other file can see it."
+    },
+    {
+      "title": "Your files",
+      "file": "repair.h",
+      "mine": true,
+      "gap": "No file to share from",
+      "tasks": [
+        "Move the class",
+        "Write the bodies",
+        "Write the bench line"
+      ]
+    },
+    {
+      "title": "Every .cpp file",
+      "text": "Includes repair.h and gets the same class."
+    }
+  ],
+  "ticket": {
+    "label": "Repair class",
+    "wrong": "stuck",
+    "why": "One file",
+    "right": "shared"
+  },
+  "captions": [
+    "Ambrose wants his prices to use the repair class too.",
+    "The class is written in main.cpp, which no other file can include.",
+    "You move the class into a header and the bodies of its functions into repair.cpp.",
+    "Now any file can include repair.h and use the same class.",
+    "The class has files of its own. Next, a bench that keeps a whole list of repairs."
+  ]
+}

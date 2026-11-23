@@ -1,0 +1,109 @@
+{
+  "id": "const-and-static",
+  "title": "Const and static members",
+  "files": [
+    "src/screen.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Dorrit's counter screen here and run it, after you try your class in main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/screen.cpp -o screen && ./screen"
+  },
+  "tasks": [
+    {
+      "id": "readers",
+      "title": "Read a repair that must not change",
+      "file": "src/screen.cpp",
+      "description": "Inside `class Repair`, under `// Task 1` in `src/screen.cpp`, write:\n\n- under `private:`, three members: `ticket`, an `int` that starts at `0`; `item`, a `std::string`; and `minutes`, an `int` that starts at `0`\n- under `public:`, three member functions marked `const`, which take nothing: `getTicket` gives back the ticket as an `int`, `getItem` gives back the item as a reference to a `const std::string`, and `getMinutes` gives back the minutes as an `int`\n\nCheck makes repairs of its own, gives them minutes, and reads them through a `const Repair&` of its own, which only lets it call functions marked `const`. It also asks the compiler what each function gives back. Check builds this task with a constructor, an `addMinutes` and a ticket count of its own, written as Tasks 2 and 3 ask, so it is judged on its own.",
+      "nextSteps": [
+        "Write the three members under `private:`, with their starting values.",
+        "Write the three getters under `public:`, each with `const` after its round brackets.",
+        "Make `getItem` give back a `const std::string&` instead of a copy.",
+        "In `main`, read a repair through a `const Repair&` and print what each getter gives back."
+      ],
+      "hints": [
+        "Through a `const` reference, only functions marked `const` can be called. The word goes at the end of the first line, after the round brackets.",
+        "A `const` reference to a member hands out the member to read without copying it. Inside a `const` function every member is `const`, so a reference to one is a `const` reference too.",
+        "The shape is `int getTicket() const { return ticket; }` and `const std::string& getItem() const { return item; }`."
+      ],
+      "docs": [
+        {
+          "title": "Non-static member functions (const)",
+          "url": "https://en.cppreference.com/w/cpp/language/member_functions"
+        },
+        {
+          "title": "Non-static data members",
+          "url": "https://en.cppreference.com/w/cpp/language/data_members"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Const in C++, member functions included",
+          "url": "https://www.youtube.com/watch?v=4fJBrditnJU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "limit",
+      "title": "Log time, never past the day's limit",
+      "file": "src/screen.cpp",
+      "description": "Under `// Task 2`, inside the class and under `public:`, write:\n\n- a `static const int` called `dayLimit`, set to `480`: the most minutes a repair can have\n- a member function called `addMinutes` that takes the extra minutes as an `int` and gives back a `bool`\n\n`addMinutes` adds the minutes and gives back `true` when they are at least 1 and the repair's minutes, with them added, stay within `dayLimit`. Anything else changes nothing and gives back `false`. It changes the repair, so it is not `const`.\n\nCheck reads `Repair::dayLimit` from the class itself and asks the compiler whether it can be changed, then makes repairs of its own and adds minutes of its own, some that reach the limit and some that would go past it. Check builds this task with the members, the getters and a constructor of its own, written as Tasks 1 and 3 ask, so it is judged on its own.",
+      "nextSteps": [
+        "Write `dayLimit` with `static const` in front and its value.",
+        "Write `addMinutes`, with no `const` at the end of its first line.",
+        "Refuse fewer than 1 minute, and minutes that would take the repair past `dayLimit`.",
+        "Add the minutes and give back `true`. In `main`, print `Repair::dayLimit`."
+      ],
+      "hints": [
+        "A `static` member belongs to the class, not to one repair, so it is read with the class's name: `Repair::dayLimit`. A `static const` whole number can get its value right where it is declared.",
+        "The limit is about the repair's total: compare the minutes it already has plus the new ones with `dayLimit`, not the new ones alone. Reaching the limit exactly is allowed.",
+        "The shape is `if (extra < 1 || minutes + extra > dayLimit) { return false; } minutes += extra; return true;`."
+      ],
+      "docs": [
+        {
+          "title": "static members",
+          "url": "https://en.cppreference.com/w/cpp/language/static"
+        },
+        {
+          "title": "Non-static member functions (const)",
+          "url": "https://en.cppreference.com/w/cpp/language/member_functions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "numbers",
+      "title": "Number every ticket",
+      "file": "src/screen.cpp",
+      "description": "Under `// Task 3`, inside the class, write:\n\n- under `private:`, a `static int` called `issued`: the last ticket number given out\n- below the class, after its `};`, the definition of `issued` with the value `3100`\n- under `public:`, a constructor marked `explicit` that takes the item as a reference to a `const std::string`, and gives the repair the next ticket number (one more than the last) and that item\n- under `public:`, a `static` member function called `lastTicket` that takes nothing and gives back the last ticket number given out, as an `int`\n\nCheck calls `Repair::lastTicket()` before any repair is made, makes repairs of its own and reads their tickets, and copies one. It also compiles a line of its own that would turn a text into a repair without naming the constructor: with `explicit`, the compiler refuses it. Check builds this task with the members and getters of its own, written as Task 1 asks, so it is judged on its own.",
+      "nextSteps": [
+        "Declare `issued` under `private:`, with `static` in front and no value.",
+        "Below the class, write its definition: its type, `Repair::issued` and its value.",
+        "In the constructor, give `ticket` the next number and keep that number in `issued`.",
+        "Write `lastTicket`, marked `static`. In `main`, make two repairs and print their tickets."
+      ],
+      "hints": [
+        "A `static` member is one value for the whole class, shared by every repair: just right for a count. Declared in the class, it is defined once outside it, or the linker cannot find it.",
+        "Each new repair takes `issued + 1` and then `issued` becomes that number, so the next repair takes the one after. A `static` function has no repair of its own, so it can only use `static` members.",
+        "The shape is `explicit Repair(const std::string& name) : ticket(issued + 1), item(name) { issued = ticket; }`, `static int lastTicket() { return issued; }` and, below the class, `int Repair::issued = 3100;`."
+      ],
+      "docs": [
+        {
+          "title": "static members",
+          "url": "https://en.cppreference.com/w/cpp/language/static"
+        },
+        {
+          "title": "Definitions and ODR",
+          "url": "https://en.cppreference.com/w/cpp/language/definition"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Static members of a class",
+          "url": "https://www.youtube.com/watch?v=V-BFlMrBtqQ"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

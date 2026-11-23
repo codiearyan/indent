@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Dorrit",
+      "say": "Why can my screen not read it?",
+      "note": "Two clocks share a ticket."
+    },
+    {
+      "title": "Her screen",
+      "text": "Holds repairs as const, and calls nothing."
+    },
+    {
+      "title": "Your class",
+      "file": "screen.cpp",
+      "mine": true,
+      "gap": "No promise to only read",
+      "tasks": [
+        "Const getters",
+        "A limit for the day",
+        "Number the tickets"
+      ]
+    },
+    {
+      "title": "The counter",
+      "text": "Every clock leaves with its own number."
+    }
+  ],
+  "ticket": {
+    "label": "Mantel clock",
+    "wrong": "unreadable",
+    "why": "Not const",
+    "right": "shown"
+  },
+  "captions": [
+    "Dorrit's screen holds the mantel clock as a repair it must not change.",
+    "Then it can call none of the repair's functions, and the tickets are typed by hand.",
+    "You mark the functions that only read, and give the class one shared ticket count.",
+    "Now the screen shows the mantel clock, with a number no other clock has.",
+    "The class shares what belongs to all of its repairs. Next, it moves into files of its own."
+  ]
+}
