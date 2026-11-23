@@ -29,10 +29,10 @@ def greet(name, end="!"):
 
 
 loud_greet = shout(greet)
-print(loud_greet("Morag", end="?"))
+print(loud_greet("Morven", end="?"))
 ```
 
-This prints `HELLO MORAG?`. `shout` makes a new function, `wrapper`, and gives it back without calling it. When the new function is called, it calls `greet` with the same values and does something more with the result. Three mistakes come up again and again: a decorator that calls `fn` itself while it makes the new function, so it runs before anyone asked; one that forgets `return wrapper`, so it gives back `None`; and a wrapper that calls `fn` but does not give back what it gave, so every call gives `None`.
+This prints `HELLO MORVEN?`. `shout` makes a new function, `wrapper`, and gives it back without calling it. When the new function is called, it calls `greet` with the same values and does something more with the result. Three mistakes come up again and again: a decorator that calls `fn` itself while it makes the new function, so it runs before anyone asked; one that forgets `return wrapper`, so it gives back `None`; and a wrapper that calls `fn` but does not give back what it gave, so every call gives `None`.
 
 `*args` and `**kwargs` let the wrapper take any values. In a def line, `*args` takes every value given in order, as a tuple, and `**kwargs` every value given by name, as a dictionary: `def show(*args, **kwargs): print(args, kwargs)` called as `show(1, "two", three=3)` prints `(1, 'two') {'three': 3}`. In a call, `fn(*args, **kwargs)` hands them all on again, one by one, as they came. A wrapper written as `def wrapper(n):` takes one value only, and a call with a name stops with something like `TypeError: wrapper() got an unexpected keyword argument 'extra'`.
 

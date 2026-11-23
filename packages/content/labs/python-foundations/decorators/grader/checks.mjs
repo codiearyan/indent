@@ -224,28 +224,28 @@ export const checks = {
   announce(t) {
     return classCases(t, options(1, 'announce', [
       { name: 'Two calls through the new function, and another function', steps: announceSteps(['Delta', 'at the ford'], ['Echo', 'back at base', 'Glas Tholl']) },
-      { name: 'Two more calls', steps: announceSteps(['Kestrel', 'torch seen'], ['Golf', 'on the ridge', 'Meikle Pap']) }
+      { name: 'Two more calls', steps: announceSteps(['Foxtrot', 'torch seen'], ['Golf', 'on the ridge', 'Meikle Pap']) }
     ]))
   },
 
   count(t) {
     return classCases(t, options(2, 'count_calls', [
       { name: 'Two functions, each with its own count', steps: countSteps(['Delta', 'Echo'], 'snow on the ridge') },
-      { name: 'Two more', steps: countSteps(['Kestrel', 'Golf'], 'two walkers found') }
+      { name: 'Two more', steps: countSteps(['Foxtrot', 'Golf'], 'two walkers found') }
     ]))
   },
 
   timed(t) {
     return classCases(t, options(3, 'timed', [
       { name: 'Two calls timed with Check\'s clock', steps: timedSteps([100.0, 102.5, 200.0, 201.25], ['Delta', 'Echo'], 'Glas Tholl') },
-      { name: 'Two more calls', steps: timedSteps([10.0, 13.75, 30.5, 31.0], ['Kestrel', 'Golf'], 'Stob Ruadh') }
+      { name: 'Two more calls', steps: timedSteps([10.0, 13.75, 30.5, 31.0], ['Foxtrot', 'Golf'], 'Stob Ruadh') }
     ]))
   },
 
   pages(t) {
     return classCases(t, options(4, 'page_team', [
       { name: 'Two pages, counted', steps: pageSteps(['Delta', 'Echo']) },
-      { name: 'Two more pages', steps: pageSteps(['Golf', 'Kestrel']) }
+      { name: 'Two more pages', steps: pageSteps(['Golf', 'Foxtrot']) }
     ], {
       define: COUNT,
       explain: (error) =>

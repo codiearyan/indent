@@ -255,9 +255,9 @@ export const checks = {
       {
         name: 'A log of four other lines',
         steps: linesSteps('night_log.txt', [
-          '23:15 Kestrel: on the ridge',
+          '23:15 Foxtrot: on the ridge',
           '23:50 Golf: torch seen below Meikle Pap',
-          '00:20 Kestrel: path blocked by a fall',
+          '00:20 Foxtrot: path blocked by a fall',
           '01:05 Golf: all safe, coming in'
         ])
       }
@@ -281,12 +281,12 @@ export const checks = {
       {
         name: 'The lines of another team',
         steps: teamSteps([
-          '23:15 Kestrel: on the ridge',
-          '23:50 Kestrel: torch seen below Meikle Pap',
-          '00:20 Echo: Kestrel asks for a rope',
-          '01:05 Kestrel: path blocked by a fall',
+          '23:15 Foxtrot: on the ridge',
+          '23:50 Foxtrot: torch seen below Meikle Pap',
+          '00:20 Echo: Foxtrot asks for a rope',
+          '01:05 Foxtrot: path blocked by a fall',
           '01:40 Echo: rope on its way'
-        ], 'Kestrel')
+        ], 'Foxtrot')
       }
     ]))
   },
@@ -307,9 +307,9 @@ export const checks = {
       {
         name: 'Another word, found in the first line',
         steps: mentionSteps([
-          '23:15 Kestrel: torch seen on the ridge',
+          '23:15 Foxtrot: torch seen on the ridge',
           '23:50 Golf: on our way',
-          '00:20 Kestrel: torch gone out',
+          '00:20 Foxtrot: torch gone out',
           '01:05 Golf: all safe'
         ], 'torch', 'stretcher')
       }

@@ -195,11 +195,11 @@ export const checks = {
       {
         name: 'Six more callouts',
         steps: longestSteps([
-          ['2026-03-02', 'Black Corrie', 10, 'Kestrel'],
+          ['2026-03-02', 'Black Corrie', 10, 'Foxtrot'],
           ['2026-03-07', 'Lochan Wood', 3, 'Golf'],
           ['2026-03-11', 'Glas Tholl', 10, 'Echo'],
           ['2026-03-18', 'Creag Bheag', 6, 'Golf'],
-          ['2026-03-25', 'Meikle Pap', 3, 'Kestrel'],
+          ['2026-03-25', 'Meikle Pap', 3, 'Foxtrot'],
           ['2026-04-01', 'Stob Ruadh', 12, 'Echo']
         ])
       }
@@ -222,11 +222,11 @@ export const checks = {
       {
         name: 'Six callouts on three other hills',
         steps: hillSteps([
-          ['2026-02-21', 'Stob Ruadh', 6, 'Kestrel'],
+          ['2026-02-21', 'Stob Ruadh', 6, 'Foxtrot'],
           ['2026-02-28', 'Lochan Wood', 2, 'Golf'],
           ['2026-01-15', 'Stob Ruadh', 9, 'Echo'],
           ['2026-02-03', 'Lochan Wood', 4, 'Golf'],
-          ['2026-01-02', 'Creag Bheag', 7, 'Kestrel'],
+          ['2026-01-02', 'Creag Bheag', 7, 'Foxtrot'],
           ['2026-03-09', 'Stob Ruadh', 3, 'Echo']
         ])
       }
@@ -256,11 +256,11 @@ export const checks = {
       {
         name: 'Five other callouts',
         steps: pairSteps([
-          ['2026-03-02', 'Lochan Wood', 12, 'Kestrel'],
+          ['2026-03-02', 'Lochan Wood', 12, 'Foxtrot'],
           ['2026-03-07', 'Black Corrie', 4, 'Golf'],
           ['2026-03-11', 'Glas Tholl', 12, 'Echo'],
           ['2026-03-18', 'Creag Bheag', 1, 'Golf'],
-          ['2026-03-25', 'Meikle Pap', 1, 'Kestrel']
+          ['2026-03-25', 'Meikle Pap', 1, 'Foxtrot']
         ])
       }
     ]))

@@ -220,7 +220,7 @@ export const checks = {
   send(t) {
     return classCases(t, options(1, 'send_to_all', [
       { name: 'A message for each of three teams', steps: sendSteps(['Delta', 'Echo', 'Foxtrot']) },
-      { name: 'A message for each of two other teams', steps: sendSteps(['Kestrel', 'Golf']) }
+      { name: 'A message for each of two other teams', steps: sendSteps(['Foxtrot', 'Golf']) }
     ]))
   },
 
@@ -234,14 +234,14 @@ export const checks = {
   pager(t) {
     return classCases(t, options(3, 'make_pager', [
       { name: 'Two pagers, each with its own call sign', steps: pagerSteps(['Delta', 'Echo'], ['at the ford', 'back at base', 'moving up']) },
-      { name: 'Two more pagers', steps: pagerSteps(['Kestrel', 'Golf'], ['stretcher needed', 'on the ridge', 'two hours out']) }
+      { name: 'Two more pagers', steps: pagerSteps(['Foxtrot', 'Golf'], ['stretcher needed', 'on the ridge', 'two hours out']) }
     ]))
   },
 
   pagers(t) {
     return classCases(t, options(4, 'pagers_for', [
       { name: 'A pager for each of three teams', steps: pagersSteps(['Delta', 'Echo', 'Foxtrot'], ['at the ford', 'back at base', 'moving up']) },
-      { name: 'A pager for each of two teams', steps: pagersSteps(['Golf', 'Kestrel'], ['on the ridge', 'stretcher needed']) }
+      { name: 'A pager for each of two teams', steps: pagersSteps(['Golf', 'Foxtrot'], ['on the ridge', 'stretcher needed']) }
     ], { define: DEFINE }))
   }
 }
