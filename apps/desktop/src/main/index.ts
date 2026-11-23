@@ -18,7 +18,7 @@ import * as telemetry from './services/telemetry'
 import * as updates from './services/updates'
 import * as reminders from './services/reminders'
 import { answerAfter, appWindows } from './ipc'
-import { perf } from './perf'
+import { perf, watchMemory } from './perf'
 import { seedContent } from './library'
 import { saveBeforeClose } from './saveBeforeClose'
 import { bundledContentDir, contentDir, usesLibrary } from './paths'
@@ -177,6 +177,7 @@ app.whenReady().then(() => {
     service.register()
   }
   reminders.register(showWindow)
+  watchMemory()
   allowVideoPlayer()
 
   if (!reminders.startsHidden()) createWindow()
