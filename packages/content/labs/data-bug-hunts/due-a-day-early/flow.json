@@ -1,0 +1,113 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "log", "label": "Open invoices", "kind": "data" },
+      { "id": "laptop", "label": "Marek's laptop", "kind": "story" },
+      { "id": "reminder", "label": "reminder()", "kind": "function", "mine": true, "fn": "reminder" },
+      { "id": "email", "label": "Reminder email", "kind": "story" },
+      { "id": "choir", "label": "Cedar Narrows", "kind": "story" },
+      { "id": "test", "label": "reminder.test.js", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "log", "to": "reminder", "label": "due date" },
+      { "from": "laptop", "to": "reminder", "label": "today, its zone" },
+      { "from": "reminder", "to": "email", "label": "date, days" },
+      { "from": "email", "to": "choir", "label": "a day early" },
+      { "from": "test", "to": "reminder", "label": "invoices, a zone" }
+    ],
+    "note": "reminder() writes the date and the days left into every reminder, and it changes its answer with the laptop's time zone."
+  },
+  "tasks": {
+    "ticket": {
+      "steps": [
+        {
+          "active": ["test", "test->reminder", "reminder"],
+          "note": "The ticket block hands reminder() open invoices and the day the reminders went out."
+        },
+        {
+          "active": ["laptop", "laptop->reminder", "reminder"],
+          "note": "inZone sets the zone the code runs in, so the test runs as if the laptop were in Vancouver, on any computer."
+        },
+        {
+          "active": ["reminder", "reminder->email", "email", "email->choir", "choir"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the ticket block",
+            "entries": [
+              { "key": "the shop's reminder()", "value": "must fail" },
+              { "key": "a right fix", "value": "must pass" },
+              { "key": "mends only the ticket's invoice", "value": "must fail" }
+            ]
+          },
+          "note": "Check runs the block on three computers beside the shop's code, a right fix and a version that knows only the ticket's invoice."
+        }
+      ]
+    },
+    "fix": {
+      "trace": {
+        "file": "src/reminder.js",
+        "call": "reminder",
+        "args": [{ "number": "WH-2291", "choir": "Cedar Narrows Choir", "due": "2026-03-31" }, "2026-03-27"]
+      },
+      "steps": [
+        {
+          "active": ["log", "log->reminder", "laptop", "laptop->reminder", "reminder"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "invoice.due", "value": "2026-03-31" },
+              { "key": "today", "value": "2026-03-27" }
+            ]
+          },
+          "note": "reminder() gets WH-2291's due date and the day the reminders go out, both calendar dates as text."
+        },
+        {
+          "active": ["reminder"],
+          "note": "Both dates are read in one zone that never changes its clocks, whatever zone the laptop is in."
+        },
+        {
+          "active": ["reminder"],
+          "note": "The due date is written out in that same zone, and the days left are counted between the two dates."
+        },
+        {
+          "active": ["reminder", "reminder->email", "email"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "due", "value": "day, date, month, year in words" },
+              { "key": "daysLeft", "value": "a whole number" }
+            ]
+          },
+          "note": "The email gets the same date and the same count on every computer."
+        }
+      ]
+    },
+    "next": {
+      "steps": [
+        {
+          "active": ["test", "test->reminder", "reminder", "laptop"],
+          "note": "The next door block runs reminder() as if the laptop were east of Greenwich, where the date already looks right."
+        },
+        {
+          "active": ["reminder", "reminder->email", "email"],
+          "note": "It looks at the other half of what the email says, the number of days left."
+        },
+        {
+          "active": ["test", "reminder"],
+          "value": {
+            "kind": "map",
+            "label": "three runs of the next door block",
+            "entries": [
+              { "key": "the shop's reminder()", "value": "must fail" },
+              { "key": "a right fix", "value": "must pass" },
+              { "key": "right date, days from local midnight", "value": "must fail" }
+            ]
+          },
+          "note": "Check runs the block on three computers beside the shop's code, a right fix and a version that only mends the date shown."
+        }
+      ]
+    }
+  }
+}

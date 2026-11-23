@@ -1,0 +1,80 @@
+{
+  "id": "names-cut-in-half",
+  "title": "Names cut in half",
+  "files": ["src/names.test.js", "src/names.js", "src/contacts.js", "src/demo.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the demo prints the parcel labels and compares two spellings of one name.",
+    "suggestedCommand": "node src/demo.js"
+  },
+  "tasks": [
+    {
+      "id": "ticket",
+      "title": "Catch the name that is cut in half",
+      "file": "src/names.test.js",
+      "description": "Prove the bug with a test before you change `names.js`. In `src/names.test.js`, write tests in the `describe('the ticket')` block that fail on the shop's `names.js` today and will pass once it is right.\n\nThe check runs the tests in that block on three computers beside:\n\n- the shop's `names.js`: they must fail\n- a right fix: they must pass\n- a version that mends only the ticket's own name: they must fail\n- a version that knows two spellings of a name but still cuts and counts them wrong: they must fail\n\nA cut name may keep its accents as they were typed, so compare a cut with `sameName`, or put both sides into one form with `normalize`, rather than with `toBe` alone.",
+      "nextSteps": [
+        "Run `node src/demo.js` and read Ängsö's label and the line under it.",
+        "Test the pasted name from `contacts.js`: its label, its count, and whether it matches the one on file.",
+        "Add a name of your own whose accent is a separate mark, with `normalize('NFD')`.",
+        "Run `npx vitest run src/names.test.js` and see your tests fail."
+      ],
+      "hints": [
+        "The pasted name looks like the one on file, but each dotted letter in it is two code units: a plain letter and a mark of two dots.",
+        "`'Mairéad'.normalize('NFD')` writes any accented name that way, so you can make as many such names as you like.",
+        "Expect `sameName(pasted, onFile)` to be `true`, `nameLength` of the pasted name to be the number of letters you count, and a cut that keeps an accented letter whole."
+      ],
+      "docs": [
+        { "title": "String.prototype.normalize()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize" },
+        { "title": "UTF-16 characters, code points and grapheme clusters", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#utf-16_characters_unicode_code_points_and_grapheme_clusters" },
+        { "title": "Vitest expect", "url": "https://vitest.dev/api/expect.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Cut, count and compare by what a person sees",
+      "file": "src/names.js",
+      "description": "Fix the three functions in `src/names.js`. A character here is what a person sees as one: a letter with its accent, a flag, an emoji.\n\n- `fitName(name, max)` returns the name cut to at most `max` characters, never in the middle of one. A name that fits comes back as it is.\n- `nameLength(name)` returns how many characters the name has.\n- `sameName(a, b)` is `true` when the two are the same name letter for letter, even when the accents were typed in different ways. Capitals, accents and the characters themselves still count.\n\nNames come from forms people fill in on phones and laptops: an accent may be one code unit or a letter and a mark, some characters take two code units, and some choirs put a flag or an emoji in their name. The check tries all of these.",
+      "nextSteps": [
+        "Find what `slice` and `length` count.",
+        "Split a name into the characters a person sees, and cut and count those.",
+        "Put both names into the same form before you compare them.",
+        "Run `node src/demo.js` and read the labels again."
+      ],
+      "hints": [
+        "`slice` and `length` count UTF-16 code units. An accent typed as a separate mark is one more, and so is the second half of a character like 𝄞 or 𠮷.",
+        "`Intl.Segmenter` with `granularity: 'grapheme'` splits text into the characters a person sees, and `normalize('NFC')` joins each letter and its mark into one wherever a joined form exists.",
+        "Make one `new Intl.Segmenter('en', { granularity: 'grapheme' })`, turn its `segment(name)` into a list of `segment` texts, and slice or count that list. Compare `a.normalize('NFC')` with `b.normalize('NFC')`."
+      ],
+      "docs": [
+        { "title": "Intl.Segmenter", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter" },
+        { "title": "String.prototype.normalize()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize" },
+        { "title": "String length", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length" }
+      ],
+      "videos": [{ "title": "How text is stored as code points and characters", "url": "https://www.youtube.com/watch?v=Z_LQa_NeA8w" }],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "Write the test for the case next door",
+      "file": "src/names.test.js",
+      "description": "The ticket was about accents. Next to it sit characters with no accent at all that still take two code units, like 𠮷 in some Japanese names. A fix that joins accents first and then cuts code units passes the ticket and breaks these. In the `describe('next door')` block, write a test that shows it.\n\nThe check runs the tests in that block on three computers beside the shop's `names.js` (they must fail), beside a right fix (they must pass) and beside a version that joins accents first and then still cuts code units (they must fail).",
+      "nextSteps": [
+        "In the terminal, print `'𠮷'.length` and `'𠮷'.normalize('NFC').length`.",
+        "Pick a name with such a character, and a width that cuts right after it.",
+        "Expect the cut name and the count.",
+        "Run `npx vitest run src/names.test.js`."
+      ],
+      "hints": [
+        "Joining accents cannot help a character that has no accent. It stays two code units.",
+        "Sakura Hill Chorus's conductor is 𠮷田 Haruka. Cut her name to one character.",
+        "expect(fitName('𠮷田 Haruka', 1)).toBe(...) with the first character whole, and expect nameLength of the name to be the characters you count."
+      ],
+      "docs": [
+        { "title": "Intl.Segmenter", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter" },
+        { "title": "UTF-16 characters, code points and grapheme clusters", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#utf-16_characters_unicode_code_points_and_grapheme_clusters" }
+      ],
+      "points": 10
+    }
+  ]
+}

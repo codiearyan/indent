@@ -26,7 +26,8 @@
           "browser-js",
           "async-js",
           "js-bug-hunts",
-          "build-a-json-parser"
+          "build-a-json-parser",
+          "data-bug-hunts"
         ]
       },
       {
@@ -155,7 +156,8 @@
         "labs": [
           "js-foundations",
           "async-js",
-          "build-a-json-parser"
+          "build-a-json-parser",
+          "data-bug-hunts"
         ]
       },
       {
@@ -282,7 +284,8 @@
           "security-bug-hunts",
           "sql-bug-hunts",
           "react-bug-hunts",
-          "css-bug-hunts"
+          "css-bug-hunts",
+          "data-bug-hunts"
         ]
       }
     ]
