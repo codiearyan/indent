@@ -80,6 +80,12 @@
         "child-classes",
         "dataclasses"
       ]
+    },
+    {
+      "title": "Functions, generators and hints",
+      "chapters": [
+        "functions-as-values"
+      ]
     }
   ]
 }

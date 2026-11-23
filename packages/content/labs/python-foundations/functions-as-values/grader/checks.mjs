@@ -88,7 +88,7 @@ function routeSteps([kind, text], [unknown, otherText]) {
     const got = Array.isArray(v) ? v : []
     const fresh = got.slice(want.length - 1)
     if (fresh.length === 0) {
-      return 'No handler was called. Looking a handler up in the dictionary gives the function itself, and it runs only when it is called with round brackets and the text in them.'
+      return 'None of the handlers in the dictionary route was given was called. Looking a handler up in the dictionary gives the function itself, and it runs only when it is called with round brackets and the text in them.'
     }
     if (fresh.length > 1) return 'route called more than one handler for one call. Only the handler for the call\'s kind runs.'
     const [k, x] = fresh[0]['@tuple'] ?? []
@@ -145,7 +145,7 @@ function pagerSteps([one, two], [m1, m2, m3]) {
       want: `${one}: ${m1}`,
       hint: (v) =>
         v === null
-          ? 'The function make_pager gives back gives back None: it ends without return.'
+          ? 'The pager gives back None: it ends without return, or only prints its text. The task asks it to give back the text.'
           : typeof v === 'string' && v.includes(one) && v.includes(m1)
             ? 'The pager\'s text has the call sign and the message, but not in the shape the task gives: the call sign, a colon, a space, then the message.'
             : 'The pager does not give back its call sign, a colon, a space and the message.'
