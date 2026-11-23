@@ -1,7 +1,7 @@
 {
   "id": "how-the-web-works",
   "title": "How the web works",
-  "description": "Heronsgate Community Radio is run by volunteers, and its programme listings and song requests go through a small server in a cupboard next to the studio. As the station's new volunteer developer you write small Node scripts that build addresses, send real requests and data to that server and read what comes back, for Odette who runs the station, Ffion who presents the Saturday late show and Gethin who looks after the cupboard. You learn what really happens between a program that asks and a server that answers, one request at a time.",
+  "description": "Heronsgate Community Radio is run by volunteers, and its programme listings and song requests go through a small server in a cupboard next to the studio. As the station's new volunteer developer you write small Node scripts that build addresses, send real requests and data to that server and read what comes back, then keep copies of its answers, sign presenters in with cookies and decide which other sites' pages may read from it, for Odette who runs the station, Ffion who presents the Saturday late show and Gethin who looks after the cupboard. You learn what really happens between a program that asks and a server that answers, one request at a time.",
   "category": "Web and frontend",
   "language": "javascript",
   "tags": [
@@ -26,6 +26,14 @@
         "sending-data",
         "forms",
         "redirects"
+      ]
+    },
+    {
+      "title": "Remembering and sharing",
+      "chapters": [
+        "caching",
+        "cookies",
+        "origins"
       ]
     }
   ]
