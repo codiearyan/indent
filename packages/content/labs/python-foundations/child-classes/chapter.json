@@ -1,0 +1,102 @@
+{
+  "id": "child-classes",
+  "title": "A class built on another",
+  "files": ["kit.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to label the kit, pick out the ropes and check the lot.",
+    "suggestedCommand": "python3 kit.py"
+  },
+  "tasks": [
+    {
+      "id": "rope",
+      "title": "A rope is kit",
+      "file": "kit.py",
+      "description": "Under `# Task 1` in `kit.py`, make `Rope` a class built on `Kit`. Its `__init__` takes a name, a weight in kilos and a length in metres. It hands the name and the weight to Kit's `__init__` with `super()`, and keeps the length in the attribute `metres`. The task asks for `super()`.\n\nCheck makes ropes of its own and looks at whether a rope is a `Kit`, at its `name`, `kg` and `metres`, at whether Kit's own `__init__` ran for it, and at whether it still has what every piece of kit has.",
+      "nextSteps": [
+        "Read the part of the lesson on a child class.",
+        "Put Kit in round brackets after the name Rope on the class line.",
+        "Write __init__ inside Rope, with self, name, kg and metres.",
+        "Hand name and kg to Kit's __init__ with super(), keep metres on self, and make a rope under the main guard."
+      ],
+      "hints": [
+        "Rope's own `__init__` takes the place of Kit's, so Kit's runs for a rope only when Rope's asks for it.",
+        "`super()` stands for the class Rope is built on, and Kit's `__init__`, reached through it, runs on this rope with the values Kit takes.",
+        "The shape is `class Rope(Kit):`, then `def __init__(self, name, kg, metres):` with `super().__init__(name, kg)` and `self.metres = metres` under it."
+      ],
+      "docs": [
+        { "title": "Inheritance", "url": "https://docs.python.org/3/tutorial/classes.html#inheritance" },
+        { "title": "super()", "url": "https://docs.python.org/3/library/functions.html#super" }
+      ],
+      "videos": [
+        { "title": "A class built on another", "url": "https://www.youtube.com/watch?v=RSl87lqOXDE" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "label",
+      "title": "A rope's own label",
+      "file": "kit.py",
+      "description": "Under `# Task 2`, inside `Rope`, write a `label` method of its own. It gives back Kit's label for the rope, then a comma, a space and the length, such as\n\n```\nstatic line (4.5 kg), 50 m\n```\n\nIt gets Kit's label with `super()` and adds to it, so a change to Kit's label reaches the ropes too. Every other kind of kit keeps Kit's label. The task asks for `super()`.\n\nCheck makes ropes with your `Rope`, reads their labels and the labels of other kit, then gives Kit a label written another way and looks at whether a rope's label follows it. When Task 1 is not right yet, Check says so.",
+      "nextSteps": [
+        "Read the part of the lesson on your own version of a method.",
+        "Write def label(self): inside Rope, lined up with its __init__.",
+        "Get Kit's label for this rope with super(), and add the length to it.",
+        "Print a rope's label and a map's label under the main guard."
+      ],
+      "hints": [
+        "Inside Rope's label, `self.label()` is Rope's own label again, which calls itself without end.",
+        "Through `super()`, Rope's label reaches Kit's label for this same rope. Copying Kit's line into Rope gives the same text today and goes wrong the day Kit's label changes.",
+        "The shape is `def label(self):` with `return f\"{super().label()}, {self.metres} m\"`."
+      ],
+      "docs": [
+        { "title": "super()", "url": "https://docs.python.org/3/library/functions.html#super" },
+        { "title": "Inheritance", "url": "https://docs.python.org/3/tutorial/classes.html#inheritance" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ropes",
+      "title": "Only the ropes",
+      "file": "kit.py",
+      "description": "Under `# Task 3`, write a function called `ropes_in` that takes a list of kit and gives back a new list of the ropes in it, in the same order: every `Rope`, and every kind of rope built on `Rope`. Leave the list it is given as it was.\n\nCheck makes lists of kit of its own, with a kind of rope built on `Rope` that your file has never heard of among them, and looks at the names of the kit `ropes_in` gives back. It uses its own `Rope`, so a mistake in Tasks 1 and 2 does not count here.",
+      "nextSteps": [
+        "Read the part of the lesson on is it a kind of.",
+        "Start an empty list and go through the kit with a for loop.",
+        "Ask isinstance whether each item is a Rope, and add the ones that are.",
+        "Give the list back, and print the label of each rope under the main guard."
+      ],
+      "hints": [
+        "`type(item) == Rope` is True only for an object made from Rope itself, not from a class built on it.",
+        "One built-in function asks about a class and every class built on it. Every piece of kit is a Kit, so asking about Kit picks them all.",
+        "The shape is `ropes = []`, then `for item in kit:` with `if isinstance(item, Rope):` and `ropes.append(item)`, then `return ropes`."
+      ],
+      "docs": [
+        { "title": "isinstance()", "url": "https://docs.python.org/3/library/functions.html#isinstance" },
+        { "title": "type()", "url": "https://docs.python.org/3/library/functions.html#type" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ready",
+      "title": "Ready for the hill",
+      "file": "kit.py",
+      "description": "Under `# Task 4`, write an exception class called `NotReady`, built on `Exception`. Then write a function called `check_kit` that takes a list of kit and asks each item, with its own `ready` method, whether it is ready. It raises `NotReady` with a message that names the first item that is not ready. When every item is ready, it gives back the total weight of the list.\n\nCheck makes lists of kit of its own, with a kind of kit your file has never heard of among them that knows for itself whether it is ready, and looks at the total, or at whether `NotReady` was raised by your own raise line and what its message names. It uses its own `Rope`.",
+      "nextSteps": [
+        "Read the parts of the lesson on each answers for itself and an error of your own.",
+        "Write the class NotReady, built on Exception, with pass inside.",
+        "In check_kit, go through the kit, ask each item's ready(), and raise NotReady with its name when it says False.",
+        "Add up the weights of the items as you go, and give back the total after the loop."
+      ],
+      "hints": [
+        "Every kind of kit has a `ready` method, and each kind answers in its own way. Asking what class each item is gets wrong the kinds you have never heard of.",
+        "An error class is built on `Exception` and needs nothing inside but `pass`. Raising it takes a message, as raising ValueError does.",
+        "The shape is `total = 0`, then `for item in kit:` with `if not item.ready():` and `raise NotReady(f\"{item.name} is not ready\")`, then `total += item.kg`, then `return total` after the loop."
+      ],
+      "docs": [
+        { "title": "User-defined exceptions", "url": "https://docs.python.org/3/tutorial/errors.html#user-defined-exceptions" },
+        { "title": "Exception", "url": "https://docs.python.org/3/library/exceptions.html#Exception" }
+      ],
+      "points": 10
+    }
+  ]
+}

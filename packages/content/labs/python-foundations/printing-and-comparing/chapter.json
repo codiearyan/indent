@@ -1,0 +1,104 @@
+{
+  "id": "printing-and-comparing",
+  "title": "Objects that print and compare",
+  "files": ["radio_log.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to print, compare and sort the night's calls.",
+    "suggestedCommand": "python3 radio_log.py"
+  },
+  "tasks": [
+    {
+      "id": "print",
+      "title": "A call that prints",
+      "file": "radio_log.py",
+      "description": "Under `# Task 1` in `radio_log.py`, inside the class `Call`, write `__str__`, which gives back the call as one line of the log, and `__repr__`, which gives back the Python that makes the call. For `Call(\"21:40\", \"Alpha\", \"at the bridge\")`, `str` gives exactly\n\n```\n21:40 Alpha: at the bridge\n```\n\nand `repr` gives exactly\n\n```\nCall('21:40', 'Alpha', 'at the bridge')\n```\n\nCheck makes calls of its own and reads `str`, `repr`, an f-string with the call in it, and a list with the call in it.",
+      "nextSteps": [
+        "Read the part of the lesson on printing.",
+        "Write __str__ inside Call, lined up with __init__, giving back an f-string of the call's own attributes.",
+        "Write __repr__ the same way, with each value's repr, quotes and all.",
+        "Print a call and a list of calls under the main guard, and compare them with the task."
+      ],
+      "hints": [
+        "Both methods give back text with `return`. A method that prints its line gives back None, and Python refuses that.",
+        "`print`, `str()` and f-strings use `__str__`; `repr()` and a list that prints what it holds use `__repr__`. An f-string can put in a value's repr, quotes included: the lesson shows how.",
+        "The shape is `def __str__(self):` with `return f\"{self.time} {self.call_sign}: {self.message}\"`, and `def __repr__(self):` with `return f\"Call({self.time!r}, {self.call_sign!r}, {self.message!r})\"`."
+      ],
+      "docs": [
+        { "title": "object.__str__()", "url": "https://docs.python.org/3/reference/datamodel.html#object.__str__" },
+        { "title": "object.__repr__()", "url": "https://docs.python.org/3/reference/datamodel.html#object.__repr__" },
+        { "title": "Formatted string literals", "url": "https://docs.python.org/3/reference/lexical_analysis.html#f-strings" }
+      ],
+      "videos": [
+        { "title": "Special methods that print and compare", "url": "https://www.youtube.com/watch?v=3ohzBxoFHAY" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "equal",
+      "title": "The same call twice",
+      "file": "radio_log.py",
+      "description": "Under `# Task 2`, inside `Call`, write `__eq__`: a call is equal to another call with the same time and the same call sign, whatever the message, so the same call typed in by two people counts as one. A call is never equal to something that is not a call, and comparing it with one does not stop with an error.\n\nCheck makes calls of its own and compares a call with itself, with the same call typed another way, with a call at another time, with a call from another team, and with a text.",
+      "nextSteps": [
+        "Read the part of the lesson on equal.",
+        "Ask first whether the other value is a Call, with isinstance.",
+        "Compare the time and the call sign of both calls, and leave the message out.",
+        "Compare night[0] and night[2] under the main guard."
+      ],
+      "hints": [
+        "Without `__eq__`, `==` asks whether both are one and the same object, so two calls made apart are never equal.",
+        "`other` may be anything, a text included, and a text has no `time`. When it is not a Call, give back `False`, or `NotImplemented`.",
+        "The shape is `def __eq__(self, other):`, then `if not isinstance(other, Call):` with `return NotImplemented`, then `return self.time == other.time and self.call_sign == other.call_sign`."
+      ],
+      "docs": [
+        { "title": "object.__eq__()", "url": "https://docs.python.org/3/reference/datamodel.html#object.__eq__" },
+        { "title": "isinstance()", "url": "https://docs.python.org/3/library/functions.html#isinstance" },
+        { "title": "NotImplemented", "url": "https://docs.python.org/3/library/constants.html#NotImplemented" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "order",
+      "title": "Calls in order of time",
+      "file": "radio_log.py",
+      "description": "Under `# Task 3`, inside `Call`, write `__lt__`: a call is less than a call that came later, so that `sorted()` puts a list of calls in order of time, the earliest first. Times are `\"HH:MM\"` text, always two digits each side.\n\nCheck makes nights of calls of its own, typed in out of order, sorts them, and compares two calls with `<` both ways and a call with itself.",
+      "nextSteps": [
+        "Read the part of the lesson on in order.",
+        "Write __lt__ inside Call, giving back whether this call's time comes before the other's.",
+        "Remember that two times written as two digits each side compare as text in the order of the day.",
+        "Print each call of sorted(night) under the main guard."
+      ],
+      "hints": [
+        "`sorted()` compares two calls at a time with `<`, and Python asks `__lt__` of the call on the left.",
+        "`self` is the call on the left of `<`. It is less when its time comes first, and a call is never less than itself.",
+        "The shape is `def __lt__(self, other):` with `return self.time < other.time`."
+      ],
+      "docs": [
+        { "title": "object.__lt__()", "url": "https://docs.python.org/3/reference/datamodel.html#object.__lt__" },
+        { "title": "sorted()", "url": "https://docs.python.org/3/library/functions.html#sorted" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "log",
+      "title": "A log you can ask",
+      "file": "radio_log.py",
+      "description": "Under `# Task 4`, inside the class `Log`, write `__len__`, which gives back how many calls the log holds, and `__contains__`, which says whether a call sign is in the log: `\"Alpha\" in log` is `True` once Alpha has called, and `False` before.\n\nCheck makes logs of its own, adds calls to one with `add`, and asks `len()` and `in` of it and of another log.",
+      "nextSteps": [
+        "Read the part of the lesson on a class that holds things.",
+        "Write __len__ inside Log, giving back how many calls self.calls holds.",
+        "Write __contains__, which goes through self.calls and looks at each call's call sign.",
+        "Print len(log) and \"Charlie\" in log under the main guard."
+      ],
+      "hints": [
+        "A call sign is text, and `self.calls` holds whole calls, so asking whether the text is in that list compares it with calls.",
+        "Give back `True` as soon as one call has that call sign, and `False` only after the loop has looked at all of them.",
+        "The shape is `def __len__(self):` with `return len(self.calls)`, and `def __contains__(self, call_sign):` with a for loop over `self.calls`, `if call.call_sign == call_sign: return True`, and `return False` after the loop."
+      ],
+      "docs": [
+        { "title": "object.__len__()", "url": "https://docs.python.org/3/reference/datamodel.html#object.__len__" },
+        { "title": "object.__contains__()", "url": "https://docs.python.org/3/reference/datamodel.html#object.__contains__" }
+      ],
+      "points": 10
+    }
+  ]
+}

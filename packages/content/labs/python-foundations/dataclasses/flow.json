@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhona", "label": "Rhona", "kind": "story" },
+      { "id": "callout", "label": "Callout", "kind": "function", "mine": true },
+      { "id": "search", "label": "Search", "kind": "function", "mine": true },
+      { "id": "grid", "label": "GridRef", "kind": "function", "mine": true },
+      { "id": "records", "label": "The year's records", "kind": "data" },
+      { "id": "teams", "label": "Teams on a search", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "callout", "to": "records", "label": "one record" },
+      { "from": "records", "to": "rhona", "label": "printed, compared" },
+      { "from": "search", "to": "teams", "label": "its own list" },
+      { "from": "grid", "to": "teams", "label": "a bearing from base" }
+    ],
+    "note": "Each callout, search and grid reference becomes a record that prints, compares and keeps what it must."
+  },
+  "tasks": {
+    "callout": {
+      "steps": [
+        { "active": ["callout"], "value": { "kind": "map", "label": "a callout", "entries": [{ "key": "date", "value": "text" }, { "key": "hill", "value": "text" }, { "key": "hours", "value": "whole number" }] }, "note": "A callout is a date, a hill and the hours, in that order." },
+        { "active": ["callout", "callout->records", "records"], "note": "Each one is a record that shows its fields when printed." },
+        { "active": ["records", "records->rhona", "rhona"], "note": "Two records with the same values count as the same callout." }
+      ]
+    },
+    "search": {
+      "steps": [
+        { "active": ["search"], "note": "A search starts with its area, no teams yet, and no hours." },
+        { "active": ["search", "search->teams", "teams"], "note": "A team joins one search." },
+        { "active": ["teams"], "note": "Every other search still has its own list, without that team." }
+      ]
+    },
+    "grid": {
+      "steps": [
+        { "active": ["grid"], "note": "The base has one grid reference, an easting and a northing." },
+        { "active": ["grid"], "note": "Anything that tries to change it is stopped." },
+        { "active": ["grid", "grid->teams", "teams"], "note": "A point some way off is a new grid reference, and the base stays where it was." }
+      ]
+    }
+  }
+}

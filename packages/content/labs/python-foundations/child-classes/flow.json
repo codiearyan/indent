@@ -1,0 +1,51 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kitclass", "label": "Kit", "kind": "function" },
+      { "id": "rope", "label": "Rope", "kind": "function", "mine": true },
+      { "id": "store", "label": "Kit store", "kind": "data" },
+      { "id": "ropes", "label": "ropes_in()", "kind": "function", "mine": true },
+      { "id": "check", "label": "check_kit()", "kind": "function", "mine": true },
+      { "id": "dougie", "label": "Dougie", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kitclass", "to": "rope", "label": "built on" },
+      { "from": "rope", "to": "store", "label": "ropes" },
+      { "from": "store", "to": "ropes", "label": "mixed kit" },
+      { "from": "store", "to": "check", "label": "every item" },
+      { "from": "ropes", "to": "dougie", "label": "ropes for the crag" },
+      { "from": "check", "to": "dougie", "label": "weight or an error" }
+    ],
+    "note": "Every kind of kit is built on Kit, keeps what makes it different, and answers for itself."
+  },
+  "tasks": {
+    "rope": {
+      "steps": [
+        { "active": ["kitclass", "kitclass->rope", "rope"], "note": "A rope is kit: it is built on Kit and has all that Kit has." },
+        { "active": ["rope", "kitclass"], "note": "Kit's own setup keeps the rope's name and weight." },
+        { "active": ["rope", "rope->store", "store"], "value": { "kind": "map", "label": "a rope", "entries": [{ "key": "name", "value": "from Kit" }, { "key": "kg", "value": "from Kit" }, { "key": "metres", "value": "its own" }] }, "note": "The rope keeps its length itself, and goes on the store's shelf." }
+      ]
+    },
+    "label": {
+      "steps": [
+        { "active": ["rope", "kitclass"], "note": "A rope's label starts from Kit's label for that rope." },
+        { "active": ["rope"], "note": "The rope adds its length to the end." },
+        { "active": ["rope", "rope->store", "store"], "note": "Every other kind of kit keeps Kit's label." }
+      ]
+    },
+    "ropes": {
+      "steps": [
+        { "active": ["store", "store->ropes", "ropes"], "value": { "kind": "array", "label": "the store", "values": ["kit", "rope", "battery", "a kind of rope", "..."] }, "note": "The store holds kit of every kind." },
+        { "active": ["ropes"], "note": "Each item is asked whether it is a rope, or a kind built on a rope." },
+        { "active": ["ropes", "ropes->dougie", "dougie"], "note": "Dougie gets the ropes, in the order of the store." }
+      ]
+    },
+    "ready": {
+      "steps": [
+        { "active": ["store", "store->check", "check"], "note": "Before a callout, every item of the kit is checked." },
+        { "active": ["check"], "note": "Each item says for itself whether it is ready, the kinds nobody planned for too." },
+        { "active": ["check", "check->dougie", "dougie"], "note": "Dougie gets the total weight, or an error of the team's own that names the first item not ready." }
+      ]
+    }
+  }
+}

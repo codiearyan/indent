@@ -1,0 +1,84 @@
+{
+  "id": "classes-and-objects",
+  "title": "A class and its objects",
+  "files": ["hill_teams.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to make the teams and vehicles and see what each one holds.",
+    "suggestedCommand": "python3 hill_teams.py"
+  },
+  "tasks": [
+    {
+      "id": "team",
+      "title": "A team of its own",
+      "file": "hill_teams.py",
+      "description": "Under `# Task 1` in `hill_teams.py`, write a class called `Team`. Its `__init__` takes a call sign and a leader, and keeps them in the attributes `call_sign` and `leader` of the new object. Then make `alpha = Team(\"Alpha\", \"Kirsty\")` and `bravo = Team(\"Bravo\", \"Iain\")`, and print the leader of each.\n\nCheck makes teams of its own, two at a time, and reads the `call_sign` and `leader` of each, to see that every team keeps the values it was made with.",
+      "nextSteps": [
+        "Read the parts of the lesson on a class and on the errors it gives.",
+        "Write the class line, then the def line of __init__, with self first.",
+        "Keep each value on the new object, through self.",
+        "Make alpha and bravo, print their leaders, and run the file."
+      ],
+      "hints": [
+        "Look at the `Tent` class in the lesson: it has the same shape, with other names.",
+        "Python hands the new object to `__init__` as its first value, so the def line takes `self`, then the call sign, then the leader. A value lands on the object only when it is written to `self` and a dot.",
+        "The shape is `class Team:`, then `def __init__(self, call_sign, leader):` moved in under it, with `self.call_sign = call_sign` and `self.leader = leader` moved in under that."
+      ],
+      "docs": [
+        { "title": "A first look at classes", "url": "https://docs.python.org/3/tutorial/classes.html#a-first-look-at-classes" },
+        { "title": "Instance objects", "url": "https://docs.python.org/3/tutorial/classes.html#instance-objects" },
+        { "title": "object.__init__()", "url": "https://docs.python.org/3/reference/datamodel.html#object.__init__" }
+      ],
+      "videos": [
+        { "title": "Classes and the objects they make", "url": "https://www.youtube.com/watch?v=ZDa-Z5JzLYM" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "kit",
+      "title": "Each vehicle its own kit",
+      "file": "hill_teams.py",
+      "description": "Under `# Task 2`, Dougie's `Vehicle` keeps its `kit` list in the class, so every vehicle shares one list: the rope he put in the van shows up in the Land Rover too. Change `Vehicle` so that every vehicle has a `kit` list of its own, empty when the vehicle is made. A vehicle still keeps its name in `name`.\n\nCheck makes two vehicles of its own, reads the kit of each, puts a stretcher in one, and looks at whether the other's kit stays empty.",
+      "nextSteps": [
+        "Read the part of the lesson on one list for every object.",
+        "Run the file and see the rope turn up in the Land Rover.",
+        "Find where the kit list is made, and when that line runs.",
+        "Make the list where each new vehicle gets a list of its own, and run the file again."
+      ],
+      "hints": [
+        "The line `kit = []` runs once, when Python makes the class, so there is only ever one list.",
+        "`__init__` runs once for every new vehicle. A list made there, and kept on `self`, is a new list each time.",
+        "The shape is to take out `kit = []` from the class and add `self.kit = []` under `self.name = name` in `__init__`."
+      ],
+      "docs": [
+        { "title": "Class and instance variables", "url": "https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables" },
+        { "title": "Default argument values", "url": "https://docs.python.org/3/tutorial/controlflow.html#default-argument-values" }
+      ],
+      "videos": [
+        { "title": "Values on the class against values on each object", "url": "https://www.youtube.com/watch?v=BJ-VvGyQxho" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rota",
+      "title": "Teams from the rota",
+      "file": "hill_teams.py",
+      "description": "Under `# Task 3`, write a function called `make_teams` that takes a list of `(call sign, leader)` tuples and gives back a list of `Team` objects, one for each tuple, in the same order. Leave the list it is given as it was. Print the leader of each team it gives back for `rota`.\n\nCheck calls `make_teams` with lists of its own, an empty one among them, and looks at whether it gives back a list of teams, each a new `Team` with the call sign and leader of its tuple. It uses its own `Team`, so a mistake in Task 1 does not count here.",
+      "nextSteps": [
+        "Read the part of the lesson on many objects from data.",
+        "Start an empty list, and go through the tuples with a for loop, taking each apart into its two values.",
+        "Make a new Team in each round of the loop, and add it to the list.",
+        "Give the list back, and print each leader for rota."
+      ],
+      "hints": [
+        "Each call of `Team(...)` makes a new object. One team made before the loop and changed in each round is still one object, put in the list several times.",
+        "A tuple of two values comes apart into two names on the for line, and `Team` takes those two values, not the tuple.",
+        "The shape is `teams = []`, then `for call_sign, leader in rows:` with `teams.append(Team(call_sign, leader))` under it, then `return teams`."
+      ],
+      "docs": [
+        { "title": "Class objects", "url": "https://docs.python.org/3/tutorial/classes.html#class-objects" },
+        { "title": "Tuples and sequences", "url": "https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences" }
+      ],
+      "points": 10
+    }
+  ]
+}

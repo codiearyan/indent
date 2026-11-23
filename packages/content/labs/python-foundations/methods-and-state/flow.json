@@ -1,0 +1,50 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dougie", "label": "Dougie", "kind": "story" },
+      { "id": "kit", "label": "Kit for the hill", "kind": "data" },
+      { "id": "pack", "label": "Pack", "kind": "function", "mine": true },
+      { "id": "items", "label": "Items in the pack", "kind": "data" },
+      { "id": "copy", "label": "Second team's pack", "kind": "data" },
+      { "id": "volunteer", "label": "Volunteer on the hill", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kit", "to": "pack", "label": "name and weight" },
+      { "from": "pack", "to": "items", "label": "keeps" },
+      { "from": "pack", "to": "dougie", "label": "weight or refusal" },
+      { "from": "pack", "to": "copy", "label": "a new pack" },
+      { "from": "items", "to": "volunteer", "label": "carried" }
+    ],
+    "note": "The pack keeps its own items and its own rule, so nobody carries more than their limit."
+  },
+  "tasks": {
+    "add": {
+      "steps": [
+        { "active": ["kit", "kit->pack", "pack"], "note": "An item comes to the pack with its name and weight." },
+        { "active": ["pack", "pack->dougie", "dougie"], "note": "An item that weighs nothing, or would take the pack over its owner's limit, is refused, and the message says why." },
+        { "active": ["pack", "pack->items", "items"], "value": { "kind": "map", "label": "items", "entries": [{ "key": "item name", "value": "weight in kilos" }] }, "note": "An item that fits goes into the pack's own items." }
+      ]
+    },
+    "weight": {
+      "steps": [
+        { "active": ["items"], "note": "The pack holds its items, whoever put them there." },
+        { "active": ["items", "pack"], "note": "Every time the weight is asked for, the pack adds up what its items weigh." },
+        { "active": ["pack", "pack->dougie", "dougie"], "note": "Dougie reads the weight like any other value, without brackets." }
+      ]
+    },
+    "remove": {
+      "steps": [
+        { "active": ["dougie", "pack"], "note": "Dougie asks for one item out of the pack." },
+        { "active": ["pack", "pack->items", "items"], "note": "The item leaves the pack's own items." },
+        { "active": ["pack", "pack->dougie", "dougie"], "note": "Dougie gets back what it weighed, or a refusal that names an item the pack never held." }
+      ]
+    },
+    "without": {
+      "steps": [
+        { "active": ["pack", "items"], "note": "The first team's pack is packed." },
+        { "active": ["pack", "pack->copy", "copy"], "note": "A new pack is made for the same owner, with every item but one." },
+        { "active": ["copy", "items"], "note": "The two packs keep their items apart, so changing one never changes the other." }
+      ]
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "radio", "label": "Radio", "kind": "story" },
+      { "id": "call", "label": "Call", "kind": "function", "mine": true },
+      { "id": "log", "label": "Log", "kind": "function", "mine": true },
+      { "id": "night", "label": "The night's calls", "kind": "data" },
+      { "id": "ailsa", "label": "Ailsa at the radio desk", "kind": "story" },
+      { "id": "rhona", "label": "Rhona", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "radio", "to": "call", "label": "time, team, words" },
+      { "from": "call", "to": "log", "label": "added" },
+      { "from": "log", "to": "ailsa", "label": "has a team called?" },
+      { "from": "call", "to": "night", "label": "compared" },
+      { "from": "night", "to": "rhona", "label": "in order of time" }
+    ],
+    "note": "Each call prints as a line of the log, knows when it is the same call, and sorts by time."
+  },
+  "tasks": {
+    "print": {
+      "steps": [
+        { "active": ["radio", "radio->call", "call"], "note": "A call comes in with its time, its team and what they said." },
+        { "active": ["call", "ailsa"], "note": "Printed for people, it is one line of the log." },
+        { "active": ["call", "night"], "note": "Shown as Python, as in a list, it is the code that makes it." }
+      ]
+    },
+    "equal": {
+      "steps": [
+        { "active": ["call", "call->night", "night"], "note": "Two people type the same call, in different words." },
+        { "active": ["night"], "note": "Same time and same team counts as the same call; the words do not matter." },
+        { "active": ["night"], "note": "A call is never the same as something that is not a call, and asking does not crash." }
+      ]
+    },
+    "order": {
+      "steps": [
+        { "active": ["night"], "value": { "kind": "array", "label": "as typed", "values": ["a call", "a call", "a call", "..."] }, "note": "The calls arrive in the order they were typed in." },
+        { "active": ["call", "night"], "note": "Two calls at a time are asked which came first." },
+        { "active": ["night", "night->rhona", "rhona"], "note": "Rhona reads the night in order of time, the earliest first." }
+      ]
+    },
+    "log": {
+      "steps": [
+        { "active": ["call", "call->log", "log"], "note": "Each call is added to the night's log." },
+        { "active": ["log"], "note": "Asked how long it is, the log counts its calls." },
+        { "active": ["log", "log->ailsa", "ailsa"], "note": "Asked about a team, the log says whether that team has called tonight." }
+      ]
+    }
+  }
+}

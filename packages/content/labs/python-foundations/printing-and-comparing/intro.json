@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Has Charlie called tonight?", "note": "Rhona wants the night's calls." },
+    { "title": "Radio log", "text": "Prints as object at 0x and a number" },
+    {
+      "title": "Your methods",
+      "file": "radio_log.py",
+      "mine": true,
+      "gap": "Calls that cannot speak",
+      "tasks": ["A call that prints", "The same call twice", "In order of time", "A log you can ask"]
+    },
+    { "title": "Rhona", "say": "The night, in order. Thanks.", "note": "Every call reads as a line." }
+  ],
+  "ticket": { "label": "Charlie", "wrong": "object at 0x", "why": "Unreadable", "right": "called at 20:15" },
+  "captions": [
+    "At the radio desk, Ailsa asks whether Charlie has called in tonight.",
+    "Today the log prints a row of object at 0x and numbers, and nobody can read it.",
+    "You teach a call to print, to know itself typed twice, to sort, and the log to answer.",
+    "Now Charlie's call reads as a line of the log, at its place in the night.",
+    "The log prints, compares and sorts itself, and Rhona reads the night in order."
+  ]
+}
