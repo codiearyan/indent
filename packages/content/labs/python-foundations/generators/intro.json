@@ -9,7 +9,7 @@
       "gap": "Nothing reads one line at a time",
       "tasks": ["One line at a time", "One team's lines", "The first mention", "Longest and total"]
     },
-    { "title": "The log", "rows": [["19:05", "Alpha", "leaving base"], ["...", "...", "..."], ["23:50", "Charlie", "back at base"]], "note": "The whole winter, line by line." }
+    { "title": "The log", "rows": [["19:05 Alpha", "leaving base"], ["21:05 Bravo", "walker found"], ["...", "..."]], "note": "The whole winter, line by line." }
   ],
   "ticket": { "label": "Stretcher call", "wrong": "frozen", "why": "Reads it all", "right": "found" },
   "captions": [
