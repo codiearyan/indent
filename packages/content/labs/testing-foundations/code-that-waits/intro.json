@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Wendell", "say": "Why did the form sell squash?", "note": "Three boxes, no squash." },
+    { "title": "Shed counts", "text": "Counted each morning, read a moment later." },
+    {
+      "title": "Your tests",
+      "file": "stock.test.js",
+      "mine": true,
+      "gap": "Nobody waits for the answer",
+      "tasks": ["Test a count", "Test yes and no", "Test an unknown item"]
+    },
+    { "title": "Order form", "text": "Only sells what the shed can fill." }
+  ],
+  "ticket": { "label": "Squash box", "wrong": "sold", "why": "Not checked", "right": "not on sale" },
+  "captions": [
+    "Wendell asks why the form sold three boxes with squash when the shed had none.",
+    "The form asks the shed's counts, and that answer comes a moment later. Nothing tests it.",
+    "You write tests that wait for each answer, for a count, a yes, a no and an unknown item.",
+    "Now a box the shed cannot fill is not on sale.",
+    "Same counts, same form. Your tests wait for each answer before they check it."
+  ]
+}

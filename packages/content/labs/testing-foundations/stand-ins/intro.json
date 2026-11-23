@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Effie", "say": "Charged twice for one box?", "note": "Mrs Pellow's card, last week." },
+    { "title": "Checkout", "text": "Talks to the card company and to chance." },
+    {
+      "title": "Your tests",
+      "file": "checkout.test.js",
+      "mine": true,
+      "gap": "Nothing stands in for them",
+      "tasks": ["Test the surprise", "Test the charge", "Test a declined card"]
+    },
+    { "title": "Card company", "text": "Real cards, real money." }
+  ],
+  "ticket": { "label": "Pellow box", "wrong": "charged twice", "why": "Untested", "right": "charged once" },
+  "captions": [
+    "Effie asks why Mrs Pellow was charged twice for one box last week.",
+    "Checkout talks to the card company and picks extras at random, and nothing tests it.",
+    "You stand in for chance and for the card company, and check every call it makes.",
+    "Now one box is one charge, and a declined card stays off Wendell's list.",
+    "Same checkout, no real cards. Your tests know every answer before they ask."
+  ]
+}
