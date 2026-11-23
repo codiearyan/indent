@@ -92,7 +92,7 @@ export const checks = tasks({
           allowed: 'Check called board with no try around it, and Java let it: board does not say it may throw CancelledException. A checked exception has to be named after throws on the first line of the method, so every caller knows to deal with it.',
           other: 'Check called board with no try around it, and Java refused it for another reason than the task is about. The task asks board to say it may throw CancelledException, by its own name: the message below names what it says instead.'
         },
-        attempt({ name: 'A caller can catch CancelledException by its name', setup: ['String said = "nothing caught";', 'try { Crossings.board(18, true); } catch (CancelledException e) { said = e.getMessage(); }'], call: 'said.length()', type: 'int', after: { said: 'said' }, expected: {}, byName: true, hint: 'A caller of board should be able to catch CancelledException by its own name.', show: 'try {\n    Crossings.board(18, true);\n} catch (CancelledException e) {\n    said = e.getMessage();\n}' }),
+        attempt({ name: 'A caller can catch CancelledException by its name', setup: ['String said = "nothing caught";', 'try { Crossings.board(18, true); } catch (CancelledException e) { said = e.getMessage(); }'], call: 'said', type: 'String', expected: {}, byName: true, hint: 'A caller of board should be able to catch CancelledException by its own name.', show: 'try {\n    Crossings.board(18, true);\n} catch (CancelledException e) {\n    said = e.getMessage();\n}' }),
         {
           name: 'A caller of notice needs no try',
           code: ['String s = Crossings.notice(12, false);'],
@@ -132,7 +132,7 @@ export const checks = tasks({
                 ? d
                 : fail(r.case.name, 'In a gale notice should give back Cancelled: and then the message of the CancelledException board throws, exactly as the exception holds it.', d.output)
             }
-            return /18:00/.test(value(r, 'said') ?? '') ? d : fail(r.case.name, 'Check caught a CancelledException from board by its name, and its message does not name the crossing, as in 18:00.', d.output)
+            return /18:00/.test(value(r, 'got') ?? '') ? d : fail(r.case.name, 'Check caught a CancelledException from board by its name, and its message does not name the crossing, as in 18:00.', d.output)
           })
         return [
           ...details.map((d) => own.find((o) => o?.name === d.name) ?? d),

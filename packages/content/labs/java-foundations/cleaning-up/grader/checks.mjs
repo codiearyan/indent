@@ -45,7 +45,15 @@ const log = (r) => r.values[LOG]?.value ?? ''
 const count = (r, what) => log(r).split(', ').filter((x) => x === what).length
 const finallyReturns = (section) => /\bfinally\s*\{[^{}]*\breturn\b/.test(codeOnly(section))
 
-const happened = (c) => attempt({ ...c, after: { [LOG]: '__IndentLog.text()' } })
+// What Check's stand-ins are told is said in words, since the learner's own classes have no such fields.
+const SAY = { 'TicketPrinter.paper = 1;': "// Check's printer has paper for 1 ticket.", 'TicketPrinter.broken = true;': "// Check's printer will not start." }
+
+const happened = (c) =>
+  attempt({
+    ...c,
+    after: { [LOG]: '__IndentLog.text()' },
+    show: [...(c.setup ?? []).map((l) => SAY[l] ?? l), `${c.type} got = ${c.call};`].join('\n')
+  })
 
 /** Mistakes every task here shares: a return in finally, a failure caught and kept back. */
 const kept = (method) => [
@@ -100,7 +108,7 @@ export const checks = tasks({
         mistakes: [
           ...kept('printAll'),
           { when: (r) => count(r, 'printer off') > 1, hint: 'printAll switches the printer off twice. A try with resources already calls close() on the way out: a close() of your own as well is one too many.' },
-          { when: (r) => r.case.fails && count(r, 'printer off') === 0 && count(r, 'printer on') > 0, hint: 'When the printer ran out of paper, it was never switched off: the line that closes it never ran. A close() after the loop is skipped when an exception leaves the loop; a try with resources closes it on every way out.' },
+          { when: (r) => r.case.fails && count(r, 'printer off') === 0 && count(r, 'printer on') > 0, hint: 'When the printer failed, it was never switched off: the line that closes it never ran. A close() after the loop is skipped when an exception leaves the loop; a try with resources closes it on every way out.' },
           { when: (r) => !r.case.fails && count(r, 'printer on') > 0 && count(r, 'printer off') === 0, hint: 'printAll never switches its printer off. A printer made in the round brackets of a try with resources is closed on every way out; one made anywhere else is not.' }
         ]
       })
@@ -121,6 +129,14 @@ export const checks = tasks({
           ...kept('sellAll'),
           { when: (r) => count(r, 'printer off') > 1 || count(r, 'till shut') > 1, hint: 'sellAll closes something twice. A try with resources already calls close() on each of its resources on the way out: a close() of your own as well is one too many.' },
           { when: (r) => /till shut.*printer off/.test(log(r)), hint: 'sellAll shuts the till before the printer is switched off. Things are closed in the opposite order to the one they were opened in: the printer, opened last, is closed first.' },
+          {
+            when: (r) => r.case.fails && /printer would not start/.test(log(r)) && count(r, 'till open') > 0 && count(r, 'till shut') === 0,
+            hint: 'When the printer would not start, the till was already open and was never shut: the printer was made before the cleaning up could begin, so it never ran. A try with resources that holds both shuts the till when the printer cannot start.'
+          },
+          {
+            when: (r) => /^till open, printer on, printed/.test(log(r)),
+            hint: 'sellAll prints a ticket before it adds its fare to the till. The task adds each fare first, then prints its ticket, so a fare the till refuses gets no ticket.'
+          },
           { when: (r) => /^printer/.test(log(r)), hint: 'sellAll opens the printer before the till. The task opens the till first, then the printer: a try with resources opens them in the order they are written.' },
           { when: (r) => r.case.fails && (count(r, 'printer off') === 0 && count(r, 'printer on') > 0 || count(r, 'till shut') === 0), hint: 'When something failed, the printer or the till was left open: the line that closes it never ran. A close() after the loop is skipped when an exception leaves the loop; a try with resources closes each one on every way out.' }
         ]

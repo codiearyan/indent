@@ -29,7 +29,8 @@ public class HutRules {
 // Task 1: Write NoRoomException, which says how many seats are free
 // Write a class NoRoomException, a checked exception, with a constructor
 // NoRoomException(String boat, int seatsFree). Its message names the boat and the seats free,
-// as in No room on Linnet: 2 seats free, and a method int seatsFree() gives back the seats free.
+// as in No room on Linnet: 2 seats free, and a method int seatsFree() gives back the seats free,
+// kept in a field of their own.
 
 // Task 2: Throw it when a boat is full, and catch it by its name
 // Write a class Booking with two methods. static String reserve(String boat, int free,

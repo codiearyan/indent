@@ -35,6 +35,7 @@ try {
 A `return` inside `finally` replaces whatever the `try` was doing, an exception included:
 
 ```java
+int jars = 0;
 try {
     jars = Integer.parseInt("lots");
     return jars;

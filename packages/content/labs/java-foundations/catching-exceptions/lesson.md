@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Ossian's report crashed because of mistakes in the code. Bridie's desk is different: she types seat counts and seat numbers all day, and sometimes a smudge, a word or a stray space gets in. Today one bad entry stops the whole program and the queue waits. A typing slip is not a mistake in the code; it is something that will happen, and the program should answer it. By the end of this issue you will be able to:
+Ossian's report crashed because of mistakes in the code. Bridie's desk is different: she types seat counts and seat numbers all day, and sometimes a word or a stray space gets in. Today one bad entry stops the program. A typing slip is not a mistake in the code; it is something that will happen, and the program should answer it. By the end of this issue you will be able to:
 
 - catch an exception with `try` and `catch`, naming the exception you expect
 - put the `try` around only the line that can fail
@@ -29,13 +29,13 @@ static int jars(String counted) {
 }
 ```
 
-Java runs the lines inside `try`. If one throws a `NumberFormatException`, the rest of the `try` is skipped and the `catch` block runs; then the method goes on after it, here by giving back -1. If nothing is thrown, the `catch` never runs. `jars("a dozen")` gives back -1, and the program carries on.
+Java runs the lines inside `try`. If one throws a `NumberFormatException`, the rest of the `try` is skipped and the `catch` block runs, here giving back -1. If nothing is thrown, the `catch` never runs.
 
 The `catch` names the exception it is for, and catches only that kind (and kinds that extend it). Anything else goes on to the caller as if the `try` were not there.
 
 ## What a caught exception holds
 
-The `e` in `catch (NumberFormatException e)` is the exception itself, an object like any other. `e.getMessage()` gives back its message, `For input string: "a dozen"`, and printing `e` shows its class and message: `java.lang.NumberFormatException: For input string: "a dozen"`. That message is often worth passing on: it says exactly what went wrong.
+The `e` in `catch (NumberFormatException e)` is the exception itself, an object like any other. `e.getMessage()` gives back its message, `For input string: "a dozen"`; printing `e` shows its class too. That message is often worth passing on: it says exactly what went wrong.
 
 ## Catch only what you expect, only where you expect it
 
@@ -52,9 +52,9 @@ try {
 }
 ```
 
-Now a `null` fails on the first line, outside the `try`, and goes on to the caller. The same thinking decides what happens to the lines after a failure: everything in the `try` after the failing line is skipped, so a `try` around more than it needs skips more than it should.
+Now a `null` fails on the first line, outside the `try`, and goes on to the caller. Handed `null` itself, `parseInt` would throw a `NumberFormatException`, and the `catch` would take it for a typing slip: one more reason the `trim()` comes first. And everything in the `try` after a failing line is skipped, so a `try` around more than it needs skips more than it should.
 
-This is why `catch (Exception e)` with an empty body is the worst line you can write. Every exception extends `Exception`, so it catches the typing slips, and the `null`, and the mistakes in your own lines, and says nothing. The program carries on with a wrong answer, and nobody ever learns why.
+This is why `catch (Exception e)` with an empty body is the worst line you can write. Every exception you have met so far extends `Exception`, so it catches the typing slips, and the `null`, and the mistakes in your own lines, and says nothing. The program carries on with a wrong answer, and nobody ever learns why.
 
 ## Two catches, and their order
 
@@ -66,11 +66,23 @@ Order.java:7: error: exception NumberFormatException has already been caught
           ^
 ```
 
-The `catch` for `IllegalArgumentException` above it already catches every `NumberFormatException`, so this one could never run. Put the more particular one first. Two kinds that do not extend each other, such as `NumberFormatException` and `ArrayIndexOutOfBoundsException`, can come in either order.
+The `catch` above it already catches every `NumberFormatException`, so this one could never run. Put the more particular one first. Two kinds that do not extend each other, such as `NumberFormatException` and `ArrayIndexOutOfBoundsException`, can come in either order.
 
 ## A variable set inside try
 
-Here the `catch` prints and carries on:
+Here the `catch` prints and carries on, and the compiler refuses it:
+
+```java
+static int jars(String counted) {
+    int jars;
+    try {
+        jars = Integer.parseInt(counted);
+    } catch (NumberFormatException e) {
+        System.out.println("Not a number: " + counted);
+    }
+    return jars;
+}
+```
 
 ```
 Init.java:9: error: variable jars might not have been initialized
@@ -78,7 +90,7 @@ Init.java:9: error: variable jars might not have been initialized
                ^
 ```
 
-`jars` gets its value inside the `try`. When `parseInt` fails, that line never finishes, so after the `catch` `jars` may have no value at all. Give it one on every way through: in the `catch` too, or where it is made, or give back from inside the `try` and the `catch`.
+When `parseInt` fails, the line that sets `jars` never finishes, so after the `catch` it may have no value. Give it one on every way through: in the `catch` too, where it is made, or give back from inside the `try` and the `catch`.
 
 ## Your work in this issue
 

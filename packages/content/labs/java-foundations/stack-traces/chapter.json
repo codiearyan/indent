@@ -11,7 +11,7 @@
       "id": "departures",
       "title": "Mend the last departure",
       "file": "EveningReport.java",
-      "description": "Under `// Task 1`, `Departures.last(int[] hours)` should give back the day's last crossing, as in `Crossing 6 leaves at 19:00`. It stops with an `ArrayIndexOutOfBoundsException`. Read the trace, and mend the one method of `Departures` that is wrong. Leave the other two exactly as they are: each does what its comment says with what it is handed.\n\nCheck calls `last` with days of its own, of one crossing and of several, and calls `line` with position 0. It also compares the two methods you leave alone with the starter's, comments and spaces aside.",
+      "description": "Under `// Task 1`, `Departures.last(int[] hours)` should give back the day's last crossing, as in `Crossing 6 leaves at 19:00`. It stops with an `ArrayIndexOutOfBoundsException`. Read the trace, and mend the one method of `Departures` that is wrong. Leave the other two exactly as they are: each does what its comment says with what it is handed.\n\nCheck calls `last` with days of its own, of one crossing and of several, and calls `line` with position 0. It also compares the two methods you leave alone with the starter's, comments, spaces and lines that only print aside.",
       "nextSteps": [
         "Run the file and read the first line of the trace to the end: which position was asked for, and how long was the array?",
         "Go to the method on the top at line. Does it do what its comment says with the position it was handed?",
@@ -49,7 +49,7 @@
       "id": "skippers",
       "title": "Mend the skippers' notice",
       "file": "EveningReport.java",
-      "description": "Under `// Task 2`, `Skippers.notice` should give back a line for each boat sailing today, as in `Gannet: M.`, with the first letter of its skipper's name. Every boat sailing is on the rota. It stops with a `NullPointerException`: in its message, `\"<parameter1>\"` is the first parameter of the method on the top `at` line. Mend the one method of `Skippers` that is wrong, and leave the other three exactly as they are.\n\nCheck calls `notice` and `skipperOf` with rotas of its own, with the boat at every place on the rota, and compares the three methods you leave alone with the starter's, comments and spaces aside.",
+      "description": "Under `// Task 2`, `Skippers.notice` should give back a line for each boat sailing today, as in `Gannet: M.`, with the first letter of its skipper's name. Every boat sailing is on the rota. It stops with a `NullPointerException`: in its message, `\"<parameter1>\"` is the first parameter of the method on the top `at` line. Mend the one method of `Skippers` that is wrong, and leave the other three exactly as they are.\n\nCheck calls `notice` and `skipperOf` with rotas of its own, with the boat at every place on the rota, and compares the three methods you leave alone with the starter's, comments, spaces and lines that only print aside.",
       "nextSteps": [
         "Run the file, and read the first line of the trace: what was called on null, and which name held it?",
         "Walk down the trace: where did that null come from?",
@@ -77,7 +77,7 @@
       "id": "takings",
       "title": "Mend the seats sold",
       "file": "EveningReport.java",
-      "description": "Under `// Task 3`, `Takings.total` should give back the seats sold over the day, from ledger lines such as `09:00,Linnet,9`: the time, the boat and the seats. `line.split(\",\")` cuts a line at each comma and gives back the pieces as an array of `String`, in order. It stops with an `IllegalArgumentException` that has a `Caused by` part. `Ledger`, above the tasks, is right and stays as it is. Mend the one method of `Takings` that is wrong, and leave the other exactly as it is.\n\nCheck calls `total` and `seatsOn` with ledger lines of its own and compares the method you leave alone with the starter's, comments and spaces aside.",
+      "description": "Under `// Task 3`, `Takings.total` should give back the seats sold over the day, from ledger lines such as `09:00,Linnet,9`: the time, the boat and the seats. `line.split(\",\")` cuts a line at each comma and gives back the pieces as an array of `String`, in order. It stops with an `IllegalArgumentException` that has a `Caused by` part. `Ledger`, above the tasks, is right and stays as it is. Mend the one method of `Takings` that is wrong, and leave the other exactly as it is.\n\nCheck calls `total` and `seatsOn` with ledger lines of its own and compares the method you leave alone with the starter's, comments, spaces and lines that only print aside.",
       "nextSteps": [
         "Run the file, and read the top part of the trace, then the part after Caused by.",
         "Which text was Integer.parseInt handed? Which part of the ledger line is that?",

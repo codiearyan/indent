@@ -17,6 +17,9 @@ function method(text, name) {
   return null
 }
 
+// A line that only prints, such as a debug println left in, does not count as a change.
+const quiet = (code) => code.replace(/^[ \t]*System\.out\.print(?:ln|f)?\s*\(.*\);[ \t]*(?:\/\/.*)?$/gm, '')
+
 /** Details for the methods a task says to leave as they are: each must match the starter's. */
 async function leftAlone(t, section, n, names, why) {
   const starter = await readFile(t.chapterPath(`starter/${FILE}`), 'utf8')
@@ -24,7 +27,7 @@ async function leftAlone(t, section, n, names, why) {
   return names.map((name) => {
     const was = method(given, name)
     const now = method(section, name)
-    if (now !== null && sameCode(was, now)) return pass(`${name} is as it was`)
+    if (now !== null && sameCode(was, quiet(now))) return pass(`${name} is as it was`)
     return fail(
       `${name} is as it was`,
       now === null

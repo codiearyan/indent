@@ -11,7 +11,7 @@
       "id": "no-room",
       "title": "Write NoRoomException, which says how many seats are free",
       "file": "HutRules.java",
-      "description": "Under `// Task 1`, write a class `NoRoomException`, a checked exception, with a constructor `NoRoomException(String boat, int seatsFree)`. Its message names the boat and the seats free, as in `No room on Linnet: 2 seats free`, and a method `int seatsFree()` gives back the seats free.\n\nCheck makes, throws and catches `NoRoomException`s of its own, two at once included, keeps one in a variable of type `Exception`, and reads `getMessage()` and `seatsFree()`. It also compiles a method of its own that throws one with no `throws`, which must be refused because the exception is checked.",
+      "description": "Under `// Task 1`, write a class `NoRoomException`, a checked exception, with a constructor `NoRoomException(String boat, int seatsFree)`. Its message names the boat and the seats free, as in `No room on Linnet: 2 seats free`, and a method `int seatsFree()` gives back the seats free, kept in a field of their own.\n\nCheck makes, throws and catches `NoRoomException`s of its own, two at once included, keeps one in a variable of type `Exception`, and reads `getMessage()` and `seatsFree()`. It also compiles a method of its own that throws one with no `throws`, which must be refused because the exception is checked.",
       "nextSteps": [
         "Read the part of the lesson about a class that extends Exception.",
         "Write the first line of the class, with the exception class it extends.",

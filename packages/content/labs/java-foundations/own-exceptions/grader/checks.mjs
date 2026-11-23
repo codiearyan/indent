@@ -71,7 +71,13 @@ export const checks = tasks({
           other: 'Check\'s own method threw a NoRoomException, and Java refused it for another reason than the task is about. Its message is below.'
         }
       ],
-      judge: (runs) => [...noRoom(runs), ...runs.filter((r) => r.case.refuse).map((r) => refusal(r, r.case))]
+      judge: (runs, { section }) => [
+        ...(/\bgetMessage\s*\(/.test(codeOnly(section))
+          ? [fail('seatsFree() reads a field', 'seatsFree() picks the number out of the message. The message is for people; keep the seats free in a field of their own, set in the constructor, and give that back.')]
+          : []),
+        ...noRoom(runs),
+        ...runs.filter((r) => r.case.refuse).map((r) => refusal(r, r.case))
+      ]
     },
 
     booking: {
@@ -108,6 +114,10 @@ export const checks = tasks({
           mistakes: [
             wrongCatch('answer', 'the exception of a full boat'),
             {
+              when: (r, x, runs, { section }) => r.case.room && /\bgetMessage\s*\(/.test(codeOnly(section)) && value(r, 'got') !== r.case.expected.got,
+              hint: 'answer picks the seats free out of the exception\'s message. Check runs it beside a NoRoomException of its own, whose message uses other words, and the number is not where your code looks. Read the seats free from the exception\'s own method, seatsFree().'
+            },
+            {
               when: (r) => r.case.room && /is full|to spare/.test(value(r, 'got') ?? ''),
               hint: 'answer gives back words from the exception\'s message. The task asks for its own words, with the seats free read from the exception\'s own method.'
             }
@@ -132,7 +142,7 @@ export const checks = tasks({
         attempt({ name: 'seatsOn reads the seats', call: 'Lines.seatsOn("10:00,Curlew,4")', type: 'int', expected: { got: 4 }, hint: 'seatsOn should give back the seats, the third part of the line.' }),
         attempt({ name: 'seatsOn with seats that are not a number', call: 'Lines.seatsOn("12:00,Dunlin,four")', type: 'int', throws: 'BadLineException', names: ['12:00,Dunlin,four'], cause: 'NumberFormatException', hint: 'When the seats are not a whole number, seatsOn should throw a BadLineException.', namesHint: 'seatsOn throws a BadLineException, and its message should name the line, so whoever reads it can find the line in the ledger.' }),
         attempt({ name: 'seatsOn with no seats on the line', call: 'Lines.seatsOn("14:00,Scaup")', type: 'int', throws: 'BadLineException', names: ['14:00,Scaup'], cause: 'ArrayIndexOutOfBoundsException', hint: 'When the line has no third part, seatsOn should throw a BadLineException.', namesHint: 'seatsOn throws a BadLineException, and its message should name the line, so whoever reads it can find the line in the ledger.' }),
-        attempt({ name: 'Caught by its own name', setup: ['String said = "nothing caught";', 'try { Lines.seatsOn("16:00,Shoveler,x"); } catch (BadLineException e) { said = e.getMessage(); }'], call: 'said.length()', type: 'int', after: { said: 'said' }, expected: {}, show: 'try {\n    Lines.seatsOn("16:00,Shoveler,x");\n} catch (BadLineException e) {\n    said = e.getMessage();\n}', hint: 'A caller of seatsOn should be able to catch BadLineException by its own name.' }),
+        attempt({ name: 'Caught by its own name', setup: ['String said = "nothing caught";', 'try { Lines.seatsOn("16:00,Shoveler,x"); } catch (BadLineException e) { said = e.getMessage(); }'], call: 'said', type: 'String', expected: {}, show: 'try {\n    Lines.seatsOn("16:00,Shoveler,x");\n} catch (BadLineException e) {\n    said = e.getMessage();\n}', hint: 'A caller of seatsOn should be able to catch BadLineException by its own name.' }),
         {
           name: 'seatsOn says it may throw BadLineException, a checked exception',
           refuse: true,
@@ -165,7 +175,7 @@ export const checks = tasks({
             if (!x.cause) return fail(d.name, `The BadLineException holds no cause, so the ${r.case.cause} that Java threw is lost, and with it what was wrong with the line. Hand it to the BadLineException when you make it, and on to Exception.`, d.output)
             if (x.cause.name !== r.case.cause) return fail(d.name, `The cause of the BadLineException should be the exception Java threw when it read the line, and it is ${x.cause.type}.`, d.output)
           }
-          if (r.case.name === 'Caught by its own name' && !/16:00,Shoveler,x/.test(value(r, 'said') ?? ''))
+          if (r.case.name === 'Caught by its own name' && !/16:00,Shoveler,x/.test(value(r, 'got') ?? ''))
             return fail(d.name, 'Check caught a BadLineException from seatsOn by its name, and its message does not name the line.', d.output)
           return d
         }).concat(runs.filter((r) => r.case.refuse).map((r) => refusal(r, r.case)))

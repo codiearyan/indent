@@ -5,28 +5,36 @@ const got = (r) => r.values.got?.value
 
 /** A catch in the task's lines that catches every kind of exception, or null. */
 const broad = (section) => {
-  const m = /\bcatch\s*\(\s*(?:final\s+)?(?:java\.lang\.)?(Exception|Throwable|RuntimeException)\s+(\w+)\s*\)/.exec(codeOnly(section))
+  const m = /\bcatch\s*\(\s*(?:final\s+)?(?:[\w.]+\s*\|\s*)*(?:java\.lang\.)?(Exception|Throwable|RuntimeException)(?:\s*\|\s*[\w.]+)*\s+(\w+)\s*\)/.exec(codeOnly(section))
   return m ? `${m[1]} ${m[2]}` : null
 }
 
 /** A detail, first, for a catch of every exception where the task names one kind. */
-const onlyNamed = (method, what, section) => {
+const onlyNamed = (method, what, section, two = false) => {
   const b = broad(section)
   return b
     ? [
         fail(
           `${method} catches only what the task names`,
-          `${method} has catch (${b}), which catches every exception of that kind: a mistake in the calling code, or in your own lines, would be hidden too. The task asks to catch only the exception ${what} brings: name that one.`
+          `${method} has catch (${b}), which catches every exception of that kind: a mistake in the calling code, or in your own lines, would be hidden too. The task asks to catch only ${two ? `the exceptions ${what} bring: name each of them` : `the exception ${what} brings: name that one`}.`
         )
       ]
     : []
 }
 
 /** Mistakes every task of this issue shares: a null hidden, a catch for everything. */
-const shared = (method, what, section) => [
+const shared = (method, what, section, parses = false) => [
   {
     when: (r, x) => r.case.throws === 'NullPointerException' && !x && broad(section),
     hint: `${method} caught the NullPointerException that a null brings, so the mistake in the calling code was hidden. catch (${broad(section)}) catches every exception of that kind, this one too: name only the exception ${what} brings.`
+  },
+  {
+    // parseInt(null) throws a NumberFormatException, so a null handed straight to it is caught too.
+    when: (r, x) => {
+      const code = codeOnly(section)
+      return parses && r.case.throws === 'NullPointerException' && !x && /\bparseInt\s*\(/.test(code) && !/\.(?:trim|strip)\s*\(|\bNullPointerException\b/.test(code)
+    },
+    hint: `${method} carried on with a null, so the mistake in the calling code was hidden. Handed null, Integer.parseInt throws a NumberFormatException, not a NullPointerException, so your catch took it for a typing slip. Leave out the spaces first, before the try: on a null, that line throws the NullPointerException that should reach the caller.`
   },
   {
     when: (r, x) => r.case.throws === 'NullPointerException' && !x,
@@ -55,7 +63,7 @@ export const checks = tasks({
           file: FILE,
           typed: 'seats gives back the same number whatever text Check hands it. It should read the number in the text it is handed.',
           mistakes: [
-            ...shared('seats', 'a text that is not a whole number', ctx.section),
+            ...shared('seats', 'a text that is not a whole number', ctx.section, true),
             {
               when: (r) => r.case.bad && r.lines.length > 0,
               hint: 'seats prints something when the text is not a number. The task says it prints nothing: it gives back 0 and the caller decides what to show.'
@@ -91,7 +99,7 @@ export const checks = tasks({
         ...outcomeCases({
           file: FILE,
           mistakes: [
-            ...shared('summary', 'an entry that is not a whole number', ctx.section),
+            ...shared('summary', 'an entry that is not a whole number', ctx.section, true),
             {
               when: (r) => r.case.past && /^\d+ seats, 1 not read$/.test(got(r) ?? '') && got(r) !== r.case.expected.got,
               hint: 'summary stopped adding at the first entry it could not read, so the entries after it were never added. The try is around more than the line that can fail: put it inside the loop, around the reading of one entry.'
@@ -112,7 +120,7 @@ export const checks = tasks({
         attempt({ name: 'Lets a null seats reach the caller', call: 'Seats.holder(null, "2")', type: 'String', throws: 'NullPointerException', hint: 'A null seats is a mistake in the calling code, and its exception should reach the caller.' })
       ],
       judge: (runs, ctx) => [
-        ...onlyNamed('holder', 'a seat number that is not a whole number, or a seat the boat does not have,', ctx.section),
+        ...onlyNamed('holder', 'a seat number that is not a whole number, or a seat the boat does not have,', ctx.section, true),
         ...outcomeCases({
           file: FILE,
           mistakes: [

@@ -2130,6 +2130,7 @@ export function attempt({ setup = [], call, type = 'void', after = {}, ...rest }
   const keep = type === 'void' ? `${call};` : `got = ${call};`
   return {
     ...rest,
+    after,
     code: [
       ...setup,
       ...(type === 'void' ? [] : [`${type} got = ${ZERO[type] ?? 'null'};`]),
@@ -2162,14 +2163,20 @@ export function thrownIn(run, mainClass) {
   return x
 }
 
+// A frame of the learner's file past its `last` line is in a stand-in Check adds below it.
+const ownFrame = (f, last) => {
+  const m = !f.includes('/') && /\([\w$]+\.java:(\d+)\)$/.exec(f)
+  return m && Number(m[1]) > last ? f.replace(/\([^()]*\)$/, "(Check's own code)") : f
+}
+
 /** A thrown exception as the java launcher prints it, Check's own frames left out. */
-export function traceText(x) {
+export function traceText(x, last = Infinity) {
   const head = (e) => `${e.type}${e.message === null ? '' : `: ${e.message}`}`
-  const out = [head(x), ...x.frames.map((f) => `\tat ${f}`)]
+  const out = [head(x), ...x.frames.map((f) => `\tat ${ownFrame(f, last)}`)]
   if (x.cause) {
     let same = 0
     while (same < x.cause.frames.length && same < x.frames.length && x.cause.frames.at(-1 - same) === x.frames.at(-1 - same)) same++
-    out.push(`Caused by: ${head(x.cause)}`, ...x.cause.frames.slice(0, x.cause.frames.length - same).map((f) => `\tat ${f}`))
+    out.push(`Caused by: ${head(x.cause)}`, ...x.cause.frames.slice(0, x.cause.frames.length - same).map((f) => `\tat ${ownFrame(f, last)}`))
     if (same) out.push(`\t... ${same} more`)
   }
   return out.join('\n')
@@ -2180,12 +2187,17 @@ export function traceText(x) {
  * the learner's file it escaped from. { purpose, line, source, inside }
  */
 export function whence(x, text, file, section) {
-  const at = (f) => new RegExp(`\\(${file.replace('.', '\\.')}:(\\d+)\\)$`).exec(f)
+  const lines = text.split('\n').length
+  const at = (f) => {
+    const m = new RegExp(`\\(${file.replace('.', '\\.')}:(\\d+)\\)$`).exec(f)
+    return m && Number(m[1]) <= lines ? m : null
+  }
   const first = x.frames.findIndex((f) => at(f))
   if (first < 0) return { purpose: false, line: null, source: '', inside: null, given: false }
   const line = Number(at(x.frames[first])[1])
   const source = (text.split('\n')[line - 1] ?? '').trim()
-  const purpose = first === 0 && /\bthrow\b|\bnew\s+[\w.]*(?:Exception|Error)\s*\(/.test(codeOnly(source))
+  // Made on that line by new: a throw whose own words fail (a null, an index) is not on purpose.
+  const purpose = first === 0 && new RegExp(`\\bnew\\s+(?:[\\w$]+\\.)*${x.name.split('.').pop()}\\s*\\(`).test(codeOnly(source))
   const inside = first > 0 ? x.frames[first - 1].replace(/^java\.base\//, '').replace(/\(.*$/, '').replace(/^java\.lang\./, '') : null
   const from = section ? lineOf(text, text.indexOf(section)) : 0
   const given = !!section && (line < from || line >= from + section.split('\n').length)
@@ -2203,10 +2215,10 @@ export function fromWhere(x, text, file, section) {
 }
 
 /** What Check ran for an attempt() case, what came of it and what was printed, for a detail's output. */
-export function outcome(run, mainClass, names = Object.keys(run.case.after ?? {})) {
+export function outcome(run, mainClass, names = Object.keys(run.case.after ?? {}), last = Infinity) {
   const x = thrownIn(run, mainClass)
   const came = x
-    ? `It threw:\n${indent(traceText(x))}`
+    ? `It threw:\n${indent(traceText(x, last))}`
     : run.case.type === undefined
       ? ''
       : run.case.type === 'void'
@@ -2237,7 +2249,7 @@ export function outcomeCases({ file, mainClass = file.replace(/\.java$/, ''), mi
       .map((r) => {
         const c = r.case
         const x = thrownIn(r, mainClass)
-        const said = outcome(r, mainClass)
+        const said = outcome(r, mainClass, undefined, text.split('\n').length)
         const want = Object.entries(c.expected ?? {}).every(([n, v]) => gave(r.values[n], v))
         const mistake = mistakes.find((m) => m.when(r, x, runs, { text, section }))
         if (c.throws) {
@@ -2374,6 +2386,12 @@ const EXCEPTION_GLOSS = [
   [
     /^compiler\.err\.try\.without\.catch\.finally\.or\.resource\.decls/,
     () => 'A try needs a catch, a finally, or resources in round brackets after it.'
+  ],
+  [
+    /^compiler\.err\.cant\.apply\.symbol/,
+    (e) =>
+      /constructor Object in class (?:java\.lang\.)?Object\b/.test(e.message) &&
+      'super(...) hands the message to the class this one extends, and this class extends nothing, so there is nobody to take it. An exception class says on its first line which exception class it extends.'
   ],
   [
     /^compiler\.err\.call\.must\.be\.first/,
