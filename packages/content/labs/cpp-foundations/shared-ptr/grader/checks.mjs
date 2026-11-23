@@ -30,8 +30,8 @@ export const checks = {
       },
       callWith: `${LIST}&, ${LIST}&, int, std::string`,
       say: {
-        twice: 'The repair ended twice: two shared_ptrs were made from one plain pointer, so each kept a count of its own, and each deleted the repair when its count reached 0. Make the repair with std::make_shared once, and copy that shared_ptr: copies share one count.',
-        notNew: 'A shared_ptr owned a repair that new did not make, so when it let go it deleted something delete is not for. Make the repair with std::make_shared.'
+        twice: 'The repair ended twice: two shared_ptrs were made from one plain pointer, so each kept a count of its own, and each deleted the repair when its count reached 0. Only copies of one shared_ptr share one count.',
+        notNew: 'A shared_ptr owned a repair that new did not make, so when it let go it deleted something delete is not for. A shared_ptr owns only a repair made for it.'
       },
       cases: [
         {

@@ -34,7 +34,7 @@ export const checks = {
       },
       callWith: 'int, std::string',
       say: {
-        notNew: 'The unique_ptr openRepair gave back owned a repair that new did not make, so when it let go, it deleted something delete is not for. A unique_ptr owns a repair made for it, with std::make_unique.',
+        notNew: 'The unique_ptr openRepair gave back owned a repair that new did not make, so when it let go, it deleted something delete is not for. A unique_ptr owns only a repair made for it.',
         twice: 'A repair openRepair handed over ended twice: once by itself and once when the unique_ptr let go. A unique_ptr must be the only owner of a repair made for it.',
         left: 'When Check\'s code was done, a repair openRepair made was still there, with no owner to delete it. A repair made for a unique_ptr stays owned by it: release() lets go of the repair without ending it, and after that nothing ever deletes it.',
         dead: 'Check read the repair the unique_ptr from openRepair owns, and it had already ended. The unique_ptr given back must own a repair that is still there.'
@@ -167,8 +167,8 @@ export const checks = {
       },
       callWith: `${OWNERS}&, int`,
       say: {
-        twice: 'A repair ended twice: the unique_ptr takeForBilling gave back owned a repair that its place on the bench had already ended. Two owners for one repair end it twice: hand the owner itself on with std::move, and take its place off the bench after that.',
-        dead: 'A repair was used after it had ended: its place on the bench ended it during the call, since that unique_ptr was its owner, and takeForBilling went on to use it. Move the owner out of its place before the place goes.'
+        twice: 'A repair ended twice: the unique_ptr takeForBilling gave back owned a repair that its place on the bench had already ended. Two owners for one repair end it twice: one owner hands the repair on, and only then does its place go.',
+        dead: 'A repair was used after it had ended: its place on the bench ended it during the call, since that unique_ptr was its owner, and takeForBilling went on to use it. A place still owns its repair until the owner leaves it.'
       },
       cases: cases.map(([name, list, ticket]) => {
         const at = list.findIndex(([tk]) => tk === ticket)

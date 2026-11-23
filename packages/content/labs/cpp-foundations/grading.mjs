@@ -3166,6 +3166,9 @@ inline void report_() {
   std::string left;
   for (int i = 0; i < nobjs_; i++) if (objs_[i].state == 1) left += (left.empty() ? "" : ", ") + std::to_string(objs_[i].ticket);
   indent_::put_("left", left);
+  int unfreed = 0;
+  for (int i = 0; i < nblocks_; i++) { int j = at_(blocks_[i]); if (!freed_[i] && j != -1 && objs_[j].state != 1) unfreed++; }
+  indent_::put_("unfreed", unfreed);
 }
 }`
 ]
@@ -3271,7 +3274,7 @@ function memoryCause(errors, ctx, spec) {
   const rawToOwner = /no viable conversion from (?:returned value of type )?'Repair\*' to (?:function return type )?'std::(?:__1::)?(unique_ptr|shared_ptr)<Repair>'|conversion from 'Repair\*' to non-scalar type 'std::(unique_ptr|shared_ptr)<Repair>' requested|could not convert '[^']*' from 'Repair\*' to 'std::(unique_ptr|shared_ptr)<Repair>'/.exec(all)
   if (rawToOwner) {
     const kind = rawToOwner[1] ?? rawToOwner[2] ?? rawToOwner[3]
-    return `A plain pointer stands where a std::${kind} goes. The compiler never turns a plain pointer into an owner by itself, so that no owner is made by accident: make the repair with std::make_${kind === 'unique_ptr' ? 'unique' : 'shared'}<Repair>(...) instead of new.`
+    return `A plain pointer stands where a std::${kind} goes. The compiler never turns a plain pointer into an owner by itself, so that no owner is made by accident. The lesson shows how an owner is made together with its repair.`
   }
   const ownerToRaw = /cannot initialize [^\n]*?of type 'Repair\*' with an [lr]value of type '(?:const )?std::(?:__1::)?(unique_ptr|shared_ptr)|no viable conversion from (?:returned value of type )?'(?:const )?std::(?:__1::)?(unique_ptr|shared_ptr)<Repair>' to (?:function return type )?'Repair\*'|cannot convert '(?:const )?std::(unique_ptr|shared_ptr)<Repair>' to 'Repair\*'/.exec(all)
   if (ownerToRaw) {
@@ -3402,6 +3405,7 @@ export function memoryFault(got, say = {}) {
   if (n('strange')) return say.strange ?? `${who} used a repair through a pointer that was never given the address of one. Give every pointer a value: an address, or nullptr.`
   const many = (got.left ?? '').includes(',')
   if (got.left) return say.left ?? `When Check's code was done, the ${many ? 'repairs' : 'repair'} with ticket ${got.left} ${many ? 'were' : 'was'} still there: made with new, and never deleted. Every repair made with new needs one delete, or an owner that deletes it, once it is no longer needed.`
+  if (n('unfreed')) return say.unfreed ?? `${who} ended a repair made with new without delete: its destructor ran, but the memory new gave it was never given back. Only delete ends a repair made with new and gives its memory back.`
   return null
 }
 
@@ -3410,6 +3414,7 @@ export function counts(got) {
   const n = (k) => Number(got[k] ?? 0)
   const parts = [`Repairs made: ${n('made')}, ended: ${n('ended')}`]
   if (got.left) parts.push(`Still there at the end: ${got.left}`)
+  else if (n('unfreed')) parts.push(`Memory from new never given back: ${n('unfreed')}`)
   if (n('twice') || n('freedTwice')) parts.push('A repair was ended twice')
   if (n('dead')) parts.push(`Uses of a repair after it ended: ${n('dead')}`)
   if (n('nulls')) parts.push(`Uses through nullptr: ${n('nulls')}`)
