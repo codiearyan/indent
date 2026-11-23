@@ -1,6 +1,8 @@
 import { Loader2 } from 'lucide-react'
-import { RELEASES_URL } from '@shared/repo'
+import { RELEASES_URL, REPO_URL } from '@shared/repo'
+import type { UpdateRelease } from '@shared/types'
 import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import {
@@ -12,8 +14,84 @@ import {
   useUpdates
 } from '@/stores/updates'
 
+/** A state's title with the release's notes: under it in Settings, a click away in the sidebar. */
+function Titled({
+  release,
+  compact,
+  children
+}: {
+  release: UpdateRelease
+  compact: boolean
+  children: React.ReactNode
+}): React.JSX.Element {
+  return (
+    <>
+      {children}
+      {compact ? <WhatsNew release={release} /> : <ReleaseNotes release={release} />}
+    </>
+  )
+}
+
 const outline = 'border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-accent'
 const megabytes = (bytes: number): string => `${Math.round(bytes / 1e6)} MB`
+
+function released(date: string): string {
+  const time = Date.parse(date)
+  if (Number.isNaN(time)) return ''
+  const day = new Date(time).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+  return `Released ${day}`
+}
+
+/** What a release brings: the day it came out, a few lines of notes and the way to the whole list. */
+function ReleaseNotes({ release }: { release: UpdateRelease }): React.JSX.Element {
+  const when = released(release.date)
+  return (
+    <div className="space-y-2">
+      {when && <p className="text-[13px] text-muted-foreground">{when}</p>}
+      {release.notes.length > 0 && (
+        <ul className="list-disc space-y-1 pl-5 text-[13px] text-muted-foreground">
+          {release.notes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
+        </ul>
+      )}
+      <a
+        href={`${REPO_URL}/releases/tag/v${release.version}`}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-block text-[13px] text-muted-foreground hover:text-foreground"
+      >
+        See all changes
+      </a>
+    </div>
+  )
+}
+
+/** The sidebar has no room for the notes, so they open above the card. */
+function WhatsNew({ release }: { release: UpdateRelease }): React.JSX.Element {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="ghost"
+          size="xs"
+          className="-ml-2 font-normal text-muted-foreground hover:text-foreground"
+        >
+          What&apos;s new
+        </Button>
+      </PopoverTrigger>
+      {/* The offset clears the title above the button and the card's edge. */}
+      <PopoverContent side="top" align="start" sideOffset={40} className="w-80 space-y-2">
+        <p className="text-sm font-medium">Indent {release.version}</p>
+        <ReleaseNotes release={release} />
+      </PopoverContent>
+    </Popover>
+  )
+}
 
 /**
  * The app's update, in each of its states, with the action that fits. The sidebar shows it compact
@@ -51,14 +129,11 @@ export function UpdateCard({ compact = false }: { compact?: boolean }): React.JS
   if (status.state === 'available') {
     return (
       <div className="space-y-3">
-        <p className={cn(text, 'font-medium')}>Indent {status.version} is available.</p>
-        {!compact && status.notes.length > 0 && (
-          <ul className="list-disc space-y-1 pl-5 text-[13px] text-muted-foreground">
-            {status.notes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
-        )}
+        <div className="space-y-1">
+          <Titled release={status} compact={compact}>
+            <p className={cn(text, 'font-medium')}>Indent {status.version} is available.</p>
+          </Titled>
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" className={outline} onClick={downloadUpdate}>
             Download update
@@ -99,7 +174,11 @@ export function UpdateCard({ compact = false }: { compact?: boolean }): React.JS
   if (status.state === 'ready') {
     return (
       <div className="space-y-2">
-        <p className={cn(text, 'font-medium')}>Restart to update to {status.version}.</p>
+        <div className="space-y-1">
+          <Titled release={status} compact={compact}>
+            <p className={cn(text, 'font-medium')}>Restart to update to {status.version}.</p>
+          </Titled>
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" onClick={() => void installUpdate()}>
             Restart now

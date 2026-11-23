@@ -424,14 +424,21 @@ export interface NodeOption {
   supported: boolean
 }
 
+/** What a release says about itself: a few lines of notes and the day it came out (ISO, or ''). */
+export interface UpdateRelease {
+  version: string
+  notes: string[]
+  date: string
+}
+
 /** Where the app's own update is. */
 export type UpdateStatus =
   | { state: 'idle' }
   | { state: 'checking' }
   | { state: 'current'; version: string }
-  | { state: 'available'; version: string; notes: string[]; size: number }
-  | { state: 'downloading'; version: string; done: number; size: number }
-  | { state: 'ready'; version: string }
+  | ({ state: 'available'; size: number } & UpdateRelease)
+  | ({ state: 'downloading'; done: number; size: number } & UpdateRelease)
+  | ({ state: 'ready' } & UpdateRelease)
   | { state: 'failed'; message: string; version?: string }
 
 export interface ToolInstallResult {
