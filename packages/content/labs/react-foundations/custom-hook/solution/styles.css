@@ -1,0 +1,352 @@
+:root {
+  --paper: #efe9dc;
+  --sheet: #fbf8f1;
+  --ink: #1d2a24;
+  --muted: #5f6b63;
+  --line: #d9d0bd;
+  --green: #234a3a;
+  --brass: #b8862f;
+  --cream: #f6efdc;
+  --full: #9b3b2c;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.screen {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+h1 {
+  margin: 0 0 20px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  background: var(--green);
+  color: var(--cream);
+  font-size: 28px;
+  letter-spacing: 0.01em;
+}
+
+h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+p {
+  margin: 0 0 6px;
+}
+
+section,
+.board,
+.tram-card,
+.shop,
+.rides {
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--sheet);
+}
+
+.footer {
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 2px solid var(--green);
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: 4px 20px;
+}
+
+.board img {
+  grid-column: 2;
+  grid-row: 1 / span 6;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.livery {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--line);
+}
+
+.fare {
+  font-weight: 600;
+}
+
+.trams {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.tram-card {
+  margin: 0;
+  border-top: 6px solid var(--brass);
+}
+
+.tram-card .number {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tram-card .extra {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.shop-list,
+.ride-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shop-list li,
+.ride-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.shop-list li:last-child,
+.ride-list li:last-child {
+  border-bottom: 0;
+}
+
+.shop-list .price {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.ride-list .time {
+  width: 56px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.seats {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+.seats.full {
+  color: var(--full);
+}
+
+.step-free,
+.wheelchair {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--cream);
+  font-size: 13px;
+}
+
+.empty,
+.closed {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.notice {
+  margin: 0 0 20px;
+  padding: 12px 16px;
+  border-left: 4px solid var(--brass);
+  border-radius: 6px;
+  background: var(--cream);
+}
+
+button,
+select,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  padding: 8px 16px;
+  border: 1px solid var(--green);
+  border-radius: 8px;
+  background: var(--sheet);
+  color: var(--green);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  border-color: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+button[aria-pressed='true'] {
+  background: var(--green);
+  color: var(--cream);
+}
+
+.ring {
+  background: var(--brass);
+  border-color: var(--brass);
+  color: var(--ink);
+}
+
+.ticket-buttons,
+.buttons,
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+select,
+input,
+textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.door .count {
+  font-size: 48px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.till {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.stock-list,
+.basket-list,
+.entries {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.stock-list li,
+.basket-list li,
+.entries li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.stock-list .price,
+.basket-list .qty {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.total {
+  font-weight: 600;
+}
+
+.book form {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.book label {
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.preview {
+  padding: 12px 16px;
+  border-left: 4px solid var(--brass);
+  border-radius: 6px;
+  background: var(--cream);
+}
+
+.entries li {
+  display: block;
+}
+
+/* The comma between a name and a place, only when there is a place to show. */
+.from:not(:empty)::before {
+  content: ', ';
+}
+
+.who {
+  font-weight: 600;
+}
+
+.problem {
+  color: var(--full);
+}
+
+.picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.whereabouts .at {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.platform {
+  border-top: 6px solid var(--brass);
+}
+
+.sign {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.departures {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.departures li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.departures li:last-child {
+  border-bottom: 0;
+}
+
+.departures .sign {
+  font-size: 16px;
+}

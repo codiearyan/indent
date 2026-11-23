@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "The child fare is in three places.",
+      "note": "One rule, written out each time."
+    },
+    {
+      "title": "Ossian's count",
+      "text": "Takes people off, but the seats never drop"
+    },
+    {
+      "title": "Your methods",
+      "file": "FareRules.java",
+      "mine": true,
+      "gap": "Every rule copied by hand",
+      "tasks": ["A child's fare", "Print the ticket", "A party's fare", "Count the seats"]
+    },
+    {
+      "title": "Ticket hut",
+      "text": "Each rule written once, used everywhere."
+    }
+  ],
+  "ticket": {
+    "label": "Family fare",
+    "wrong": "three ways",
+    "why": "Copied rule",
+    "right": "one rule"
+  },
+  "captions": [
+    "The ticket hut. Bridie wants each fare rule in one place, not in every program.",
+    "Today the rules are copied by hand, and Ossian's seat count never goes down.",
+    "You write methods that take values and give one back, and fix Ossian's.",
+    "Now a family's fare comes from one rule, and the seat count follows each boarding.",
+    "Methods, return and void. Next, a whole day of counts kept in one place."
+  ]
+}

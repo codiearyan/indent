@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "It has said five minutes all day.",
+      "note": "The countdown at the gate."
+    },
+    {
+      "title": "Ossian's lines",
+      "text": "Say the same minute, over and over"
+    },
+    {
+      "title": "Your loops",
+      "file": "Timetable.java",
+      "mine": true,
+      "gap": "Nothing ever moves on",
+      "tasks": ["Stop the countdown", "Print departures", "Add up the day", "Count and search"]
+    },
+    {
+      "title": "Boarding gate",
+      "text": "Counts down, then closes on time."
+    }
+  ],
+  "ticket": {
+    "label": "Countdown",
+    "wrong": "stuck",
+    "why": "Never ends",
+    "right": "closed on time"
+  },
+  "captions": [
+    "The boarding gate at the quay. Bridie wants a countdown that reaches the end.",
+    "Ossian's countdown says the same minute again and again, and never stops.",
+    "You write loops: a countdown, the departures, a running total, a search.",
+    "Now the countdown moves on each minute and the gate closes when it should.",
+    "while, for and break. Next, Bridie wants the rules in pieces she can reuse."
+  ]
+}

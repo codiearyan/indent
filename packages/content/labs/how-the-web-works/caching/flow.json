@@ -1,0 +1,146 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "screen", "label": "Studio screen", "kind": "story" },
+      { "id": "listings", "label": "listings()", "kind": "function", "mine": true },
+      { "id": "fresh", "label": "isFresh()", "kind": "function", "mine": true, "fn": "isFresh" },
+      { "id": "keep", "label": "keepRules()", "kind": "function", "mine": true, "fn": "keepRules" },
+      { "id": "refresh", "label": "refresh()", "kind": "function", "mine": true },
+      { "id": "server", "label": "Cupboard server", "kind": "story" },
+      { "id": "copy", "label": "Kept copy", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "screen", "to": "listings", "label": "asks" },
+      { "from": "listings", "to": "fresh", "label": "the copy" },
+      { "from": "fresh", "to": "keep", "label": "cache-control" },
+      { "from": "listings", "to": "refresh", "label": "stale copy" },
+      { "from": "refresh", "to": "server", "label": "changed?" },
+      { "from": "refresh", "to": "copy", "label": "keeps" },
+      { "from": "copy", "to": "screen", "label": "shown" }
+    ],
+    "note": "Each studio screen keeps its own copy of the listings, uses it while it is fresh and asks the cupboard server a short question once it is stale."
+  },
+  "tasks": {
+    "keep": {
+      "trace": { "file": "src/cache.js", "call": "keepRules", "args": ["public, max-age=600"] },
+      "steps": [
+        {
+          "active": ["keep"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "cacheControl", "value": "the header's text, or null" }]
+          },
+          "note": "keepRules() gets the cache-control header the cupboard server sends with an answer."
+        },
+        {
+          "active": ["keep"],
+          "note": "It reads the directives in the header, whatever their order and letter case."
+        },
+        {
+          "active": ["keep"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "store", "value": "true or false" },
+              { "key": "freshFor", "value": "a number of seconds" }
+            ]
+          },
+          "note": "It says whether the answer may be kept at all, and for how long a copy needs no question."
+        }
+      ]
+    },
+    "fresh": {
+      "trace": {
+        "file": "src/cache.js",
+        "call": "isFresh",
+        "args": [
+          {
+            "body": "[{\"name\":\"Dawn Chorus\"}]",
+            "etag": null,
+            "cacheControl": "max-age=600",
+            "storedAt": 1767254400000
+          },
+          1767254640000
+        ]
+      },
+      "steps": [
+        {
+          "active": ["copy", "fresh"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "copy", "value": "body, etag, cacheControl, storedAt" },
+              { "key": "now", "value": "a time in milliseconds" }
+            ]
+          },
+          "note": "isFresh() gets a kept copy of the listings and the time a screen wants to show it."
+        },
+        {
+          "active": ["fresh"],
+          "note": "The copy's age is the time since it was stored, and its lifetime comes from its own cache-control."
+        },
+        {
+          "active": ["fresh"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "fresh", "value": "true" },
+              { "key": "stale", "value": "false" }
+            ]
+          },
+          "note": "A young copy can be shown as it is. An old one needs a question first."
+        }
+      ]
+    },
+    "refresh": {
+      "steps": [
+        {
+          "active": ["refresh", "refresh->server", "server"],
+          "note": "refresh() asks the cupboard server for the listings, and says which copy it already has."
+        },
+        {
+          "active": ["server"],
+          "note": "The server answers in short when the listings are the same, or in full when they changed."
+        },
+        {
+          "active": ["refresh", "refresh->copy", "copy"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "body", "value": "the kept one or the new one" },
+              { "key": "etag", "value": "from the answer" },
+              { "key": "cacheControl", "value": "from the answer" },
+              { "key": "storedAt", "value": "now" }
+            ]
+          },
+          "note": "Either way the screen ends up with a copy that is as good as new."
+        }
+      ]
+    },
+    "listings": {
+      "steps": [
+        {
+          "active": ["screen", "screen->listings", "listings"],
+          "note": "A studio screen asks for the listings, as it does every ten seconds."
+        },
+        {
+          "active": ["listings", "listings->fresh", "fresh"],
+          "note": "While its copy is fresh, the copy is the answer and the cupboard server hears nothing."
+        },
+        {
+          "active": ["listings", "listings->refresh", "refresh", "refresh->server", "server"],
+          "note": "Once the copy is stale, or there is none yet, the server is asked."
+        },
+        {
+          "active": ["copy", "copy->screen", "screen"],
+          "note": "The screen shows the copy, and the cupboard server's fan gets a rest."
+        }
+      ]
+    }
+  }
+}

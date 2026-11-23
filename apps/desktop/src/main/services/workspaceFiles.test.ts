@@ -1,8 +1,18 @@
-import { mkdtemp, mkdir, readdir, writeFile } from 'fs/promises'
+import { chmod, mkdtemp, mkdir, readdir, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { describe, expect, it } from 'vitest'
-import { copyStarter, emptyDir, isAppPath, readWorkspace, resolveInside } from './workspaceFiles'
+import {
+  copyStarter,
+  emptyDir,
+  isAppPath,
+  readFolders,
+  readWorkspace,
+  resolveInside
+} from './workspaceFiles'
+
+// Permissions mean nothing on Windows, and root reads everything.
+const hasPermissions = process.platform !== 'win32' && process.getuid?.() !== 0
 
 async function tree(files: Record<string, string | Buffer>): Promise<string> {
   const dir = await mkdtemp(join(tmpdir(), 'indent-ws-'))
@@ -79,5 +89,16 @@ describe('workspace files', () => {
     const dir = await tree({ 'a.ts': 'a', 'src/b.ts': 'b', '.hidden': 'h' })
     await emptyDir(dir)
     expect(await readdir(dir)).toEqual([])
+  })
+
+  it.skipIf(!hasPermissions)('leaves out a file and a folder the learner locked', async () => {
+    const dir = await tree({ 'a.txt': 'a', 'locked.txt': 'l', 'shut/b.txt': 'b' })
+    await chmod(join(dir, 'locked.txt'), 0o000)
+    await chmod(join(dir, 'shut'), 0o000)
+
+    expect((await readWorkspace(dir, [])).map((f) => f.path)).toEqual(['a.txt'])
+    expect(await readFolders(dir)).toEqual(['shut'])
+
+    await chmod(join(dir, 'shut'), 0o700)
   })
 })
