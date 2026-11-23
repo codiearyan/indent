@@ -1,0 +1,103 @@
+{
+  "id": "threads",
+  "title": "A second thread",
+  "files": [
+    "BusyHut.java"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run the hut program here; take the // off a group of lines in main once its task is written.",
+    "suggestedCommand": "java BusyHut.java"
+  },
+  "tasks": [
+    {
+      "id": "announce",
+      "title": "Read the announcement on a thread of its own",
+      "file": "BusyHut.java",
+      "description": "Under `// Task 1`, write a class `Announcer` with one method. `static Thread announce(List<String> lines, Speaker speaker)` makes a new thread that hands each line to `speaker.say`, in order, starts it, and gives that thread back at once, without waiting for the lines to be said. `Speaker` is given above the tasks.\n\nCheck hands `announce` lines of its own and a speaker of its own. Its speaker holds each line it is given on another thread until `announce` has returned, so Check sees whether the lines were said on a thread of their own, by the very thread given back, in order, and whether `announce` came back before they were said.",
+      "nextSteps": [
+        "Read the part of the lesson about making a thread.",
+        "Make the Thread with a lambda that says the lines, one after another.",
+        "Start it, then give it back.",
+        "Take the // off the first group of lines in main and run it: the hut line comes before the speaker's."
+      ],
+      "hints": [
+        "A Thread is made with the work it is to do, as a lambda with no parameters: the same shape of lambda as the Runnable in the lesson.",
+        "Making a Thread runs nothing. One method gives it a life of its own; another, with a name that looks right, runs the work on the thread that calls it, like any method.",
+        "`Thread reader = new Thread(() -> { for (String line : lines) speaker.say(line); });`, then `reader.start();` and `return reader;`."
+      ],
+      "docs": [
+        {
+          "title": "Defining and starting a thread",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/runthread.html"
+        },
+        {
+          "title": "Thread",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "total",
+      "title": "Count every boat's list at once",
+      "file": "BusyHut.java",
+      "description": "Under `// Task 2`, write a class `Counting` with one method, with `throws InterruptedException`. `static int total(List<Manifest> manifests)` starts one thread for each manifest, all of them before it waits for any. Each thread calls `count()` on its manifest once. Give each thread a place of its own for its answer, such as its own place in an array: threads adding into one shared total can lose a count, as the next issue shows. Then `total` waits for every thread to end and gives back the counts added up. `Manifest` is given above the tasks.\n\nCheck hands `total` manifests of its own. Their `count()` holds every thread until `total` is waiting for its threads, and Check counts at that moment how many threads had been started, then lets the counts through one at a time. It reads what `total` gives back, how many times each manifest was counted and on which thread. Once more it interrupts the thread that called `total` while it waits, and sees whether the `InterruptedException` reaches it.",
+      "nextSteps": [
+        "Read the parts of the lesson about join and about InterruptedException.",
+        "Make an array with a place for each manifest, and a list for the threads.",
+        "In one loop, start a thread per manifest that puts its count in its place.",
+        "In a second loop, wait for each thread; then add up the array."
+      ],
+      "hints": [
+        "Two loops: one that starts the threads, and one that waits for them. A wait inside the first loop holds up the next start.",
+        "A lambda can use a local variable only when it never changes, so the loop's own counter cannot go in; a copy made inside the loop can. A thread that has ended has finished writing its place.",
+        "`int at = i; Thread t = new Thread(() -> counts[at] = manifests.get(at).count()); t.start(); threads.add(t);` in the first loop, `for (Thread t : threads) t.join();` after it, then add up `counts`."
+      ],
+      "docs": [
+        {
+          "title": "Joins",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/join.html"
+        },
+        {
+          "title": "Thread.join",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html#join()"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Waiting for threads to finish with join",
+          "url": "https://www.youtube.com/watch?v=EDnJ2lLZb8o"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ringer",
+      "title": "Ring the quay bell until the hut closes",
+      "file": "BusyHut.java",
+      "description": "Under `// Task 3`, write a class `Ringer` with two methods. `static Thread start(Bell bell, long everyMillis)` starts a thread that rings the bell, sleeps `everyMillis` milliseconds with `Thread.sleep`, and does it again, until the thread is interrupted, and gives the thread back at once. Interrupted while it sleeps or while it rings, the thread ends. `static void stop(Thread ringer)`, with `throws InterruptedException`, interrupts the thread and waits for it to end. `Bell` is given above the tasks.\n\nCheck starts a ringer on a bell of its own three times: once it stops it while the ringer is ringing (its bell holds that ring until `stop` is waiting or has returned), once while the ringer is asleep, and once after a few rings. It counts the rings after `stop` was called, sees whether `stop` returned while the ringer was still ringing, and whether the ringer ended.",
+      "nextSteps": [
+        "Read the part of the lesson about interrupting a thread.",
+        "Write start: a thread whose loop rings and sleeps, and a catch that ends it when it is interrupted.",
+        "Write stop: ask the ringer to stop, then wait for it.",
+        "Take the // off the last group of lines in main and run it: the bell rings, then the hut closes and the program ends."
+      ],
+      "hints": [
+        "The lesson's interrupt part has all of it: what a sleeping thread does when it is interrupted, and what a catch must not do with it.",
+        "Where the catch sits decides what an interrupt does: a catch outside the loop ends the loop; an empty one inside it carries on as if nothing had happened. stop does two things, in an order: ask, then wait.",
+        "In start: `new Thread(() -> { try { while (true) { bell.ring(); Thread.sleep(everyMillis); } } catch (InterruptedException e) { /* the hut is closing: end here */ } })`, started and given back. In stop: `ringer.interrupt(); ringer.join();`."
+      ],
+      "docs": [
+        {
+          "title": "Interrupts",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/interrupt.html"
+        },
+        {
+          "title": "InterruptedException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/InterruptedException.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

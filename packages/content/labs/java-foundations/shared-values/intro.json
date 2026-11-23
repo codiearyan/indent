@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "The stubs say more than the count.",
+      "note": "Two windows sold all Saturday."
+    },
+    {
+      "title": "Old count",
+      "text": "Two windows add at once and some adds vanish"
+    },
+    {
+      "title": "Your guards",
+      "file": "PierWindow.java",
+      "mine": true,
+      "gap": "Nothing guards the count",
+      "tasks": [
+        "Count with a lock",
+        "Number each ticket",
+        "Lock only the adding"
+      ]
+    },
+    {
+      "title": "Evening count",
+      "say": "Count and stubs agree.",
+      "note": "Every ticket numbered once."
+    }
+  ],
+  "ticket": {
+    "label": "Saturday",
+    "wrong": "count short",
+    "why": "Lost adds",
+    "right": "all counted"
+  },
+  "captions": [
+    "Saturday at Lanternquay: Diarmid's pier window sells beside Bridie's hut.",
+    "Both windows add to one count, and when they meet, one of the sales is lost.",
+    "You make the count, the ticket numbers and the takings safe for both windows.",
+    "Both windows sell at once, and every ticket and every fare is counted.",
+    "The evening count matches the stubs, and no two tickets share a number."
+  ]
+}

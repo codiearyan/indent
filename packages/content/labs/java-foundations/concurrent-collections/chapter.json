@@ -1,0 +1,103 @@
+{
+  "id": "concurrent-collections",
+  "title": "Collections for several threads",
+  "files": [
+    "QuayBoard.java"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run the counts, the board and the labels here; a plain HashMap counts short.",
+    "suggestedCommand": "java QuayBoard.java"
+  },
+  "tasks": [
+    {
+      "id": "scans",
+      "title": "Count the scans of both gangways",
+      "file": "QuayBoard.java",
+      "description": "Under `// Task 1`, write a class `Scans` with two methods. `static ConcurrentMap<String, Integer> newCounts()` gives back a new, empty map that several threads can change at once. `static void scan(ConcurrentMap<String, Integer> counts, String boat, int tickets)` adds `tickets` to the boat's count in `counts`, starting a boat that is not there yet at `tickets`, in one step that two threads scanning for the same boat at once cannot both get in the middle of.\n\nCheck calls `newCounts` twice and reads both maps. It hands `scan` a map of its own and has two threads scan for one boat at the same moment: when one of them has read the boat's count, the map holds it until the other has read it too, or is inside one of the map's own one-step changes. Then it compares the counts. It also has four threads scan at once, many times over.",
+      "nextSteps": [
+        "Read the parts of the lesson about why a plain HashMap breaks and about ConcurrentHashMap.",
+        "Write newCounts: one line.",
+        "Write scan with one call on the map that does the reading, the adding and the putting together.",
+        "Take the // off the Scans lines in main and run it: the count is right every time."
+      ],
+      "hints": [
+        "The lesson's part on maps for several threads names the class, and ConcurrentMap is its type, as Map is the type of a HashMap.",
+        "Each call on a ConcurrentHashMap is safe by itself; a get and then a put are two calls, and another thread can come between them. The issue on lists and maps that take a function met a method of maps that adds to a count in one call, starting it when the key is not there.",
+        "`return new ConcurrentHashMap<>();` in newCounts, and `counts.merge(boat, tickets, Integer::sum);` in scan."
+      ],
+      "docs": [
+        {
+          "title": "ConcurrentHashMap",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+        },
+        {
+          "title": "ConcurrentHashMap.merge",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html#merge(K,V,java.util.function.BiFunction)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "board",
+      "title": "Post to the noticeboard while it is read",
+      "file": "QuayBoard.java",
+      "description": "Under `// Task 2`, write a class `Board`, the noticeboard. `void post(String line)` adds a line to the end of the board, safe for several threads at once. `List<String> lines()` gives back the lines posted so far, in order, as a list that one thread can go through while other threads go on posting.\n\nCheck posts lines and reads them back in order, and sees that a new board starts empty. Then it starts going through the list `lines` gave back, has another thread post a line, and goes on to the end: a `ConcurrentModificationException` there fails. It also has four threads post at once, many times over, and counts the lines.",
+      "nextSteps": [
+        "Read the parts of the lesson about lists for several threads.",
+        "Choose how the board keeps its lines, so that a reader can never be caught by a post.",
+        "Write post and lines.",
+        "Take the // off the Board lines in main and run it: the loop posts while it reads, and nothing breaks."
+      ],
+      "hints": [
+        "The lesson shows the exception a reader gets when the list changes under it, and two ways to give a reader a list that will not change.",
+        "A list made safe only by a lock still breaks a reader that loops over it, since a loop is many calls. One kind of list copies itself on every change, so a reader keeps the version it started with; or lines can hand out a copy taken under the lock.",
+        "`private final List<String> lines = new CopyOnWriteArrayList<>();`, with `lines.add(line);` in post and `return lines;` in lines."
+      ],
+      "docs": [
+        {
+          "title": "CopyOnWriteArrayList",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CopyOnWriteArrayList.html"
+        },
+        {
+          "title": "Concurrent collections",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/collections.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "labels",
+      "title": "Make every label with a parallel stream",
+      "file": "QuayBoard.java",
+      "description": "Under `// Task 3`, write a class `Labels` with one method. `static List<String> labels(List<String> bookings, Labeller labeller)` makes the label of every booking with `labeller.label`, with a parallel stream so that the labels are made on several threads at once, and gives back the labels in the order of the bookings. `Labeller` is given above the tasks.\n\nCheck hands `labels` bookings and a labeller of its own. The labeller holds the first booking's label until the last booking's label has been made, so the work must be shared over more than one thread, and the last label is always made before the first. Check reads the labels, in order, and counts the threads that made them, and sees whether those were the threads of a parallel stream.",
+      "nextSteps": [
+        "Read the part of the lesson about parallel streams.",
+        "Ask the list for a parallel stream instead of a stream.",
+        "Map each booking to its label.",
+        "Let the stream collect the labels itself."
+      ],
+      "hints": [
+        "Part 7 made a list from a list with a stream in one line. This is that line, with one word changed.",
+        "A parallel stream shares the list out over several threads, and its map and toList still keep the order of the list. Adding to a list of your own from inside the stream keeps the order the work happened to finish in.",
+        "`return bookings.parallelStream().map(labeller::label).toList();`."
+      ],
+      "docs": [
+        {
+          "title": "Parallelism with streams",
+          "url": "https://docs.oracle.com/javase/tutorial/collections/streams/parallelism.html"
+        },
+        {
+          "title": "Collection.parallelStream",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html#parallelStream()"
+        }
+      ],
+      "videos": [
+        {
+          "title": "How parallel streams share out the work",
+          "url": "https://www.youtube.com/watch?v=cjfOpgC8_Uc"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

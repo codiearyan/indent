@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "The scan counts come out short.",
+      "note": "Both gangways scan at once."
+    },
+    {
+      "title": "Plain map",
+      "text": "Two threads at once, and scans go missing"
+    },
+    {
+      "title": "Your collections",
+      "file": "QuayBoard.java",
+      "mine": true,
+      "gap": "Plain lists and maps",
+      "tasks": [
+        "Count every scan",
+        "Read while posting",
+        "Labels in parallel"
+      ]
+    },
+    {
+      "title": "Hut screen",
+      "say": "Every scan, a board that holds.",
+      "note": "Labels done in a fraction."
+    }
+  ],
+  "ticket": {
+    "label": "Linnet scans",
+    "wrong": "short",
+    "why": "Lost adds",
+    "right": "all counted"
+  },
+  "captions": [
+    "Boarding at Lanternquay: both gangway scanners send every ticket to the hut.",
+    "The plain map loses scans when they meet, and the board falls over mid read.",
+    "You make the counts, the board and the labels safe for several threads at once.",
+    "Every scan counts, the board reads while it changes, and labels come back in order.",
+    "Ossian's counts match the boats, and the day's labels print while cores share the work."
+  ]
+}

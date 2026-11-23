@@ -1,0 +1,106 @@
+{
+  "id": "day-at-once",
+  "title": "The whole day, checked at once",
+  "files": [
+    "HarbourCheck.java",
+    "linnet.csv",
+    "gannet.csv",
+    "relief-boat.csv"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run the closing check here; it reads every till file beside it.",
+    "suggestedCommand": "java HarbourCheck.java"
+  },
+  "tasks": [
+    {
+      "id": "jobs",
+      "title": "Make a job that reads one till file",
+      "file": "HarbourCheck.java",
+      "description": "Under `// Task 1`, write a class `Jobs` with one method. `static Callable<BigDecimal> takings(Path file)` gives back a job that, when it is called, reads `file` with `Sailings.read` and gives back the takings of all its sailings added up, 0 for none. Making the job reads nothing. Calling it lets anything reading throws reach whoever called it. `Sailing` and `Sailings` are given above the tasks.\n\nCheck runs every task beside a `Sailings` of its own, which reads no disk: it says what each till holds and counts the reads. It makes a job, counts the reads so far, then calls the job and compares the takings by their value, or reads what it threw, for a till that cannot be read and one that is not there. It also calls two jobs at the same moment, each on a thread of its own, and sees whether each gives back the takings of its own till.",
+      "nextSteps": [
+        "Read the part of the lesson about a job as a value.",
+        "Give back a lambda with no parameters that returns the takings.",
+        "Inside it, read the file and add up the takings, as the money issue did.",
+        "Take the // off the first lines in main and run it."
+      ],
+      "hints": [
+        "A Callable is a lambda with no parameters that gives back an answer and may throw: the job is written now and run later.",
+        "Everything that reads belongs inside the lambda, so that nothing reads until someone calls it. A Callable may throw a checked exception, so the IOException needs no catch.",
+        "`return () -> { BigDecimal total = BigDecimal.ZERO; for (Sailing s : Sailings.read(file)) total = total.add(s.takings()); return total; };`."
+      ],
+      "docs": [
+        {
+          "title": "Callable",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Callable.html"
+        },
+        {
+          "title": "BigDecimal.add",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html#add(java.math.BigDecimal)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "results",
+      "title": "Gather the answers, and the problems",
+      "file": "HarbourCheck.java",
+      "description": "Under `// Task 2`, write a class `Results` with one method, with `throws InterruptedException`. `static BigDecimal collect(Map<String, Future<BigDecimal>> answers, List<String> problems)` waits for every future and gives back the takings of those that worked, added up, reading the answers one after another on the thread that called it. A future whose job threw is left out of the total, and a problem is added for it: its name in the map, a colon and a space, then the message of what its job threw, as in `relief-boat.csv: Line 3 cannot be read`. The other futures still count, in any order.\n\nCheck hands `collect` futures of its own: some with an answer, some whose job threw, and one that gets its answer only once `collect` is waiting for it. It compares the total by its value and the problems as a set, and notes any answer read on another thread.",
+      "nextSteps": [
+        "Read the part of the lesson about gathering the answers.",
+        "Go through the map's entries, adding up as the money issue did.",
+        "Wrap each get in a try of its own.",
+        "Name the problem by the entry's key and the cause's message."
+      ],
+      "hints": [
+        "The executor issue's Task 2 did this for a list of confirmations; here it is a map of amounts.",
+        "A future that is not done yet is not a reason to skip it: get waits for it. The total is added up here, on one thread, one answer after another, so no two threads ever add to it at once.",
+        "`try { total = total.add(answer.getValue().get()); } catch (ExecutionException e) { problems.add(answer.getKey() + \": \" + e.getCause().getMessage()); }` inside a loop over `answers.entrySet()`."
+      ],
+      "docs": [
+        {
+          "title": "Future.get",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Future.html#get()"
+        },
+        {
+          "title": "ExecutionException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ExecutionException.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Futures, and what get waits for",
+          "url": "https://www.youtube.com/watch?v=05fgxhat4yU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "day",
+      "title": "Check the whole day with a pool of three",
+      "file": "HarbourCheck.java",
+      "description": "Under `// Task 3`, write a class `Closing` with one method, with `throws InterruptedException`. `static BigDecimal day(List<Path> files, List<String> problems)` makes a pool of exactly three threads, hands it the job of `Jobs.takings` for every file, keeps each future under the file's own name (the last part of its path, as in `linnet.csv`), and gives back what `Results.collect` makes of them, with `problems`. Whatever happens, the pool is shut down before `day` returns.\n\nCheck runs `day` beside its own right `Jobs` and `Results`, so Task 3 passes or fails on its own lines. Its `Sailings` holds every read until `day` is waiting for an answer; Check counts the pool's threads at that moment and every thread that read a till. It compares the total by its value, reads the problems (as a set when more than one till fails), and sees whether any thread is still alive afterwards, once more when its own `Results.collect` throws an `InterruptedException`.",
+      "nextSteps": [
+        "Read the part of the lesson that puts the course together.",
+        "Make the pool, and a map that keeps the order you put things in.",
+        "Hand over a job per file, keeping its future under the file's name.",
+        "Gather with Results.collect, and shut the pool down in a finally."
+      ],
+      "hints": [
+        "Every piece is already written: a pool from the executor issue, a job from Task 1, the gathering from Task 2, a finally from part 5.",
+        "A path has parts, and its last part is the file's own name. Hand over every job before gathering any answer.",
+        "`ExecutorService pool = Executors.newFixedThreadPool(3); try { for (Path file : files) answers.put(file.getFileName().toString(), pool.submit(Jobs.takings(file))); return Results.collect(answers, problems); } finally { pool.shutdown(); }`."
+      ],
+      "docs": [
+        {
+          "title": "Thread pools",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/pools.html"
+        },
+        {
+          "title": "Path.getFileName",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Path.html#getFileName()"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

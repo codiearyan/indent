@@ -1,0 +1,144 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "hut",
+        "label": "Hut window",
+        "kind": "story"
+      },
+      {
+        "id": "pier",
+        "label": "Pier window",
+        "kind": "story"
+      },
+      {
+        "id": "sold",
+        "label": "Sold",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "numbers",
+        "label": "Numbers",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "takings",
+        "label": "Takings",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "printer",
+        "label": "Ticket printer",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "hut",
+        "to": "sold",
+        "label": "tickets"
+      },
+      {
+        "from": "pier",
+        "to": "sold",
+        "label": "tickets"
+      },
+      {
+        "from": "pier",
+        "to": "numbers",
+        "label": "next number"
+      },
+      {
+        "from": "hut",
+        "to": "takings",
+        "label": "fare"
+      },
+      {
+        "from": "takings",
+        "to": "printer",
+        "label": "print"
+      }
+    ],
+    "note": "Both windows sell into one program, and every value they share is guarded so no sale is lost."
+  },
+  "tasks": {
+    "sold": {
+      "steps": [
+        {
+          "active": [
+            "hut",
+            "hut->sold",
+            "pier",
+            "pier->sold"
+          ],
+          "note": "Both windows add their tickets to one count at the same moment."
+        },
+        {
+          "active": [
+            "sold"
+          ],
+          "note": "Each add takes the count's lock first, so the other window waits its turn."
+        },
+        {
+          "active": [
+            "sold"
+          ],
+          "note": "Reading the count takes the lock too, and every ticket is counted."
+        }
+      ]
+    },
+    "numbers": {
+      "steps": [
+        {
+          "active": [
+            "pier",
+            "pier->numbers",
+            "numbers"
+          ],
+          "note": "A window asks for the next ticket number."
+        },
+        {
+          "active": [
+            "numbers"
+          ],
+          "note": "The last number goes up by one and comes back in a single step."
+        },
+        {
+          "active": [
+            "numbers"
+          ],
+          "note": "However many windows ask at once, no two tickets share a number."
+        }
+      ]
+    },
+    "takings": {
+      "steps": [
+        {
+          "active": [
+            "hut",
+            "hut->takings",
+            "takings"
+          ],
+          "note": "A window sells a ticket for a fare."
+        },
+        {
+          "active": [
+            "takings",
+            "takings->printer",
+            "printer"
+          ],
+          "note": "The ticket is printed with no lock held, so the other window keeps selling."
+        },
+        {
+          "active": [
+            "takings"
+          ],
+          "note": "Only the adding of the fare to the takings is done under the lock."
+        }
+      ]
+    }
+  }
+}

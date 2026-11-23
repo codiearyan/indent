@@ -1,0 +1,155 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "bookings",
+        "label": "Morning bookings",
+        "kind": "data"
+      },
+      {
+        "id": "batch",
+        "label": "Batch",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "careful",
+        "label": "Careful",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "desk",
+        "label": "Desk",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "office",
+        "label": "Harbour office",
+        "kind": "story"
+      },
+      {
+        "id": "bridie",
+        "label": "Bridie",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "bookings",
+        "to": "batch",
+        "label": "bookings"
+      },
+      {
+        "from": "batch",
+        "to": "office",
+        "label": "three at once"
+      },
+      {
+        "from": "careful",
+        "to": "bridie",
+        "label": "problems"
+      },
+      {
+        "from": "desk",
+        "to": "office",
+        "label": "jobs"
+      },
+      {
+        "from": "office",
+        "to": "desk",
+        "label": "confirmations"
+      }
+    ],
+    "note": "A small pool of threads confirms the bookings with the office three at a time, and reports the ones that fail."
+  },
+  "tasks": {
+    "batch": {
+      "steps": [
+        {
+          "active": [
+            "bookings",
+            "bookings->batch",
+            "batch"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "bookings",
+            "values": [
+              "booking",
+              "booking",
+              "booking",
+              "booking"
+            ]
+          },
+          "note": "The morning's bookings arrive, one job each."
+        },
+        {
+          "active": [
+            "batch",
+            "batch->office",
+            "office"
+          ],
+          "note": "A pool of three threads confirms three bookings at once with the office."
+        },
+        {
+          "active": [
+            "batch"
+          ],
+          "note": "Each answer is read from its future, in the order of the bookings, and the pool is shut down."
+        }
+      ]
+    },
+    "careful": {
+      "steps": [
+        {
+          "active": [
+            "careful"
+          ],
+          "note": "The bookings go to the pool Bridie hands over."
+        },
+        {
+          "active": [
+            "careful"
+          ],
+          "note": "A booking whose call failed comes back wrapped, with the office's own reason inside."
+        },
+        {
+          "active": [
+            "careful",
+            "careful->bridie",
+            "bridie"
+          ],
+          "note": "The failed booking is noted for Bridie, and the others are still confirmed."
+        }
+      ]
+    },
+    "desk": {
+      "steps": [
+        {
+          "active": [
+            "desk"
+          ],
+          "note": "At opening the desk makes one pool for the whole day."
+        },
+        {
+          "active": [
+            "desk",
+            "desk->office",
+            "office"
+          ],
+          "note": "Each list of bookings goes to the pool all at once."
+        },
+        {
+          "active": [
+            "office",
+            "office->desk",
+            "desk"
+          ],
+          "note": "The confirmations come back in order, and at closing the pool is shut down."
+        }
+      ]
+    }
+  }
+}

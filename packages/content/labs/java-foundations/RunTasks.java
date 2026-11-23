@@ -57,6 +57,8 @@ public class RunTasks {
         volatile boolean exited;
         boolean reported;
         Thread thread;
+        // Every thread the unit's code starts belongs to this group or one under it.
+        ThreadGroup group;
     }
 
     static final class Capture {
@@ -195,7 +197,8 @@ public class RunTasks {
                 report(unit, false);
                 continue;
             }
-            unit.thread = new Thread(() -> run(unit), "main");
+            unit.group = new ThreadGroup("unit-" + unit.id);
+            unit.thread = new Thread(unit.group, () -> run(unit), "main");
             unit.thread.setDaemon(true);
         }
         end = System.currentTimeMillis() + DEADLINE_MS;
@@ -204,6 +207,13 @@ public class RunTasks {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             for (Unit unit : units) {
                 if (unit.thread != null && exiting(unit.thread)) unit.exited = true;
+            }
+            // A thread the learner's code started may call System.exit too: its group names the unit.
+            for (Thread t : Thread.getAllStackTraces().keySet()) {
+                if (!exiting(t)) continue;
+                for (Unit unit : units) {
+                    if (unit.group != null && unit.group.parentOf(t.getThreadGroup())) unit.exited = true;
+                }
             }
             finish(units);
         }));
@@ -227,11 +237,12 @@ public class RunTasks {
         for (Unit unit : units) {
             if (unit.thread == null) continue;
             start(unit);
-            if (!unit.exited) {
+            // Learner code can reach every thread, this one too: an interrupt never cuts the wait short.
+            while (!unit.exited && unit.thread.isAlive() && System.currentTimeMillis() < end) {
                 try {
                     unit.thread.join(Math.max(1, end - System.currentTimeMillis()));
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                    // keep waiting until the deadline
                 }
             }
             if (!unit.done && exiting(unit.thread)) unit.exited = true;
