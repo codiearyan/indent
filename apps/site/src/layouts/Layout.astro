@@ -15,6 +15,7 @@ const icon = await getImage({ src: logo, width: 64, height: 64, format: 'png' })
 // iOS fills transparent corners with white, so the touch icon sits on the dark --background.
 const ground = tokens.match(/--ink-900:\s*(#[0-9a-f]+)/i)?.[1]
 if (!ground) throw new Error('tokens.css has no --ink-900')
+const canonical = new URL(Astro.url.pathname, Astro.site).href
 const touchIcon = await getImage({ src: logo, format: 'png', background: ground, width: 180, height: 180 })
 const shareImage = await getImage({ src: share, width: 1200, height: 630, format: 'jpg', quality: 85 })
 ---
@@ -27,16 +28,24 @@ const shareImage = await getImage({ src: share, width: 1200, height: 630, format
     <meta name="color-scheme" content="dark" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="theme-color" content={ground} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:site_name" content="Indent" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:image" content={new URL(shareImage.src, Astro.site).href} />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Indent: learn to code by fixing real problems. tryindent.in" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/png" href={icon.src} />
     <link rel="apple-touch-icon" href={touchIcon.src} />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <slot name="head" />
   </head>
   <body class="bg-background text-[15px] text-foreground">
     <a
