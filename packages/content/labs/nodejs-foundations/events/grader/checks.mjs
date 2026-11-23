@@ -29,7 +29,7 @@ console.log(JSON.stringify(events))
 // Stands in for meter.js so watch.js is judged on its own. It emits what the task's Meter emits
 // and, as the script ends, reports on standard error what watch.js asked of it.
 const STUB = `import { EventEmitter } from 'node:events'
-const seen = { limit: null, feeds: 0, listeners: null, leakBefore: null, leakAfter: null }
+const seen = { limit: null, feeds: 0, listeners: null, lastListeners: null, leakBefore: null, leakAfter: null }
 process.on('exit', () => process.stderr.write('\\u0000meter ' + JSON.stringify(seen) + '\\n'))
 export class Meter extends EventEmitter {
   constructor(limit) {
@@ -39,9 +39,8 @@ export class Meter extends EventEmitter {
   }
   feed(line) {
     seen.feeds++
-    if (seen.listeners === null) {
-      seen.listeners = { reading: this.listenerCount('reading'), leak: this.listenerCount('leak'), error: this.listenerCount('error') }
-    }
+    seen.lastListeners = { reading: this.listenerCount('reading'), leak: this.listenerCount('leak'), error: this.listenerCount('error') }
+    seen.listeners ??= seen.lastListeners
     if (typeof line !== 'string' || line.trim() === '' || line.startsWith('#')) return
     const parts = line.split(',')
     const litres = Number(parts[2])
@@ -116,6 +115,15 @@ const describe = (events) =>
     ? events.map(([name, value]) => (name === 'feed' ? `fed: ${value === '' ? '(a blank line)' : value}` : `  ${name} event: ${JSON.stringify(value)}`)).join('\n')
     : '(nothing came back)'
 
+/** Why feeding stopped with an error, in words. An error thrown by feed itself was not emitted. */
+function feedStopped(stderr) {
+  const line = errorLine(stderr) ?? 'see the output'
+  if (/^Error:/.test(line) && /at Meter\.feed/.test(stderr) && !/Emitted 'error' event/.test(stderr)) {
+    return `Feeding the Meter stopped with an error: ${line}. feed threw it, so the script stopped there. Emit it as an error event instead: feed itself does not throw.`
+  }
+  return `Feeding the Meter stopped with an error: ${line}.`
+}
+
 /** The detail for a driver run that went wrong before any event could be judged, or null. */
 async function driverTrouble(name, d) {
   const found = await broken(name, d.r, d.dir, 'meter.js')
@@ -130,7 +138,7 @@ async function driverTrouble(name, d) {
     return fail(name, `Making a Meter failed: ${errorLine(d.r.stderr) ?? 'see the output'}. A class that extends another calls super() first in its constructor.`, report(d.r))
   }
   if (hasStack(d.r.stderr) && d.events === undefined) {
-    return fail(name, `Feeding the Meter stopped with an error: ${errorLine(d.r.stderr) ?? 'see the output'}.`, report(d.r))
+    return fail(name, feedStopped(d.r.stderr), report(d.r))
   }
   return null
 }
@@ -142,7 +150,7 @@ function eventTrouble(got, want, limit) {
     const g = got[i]
     const w = want[i]
     if (isDeepStrictEqual(g, w)) continue
-    const line = [...(g === undefined ? want : got).slice(0, i + 1)].reverse().find((e) => e[0] === 'feed')?.[1]
+    const line = [...(w === undefined ? got : want).slice(0, i + 1)].reverse().find((e) => e[0] === 'feed')?.[1]
     const at = line === undefined ? '' : line === '' ? ' After a blank line,' : ` After the line ${line},`
     if (g === undefined) return `${at} the Meter emitted no ${w[0]} event, and one was expected.`.trim()
     if (w === undefined || w[0] === 'feed' && g[0] !== 'feed') {
@@ -163,6 +171,9 @@ function eventTrouble(got, want, limit) {
     if (g[0] !== w[0]) {
       if (g[0] === 'leak' && w[0] === 'reading') return `${at} the Meter emitted leak before reading. Emit reading first, then leak.`.trim()
       if (w[0] === 'leak') return `${at} the Meter emitted no leak event. The reading is more than the limit of ${limit}.`.trim()
+      if (w[0] === 'reading' && got.every((e) => e[0] === 'feed')) {
+        return `${at} the Meter emitted no reading event, and none for any line. Compare the event's name in emit with reading, letter by letter.`.trim()
+      }
       if (w[0] === 'reading') return `${at} the Meter emitted no reading event.`.trim()
       return `${at} the Meter emitted ${g[0]} where ${w[0]} was expected.`.trim()
     }
@@ -184,7 +195,7 @@ async function judgeDriver(t, name, feedLines, limit) {
   if (early) return early
   const output = `${fed(feedLines, limit)}\n\nWhat happened:\n${describe(d.events)}\n\n${report(d.r)}`
   const message = hasStack(d.r.stderr)
-    ? `Feeding the Meter stopped with an error: ${errorLine(d.r.stderr) ?? 'see the output'}.`
+    ? feedStopped(d.r.stderr)
     : eventTrouble(d.events, expected(feedLines, limit), limit)
   return message ? fail(name, message, output) : pass(name, output)
 }
@@ -269,6 +280,13 @@ export const checks = {
       }
       const alarms = out.filter((l) => l.startsWith('ALARM'))
       if (wanted.alarm && alarms.length === 0) return 'At the first leak, no ALARM line was printed. Listen for leak.'
+      const grew = seen.lastListeners && ['reading', 'leak', 'error'].find((e) => seen.lastListeners[e] > seen.listeners[e] + 1)
+      if (grew) {
+        return `By the last line, the Meter had ${seen.lastListeners[grew]} listeners for ${grew}, against ${seen.listeners[grew]} at the first. A listener added inside the loop is added again for every line, and each one runs. Add the listeners once, before the loop.`
+      }
+      if (alarms.length > 1 && seen.leakBefore !== null && seen.leakAfter >= seen.leakBefore) {
+        return `The alarm rang ${alarms.length} times: after the first leak its listener was still on the Meter. off removes only the very function given to on; an arrow written again is a new function, so it removes nothing. Give the alarm a name, or add it with once.`
+      }
       if (alarms.length > 1) return `The alarm rang ${alarms.length} times. It rings at the first leak only: after that, remove its listener.`
       if (wanted.alarm && alarms[0] !== wanted.alarm) return 'The ALARM line is not right. Compare it with the task: the tap and the time of the first leak.'
       if (wanted.alarm && seen.leakBefore !== null && seen.leakAfter === seen.leakBefore) {

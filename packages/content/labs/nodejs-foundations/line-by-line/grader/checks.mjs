@@ -1,4 +1,4 @@
-import { box, broken, errorLine, fail, hasStack, lines, outOfMemory, pass, report, run } from '../../grading.mjs'
+import { box, broken, errorLine, fail, hasStack, lines, outOfMemory, pass, read, report, run, withoutComments } from '../../grading.mjs'
 
 // The script gets 16 MB for its data and a log of about 24 MB. Holding the whole log, as one text
 // or as an array of its lines, cannot fit, so it runs out of memory every time; reading a line at a
@@ -69,6 +69,12 @@ function common(r, script, which) {
   return null
 }
 
+// A file read whole as bytes is kept outside the memory the limit counts, so it can get through
+// here. The task asks for a line at a time, so a script that reads the whole file is named.
+const readsWhole = (source) => /\breadFile(Sync)?\s*\(/.test(withoutComments(source ?? ''))
+const wholeMessage = (script) =>
+  `${script} reads the whole log at once with readFile, which the box by the tap has no room for, even where it got through here. Read it a line at a time, with readline over a read stream.`
+
 async function start(t, script) {
   const dir = await logs(t)
   const [big, small] = await both(dir, script)
@@ -76,7 +82,7 @@ async function start(t, script) {
     const found = await broken(`${script} reads a log`, r, dir, script)
     if (found) return { early: [found] }
   }
-  return { big, small }
+  return { big, small, whole: readsWhole(await read(dir, script)) }
 }
 
 const BIG_NAME = 'A log bigger than the memory the script has is read a line at a time'
@@ -84,7 +90,7 @@ const SMALL_NAME = 'A short log saved on Windows, with blank lines and a restart
 
 export const checks = {
   async count(t) {
-    const { early, big, small } = await start(t, 'count-readings.js')
+    const { early, big, small, whole } = await start(t, 'count-readings.js')
     if (early) return early
     const sameAnswer = big.stdout === small.stdout
     const judge = (r, log, which) => {
@@ -107,7 +113,7 @@ export const checks = {
       if (number === log.count) return `On the ${which} log, the count is right but the line is not: write it like the task's example.`
       return `On the ${which} log, the count is not right. Count every line that is a reading, and only those.`
     }
-    const m1 = judge(big, bigLog(), 'big')
+    const m1 = judge(big, bigLog(), 'big') ?? (whole ? wholeMessage('count-readings.js') : null)
     const m2 = judge(small, SMALL_LOG, 'short')
     return [
       m1 ? fail(BIG_NAME, m1, report(big)) : pass(BIG_NAME, report(big)),
@@ -116,7 +122,7 @@ export const checks = {
   },
 
   async total(t) {
-    const { early, big, small } = await start(t, 'water-year.js')
+    const { early, big, small, whole } = await start(t, 'water-year.js')
     if (early) return early
     const judge = (r, log, which) => {
       const trouble = common(r, 'water-year.js', which)
@@ -133,7 +139,7 @@ export const checks = {
     }
     const m2 = judge(small, SMALL_LOG, 'short')
     // Text that grows by every litre can outgrow the memory too; the short log names that cause.
-    const m1 = outOfMemory(big.stderr) && /joined as text/.test(m2 ?? '') ? m2.replace('short', 'big') : judge(big, bigLog(), 'big')
+    const m1 = outOfMemory(big.stderr) && /joined as text/.test(m2 ?? '') ? m2.replace('short', 'big') : (judge(big, bigLog(), 'big') ?? (whole ? wholeMessage('water-year.js') : null))
     return [
       m1 ? fail(BIG_NAME, m1, report(big)) : pass(BIG_NAME, report(big)),
       m2 ? fail(SMALL_NAME, m2, report(small)) : pass(SMALL_NAME, report(small))
@@ -141,7 +147,7 @@ export const checks = {
   },
 
   async taps(t) {
-    const { early, big, small } = await start(t, 'tap-totals.js')
+    const { early, big, small, whole } = await start(t, 'tap-totals.js')
     if (early) return early
     const judge = (r, log, which) => {
       const trouble = common(r, 'tap-totals.js', which)
@@ -160,7 +166,7 @@ export const checks = {
       if (got.length !== names.length) return `On the ${which} log, print one line for each tap in the log, ${names.length} here, and no other lines.`
       return `On the ${which} log, a tap's total is not right. Each reading's litres go to the total of its own tap.`
     }
-    const m1 = judge(big, bigLog(), 'big')
+    const m1 = judge(big, bigLog(), 'big') ?? (whole ? wholeMessage('tap-totals.js') : null)
     const m2 = judge(small, SMALL_LOG, 'short')
     return [
       m1 ? fail(BIG_NAME, m1, report(big)) : pass(BIG_NAME, report(big)),

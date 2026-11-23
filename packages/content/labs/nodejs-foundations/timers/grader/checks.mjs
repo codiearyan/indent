@@ -1,4 +1,4 @@
-import { box, broken, errorLine, fail, hasStack, lines, pass, report, reports, run } from '../../grading.mjs'
+import { box, broken, errorLine, fail, hasStack, lines, pass, read, report, reports, run, withoutComments } from '../../grading.mjs'
 
 // Every run keeps the script's standard input open, like a terminal where nobody types. Once the
 // rota has said its last line, Check ends that input itself: a pipe, unlike a terminal, can keep a
@@ -56,12 +56,12 @@ const inputSeen = (r) => {
  * Runs rota.js with its input open. `typed[i]` is typed as soon as turn i + 1 shows, and the input
  * ends once the rota has said its last line.
  */
-function rota(dir, args, { from, typed = [], preload = '.check/input.mjs' } = {}) {
+function rota(dir, args, { from, typed = [], preload = '.check/input.mjs', seconds = 10 } = {}) {
   let turns = 0
   return run(dir, 'rota.js', args, {
     from,
     preload,
-    seconds: 10,
+    seconds,
     onLine: (line, type) => {
       if (line.endsWith('your turn at the tap.') && typed[turns++] !== undefined) type(`${typed[turns - 1]}\n`)
       if (line.trim() === EVERYONE || line.trim().startsWith('Stopped')) type(null)
@@ -136,12 +136,15 @@ export const checks = {
     const m1 = wholeRota(clean(r), ROTA)
     const results = [m1 ? fail(name, m1, report(clean(r))) : pass(name, report(clean(r)))]
 
-    const none = clean(await rota(dir, []))
-    const word = clean(await rota(dir, ['soon']))
+    // A refused rota has nothing to wait for, so these runs get the usual time.
+    const none = clean(await rota(dir, [], { seconds: 5 }))
+    const word = clean(await rota(dir, ['soon'], { seconds: 5 }))
     const name2 = 'With no seconds, or seconds that are not a number, one line on standard error and exit code 1'
     let m2 = null
     for (const [x, how] of [[none, 'With no seconds'], [word, 'With node rota.js soon']]) {
-      if (x.timedOut || out(x).length > 0) m2 = `${how}, the rota started anyway. Check the seconds before anything else.`
+      if (x.timedOut && out(x).length === 0 && lines(x.stderr).length > 0) {
+        m2 = `${how}, rota.js printed its line but did not end, so Check stopped it after ${x.seconds} seconds. Something it opened before checking the seconds, such as what reads the input, still keeps it running. Check the seconds first.`
+      } else if (x.timedOut || out(x).length > 0) m2 = `${how}, the rota started anyway. Check the seconds before anything else.`
       else if (hasStack(x.stderr)) m2 = `${how}, rota.js stopped with an error: ${errorLine(x.stderr) ?? 'see the output'}. Check the seconds and print one plain line.`
       else if (lines(x.stderr).length !== 1 || x.code !== 1) m2 = `${how}, print one line on standard error that says what to type, and end with exit code 1.`
       if (m2) break
@@ -186,9 +189,15 @@ export const checks = {
     if (stop) return [stop]
     const said = 'Check raised SIGINT inside the script as soon as the first turn showed, which runs its SIGINT listeners the way Ctrl+C does.'
     const output = `${said}\n${report(clean(r))}`
+    // Given an output, readline takes the terminal and Ctrl+C with it, which a pipe cannot show.
+    const code = withoutComments((await read(dir, 'rota.js')) ?? '')
+    const takesCtrlC = /createInterface\s*\(\s*\{[^}]*\boutput\s*:/.test(code) && !/(?<!process)\.(on|once)\(\s*['"]SIGINT/.test(code)
     const message = r.stderr.includes('\u0000no-listener')
       ? 'The script has no listener for SIGINT, so Ctrl+C stopped it on the spot, in the middle of the rota, without saying who is next. Listen for SIGINT on process.'
-      : stopped(r, ROTA, 'Ctrl+C')
+      : (stopped(r, ROTA, 'Ctrl+C') ??
+        (takesCtrlC
+          ? 'Here the SIGINT listener ran, but in a terminal it would not: rota.js gives createInterface an output, so readline takes Ctrl+C for itself and the rota goes on. Give createInterface only its input.'
+          : null))
     return [message ? fail(name, message, output) : pass(name, output)]
   }
 }

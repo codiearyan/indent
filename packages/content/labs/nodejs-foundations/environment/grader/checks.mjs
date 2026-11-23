@@ -19,6 +19,9 @@ function billTrouble(r, litres, price) {
   const setting = `WATER_PRICE=${price}`
   if (hasStack(r.stderr)) return `With ${setting}, water-bill.js stopped with an error: ${errorLine(r.stderr) ?? 'see the output'}.`
   if (got.some((l) => l.includes('NaN'))) return `With ${setting}, the cost came out as NaN. Look at what you turn into a number: the setting, or the litres typed.`
+  if (got.length === 0 && r.code === 1 && err(r).some((l) => l.includes('WATER_PRICE') && /not set|missing|undefined/i.test(l))) {
+    return `With ${setting}, the script refused the price as if it were not set. Compare the name you read from process.env with WATER_PRICE, letter by letter: the case of the letters counts.`
+  }
   if (got.length === 0) return `With ${setting}, nothing went to standard output. Print the line with the cost there.`
   if (got.length > 1) return `With ${setting}, standard output had more than one line. Only the line with the cost goes there.`
   const number = /cost (-?\d+(?:\.\d+)?)/.exec(got[0])?.[1]
@@ -58,12 +61,16 @@ function refusalTrouble(r, name, value) {
   return null
 }
 
-const early = async (name, runs, dir) => {
-  for (const r of runs) {
+/** Runs water-bill.js for each [litres, settings], and stops at the first run that went wrong the same way in every task. */
+async function bills(name, dir, cases) {
+  const runs = []
+  for (const [litres, settings] of cases) {
+    const r = await bill(dir, litres, settings)
     const found = await broken(name, r, dir, 'water-bill.js')
-    if (found) return found
+    if (found) return { stop: found }
+    runs.push(r)
   }
-  return null
+  return { runs }
 }
 
 const SHOWN = ['WATER_PRICE', 'LEAK_LITRES', 'WATER_KEY']
@@ -72,10 +79,9 @@ export const checks = {
   async price(t) {
     const dir = await box(t)
     const name = 'The bill uses the price in WATER_PRICE'
-    const a = await bill(dir, 3600, { WATER_PRICE: '1.75' })
-    const b = await bill(dir, 850, { WATER_PRICE: '3.2' })
-    const stop = await early(name, [a, b], dir)
+    const { stop, runs } = await bills(name, dir, [[3600, { WATER_PRICE: '1.75' }], [850, { WATER_PRICE: '3.2' }]])
     if (stop) return [stop]
+    const [a, b] = runs
     const m1 = billTrouble(a, 3600, 1.75) ?? billTrouble(b, 850, 3.2)
     const results = [m1 ? fail(name, m1, reports(a, b)) : pass(name, reports(a, b))]
 
@@ -90,9 +96,7 @@ export const checks = {
     const dir = await box(t)
     const name = 'A WATER_PRICE that is not a number above 0 is refused'
     const values = ['two', '1,80', '', '-1.5']
-    const runs = []
-    for (const value of values) runs.push(await bill(dir, 2000, { WATER_PRICE: value }))
-    const stop = await early(name, runs, dir)
+    const { stop, runs } = await bills(name, dir, values.map((value) => [2000, { WATER_PRICE: value }]))
     if (stop) return [stop]
     let message = null
     for (const [i, value] of values.entries()) {
@@ -114,13 +118,11 @@ export const checks = {
     // [litres, LEAK_LITRES, warned]
     const unset = [[4800, undefined, false], [5200, undefined, true], [5000, undefined, false], [4800, '', false]]
     const set = [[2000, '1500', true], [900, '1500', false], [1400, '1500', false]]
-    const runCase = ([litres, leak]) => bill(dir, litres, { ...price, LEAK_LITRES: leak })
-    const unsetRuns = []
-    for (const c of unset) unsetRuns.push(await runCase(c))
-    const setRuns = []
-    for (const c of set) setRuns.push(await runCase(c))
-    const stop = await early('water-bill.js warns about a leak', [...unsetRuns, ...setRuns], dir)
+    const cases = [...unset, ...set].map(([litres, leak]) => [litres, { ...price, LEAK_LITRES: leak }])
+    const { stop, runs } = await bills('water-bill.js warns about a leak', dir, cases)
     if (stop) return [stop]
+    const unsetRuns = runs.slice(0, unset.length)
+    const setRuns = runs.slice(unset.length)
 
     const judge = (cases, runs) => {
       for (const [i, [litres, leak, warned]] of cases.entries()) {
@@ -180,7 +182,7 @@ export const checks = {
 
     const leakName = 'The key never shows, not even a part of it'
     const printed = all.stdout + all.stderr
-    const pieces = Array.from({ length: KEY.length - 3 }, (_, i) => KEY.slice(i, i + 4))
+    const pieces = Array.from({ length: KEY.length - 2 }, (_, i) => KEY.slice(i, i + 3))
     let leak = null
     if (printed.includes(KEY)) {
       leak = /PATH|HOME|USERPROFILE|SystemRoot/i.test(printed)
@@ -200,6 +202,7 @@ export const checks = {
         if (got[i] === line) continue
         const setting = SHOWN[i]
         if (!got[i].startsWith(`${setting}: `)) return `${how}, line ${i + 1} should start with ${setting}: and a space.`
+        if (setting === 'WATER_KEY') return `${how}, the line for WATER_KEY is not right. It says only set or not set, nothing more.`
         return `${how}, the line for ${setting} is not right. Compare it with the task: the value as it is set, or what to say when it is not.`
       }
       return `${how}, settings.js ended with exit code ${r.code}. Showing the settings is not a failure, whatever is set.`

@@ -87,8 +87,17 @@ function collect(child, timeoutMs, onOutput) {
   })
 }
 
+// A script handed settings may print its whole environment, so it gets only what Node needs to
+// run from this computer's, never the rest of what the app or the learner's shell holds.
+const KEPT = /^(PATH|SYSTEMROOT|WINDIR|TEMP|TMP|TMPDIR|HOME|USERPROFILE|LANG|NO_COLOR|FORCE_COLOR|NODE_NO_WARNINGS)$/i
+const settingsEnv = (env) => Object.fromEntries(Object.entries(childEnv(env)).filter(([k]) => k in env || KEPT.test(k)))
+
 const spawnNode = (args, cwd, { env, input = false } = {}) =>
-  spawn(process.execPath, args, { cwd, env: childEnv(env), stdio: [input ? 'pipe' : 'ignore', 'pipe', 'pipe'] })
+  spawn(process.execPath, args, {
+    cwd,
+    env: env ? settingsEnv(env) : childEnv(),
+    stdio: [input ? 'pipe' : 'ignore', 'pipe', 'pipe']
+  })
 
 // Calls onLine(line, type) for each whole line of standard output; type(text) writes to standard
 // input, and type(null) ends it, as when a person closes the terminal's input.

@@ -43,7 +43,7 @@ const input = createInterface({ input: process.stdin })
 input.on('line', (line) => console.log(`You typed ${line}`))
 ```
 
-Each time the person presses Enter, `line` gets what they typed. While it listens, the script waits for the next line forever, so it never ends by itself. `input.close()` stops listening. A script that ends once its work is done has to stop every timer and close every input it opened, so it helps to put all of that in one function and call it from every place the work can end.
+Each time the person presses Enter, `line` gets what they typed. Give it only the input, as here. Given `output: process.stdout` as well, readline takes over the terminal: it catches Ctrl+C itself and closes, and a `SIGINT` listener on `process`, below, never runs. While it listens, the script waits for the next line forever, so it never ends by itself. `input.close()` stops listening. A script that ends once its work is done has to stop every timer and close every input it opened, so it helps to put all of that in one function and call it from every place the work can end.
 
 ## Ctrl+C and SIGINT
 
