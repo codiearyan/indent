@@ -6,8 +6,9 @@ const put = (key, expr) => `indent_::put_("${key}", ${expr});`
 const cpp = (text) => JSON.stringify(text)
 const make = (list) => `std::vector<Repair> bench = {${list.map(([t, i]) => `Repair(${t}, ${cpp(i)})`).join(', ')}}; ${list.map(([, , m], k) => (m ? `bench[${k}].addMinutes(${m});` : '')).join(' ')}`
 const BENCH = 'std::string indent_s_; for (const Repair& r : bench) indent_s_ += std::to_string(r.getTicket()) + "|" + r.getItem() + "|" + std::to_string(r.getMinutes()) + ";"; indent_::put_("bench", indent_s_);'
-const readBench = (got) =>
-  (got.bench ?? '')
+const MID = BENCH.replace(/indent_s_/g, 'indent_m_').replace('"bench"', '"mid"')
+const readBench = (got, key = 'bench') =>
+  (got[key] ?? '')
     .split(';')
     .filter(Boolean)
     .map((p) => {
@@ -77,10 +78,13 @@ export const checks = {
       callWith: 'std::vector<Repair>&',
       cases: cases.map(([name, list, want]) => ({
         name,
-        code: `${make(list)} auto&& indent_r_ = nextUp(bench); int indent_at_ = -1; for (std::size_t k = 0; k < bench.size(); k++) if (&indent_r_ == &bench[k]) indent_at_ = static_cast<int>(k); ${put('at', 'indent_at_')} indent_r_.addMinutes(25); ${BENCH}`,
+        code: `${make(list)} auto&& indent_r_ = nextUp(bench); int indent_at_ = -1; for (std::size_t k = 0; k < bench.size(); k++) if (&indent_r_ == &bench[k]) indent_at_ = static_cast<int>(k); ${put('at', 'indent_at_')} ${MID} indent_r_.addMinutes(25); ${BENCH}`,
         judge: (got) => {
           const at = num(got, 'at')
           const minutes = list.map(([, , m]) => m)
+          if (JSON.stringify(readBench(got, 'mid')) !== JSON.stringify(list)) {
+            return 'nextUp changed Check\'s bench while it ran: a repair on it now holds the values of another. Assigning to a reference copies into the repair it refers to; it never moves the reference on to another repair. Keep a position to find the repair, and change nothing on the bench.'
+          }
           if (at === -1) {
             return 'The repair nextUp gives back is not one of the repairs on Check\'s bench, so the 25 minutes Check logged through it never reached the bench. It gives back a reference to the repair where it sits in the caller\'s vector.'
           }

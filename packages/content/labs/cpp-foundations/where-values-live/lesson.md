@@ -60,7 +60,7 @@ A position is still good after the vector moves: `shelf[i]` finds the value wher
 
 ## How Check knows
 
-Check never judges your code by what a mistake like this happens to print. It builds each task with a `Repair` of its own that keeps a count, outside the repair itself, of every repair made and ended, and notices any use of one that has already ended. Changes you make to the class in your file are left out.
+Check never judges your code by what a mistake like this happens to print. It builds each task with a `Repair` of its own that keeps a count, outside the repair itself, of every repair made and ended, and notices any use of one that has already ended. Changes you make to the class in your file are left out. Your own build in the terminal uses your file's class and counts nothing, so a run that seems to work proves nothing.
 
 ## Your work in this issue
 

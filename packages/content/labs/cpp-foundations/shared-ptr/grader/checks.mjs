@@ -149,7 +149,7 @@ export const checks = {
           if (n === want) return null
           if (want && n === want + 1) return `ownersOf gave back ${n}, one more than the shared_ptrs Check holds. While it counts, ownersOf holds one more of its own: a copy of a shared_ptr, such as a loop variable without &, is one more owner as long as it lives.`
           if (want === 0) return `No repair on the list has ticket ${ticket}, and ownersOf gave back ${n}. It gives back 0 then.`
-          return `ownersOf gave back ${n} for ticket ${ticket}, and Check holds ${want} shared_ptr${want === 1 ? '' : 's'} to that repair. The shared_ptr itself keeps that count.`
+          return `ownersOf gave back ${n} for ticket ${ticket}, which is not how many shared_ptrs own that repair. The shared_ptr itself keeps that count, and the function reads it.`
         },
         output: (got) => `Check's bench holds 4417, 5020 and 61, its waiting list 5020 and 61, and Check holds 61 once more\nownersOf(${list === 'none' ? 'an empty list' : list}, ${ticket}) gave back ${got.n ?? '?'}`
       }))

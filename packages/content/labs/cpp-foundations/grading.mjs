@@ -3208,7 +3208,11 @@ function memoryCause(errors, ctx, spec) {
     if (fromCheck) {
       return `Check gives ${fn} a std::unique_ptr, and ${fn} takes it in a way that needs a copy, which a unique_ptr cannot be. ${words} Compare what ${fn} takes with the task.`
     }
-    return `A line of ${label} copies a std::unique_ptr, and a unique_ptr cannot be copied: it is the one owner of its object. To hand the object on to a new owner, the line moves it, with std::move around the name; a function that only needs to look takes a reference or a plain pointer. ${words}`
+    const subject = ctx.where === 'task' ? 'The line' : `A line of ${label}`
+    if (/^\s*for\s*\(/.test(source)) {
+      return `${subject} is a loop whose variable is a copy of each std::unique_ptr, and a unique_ptr cannot be copied: it is the one owner of its object. A loop that only looks takes each one by reference, const std::unique_ptr<Repair>&. ${words}`
+    }
+    return `${subject} copies a std::unique_ptr, and a unique_ptr cannot be copied: it is the one owner of its object. To hand the object on to a new owner, the line moves it, with std::move around the name; a function that only needs to look takes a reference or a plain pointer. ${words}`
   }
   if (!fromCheck && /no matching member function for call to 'push_back'|no matching function for call to '[^']*push_back/.test(all) && /unique_ptr/.test(ctx.code ?? '') && /shared_ptr/.test(ctx.code ?? '')) {
     return `A line puts a std::unique_ptr on a list of shared_ptrs by copying it, and a unique_ptr cannot be copied: it is the only owner of its repair. A repair that two lists share is made with std::make_shared, and each list gets a copy of that shared_ptr.`
@@ -3297,11 +3301,11 @@ function memoryWarning(warnings) {
   const name = m[1] ?? m[2]
   return {
     warning,
-    message: `The compiler warns that a function gives back ${/address/.test(warning.text) ? 'the address of' : 'a reference to'} ${name ? `${name}, a variable of its own` : 'a value of its own'}. ${name ?? 'That value'} ends at the } of the function, so the caller gets a way to a repair that is gone, and what it reads there has no promised value. Give back the value itself, or a way to something that outlives the call, such as a repair in the caller's own vector.`
+    message: `The compiler warns that a function gives back ${/address/.test(warning.text) ? 'the address of' : 'a reference to'} ${name ? `${name}, a variable of its own` : 'a value of its own'}. ${name ?? 'That value'} ends at the } of its block, so the caller gets a way to a repair that is gone, and what it reads there has no promised value. A loop variable without & is such a variable too: a copy that ends with each round. Give back a way only to something that outlives the call, such as a repair where it sits in the caller's own vector, or else the value itself.`
   }
 }
 
-function memoryCrashed(r, label) {
+function memoryCrashed(r, label, mayFree) {
   const text = r.stderr ?? ''
   const guard = `a [] with a position past the end of a vector, such as the first one of an empty vector. Check builds your code with the library's guard, which stops a program right there. Built without it, as in your terminal, it may seem to work`
   if (/free\(\)|malloc|pointer being freed|double free|corruption/.test(text)) {
@@ -3310,8 +3314,13 @@ function memoryCrashed(r, label) {
   if (/Assertion '[^']*' failed|__glibcxx_assert|out of bounds|_M_range_check/.test(text)) {
     return `The program stopped while the code of ${label} ran, at ${guard}.`
   }
+  // A repair deleted twice is counted and never stops the program, so a silent stop comes from the
+  // guard, or from a delete of memory that is not a repair, which only code with delete can do.
+  if ((r.signal === 'SIGTRAP' || r.signal === 'SIGILL' || r.signal === 'SIGABRT') && !mayFree) {
+    return `The program stopped while the code of ${label} ran, at ${guard}.`
+  }
   if (r.signal === 'SIGTRAP' || r.signal === 'SIGILL' || r.signal === 'SIGABRT') {
-    return `The program was stopped while the code of ${label} ran. Two mistakes stop it this way: a [] with a position past the end of a vector, which the library's guard Check builds with stops at once (built without it, as in your terminal, it may seem to work); and memory given back twice, or given back that new never handed out. Look for both.`
+    return `The program was stopped while the code of ${label} ran. Two mistakes stop it this way: a [] with a position past the end of a vector, which the library's guard Check builds with stops at once (built without it, as in your terminal, it may seem to work); and memory that is not a repair given back twice, or given back when new never handed it out. Check counts every repair, so a repair deleted twice is named as such. Look for both.`
   }
   if (r.signal === 'SIGSEGV' || r.signal === 'SIGBUS') {
     return `The system stopped the program while the code of ${label} ran: a line reached memory the program does not own. That happens through a pointer that is nullptr, that was never given an address, or that points at something that has ended; or when a function calls itself without end.`
@@ -3454,7 +3463,7 @@ export async function judgeMemory(t, spec) {
     classCause: (errors, ctx) => memoryCause(errors, ctx, spec) ?? classCause(errors, ctx, { ...spec, className: 'Repair', members: [], functions: ['getTicket', 'getItem', 'getMinutes', 'addMinutes'] }),
     classLink: () => null,
     classWarning: (warnings) => memoryWarning(warnings) ?? classWarning(warnings),
-    classCrashed: memoryCrashed
+    classCrashed: (r, label) => memoryCrashed(r, label, /\bdelete\b|\bfree\s*\(|_ptr\b/.test(codeOnly(whole)))
   })
   if (built.problem) return built.problem
   const sigProblemText = pointerSig(built.runs[0].got, fn, spec.sig)

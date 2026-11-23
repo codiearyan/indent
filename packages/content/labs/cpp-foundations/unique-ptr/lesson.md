@@ -59,4 +59,4 @@ A `std::vector<std::unique_ptr<Lamp>>` owns every lamp on it. When the vector en
 
 ## Your work in this issue
 
-Write the four functions in `src/desk.cpp` and try them in `main`: watch the destructor's lines appear without a single `delete`. Check builds each task with a `Repair` of its own that counts every repair made and ended. Build and run with `g++ -std=c++17 -Wall src/desk.cpp -o desk && ./desk`.
+Write the four functions in `src/desk.cpp` and try them in `main`: watch the destructor's lines appear without a single `delete`. Check builds each task with a `Repair` of its own that counts every repair made and ended. Your own build counts nothing, so a run that seems to work proves nothing. Build and run with `g++ -std=c++17 -Wall src/desk.cpp -o desk && ./desk`.

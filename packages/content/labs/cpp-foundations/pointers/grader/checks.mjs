@@ -74,7 +74,7 @@ export const checks = {
         ]
       },
       callWith: 'Repair*, int',
-      say: { nulls: 'logCall followed nullptr to reach a repair. nullptr points at no repair at all: in your terminal the program would stop there. logCall asks first whether the pointer is nullptr, and only follows it when it is not.' },
+      say: { nulls: 'logCall followed nullptr to reach a repair. nullptr points at no repair at all: in your terminal the program may stop there, or seem to go on, with no promised result. logCall asks first whether the pointer is nullptr, and only follows it when it is not.' },
       cases: [
         ...cases.map(([name, start, minutes]) => ({
           name,

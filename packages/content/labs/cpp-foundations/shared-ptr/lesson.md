@@ -53,4 +53,4 @@ If a lamp held a `shared_ptr` to its socket and the socket held one back to the 
 
 ## Your work in this issue
 
-Write the three functions in `src/lists.cpp` and try them in `main`: put a repair on both lists, read its count, let go of it one list at a time, and see when the destructor's line appears. Check builds each task with a `Repair` of its own that counts every repair made and ended. Build and run with `g++ -std=c++17 -Wall src/lists.cpp -o lists && ./lists`.
+Write the three functions in `src/lists.cpp` and try them in `main`: put a repair on both lists, read its count, let go of it one list at a time, and see when the destructor's line appears. Check builds each task with a `Repair` of its own that counts every repair made and ended. Your own build counts nothing, so a run that seems to work proves nothing. Build and run with `g++ -std=c++17 -Wall src/lists.cpp -o lists && ./lists`.

@@ -57,4 +57,4 @@ A vector taken as a `const` reference holds read-only lamps, so `&shelf[i]` is a
 
 ## Your work in this issue
 
-Write the three functions in order in `src/lookup.cpp`, and try each in `main`. Check builds each task with a `Repair` of its own that counts every time a repair is reached through `nullptr`. Build and run with `g++ -std=c++17 -Wall src/lookup.cpp -o lookup && ./lookup`.
+Write the three functions in order in `src/lookup.cpp`, and try each in `main`. Check builds each task with a `Repair` of its own that counts every time a repair is reached through `nullptr`. Your own build counts nothing, so a run that seems to work proves nothing. Build and run with `g++ -std=c++17 -Wall src/lookup.cpp -o lookup && ./lookup`.

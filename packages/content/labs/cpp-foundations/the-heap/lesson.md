@@ -39,13 +39,13 @@ Everything made with `new` must be ended by exactly one `delete`, at the right t
 
 **Never deleted.** The last pointer to a lamp goes away, and the lamp stays in memory with no way to reach it. Nothing goes wrong at once; the program just holds more memory every time it happens. That is Kasimir's slow laptop. A `delete` that sits after an early `return` is skipped on that path, and leaks the same way.
 
-**Deleted twice.** Two `delete`s on the same address, through one pointer or through two pointers that hold it. The second has no promised result. Often the system notices and stops the program with a message such as `pointer being freed was not allocated` on a Mac or `free(): double free detected` on Linux, but it may also seem to work and fail somewhere else later.
+**Deleted twice.** Two `delete`s on the same address, through one pointer or through two pointers that hold it. The second has no promised result. Often the system notices and stops the program: on Linux with a message such as `free(): double free detected`, on a Mac often with nothing but a short line from the terminal, something like `trace trap`. It may also seem to work and fail somewhere else later.
 
 **Used after it was deleted.** A line reads or changes the lamp through a pointer after the `delete`. It may print the old value, nonsense, or stop the program, and it can differ on every run. So read what you need into a variable of your own before you delete.
 
 One more: `delete` is only for what `new` made. A variable of your own, or a value inside a vector, ends by itself; deleting it has no promised result. `delete` on something that is not a pointer at all is refused, with something like `cannot delete expression of type 'Lamp'`.
 
-Because none of these mistakes promises a result, you cannot test for them by running the program and looking. Check builds each task with a `Repair` of its own that counts every repair made and ended, every delete, and every use of a repair that already ended, so these faults fail the same way on every run.
+Because none of these mistakes promises a result, you cannot test for them by running the program and looking. Check builds each task with a `Repair` of its own that counts every repair made and ended, every delete, and every use of a repair that already ended, so these faults fail the same way on every run. Your own build uses the class in your file and counts nothing.
 
 ## A list of pointers
 
