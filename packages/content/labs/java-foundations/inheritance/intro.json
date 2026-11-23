@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "Three new boats, three Boat copies?",
+      "note": "Bikes, nights and hire."
+    },
+    {
+      "title": "Boat",
+      "text": "Name, seats, the day fare, a description"
+    },
+    {
+      "title": "Your boat kinds",
+      "file": "BoatKinds.java",
+      "mine": true,
+      "gap": "Every new kind starts from zero",
+      "tasks": ["A bike ferry", "A night fare", "Who hired the boat"]
+    },
+    {
+      "title": "Ticket hut",
+      "rows": [["Cormorant", "bikes too"], ["Shearwater", "night fare"], ["Petrel", "hired out"]]
+    }
+  ],
+  "ticket": {
+    "label": "Petrel",
+    "wrong": "a copy of Boat",
+    "why": "Copied code",
+    "right": "a Boat and more"
+  },
+  "captions": [
+    "Lanternquay has new kinds of boat, and Ossian does not want Boat copied for each.",
+    "Today each new kind would be Boat written out again, with every fix made three times.",
+    "You write three classes that extend Boat: one adds bikes, one a fare, one a hirer.",
+    "Now each new kind is a Boat, and adds or changes only its own part.",
+    "New kinds that start from Boat. Next: a parent that is never made by itself."
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "counts",
+        "label": "Idris's counts",
+        "kind": "story"
+      },
+      {
+        "id": "set",
+        "label": "set()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "values",
+        "label": "Keys and values",
+        "kind": "data"
+      },
+      {
+        "id": "get",
+        "label": "get() and has()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "counter",
+        "label": "The counter",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "counts",
+        "to": "set",
+        "label": "key, value"
+      },
+      {
+        "from": "set",
+        "to": "values",
+        "label": "kept as text"
+      },
+      {
+        "from": "values",
+        "to": "get",
+        "label": "one key"
+      },
+      {
+        "from": "get",
+        "to": "counter",
+        "label": "value or none"
+      }
+    ],
+    "note": "The counts move into a store that keeps each value under its key, in memory for now."
+  },
+  "tasks": {
+    "keep": {
+      "steps": [
+        {
+          "active": [
+            "counts",
+            "counts->set",
+            "set"
+          ],
+          "note": "Idris has a new card count. set is handed the key and the count, both as text.",
+          "value": {
+            "kind": "map",
+            "label": "a change",
+            "entries": [
+              {
+                "key": "key",
+                "value": "card"
+              },
+              {
+                "key": "value",
+                "value": "the new count, as text"
+              }
+            ]
+          }
+        },
+        {
+          "active": [
+            "set",
+            "set->values",
+            "values"
+          ],
+          "note": "The store keeps the count under card, in place of the one before."
+        },
+        {
+          "active": [
+            "values",
+            "values->get",
+            "get",
+            "get->counter"
+          ],
+          "note": "The counter asks for card and gets the count back exactly as it was given."
+        }
+      ]
+    },
+    "empty": {
+      "steps": [
+        {
+          "active": [
+            "counts",
+            "counts->set",
+            "set",
+            "set->values",
+            "values"
+          ],
+          "note": "Idris keeps an empty note on card stock: the key is there, its value is empty."
+        },
+        {
+          "active": [
+            "values",
+            "values->get",
+            "get"
+          ],
+          "note": "has asks whether a key is kept at all, so the empty note counts and a key nobody set does not.",
+          "value": {
+            "kind": "map",
+            "label": "two answers",
+            "entries": [
+              {
+                "key": "note",
+                "value": "there, empty"
+              },
+              {
+                "key": "napkin",
+                "value": "no such key"
+              }
+            ]
+          }
+        },
+        {
+          "active": [
+            "get",
+            "get->counter",
+            "counter"
+          ],
+          "note": "After a delete the key itself is gone, and the counter hears there is none."
+        }
+      ]
+    },
+    "text": {
+      "steps": [
+        {
+          "active": [
+            "counts",
+            "counts->set",
+            "set"
+          ],
+          "note": "A key can be any text, even a name every object already has."
+        },
+        {
+          "active": [
+            "set",
+            "set->values",
+            "values"
+          ],
+          "note": "The store keeps it like any other key, in a place that starts truly empty."
+        },
+        {
+          "active": [
+            "set"
+          ],
+          "note": "A count handed over as a number is refused on the spot: keys and values are text."
+        }
+      ]
+    }
+  }
+}

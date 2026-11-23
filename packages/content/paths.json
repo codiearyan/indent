@@ -74,6 +74,7 @@
           "node-api",
           "express-crud-api",
           "build-a-router",
+          "build-a-key-value-database",
           "api-with-a-database",
           "sign-in-and-sessions",
           "security-bug-hunts"
@@ -195,7 +196,8 @@
         "labs": [
           "sql-foundations",
           "sql-basics",
-          "sql-bug-hunts"
+          "sql-bug-hunts",
+          "build-a-key-value-database"
         ]
       },
       {
@@ -268,7 +270,8 @@
           "build-a-promise",
           "build-a-router",
           "build-a-state-store",
-          "build-a-json-parser"
+          "build-a-json-parser",
+          "build-a-key-value-database"
         ]
       },
       {

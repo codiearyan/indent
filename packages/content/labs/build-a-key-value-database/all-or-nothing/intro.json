@@ -1,0 +1,52 @@
+{
+  "stations": [
+    {
+      "title": "Hesper",
+      "say": "One order: both counts or none.",
+      "note": "Cards and envelopes together."
+    },
+    {
+      "title": "Two sets",
+      "text": "A stop between them takes half an order.",
+      "note": "Nothing says one is missing."
+    },
+    {
+      "title": "Your batches",
+      "file": "db.js",
+      "mine": true,
+      "gap": "No way to make two one",
+      "tasks": [
+        "Write a batch as one",
+        "Check, then write",
+        "Stock on your store"
+      ]
+    },
+    {
+      "title": "Stock counts",
+      "rows": [
+        [
+          "card",
+          "with envelope"
+        ],
+        [
+          "envelope",
+          "with card"
+        ]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "order",
+    "wrong": "half taken",
+    "why": "Two writes",
+    "right": "all or none"
+  },
+  "captions": [
+    "Hesper wants an order of cards and envelopes taken whole or not at all.",
+    "Two separate sets mean a stop between them takes half an order.",
+    "You write batches that are all there or not at all, and move the stock onto them.",
+    "A stop in an order leaves both counts as they were, never one of them.",
+    "Ashgrove's stock runs on a database the shop wrote and can explain."
+  ]
+}

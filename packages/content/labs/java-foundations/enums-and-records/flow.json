@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "kind", "label": "Kind", "kind": "data", "mine": true },
+      { "id": "prices", "label": "pence()", "kind": "function", "mine": true },
+      { "id": "route", "label": "Route", "kind": "data", "mine": true },
+      { "id": "ticket", "label": "Ticket", "kind": "data", "mine": true },
+      { "id": "printer", "label": "Ticket printer", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bridie", "to": "kind", "label": "adult, child, bike" },
+      { "from": "kind", "to": "prices", "label": "a kind" },
+      { "from": "prices", "to": "ticket", "label": "price" },
+      { "from": "route", "to": "printer", "label": "minutes" },
+      { "from": "ticket", "to": "printer", "label": "printed" }
+    ],
+    "note": "Kinds of ticket and routes become fixed sets the compiler checks, and a printed ticket never changes."
+  },
+  "tasks": {
+    "kinds": {
+      "steps": [
+        { "active": ["bridie", "bridie->kind", "kind"], "value": { "kind": "array", "label": "every kind there is", "values": ["adult", "child", "bike"] }, "note": "The kinds of ticket are a fixed set, and no other kind can be written." },
+        { "active": ["kind", "kind->prices", "prices"], "note": "The price is picked by the kind itself, never by how its name is spelt." },
+        { "active": ["prices", "prices->ticket", "ticket"], "note": "Each kind has its own price, and a kind left out is easy to see." }
+      ]
+    },
+    "routes": {
+      "steps": [
+        { "active": ["route"], "value": { "kind": "map", "label": "each route keeps", "entries": [{ "key": "its name", "value": "fixed" }, { "key": "its minutes", "value": "its own" }] }, "note": "Each route carries how long its crossing takes, kept with the route itself." },
+        { "active": ["route", "route->printer", "printer"], "note": "From the minutes, the timetable works out how many crossings fit in a stretch of hours." }
+      ]
+    },
+    "ticket": {
+      "steps": [
+        { "active": ["ticket"], "value": { "kind": "array", "label": "a ticket", "values": ["passenger", "kind", "pence"] }, "note": "A ticket is only its values: who, what kind, what price." },
+        { "active": ["ticket", "ticket->printer", "printer"], "note": "Once printed it never changes, and two tickets with the same values are equal." },
+        { "active": ["ticket"], "note": "A ticket for someone else is a new ticket, with the same kind and price." }
+      ]
+    }
+  }
+}

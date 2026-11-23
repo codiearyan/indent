@@ -1,0 +1,38 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "What did Struan's day cost?",
+      "note": "Over by ferry, back by taxi."
+    },
+    {
+      "title": "Takings sheet",
+      "text": "A plain vessel with no fare went down free"
+    },
+    {
+      "title": "Your takings",
+      "file": "Takings.java",
+      "mine": true,
+      "gap": "A vessel can have no fare",
+      "tasks": ["No plain vessel", "A fare for each kind", "Add up any day"]
+    },
+    {
+      "title": "Takings sheet",
+      "rows": [["Linnet", "ferry fare"], ["Eider", "taxi fare"], ["Struan's day", "added up"]],
+      "mark": 2
+    }
+  ],
+  "ticket": {
+    "label": "Struan's day",
+    "wrong": "partly free",
+    "why": "No fare",
+    "right": "all paid"
+  },
+  "captions": [
+    "The takings sheet. Bridie wants the cost of Struan's day, on any boats.",
+    "Today a vessel can be made with no fare at all, and it goes down as free.",
+    "You write a vessel that is never made alone, two kinds with fares, and the day's cost.",
+    "Now every trip is some kind of vessel, and each one gives its own fare.",
+    "Every vessel is some kind, with its own fare. Next: things that are not boats."
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "change",
+        "label": "A note on card stock",
+        "kind": "story"
+      },
+      {
+        "id": "encode",
+        "label": "encode()",
+        "kind": "function",
+        "mine": true,
+        "fn": "encode"
+      },
+      {
+        "id": "log",
+        "label": "store.log",
+        "kind": "data"
+      },
+      {
+        "id": "cut",
+        "label": "A stop halfway",
+        "kind": "story"
+      },
+      {
+        "id": "decode",
+        "label": "decode()",
+        "kind": "function",
+        "mine": true,
+        "fn": "decode"
+      },
+      {
+        "id": "open",
+        "label": "open()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "morning",
+        "label": "The store next morning",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "change",
+        "to": "encode",
+        "label": "any text"
+      },
+      {
+        "from": "encode",
+        "to": "log",
+        "label": "one record"
+      },
+      {
+        "from": "cut",
+        "to": "log",
+        "label": "cuts the end"
+      },
+      {
+        "from": "log",
+        "to": "decode",
+        "label": "whole and cut"
+      },
+      {
+        "from": "decode",
+        "to": "open",
+        "label": "changes, end"
+      },
+      {
+        "from": "open",
+        "to": "morning",
+        "label": "a clean log"
+      }
+    ],
+    "note": "Records now hold any text, and a record a stop cut short is left out and cut off."
+  },
+  "tasks": {
+    "anything": {
+      "steps": [
+        {
+          "active": [
+            "change",
+            "change->encode",
+            "encode"
+          ],
+          "note": "Sefton writes a note with two lines on the card stock.",
+          "value": {
+            "kind": "map",
+            "label": "a change",
+            "entries": [
+              {
+                "key": "key",
+                "value": "note:card"
+              },
+              {
+                "key": "value",
+                "value": "two lines of text"
+              }
+            ]
+          }
+        },
+        {
+          "active": [
+            "encode",
+            "encode->log",
+            "log"
+          ],
+          "note": "encode writes a record that says where it ends without trusting the text inside it."
+        },
+        {
+          "active": [
+            "log",
+            "morning"
+          ],
+          "note": "After a restart the note comes back with both its lines, and no line became a record of its own."
+        }
+      ],
+      "trace": {
+        "file": "src/db.js",
+        "call": "encode",
+        "args": [
+          {
+            "op": "set",
+            "key": "note:card",
+            "value": "Keep dry.\nStore flat."
+          }
+        ]
+      }
+    },
+    "cut": {
+      "steps": [
+        {
+          "active": [
+            "cut",
+            "cut->log",
+            "log"
+          ],
+          "note": "The power goes while the envelope count is written. The log ends partway through that record."
+        },
+        {
+          "active": [
+            "log",
+            "log->decode",
+            "decode"
+          ],
+          "note": "decode finds the last record has not all arrived, and stops at the last whole one."
+        },
+        {
+          "active": [
+            "decode",
+            "decode->open",
+            "open",
+            "open->morning",
+            "morning"
+          ],
+          "note": "The store opens with every whole record. The envelope keeps the count it had before."
+        }
+      ]
+    },
+    "go-on": {
+      "steps": [
+        {
+          "active": [
+            "log",
+            "log->decode",
+            "decode",
+            "decode->open",
+            "open"
+          ],
+          "note": "open learns where the whole records end."
+        },
+        {
+          "active": [
+            "open",
+            "cut->log",
+            "log"
+          ],
+          "note": "It cuts the broken bytes off the end of store.log before anything else is written."
+        },
+        {
+          "active": [
+            "open",
+            "open->morning",
+            "morning"
+          ],
+          "note": "The next change starts clean, and a store opened later finds it."
+        }
+      ]
+    }
+  }
+}

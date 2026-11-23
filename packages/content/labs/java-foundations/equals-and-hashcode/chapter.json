@@ -1,0 +1,105 @@
+{
+  "id": "equals-and-hashcode",
+  "title": "The same booking, or an equal one",
+  "files": ["WaitingList.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the waiting list here, and try your methods from main.",
+    "suggestedCommand": "java WaitingList.java"
+  },
+  "tasks": [
+    {
+      "id": "equals",
+      "title": "Say when two bookings are the same booking",
+      "file": "WaitingList.java",
+      "description": "Under `// Task 1`, inside `Booking`, write `public boolean equals(Object other)`. It gives back `true` when `other` is a `Booking` with the same passenger and the same hour, whatever the seats, and `false` for anything else, `null` included.\n\nCheck makes bookings of its own, each passenger's name made separately as a name read in would be, and calls `equals` with the booking itself, an equal booking held as an `Object`, one with other seats, another passenger, another hour, `null` and a text. Then it asks a list of bookings to find and to remove a booking equal to one of them.",
+      "nextSteps": [
+        "Read the parts of the lesson about == and about writing equals.",
+        "Write the first line exactly as the task gives it, with @Override above it.",
+        "Give back false when other is not a Booking; only then cast it.",
+        "Compare the passengers with equals and the hours with ==, then run the file."
+      ],
+      "hints": [
+        "Morag's booking and the booking read in from her phone call are two objects. == only says whether they are the same object.",
+        "equals must take an Object, or a list never calls it. instanceof says whether other is a Booking (and false for null); a cast then lets you read its fields.",
+        "The shape: `if (!(other instanceof Booking)) { return false; }`, then `Booking that = (Booking) other;` and `return passenger.equals(that.passenger) && hour == that.hour;`."
+      ],
+      "docs": [
+        {
+          "title": "Object.equals(Object)",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)"
+        },
+        {
+          "title": "Methods of the Object class",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/objectclass.html"
+        },
+        {
+          "title": "The instanceof operator",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hash-code",
+      "title": "Give equal bookings the same hash code",
+      "file": "WaitingList.java",
+      "description": "Under `// Task 2`, inside `Booking`, write `public int hashCode()`, built from the same fields `equals` compares, the passenger and the hour, so that equal bookings always have the same hash code.\n\nCheck makes bookings of its own and compares the hash codes of two equal bookings, of two that differ only in their seats, and of six different bookings, which should mostly have hash codes of their own.",
+      "nextSteps": [
+        "Read the part of the lesson about hash codes and why they go with equals.",
+        "Write the first line exactly as the task gives it, with @Override above it.",
+        "Build the hash code from the passenger and the hour, and nothing else.",
+        "Take the // off the hash code line in main and run the file."
+      ],
+      "hints": [
+        "Without a hashCode of its own, each booking has the one Object gives it, which differs for every object, equal or not.",
+        "The rule: equal objects must have equal hash codes. Use exactly the fields equals compares; the seats are not one of them.",
+        "One line does it: `return Objects.hash(passenger, hour);`."
+      ],
+      "docs": [
+        {
+          "title": "Object.hashCode()",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()"
+        },
+        {
+          "title": "Objects.hash(Object...)",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Objects.html#hash(java.lang.Object...)"
+        }
+      ],
+      "videos": [
+        {
+          "title": "The equals and hashCode contract",
+          "url": "https://www.youtube.com/watch?v=8cI6cqASR98"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cancel",
+      "title": "Take cancelled bookings off the waiting list",
+      "file": "WaitingList.java",
+      "description": "Under `// Task 3`, inside `Booking`, write `static int cancel(ArrayList<Booking> waiting, ArrayList<Booking> cancelled)`. For each booking in `cancelled`, it takes one booking equal to it off `waiting`, if there is one, and gives back how many it took off: a passenger who is on the list twice and cancels once stays on it once. It builds on Task 1.\n\nCheck makes the two lists itself, with cancelled bookings that are new objects equal to the waiting ones, some next to each other, one cancelled twice, one waiting twice and some not waiting at all, and reads what `cancel` gives back and what is left on `waiting`.",
+      "nextSteps": [
+        "Read the part of the lesson about contains and remove.",
+        "Write the first line exactly as the task gives it.",
+        "Go through cancelled, and take each one off waiting.",
+        "Count only the ones that were really taken off, then take the // off the last lines in main."
+      ],
+      "hints": [
+        "A list's remove(Object) finds the item to take off with equals, so with Task 1 done it finds equal bookings.",
+        "remove(Object) gives back true when it took something off, and false when nothing on the list was equal.",
+        "The loop: `for (Booking booking : cancelled) { if (waiting.remove(booking)) { taken++; } }`, then give back taken."
+      ],
+      "docs": [
+        {
+          "title": "ArrayList.remove(Object)",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html#remove(java.lang.Object)"
+        },
+        {
+          "title": "ArrayList.contains(Object)",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html#contains(java.lang.Object)"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

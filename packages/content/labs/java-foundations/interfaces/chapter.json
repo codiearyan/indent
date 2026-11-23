@@ -1,0 +1,101 @@
+{
+  "id": "interfaces",
+  "title": "Interfaces: more than boats to book",
+  "files": ["Reservations.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the reservations here, and try your classes from main.",
+    "suggestedCommand": "java Reservations.java"
+  },
+  "tasks": [
+    {
+      "id": "bike-shed",
+      "title": "Write Bookable, and a bike shed that is bookable",
+      "file": "Reservations.java",
+      "description": "Under `// Task 1`, write an interface `Bookable` with three methods: `String label()`, `int placesFree()` and `boolean book(int places)`. Then write a class `BikeShed` that implements `Bookable`, with a constructor `BikeShed(int bikes)`. Its label is `Bike shed`. `book` takes the places and gives back `true` while there are enough free; otherwise it changes nothing and gives back `false`.\n\nCheck writes a class of its own that implements your `Bookable` with exactly those three methods, and uses it through a variable of type `Bookable`. Then it makes bike sheds, two at once included, keeps them in variables of type `Bookable`, books them down to the last place and one past, and reads what each call gives back.",
+      "nextSteps": [
+        "Read the parts of the lesson about writing an interface and implementing one.",
+        "Write the interface: three first lines, no bodies.",
+        "Write BikeShed: its first line says it implements Bookable, then a field for the places free and the constructor.",
+        "Write the three methods with public in front, then take the // off the first lines in main."
+      ],
+      "hints": [
+        "An interface lists what a thing can do, not how. BikeShed writes the how.",
+        "Every method of an interface is public, so the class must write each one with public in front. book refuses first, then takes the places.",
+        "book's shape: `if (places > free) { return false; }`, then `free -= places;` and `return true;`."
+      ],
+      "docs": [
+        {
+          "title": "Defining an interface",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/interfaceDef.html"
+        },
+        {
+          "title": "Implementing an interface",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/usinginterface.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Interfaces in Java",
+          "url": "https://www.youtube.com/watch?v=GhslBwrRsnw"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "tour-bus",
+      "title": "Write TourBus, which is bookable and departing",
+      "file": "Reservations.java",
+      "description": "Under `// Task 2`, write a class `TourBus` that implements both `Bookable` and `Departing`, with a constructor `TourBus(int seats, int hour)`. Its label is `Tour bus`, `book` works as the bike shed's does, and `departsAt` gives back the hour. `Departing` is given above the tasks.\n\nCheck runs your class beside a `Bookable` of its own, written as Task 1 asks, so this task is judged on its own lines. It makes tour buses, two at once included, keeps one in a variable of each interface's type, and reads what `label`, `departsAt`, `placesFree` and `book` give back.",
+      "nextSteps": [
+        "Read the part of the lesson about one class with two interfaces.",
+        "Write the first line of the class with both interfaces.",
+        "Write the fields, the constructor and the four methods, each with public in front.",
+        "Take the // off the TourBus lines in main and run the file."
+      ],
+      "hints": [
+        "A class has one parent at most, but it can implement as many interfaces as it needs.",
+        "After implements, list both interfaces with a comma between them. The class then writes every method of both.",
+        "The first line: `class TourBus implements Bookable, Departing {`."
+      ],
+      "docs": [
+        {
+          "title": "Implementing an interface",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/usinginterface.html"
+        },
+        {
+          "title": "Using an interface as a type",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/interfaceAsType.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "trip",
+      "title": "Book a whole trip, or none of it",
+      "file": "Reservations.java",
+      "description": "Under `// Task 3`, write a class `Trip` with a method `static boolean bookAll(ArrayList<Bookable> parts, int places)`. When every part has that many places free, it books them on each part and gives back `true`. When any part is short, it books nothing at all, on any part, and gives back `false`.\n\nCheck runs your class beside a `Bookable` of its own and with bookable parts of its own, which you have never seen, and reads what `bookAll` gives back and how many places each part has free afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson about a method that asks only for an interface.",
+        "Write the class and the first line of bookAll exactly as the task gives it.",
+        "First find out whether every part has room, without booking anything.",
+        "Only then book every part, and take the // off the last lines in main."
+      ],
+      "hints": [
+        "bookAll does not need to know what each part is: a bike shed, a bus, or something new. Bookable is enough.",
+        "Booking as you go leaves half a trip booked when a later part is short. Use two loops: one that only looks, one that books.",
+        "The first loop gives back false as soon as `part.placesFree() < places`; the second calls `part.book(places)` on each part."
+      ],
+      "docs": [
+        {
+          "title": "Using an interface as a type",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/interfaceAsType.html"
+        },
+        {
+          "title": "Interfaces",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/createinterface.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

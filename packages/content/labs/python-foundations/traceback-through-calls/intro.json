@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Why does the report stop?", "note": "The council wants it this week." },
+    { "title": "Dougie's tries", "text": "Each try changes the last function named." },
+    {
+      "title": "Your mends",
+      "file": "hill_report.py",
+      "mine": true,
+      "gap": "A mistake far from the error",
+      "tasks": ["Hours on one hill", "Weight of a pack", "Where the teams were"]
+    },
+    { "title": "Council", "say": "Report in, thank you.", "note": "Every part of it prints." }
+  ],
+  "ticket": { "label": "Report", "wrong": "all error", "why": "Wrong place", "right": "sent off" },
+  "captions": [
+    "At the base, Rhona asks why the hill report for the council keeps stopping.",
+    "Dougie changed the last function in each error, and the report still stops.",
+    "You read each traceback from the bottom up and mend the one function with the mistake.",
+    "Now each part of the report prints, and nothing that worked was changed.",
+    "The report reaches the council, and each mistake was mended where it was made."
+  ]
+}

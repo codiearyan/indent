@@ -1,0 +1,51 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "trips", "label": "A day of trips", "kind": "data" },
+      { "id": "vessel", "label": "Vessel", "kind": "data", "mine": true },
+      { "id": "kinds", "label": "Ferry, WaterTaxi", "kind": "data", "mine": true },
+      { "id": "cost", "label": "cost()", "kind": "function", "mine": true },
+      { "id": "sheet", "label": "Takings sheet", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bridie", "to": "trips", "label": "Struan's day" },
+      { "from": "vessel", "to": "kinds", "label": "extends" },
+      { "from": "kinds", "to": "trips", "label": "each trip" },
+      { "from": "trips", "to": "cost", "label": "vessels, age" },
+      { "from": "cost", "to": "sheet", "label": "total" }
+    ],
+    "note": "No vessel is just a vessel: every kind brings its own fare, and the day's cost asks each one for it."
+  },
+  "tasks": {
+    "vessel": {
+      "steps": [
+        { "active": ["vessel"], "note": "Every vessel has a name and a fare, but a vessel that is no kind in particular is never made." },
+        {
+          "active": ["vessel", "vessel->kinds", "kinds"],
+          "value": { "kind": "map", "label": "who writes what", "entries": [{ "key": "name, fare line", "value": "Vessel" }, { "key": "the fare", "value": "each kind" }] },
+          "note": "Vessel says every kind has a fare, and leaves the fare itself to each kind."
+        },
+        { "active": ["vessel", "kinds"], "note": "The fare line is the same for every kind, and uses whatever fare the kind gives." }
+      ]
+    },
+    "kinds": {
+      "steps": [
+        { "active": ["vessel", "vessel->kinds", "kinds"], "note": "The ferry and the water taxi are both vessels." },
+        {
+          "active": ["kinds"],
+          "value": { "kind": "map", "label": "fares", "entries": [{ "key": "ferry", "value": "by age" }, { "key": "water taxi", "value": "one price" }] },
+          "note": "Each writes the fare its own way."
+        },
+        { "active": ["kinds", "kinds->trips", "trips"], "note": "Both can stand in a day of trips, as vessels." }
+      ]
+    },
+    "day-trips": {
+      "steps": [
+        { "active": ["bridie", "bridie->trips", "trips"], "note": "Bridie has Struan's day: the vessels he took, in order, and his age." },
+        { "active": ["trips", "trips->cost", "cost"], "value": { "kind": "array", "label": "a day of trips", "values": ["a vessel", "a vessel", "..."] }, "note": "The cost goes through the trips one by one, without asking what kind each vessel is." },
+        { "active": ["cost", "cost->sheet", "sheet"], "note": "Each vessel gives its own fare for his age, and the total goes on the takings sheet." }
+      ]
+    }
+  }
+}

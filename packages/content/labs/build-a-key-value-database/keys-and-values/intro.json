@@ -1,0 +1,52 @@
+{
+  "stations": [
+    {
+      "title": "Hesper",
+      "say": "Keep the counts, and lose none.",
+      "note": "After two half-empty files."
+    },
+    {
+      "title": "Old stock script",
+      "text": "Writes the whole file on every change.",
+      "note": "A stop leaves half of it."
+    },
+    {
+      "title": "Your store",
+      "file": "db.js",
+      "mine": true,
+      "gap": "Nowhere to keep a count",
+      "tasks": [
+        "Keep keys and values",
+        "Missing is not empty",
+        "Only text, any text"
+      ]
+    },
+    {
+      "title": "The counter",
+      "rows": [
+        [
+          "card",
+          "a count"
+        ],
+        [
+          "poster",
+          "no such key"
+        ]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "card count",
+    "wrong": "half a file",
+    "why": "Rewritten",
+    "right": "kept"
+  },
+  "captions": [
+    "At Ashgrove Press, Hesper wants the stock counts kept, after two half-empty files.",
+    "The old script writes the whole file on every change, and a stop leaves half.",
+    "You write a store that keeps text values under text keys, in three tasks.",
+    "Now the counter asks for card and gets its count back, and knows a missing key.",
+    "Same shop, same counts, and a store that is the start of a database."
+  ]
+}

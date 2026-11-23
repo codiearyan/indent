@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "How many hours this week?", "note": "The log is typed by many hands." },
+    { "title": "Callout log", "rows": [["Scarth Fell; 3"], ["Garve Edge; two"], ["Lowther Crag; 4"]] },
+    {
+      "title": "Your functions",
+      "file": "log_totals.py",
+      "mine": true,
+      "gap": "One bad entry stops it all",
+      "tasks": ["A number or fallback", "One callout", "Hours and what failed", "A log, if there is one"]
+    },
+    { "title": "Ailsa", "say": "Thanks. I'll ask about the rest.", "note": "Who wrote two, not 2?" }
+  ],
+  "ticket": { "label": "Week's hours", "wrong": "a traceback", "why": "One bad line", "right": "added up" },
+  "captions": [
+    "At the base, Ailsa asks how many hours the team spent on the hill this week.",
+    "Today one entry with two written as a word stops the whole total with a traceback.",
+    "You catch the one error you expect, and let every other error through.",
+    "Now the hours that can be read are added up, and the others are listed to ask about.",
+    "Ailsa has the week's total, and the scrawled entries no longer cost her the report."
+  ]
+}

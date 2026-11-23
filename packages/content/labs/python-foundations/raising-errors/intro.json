@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dougie", "say": "How many splints are left?", "note": "Saturday's orders are in." },
+    { "title": "Kit store", "rows": [["rope", "9"], ["radio", "6"], ["splint", "3"]] },
+    {
+      "title": "Your functions",
+      "file": "kit_orders.py",
+      "mine": true,
+      "gap": "Any order goes through",
+      "tasks": ["Refuse a bad order", "A kind not on the list", "Note it, pass it on"]
+    },
+    { "title": "Dougie", "say": "Refused, and it says why.", "note": "The store count stays true." }
+  ],
+  "ticket": { "label": "Splints", "wrong": "minus two", "why": "No refusal", "right": "count kept" },
+  "captions": [
+    "At the store, Dougie asks how many splints are left after Saturday's orders.",
+    "Today an order for more than the shelf holds goes through, and the count goes below zero.",
+    "You refuse a bad order before anything changes, with a message that says what is wrong.",
+    "Now the order that was too big is refused, and the splint count stays true.",
+    "The store's counts can be trusted, and every refusal says what to put right."
+  ]
+}
