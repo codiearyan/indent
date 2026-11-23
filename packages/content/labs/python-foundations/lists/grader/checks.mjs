@@ -69,6 +69,8 @@ export const checks = {
         name,
         args: [names, size],
         expected: names.slice(0, size),
+        fresh:
+          'hill_party gives back the list it was given, under a second name, not a new list, so a change made to the hill party later would change the call-out list too. A slice always makes a new list, even one that holds every name.',
         hint: (v) => {
           const got = JSON.stringify(v.data)
           const like = (a, b) => got === JSON.stringify(names.slice(a, b))

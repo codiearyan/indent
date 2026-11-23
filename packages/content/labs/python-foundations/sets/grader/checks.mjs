@@ -4,6 +4,19 @@ const FILE = 'call_signs.py'
 
 const unique = (list) => [...new Set(list)]
 
+// Eight call signs heard twice each, so an answer that follows a set's order is right by luck
+// in one run out of many, not one out of two.
+const EIGHT = [
+  'Alpha one',
+  'Bravo six',
+  'Delta four',
+  'Echo one',
+  'Golf six',
+  'Hotel nine',
+  'Kilo five',
+  'Lima two'
+]
+
 export const checks = {
   different(t) {
     const list = [
@@ -33,6 +46,15 @@ export const checks = {
     const list = [
       ['A repeat after a repeat', ['Echo one', 'Golf six', 'Golf six', 'Echo one']],
       ['A repeat at the end', ['Kilo five', 'Lima two', 'Mike four', 'Lima two']],
+      ['Every call sign heard again', [...EIGHT, 'Hotel nine', ...EIGHT]],
+      [
+        'Every call sign heard again, another order',
+        [...EIGHT.slice(3), ...EIGHT.slice(0, 3), 'Bravo six', ...EIGHT]
+      ],
+      [
+        'Every call sign heard again, a third order',
+        [...EIGHT.slice(5), ...EIGHT.slice(0, 5), 'Kilo five', ...EIGHT]
+      ],
       ['No repeat', ['Echo one', 'Golf six', 'Hotel nine']]
     ]
     const firstRepeat = (calls) => {
@@ -47,6 +69,12 @@ export const checks = {
       file: FILE,
       task: 2,
       fn: 'first_repeat',
+      mistakes: [
+        {
+          value: (c) => c.args[0][0] ?? null,
+          hint: 'first_repeat gives back the first call sign of every list, even one in which no call sign is heard twice. Ask whether a call sign is in the set before you add it: added first, every call sign is in the set by the time you ask.'
+        }
+      ],
       list: list.map(([name, calls]) => ({
         name,
         args: [calls],

@@ -112,6 +112,10 @@ export const checks = {
       fn: 'last_heard',
       mistakes: [
         {
+          value: (c) => c.args[0][0]['@tuple'][0],
+          hint: "last_heard gives back the time of the first call in the log, whoever made it. If one of the names after for is the same as a parameter, the loop gives that name a new value on every round, and the call sign the function was given is lost. Give the loop's names names of their own."
+        },
+        {
           value: (c) => c.args[0].at(-1)['@tuple'][0],
           hint: "last_heard gives back the time of the last call in the log, whoever made it. If one of the names after for is the same as a parameter, the loop gives that name a new value on every round, and the call sign the function was given is lost. Give the loop's names names of their own."
         }

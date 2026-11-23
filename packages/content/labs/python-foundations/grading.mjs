@@ -1144,6 +1144,8 @@ export const dataCallText = (fn, c) =>
  * changed the wrong way (`afterHint`, a string or a function of what it holds and the call).
  * `noneHint` replaces the words for None given back without printing, where None is one of the
  * task's own answers. `errors(error)` gives the task's own words for an error, or null.
+ * `fresh` (true, or the words to say) fails a case whose result is right but is one of the
+ * arguments themselves, where the task asks for a new list.
  */
 export async function dataCases(t, { file, task, fn, list, mistakes = [], typed, define, errors }) {
   const runs = await Promise.all(
@@ -1231,19 +1233,31 @@ export async function dataCases(t, { file, task, fn, list, mistakes = [], typed,
     const want = (k) => (c.after && k in c.after ? c.after[k] : args[k])
     const changed = args.map((a, k) => !equalData(call.after[k], a))
     const wrongAfter = args.map((a, k) => !equalData(call.after[k], want(k)))
+    const argName = (k) => {
+      const kin = args.filter((a) => noun(a) === noun(args[k])).length
+      return `${kin > 1 ? `${['first', 'second', 'third'][k]} ` : ''}${noun(args[k])}`
+    }
     const afterLines = args
       .map((a, k) =>
         (c.after && k in c.after) || changed[k]
-          ? `Afterwards, the ${noun(a)} it was given is ${call.after_repr[k]}`
+          ? `Afterwards, the ${argName(k)} it was given is ${call.after_repr[k]}`
           : null
       )
       .filter(Boolean)
     const output = [`Check called ${shown}`, `It gave back: ${v.repr}`, ...afterLines, told].join('\n')
     const wrongResult = c.expected !== undefined && !equalData(v.data, c.expected)
     const k = wrongAfter.findIndex(Boolean)
-    if (!wrongResult && k < 0) return pass(c.name, output)
-    const kin = k >= 0 ? args.filter((a) => noun(a) === noun(args[k])).length : 0
-    const what = k < 0 ? 'list' : `${kin > 1 ? `${['first', 'second', 'third'][k]} ` : ''}${noun(args[k])}`
+    if (!wrongResult && k < 0) {
+      if (!(c.fresh && Number.isInteger(v.same))) return pass(c.name, output)
+      return fail(
+        c.name,
+        typeof c.fresh === 'string'
+          ? c.fresh
+          : `${fn} gives back the ${argName(v.same)} it was given, under a second name, and the task asks for a new ${noun(args[v.same])}: a change made later to what it gives back would change the caller's ${noun(args[v.same])} too.`,
+        output
+      )
+    }
+    const what = k < 0 ? 'list' : argName(k)
     const thing = k < 0 ? 'list' : noun(args[k])
     let message
     if (mistake) message = mistake.hint

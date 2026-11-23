@@ -74,6 +74,8 @@ export const checks = {
         name,
         args: [squares, first],
         expected: [first, ...squares.filter((s) => s !== first)],
+        fresh:
+          'draft_order gives back the board it was given, under a second name, not a copy, so a change made to the draft later would change the board too. Give back a copy, even when the square is first already.',
         hint: (v) => {
           const got = Array.isArray(v.data) ? v.data : []
           if (count(got, first) > 1)

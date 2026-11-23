@@ -28,7 +28,7 @@
     "repeat": {
       "steps": [
         { "active": ["radio", "radio->functions", "functions"], "note": "The calls are gone through in the order they came." },
-        { "active": ["functions"], "note": "Each call sign is looked for among those heard so far, then remembered." },
+        { "active": ["functions"], "note": "Each call sign is looked for among the ones heard before it." },
         { "active": ["functions", "functions->ailsa", "ailsa"], "note": "The first one already heard comes back, or nothing if none was." }
       ]
     },

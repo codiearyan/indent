@@ -117,7 +117,8 @@ export const checks = {
     const list = [
       ['Some running low', 5, ['splint', 'bivvy bag']],
       ['A count exactly on the line', 7, ['splint', 'bivvy bag']],
-      ['None running low', 1, []]
+      ['None running low', 1, []],
+      ['Every kind running low', 11, ['splint', 'flare', 'bivvy bag', 'compass']]
     ]
     return dataCases(t, {
       file: FILE,
@@ -133,7 +134,9 @@ export const checks = {
         hint: (v) => {
           const got = Array.isArray(v.data) ? v.data : []
           if (got.some((x) => typeof x === 'number')) return 'running_low gives back counts. The task asks for the names of the kinds.'
-          if (got.includes('compass') && smallest === 7) return 'The compass count is exactly 7, which is not fewer than 7.'
+          const onLine = Object.keys(STORE).find((kind) => STORE[kind] === smallest)
+          if (onLine && got.includes(onLine))
+            return `The ${onLine} count is exactly ${smallest}, which is not fewer than ${smallest}.`
           return 'running_low does not give back the kinds with fewer than that many, in the order of the store.'
         }
       }))
@@ -170,6 +173,8 @@ export const checks = {
               ? 'hours_on gives back how many callouts there were on that hill. The task asks for their hours added up.'
               : on.length > 1 && v.value === on.at(-1).hours
                 ? 'hours_on gives back the hours of the last callout on that hill only. Add each one to a total that starts before the loop.'
+                : on.length && v.value === 0 && callouts.at(-1).hill !== hill
+                  ? 'hours_on gives back 0 for a hill that had a callout. A total that starts inside the loop goes back to 0 on every round, so only the last callout of the list can count: start it before the loop.'
                 : v.value === on.reduce((sum, c) => sum + c.crew, 0) && on.length
                   ? 'hours_on adds up the crew. The task asks for the hours.'
                   : 'hours_on does not give back the hours of every callout on that hill added up.'

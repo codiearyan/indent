@@ -6,10 +6,29 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
 const down = (list) => [...list].sort((a, b) => b - a)
 const up = (list) => [...list].sort((a, b) => a - b)
 
+const FIRST =
+  'coldest gives back the first reading. A return inside the loop ends the whole function on the first round: give back the lowest after the loop, once every reading has been looked at.'
+
+/**
+ * The functions of a part, without their texts: a print or a call under the task may use what
+ * the function itself may not, and a text that holds code is not code.
+ */
+function functionCode(code) {
+  let inDef = false
+  return code
+    .split('\n')
+    .filter((line) => {
+      if (!/^\s/.test(line)) inDef = /^def\b/.test(line)
+      return inDef
+    })
+    .join('\n')
+    .replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g, '""')
+}
+
 /** The details, with one more that looks at the code once every case passed. */
 async function andCode(t, task, details, name, test, message) {
   if (!details.every((d) => d.passed)) return details
-  const code = await partCode(t, FILE, task)
+  const code = functionCode(await partCode(t, FILE, task))
   return [...details, test(code) ? pass(name) : fail(name, message)]
 }
 
@@ -17,7 +36,7 @@ export const checks = {
   async coldest(t) {
     const list = [
       ['A night above freezing', [6, 4, 9, 5]],
-      ['A night below freezing', [-1, -7, -3, -4]],
+      ['A night below freezing', [-3, -7, -1, -4]],
       ['The coldest reading first', [-6, 2, 0, 1]],
       ['One reading', [8]]
     ]
@@ -28,7 +47,7 @@ export const checks = {
       mistakes: [
         {
           value: (c) => c.args[0][0],
-          hint: 'coldest gives back the first reading. A return inside the loop ends the whole function on the first round: give back the lowest after the loop, once every reading has been looked at.'
+          hint: FIRST
         },
         {
           value: (c) => Math.max(...c.args[0]),
@@ -46,9 +65,11 @@ export const checks = {
             ? 'coldest gives back 0, which is not one of the readings. The lowest so far has to start as a value from the list: a reading of 0 to start with beats every reading above freezing.'
             : v.value === Math.max(...readings)
               ? 'coldest gives back the highest reading, not the lowest. Look at the comparison that decides when a reading is the new lowest.'
-              : v.value === readings.at(-1)
-                ? 'coldest gives back the last reading. Keep the lowest so far in a name of its own, and change it only when a reading is lower.'
-                : 'coldest does not give back the lowest reading of the list it is given.'
+              : v.value === readings[0]
+                ? FIRST
+                : v.value === readings.at(-1)
+                  ? 'coldest gives back the last reading. Keep the lowest so far in a name of its own, and change it only when a reading is lower.'
+                  : 'coldest does not give back the lowest reading of the list it is given.'
       }))
     })
     return andCode(
@@ -134,6 +155,10 @@ export const checks = {
       file: FILE,
       task: 4,
       fn: 'kit_lines',
+      errors: (error) =>
+        error.type === 'UnboundLocalError'
+          ? 'the line reads a name before it has a value. With no items the loop runs no rounds, so a list made inside the loop is never made: make the new list before the loop, and give it back after'
+          : null,
       typed:
         'kit_lines gives back the same lines whatever kit Check gives it. Make them from the list it is given.',
       list: list.map(([name, items]) => ({

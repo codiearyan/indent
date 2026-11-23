@@ -135,7 +135,7 @@
       "id": "next",
       "title": "Page the next one",
       "file": "call_list.py",
-      "description": "Under `# Task 5`, write a function called `next_to_page` that takes a list of names, takes the first name off that same list and gives it back. For tonight's list it gives back `Rhona`, and the list is one name shorter. When the list is empty, there is nobody to page: it gives back `None` and leaves the list as it is. Call it for `call_list`, print what it gives back, then print `call_list`.\n\nCheck calls `next_to_page` with lists of its own, an empty one too, and looks at what it gives back and at the list it gave it afterwards.",
+      "description": "Under `# Task 5`, write a function called `next_to_page` that takes a list of names, takes the first name off that same list and gives it back. After Task 4 has moved Kirsty to the front of `call_list`, it gives back `Kirsty`, and the list is one name shorter. When the list is empty, there is nobody to page: it gives back `None` and leaves the list as it is. Call it for `call_list`, print what it gives back, then print `call_list`.\n\nCheck calls `next_to_page` with lists of its own, an empty one too, and looks at what it gives back and at the list it gave it afterwards.",
       "nextSteps": [
         "Read the part of the lesson on taking items off a list.",
         "First deal with the empty list: give back `None`.",
