@@ -1,0 +1,159 @@
+{
+  "id": "algorithms-with-rules",
+  "title": "The algorithms, handed a rule",
+  "files": [
+    "src/schedule.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Kasimir's schedule here and run it, after you call your functions from main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/schedule.cpp -o schedule && ./schedule"
+  },
+  "tasks": [
+    {
+      "id": "order",
+      "title": "Put the bench in order",
+      "file": "src/schedule.cpp",
+      "description": "Under `// Task 1` in `src/schedule.cpp`, make a variable called `benchFirst` that holds a lambda. It takes two repairs, each as a reference to a `const Repair`, and gives back `true` when the first goes before the second on the bench, as a `bool`. The longer repair goes first; of two with the same minutes, the one with the smaller ticket goes first. Then write a function called `benchOrder` that takes the repairs as a reference to a `std::vector<Repair>`, gives nothing back, and puts them in that order with `std::sort` and `benchFirst`.\n\nCheck calls `benchFirst` on pairs of its own repairs, both ways round, and on a repair and itself. When it keeps the promise `std::sort` needs, Check calls `benchOrder` on lists of its own, with ties, two equal repairs, one repair and none, and reads the order.",
+      "nextSteps": [
+        "Add the `#include` that `std::sort` comes from.",
+        "Write `benchFirst`: compare the minutes first, and the tickets only when the minutes are the same.",
+        "Ask yourself what `benchFirst` says for a repair and itself.",
+        "Write `benchOrder` with `std::sort`, and call it on `bench` in `main`."
+      ],
+      "hints": [
+        "`std::sort` asks the rule about two items at a time: does the first go before the second? The rule answers that one question, with no ties left over when the task gives a second rule.",
+        "\"Goes before\" is strict: for two equal repairs, neither goes before the other, so the rule says false. `>=` and `<=` say true for equal values, and break the sort's promise.",
+        "The shape is `if (a.minutes != b.minutes) { return a.minutes > b.minutes; } return a.ticket < b.ticket;` inside the lambda, and `std::sort(repairs.begin(), repairs.end(), benchFirst);` in `benchOrder`."
+      ],
+      "docs": [
+        {
+          "title": "std::sort",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/sort"
+        },
+        {
+          "title": "Compare: what a comparison must promise",
+          "url": "https://en.cppreference.com/w/cpp/named_req/Compare"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Sorting with a comparison function",
+          "url": "https://www.youtube.com/watch?v=JiMcwYYZhtc"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "find",
+      "title": "Find a repair by its item",
+      "file": "src/schedule.cpp",
+      "description": "Under `// Task 2`, write a function called `ticketFor` that takes the repairs as a reference to a `const std::vector<Repair>` and an item as a reference to a `const std::string`. It gives back the ticket of the first repair of that item, as an `int`, found with `std::find_if` and a lambda, or `0` when no repair has that item.\n\nCheck calls `ticketFor` with repairs and items of its own, an item no repair has and an empty list included, and reads what it gives back.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<Repair>&` and a `const std::string&` in, an `int` back.",
+        "Call `std::find_if` over the repairs with a lambda that asks about one repair.",
+        "Compare what it gives back with `end()` before you read anything there.",
+        "Give back the ticket at that place, or 0."
+      ],
+      "hints": [
+        "`std::find_if` is `std::find` from part 3 with a question in place of a value: it gives back the place of the first item the lambda says true for.",
+        "The lambda needs the item it is looking for, which is a parameter of `ticketFor`, so its square brackets bring it in. When nothing matches, the place is `end()`, where there is no repair.",
+        "The shape is `auto found = std::find_if(repairs.begin(), repairs.end(), [&item](const Repair& r) { return r.item == item; }); if (found == repairs.end()) { return 0; } return found->ticket;`."
+      ],
+      "docs": [
+        {
+          "title": "std::find, std::find_if",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/find"
+        },
+        {
+          "title": "Lambda expressions: lambda capture",
+          "url": "https://en.cppreference.com/w/cpp/language/lambda#Lambda_capture"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "count",
+      "title": "Count the long repairs",
+      "file": "src/schedule.cpp",
+      "description": "Under `// Task 3`, write a function called `countLonger` that takes the repairs as a reference to a `const std::vector<Repair>` and a limit in minutes as an `int`. It gives back how many repairs take more minutes than the limit, as an `int`, counted with `std::count_if` and a lambda.\n\nCheck calls `countLonger` with repairs and limits of its own, a repair of exactly the limit and an empty list included.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<Repair>&` and an `int` in, an `int` back.",
+        "Write a lambda that asks whether one repair takes more minutes than the limit.",
+        "Hand it to `std::count_if` over the repairs.",
+        "Give back what `std::count_if` gives back."
+      ],
+      "hints": [
+        "`std::count_if` counts the items its lambda says true for, as `std::count` counted the items equal to a value.",
+        "\"More than the limit\" leaves out a repair of exactly the limit. The lambda takes one repair and needs the limit too.",
+        "The shape is `return std::count_if(repairs.begin(), repairs.end(), [limit](const Repair& r) { return r.minutes > limit; });`."
+      ],
+      "docs": [
+        {
+          "title": "std::count, std::count_if",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/count"
+        },
+        {
+          "title": "std::all_of, std::any_of, std::none_of",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/all_any_none_of"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "prices",
+      "title": "Price every repair",
+      "file": "src/schedule.cpp",
+      "description": "Under `// Task 4`, write a function called `pricesAt` that takes the repairs as a reference to a `const std::vector<Repair>` and an hourly rate as a `double`. It gives back a new `std::vector<double>` with the price of each repair, in the same order: its minutes in hours times the rate, worked out with `std::transform` and a lambda.\n\nCheck calls `pricesAt` with repairs and rates of its own, an empty list included, and reads the prices.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<Repair>&` and a `double` in, a `std::vector<double>` back.",
+        "Make the vector of prices with a place for every repair.",
+        "Call `std::transform` from the repairs into the prices, with a lambda that prices one repair.",
+        "Give the prices back, and print them from `main`."
+      ],
+      "hints": [
+        "`std::transform` reads each item, hands it to the lambda, and writes what comes back at the next place of another vector, which it is given as a beginning only.",
+        "It writes over places that are there already, and never adds any. A vector made with a size has its places; an empty one has none to write to.",
+        "The shape is `std::vector<double> prices(repairs.size()); std::transform(repairs.begin(), repairs.end(), prices.begin(), [rate](const Repair& r) { return r.minutes / 60.0 * rate; }); return prices;`."
+      ],
+      "docs": [
+        {
+          "title": "std::transform",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/transform"
+        },
+        {
+          "title": "std::vector constructors",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/vector"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "drop",
+      "title": "Take repairs off the bench by a rule",
+      "file": "src/schedule.cpp",
+      "description": "Under `// Task 5`, write a function template called `dropWhere`, with one type `Rule`, that takes the repairs as a reference to a `std::vector<Repair>` and a rule, of type `Rule`, and gives nothing back. The rule is a function that takes a repair and gives back `true` for a repair that comes off the bench. `dropWhere` takes every such repair off, keeps the others in their order, and asks the rule about each repair once. It does this with `std::remove_if` and `erase`.\n\nCheck hands `dropWhere` rules of its own, which count how often they are asked and about which repairs, and reads Check's list afterwards: what it holds and how long it is.",
+      "nextSteps": [
+        "Write the template line with the type `Rule`, then the first line.",
+        "Hand the rule to `std::remove_if` over the repairs, and keep the place it gives back.",
+        "Cut the vector at that place with `erase`.",
+        "In `main`, call it on `bench` with a lambda that picks the repairs of 0 minutes."
+      ],
+      "hints": [
+        "A lambda's type has no name you can write, so a function that takes one leaves its type open, as Task 1 of the first issue of this part did. The algorithms of the library are written that way too.",
+        "`std::remove_if` cannot make a vector shorter: it moves the items that stay to the front and gives back where they end. What is after that place is left over, and only the vector's own `erase` takes it away.",
+        "The shape is `template <typename Rule> void dropWhere(std::vector<Repair>& repairs, Rule rule) { auto kept = std::remove_if(repairs.begin(), repairs.end(), rule); repairs.erase(kept, repairs.end()); }`."
+      ],
+      "docs": [
+        {
+          "title": "std::remove, std::remove_if",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/remove"
+        },
+        {
+          "title": "std::vector::erase",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/erase"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

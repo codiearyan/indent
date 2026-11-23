@@ -1,0 +1,111 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kasimir", "label": "Kasimir at the bench", "kind": "story" },
+      { "id": "bench", "label": "The bench list", "kind": "data" },
+      { "id": "rules", "label": "Your rules", "kind": "function", "mine": true },
+      { "id": "library", "label": "The library's algorithms", "kind": "story" },
+      { "id": "answers", "label": "Orders, counts and prices", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "kasimir", "to": "bench", "label": "repairs" },
+      { "from": "bench", "to": "library", "label": "every repair" },
+      { "from": "rules", "to": "library", "label": "handed in" },
+      { "from": "library", "to": "answers", "label": "results" },
+      { "from": "answers", "to": "kasimir", "label": "the answer" }
+    ],
+    "note": "The library goes through the bench list; your rules say what first, which one and how much mean."
+  },
+  "tasks": {
+    "order": {
+      "steps": [
+        {
+          "active": ["kasimir->bench", "bench"],
+          "value": { "kind": "array", "label": "goes in", "values": ["repairs in the order they came in"] },
+          "note": "The bench list is in the order the tickets arrived."
+        },
+        {
+          "active": ["rules", "rules->library", "library"],
+          "note": "A rule says, for any two repairs, which goes first, and the sort asks it again and again."
+        },
+        {
+          "active": ["library->answers", "answers"],
+          "value": { "kind": "array", "label": "comes out", "values": ["the same repairs, in bench order"] },
+          "note": "The bench list comes back in the order Kasimir works through it."
+        }
+      ]
+    },
+    "find": {
+      "steps": [
+        {
+          "active": ["bench->library", "rules"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the repairs", "an item"] },
+          "note": "Kasimir asks for the first repair of one kind of item."
+        },
+        {
+          "active": ["library"],
+          "note": "The search asks the rule about each repair in turn and stops at the first yes, or reaches the end."
+        },
+        {
+          "active": ["library->answers", "answers->kasimir"],
+          "value": { "kind": "array", "label": "comes out", "values": ["a ticket, or nothing found"] },
+          "note": "A ticket comes back, or word that no repair has that item."
+        }
+      ]
+    },
+    "count": {
+      "steps": [
+        {
+          "active": ["bench->library", "rules"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the repairs", "a limit in minutes"] },
+          "note": "Kasimir asks how many jobs run over a limit."
+        },
+        {
+          "active": ["library"],
+          "note": "Every repair is asked the same question, and each yes is counted."
+        },
+        {
+          "active": ["answers->kasimir"],
+          "value": { "kind": "array", "label": "comes out", "values": ["how many"] },
+          "note": "A count comes back."
+        }
+      ]
+    },
+    "prices": {
+      "steps": [
+        {
+          "active": ["bench->library", "rules"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the repairs", "an hourly rate"] },
+          "note": "Ambrose wants a price for every repair at one rate."
+        },
+        {
+          "active": ["library", "library->answers"],
+          "note": "Each repair is turned into its price, one place of a new list for each."
+        },
+        {
+          "active": ["answers"],
+          "value": { "kind": "array", "label": "comes out", "values": ["one price per repair, in order"] },
+          "note": "A list of prices comes back, as long as the bench list."
+        }
+      ]
+    },
+    "drop": {
+      "steps": [
+        {
+          "active": ["kasimir", "rules"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the bench list", "any rule for what comes off"] },
+          "note": "Kasimir hands over the bench list and a rule of his own for what comes off it."
+        },
+        {
+          "active": ["rules->library", "library"],
+          "note": "Each repair is asked about once; the ones that stay move up, in their order."
+        },
+        {
+          "active": ["library->answers", "bench"],
+          "value": { "kind": "array", "label": "comes out", "values": ["the bench list, shorter"] },
+          "note": "The bench list holds only the repairs that stay."
+        }
+      ]
+    }
+  }
+}

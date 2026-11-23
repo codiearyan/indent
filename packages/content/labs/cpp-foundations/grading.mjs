@@ -4029,6 +4029,13 @@ async function toolRule(t, file, task, rule) {
         : `${fn} calls std::${ignored} on a line of its own, so what it gives back is thrown away. std::${ignored} changes nothing: its answer is what it gives back, so ${fn} uses that answer.`
     )
   }
+  const unnamed = (rule.names ?? []).find((name) => !new RegExp(`\\b${name}\\b`).test(body))
+  if (unnamed) {
+    return fail(
+      `${fn} uses ${unnamed}`,
+      `${label(task)} asks ${fn} to hand its algorithm ${unnamed}, and Check cannot find ${unnamed} in ${fn}. The rule is written once, in ${unnamed}, and every place that needs it uses that one.`
+    )
+  }
   if (rule.lambda && !/\[[^\]]*\]\s*\(/.test(body)) {
     return fail(
       `${fn} hands the algorithm a lambda`,
