@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Who is on the wrong channel?", "note": "A stranger on the radio." },
+    { "title": "Radio log", "text": "The same teams again and again, in a heap." },
+    {
+      "title": "Your functions",
+      "file": "call_signs.py",
+      "mine": true,
+      "gap": "Repeats hide the stranger",
+      "tasks": ["Count the teams", "First heard twice", "On both rotas", "Unknown call signs"]
+    },
+    { "title": "Ailsa", "say": "Now I know who to call.", "note": "One name, once." }
+  ],
+  "ticket": { "label": "Stranger", "wrong": "lost in repeats", "why": "Long log", "right": "spotted" },
+  "captions": [
+    "A busy night, and Ailsa thinks someone unknown is on the team's channel.",
+    "Today the log repeats the same teams so often that a stranger is easy to miss.",
+    "You use sets to drop repeats, remember what was heard, and compare groups.",
+    "Now the call sign nobody knows stands out, once, in order.",
+    "Sets, add, in, and what two groups share or do not."
+  ]
+}
