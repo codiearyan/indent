@@ -99,7 +99,7 @@ function judge(mistakes, { calls }) {
         return quiet(fail(d.name, `Check waited for ${calls} to return, and it did not. When Check stopped waiting there was ${threadWords(stuck, FILE)}. Two threads that each wait for a lock the other holds wait for ever.`, d.output))
       if (d.passed) {
         const left = value(r, 'threads left running')
-        return left ? quiet(fail(d.name, `The answer is right, and afterwards ${threadWords(left, FILE)} was still alive.`, d.output)) : quiet(d)
+        return left ? quiet(fail(d.name, `The answer is right, and the call left behind ${threadWords(left, FILE)}. In a program of its own, a thread still alive keeps the program from ending.`, d.output)) : quiet(d)
       }
       const m = mistakes.find((k) => k.when(r, ctx))
       return quiet(m ? { ...d, message: typeof m.hint === 'function' ? m.hint(r) : m.hint } : d)

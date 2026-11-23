@@ -3192,7 +3192,8 @@ final class CheckRun {
         Thread[] all = new Thread[GROUP.activeCount() + 64];
         int n = GROUP.enumerate(all);
         java.util.List<Thread> out = new java.util.ArrayList<>();
-        for (int i = 0; i < n; i++) if (all[i].isAlive()) out.add(all[i]);
+        // The common pool that parallel streams use belongs to the whole program, not to the call.
+        for (int i = 0; i < n; i++) if (all[i].isAlive() && !(all[i] instanceof java.util.concurrent.ForkJoinWorkerThread w && w.getPool() == java.util.concurrent.ForkJoinPool.commonPool())) out.add(all[i]);
         return out;
     }
 

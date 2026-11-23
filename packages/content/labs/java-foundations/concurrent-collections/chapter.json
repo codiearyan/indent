@@ -1,0 +1,11 @@
+{
+  "id": "concurrent-collections",
+  "title": "x",
+  "files": ["QuayBoard.java"],
+  "terminal": { "description": "x", "suggestedCommand": "java QuayBoard.java" },
+  "tasks": [
+    { "id": "scans", "title": "a", "file": "QuayBoard.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
+    { "id": "board", "title": "a", "file": "QuayBoard.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
+    { "id": "labels", "title": "a", "file": "QuayBoard.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 }
+  ]
+}
