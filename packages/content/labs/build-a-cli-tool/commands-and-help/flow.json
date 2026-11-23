@@ -63,7 +63,7 @@
       "steps": [
         {
           "active": ["hesper", "hesper->main", "main"],
-          "note": "Sefton types lsit, two letters the wrong way round."
+          "note": "Hesper types lsit, as Sefton does: two letters the wrong way round."
         },
         {
           "active": ["main", "main->nearest", "nearest"],

@@ -145,9 +145,9 @@ export const checks = {
       { name: 'No words at all', args: [], want: { command: undefined, values: [], flags: {} } }
     ]
     const { replies, results } = await directCases(b, cases)
-    const tool = await toolCase(b, 'The tool reads its own words', ['-h', 'list', 'press-1.txt', 'press-2.txt', '--version'], {
-      command: 'list',
-      values: ['press-1.txt', 'press-2.txt'],
+    const tool = await toolCase(b, 'The tool reads its own words', ['-h', 'tally', 'spring.txt', 'autumn.txt', '--version'], {
+      command: 'tally',
+      values: ['spring.txt', 'autumn.txt'],
       flags: { help: true, version: true }
     })
     const stop = blocker('readArgs is written', replies, 'readArgs()')
@@ -198,10 +198,10 @@ export const checks = {
       }
     ]
     const { replies, results } = await directCases(b, cases)
-    const tool = await toolCase(b, 'The tool reads its own words', ['list', '--paper=linen', '-n', '3', 'press-1.txt'], {
-      command: 'list',
-      values: ['press-1.txt'],
-      flags: { paper: 'linen', limit: '3' }
+    const tool = await toolCase(b, 'The tool reads its own words', ['tally', '--paper=kraft', '-n', '7', 'autumn.txt'], {
+      command: 'tally',
+      values: ['autumn.txt'],
+      flags: { paper: 'kraft', limit: '7' }
     })
     const stop = blocker('readArgs is written', replies, 'readArgs()')
     return stop ? [stop] : [...results, tool]

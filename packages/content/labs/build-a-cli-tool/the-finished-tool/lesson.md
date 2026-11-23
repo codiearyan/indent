@@ -41,7 +41,7 @@ Today you type `node orders.js`. A tool people use is just `orders`. Two things 
 
 The first line of the file, `#!/usr/bin/env node`, tells a Unix system which program runs this file: `/usr/bin/env` finds `node` wherever it is installed. Node itself skips that line, so `node orders.js` works as before. It must be the very first two characters of the file.
 
-The `bin` entry in `package.json` maps a command name to a file: `"bin": { "orders": "orders.js" }`. When the shop installs the tool, npm puts `orders` on the PATH and points it at that file. On Windows, which ignores the `#!` line, npm makes a small `orders.cmd` instead, which reads that line and starts the file with `node`. You do not install anything in this repo: `node orders.js` does exactly what `orders` will do.
+The `bin` entry in `package.json` maps a command name to a file: `"bin": { "orders": "orders.js" }`. When the shop installs the tool with `npm install --global`, npm puts `orders` in a folder on the PATH and points it at that file. Windows ignores the `#!` line, so there npm reads it at install time and makes a small `orders.cmd` that starts the file with `node`. You do not install anything in this repo: `node orders.js` does exactly what `orders` will do.
 
 ## The morning
 

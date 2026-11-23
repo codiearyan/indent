@@ -203,9 +203,9 @@ async function morning(t, b) {
     // Colour is task 2's: here only the words count.
     const ok = isDeepStrictEqual(lines(plain(r.stdout)), texts(want)) && r.code === code
     const missing = !commands[i].includes('orders/press-1.txt') || !commands[i].includes('orders/press-2.txt')
-    return ok
+    return ok && !missing
       ? pass(`Morning command ${i + 1}`, report(r))
-      : fail(`Morning command ${i + 1}`, missing ? `${why} Name the files by their paths, ${NAMES_BOTH}, as the old commands did.` : why, report(r))
+      : fail(`Morning command ${i + 1}`, r.timedOut ? 'The tool never ended, so Check stopped it.' : missing ? `${why} Name the files by their paths, ${NAMES_BOTH}, as the old commands did.` : why, report(r))
   })
   return [pass(name, shownFile), ...results]
 }

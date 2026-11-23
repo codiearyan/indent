@@ -252,7 +252,7 @@ export const said = (r, line) => [...lines(r.stdout), ...lines(r.stderr)].some((
 export async function usesUtil(b) {
   for (const rel of await learnerFiles(b.dir)) {
     const code = withoutComments(await readFile(join(b.dir, rel), 'utf8'))
-    const what = /['"](?:node:)?util['"]|\bparseArgs\b|getBuiltinModule|createRequire/.exec(code)?.[0]
+    const what = /['"](?:node:)?util['"]|getBuiltinModule|createRequire/.exec(code)?.[0]
     if (what) return { file: rel, what: what.replace(/['"]/g, '') }
   }
   return undefined
@@ -290,7 +290,7 @@ export function blocker(name, runs, unwritten) {
   }
   const stuck = runs.find((r) => r.timedOut)
   if (stuck && !stuck.command) {
-    return fail(name, 'Your function never finished, so Check stopped it after a few seconds. Look for a loop that does not move on to the next word.', stuck.error)
+    return fail(name, 'Your function never finished, so Check stopped it after a few seconds. Look for a loop that never ends.', stuck.error)
   }
   return undefined
 }

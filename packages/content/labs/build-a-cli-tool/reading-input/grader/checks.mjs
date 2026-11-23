@@ -64,6 +64,7 @@ export const checks = {
     const shown = `readOrders(["win.txt", "week.txt"]), with win.txt saved with Windows line breaks, gave:\n${direct.ok ? JSON.stringify(direct.value, null, 1) : `threw ${direct.error}`}`
     let message
     if (direct.ok && isDeepStrictEqual(direct.value, want)) message = undefined
+    else if (!direct.ok && direct.timedOut) message = 'readOrders never finished with two files that are there, so Check stopped it.'
     else if (!direct.ok) message = 'readOrders threw when it was called with two files that are there.'
     else if (!Array.isArray(direct.value)) message = 'readOrders should give its lines one at a time, as an async generator: an async function* that yields each line.'
     else if (direct.value.some((x) => typeof x?.text === 'string' && x.text.endsWith('\r'))) {
@@ -77,7 +78,7 @@ export const checks = {
         ? pass('A file that is not there', report(missing))
         : fail(
             'A file that is not there',
-            'A file that cannot be read should still end as before: one line on standard error that names it, nothing on standard output, and exit code 2. An error on a stream is thrown out of the loop that reads it, where the catch at the bottom of orders.js can say it.',
+            missing.timedOut ? 'The tool never ended, so Check stopped it.' : 'A file that cannot be read should still end as before: one line on standard error that names it, nothing on standard output, and exit code 2. An error on a stream is thrown out of the loop that reads it, where the catch at the bottom of orders.js can say it.',
             report(missing)
           )
     )
@@ -94,7 +95,7 @@ export const checks = {
     const results = [
       isDeepStrictEqual(lines(first.stdout), texts(want))
         ? pass('No file named: standard input', report(first))
-        : fail('No file named: standard input', noFile, report(first)),
+        : fail('No file named: standard input', first.timedOut ? 'The tool never ended, so Check stopped it.' : noFile, report(first)),
       await resultsCase(t, b, '- in the middle of the files', ['check', 'week.txt', '-', 'late.txt'], 'check', { 'week.txt': WEEK, stdin: CRLF, 'late.txt': LATE }, {
         files: FILES,
         stdin: CRLF,

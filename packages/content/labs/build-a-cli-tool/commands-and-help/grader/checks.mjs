@@ -243,12 +243,12 @@ export const checks = {
     )
     const tool = await Promise.all([
       run(b, ['cuont', 'week.txt'], { files: FILES }),
-      run(b, ['lsit']),
+      run(b, ['lst']),
       run(b, ['print', '--paper', 'linen'])
     ])
     const wants = [
       'orders: unknown command cuont (did you mean count?)',
-      'orders: unknown command lsit (did you mean list?)',
+      'orders: unknown command lst (did you mean list?)',
       'orders: unknown command print (orders --help lists the commands)'
     ]
     const ok = tool.every((r, i) => [...lines(r.stdout), ...lines(r.stderr)].includes(wants[i]))

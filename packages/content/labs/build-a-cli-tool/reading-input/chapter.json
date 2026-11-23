@@ -94,9 +94,9 @@
         "End the tool there, and let any other error be thrown as before."
       ],
       "hints": [
-        "Writing into a pipe nobody reads fails with the code `EPIPE`. `console.log` hides that failure, so the tool keeps working for nobody; a plain `process.stdout.write` without a listener stops with the error.",
+        "Writing into a pipe nobody reads fails with the code `EPIPE` (on Windows often `EOF`). With no listener the tool stops with a stack trace; a listener that ignores it keeps the tool working for nobody.",
         "`process.stdout` is a stream, and a stream says it failed with an `error` event. Here the work is over, so stopping at once is right, and nothing is left to write.",
-        "At the top of `orders.js`: `process.stdout.on('error', (error) => { if (error.code === 'EPIPE') process.exit(0); throw error })`."
+        "At the top of `orders.js`: `process.stdout.on('error', (error) => { if (error.code === 'EPIPE' || error.code === 'EOF') process.exit(0); throw error })`."
       ],
       "docs": [
         {

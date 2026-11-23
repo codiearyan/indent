@@ -51,9 +51,9 @@ cat orders/press-2.txt | node orders.js check orders/press-1.txt -
 
 ## When the reader goes away
 
-`orders list year.txt | head -3` shows three orders, and then `head` is done and closes its end of the pipe. The next time the tool writes, the system answers with an error, `EPIPE`: nobody is reading. On Windows the same failure can come with the code `EOF`.
+`orders list year.txt | head -3` shows three orders, and then `head` is done and closes its end of the pipe. The next time the tool writes, the system answers with an error, `EPIPE`: nobody is reading. On Windows the same failure can come with another code; `EOF` is the one usually seen there.
 
-What happens next depends on how you write. `process.stdout.write` with nobody listening for errors stops the tool with a stack trace about `EPIPE`, a scary message about nothing. `console.log` quietly drops what it cannot write, so the tool does not crash: it reads and works through the rest of the year for nobody, and if its input is a pipe that keeps coming, it never ends at all.
+What happens next depends on how you write. With nobody listening for errors on standard output, the tool usually stops with a stack trace about `EPIPE`, a scary message about nothing; `console.log` does not prevent it. And the common first fix, listening for the error and ignoring it, is worse: the tool reads and works through the rest of the year for nobody, and if its input is a pipe that keeps coming, it never ends at all.
 
 Neither is right. Once the reader is gone, there is no one to work for, and nothing went wrong in the tool's own work. `process.stdout` is a stream, and a stream reports a failure as an `error` event. Listen for it, and when the code says the reader is gone, end the tool at once, with exit code 0. This is the one place where stopping straight away is right: there is nothing left to write and nobody to write it to.
 

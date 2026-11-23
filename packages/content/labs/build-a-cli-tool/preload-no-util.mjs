@@ -4,10 +4,11 @@
 import { registerHooks } from 'node:module'
 
 const REFUSED = new Set(['node:util', 'util'])
+const OWN = new URL('./', import.meta.url).href
 
 registerHooks?.({
   resolve(spec, context, next) {
-    if (REFUSED.has(spec) && !context.parentURL?.includes('/.grader/')) throw new Error(`RefusedImport: ${spec}`)
+    if (REFUSED.has(spec) && !context.parentURL?.startsWith(OWN)) throw new Error(`RefusedImport: ${spec}`)
     return next(spec, context)
   }
 })

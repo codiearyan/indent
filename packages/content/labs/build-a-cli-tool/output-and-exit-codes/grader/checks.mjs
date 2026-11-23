@@ -7,6 +7,7 @@ const FILES = { 'week.txt': WEEK, 'late.txt': LATE }
 function streamProblem(r, { results = [], notes = [], error }) {
   const out = lines(r.stdout)
   const err = lines(r.stderr)
+  if (r.timedOut || r.flooded) return 'The tool did not end by itself, so Check stopped it.'
   if (hasStack(r.stderr)) {
     return 'The tool stopped with a stack trace. That is for whoever writes the code; a person using the tool gets one plain line that says what is wrong.'
   }
@@ -166,6 +167,8 @@ export const checks = {
         message = 'The JSON is spread over several lines. Each result is one JSON value on one line, so a program can read the output a line at a time.'
       } else if (want.results.map((x) => x.text).some((x) => out.includes(x))) {
         message = 'With --json, the results are still the text for a person. Each result should be printed as the JSON of the value out.result was given.'
+      } else if (parsed.every((p) => p.ok) && out.length > want.results.length && want.results.every((x) => parsed.some((p) => isDeepStrictEqual(p.value, x.value)))) {
+        message = 'Every result is there, and a line more that is not one of them. With --json, standard output holds only the results; a message for the person stays plain text on standard error.'
       } else if (parsed.every((p) => p.ok)) {
         message = 'Each line is JSON, but not of the value out.result was given for that result. Print that value as it is, one result on each line.'
       } else {

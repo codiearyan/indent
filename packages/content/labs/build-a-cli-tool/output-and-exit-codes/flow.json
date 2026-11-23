@@ -46,9 +46,9 @@
             "kind": "map",
             "label": "what each code says",
             "entries": [
-              { "key": "0", "value": "all went well" },
-              { "key": "1", "value": "check found a problem" },
-              { "key": "2", "value": "could not do what was asked" }
+              { "key": "all went well", "value": "one code" },
+              { "key": "check found a problem", "value": "another" },
+              { "key": "could not do what was asked", "value": "a third" }
             ]
           },
           "note": "The tool ends with a code that says how it went, once everything it printed has been handed over."
