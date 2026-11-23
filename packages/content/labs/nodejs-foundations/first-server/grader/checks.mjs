@@ -134,9 +134,9 @@ export const checks = {
 
     const name2 = 'A PORT that is not a port is refused: one line on standard error, exit code 1'
     const bad = []
-    for (const value of ['abc', '70000', '80.5', '-1']) bad.push(await serve(dir, 'server.js', { env: { PORT: value } }))
+    for (const value of ['abc', '70000', '80.5', '0']) bad.push(await serve(dir, 'server.js', { env: { PORT: value } }))
     let m2 = null
-    for (const [i, value] of ['abc', '70000', '80.5', '-1'].entries()) {
+    for (const [i, value] of ['abc', '70000', '80.5', '0'].entries()) {
       const s = bad[i]
       const how = `With PORT=${value}`
       if (s.listening) m2 = `${how}, the server started anyway. Refuse a PORT that is not a whole number from 1 to 65535 before listening.`
@@ -188,7 +188,7 @@ export const checks = {
           ? 'After Ctrl+C the server closed, but the script did not end. Something else still keeps it running.'
           : 'After Ctrl+C the server was still running. Your listener has to close the server, or nothing stops it.'
       } else if (hasStack(s.stderr)) message = `After Ctrl+C the server stopped with an error: ${errorLine(s.stderr) ?? 'see the output'}.`
-      else if (!s.closed) message = 'After Ctrl+C the script ended without closing the server. Ending the process at once would cut off an answer still on its way; close the server, and let the script end by itself.'
+      else if (!s.closed) message = 'After Ctrl+C the script ended before the server had closed. Ending the process at once would cut off an answer still on its way: close the server, and let the script end by itself once it has.'
       else if (got.at(-1) !== 'Server stopped.') message = got.includes('Server stopped.') ? 'Server stopped. should be the last line, once the server has closed.' : 'After Ctrl+C, print the line from the task once the server has closed.'
       else if (got.filter((l) => l === 'Server stopped.').length > 1) message = 'Server stopped. was printed more than once.'
       else if (s.code !== 0) message = `After Ctrl+C the script ended with exit code ${s.code}. Stopping when asked is not a failure: it ends with 0.`

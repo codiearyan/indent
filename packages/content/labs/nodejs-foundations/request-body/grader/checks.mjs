@@ -48,6 +48,9 @@ function savedTrouble(r, reading, s) {
   if (r.json === undefined) return `${r.request} was answered with a body that is not JSON: ${r.body.trim().slice(0, 80)}. Turn the reading into JSON text first.`
   if (isDeepStrictEqual(r.json, reading)) return null
   if (r.json && typeof r.json === 'object' && 'by' in r.json) return `${r.request} was answered with ${show(r.json)}. Keep only the tap and the litres of a reading.`
+  if (typeof r.json?.tap === 'string' && r.json.tap.includes('\uFFFD')) {
+    return `${r.request} came back with the â broken: it takes two bytes, and they arrived in two pieces. Join the bytes of every piece first, and turn them into text once, at the end.`
+  }
   if (typeof r.json?.litres === 'string') return `${r.request} was answered with litres as text. Keep the litres as the number that was sent.`
   return `${r.request} was answered with ${show(r.json)}. Answer with the reading that was kept: its tap and its litres.`
 }
@@ -83,12 +86,17 @@ export const checks = {
     const { dir, s } = await start(t, 4319, async (send) => {
       await post(send, { tap: 'west', litres: 31, by: 'Imran' }, 3)
       await post(send, { tap: 'pond', litres: 0.5 }, 4)
+      // In 3 pieces, the two bytes of the â fall in different pieces.
+      await post(send, { tap: 'Siân\'s shed', litres: 8 }, 3)
     })
     const stop = await early(name, s, dir, 4319)
     if (stop) return [stop]
     const said = 'Check sent each body in pieces, each one only once the server had the one before.'
-    const [a, b] = s.replies
-    const message = savedTrouble(a, { tap: 'west', litres: 31 }, s) ?? (b ? savedTrouble(b, { tap: 'pond', litres: 0.5 }, s) : null)
+    const [a, b, c] = s.replies
+    const message =
+      savedTrouble(a, { tap: 'west', litres: 31 }, s) ??
+      (b ? savedTrouble(b, { tap: 'pond', litres: 0.5 }, s) : null) ??
+      (c ? savedTrouble(c, { tap: 'Siân\'s shed', litres: 8 }, s) : null)
     return [message ? fail(name, message, `${said}\n${serverReport(s)}`) : pass(name, `${said}\n${serverReport(s)}`)]
   },
 

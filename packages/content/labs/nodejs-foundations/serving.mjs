@@ -57,7 +57,11 @@ net.Server.prototype.listen = function (...args) {
   const asked = first !== null && typeof first === 'object' ? first.port : first
   const done = typeof args.at(-1) === 'function' ? args.at(-1) : undefined
   mark('listen', { asked: asked === undefined || asked === null ? null : String(asked), kind: typeof asked })
-  if (!validPort(asked)) return listen.apply(this, args)
+  if (!validPort(asked)) {
+    // Text such as 'abc' is a pipe name to Node, so the server may listen anyway: say where at once.
+    this.once('listening', () => mark('listening', this.address()))
+    return listen.apply(this, args)
+  }
   if (o.busy) {
     const port = Number(asked)
     const error = new Error('listen EADDRINUSE: address already in use :::' + port)
@@ -95,7 +99,22 @@ http.IncomingMessage.prototype.push = function (chunk, ...rest) {
 const spawnIt = ChildProcess.prototype.spawn
 ChildProcess.prototype.spawn = function (options) {
   mark('spawn', { file: options.file, args: (options.args ?? []).slice(1), shell: Boolean(options.shell) })
-  return spawnIt.call(this, options)
+  const started = spawnIt.call(this, options)
+  // Check's report waits for a line on its input before it prints the rest: one is sent once the
+  // server has its first piece of output, so a server that answers on that piece always gets part.
+  const { stdout, stdin } = this
+  if (stdout && stdin) {
+    stdin.on('error', () => {})
+    const push = stdout.push
+    stdout.push = function (chunk, ...rest) {
+      if (chunk !== null && chunk !== undefined && chunk.length > 0) {
+        stdout.push = push
+        if (stdin.writable) stdin.write('\\n')
+      }
+      return push.call(this, chunk, ...rest)
+    }
+  }
+  return started
 }
 for (const name of ['execSync', 'execFileSync', 'spawnSync']) {
   const real = cp[name]
@@ -114,10 +133,11 @@ const netFlags = () => (process.allowedNodeEnvironmentFlags.has('--allow-net') ?
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-/** Splits text into `count` pieces of about the same length. */
+/** Splits the bytes of text into `count` pieces of about the same length, a letter's bytes too. */
 export function pieces(text, count) {
-  const size = Math.ceil(text.length / count)
-  return Array.from({ length: count }, (_, i) => text.slice(i * size, (i + 1) * size)).filter((p) => p !== '')
+  const bytes = Buffer.from(text)
+  const size = Math.ceil(bytes.length / count)
+  return Array.from({ length: count }, (_, i) => bytes.subarray(i * size, (i + 1) * size)).filter((p) => p.length > 0)
 }
 
 /**

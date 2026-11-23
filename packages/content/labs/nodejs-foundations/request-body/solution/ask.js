@@ -112,6 +112,8 @@ if (script === undefined) {
     if (code !== undefined) return
     stopped = true
     server.kill()
+    // A server that catches the polite signal is ended for sure after 3 seconds.
+    setTimeout(() => server.kill('SIGKILL'), 3000).unref()
   }
   process.on('SIGINT', stop)
 

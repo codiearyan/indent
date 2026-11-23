@@ -7,8 +7,21 @@ const pass = (name, output) => ({ name, passed: true, output })
 const fail = (name, message, output) => ({ name, passed: false, message, output })
 
 // Every run gets the report tool as the starter gives it, whatever the workspace holds, and
-// readings of Check's own.
-const TOOL = await readFile(new URL('../starter/tools/water-report.js', import.meta.url), 'utf8')
+// readings of Check's own. Its pause becomes a wait for the line serving.mjs sends once the server
+// has the first line, so answering on the first piece fails every time, not by timing.
+const STARTER_TOOL = await readFile(new URL('../starter/tools/water-report.js', import.meta.url), 'utf8')
+const HOLD = `await new Promise((go) => {
+      const done = () => {
+        process.stdin.destroy()
+        go()
+      }
+      process.stdin.once('data', done)
+      process.stdin.once('end', () => pause(150).then(done))
+      process.stdin.once('error', done)
+      setTimeout(done, 2000).unref()
+    })`
+if (!STARTER_TOOL.includes('await pause(150)')) throw new Error('The report tool no longer has its pause.')
+const TOOL = STARTER_TOOL.replace('await pause(150)', HOLD)
 const WATER = {
   'water/2026-04.txt': '2026-04-02T19:00,well,140\r\n2026-04-02T19:05,east,75\r\n# meter swapped\r\n2026-04-09T19:00,well,96\r\n',
   'water/2026-05.txt': '2026-05-07T19:00,east,12\n',
@@ -59,6 +72,13 @@ function howTrouble(s) {
   return null
 }
 
+/** Why the report could not be found, when the server gave its path relative to where it started, or null. */
+function pathTrouble(r, s) {
+  const rel = s.spawns.find((x) => !x.shell && x.args[0] !== undefined && !isAbsolute(x.args[0]))
+  if (!rel) return null
+  return `${r.request} could not run the report: the server gave its path as ${rel.args[0]}, which is looked for from the folder the server was started in, and Check started it from another one. Build the path from the server's own folder.`
+}
+
 /** Why the answer to a month with readings is not the report, in words, or null. */
 function reportTrouble(r, wanted, s) {
   const missing = unanswered(r, s)
@@ -71,9 +91,7 @@ function reportTrouble(r, wanted, s) {
   if (plain.length > 0 && !plain.some((x) => x.args.includes(month))) {
     return `${r.request} ran the report with ${JSON.stringify(plain.at(-1).args.slice(1))} after the script, not the month in the query, ${month}.`
   }
-  if (r.status !== 200 && plain.some((x) => x.args[0] !== undefined && !isAbsolute(x.args[0]))) {
-    return `${r.request} could not run the report: the server gave its path as ${plain.find((x) => !isAbsolute(x.args[0])).args[0]}, which is looked for from the folder the server was started in, and Check started it from another one. Build the path from the server's own folder.`
-  }
+  if (got.join('\n') !== wanted.join('\n') && pathTrouble(r, s)) return pathTrouble(r, s)
   if (r.status !== 200) return `${r.request} got status ${r.status}, but that month has readings: the report makes it and ends with exit code 0, which is 200.`
   if (got.join('\n') === wanted.join('\n')) return isText(r) ? null : `${r.request} should say it is plain text in UTF-8.`
   if (got.length > 0 && got.length < wanted.length && got.every((l, i) => l === wanted[i])) {
@@ -113,7 +131,7 @@ export const checks = {
       if (missing) message = r === empty ? `${missing} With no month in the address, give the report an empty month.` : missing
       else if (r.status === 501) message = `${r.request} still got the starter's answer, Not written yet.`
       else if (r.status === 200) message = `${r.request} got status 200, though the report ended with exit code ${code}. Read the exit code, not only what was printed.`
-      else if (r.status === 500) message = `${r.request} got 500. The report did run: its exit code ${code} says what was wrong, and that is ${status}.`
+      else if (r.status === 500) message = pathTrouble(r, s) ?? `${r.request} got 500. The report did run: its exit code ${code} says what was wrong, and that is ${status}.`
       else if (r.status !== status) message = `${r.request} got status ${r.status}. The report ended with exit code ${code}, which the task answers with ${status}.`
       else if (r === empty && /"(null|undefined)"/.test(r.body)) message = `${r.request}, with no month, gave the report the word ${/"null"/.test(r.body) ? 'null' : 'undefined'}. With no month in the address, give it an empty month.`
       else if (bodyLines(r).join(' ') !== reason) message = `${r.request} got ${r.status} with "${bodyLines(r).join(' ')}". The body should be the reason the report printed on its standard error, as it is.`
@@ -179,7 +197,7 @@ export const checks = {
         if (missing) message = missing
         else if (r.status === 200) message = `${r.request} got a report, though "${month}" is not a month. The server changed the month before giving it to the report: pass it on as it was typed.`
         else if (bodyLines(r).join(' ') !== notMonth(month)) {
-          message = `${r.request} got "${bodyLines(r).join(' ')}". The report should have been given the month exactly as it was typed, in one argument, and said so in its reason.`
+          message = (r.status === 500 ? pathTrouble(r, s) : null) ?? `${r.request} got "${bodyLines(r).join(' ')}". The report should have been given the month exactly as it was typed, in one argument, and said so in its reason.`
         } else if (r.status !== 400) message = `${r.request} got status ${r.status}. The report ended with exit code 2: that is 400.`
         if (message) break
       }

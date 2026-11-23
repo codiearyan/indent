@@ -156,7 +156,7 @@ export const checks = {
       if (m1) break
       const got = bodyLine(r)
       if (got === wanted) continue
-      if (got === FREE) m1 = `${r.request} got every free plot. Read row from the query, and keep only the plots of that row.`
+      if (got === FREE && r !== m) m1 = `${r.request} got every free plot. Read row from the query, and keep only the plots of that row.`
       else if (r === k && /row k/i.test(got)) m1 = 'GET /free?row=k should give row K: people type the letter in either case. Name the row in capitals.'
       else if (r === m) m1 = 'GET /free?season=spring&row=M did not find row M. A query can hold several names, in any order; read them with the URL tools, not by cutting the text.'
       else if (r === encoded) m1 = 'GET /free?row=%4C asks for row L: %4C is how an address writes L in code. The URL tools decode it for you; cutting the text by hand does not.'

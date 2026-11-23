@@ -56,7 +56,7 @@ res.setHeader('Content-Type', 'text/plain; charset=utf-8')
 res.end('The tool shed is closed for stocktaking.\n')
 ```
 
-Status and headers travel first, so they must be set before any of the body is sent. Set one after `res.write(...)` or `res.end(...)` and Node throws `Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client`. And an error that nobody catches inside the function, such as a file that is not there, stops the whole server, not just one answer. Catch it and answer 500 instead.
+Status and headers travel first, so they must be set before any of the body is sent. Set a header after `res.write(...)` or `res.end(...)` and Node throws `Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client`. A status set then throws nothing, but it is too late: the visitor already got the old one. And an error that nobody catches inside the function, such as a file that is not there, stops the whole server, not just one answer. Catch it and answer 500 instead.
 
 ## Stopping a server
 

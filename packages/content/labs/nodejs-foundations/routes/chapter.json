@@ -26,7 +26,7 @@
       "hints": [
         "The function given to `createServer` runs for every request, whatever its address. It is your code that tells the addresses apart.",
         "`req.url` is the address without the computer's name: `/plots` for `http://localhost:3000/plots`. Compare it, and `return` after each answer so only one is sent.",
-        "`if (path === '/plots') { res.end(plots.map((p) => `${p.plot}: ${p.holder || 'free'}\\n`).join('')); return }`."
+        "``if (path === '/plots') { res.end(plots.map((p) => `${p.plot}: ${p.holder || 'free'}\\n`).join('')); return }``."
       ],
       "docs": [
         {
@@ -54,7 +54,7 @@
       "hints": [
         "A status of 200 tells every program that all went well. A page that is not there, answered with 200, looks like a page whose text is \"No page\".",
         "`req.method` is the method in capitals, such as `'GET'` or `'POST'`. 404 means the address is not there at all; 405 means it is there, but not for this method.",
-        "`if (req.method !== 'GET') { res.statusCode = 405; res.setHeader('Allow', 'GET'); res.end(`Only GET works at ${path}.`); return }`."
+        "``if (req.method !== 'GET') { res.statusCode = 405; res.setHeader('Allow', 'GET'); res.end(`Only GET works at ${path}.`); return }``."
       ],
       "docs": [
         {
