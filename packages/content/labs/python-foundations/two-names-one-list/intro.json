@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Did my plan change the board?", "note": "Two squares crossed, one gone." },
+    { "title": "Search board", "text": "One list that every team works from." },
+    {
+      "title": "Your functions",
+      "file": "search_board.py",
+      "mine": true,
+      "gap": "Plans that touch the board",
+      "tasks": ["What if, on a new list", "Cross off for real", "Draft on a copy", "Clear side by side"]
+    },
+    { "title": "Search teams", "say": "Board matches the hill.", "note": "Plans stay plans." }
+  ],
+  "ticket": { "label": "Board", "wrong": "changed by a plan", "why": "One list", "right": "only real changes" },
+  "captions": [
+    "A long search, and Ailsa keeps the squares still to search on the board.",
+    "Today a plan on the laptop changes the real board, and a searched square stays on it.",
+    "You write functions that either change the board or give back a new list, never both.",
+    "Now plans come back as new lists, and only real changes reach the board.",
+    "Second names, copies, and lists that change while a loop goes through them."
+  ]
+}

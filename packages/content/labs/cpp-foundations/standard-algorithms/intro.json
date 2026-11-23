@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ambrose", "say": "Can the computer sort them?", "note": "It is the end of the month." },
+    { "title": "Loops by hand", "text": "A loop for each question, each a new chance." },
+    {
+      "title": "Your code",
+      "file": "ledger.cpp",
+      "mine": true,
+      "gap": "Writes every loop itself",
+      "tasks": ["Add up the month", "Find the largest", "Find and count", "Largest first"]
+    },
+    { "title": "Month's summary", "rows": [["Total", "with the pence"], ["Largest", "the bill itself"], ["Bills", "largest first"]] }
+  ],
+  "ticket": { "label": "The month", "wrong": "half done", "why": "By hand", "right": "summed up" },
+  "captions": [
+    "At the end of the month Ambrose wants the total, the largest bill and the bills in order.",
+    "Every question means another loop written by hand, each with its own chance of a slip.",
+    "You hand the bills to the standard library's own tools, in five tasks.",
+    "Now the month is added up, searched, counted and sorted by tools that are already tested.",
+    "The workshop's lists are summed, searched, counted and sorted by the library now."
+  ]
+}

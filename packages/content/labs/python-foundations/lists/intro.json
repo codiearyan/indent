@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Who do I phone next?", "note": "The board is all arrows." },
+    { "title": "Whiteboard", "text": "Names crossed out, moved and squeezed in." },
+    {
+      "title": "Your functions",
+      "file": "call_list.py",
+      "mine": true,
+      "gap": "No list, only arrows",
+      "tasks": ["Read both ends", "Cut a hill party", "Join and move up", "Page the next one"]
+    },
+    { "title": "Pager", "say": "Next one, in order.", "note": "No name missed." }
+  ],
+  "ticket": { "label": "Next page", "wrong": "lost place", "why": "Messy board", "right": "next in order" },
+  "captions": [
+    "A callout at the base, and Rhona phones down the call-out list from the top.",
+    "Today the list is a whiteboard of arrows, and she loses her place.",
+    "You keep the names in a list, read it by position, and change it in place.",
+    "Now the next name is always at the top, and the board is tidy.",
+    "Lists, positions, slices, and methods that change a list."
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dorrit", "label": "Dorrit at the counter", "kind": "story" },
+      { "id": "queue", "label": "Bench queue", "kind": "data" },
+      { "id": "funcs", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "kasimir", "label": "Kasimir at the bench", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dorrit", "to": "queue", "label": "new tickets" },
+      { "from": "queue", "to": "funcs", "label": "the whole list" },
+      { "from": "funcs", "to": "compiler", "label": "builds" },
+      { "from": "compiler", "to": "kasimir", "label": "what is next" }
+    ],
+    "note": "The tickets at the bench live in one list that grows, instead of one variable each."
+  },
+  "tasks": {
+    "waiting": {
+      "steps": [
+        {
+          "active": ["queue", "queue->funcs"],
+          "value": { "kind": "array", "label": "goes in", "values": ["ticket", "ticket", "ticket"] },
+          "note": "The queue goes in as it is, to be read and not changed."
+        },
+        {
+          "active": ["funcs"],
+          "note": "The function asks the queue whether it is empty, and how many it holds."
+        },
+        {
+          "active": ["funcs->compiler", "compiler", "compiler->kasimir", "kasimir"],
+          "value": { "kind": "array", "label": "comes back", "values": ["one line of text"] },
+          "note": "Kasimir reads one line that says how much work is waiting."
+        }
+      ]
+    },
+    "last": {
+      "steps": [
+        {
+          "active": ["queue", "queue->funcs"],
+          "value": { "kind": "array", "label": "positions", "values": ["0", "1", "2"] },
+          "note": "The queue goes in. Its positions start at 0."
+        },
+        {
+          "active": ["funcs"],
+          "note": "The function works out where the last ticket sits, and minds the empty queue."
+        },
+        {
+          "active": ["funcs->compiler", "compiler->kasimir", "kasimir"],
+          "value": { "kind": "array", "label": "comes back", "values": ["a ticket, or 0"] },
+          "note": "Kasimir learns which ticket came in most recently."
+        }
+      ]
+    },
+    "add": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->queue"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the queue", "a new ticket"] },
+          "note": "Dorrit brings a new ticket to the bench."
+        },
+        {
+          "active": ["queue", "queue->funcs", "funcs"],
+          "note": "The function gets the bench's own queue, not a copy, and adds the ticket at its end."
+        },
+        {
+          "active": ["queue"],
+          "value": { "kind": "array", "label": "comes back", "values": ["the new count"] },
+          "note": "The queue at the bench is one longer, and the count says so."
+        }
+      ]
+    },
+    "replace": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->queue"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the queue", "a place", "a new ticket"] },
+          "note": "Dorrit swaps a ticket and names its place, counting from 1."
+        },
+        {
+          "active": ["queue->funcs", "funcs"],
+          "note": "The function asks whether the queue has that place before it touches anything."
+        },
+        {
+          "active": ["queue"],
+          "value": { "kind": "array", "label": "comes back", "values": ["true or false"] },
+          "note": "The queue changes at that place only when the place is there."
+        }
+      ]
+    }
+  }
+}

@@ -296,6 +296,14 @@ const repos: { labId: string; expected: string[] }[] = [
     expected: ['parts-that-vary/match', 'query-and-body/query']
   },
   {
+    labId: 'build-a-state-store',
+    expected: ['one-place-for-state/create', 'selectors/shallow']
+  },
+  {
+    labId: 'testing-foundations',
+    expected: ['choosing-cases/fix', 'test-first/free-code', 'test-first/large-code']
+  },
+  {
     labId: 'security-bug-hunts',
     expected: [
       'search-leak/reproduce',

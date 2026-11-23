@@ -1,0 +1,78 @@
+{
+  "id": "selectors",
+  "title": "Only the part you read",
+  "files": ["src/store.js", "src/try.js", "src/order.js"],
+  "terminal": {
+    "description": "A shell in your workspace where each part of the order screen watches only what it shows, and prints when it is drawn again.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "watch",
+      "title": "Watch one part",
+      "file": "src/store.js",
+      "description": "Implement `watch(store, selector, listener)` in `src/store.js`.\n\n- `selector` is a function that picks a part out of the state, such as `(state) => state.basket.length`\n- `watch` reads the part once when it is called; after each change of the state, it picks the part again and tells `listener(part, previousPart)` only when the part changed\n- parts are compared with `Object.is`: a number or a text worked out again is the same when its value is; a new array or object is always a change\n- `watch` returns a function that stops it\n\nThe check watches numbers, texts, arrays and `NaN` with selectors of its own, makes changes that do and do not touch them, and notes every call.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the error.",
+        "Build `watch` on `store.subscribe`: it is a listener that compares before it passes the news on.",
+        "Keep the part from the last time in a variable, starting with the part when `watch` is called.",
+        "Return what `subscribe` returns."
+      ],
+      "hints": [
+        "A part of the screen does not care about the whole state, only about its piece of it. `watch` stands between the store and that part, and keeps quiet when its piece did not change.",
+        "Inside the listener you give `subscribe`, run the selector on the new state and compare the result with the one you kept. When they differ, keep the new one and tell the listener.",
+        "`let current = selector(store.getState())`, then `return store.subscribe((state) => { const next = selector(state); if (Object.is(current, next)) return; const previous = current; current = next; listener(next, previous) })`."
+      ],
+      "docs": [
+        { "title": "Object.is()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" },
+        { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures" },
+        { "title": "Arrow function expressions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "equal",
+      "title": "Decide what counts as a change",
+      "file": "src/store.js",
+      "description": "Give `watch` a fourth argument, `isEqual`, for parts that are made new every time.\n\n- `watch(store, selector, listener, isEqual)`: when `isEqual` is given, `isEqual(previousPart, part)` decides alone, in place of `Object.is`; `true` means the part did not change\n- it is called once per round, with the part before first and the new part second\n- when it says the part changed, the listener is told with the new part and the part before, as in task 1\n- without `isEqual`, parts are still compared with `Object.is`\n\nThe check watches a part made new on every round, `{ jobs, ink }`, with and without an `isEqual` of its own, and with one that never calls two parts the same.",
+      "nextSteps": [
+        "Run `node src/try.js`: the summary line passes `shallowEqual` as a fourth argument, which is the next task.",
+        "Add the fourth parameter to `watch`.",
+        "Where you compare with `Object.is`, use `isEqual` when it is given."
+      ],
+      "hints": [
+        "A selector that returns `{ jobs, ink }` makes a new object every time it runs, so `Object.is` calls every round a change. Only whoever wrote the selector knows what \"the same\" means for it.",
+        "A default parameter, `isEqual = Object.is`, gives you one name for both cases.",
+        "`export function watch(store, selector, listener, isEqual = Object.is)`, and `if (isEqual(current, next)) return` in place of the `Object.is` check."
+      ],
+      "docs": [
+        { "title": "Default parameters", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters" },
+        { "title": "Equality comparisons and sameness", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Equality_comparisons_and_sameness" }
+      ],
+      "videos": [{ "title": "Referential equality in JavaScript", "url": "https://www.youtube.com/watch?v=p8MpTvVYLVI" }],
+      "points": 10
+    },
+    {
+      "id": "shallow",
+      "title": "Compare an object key by key",
+      "file": "src/store.js",
+      "description": "Implement `shallowEqual(a, b)` in `src/store.js`, a ready-made `isEqual` for parts that are small objects.\n\n- it is `true` when `Object.is(a, b)` is\n- otherwise both have to be objects, not `null`, with the same keys, in any order, and each key's values the same by `Object.is`; arrays count, by their places\n- it looks one level deep only: two values that are each their own array or object are different, whatever is inside them\n- in every other case it is `false`\n\nThe check calls `shallowEqual` with pairs of its own, then uses it with `watch` on a part made new every round.",
+      "nextSteps": [
+        "Read \"One level down\" in the lesson.",
+        "Start with the easy answers: the same value, then two values that are not both objects.",
+        "Compare the number of keys, then every key of the first with the same key of the second."
+      ],
+      "hints": [
+        "`shallowEqual` answers one question: would a part made of these values look the same on screen? It looks at each value once, never inside it.",
+        "`Object.keys(a)` gives the keys. A key the second object lacks reads as `undefined` there, the same as a key that holds `undefined`, so ask `Object.hasOwn(b, key)` too.",
+        "After `if (Object.is(a, b)) return true` and the object check, `const keys = Object.keys(a)`, then `keys.length === Object.keys(b).length && keys.every((key) => Object.hasOwn(b, key) && Object.is(a[key], b[key]))`."
+      ],
+      "docs": [
+        { "title": "Object.keys()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys" },
+        { "title": "Object.hasOwn()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn" },
+        { "title": "Array.prototype.every()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every" }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "before", "label": "beforeEach()", "kind": "function", "mine": true },
+      { "id": "van", "label": "A fresh van", "kind": "data" },
+      { "id": "tests", "label": "van.test.js", "kind": "file", "mine": true },
+      { "id": "code", "label": "van.js", "kind": "file" },
+      { "id": "log", "label": "Day's log", "kind": "data" },
+      { "id": "after", "label": "afterEach()", "kind": "function", "mine": true }
+    ],
+    "edges": [
+      { "from": "before", "to": "van", "label": "makes" },
+      { "from": "van", "to": "tests", "label": "one per test" },
+      { "from": "tests", "to": "code", "label": "load, deliver" },
+      { "from": "code", "to": "log", "label": "writes" },
+      { "from": "after", "to": "log", "label": "empties" }
+    ],
+    "note": "Every test gets a van of its own, and the day's log is emptied after each one, so no test leans on another."
+  },
+  "tasks": {
+    "lean": {
+      "steps": [
+        {
+          "active": ["tests"],
+          "note": "Run alone, Lorcan's weighing test finds an empty van: the box it weighs was loaded by the test above it."
+        },
+        {
+          "active": ["before", "before->van", "van"],
+          "note": "Before each test, a new empty van is made for that test only."
+        },
+        {
+          "active": ["van", "van->tests", "tests", "tests->code", "code"],
+          "note": "The weighing test loads its own box, then asks van.js what the van weighs."
+        }
+      ]
+    },
+    "full": {
+      "steps": [
+        {
+          "active": ["before", "before->van", "van"],
+          "value": {
+            "kind": "map",
+            "label": "the van each test gets",
+            "entries": [
+              { "key": "boxes", "value": "loaded in beforeEach" },
+              { "key": "weight", "value": "a few kilos short of the limit" }
+            ]
+          },
+          "note": "Before each test, a fresh van is made and loaded until it is nearly full."
+        },
+        {
+          "active": ["van->tests", "tests", "tests->code", "code"],
+          "note": "One test adds a box that fills the van exactly to the limit, and it goes in."
+        },
+        {
+          "active": ["tests", "code"],
+          "note": "Another test, with a nearly full van of its own, adds a box that is too heavy. It is turned away, and the van weighs what it did."
+        }
+      ]
+    },
+    "log": {
+      "steps": [
+        {
+          "active": ["before", "before->van", "van"],
+          "note": "Each test starts with a fresh van holding two boxes."
+        },
+        {
+          "active": ["tests", "tests->code", "code", "code->log", "log"],
+          "value": {
+            "kind": "map",
+            "label": "a line in the log",
+            "entries": [
+              { "key": "customer", "value": "a name" },
+              { "key": "village", "value": "a village" }
+            ]
+          },
+          "note": "The test delivers a box. van.js takes it out of the van and writes it in the day's log."
+        },
+        {
+          "active": ["log", "tests"],
+          "note": "The test reads the log and checks every line, in the order the boxes were delivered."
+        },
+        {
+          "active": ["after", "after->log", "log"],
+          "note": "After the test, passed or failed, the log is emptied for the next one."
+        }
+      ]
+    }
+  }
+}
