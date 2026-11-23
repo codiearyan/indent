@@ -1,0 +1,11 @@
+{
+  "id": "threads",
+  "title": "A second thread",
+  "files": ["BusyHut.java"],
+  "terminal": { "description": "x", "suggestedCommand": "java BusyHut.java" },
+  "tasks": [
+    { "id": "announce", "title": "a", "file": "BusyHut.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
+    { "id": "total", "title": "a", "file": "BusyHut.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
+    { "id": "ringer", "title": "a", "file": "BusyHut.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 }
+  ]
+}

@@ -3149,3 +3149,225 @@ final class CheckPath implements java.nio.file.Path {
     @Override public String toString() { return real.isAbsolute() ? fs.provider.show(real.normalize()) : real.toString().replace('\\\\', '/'); }
 }
 `
+
+// --- Several things at once ---------------------------------------------------------------------
+// From part 9 a task starts threads, shares a value between them, or hands work to a pool. A mistake
+// with threads shows only sometimes, so Check does not hope to see it: its own stand-ins decide the
+// order of events. A case made with threaded() runs the call on a thread of Check's own, named main,
+// in a thread group of its own (CheckRun.GROUP), so every thread the call starts is in that group.
+// Check waits a bounded time for the call; a call that never returns is named by what its thread is
+// doing (CheckStuck) and the case goes on. Once it returns, Check gives the threads it started a
+// moment to end and names the ones still alive: a pool's thread still waiting for jobs, a thread
+// still waiting or still running, with the learner's line. A stand-in can ask whether the caller is
+// waiting for other threads (CheckRun.waiting) and hold a job until it is (CheckRun.until), which
+// is how a check knows how many threads were started before the first wait, without timing anything.
+
+export const CHECK_THREADS = `final class CheckStuck extends RuntimeException {
+    final String what;
+    CheckStuck(String what) { super("Check stopped waiting for the call to return"); this.what = what; }
+}
+final class CheckRun {
+    static final ThreadGroup GROUP = new ThreadGroup("check-call");
+    static volatile Thread caller;
+    static Runnable watch = () -> {};
+
+    @SuppressWarnings("unchecked")
+    static <T> T call(long wait, java.util.concurrent.Callable<T> work) throws Throwable {
+        Object[] got = new Object[1];
+        Throwable[] err = new Throwable[1];
+        Thread t = new Thread(GROUP, () -> { try { got[0] = work.call(); } catch (Throwable x) { err[0] = x; } }, "main");
+        caller = t;
+        long until = System.nanoTime() + wait * 1_000_000L;
+        t.start();
+        while (t.isAlive() && System.nanoTime() < until) { watch.run(); pause(); }
+        if (t.isAlive()) throw new CheckStuck(describe(java.util.List.of(t)) + describe(others(t)));
+        watch.run();
+        if (err[0] != null) { trim(err[0]); throw err[0]; }
+        return (T) got[0];
+    }
+
+    static void pause() { java.util.concurrent.locks.LockSupport.parkNanos(50_000); }
+
+    static java.util.List<Thread> threads() {
+        Thread[] all = new Thread[GROUP.activeCount() + 64];
+        int n = GROUP.enumerate(all);
+        java.util.List<Thread> out = new java.util.ArrayList<>();
+        for (int i = 0; i < n; i++) if (all[i].isAlive()) out.add(all[i]);
+        return out;
+    }
+
+    static java.util.List<Thread> others(Thread but) {
+        java.util.List<Thread> out = threads();
+        out.remove(but);
+        return out;
+    }
+
+    // Waits up to grace ms for every thread the calls started to end; names the ones still alive.
+    static String settle(long grace) {
+        long until = System.nanoTime() + grace * 1_000_000L;
+        for (int round = 0; round < 3; round++) {
+            for (Thread x : threads()) {
+                long ms = (until - System.nanoTime()) / 1_000_000L;
+                if (ms <= 0) break;
+                try { x.join(ms); } catch (InterruptedException e) { return null; }
+            }
+        }
+        java.util.List<Thread> still = threads();
+        return still.isEmpty() ? null : describe(still);
+    }
+
+    static boolean learner(StackTraceElement e) {
+        String c = e.getClassName();
+        return !c.startsWith("java.") && !c.startsWith("jdk.") && !c.startsWith("sun.") && !c.startsWith("Check");
+    }
+
+    // kind:line; per thread, kind one of pool (a pool's thread waiting for jobs), lock, join, sleep,
+    // wait or running, line the learner's line it is on, 0 when none.
+    static String describe(java.util.List<Thread> ts) {
+        StringBuilder b = new StringBuilder();
+        for (Thread x : ts) {
+            if (!x.isAlive()) continue;
+            Thread.State s = x.getState();
+            boolean pool = false, join = false, sleep = false;
+            int line = 0;
+            for (StackTraceElement e : x.getStackTrace()) {
+                String c = e.getClassName(), m = e.getMethodName();
+                if (c.equals("java.util.concurrent.ThreadPoolExecutor") && m.equals("getTask")) pool = true;
+                if (c.equals("java.lang.Thread") && m.equals("join")) join = true;
+                if (c.equals("java.lang.Thread") && m.startsWith("sleep")) sleep = true;
+                if (line == 0 && learner(e) && e.getLineNumber() > 0) line = e.getLineNumber();
+            }
+            String kind = pool ? "pool" : s == Thread.State.BLOCKED ? "lock" : join ? "join" : sleep ? "sleep" : s == Thread.State.RUNNABLE ? "running" : "wait";
+            b.append(kind).append(':').append(line).append(';');
+        }
+        return b.toString();
+    }
+
+    // True while t waits for other threads: in join, a future's get, invokeAll, awaitTermination or
+    // a latch, and not in a print or a stand-in of Check's own.
+    static boolean waiting(Thread t) {
+        Thread.State s = t.getState();
+        if (s != Thread.State.WAITING && s != Thread.State.TIMED_WAITING) return false;
+        boolean waits = false;
+        for (StackTraceElement e : t.getStackTrace()) {
+            String c = e.getClassName(), m = e.getMethodName();
+            if (c.startsWith("java.io.") || c.startsWith("Check")) return false;
+            if (learner(e)) break;
+            if ((c.equals("java.lang.Thread") && m.equals("join")) || c.equals("java.util.concurrent.FutureTask")
+                || (c.equals("java.util.concurrent.ThreadPoolExecutor") && m.equals("awaitTermination"))
+                || (c.equals("java.util.concurrent.AbstractExecutorService") && m.startsWith("invoke"))
+                || c.equals("java.util.concurrent.CountDownLatch") || c.equals("java.util.concurrent.CyclicBarrier")
+                || c.equals("java.util.concurrent.CompletableFuture") || c.equals("java.util.concurrent.ForkJoinTask")
+                || c.equals("java.util.concurrent.Phaser")) waits = true;
+        }
+        return waits;
+    }
+
+    // True while t waits for a lock at a line of the learner's: synchronized, or a ReentrantLock.
+    static boolean atLock(Thread t) {
+        Thread.State s = t.getState();
+        StackTraceElement[] f = t.getStackTrace();
+        if (s == Thread.State.BLOCKED) return f.length > 0 && learner(f[0]);
+        if (s != Thread.State.WAITING) return false;
+        for (StackTraceElement e : f) {
+            if (e.getClassName().startsWith("Check") || e.getClassName().startsWith("java.io.")) return false;
+            if (learner(e)) return false;
+            if (e.getClassName().startsWith("java.util.concurrent.locks.Reentrant")) return true;
+        }
+        return false;
+    }
+
+    // An exception from the call, without the frames of Check's own thread under it.
+    static void trim(Throwable x) {
+        java.util.Set<Throwable> seen = new java.util.HashSet<>();
+        for (Throwable e = x; e != null && seen.add(e); e = e.getCause()) {
+            StackTraceElement[] f = e.getStackTrace();
+            int end = f.length;
+            for (int i = 0; i < f.length; i++) if (f[i].getClassName().startsWith("CheckRun")) { end = i; break; }
+            e.setStackTrace(java.util.Arrays.copyOf(f, end));
+        }
+    }
+
+    // Holds the current thread until done says so, or ms pass; true when done said so. An interrupt
+    // is kept for the code that comes after.
+    static boolean until(long ms, java.util.function.BooleanSupplier done) {
+        long end = System.nanoTime() + ms * 1_000_000L;
+        while (!done.getAsBoolean()) {
+            if (System.nanoTime() > end) return false;
+            pause();
+        }
+        return true;
+    }
+}
+`
+
+/**
+ * A case whose call runs on Check's own thread, through CheckRun: `{ setup, call, type, after,
+ * ...case }` as for attempt(), with `wait` (ms Check waits for the call) and `grace` (ms it gives
+ * the threads the call started to end). Its run carries 'still waiting' (what the call's thread was
+ * doing when Check stopped waiting, or null) and 'threads left running' (null when none).
+ */
+export function threaded({ setup = [], call, type = 'void', wait = 1500, grace = 600, after = {}, ...rest }) {
+  const work = type === 'void' ? `() -> { ${call}; return null; }` : `() -> ${call}`
+  return {
+    ...rest,
+    after,
+    code: [
+      ...setup,
+      `${type} got = ${ZERO[type] ?? 'null'}; Throwable thrown = null; String stuck = null;`,
+      `try { ${type === 'void' ? '' : 'got = '}CheckRun.call(${wait}, ${work}); } catch (CheckStuck x$) { stuck = x$.what; } catch (Throwable x$) { thrown = x$; }`
+    ],
+    reads: {
+      ...(type === 'void' ? {} : { got: 'got' }),
+      ...THROWN_READS,
+      'still waiting': 'stuck',
+      'threads left running': `stuck != null ? null : CheckRun.settle(${grace})`,
+      ...after
+    },
+    show: rest.show ?? [...setup, type === 'void' ? `${call};` : `${type} got = ${call};`].join('\n'),
+    type
+  }
+}
+
+const THREAD_DOING = {
+  pool: () => "a pool's thread, still waiting for jobs: a pool keeps its threads until it is shut down",
+  lock: (at) => `a thread waiting for a lock another thread holds${at}`,
+  join: (at) => `a thread waiting for another thread to end${at}`,
+  sleep: (at) => `a thread asleep${at}`,
+  wait: (at) => `a thread still waiting${at}`,
+  running: (at) => `a thread still running${at}`
+}
+
+/** CheckRun's kind:line; list as plain words, one phrase per thread, alike ones counted once. */
+export function threadWords(desc, file) {
+  const phrases = (desc ?? '')
+    .split(';')
+    .filter(Boolean)
+    .map((one) => {
+      const [kind, line] = one.split(':')
+      return (THREAD_DOING[kind] ?? THREAD_DOING.wait)(Number(line) > 0 ? `, at line ${line} of ${file}` : '')
+    })
+  const counted = [...new Set(phrases)].map((p) => {
+    const n = phrases.filter((q) => q === p).length
+    return n > 1 ? `${p} (${n} of them)` : p
+  })
+  return counted.join('; ')
+}
+
+// What an exception usually means with threads and pools, in plain words, without the fix.
+const THREAD_THROWN = [
+  [/InterruptedException/, 'The thread was interrupted while it waited or slept: another thread asked it to stop.'],
+  [/ExecutionException/, 'A job handed to a pool threw an exception. get wraps it in an ExecutionException, and the job\'s own exception is its cause, under Caused by.'],
+  [/CancellationException/, 'That job was cancelled before it finished, so its future holds no answer: a pool stopped at once drops the jobs still waiting and interrupts the ones running.'],
+  [/RejectedExecutionException/, 'A job was handed to a pool that was already shut down, and a pool takes no more jobs once it is.'],
+  [/IllegalMonitorStateException/, 'wait, notify and notifyAll may be called only by a thread that holds that object\'s lock.'],
+  [/IllegalThreadStateException/, 'A thread can be started only once.'],
+  [/ConcurrentModificationException/, 'A list or a map was changed while something was going through it, so the loop stopped.'],
+  [/UnsupportedOperationException[\s\S]*java\.lang\.Thread\.stop/, 'A thread cannot be stopped from outside any more: it can only be asked to stop, and then it stops itself.']
+]
+
+/** One sentence on what an exception with threads usually means, or one with values. For outcomeCases. */
+export function explainThread(x) {
+  const text = `${x.type}${x.message === null ? '' : `: ${x.message}`}\n${x.frames.map((f) => `\tat ${f}`).join('\n')}`
+  return THREAD_THROWN.find(([re]) => re.test(text))?.[1] ?? explainValue(x)
+}
