@@ -351,8 +351,9 @@ async function build(t, spec) {
   const text = raw.replace(/\r\n?/g, '\n')
   const starterRaw = await readFile(t.chapterPath(`starter/${spec.file}`), 'utf8')
   const starter = starterRaw.replace(/\r\n?/g, '\n')
-  const l = spec.methods ? methodLayout(text) : layout(text)
-  const s = spec.methods ? methodLayout(starter) : layout(starter)
+  const pick = spec.methods ? methodLayout : spec.objects ? objectLayout : layout
+  const l = pick(text)
+  const s = pick(starter)
   const lost = [...s.marks.keys()].filter((n) => !l.marks.has(n))
   if (lost.length || l.twice.size) return { stop: 'marks', lost, twice: [...l.twice], text, l }
   const fileClass = spec.file
@@ -364,7 +365,7 @@ async function build(t, spec) {
   if (!l.main) return { stop: 'main' }
   const outside = [...l.sections.entries()].find(([, sec]) => !sec.inside)
   if (outside) return { stop: 'outside', task: outside[0] }
-  const around = spec.methods ? methodShared : shared
+  const around = spec.methods ? methodShared : spec.objects ? objectShared : shared
   if (bare(around(text, l)) !== bare(around(starter, s))) return { stop: 'shared' }
 
   const reached = new Map()
@@ -377,6 +378,10 @@ async function build(t, spec) {
     const keep = [task.task, ...(task.needs ?? [])]
     if (keep.some((n) => reached.has(n))) continue
     task.cases.forEach((c, i) => {
+      if (spec.objects) {
+        units.push({ id: `${id}.${i}`, task: id, case: c, ...methodVariant(text, l, keep, objectCall(c), 0) })
+        return
+      }
       const v = spec.methods
         ? methodVariant(text, l, keep, methodCall(task, c), callAt(task, c))
         : variant(text, l, keep, c.given ?? {}, task.reads ?? [])
@@ -577,7 +582,9 @@ const METHOD_GLOSS = [
 ]
 
 function gloss(e, src, methods) {
-  for (const [code, say] of methods ? [...METHOD_GLOSS, ...GLOSS] : GLOSS) {
+  const table =
+    methods === 'objects' ? [...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS] : methods ? [...METHOD_GLOSS, ...GLOSS] : GLOSS
+  for (const [code, say] of table) {
     if (code.test(e.code)) {
       const text = say(e, src ?? '')
       if (text) return ` ${text}`
@@ -597,6 +604,7 @@ function compileProblem(spec, b, task, unit, result) {
   const mine = result.errors.filter((e) => !isRead(e))
   const n = task.task
   if (mine.length === 0 && spec.methods) return callProblem(task, result.errors, at.col + unit.paren)
+  if (mine.length === 0 && spec.objects) return objectProblem(spec, b, task, unit, result.errors)
   if (mine.length === 0) {
     if (result.errors.some((e) => /unreachable/.test(e.code))) {
       return fail(
@@ -638,7 +646,7 @@ function compileProblem(spec, b, task, unit, result) {
   )
   const shown = mine
     .slice(0, 3)
-    .map((e) => javacLike(spec.file, lines, e, spec.methods))
+    .map((e) => javacLike(spec.file, lines, e, spec.methods || spec.objects))
     .join('\n\n')
   if (earlier !== undefined) {
     return fail(
@@ -651,7 +659,7 @@ function compileProblem(spec, b, task, unit, result) {
   if (elsewhere) return fail(`${label(n)} compiles`, elsewhere, shown)
   return fail(
     `${label(n)} compiles`,
-    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.methods)}`,
+    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.objects ? 'objects' : spec.methods)}`,
     shown
   )
 }
@@ -760,7 +768,9 @@ const METHOD_THROWN = [
 function runProblem(spec, task, result, given = {}, call) {
   const n = task.task
   const values =
-    call !== undefined
+    spec.objects && call !== undefined
+      ? `Check ran:\n${indent(call)}\n`
+      : call !== undefined
       ? `Check called ${call}\n`
       : Object.keys(given).length
         ? `With ${givenText(given)}\n`
@@ -794,6 +804,14 @@ function runProblem(spec, task, result, given = {}, call) {
       `${label(n)} runs`,
       `${label(n)} waits for someone to type. Check gives a program no typing: everything a task needs is already in the file.`,
       values + result.exception
+    )
+  }
+  if (result.exception && spec.objects) {
+    const known = [...METHOD_THROWN, ...THROWN].find(([re]) => re.test(result.exception))
+    return fail(
+      `${label(n)} runs`,
+      `${label(n)} compiles, but stops with an exception when Check runs the code below. Read the first line of the stack trace for what went wrong, and the line starting with at that names ${spec.file} for where.${known ? ` ${known[1]}` : ''}`,
+      values + result.exception.replace(/\n\tat [\w$.]*\.main\(.*/g, '')
     )
   }
   if (result.exception && spec.methods) {
@@ -855,6 +873,11 @@ function stopMessage(spec, b) {
         `The class is called ${b.className}, but the file is ${spec.file}. Java needs the name after public class to be the file's name without .java, capital letters included. java ${spec.file} may still run it, but javac and Check refuse it. Put the name back.`
       ]
     case 'main':
+      if (spec.objects)
+        return [
+          `${spec.file} has its main`,
+          `Check cannot find main in ${spec.file} as the starter gave it: the class at the top holds only main, and its closing brace comes just above // Task 1. Put back the lines the starter gave around the tasks, and write your own classes and methods under the // Task comments.`
+        ]
       if (spec.methods)
         return [
           `${spec.file} has its main`,
@@ -865,6 +888,11 @@ function stopMessage(spec, b) {
         `Check cannot find main in ${spec.file}, with its opening brace and the two closing braces at the end of the file. Put back the lines the starter gave around the tasks.`
       ]
     case 'outside':
+      if (spec.objects)
+        return [
+          `${spec.file} keeps its tasks below the class with main`,
+          `The // Task ${b.task} comment is inside the class with main. Every task goes below that class's closing brace, where the starter had the comment.`
+        ]
       if (spec.methods)
         return [
           `${spec.file} keeps its tasks below main`,
@@ -875,6 +903,11 @@ function stopMessage(spec, b) {
         `The // Task ${b.task} comment is outside main. Every task's lines go inside main, between its braces, where the starter had them.`
       ]
     case 'shared':
+      if (spec.objects)
+        return [
+          'The lines around the tasks are as the starter gave them',
+          `The lines outside main and outside the // Task parts are not as the starter gave them. Write each task under its own // Task comment, and try things inside main, which is yours to change.`
+        ]
       if (spec.methods)
         return [
           'The lines around the tasks are as the starter gave them',
@@ -937,27 +970,38 @@ export function tasks(spec) {
         ]
     }
     const units = b.units.filter((u) => u.task === id)
+    // A case that `refuse`s expects Check's own line not to compile: its judge reads the errors.
     for (const u of units) {
+      if (u.case?.refuse) continue
       const problem = compileProblem(spec, b, task, u, b.results.get(u.id))
-      if (problem) return [problem]
+      if (problem) return spec.objects ? behindFirst(t, task, [problem]) : [problem]
     }
     for (const u of units) {
+      if (u.case?.refuse) continue
       const c = task.cases[Number(u.id.split('.').pop())]
-      const problem = spec.methods
+      const problem = spec.objects
+        ? runProblem(spec, task, b.results.get(u.id), {}, ranText(c))
+        : spec.methods
         ? runProblem(spec, task, b.results.get(u.id), {}, callText(task, c))
         : runProblem(spec, task, b.results.get(u.id), c.given)
-      if (problem) return [problem]
+      if (problem) return spec.objects ? behindFirst(t, task, [problem]) : [problem]
     }
     const runs = units.map((u, i) => {
       const r = b.results.get(u.id)
       const values = {}
-      for (const read of r.reads) {
+      for (const read of r.reads ?? []) {
         const [name, type, value] = read.split(SEP)
         values[name] = { type, value: value === NULL ? null : value }
-        if (spec.methods && value?.startsWith(ITEMS))
+        if ((spec.methods || spec.objects) && value?.startsWith(ITEMS))
           values[name].items = value === ITEMS ? [] : value.slice(1).split(ITEMS)
       }
-      const stdout = r.stdout.replace(/\r\n/g, '\n')
+      const stdout = (r.stdout ?? '').replace(/\r\n/g, '\n')
+      if (spec.objects) {
+        const c = task.cases[i]
+        const at = u.readAt
+        const errors = r.errors.filter((e) => e.line === at.line && e.col >= at.col)
+        return { case: c, call: ranText(c), stdout, lines: lines(stdout), values, given: {}, compiled: r.compiled, errors }
+      }
       if (spec.methods) {
         const c = task.cases[i]
         return { case: c, call: callText(task, c), stdout, lines: lines(stdout), values, given: {} }
@@ -973,6 +1017,19 @@ export function tasks(spec) {
     if (behind.length && !details.every((d) => d.passed)) {
       const message = `${label(task.task)} builds on ${label(behind[0])}, which is not passing yet. Get ${label(behind[0])} passing first, then check again.`
       return details.map((d) => (d.passed ? d : { ...d, message }))
+    }
+    return details
+  }
+  // In object issues a later task makes objects with an earlier task's constructor and fields, so
+  // when that task is not passing, it is named before anything else.
+  const behindFirst = async (t, task, details) => {
+    for (const k of task.needs ?? []) {
+      const other = Object.keys(spec.tasks).find((key) => spec.tasks[key].task === k)
+      if (other && !(await verdict(t, other)))
+        return details.map((d) => ({
+          ...d,
+          message: `${label(task.task)} builds on ${label(k)}, which is not passing yet. Get ${label(k)} passing first, then check again.`
+        }))
     }
     return details
   }
@@ -1178,4 +1235,542 @@ export function methodCases({ method, mistakes = [], typed }) {
           )
     )
   }
+}
+
+// --- Object issues ------------------------------------------------------------------------------
+// From part 3 a task is a class, or the fields, constructors and methods of one. The file opens
+// with the public class that holds main (main's body is the learner's), and the `// Task N` parts
+// come after that class's closing brace. Either the parts sit at the top level, each holding whole
+// classes, or the starter gives a class's first line above Task 1 and its closing brace at the end
+// of the file, and the parts sit inside it. Check blanks main's body and the other tasks, as for
+// methods, and puts its own code in main: it makes objects with its own values, calls their
+// methods and reads back what it names.
+
+function objectLayout(text) {
+  const code = codeOnly(text)
+  const marks = new Map()
+  const twice = new Set()
+  for (const m of text.matchAll(TASK_MARK)) {
+    if (code[m.index + m[0].search(/\S/)] !== ' ') continue
+    const n = Number(m[1])
+    if (marks.has(n)) twice.add(n)
+    marks.set(n, m.index)
+  }
+  const main = /\bstatic\s+void\s+main\s*\([^)]*\)\s*(?:throws\s+[\w.,\s]+)?\{/.exec(code)
+  const className = /\bclass\s+([A-Za-z_$][\w$]*)/.exec(code)?.[1] ?? null
+  if (!main || marks.size === 0) return { marks, twice, className, main: null }
+  const bodyStart = main.index + main[0].length
+  const firstMark = Math.min(...marks.values())
+  const head = [...code.slice(0, firstMark).matchAll(/\bclass\s+[A-Za-z_$][\w$]*[^{};]*\{/g)].at(-1)
+  const inClass = !!head && head.index > bodyStart
+  const classEnd = code.lastIndexOf('}', inClass ? head.index : firstMark)
+  const bodyEnd = code.lastIndexOf('}', classEnd - 1)
+  const tasksEnd = inClass ? code.lastIndexOf('}') : text.length
+  if (bodyEnd < bodyStart || tasksEnd < firstMark) return { marks, twice, className, main: null }
+  const sorted = [...marks.entries()].sort((a, b) => a[1] - b[1])
+  const sections = new Map()
+  sorted.forEach(([n, at], i) => {
+    const next = i + 1 < sorted.length ? sorted[i + 1][1] : Infinity
+    sections.set(n, { start: at, end: Math.min(next, tasksEnd), inside: at > classEnd })
+  })
+  const taskClass = inClass ? /class\s+([A-Za-z_$][\w$]*)/.exec(head[0])[1] : null
+  return { marks, twice, className, inClass, taskClass, main: { bodyStart, bodyEnd, classEnd, tasksEnd }, sections }
+}
+
+/** The lines an object task file shares: all but main's body and the tasks. */
+function objectShared(text, l) {
+  const firstTask = Math.min(...[...l.sections.values()].map((s) => s.start))
+  return text.slice(0, l.main.bodyStart) + text.slice(l.main.bodyEnd, firstTask) + text.slice(l.main.tasksEnd)
+}
+
+const statements = (c) => (Array.isArray(c.code) ? c.code : c.code ? [c.code] : [])
+
+/** The Java Check runs in main for one case of an object task, on one line. */
+function objectCall(c) {
+  const reads = Object.entries(c.reads ?? {}).map(([name, expr]) => `__Indent.read(${JSON.stringify(name)}, ${expr}); `)
+  return statements(c).map((s) => `${s} `).join('') + reads.join('')
+}
+
+const indent = (text) => text.split('\n').map((l) => `  ${l}`).join('\n')
+
+/** What Check ran for a case, as a person reads it. */
+function ranText(c) {
+  return c.show ?? statements(c).join('\n')
+}
+
+/** Why Check's own code did not compile against the learner's classes, when theirs did. */
+function objectProblem(spec, b, task, unit, errors) {
+  const n = task.task
+  const c = unit.case
+  const e = errors[0]
+  const message = (x) => x.message.replace(/\bjava\.(?:lang|util)\.(?=[A-Z])/g, '')
+  const reads = Object.values(c.reads ?? {})
+  const asIs = `Check ran:\n${indent(ranText(c))}${reads.length && !c.show ? `\nand read:\n${indent(Object.keys(c.reads).join('\n'))}` : ''}\n\n${errors.map(message).join('\n\n')}`
+  const keep = [n, ...(task.needs ?? [])]
+  const mine = codeOnly(keep.map((k) => section(b, k)).join('\n'))
+  const where = b.l.inClass ? `in ${b.l.taskClass}, under // ${label(n)}` : `under // ${label(n)}`
+  const symbol = /symbol:\s+(class|variable|method)\s+(\w+)/.exec(e.message)
+  const owner = /location:\s+(?:variable \w+ of type|class)\s+(\w+)/.exec(e.message)?.[1]
+  if (/^compiler\.err\.cant\.resolve/.test(e.code) && symbol) {
+    const [, kind, name] = symbol
+    if (kind === 'class')
+      return fail(
+        `${label(n)} has the class ${name}`,
+        `Check cannot find a class called ${name} under // ${label(n)}. Write it there, with exactly that name: capital letters count.`,
+        asIs
+      )
+    const what = kind === 'variable' ? 'field' : 'method'
+    // A class another task makes: that task is where the name is missing.
+    const from = !b.l.inClass && owner && (task.needs ?? []).find((k) => new RegExp(`\\bclass\\s+${owner}\\b`).test(codeOnly(section(b, k))))
+    if (from !== undefined && from !== false)
+      return fail(
+        `${label(from)} has ${name}`,
+        `${label(n)} builds on ${label(from)}, and Check cannot find a ${what} called ${name} in ${owner}. Get ${label(from)} passing first, then check again.`,
+        asIs
+      )
+    return fail(
+      `${label(n)} has ${name}`,
+      `Check cannot find a ${what} called ${name} in ${owner ?? 'the class'}. Write it ${where}, with exactly the name the task gives: capital letters count.${b.l.inClass ? '' : ` Check runs each task with only its own lines and those of the tasks it builds on.`}`,
+      asIs
+    )
+  }
+  const ctor = /constructor (\w+) in class \w+ cannot be applied/.exec(e.message)
+  if (ctor) {
+    const name = ctor[1]
+    const required = /required:\s*(.*)/.exec(e.message)?.[1]?.trim()
+    if (new RegExp(`\\b(?!new\\b)[A-Za-z_$][\\w$<>\\[\\]]*\\s+${name}\\s*\\(`).test(mine))
+      return fail(
+        `${name} has a constructor`,
+        `What should be the constructor of ${name} has a type in front of its name, so Java reads it as a method called ${name} and never runs it when an object is made. A constructor has no type in front, not even void.`,
+        asIs
+      )
+    return fail(
+      `${name} has the constructor the task asks for`,
+      `Check makes a ${name} as shown below, and ${name} has no constructor that takes those values. Compare the parameters in its round brackets with the task: how many, their types and their order.${required && required !== 'no arguments' ? ` Yours take ${simple(required).replace(/,/g, ', ')}.` : required ? ` The only constructor ${name} has takes nothing.` : ''}`,
+      asIs
+    )
+  }
+  const none = /no suitable (constructor|method) found for (\w+)\(/.exec(e.message)
+  if (none) {
+    const [, kind, name] = none
+    return fail(
+      kind === 'constructor' ? `${name} has the constructor the task asks for` : `${name} takes what the task says`,
+      kind === 'constructor'
+        ? `Check makes a ${name} as shown below, and none of the constructors of ${name} takes those values. Compare the parameters in their round brackets with the task: how many, their types and their order.`
+        : `Check calls ${name} as shown below, and no method of that name takes those values. Compare the parameters in its round brackets with the task: how many, their types and their order.`,
+      asIs
+    )
+  }
+  const method = /method (\w+) in class (\w+) cannot be applied/.exec(e.message)
+  if (method) {
+    const required = /required:\s*(.*)/.exec(e.message)?.[1]?.trim()
+    return fail(
+      `${method[1]} takes what the task says`,
+      `Check found ${method[1]}, but cannot call it the way the task says. Compare the parameters in its round brackets with the task: how many, their types and their order.${required && required !== 'no arguments' ? ` Yours take ${simple(required).replace(/,/g, ', ')}.` : required ? ' Yours takes none.' : ''}`,
+      asIs
+    )
+  }
+  const hidden = /(\w+) has private access in (\w+)/.exec(e.message)
+  if (hidden)
+    return fail(
+      `${hidden[1]} can be used from outside ${hidden[2]}`,
+      `Check uses ${hidden[1]} from outside ${hidden[2]}, as the task says it can, and ${hidden[1]} is private, so only code inside ${hidden[2]} may use it.`,
+      asIs
+    )
+  const nonStatic = /non-static (variable|method) (\w+)(?:\([^)]*\))? cannot be referenced from a static context/.exec(e.message)
+  if (nonStatic) {
+    const what = nonStatic[1] === 'variable' ? 'field' : 'method'
+    return fail(
+      `${nonStatic[2]} belongs to the class`,
+      `Check uses ${nonStatic[2]} through the class's own name, with no object, as the task says it can. Java says it is non-static: it is a ${what} each object has, so it needs an object first. The lesson shows the word that makes a ${what} belong to the class itself.`,
+      asIs
+    )
+  }
+  if (/^compiler\.err\.void\.not\.allowed/.test(e.code)) {
+    const hiddenLine = unit.source.split('\n')[unit.readAt.line - 1] ?? ''
+    // javac points at the round bracket of the call.
+    const name = /(\w+)\s*$/.exec(hiddenLine.slice(0, e.col - 1))?.[1] ?? 'it'
+    return fail(
+      `${name} gives back a value`,
+      `Check uses the value ${name} gives back, but ${name} is void, so it gives nothing back. Printing a value does not give it back to the caller: return does.`,
+      asIs
+    )
+  }
+  if (/^compiler\.err\.cant\.assign\.val\.to\.var/.test(e.code)) {
+    const name = /final variable (\w+)/.exec(e.message)?.[1] ?? 'it'
+    return fail(
+      `${name} can be changed`,
+      `Check gives ${name} a new value from outside, as the task says it can, and Java refuses because ${name} is final.`,
+      asIs
+    )
+  }
+  if (/^compiler\.err\.prob\.found\.req/.test(e.code) && /cannot be converted/.test(e.message))
+    return fail(
+      `${label(n)} takes what the task says`,
+      `Check runs the code below, with values of the types the task gives, and Java says one does not fit where it goes: ${message(e).split('\n')[0]}. Compare the parameters in the round brackets of your constructors and methods with the task: how many, their types and their order.`,
+      asIs
+    )
+  return fail(
+    `Check can use ${label(n)}`,
+    `Check cannot use the lines of ${label(n)} the way the task says. Compare each first line with the task: the names, the types and the parameters.`,
+    asIs
+  )
+}
+
+// Errors objects bring, read before the method and main ones in object issues.
+const OBJECT_GLOSS = [
+  [
+    /^compiler\.err\.non-static\.cant\.be\.ref/,
+    () =>
+      'That line is in a static method, such as main. A static method belongs to the class, not to one object, so it cannot use a field or method that each object has without an object in front of it.'
+  ],
+  [
+    /^compiler\.err\.invalid\.meth\.decl\.ret\.type\.req/,
+    () =>
+      'Java reads that line as the first line of a method, and a method needs the type it gives back in front of its name. Only a constructor has none, and its name is exactly the name of its class, capital letters included.'
+  ],
+  [
+    /^compiler\.err\.override\./,
+    () =>
+      'Every object already has a toString that Java gives it, and yours takes its place only when its first line is exactly as the lesson shows. The second line of the message says which part does not fit.'
+  ],
+  [
+    /^compiler\.err\.already\.defined/,
+    (e) =>
+      /^(?:constructor|method) /.test(e.message) &&
+      'Two constructors or methods of the class take the same types in the same order, so Java cannot tell them apart. Each needs its own list of parameters.'
+  ],
+  [
+    /^compiler\.err\.call\.must\.be\.first/,
+    () => 'A constructor can hand its work to another constructor of the class with this(...), but only on its very first line.'
+  ],
+  [
+    /^compiler\.err\.report\.access/,
+    () => 'That field or method is private, so only code inside its own class can use it.'
+  ],
+  [
+    /^compiler\.err\.class\.public\.should\.be\.in\.file/,
+    () =>
+      'A public class goes in a file with exactly its name and .java, capital letters included. Compare the name after public class with the name of the file.'
+  ],
+  [
+    /^compiler\.err\.not\.def\.public\.cant\.access/,
+    () =>
+      'That class, or that part of it, has no public in front, so only code in its own package can use it.'
+  ],
+  [
+    /^compiler\.err\.doesnt\.exist/,
+    () =>
+      'The compiler knows no package of that name among the files it builds. A package is made by the package line at the top of its files: compare the two letter by letter.'
+  ],
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) =>
+      /symbol:\s+class /.test(e.message) &&
+      'The compiler does not know that class. Check its spelling, and that a class from another package is imported at the top of the file.'
+  ]
+]
+
+// --- Helpers for judging object tasks -----------------------------------------------------------
+
+/** What Check ran for a case, what came back and what was printed, for a detail's output. */
+export function ran(run, names = Object.keys(run.case.reads ?? {})) {
+  const back = names.map((n) => `  ${n} is ${shown(run.values[n])}`).join('\n')
+  const out = run.lines.length ? run.lines.map((l) => `  ${l}`).join('\n') : '  (nothing)'
+  return `Check ran:\n${indent(run.call)}${back ? `\nThen:\n${back}` : ''}\nIt printed:\n${out}`
+}
+
+/** True when every read a case names in `expected` came back as that value. */
+export const meets = (run) =>
+  Object.entries(run.case.expected ?? {}).every(([name, value]) => gave(run.values[name], value))
+
+/**
+ * Judges the cases of an object task that do not `refuse`. Each case has `name`, `expected`
+ * ({ read: value }) and `hint`. A failing case gets the first message that fits: a read of another
+ * type than `types` names, a known mistake (`mistakes: [{ when(run, runs), hint }]`), reads that stay the
+ * same whatever Check passes in (`typed`), then the case's own hint.
+ */
+export function objectCases({ types = {}, mistakes = [], typed } = {}) {
+  return (runs) => {
+    const own = runs.filter((r) => !r.case.refuse)
+    const key = (r) => Object.keys(r.case.expected ?? {}).map((n) => shown(r.values[n])).join('\u0001')
+    const want = (r) => Object.values(r.case.expected ?? {}).map(display).join('\u0001')
+    const stuck = own.length > 1 && own.every((r) => key(r) === key(own[0])) && !own.every((r) => want(r) === want(own[0]))
+    return own.map((r) => {
+      if (meets(r)) return pass(r.case.name, ran(r))
+      const wrongType = Object.entries(types).find(([n, t]) => r.values[n] && r.values[n].value !== null && r.values[n].type !== t)
+      if (wrongType) {
+        const [n, t] = wrongType
+        return fail(
+          r.case.name,
+          `${n} gives back ${an(r.values[n].type)}, and the task asks for ${an(t)}. The type in front of the method's name says what it gives back.`,
+          ran(r)
+        )
+      }
+      const mistake = mistakes.find((m) => m.when(r, own))
+      return fail(r.case.name, mistake?.hint ?? (stuck && typed ? typed : r.case.hint), ran(r))
+    })
+  }
+}
+
+/**
+ * A detail for a case that `refuse`s: Check's own line must not compile, and its first error must
+ * match `error`. `allowed` says what it means when Java let it through.
+ */
+export function refusal(run, { error, allowed, other }) {
+  const out = `Check ran:\n${indent(run.call)}`
+  if (!run.compiled) {
+    const first = run.errors[0]?.message ?? ''
+    if (error.test(first)) return pass(run.case.name, `${out}\nJava refused it: ${first.split('\n')[0]}`)
+    return fail(run.case.name, other ?? `Java refused Check's line for another reason than the task is about. Its message is below.`, `${out}\n\n${first}`)
+  }
+  return fail(run.case.name, allowed, `${out}\nJava let it through.`)
+}
+
+// --- Issues of several files --------------------------------------------------------------------
+// Each task is one file of a folder of packages. For each case Check compiles, in memory, the
+// task's file beside files of its own (`stubs`, standing in for the other tasks' files, so each
+// task is judged alone) and, unless the case runs the learner's `main` by name, a small class of
+// its own in the package the case names, holding the code it runs. One JVM runs every case.
+
+const RUNNER_CLASS = '__IndentRun'
+
+function runnerFile(pkg, hidden) {
+  const head = pkg ? `package ${pkg}; ` : ''
+  return {
+    path: `${pkg ? `${pkg.replace(/\./g, '/')}/` : ''}${RUNNER_CLASS}.java`,
+    source: `${head}public class ${RUNNER_CLASS} { public static void main(String[] args) { ${hidden}} ${METHOD_READER}}`
+  }
+}
+
+const packageBatches = new Map()
+
+async function buildPackages(t, spec) {
+  const bin = findJava()
+  if (!bin) return { stop: 'nojava' }
+  const texts = {}
+  await Promise.all(
+    Object.values(spec.tasks).map(async (task) => {
+      const raw = await readFile(join(t.workspace, task.file), 'utf8').catch(() => null)
+      texts[task.file] = raw === null ? null : raw.replace(/\r\n?/g, '\n')
+    })
+  )
+  const before = new Map()
+  const units = []
+  for (const [id, task] of Object.entries(spec.tasks)) {
+    const text = texts[task.file]
+    const early = packageEarly(task, text)
+    if (early) {
+      before.set(id, early)
+      continue
+    }
+    const stubs = Object.entries(typeof task.stubs === 'function' ? task.stubs(t) : (task.stubs ?? {})).map(
+      ([path, source]) => ({ path, source })
+    )
+    task.cases.forEach((c, i) => {
+      const files = [{ path: task.file, source: text }, ...stubs]
+      let main = c.main
+      if (!main) {
+        const runner = runnerFile(c.pkg, objectCall(c))
+        files.push(runner)
+        main = c.pkg ? `${c.pkg}.${RUNNER_CLASS}` : RUNNER_CLASS
+      }
+      units.push({ id: `${id}.${i}`, task: id, case: c, main, files })
+    })
+  }
+  if (units.length === 0) return { texts, before, results: new Map(), units }
+  const dir = await t.sandbox()
+  const key = randomBytes(16).toString('hex')
+  const input =
+    `KEY ${key}\n` +
+    units
+      .map(
+        (u) =>
+          `FILES ${u.id} ${u.main} ${u.files.length}\n` +
+          u.files.map((f) => `FILE ${f.source.length} ${f.path}\n${f.source}\n`).join('')
+      )
+      .join('')
+  const r = await runJava(bin, dir, input)
+  const results = new Map()
+  let fatal = null
+  for (const line of r.stdout.split('\n')) {
+    if (!line.startsWith('{')) continue
+    let parsed
+    try {
+      parsed = JSON.parse(line)
+    } catch {
+      continue
+    }
+    if (parsed.fatal) fatal = parsed
+    else if (parsed.key === key) results.set(parsed.id, parsed)
+  }
+  if (fatal) return { stop: 'fatal', fatal }
+  if (results.size === 0) return { stop: 'crashed', output: r.stderr }
+  return { texts, before, results, units }
+}
+
+const fileName = (path) => path.split('/').pop()
+const folderOf = (path) => path.split('/').slice(0, -1).join('/')
+
+/** What stops a task before anything compiles: its file is gone, reaches into Check, has no
+ * class yet, or names another package than its folders. */
+function packageEarly(task, text) {
+  const name = fileName(task.file)
+  const n = task.task
+  if (text === null)
+    return fail(
+      `${task.file} is there`,
+      `Check cannot find ${task.file} in your workspace. Put it back, or start the issue over with Reset.`
+    )
+  const word = reaches(text)
+  if (word)
+    return fail(
+      `${label(n)} uses only Java the lessons teach`,
+      word === '\\u'
+        ? `${name} has a \\u escape, which Java turns into a character before it reads anything else, even in a comment. Type the character itself instead, so Check runs your lines.`
+        : `${name} uses ${word}, which reaches into how Check runs your program instead of doing the task. Nothing in this issue needs it, and Check does not run it: take it out.`
+    )
+  const code = codeOnly(text)
+  if (!/\bclass\s+[A-Za-z_$]/.test(code))
+    return fail(
+      `${name} has its class`,
+      `${name} has no class yet. Write the package line and the class under the // ${label(n)} comment.`
+    )
+  const pkg = /^\s*package\s+([^;]*?)\s*;/m.exec(code)?.[1]?.replace(/\s+/g, '')
+  if (pkg !== task.pkg)
+    return fail(
+      `${name} is in the package of its folder`,
+      pkg
+        ? `The package line of ${name} names another package than the folders the file sits in, ${folderOf(task.file)}. Check builds the files as the lesson's command does, so code that looks for ${task.className} in the package of that folder would not find it. The lesson shows how a package line follows the folders.`
+        : `${name} has no package line, so its class would be in no package at all. A file in the folder ${folderOf(task.file)} starts with the package line of that folder: the lesson shows how one is written.`
+    )
+  return null
+}
+
+/** Why a case of a package task did not compile or run, or null when it ran. */
+function packageProblem(spec, task, u, r) {
+  const n = task.task
+  const name = fileName(task.file)
+  const c = u.case
+  const text = u.files[0].source
+  const ranWhat = c.main ? `Check built ${name} and ran ${c.main} by name, as the lesson's command does` : `Check ran:\n${indent(ranText(c))}`
+  if (!r) return fail(`${label(n)} runs`, `Check's run stopped before ${label(n)} finished. If a line calls System.exit, remove it: it stops every check at once.`)
+  if (!r.compiled) {
+    const mine = r.errors.filter((e) => e.file === task.file)
+    if (mine.length) {
+      const lines = text.split('\n')
+      return fail(
+        `${name} compiles`,
+        `The compiler refuses a line of ${name}, so Check cannot run it. Build the folder with ${spec.command} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], 'objects')}`,
+        mine.slice(0, 3).map((e) => javacLike(task.file, lines, e, true)).join('\n\n')
+      )
+    }
+    const e = r.errors[0]
+    const message = e.message.replace(/\bjava\.(?:lang|util)\.(?=[A-Z])/g, '')
+    const asIs = `${ranWhat}\n\n${r.errors.map((x) => x.message).join('\n\n')}`
+    const closed = /^(\S+?)(\([^)]*\))? is not public in (\S+); cannot be accessed from outside package/.exec(message)
+    if (closed) {
+      const [, what, args] = closed
+      const short = what.split('.').pop()
+      const part = args ? (short === task.className ? 'The constructor of ' + task.className : `${short}()`) : task.className
+      return fail(
+        `${part} can be used from another package`,
+        `${part} has no public in front, so only code in its own package can use it. Check uses it from another package, as the task says it can.`,
+        asIs
+      )
+    }
+    const symbol = /symbol:\s+(class|variable|method)\s+(\w+)/.exec(message)
+    if (/^compiler\.err\.cant\.resolve/.test(e.code) && symbol) {
+      const [, kind, missing] = symbol
+      return fail(
+        `${name} has ${missing}`,
+        kind === 'class'
+          ? `Check cannot find a class called ${missing} in the package ${task.pkg}. Look at the name after class in ${name}: capital letters count.`
+          : `Check cannot find a ${kind === 'variable' ? 'field' : 'method'} called ${missing} in ${task.className}. Write it with exactly the name the task gives.`,
+        asIs
+      )
+    }
+    if (/^compiler\.err\.doesnt\.exist/.test(e.code))
+      return fail(`${name} is in its package`, `Check cannot find the package ${task.pkg} among the files it builds. Look at the package line of ${name}.`, asIs)
+    if (/constructor \w+ in class \w+ cannot be applied|no suitable constructor/.test(message))
+      return fail(
+        `${task.className} has the constructor the task asks for`,
+        `Check makes a ${task.className} as shown below, and it has no constructor that takes those values. Compare the parameters in its round brackets with the task: how many, their types and their order.`,
+        asIs
+      )
+    if (/^compiler\.err\.non-static/.test(e.code))
+      return fail(
+        `${/non-static \w+ (\w+)/.exec(message)?.[1] ?? 'It'} belongs to the class`,
+        `Check calls the method through the class's name, with no object, as the task says it can, and Java says it is non-static. A method used that way has static in front.`,
+        asIs
+      )
+    if (/^compiler\.err\.void\.not\.allowed/.test(e.code))
+      return fail(`${name} gives back a value`, `Check uses the value a method of ${task.className} gives back, and the method is void, so it gives nothing back.`, asIs)
+    return fail(
+      `Check can use ${name}`,
+      `Check cannot use ${task.className} the way the task says. Compare its first lines with the task: the names, the words in front, the types and the parameters.`,
+      asIs
+    )
+  }
+  if (r.exited) return fail(`${label(n)} runs`, `${name} calls System.exit, which ends the whole program at once. Nothing in this issue needs it: remove it.`)
+  if (r.flooded) return fail(`${label(n)} runs`, `${name} printed without stopping, so Check stopped it. Look for something that repeats a print forever.`)
+  if (r.timedOut) return fail(`${label(n)} runs`, `${name} did not finish within a few seconds, so Check stopped it. Look for something that never ends.`)
+  if (r.exception?.startsWith('Check could not start main'))
+    return fail(
+      `${name} has a main Java can start`,
+      `Check found no main it could start in ${c.main}. The class needs public static void main(String[] args), as in every program of this repo.`,
+      r.exception
+    )
+  if (r.exception) {
+    const known = [...METHOD_THROWN, ...THROWN].find(([re]) => re.test(r.exception))
+    return fail(
+      `${label(n)} runs`,
+      `${name} compiles, but stops with an exception when Check runs it as below. Read the first line of the stack trace for what went wrong, and the line starting with at that names ${name} for where.${known ? ` ${known[1]}` : ''}`,
+      `${ranWhat}\n${c.main ? r.exception : r.exception.replace(/\n\tat [\w$.]*\.main\(.*/g, '')}`
+    )
+  }
+  return null
+}
+
+/**
+ * The checks of an issue whose tasks are files in packages. Spec: { command, tasks: { id: { task,
+ * file, pkg, className, stubs, cases, judge } } }.
+ * - file: the task's file, relative to the workspace; pkg: the package its folder means
+ * - stubs: { path: source } (or a function of t), Check's own files compiled beside it
+ * - cases: object cases with a `pkg` for where Check's code sits, or `main: 'pkg.Class'` to run
+ *   the learner's main by name; judge(runs) as for object tasks
+ */
+export function packageTasks(spec) {
+  const judgeTask = async (t, id) => {
+    const task = spec.tasks[id]
+    if (!packageBatches.has(t.workspace)) packageBatches.set(t.workspace, buildPackages(t, spec))
+    const b = await packageBatches.get(t.workspace)
+    if (b.stop) {
+      const [name, message] = stopMessage(spec, b)
+      return [fail(name, message, b.output)]
+    }
+    if (b.before.has(id)) return [b.before.get(id)]
+    const units = b.units.filter((u) => u.task === id)
+    for (const u of units) {
+      const r = b.results.get(u.id)
+      if (u.case.refuse && r && !r.compiled && !r.errors.some((e) => e.file === task.file)) continue
+      const problem = packageProblem(spec, task, u, r)
+      if (problem && !(u.case.refuse && r?.compiled)) return [problem]
+    }
+    const runs = units.map((u) => {
+      const r = b.results.get(u.id)
+      const values = {}
+      for (const read of r.reads ?? []) {
+        const [name, type, value] = read.split(SEP)
+        values[name] = { type, value: value === NULL ? null : value }
+        if (value?.startsWith(ITEMS)) values[name].items = value === ITEMS ? [] : value.slice(1).split(ITEMS)
+      }
+      const stdout = (r.stdout ?? '').replace(/\r\n/g, '\n')
+      const call = u.case.main ? `the main of ${u.case.main}` : ranText(u.case)
+      const errors = r.errors.filter((e) => e.file !== task.file)
+      return { case: u.case, call, stdout, lines: lines(stdout), values, given: {}, compiled: r.compiled, errors }
+    })
+    return task.judge(runs, { text: b.texts[task.file], t })
+  }
+  return Object.fromEntries(Object.keys(spec.tasks).map((id) => [id, (t) => judgeTask(t, id)]))
 }
