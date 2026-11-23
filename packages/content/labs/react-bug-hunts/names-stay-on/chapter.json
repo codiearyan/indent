@@ -1,0 +1,78 @@
+{
+  "id": "names-stay-on",
+  "title": "A swimmer taken off stays on the board",
+  "files": ["src/LaneBoard.jsx", "src/App.jsx", "src/lanes.js"],
+  "terminal": {
+    "description": "The lane board runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "take-off",
+      "title": "Take a swimmer off the board at once",
+      "file": "src/LaneBoard.jsx",
+      "description": "Pressing Take off beside a name takes that swimmer off their lane at once, and leaves everyone else where they were. New session then shows the morning's bookings again, as they came in the `booked` prop, the swimmer taken off included.\n\nThe check draws `LaneBoard` with bookings of its own, takes a swimmer off, presses New session, and does both again with another lane.",
+      "nextSteps": [
+        "Take Hettie off lane 1 in the Browser panel, then type a letter in the name box.",
+        "Read \"Same array, no new draw\" in the lesson.",
+        "Look at what `takeOff` hands to `setLanes`.",
+        "Hand it a new array of lanes, with a new lane in place of the one that changed."
+      ],
+      "hints": [
+        "`setLanes` is called, so look at what it is given. Is it a different array from the one React already holds?",
+        "`splice` changes the array it is called on, and that array is in state and in the morning's bookings at the same time. React compares the new value with the old one, sees the same array and does not draw.",
+        "`setLanes(lanes.map((l) => (l.number === number ? { ...l, swimmers: l.swimmers.filter((_, i) => i !== index) } : l)))`."
+      ],
+      "docs": [
+        { "title": "Updating arrays in state", "url": "https://react.dev/learn/updating-arrays-in-state" },
+        { "title": "Array.prototype.splice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice" }
+      ],
+      "videos": [{ "title": "Updating an array of objects in state", "url": "https://www.youtube.com/watch?v=Y62mbztjmus" }],
+      "points": 10
+    },
+    {
+      "id": "add",
+      "title": "Keep today's swimmers out of the morning bookings",
+      "file": "src/LaneBoard.jsx",
+      "description": "Find the same cause in another part of the board. Adding a swimmer puts the name at the end of the chosen lane at once, as it does now, and New session shows the morning's bookings without anyone added since.\n\nThe check draws `LaneBoard` with bookings of its own, adds a swimmer, presses New session, and does both again with another lane.",
+      "nextSteps": [
+        "Add a name in the Browser panel, then press New session.",
+        "Look at what `addSwimmer` changes before it calls `setLanes`.",
+        "Make a new list of swimmers with the name at the end, in a new lane.",
+        "Press New session again and check the bookings are as they were."
+      ],
+      "hints": [
+        "The name shows at once only because `setName('')` draws the board. Look at what happened to the lane's list.",
+        "`push` changes the list in place. The lane in state and the lane in the morning's bookings are the same object, so the bookings now hold the new name too, and New session brings it back.",
+        "`setLanes(lanes.map((l) => (l.number === laneNumber ? { ...l, swimmers: [...l.swimmers, added] } : l)))`."
+      ],
+      "docs": [
+        { "title": "Updating objects in state", "url": "https://react.dev/learn/updating-objects-in-state" },
+        { "title": "Spread syntax", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rest",
+      "title": "Leave the rest of the board as it was",
+      "file": "src/LaneBoard.jsx",
+      "description": "Each change touches one lane and nothing else. Every lane keeps its number, its speed, whether it is closed, and its place on the board; the other lanes keep their swimmers in their order. Take off takes off the swimmer pressed, even when another swimmer in the lane has the same name.\n\nThe check draws `LaneBoard` with a busy board of its own, with two swimmers of the same name in one lane, and takes off, adds, closes and opens lanes, closed lanes included, comparing the whole board after each step.",
+      "nextSteps": [
+        "Read \"When a blunt fix makes it worse\" in the lesson.",
+        "For each handler, list what the new lane keeps from the old one.",
+        "Add a second Jonah to lane 1 in the Browser panel and take one of them off.",
+        "Close a lane, then add and take off swimmers in another."
+      ],
+      "hints": [
+        "A new lane made from scratch has only the fields you wrote into it.",
+        "Spread the old lane first and then write the one field that changes. Pick the swimmer to take off by their place in the list, not by their name.",
+        "`{ ...l, swimmers: l.swimmers.filter((_, i) => i !== index) }` keeps every field and takes off one place only."
+      ],
+      "docs": [
+        { "title": "Updating arrays in state", "url": "https://react.dev/learn/updating-arrays-in-state#replacing-items-in-an-array" },
+        { "title": "Array.prototype.filter()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter" }
+      ],
+      "points": 10
+    }
+  ]
+}

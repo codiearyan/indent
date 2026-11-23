@@ -56,7 +56,8 @@
           "react-foundations",
           "react-screens",
           "react-with-an-api",
-          "build-a-state-store"
+          "build-a-state-store",
+          "react-bug-hunts"
         ]
       },
       {
@@ -243,7 +244,8 @@
           "react-foundations",
           "react-screens",
           "react-with-an-api",
-          "build-a-state-store"
+          "build-a-state-store",
+          "react-bug-hunts"
         ]
       }
     ]
@@ -273,7 +275,8 @@
           "js-bug-hunts",
           "llm-bug-hunts-ts",
           "security-bug-hunts",
-          "sql-bug-hunts"
+          "sql-bug-hunts",
+          "react-bug-hunts"
         ]
       }
     ]

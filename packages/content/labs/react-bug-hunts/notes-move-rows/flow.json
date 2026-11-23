@@ -1,0 +1,168 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "kwabena",
+        "label": "Kwabena",
+        "kind": "story"
+      },
+      {
+        "id": "lesson",
+        "label": "Saturday's class",
+        "kind": "data"
+      },
+      {
+        "id": "register",
+        "label": "Register",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "rows",
+        "label": "Rows",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "screen",
+        "label": "Register screen",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "lesson",
+        "to": "register",
+        "label": "children"
+      },
+      {
+        "from": "kwabena",
+        "to": "register",
+        "label": "notes, ticks"
+      },
+      {
+        "from": "register",
+        "to": "rows",
+        "label": "one per child"
+      },
+      {
+        "from": "rows",
+        "to": "screen",
+        "label": "note, tick"
+      }
+    ],
+    "note": "The register draws one row per child, and each row keeps a note or a tick of its own."
+  },
+  "tasks": {
+    "leave": {
+      "steps": [
+        {
+          "active": [
+            "lesson",
+            "lesson->register",
+            "register"
+          ],
+          "note": "The register lists the class by first name.",
+          "value": {
+            "kind": "map",
+            "label": "a child",
+            "entries": [
+              {
+                "key": "id",
+                "value": "the booking's id"
+              },
+              {
+                "key": "name",
+                "value": "a first name"
+              }
+            ]
+          }
+        },
+        {
+          "active": [
+            "kwabena",
+            "kwabena->register",
+            "register->rows",
+            "rows"
+          ],
+          "note": "Kwabena types a note for Bronwen in her row."
+        },
+        {
+          "active": [
+            "kwabena",
+            "register"
+          ],
+          "note": "Arlo leaves early and is taken off the class."
+        },
+        {
+          "active": [
+            "register",
+            "register->rows",
+            "rows",
+            "rows->screen",
+            "screen"
+          ],
+          "note": "The rows draw again, and Bronwen's note is still beside Bronwen."
+        }
+      ]
+    },
+    "sort": {
+      "steps": [
+        {
+          "active": [
+            "lesson",
+            "lesson->register",
+            "register"
+          ],
+          "note": "Under the class, the waiting list is in the order the children joined it."
+        },
+        {
+          "active": [
+            "kwabena",
+            "kwabena->register",
+            "rows"
+          ],
+          "note": "Kwabena ticks Bodhi once his parent has been called."
+        },
+        {
+          "active": [
+            "register",
+            "register->rows",
+            "rows",
+            "rows->screen",
+            "screen"
+          ],
+          "note": "The list is sorted by age, and the tick moves with Bodhi to his new place."
+        }
+      ]
+    },
+    "steady": {
+      "steps": [
+        {
+          "active": [
+            "kwabena",
+            "kwabena->register",
+            "register"
+          ],
+          "note": "Children are ticked here, and every tick draws the register again."
+        },
+        {
+          "active": [
+            "register",
+            "register->rows",
+            "rows"
+          ],
+          "note": "Through every draw, each row stays with its own child."
+        },
+        {
+          "active": [
+            "rows",
+            "rows->screen",
+            "screen"
+          ],
+          "note": "Every note and tick stays with its child, even with two children of one name."
+        }
+      ]
+    }
+  }
+}

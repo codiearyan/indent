@@ -1,0 +1,78 @@
+{
+  "id": "notes-move-rows",
+  "title": "Notes moved to another child",
+  "files": ["src/Register.jsx", "src/App.jsx", "src/lesson.js"],
+  "terminal": {
+    "description": "The register runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "leave",
+      "title": "Keep each note with its child",
+      "file": "src/Register.jsx",
+      "description": "Each child in the class list has a note box. When a child leaves early, every other child keeps the note typed for them, on their own row.\n\nThe check draws `Register` with a class of its own, types notes for three children, presses Left early on the first child and then on one in the middle, and reads every row after each.",
+      "nextSteps": [
+        "Type a note for Bronwen in the Browser panel, then press Left early on Arlo.",
+        "Read \"How React matches rows\" in the lesson.",
+        "Look at the key each `ChildRow` is given.",
+        "Give each row a key that belongs to its child."
+      ],
+      "hints": [
+        "The note lives in the row's own state. React decides which state goes with which row by the row's key.",
+        "The key is the row's place in the list. When Arlo leaves, Bronwen moves to place 0, and React hands her the state of the row that was at place 0: Arlo's.",
+        "`key={child.id}` on `ChildRow`."
+      ],
+      "docs": [
+        { "title": "Keeping list items in order with key", "url": "https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key" },
+        { "title": "Preserving and resetting state", "url": "https://react.dev/learn/preserving-and-resetting-state" }
+      ],
+      "videos": [{ "title": "Why index keys break a list", "url": "https://www.youtube.com/watch?v=SRjN8SHOS6U" }],
+      "points": 10
+    },
+    {
+      "id": "sort",
+      "title": "Keep each tick with its child when the list is sorted",
+      "file": "src/Register.jsx",
+      "description": "Find the same cause in another part of the register. On the waiting list, the Called box of a child stays ticked on that child's row when the list is sorted by age, and when it is sorted back by date joined.\n\nThe check draws `Register` with a waiting list of its own, ticks a child, sorts by age, ticks another, sorts back, and reads every row after each.",
+      "nextSteps": [
+        "Tick Bodhi on the waiting list in the Browser panel, then press By age.",
+        "Look at the key each `WaitingRow` is given.",
+        "Give each row a key that belongs to its child.",
+        "Sort back and forth and watch the ticks."
+      ],
+      "hints": [
+        "The Called box is the row's own state too.",
+        "Sorting moves the children to new places, but the rows keep their places, so each tick stays where it was on the screen.",
+        "`key={child.id}` on `WaitingRow`."
+      ],
+      "docs": [
+        { "title": "Rules of keys", "url": "https://react.dev/learn/rendering-lists#rules-of-keys" },
+        { "title": "Array.prototype.toSorted()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "steady",
+      "title": "Keep the rows steady while the register is busy",
+      "file": "src/Register.jsx",
+      "description": "The register draws again every time a child is ticked here. Those draws must keep every note and every tick, and two children with the same first name, which any class can have, each keep their own.\n\nThe check draws `Register` with a class and a waiting list of its own, each with two children of the same name. It types notes, ticks children here, sends one of the two away early, and sorts the waiting list, reading every row after each step and watching the console for React's warnings.",
+      "nextSteps": [
+        "Read \"When a blunt fix makes it worse\" in the lesson.",
+        "Add a second Esme to `lesson.js` with an id of her own, and type a note for each.",
+        "Tick a few children here and watch the notes.",
+        "Look in the Browser panel console for a warning about keys."
+      ],
+      "hints": [
+        "A key that is new in every draw throws every row away each time the register draws. A key that two children share mixes them up.",
+        "A key has to stay the same for one child in every draw, and differ from every other child's. Only one field of a child is made for that.",
+        "The `id` of each child, in both lists."
+      ],
+      "docs": [
+        { "title": "Where to get your key", "url": "https://react.dev/learn/rendering-lists#where-to-get-your-key" },
+        { "title": "Resetting state with a key", "url": "https://react.dev/learn/preserving-and-resetting-state#option-2-resetting-state-with-a-key" }
+      ],
+      "points": 10
+    }
+  ]
+}
