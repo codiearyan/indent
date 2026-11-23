@@ -291,6 +291,29 @@ describe('refresh', () => {
     expect(useWorkspace.getState().files.map((f) => f.path)).toEqual(['two.js'])
   })
 
+  it('leaves the store alone when nothing on disk changed', async () => {
+    await openIssue('one', [file('index.js', 'a'), file('notes.md', 'b')])
+    api.workspace.open.mockResolvedValueOnce(
+      snapshot([file('index.js', 'a'), file('notes.md', 'b')])
+    )
+    const listener = vi.fn()
+    const off = useWorkspace.subscribe(listener)
+    await useWorkspace.getState().refresh()
+    off()
+    expect(listener).not.toHaveBeenCalled()
+  })
+
+  it('keeps the files that did not change as they were', async () => {
+    await openIssue('one', [file('index.js', 'a'), file('notes.md', 'b')])
+    const [index] = useWorkspace.getState().files
+    api.workspace.open.mockResolvedValueOnce(
+      snapshot([file('index.js', 'a'), file('notes.md', 'changed')])
+    )
+    await useWorkspace.getState().refresh()
+    expect(useWorkspace.getState().files[0]).toBe(index)
+    expect(content('notes.md')).toBe('changed')
+  })
+
   it('closes the tabs of files that are gone', async () => {
     await openIssue('one', [file('index.js', 'a'), file('notes.md', 'b')])
     useWorkspace.getState().openFile('notes.md')

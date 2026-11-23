@@ -56,15 +56,16 @@ async function readStarter(starterDir: string, first: string[]): Promise<Files> 
 }
 
 async function readMine(dir: string, paths: string[]): Promise<Files> {
-  const mine: Files = {}
-  for (const path of paths) {
-    try {
-      mine[path] = await readFile(resolveInside(dir, path), 'utf8')
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') mine[path] = UNREADABLE
-    }
-  }
-  return mine
+  const read = await Promise.all(
+    paths.map(async (path): Promise<[string, string] | null> => {
+      try {
+        return [path, await readFile(resolveInside(dir, path), 'utf8')]
+      } catch (error) {
+        return (error as NodeJS.ErrnoException).code === 'ENOENT' ? null : [path, UNREADABLE]
+      }
+    })
+  )
+  return Object.fromEntries(read.filter((entry) => entry !== null))
 }
 
 async function takeFromStarter(starterDir: string, dir: string, path: string): Promise<void> {

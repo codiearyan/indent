@@ -53,17 +53,18 @@ async function listEntries(
   prefix = '',
   found: { files: string[]; folders: string[] } = { files: [], folders: [] }
 ): Promise<{ files: string[]; folders: string[] }> {
+  const folders: string[] = []
   for (const entry of await readdir(join(dir, prefix), { withFileTypes: true })) {
     const path = prefix ? `${prefix}/${entry.name}` : entry.name
     // A dot file shows only when the issue lists it (.gitignore); a dot folder never does.
     const shown = !entry.name.startsWith('.') || (entry.isFile() && listed.includes(path))
     if (!shown || entry.name === 'node_modules') continue
-    if (entry.isDirectory()) {
-      found.folders.push(path)
-      // A folder the learner locked is listed, with nothing in it.
-      await listEntries(dir, listed, path, found).catch(() => found)
-    } else if (entry.isFile()) found.files.push(path)
+    if (entry.isDirectory()) folders.push(path)
+    else if (entry.isFile()) found.files.push(path)
   }
+  found.folders.push(...folders)
+  // A folder the learner locked is listed, with nothing in it.
+  await Promise.all(folders.map((path) => listEntries(dir, listed, path, found).catch(() => found)))
   return found
 }
 
@@ -77,15 +78,21 @@ export async function readFolders(dir: string): Promise<string[]> {
  * A file whose name starts with a dot is read only when `first` names it.
  */
 export async function readWorkspace(dir: string, first: string[]): Promise<WorkspaceFile[]> {
-  const files: WorkspaceFile[] = []
-  for (const path of (await listEntries(dir, first)).files) {
-    const full = join(dir, ...path.split('/'))
-    if ((await stat(full)).size > MAX_FILE_BYTES) continue
-    // A file the learner locked is left out, as a binary one is, so the issue still opens.
-    const buffer = await readFile(full).catch(() => null)
-    if (!buffer || buffer.includes(0)) continue
-    files.push({ path, content: buffer.toString('utf8') })
-  }
+  const read = await Promise.all(
+    (await listEntries(dir, first)).files.map(async (path): Promise<WorkspaceFile | null> => {
+      const full = join(dir, ...path.split('/'))
+      const size = await stat(full).then(
+        (info) => info.size,
+        () => Infinity
+      )
+      if (size > MAX_FILE_BYTES) return null
+      // A file the learner locked is left out, as a binary one is, so the issue still opens.
+      const buffer = await readFile(full).catch(() => null)
+      if (!buffer || buffer.includes(0)) return null
+      return { path, content: buffer.toString('utf8') }
+    })
+  )
+  const files = read.filter((file): file is WorkspaceFile => file !== null)
   const rank = (path: string): number => {
     const index = first.indexOf(path)
     return index === -1 ? first.length : index
