@@ -86,7 +86,8 @@
       "chapters": [
         "functions-as-values",
         "sorting-and-choosing",
-        "generators"
+        "generators",
+        "decorators"
       ]
     }
   ]

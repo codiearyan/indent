@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dougie", "say": "How often did paging run tonight?", "note": "After a busy night at the base." },
+    { "title": "The handlers", "text": "Twenty handlers, none counts or times itself" },
+    {
+      "title": "Your decorators",
+      "file": "base_handlers.py",
+      "mine": true,
+      "gap": "No lines that wrap a handler",
+      "tasks": ["Say what runs", "Count the calls", "Time each call", "Count the pages"]
+    },
+    { "title": "The night's report", "rows": [["Paging", "counted"], ["Logging", "timed"]], "note": "Every handler, counted and timed." }
+  ],
+  "ticket": { "label": "Pages sent", "wrong": "nobody knows", "why": "Not counted", "right": "counted" },
+  "captions": [
+    "After a busy night, Dougie wants to know how often each handler ran and how long it took.",
+    "Today twenty handlers run with nothing around them, and nobody can say.",
+    "You write decorators once and put them on any handler with a single line.",
+    "Now every page is counted and every call is timed, and each handler works as before.",
+    "Dougie reads the whole night from the report, without opening one handler."
+  ]
+}

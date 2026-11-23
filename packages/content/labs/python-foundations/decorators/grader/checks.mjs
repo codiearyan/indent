@@ -1,6 +1,6 @@
 import { classCases, tuple, valueRunCause } from '../../grading.mjs'
 
-const FILE = 'callout_handlers.py'
+const FILE = 'base_handlers.py'
 const s = JSON.stringify
 const nums = (v) => (Array.isArray(v) ? v.map((x) => x?.['@float'] ?? x) : v)
 const OWN = ['announce', 'count_calls', 'timed', 'page_team', 'page', 'log', 'weather']
@@ -8,14 +8,14 @@ const OWN = ['announce', 'count_calls', 'timed', 'page_team', 'page', 'log', 'we
 const EXPLAIN = (error) => {
   const m = error.message
   let found
-  if ((found = /^(\w+)\(\) got an unexpected keyword argument '(\w+)'/.exec(m)) && !OWN.includes(found[1])) {
+  if ((found = /^(?:[\w.<>]+\.)?(\w+)\(\) got an unexpected keyword argument '(\w+)'/.exec(m)) && !OWN.includes(found[1])) {
     return `the new function, ${found[1]}, takes no value called ${found[2]}, so a call that gives one by name has nowhere to put it. The new function has to take whatever values the call gives, in order and by name, and hand all of them on`
   }
-  if ((found = /^(\w+)\(\) takes (\d+) positional arguments? but (\d+) (?:was|were) given/.exec(m)) && !OWN.includes(found[1])) {
+  if ((found = /^(?:[\w.<>]+\.)?(\w+)\(\) takes (\d+) positional arguments? but (\d+) (?:was|were) given/.exec(m)) && !OWN.includes(found[1])) {
     return `the new function, ${found[1]}, takes ${found[2]} ${found[2] === '1' ? 'value' : 'values'}, and it was called with ${found[3]}. It has to take whatever values the call gives, in order and by name, and hand all of them on`
   }
   if ((found = /^(page|log|weather)\(\) (missing|takes|got)/.exec(m))) {
-    return `${found[1]} is a function of Check's own, and it was not handed the values the new function was called with. The new function hands every value it gets on to the function it wraps, as it got them`
+    return `${found[1]} is a function of Check's own, and it was called without the values it takes. Either it, or the new function, was called inside the decorator while it made the new function, or the new function did not hand on, one by one, the values it was given`
   }
   if ((found = /^count_calls\(\) missing 1 required positional argument/.exec(m))) {
     return 'count_calls was called with nothing in its round brackets. On the @ line, the decorator is named without round brackets: Python calls it with the function below, by itself'
@@ -33,13 +33,13 @@ const EXPLAIN = (error) => {
 const FUNCTIONS = `seen = []
 def page(team, message, urgent=False):
     seen.append((team, message, urgent))
-    return team + " paged: " + message + (" (urgent)" if urgent else "")
+    return f"{team} paged: {message}" + (" (urgent)" if urgent else "")
 def log(line):
     seen.append(line)
-    return "logged " + line
+    return f"logged {line}"
 def weather(area):
     seen.append(area)
-    return "weather for " + area`
+    return f"weather for {area}"`
 const SETUP = { code: FUNCTIONS, hidden: '# Check makes functions of its own, page, log and weather, that note every call' }
 
 const isFunction = (name, maker) => ({
@@ -74,17 +74,19 @@ function announceSteps(first, second) {
     notYet('announce'),
     isFunction('loud', 'announce'),
     {
-      code: `loud(${first.map(s).join(', ')}, urgent=True)`,
-      want: `${first[0]} paged: ${first[1]} (urgent)`,
-      hint: noneHint,
+      code: `answer = loud(${first.map(s).join(', ')}, urgent=True)`,
       printed: 'Running page\n',
       printedHint: said('page')
     },
     {
       code: 'seen',
       want: [tuple(first[0], first[1], true)],
-      hint: 'page was not called once, with the values the new function was given.'
+      hint: (v) =>
+        Array.isArray(v) && v.length === 1 && typeof v[0]?.['@tuple']?.[0] === 'object'
+          ? 'page was handed all the values at once, as a tuple and a dictionary. *args and **kwargs in the call hand them on one by one, as they came.'
+          : 'page was not called once, with the values the new function was given.'
     },
+    { code: 'answer', want: `${first[0]} paged: ${first[1]} (urgent)`, hint: noneHint },
     {
       code: `loud(${second.slice(0, 2).map(s).join(', ')})`,
       want: `${second[0]} paged: ${second[1]}`,
@@ -121,6 +123,7 @@ function countSteps([a, b], line) {
         if (p === 3 && l === 3) return 'Both counts are 3, the calls of the two functions together: one count is shared by every function count_calls gives back. Each new function keeps a count of its own.'
         if (p === 1 && l === 1) return 'Both counts are 1 after two calls and one: the count starts again from 0 at every call. It is set to 0 once, when the new function is made.'
         if (p === 0 && l === 0) return 'Both counts are still 0: the count never goes up when the new function is called.'
+        if (p === 3 || l === 3) return 'The counts run on from each other: the calls of both functions went into one count, shared by every function count_calls gives back. Each new function keeps a count of its own.'
         return 'The counts are not how many times each new function was called: 2 for one, 1 for the other.'
       }
     },
