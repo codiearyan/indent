@@ -14,7 +14,7 @@ const resourceTasks = (chapter: Chapter): Chapter['tasks'] =>
 export function ResourcesPanel({ chapter }: { chapter: Chapter }): React.JSX.Element {
   const key = chapterKey(chapter.labId, chapter.id)
   const shown = useSettings((s) => s.resourcesShown.includes(key))
-  const playing = useVideo((s) => (s.playing?.key === key ? s.playing.video.url : null))
+  const playing = useVideo((s) => (s.playing?.key === key ? s.playing : null))
   const videosFirst = useSettings((s) => s.learnFirst === 'videos')
   const tasks = resourceTasks(chapter)
 
@@ -58,7 +58,11 @@ export function ResourcesPanel({ chapter }: { chapter: Chapter }): React.JSX.Ele
         ))
         const videoRows = taskVideos(task).map((video) => (
           <li key={video.url}>
-            <VideoPlayer video={video} load={shown} autoplay={playing === video.url} />
+            <VideoPlayer
+              video={video}
+              load={shown}
+              autoplay={playing?.taskId === task.id && playing.video.url === video.url}
+            />
           </li>
         ))
         return (

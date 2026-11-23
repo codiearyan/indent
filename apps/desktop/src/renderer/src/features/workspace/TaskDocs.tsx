@@ -46,7 +46,11 @@ export function TaskDocs({
         <ul className="mt-1 space-y-1 text-sm">
           {videos.map((video) => (
             <li key={video.url}>
-              <button type="button" className={link} onClick={() => playVideo(chapter, video)}>
+              <button
+                type="button"
+                className={link}
+                onClick={() => playVideo(chapter, task.id, video)}
+              >
                 {video.title}
               </button>
             </li>
