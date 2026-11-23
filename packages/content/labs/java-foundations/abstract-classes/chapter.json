@@ -54,7 +54,7 @@
       ],
       "hints": [
         "Each class needs only two things: a constructor and its own fareFor.",
-        "The constructor's first line is super(name). fareFor has exactly Vessel's first line, without abstract, with @Override above it and a body.",
+        "The constructor's first line hands the name to Vessel's constructor. fareFor has exactly Vessel's first line, without abstract, with @Override above it and a body.",
         "Ferry's fareFor gives back 160 when age is below 16 and 320 otherwise; WaterTaxi's is one line, `return 600;`."
       ],
       "docs": [

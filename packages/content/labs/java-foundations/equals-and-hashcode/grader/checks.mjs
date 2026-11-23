@@ -31,7 +31,7 @@ export const checks = tasks({
       cases: [
         equalsCase('Is equal to itself', [booking('a', 'Ishbel', 14, 2)], 'a.equals(a)', true),
         equalsCase('Is equal to another booking for the same passenger and hour', [booking('a', 'Ishbel', 14, 2), asObject('b', 'Ishbel', 14, 2)], 'a.equals(b)', true, { same: true }),
-        equalsCase('Is equal whatever the seats', [booking('a', 'Rab', 9, 1), asObject('b', 'Rab', 9, 4)], 'a.equals(b)', true, { seats: true }),
+        equalsCase('Is equal whatever the seats', [booking('a', 'Rab', 9, 1), asObject('b', 'Rab', 9, 4)], 'a.equals(b)', true, { same: true, seats: true }),
         equalsCase('Is not equal for another passenger', [booking('a', 'Rab', 9, 1), asObject('b', 'Wen', 9, 1)], 'a.equals(b)', false),
         equalsCase('Is not equal for another hour', [booking('a', 'Rab', 9, 1), asObject('b', 'Rab', 11, 1)], 'a.equals(b)', false),
         equalsCase('Is not equal to null', [booking('a', 'Seonag', 16, 3), 'Object nothing = null;'], 'a.equals(nothing)', false),
@@ -119,7 +119,7 @@ export const checks = tasks({
         return objectCases({
           mistakes: [
             {
-              when: (r) => r.case.equal && !/\bhashCode\s*\(/.test(code),
+              when: (r) => (r.case.equal || r.case.seats) && !/\bhashCode\s*\(/.test(code),
               hint: 'Equal bookings get different hash codes. Booking still has the hashCode every object gets from Object, which differs from one object to the next, equal or not.'
             },
             {
@@ -170,12 +170,24 @@ export const checks = tasks({
           show: 'ArrayList<Booking> waiting: Rab at 16, Wen at 16\nArrayList<Booking> cancelled: new Booking("Rab", 16, 1), new Booking("Rab", 16, 1)\nint taken = Booking.cancel(waiting, cancelled);',
           reads: { taken: 'taken', waiting: 'waiting' },
           expected: { taken: 1, waiting: ['Wen at 16:00, seats 1'] }
+        },
+        {
+          name: 'Takes off one booking for each one cancelled',
+          code: [...list('waiting', [make('Fenella', 13, 1), make('Calum', 13, 2), make('Calum', 13, 2), make('Struan', 17, 3)]), ...list('cancelled', [make('Calum', 13, 2)]), 'int taken = Booking.cancel(waiting, cancelled);'],
+          show: 'ArrayList<Booking> waiting: Fenella at 13, Calum at 13, Calum at 13, Struan at 17\nArrayList<Booking> cancelled: new Booking("Calum", 13, 2)\nint taken = Booking.cancel(waiting, cancelled);',
+          reads: { taken: 'taken', waiting: 'waiting' },
+          expected: { taken: 1, waiting: ['Fenella at 13:00, seats 1', 'Calum at 13:00, seats 2', 'Struan at 17:00, seats 3'] },
+          once: true
         }
-      ].map((c) => ({ ...c, hint: 'cancel should take off waiting the booking equal to each cancelled one, when there is one, and give back how many it took off.' })),
+      ].map((c) => ({ ...c, hint: 'cancel should take off waiting one booking equal to each cancelled one, when there is one, and give back how many it took off.' })),
       judge: objectCases({
         types: { taken: 'int' },
         typed: 'cancel gives back the same number whatever lists Check passes. Count the bookings it really takes off.',
         mistakes: [
+          {
+            when: (r) => r.case.once && r.values.waiting?.items?.length === 2,
+            hint: 'cancel took off every booking equal to a cancelled one. Calum is on the list twice and cancelled once, so one of his bookings stays: each cancelled booking takes off one equal booking, as a list\'s remove does.'
+          },
           {
             when: (r) => r.values.waiting?.items && r.values.waiting.items.length === r.case.expected.waiting.length + Number(r.case.expected.taken) && r.case.expected.taken > 0,
             hint: 'cancel takes nothing off the waiting list. Check\'s cancelled bookings are new objects, equal to the ones waiting but not the same objects, so only a comparison that uses equals finds them.'

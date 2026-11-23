@@ -1,4 +1,4 @@
-import { near, objectCases, refusal, tasks } from '../../grading.mjs'
+import { codeOnly, near, objectCases, refusal, tasks } from '../../grading.mjs'
 
 const value = (r, name) => r.values[name]?.value
 
@@ -161,16 +161,21 @@ export const checks = tasks({
           expected: { got: 0 }
         }
       ].map((c) => ({ ...c, hint: 'cost should add up, for every trip in the list, what that trip\'s own vessel charges for the age.' })),
-      judge: objectCases({
-        types: { got: 'int' },
-        typed: 'cost gives back the same number whatever trips and age Check passes. Work it out from the list and the age.',
-        mistakes: [
-          {
-            when: (r) => r.case.expected.got === 455 && ['250', '205'].includes(value(r, 'got')),
-            hint: 'cost counts only one of the trips. Every trip in the list adds its own fare.'
-          }
-        ]
-      })
+      judge: (runs, { section }) =>
+        objectCases({
+          types: { got: 'int' },
+          typed: 'cost gives back the same number whatever trips and age Check passes. Work it out from the list and the age.',
+          mistakes: [
+            {
+              when: (r) => r.case.expected.got === 455 && ['250', '205'].includes(value(r, 'got')),
+              hint: 'cost counts only one of the trips. Every trip in the list adds its own fare.'
+            },
+            {
+              when: () => !/\.\s*fareFor\s*\(/.test(codeOnly(section)),
+              hint: 'cost works out each fare itself, from what it knows about the kinds of vessel, so it is wrong for Check\'s own kinds, which it has never seen. Ask each vessel for its own fare: then the loop never needs to know what kind it holds.'
+            }
+          ]
+        })(runs)
     }
   }
 })

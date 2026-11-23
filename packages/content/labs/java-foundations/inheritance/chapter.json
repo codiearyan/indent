@@ -82,7 +82,7 @@
       ],
       "hints": [
         "Boat already knows how to describe a boat. CharterBoat only adds who hired it.",
-        "Inside CharterBoat, describe() alone means CharterBoat's own describe, which would call itself forever. super.describe() runs Boat's.",
+        "Inside CharterBoat, describe() alone means CharterBoat's own describe, which would call itself forever. The lesson shows the word that reaches the parent's version instead.",
         "The shape: `return super.describe() + \", hired by \" + hiredBy;`."
       ],
       "docs": [

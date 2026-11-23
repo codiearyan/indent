@@ -34,7 +34,7 @@
     "cancel": {
       "steps": [
         { "active": ["call", "call->cancel", "cancel"], "value": { "kind": "array", "label": "cancelled", "values": ["a booking read in", "..."] }, "note": "The cancellations come in as bookings read in, new objects every one." },
-        { "active": ["cancel", "cancel->list", "list", "list->equals", "equals"], "note": "For each one, the waiting list finds the booking equal to it and takes that one off." },
+        { "active": ["cancel", "cancel->list", "list", "list->equals", "equals"], "note": "For each one, the waiting list finds one booking equal to it and takes that one off." },
         { "active": ["cancel", "list"], "note": "Only bookings really taken off are counted, and the rest of the list stays in order." }
       ]
     }

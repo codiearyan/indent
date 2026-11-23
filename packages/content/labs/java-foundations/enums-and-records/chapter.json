@@ -45,7 +45,7 @@
       "id": "routes",
       "title": "Write the routes, each with its minutes",
       "file": "TicketKinds.java",
-      "description": "Under `// Task 2`, write an enum `Route` with three values, each carrying how long its crossing takes: `HARBOUR` 10 minutes, `ISLAND` 35 and `HEADLAND` 20. Each keeps its minutes in a `private final int` field, set by the enum's constructor. Write `int minutes()`, and `int crossingsIn(int hours)`: how many whole crossings of that route fit in that many hours.\n\nCheck makes sure `Route` is an enum, reads what `minutes` and `crossingsIn` give back for each route and for hours of its own, and looks for the enum's constructor. The numbers must not come from the order of the values or from their names as text.",
+      "description": "Under `// Task 2`, write an enum `Route` with three values, each carrying how long its crossing takes: `HARBOUR` 10 minutes, `ISLAND` 35 and `HEADLAND` 20. Each keeps its minutes in a `private final int` field, set by the enum's constructor. Write `int minutes()`, and `int crossingsIn(int hours)`: how many whole crossings of that route fit in that many hours.\n\nCheck makes sure `Route` is an enum, reads what `minutes` and `crossingsIn` give back for each route and for hours of its own, and looks for the enum's constructor and its `private final` field. The numbers must not come from the order of the values or from their names as text.",
       "nextSteps": [
         "Read the part of the lesson about an enum that carries a value.",
         "Write the three values, each with its minutes in brackets, ending with a semicolon.",

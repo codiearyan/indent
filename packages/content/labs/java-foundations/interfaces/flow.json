@@ -35,8 +35,8 @@
     "trip": {
       "steps": [
         { "active": ["bridie", "bridie->trip", "trip"], "value": { "kind": "array", "label": "Peigi's trip", "values": ["a boat", "bikes", "the tour bus"] }, "note": "Bridie asks for places for Peigi's family on every part of a trip." },
-        { "active": ["trip", "trip->bookable", "bookable"], "note": "First every part is asked whether it has room, without booking anything." },
-        { "active": ["trip", "bookable"], "note": "Only when all of them do is every part booked. Otherwise none is." }
+        { "active": ["trip", "trip->bookable", "bookable"], "note": "Every part, whatever it is, is reached through Bookable alone." },
+        { "active": ["trip", "bookable"], "note": "The trip ends booked on every part, or on none of them." }
       ]
     }
   }

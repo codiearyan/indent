@@ -1739,7 +1739,7 @@ const FAMILY_GLOSS = [
   [
     /^compiler\.err\.method\.does\.not\.override\.superclass/,
     () =>
-      "@Override says the method takes the place of one the class gets from its parent or an interface, and there is none with that name and those parameter types. Compare its first line with the parent's method: the name, capital letters included, and the type of each parameter."
+      "@Override says the method takes the place of one the class gets from its parent or an interface, and there is none with that name and those parameter types. Compare its first line with the parent's method: the name, capital letters included, and the type of each parameter. If they match, look at the first line of the class: it has to say which class it extends or which interface it implements."
   ],
   [
     /^compiler\.err\.override\.weaker\.access/,
@@ -1795,7 +1795,8 @@ const FAMILY_GLOSS = [
   ],
   [
     /^compiler\.err\.enum\.label\.must\.be\.unqualified\.enum/,
-    () => 'Inside a switch over an enum, each case names a value alone, without the enum\'s name and a dot in front.'
+    () =>
+      'Inside a switch over an enum, each case names a value alone, without the enum\'s name and a dot in front. Your terminal may show no error: Java 21 and newer accept the name in front, but this repo is written for Java 17, and Check compiles as Java 17, which does not.'
   ],
   [
     /^compiler\.err\.illegal\.enum\.static\.ref/,

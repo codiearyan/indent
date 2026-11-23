@@ -77,7 +77,7 @@
       "id": "cancel",
       "title": "Take cancelled bookings off the waiting list",
       "file": "WaitingList.java",
-      "description": "Under `// Task 3`, inside `Booking`, write `static int cancel(ArrayList<Booking> waiting, ArrayList<Booking> cancelled)`. For each booking in `cancelled`, it takes the booking equal to it off `waiting`, if there is one, and gives back how many it took off. It builds on Task 1.\n\nCheck makes the two lists itself, with cancelled bookings that are new objects equal to the waiting ones, some next to each other, one cancelled twice and some not waiting at all, and reads what `cancel` gives back and what is left on `waiting`.",
+      "description": "Under `// Task 3`, inside `Booking`, write `static int cancel(ArrayList<Booking> waiting, ArrayList<Booking> cancelled)`. For each booking in `cancelled`, it takes one booking equal to it off `waiting`, if there is one, and gives back how many it took off: a passenger who is on the list twice and cancels once stays on it once. It builds on Task 1.\n\nCheck makes the two lists itself, with cancelled bookings that are new objects equal to the waiting ones, some next to each other, one cancelled twice, one waiting twice and some not waiting at all, and reads what `cancel` gives back and what is left on `waiting`.",
       "nextSteps": [
         "Read the part of the lesson about contains and remove.",
         "Write the first line exactly as the task gives it.",

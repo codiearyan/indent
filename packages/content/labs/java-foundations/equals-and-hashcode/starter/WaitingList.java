@@ -64,6 +64,6 @@ class Booking {
 
     // Task 3: Take cancelled bookings off the waiting list
     // Write static int cancel(ArrayList<Booking> waiting, ArrayList<Booking> cancelled). For each
-    // booking in cancelled, it takes the booking equal to it off waiting, if there is one, and
+    // booking in cancelled, it takes one booking equal to it off waiting, if there is one, and
     // gives back how many it took off. It builds on Task 1.
 }

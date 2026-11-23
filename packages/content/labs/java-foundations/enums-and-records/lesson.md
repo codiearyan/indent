@@ -46,7 +46,7 @@ static int jarPence(Size size) {
 }
 ```
 
-Write `case Size.SMALL:` and the compiler says `an enum switch case label must be the unqualified name of an enumeration constant`. With colons, a case that matches runs on into the cases below it until a `return` or a `break`; forgetting a `break` is a classic slip. A `switch` with arrows never runs on, and it can give back a value directly:
+Write `case Size.SMALL:` and Java 17, which Check uses, says `an enum switch case label must be the unqualified name of an enumeration constant`. Java 21 and newer accept it, so your terminal may say nothing, but Check refuses it. With colons, a case that matches runs on into the cases below it until a `return` or a `break`; forgetting a `break` is a classic slip. A `switch` with arrows never runs on, and it can give back a value directly:
 
 ```java
 return switch (size) {
@@ -56,7 +56,7 @@ return switch (size) {
 };
 ```
 
-That form has one more guard. Leave a value out and it does not compile: `the switch expression does not cover all possible input values`. A `switch` with colons and no `default` says nothing, and quietly does nothing for the value it missed.
+That form has one more guard. Leave a value out and it does not compile: `the switch expression does not cover all possible input values`. A `switch` with colons and no `default` says nothing, and quietly does nothing for the value it missed. That is also why a method whose `switch` with colons has a `return` in a case for every value still brings `missing return statement`: Java does not count the values for you, so it needs a `default`, or a `return` after the `switch`.
 
 ## An enum that carries a value
 

@@ -67,7 +67,7 @@ Use exactly the fields `equals` compares. A field `equals` leaves out would give
 
 ## Lists use equals too
 
-A list's `contains(x)` and `remove(x)` go through the list asking each item whether it `equals` `x`. Without an `equals` of your own they look for that very object, so a booking made from a phone call is never found. With it, they find the equal one. `remove` gives back `true` when it took something off, and `false` when nothing was equal. Taking an item off moves every later item one place back, so a loop that walks positions while it removes steps over the next one.
+A list's `contains(x)` and `remove(x)` go through the list asking each item whether it `equals` `x`. Without an `equals` of your own they look for that very object, so a booking made from a phone call is never found. With it, they find the equal one. `remove` takes off only the first item that is equal, and gives back `true` when it took something off, and `false` when nothing was equal. Taking an item off moves every later item one place back, so a loop that walks positions while it removes steps over the next one.
 
 ## Your work in this issue
 

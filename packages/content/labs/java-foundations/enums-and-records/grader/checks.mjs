@@ -110,7 +110,7 @@ export const checks = tasks({
               hint: 'Every route gives back the same minutes, the last route\'s. minutes is shared by every value of the enum: a field with static in front belongs to the type, so each value\'s constructor writes over the last. Each value needs its own.'
             },
             {
-              when: (r) => value(r, 'Route.ISLAND.crossingsIn(3)') === '0' || value(r, 'Route.HARBOUR.crossingsIn(1)') === '0',
+              when: (r) => ['Route.ISLAND.crossingsIn(3)', 'Route.HARBOUR.crossingsIn(1)', 'Route.ISLAND.crossingsIn(1)'].some((k) => value(r, k) === '0'),
               hint: 'crossingsIn gives back 0 for hours that fit crossings. Hours and minutes are different units: turn the hours into minutes before you divide.'
             }
           ]
@@ -118,6 +118,8 @@ export const checks = tasks({
         const extra = shortcuts(section, 'Route')
         if (details.every((d) => d.passed) && !/\bRoute\s*\(\s*(?:final\s+)?int\s+\w+\s*\)/.test(code))
           extra.push(fail('Each route keeps its minutes', 'The numbers are right, and the task asks for each route to carry its minutes: a value in brackets after each route, kept by the enum\'s constructor in a private final field.'))
+        else if (details.every((d) => d.passed) && !/\b(?:private\s+final|final\s+private)\s+int\s+\w+\s*;/.test(code))
+          extra.push(fail('Each route keeps its minutes in a private final field', 'The numbers are right, and the task asks for the minutes to be kept in a private final int field: private, so no code outside Route can change them, and final, so a route\'s minutes never change once it is made.'))
         return [...extra, ...details]
       }
     },

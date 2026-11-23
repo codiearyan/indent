@@ -67,9 +67,9 @@ export const checks = tasks({
         },
         {
           name: 'Each bike ferry keeps its own values',
-          code: ['BikeFerry a = new BikeFerry("Fulmar", 16, 6);', 'BikeFerry c = new BikeFerry("Eider", 5, 0);'],
+          code: ['BikeFerry a = new BikeFerry("Fulmar", 16, 6);', 'BikeFerry c = new BikeFerry("Eider", 5, 3);'],
           reads: { 'a.getName()': 'a.getName()', 'a.getSeats()': 'a.getSeats()', 'a.getBikeSpaces()': 'a.getBikeSpaces()', 'c.getBikeSpaces()': 'c.getBikeSpaces()' },
-          expected: { 'a.getName()': 'Fulmar', 'a.getSeats()': 16, 'a.getBikeSpaces()': 6, 'c.getBikeSpaces()': 0 },
+          expected: { 'a.getName()': 'Fulmar', 'a.getSeats()': 16, 'a.getBikeSpaces()': 6, 'c.getBikeSpaces()': 3 },
           hint: 'Each bike ferry should keep the values it was made with, whatever other bike ferries are made after it.'
         }
       ],
@@ -79,7 +79,7 @@ export const checks = tasks({
           types: { 'f.getBikeSpaces()': 'int' },
           mistakes: [
             {
-              when: (r) => value(r, 'c.getBikeSpaces()') !== undefined && value(r, 'a.getBikeSpaces()') === '0',
+              when: (r) => value(r, 'c.getBikeSpaces()') === '3' && value(r, 'a.getBikeSpaces()') === '3',
               hint: 'Check made two bike ferries, and the first now gives back the second one\'s bike spaces. bikeSpaces is shared by every bike ferry: a field with static in front belongs to the class. Each needs its own.'
             },
             {
@@ -91,7 +91,7 @@ export const checks = tasks({
               hint: 'Boat\'s getName gives back a name Check never passed. The constructor should hand Boat the name and the seats it is given, not values of its own.'
             },
             {
-              when: (r) => r.case.expected['f.getBikeSpaces()'] !== undefined && value(r, 'f.getBikeSpaces()') === '0',
+              when: (r) => value(r, 'f.getBikeSpaces()') === '0' || value(r, 'a.getBikeSpaces()') === '0',
               hint: 'getBikeSpaces gives back 0: the constructor never keeps the bike spaces it is given.'
             }
           ]
@@ -129,7 +129,7 @@ export const checks = tasks({
           types: { 'b.fareFor(40)': 'int', 'b.fareFor(9)': 'int' },
           mistakes: [
             {
-              when: (r) => ['b.fareFor(40)', 'b.fareFor(9)'].some((k) => value(r, k) === (k === 'b.fareFor(40)' ? '320' : '160')),
+              when: (r) => ['b.fareFor(40)', 'n.fareFor(30)'].some((k) => value(r, k) === '320') || value(r, 'b.fareFor(9)') === '160',
               hint: 'Check holds the night boat in a variable of type Boat, and Boat\'s own fareFor ran, not NightBoat\'s. A method takes the place of the parent\'s only when its name and parameter types are exactly the same: compare NightBoat\'s fareFor with Boat\'s. @Override above it makes the compiler say when they differ.'
             },
             {
@@ -177,6 +177,14 @@ export const checks = tasks({
         const details = objectCases({
           types: { 'b.describe()': 'String' },
           mistakes: [
+            {
+              when: (r) => said(r).endsWith('hired by null'),
+              hint: 'describe says hired by null: the constructor never keeps the hirer it is given.'
+            },
+            {
+              when: (r) => said(r).endsWith('hired by Struan'),
+              hint: 'describe gives back a hirer Check never passed. Use this boat\'s own hiredBy, kept by the constructor.'
+            },
             {
               when: (r, own) => own.every((x) => said(x) === said(own[0])),
               hint: 'describe gives back the same text for every boat Check makes. Build it from Boat\'s describe and this boat\'s own hiredBy.'
