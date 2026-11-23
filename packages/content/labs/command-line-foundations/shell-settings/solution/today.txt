@@ -1,0 +1,8 @@
+Today's jobs, from Idris
+
+1. Save what echo $HOME prints in your terminal into home.txt, in the top folder.
+2. label.sh prints the top of a parcel label, and takes the shop's name from SHOP_NAME. In the terminal, set SHOP_NAME to Ashgrove Press so that label.sh sees it, then save what label.sh prints into label.txt, in the top folder.
+3. Sol's stamp tool is in bin. Make bin/stamp runnable for you, and add a line to shop-settings.sh that adds the full path of the bin folder to PATH, keeping every folder already on it, so that stamp alone works from any folder once the file is loaded.
+4. Add a line to shop-settings.sh that sets SHOP_NAME to Ashgrove Press for every program started after the file is loaded.
+
+Keep every line shop-settings.sh has now.

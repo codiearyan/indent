@@ -1,0 +1,6 @@
+Today's jobs, from Idris
+
+1. Lock prices.csv: nobody may change it, you included, and everyone may still read it.
+2. accounts/bank-details.txt is for your eyes only. You may read and change it. Nobody else on this laptop may read it, change it or run it.
+3. Lock every old price list in archive the way prices.csv is locked, but leave the archive folder itself open, so next year's list can go in.
+4. The fox poster now costs 22.00. Change its line in prices.csv to fox poster A3,22.00, keep every other line as it is, then lock the list again.

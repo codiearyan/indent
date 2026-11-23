@@ -1,0 +1,3 @@
+#!/bin/sh
+# Prints the line for the back of every card. Sol, 2025.
+echo "Printed by hand at Ashgrove Press"

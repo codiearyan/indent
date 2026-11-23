@@ -1,0 +1,13 @@
+Today's jobs, from Idris
+
+Every evening I type these four lines in the top folder, one at a time:
+
+echo "Orders today:"
+wc -l < orders/today.csv
+echo "Unpaid:"
+grep -c unpaid orders/today.csv
+
+1. Save them in a script called evening.sh in the top folder, in that order, so that sh evening.sh does all four.
+2. Make evening.sh a program of its own: a first line that names sh, and runnable by you, so that ./evening.sh works.
+3. Sol's count.sh only ever counts orders/today.csv. Make it count the file I give it, as in ./count.sh orders/2026-04-02.csv, from whichever folder I am in.
+4. count.sh always says it worked. When it counted, it prints the number, then Counted., and ends with status 0. When the file does not exist, it must not print Counted., and its status must not be 0.

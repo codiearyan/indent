@@ -1,0 +1,9 @@
+Card reader account, practice copy
+
+Bank: Thornby Savings
+Account name: Ashgrove Press
+Account number: 0000 0000
+Sort code: 00-00-00
+Card reader passcode: 0000
+
+Hesper changes the passcode on the first of each month.

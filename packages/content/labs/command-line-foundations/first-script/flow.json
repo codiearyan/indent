@@ -1,0 +1,96 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "idris", "label": "Idris", "kind": "story" },
+      { "id": "orders", "label": "Order files", "kind": "data" },
+      { "id": "evening", "label": "evening.sh", "kind": "file", "mine": true },
+      { "id": "count", "label": "count.sh", "kind": "file", "mine": true },
+      { "id": "terminal", "label": "Terminal", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "idris", "to": "evening", "label": "four lines" },
+      { "from": "idris", "to": "count", "label": "a file name" },
+      { "from": "orders", "to": "evening", "label": "today" },
+      { "from": "orders", "to": "count", "label": "any day" },
+      { "from": "evening", "to": "terminal", "label": "the day" },
+      { "from": "count", "to": "terminal", "label": "count and status" }
+    ],
+    "note": "You save the commands Idris types into scripts, so one word runs them and says how it went."
+  },
+  "tasks": {
+    "save": {
+      "steps": [
+        {
+          "active": ["idris", "idris->evening", "evening"],
+          "note": "Idris's four evening lines go into one file, in the same order."
+        },
+        {
+          "active": ["orders", "orders->evening", "evening"],
+          "note": "The script reads today's orders, as the lines did when Idris typed them."
+        },
+        {
+          "active": ["evening", "evening->terminal", "terminal"],
+          "value": {
+            "kind": "array",
+            "label": "what it prints",
+            "values": ["a heading", "how many", "a heading", "how many unpaid"]
+          },
+          "note": "One command runs all four lines and prints what they printed."
+        }
+      ]
+    },
+    "program": {
+      "steps": [
+        {
+          "active": ["evening"],
+          "note": "The file gets a first line that names the program that reads it."
+        },
+        {
+          "active": ["evening"],
+          "note": "Its owner may run it now, like any other program."
+        },
+        {
+          "active": ["evening", "evening->terminal", "terminal"],
+          "note": "Started by its own name, it prints the same as before."
+        }
+      ]
+    },
+    "argument": {
+      "steps": [
+        {
+          "active": ["idris", "idris->count", "count"],
+          "note": "Idris names a day's file after the script's name."
+        },
+        {
+          "active": ["orders", "orders->count", "count"],
+          "note": "The script counts the file it was given, found from the folder Idris is in."
+        },
+        {
+          "active": ["count", "count->terminal", "terminal"],
+          "note": "Each day's file gives its own number."
+        }
+      ]
+    },
+    "status": {
+      "steps": [
+        {
+          "active": ["count", "count->terminal", "terminal"],
+          "value": {
+            "kind": "array",
+            "label": "after a count",
+            "values": ["the number", "a word that it worked", "exit status"]
+          },
+          "note": "When the file is there, the script prints the count, says it worked, and ends well."
+        },
+        {
+          "active": ["idris", "idris->count", "count"],
+          "note": "One evening Idris names a day that has no file."
+        },
+        {
+          "active": ["count", "count->terminal", "terminal"],
+          "note": "The script does not claim it counted, and its status tells Idris it failed."
+        }
+      ]
+    }
+  }
+}
