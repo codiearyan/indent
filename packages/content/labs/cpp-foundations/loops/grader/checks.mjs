@@ -91,7 +91,7 @@ export const checks = {
                   ? 'The strikes of the first hour are missing. fromHour is included: look at where the loop starts.'
                   : reads.strikes === toHour - fromHour + 1
                     ? "strikes counts the hours, not the strikes. Each hour adds its own number of strikes: one at one o'clock, two at two."
-                    : 'strikes is not the strikes of every hour from fromHour to toHour added up. Start it at 0 before the loop, and add each hour to it inside.'
+                    : 'strikes is not the strikes of every hour from fromHour to toHour added up. Look at where the total starts, and at what each time round adds to it.'
         }
       })
     })
@@ -122,8 +122,8 @@ export const checks = {
           reads.digitSum === digits(serialNumber)
             ? 'digitSum is right, but the printed line is not. Print Check number: and then digitSum, once, after the loop.'
             : reads.digitSum === serialNumber % 10
-              ? 'digitSum holds only the last digit. The loop has to go on to every digit: % 10 gives the last digit, and / 10 takes it off.'
-              : 'digitSum is not the digits of serialNumber added up. Each time round, add the last digit and take it off, until nothing is left.'
+              ? 'digitSum holds only the last digit. The loop has to go on to every digit of the number.'
+              : 'digitSum is not the digits of serialNumber added up. Look at what the loop does with each digit, and whether it reaches every one.'
       }))
     })
   },

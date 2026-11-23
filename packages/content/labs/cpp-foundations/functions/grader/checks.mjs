@@ -19,7 +19,7 @@ export const checks = {
         expect: { result: labour(minutes), printed: '' },
         hint: (r) =>
           r.result === Math.trunc(minutes / 60) * 48
-            ? 'The minutes past the last whole hour are lost. Two whole numbers divided give a whole number, so work with a double before you divide.'
+            ? 'The minutes past the last whole hour are lost: two whole numbers divided give a whole number.'
             : r.result === minutes * 48
               ? 'This is the price of that many hours, not minutes. Ambrose charges 48 for a whole hour of 60 minutes.'
               : 'labourCost does not give back 48 for every 60 minutes, counted by the minute.'
