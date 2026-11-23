@@ -2,7 +2,7 @@
   "stations": [
     {
       "title": "Kasimir",
-      "say": "The drawer list is in a file. Read it."
+      "say": "The list is in a file. Read it."
     },
     {
       "title": "The morning",
@@ -28,10 +28,10 @@
     "label": "Drawer list",
     "wrong": "typed again",
     "why": "By hand",
-    "right": "read from disk"
+    "right": "from disk"
   },
   "captions": [
-    "Kasimir keeps the drawer list and his bench notes in files, and wants the program to read them.",
+    "Kasimir keeps the drawer list and his notes in files, and wants the program to read them.",
     "Today he copies both into the program by hand every morning, and a count goes wrong.",
     "You read a file line by line, add up the drawer, and read the notes, spaces and all.",
     "The stocktake reads the files on disk, and the counts are the ones Kasimir wrote.",

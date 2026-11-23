@@ -40,6 +40,10 @@
     {
       "title": "Templates, lambdas and rules as values",
       "chapters": ["function-templates", "class-templates", "lambdas", "algorithms-with-rules", "functions-as-values"]
+    },
+    {
+      "title": "Files, text and the whole build",
+      "chapters": ["reading-files", "writing-files"]
     }
   ]
 }

@@ -2,11 +2,11 @@
   "stations": [
     {
       "title": "Ambrose",
-      "say": "Write the sheet for me, columns straight."
+      "say": "Write my sheet, columns straight."
     },
     {
       "title": "The desk",
-      "text": "Bills copied by hand and lined up with a ruler."
+      "text": "Bills copied by hand, lined up with a ruler."
     },
     {
       "title": "Your code",
@@ -28,7 +28,7 @@
     "label": "Day sheet",
     "wrong": "by hand",
     "why": "No file",
-    "right": "written, in columns"
+    "right": "in columns"
   },
   "captions": [
     "Ambrose wants the day's bills on a sheet with straight columns, and a line in the log.",
