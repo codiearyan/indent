@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Kasimir",
+      "say": "Why is ticket 3101 on here twice?",
+      "note": "The bench list is a mess."
+    },
+    {
+      "title": "A plain vector",
+      "text": "Any line can add, change or clear it."
+    },
+    {
+      "title": "Your bench",
+      "file": "bench.cpp",
+      "mine": true,
+      "gap": "Nobody owns the list",
+      "tasks": [
+        "Add, one per ticket",
+        "Find by ticket",
+        "Total the minutes",
+        "Take one off"
+      ]
+    },
+    {
+      "title": "The bench",
+      "text": "One repair per ticket, kept that way."
+    }
+  ],
+  "ticket": {
+    "label": "Ticket 3101",
+    "wrong": "listed twice",
+    "why": "No owner",
+    "right": "listed once"
+  },
+  "captions": [
+    "Kasimir finds ticket 3101 on the bench list twice.",
+    "The list is a plain vector, so any line of the program can add to it or clear it.",
+    "You write a bench class that owns its repairs and changes them only by its own rules.",
+    "Now ticket 3101 is on the bench once, and the list cannot be cleared by accident.",
+    "The repair and the bench keep their own rules now. Classes are yours to build."
+  ]
+}

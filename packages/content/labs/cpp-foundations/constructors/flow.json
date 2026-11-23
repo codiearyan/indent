@@ -1,0 +1,152 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "dorrit",
+        "label": "Dorrit at the counter",
+        "kind": "story"
+      },
+      {
+        "id": "ctor",
+        "label": "Your constructors",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "repair",
+        "label": "A new repair",
+        "kind": "data"
+      },
+      {
+        "id": "rack",
+        "label": "Kasimir's rack",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "dorrit",
+        "to": "ctor",
+        "label": "what she knows"
+      },
+      {
+        "from": "ctor",
+        "to": "repair",
+        "label": "every member set"
+      },
+      {
+        "from": "repair",
+        "to": "rack",
+        "label": "onto a hook"
+      }
+    ],
+    "note": "Every repair gets all of its values the moment it is made, so none starts half filled in."
+  },
+  "tasks": {
+    "whole": {
+      "steps": [
+        {
+          "active": [
+            "dorrit",
+            "dorrit->ctor"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "its ticket",
+              "what it is"
+            ]
+          },
+          "note": "A clock comes in, and Dorrit knows its ticket and what it is."
+        },
+        {
+          "active": [
+            "ctor"
+          ],
+          "note": "The constructor gives each member its first value, in the order the class declares them."
+        },
+        {
+          "active": [
+            "ctor->repair",
+            "repair"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "a ticket that never changes",
+              "the item",
+              "no time yet"
+            ]
+          },
+          "note": "A whole repair comes out, and its ticket can never change after."
+        }
+      ]
+    },
+    "empty": {
+      "steps": [
+        {
+          "active": [
+            "rack"
+          ],
+          "note": "Kasimir's rack has hooks with no repair on them yet."
+        },
+        {
+          "active": [
+            "ctor",
+            "ctor->repair"
+          ],
+          "note": "A constructor that takes nothing makes an empty repair for each free hook."
+        },
+        {
+          "active": [
+            "repair",
+            "repair->rack",
+            "rack"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "on each free hook",
+            "values": [
+              "an empty repair"
+            ]
+          },
+          "note": "A row of hooks can be made in one go, each with an empty repair that holds known values."
+        }
+      ]
+    },
+    "post": {
+      "steps": [
+        {
+          "active": [
+            "dorrit",
+            "dorrit->ctor"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "its ticket only"
+            ]
+          },
+          "note": "A parcel arrives with a ticket on it and nothing else."
+        },
+        {
+          "active": [
+            "ctor",
+            "ctor->repair",
+            "repair"
+          ],
+          "note": "One constructor makes a repair from the ticket alone, with a word that says it came by post."
+        },
+        {
+          "active": [
+            "ctor"
+          ],
+          "note": "It only runs when the code asks for it by name, so a stray number never turns into a repair."
+        }
+      ]
+    }
+  }
+}

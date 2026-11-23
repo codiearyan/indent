@@ -1,0 +1,111 @@
+{
+  "id": "class-files",
+  "title": "A class in two files",
+  "files": [
+    "src/repair.h",
+    "src/repair.cpp",
+    "src/main.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build main.cpp and repair.cpp into one program here and run it.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/main.cpp src/repair.cpp -o workshop && ./workshop"
+  },
+  "tasks": [
+    {
+      "id": "header",
+      "title": "Move the class into repair.h",
+      "file": "src/repair.h",
+      "description": "Under `// Task 1` in `src/repair.h`, move `class Repair` out of `src/main.cpp`, inside an include guard, with the `#include` this file needs for `std::string`. Keep its members, private as they were, and keep the first line of the constructor and of each function, with a semicolon in place of its body: the bodies go to `repair.cpp` in Task 2. Take the class out of `main.cpp`, which keeps `#include \"repair.h\"`.\n\nCheck builds a program of its own that includes `repair.h` twice before anything else, with bodies of its own for the class's functions, as `repair.cpp` will give them. It makes a repair, reads it through a `const Repair&`, tries `addMinutes`'s rule, and compiles a line of its own outside the class that reads `minutes`, which must be refused. Once the task passes otherwise, Check also looks that `main.cpp` no longer writes the class.",
+      "nextSteps": [
+        "Write the guard's `#ifndef` and `#define` at the top of `repair.h`, and its `#endif` on the last line.",
+        "Add `#include <string>`, then move the class from `main.cpp`, with its `};`.",
+        "In the class, end each function's first line with a semicolon and take its body away.",
+        "Build both files with the terminal's command: the linker will say what has no body yet."
+      ],
+      "hints": [
+        "A header holds what other files need to know: the class, its members and the first line of each function. The include guard stops a file that includes it twice from meeting the class twice.",
+        "Only the bodies leave. The constructor's line keeps its parameters and loses its member initialiser list, which goes with its body. `const` at the end of a getter stays.",
+        "The shape is `#ifndef REPAIR_H`, `#define REPAIR_H`, `#include <string>`, the class with lines like `int getTicket() const;` and `Repair(int number, const std::string& name);`, then `#endif`."
+      ],
+      "docs": [
+        {
+          "title": "Classes",
+          "url": "https://en.cppreference.com/w/cpp/language/classes"
+        },
+        {
+          "title": "Definitions and ODR",
+          "url": "https://en.cppreference.com/w/cpp/language/definition"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Header files",
+          "url": "https://www.youtube.com/watch?v=9RJTQmK0YPI"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "source",
+      "title": "Write the member functions in repair.cpp",
+      "file": "src/repair.cpp",
+      "description": "In `src/repair.cpp`, include `repair.h` above `// Task 2`. Under `// Task 2`, write the body of the constructor and of every function the class declares, moved from `main.cpp`, each with `Repair::` in front of its name. Each first line matches its line in the class, `const` included, and the constructor keeps its member initialiser list.\n\nCheck builds a program of its own with a `repair.h` of its own, written as Task 1 asks, and links it with your `repair.cpp`. It makes repairs on memory that still holds old values, reads them back through a `const Repair&`, and tries `addMinutes`'s rule. So this task is judged on its own.",
+      "nextSteps": [
+        "Write `#include \"repair.h\"` below the file's first comment.",
+        "Move each body from `main.cpp`, and put `Repair::` in front of each name.",
+        "The constructor becomes `Repair::Repair(...)`, with its member initialiser list after the round brackets.",
+        "Build both `.cpp` files together with the terminal's command and run the program."
+      ],
+      "hints": [
+        "Outside the class, a member function's name is written with the class's name and `::` in front. Without it, it is a new function of its own, and the class's members mean nothing in it.",
+        "The first line in the `.cpp` must match the class's line: the same parameter types, the same return type and the same `const` at the end. Otherwise the compiler says it matches no declaration.",
+        "The shape is `int Repair::getTicket() const { return ticket; }` and `Repair::Repair(int number, const std::string& name) : ticket(number), item(name), minutes(0) {}`."
+      ],
+      "docs": [
+        {
+          "title": "Non-static member functions",
+          "url": "https://en.cppreference.com/w/cpp/language/member_functions"
+        },
+        {
+          "title": "Definitions and ODR",
+          "url": "https://en.cppreference.com/w/cpp/language/definition"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Writing a class step by step",
+          "url": "https://www.youtube.com/watch?v=3dHBFBw13E0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "line",
+      "title": "Write the bench line in main.cpp",
+      "file": "src/main.cpp",
+      "description": "Under `// Task 3` in `src/main.cpp`, write a function called `benchLine` that takes a repair as a reference to a `const Repair` and gives back its line for the bench as a `std::string`: the ticket, a space, the item, `, ` and the minutes, then ` min`. Like this:\n\n```\n3101 mantel clock, 75 min\n```\n\n`benchLine` is outside the class, so it reads the repair through its public functions. Check builds your `main.cpp` with a `repair.h` of its own in place of yours, makes repairs of its own and reads what `benchLine` gives back. The class must have left `main.cpp` (Task 1) for this to build.",
+      "nextSteps": [
+        "Write the first line: a `const Repair&` in, a `std::string` back.",
+        "Read the ticket, the item and the minutes through the getters.",
+        "Turn the two numbers into text with `std::to_string`, and join the parts with `+`.",
+        "Print `benchLine` of a repair from `main`, and build both files."
+      ],
+      "hints": [
+        "`main.cpp` includes `repair.h`, so it knows the class and can call its public functions. The members stay private.",
+        "The repair comes in as a `const` reference, so only functions marked `const` can be called on it: the getters are.",
+        "The shape is `return std::to_string(repair.getTicket()) + \" \" + repair.getItem() + \", \" + std::to_string(repair.getMinutes()) + \" min\";`."
+      ],
+      "docs": [
+        {
+          "title": "std::to_string",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/to_string"
+        },
+        {
+          "title": "Access specifiers",
+          "url": "https://en.cppreference.com/w/cpp/language/access"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

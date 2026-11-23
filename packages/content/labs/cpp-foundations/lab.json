@@ -1,7 +1,7 @@
 {
   "id": "cpp-foundations",
   "title": "C++ foundations",
-  "description": "Tolliver Clockworks is a small workshop that repairs clocks and watches, and its repair tickets, parts and prices are still worked out by hand on paper slips. You are its new developer and have never written code, so you start by building your first program and move the slips onto the laptop one idea at a time, reading what the compiler tells you on the way. Each issue teaches one part of C++, from your first line through values, numbers and their traps, and text, then decisions, loops, functions, references and reading what people type, then lists with vectors, look-ups with maps and the standard algorithms, then types of your own with structs and enum class, headers, and a program built from several files, each of which you build, run and check yourself.",
+  "description": "Tolliver Clockworks is a small workshop that repairs clocks and watches, and its repair tickets, parts and prices are still worked out by hand on paper slips. You are its new developer and have never written code, so you start by building your first program and move the slips onto the laptop one idea at a time, reading what the compiler tells you on the way. Each issue teaches one part of C++, from your first line through values, numbers and their traps, and text, then decisions, loops, functions, references and reading what people type, then lists with vectors, look-ups with maps and the standard algorithms, then types of your own with structs and enum class, headers, and a program built from several files, then classes that keep their own rules with private members, constructors, const and static members, a class in two files and a class that owns a list, each of which you build, run and check yourself.",
   "category": "Programming languages",
   "language": "cpp",
   "tags": ["C++"],
@@ -24,6 +24,10 @@
     {
       "title": "Tickets, states and shared files",
       "chapters": ["structs", "structs-and-functions", "enums", "headers", "several-files"]
+    },
+    {
+      "title": "Classes that keep their rules",
+      "chapters": ["classes", "constructors", "const-and-static", "class-files", "owning-a-collection"]
     }
   ]
 }

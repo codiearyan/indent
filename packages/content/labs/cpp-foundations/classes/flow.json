@@ -1,0 +1,177 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "kasimir",
+        "label": "Kasimir at the bench",
+        "kind": "story"
+      },
+      {
+        "id": "program",
+        "label": "The rest of the program",
+        "kind": "story"
+      },
+      {
+        "id": "funcs",
+        "label": "Your public functions",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "values",
+        "label": "Your private values",
+        "kind": "data",
+        "mine": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "kasimir",
+        "to": "program",
+        "label": "time to log"
+      },
+      {
+        "from": "program",
+        "to": "funcs",
+        "label": "a call"
+      },
+      {
+        "from": "funcs",
+        "to": "values",
+        "label": "the only way in"
+      },
+      {
+        "from": "funcs",
+        "to": "program",
+        "label": "an answer"
+      }
+    ],
+    "note": "A repair's values change only through its own functions, which keep the bench's rules."
+  },
+  "tasks": {
+    "item": {
+      "steps": [
+        {
+          "active": [
+            "program",
+            "program->funcs",
+            "funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the item's new name"
+            ]
+          },
+          "note": "The program hands a new item to the repair's own function."
+        },
+        {
+          "active": [
+            "funcs->values",
+            "values"
+          ],
+          "note": "The function puts it in the private item, which nothing outside the class can reach."
+        },
+        {
+          "active": [
+            "funcs",
+            "funcs->program"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "a copy of the item"
+            ]
+          },
+          "note": "Reading the item gives back a copy, so changing that copy leaves the repair as it was."
+        }
+      ]
+    },
+    "minutes": {
+      "steps": [
+        {
+          "active": [
+            "kasimir",
+            "kasimir->program",
+            "program->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "minutes for one entry"
+            ]
+          },
+          "note": "Kasimir logs time on a repair through its function, never straight into its minutes."
+        },
+        {
+          "active": [
+            "funcs"
+          ],
+          "note": "The function checks the bench's rule for one entry before it changes anything."
+        },
+        {
+          "active": [
+            "funcs->values",
+            "values"
+          ],
+          "note": "Only minutes that keep the rule are added to the private minutes."
+        },
+        {
+          "active": [
+            "funcs->program",
+            "program"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "true or false"
+            ]
+          },
+          "note": "The program hears whether the time was added or refused."
+        }
+      ]
+    },
+    "remove": {
+      "steps": [
+        {
+          "active": [
+            "program",
+            "program->funcs"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "minutes to take off"
+            ]
+          },
+          "note": "A mistake on the card is put right by taking minutes off."
+        },
+        {
+          "active": [
+            "funcs",
+            "values"
+          ],
+          "note": "The function compares them with what the repair has, so the minutes never go below zero."
+        },
+        {
+          "active": [
+            "funcs->program"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes back",
+            "values": [
+              "true or false"
+            ]
+          },
+          "note": "It says whether it took them off, and changes nothing when it refuses."
+        }
+      ]
+    }
+  }
+}

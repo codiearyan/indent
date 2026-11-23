@@ -1907,7 +1907,7 @@ function typesHarness(types = {}) {
  * The lines of `file` that Task `task` keeps. Returns { problem } or the cut: { lines, kept, keep,
  * first, code, fns, main, def, uses, providedAt }.
  */
-function cutFile(file, whole, starter, { task, fn, guard, provides = [], dropMain, skip = [] }) {
+function cutFile(file, whole, starter, { task, fn, guard, provides = [], dropMain, skip = [], inClass = false }) {
   const lines = whole.split('\n')
   const tasks = keepsTasks(file, lines, starter)
   if (tasks.problem) return { problem: tasks.problem }
@@ -1918,16 +1918,23 @@ function cutFile(file, whole, starter, { task, fn, guard, provides = [], dropMai
   const main = fns.find((f) => f.name === 'main' && f.kind === 'def' && !f.nested)
   const marks = [...starts.values()].sort((a, b) => a - b)
   const first = marks.length ? marks[0] : lines.length
+  const room = inClass ? classRoom(file, lines, codeLines, starter, starts, main) : null
+  if (room?.problem) return { problem: room.problem }
   const sectionOf = (n) => {
     const s = starts.get(n)
     if (s === undefined) return null
     let e = Math.min(lines.length, ...marks.filter((i) => i > s))
     if (main && main.startLine > s) e = Math.min(e, main.startLine)
+    if (room && n === room.last) e = Math.min(e, room.close)
     return [s, e]
   }
   const keep = lines.map((_, i) => i < first)
   const own = sectionOf(task)
   if (own) for (let i = own[0]; i < own[1]; i++) keep[i] = true
+  if (room) {
+    keep[room.close] = true
+    for (let i = room.close + 1; i < room.end; i++) keep[i] = task === room.last || GUARDISH.test(codeLines[i])
+  }
   const span = (f) => {
     for (let i = f.startLine; i <= f.endLine; i++) keep[i] = true
   }
@@ -1955,6 +1962,9 @@ function cutFile(file, whole, starter, { task, fn, guard, provides = [], dropMai
     })
   }
   const kept = lines.map((l, i) => (keep[i] ? l : ''))
+  // The other tasks' lines are gone, and with them any public: or private: they wrote, so the
+  // task starts under the label it has in the learner's own file.
+  if (room?.inside.has(task)) kept[starts.get(task)] = `${accessAt(codeLines, starts.get(task))}: ${kept[starts.get(task)]}`
   const providedAt = new Set()
   for (const p of provides.filter((x) => (x.file ?? file) === file && x.task !== undefined)) {
     const section = sectionOf(p.task)
@@ -1968,10 +1978,10 @@ function cutFile(file, whole, starter, { task, fn, guard, provides = [], dropMai
       providedAt.add(at)
     })
   }
-  return { lines, kept, keep, first, code, codeLines, fns, main, def, uses, providedAt, starts }
+  return { lines, kept, keep, first, code, codeLines, fns, main, def, uses, providedAt, starts, sharedBelow: room ? new Set([room.close]) : undefined }
 }
 
-const cutCode = (cut) => cut.codeLines.filter((_, i) => cut.keep[i] && i >= cut.first).join('\n')
+const cutCode = (cut) => cut.codeLines.filter((_, i) => cut.keep[i] && i >= cut.first && !cut.sharedBelow?.has(i)).join('\n')
 
 function placeOf(d, cut) {
   const i = d.line - 1
@@ -1983,7 +1993,7 @@ function placeOf(d, cut) {
     const f = cut.fns.find((x) => x.name === u.name && x.kind === 'def')
     return j >= f.startLine && j <= f.endLine
   })
-  return { line: j + 1, place: j < cut.first ? 'shared' : owner ? 'other' : 'task', owner }
+  return { line: j + 1, place: j < cut.first || cut.sharedBelow?.has(j) ? 'shared' : owner ? 'other' : 'task', owner }
 }
 
 const MEMBER_MISSING = /no member named '(\w+)' in '(?:const )?(?:struct )?(\w+)'|'(?:const )?(?:struct )?(\w+)' has no member named '(\w+)'|'(\w+)' is not a member of '(?:const )?(\w+)'/
@@ -2155,7 +2165,8 @@ export async function buildTypes(t, spec) {
       guard: spec.guard,
       provides: spec.provides,
       dropMain: starterMain,
-      skip: (spec.provides ?? []).map((p) => p.name)
+      skip: (spec.provides ?? []).map((p) => p.name),
+      inClass: spec.inClass?.includes(file)
     })
     if (cut.problem) return { problem: [cut.problem] }
     if (starterMain && !cut.main) {
@@ -2230,6 +2241,7 @@ export async function buildTypes(t, spec) {
   const harnessText = [
     ...appended,
     typesHarness(types),
+    ...(spec.helpers ?? []),
     'int main(int argc, char** argv) {',
     '  std::cerr.precision(17);',
     '  static indent_::in_ indent_in_(std::cin.rdbuf());',
@@ -2251,6 +2263,7 @@ export async function buildTypes(t, spec) {
   for (const [file, cut] of Object.entries(cuts)) {
     await writeFile(join(dir, file), cut.kept.join('\n') + (single && balanced ? '\n' + harnessText : '\n'))
   }
+  for (const [file, text] of Object.entries(spec.replaced ?? {})) await writeFile(join(dir, file), text)
   if (!single) {
     const includes = spec.files.filter(isHeader).map((h) => `#include "${h.slice(dirname(header).length + 1)}"`)
     const twice = spec.guard?.task === task ? includes : []
@@ -2260,11 +2273,13 @@ export async function buildTypes(t, spec) {
   await mkdir(join(dir, '.check'), { recursive: true })
   const exe = join(dir, '.check', 'program')
   const sources = [...(single ? [] : [checkFile]), ...spec.files.filter((f) => !isHeader(f))]
+  const probing = spec.probes?.length ? startProbes(cc, dir, spec, cuts, header) : null
   const made = await output(cc, ['-std=c++17', '-Wall', ...HARDENED, ...(balanced ? [] : ['-fsyntax-only']), ...sources, '-o', exe], {
     cwd: dir,
     timeoutMs: 60000,
     env: { LC_ALL: 'C' }
   })
+  const probed = probing ? await probing : undefined
   if (made.spawnError || made.timedOut) {
     return { problem: [fail(`${label} builds`, 'The C++ compiler could not run. Try Check again.')] }
   }
@@ -2307,6 +2322,8 @@ export async function buildTypes(t, spec) {
       source: first && first.line ? linesOf(first.file)[first.line - 1] ?? '' : '',
       guarded: spec.guard?.task === task && spec.guard.file,
       code: taskCode,
+      cuts,
+      stderr: made.stderr,
       missingInclude:
         header && cuts[first?.file] && !isHeader(first.file) && !spec.files.filter(isHeader).some((h) => cuts[first.file]?.kept.some((l) => new RegExp(`^\\s*#\\s*include\\s*"${basename(h).replace('.', '\\.')}"`).test(l)))
           ? basename(header)
@@ -2314,6 +2331,7 @@ export async function buildTypes(t, spec) {
     }
     const context = { lines: linesOf(first?.file), code: taskCode, stderr: made.stderr, label, file: first?.file }
     return (
+      spec.classCause?.(list, ctx) ??
       part4Cause(list, ctx) ??
       (where === 'added' ? null : part3Cause(list, context) ?? part2Cause(list, linesOf(first?.file), taskCode, { label, fns: cuts[first?.file]?.fns ?? [], provided: provided.map((p) => p.name) }) ?? causeOf(list.slice(0, 1), linesOf(first?.file)))
     )
@@ -2390,8 +2408,8 @@ export async function buildTypes(t, spec) {
       }
     }
     const said = linkerSaid(made.stderr)
-    if (said) return { problem: [fail(`${label} links`, await linkMessage(said, { spec, cuts, read, header, fnFile, label }), said.kind === 'undefined' ? `The linker cannot find ${linkedName(said)}` : `The linker finds ${linkedName(said)} twice`)] }
-    const inLibrary = part3Cause([], { lines: [], code: taskCode, stderr: made.stderr, label })
+    if (said) return { problem: [fail(`${label} links`, spec.classLink?.(said, { spec, cuts, label }) ?? (await linkMessage(said, { spec, cuts, read, header, fnFile, label })), said.kind === 'undefined' ? `The linker cannot find ${linkedName(said)}` : `The linker finds ${linkedName(said)} twice`)] }
+    const inLibrary = spec.classCause?.([], { label, stderr: made.stderr, code: taskCode, cuts }) ?? part3Cause([], { lines: [], code: taskCode, stderr: made.stderr, label })
     return {
       problem: [
         fail(
@@ -2403,6 +2421,8 @@ export async function buildTypes(t, spec) {
     }
   }
 
+  const warnedClass = spec.classWarning?.(warnings)
+  if (warnedClass) return { problem: [fail(`${label} builds without a warning`, warnedClass.message, explainAll([warnedClass.warning]))] }
   const unhandled = warnings.find((w) => /not handled in switch/.test(w.text))
   if (unhandled) {
     const value = /value '(\w+)'/.exec(unhandled.text)?.[1]
@@ -2464,12 +2484,13 @@ export async function buildTypes(t, spec) {
             : r.timedOut
               ? `${fn ? `${who}, under ${label},` : `The code of ${label}`} did not finish within ${RUN_SECONDS} seconds, so Check stopped it. A loop in it never ends: look at what changes each time round, and whether it moves toward the end.`
               : `${fn ? `${who}, under ${label},` : `The code of ${label}`} printed far more than the task asks for, so Check stopped it. Look for a loop that prints without end.`
-        : crashedWhy(r, who, label)
+        : spec.classCrashed?.(r, label) ?? crashedWhy(r, who, label)
     const call = fn ? `${describeCall(fn, spec, spec.cases[broken])}\n` : ''
     return { problem: [fail(`${who} runs to the end`, why, `${call}${(r.stdout ?? '').trim() ? printedText(firstLines(clip(r.stdout))) : ''}`.trim())] }
   }
   const sig = (runs[0].got.sig ?? '').split(SPLIT)
   return {
+    probed,
     sig: { returns: sig[0], params: sig.slice(1) },
     uses: Object.values(cuts).flatMap((c) => c.uses),
     warnings: warnings.map((w) => `${w.file}:${w.line}: warning: ${w.text}\n  ${linesOf(w.file)[w.line - 1]?.trim() ?? ''}`),
@@ -2586,3 +2607,411 @@ export async function bodyOf(t, file, fn) {
   const def = functionsOf(code).find((f) => f.name === fn && f.kind === 'def' && !f.nested)
   return def ? code.slice(def.start, def.end) : null
 }
+
+// ---------- Part 5: classes ----------
+//
+// A class's tasks may sit inside the class, between its first line and its closing };, which the
+// starter gives. For Task N, Check keeps the lines above Task 1, the lines of Task N and the };
+// that ends the class, puts its own right version of another task's members where that task's
+// lines were (spec.provides), and starts Task N under the public: or private: it has in the
+// learner's file, so one unfinished task never turns the others red. Lines below the }; and above
+// main belong to the last task inside the class (a static member's definition), except the
+// preprocessor's, which every task keeps.
+//
+// Check's own code makes objects of the class and calls their public functions; it never reads
+// the learner's text to judge them. What must not compile from outside the class (a private
+// member, a number turning into an object by itself) is a probe: a line of Check's own, compiled
+// apart with -fsyntax-only next to the build, which must fail for exactly that reason.
+
+/** Which tasks of `starter` sit inside a class, and where the learner's class ends. */
+function classRoom(file, lines, codeLines, starter, starts, main) {
+  const starterCode = codeOnly(starter.join('\n')).split('\n')
+  let depth = 0
+  const depthAt = starterCode.map((l) => {
+    const d = depth
+    for (const ch of l) depth += ch === '{' ? 1 : ch === '}' ? -1 : 0
+    return d
+  })
+  const inside = new Set([...marks(starter).starts].filter(([, at]) => depthAt[at] > 0).map(([n]) => n))
+  if (!inside.size) return null
+  const last = [...inside].sort((a, b) => starts.get(b) - starts.get(a))[0]
+  const from = starts.get(last)
+  let end = Math.min(lines.length, ...[...starts.values()].filter((i) => i > from))
+  if (main && main.startLine > from) end = Math.min(end, main.startLine)
+  let close = -1
+  for (let i = from; i < end; i++) if (/^\s*\}\s*;/.test(codeLines[i])) close = i
+  if (close === -1) {
+    return {
+      problem: fail(
+        `${file} keeps the end of its class`,
+        `Check cannot find the }; that ends the class in ${file}, below its last task. Put back the closing brace with the semicolon after it, on a line of its own, as the starter had it.`
+      )
+    }
+  }
+  return { inside, last, close, end }
+}
+
+/** The access label in force at line `at` of the learner's class: the last one above it. */
+function accessAt(codeLines, at) {
+  for (let i = at - 1; i >= 0; i--) {
+    const label = [...codeLines[i].matchAll(/\b(public|private|protected)\s*:(?!:)/g)].at(-1)
+    if (label) return label[1]
+    const head = /\b(class|struct)\s+\w+[^;{]*\{/.exec(codeLines[i])
+    if (head) return head[1] === 'class' ? 'private' : 'public'
+  }
+  return 'private'
+}
+
+/** Writes Check's probe lines to a file of their own and compiles it apart, syntax only. */
+async function startProbes(cc, dir, spec, cuts, header) {
+  const base = dirname(header ?? spec.files[0])
+  const file = join(base, 'indent_probe_.cpp').replaceAll('\\', '/')
+  const head = header ? spec.files.filter(isHeader).map((h) => `#include "${basename(h)}"`) : cuts[spec.files[0]].kept
+  const lines = [...head, '#include <string>', ...spec.probes.map((p, i) => `void indent_probe_${i}_(${p.params ?? ''}) { ${p.code} }`)]
+  await writeFile(join(dir, file), lines.join('\n') + '\n')
+  const r = await output(cc, ['-std=c++17', '-fsyntax-only', file], { cwd: dir, timeoutMs: 60000, env: { LC_ALL: 'C' } })
+  return { ...r, file, at: spec.probes.map((_, i) => head.length + 2 + i) }
+}
+
+function probeDetail(p, i, probed) {
+  if (!probed || probed.spawnError || probed.timedOut) return fail(p.name, 'The C++ compiler could not run. Try Check again.')
+  const errors = diagnostics(probed.stderr ?? '', probed.file).filter((d) => d.kind === 'error' && d.line === probed.at[i])
+  if (!errors.length) return fail(p.name, p.compiled, p.shown)
+  const text = errors.map((e) => e.text).join('\n')
+  if (p.expect.test(text)) return pass(p.name, p.shown)
+  return fail(p.name, p.other?.(text) ?? `Check's own line fails for another reason than the task asks for. Compare the class with the task, name by name.`, `${p.shown}\nThe compiler: ${errors[0].text}`)
+}
+
+/** C++ that names the learner's classes and reads the shape of a member function. */
+function classHelpers(names) {
+  const own = names.map((n) => `std::is_same_v<B, ${n}>`).join(' || ')
+  const named = names.map((n, i) => `${i ? 'else ' : ''}if constexpr (std::is_same_v<B, ${n}>) std::cerr << "${n}";`).join(' ')
+  const say = (kind) =>
+    `static void say(const char* n) { std::cerr << "\\036" << n << "\\037"; ctype_<R>(); ((std::cerr << "\\037", ctype_<A>()), ...); std::cerr << "\\037${kind}\\036"; }`
+  return [
+    'namespace indent_ {',
+    `template <class B> constexpr bool own_() { return ${own}; }`,
+    'template <class T> void ctype_() {',
+    '  using B = std::remove_cv_t<std::remove_reference_t<T>>;',
+    '  if constexpr (own_<B>() || vec_<B>::value) {',
+    '    if constexpr (std::is_reference_v<T> && std::is_const_v<std::remove_reference_t<T>>) std::cerr << "const ";',
+    '    if constexpr (vec_<B>::value) { std::cerr << "std::vector<"; ctype_<typename vec_<B>::elem>(); std::cerr << ">"; }',
+    `    else { ${named} }`,
+    '    if constexpr (std::is_lvalue_reference_v<T>) std::cerr << "&";',
+    '  } else type_<T>();',
+    '}',
+    'template <class T> struct m_;',
+    `template <class C, class R, class... A> struct m_<R (C::*)(A...)> { ${say('mutable')} };`,
+    `template <class C, class R, class... A> struct m_<R (C::*)(A...) const> { ${say('const')} };`,
+    `template <class R, class... A> struct m_<R (*)(A...)> { ${say('static')} };`,
+    '}'
+  ]
+}
+
+/** Check's C++ that writes the shape of `cls::fn` as `sig_<fn>`. */
+export const memberSig = (cls, fn) => `indent_::m_<decltype(&${cls}::${fn})>::say("sig_${fn}");`
+/** The same for a function outside any class; sigProblem() then reads its kind as 'static'. */
+export const freeSig = (fn) => `indent_::m_<decltype(&${fn})>::say("sig_${fn}");`
+
+/** The shape memberSig() wrote: { returns, params, kind: 'mutable' | 'const' | 'static' }. */
+function sigOf(got, fn) {
+  const text = got[`sig_${fn}`]
+  if (text === undefined) return null
+  const parts = text.split(SPLIT)
+  return { returns: parts[0], params: parts.slice(1, -1), kind: parts.at(-1) }
+}
+
+/**
+ * A message when `fn` does not have the shape the task asks for, or null. want: { returns,
+ * params: [{ type, what }], kind } (kind left out when it does not matter).
+ */
+export function sigProblem(got, fn, want) {
+  const sig = sigOf(got, fn)
+  if (!sig) return `Check could not read what ${fn} takes and gives back.`
+  if (want.returns !== undefined && sig.returns !== want.returns) {
+    const plain = bareType(want.returns)
+    if (want.returns === `const ${plain}&` && sig.returns === plain) {
+      return `${fn} gives back a copy. The task asks for a const reference: it lets the caller read the member where it is, without copying it, and still not change it.`
+    }
+    if (sig.returns === `${plain}&`) {
+      return `${fn} gives back a reference the caller can change, so the caller could change the member itself without any of the class's rules. ${want.returns === plain ? 'The task asks for a copy.' : 'The task asks for a const reference.'}`
+    }
+    return `${fn} gives back ${typeWords(sig.returns)}, and the task asks for ${typeWords(want.returns)}. The type in front of its name says what it gives back.`
+  }
+  if (want.params) {
+    if (sig.params.length !== want.params.length) {
+      return `${fn} takes ${sig.params.length} ${sig.params.length === 1 ? 'value' : 'values'}, and the task gives it ${want.params.length}${want.params.length ? `: ${want.params.map((p) => p.what).join(', ')}` : ''}. Look at the list in its round brackets.`
+    }
+    for (const [k, p] of want.params.entries()) {
+      const got = sig.params[k]
+      if (got === p.type) continue
+      const plain = bareType(p.type)
+      return got === plain && p.type !== plain
+        ? `${fn} takes ${p.what} as a copy. The task asks for a const reference, which reads the caller's own value without copying it.`
+        : got === `${plain}&`
+          ? `${fn} takes ${p.what} as a reference it could change, though it only reads it. The task asks for a const reference.`
+          : `${fn} takes ${p.what} as ${typeWords(got)}, and the task asks for ${typeWords(p.type)}.`
+    }
+  }
+  if (want.kind && sig.kind !== want.kind) {
+    if (want.kind === 'const') return `${fn} only reads the object and is not marked const. A member function that changes nothing has const at the end of its first line, so it can be called on an object that must not change.`
+    if (want.kind === 'static') return `${fn} is not static, so it can only be called on one object. A function of the whole class, called with the class's name and ::, is static.`
+    if (sig.kind === 'static') return `${fn} is static, so it belongs to no object, and the task asks for a function of each object.`
+    return `${fn} is marked const, a promise that it changes nothing, and the task asks it to change the object.`
+  }
+  return null
+}
+
+const nameIn = (quoted) => /(\w+)(?:\([^']*\))?(?:\s*const)?$/.exec(quoted)?.[1] ?? quoted
+
+/** The causes of an error that part 5 teaches, tried before those of parts 1 to 4. */
+function classCause(errors, ctx, spec) {
+  const C = spec.className ?? 'Repair'
+  const members = spec.members ?? []
+  const fns = spec.functions ?? []
+  const label = ctx.label
+  const fromCheck = ctx.where === 'added' || ctx.where === 'provided'
+  if (!errors.length) {
+    const lib = ctx.stderr ?? ''
+    if (new RegExp(`no matching constructor for initialization of '${C}'|no matching function for call to '${C}::${C}\\(\\)'`).test(lib)) {
+      return `Check makes a std::vector of a given size, which fills it with new ${C}s made with no values, and ${C} has no constructor that takes nothing. Once a class has a constructor of its own, it has a constructor with no parameters only when you write one.`
+    }
+    return null
+  }
+  const text = errors.map((e) => e.text).join('\n')
+  const source = ctx.source ?? ''
+  if (/expected ';' after class/.test(text) || unclosedClass(ctx.code ?? '')) {
+    return `class ${C} ends with a semicolon after its closing brace, as a struct does. Without it, the compiler reads the class and the line after it as one, so the error can point at the line below the }.`
+  }
+  const self = /\b(\w+)\s*=\s*\1\s*;/.exec(source)
+  if (self && members.includes(self[1])) {
+    return `${self[0].trim()} gives ${self[1]} its own value. Inside that function a parameter called ${self[1]} hides the member with the same name, so the line never reaches the member. Give the parameter a name of its own.`
+  }
+  const priv = /'(\w+)' is a private member of '(\w+)'|'([^']+)' is private within this context|calling a private constructor of class '(\w+)'/.exec(text)
+  if (priv) {
+    const name = priv[1] ?? priv[4] ?? nameIn(priv[3].replace(/\(.*$/, ''))
+    if (fromCheck) {
+      return name === C
+        ? `Check cannot make a ${C} with that constructor from outside the class: it is private. A constructor the rest of the program uses goes under public:.`
+        : fns.includes(name)
+          ? `Check cannot call ${name} from outside the class: it is private. The functions the rest of the program calls go under public:, and only the values the rules keep safe under private:.`
+          : `Check cannot read ${C}::${name} from outside the class: it is private, and ${label} asks for it to be public.`
+    }
+    return `${name} is private: only ${C}'s own functions can reach it. From outside the class, use its public functions.`
+  }
+  const readOnly = /'this' argument to member function '(\w+)' has type 'const (\w+)', but function is not marked const|member function '(\w+)' not viable: 'this' argument has type 'const|passing 'const (\w+)' as 'this' argument discards qualifiers/.exec(text)
+  if (readOnly && (readOnly[2] === C || readOnly[3] || readOnly[4] === C)) {
+    const name = readOnly[1] ?? readOnly[3] ?? /in call to '[^']*?(\w+)\(/.exec(ctx.stderr ?? '')?.[1]
+    const who = name ? `${name}` : 'A function of the class'
+    return `${fromCheck ? 'Check calls' : 'A line calls'} ${who} on a ${C} it may only read, through a const reference, and ${name ?? 'that function'} is not marked const. A member function that only reads ends its first line with const, and then it can be called on an object that must not change.`
+  }
+  const constMember = /cannot assign to non-static data member '(\w+)' with const-qualified type|assignment of read-only member '([^']+)'|must explicitly initialize the const member '(\w+)'|uninitialized const member in/.exec(text)
+  if (constMember) {
+    const m = constMember[1] ?? (constMember[2] && nameIn(constMember[2])) ?? constMember[3] ?? /'(?:const )?[\w:]+ \w+::(\w+)' should be initialized/.exec(ctx.stderr ?? '')?.[1] ?? 'A const member'
+    return `${m} is const: it gets its value once, when the object is made, and never changes after. So a constructor gives it its value in the member initialiser list, after the colon, and not with = in its body.`
+  }
+  const inConst = /cannot assign to non-static data member within const member function '(\w+)'|(?:assignment|increment|decrement) of member '([^']+)' in read-only object|passing 'const std::[^']*'[^\n]* as 'this' argument discards qualifiers/.exec(text)
+  if (inConst) {
+    const what = inConst[1] ? `${inConst[1]} is marked const` : 'This function is marked const'
+    const member = inConst[2] ? ` changes ${nameIn(inConst[2])}` : ' changes a member'
+    return `${what}, a promise that it changes nothing in the object, and a line in it${member}. A function that changes the object has no const at the end of its first line.`
+  }
+  if (/constructor cannot have a return type|return type specification for constructor invalid/.test(text)) {
+    return `A constructor has no return type, not even void: its first line is the class's name, then its round brackets.`
+  }
+  const outOfLine = /out-of-line definition of '(\w+)' does not match any declaration in '(\w+)'|no declaration matches '([^']+)'/.exec(text)
+  if (outOfLine) {
+    const n = outOfLine[1] ?? nameIn(outOfLine[3].replace(/\(.*$/, ''))
+    if (fromCheck) {
+      return `Check builds ${label} with a body of its own for ${C}::${n}, as the task describes it, and it matches no declaration in the class. Compare the class's line for ${n} with the task: the name, the type of each parameter, what it gives back and const at the end.`
+    }
+    return `${ctx.file ?? 'A file'} writes ${C}::${n} with a first line that matches no declaration in the class. Compare it with the class's line for ${n}: the name, the type of each parameter, what it gives back and const at the end must all be the same.`
+  }
+  const unknown = /use of undeclared identifier '(\w+)'|'(\w+)' was not declared in this scope/.exec(text)
+  const unknownName = unknown && (unknown[1] ?? unknown[2])
+  if (/non-member function cannot have 'const' qualifier|non-member function '[^']*' cannot have cv-qualifier/.test(text)) {
+    const loose = fns.find((f) => new RegExp(`\\b${f}\\s*\\(`).test(source))
+    return `${loose ?? 'A function'} is written without ${C}:: in front, so it is a function of its own, outside the class, and only a member function can be const. A member function written in a .cpp file has the class's name and :: before its own name.`
+  }
+  if (unknownName && fromCheck && unknownName === spec.free?.name) {
+    return `Check cannot find ${unknownName} in ${spec.free.file}. Write it under // ${label}, with exactly that name, capital letters included, outside the class.`
+  }
+  if ((/only constructors take (?:base|member) initializers|C\+\+ requires a type specifier for all declarations|forbids declaration of '\w+' with no type/.test(text) || new RegExp(`^\\s*${C}\\s*\\(`).test(source)) && ctx.file && !isHeader(ctx.file) && !spec.inClass?.includes(ctx.file)) {
+    return `${ctx.file} writes the constructor without ${C}:: in front. Outside the class, the constructor's name is written with the class's name and :: before it, as for every member function: ${C}::${C}.`
+  }
+  if (fromCheck && new RegExp(`'${C}'`).test(text) && /undeclared identifier|unknown type name|does not name a type|has not been declared|was not declared/.test(text)) {
+    return `Check cannot find class ${C}. ${label} writes it in ${spec.files.find(isHeader) ?? spec.files[0]}, with exactly that name.`
+  }
+  const elsewhere = unknownName && !fromCheck && declaredElsewhere(unknownName, ctx.cuts ?? {})
+  if (elsewhere) {
+    return `${unknownName} is declared under Task ${elsewhere.task} in ${elsewhere.file}, and Check builds ${label} with the lines of the other tasks taken out, so ${unknownName} is not there. ${label} works with what its own lines write and with what the task names.`
+  }
+  if (unknownName && fromCheck && members.includes(unknownName)) {
+    return `Check builds ${label} with lines of its own for the other tasks, and they use ${unknownName}, the name the task gives that member. The class has no member called ${unknownName}: write it with exactly that name, capital letters included.`
+  }
+  if (/call to non-static member function without an object argument|cannot call member function '[^']*' without object/.test(text) && !/no member named|has no member named/.test(text)) {
+    return `Check calls a function on the class itself, ${C}:: and its name, without any object, and that function is not static. A function of the whole class, which needs no object, is marked static.`
+  }
+  if (unknownName && members.includes(unknownName) && ctx.file && !isHeader(ctx.file)) {
+    const loose = fns.find((f) => (ctx.code ?? '').split('\n').some((l) => new RegExp(`\\b${f}\\s*\\(`).test(l) && !new RegExp(`\\b${C}\\s*::\\s*${f}\\b`).test(l) && /\{\s*$|\)\s*(?:const\s*)?$/.test(l) && !/;\s*$/.test(l)))
+    if (loose) {
+      return `${loose} is written without ${C}:: in front, so it is a function of its own, outside the class, and the class's members such as ${unknownName} mean nothing in it. A member function written in a .cpp file has the class's name and :: before its own name.`
+    }
+  }
+  const again = /redefinition of '(?:class )?(\w+)'|redefinition of '([^']+)'/.exec(text)
+  if (again) {
+    const n = again[1] ?? nameIn(again[2].replace(/\(.*$/, ''))
+    if (n === C && fromCheck && spec.twice) return spec.twice
+    if (n === C) {
+      return ctx.guarded
+        ? `${ctx.guarded} is read twice by the same file, and class ${C} is met a second time. The include guard is what stops the second read: an #ifndef with a name, a #define of the same name, and an #endif on the last line.`
+        : `class ${C} is written twice, and a class is written once in a program's files: keep one of them.`
+    }
+    if (fns.includes(n)) return spec.twice ?? `${n} has a body twice: once inside the class and once more outside it. Write its body once.`
+  }
+  if (/non-const static data member must be initialized out of line|in-class initialization of non-const static member/.test(text)) {
+    return 'A static member that is not const gets no value inside the class. Declare it there without one, and give it its value on a line of its own below the class, with its type, the class\'s name and :: in front of its name.'
+  }
+  const staticUse = /invalid use of member '([^']+)' in static member function/.exec(text)
+  if (staticUse) {
+    return `${nameIn(staticUse[1])} belongs to one object, and a static member function runs without any object, so it can only use the static members of the class.`
+  }
+  const nonStatic = /invalid use of non-static data member '([^']+)'/.exec(text)
+  if (nonStatic) {
+    const m = nameIn(nonStatic[1])
+    return fromCheck
+      ? `Check reads ${C}::${m} from the class itself, without any object, and ${m} belongs to each object. A value the whole class shares is static.`
+      : `${m} belongs to each object, and this line reads it without one.`
+  }
+  const notMember = /initializer '(\w+)' does not name a non-static data member|'([^']+)' is a static data member; it can only be initialized at its definition|class '\w+' does not have any field named '(\w+)'/.exec(text)
+  if (notMember) {
+    const m = notMember[1] ?? notMember[3] ?? nameIn(notMember[2])
+    return `The member initialiser list names ${m}, and ${m} is not a member that each ${C} owns. Compare the name with the members the class declares, letter by letter, and look whether it is static: a static member is not given a value by a constructor.`
+  }
+  const twiceMember = /duplicate member '(\w+)'|redeclaration of '([^']+)'/.exec(text)
+  if (twiceMember) {
+    const m = twiceMember[1] ?? nameIn(twiceMember[2])
+    return `${m} is declared twice in ${C}, and each member is declared once. Check builds ${label} with the members of the other tasks written as they ask, so declare ${m} only under the task that names it.`
+  }
+  const missing = /no member named '(\w+)' in '(?:const )?(\w+)'|'(?:const )?class (\w+)' has no member named '(\w+)'/.exec(text)
+  if (missing) {
+    const n = missing[1] ?? missing[4]
+    return fromCheck
+      ? `Check cannot find ${n} in ${C}. ${label} names it: write it with exactly that name, capital letters included, inside the class.`
+      : `${C} has no member called ${n}. A member is used with exactly the name the class gives it, capital letters included.`
+  }
+  if (new RegExp(`no matching constructor for initialization of '${C}'|no matching function for call to '${C}::${C}\\(`).test(text)) {
+    return spec.noConstructor ?? `Check cannot make a ${C} the way ${label} describes: no constructor of ${C} takes what Check passes. Compare the round brackets of each constructor with the task.`
+  }
+  const call = /no matching member function for call to '(\w+)'|no matching function for call to '\w+::(\w+)\(|too (?:many|few) arguments to (?:member )?function call/.exec(text)
+  if (call) {
+    const n = call[1] ?? call[2]
+    return `Check cannot call ${n ?? 'a member function'} with what ${label} gives it. Compare the types in its round brackets with the task.`
+  }
+  if (/drops 'const' qualifier|binding reference of type [^\n]* discards qualifiers|cannot initialize return object of type '[^']*&' with an lvalue of type 'const/.test(text)) {
+    return 'A const member function gives back a reference that could change a member. Inside a const function every member is const, so it gives back a copy or a const reference.'
+  }
+  return null
+}
+
+const linkWords = (kind) => LINK_WORDS[kind]
+
+/** Where the learner's files declare `name` in lines this task's build left out: { file, task } or null. */
+function declaredElsewhere(name, cuts) {
+  const decl = new RegExp(`\\b[\\w:<>]+\\s*[&*]?\\s+${name}\\s*(?:=|;|\\{|\\()`)
+  for (const [file, cut] of Object.entries(cuts)) {
+    const at = cut.codeLines.findIndex((l, i) => !cut.keep[i] && decl.test(l))
+    if (at === -1) continue
+    const task = [...cut.starts.entries()].filter(([, line]) => line <= at).sort((x, y) => y[1] - x[1])[0]?.[0]
+    if (task !== undefined) return { file, task }
+  }
+  return null
+}
+
+/** Whether a class in `code` has no semicolon after its closing brace. */
+function unclosedClass(code) {
+  const re = /\bclass\s+\w+\s*\{/g
+  let m
+  while ((m = re.exec(code))) {
+    const end = closing(code, m.index + m[0].length - 1)
+    if (end !== -1 && !/^\s*;/.test(code.slice(end + 1))) return true
+  }
+  return false
+}
+
+function classLink(said, { cuts }, spec) {
+  const C = spec.className ?? 'Repair'
+  if (said.kind !== 'undefined' || !said.symbol.includes(`${C}::`)) return null
+  const name = said.name.replace(`${C}::`, '')
+  if (!/\(/.test(said.symbol) && spec.owned?.includes(name)) {
+    return `${name} is static, so it is one value shared by every ${C}, and the linker looks for the one place it is defined (${linkWords('undefined')}). Each ${C} keeps its own ${name}: a member that belongs to each object is not static.`
+  }
+  if (!/\(/.test(said.symbol)) {
+    return `${C}::${name} is static and declared in the class, and no file Check built defines it, so the linker cannot find it (${linkWords('undefined')}). A static member that is not const is declared in the class and defined once below it: its type, ${C}::${name}, and its first value.`
+  }
+  for (const [file, cut] of Object.entries(cuts)) {
+    if (isHeader(file)) continue
+    const loose = cut.kept.find((l, i) => cut.keep[i] && new RegExp(`\\b${name}\\s*\\(`).test(codeOnly(l)) && !new RegExp(`${C}\\s*::\\s*${name}\\b`).test(l) && !/;\s*$/.test(codeOnly(l)))
+    if (loose) {
+      return `${file} writes a function called ${name}, but without ${C}:: in front, so it is a function of its own and not the member the class declares. The linker looks for ${C}::${name} and finds nothing (${linkWords('undefined')}).`
+    }
+  }
+  return `${C}::${name} is declared in the class, but no file Check built writes its body, so the linker cannot finish the program (${linkWords('undefined')}).${spec.writtenIn ? ` Write it in ${spec.writtenIn}, with ${C}:: in front of its name.` : ''}`
+}
+
+function classWarning(warnings) {
+  const early = warnings.find((w) => /field '\w+' is uninitialized when used here|member '[^']*' is used uninitialized/.test(w.text))
+  if (early) {
+    return {
+      warning: early,
+      message:
+        'The compiler warns that a constructor reads a member before that member has its value. Members get their values in the order the class declares them, so a member declared further down still holds nothing when an earlier one is worked out from it.'
+    }
+  }
+  const warning = warnings.find((w) => /will be initialized after/.test(w.text))
+  if (!warning) return null
+  return {
+    warning,
+    message:
+      'The compiler warns that a member initialiser list names the members in another order than the class declares them. Members always get their values in the order the class declares them, whatever the order of the list, so write the list in that order: then a member that uses another always finds it ready.'
+  }
+}
+
+const classCrashed = (r, label) =>
+  `The program stopped while the code of ${label} ran. That happens when a function calls itself without end, such as a member function that calls itself where it meant to read a member, or when a line reads a vector outside its positions.`
+
+/**
+ * Judges a task of a class with Check's own code. Spec, besides what buildTypes() takes:
+ * - className (and classNames, every class Check names), members and functions of the class,
+ *   for the messages; inClass: the files whose tasks sit inside a class
+ * - probes: [{ name, params, code, expect, compiled, other(text), shown }] lines of Check's own
+ *   that must fail to compile with an error matching expect
+ * - cases: [{ name, code, judge(got) => message or null, output(got) => text }] as judgeType()
+ */
+export async function judgeClass(t, spec) {
+  const built = await buildTypes(t, {
+    ...spec,
+    helpers: [...classHelpers(spec.classNames ?? [spec.className ?? 'Repair']), ...(spec.helpers ?? [])],
+    classCause: (errors, ctx) => classCause(errors, ctx, spec),
+    classLink: (said, ctx) => classLink(said, ctx, spec),
+    classWarning,
+    classCrashed
+  })
+  if (built.problem) return built.problem
+  const cases = spec.cases.map((c, i) => {
+    const { got, eof } = built.runs[i]
+    const message = eof
+      ? `The code of ${label(spec.task)} went on reading after the end of what Check typed. Nothing in this task reads what people type: in the terminal it would sit and wait.`
+      : c.judge(got)
+    return { name: c.name, passed: !message, message: message ?? undefined, output: c.output?.(got) }
+  })
+  return [...cases, ...(spec.probes ?? []).map((p, i) => probeDetail(p, i, built.probed))]
+}
+
+/** Check's C++ that makes a `cls` with `args` on memory filled with 0x5A, so a member left without a value reads the same leftovers on every run, calls `use(name)` on it, then ends it. */
+export const onLeftovers = (cls, args, name, use) =>
+  `alignas(${cls}) unsigned char ${name}_b_[sizeof(${cls})]; std::memset(${name}_b_, 0x5A, sizeof ${name}_b_); ${cls}& ${name} = *new (${name}_b_) ${cls}${args}; ${use} ${name}.~${cls}();`
+
+/** A value Check wrote with put_, as a number, or undefined. */
+export const num = (got, key) => (got[key] === undefined || got[key] === '' ? undefined : Number(got[key]))
+export const LEFTOVER = 1515870810

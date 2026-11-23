@@ -1,0 +1,113 @@
+{
+  "id": "classes",
+  "title": "From a struct to a class",
+  "files": [
+    "src/timecard.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Kasimir's time card here and run it, after you try your class in main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/timecard.cpp -o timecard && ./timecard"
+  },
+  "tasks": [
+    {
+      "id": "item",
+      "title": "Keep the item behind two functions",
+      "file": "src/timecard.cpp",
+      "description": "Inside `class Repair`, under `// Task 1` in `src/timecard.cpp`, write:\n\n- under `private:`, a `std::string` member called `item`\n- under `public:`, a member function called `getItem` that takes nothing and gives back the item as a `std::string`\n- under `public:`, a member function called `setItem` that takes the new item as a reference to a `const std::string`, gives nothing back and puts it in `item`\n\nCheck makes repairs of its own, puts items of its own in with `setItem` and reads them back with `getItem`, makes two repairs to see that each keeps its own item, and changes the text `getItem` gives back to see that the repair stays as it was. It also compiles a line of its own, outside the class, that reads `item` directly: that line must be refused because `item` is private.",
+      "nextSteps": [
+        "Write `private:` under the task's comment, then the member.",
+        "Write `public:`, then `getItem`, which gives back the member.",
+        "Write `setItem`, which puts its parameter into the member. Give the parameter its own name.",
+        "In `main`, make a `Repair`, set its item and print what `getItem` gives back."
+      ],
+      "hints": [
+        "Inside a class, a label like `private:` covers every line below it until the next label. A member function is written inside the class like any function, and reaches the members directly by name.",
+        "If `setItem`'s parameter is also called `item`, then `item` inside it means the parameter, and the member never changes. Call the parameter something else, such as `name`.",
+        "The shape is `private: std::string item; public: std::string getItem() { return item; } void setItem(const std::string& name) { item = name; }`, each part on its own lines."
+      ],
+      "docs": [
+        {
+          "title": "Classes",
+          "url": "https://en.cppreference.com/w/cpp/language/classes"
+        },
+        {
+          "title": "Access specifiers",
+          "url": "https://en.cppreference.com/w/cpp/language/access"
+        },
+        {
+          "title": "Non-static member functions",
+          "url": "https://en.cppreference.com/w/cpp/language/member_functions"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Classes and structs compared",
+          "url": "https://www.youtube.com/watch?v=fLgTtaqqJp0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "minutes",
+      "title": "Add bench time by the rule",
+      "file": "src/timecard.cpp",
+      "description": "Under `// Task 2`, inside the class, write:\n\n- under `private:`, an `int` member called `minutes` that starts at `0`\n- under `public:`, a member function called `getMinutes` that takes nothing and gives back the minutes as an `int`\n- under `public:`, a member function called `addMinutes` that takes the extra minutes as an `int` and gives back a `bool`\n\nKasimir's rule: one entry is from 1 to 480 minutes, a day at the bench at most. `addMinutes` adds the extra minutes and gives back `true` when they keep the rule. Anything else changes nothing and gives back `false`.\n\nCheck makes repairs of its own, adds minutes of its own, some inside the rule, some outside it and some right on its edges, and reads what each call gives back and what `getMinutes` says after it. It also makes two repairs, and compiles a line of its own outside the class that sets `minutes` directly: that line must be refused.",
+      "nextSteps": [
+        "Write the member under `private:`, with its starting value.",
+        "Write `getMinutes` under `public:`.",
+        "In `addMinutes`, first refuse what breaks the rule: give back `false` before anything changes.",
+        "Then add the minutes to the member and give back `true`."
+      ],
+      "hints": [
+        "Two things break the rule: fewer than 1 minute, and more than 480. One `if` with `||` can ask both.",
+        "Give back `false` as soon as the rule is broken, so the line that adds is only reached by minutes that keep it. 480 itself keeps the rule.",
+        "The shape is `if (extra < 1 || extra > 480) { return false; } minutes += extra; return true;`."
+      ],
+      "docs": [
+        {
+          "title": "Access specifiers",
+          "url": "https://en.cppreference.com/w/cpp/language/access"
+        },
+        {
+          "title": "Non-static data members",
+          "url": "https://en.cppreference.com/w/cpp/language/data_members"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Classes in C++",
+          "url": "https://www.youtube.com/watch?v=2BP8NhxjrO0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "remove",
+      "title": "Take time off by the rule",
+      "file": "src/timecard.cpp",
+      "description": "Under `// Task 3`, inside the class and under `public:`, write a member function called `removeMinutes` that takes the minutes to take off as an `int` and gives back a `bool`. When they are at least 1 and no more than the repair has, it takes them off and gives back `true`. Anything else changes nothing and gives back `false`, so a repair's minutes never go below 0.\n\nCheck adds minutes with `addMinutes`, takes minutes of its own off, and reads what each call gives back and what `getMinutes` says after it. Check builds this task with a `minutes`, a `getMinutes` and an `addMinutes` of its own, written as Task 2 asks, so it is judged on its own.",
+      "nextSteps": [
+        "Write `removeMinutes` under `public:`.",
+        "Refuse what is below 1, and what is more than the repair's `minutes`.",
+        "Take the minutes off the member and give back `true`.",
+        "Try it in `main`: take off more than the repair has and print what you get."
+      ],
+      "hints": [
+        "The member `minutes` is the repair's minutes, so the function can compare with it directly.",
+        "Taking off all of a repair's minutes keeps the rule; taking off one more does not. A negative number would add time, so it breaks the rule too.",
+        "The shape is `if (extra < 1 || extra > minutes) { return false; } minutes -= extra; return true;`."
+      ],
+      "docs": [
+        {
+          "title": "Non-static member functions",
+          "url": "https://en.cppreference.com/w/cpp/language/member_functions"
+        },
+        {
+          "title": "The this pointer",
+          "url": "https://en.cppreference.com/w/cpp/language/this"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
