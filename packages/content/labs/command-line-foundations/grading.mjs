@@ -3,6 +3,10 @@
 import { readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { spawn } from 'node:child_process'
+import { chmodSync, lstatSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { relative, sep } from 'node:path'
 
 export const check = (name, passed, message, output) => ({
   name,
@@ -230,3 +234,179 @@ export function changedNote(t, ...rels) {
 /** The same detail with `note` added to its message. */
 export const noted = (detail, note) =>
   note ? { ...detail, message: detail.message + note } : detail
+
+/** A path's permission bits, or null when it cannot be looked at. */
+export function modeOf(path) {
+  try {
+    return statSync(path).mode & 0o777
+  } catch {
+    return null
+  }
+}
+
+/** The ten letters a long listing starts its line with, such as -rw-r--r--. */
+export function modeLetters(path) {
+  try {
+    const s = statSync(path)
+    const bits = [...'rwxrwxrwx'].map((c, i) => (s.mode & (0o400 >> i) ? c : '-')).join('')
+    return (s.isDirectory() ? 'd' : '-') + bits
+  } catch {
+    return '?'
+  }
+}
+
+/** A long-listing line for a check's output: the letters and the path. */
+export const modeLine = (root, rel) => `${modeLetters(join(root, ...rel.split('/')))}  ${rel}`
+
+const WHO = [
+  ['the owner', 6],
+  ['the group', 3],
+  ['others', 0]
+]
+
+/** Which of the owner, the group and others have `letter` (r, w or x) in `mode`. */
+export function whoHas(mode, letter) {
+  const bit = { r: 4, w: 2, x: 1 }[letter]
+  return WHO.filter(([, shift]) => mode & (bit << shift)).map(([who]) => who)
+}
+
+/** Words joined as a person writes a list: a, b and c. */
+export const listWords = (words) =>
+  words.length < 2 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words.at(-1)}`
+
+/**
+ * A file the task wants in the top folder: its path, or the one detail that says why there is
+ * nothing to judge yet.
+ */
+export function topFile(t, name, file) {
+  const ws = t.workspace
+  const fail = (message, output = listing(ws)) => ({ failed: check(name, false, message, output) })
+  const k = kind(ws, file)
+  if (k === 'dir') return fail(`${file} in the top folder is a folder. Check wants a file of that name.`)
+  if (k !== 'file') {
+    const other = names(ws).find((n) => n.toLowerCase() === file.toLowerCase())
+    if (other) return fail(`The top folder has ${other}, but the task's name is ${file}. Capitals count.`)
+    const elsewhere = findByName(ws, file)
+    if (elsewhere.length) {
+      return fail(
+        `${file} is at ${elsewhere[0]}, not in the top folder.`,
+        elsewhere.join('\n')
+      )
+    }
+    return fail(`The top folder has no ${file} yet.`)
+  }
+  const path = join(ws, file)
+  if (!whoHas(modeOf(path), 'r').includes('the owner')) {
+    return fail(
+      `Nobody may read ${file} now, you included: its owner has no r. chmod u+r ${file} gives it back.`,
+      modeLine(ws, file)
+    )
+  }
+  return { path, text: read(path) ?? '' }
+}
+
+/** The lines of a script or settings file have Windows line endings, which the shell reads as part of each command. */
+export const crlfMessage = (file) =>
+  `The lines of ${file} end in Windows line endings, an invisible \\r before each line break. The shell reads it as part of every command. Save the file again with plain line ends, as the lesson says.`
+
+/** The small environment a learner's script runs in: the standard tools, the temp folders, and the copy as home. */
+export const scriptEnv = (home, extra = {}) => ({
+  PATH: '/usr/bin:/bin:/usr/sbin:/sbin',
+  HOME: home,
+  TMPDIR: tmpdir(),
+  LC_ALL: 'C',
+  ...extra
+})
+
+export const SCRIPT_TIMEOUT = 5000
+
+/**
+ * Runs a program with no input, a time limit and capped output, and never throws. It runs in a
+ * process group of its own, so whatever it leaves running is stopped with it.
+ */
+export function runScript(file, args, { cwd, env, timeoutMs = SCRIPT_TIMEOUT }) {
+  return new Promise((done) => {
+    let stdout = ''
+    let stderr = ''
+    let timedOut = false
+    let finished = false
+    let child
+    const stop = () => {
+      try {
+        process.kill(-child.pid, 'SIGKILL')
+      } catch {
+        // Already gone.
+      }
+    }
+    const finish = (result) => {
+      if (finished) return
+      finished = true
+      clearTimeout(timer)
+      if (child?.pid) stop()
+      done({ stdout, stderr, timedOut, ...result })
+    }
+    const timer = setTimeout(() => {
+      timedOut = true
+      stop()
+    }, timeoutMs)
+    try {
+      child = spawn(file, args, { cwd, env, stdio: ['ignore', 'pipe', 'pipe'], detached: true })
+    } catch (error) {
+      finish({ code: null, error: error?.code ?? String(error) })
+      return
+    }
+    child.stdout.on('data', (d) => {
+      if (stdout.length < MAX_SCRIPT_OUTPUT) stdout += d
+    })
+    child.stderr.on('data', (d) => {
+      if (stderr.length < MAX_SCRIPT_OUTPUT) stderr += d
+    })
+    child.on('error', (error) => finish({ code: null, error: error.code ?? String(error) }))
+    child.on('close', (code) => finish({ code }))
+  })
+}
+
+const MAX_SCRIPT_OUTPUT = 8000
+
+/** Gives the owner every right on every folder under `dir`, so the copy can be removed afterwards. */
+function openUp(dir) {
+  try {
+    if (!lstatSync(dir).isDirectory()) return
+    chmodSync(dir, 0o700 | (statSync(dir).mode & 0o777))
+    for (const name of readdirSync(dir)) openUp(join(dir, name))
+  } catch {
+    // What cannot be opened is left for the removal to report.
+  }
+}
+
+/**
+ * Runs `fn` on a fresh copy of the workspace. When the copy cannot be made, it returns the one
+ * detail that says why instead.
+ */
+export async function withSandbox(t, name, fn) {
+  let dir
+  try {
+    dir = await t.sandbox()
+  } catch (error) {
+    const where = error?.path
+      ? relative(t.workspace, error.path).split(sep).join('/')
+      : 'a file in the top folder'
+    const message =
+      error?.code === 'EACCES'
+        ? `Check copies the top folder before it runs anything, and it could not read ${where}. A file needs its owner's r, and a folder its owner's r and x: chmod u+r gives a file its r back, and chmod u+rwx a folder.`
+        : `Check could not copy the top folder: ${error?.message ?? error}`
+    return [check(name, false, message, '')]
+  }
+  try {
+    return await fn(dir)
+  } finally {
+    openUp(dir)
+  }
+}
+
+/** The lines a program printed, each trimmed, empty ones left out. */
+export const printed = (text) =>
+  text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)

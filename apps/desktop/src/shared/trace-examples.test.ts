@@ -279,7 +279,16 @@ const repos: { labId: string; expected: string[] }[] = [
       'status-families/family',
       'json/line',
       'forms/body',
-      'redirects/kind'
+      'redirects/kind',
+      'caching/keep',
+      'caching/fresh',
+      'cookies/header',
+      'cookies/session',
+      'cookies/trust',
+      'origins/same',
+      'origins/allow',
+      'origins/preflight',
+      'origins/answer'
     ]
   },
   {

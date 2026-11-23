@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhiannon", "say": "Just row B, and the whole list?", "note": "Two new asks, one server." },
+    { "title": "The server", "text": "Answers the free plots, whatever is asked." },
+    {
+      "title": "Your routes",
+      "file": "server.js",
+      "mine": true,
+      "gap": "Every address looks the same",
+      "tasks": ["Answer each address", "Say what is wrong", "Read the row asked"]
+    },
+    { "title": "Row B by the tap", "rows": [["B1", "Wilfred Cuthbert"], ["B2", "free"], ["B3", "Petronella Gale"]], "mark": 1 }
+  ],
+  "ticket": { "label": "Row B", "wrong": "every row", "why": "Same answer", "right": "row B alone" },
+  "captions": [
+    "At Marrowfield, the people by the tap want the free plots of row B, and no others.",
+    "Today the server gives the same answer to every address, typos included.",
+    "You write routes that read the method, the path and the query, in three tasks.",
+    "Now asking for row B brings back row B alone, and a wrong address says so.",
+    "Same server, more questions. Each address gets its own answer."
+  ]
+}

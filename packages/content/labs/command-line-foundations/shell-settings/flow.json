@@ -1,0 +1,93 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "idris", "label": "Idris", "kind": "story" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "settings", "label": "shop-settings.sh", "kind": "file", "mine": true },
+      { "id": "shell", "label": "Terminal", "kind": "story" },
+      { "id": "label", "label": "label.sh", "kind": "file" },
+      { "id": "stamp", "label": "bin/stamp", "kind": "file" }
+    ],
+    "edges": [
+      { "from": "idris", "to": "you", "label": "jobs" },
+      { "from": "you", "to": "shell", "label": "variables" },
+      { "from": "you", "to": "settings", "label": "new lines" },
+      { "from": "settings", "to": "shell", "label": "loaded" },
+      { "from": "shell", "to": "label", "label": "exported name" },
+      { "from": "shell", "to": "stamp", "label": "search" }
+    ],
+    "note": "You give the shop's terminal its settings, and keep them in a file it loads."
+  },
+  "tasks": {
+    "home": {
+      "steps": [
+        {
+          "active": ["idris", "idris->you", "you"],
+          "note": "Idris wants to know which folder is your home folder."
+        },
+        {
+          "active": ["you", "you->shell", "shell"],
+          "value": { "kind": "array", "label": "a variable", "values": ["name", "value"] },
+          "note": "The shell already holds a name for it, and a dollar sign reads its value."
+        },
+        {
+          "active": ["shell"],
+          "note": "What the shell prints is kept in a file in the top folder."
+        }
+      ]
+    },
+    "label": {
+      "steps": [
+        {
+          "active": ["shell", "shell->label", "label"],
+          "note": "The label script looks for the shop's name and finds nothing."
+        },
+        {
+          "active": ["you", "you->shell", "shell"],
+          "note": "The name is set in the shell, then handed on to the programs it starts."
+        },
+        {
+          "active": ["shell", "shell->label", "label"],
+          "note": "The script prints a label that names the sender, and it is kept in a file."
+        }
+      ]
+    },
+    "stamp": {
+      "steps": [
+        {
+          "active": ["shell", "shell->stamp", "stamp"],
+          "value": {
+            "kind": "array",
+            "label": "PATH",
+            "values": ["a folder", "another folder", "..."]
+          },
+          "note": "A name typed alone is looked for in each folder on the list, in order."
+        },
+        {
+          "active": ["you", "you->settings", "settings"],
+          "note": "The settings file gets a line that adds the shop's tool folder, and keeps the rest."
+        },
+        {
+          "active": ["settings", "settings->shell", "shell", "shell->stamp", "stamp"],
+          "note": "Once the file is loaded, Sol's tool runs by its name from any folder."
+        }
+      ]
+    },
+    "lasting": {
+      "steps": [
+        {
+          "active": ["idris", "idris->you", "you"],
+          "note": "Every new terminal has forgotten the shop's name."
+        },
+        {
+          "active": ["you", "you->settings", "settings"],
+          "note": "The settings file gets a line that sets the name and hands it on."
+        },
+        {
+          "active": ["settings", "settings->shell", "shell", "shell->label", "label"],
+          "note": "Loaded in a fresh shell, the file gives the label its sender again."
+        }
+      ]
+    }
+  }
+}

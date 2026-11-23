@@ -1,0 +1,62 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhona", "label": "Rhona", "kind": "story" },
+      { "id": "board", "label": "Call-out list", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "hill", "label": "Pager and hill party", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "rhona", "to": "board", "label": "names in order" },
+      { "from": "board", "to": "functions", "label": "the list" },
+      { "from": "functions", "to": "board", "label": "changes" },
+      { "from": "functions", "to": "hill", "label": "names" }
+    ],
+    "note": "The whiteboard becomes one list that your functions read by position, cut, and change in place."
+  },
+  "tasks": {
+    "ends": {
+      "steps": [
+        {
+          "active": ["board", "board->functions", "functions"],
+          "value": { "kind": "array", "label": "the call-out list", "values": ["first name", "...", "last name"] },
+          "note": "Rhona phones from the top of the list, and the newest member is at the bottom."
+        },
+        { "active": ["functions"], "note": "Positions count from 0 at the start, and from -1 at the end, whatever the length." },
+        { "active": ["functions", "functions->hill", "hill"], "note": "The first and the last name come back, one name each." }
+      ]
+    },
+    "party": {
+      "steps": [
+        { "active": ["board", "board->functions", "functions"], "note": "A callout needs a hill party of a given size, taken from the top of the list." },
+        { "active": ["functions"], "note": "A slice cuts the first names out as a new list, and a short list just gives all it has." },
+        {
+          "active": ["functions", "functions->hill", "hill"],
+          "value": { "kind": "array", "label": "what comes back", "values": ["a new list of names"] },
+          "note": "The hill party goes up, and the whiteboard stays as it was."
+        }
+      ]
+    },
+    "join": {
+      "steps": [
+        { "active": ["rhona", "rhona->board"], "note": "A new member signs up at the base." },
+        { "active": ["board", "board->functions", "functions"], "note": "First ask whether the name is on the list already." },
+        { "active": ["functions", "functions->board", "board"], "note": "If it is not, the name goes on at the bottom of the same list, and nothing comes back." }
+      ]
+    },
+    "leader": {
+      "steps": [
+        { "active": ["rhona", "rhona->board"], "note": "Tonight's leader is somewhere on the list." },
+        { "active": ["board", "board->functions", "functions"], "note": "The leader comes out of their place, and goes back in at the top." },
+        { "active": ["functions", "functions->board", "board"], "note": "Everyone else keeps their order on the same list." }
+      ]
+    },
+    "next": {
+      "steps": [
+        { "active": ["board", "board->functions", "functions"], "note": "Rhona is ready to phone the next person." },
+        { "active": ["functions", "functions->board", "board"], "note": "The top name comes off the list, so the list is one shorter." },
+        { "active": ["functions", "functions->hill", "hill"], "note": "That name comes back to be paged. An empty list gives back nothing to page." }
+      ]
+    }
+  }
+}

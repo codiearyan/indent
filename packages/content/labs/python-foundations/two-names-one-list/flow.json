@@ -1,0 +1,53 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" },
+      { "id": "board", "label": "Search board", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "plan", "label": "A plan on paper", "kind": "data" },
+      { "id": "teams", "label": "Search teams", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ailsa", "to": "functions", "label": "asks" },
+      { "from": "board", "to": "functions", "label": "the same list" },
+      { "from": "functions", "to": "board", "label": "changes" },
+      { "from": "functions", "to": "plan", "label": "a new list" },
+      { "from": "board", "to": "teams", "label": "squares left" }
+    ],
+    "note": "Some of your functions change the board everyone reads, and some hand back a new plan and leave the board alone."
+  },
+  "tasks": {
+    "added": {
+      "steps": [
+        { "active": ["ailsa", "ailsa->functions", "functions"], "note": "Ailsa asks what the board would look like with one more square." },
+        { "active": ["board", "board->functions", "functions"], "note": "The function gets the board itself, under a second name, so it must not change it." },
+        { "active": ["functions", "functions->plan", "plan"], "note": "A new list comes back with the square at the end, and the board stays as it was." }
+      ]
+    },
+    "crossed": {
+      "steps": [
+        { "active": ["board", "board->functions", "functions"], "note": "A team radios in: one square is done." },
+        { "active": ["functions", "functions->board", "board"], "note": "The square comes off the board itself, if it is there, and nothing comes back." },
+        { "active": ["board", "board->teams", "teams"], "note": "Every team reading the board sees it gone." }
+      ]
+    },
+    "draft": {
+      "steps": [
+        { "active": ["ailsa", "ailsa->functions", "functions"], "note": "Ailsa wants a draft order for the next team, starting with one square." },
+        { "active": ["functions"], "note": "The changes happen on a copy, never on the board." },
+        { "active": ["functions", "functions->plan", "plan"], "note": "The draft comes back with that square first, and the board keeps its order." }
+      ]
+    },
+    "cleared": {
+      "steps": [
+        {
+          "active": ["board", "board->functions", "functions"],
+          "value": { "kind": "array", "label": "what clear_searched is given", "values": ["the board", "the squares searched"] },
+          "note": "At the end of a shift, several squares are done, some of them side by side."
+        },
+        { "active": ["functions"], "note": "The loop goes through something that does not change, so it never skips a square." },
+        { "active": ["functions", "functions->board", "board"], "note": "Every searched square comes off the board itself." }
+      ]
+    }
+  }
+}

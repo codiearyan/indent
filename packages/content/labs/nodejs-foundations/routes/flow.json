@@ -1,0 +1,78 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "visitor", "label": "Visitor's phone", "kind": "story" },
+      { "id": "server", "label": "server.js", "kind": "file", "mine": true },
+      { "id": "home", "label": "Welcome line", "kind": "data" },
+      { "id": "list", "label": "Whole plot list", "kind": "data" },
+      { "id": "free", "label": "Free plots", "kind": "data" },
+      { "id": "plots", "label": "plots.txt", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "visitor", "to": "server", "label": "method, path" },
+      { "from": "plots", "to": "server", "label": "plot list" },
+      { "from": "server", "to": "home", "label": "/" },
+      { "from": "server", "to": "list", "label": "/plots" },
+      { "from": "server", "to": "free", "label": "/free" }
+    ],
+    "note": "server.js now looks at what each request asks for and answers each address in its own way, or says plainly what was wrong."
+  },
+  "tasks": {
+    "routes": {
+      "steps": [
+        {
+          "active": ["visitor", "visitor->server", "server"],
+          "note": "A request arrives, and the server looks at its path."
+        },
+        {
+          "active": ["server", "server->list", "list", "plots", "plots->server"],
+          "note": "The noticeboard team asks for the whole list, and gets every plot with its holder."
+        },
+        {
+          "active": ["server", "server->free", "free"],
+          "note": "A phone at the gate asks for the free plots, as before."
+        },
+        {
+          "active": ["server", "server->home", "home"],
+          "note": "The bare address gets a welcome that names the other two."
+        }
+      ]
+    },
+    "not-found": {
+      "steps": [
+        {
+          "active": ["visitor", "visitor->server", "server"],
+          "note": "Someone types an address the server does not have."
+        },
+        {
+          "active": ["server", "visitor"],
+          "note": "The server says the page is not there, with a status every program understands."
+        },
+        {
+          "active": ["visitor", "visitor->server", "server"],
+          "note": "Another program tries to change the plot list, which can only be read."
+        },
+        {
+          "active": ["server", "visitor"],
+          "note": "The server says that method is not allowed there, and which one is."
+        }
+      ]
+    },
+    "query": {
+      "steps": [
+        {
+          "active": ["visitor", "visitor->server", "server"],
+          "note": "Someone by the tap asks for the free plots, with their row in the query."
+        },
+        {
+          "active": ["server"],
+          "note": "The server takes the path alone to choose the route, and reads the row with the URL tools."
+        },
+        {
+          "active": ["plots", "plots->server", "server", "server->free", "free"],
+          "note": "Only the free plots of that row are answered, or a line saying the row has none."
+        }
+      ]
+    }
+  }
+}

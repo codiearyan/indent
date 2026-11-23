@@ -1,0 +1,137 @@
+{
+  "id": "other-programs",
+  "title": "Running another program",
+  "files": [
+    "server.js",
+    "tools/water-report.js",
+    "requests.txt",
+    "ask.js",
+    "try.js"
+  ],
+  "terminal": {
+    "description": "A terminal in your workspace. `node ask.js server.js` starts your server, sends it each request in `requests.txt`, shows every answer, then stops it. `node try.js tools/water-report.js 2026-06` runs the water report by itself and shows both streams and its exit code.",
+    "suggestedCommand": "node try.js tools/water-report.js 2026-06"
+  },
+  "tasks": [
+    {
+      "id": "run-report",
+      "title": "Run the water report and answer with it",
+      "file": "server.js",
+      "description": "Imran's `tools/water-report.js` makes the report of a month from the readings in `water/`. Change `server.js` so that `GET /report?month=2026-06` runs it as another program, with the month as its argument:\n\n```\nnode tools/water-report.js 2026-06\n```\n\nRun it with `process.execPath`, the Node that runs the server, and build the path of `tools/water-report.js` from the server's own folder. Wait without stopping the server, and once the report has ended, answer with status `200`, the header `Content-Type: text/plain; charset=utf-8`, and exactly what it printed on its standard output.\n\nCheck starts your server from another folder, with readings of its own, and asks for two months.",
+      "nextSteps": [
+        "Run `node try.js tools/water-report.js 2026-06` to see what the report prints and how it ends.",
+        "Import `execFile` from `node:child_process`, and give it `process.execPath` and a list of arguments: the report's path, then the month.",
+        "Wrap it in a promise, so the request can `await` the report's output.",
+        "Answer with what it printed on standard output."
+      ],
+      "hints": [
+        "The report prints its first line, then takes a moment to add up the month. An answer sent as soon as something arrives has only the start of it.",
+        "`execFile(file, args, callback)` runs the program and calls `callback(error, stdout, stderr)` once it has ended, with everything it printed on each stream.",
+        "`execFile(process.execPath, [join(import.meta.dirname, 'tools', 'water-report.js'), month], (error, stdout, stderr) => resolve({ error, stdout, stderr }))`, inside `new Promise((resolve) => ...)`."
+      ],
+      "docs": [
+        {
+          "title": "child_process.execFile()",
+          "url": "https://nodejs.org/api/child_process.html#child_processexecfilefile-args-options-callback"
+        },
+        {
+          "title": "process.execPath",
+          "url": "https://nodejs.org/api/process.html#processexecpath"
+        },
+        {
+          "title": "Asynchronous process creation",
+          "url": "https://nodejs.org/api/child_process.html#asynchronous-process-creation"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "exit-code",
+      "title": "Answer by the report's exit code",
+      "file": "server.js",
+      "description": "The report says how it went with its exit code, as the comment at the top of `tools/water-report.js` explains. Change `server.js` so that:\n\n- Exit code `2`, a month not written like 2026-06, is answered with status `400`.\n- Exit code `3`, a month with no readings, is answered with status `404`.\n\nEither way the body is the reason the report printed on its standard error, as it is, as plain text. With no `month` in the address, the report is given an empty month, and it says that is not a month.\n\nCheck asks for a month that cannot be, one with no readings, one with no month at all, and one with readings.",
+      "nextSteps": [
+        "Run `node try.js tools/water-report.js 2026-13` and `node try.js tools/water-report.js 2025-01`, and look at their exit codes.",
+        "In `execFile`'s callback, find the exit code: `error` is `null` for 0, and holds the code otherwise.",
+        "Choose the status from the exit code, and answer with what the report printed on standard error."
+      ],
+      "hints": [
+        "A program that failed may print nothing on standard output, so answering with its output alone gives an empty page with status 200.",
+        "When the program ends with an exit code other than 0, `execFile` passes an `error` whose `code` is that exit code, a number.",
+        "`const code = error ? error.code : 0`, then `if (code === 2) { res.statusCode = 400; res.end(stderr) }`, and the same for 3 and 404."
+      ],
+      "docs": [
+        {
+          "title": "child_process.execFile()",
+          "url": "https://nodejs.org/api/child_process.html#child_processexecfilefile-args-options-callback"
+        },
+        {
+          "title": "Exit codes",
+          "url": "https://nodejs.org/api/process.html#exit-codes"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cannot-run",
+      "title": "Say when the report cannot be made",
+      "file": "server.js",
+      "description": "Sometimes the report cannot be made at all: `tools/water-report.js` has been moved, or Node cannot be started. Change `server.js` so that every other outcome, an exit code that is not 0, 2 or 3, or a program that could not be started, is answered with status `500` and the body:\n\n```\nThe report could not be made.\n```\n\nThe server keeps running, and answers the next request as usual.\n\nCheck removes `tools/water-report.js` and puts it back, and starts your server once with `process.execPath` naming a program that is not there.",
+      "nextSteps": [
+        "Rename `tools/water-report.js` for a moment, ask for a report, and look at the exit code and the error you get.",
+        "Answer 500 for every outcome the last two tasks did not.",
+        "Put the file back under its own name."
+      ],
+      "hints": [
+        "When the script is not there, Node itself starts and ends with exit code 1. When the program cannot be started at all, there is no exit code: the error's `code` is text, such as `'ENOENT'`.",
+        "`execFile` hands both cases to its callback as `error`. A child made with `spawn` instead reports the second one with an `error` event, and with no listener, the server stops.",
+        "After the checks for 0, 2 and 3: `else { res.statusCode = 500; res.end('The report could not be made.') }`."
+      ],
+      "docs": [
+        {
+          "title": "Event 'error' of a child process",
+          "url": "https://nodejs.org/api/child_process.html#event-error"
+        },
+        {
+          "title": "Common system errors",
+          "url": "https://nodejs.org/api/errors.html#common-system-errors"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "no-shell",
+      "title": "Keep the month out of a shell",
+      "file": "server.js",
+      "description": "Anyone who can open the address can type anything after `month=`. Make sure `server.js` gives the month to the report as one argument, exactly as it was typed, and never builds the text of a command for a shell. Then a month such as `2026-06;echo hello` reaches the report as it is, and the report answers that it is not a month.\n\nCheck asks for months with signs that a shell reads as more commands, and watches how your server starts the report.",
+      "nextSteps": [
+        "Read the part of the lesson about shells.",
+        "Check how your server starts the report: with `exec`, `shell: true`, or a command written as one piece of text, a shell is involved.",
+        "Give the program and each argument separately, with no shell, and do not change the month on the way.",
+        "Add `GET /report?month=2026-06;echo%20hello` to `requests.txt`, where `%20` is a space, and see what comes back."
+      ],
+      "hints": [
+        "A shell reads `&`, `;` and `$( )` in a command as the start of other commands, so text typed by a visitor and glued into a command can run any program at all.",
+        "`execFile` with a list of arguments starts the program directly: each item reaches it as one argument, whatever signs it holds. `exec`, and the option `shell: true`, hand a whole line of text to a shell.",
+        "`execFile(process.execPath, [reportPath, month], callback)`, with no `shell` option and the month as it came."
+      ],
+      "docs": [
+        {
+          "title": "child_process.exec(), and its warning",
+          "url": "https://nodejs.org/api/child_process.html#child_processexeccommand-options-callback"
+        },
+        {
+          "title": "Shell requirements",
+          "url": "https://nodejs.org/api/child_process.html#shell-requirements"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What command injection is",
+          "url": "https://www.youtube.com/watch?v=sB3ZDZ5PsPE"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
