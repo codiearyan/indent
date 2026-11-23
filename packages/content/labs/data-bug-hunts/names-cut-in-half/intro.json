@@ -6,15 +6,15 @@
       "title": "Your code",
       "file": "names.js",
       "mine": true,
-      "gap": "Counts code units, not letters",
+      "gap": "The last letter loses its dots",
       "tasks": ["Catch it in a test", "Count what people see", "Test another alphabet"]
     },
     { "title": "Parcel label", "text": "One line for the choir's name.", "note": "Where a half letter shows." }
   ],
-  "ticket": { "label": "Label", "wrong": "cut in half", "why": "Code units", "right": "whole" },
+  "ticket": { "label": "Label", "wrong": "cut in half", "why": "Dots lost", "right": "whole" },
   "captions": [
     "At Wrenhaven Scores, a parcel label cuts Ängsö's name and drops two dots.",
-    "The code cuts and counts code units, and a dotted letter here takes two.",
+    "The label drops the last dots, the count is too high, and the name seems new.",
     "You catch it in a test, work by what a person sees, and test another alphabet.",
     "Now names stay whole on labels, count right and match their accounts.",
     "Same name, same choir. One account and a whole label."

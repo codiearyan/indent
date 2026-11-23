@@ -11,10 +11,10 @@
     },
     { "title": "Printed invoice", "text": "Lines, VAT and a total.", "note": "What the choir adds up." }
   ],
-  "ticket": { "label": "WH-2291", "wrong": "a penny over", "why": "Drift", "right": "adds up" },
+  "ticket": { "label": "WH-2291", "wrong": "a penny over", "why": "Overcharged", "right": "adds up" },
   "captions": [
     "At Wrenhaven Scores, Nadia hears that a choir was charged a penny more than its lines.",
-    "The invoice rounds its total apart from its lines, and the two stop agreeing.",
+    "Its lines add up to one total, and the invoice line shows a penny more.",
     "You catch it in a test, fix the invoice, and test the case next door.",
     "Now every invoice adds up to the penny, whatever the amounts.",
     "Same invoice, same choir. The total is what the lines say."

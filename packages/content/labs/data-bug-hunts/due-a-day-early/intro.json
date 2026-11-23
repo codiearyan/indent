@@ -11,10 +11,10 @@
     },
     { "title": "Cedar Narrows", "say": "Which day do we pay?", "note": "A choir in Vancouver." }
   ],
-  "ticket": { "label": "Reminder", "wrong": "a day early", "why": "Wrong zone", "right": "on the day" },
+  "ticket": { "label": "Reminder", "wrong": "a day early", "why": "Off by a day", "right": "on the day" },
   "captions": [
     "At Wrenhaven Scores, Marek sends the reminders from Vancouver and they say a day early.",
-    "The code reads the due date in one zone and shows it in the laptop's.",
+    "In Vancouver every reminder shows the day before the date on the invoice.",
     "You catch it in a test, keep the date a calendar date, and test the case next door.",
     "Now the reminder shows the invoice's own date, wherever the laptop is.",
     "Same invoice, same choir. The date is the one on the invoice."

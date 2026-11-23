@@ -6,15 +6,15 @@
       "title": "Your code",
       "file": "renewals.js",
       "mine": true,
-      "gap": "A month rolls into the next",
+      "gap": "February is skipped",
       "tasks": ["Catch it in a test", "Count like a calendar", "Test the edges nearby"]
     },
     { "title": "Invoice run", "text": "One invoice a month, on the renewal date.", "note": "And follow-ups a week later." }
   ],
-  "ticket": { "label": "Renewal", "wrong": "skips February", "why": "Rolled over", "right": "in February" },
+  "ticket": { "label": "Renewal", "wrong": "skips February", "why": "Month missed", "right": "in February" },
   "captions": [
     "At Wrenhaven Scores, Marek finds that a licence from 31 January skipped February.",
-    "The code moves the date a month on, and a short month rolls it into the next.",
+    "The next invoice after 31 January goes out on 3 March, and February has none.",
     "You catch it in a test, add months and days like a calendar, and test the edges.",
     "Now every licence renews once a month, and follow-ups keep their time.",
     "Same licence, same choir. February gets its invoice."

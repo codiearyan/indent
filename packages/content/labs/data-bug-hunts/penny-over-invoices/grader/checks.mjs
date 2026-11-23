@@ -8,7 +8,7 @@ const SHOP = { label: "the shop's invoice()", source: `starter/${TARGET}` }
 const PARTS =
   'The invoice does not add up: its net, VAT or total differ from the sums of what its own lines show. Decimal numbers cannot hold most amounts in pence exactly, so adding them drifts, and rounding a total by itself can land on another penny than its lines. Build the totals from the lines, in a unit that has no fractions.'
 const ROUND =
-  "A line's net or VAT is off by a penny. The shop rounds each line's VAT once, to the nearest penny, with exactly half a penny going up. A decimal number like 1.075 is stored a hair below or above the half, and a small amount added before rounding pushes amounts that are just under the half up too. Work it out from whole pence, where a half is exactly a half."
+  "A line's net or VAT is off by a penny. The shop rounds each line's VAT once, to the nearest penny, with exactly half a penny going up. A decimal number like 1.075, or a rate like 9.2, is stored a hair below or above its value, and a small amount added before rounding pushes amounts that are just under the half up too. Work it out from whole numbers, where a half is exactly a half."
 
 const NET =
   "A line's net is off by a penny. A fee like 2.01 is stored a hair below or above its value, so the fee times 100 is a hair off too, and cutting the decimals off it loses a penny. Turn each fee into whole pence by rounding it once, then multiply."
@@ -48,6 +48,11 @@ const cases = [
   {
     name: 'A rate with a decimal is right',
     args: [[{ title: 'Psalm 121', fee: 2.15, copies: 12 }, { title: 'Night prayer', fee: 1.24, copies: 10 }], 17.5],
+    cause
+  },
+  {
+    name: 'A rate like 9.2 still rounds half a penny up',
+    args: [[{ title: 'Carol of the bells', fee: 3.75, copies: 1 }, { title: 'Vespers', fee: 1.4, copies: 15 }], 9.2],
     cause
   },
   {

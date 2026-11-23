@@ -19,9 +19,11 @@ function asPounds(pence) {
 }
 
 export function invoice(lines, vatPercent) {
+  // A rate like 9.2 is a hair off as a decimal too, so it becomes whole tenths of a percent.
+  const tenths = Math.round(vatPercent * 10)
   const rows = lines.map((line) => {
     const net = toPence(line.fee) * line.copies
-    const vat = Math.round((net * vatPercent) / 100)
+    const vat = Math.round((net * tenths) / 1000)
     return { title: line.title, net, vat }
   })
   const net = rows.reduce((sum, row) => sum + row.net, 0)
