@@ -1,0 +1,117 @@
+{
+  "id": "a-log-on-disk",
+  "title": "A log on disk",
+  "files": [
+    "src/db.js",
+    "src/try.js",
+    "data/stock.json"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where your store keeps Idris's counts in a log, stops, and opens again.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "append",
+      "title": "Add each change to the log",
+      "file": "src/db.js",
+      "description": "Make `set` add its change to a log file, and give the store `close()`.\n\n- the log is the file `store.log` in the folder `open(dir)` was given; `open` makes that folder when it is missing\n- each `set(key, value)` adds one record to the end of the log: `set`, a tab, the key, a tab, the value and a line break (`set\\tpaper\\tlinen\\n`); `encode(change)` is the place to build it\n- the promise `set` returns resolves once its record is in the file\n- what was in the file before is never changed: no change writes the file again from the start, and opening never empties it\n- `close()` returns a promise that resolves once every change is in the file\n- in this issue keys and values hold no tab and no line break\n\nThe format is fixed in this issue, so the check reads `store.log` itself: after each `set`, after `close()`, and after a `set` on a log that already holds records of its own.",
+      "nextSteps": [
+        "Read \"Never write over what you have\" in the lesson.",
+        "Write `encode` for a set: one line, with tabs between its parts.",
+        "In `open`, make the folder and work out the path of `store.log`.",
+        "Make `set` add the record to the end of the file and wait for it, and write `close`."
+      ],
+      "hints": [
+        "The old stock script writes the whole file again on every change. A log only ever adds to its end, so a stop can only cut the newest record short.",
+        "`appendFile` from `node:fs/promises` adds text to the end of a file, and makes the file when it is missing. `mkdir` with `{ recursive: true }` makes a folder, and does nothing when it is there.",
+        "In `set`: `await appendFile(join(dir, 'store.log'), encode({ op: 'set', key, value }))`, then keep the value in memory. `encode` returns `` `set\\t${change.key}\\t${change.value}\\n` ``. `close` can be `async close() {}` when every change already waited for its write."
+      ],
+      "docs": [
+        {
+          "title": "fsPromises.appendFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesappendfilepath-data-options"
+        },
+        {
+          "title": "fsPromises.mkdir()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesmkdirpath-options"
+        },
+        {
+          "title": "path.join()",
+          "url": "https://nodejs.org/api/path.html#pathjoinpaths"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Write-ahead logs explained",
+          "url": "https://www.youtube.com/watch?v=s3hKYMOpp3E"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "replay",
+      "title": "Replay the log when the store opens",
+      "file": "src/db.js",
+      "description": "Make `open` read the log and replay it.\n\n- when `store.log` is there, `open` reads it and replays its records in order, so each key holds the value of its last record\n- `decode(text)` is the place to turn the text of the log into a list of changes, in order\n- an empty value comes back as `''`\n- a folder without a log, or a folder that is not there yet, gives an empty store, without an error\n\nThe check writes logs of its own in this format and opens your store on them, and it opens, sets, closes and opens the same folder again, three stores in a row.",
+      "nextSteps": [
+        "Run `node src/try.js`: the store opened again should hold the counts.",
+        "Write `decode`: split the text into lines, and each line into its parts.",
+        "In `open`, read `store.log`, decode it, and set each change into the store in order.",
+        "Catch the error a missing file gives, and only that one."
+      ],
+      "hints": [
+        "The log is the whole history of the store. Replaying it from the first record to the last builds the same state the store had when it stopped.",
+        "`readFile` gives the whole log as text. Every record ends with a line break, so splitting on it leaves an empty text after the last one. A missing file fails with the code `ENOENT`.",
+        "`for (const change of decode(text)) values.set(change.key, change.value)`. In `decode`: `text.split('\\n').filter((line) => line !== '').map((line) => { const [op, key, value] = line.split('\\t'); return { op, key, value } })`."
+      ],
+      "docs": [
+        {
+          "title": "fsPromises.readFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesreadfilepath-options"
+        },
+        {
+          "title": "String.prototype.split()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split"
+        },
+        {
+          "title": "Common system errors",
+          "url": "https://nodejs.org/api/errors.html#common-system-errors"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "delete",
+      "title": "Make a delete a record too",
+      "file": "src/db.js",
+      "description": "Make `delete` add a record, and make the replay follow it.\n\n- `delete(key)` adds one record to the end of the log: `delete`, a tab, the key and a line break (`delete\\tpaper\\n`), and its promise resolves once the record is in the file\n- deleting a key the store does not hold changes nothing and adds no record\n- the replay follows every delete record: the key is gone, and a later `set` record brings it back\n\nThe check reads `store.log` after deletes, opens your store on logs of its own with sets and deletes, and deletes keys, closes and opens the folder again.",
+      "nextSteps": [
+        "Delete a key in `node src/try.js` and look at the log it prints.",
+        "Give `encode` the line for a delete.",
+        "Make `delete` add that record when the store holds the key.",
+        "In the replay, remove a key when its record is a delete."
+      ],
+      "hints": [
+        "A delete that only changes memory is forgotten the moment the program stops: the replay finds the key's last set and brings it back.",
+        "A record that says a key was removed is the only way the log can remember it. It needs no value.",
+        "`encode` returns `` `delete\\t${change.key}\\n` `` for a delete. In `delete`: `if (!values.has(key)) return`, then append the record and `values.delete(key)`. In the replay: `if (change.op === 'delete') values.delete(change.key) else values.set(change.key, change.value)`."
+      ],
+      "docs": [
+        {
+          "title": "fsPromises.appendFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesappendfilepath-data-options"
+        },
+        {
+          "title": "Map.prototype.delete()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/delete"
+        },
+        {
+          "title": "if...else",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

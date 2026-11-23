@@ -1,0 +1,187 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "change",
+        "label": "A stock change",
+        "kind": "story"
+      },
+      {
+        "id": "store",
+        "label": "set() and delete()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "encode",
+        "label": "encode()",
+        "kind": "function",
+        "mine": true,
+        "fn": "encode"
+      },
+      {
+        "id": "log",
+        "label": "store.log",
+        "kind": "data"
+      },
+      {
+        "id": "decode",
+        "label": "decode()",
+        "kind": "function",
+        "mine": true,
+        "fn": "decode"
+      },
+      {
+        "id": "morning",
+        "label": "The store next morning",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "change",
+        "to": "store",
+        "label": "key, value"
+      },
+      {
+        "from": "store",
+        "to": "encode",
+        "label": "a change"
+      },
+      {
+        "from": "encode",
+        "to": "log",
+        "label": "one record"
+      },
+      {
+        "from": "log",
+        "to": "decode",
+        "label": "the whole log"
+      },
+      {
+        "from": "decode",
+        "to": "morning",
+        "label": "changes in order"
+      }
+    ],
+    "note": "Every change is added to the end of a log, and a store opened later replays it."
+  },
+  "tasks": {
+    "append": {
+      "steps": [
+        {
+          "active": [
+            "change",
+            "change->store",
+            "store"
+          ],
+          "note": "Idris sets the card count. The store hands encode the change."
+        },
+        {
+          "active": [
+            "store",
+            "store->encode",
+            "encode"
+          ],
+          "note": "encode turns it into one line: the kind of change, the key and the value, with tabs between."
+        },
+        {
+          "active": [
+            "encode",
+            "encode->log",
+            "log"
+          ],
+          "note": "The line is added to the end of store.log. Nothing already in the file changes.",
+          "value": {
+            "kind": "array",
+            "label": "store.log",
+            "values": [
+              "a record",
+              "a record",
+              "the new record"
+            ]
+          }
+        }
+      ]
+    },
+    "replay": {
+      "steps": [
+        {
+          "active": [
+            "log",
+            "log->decode",
+            "decode"
+          ],
+          "note": "The next morning a new store opens and reads the whole log."
+        },
+        {
+          "active": [
+            "decode"
+          ],
+          "note": "decode turns each line back into a change, in the order they were written."
+        },
+        {
+          "active": [
+            "decode",
+            "decode->morning",
+            "morning"
+          ],
+          "note": "Replayed in order, each key ends with the value of its last record.",
+          "value": {
+            "kind": "map",
+            "label": "the store",
+            "entries": [
+              {
+                "key": "card",
+                "value": "its last count"
+              },
+              {
+                "key": "invite",
+                "value": "its last count"
+              }
+            ]
+          }
+        }
+      ],
+      "trace": {
+        "file": "src/db.js",
+        "call": "decode",
+        "args": [
+          "set\tcard\t1200\nset\tinvite\t400\nset\tcard\t1150\n"
+        ]
+      }
+    },
+    "delete": {
+      "steps": [
+        {
+          "active": [
+            "change",
+            "change->store",
+            "store",
+            "store->encode",
+            "encode"
+          ],
+          "note": "The posters run out and the key is deleted. A delete is a change of its own."
+        },
+        {
+          "active": [
+            "encode",
+            "encode->log",
+            "log"
+          ],
+          "note": "Its record goes on the end of the log, with no value."
+        },
+        {
+          "active": [
+            "log",
+            "log->decode",
+            "decode",
+            "decode->morning",
+            "morning"
+          ],
+          "note": "The replay meets the delete record and removes the key, so it stays deleted after the restart."
+        }
+      ]
+    }
+  }
+}

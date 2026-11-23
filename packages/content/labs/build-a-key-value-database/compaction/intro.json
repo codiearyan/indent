@@ -1,0 +1,52 @@
+{
+  "stations": [
+    {
+      "title": "Idris",
+      "say": "Why is the log so big?",
+      "note": "Card changes all day."
+    },
+    {
+      "title": "store.log",
+      "text": "Every old count, replayed on each open.",
+      "note": "It only grows."
+    },
+    {
+      "title": "Your compaction",
+      "file": "db.js",
+      "mine": true,
+      "gap": "No way to forget old counts",
+      "tasks": [
+        "One record per key",
+        "Swap in one step",
+        "Keep going after"
+      ]
+    },
+    {
+      "title": "The folder",
+      "rows": [
+        [
+          "store.log",
+          "short, whole"
+        ],
+        [
+          "store.log.new",
+          "gone"
+        ]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "store.log",
+    "wrong": "ever longer",
+    "why": "Only grows",
+    "right": "short, whole"
+  },
+  "captions": [
+    "Idris asks why the log is so big after a month of card orders.",
+    "Every old count is still in it, and each open replays them all.",
+    "You write the log again beside the old one and swap it in at one stroke.",
+    "The log is short again, and a stop at any moment leaves one whole log.",
+    "The store forgets old counts and keeps every new one."
+  ]
+}

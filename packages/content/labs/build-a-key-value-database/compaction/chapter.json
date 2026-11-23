@@ -1,0 +1,115 @@
+{
+  "id": "compaction",
+  "title": "A log that stays small",
+  "files": [
+    "src/db.js",
+    "src/try.js",
+    "data/stock.json"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where a month of stock changes fills the log, and compaction makes it small again.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "compact",
+      "title": "Write one record per key",
+      "file": "src/db.js",
+      "description": "Implement `store.compact()`: write the log again, one record per key.\n\n- `compact()` writes a new log that holds one record for each key the store holds, with its value, written the way `set` writes it, and no record for a deleted key\n- the new log becomes `store.log`; the store's keys and values are the same before and after, and after a restart\n- so the new log is exactly as long as the log of a fresh store in which each key was set once\n\nThe check never reads the records: it compacts, opens the folder again, and compares the size of `store.log` with a fresh store's log.",
+      "nextSteps": [
+        "Run `node src/try.js` and note how big the log gets.",
+        "Build the text of the new log from the keys and values the store holds now.",
+        "Write it so that it becomes `store.log`, and run the script again."
+      ],
+      "hints": [
+        "Everything a store opened later needs is the last value of each key. Old values and deleted keys are history nobody reads.",
+        "The store already holds the last value of every key in memory, and `encode` already writes a set record.",
+        "`const text = [...values].map(([key, value]) => encode({ op: 'set', key, value })).join('')` is the whole new log. The next task says how it takes the old one's place."
+      ],
+      "docs": [
+        {
+          "title": "Map.prototype.entries()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/entries"
+        },
+        {
+          "title": "Array.prototype.join()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join"
+        },
+        {
+          "title": "fsPromises.writeFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromiseswritefilefile-data-options"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "swap",
+      "title": "Swap the new log in, in one step",
+      "file": "src/db.js",
+      "description": "Make the new log take the old one's place so that a stop at any moment leaves the whole old log or the whole new one.\n\n- `compact()` writes the new log into `store.log.new`, in the same folder, from the start: a file a stop left under that name is replaced, not added to\n- only once that file is whole is it renamed onto `store.log`; afterwards no `store.log.new` is left\n- `store.log` itself is never written into, emptied, removed or moved away along the way\n- `open` uses only `store.log` and pays no attention to a `store.log.new` it finds\n\nThe check keeps a second name for the old log's bytes, to see whether they were written over, notes every call that removes `store.log` or moves it away, and leaves a half-written `store.log.new` from a stop beside the log before it opens your store.",
+      "nextSteps": [
+        "Read \"Swapping in one step\" in the lesson.",
+        "Write the new log into `store.log.new`.",
+        "Then rename it onto `store.log`.",
+        "Check that `open` reads nothing but `store.log`."
+      ],
+      "hints": [
+        "Writing the new log into `store.log` itself means a stop halfway leaves half of it, and the old records are already gone.",
+        "`rename` gives a file a new name in one step, and when a file with that name is there, it is replaced in the same step. `writeFile` starts a file from nothing; `appendFile` adds to what is there.",
+        "`` await writeFile(`${log}.new`, text) ``, then `` await rename(`${log}.new`, log) ``. No `unlink` before the rename: the rename replaces `store.log` by itself."
+      ],
+      "docs": [
+        {
+          "title": "fsPromises.rename()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesrenameoldpath-newpath"
+        },
+        {
+          "title": "fsPromises.writeFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromiseswritefilefile-data-options"
+        },
+        {
+          "title": "fsPromises.unlink()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesunlinkpath"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Replacing a file in one step",
+          "url": "https://www.youtube.com/watch?v=-9eXCb3yvyY"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "go-on",
+      "title": "Keep going after compaction",
+      "file": "src/db.js",
+      "description": "Make the store carry on after `compact()`.\n\n- right after `compact()`, the same store gives every key the value it gave before\n- every change after it lands in the new log, the file now called `store.log`\n- a store opened later sees the compacted records and every change made after them, around a second `compact()` too\n\nThe check compacts, makes changes on the same store, compacts again, closes it and opens the folder again.",
+      "nextSteps": [
+        "Set a key after `compact()` in `node src/try.js`, and check it after the restart.",
+        "Think about how your store writes: by the file's name each time, or through something it opened once?",
+        "Make sure later changes reach the file that is now `store.log`."
+      ],
+      "hints": [
+        "After the rename, the name `store.log` belongs to the new file. Whatever still points at the old file writes into a file nobody will read again.",
+        "`appendFile` with a path opens the file by its name each time, so it finds the new one. A file handle opened once keeps pointing at the old file.",
+        "If your store keeps a handle from `fs.open`, close it before the rename and open `store.log` again after it, or write with `appendFile(log, ...)` each time."
+      ],
+      "docs": [
+        {
+          "title": "fsPromises.open()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesopenpath-flags-mode"
+        },
+        {
+          "title": "filehandle.close()",
+          "url": "https://nodejs.org/api/fs.html#filehandleclose"
+        },
+        {
+          "title": "fsPromises.appendFile()",
+          "url": "https://nodejs.org/api/fs.html#fspromisesappendfilepath-data-options"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

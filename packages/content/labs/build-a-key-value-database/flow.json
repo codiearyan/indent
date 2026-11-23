@@ -1,0 +1,55 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "orders",
+        "label": "Orders and deliveries",
+        "kind": "story"
+      },
+      {
+        "id": "store",
+        "label": "Your database",
+        "kind": "file",
+        "mine": true
+      },
+      {
+        "id": "log",
+        "label": "store.log",
+        "kind": "data"
+      },
+      {
+        "id": "morning",
+        "label": "The next morning",
+        "kind": "story"
+      },
+      {
+        "id": "hesper",
+        "label": "Hesper",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "orders",
+        "to": "store",
+        "label": "changes"
+      },
+      {
+        "from": "store",
+        "to": "log",
+        "label": "added at the end"
+      },
+      {
+        "from": "log",
+        "to": "morning",
+        "label": "replayed whole"
+      },
+      {
+        "from": "hesper",
+        "to": "store",
+        "label": "every line explained"
+      }
+    ],
+    "note": "At Ashgrove Press, every stock change goes into a database you write yourself, which adds it to a log that a stop halfway can never empty."
+  }
+}

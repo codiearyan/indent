@@ -1,0 +1,117 @@
+{
+  "id": "keys-and-values",
+  "title": "Keys and values",
+  "files": [
+    "src/db.js",
+    "src/try.js",
+    "src/old-stock.js",
+    "data/stock.json"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where Idris's stock counts go into your store and come back out.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "keep",
+      "title": "Keep keys and values",
+      "file": "src/db.js",
+      "description": "Implement `open(dir)` and the store's `get(key)` and `set(key, value)` in `src/db.js`.\n\n- `open(dir)` returns a promise of a new store; in this issue the store keeps everything in memory and does not use `dir` yet\n- `store.set(key, value)` keeps `value` under `key`; a second `set` of the same key replaces the value\n- `store.get(key)` returns the value kept under `key`, exactly as it was given, or `undefined` when the store has no such key\n- two stores never share their keys and values\n\nThe check opens stores of its own, a fresh one for every case, sets keys and values of its own and reads them back.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the error under the first lines.",
+        "In `open`, make somewhere to keep the values, inside that one call.",
+        "Return an object with `get` and `set` that reach it.",
+        "Run the script again: the counts should come back."
+      ],
+      "hints": [
+        "A store is a place for the values and the functions that can reach it. Functions written inside `open` keep the variables of that call for as long as the store exists.",
+        "A `Map` keeps values under keys and starts empty: `set` puts a value in, `get` takes it out, and a key it never had gives `undefined`.",
+        "In `open`: `const values = new Map()`, then `return { get: (key) => values.get(key), set: (key, value) => { values.set(key, value) } }`."
+      ],
+      "docs": [
+        {
+          "title": "Map",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"
+        },
+        {
+          "title": "Closures",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures"
+        },
+        {
+          "title": "async function",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function"
+        }
+      ],
+      "points": 10,
+      "videos": [
+        {
+          "title": "Hash tables in four minutes",
+          "url": "https://www.youtube.com/watch?v=knV86FlSXJ8"
+        }
+      ]
+    },
+    {
+      "id": "empty",
+      "title": "Tell a missing key from an empty value",
+      "file": "src/db.js",
+      "description": "Add `has(key)` and `delete(key)` to the store.\n\n- `store.has(key)` returns `true` when the store holds `key`, even when its value is the empty text `''`, and `false` otherwise\n- `get` of a key whose value is `''` gives `''`; `get` of a key that is not there gives `undefined`\n- `store.delete(key)` removes the key and its value, so `has` gives `false` and `get` gives `undefined`; other keys stay as they were\n- deleting a key that is not there does nothing and does not throw\n- a deleted key can be set again\n\nThe check sets empty values, deletes keys that are there and keys that are not, and asks `has` and `get` about each.",
+      "nextSteps": [
+        "Read \"Missing is not empty\" in the lesson.",
+        "Write `has` so that it asks whether the key is kept, not what its value is.",
+        "Write `delete` so that the key itself goes, not only its value.",
+        "Look at the `note` line that `node src/try.js` prints."
+      ],
+      "hints": [
+        "An empty text is falsy, so anything that asks `if (value)` treats a note with an empty value as no note at all.",
+        "Whether a key is there and what its value is are two questions. A `Map` answers the first with `has`, and removes a key with `delete`.",
+        "`has: (key) => values.has(key)` and `delete: (key) => { values.delete(key) }`. Setting the value to `''` or `undefined` is not a delete: the key stays."
+      ],
+      "docs": [
+        {
+          "title": "Map.prototype.has()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/has"
+        },
+        {
+          "title": "Map.prototype.delete()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/delete"
+        },
+        {
+          "title": "Falsy",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Falsy"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "text",
+      "title": "Take any text as a key, and only text",
+      "file": "src/db.js",
+      "description": "Make the store take every text as a key, and refuse what is not text.\n\n- any text is a key, the empty text `''` included, and so are names that every object already has, like `toString`, `constructor` and `__proto__`: an empty store holds none of them, and each one keeps a value like any other key\n- `set(key, value)` throws a `TypeError` when the key or the value is not text, and keeps nothing\n- `get`, `has` and `delete` throw a `TypeError` when the key is not text, and leave the store as it was\n\nThe check asks a new store about those names, sets values under them, and calls every function with numbers, `null`, `undefined`, objects and arrays.",
+      "nextSteps": [
+        "Read \"Any text is a key\" in the lesson.",
+        "Ask your empty store about `constructor`: does it say no?",
+        "Write one small function that throws a `TypeError` for anything that is not text, and call it first in each of the four."
+      ],
+      "hints": [
+        "A plain object `{}` is not empty: it already has `toString`, `constructor` and more from `Object.prototype`, and `__proto__` is not an ordinary property on it.",
+        "A `Map` starts truly empty and treats every text alike. `typeof key === 'string'` tells you whether a key is text.",
+        "`function mustBeText(value) { if (typeof value !== 'string') throw new TypeError('A key or value must be text') }`, called at the top of `get`, `set`, `has` and `delete`, for the value too in `set`."
+      ],
+      "docs": [
+        {
+          "title": "TypeError",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError"
+        },
+        {
+          "title": "typeof",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof"
+        },
+        {
+          "title": "Objects compared with maps",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#objects_vs._maps"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

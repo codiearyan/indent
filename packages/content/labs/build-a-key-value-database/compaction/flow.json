@@ -1,0 +1,158 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "memory",
+        "label": "The store in memory",
+        "kind": "story"
+      },
+      {
+        "id": "compact",
+        "label": "compact()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "next",
+        "label": "store.log.new",
+        "kind": "data"
+      },
+      {
+        "id": "log",
+        "label": "store.log",
+        "kind": "data"
+      },
+      {
+        "id": "morning",
+        "label": "The store next morning",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "memory",
+        "to": "compact",
+        "label": "every key"
+      },
+      {
+        "from": "compact",
+        "to": "next",
+        "label": "one record each"
+      },
+      {
+        "from": "next",
+        "to": "log",
+        "label": "renamed in one step"
+      },
+      {
+        "from": "log",
+        "to": "morning",
+        "label": "a short replay"
+      }
+    ],
+    "note": "The log is written again as one record per key, beside the old one, and swapped in at one stroke."
+  },
+  "tasks": {
+    "compact": {
+      "steps": [
+        {
+          "active": [
+            "memory",
+            "memory->compact",
+            "compact"
+          ],
+          "note": "After a month of orders the log holds every card count there ever was. The store in memory holds only the last."
+        },
+        {
+          "active": [
+            "compact",
+            "compact->next",
+            "next"
+          ],
+          "note": "compact writes one record for each key the store holds, and none for a deleted one.",
+          "value": {
+            "kind": "map",
+            "label": "the new log",
+            "entries": [
+              {
+                "key": "card",
+                "value": "its last count"
+              },
+              {
+                "key": "invite",
+                "value": "its last count"
+              },
+              {
+                "key": "envelope",
+                "value": "its last count"
+              }
+            ]
+          }
+        },
+        {
+          "active": [
+            "next",
+            "next->log",
+            "log",
+            "log->morning",
+            "morning"
+          ],
+          "note": "Opened later, the short log gives the same store as the long one."
+        }
+      ]
+    },
+    "swap": {
+      "steps": [
+        {
+          "active": [
+            "compact",
+            "compact->next",
+            "next"
+          ],
+          "note": "The new log is written beside the old one, from the start, under its own name."
+        },
+        {
+          "active": [
+            "log"
+          ],
+          "note": "store.log is not touched while that happens. A stop now leaves the whole old log."
+        },
+        {
+          "active": [
+            "next",
+            "next->log",
+            "log"
+          ],
+          "note": "Once the new log is whole, a rename puts it in store.log's place in one step."
+        }
+      ]
+    },
+    "go-on": {
+      "steps": [
+        {
+          "active": [
+            "compact",
+            "next->log",
+            "log"
+          ],
+          "note": "After the rename the name store.log belongs to the new file."
+        },
+        {
+          "active": [
+            "memory",
+            "memory->compact"
+          ],
+          "note": "The store goes on answering from memory, as before."
+        },
+        {
+          "active": [
+            "log",
+            "log->morning",
+            "morning"
+          ],
+          "note": "The next card count lands in the new log, and the next morning finds it."
+        }
+      ]
+    }
+  }
+}
