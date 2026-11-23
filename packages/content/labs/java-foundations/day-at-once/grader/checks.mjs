@@ -170,6 +170,10 @@ export const checks = tasks({
               hint: 'The total ends in a long tail of decimal places: the takings went through a double on their way. Keep them in BigDecimal, as the money issue did.'
             },
             {
+              when: (r) => r.case.kind === 'good' && /^NoSuchFileException/.test(value(r, 'calling the job threw') ?? ''),
+              hint: 'Called, the job read the file some other way than Sailings.read, and found no file there. The task reads each till with Sailings.read, the reader the starter gives, and Check hands over tills of its own through it.'
+            },
+            {
               when: (r) => r.case.kind === 'good' && value(r, 'calling the job threw'),
               hint: (r) => `Called, the job threw ${value(r, 'calling the job threw')}, for a till that reads well.`
             }
@@ -264,12 +268,12 @@ export const checks = tasks({
               hint: 'A problem holds the name of an exception class. The ExecutionException\'s own message is the name and message of what the job threw; the task wants only the job\'s message, and what the job threw is the ExecutionException\'s cause.'
             },
             {
-              when: (r) => r.case.kind === 'late' && value(r, 'the right amount') === 'false',
-              hint: 'A till whose job was still running was left out of the total. collect waits for every future: get waits for a job that is not done yet.'
-            },
-            {
               when: (r, ctx) => /\bnew\s+Thread\b|\.start\s*\(/.test(ctx.section) && value(r, 'the right amount') === 'false',
               hint: 'The total is short: several threads add to one total, and a thread that adds reads the total before its own amount is in, so another thread\'s amount is overwritten. A BigDecimal never changes: each add gives back a new one. collect gathers the answers on its own thread, one after another; the jobs ran at once already.'
+            },
+            {
+              when: (r) => r.case.kind === 'late' && value(r, 'the right amount') === 'false',
+              hint: 'A till whose job was still running was left out of the total. collect waits for every future: get waits for a job that is not done yet.'
             },
             {
               when: (r) => r.case.kind === 'one' && value(r, 'the right amount') === 'false' && (items(r, 'problems afterwards') ?? []).length === 1,
