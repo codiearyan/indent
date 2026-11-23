@@ -4270,10 +4270,24 @@ function part9Cause(errors, ctx) {
   return null
 }
 
+// Warnings that clang and GCC both give under -Wall -Wextra, in the words of each, so a task fails
+// the same on a Mac as on Linux. Others, such as clang's warning for a variable that is only
+// counted up, or GCC's for an unsigned number compared with 0, are left to the learner's own build.
+const SHARED_WARNINGS = [
+  /^unused (?:variable|parameter) '/,
+  /^comparison of integers of different signs|^comparison of integer expressions of different signedness/,
+  /^missing field '\w+' initializer|^missing initializer for member/,
+  /^non-void function does not return a value|^control reaches end of non-void function|^no return statement in function returning non-void/,
+  /will be initialized after/,
+  /^expression result unused|^value computed is not used|^statement has no effect/,
+  /^using the result of an assignment as a condition without parentheses|^suggest parentheses around assignment used as truth value/
+]
+
 function part9Warning(warnings, spec) {
-  if (!spec.allWarnings || !warnings.length) return null
+  const shared = spec.allWarnings ? warnings.filter((w) => SHARED_WARNINGS.some((p) => p.test(w.text))) : []
+  if (!shared.length) return null
   return {
-    warning: warnings[0],
+    warning: shared[0],
     message: `The compiler warns about a line of ${label(spec.task)}. Check builds it with -Wall -Wextra, as build.sh does. A warning is the compiler pointing at a line that builds but may not do what you meant: read what it says, and change the line until it builds without one.`
   }
 }

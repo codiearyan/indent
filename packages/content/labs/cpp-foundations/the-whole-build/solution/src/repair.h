@@ -16,4 +16,7 @@ struct Repair {
 // gives back false and leaves it as it was.
 bool parseRepair(const std::string& line, Repair& repair);
 
+// Written in repair.cpp: the text without the spaces, tabs and carriage returns at its two ends.
+std::string trim(const std::string& text);
+
 #endif

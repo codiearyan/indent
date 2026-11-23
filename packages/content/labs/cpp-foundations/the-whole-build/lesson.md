@@ -52,10 +52,10 @@ g++ $FLAGS -c src/menu.cpp -o build/menu.o
 
 `set -e` matters: without it, a failed compile goes on to the link, which joins an old object file. The `cd` line makes the paths work from wherever the script is run, so they are written from the script's folder. `$FLAGS` is replaced by its value, split into words; inside double quotes it would stay one word.
 
-## Where you are now
-
-You started with one line that printed text. You can now write a program of several files with classes that keep their rules, read and write its data on disk, refuse what is wrong in plain words, and build it step by step without a warning. The projects and bug hunts in the app are where to use that next: bigger programs to build, and broken ones to fix.
-
 ## Your work in this issue
 
 Write Tasks 1 and 2 in `src/daybook.cpp`, Task 3 in `src/report.h` and `src/report.cpp`, and Task 4 in `build.sh`. Then try them in `main.cpp`, and build and run with `sh build.sh && ./daybook`. Check compiles each of your `.cpp` files on its own and links it with a program of its own; it reads `build.sh` without running it.
+
+## Where you are now
+
+You started with one line that printed text. You can now write a program of several files with classes that keep their rules, read and write its data on disk, refuse what is wrong in plain words, and build it step by step without a warning. The projects and bug hunts in the app are where to use that next: bigger programs to build, and broken ones to fix.

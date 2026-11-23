@@ -142,7 +142,8 @@ export const checks = {
     ]
     return judgeFile(t, {
       ...classSpec,
-      files: [REPORT_CPP, REPAIR_H, DAYBOOK_H, REPORT_H, REPAIR_CPP],
+      // report.h first: the linker's words name the first header as the one that declares writeSummary.
+      files: [REPORT_CPP, REPORT_H, REPAIR_H, DAYBOOK_H, REPAIR_CPP],
       toolFile: REPORT_CPP,
       task: 3,
       fn: 'writeSummary',
@@ -201,7 +202,8 @@ function words(line, vars) {
   const expand = (i, inDouble) => {
     const m = /^\$(?:\{(\w+)\}|(\w+))/.exec(line.slice(i))
     if (!m) return null
-    const value = vars[m[1] ?? m[2]] ?? ''
+    // A name no line above sets, such as the variable of a loop, is kept as written.
+    const value = vars[m[1] ?? m[2]] ?? m[0]
     return { value, length: m[0].length, inDouble }
   }
   for (let i = 0; i < line.length; i++) {
@@ -256,10 +258,11 @@ function words(line, vars) {
 function commands(text) {
   const vars = {}
   const found = []
+  let ended = false
   const lines = text.replace(/\r\n/g, '\n').replace(/\\\n/g, ' ').split('\n')
   lines.forEach((raw, i) => {
     const line = raw.replace(/(^|\s)#.*$/, '$1').trim()
-    if (!line) return
+    if (!line || ended) return
     for (const part of line.split(/\s*(?:&&|;)\s*/)) {
       const assign = /^(\w+)=(.*)$/.exec(part)
       if (assign) {
@@ -268,7 +271,9 @@ function commands(text) {
         continue
       }
       const w = words(part, vars)
-      if (w.length) found.push({ line: i + 1, words: w, text: part })
+      // sh stops at exit, so nothing after it runs.
+      if (w[0] === 'exit') ended = true
+      else if (w.length) found.push({ line: i + 1, words: w, text: part })
     }
   })
   return found
@@ -326,11 +331,17 @@ async function judgeBuild(t) {
   const all = SOURCES.map((s) => s)
   for (const c of compiles) {
     for (const f of c.files) {
+      if (f.includes('$')) {
+        return [fail(name('one line for each file'), `Line ${c.line} compiles ${f}, a name with a variable in it that no line above sets, such as the name of a loop. Check reads each line as written: write one line for each .cpp file, with its name in full, as the given line does.`)]
+      }
       if (!all.includes(f)) {
         const base = f.split('/').at(-1)
         const meant = all.find((s) => s.endsWith(`/${base}`))
         return [fail(name('every path is from the workspace folder'), `Line ${c.line} compiles ${f}, and there is no such file from the folder build.sh works in: its cd line moves into the workspace folder, where build.sh is.${meant ? ` That file is ${meant} from there.` : ''} So build.sh works from any folder, and only with paths written from the workspace folder.`)]
       }
+    }
+    if (!c.files.length && c.objects.length) {
+      return [fail(name('the link line has no -c'), `Line ${c.line} hands the compiler object files with -c. -c stops before linking, so that line makes no program: the link line is the one line without -c.`)]
     }
     if (c.files.length !== 1) {
       return [fail(name('one file per compile line'), `Line ${c.line} compiles ${c.files.length ? c.files.join(' and ') : 'no .cpp file'} with -c. Each compile line takes one .cpp file into its own object file: with -o, the compiler takes one file only.`)]
@@ -341,6 +352,15 @@ async function judgeBuild(t) {
   }
   for (const s of all) {
     const n = compiles.filter((c) => c.files[0] === s)
+    const bare = links.find((l) => l.files.includes(s))
+    if (!n.length && bare) {
+      return [
+        fail(
+          name('every .cpp file is compiled'),
+          `Line ${bare.line} hands ${s} to the compiler without -c. Without -c, the compiler compiles and links in one go, so ${bare.out === 'daybook' ? 'that file is compiled again from the start on every link, and no object file of its own is made' : 'it tries to make a whole program from that one file, without the functions of the other files'}. Each .cpp file is compiled on a line of its own, with -c, into its own object file.`
+        )
+      ]
+    }
     if (!n.length) {
       return [fail(name('every .cpp file is compiled'), `No line of build.sh compiles ${s} with -c into an object file. Every .cpp file of the program is compiled on its own; left out, its functions are missing when the program is linked, and the linker says something like "Undefined symbols" or "undefined reference to".`)]
     }

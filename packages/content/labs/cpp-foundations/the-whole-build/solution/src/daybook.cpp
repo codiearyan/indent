@@ -31,7 +31,7 @@ int DayBook::load(std::istream& in) {
     int refused = 0;
     while (std::getline(in, line)) {
         number++;
-        if (number == 1 || line.find_first_not_of(" \t\r") == std::string::npos) {
+        if (number == 1 || trim(line).empty()) {
             continue;
         }
         Repair repair;

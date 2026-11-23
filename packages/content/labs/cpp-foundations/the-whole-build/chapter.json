@@ -21,7 +21,7 @@
       "id": "load",
       "title": "Load the day",
       "file": "src/daybook.cpp",
-      "description": "Under `// Task 1` in `src/daybook.cpp`, write `DayBook::load`, as `daybook.h` declares it: `int load(std::istream& in)`. It reads the day's file from the stream. The first line is a heading, which it skips, and so is every line that is empty or only blanks. Every other line that `parseRepair` takes is added to the book's repairs, in order. It gives back how many lines it refused.\n\nCheck compiles `daybook.cpp` and `repair.cpp` each on its own, with `-std=c++17 -Wall -Wextra`, and links them with a program of its own, which makes a `DayBook`, hands `load` string streams of its own and reads the book back through `all()`. A warning in your lines fails the task.",
+      "description": "Under `// Task 1` in `src/daybook.cpp`, write `DayBook::load`, as `daybook.h` declares it: `int load(std::istream& in)`. It reads the day's file from the stream. The first line is a heading, which it skips, and so is every line that is empty or only blanks. Every other line that `parseRepair` takes is added to the book's repairs, in order. It gives back how many lines it refused. `repair.h` declares `parseRepair`, and `trim` from this part's third issue too, so `daybook.cpp` can call both.\n\nCheck compiles `daybook.cpp` and `repair.cpp` each on its own, with `-std=c++17 -Wall -Wextra`, and links them with a program of its own, which makes a `DayBook`, hands `load` string streams of its own and reads the book back through `all()`. A warning in your lines fails the task.",
       "nextSteps": [
         "Write the first line, with `DayBook::` in front of `load`, exactly as `daybook.h` declares it.",
         "Read the stream a line at a time, counting the lines.",
@@ -30,8 +30,8 @@
       ],
       "hints": [
         "This is last issue's reading of the day, inside a class this time: the member `repairs` is the list it fills.",
-        "A member function written below its class has the class's name and `::` in front of its own name, and its first line matches the declaration in the header exactly. A blank line of a Windows file still holds a carriage return.",
-        "The shape is `int DayBook::load(std::istream& in) { std::string line; int number = 0; int refused = 0; while (std::getline(in, line)) { number++; if (number == 1 || line.find_first_not_of(\" \\t\\r\") == std::string::npos) { continue; } Repair repair; if (parseRepair(line, repair)) { repairs.push_back(repair); } else { refused++; } } return refused; }`."
+        "A member function written below its class has the class's name and `::` in front of its own name, and its first line matches the declaration in the header exactly. A blank line of a Windows file still holds a carriage return, so ask whether it is empty once it is trimmed.",
+        "The shape is `int DayBook::load(std::istream& in) { std::string line; int number = 0; int refused = 0; while (std::getline(in, line)) { number++; if (number == 1 || trim(line).empty()) { continue; } Repair repair; if (parseRepair(line, repair)) { repairs.push_back(repair); } else { refused++; } } return refused; }`."
       ],
       "docs": [
         {
