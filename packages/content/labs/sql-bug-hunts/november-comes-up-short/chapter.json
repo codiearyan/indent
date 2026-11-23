@@ -53,9 +53,6 @@
         { "title": "BETWEEN", "url": "https://www.sqlite.org/lang_expr.html#between" },
         { "title": "Comparison of text", "url": "https://www.sqlite.org/datatype3.html#comparisons" }
       ],
-      "videos": [
-        { "title": "The date range trap of BETWEEN", "url": "https://www.youtube.com/watch?v=vliZC4uGy5A" }
-      ],
       "points": 10
     },
     {

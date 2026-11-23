@@ -94,7 +94,7 @@ JOIN (SELECT product_id, SUM(packets) AS sold FROM order_lines GROUP BY product_
 const fanOut = (code) => {
   const found = []
   if (/\bsum\s*\(\s*distinct\b/.test(code)) found.push(SAME_VALUE)
-  else if (/\bdistinct\b/.test(code)) found.push(DISTINCT_ROWS)
+  else if (/\bselect\s+distinct\b/.test(code)) found.push(DISTINCT_ROWS)
   if (/\bsum\s*\([^()]*\)\s*\/\s*count\b/.test(code)) found.push(DIVIDED)
   return found
 }
@@ -109,7 +109,12 @@ export const checks = {
   'fix-statements': (t) =>
     checkQuery(t, 'queries/2-statements.sql', {
       variants: statementVariants,
-      causes: fanOut,
+      causes: (code, mine) => [
+        ...(mine.rows.some((r) => !r[1])
+          ? ['The statements list only the customers who have placed an order. A customer with no order has no statement, so no row.']
+          : []),
+        ...fanOut(code)
+      ],
       fallback:
         'Look at where each total is added up. A sum over a join that repeats rows adds the repeats too, so each total has to be worked out where every packet, or every payment, is one row.'
     }),

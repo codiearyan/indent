@@ -32,7 +32,7 @@ Nobody wrote anything wrong. Each `ON` is correct, the query runs, and on an ord
 
 ## See it for yourself
 
-Order 14 is Ulla Dunsford's: three lines, paid partly with a gift voucher and partly by card. Ask the join for just that order:
+Order 14 is Isadora Dunsford's: three lines, paid partly with a gift voucher and partly by card. Ask the join for just that order:
 
 ```sql
 SELECT o.id, l.packets, p.method, p.amount_pence

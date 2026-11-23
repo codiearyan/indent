@@ -2,7 +2,7 @@
 -- each trap shaped differently from the data the learner can see. Never copied into a workspace.
 
 INSERT INTO customers (id, name, email, town, post) VALUES
-  (1, 'Osric Haverley', 'osric@haverley.example', 'Kelderby', 'yes'),
+  (1, 'Evander Haverley', 'evander@haverley.example', 'Kelderby', 'yes'),
   (2, 'Ione Mabry', NULL, 'Kelderby', NULL),
   (3, 'Emrys Quennell', 'emrys.q@mail.example', 'Owlsmoor', 'no'),
   (4, 'Fenna Brightwell', 'fenna@brightwell.example', 'Owlsmoor', NULL),
@@ -12,7 +12,7 @@ INSERT INTO customers (id, name, email, town, post) VALUES
   (8, 'Ignatius Moberly', NULL, 'Rushford', 'no'),
   (9, 'Owlsmoor Allotment Group', 'plots@owlsmoor-allotments.example', 'Owlsmoor', 'yes'),
   (10, 'Perdita Lusk', 'perdita@lusk.example', 'Kelderby', 'yes'),
-  (11, 'Hollis Grange', 'hollis.grange@mail.example', 'Dunmere', 'yes');
+  (11, 'Severin Grange', 'severin.grange@mail.example', 'Dunmere', 'yes');
 
 INSERT INTO products (id, name, kind, price_pence) VALUES
   (1, 'Climbing French bean', 'vegetable', 290),
@@ -55,7 +55,10 @@ INSERT INTO orders (id, customer_id, placed_at, channel) VALUES
   (27, 7, '2026-06-12 11:30', 'phone'),
   (28, 5, '2026-10-17', 'market'),
   (29, 8, '2025-11-15 09:00', 'phone'),
-  (26, 5, '2026-10-31 23:59:59', 'website');
+  (26, 5, '2026-10-31 23:59:59', 'website'),
+  (30, 8, '2026-11-07', 'market'),
+  (31, 2, '2026-07-02 14:20', 'phone'),
+  (32, 1, '2026-04-18 10:05:12', 'website');
 
 INSERT INTO order_lines (id, order_id, product_id, packets, price_pence) VALUES
   (1, 1, 1, 2, 290),
@@ -99,7 +102,11 @@ INSERT INTO order_lines (id, order_id, product_id, packets, price_pence) VALUES
   (39, 27, 3, 1, 220),
   (40, 28, 2, 1, 260),
   (41, 29, 6, 16, 270),
-  (42, 26, 5, 1, 240);
+  (42, 26, 5, 1, 240),
+  (43, 30, 9, 1, 230),
+  (44, 31, 9, 5, 250),
+  (45, 31, 5, 4, 240),
+  (46, 32, 1, 11, 290);
 
 INSERT INTO payments (id, order_id, paid_at, method, amount_pence) VALUES
   (1, 1, '2025-09-20 10:00:00', 'card', 840),
@@ -126,7 +133,7 @@ INSERT INTO payments (id, order_id, paid_at, method, amount_pence) VALUES
   (22, 18, '2026-11-09 07:45:30', 'card', 530),
   (23, 19, '2026-11-21', 'cash', 650),
   (24, 20, '2026-11-30', 'cash', 220),
-  (25, 21, '2026-11-30 00:00:00', 'card', 210),
+  (25, 21, '2026-11-30 00:00:00', 'card', 110),
   (26, 22, '2026-11-30 18:45', 'card', 260),
   (27, 23, '2026-11-30 23:59:30', 'card', 210),
   (28, 24, '2026-12-01', 'cash', 290),
@@ -134,7 +141,11 @@ INSERT INTO payments (id, order_id, paid_at, method, amount_pence) VALUES
   (30, 27, '2026-06-12 11:30', 'card', 220),
   (31, 28, '2026-10-17', 'cash', 260),
   (32, 29, '2025-11-15 09:00', 'card', 4320),
-  (33, 26, '2026-10-31 23:59:59', 'card', 240);
+  (33, 26, '2026-10-31 23:59:59', 'card', 240),
+  (34, 21, '2026-11-30 00:00:00', 'voucher', 100),
+  (35, 30, '2026-11-07', 'cash', 230),
+  (36, 31, '2026-07-02 14:20', 'card', 2210),
+  (37, 32, '2026-04-18 10:05:12', 'card', 3190);
 
 INSERT INTO restocks (id, product_id, received_on, packets) VALUES
   (1, 7, '2025-08-15', 15),

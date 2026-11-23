@@ -5,6 +5,7 @@ const WHOLE =
   'Both numbers in that division are whole numbers, so SQLite drops everything after the point before you ever see it. Make one side a decimal, such as 100.0, before dividing.'
 const OF_AVERAGES =
   "This is an average of each customer's average. A customer with five orders counts the same as a customer with one, so the result is not what one order comes to. Average the orders themselves."
+const ROUNDED = 'The task asks for pounds rounded to two places, with ROUND and 2.'
 const LINES = 'After joining the lines, each row is one line of an order, so COUNT(*) counts lines and AVG averages lines. An order is one row only before its lines are joined.'
 
 const handVariants = [
@@ -50,7 +51,7 @@ JOIN order_lines AS l ON l.order_id = o.id GROUP BY o.channel`,
   },
   {
     sql: `SELECT o.channel, AVG(t.total) / 100.0 AS average_pounds FROM orders AS o JOIN ${TOTALS} GROUP BY o.channel`,
-    cause: 'The average is right, but the task asks for it rounded to two places with ROUND.'
+    cause: `The average is right. ${ROUNDED}`
   }
 ]
 
@@ -91,7 +92,7 @@ export const checks = {
       variants: averageVariants,
       causes: (code) => {
         const found = []
-        if (!/\bround\s*\(/.test(code)) found.push('The task asks for pounds rounded to two places with ROUND.')
+        if (!/\bround\s*\(.*,\s*2\s*\)/.test(code)) found.push(ROUNDED)
         if (/\/\s*100\b(?!\.)/.test(code) && !/\*\s*1\.0|\.0\b|\breal\b|\bavg\s*\(/.test(code)) found.push(WHOLE)
         return found
       },
@@ -102,9 +103,14 @@ export const checks = {
       variants: tradeVariants,
       causes: (code) => {
         const having = code.split(/\bhaving\b/)[1] ?? ''
-        return /placed_at/.test(having)
-          ? ['A test on one row, such as the date of an order, belongs in WHERE. In HAVING, a plain column of a group gives the value of just one of its rows.']
-          : []
+        const found = []
+        if (/placed_at/.test(having)) {
+          found.push('A test on one row, such as the date of an order, belongs in WHERE. In HAVING, a plain column of a group gives the value of just one of its rows.')
+        }
+        if (/\/\s*100\b(?!\.)/.test(having)) {
+          found.push('Dividing whole numbers drops the fraction, so a customer at £40 and some pence comes out as 40, which is not more than 40. Compare the pence with 4000, or divide by 100.0.')
+        }
+        return found
       },
       fallback: 'Look at what each condition tests: one row at a time belongs in WHERE, a total of a group belongs in HAVING.'
     })

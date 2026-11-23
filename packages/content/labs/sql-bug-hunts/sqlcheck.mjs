@@ -134,9 +134,17 @@ function cause(mine, variants, list, opts, names) {
   if (/\bid\s*(=|in\s*\()\s*\d/.test(code)) {
     return 'Your query picks rows by ids typed in by hand. Those ids only fit the data you can see: the rule that picks the rows has to come from the data itself.'
   }
+  const alias = code.match(/\bproducts\s+(?:as\s+)?(?!on\b|join\b|where\b|left\b|group\b)(\w+)/)?.[1] ?? 'products'
+  if (code.includes(`${alias}.price_pence`)) {
+    return "The price of a seed changes over time. What an order came to uses the price on the day, kept on each line in order_lines.price_pence, not today's price in products."
+  }
+  if (!opts.ordered && /\blimit\b/.test(code)) {
+    return 'LIMIT keeps only the first few rows, and this report has no first few: it lists every row the task describes.'
+  }
   const found = opts.causes ? opts.causes(code, mine) : []
   const hit = list.findIndex((v, i) => variants[i]?.rows && (!v.when || v.when.test(code)) && sameRows(mine.rows, variants[i].rows, opts.ordered))
-  if (hit !== -1) return [list[hit].cause, ...found.filter((f) => !list[hit].cause.includes(f))].join(' ')
+  const said = (f) => list[hit].cause.toLowerCase().includes(f.toLowerCase())
+  if (hit !== -1) return [list[hit].cause, ...found.filter((f) => !said(f))].join(' ')
   return found.length ? found.join(' ') : opts.fallback
 }
 

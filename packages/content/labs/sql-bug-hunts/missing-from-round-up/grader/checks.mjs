@@ -5,7 +5,7 @@ const NOT_IN_NULL =
 const WHERE_AFTER =
   "WHERE runs after the LEFT JOIN. A customer it kept with no partner has NULL in every column of orders, the date test is not true, and the customer drops out again: the LEFT JOIN has quietly become a plain one."
 const OR_NULL =
-  'OR placed_at IS NULL brings back the customers with no orders at all, but a customer whose orders are all from before 2026 still has rows, each with an old date, and WHERE throws every one of them away.'
+  'A test for NULL added to WHERE brings back the customers with no orders at all, but a customer whose orders are all from before 2026 still has rows, each with an old date, and WHERE throws every one of them away.'
 
 const leftOutVariants = [
   {
@@ -66,7 +66,7 @@ GROUP BY p.id, p.name`,
 LEFT JOIN order_lines AS l ON l.product_id = p.id LEFT JOIN orders AS o ON o.id = l.order_id
 WHERE o.placed_at LIKE '2026-11%' OR o.placed_at IS NULL GROUP BY p.id, p.name`,
     cause:
-      'OR placed_at IS NULL brings back the seeds that were never sold, but a seed sold only in other months still has rows, each with another date, and WHERE throws them all away.'
+      'A test for NULL added to WHERE brings back the seeds that were never sold, but a seed sold only in other months still has rows, each with another date, and WHERE throws them all away.'
   },
   {
     sql: `SELECT p.name AS product, n.packets FROM products AS p LEFT JOIN (SELECT l.product_id, SUM(l.packets) AS packets

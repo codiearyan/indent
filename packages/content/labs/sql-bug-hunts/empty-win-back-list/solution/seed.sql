@@ -14,7 +14,7 @@ INSERT INTO customers (id, name, email, town, post) VALUES
   (8, 'Henrietta Lockhart', 'henrietta@lockhart.example', 'Hallowdene', 'no'),
   (9, 'Adaeze Nkemdirim', 'adaeze.n@mail.example', 'Ferrisford', NULL),
   (10, 'Kwabena Okonjo', 'kwabena@okonjo.example', 'Brookhythe', 'yes'),
-  (11, 'Ulla Dunsford', 'ulla.dunsford@mail.example', 'Saltmere', 'yes'),
+  (11, 'Isadora Dunsford', 'isadora.dunsford@mail.example', 'Saltmere', 'yes'),
   (12, 'Auberon Fitch', NULL, 'Ferrisford', NULL);
 
 INSERT INTO products (id, name, kind, price_pence) VALUES

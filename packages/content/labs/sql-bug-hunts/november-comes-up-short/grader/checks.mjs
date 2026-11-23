@@ -11,6 +11,11 @@ const leftOutVariants = [
     cause: DATE_ONLY
   },
   {
+    sql: "SELECT id, paid_at, amount_pence FROM payments WHERE paid_at > '2026-11-30' AND paid_at < '2026-12-01' AND method = 'card'",
+    cause: 'Not only card payments keep their time. What makes the report leave a payment out is how its paid_at is written, not how it was paid.',
+    when: /\bmethod\b/
+  },
+  {
     sql: "SELECT id, paid_at, amount_pence FROM payments WHERE paid_at > '2026-11-30'",
     cause: 'With no upper limit, this goes on into December. The ticket is about November.'
   },
@@ -27,7 +32,7 @@ const takingsVariants = [
   },
   {
     sql: "SELECT method, COUNT(*) AS payments, SUM(amount_pence) AS takings_pence FROM payments WHERE paid_at BETWEEN '2026-11-01' AND '2026-12-01' GROUP BY method",
-    cause: "BETWEEN keeps both limits, so a cash payment written as '2026-12-01' is counted in November."
+    cause: "An upper limit that keeps '2026-12-01' counts a cash payment of 1 December in November. BETWEEN keeps both of its limits, and so does <=."
   },
   {
     sql: "SELECT method, COUNT(*) AS payments, SUM(amount_pence) AS takings_pence FROM payments WHERE paid_at BETWEEN '2026-11-01' AND '2026-11-30 23:59' GROUP BY method",
@@ -86,7 +91,10 @@ export const checks = {
       ordered: true,
       stable: true,
       variants: seedsVariants,
-      causes: (code) => (/\blimit\b/.test(code) ? [] : ['The box shows three seeds. Without LIMIT, every seed comes back.']),
+      causes: (code) => {
+        if (!/\blimit\b/.test(code)) return ['The box shows three seeds. Without LIMIT, every seed comes back.']
+        return /\blimit\s+3\b/.test(code) ? [] : ['The box shows three seeds, so LIMIT keeps three.']
+      },
       fallback: 'Look at what you sort by, its direction, and what decides between two seeds with the same number of packets.'
     })
 }

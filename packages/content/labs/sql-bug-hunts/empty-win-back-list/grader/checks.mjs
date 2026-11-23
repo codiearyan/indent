@@ -43,13 +43,31 @@ const winBackVariants = [
   {
     sql: "SELECT c.name AS customer, c.email FROM customers AS c WHERE c.id NOT IN (SELECT o.customer_id FROM orders AS o WHERE o.placed_at >= '2026-09-01' AND o.customer_id IS NOT NULL) AND c.email IS NOT NULL",
     cause: 'A customer with no email is still on the win-back list; their email column is NULL.'
+  },
+  {
+    sql: "SELECT c.name AS customer, c.email FROM customers AS c WHERE c.id NOT IN (SELECT o.customer_id FROM orders AS o WHERE o.placed_at >= '2026-09-01' AND o.channel <> 'market')",
+    cause: 'A regular who gives their name at the stall has a market order with a real customer id: they have ordered since September. What empties the list is a NULL customer_id, whatever the channel.',
+    when: /\bchannel\b/
+  },
+  {
+    sql: "SELECT c.name AS customer, c.email FROM customers AS c WHERE c.id IN (SELECT customer_id FROM orders) AND c.id NOT IN (SELECT o.customer_id FROM orders AS o WHERE o.placed_at >= '2026-09-01' AND o.customer_id IS NOT NULL)",
+    cause: 'A customer who never ordered at all has not ordered since September either, so they belong on the list too.'
   }
 ]
 
 const catalogueVariants = [
-  { sql: "SELECT town, COUNT(post) AS catalogues FROM customers WHERE post <> 'no' GROUP BY town", cause: `${NOT_EQUAL} ${COUNT_COLUMN}` },
-  { sql: "SELECT town, COUNT(post) AS catalogues FROM customers WHERE post IS NULL OR post <> 'no' GROUP BY town", cause: COUNT_COLUMN },
-  { sql: "SELECT town, COUNT(*) AS catalogues FROM customers WHERE post <> 'no' GROUP BY town", cause: NOT_EQUAL },
+  // On the data you can see these three return the same rows, so the query decides which cause is named.
+  {
+    sql: "SELECT town, COUNT(post) AS catalogues FROM customers WHERE post <> 'no' GROUP BY town",
+    cause: `${NOT_EQUAL} ${COUNT_COLUMN}`,
+    when: /^(?=.*\bcount\s*\(\s*(\w+\.)?post\s*\))(?=.*post\s*(<>|!=)\s*'')(?!.*(is\s+null|coalesce|ifnull))/
+  },
+  {
+    sql: "SELECT town, COUNT(post) AS catalogues FROM customers WHERE post IS NULL OR post <> 'no' GROUP BY town",
+    cause: COUNT_COLUMN,
+    when: /\bcount\s*\(\s*(\w+\.)?post\s*\)/
+  },
+  { sql: "SELECT town, COUNT(*) AS catalogues FROM customers WHERE post <> 'no' GROUP BY town", cause: NOT_EQUAL, when: /post\s*(<>|!=)\s*''/ },
   {
     sql: 'SELECT town, COUNT(*) AS catalogues FROM customers GROUP BY town',
     cause: "Every customer is counted now, those who said no included. Perpetua's rule leaves out only the customers with 'no'."
