@@ -72,12 +72,6 @@
           "url": "https://nodejs.org/api/fs.html#fspromisesunlinkpath"
         }
       ],
-      "videos": [
-        {
-          "title": "Replacing a file in one step",
-          "url": "https://www.youtube.com/watch?v=-9eXCb3yvyY"
-        }
-      ],
       "points": 10
     },
     {

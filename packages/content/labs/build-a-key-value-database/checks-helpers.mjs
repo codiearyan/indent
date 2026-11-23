@@ -12,7 +12,8 @@ const SECONDS = 5
 const MAX_READ = 100000
 const POOL = 4
 
-const KEPT = /^(PATH|SYSTEMROOT|WINDIR|TEMP|TMP|TMPDIR|HOME|USERPROFILE|LANG)$/i
+// Learner code may start no other program, so it needs no PATH or HOME; Windows needs these two.
+const KEPT = /^(SYSTEMROOT|WINDIR)$/i
 const smallEnv = () => ({
   ...Object.fromEntries(Object.entries(process.env).filter(([key]) => KEPT.test(key))),
   NO_COLOR: '1',

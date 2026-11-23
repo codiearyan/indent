@@ -2,6 +2,7 @@
 // judges a batch by what a store opened later gives back, with store.log cut at every byte inside
 // the batch. The stock task runs src/stock.js on a right store of the check's own. Every case runs
 // in its own process, in a fresh folder.
+import { statSync } from 'node:fs'
 import { join } from 'node:path'
 import * as db from '../src/db.js'
 import { attempt, compare, cutCopy, earlier, LOG, needs, note, shown, size, tried } from './helpers.mjs'
@@ -52,16 +53,19 @@ export async function batchCase(folder, kind) {
     await written(db, dir, BASE)
     const before = await size(join(dir, LOG))
     const store = await db.open(dir)
-    await store.batch(BATCH)
+    const pending = store.batch(BATCH)
+    // Read at once, before batch() has had a chance to write: memory may not run ahead of the log.
+    const early = store.get('binding') === 'saddle\nstitch' && statSync(join(dir, LOG)).size === before
+    await pending
     const grew = (await size(join(dir, LOG))) > before
     const now = await compare(store, BATCH_STATE)
     await store.close()
     const r = await reopened(db, dir, BATCH_STATE)
-    const why = !now.ok ? 'memory' : r.ok && !grew ? 'late' : 'restart'
+    const why = !now.ok ? 'memory' : r.ok && !grew ? 'late' : early ? 'early' : 'restart'
     return {
-      ok: grew && now.ok && r.ok,
+      ok: grew && now.ok && r.ok && !early,
       why,
-      seen: `store.log ${grew ? 'grew' : 'did not grow'} by the time batch() had finished\nthe same store after batch():\n${now.text}\nclosed and opened again:\n${r.text}`
+      seen: `${early ? 'the store held binding before the batch was in store.log\n' : ''}store.log ${grew ? 'grew' : 'did not grow'} by the time batch() had finished\nthe same store after batch():\n${now.text}\nclosed and opened again:\n${r.text}`
     }
   }
   if (kind === 'order') {
@@ -137,7 +141,7 @@ async function batches(folder) {
 const BAD = {
   value: [{ op: 'set', key: 'paper', value: 'cotton' }, { op: 'set', key: 'ink', value: 'blue' }, { op: 'set', key: 'glue', value: 7 }],
   op: [{ op: 'set', key: 'paper', value: 'cotton' }, { op: 'rename', key: 'ink' }],
-  key: [{ op: 'delete', key: 'ink' }, { op: 'delete', key: null }, { op: 'set', value: 'cotton' }],
+  key: [[{ op: 'delete', key: 'ink' }, { op: 'delete', key: null }], [{ op: 'delete', key: 'ink' }, { op: 'set', key: 7, value: 'cotton' }], [{ op: 'set', value: 'cotton' }]],
   noValue: [{ op: 'set', key: 'paper', value: 'cotton' }, { op: 'set', key: 'ink' }],
   shape: [{ op: 'set', key: 'paper', value: 'cotton' }, null]
 }
@@ -148,7 +152,8 @@ export async function checkedCase(folder, kind) {
   await written(db, dir, BASE)
   const before = await size(join(dir, LOG))
   const store = await db.open(dir)
-  const calls = kind === 'notArray' ? ['paper', undefined, { op: 'set', key: 'paper', value: 'cotton' }] : [kind === 'empty' ? [] : BAD[kind]]
+  const calls =
+    kind === 'notArray' ? ['paper', undefined, { op: 'set', key: 'paper', value: 'cotton' }] : kind === 'key' ? BAD.key : [kind === 'empty' ? [] : BAD[kind]]
   const tries = []
   for (const changes of calls) tries.push(await attempt(() => store.batch(changes)))
   const now = await compare(store, BASE_STATE)
@@ -174,8 +179,13 @@ export async function stockCase(folder, kind) {
   if (kind === 'stockOf') {
     const card = stock.stockOf(store, 'card')
     const napkin = stock.stockOf(store, 'napkin')
-    const ok = card === 1200 && napkin === 0
-    return { ok, why: typeof card === 'string' ? 'text' : undefined, seen: `stockOf(db, 'card') gave ${shown(card)}\nstockOf(db, 'napkin') gave ${shown(napkin)}` }
+    const invite = stock.stockOf(store, 'invite')
+    const ok = card === 1200 && napkin === 0 && invite === 0
+    return {
+      ok,
+      why: typeof card === 'string' ? 'text' : undefined,
+      seen: `stockOf(db, 'card') gave ${shown(card)}\nstockOf(db, 'napkin') gave ${shown(napkin)}\nstockOf(db, 'invite') gave ${shown(invite)}`
+    }
   }
   if (kind === 'receive') {
     await stock.receive(store, 'card', 300)

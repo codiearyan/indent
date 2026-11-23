@@ -75,24 +75,28 @@ export async function compare(store, want, { has = true } = {}) {
   return { ok, text: lines.join('\n') }
 }
 
-// The names fs gives to the calls that remove or move a file away, in each of its three forms.
+// The names fs gives to the calls that remove or move a file away, in each of its three forms,
+// and to the copies that replace a file: cp removes the old file first, out of sight of a wrap.
 const REMOVERS = ['unlink', 'rm', 'rename', 'unlinkSync', 'rmSync', 'renameSync']
+const COPIERS = ['cp', 'copyFile', 'cpSync', 'copyFileSync']
 
 /**
- * Notes every call that removes `file` or moves it away, whatever form of fs makes it. The calls
- * still happen; the list says what a stop between two of them would have left.
+ * Notes every call that removes `file`, moves it away or copies something over it, whatever form
+ * of fs makes it. The calls still happen; the list says what a stop between two of them would
+ * have left.
  */
 export function watchRemovals(file) {
   const seen = []
   const where = (path) => resolve(path instanceof URL ? fileURLToPath(path) : String(path))
   const wrap = (target, key) => {
     const original = target[key]
-    target[key] = function (path, ...rest) {
-      if (where(path) === resolve(file)) seen.push(key.replace('Sync', ''))
-      return original.call(this, path, ...rest)
+    const at = COPIERS.includes(key) ? 1 : 0
+    target[key] = function (...args) {
+      if (where(args[at]) === resolve(file)) seen.push(key.replace('Sync', ''))
+      return original.apply(this, args)
     }
   }
-  for (const key of REMOVERS) {
+  for (const key of [...REMOVERS, ...COPIERS]) {
     if (typeof fs[key] === 'function') wrap(fs, key)
     if (!key.endsWith('Sync') && typeof fs.promises[key] === 'function') wrap(fs.promises, key)
   }

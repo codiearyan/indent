@@ -4,6 +4,7 @@ const BATCH = {
   memory: 'Right after batch(), the same store should hold every change of the batch, in order.',
   restart: 'The changes of the batch were not all there once the store was opened again. A batch is written to the log too.',
   nothing: 'The batch did not make store.log any longer. A batch is written to the log, like any change.',
+  early: 'The store held the changes of the batch before the batch was in store.log. A stop in that moment would lose what the store already answered with: write the batch first, then make its changes in memory.',
   late: 'The batch was not in store.log yet when its promise resolved. batch() waits for the whole batch to be in the file before it resolves, so a stop right after it loses nothing.',
   openThrew: 'open() threw on a log that ends inside a batch. A batch cut short is left out like a record cut short, and everything before it is kept.',
   half: 'Some changes of the batch were there and some were not: half a batch. A stop can come between any two bytes of the file, so the batch needs something that says where it ends, and the store takes its changes only once all of it is there.',
@@ -99,7 +100,7 @@ export const checks = {
         name: 'A key that is missing or not text',
         run: 'checkedCase',
         args: ['key'],
-        setup: 'the same store, then batch() of a good delete, a delete with the key null and a set with no key',
+        setup: 'the same store, then three batches, each a good delete followed by a delete with the key null, a set with the key 7, or a set with no key',
         hint: CHECKED.notRefused,
         hints: CHECKED
       },
@@ -145,8 +146,8 @@ export const checks = {
         name: 'stockOf() gives numbers',
         run: 'stockCase',
         args: ['stockOf'],
-        setup: "a store with card '1200', envelope '900' and poster '60', then stockOf(db, 'card') and stockOf(db, 'napkin'), an item it does not hold",
-        hint: 'stockOf() gives the count as a number, and 0 for an item the store does not hold.',
+        setup: "a store with card '1200', envelope '900' and poster '60', then stockOf(db, 'card'), and stockOf(db, 'napkin') and stockOf(db, 'invite'), items it does not hold",
+        hint: 'stockOf() gives the count as a number, and 0 for an item the store does not hold, whatever the shop\'s own counts say.',
         hints: STOCK
       },
       {

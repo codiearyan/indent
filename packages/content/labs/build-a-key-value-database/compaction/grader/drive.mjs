@@ -63,7 +63,8 @@ export async function compactCase(folder, kind) {
   const got = await size(join(dir, LOG))
   const fresh = await freshSize(folder, want)
   const r = await reopened(dir, want)
-  const why = !r.ok ? 'lost' : got === before ? 'same' : got > fresh ? 'long' : 'short'
+  const unswapped = await stat(join(dir, `${LOG}.new`)).then(() => true, () => false)
+  const why = !r.ok ? 'lost' : got === before ? (unswapped ? 'unswapped' : 'same') : got > fresh ? 'long' : 'short'
   return { ok: r.ok && got === fresh, why, seen: `${r.text}\n${sizes(got, fresh, before)}` }
 }
 
@@ -84,15 +85,20 @@ export async function swapCase(folder, kind) {
   await written(dir, CHANGES)
   if (kind === 'inPlace') {
     const old = await bytesOf(log)
-    await link(log, join(folder, 'old-log'))
+    // Some systems and network folders cannot give a file a second name: say so, judge the rest.
+    const linked = await link(log, join(folder, 'old-log')).then(() => true, () => false)
     const removed = watchRemovals(log)
     await compacted(dir)
-    const kept = (await bytesOf(join(folder, 'old-log'))).equals(old)
+    const kept = !linked || (await bytesOf(join(folder, 'old-log'))).equals(old)
     const leftover = await stat(`${log}.new`).then(() => true, () => false)
     const r = await reopened(dir, STATE)
     const why = !kept ? 'inPlace' : removed.length ? 'removed' : leftover ? 'leftover' : 'lost'
     const said = [
-      kept ? 'the bytes of the old log were left as they were' : 'the bytes of the old log were written over',
+      !linked
+        ? 'this system cannot give a file a second name, so the check could not see whether the old log was written over'
+        : kept
+          ? 'the bytes of the old log were left as they were'
+          : 'the bytes of the old log were written over',
       removed.length ? `store.log was taken away along the way (${removed.join(', ')})` : 'store.log was never taken away',
       leftover ? 'store.log.new is still there afterwards' : 'no store.log.new is left'
     ]
@@ -114,11 +120,12 @@ export async function swapCase(folder, kind) {
   const after = await reopened(dir, { ...STATE, sneak: undefined })
   const got = await size(log)
   const fresh = await freshSize(folder, STATE)
-  const why = !opened.ok ? 'readNew' : !after.ok || got !== fresh ? 'added' : undefined
+  const leftover = await stat(`${log}.new`).then(() => true, () => false)
+  const why = !opened.ok ? 'readNew' : !after.ok || got !== fresh ? 'added' : leftover ? 'staleNew' : undefined
   return {
-    ok: opened.ok && after.ok && got === fresh,
+    ok: opened.ok && after.ok && got === fresh && !leftover,
     why,
-    seen: `opened with that store.log.new beside the log:\n${opened.text}\nafter compact(), closed and opened again:\n${after.text}\nstore.log is ${got} bytes; a fresh store with each key set once: ${fresh}`
+    seen: `opened with that store.log.new beside the log:\n${opened.text}\nafter compact(), closed and opened again:\n${after.text}\nstore.log is ${got} bytes; a fresh store with each key set once: ${fresh}\n${leftover ? 'the store.log.new from the earlier stop is still there' : 'no store.log.new is left'}`
   }
 }
 

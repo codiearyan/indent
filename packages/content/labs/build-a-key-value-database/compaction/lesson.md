@@ -33,7 +33,7 @@ await writeFile(join(dir, 'menu.txt.new'), text)
 await rename(join(dir, 'menu.txt.new'), join(dir, 'menu.txt'))
 ```
 
-A rename onto a name that is taken replaces that file, in one step. There is no moment without a `menu.txt`, and no need to remove the old one first; removing it first would make exactly such a moment. A stop before the rename leaves the whole old log, plus a `store.log.new` that may be half written. A stop after it leaves the whole new log. Either way, the store has one whole log.
+A rename onto a name that is taken replaces that file, in one step. There is no moment without a `menu.txt`, and no need to remove the old one first; removing it first would make exactly such a moment. On Windows a rename replaces the file too, though Windows does not promise it in one step as Linux and macOS do, and it throws while another program has the file open, leaving the old log in place. A stop before the rename leaves the whole old log, plus a `store.log.new` that may be half written. A stop after it leaves the whole new log. Either way, the store has one whole log.
 
 That half-written leftover is why `open` reads only `store.log`, and pays no attention to a `store.log.new`. A file cut at a record boundary looks just like a shorter, whole log. It is also why compaction writes `store.log.new` from the start with `writeFile`, never adds to it with `appendFile`: whatever an earlier stop left under that name has to go.
 
@@ -41,7 +41,9 @@ That half-written leftover is why `open` reads only `store.log`, and pays no att
 
 After the rename, the name `store.log` belongs to the new file. A store that writes with `appendFile(log, ...)` opens the file by its name each time, so its next change lands in the new log. A store that opened the file once and kept the handle, with `fs.open`, is still holding the old file, which nobody will ever read again: every change it writes there is lost. If your store keeps a handle, close it before the rename and open the new `store.log` after.
 
-Two honest notes. This store compacts when you call `compact()`; a busier one would do it by itself when the log grows past some size. And compaction needs every key in memory, which is fine for a shop's stock and not for a store bigger than memory.
+The same honest note as in the second issue holds here: a stop of the program leaves one whole log, but a power cut can still catch the system holding `store.log.new` in memory, because the store never asks for it to be flushed to the disk before the rename. A store that must survive that flushes first.
+
+Two more honest notes. This store compacts when you call `compact()`; a busier one would do it by itself when the log grows past some size. And compaction needs every key in memory, which is fine for a shop's stock and not for a store bigger than memory.
 
 ## Your work in this issue
 

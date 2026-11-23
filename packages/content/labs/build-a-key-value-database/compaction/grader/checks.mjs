@@ -2,6 +2,7 @@ import { runCases } from '../../checks-helpers.mjs'
 
 const SHORT = {
   lost: 'After compact(), closed and opened again, the store does not hold what it held before. The new log holds one record for each key the store holds now, with its value, written the way set writes it.',
+  unswapped: 'store.log is as long as it was before compact(), and a store.log.new is still beside it. The new log is written, but it never took store.log\'s place.',
   same: 'store.log is as long as it was before compact(). Write a new log from the keys and values the store holds now, not a copy of the old records.',
   long: 'store.log is longer than a fresh store\'s log with each key set once. One record per key, written the way set writes it, and none at all for a deleted key: old values and deletes are what compaction leaves behind.',
   short: 'store.log is shorter than a fresh store\'s log with each key set once, though the store gives back what it held. Write each record exactly the way set writes it, and nothing else in the file.'
@@ -9,10 +10,11 @@ const SHORT = {
 
 const SWAP = {
   inPlace: 'The bytes of the old log were written over. A stop halfway through that write would leave neither the old log nor the new one. Write the new log into store.log.new, and leave store.log itself alone until the new file takes its place in one step.',
-  removed: 'store.log was taken away before the new log took its place, so a stop between the two steps would leave no log at all. A rename onto a file that is there replaces it in one step: there is no need to remove it first.',
+  removed: 'store.log was taken away, or a copy was made over it, before the new log took its place, so a stop in between would leave no whole log. A rename onto a file that is there replaces it in one step: there is no need to remove it first.',
   leftover: 'store.log.new is still there after compact(). Once the new log is whole, it takes store.log\'s place, so nothing is left under the other name.',
   lost: 'After compact(), closed and opened again, the store does not hold what it held before.',
   readNew: 'Opening paid attention to the store.log.new a stop had left. Only store.log is the log: a store.log.new may be half written, and one that ends on a whole record looks just like a log of its own.',
+  staleNew: 'The store.log.new an earlier stop left was still there after compact(). compact() writes its new log under exactly that name, from the start, and renames it onto store.log, so nothing is left under it.',
   added: 'The half-written store.log.new from the earlier stop got into the new log. compact() writes the new log from the start, so whatever a stop left under that name is replaced, not added to.'
 }
 
@@ -57,7 +59,7 @@ export const checks = {
         name: 'The old log is never written over or taken away',
         run: 'swapCase',
         args: ['inPlace'],
-        setup: 'a store with old values and deletes in its log; the check keeps a second name for the old log\'s bytes and notes every call that removes store.log or moves it away, then compact()',
+        setup: 'a store with old values and deletes in its log; the check keeps a second name for the old log\'s bytes and notes every call that removes store.log, moves it away or copies over it, then compact()',
         hint: SWAP.inPlace,
         hints: SWAP
       },

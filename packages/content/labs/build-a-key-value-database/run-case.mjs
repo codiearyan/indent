@@ -18,6 +18,15 @@ registerHooks?.({
   }
 })
 
+// process.getBuiltinModule loads a built-in without going through the hook above.
+const builtin = process.getBuiltinModule
+if (builtin) {
+  process.getBuiltinModule = (id) => {
+    if (!ALLOWED.has(id)) throw new Error(`RefusedImport: ${id}`)
+    return builtin(id)
+  }
+}
+
 const shown = (error) =>
   error instanceof Error ? `${error.name}${error.code ? ` [${error.code}]` : ''}: ${error.message}` : String(error)
 let reply
