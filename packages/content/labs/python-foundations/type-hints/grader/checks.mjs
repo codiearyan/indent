@@ -23,7 +23,7 @@ const EXPLAIN = (error) => {
 // Reads what Python keeps for a function's hints and gives one name for each kind, the same for
 // every way of writing it: list[int] and typing.List[int], Optional[str], Union[str, None] and
 // str | None, a hint written as text, and str | None in text on a Python that cannot run it.
-const READER = `import ast, collections.abc, sys, typing
+const READER = `import ast, collections.abc, inspect, sys, typing
 def kind_name(t, g):
     if isinstance(t, str):
         return text_name(t, g)
@@ -64,7 +64,13 @@ def text_name(text, g):
         return "not a kind Python knows: " + text
 def hints(fn):
     notes = getattr(fn, "__annotations__", None) or {}
-    return {name: kind_name(t, fn.__globals__) for name, t in notes.items()}`
+    try:
+        names = list(inspect.signature(fn).parameters)
+    except (TypeError, ValueError):
+        names = [name for name in notes if name != "return"]
+    found = {name: kind_name(notes[name], fn.__globals__) if name in notes else None for name in names}
+    found["return"] = kind_name(notes["return"], fn.__globals__) if "return" in notes else None
+    return found`
 
 const WORDS = {
   int: 'a whole number',
@@ -85,34 +91,47 @@ const words = (kind) => WORDS[kind] ?? (kind?.startsWith('not a kind') ? `a name
 
 const fromDict = (v) => Object.fromEntries((v?.['@dict'] ?? []).map(([k, x]) => [k, x]))
 
-/** The words for the first hint in `got` that is not what `want` says, or a general message. */
+/**
+ * The words for the first hint in `got` that is not what `want` says, or a general message. The
+ * parameters are matched by their place in the def line, not their names, which the task leaves
+ * open: `got` holds the learner's names in that order, then "return".
+ */
 function hintWords(fn, want, got, extra = {}) {
-  const have = fromDict(got)
-  if (Object.keys(have).length === 0) {
+  const have = Object.entries(fromDict(got))
+  const params = have.filter(([k]) => k !== 'return')
+  const asked = Object.entries(want).filter(([k]) => k !== 'return')
+  if (have.every(([, k]) => k === null)) {
     return `Python keeps no hints for ${fn}. A hint is written in the def line itself: a colon and the kind after a parameter's name, and -> and the kind before the colon at its end. A comment is not a hint, and Python keeps nothing of it.`
   }
-  for (const [name, kind] of Object.entries(want)) {
-    const mine = have[name]
-    const what = name === 'return' ? `what ${fn} gives back` : name
-    if (mine === undefined) {
-      return name === 'return'
-        ? `${fn} has no hint for what it gives back. That hint is written after ->, between the round brackets and the colon of the def line.`
-        : `${fn} has no hint on ${name}.${Object.keys(have).some((k) => !(k in want)) ? ` It has one on ${Object.keys(have).find((k) => !(k in want))}, a name its def line does not have.` : ''}`
+  for (const [i, [task, kind]] of [...asked, ['return', want.return]].entries()) {
+    const back = task === 'return'
+    const [name, mine] = back ? ['return', fromDict(got).return ?? null] : params[i] ?? []
+    if (name === undefined) return `${fn} takes fewer values than the task says. Its def line needs a parameter for each of them.`
+    const what = back ? `what ${fn} gives back` : name
+    if (mine === null) {
+      if (back) return `${fn} has no hint for what it gives back. That hint is written after ->, between the round brackets and the colon of the def line.`
+      const other = params.find(([, k], j) => j !== i && k !== null && j >= asked.length)
+      return `${fn} has no hint on ${name}.${other ? ` It has one on ${other[0]}, which the task does not ask for.` : ''}`
     }
     if (mine !== kind) {
-      const own = extra[name]?.(mine)
+      const own = extra[task]?.(mine, name)
       if (own) return own
-      return `The hint on ${what} says ${words(mine)}, and the task says ${name === 'return' ? 'it gives back' : `${name} is`} ${words(kind)}.`
+      return `The hint on ${what} says ${words(mine)}, and the task says ${back ? 'it gives back' : `${name} is`} ${words(kind)}.`
     }
   }
+  if (params.length > asked.length) return `${fn} takes more values than the task says. Its def line has a parameter for each value the task names, and no others.`
   return `The hints of ${fn} are not the ones the task asks for.`
 }
 
-const hintStep = (fn, want, extra) => ({
-  code: `hints(${fn})`,
-  want,
-  hint: (v) => hintWords(fn, want, v, extra)
-})
+const hintStep = (fn, want, extra) => [
+  { code: `hints(${fn})`, value: true },
+  {
+    code: `list(hints(${fn}).values())`,
+    want: [...Object.entries(want).filter(([k]) => k !== 'return').map(([, k]) => k), want.return],
+    hidden: `# Check compares each hint of ${fn}, in the order of its def line, with what the task asks`,
+    hint: (v, seen) => hintWords(fn, want, seen[seen.length - 2], extra)
+  }
+]
 
 const READ = { code: READER, hidden: '# Check makes hints, which reads the hints Python keeps for a function, one name for each kind' }
 
@@ -124,7 +143,7 @@ function totalSteps(cases) {
       want: hours.reduce((a, b) => a + b, 0),
       hint: (v) => (v === null ? 'total_hours gives back None: it ends without return.' : 'total_hours does not give back the total of the numbers.')
     })),
-    hintStep('total_hours', { hours: 'list[int]', return: 'int' })
+    ...hintStep('total_hours', { hours: 'list[int]', return: 'int' })
   ]
 }
 
@@ -142,7 +161,7 @@ function betweenSteps(pairs) {
       want: b - a,
       hint: 'hours_between no longer gives back the end take away the start. The task asks to correct its hints only, and leave what it does as it was.'
     })),
-    hintStep('hours_between', { start: 'int', end: 'int', return: 'int' }, BELIEVED)
+    ...hintStep('hours_between', { start: 'int', end: 'int', return: 'int' }, BELIEVED)
   ]
 }
 
@@ -161,7 +180,7 @@ function leaderSteps(table, found, missing) {
       hint: (v) => `For a call sign the dictionary does not have, leader_of gives back ${s(v)}. The task asks for None.`
     },
     { code: 'len(leaders)', want: Object.keys(table).length, hidden: true, hint: 'leader_of changed the dictionary it was given.' },
-    hintStep('leader_of', { call_sign: 'str', leaders: 'dict[str, str]', return: 'Optional[str]' }, {
+    ...hintStep('leader_of', { call_sign: 'str', leaders: 'dict[str, str]', return: 'Optional[str]' }, {
       return: (mine) => (mine === 'str' ? 'The hint for what leader_of gives back says text, and it gives back None too, for a call sign the dictionary does not have. A hint for text or None says both.' : null)
     })
   ]
@@ -211,8 +230,8 @@ function pickSteps(rows) {
           : 'pick does not give back the callouts the rule gave True for, in their order.'
     },
     { code: 'len(season)', want: rows.length, hidden: true, hint: 'pick changed the list it was given.' },
-    hintStep('pick', { callouts: 'list[Callout]', rule: 'Callable[[Callout], bool]', return: 'list[Callout]' }, {
-      rule: (mine) => (mine === 'Callable' ? 'The hint on rule says a function, but not what it takes and gives back. The task says it takes one Callout and gives back True or False.' : null)
+    ...hintStep('pick', { callouts: 'list[Callout]', rule: 'Callable[[Callout], bool]', return: 'list[Callout]' }, {
+      rule: (mine, name) => (mine === 'Callable' ? `The hint on ${name} says a function, but not what it takes and gives back. The task says it takes one Callout and gives back True or False.` : null)
     })
   ]
 }
@@ -279,7 +298,7 @@ function longestSteps(path, rows, counts) {
       want: Math.min(counts[1], rows.length),
       hint: (v) => `Asked for ${counts[1]} from a file of ${rows.length} callouts, longest_callouts gives back ${v}. The task asks for at most that many: all of them, when there are fewer.`
     },
-    hintStep('longest_callouts', { path: 'str', count: 'int', return: 'list[Callout]' })
+    ...hintStep('longest_callouts', { path: 'str', count: 'int', return: 'list[Callout]' })
   ]
 }
 

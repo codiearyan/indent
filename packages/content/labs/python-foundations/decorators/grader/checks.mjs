@@ -86,7 +86,7 @@ function announceSteps(first, second) {
       want: [tuple(first[0], first[1], true)],
       hint: (v) =>
         Array.isArray(v) && v.length === 1 && typeof v[0]?.['@tuple']?.[0] === 'object'
-          ? 'page was handed all the values at once, as a tuple and a dictionary. *args and **kwargs in the call hand them on one by one, as they came.'
+          ? 'page was handed all the values at once, as one tuple and one dictionary, not one by one as the new function was given them. The lesson shows how a call hands them on as they came.'
           : 'page was not called once, with the values the new function was given.'
     },
     { code: 'answer', want: `${first[0]} paged: ${first[1]} (urgent)`, hint: noneHint },
