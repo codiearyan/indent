@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bryn",
+      "say": "Why does OK-2052 cost the top price?",
+      "note": "A light parcel of two tins."
+    },
+    {
+      "title": "Packing",
+      "text": "Its own copy of an order, kept up to date."
+    },
+    {
+      "title": "Your code",
+      "file": "order.ts",
+      "mine": true,
+      "gap": "Each file has its own order",
+      "tasks": ["One type of order", "Packing imports it", "Shipping imports it"]
+    },
+    {
+      "title": "Shipping",
+      "text": "Its copy still reads a weight nobody sends."
+    }
+  ],
+  "ticket": {
+    "label": "OK-2052",
+    "wrong": "top price",
+    "why": "Copy drifted",
+    "right": "light parcel"
+  },
+  "captions": [
+    "Bryn asks why order OK-2052, two small tins, costs the top shipping price.",
+    "Packing and shipping each keep a copy of an order, and shipping's copy is out of date.",
+    "You write the type of an order once, in order.ts, and both files import it as a type.",
+    "Shipping now reads the weight the form sends, and OK-2052 ships as a light parcel.",
+    "One type of an order, shared by every file, so the copies can no longer drift."
+  ]
+}

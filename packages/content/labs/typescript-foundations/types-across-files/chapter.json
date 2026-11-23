@@ -1,0 +1,101 @@
+{
+  "id": "types-across-files",
+  "title": "One type, shared by files",
+  "files": ["src/order.ts", "src/packing.ts", "src/shipping.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/packing.ts` and `node src/shipping.ts` run the two files, and `npm run types` checks the types of all three.",
+    "suggestedCommand": "npm run types"
+  },
+  "tasks": [
+    {
+      "id": "order",
+      "title": "Write and export the type of an order",
+      "file": "src/order.ts",
+      "description": "Under `// Task 1` in `src/order.ts`, write a type alias called `Order`, with `export` in front, for an order as the order form sends it: `id` (text), `blend` (text), `tins` (a number), `grams` (a number, the weight of the whole order) and `express` (true or false).\n\nCheck refuses `any` and `as` in your lines. It compiles code of its own that imports `Order` from `order.ts`: an order as the form sends it, with each property read as its type, must compile, while an order without `express`, with tins or express as text, or with a `weight` must be refused.",
+      "nextSteps": [
+        "Read the lesson's part on exporting a type.",
+        "Write the type alias under the Task 1 comment, with `export` in front.",
+        "Give it the five properties the task names, each with its type.",
+        "Run `npm run types`: it should refuse no line of `order.ts`."
+      ],
+      "hints": [
+        "This is the type alias you wrote in the issue on naming shapes. The only new part is the word in front of it, so other files can use it.",
+        "`export` in front of `type` shares the type with every file that imports it. Without it, the type stays inside `order.ts`.",
+        "`export type Order = { id: string; blend: string; tins: number; grams: number; express: boolean }`, one property to a line if you like."
+      ],
+      "docs": [
+        {
+          "title": "Modules: ES module syntax",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/modules.html#es-module-syntax"
+        },
+        {
+          "title": "export",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "packing",
+      "title": "Import the shared type for packing",
+      "file": "src/packing.ts",
+      "description": "Under `// Task 2` in `src/packing.ts`, take out the file's own copy of the type of an order. In its place, just below the comment, import `Order` from `order.ts` as a type only. Leave `packingSlip` and the lines below it as they are.\n\nCheck reads `packing.ts` for a type called `Order` of its own, and for an import of `Order` from `./order.ts` that starts with `import type`. It refuses `any` and `as` in your lines. It compiles `packing.ts` beside an `order.ts` of its own, with code that passes `packingSlip` an `Order`. Then it adds a property to that `Order`, and expects `packingSlip` to follow. It runs `packingSlip` with orders of its own, beside an `order.ts` that stops Node if Node ever opens it.",
+      "nextSteps": [
+        "Read the lesson's parts on importing a type and on what Node erases.",
+        "Remove the copy of the type, from `type Order = {` to its closing brace.",
+        "Write the import line just below the Task 2 comment: what, from which file, and that it is a type only.",
+        "Run `npm run types` and `node src/packing.ts`."
+      ],
+      "hints": [
+        "If `npm run types` says `Import declaration conflicts with local declaration of 'Order'`, the copy is still there. If it says `Cannot find name 'Order'`, the import is missing.",
+        "An import line names what it wants in curly braces, then the file. The path starts with `./` and ends with the whole file name, `.ts` included. The word `type` right after `import` says the whole line is about types.",
+        "`import type { Order } from './order.ts'`, on the line below the Task 2 comment."
+      ],
+      "docs": [
+        {
+          "title": "Modules: TypeScript-specific syntax",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/modules.html#typescript-specific-es-module-syntax"
+        },
+        {
+          "title": "Importing types without the type keyword in Node",
+          "url": "https://nodejs.org/api/typescript.html#importing-types-without-type-keyword"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Importing and exporting types",
+          "url": "https://www.youtube.com/watch?v=0-8v7XkKiHc"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "shipping",
+      "title": "Fix the shipping import, and what it shows",
+      "file": "src/shipping.ts",
+      "description": "Under `// Task 3` in `src/shipping.ts`, Rafe took out the file's copy of the type, which called the weight of an order `weight`, and imported `Order` from `order.ts`. Now `node src/shipping.ts` stops before it runs a line. Make the import one that Node can run, then fix the line the shared type shows to be wrong, so `shippingFor` charges by the grams of the whole order. Leave the prices as they are.\n\nCheck reads `shipping.ts` for a type called `Order` of its own, and for an import of `Order` from `./order.ts` that starts with `import type`. It refuses `any`, `as` and comments that start with `@ts-` in your lines. It compiles `shipping.ts` beside an `order.ts` of its own, with an `Order` as Task 1 asks for, then adds a property to that `Order` and expects `shippingFor` to follow. It runs `shippingFor` with orders of its own, light, heavy and express.",
+      "nextSteps": [
+        "Run `node src/shipping.ts` and read the error Node gives.",
+        "Read the lesson's part on what Node erases, and fix the import line.",
+        "Run `npm run types` and read the error that is left.",
+        "Fix that line, and run both commands."
+      ],
+      "hints": [
+        "`does not provide an export named 'Order'` is Node speaking: when it runs a file, types are already gone, so `order.ts` has no `Order` to give. `npm run types` says the same in its own words.",
+        "Once the import is fixed, the compiler compares the code with the shared `Order`, and finds a property it does not have. That is where the copy had drifted. Use the property the order form really sends.",
+        "`import type { Order } from './order.ts'`, and `order.grams` in place of each `order.weight`."
+      ],
+      "docs": [
+        {
+          "title": "verbatimModuleSyntax",
+          "url": "https://www.typescriptlang.org/tsconfig/#verbatimModuleSyntax"
+        },
+        {
+          "title": "Type stripping in Node",
+          "url": "https://nodejs.org/api/typescript.html#type-stripping"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

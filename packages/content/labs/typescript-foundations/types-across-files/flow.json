@@ -1,0 +1,121 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "form", "label": "Order form", "kind": "data" },
+      { "id": "order", "label": "order.ts", "kind": "file", "mine": true },
+      {
+        "id": "packing",
+        "label": "packingSlip()",
+        "kind": "function",
+        "mine": true,
+        "fn": "packingSlip"
+      },
+      {
+        "id": "shipping",
+        "label": "shippingFor()",
+        "kind": "function",
+        "mine": true,
+        "fn": "shippingFor"
+      },
+      { "id": "bryn", "label": "Bryn at the packing table", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "form", "to": "order", "label": "what it sends" },
+      { "from": "order", "to": "packing", "label": "type only" },
+      { "from": "order", "to": "shipping", "label": "type only" },
+      { "from": "packing", "to": "bryn", "label": "slip" },
+      { "from": "shipping", "to": "bryn", "label": "pence" }
+    ],
+    "note": "The type of an order lives in one file, and packing and shipping both import it, so they cannot drift apart."
+  },
+  "tasks": {
+    "order": {
+      "steps": [
+        {
+          "active": ["form", "form->order"],
+          "value": {
+            "kind": "map",
+            "label": "what the form sends",
+            "entries": [
+              { "key": "id", "value": "text" },
+              { "key": "blend", "value": "text" },
+              { "key": "tins", "value": "number" },
+              { "key": "grams", "value": "number" },
+              { "key": "express", "value": "true or false" }
+            ]
+          },
+          "note": "The order form sends five things for every order."
+        },
+        {
+          "active": ["order"],
+          "note": "One file describes an order, and shares that description with any file that asks."
+        },
+        {
+          "active": ["order", "order->packing", "order->shipping"],
+          "note": "Packing and shipping will both take their order from here, instead of keeping copies."
+        }
+      ]
+    },
+    "packing": {
+      "trace": {
+        "file": "src/packing.ts",
+        "call": "packingSlip",
+        "args": [
+          { "id": "OK-2051", "blend": "Hearth Assam", "tins": 3, "grams": 375, "express": true }
+        ]
+      },
+      "steps": [
+        {
+          "active": ["order", "order->packing"],
+          "note": "Packing brings in the type of an order. The line goes when Node runs the file, so order.ts is never opened."
+        },
+        {
+          "active": ["packing"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "order", "value": "an Order from order.ts" }]
+          },
+          "note": "Order OK-2051 arrives at packing, typed by the shared Order."
+        },
+        {
+          "active": ["packing", "packing->bryn", "bryn"],
+          "note": "Bryn gets the slip with the blend, the tins and the weight."
+        }
+      ]
+    },
+    "shipping": {
+      "trace": {
+        "file": "src/shipping.ts",
+        "call": "shippingFor",
+        "args": [
+          { "id": "OK-2052", "blend": "Frost Sencha", "tins": 2, "grams": 100, "express": false }
+        ]
+      },
+      "steps": [
+        {
+          "active": ["order", "order->shipping"],
+          "note": "Shipping brings in the same type of an order, in a way Node can erase."
+        },
+        {
+          "active": ["shipping"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [{ "key": "order", "value": "an Order from order.ts" }]
+          },
+          "note": "Order OK-2052 arrives at shipping, and the price comes from the weight the form really sends."
+        },
+        {
+          "active": ["shipping", "shipping->bryn", "bryn"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "shipping", "value": "pence" }]
+          },
+          "note": "Bryn gets the shipping in pence for that parcel."
+        }
+      ]
+    }
+  }
+}
