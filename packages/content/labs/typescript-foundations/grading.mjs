@@ -576,7 +576,9 @@ export async function judge(t, spec) {
     )
   }
 
-  if (followRun && !crashed && !absent && shared.length === 0 && mine.length === 0) {
+  // Only once today's uses hold, so a type that is wrong today is not also told it did not follow.
+  const today = usesErrors.length === 0 && misuseErrors.length === 0
+  if (followRun && today && !crashed && !absent && shared.length === 0 && mine.length === 0) {
     const f = await followRun
     if (f) details.push(followed(f, spec.follow))
   }
@@ -696,16 +698,28 @@ function settings([shown, run], { need, messages = {} }, { file, p, lines, label
   } catch {}
   const errors = parseErrors(run.output)
   const unread = errors.filter((e) => e.path === name)
+  if (/\bTS5058\b/.test(run.output)) {
+    return [
+      fail(
+        `${name} can be read`,
+        `There is no ${name} in your workspace, so npm run types has no settings to read. Put it back with the settings the starter had, and the ones the tasks ask for.`
+      )
+    ]
+  }
   if (!config || unread.length) {
+    // The compiler names the config by its full path, which is Check's sandbox, not the workspace.
+    const local = (text) => text.replace(/'[^'\n]*[\\/]tsconfig\.json'/g, `'${name}'`)
     return [
       fail(
         `${name} can be read`,
         `The compiler cannot read ${name}, so npm run types stops there. Run it and read the message: it names the line of ${name} and what is wrong with it.`,
-        unread.length
-          ? unread
-              .map((e) => `${name} line ${e.line}: ${e.text}${e.more ? `\n  ${e.more}` : ''}`)
-              .join('\n')
-          : (run.output || shown.output).trim()
+        local(
+          unread.length
+            ? unread
+                .map((e) => `${name} line ${e.line}: ${e.text}${e.more ? `\n  ${e.more}` : ''}`)
+                .join('\n')
+            : (run.output || shown.output).trim()
+        )
       )
     ]
   }
@@ -728,7 +742,7 @@ function settings([shown, run], { need, messages = {} }, { file, p, lines, label
         : fail(
             `${setting} is on`,
             messages[setting] ??
-              `${label} asks for ${setting} on in ${name}, and it is off. Set it in compilerOptions, spelt exactly so, with true and no quotes.`,
+              `${label} asks for ${setting} on in ${name}, and it is off. Set it in compilerOptions, spelt exactly so, with true and no quotes. A name written twice counts only the second time.`,
             off.map((s) => `${s}: off`).join('\n')
           )
     )

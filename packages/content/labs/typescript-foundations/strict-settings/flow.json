@@ -117,8 +117,8 @@
             "label": "tsconfig.json",
             "entries": [
               {
-                "key": "noImplicitAny",
-                "value": "on"
+                "key": "a parameter without a type",
+                "value": "refused"
               }
             ]
           },
@@ -167,8 +167,8 @@
             "label": "tsconfig.json",
             "entries": [
               {
-                "key": "strictNullChecks",
-                "value": "on"
+                "key": "undefined where a value is expected",
+                "value": "refused"
               }
             ]
           },
@@ -198,7 +198,7 @@
             "label": "tsconfig.json",
             "entries": [
               {
-                "key": "strict",
+                "key": "every strict check",
                 "value": "on"
               }
             ]
@@ -237,8 +237,8 @@
             "label": "tsconfig.json",
             "entries": [
               {
-                "key": "noUncheckedIndexedAccess",
-                "value": "on"
+                "key": "an item read by its position",
+                "value": "may be undefined"
               }
             ]
           },

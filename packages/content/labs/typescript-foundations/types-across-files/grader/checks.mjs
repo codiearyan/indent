@@ -72,8 +72,10 @@ async function sharesOrder(t, file, task) {
         title,
         !local
           ? `The path '${one.path}' does not start with ./, so the compiler and Node look for a package of that name instead of a file in the same folder as ${name}.`
-          : /^order(\.[cm]?js)?$/.test(bare)
-            ? `The path '${one.path}' does not name the file as it is. These files run as .ts files, and Node finds a file only by its whole name, ending included.`
+          : /^order\.[cm]?js$/.test(bare)
+            ? `The path '${one.path}' names a file that is not there: these files run as .ts files, and Node finds a file only by its whole name. The compiler lets it through, and a type-only import never reaches Node, so both commands are quiet today; the day this line imports a value, Node looks for that file and stops. Write the real name of the file, as the lesson shows.`
+            : bare === 'order'
+            ? `The path '${one.path}' has no ending. These files run as .ts files, and Node finds a file only by its whole name, ending included.`
             : `The path '${one.path}' does not lead to order.ts. It sits in the same folder as ${name}.`,
         one.text
       )
@@ -92,6 +94,16 @@ async function sharesOrder(t, file, task) {
     details.push(pass(title))
   }
   return details
+}
+
+/**
+ * With an import of Order that is there but wrong, the compiler and Node fail on that line, so
+ * Check's own misuses and runs fail too; the message about the import says the one cause.
+ */
+function afterImport(shared, judged) {
+  const imported = shared.find((d) => d.name.includes('imports Order from order.ts'))
+  if (!imported || imported.passed || /cannot find an import/.test(imported.message)) return judged
+  return judged.filter((d) => d.passed || !/^Wrong uses are refused$|^Task \d runs$/.test(d.name))
 }
 
 export const checks = {
@@ -148,7 +160,7 @@ export const checks = {
         )
       ]
     })
-    return [...shared, ...judged]
+    return [...shared, ...afterImport(shared, judged)]
   },
 
   async shipping(t) {
@@ -183,6 +195,6 @@ export const checks = {
         call('shippingFor', [{ ...yunnan, grams: 501 }], 450, prices)
       ]
     })
-    return [...shared, ...judged]
+    return [...shared, ...afterImport(shared, judged)]
   }
 }

@@ -40,7 +40,7 @@ export function bakeTime(cake: Cake): number {
 The names go in curly braces, then the file. The path starts with `./`, which means the same folder as this file, and it ends with the whole file name. Two mistakes the compiler reports:
 
 - Without `./`, as in `'cake.ts'`, it looks for a package of that name and says `Cannot find module 'cake.ts' or its corresponding type declarations`.
-- Without the ending, as in `'./cake'`, it says `Relative import paths need explicit file extensions` and suggests `'./cake.js'`. That is a habit from code that is turned into `.js` files before it runs. In this repo Node runs the `.ts` files themselves, and finds a file only by its real name, so write `'./cake.ts'`.
+- Without the ending, as in `'./cake'`, it says `Relative import paths need explicit file extensions` and suggests `'./cake.js'`. That is a habit from code that is turned into `.js` files before it runs. In this repo Node runs the `.ts` files themselves, and finds a file only by its real name, so write `'./cake.ts'`. The compiler also lets `'./cake.js'` through, but there is no `cake.js` for Node to find.
 
 If the file still has a copy of `Cake` of its own, the import is refused with `Import declaration conflicts with local declaration of 'Cake'`. One name, one type.
 
@@ -61,6 +61,8 @@ In this issue `npm run types` has one more setting, so the compiler says the sam
 ```
 error TS1484: 'Cake' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
 ```
+
+The editor does not have that setting, so it does not underline the line. `npm run types` does, and so does Node.
 
 You may also see `type` inside the curly braces: `import { type Cake } from './cake.ts'`. It erases the name, and keeps the line as an import of nothing, so Node still opens `cake.ts` every time. When a line brings in only types, put `type` right after `import`, and the whole line goes.
 

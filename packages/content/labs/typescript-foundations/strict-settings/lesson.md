@@ -36,6 +36,8 @@ The settings go inside `compilerOptions`, each a name in double quotes, a colon,
 
 In the TypeScript of this repo, every strict check is on unless a `tsconfig.json` switches it off. Rafe's has `"strict": false`, and that is why nothing is reported.
 
+The editor in this app does not read `tsconfig.json`. It underlines with every check of `strict` on from the start, and without `noUncheckedIndexedAccess`, so in this issue its underlines and `npm run types` disagree. Go by what `npm run types` prints.
+
 ## noImplicitAny
 
 With `noImplicitAny` off, a parameter without a type quietly becomes `any`, and anything goes. On, the compiler asks for its type:
@@ -106,4 +108,4 @@ Checking `flavours.length` first does not help: the compiler does not connect a 
 
 ## Your work in this issue
 
-Open `tsconfig.json` and `src/stock.ts`. For each task, switch one setting on, run `npm run types`, and fix what it finds under that task's comment. `Shelf` at the top is shared; leave it as it is. Run `node src/stock.ts` too. The editor underlines with every strict check on, whatever `tsconfig.json` says; `npm run types` reads your settings. Check reads your `tsconfig.json` the way the compiler does, and compiles your code with it and with its own settings, so a setting switched off again to quiet an error does not pass.
+Open `tsconfig.json` and `src/stock.ts`. For each task, switch one setting on, run `npm run types`, and fix what it finds under that task's comment. `Shelf` at the top is shared; leave it as it is. Run `node src/stock.ts` too. Go by `npm run types`, not the editor's underlines: only the command reads your settings. Check reads your `tsconfig.json` the way the compiler does, and compiles your code with it and with its own settings, so a setting switched off again to quiet an error does not pass.

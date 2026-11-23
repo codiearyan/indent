@@ -54,7 +54,7 @@ function cakesOfTier(cakes: Cake[], tier: Tier): Cake[] {
 }
 ```
 
-Why not write `number`? It compiles, and it allows `cakesOfTier(cakes, 4)`, which finds nothing and says nothing. `Tier` refuses it: `Type '4' is not assignable to type '1 | 2 | 3'`. And when the bakery adds a fourth tier to `Cake`, `Tier` allows it without being touched.
+Why not write `number`? It compiles, and it allows `cakesOfTier(cakes, 4)`, which finds nothing and says nothing. `Tier` refuses it: `Argument of type '4' is not assignable to parameter of type '1 | 2 | 3'`. And when the bakery adds a fourth tier to `Cake`, `Tier` allows it without being touched.
 
 ## Every property optional
 

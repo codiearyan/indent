@@ -60,7 +60,7 @@ export const checks = {
       messages: {
         uses: "Check's own code uses every size a tin can have as a Size, and the compiler refuses one of them. Size should be the type of the size property of Tin. The output says which use.",
         misuse:
-          "Check's own code uses a size the shop does not sell, or text, as a Size, and the compiler lets it through. Size should allow only the sizes a tin can have, not every number. The output says which use."
+          "Check's own code uses a size the shop does not sell, or text, as a Size, and the compiler lets it through. Size should allow only the sizes a tin can have. The output says which use."
       },
       follow: {
         type: 'Tin',
@@ -161,7 +161,7 @@ export const checks = {
         misuse: 'grader/types/parts.follow.misuse.ts',
         name: 'NewTin and ShelfLabel follow Tin',
         message:
-          'Check added a property, origin, and a size, 500, to Tin in its own copy, and NewTin or ShelfLabel did not follow. A NewTin is everything a tin has but its id, so it gains origin too; a ShelfLabel is only the blend and the size, so it does not. A copy written out by hand stays as it was. Make each from Tin, naming the properties that decide it, as the lesson shows.'
+          'Check added a property, origin, and a size, 500, to Tin in its own copy, and NewTin or ShelfLabel did not follow. A NewTin is everything a tin has but its id, so it gains origin too; a ShelfLabel is only the blend and the size, so it does not. A copy written out by hand stays as it was, and so does a type that names the wrong side: the properties it keeps where it should name the ones it leaves out, or the other way round. Make each from Tin, naming the properties that decide it, as the lesson shows.'
       },
       cases: [
         call(
