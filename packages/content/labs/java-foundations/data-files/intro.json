@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "The office wants tonight's report.",
+      "note": "From the till's sailings file."
+    },
+    {
+      "title": "Old program",
+      "text": "Met one bad line and sent nothing"
+    },
+    {
+      "title": "Your report",
+      "file": "DayReport.java",
+      "mine": true,
+      "gap": "Bad lines set aside",
+      "tasks": [
+        "Read one line",
+        "Read the file",
+        "Write the report"
+      ]
+    },
+    {
+      "title": "Harbour office",
+      "say": "The whole day, the bad line named.",
+      "note": "Takings to the penny."
+    }
+  ],
+  "ticket": {
+    "label": "Evening report",
+    "wrong": "not sent",
+    "why": "Fell over",
+    "right": "all sent"
+  },
+  "captions": [
+    "Closing time at Lanternquay. The harbour office wants the day's sailings from the till.",
+    "One line of the file says thirty, and the old program falls over and sends nothing.",
+    "You read each line into a record, set bad lines aside by number, and write the report.",
+    "Now every good sailing is counted and summed, and the bad line is named for a fix.",
+    "The office gets its report every evening, to the penny, whatever the till writes."
+  ]
+}

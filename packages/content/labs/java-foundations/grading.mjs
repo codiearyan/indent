@@ -2872,8 +2872,9 @@ const COMMENT_OR_TEXT = /"""[\s\S]*?(?:"""|$)|\/\*[\s\S]*?(?:\*\/|$)|\/\/[^\n]*|
 function pathOut(text) {
   for (const m of text.matchAll(COMMENT_OR_TEXT)) {
     if (!m[0].startsWith('"')) continue
-    const s = m[0].replace(/^"+|"+$/g, '')
-    if (/^(?:\/[\w.~-]|\\\\|[A-Za-z]:(?:\\\\|\/)|~[\\/])/.test(s) || /(?:^|\/|\\\\)\.\.(?:\/|\\\\|$)/.test(s)) return PATH_OUT + m[0]
+    // What the text holds once Java has read its escapes: "\\." is a backslash and a point.
+    const s = m[0].replace(/^"+|"+$/g, '').replace(/\\(.)/g, '$1')
+    if (/^(?:\/[\w.~-]|\\\\\w|[A-Za-z]:[\\/]|~[\\/])/.test(s) || /(?:^|[\\/])\.\.(?:[\\/]|$)/.test(s)) return PATH_OUT + m[0]
   }
   return null
 }

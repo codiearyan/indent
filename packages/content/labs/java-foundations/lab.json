@@ -90,7 +90,8 @@
         "money",
         "text-in-depth",
         "dates-and-times",
-        "files"
+        "files",
+        "data-files"
       ]
     }
   ]
