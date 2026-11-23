@@ -1,0 +1,34 @@
+{
+  "stations": [
+    {
+      "title": "Rosamund",
+      "say": "Is every owner on my card list?",
+      "note": "The Christmas cards."
+    },
+    {
+      "title": "owners",
+      "text": "A join keeps only owners with an animal.",
+      "note": "Nia's kitten is not in yet."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "file": "1-every-owner.sql",
+      "gap": "Rows with no partner",
+      "tasks": ["Every owner", "Animals never seen", "Visits not charged"]
+    }
+  ],
+  "ticket": {
+    "label": "Nia's card",
+    "wrong": "missing",
+    "why": "No partner",
+    "right": "written"
+  },
+  "captions": [
+    "Rosamund writes the Christmas cards from a list of owners and their animals.",
+    "Nia has signed up but her kitten has not come in, so a plain join leaves her out.",
+    "You keep every row of one table, and find the rows with no partner, in three tasks.",
+    "Now Nia is on the list, with an empty space where her kitten will go.",
+    "Same tables, and now no row goes missing without a word."
+  ]
+}

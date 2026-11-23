@@ -1,0 +1,34 @@
+{
+  "stations": [
+    {
+      "title": "Rosamund",
+      "say": "How many dogs has each owner got?",
+      "note": "For the dog food samples."
+    },
+    {
+      "title": "owners",
+      "text": "Every count so far covered one table.",
+      "note": "The dogs are in animals."
+    },
+    {
+      "title": "Your queries",
+      "mine": true,
+      "file": "4-dog-counts.sql",
+      "gap": "Totals that cross tables",
+      "tasks": ["This month's calls", "Animals per owner", "Visits and spend", "Dogs per owner"]
+    }
+  ],
+  "ticket": {
+    "label": "Sample list",
+    "wrong": "by hand",
+    "why": "Two tables",
+    "right": "every owner"
+  },
+  "captions": [
+    "The dog food supplier asks Rosamund how many dogs each owner has, to send samples.",
+    "The owners are in one table and the dogs in another, so the list is counted by hand.",
+    "You join, count and total across tables, in four tasks.",
+    "Now every owner is on the list with a count of dogs, and the samples go out.",
+    "Same records, counted across tables, with nobody counted twice or left out."
+  ]
+}
