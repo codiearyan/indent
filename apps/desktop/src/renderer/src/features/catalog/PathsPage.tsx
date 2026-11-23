@@ -1,7 +1,7 @@
 import { Check, ChevronDown, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Kind, LabSummary, PathDef, ProgressState } from '@shared/types'
-import { BuildStrip } from '@/components/app/BuildStrip'
+import { Meter } from '@/components/app/Meter'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -11,7 +11,7 @@ import { useProgress } from '@/stores/progress'
 import { useSettings } from '@/stores/settings'
 import { EmptyState } from './EmptyState'
 import { kindOf } from './labFilters'
-import { stageFinished } from './labStatus'
+import { labProgress, stageFinished } from './labStatus'
 
 const KIND: Record<Kind, string> = {
   foundations: 'Foundations',
@@ -136,6 +136,7 @@ function PathCard({
                   <ul className="mt-1 border-t border-rule">
                     {stage.labs.map((id) => {
                       const lab = byId.get(id)
+                      const p = lab ? labProgress(lab, chapters) : undefined
                       return (
                         <li key={id} className="border-b border-rule">
                           {lab ? (
@@ -147,15 +148,15 @@ function PathCard({
                               <span className="w-24 shrink-0 text-[13px] text-muted-foreground">
                                 {KIND[kindOf(lab)]}
                               </span>
-                              <span className="w-20 shrink-0 text-right text-[13px] text-muted-foreground tabular-nums">
-                                {lab.chapters.length}{' '}
-                                {lab.chapters.length === 1 ? 'issue' : 'issues'}
-                              </span>
-                              <BuildStrip
-                                lab={lab}
-                                chapters={chapters}
-                                className="w-[180px] shrink-0"
+                              <Meter
+                                value={p?.issuesFilled ?? 0}
+                                max={lab.chapters.length}
+                                label={`${p?.chaptersDone ?? 0} of ${lab.chapters.length} issues finished`}
+                                className="w-[140px] shrink-0"
                               />
+                              <span className="w-12 shrink-0 text-right text-[13px] text-muted-foreground tabular-nums">
+                                {p?.chaptersDone ?? 0}/{lab.chapters.length}
+                              </span>
                               <ChevronRight
                                 className="size-4 shrink-0 text-muted-foreground"
                                 strokeWidth={1.5}

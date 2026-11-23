@@ -54,6 +54,14 @@ describe('labProgress', () => {
     const p = labProgress(lab, { 'lab/a': chapter(true), 'lab/b': chapter(true) })
     expect(p).toMatchObject({ status: 'completed', chaptersDone: 2, nextChapterId: 'a' })
   })
+
+  it('fills an unfinished issue by its share of passed tasks', () => {
+    const started = { ...chapter(false), tasks: { t1: { passed: true, pointsEarned: 10 } } }
+    expect(labProgress(lab, {}).issuesFilled).toBe(0)
+    expect(labProgress(lab, { 'lab/a': chapter(true), 'lab/b': started }).issuesFilled).toBeCloseTo(
+      1 + 1 / 3
+    )
+  })
 })
 
 describe('heatmap weeks', () => {

@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, ChevronRight } from 'lucide-react'
 import { chapterKey, currentStreak, goalFor, levelFor, localDate } from '@shared/rules'
 import type { LabSummary, ProgressState } from '@shared/types'
-import { BuildStrip } from '@/components/app/BuildStrip'
+import { Cover } from '@/components/app/Cover'
+import { Meter } from '@/components/app/Meter'
 import { LanguageIcon } from '@/components/app/LanguageIcon'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -17,7 +18,7 @@ import { TOUR } from '@/features/tour/anchors'
 import { parseDate, recentWeeks } from './activity'
 import { Heatmap } from './Heatmap'
 import { NextSession } from './NextSession'
-import { labProgress, type LabProgress } from './labStatus'
+import { chapterState, labProgress, type LabProgress } from './labStatus'
 import { goalLabIds, recommendedOrder } from './recommend'
 
 interface LabRow {
@@ -68,6 +69,7 @@ export function DashboardPage(): React.JSX.Element {
     (row) => row.lab.id === progress.lastOpened?.labId && row.progress.status !== 'completed'
   )
   const next = last ?? inProgress[0] ?? notStarted[0]
+  const startNext = notStarted.filter((row) => row !== next)
 
   const streak = currentStreak(progress.activity)
   const passedToday = progress.activity[localDate()]?.tasksPassed ?? 0
@@ -92,6 +94,9 @@ export function DashboardPage(): React.JSX.Element {
         <UpNext row={next} lastOpened={progress.lastOpened} chapters={progress.chapters} />
         <Stats
           totalPoints={progress.totalPoints}
+          pointsToday={progress.activity[localDate()]?.points ?? 0}
+          passedToday={passedToday}
+          goal={goalFor(progress)}
           streak={streak}
           chaptersDone={chaptersDone}
           chapterCount={chapterCount}
@@ -107,13 +112,7 @@ export function DashboardPage(): React.JSX.Element {
           ) : (
             <ul>
               {inProgress.slice(0, 3).map(({ lab, progress: p }) => (
-                <LabLine
-                  key={lab.id}
-                  lab={lab}
-                  to={`/learn/${lab.id}/${p.nextChapterId}`}
-                  meta={`Issue ${p.chaptersDone + 1} of ${p.chapterCount}`}
-                  chapters={progress.chapters}
-                />
+                <LabLine key={lab.id} lab={lab} progress={p} />
               ))}
             </ul>
           )}
@@ -124,7 +123,7 @@ export function DashboardPage(): React.JSX.Element {
           action={{ to: '/year', label: 'Activity' }}
         >
           <div className="px-5 py-4">
-            <Heatmap weeks={weeks} activity={progress.activity} />
+            <Heatmap weeks={weeks} activity={progress.activity} fill />
             <p className="mt-3 text-[13px] text-muted-foreground">
               <span className="text-foreground tabular-nums">{thisWeek}</span>{' '}
               {thisWeek === 1 ? 'task' : 'tasks'} passed this week
@@ -137,16 +136,15 @@ export function DashboardPage(): React.JSX.Element {
           title="Start next"
           action={{ to: '/paths', label: 'Roadmaps' }}
         >
-          {notStarted.length === 0 ? (
+          {startNext.length === 0 ? (
             <Empty>You have started every repo.</Empty>
           ) : (
-            <ul>
-              {notStarted.slice(0, 3).map(({ lab, progress: p }) => (
-                <LabLine
+            <ul className="grid grid-cols-3 gap-5 p-5">
+              {startNext.slice(0, 3).map(({ lab, progress: p }) => (
+                <CoverCard
                   key={lab.id}
                   lab={lab}
-                  to={`/labs/${lab.id}`}
-                  meta={`${p.chapterCount} issues, ${p.taskCount} tasks${onRoadmap.has(lab.id) ? ', on your roadmap' : ''}`}
+                  meta={`${plural(p.chapterCount, 'issue')}${onRoadmap.has(lab.id) ? ', on your roadmap' : ''}`}
                 />
               ))}
             </ul>
@@ -189,54 +187,80 @@ function UpNext({
     )
   }
 
+  const tasksPassed = chapterState(lab.id, chapter, chapters).tasksPassed
+  const { chaptersDone, chapterCount, issuesFilled } = row.progress
+
   return (
     <section
-      className="col-span-8 flex flex-col rounded-lg border border-border p-6"
+      className="col-span-8 flex overflow-hidden rounded-lg border border-border"
       data-tour={TOUR.upNext}
     >
-      <p className="text-[13px] text-muted-foreground">{started ? 'Up next' : 'Start here'}</p>
-      <div className="mt-2 flex items-start gap-6">
-        <div className="min-w-0 flex-1">
-          <h2 className="truncate text-lg leading-6 font-semibold">{lab.title}</h2>
-          <p className="mt-1 truncate text-sm text-muted-foreground">
-            Issue {chapter.number}: {chapter.title}
+      <Cover lab={lab} className="aspect-auto w-[38%] shrink-0 border-r border-rule" />
+      <div className="flex min-w-0 flex-1 flex-col p-6">
+        <div className="flex items-start gap-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] text-muted-foreground">
+              {started ? 'Up next' : 'Start here'}
+            </p>
+            <h2 className="mt-1 truncate text-lg leading-6 font-semibold">{lab.title}</h2>
+          </div>
+          <Button asChild>
+            <Link to={`/learn/${lab.id}/${chapter.id}`}>
+              {started ? 'Continue' : 'Start repo'}
+              <ArrowRight />
+            </Link>
+          </Button>
+        </div>
+
+        <div className="mt-5">
+          <div className="flex items-baseline justify-between gap-4 text-[13px]">
+            <span className="truncate font-medium">
+              Issue {chapter.number}: {chapter.title}
+            </span>
+            <span className="shrink-0 text-muted-foreground tabular-nums">
+              {tasksPassed} of {plural(chapter.taskCount, 'task')}
+            </span>
+          </div>
+          <div
+            role="img"
+            aria-label={`${tasksPassed} of ${chapter.taskCount} tasks passed`}
+            className="mt-2.5 flex h-1.5 gap-1"
+          >
+            {Array.from({ length: chapter.taskCount }, (_, i) => (
+              <span
+                key={i}
+                className={cn('flex-1 rounded-full', i < tasksPassed ? 'bg-brand' : 'bg-accent')}
+              />
+            ))}
+          </div>
+          <p className="mt-2.5 min-h-5 truncate text-sm">
+            {nextTask && (
+              <>
+                <span className="text-muted-foreground">Next task </span>
+                {nextTask}
+              </>
+            )}
           </p>
         </div>
-        <Button asChild>
-          <Link to={`/learn/${lab.id}/${chapter.id}`}>
-            {started ? 'Continue' : 'Start repo'}
-            <ArrowRight />
-          </Link>
-        </Button>
-      </div>
-      <p className="mt-5 mb-5 min-h-5 text-sm">
-        {nextTask && (
-          <>
-            <span className="text-muted-foreground">Next task </span>
-            {nextTask}
-          </>
-        )}
-      </p>
-      <div className="mt-auto" data-tour={TOUR.upNextStrip}>
-        <BuildStrip lab={lab} chapters={chapters} />
-        <p className="mt-2 text-xs text-muted-foreground tabular-nums">
-          {row.progress.pointsEarned > 0 || started
-            ? `${passedTasks(lab, chapters)} of ${row.progress.taskCount} tasks passed`
-            : `${row.progress.chapterCount} issues, ${row.progress.taskCount} tasks. Each cell is one task.`}
-        </p>
+
+        <div className="mt-auto pt-5" data-tour={TOUR.upNextStrip}>
+          <Meter
+            value={issuesFilled}
+            max={chapterCount}
+            label={`${chaptersDone} of ${chapterCount} issues finished`}
+          />
+          <p className="mt-2 text-[13px] text-muted-foreground tabular-nums">
+            <span className="text-foreground">{chaptersDone}</span> of{' '}
+            {plural(chapterCount, 'issue')} finished
+          </p>
+        </div>
       </div>
     </section>
   )
 }
 
-function passedTasks(lab: LabSummary, chapters: ProgressState['chapters']): number {
-  return lab.chapters.reduce(
-    (sum, chapter) =>
-      sum +
-      Object.values(chapters[chapterKey(lab.id, chapter.id)]?.tasks ?? {}).filter((t) => t.passed)
-        .length,
-    0
-  )
+function plural(count: number, word: string): string {
+  return `${count} ${count === 1 ? word : `${word}s`}`
 }
 
 /** The title of the first task not yet passed in a chapter. */
@@ -265,24 +289,58 @@ function useNextTask(
   return titles.tasks.find((task) => !passed[task.id]?.passed)?.title ?? null
 }
 
-/** Four figures in one container, split by hairlines. */
+/** Four figures in one container, split by hairlines, each top-aligned so the rows line up. */
 function Stats({
   totalPoints,
+  pointsToday,
+  passedToday,
+  goal,
   streak,
   chaptersDone,
   chapterCount
 }: {
   totalPoints: number
+  pointsToday: number
+  passedToday: number
+  goal: number
   streak: number
   chaptersDone: number
   chapterCount: number
 }): React.JSX.Element {
   const { level, into, span } = levelFor(totalPoints)
-  const cells = [
-    { label: 'Level', value: level, note: `${span - into} points to level ${level + 1}` },
-    { label: 'Points', value: totalPoints.toLocaleString('en-US') },
-    { label: 'Streak', value: streak, unit: streak === 1 ? 'day' : 'days' },
-    { label: 'Issues finished', value: chaptersDone, unit: `/ ${chapterCount}` }
+  const cells: { label: string; value: React.ReactNode; unit?: string; note: React.ReactNode }[] = [
+    {
+      label: 'Level',
+      value: level,
+      note: (
+        <>
+          <Meter
+            value={into}
+            max={span}
+            label={`${into} of ${span} points into this level`}
+            className="mb-1.5 h-1"
+          />
+          {span - into} points to level {level + 1}
+        </>
+      )
+    },
+    {
+      label: 'Points',
+      value: totalPoints.toLocaleString('en-US'),
+      note: `${pointsToday} today`
+    },
+    {
+      label: 'Streak',
+      value: streak,
+      unit: streak === 1 ? 'day' : 'days',
+      note: `${Math.min(passedToday, goal)} of ${goal} ${goal === 1 ? 'task' : 'tasks'} today`
+    },
+    {
+      label: 'Issues finished',
+      value: chaptersDone,
+      unit: `/ ${chapterCount}`,
+      note: 'In every repo'
+    }
   ]
   return (
     <section
@@ -293,7 +351,7 @@ function Stats({
         <div
           key={cell.label}
           className={cn(
-            'flex flex-col justify-center px-5 py-4',
+            'flex flex-col px-5 py-4',
             i % 2 === 1 && 'border-l border-rule',
             i > 1 && 'border-t border-rule'
           )}
@@ -303,7 +361,9 @@ function Stats({
             {cell.value}
             {cell.unit && <span className="ml-1.5 text-sm text-muted-foreground">{cell.unit}</span>}
           </span>
-          {cell.note && <span className="text-xs text-muted-foreground">{cell.note}</span>}
+          <span className="mt-auto pt-2 text-xs text-muted-foreground tabular-nums">
+            {cell.note}
+          </span>
         </div>
       ))}
     </section>
@@ -343,30 +403,49 @@ function Empty({ children }: { children: React.ReactNode }): React.JSX.Element {
   return <p className="px-5 py-6 text-sm text-muted-foreground">{children}</p>
 }
 
-function LabLine({
-  lab,
-  to,
-  meta,
-  chapters
-}: {
-  lab: LabSummary
-  to: string
-  meta: string
-  chapters?: ProgressState['chapters']
-}): React.JSX.Element {
+function LabLine({ lab, progress }: { lab: LabSummary; progress: LabProgress }): React.JSX.Element {
+  const next = lab.chapters.find((c) => c.id === progress.nextChapterId)
   return (
     <li className="border-b border-rule last:border-b-0">
       <Link
-        to={to}
+        to={`/learn/${lab.id}/${progress.nextChapterId}`}
         className="flex h-14 items-center gap-3 px-5 outline-none transition-colors hover:bg-muted/60 focus-visible:bg-muted/60"
       >
         <LanguageIcon language={lab.language} className="size-7 shrink-0" />
         <span className="min-w-0 flex-1">
           <span className="block truncate text-sm font-medium">{lab.title}</span>
-          <span className="block truncate text-xs text-muted-foreground tabular-nums">{meta}</span>
+          <span className="block truncate text-xs text-muted-foreground">
+            {next && `Issue ${next.number}: ${next.title}`}
+          </span>
         </span>
-        {chapters && <BuildStrip lab={lab} chapters={chapters} className="w-44 shrink-0" />}
+        <Meter
+          value={progress.issuesFilled}
+          max={progress.chapterCount}
+          label={`${progress.chaptersDone} of ${progress.chapterCount} issues finished`}
+          className="w-28 shrink-0"
+        />
+        <span className="w-12 shrink-0 text-right text-xs text-muted-foreground tabular-nums">
+          {progress.chaptersDone}/{progress.chapterCount}
+        </span>
         <ChevronRight className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+      </Link>
+    </li>
+  )
+}
+
+function CoverCard({ lab, meta }: { lab: LabSummary; meta: string }): React.JSX.Element {
+  return (
+    <li className="min-w-0">
+      <Link
+        to={`/labs/${lab.id}`}
+        className="group block rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      >
+        <Cover
+          lab={lab}
+          className="overflow-hidden rounded-md border border-rule transition-colors group-hover:border-input"
+        />
+        <span className="mt-3 block truncate text-sm font-medium">{lab.title}</span>
+        <span className="mt-0.5 block truncate text-xs text-muted-foreground">{meta}</span>
       </Link>
     </li>
   )

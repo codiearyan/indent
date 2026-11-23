@@ -90,7 +90,7 @@ export function homeSteps({ goal, started }: { goal: boolean; started: boolean }
     {
       anchor: TOUR.upNextStrip,
       title: 'Issues and tasks',
-      text: 'A repo has issues, and each issue has tasks. Each group here is an issue and each cell a task. A cell fills when its task passes its checks.',
+      text: 'A repo has issues, and each issue has tasks. The cells above are the tasks of this issue and fill as they pass their checks. This bar fills as you finish issues.',
       next: 'Open repo'
     }
   ]

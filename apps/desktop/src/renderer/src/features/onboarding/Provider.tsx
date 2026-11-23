@@ -164,7 +164,7 @@ function ProviderRow({
             provider.available ? 'cursor-pointer' : 'text-muted-foreground'
           )}
         >
-          <ProviderIcon id={provider.id} />
+          <ProviderIcon id={provider.id} className={cn(!provider.available && 'opacity-50')} />
           {provider.label}
           {FREE[provider.id] && (
             <Badge variant="outline" className="rounded-sm font-normal text-muted-foreground">

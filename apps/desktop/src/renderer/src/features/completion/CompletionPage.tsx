@@ -183,7 +183,7 @@ export function CompletionPage(): React.JSX.Element {
                 'done-issue min-w-0 truncate font-mono text-xs tabular-nums',
                 i < shown ? 'text-foreground' : 'text-muted-foreground'
               )}
-              style={{ flexGrow: chapter.taskCount, flexBasis: 0 }}
+              style={{ flexGrow: 1, flexBasis: 0 }}
             >
               {String(chapter.number).padStart(2, '0')}
             </span>

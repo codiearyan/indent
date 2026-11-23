@@ -79,15 +79,16 @@ the chrome is neutral, and the one hue is a calm orange.
 - **Three levels, no more.** The frame is `bg-background`. The sheet is `bg-card rounded-2xl border`
   inset 8px from the window edges. Cards on the sheet are `rounded-lg border border-border` with no
   fill of their own and no shadow. Shadows are only for what floats (menus, popovers, dialogs).
-- **Colour is meaning.** `brand` is the orange. It marks progress (a filled task cell in the build
+- **Colour is meaning.** `brand` is the orange. It marks progress (a filled issue cell in the build
   strip, the level meter, the activity heatmap) and it is the one main action of a view
   (`bg-primary text-primary-foreground`: an orange button with ink text). `success` is the small green
   mark of a passed check and `destructive` the red mark of a failed one; they are status marks, never
   fills for large areas. `warning` is only the "being compared" tone in the DSA animations.
   Nothing else has a hue: links, active navigation, selected tabs, hints and AI are neutral.
-  The one exception is a language's logo (`components/app/LanguageIcon`, drawn from
-  `@icons-pack/react-simple-icons`): it keeps its own colour, because that colour is how people
-  recognise it. Logos that are near black take the muted text colour instead.
+  The one exception is a logo: a language's (`components/app/LanguageIcon`, drawn from
+  `@icons-pack/react-simple-icons`) or an AI provider's (`components/app/ProviderIcon`). It keeps
+  its own colour, because that colour is how people recognise it. Logos that are near black take
+  the text colour instead.
   - Selected or active: a neutral pill (`bg-accent text-foreground`) or ink text. Never the brand.
   - Links: `text-muted-foreground hover:text-foreground`, or ink with an underline in prose.
   - Never set text in the brand colour on a light surface; use it as a fill with ink text on top.
@@ -110,9 +111,10 @@ the chrome is neutral, and the one hue is a calm orange.
   No icon in a tinted square, no sparkline, no coloured figure.
 - **Lists are rules and alignment.** Rows separated by `border-rule`, no zebra, no header band,
   numbers right-aligned in tabular figures, one status mark per row.
-- **Progress is the build strip.** A lab's progress is drawn with `components/app/BuildStrip`: one
-  group per chapter, one cell per task, green when passed. Use it instead of a generic progress bar
-  wherever a lab's progress is shown.
+- **Progress is counted in issues.** Where there is room, a lab's progress is drawn with
+  `components/app/BuildStrip`: one cell per chapter, full when it is finished, filling as the tasks
+  of the chapter being worked on pass. In narrow places (a row, a small card) it is
+  `components/app/Meter`, a thin bar, with the count beside it ("3/45"). Never one cell per task.
 - **Empty states keep the frame**: the card and its header stay, with one plain sentence inside.
 - **Covers are the one blur.** Content the learner chooses when to see (the Resources tab of an
   issue) is drawn as it is with `blur-sm`, `inert` and `aria-hidden`, under a floating card with one
@@ -498,8 +500,8 @@ The automated review of each pull request reads this section. Report these as hi
 - Text that names or alludes to another product, course, site or codebase, anywhere in the change.
 - An id or path from the renderer that reaches the file system without `safeId` or `resolveInside`.
 - A changed signature in `src/shared/types.ts` with a caller left on the old one.
-- A hex, rgb or oklch colour or a Tailwind palette colour in a component. Language logos are the
-  one exception.
+- A hex, rgb or oklch colour or a Tailwind palette colour in a component. Language and AI
+  provider logos are the one exception.
 - A grader message that gives the answer away, an issue whose starter passes a task, or one whose
   solution fails a task.
 - An intro that shows code, a hint or a value a check compares against.
