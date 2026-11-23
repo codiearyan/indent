@@ -17,7 +17,7 @@ import {
   type PreviewWindowEvent
 } from '@shared/preview'
 import { EVENTS } from '@shared/types'
-import { emit, handle, listen, markPageWindow } from '../ipc'
+import { emit, handle, listen, markPageWindow, whenReady } from '../ipc'
 import { contentDir, safeId, workspaceDir, workspacesRoot } from '../paths'
 import { ensureRuntime } from './checks'
 import { getChapter } from './packs'
@@ -336,10 +336,11 @@ export function closeAll(): void {
 }
 
 export function register(): void {
-  protocol.handle(PREVIEW_SCHEME, (request) => {
+  protocol.handle(PREVIEW_SCHEME, async (request) => {
+    await whenReady()
     try {
       const { labId, chapterId, path } = previewTarget(request.url)
-      return serve(labId, chapterId, path)
+      return await serve(labId, chapterId, path)
     } catch {
       return new Response('Not found', { status: 404 })
     }

@@ -98,7 +98,7 @@ beforeAll(async () => {
 afterAll(() => server.close())
 
 describe('seedContent', () => {
-  it('copies the kit, runtime, roadmaps and missing repos once per app version', () => {
+  it('copies the kit, runtime, roadmaps and missing repos once per app version', async () => {
     const bundled = write(temp('bundled-'), {
       'kit/run-check.mjs': 'v1',
       'runtime/package.json': '{}',
@@ -106,18 +106,44 @@ describe('seedContent', () => {
       ...Object.fromEntries(Object.entries(lab('Shop')).map(([k, v]) => [`labs/shop/${k}`, v]))
     })
     const root = temp('root-')
-    seedContent(bundled, root, '1.0.0')
+    await seedContent(bundled, root, '1.0.0')
     expect(readFileSync(join(root, 'kit/run-check.mjs'), 'utf8')).toBe('v1')
     expect(existsSync(join(root, 'labs/shop/one/lesson.md'))).toBe(true)
 
     writeFileSync(join(root, 'labs/shop/lab.json'), 'downloaded copy')
     writeFileSync(join(bundled, 'kit/run-check.mjs'), 'v2')
-    seedContent(bundled, root, '1.0.0')
+    await seedContent(bundled, root, '1.0.0')
     expect(readFileSync(join(root, 'kit/run-check.mjs'), 'utf8')).toBe('v1')
 
-    seedContent(bundled, root, '1.1.0')
+    await seedContent(bundled, root, '1.1.0')
     expect(readFileSync(join(root, 'kit/run-check.mjs'), 'utf8')).toBe('v2')
     expect(readFileSync(join(root, 'labs/shop/lab.json'), 'utf8')).toBe('downloaded copy')
+  })
+
+  it('records the versions of the repos it copied from the shipped index', async () => {
+    const entry = { format: 1, size: 1, sha256: 'x', summary: {} }
+    const bundled = write(temp('bundled-'), {
+      'kit/run-check.mjs': 'v1',
+      'runtime/package.json': '{}',
+      'index.json': JSON.stringify({
+        paths: [],
+        labs: [
+          { ...entry, id: 'shop', version: 'shipped1', file: 'shop.tar.gz' },
+          { ...entry, id: 'bank', version: 'shipped2', file: 'bank.tar.gz' }
+        ]
+      }),
+      ...Object.fromEntries(Object.entries(lab('Shop')).map(([k, v]) => [`labs/shop/${k}`, v])),
+      ...Object.fromEntries(Object.entries(lab('Bank')).map(([k, v]) => [`labs/bank/${k}`, v]))
+    })
+    const root = temp('root-')
+    // A newer download of the bank is already here, with its own version.
+    write(join(root, 'labs/bank'), lab('Bank'))
+    recordVersion(root, 'bank', 'downloaded')
+    await seedContent(bundled, root, '1.0.0')
+    expect(JSON.parse(readFileSync(join(root, 'versions.json'), 'utf8'))).toEqual({
+      shop: 'shipped1',
+      bank: 'downloaded'
+    })
   })
 })
 
@@ -241,6 +267,19 @@ describe('staleRepos', () => {
       ]
     }
     expect(staleRepos(index, root).map((e) => e.id)).toEqual(['shop', 'cafe'])
+  })
+
+  it('hashes a repo with no recorded version once, then remembers it', () => {
+    const root = temp('root-')
+    const dir = write(join(root, 'labs', 'shop'), lab('Shop'))
+    const index: PackIndex = {
+      paths: [],
+      labs: [{ id: 'shop', version: packVersion(dir), format: 1 } as PackEntry]
+    }
+    expect(staleRepos(index, root)).toEqual([])
+    expect(JSON.parse(readFileSync(join(root, 'versions.json'), 'utf8'))).toEqual({
+      shop: packVersion(dir)
+    })
   })
 })
 

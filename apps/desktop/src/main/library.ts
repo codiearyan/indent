@@ -1,16 +1,6 @@
 import { createHash } from 'crypto'
-import {
-  copyFileSync,
-  cpSync,
-  createWriteStream,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync
-} from 'fs'
-import { mkdir, rename, rm } from 'fs/promises'
+import { createWriteStream, existsSync, readdirSync, readFileSync, writeFileSync } from 'fs'
+import { copyFile, cp, mkdir, rename, rm } from 'fs/promises'
 import { isAbsolute, join, posix } from 'path'
 import { Readable } from 'stream'
 import { pipeline } from 'stream/promises'
@@ -61,24 +51,41 @@ const readText = (file: string): string | null => {
  * time the app version changes, and each shipped repo that is not there yet. A repo already on
  * disk may be a newer download, so it is never replaced here.
  */
-export function seedContent(bundled: string, root: string, appVersion: string): void {
+export async function seedContent(
+  bundled: string,
+  root: string,
+  appVersion: string
+): Promise<void> {
   const marker = join(root, '.app-version')
   if (readText(marker) === appVersion) return
-  mkdirSync(join(root, 'labs'), { recursive: true })
-  for (const name of ['kit', 'runtime']) {
-    rmSync(join(root, name), { recursive: true, force: true })
-    cpSync(join(bundled, name), join(root, name), { recursive: true })
-  }
+  await mkdir(join(root, 'labs'), { recursive: true })
+  await Promise.all(
+    ['kit', 'runtime'].map(async (name) => {
+      await rm(join(root, name), { recursive: true, force: true })
+      await cp(join(bundled, name), join(root, name), { recursive: true })
+    })
+  )
   for (const name of ['paths.json', 'package.json']) {
-    if (existsSync(join(bundled, name))) copyFileSync(join(bundled, name), join(root, name))
+    if (existsSync(join(bundled, name))) await copyFile(join(bundled, name), join(root, name))
   }
   if (!existsSync(join(root, 'index.json')) && existsSync(join(bundled, 'index.json'))) {
-    copyFileSync(join(bundled, 'index.json'), join(root, 'index.json'))
+    await copyFile(join(bundled, 'index.json'), join(root, 'index.json'))
   }
-  for (const id of labFolders(join(bundled, 'labs'))) {
-    const target = join(root, 'labs', id)
-    if (!existsSync(target)) cpSync(join(bundled, 'labs', id), target, { recursive: true })
+  const copied = labFolders(join(bundled, 'labs')).filter(
+    (id) => !existsSync(join(root, 'labs', id))
+  )
+  await Promise.all(
+    copied.map((id) => cp(join(bundled, 'labs', id), join(root, 'labs', id), { recursive: true }))
+  )
+  // The shipped index was built from these very files, so its versions are theirs and the repos
+  // never have to be hashed to learn them.
+  const shipped = readIndexFile(join(bundled, 'index.json'))
+  const versions = readVersions(root)
+  for (const id of copied) {
+    const version = shipped?.labs.find((entry) => entry.id === id)?.version
+    if (version) versions[id] = version
   }
+  writeFileSync(versionsFile(root), JSON.stringify(versions))
   writeFileSync(marker, appVersion)
 }
 
@@ -164,24 +171,27 @@ export function recordVersion(root: string, labId: string, version: string): voi
   writeFileSync(versionsFile(root), JSON.stringify({ ...readVersions(root), [labId]: version }))
 }
 
-/** A shipped repo has no recorded version until its files are hashed once. */
-function installedVersion(root: string, labId: string): string {
-  const known = readVersions(root)[labId]
-  if (known) return known
-  const version = packVersion(join(root, 'labs', labId))
-  recordVersion(root, labId, version)
-  return version
-}
-
 /** Repos on disk that the library has a newer version of and that this app can run. */
 export function staleRepos(index: PackIndex, root: string): PackEntry[] {
   const installed = new Set(labFolders(join(root, 'labs')))
-  return index.labs.filter(
+  const versions = readVersions(root)
+  let learned = false
+  // A repo shipped by an app from before versions were recorded is hashed once, then remembered.
+  const versionOf = (labId: string): string => {
+    if (!versions[labId]) {
+      versions[labId] = packVersion(join(root, 'labs', labId))
+      learned = true
+    }
+    return versions[labId]
+  }
+  const stale = index.labs.filter(
     (entry) =>
       installed.has(entry.id) &&
       entry.format <= PACK_FORMAT &&
-      installedVersion(root, entry.id) !== entry.version
+      versionOf(entry.id) !== entry.version
   )
+  if (learned) writeFileSync(versionsFile(root), JSON.stringify(versions))
+  return stale
 }
 
 export async function download(
