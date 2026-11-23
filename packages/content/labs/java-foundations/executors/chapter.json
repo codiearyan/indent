@@ -1,0 +1,11 @@
+{
+  "id": "executors",
+  "title": "x",
+  "files": ["Bookings.java"],
+  "terminal": { "description": "x", "suggestedCommand": "java Bookings.java" },
+  "tasks": [
+    { "id": "batch", "title": "a", "file": "Bookings.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
+    { "id": "careful", "title": "a", "file": "Bookings.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 },
+    { "id": "desk", "title": "a", "file": "Bookings.java", "description": "", "nextSteps": [], "hints": [], "docs": [], "points": 10 }
+  ]
+}

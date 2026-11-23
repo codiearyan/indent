@@ -3332,28 +3332,25 @@ export function threaded({ setup = [], call, type = 'void', wait = 1500, grace =
 }
 
 const THREAD_DOING = {
-  pool: () => "a pool's thread, still waiting for jobs: a pool keeps its threads until it is shut down",
-  lock: (at) => `a thread waiting for a lock another thread holds${at}`,
-  join: (at) => `a thread waiting for another thread to end${at}`,
-  sleep: (at) => `a thread asleep${at}`,
-  wait: (at) => `a thread still waiting${at}`,
-  running: (at) => `a thread still running${at}`
+  pool: [() => "a pool's thread", (n) => `${n} threads of a pool`, ' still waiting for jobs, as a pool\'s threads do until it is shut down'],
+  lock: [() => 'a thread', (n) => `${n} threads`, ' waiting for a lock another thread holds'],
+  join: [() => 'a thread', (n) => `${n} threads`, ' waiting for another thread to end'],
+  sleep: [() => 'a thread', (n) => `${n} threads`, ' asleep'],
+  wait: [() => 'a thread', (n) => `${n} threads`, ' still waiting'],
+  running: [() => 'a thread', (n) => `${n} threads`, ' still running']
 }
 
-/** CheckRun's kind:line; list as plain words, one phrase per thread, alike ones counted once. */
+/** CheckRun's kind:line; list as plain words, alike threads counted once: "2 threads still running, at line 9". */
 export function threadWords(desc, file) {
-  const phrases = (desc ?? '')
-    .split(';')
-    .filter(Boolean)
+  const all = (desc ?? '').split(';').filter(Boolean)
+  return [...new Set(all)]
     .map((one) => {
+      const n = all.filter((x) => x === one).length
       const [kind, line] = one.split(':')
-      return (THREAD_DOING[kind] ?? THREAD_DOING.wait)(Number(line) > 0 ? `, at line ${line} of ${file}` : '')
+      const [single, several, rest] = THREAD_DOING[kind] ?? THREAD_DOING.wait
+      return `${n > 1 ? several(n) : single()}${rest}${Number(line) > 0 ? `, at line ${line} of ${file}` : ''}`
     })
-  const counted = [...new Set(phrases)].map((p) => {
-    const n = phrases.filter((q) => q === p).length
-    return n > 1 ? `${p} (${n} of them)` : p
-  })
-  return counted.join('; ')
+    .join('; ')
 }
 
 // What an exception usually means with threads and pools, in plain words, without the fix.
