@@ -235,7 +235,7 @@ function explain(errors, lines, file) {
  * Returns { problem: [details] } when it cannot get as far as running every case, or
  * { runs: [{ given, stdout, reads }], section, warnings }.
  */
-export async function build(t, { file, task, vars = {}, cases = [{}] }) {
+export async function build(t, { file, task, vars = {}, cases = [{}], causes, stuck, flood }) {
   const label = `Task ${task}`
   const cc = await compiler()
   if (!cc) return { problem: [fail('A C++ compiler is here', NO_COMPILER)] }
@@ -451,7 +451,7 @@ export async function build(t, { file, task, vars = {}, cases = [{}] }) {
         problem: [
           fail(
             `${label} builds`,
-            `The compiler refuses a line of ${label}. ${causeOf(mine.slice(0, 1), lines) ?? `Build the file with ${COMMAND(file)}, read the first error for a line of ${label}, and fix what it points at.`}`,
+            `The compiler refuses a line of ${label}. ${causes?.(mine, lines, section) ?? causeOf(mine.slice(0, 1), lines) ?? `Build the file with ${COMMAND(file)}, read the first error for a line of ${label}, and fix what it points at.`}`,
             explain(mine, lines, file)
           )
         ]
@@ -524,9 +524,9 @@ export async function build(t, { file, task, vars = {}, cases = [{}] }) {
     const why = broken.spawnError
       ? 'Check could not start the program it built. Try Check again.'
       : broken.timedOut
-        ? `The program did not finish within ${RUN_SECONDS} seconds, so Check stopped it. Look in ${label} for something that never ends or waits for typing.`
+        ? (typeof stuck === 'function' ? stuck(section) : stuck) ?? `The program did not finish within ${RUN_SECONDS} seconds, so Check stopped it. Look in ${label} for something that never ends or waits for typing.`
         : broken.flooded
-          ? `The program printed far more than ${label} asks for, so Check stopped it. Look for a line that repeats without end.`
+          ? (typeof flood === 'function' ? flood(section) : flood) ?? `The program printed far more than ${label} asks for, so Check stopped it. Look for a line that repeats without end.`
           : /out_of_range/.test(broken.stderr ?? '')
             ? `The program stopped because a line of ${label} asked for a part of a text that starts past its end. Positions in a text count from 0, so the last one is one less than its length.`
             : `The program stopped with an error while it ran the lines of ${label}, before the end of main.`
@@ -669,4 +669,798 @@ export function show(value, type) {
   if (type === 'char') return `'${value}'`
   if (type === 'bool') return value ? 'true' : 'false'
   return shown(value)
+}
+
+// ---------- Part 2: decisions, loops and functions ----------
+
+const lineAt = (text, offset) => text.slice(0, offset).split('\n').length - 1
+
+/** Where the { at `open` in `code` closes, or -1. */
+function closing(code, open, [o, c] = ['{', '}']) {
+  let depth = 0
+  for (let i = open; i < code.length; i++) {
+    if (code[i] === o) depth++
+    else if (code[i] === c && --depth === 0) return i
+  }
+  return -1
+}
+
+/** An if, for or while whose round brackets are followed straight by a semicolon, or null. */
+export function emptyBody(code) {
+  const re = /\b(if|for|while)\s*\(/g
+  let m
+  while ((m = re.exec(code))) {
+    if (m[1] === 'while' && /\}\s*$/.test(code.slice(0, m.index))) continue
+    const close = closing(code, m.index + m[0].length - 1, ['(', ')'])
+    if (close !== -1 && /^\s*;/.test(code.slice(close + 1))) return { keyword: m[1], line: lineAt(code, m.index) }
+  }
+  return null
+}
+
+const unbalanced = (code) => (code.match(/\{/g) ?? []).length !== (code.match(/\}/g) ?? []).length
+
+/** A variable made between { and } in `code` (comments blanked), and used after its }. */
+function madeInBlock(code, name) {
+  const decl = new RegExp(`\\b[\\w:]+\\s*[&*]?\\s+${name}\\s*(?:=|\\{|;|\\()`, 'g')
+  let m
+  while ((m = decl.exec(code))) {
+    let depth = 0
+    for (let i = m.index; i >= 0; i--) {
+      if (code[i] === '}') depth++
+      else if (code[i] === '{' && depth-- === 0) {
+        const end = closing(code, i)
+        if (end !== -1 && new RegExp(`\\b${name}\\b`).test(code.slice(end))) return true
+        break
+      }
+    }
+  }
+  return false
+}
+
+const PART2 = {
+  assign:
+    'The compiler warns about a single = inside a condition. = gives the variable a new value there, so the condition compares nothing and the variable changes. Comparing two values takes ==.',
+  empty: (keyword) =>
+    keyword === 'if'
+      ? 'A semicolon right after the round brackets of if ends the if there. The lines in { } below it are not part of it, so they run every time.'
+      : keyword === 'while'
+        ? 'A semicolon right after the round brackets of while ends the loop there: it repeats nothing, so nothing in it changes and it never ends. The lines in { } below it are not part of it.'
+        : 'A semicolon right after the round brackets of for ends the loop there: it repeats nothing, and the lines in { } below it run once, after it.',
+  indent:
+    'The compiler warns that a line is indented as if it belonged to the if or loop above it, but it does not. Without { }, only the one statement right after it belongs to it.',
+  braces: (label) =>
+    `The { and } of ${label} do not pair up. Every { needs a } of its own, and a missing one makes the compiler read the rest of the file wrong, so the line it names can be far below the mistake. Count them in each if, loop and function.`,
+  block: (name) =>
+    `${name} is made inside { } and used after the }. A variable made inside { } exists only until that }. Make it before the { with a first value, and give it its new value inside.`,
+  orphanElse:
+    'An else has no if just before it. A semicolon right after the round brackets of if ends the if there, so the else that follows belongs to nothing.'
+}
+
+function warned(warnings, code) {
+  const text = warnings.join('\n')
+  if (/assignment as a condition|assignment used as truth value/.test(text)) return PART2.assign
+  const empty = emptyBody(code)
+  if (empty) return PART2.empty(empty.keyword)
+  if (/misleading indentation|does not guard/.test(text)) return PART2.indent
+  return null
+}
+
+/** The causes of an error that part 2 teaches, tried before the ones of part 1. */
+function part2Cause(errors, lines, code, { label, fns = [], provided = [] } = {}) {
+  const text = errors.map((e) => e.text).join('\n')
+  const source = errors.map((e) => lines[e.line - 1] ?? '').join('\n')
+  if (unbalanced(code) || /expected '\}'|extraneous closing brace|at end of input/.test(text)) return PART2.braces(label)
+  if (/'else' without a previous 'if'/.test(text) || (/expected expression/.test(text) && /\belse\b/.test(source))) {
+    return PART2.orphanElse
+  }
+  if (/function.definition is not allowed here/.test(text)) {
+    return 'A function is written inside another function, here inside main. Each function is written on its own: move it above main.'
+  }
+  // GCC names the whole declaration ('double f(int)'), clang only the name.
+  const redefined = /redefinition of '([^']*)'/.exec(text)?.[1]
+  const twice = redefined && (/(\w+)\s*\(/.exec(redefined)?.[1] ?? /(\w+)\s*$/.exec(redefined)?.[1])
+  if (twice && provided.includes(twice)) {
+    return `${twice} is written in ${label} too. Write it once, under its own // Task comment: Check builds ${label} with a ${twice} of its own.`
+  }
+  if (twice && fns.some((f) => f.name === twice)) {
+    return `A function called ${twice} is written twice. Keep one of them.`
+  }
+  const unknown = /undeclared identifier '(\w+)'|'(\w+)' was not declared/.exec(text)
+  if (unknown) {
+    const name = unknown[1] ?? unknown[2]
+    if (madeInBlock(code, name)) return PART2.block(name)
+    const later = fns.find((f) => f.name === name && f.kind === 'def')
+    if (later && later.startLine + 1 > errors[0].line) {
+      return `${name} is used above the place where it is written. The compiler reads the file from the top down, so a function is written, or declared, above the first line that uses it.`
+    }
+  }
+  const constNames = [...code.matchAll(/\bconst\s+[\w:]+\s*&\s*(\w+)/g)].map((m) => m[1])
+  const changesConst = constNames.some((n) =>
+    new RegExp(`\\b${n}\\s*(?:[-+*/%]?=(?!=)|\\+\\+|--)|(?:\\+\\+|--)\\s*${n}\\b`).test(source)
+  )
+  if (changesConst || /const-qualified|read-only|discards qualifiers/.test(text)) {
+    return 'A line changes a value that is const. const promises that the function only reads that value: a parameter the function has to change cannot be const.'
+  }
+  if (/no matching function for call|too many arguments to function|too few arguments to function|cannot bind non-const/.test(text)) {
+    return 'A function is called with values it cannot take. Count them and compare their types with the list in the round brackets where the function is written. A reference that is not const takes only a variable, never a value worked out on the spot.'
+  }
+  if (/should not return a value|return-statement with a value/.test(text)) {
+    return 'A function marked void gives nothing back, so its return cannot have a value after it. The word in front of a function name is the type of what it gives back.'
+  }
+  if (/should return a value|return-statement with no value/.test(text)) {
+    return 'A return has no value after it, in a function that has to give a value back.'
+  }
+  return null
+}
+
+/** The lines a task printed: complete lines, without the shared lines' `header`. */
+function printedLines(stdout, header) {
+  const all = stdout.split('\n')
+  if (all.at(-1) === '') all.pop()
+  const kept = all.map((l) => l.trimEnd())
+  return header !== undefined && kept[0] === header ? kept.slice(1) : kept
+}
+
+const linesMatch = (got, want) => got.length === want.length && want.every((w, i) => w.test(got[i]))
+
+/**
+ * Like judge(), for a task whose printed lines must be exactly `printed`, in order, and nothing
+ * else. Each case: { name, given, expect, printed: [line(...) | numberLine(...)], hint }.
+ * spec.header: the line the shared lines print first, left out before comparing.
+ * spec.source(section): a failing detail or null, for how the task is written.
+ */
+export async function judgeLines(t, spec) {
+  const label = `Task ${spec.task}`
+  const empty = (message) => (section) => {
+    const found = emptyBody(section.code)
+    return found ? PART2.empty(found.keyword) : message
+  }
+  const built = await build(t, {
+    causes: (errors, lines, section) => part2Cause(errors, lines, section.code, { label }),
+    ...spec,
+    stuck: empty(spec.stuck),
+    flood: empty(spec.flood)
+  })
+  if (built.problem) return built.problem
+  const { runs, section, warnings, givens } = built
+  const sourceProblem = spec.source?.(section)
+  if (sourceProblem) return [sourceProblem]
+  const names = Object.keys(spec.vars ?? {})
+  const outs = runs.map((r) => printedLines(r.stdout, spec.header))
+  const wantText = (c) => c.printed.map((l) => l.text).join('\n')
+  const typedOut =
+    runs.length > 1 &&
+    outs[0].length > 0 &&
+    outs.every((o) => o.join('\n') === outs[0].join('\n')) &&
+    !spec.cases.every((c) => wantText(c) === wantText(spec.cases[0]))
+  const typedVar = names.some(
+    (n) =>
+      runs.every((r) => sameValue(r.reads[n], runs[0].reads[n])) &&
+      !spec.cases.every((c) => sameValue(c.expect?.[n], spec.cases[0].expect?.[n]))
+  )
+  const named = warned(warnings, section.code)
+  const usesGiven = givens.some((g) => new RegExp(`\\b${g.name}\\b`).test(section.code))
+  return spec.cases.map((c, i) => {
+    const r = runs[i]
+    const valuesOk = names.every((n) => c.expect?.[n] === undefined || sameValue(r.reads[n], c.expect[n]))
+    const linesOk = linesMatch(outs[i], c.printed)
+    const passed = valuesOk && linesOk && (c.printed.length === 0 || r.stdout.endsWith('\n'))
+    const out = [
+      givenText(r.given, givens).trim(),
+      ...names.map((n) => `${n} is ${r.reads[n] === undefined ? 'not there' : show(r.reads[n], spec.vars[n])}`),
+      printedText(r.stdout),
+      ...(!passed && warnings.length ? ['The compiler warned:', ...warnings] : [])
+    ]
+      .filter(Boolean)
+      .join('\n')
+    let message
+    if (!passed) {
+      const joined = c.printed.some((w) => !outs[i].some((l) => w.test(l)) && r.stdout.includes(w.text))
+      if (named) message = named
+      else if ((typedOut || typedVar) && !usesGiven && spec.typed) message = spec.typed
+      else if (valuesOk && (joined || linesOk)) message = JOINED
+      else message = typeof c.hint === 'function' ? c.hint({ ...r, given: c.given, section, lines: outs[i] }) : c.hint
+    }
+    return { name: c.name, passed, message, output: out }
+  })
+}
+
+// ---------- Functions ----------
+
+const NOT_NAMES = new Set(['if', 'for', 'while', 'switch', 'return', 'sizeof', 'catch', 'decltype', 'static_assert', 'alignof', 'noexcept'])
+
+/**
+ * The functions written in `code` (comments and strings blanked): { name, kind: 'def' | 'decl',
+ * nested, start, end, startLine, endLine }. nested is a function written inside another one.
+ */
+export function functionsOf(source) {
+  const code = source.replace(/^[ \t]*#.*$/gm, (m) => ' '.repeat(m.length))
+  const depthAt = new Int32Array(code.length + 1)
+  let d = 0
+  for (let i = 0; i < code.length; i++) {
+    depthAt[i] = d
+    if (code[i] === '{') d++
+    else if (code[i] === '}') d = Math.max(0, d - 1)
+  }
+  const found = []
+  const re = /\b([A-Za-z_]\w*)\s*\(/g
+  let m
+  while ((m = re.exec(code))) {
+    if (NOT_NAMES.has(m[1])) continue
+    const before = code.slice(0, m.index)
+    if (!/[\w>&*]\s*$/.test(before) || /\b(?:return|else|new|delete|throw|case)\s*$/.test(before)) continue
+    const close = closing(code, m.index + m[0].length - 1, ['(', ')'])
+    if (close === -1) break
+    const after = /^\s*(?:const\s*)?(?:noexcept\s*)?(?:->\s*[\w:<>&* ]+?\s*)?([{;])/.exec(code.slice(close + 1))
+    if (!after) continue
+    const boundary = Math.max(before.lastIndexOf(';'), before.lastIndexOf('}'), before.lastIndexOf('{'), before.lastIndexOf(')'))
+    const start = boundary + 1 + (/^\s*/.exec(code.slice(boundary + 1))?.[0].length ?? 0)
+    const at = close + 1 + after[0].length - 1
+    const end = after[1] === '{' ? closing(code, at) : at
+    if (end === -1) continue
+    found.push({
+      name: m[1],
+      kind: after[1] === '{' ? 'def' : 'decl',
+      nested: depthAt[m.index] > 0,
+      start,
+      end: end + 1,
+      startLine: lineAt(code, start),
+      endLine: lineAt(code, end)
+    })
+  }
+  return found
+}
+
+const parseValue = (text, type) =>
+  /^(?:const )?(int|long|long long|short|unsigned|double|float)&?$/.test(type)
+    ? Number(text)
+    : /^(?:const )?bool&?$/.test(type)
+      ? text === '1'
+      : text
+
+function cppLiteral(value, type) {
+  if (type === 'double' && Number.isInteger(value)) return `${value}.0`
+  return literal(value, type)
+}
+
+const HARNESS = String.raw`
+#include <cstdlib>
+#include <iostream>
+#include <streambuf>
+#include <string>
+#include <type_traits>
+#include <utility>
+namespace indent_ {
+template <class T> void type_() {
+  using B = std::remove_cv_t<std::remove_reference_t<T>>;
+  if constexpr (std::is_reference_v<T> && std::is_const_v<std::remove_reference_t<T>>) std::cerr << "const ";
+  if constexpr (std::is_same_v<B, int>) std::cerr << "int";
+  else if constexpr (std::is_same_v<B, double>) std::cerr << "double";
+  else if constexpr (std::is_same_v<B, bool>) std::cerr << "bool";
+  else if constexpr (std::is_same_v<B, char>) std::cerr << "char";
+  else if constexpr (std::is_same_v<B, float>) std::cerr << "float";
+  else if constexpr (std::is_same_v<B, long>) std::cerr << "long";
+  else if constexpr (std::is_same_v<B, long long>) std::cerr << "long long";
+  else if constexpr (std::is_same_v<B, unsigned>) std::cerr << "unsigned";
+  else if constexpr (std::is_same_v<B, std::string>) std::cerr << "std::string";
+  else if constexpr (std::is_same_v<B, void>) std::cerr << "void";
+  else std::cerr << "something else";
+  if constexpr (std::is_lvalue_reference_v<T>) std::cerr << "&";
+  else if constexpr (std::is_rvalue_reference_v<T>) std::cerr << "&&";
+}
+template <class R, class... A> void sig_(R (*)(A...)) {
+  std::cerr << "\036sig\037";
+  type_<R>();
+  ((std::cerr << "\037", type_<A>()), ...);
+  std::cerr << "\036";
+}
+template <class R, class... A> void sig_(R (*f)(A...) noexcept) { sig_(static_cast<R (*)(A...)>(f)); }
+template <class T> void put_(const char* name, const T& v) { std::cerr << "\036" << name << "\037" << v << "\036"; }
+template <class F, class... A> void call_(F f, A&&... a) {
+  if constexpr (std::is_invocable_v<F, A...>) {
+    std::cout.flush();
+    if constexpr (std::is_void_v<std::invoke_result_t<F, A...>>) {
+      f(std::forward<A>(a)...);
+      std::cout.flush();
+      std::cerr << "\036void\037\036";
+    } else {
+      auto&& r = f(std::forward<A>(a)...);
+      std::cout.flush();
+      put_("result", r);
+    }
+  } else {
+    std::cerr << "\036nocall\037\036";
+  }
+}
+// Says once on standard error when a read reaches the end of what Check typed.
+struct in_ : std::streambuf {
+  std::streambuf* src;
+  char ch = 0;
+  bool told = false;
+  explicit in_(std::streambuf* s) : src(s) {}
+  int_type underflow() override {
+    int_type c = src->sbumpc();
+    if (traits_type::eq_int_type(c, traits_type::eof())) {
+      if (!told) std::cerr << "\036eof\037\036" << std::flush;
+      told = true;
+      return c;
+    }
+    ch = traits_type::to_char_type(c);
+    setg(&ch, &ch, &ch + 1);
+    return c;
+  }
+};
+}
+`
+
+function harness(spec) {
+  const params = spec.params ?? []
+  const blocks = spec.cases.map((c, i) => {
+    const decls = params.map((p, k) => `${p.const ? 'const ' : ''}${p.type} indent_a${k}_ = ${cppLiteral(c.args[k], p.type)};`)
+    const args = params.map((_, k) => `, indent_a${k}_`).join('')
+    const after = params.map((p, k) => (p.after ? `indent_::put_("arg${k}", indent_a${k}_); ` : '')).join('')
+    const calls = spec.provides?.length ? 'indent_::put_("calls", indent_::calls_); ' : ''
+    return `  if (indent_case_ == ${i}) { ${decls.join(' ')} indent_::call_(&${spec.fn}${args}); ${after}${calls}}`
+  })
+  return [
+    HARNESS,
+    'int main(int argc, char** argv) {',
+    '  std::cerr.precision(17);',
+    '  static indent_::in_ indent_in_(std::cin.rdbuf());',
+    '  std::cin.rdbuf(&indent_in_);',
+    `  indent_::sig_(&${spec.fn});`,
+    '  const int indent_case_ = argc > 1 ? std::atoi(argv[1]) : 0;',
+    ...blocks,
+    '  return 0;',
+    '}',
+    ''
+  ].join('\n')
+}
+
+function readsOfCall(stderr) {
+  const got = {}
+  for (const part of stderr.split(START)) {
+    const at = part.indexOf(SPLIT)
+    if (at === -1) continue
+    got[part.slice(0, at)] = part.slice(at + 1)
+  }
+  return got
+}
+
+const article = (type) => (/^[aeiou]/.test(type) ? 'an' : 'a')
+const typeWords = (type) => (type === 'void' ? 'nothing (void)' : `${article(type)} ${type}`)
+
+function keepsTasks(file, lines, starter) {
+  const { starts, twice } = marks(lines)
+  const lost = [...marks(starter).starts.keys()].filter((n) => !starts.has(n))
+  if (!lost.length && !twice.size) return { starts }
+  const n = lost[0] ?? [...twice][0]
+  return {
+    problem: fail(
+      `${file} keeps its tasks`,
+      lost.length
+        ? `Check cannot find the // Task ${n} comment in ${file}. Check uses those comments to tell the tasks apart, so put it back on a line of its own above Task ${n}.`
+        : `The // Task ${n} comment is in ${file} more than once. Check uses those comments to tell the tasks apart, so keep the one above Task ${n} and remove the other.`
+    )
+  }
+}
+
+/**
+ * Builds the function `fn` of Task `task` with a main of Check's own that calls it once per case
+ * and reads, apart, what it gives back, what it printed and what became of the caller's
+ * variables. Spec:
+ * - fn, returns: the function and the type it gives back ('void' for nothing)
+ * - params: [{ type, const, after, want }] Check's own variables, passed in order. const makes the
+ *   variable const; after reads it back after the call; want is the exact parameter type the
+ *   task asks for, when how it is passed matters (e.g. 'const std::string&')
+ * - provides: [{ name, code }] functions of other tasks that Check writes itself for this task,
+ *   so it is judged on its own; each counts its calls in indent_::calls_
+ * - cases: [{ args, input }] input is what Check types on standard input
+ * - stuck: the message when it does not finish
+ * Returns { problem: [details] } or { runs: [{ stdout, result, args, calls, eof }], sig, uses, warnings }.
+ */
+export async function buildCall(t, spec) {
+  const { file, task, fn } = spec
+  const label = `Task ${task}`
+  const cc = await compiler()
+  if (!cc) return { problem: [fail('A C++ compiler is here', NO_COMPILER)] }
+
+  const whole = (await readFile(join(t.workspace, file), 'utf8')).replace(/\r\n/g, '\n')
+  const lines = whole.split('\n')
+  const starter = (await readFile(t.chapterPath(`starter/${file}`), 'utf8')).replace(/\r\n/g, '\n').split('\n')
+  const tasks = keepsTasks(file, lines, starter)
+  if (tasks.problem) return { problem: [tasks.problem] }
+  const { starts } = tasks
+
+  const code = codeOnly(whole)
+  const fns = functionsOf(code)
+  const main = fns.find((f) => f.name === 'main' && f.kind === 'def' && !f.nested)
+  if (!main && fns.some((f) => f.name === 'main' && f.kind === 'def')) {
+    const order = [...starts.entries()].sort((x, y) => x[1] - y[1])
+    const codeLines = code.split('\n')
+    const open = order.find(([, at], k) => unbalanced(codeLines.slice(at, order[k + 1]?.[1] ?? codeLines.length).join('\n')))
+    const where = open ? `Task ${open[0]}` : 'a function above main'
+    return {
+      problem: [
+        fail(
+          `${file} builds`,
+          `${PART2.braces(where)} Here a missing } makes the compiler read main as part of ${where}, so no task can build until it is back.`
+        )
+      ]
+    }
+  }
+  if (!main) {
+    return {
+      problem: [
+        fail(
+          `${file} keeps main`,
+          `Check cannot find main in ${file}. Every program starts at main, so keep it below your functions, as the starter wrote it.`
+        )
+      ]
+    }
+  }
+  const def = fns.find((f) => f.name === fn && f.kind === 'def' && !f.nested)
+  if (!def) {
+    const nested = fns.find((f) => f.name === fn && f.kind === 'def')
+    const declared = fns.find((f) => f.name === fn && f.kind === 'decl' && !f.nested)
+    return {
+      problem: [
+        fail(
+          `${label} writes ${fn}`,
+          nested
+            ? `${fn} is written inside another function. Each function is written on its own: move it out, under // ${label}, above main.`
+            : declared
+              ? `${fn} is declared, but Check cannot find it written out with its body in { }. Write the whole function under // ${label}.`
+              : `Check cannot find a function called ${fn} in ${file}. Write it under // ${label}, above main, with exactly that name: capital letters count.`
+        )
+      ]
+    }
+  }
+  const usesInMain = new RegExp(`\\b${fn}\\s*\\(`).test(code.slice(main.start, main.end).replace(/^[^{]*/, ''))
+  const declaredAbove = fns.some((f) => f.name === fn && !f.nested && f.start < main.start)
+  if (def.start > main.start && usesInMain && !declaredAbove) {
+    return {
+      problem: [
+        fail(
+          `${label} builds`,
+          `${fn} is written below main, and main uses it. The compiler reads the file from the top down, so at that line in main it has not met ${fn} yet. Build the file in the terminal and read the error for main.`
+        )
+      ]
+    }
+  }
+
+  const first = Math.min(...starts.values())
+  const start = starts.get(task)
+  const end = Math.min(lines.length, main.startLine > start ? main.startLine : Infinity, ...[...starts.values()].filter((i) => i > start))
+  const keep = lines.map((_, i) => i < first || (i >= start && i < end))
+  const span = (f) => {
+    for (let i = f.startLine; i <= f.endLine; i++) keep[i] = true
+  }
+  span(def)
+  const provided = (spec.provides ?? []).map((p) => p.name)
+  const taskOf = (line) => [...starts.entries()].filter(([, at]) => at <= line).sort((x, y) => y[1] - x[1])[0]?.[0]
+  const uses = []
+  const keptCode = () => code.split('\n').filter((_, i) => keep[i]).join('\n')
+  for (let grew = true; grew; ) {
+    grew = false
+    const text = keptCode()
+    for (const other of fns) {
+      if (other.kind !== 'def' || other.nested || other === main || other.name === fn || provided.includes(other.name)) continue
+      if (keep[other.startLine] || !new RegExp(`\\b${other.name}\\s*\\(`).test(text)) continue
+      span(other)
+      uses.push({ name: other.name, task: taskOf(other.startLine) })
+      grew = true
+    }
+  }
+  for (let i = main.startLine; i <= main.endLine; i++) keep[i] = false
+  const kept = lines.map((l, i) => (keep[i] ? l : ''))
+  const taskCode = code.split('\n').filter((_, i) => keep[i] && i >= first).join('\n')
+
+  let injected = ''
+  if (provided.length) {
+    injected = `namespace indent_ { inline int calls_ = 0; } ${spec.provides.map((p) => p.code).join(' ')} `
+    kept[start] = injected + kept[start]
+  }
+
+  const quoted = kept.findIndex(
+    (l, i) =>
+      i >= first &&
+      [...l.matchAll(/\/\/.*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g)].some(([m]) => m.startsWith("'") && !/^'(?:\\.|.)'$/.test(m))
+  )
+  if (quoted !== -1) {
+    return {
+      problem: [
+        fail(
+          `${label} writes text in double quotes`,
+          `A line of ${label} has text in single quotes. In C++, single quotes hold one character, and text of more than one character goes in double quotes.`,
+          `line ${quoted + 1}: ${lines[quoted].trim()}`
+        )
+      ]
+    }
+  }
+
+  const dir = await t.sandbox()
+  for (const entry of await readdir(dir, { recursive: true, withFileTypes: true })) {
+    if (entry.isSymbolicLink()) await rm(join(entry.parentPath, entry.name))
+  }
+  const balanced = !unbalanced(taskCode)
+  await writeFile(join(dir, file), kept.join('\n') + (balanced ? '\n' + harness(spec) : '\n'))
+  await mkdir(join(dir, '.check'), { recursive: true })
+  const exe = join(dir, '.check', 'program')
+  const made = await output(cc, ['-std=c++17', '-Wall', ...(balanced ? [] : ['-fsyntax-only']), file, '-o', exe], {
+    cwd: dir,
+    timeoutMs: 60000,
+    env: { LC_ALL: 'C' }
+  })
+  if (made.spawnError || made.timedOut) {
+    return { problem: [fail(`${label} builds`, 'The C++ compiler could not run. Try Check again.')] }
+  }
+  const prevKept = (i) => {
+    let j = Math.min(i, lines.length - 1)
+    while (j > 0 && kept[j].trim() === '') j--
+    return j
+  }
+  const placed = diagnostics(made.stderr, file).map((d) => {
+    const i = d.line - 1
+    if (i >= lines.length || (i === start && injected && d.column <= injected.length)) return { ...d, place: 'added' }
+    const j = keep[i] && kept[i].trim() !== '' ? i : prevKept(i)
+    const owner = uses.find((u) => {
+      const f = fns.find((x) => x.name === u.name && x.kind === 'def')
+      return j >= f.startLine && j <= f.endLine
+    })
+    return { ...d, line: j + 1, place: j < first ? 'shared' : owner ? 'other' : 'task', owner }
+  })
+  const errors = placed.filter((d) => d.kind === 'error')
+  const warnings = placed.filter((d) => d.kind === 'warning' && (d.place === 'task' || d.place === 'other'))
+  const cause = (list) =>
+    part2Cause(list, lines, taskCode, { label, fns, provided }) ??
+    causeOf(list.slice(0, 1), lines) ??
+    `Build the file with ${COMMAND(file)}, read the first error for a line of ${label}, and fix what it points at.`
+
+  if (!balanced) {
+    const mine = errors.filter((e) => e.place !== 'added')
+    return { problem: [fail(`${label} builds`, PART2.braces(label), mine.length ? explain(mine, lines, file) : undefined)] }
+  }
+  if (made.code !== 0) {
+    const shared = errors.filter((e) => e.place === 'shared')
+    const mine = errors.filter((e) => e.place === 'task').sort((x, y) => x.line - y.line)
+    const other = errors.filter((e) => e.place === 'other')
+    if (shared.length) {
+      return {
+        problem: [
+          fail(
+            'The shared lines build',
+            `The compiler refuses a line above // Task 1. Every task uses those lines, and they built in the starter, so look at what changed there. ${causeOf(shared, lines) ?? ''}`.trim(),
+            explain(shared, lines, file)
+          )
+        ]
+      }
+    }
+    if (mine.length) {
+      return { problem: [fail(`${label} builds`, `The compiler refuses a line of ${label}. ${cause(mine)}`, explain(mine, lines, file))] }
+    }
+    if (other.length) {
+      const { name, task: from } = other[0].owner
+      return {
+        problem: [
+          fail(
+            `${label} builds`,
+            `${fn} uses ${name}${from ? ` from Task ${from}` : ''}, and the compiler refuses a line of ${name}. Get ${from ? `Task ${from}` : name} to build first.`,
+            explain(other, lines, file)
+          )
+        ]
+      }
+    }
+    return {
+      problem: [
+        fail(
+          `${label} builds`,
+          errors.length
+            ? `Check could not call ${fn} as the task describes it. Compare how it is written with the task: its name, what it takes and what it gives back, and keep only one function called ${fn}.`
+            : `The compiler could not build ${file}. Build it in the terminal with ${COMMAND(file)} and read the first error.`
+        )
+      ]
+    }
+  }
+
+  const noValue = warnings.find((w) => /return-type|does not return a value|no return statement|control reaches end/.test(w.text))
+  if (noValue) {
+    return {
+      problem: [
+        fail(
+          `${label} gives a value back on every path`,
+          `The compiler warns that a function of ${label} can reach its closing } without giving a value back. Its caller then gets whatever was left in memory. Every way through a function that gives back a value ends at a return with a value.`,
+          explain([noValue], lines, file)
+        )
+      ]
+    }
+  }
+  const unset = warnings.find((w) => /uninitiali[sz]ed/.test(w.text))
+  if (unset) {
+    return {
+      problem: [
+        fail(
+          `${label} gives every variable a value`,
+          `The compiler warns that a line of ${label} uses a variable before it has a value. Such a variable holds whatever was left in memory. Give it its value on the line that makes it.`,
+          explain([unset], lines, file)
+        )
+      ]
+    }
+  }
+
+  const runs = await Promise.all(
+    spec.cases.map(async (c, i) => {
+      const r = await output(exe, [String(i)], {
+        cwd: dir,
+        input: c.input ?? '',
+        timeoutMs: RUN_SECONDS * 1000,
+        env: { HOME: dir, TMPDIR: dir }
+      })
+      return { ...r, got: readsOfCall(r.stderr ?? '') }
+    })
+  )
+  const typedText = (c) => (c.input !== undefined ? `Check typed:\n${c.input.replace(/\n$/, '').replace(/^/gm, '  ')}\n` : '')
+  const broken = runs.findIndex((r) => r.spawnError || r.timedOut || r.flooded || r.code !== 0)
+  if (broken !== -1) {
+    const r = runs[broken]
+    const eof = 'eof' in r.got
+    const why = r.spawnError
+      ? 'Check could not start the program it built. Try Check again.'
+      : r.timedOut || r.flooded
+        ? eof
+          ? `${fn} kept reading after the end of what Check typed, so Check stopped it. In the terminal it would sit and wait for more typing than the task gives it.`
+          : emptyBody(taskCode)
+            ? PART2.empty(emptyBody(taskCode).keyword)
+            : (spec.stuck ??
+            (r.timedOut
+              ? `${fn} did not finish within ${RUN_SECONDS} seconds, so Check stopped it. A loop in it never ends: look at what changes each time round, and whether it moves toward the end.`
+              : `${fn} printed far more than the task asks for, so Check stopped it. Look for a loop that prints without end.`))
+        : `The program stopped with an error while ${fn} ran.`
+    return {
+      problem: [
+        fail(`${fn} runs to the end`, why, `${typedText(spec.cases[broken])}${clip(r.stdout ?? '').trim() ? printedText(clip(r.stdout)) : ''}`.trim())
+      ]
+    }
+  }
+  const sig = (runs[0].got.sig ?? '').split(SPLIT)
+  return {
+    sig: { returns: sig[0], params: sig.slice(1) },
+    uses,
+    warnings: warnings.map((w) => `${file}:${w.line}: warning: ${w.text}\n  ${lines[w.line - 1]?.trim() ?? ''}`),
+    named: warned(
+      warnings.map((w) => w.text),
+      taskCode
+    ),
+    runs: runs.map((r, i) => {
+      const params = sig.slice(1)
+      return {
+        stdout: r.stdout,
+        called: !('nocall' in r.got),
+        gaveBack: 'result' in r.got,
+        result: 'result' in r.got ? parseValue(r.got.result, sig[0]) : undefined,
+        args: params.map((type, k) =>
+          `arg${k}` in r.got ? parseValue(r.got[`arg${k}`], spec.params[k].type) : undefined
+        ),
+        calls: 'calls' in r.got ? Number(r.got.calls) : undefined,
+        eof: 'eof' in r.got,
+        typed: typedText(spec.cases[i])
+      }
+    })
+  }
+}
+
+const describeCall = (fn, spec, c) =>
+  `Check called ${fn}(${(spec.params ?? []).map((p, k) => literal(c.args[k], p.type)).join(', ')})`
+
+/**
+ * Judges a function task with one detail per case. Spec, besides what buildCall() takes:
+ * - each case: { name, args, input, expect: { result, printed, args: [...] }, hint }
+ *   printed: the exact text it prints, '' for nothing, or (stdout) => boolean; args: the caller's variables afterwards,
+ *   undefined where it does not matter; hint: string or (run) => string
+ * - typed: the message when it gives back the same in every case while the right one changes
+ * - signature(sig): a failing detail or null, for what the function takes and gives back
+ * - rule(runs): a message or null, for a rule that holds over every case (calls: how often it
+ *   called a function Check provides)
+ */
+export async function judgeCall(t, spec) {
+  const { fn } = spec
+  const built = await buildCall(t, spec)
+  if (built.problem) return built.problem
+  const { sig, runs, uses, warnings, named } = built
+  const params = spec.params ?? []
+
+  if (sig.returns !== spec.returns) {
+    const printed = runs.some((r) => r.stdout.trim() !== '')
+    return [
+      fail(
+        `${fn} gives back ${typeWords(spec.returns)}`,
+        sig.returns === 'void'
+          ? printed
+            ? `${fn} prints its answer, but the task asks it to give the answer back to the code that calls it. Check called it and got nothing back: the type in front of its name is void.`
+            : `${fn} gives nothing back: the type in front of its name is void. The task asks it to give back ${typeWords(spec.returns)}.`
+          : spec.returns === 'void'
+            ? `${fn} gives back ${typeWords(sig.returns)}, and the task asks it to give nothing back: the type in front of its name says what it gives back.`
+            : `${fn} gives back ${typeWords(sig.returns)}, and the task asks for ${typeWords(spec.returns)}. The type in front of its name says what it gives back.`
+      )
+    ]
+  }
+  if (sig.params.length !== params.length) {
+    return [
+      fail(
+        `${fn} takes what the task gives it`,
+        `${fn} takes ${sig.params.length} ${sig.params.length === 1 ? 'value' : 'values'}, and the task gives it ${params.length}: ${params.map((p) => p.what).join(', ')}. Look at the list in its round brackets.`
+      )
+    ]
+  }
+  const custom = spec.signature?.(sig)
+  if (custom) return [custom]
+  for (const [k, p] of params.entries()) {
+    if (p.want && sig.params[k] !== p.want) {
+      return [
+        fail(
+          `${fn} takes ${p.what} as the task asks`,
+          sig.params[k] === p.want.replace(/^const /, '')
+            ? `${fn} takes ${p.what} as a reference it could change, though it only reads it. A reference that only reads is const, and then the caller can also pass a value that must not change.`
+            : sig.params[k] === p.want.replace(/^const /, '').replace(/&$/, '')
+              ? `${fn} takes ${p.what} as a copy. A text can be long, and copying it each call is work for nothing: the task asks for a reference that only reads it.`
+              : `${fn} takes ${p.what} as ${typeWords(sig.params[k])}, and the task asks for ${typeWords(p.want)}.`
+        )
+      ]
+    }
+  }
+  if (runs.some((r) => !r.called)) {
+    return [
+      fail(
+        `${fn} takes what the task gives it`,
+        `Check could not call ${fn} with ${params.map((p) => p.what).join(' and ')}. Compare the types in its round brackets with the task. A reference that is not const cannot take a value that must not change.`
+      )
+    ]
+  }
+
+  const rule = spec.rule?.(runs)
+  if (rule) return [fail(`${fn} works as the task asks`, rule)]
+
+  const results = runs.map((r) => r.result)
+  const typed =
+    spec.returns !== 'void' &&
+    runs.length > 1 &&
+    results.every((v) => sameValue(v, results[0])) &&
+    !spec.cases.every((c) => sameValue(c.expect.result, spec.cases[0].expect.result))
+  const usedNote = uses.length
+    ? ` It uses ${uses.map((u) => `${u.name}${u.task ? ` from Task ${u.task}` : ''}`).join(' and ')}, so check that ${uses.length === 1 ? 'it passes' : 'they pass'} too.`
+    : ''
+  return spec.cases.map((c, i) => {
+    const r = runs[i]
+    const resultOk = spec.returns === 'void' || sameValue(r.result, c.expect.result)
+    const printedOk = c.expect.printed === undefined || printedEqual(r.stdout, c.expect.printed)
+    const argsOk = (c.expect.args ?? []).every((v, k) => v === undefined || sameValue(r.args[k], v))
+    const passed = resultOk && printedOk && argsOk && !r.eof
+    const out = [
+      r.typed.trim(),
+      describeCall(fn, spec, c),
+      spec.returns === 'void' ? '' : `It gave back ${show(r.result, spec.returns)}`,
+      ...params.map((p, k) => (p.after ? `Afterwards, Check's ${p.name} is ${show(r.args[k], p.type)}` : '')),
+      printedText(r.stdout),
+      ...(!passed && warnings.length ? ['The compiler warned:', ...warnings] : [])
+    ]
+      .filter(Boolean)
+      .join('\n')
+    let message
+    if (!passed) {
+      if (r.eof) {
+        message = `${fn} asked for more than Check typed: it went on reading after the last line. In the terminal it would sit and wait for more typing.`
+      } else if (named) message = named
+      else if (typed && spec.typed) message = spec.typed
+      else if (resultOk && argsOk && !printedOk && c.expect.printed === '') {
+        message = `${fn} gives back the right value, but it also prints. The task asks it only to give the value back: the code that calls it decides what to print.`
+      } else message = (typeof c.hint === 'function' ? c.hint(r) : c.hint) + usedNote
+    }
+    return { name: c.name, passed, message, output: out }
+  })
+}
+
+function printedEqual(stdout, want) {
+  if (typeof want === 'function') return want(stdout)
+  if (want === '') return stdout === ''
+  return stdout === want || (want.endsWith('\n') ? false : stdout.replace(/\n$/, '') === want)
 }

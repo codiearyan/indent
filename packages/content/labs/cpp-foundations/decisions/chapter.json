@@ -1,0 +1,131 @@
+{
+  "id": "decisions",
+  "title": "Decisions with if and else",
+  "files": [
+    "src/rules.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Ambrose's rules here, run them, and change the slip's values to try each way through.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/rules.cpp -o rules && ./rules"
+  },
+  "tasks": [
+    {
+      "id": "overdue",
+      "title": "Say whether the clock is overdue",
+      "file": "src/rules.cpp",
+      "description": "Under `// Task 1` in `src/rules.cpp`, make a `bool` called `isOverdue`: `true` when the clock has been in the shop more days than promised (`daysInShop` and `promisedDays`), `false` otherwise. Then print exactly one of these two lines, chosen by `isOverdue`:\n\n```\nStatus: overdue\nStatus: on time\n```\n\nCheck runs your program with other days, the day it was promised among them, reads `isOverdue` and compares the lines your task printed.",
+      "nextSteps": [
+        "Make `isOverdue` from a comparison of the two numbers.",
+        "Write an `if` on `isOverdue` with the overdue line in its `{ }`.",
+        "Add an `else` with the other line.",
+        "Change `daysInShop` to 7 for a moment, build, run, and read which line comes out."
+      ],
+      "hints": [
+        "A comparison like `a > b` is a `bool` by itself: it is `true` or `false`, so it can be the value of `isOverdue`.",
+        "On the promised day the clock is on time. Only more days than promised make it overdue, so the comparison is \"greater than\", not \"greater than or equal\".",
+        "The shape is `bool isOverdue = daysInShop > promisedDays;`, then `if (isOverdue) { ... } else { ... }`."
+      ],
+      "docs": [
+        {
+          "title": "if statement",
+          "url": "https://en.cppreference.com/w/cpp/language/if"
+        },
+        {
+          "title": "Comparison operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_comparison"
+        }
+      ],
+      "videos": [
+        {
+          "title": "If and else in C++",
+          "url": "https://www.youtube.com/watch?v=qEgCT87KOfc"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "guarantee",
+      "title": "Work out what the customer pays",
+      "file": "src/rules.cpp",
+      "description": "A repair is free when the clock was repaired here 12 months ago or less (`monthsSinceRepair`) and the same fault came back (`sameFault`). Under `// Task 2`, make a `double` called `toPay`: `0` when the repair is free, `quote` otherwise. Print it:\n\n```\nTo pay: 45.5\n```\n\nCheck runs your program with other slips, at exactly 12 months among them, reads `toPay` and compares the line.",
+      "nextSteps": [
+        "Make `toPay` before any `if`, with a first value.",
+        "Write the condition for a free repair: two things that must both be true.",
+        "Give `toPay` its other value inside the `if`.",
+        "Print `To pay: ` and `toPay` after the `if`, then build and run."
+      ],
+      "hints": [
+        "A variable made inside `{ }` is gone after the `}`. `toPay` has to be printed after the `if`, so make it before.",
+        "`&&` joins two conditions into one that is true only when both are. 12 months ago still counts, so compare with `<=`.",
+        "The shape is `double toPay = quote;`, then `if (monthsSinceRepair <= 12 && sameFault) { toPay = 0; }`."
+      ],
+      "docs": [
+        {
+          "title": "Logical operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_logical"
+        },
+        {
+          "title": "Scope",
+          "url": "https://en.cppreference.com/w/cpp/language/scope"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rush",
+      "title": "Pick the shelf",
+      "file": "src/rules.cpp",
+      "description": "Under `// Task 3`, make a `bool` called `isRush`: `true` when the customer needs the clock back in 2 days or fewer (`daysUntilNeeded`), or when it is for an event (`forEvent`). Then print exactly one of these two lines, chosen by `isRush`:\n\n```\nShelf: rush\nShelf: normal\n```\n\nCheck runs your program with other slips, needed in exactly 2 days among them, reads `isRush` and compares the line.",
+      "nextSteps": [
+        "Write the two reasons for the rush shelf as two conditions.",
+        "Join them so that either one is enough, and make `isRush` from that.",
+        "Print one line with `if` and `else`.",
+        "Try `forEvent = true` with many days, build and run."
+      ],
+      "hints": [
+        "Either reason is enough on its own. That is a different joining word than in Task 2.",
+        "`||` is true when at least one side is true. \"2 days or fewer\" includes 2.",
+        "The shape is `bool isRush = daysUntilNeeded <= 2 || forEvent;`, then an `if` and an `else`."
+      ],
+      "docs": [
+        {
+          "title": "Logical operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_logical"
+        },
+        {
+          "title": "Boolean type",
+          "url": "https://en.cppreference.com/w/cpp/language/types"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "bench",
+      "title": "Say where the bench is",
+      "file": "src/rules.cpp",
+      "description": "The benches are numbered 1 to 6, and 0 means Kasimir has not given one yet. Under `// Task 4`, print exactly one line, chosen by `bench`:\n\n```\nBench: not given yet        when bench is 0\nBench: 3                    when bench is 1 to 6, with its own number\nBench: no such bench        for any other number\n```\n\nCheck runs your program with other benches, 0, 1 and 6 among them, and compares the line.",
+      "nextSteps": [
+        "Start with the case of bench 0: compare `bench` with 0.",
+        "Add an `else if` for a real bench, 1 to 6.",
+        "Finish with an `else` for every other number.",
+        "Build and read every warning before you run: one of them may be about this task."
+      ],
+      "hints": [
+        "Comparing for equal takes two equals signs. A single one gives `bench` a new value, and the compiler warns about it.",
+        "`if`, `else if` and `else` are tried from the top, and only the first one that is true runs. \"1 to 6\" is two comparisons joined with `&&`.",
+        "The shape is `if (bench == 0) { ... } else if (bench >= 1 && bench <= 6) { ... } else { ... }`."
+      ],
+      "docs": [
+        {
+          "title": "if statement",
+          "url": "https://en.cppreference.com/w/cpp/language/if"
+        },
+        {
+          "title": "Comparison operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_comparison"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
