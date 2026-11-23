@@ -123,6 +123,12 @@
           "url": "https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html"
         }
       ],
+      "videos": [
+        {
+          "title": "Compiling files apart and linking them with g++",
+          "url": "https://www.youtube.com/watch?v=TZcFLgL4e8g"
+        }
+      ],
       "points": 10
     }
   ]

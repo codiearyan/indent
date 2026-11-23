@@ -4256,7 +4256,7 @@ function part9Cause(errors, ctx) {
   if (/(?:call to (?:implicitly-)?deleted (?:copy )?constructor of|use of deleted function|is (?:implicitly )?deleted)[^\n]*basic_(?:i|o)?(?:f|string)?stream|basic_(?:i|o)?(?:f|string)?stream[^\n]*(?:deleted|is private)/.test(text)) {
     return 'A line copies a stream: hands it to a function, or keeps it, as a copy. A stream cannot be copied, because one stream is one place being read or written, at one position. It is handed on by reference, with & after its type.'
   }
-  if (/no matching function for call to '(?:std::)?getline'/.test(text)) {
+  if (/no matching function for call to '(?:std::)?getline\b/.test(text)) {
     return 'std::getline cannot take what this line hands it. It reads from a stream, the first thing in its round brackets, into a std::string, the second, with a separator character third when there is one.'
   }
   if (/invalid operands to binary expression \('(?:std::)?(?:basic_)?istream[^']*' and|no match for 'operator<<' \(operand types are 'std::istream/.test(text)) {

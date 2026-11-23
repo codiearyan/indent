@@ -67,6 +67,12 @@
           "url": "https://en.cppreference.com/w/cpp/io/ios_base/openmode"
         }
       ],
+      "videos": [
+        {
+          "title": "Writing and reading files with streams",
+          "url": "https://www.youtube.com/watch?v=11vXGSLRQ4I"
+        }
+      ],
       "points": 10
     },
     {

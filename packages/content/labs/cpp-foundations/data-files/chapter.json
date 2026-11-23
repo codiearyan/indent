@@ -36,6 +36,12 @@
           "url": "https://en.cppreference.com/w/cpp/container/vector/size"
         }
       ],
+      "videos": [
+        {
+          "title": "Reading a comma-separated file",
+          "url": "https://www.youtube.com/watch?v=NFvxA-57LLA"
+        }
+      ],
       "points": 10
     },
     {
