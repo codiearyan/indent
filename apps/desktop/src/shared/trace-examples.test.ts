@@ -327,6 +327,16 @@ const repos: { labId: string; expected: string[] }[] = [
     expected: ['a-log-on-disk/replay', 'records-that-hold-anything/anything']
   },
   {
+    labId: 'build-a-cli-tool',
+    expected: [
+      'reading-arguments/words',
+      'reading-arguments/values',
+      'commands-and-help/nearest',
+      'the-finished-tool/settings',
+      'the-finished-tool/colour'
+    ]
+  },
+  {
     labId: 'make-it-fast',
     expected: ['loop-inside-a-loop/match', 'work-done-again/shares', 'knowing-when-to-stop/days']
   },

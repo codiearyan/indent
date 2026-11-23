@@ -1,0 +1,88 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "script", "label": "Sefton's script", "kind": "story" },
+      { "id": "tool", "label": "orders.js", "kind": "file", "mine": true },
+      { "id": "stdout", "label": "Standard output", "kind": "data" },
+      { "id": "stderr", "label": "Standard error", "kind": "data" },
+      { "id": "code", "label": "Exit code", "kind": "data" },
+      { "id": "press", "label": "The print run", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "script", "to": "tool", "label": "runs check" },
+      { "from": "tool", "to": "stdout", "label": "results" },
+      { "from": "tool", "to": "stderr", "label": "messages" },
+      { "from": "tool", "to": "code", "label": "how it went" },
+      { "from": "code", "to": "press", "label": "go or stop" }
+    ],
+    "note": "The tool now speaks to people and programs apart: results, messages and an exit code each go their own way."
+  },
+  "tasks": {
+    "streams": {
+      "steps": [
+        {
+          "active": ["script", "script->tool", "tool"],
+          "note": "Sefton's script runs check on the morning's two order files and counts the lines it gets back."
+        },
+        {
+          "active": ["tool", "tool->stdout", "stdout"],
+          "note": "Each problem found is a result, so it goes to standard output, where the script reads it."
+        },
+        {
+          "active": ["tool", "tool->stderr", "stderr"],
+          "note": "The summary and any error are said to the person, so they go to standard error and never count as a problem."
+        }
+      ]
+    },
+    "exit": {
+      "steps": [
+        {
+          "active": ["script", "script->tool", "tool"],
+          "note": "The script runs check before the print run and waits for it to end."
+        },
+        {
+          "active": ["tool", "tool->code", "code"],
+          "value": {
+            "kind": "map",
+            "label": "what each code says",
+            "entries": [
+              { "key": "all went well", "value": "one code" },
+              { "key": "check found a problem", "value": "another" },
+              { "key": "could not do what was asked", "value": "a third" }
+            ]
+          },
+          "note": "The tool ends with a code that says how it went, once everything it printed has been handed over."
+        },
+        {
+          "active": ["code", "code->press", "press"],
+          "note": "On a problem the script stops the print run and rings the counter; on a mistake it asks for help."
+        }
+      ]
+    },
+    "json": {
+      "steps": [
+        {
+          "active": ["script", "script->tool", "tool"],
+          "note": "This time the script asks for JSON, so it never has to cut text apart."
+        },
+        {
+          "active": ["tool", "tool->stdout", "stdout"],
+          "note": "Each result goes out as one JSON value on its own line, as soon as it is found.",
+          "value": {
+            "kind": "map",
+            "label": "one line for a problem",
+            "entries": [
+              { "key": "file", "value": "where it is" },
+              { "key": "line", "value": "which line" },
+              { "key": "problem", "value": "what is wrong" }
+            ]
+          }
+        },
+        {
+          "active": ["tool", "tool->stderr", "stderr", "tool->code", "code"],
+          "note": "Messages stay plain words on standard error, and the exit code says the same as before."
+        }
+      ]
+    }
+  }
+}

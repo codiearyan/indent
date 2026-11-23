@@ -1,0 +1,85 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "hesper", "label": "Hesper", "kind": "story" },
+      { "id": "main", "label": "orders.js", "kind": "file", "mine": true },
+      { "id": "table", "label": "COMMANDS", "kind": "data", "mine": true },
+      { "id": "help", "label": "Help text", "kind": "data" },
+      { "id": "nearest", "label": "nearest()", "kind": "function", "mine": true, "fn": "nearest" },
+      { "id": "shop", "label": "The shop's work", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "hesper", "to": "main", "label": "a command" },
+      { "from": "main", "to": "table", "label": "looks it up" },
+      { "from": "table", "to": "shop", "label": "runs" },
+      { "from": "table", "to": "help", "label": "written from" },
+      { "from": "main", "to": "nearest", "label": "unknown word" }
+    ],
+    "note": "Every command now lives in one table, which runs it, writes the help and knows what a typo meant."
+  },
+  "tasks": {
+    "table": {
+      "steps": [
+        {
+          "active": ["hesper", "hesper->main", "main"],
+          "note": "Hesper types count and the two order files of the morning."
+        },
+        {
+          "active": ["main", "main->table", "table"],
+          "note": "The tool looks the word up among the table's own entries, so a name every object has is not a command.",
+          "value": {
+            "kind": "map",
+            "label": "one entry",
+            "entries": [
+              { "key": "summary", "value": "what it does" },
+              { "key": "flags", "value": "the flags it takes" },
+              { "key": "run", "value": "the shop's function" }
+            ]
+          }
+        },
+        {
+          "active": ["table", "table->shop", "shop"],
+          "note": "The entry's function runs on the order lines, with the flags and the ways to speak."
+        }
+      ]
+    },
+    "help": {
+      "steps": [
+        {
+          "active": ["hesper", "hesper->main", "main"],
+          "note": "Hesper types orders with --help, to see what it can do before using it."
+        },
+        {
+          "active": ["table", "table->help", "help"],
+          "note": "The help is written from the table: a line for each command, and for each flag its short form, its value and what it does."
+        },
+        {
+          "active": ["main", "main->table", "table"],
+          "note": "Add a command or change a summary, and the help says so the next time, with nothing typed twice."
+        }
+      ]
+    },
+    "nearest": {
+      "steps": [
+        {
+          "active": ["hesper", "hesper->main", "main"],
+          "note": "Hesper types lsit, as Sefton does: two letters the wrong way round."
+        },
+        {
+          "active": ["main", "main->nearest", "nearest"],
+          "note": "nearest counts the changes from the word to each command and keeps the one that needs the fewest.",
+          "value": { "kind": "array", "label": "the commands it weighs", "values": ["count", "list", "check"] }
+        },
+        {
+          "active": ["nearest", "main"],
+          "note": "Close enough, the tool names the command Sefton meant; too far, it says where the commands are listed."
+        }
+      ],
+      "trace": {
+        "file": "src/commands.js",
+        "call": "nearest",
+        "args": ["lsit", ["count", "list", "check"]]
+      }
+    }
+  }
+}

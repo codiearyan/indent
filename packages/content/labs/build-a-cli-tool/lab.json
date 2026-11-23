@@ -1,0 +1,29 @@
+{
+  "id": "build-a-cli-tool",
+  "title": "Build your own command line tool",
+  "description": "Every morning at Ashgrove Press, Idris types the same three long commands to count the order files and find the broken lines, and nobody else at the shop can read them. You write the shop a tool of its own in plain Node, orders: arguments read into a command, values and flags, commands from one table with help that cannot go stale, results and messages on their own streams with exit codes other programs act on, input from files or a pipe a line at a time, and settings, colour and a name of its own. By the end you know what the tools you type every day do with your words.",
+  "category": "JavaScript and TypeScript",
+  "language": "javascript",
+  "tags": [
+    "JavaScript",
+    "Build your own"
+  ],
+  "kind": "project",
+  "parts": [
+    {
+      "title": "Words in and out",
+      "chapters": [
+        "reading-arguments",
+        "commands-and-help",
+        "output-and-exit-codes"
+      ]
+    },
+    {
+      "title": "Joining in",
+      "chapters": [
+        "reading-input",
+        "the-finished-tool"
+      ]
+    }
+  ]
+}

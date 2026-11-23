@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Hesper", "say": "What can it do? Show me.", "note": "Will not read the code." },
+    { "title": "The shop's work", "text": "Count, list and check, with no way in.", "note": "Written by Sefton." },
+    {
+      "title": "Your table",
+      "file": "commands.js",
+      "mine": true,
+      "gap": "No commands, no help",
+      "tasks": ["Commands in a table", "Help from the table", "The nearest command"]
+    },
+    { "title": "orders --help", "rows": [["count", "Count the orders"], ["list", "List the orders"], ["check", "Check every order"]], "mark": 0 }
+  ],
+  "ticket": { "label": "orders lsit", "wrong": "nothing", "why": "No commands", "right": "means list" },
+  "captions": [
+    "Idris is out, and Hesper wants to see what orders can do without reading code.",
+    "The shop's work is all written, but the tool cannot run it or say what it is.",
+    "You write a table of commands, help written from it, and the nearest command.",
+    "Now Sefton's typo gets an answer, and --help always says what the tool does.",
+    "Same tool, three commands, and help that cannot go stale."
+  ]
+}

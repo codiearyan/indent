@@ -1,0 +1,11 @@
+# What Idris types every morning before the first print run, in the shell of the
+# press-room computer. You do not need to run these: they are what the tool replaces.
+
+# 1. How many orders are there today?
+grep -hv -e '^#' -e '^ *$' orders/press-1.txt orders/press-2.txt | wc -l
+
+# 2. How many orders are on each paper?
+grep -hv -e '^#' -e '^ *$' orders/press-1.txt orders/press-2.txt | cut -d, -f4 | sort | uniq -c
+
+# 3. Which order lines are broken?
+awk -F, '!/^#/ && NF && (NF != 5 || $3 !~ /^[1-9][0-9]*$/)' orders/press-1.txt orders/press-2.txt

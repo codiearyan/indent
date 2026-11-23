@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "Count the whole year, please.", "note": "On the old office computer." },
+    { "title": "orders count", "text": "Reads each file whole before it counts.", "note": "Too big for the memory." },
+    {
+      "title": "Your code",
+      "file": "input.js",
+      "mine": true,
+      "gap": "Whole files, files only",
+      "tasks": ["A line at a time", "Standard input", "Stop when unread"]
+    },
+    { "title": "The terminal", "say": "Counted, with memory to spare." }
+  ],
+  "ticket": { "label": "The year", "wrong": "out of memory", "why": "Read whole", "right": "counted" },
+  "captions": [
+    "Idris keeps the year's orders in one file, and wants them counted on the old computer.",
+    "The tool reads each file whole first, and runs out of memory before it counts.",
+    "You read a line at a time, take standard input from a pipe, and stop when unread.",
+    "Now the year is counted in a little memory, and the tool joins a chain of programs.",
+    "Same tool, any size of file, and a link that fits between other programs."
+  ]
+}
