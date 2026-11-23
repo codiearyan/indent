@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Idris", "say": "What is the price of item three?", "note": "He wants values, not tokens." },
+    { "title": "Tokenizer", "text": "A long flat row of marks, names and numbers.", "note": "Nothing knows which go together." },
+    {
+      "title": "Your code",
+      "file": "json.js",
+      "mine": true,
+      "gap": "No arrays or objects yet",
+      "tasks": ["Read an array", "Read an object", "One value, any depth"]
+    },
+    {
+      "title": "Paper list",
+      "rows": [["CT-300", "a sheet"], ["CT-600", "a sheet"], ["LD-120", "a sheet"]],
+      "mark": 2
+    }
+  ],
+  "ticket": { "label": "Item three", "wrong": "just tokens", "why": "No shape", "right": "has a price" },
+  "captions": [
+    "At Ashgrove Press, Idris wants the price of one item on the paper list.",
+    "The tokenizer gives a flat row of pieces, and nothing knows which ones make an item.",
+    "You write a parser that reads arrays and objects inside each other, in three tasks.",
+    "Now the list reads as items, and item three has a price Idris can use.",
+    "Same paper list, and the shop reads it into values as deep as they go."
+  ]
+}

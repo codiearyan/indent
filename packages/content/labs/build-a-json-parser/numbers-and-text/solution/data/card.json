@@ -1,0 +1,9 @@
+{
+  "supplier": "Card supplier",
+  "updated": "2026-11-09",
+  "items": [
+    { "code": "EV-C6", "name": "Envelope, C6, cream", "price": 0.09, "per": "envelope" },
+    { "code": "EV-DL", "name": 'Envelope, DL, white', "price": 0.11, "per": "envelope" },
+    { "code": "TG-50", "name": "Tags with string", "price": 0.07, "per": "tag", "packOf": 50 }
+  ]
+}

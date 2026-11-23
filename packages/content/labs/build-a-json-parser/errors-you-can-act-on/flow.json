@@ -1,0 +1,77 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "lists", "label": "Supplier lists", "kind": "story" },
+      { "id": "parse", "label": "parse()", "kind": "function" },
+      { "id": "error", "label": "JsonError", "kind": "data", "mine": true },
+      { "id": "where", "label": "lineAndColumn()", "kind": "function", "mine": true, "fn": "lineAndColumn" },
+      { "id": "hesper", "label": "Hesper", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "lists", "to": "parse", "label": "JSON text" },
+      { "from": "parse", "to": "error", "label": "where it broke" },
+      { "from": "error", "to": "where", "label": "text, at" },
+      { "from": "error", "to": "hesper", "label": "a plain message" }
+    ],
+    "note": "Every error the reader throws now says where in a supplier's file it is, what would have fitted, and what was there."
+  },
+  "tasks": {
+    "where": {
+      "steps": [
+        {
+          "active": ["lists", "lists->parse", "parse", "parse->error", "error"],
+          "note": "An item over five lines has no comma after its price, and parse throws a JsonError at the next key."
+        },
+        {
+          "active": ["error", "error->where", "where"],
+          "value": { "kind": "map", "label": "what goes in", "entries": [{ "key": "text", "value": "the whole list" }, { "key": "at", "value": "an index" }] },
+          "note": "The error hands the text and the index to lineAndColumn, which counts the line feeds before it."
+        },
+        {
+          "active": ["where", "error"],
+          "value": { "kind": "map", "label": "what comes back", "entries": [{ "key": "line", "value": "from 1" }, { "key": "column", "value": "from 1" }] },
+          "note": "The line and the column go on the error, and into its message."
+        },
+        {
+          "active": ["error", "error->hesper", "hesper"],
+          "note": "Hesper can read out a line and a column that the supplier's editor shows too."
+        }
+      ],
+      "trace": { "file": "src/json.js", "call": "lineAndColumn", "args": ["{\n  \"code\": \"LD-120\",\n  \"price\": 0.18\n  \"per\": \"sheet\"\n}", 40] }
+    },
+    "expected": {
+      "steps": [
+        {
+          "active": ["lists", "lists->parse", "parse"],
+          "note": "parse reads the item and, after the price, wants a comma or a closing brace."
+        },
+        {
+          "active": ["parse", "parse->error", "error"],
+          "value": { "kind": "map", "label": "the error", "entries": [{ "key": "expected", "value": "what would fit, in words" }, { "key": "found", "value": "the token as written" }] },
+          "note": "It finds a key instead, and the error says both: what it wanted and what was there."
+        },
+        {
+          "active": ["error", "error->hesper", "hesper"],
+          "note": "The message reads like a fix: a comma belongs here, before that name."
+        }
+      ]
+    },
+    "ended": {
+      "steps": [
+        {
+          "active": ["lists", "lists->parse", "parse"],
+          "note": "A list arrives that stops in the middle of an item, because the download broke off."
+        },
+        {
+          "active": ["parse", "parse->error", "error"],
+          "value": { "kind": "map", "label": "the error", "entries": [{ "key": "ended", "value": "true or false" }, { "key": "found", "value": "end of input when it ran out" }] },
+          "note": "The tokens run out before the value is complete, so the error is at the very end of the text and says the text ended."
+        },
+        {
+          "active": ["error", "error->hesper", "hesper"],
+          "note": "Hesper asks the supplier to send the file again, instead of hunting for a mistake that is not there."
+        }
+      ]
+    }
+  }
+}

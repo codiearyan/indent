@@ -1,0 +1,83 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "lists", "label": "Supplier lists", "kind": "story" },
+      { "id": "import", "label": "importPrices()", "kind": "function", "mine": true, "fn": "importPrices" },
+      { "id": "parse", "label": "parse()", "kind": "function" },
+      { "id": "stringify", "label": "stringify()", "kind": "function", "mine": true, "fn": "stringify" },
+      { "id": "file", "label": "prices.json", "kind": "file" },
+      { "id": "idris", "label": "Idris", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "lists", "to": "import", "label": "texts" },
+      { "from": "import", "to": "parse", "label": "each list" },
+      { "from": "import", "to": "stringify", "label": "all items" },
+      { "from": "stringify", "to": "file", "label": "indented text" },
+      { "from": "file", "to": "idris", "label": "one list" }
+    ],
+    "note": "The shop reads every supplier list and writes one list of its own, with a reader and a writer it can explain line by line."
+  },
+  "tasks": {
+    "write": {
+      "steps": [
+        {
+          "active": ["stringify"],
+          "value": { "kind": "map", "label": "an item", "entries": [{ "key": "code", "value": "a text" }, { "key": "sizes", "value": "an array" }, { "key": "price", "value": "a number" }] },
+          "note": "stringify gets an item of the paper list as a JavaScript object."
+        },
+        {
+          "active": ["stringify"],
+          "note": "It writes each key as a text in quotes, then calls itself for each value: the array of sizes, the price."
+        },
+        {
+          "active": ["stringify"],
+          "note": "Inside a text, the quotes around natural get a backslash, so the text does not end early."
+        },
+        {
+          "active": ["stringify", "stringify->file", "file"],
+          "note": "Out comes JSON text that any reader turns back into the same item."
+        }
+      ],
+      "trace": { "file": "src/json.js", "call": "stringify", "args": [{ "code": "KR-120", "name": "Kraft \"natural\", 120 gsm", "sizes": ["A3", "A4"], "price": 0.21 }] }
+    },
+    "cannot": {
+      "steps": [
+        {
+          "active": ["stringify"],
+          "note": "An ink price arrives that nobody worked out: a number that is not a number."
+        },
+        {
+          "active": ["stringify"],
+          "value": { "kind": "array", "label": "where it sits", "values": ["items", "[0]", "price"] },
+          "note": "stringify knows where it is in the list as it goes down, so it can say where the bad value sits."
+        },
+        {
+          "active": ["stringify"],
+          "note": "It throws a TypeError instead of writing a price of nothing. An order that holds itself is refused the same way, instead of being written for ever."
+        }
+      ]
+    },
+    "trip": {
+      "steps": [
+        {
+          "active": ["lists", "lists->import", "import"],
+          "note": "importPrices gets the three supplier lists as names and texts."
+        },
+        {
+          "active": ["import", "import->parse", "parse"],
+          "value": { "kind": "map", "label": "a problem", "entries": [{ "key": "file", "value": "the list's name" }, { "key": "line, column", "value": "from the JsonError" }, { "key": "message", "value": "from the JsonError" }] },
+          "note": "Each list is read with your parse. One that is refused becomes a problem, and the others carry on."
+        },
+        {
+          "active": ["import", "import->stringify", "stringify", "stringify->file", "file"],
+          "note": "Every item that read, with its supplier beside it, is written as one list, two spaces to each level."
+        },
+        {
+          "active": ["file", "file->idris", "idris"],
+          "note": "Idris checks one readable file by eye, and knows which supplier to call."
+        }
+      ],
+      "trace": { "file": "src/prices.js", "call": "importPrices", "args": [[{ "name": "ink.json", "text": "{\"supplier\": \"Ink supplier\", \"items\": [{\"code\": \"INK-BLK\", \"price\": 24.5}]}" }]] }
+    }
+  }
+}

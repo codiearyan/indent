@@ -1,0 +1,18 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "suppliers", "label": "Suppliers", "kind": "story" },
+      { "id": "reader", "label": "Your reader and writer", "kind": "file", "mine": true },
+      { "id": "list", "label": "Nightly price list", "kind": "story" },
+      { "id": "idris", "label": "Idris", "kind": "story" },
+      { "id": "hesper", "label": "Hesper", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "suppliers", "to": "reader", "label": "JSON lists" },
+      { "from": "reader", "to": "list", "label": "one list" },
+      { "from": "reader", "to": "idris", "label": "line and column" },
+      { "from": "hesper", "to": "reader", "label": "every line explained" }
+    ],
+    "note": "At Ashgrove Press, every supplier's price list goes through a JSON reader and writer you write yourself, which reads the values or says exactly what is wrong and where."
+  }
+}

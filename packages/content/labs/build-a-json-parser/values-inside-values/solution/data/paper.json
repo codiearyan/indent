@@ -1,0 +1,10 @@
+{
+  "supplier": "Paper supplier",
+  "updated": "2026-11-02",
+  "items": [
+    { "code": "CT-300", "name": "Cotton card, 300 gsm", "size": "A4", "price": 0.42, "per": "sheet", "inStock": true },
+    { "code": "CT-600", "name": "Cotton card, 600 gsm", "size": "A4", "price": 0.95, "per": "sheet", "inStock": true },
+    { "code": "LD-120", "name": "Cr\u00e8me laid, 120 gsm", "size": "A4", "price": 0.18, "per": "sheet", "inStock": false },
+    { "code": "KR-120", "name": "Kraft \"natural\", 120 gsm", "size": "A3", "price": 0.21, "per": "sheet", "inStock": true }
+  ]
+}
