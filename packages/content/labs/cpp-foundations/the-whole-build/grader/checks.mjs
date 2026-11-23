@@ -40,6 +40,15 @@ const listOf = (got, key) => {
 const same = (a, b) => Array.isArray(a) && a.length === b.length && a.every((x, i) => x === b[i])
 const numbers = (list) => (list === null ? 'nothing Check could read' : list.length ? list.join(', ') : 'none')
 
+// What each good line of `text` holds, as Check writes a repair: ticket|item|minutes|parts in pence.
+const fullOf = (text, tickets) => {
+  const rows = text.split('\n').slice(1).map((l) => l.split(',').map((f) => f.trim()))
+  return tickets.map((t) => {
+    const f = rows.find((r) => r.length === 4 && Number(r[0]) === t)
+    return `${t}|${f[1]}|${Number(f[2])}|${Math.round(Number(f[3]) * 100)}`
+  })
+}
+
 /** A failing detail when a file of the program includes a .cpp file, or null. */
 async function noCppIncluded(t) {
   for (const file of LEARNER) {
@@ -74,11 +83,13 @@ export const checks = {
       task: 1,
       cases: streams.map((s) => ({
         name: `load on ${s.what}`,
-        code: `DayBook book; std::istringstream in(${cppText(s.text)}); ${put('refused', 'book.load(in)')} std::vector<int> tickets; for (const Repair& r : book.all()) tickets.push_back(r.ticket); ${put('tickets', 'tickets')}`,
+        code: `DayBook book; std::istringstream in(${cppText(s.text)}); ${put('refused', 'book.load(in)')} std::vector<int> tickets; for (const Repair& r : book.all()) tickets.push_back(r.ticket); ${put('tickets', 'tickets')} std::vector<std::string> full; for (const Repair& r : book.all()) { std::ostringstream o; o << r.ticket << '|' << r.item << '|' << r.minutes << '|' << static_cast<long long>(r.parts * 100 + 0.5); full.push_back(o.str()); } ${put('full', 'full')}`,
         judge: (got) => {
           const tickets = listOf(got, 'tickets')
           const refused = num(got, 'refused')
-          if (same(tickets, s.tickets) && refused === s.refused) return null
+          if (same(tickets, s.tickets) && refused === s.refused) {
+            return same(listOf(got, 'full'), fullOf(s.text, s.tickets)) ? null : 'The book holds the right repairs by their tickets, and the item, the minutes or the parts of one are not what its line holds. Keep each repair as parseRepair filled it in, whole.'
+          }
           if (tickets === null) return 'Check could not read the repairs of the book after load.'
           if (refused === s.refused + 1) return `load gave back ${refused} refused lines where ${s.refused === 0 ? 'none are' : `${s.refused} are`} wrong: the heading, or a blank line, was counted as refused. Both are skipped.`
           if (!same(tickets, s.tickets)) return `After load, the book holds the tickets ${numbers(tickets)}, and the good lines are ${numbers(s.tickets)}, in that order.`

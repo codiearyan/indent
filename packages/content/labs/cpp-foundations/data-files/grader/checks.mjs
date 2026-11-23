@@ -36,6 +36,14 @@ const uncounted = (text, refused) => {
   const lines = text.split('\n')
   return refused.map((n) => lines.slice(0, n).filter((l) => l.trim()).length)
 }
+// What each good line of `text` holds, as Check writes a repair: ticket|item|minutes|parts in pence.
+const fullOf = (text, tickets) => {
+  const rows = text.split('\n').slice(1).map((l) => l.split(',').map((f) => f.trim()))
+  return tickets.map((t) => {
+    const f = rows.find((r) => r.length === 4 && Number(r[0]) === t)
+    return `${t}|${f[1]}|${Number(f[2])}|${Math.round(Number(f[3]) * 100)}`
+  })
+}
 const reportLines = (text) => (text === null ? 'no file' : text === '' ? 'nothing' : text.split('\n').filter((l, i, all) => i < all.length - 1 || l !== '').map((l) => `  ${JSON.stringify(l)}`).join('\n'))
 
 /** What is wrong with a written report, in words that never show the report Check wanted. */
@@ -150,11 +158,13 @@ export const checks = {
       callWith: 'std::istream&, std::vector<int>&',
       cases: streams.map((s) => ({
         name: `readRepairs on ${s.what}`,
-        code: `std::istringstream in(${cppText(s.text)}); std::vector<int> refused; std::vector<Repair> got = readRepairs(in, refused); std::vector<int> tickets; for (const Repair& r : got) tickets.push_back(r.ticket); ${put('tickets', 'tickets')} ${put('refused', 'refused')}`,
+        code: `std::istringstream in(${cppText(s.text)}); std::vector<int> refused; std::vector<Repair> got = readRepairs(in, refused); std::vector<int> tickets; for (const Repair& r : got) tickets.push_back(r.ticket); ${put('tickets', 'tickets')} ${put('refused', 'refused')} std::vector<std::string> full; for (const Repair& r : got) { std::ostringstream o; o << r.ticket << '|' << r.item << '|' << r.minutes << '|' << static_cast<long long>(r.parts * 100 + 0.5); full.push_back(o.str()); } ${put('full', 'full')}`,
         judge: (got) => {
           const tickets = listOf(got, 'tickets')
           const refused = listOf(got, 'refused')
-          if (same(tickets, s.tickets) && same(refused, s.refused)) return null
+          if (same(tickets, s.tickets) && same(refused, s.refused)) {
+            return same(listOf(got, 'full'), fullOf(s.text, s.tickets)) ? null : 'readRepairs gave back the right repairs by their tickets, and the item, the minutes or the parts of one are not what its line holds. Keep each repair as parseRepair filled it in, whole.'
+          }
           if (tickets === null || refused === null) return 'Check could not read what readRepairs gave back.'
           if (refused[0] === 1 && s.text) return 'readRepairs refused line 1, the heading. The heading names the fields and is no repair: it is skipped.'
           if (s.refused.length && same(refused, s.refused.map((n) => n - 1))) return `readRepairs refused lines ${numbers(refused)}, one less than the lines that are wrong. Lines are counted as a person counting the file would: the heading is line 1, and the first line after it is line 2.`

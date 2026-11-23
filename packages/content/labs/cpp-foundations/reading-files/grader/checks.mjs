@@ -86,7 +86,7 @@ export const checks = {
           const total = num(got, 'total')
           if (total === s.want) return null
           if (s.want === 32 && total === 39) {
-            return `totalParts gave back 39, where the parts add up to 32: the last count, 7, was added twice. The stream only learns that it is at the end when a read fails, so a loop that asks eof() before it reads goes round once more after the last pair, and that failed read leaves the count as it was.`
+            return `totalParts gave back 39: the last count, 7, was added twice. The stream only learns that it is at the end when a read fails, so a loop that asks eof() before it reads goes round once more after the last pair, and that failed read leaves the count as it was.`
           }
           if (s.what.includes('word') && total === 5) {
             return 'totalParts gave back 5, what it had before the count written as a word. A read that fails leaves the stream failed, and every read after it fails too, so the loop stops there. The task asks for -1 when that happens, not for what was added up so far.'
