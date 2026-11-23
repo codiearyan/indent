@@ -1,0 +1,109 @@
+{
+  "id": "lambdas",
+  "title": "Lambdas: a rule in one line",
+  "files": ["BoardOrders.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the board's orders here, and try your types from main.",
+    "suggestedCommand": "java BoardOrders.java"
+  },
+  "tasks": [
+    {
+      "id": "earliest",
+      "title": "Write the earliest-first order as a lambda",
+      "file": "BoardOrders.java",
+      "description": "Under `// Task 1`, write a class `Orders` with a method `static Comparator<Departure> earliestFirst()`. It gives back a comparator, written as a lambda, that puts the departure with the earlier hour first. Two departures at the same hour compare as 0, whatever their boats. `Departure` is given above the tasks.\n\nCheck calls `earliestFirst()` and compares pairs of its own both ways round, judging each answer by its sign alone: hours close together, the first and last hours of the day, and the same hour on different boats. It sorts a list of its own with the comparator. And it looks at what kind of object came back: a lambda passes, and a class written out in full, named or anonymous, does not.",
+      "nextSteps": [
+        "Read the part of the lesson that turns a Comparator class into a lambda.",
+        "Write the class Orders and the first line of earliestFirst.",
+        "Give back a lambda that takes two departures and compares their hours.",
+        "Try it from main by sorting a copy of today."
+      ],
+      "hints": [
+        "The lesson goes from a small Comparator class to one line. Comparator's one method is compare: it takes two things and gives back an int.",
+        "A lambda for a Comparator has two parameters and gives back below 0 when the first comes first. Compare the hours as numbers, the way part 6 did.",
+        "Inside earliestFirst: `return (a, b) -> Integer.compare(a.hour(), b.hour());`."
+      ],
+      "docs": [
+        {
+          "title": "Lambda expressions",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html"
+        },
+        {
+          "title": "Anonymous classes",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html"
+        },
+        {
+          "title": "Comparator",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Comparator.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Lambda expressions from the start",
+          "url": "https://www.youtube.com/watch?v=tj5sLSFjVj4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "room",
+      "title": "Ask which departures have room for a party",
+      "file": "BoardOrders.java",
+      "description": "Under `// Task 2`, write a functional interface `RoomCheck` whose one method is `boolean fits(Departure d)`. Then write a class `Window` with a method `static RoomCheck roomFor(int party)`. It gives back a `RoomCheck`, written as a lambda, that says yes for a departure with at least `party` seats free.\n\nCheck writes a lambda of its own for `RoomCheck`, which compiles only when `RoomCheck` is a functional interface with that method. It asks `roomFor` for checks for parties of its own, keeps two side by side, and asks each about departures of its own, among them one with exactly as many seats free as the party. Each check must keep the party it was made for. And it looks at what kind of object came back, as in Task 1.",
+      "nextSteps": [
+        "Read the parts of the lesson about functional interfaces and about a lambda that reads a variable.",
+        "Write RoomCheck: an interface with one abstract method.",
+        "Write Window and roomFor, which gives back a lambda that takes one departure.",
+        "In the lambda, compare the departure's seats free with party."
+      ],
+      "hints": [
+        "A functional interface is an interface with exactly one abstract method, written as the interfaces of part 4 were. A lambda can then stand for it.",
+        "roomFor gives back a lambda with one parameter, a departure. The lambda may read party, the parameter of roomFor, because party never changes. At least party means that many or more.",
+        "The interface is `interface RoomCheck { boolean fits(Departure d); }`. Inside roomFor: `return d -> d.seatsFree() >= party;`."
+      ],
+      "docs": [
+        {
+          "title": "Lambda expressions: functional interfaces",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html"
+        },
+        {
+          "title": "FunctionalInterface",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/FunctionalInterface.html"
+        },
+        {
+          "title": "Lambda bodies and effectively final variables",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-15.html#jls-15.27.2"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "board",
+      "title": "Order the board by boat, then by room",
+      "file": "BoardOrders.java",
+      "description": "Under `// Task 3`, write a class `Boards` with a method `static Comparator<Departure> byBoatThenRoom()`. It gives back a comparator that puts the departures in alphabetical order of their boats, and the departures of the same boat with most seats free first. Two departures of the same boat with the same seats free compare as 0. `Comparator.comparing` and `thenComparing` make it one line; any comparator that gives this order passes.\n\nCheck compares pairs of its own both ways round, judging each answer by its sign alone: different boats with different seats, different boats with the same seats, the same boat with different seats, and the same boat and seats. Then it sorts a list of its own whose right order differs from every rule turned round, from only the boats turned round, and from the rules taken the other way round.",
+      "nextSteps": [
+        "Read the part of the lesson about comparing, thenComparing and reversed.",
+        "Start the chain with the boat's name.",
+        "Add the second rule, so that more seats free comes first.",
+        "Sort a copy of today in main and read it: the boats A to Z, each boat's fullest departure last."
+      ],
+      "hints": [
+        "A comparator can be built from a lambda that picks the thing to compare, and a second rule added to it counts only when the first gives 0. The lesson shows the two methods that do this.",
+        "At the start of the chain, tell the first lambda that it is handed a Departure, or Java takes it to be an Object. reversed turns round the whole comparator it is called on: the seats are the only rule to turn round.",
+        "`return Comparator.comparing((Departure d) -> d.boat()).thenComparing((a, b) -> Integer.compare(b.seatsFree(), a.seatsFree()));`."
+      ],
+      "docs": [
+        {
+          "title": "Comparator.comparing",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Comparator.html#comparing(java.util.function.Function)"
+        },
+        {
+          "title": "Comparator.thenComparing",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Comparator.html#thenComparing(java.util.Comparator)"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

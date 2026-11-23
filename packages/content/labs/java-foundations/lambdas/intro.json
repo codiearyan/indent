@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Room for a family of six?",
+      "note": "A new party size at every turn."
+    },
+    {
+      "title": "Noticeboard file",
+      "text": "A class for every rule, and none for this"
+    },
+    {
+      "title": "Your rules",
+      "file": "BoardOrders.java",
+      "mine": true,
+      "gap": "No rule for a party's size",
+      "tasks": [
+        "Earliest first",
+        "Room for a party",
+        "By boat, then room"
+      ]
+    },
+    {
+      "title": "Family",
+      "say": "Those two boats can take us all",
+      "note": "Picked in a moment."
+    }
+  ],
+  "ticket": {
+    "label": "Six",
+    "wrong": "counted by hand",
+    "why": "A long wait",
+    "right": "two boats with room"
+  },
+  "captions": [
+    "The ticket window. Bridie asks which boats have room for the family in front of her.",
+    "Today every rule is a class of its own, and the family's size has no rule at all.",
+    "You write the board's rules as lambdas, and one that keeps the size of each party.",
+    "Now the family of six hears in a moment which boats can take them all.",
+    "Rules in one line, made where they are needed. Next: the shapes Java already has."
+  ]
+}

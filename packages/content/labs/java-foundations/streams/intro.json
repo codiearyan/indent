@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Harbour office",
+      "say": "Who is on the Gannet today?",
+      "note": "Each name once, please."
+    },
+    {
+      "title": "Bridie",
+      "text": "Writes a fresh loop for every question asked"
+    },
+    {
+      "title": "Your streams",
+      "file": "HarbourOffice.java",
+      "mine": true,
+      "gap": "No quick way to ask the list",
+      "tasks": [
+        "Names on one boat",
+        "Largest bookings",
+        "A stream that waits"
+      ]
+    },
+    {
+      "title": "Harbour office",
+      "say": "That was quick. And in order!",
+      "note": "No call back needed."
+    }
+  ],
+  "ticket": {
+    "label": "Gannet",
+    "wrong": "call back later",
+    "why": "Slow",
+    "right": "names at once"
+  },
+  "captions": [
+    "The harbour office rings. They want everyone on the Gannet today, each name once.",
+    "Today Bridie writes a new loop for every question, and the office waits for it.",
+    "You ask the bookings with streams: a boat's names, the biggest parties, one that waits.",
+    "Now the office gets the Gannet's names at once, in order, each name once.",
+    "Questions asked in a line, the bookings left as they were. Next: totals and empty answers."
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "id": "java-foundations",
   "title": "Java foundations",
-  "description": "Lanternquay Ferries runs one small boat across the river, and its timetable, fares and passenger counts live on a clipboard at the ticket hut. You have never written a program, and you start by making Java print the notice on the hut, then keep the clipboard's numbers and text in typed variables and let the program decide whether the boat can sail. Each issue teaches one part of Java in one file you run and check yourself, from your first class to the compiler's errors and how to read them. Then the programs learn to do things again and again: you read what the compiler says back, count through the day's crossings with loops, write the fare rules once as methods, and keep the log in an array and the waiting list in a list that grows. When a second boat joins the first, the program learns what things are: classes and their objects, constructors, private fields that keep the rules, what belongs to the class, and code split into packages across several files. Then the fleet grows into families of types: new kinds of boat that extend Boat, a vessel that is never made by itself, things that can be booked whatever they are, bookings that know when they are equal, and the kinds of ticket and the tickets themselves as enums and records. And when something goes wrong, you read a stack trace down to the line that made the mistake, catch what a typing slip throws, refuse what cannot be, close the hut up whatever happens, and give the hut exceptions of its own. Then the hut's lists grow up: a list handed on is copied, not shared, the evening's tickets are counted in a map, the gangway remembers every ticket in a set, the noticeboard and the stub book are put in an order you choose, and one tool of your own works for any type.",
+  "description": "Lanternquay Ferries runs one small boat across the river, and its timetable, fares and passenger counts live on a clipboard at the ticket hut. You have never written a program, and you start by making Java print the notice on the hut, then keep the clipboard's numbers and text in typed variables and let the program decide whether the boat can sail. Each issue teaches one part of Java in one file you run and check yourself, from your first class to the compiler's errors and how to read them. Then the programs learn to do things again and again: you read what the compiler says back, count through the day's crossings with loops, write the fare rules once as methods, and keep the log in an array and the waiting list in a list that grows. When a second boat joins the first, the program learns what things are: classes and their objects, constructors, private fields that keep the rules, what belongs to the class, and code split into packages across several files. Then the fleet grows into families of types: new kinds of boat that extend Boat, a vessel that is never made by itself, things that can be booked whatever they are, bookings that know when they are equal, and the kinds of ticket and the tickets themselves as enums and records. And when something goes wrong, you read a stack trace down to the line that made the mistake, catch what a typing slip throws, refuse what cannot be, close the hut up whatever happens, and give the hut exceptions of its own. Then the hut's lists grow up: a list handed on is copied, not shared, the evening's tickets are counted in a map, the gangway remembers every ticket in a set, the noticeboard and the stub book are put in an order you choose, and one tool of your own works for any type. Then the rules themselves become values: a lambda in place of a small class, rules handed to a method and joined, lists and maps that clean and count with a rule, streams that answer the harbour office in a line, and an Optional where there may be no answer.",
   "category": "Programming languages",
   "language": "java",
   "tags": [
@@ -72,6 +72,16 @@
         "sets",
         "sorting",
         "generics"
+      ]
+    },
+    {
+      "title": "Rules you can hand over",
+      "chapters": [
+        "lambdas",
+        "functional-interfaces",
+        "collection-functions",
+        "streams",
+        "collectors-and-optional"
       ]
     }
   ]

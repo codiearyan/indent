@@ -1,0 +1,105 @@
+{
+  "id": "collection-functions",
+  "title": "Lists and maps that take a function",
+  "files": ["QuayLists.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run Ossian's lists here, and try your types from main.",
+    "suggestedCommand": "java QuayLists.java"
+  },
+  "tasks": [
+    {
+      "id": "tidy",
+      "title": "Tidy the waiting list where it is",
+      "file": "QuayLists.java",
+      "description": "Under `// Task 1`, write a class `Tidy` with a method `static void names(List<String> names)`. It changes the list it is handed: it takes off every name that is blank (empty, or only spaces), takes the spaces off both ends of every other name, then sorts the list in alphabetical order, taking no notice of capital letters. The list methods that take a function make each step one line; a loop that does the same passes too.\n\nCheck hands `names` lists of its own and reads them afterwards: names with spaces at either end, names whose order changes when capitals count, a list of blank names only, and an empty list. It also checks that `names` is void.",
+      "nextSteps": [
+        "Read the part of the lesson about the list methods that take a function.",
+        "Take the blank names off the list.",
+        "Put a trimmed copy of each name in its place.",
+        "Sort the list so that capital letters make no difference."
+      ],
+      "hints": [
+        "A String never changes: trim gives back a new one. The list only changes when the new one is put in the old one's place.",
+        "One list method takes off every item a Predicate says yes to, one puts what a function gives in place of each item, and sort takes a Comparator. Text has a compareTo that takes no notice of capitals.",
+        "`names.removeIf(name -> name.isBlank()); names.replaceAll(name -> name.trim()); names.sort(String::compareToIgnoreCase);`."
+      ],
+      "docs": [
+        {
+          "title": "Collection.removeIf",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html#removeIf(java.util.function.Predicate)"
+        },
+        {
+          "title": "List.replaceAll",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html#replaceAll(java.util.function.UnaryOperator)"
+        },
+        {
+          "title": "String.compareToIgnoreCase",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html#compareToIgnoreCase(java.lang.String)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "seats",
+      "title": "Add up the seats booked on each boat",
+      "file": "QuayLists.java",
+      "description": "Under `// Task 2`, write a class `Seats` with a method `static Map<String, Integer> perBoat(List<Booking> bookings)`. It gives back a new map from each boat to the seats booked on it, every booking of that boat added up. `bookings` stays as it is. `Booking` is given above the tasks.\n\nCheck hands `perBoat` lists of its own made with `List.of`, one with several bookings of the same boat, one with a single booking and one empty. It compares the map that comes back with the right one as a map, whatever order it keeps, and reads `bookings` afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson about merge and getOrDefault.",
+        "Make a new map, and walk the bookings.",
+        "For each booking, add its seats to what its boat has so far.",
+        "Try it from main with the bookings given there."
+      ],
+      "hints": [
+        "This is the counting of part 6 again, with the seats of each booking in place of one per ticket. The first booking of a boat finds nothing in the map yet.",
+        "One map method puts a value for a missing key and joins it with the old value for a key that is there, using a function you hand it. Another gives back a value of your own for a missing key.",
+        "In the loop: `seats.merge(b.boat(), b.seats(), Integer::sum);`."
+      ],
+      "docs": [
+        {
+          "title": "Map.merge",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html#merge(K,V,java.util.function.BiFunction)"
+        },
+        {
+          "title": "Map.getOrDefault",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html#getOrDefault(java.lang.Object,V)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "groups",
+      "title": "Group the passengers by boat",
+      "file": "QuayLists.java",
+      "description": "Under `// Task 3`, write a class `Groups` with a method `static Map<String, List<String>> passengersByBoat(List<Booking> bookings)`. It gives back a new map from each boat to the passengers who booked it, in the order they booked. `bookings` stays as it is.\n\nCheck hands `passengersByBoat` lists of its own made with `List.of`: bookings of several boats mixed together, bookings all on one boat, and no bookings. It compares the map that comes back with the right one as a map, whatever order it keeps, each boat's passengers in the order they booked, and reads `bookings` afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson about computeIfAbsent.",
+        "Make a new map, and walk the bookings.",
+        "For each booking, get its boat's list, making a new one the first time the boat is seen.",
+        "Add the passenger to that list."
+      ],
+      "hints": [
+        "Each boat needs a list of its own, made once, the first time the boat comes up, and then added to for every booking of that boat.",
+        "One map method gives back the value of a key, and when the key is missing first makes one with a function you hand it and puts it in the map. Hand it a function, not a list: the function runs only when it is needed.",
+        "In the loop: `groups.computeIfAbsent(b.boat(), boat -> new ArrayList<>()).add(b.passenger());`."
+      ],
+      "docs": [
+        {
+          "title": "Map.computeIfAbsent",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html#computeIfAbsent(K,java.util.function.Function)"
+        },
+        {
+          "title": "Map.forEach",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html#forEach(java.util.function.BiConsumer)"
+        }
+      ],
+      "videos": [
+        {
+          "title": "A map value made only when it is missing",
+          "url": "https://www.youtube.com/watch?v=O4ELTesr85s"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

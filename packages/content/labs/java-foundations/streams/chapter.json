@@ -1,0 +1,105 @@
+{
+  "id": "streams",
+  "title": "Streams: ask for the answer, not the steps",
+  "files": ["HarbourOffice.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the harbour office's questions here, and try your types from main.",
+    "suggestedCommand": "java HarbourOffice.java"
+  },
+  "tasks": [
+    {
+      "id": "names",
+      "title": "Name the passengers on one boat",
+      "file": "HarbourOffice.java",
+      "description": "Under `// Task 1`, write a class `Passengers` with two methods, each one stream from `bookings` to its answer. `static List<String> namesOn(List<Booking> bookings, String boat)` gives back the passengers booked on that boat, in alphabetical order, each name once. `static long countOn(List<Booking> bookings, String boat)` gives back how many bookings are on that boat. `bookings` stays as it is. `Booking` is given above the tasks.\n\nCheck hands both methods lists of its own, among them one with a passenger booked twice on the same boat, a boat nobody booked, and an empty list. Its list refuses to be read by a loop, `get`, `forEach` or a copy, so only a stream can read it. Check reads what comes back, and the list afterwards. One thing it cannot see from outside, so it reads your lines for it: a `forEach` that adds to a list of your own, which is a loop written as a stream.",
+      "nextSteps": [
+        "Read the parts of the lesson about a stream's steps and its endings.",
+        "Write namesOn: from bookings, keep the boat's bookings, turn each into its passenger, and finish with a list.",
+        "Make each name come once, in alphabetical order, before the list is made.",
+        "Write countOn: keep the boat's bookings, and count them."
+      ],
+      "hints": [
+        "A stream starts from the list, each step makes a new stream, and nothing happens until an ending gives back the answer. Read the steps in order: what does each one hand to the next?",
+        "Keep comes before turn: once a booking has become a name, its boat is gone. One step drops repeats, another puts things in their natural order, and the ending makes a list, or counts.",
+        "`return bookings.stream().filter(b -> b.boat().equals(boat)).map(b -> b.passenger()).distinct().sorted().toList();` and, for countOn, `filter(...).count()`."
+      ],
+      "docs": [
+        {
+          "title": "Aggregate operations",
+          "url": "https://docs.oracle.com/javase/tutorial/collections/streams/index.html"
+        },
+        {
+          "title": "Stream",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Streams: filter, map, sort and collect",
+          "url": "https://www.youtube.com/watch?v=t1-YZ6bF-g0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "largest",
+      "title": "Find the largest bookings",
+      "file": "HarbourOffice.java",
+      "description": "Under `// Task 2`, write a class `Biggest` with two methods, each one stream from `bookings` to its answer. `static List<Booking> largest(List<Booking> bookings, int n)` gives back the `n` bookings with most seats, most first, bookings with the same seats in the order they came, and all of them when there are fewer than `n`. `static boolean anyOver(List<Booking> bookings, int seats)` says whether any booking is for more than `seats` seats. `bookings` stays as it is.\n\nCheck hands both methods lists of its own that refuse to be read but by a stream, as in Task 1: one whose largest booking comes last and two of whose bookings have the same seats, and an empty list. It asks for fewer bookings than there are, more, and none, asks `anyOver` about a number one below the largest and the largest itself, and reads the list afterwards. As in Task 1, a `forEach` that adds to a list of your own does not count as a stream.",
+      "nextSteps": [
+        "Read the part of the lesson about sorted and limit.",
+        "Write largest: sort the bookings by seats, most first, then keep the first n.",
+        "Write anyOver with an ending that stops at the first booking that fits.",
+        "Try both from main, and print bookings afterwards to see it unchanged."
+      ],
+      "hints": [
+        "A stream can be put in order with a Comparator, as in the first issue of this part, and that step keeps two equal things in the order they came. Putting a stream in order leaves the list it came from alone.",
+        "Order the bookings first and cut the stream to n afterwards; cut first, and a large booking at the end is never seen. One ending answers yes or no, and stops at the first yes.",
+        "`return bookings.stream().sorted(Comparator.comparing(Booking::seats).reversed()).limit(n).toList();` and `return bookings.stream().anyMatch(b -> b.seats() > seats);`."
+      ],
+      "docs": [
+        {
+          "title": "Stream.sorted",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#sorted(java.util.Comparator)"
+        },
+        {
+          "title": "Stream.limit",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#limit(long)"
+        },
+        {
+          "title": "Stream.anyMatch",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#anyMatch(java.util.function.Predicate)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "lazy",
+      "title": "Hand over a stream that waits",
+      "file": "HarbourOffice.java",
+      "description": "Under `// Task 3`, write a class `Later` with a method `static Stream<String> namesWhere(List<Booking> bookings, Predicate<Booking> rule)`. It gives back a stream, not yet finished, of the passengers of the bookings the rule says yes to, in the order they came. Nothing is asked of the rule until whoever gets the stream asks for an answer, and then no more than that answer needs.\n\nCheck hands `namesWhere` a list of its own and a rule of its own that remembers whom it was asked about. It reads what the rule was asked before it touches the stream, which must be nothing. Then it asks the stream for its first two names only, and reads which bookings the rule was asked about by then. A fresh stream is finished with `toList`, and an empty list gives no names.",
+      "nextSteps": [
+        "Read the part of the lesson about when a stream runs.",
+        "Start a stream from bookings, keep what the rule says yes to, and turn each booking into its passenger.",
+        "Give back the stream itself, with no ending.",
+        "Try it from main: print a line, then ask for two names, and see when the rule runs."
+      ],
+      "hints": [
+        "A stream's steps run only when an ending asks for an answer. A method that gives back a Stream leaves the ending to whoever gets it.",
+        "Steps that keep or turn things wait, and when an answer is asked for they hand on one booking at a time, reading no further than the answer needs. An ending inside namesWhere, or a step that must see everything first, runs the rule too soon or too often.",
+        "`return bookings.stream().filter(rule).map(Booking::passenger);`."
+      ],
+      "docs": [
+        {
+          "title": "Stream operations and laziness",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/package-summary.html#StreamOps"
+        },
+        {
+          "title": "Stream.filter",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#filter(java.util.function.Predicate)"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

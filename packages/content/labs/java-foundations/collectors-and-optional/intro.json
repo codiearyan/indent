@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "Biggest party on the Curlew?",
+      "note": "For the council's report."
+    },
+    {
+      "title": "Last year's report",
+      "text": "Printed null for a boat that never ran"
+    },
+    {
+      "title": "Your report",
+      "file": "SeasonReport.java",
+      "mine": true,
+      "gap": "No way to say there is none",
+      "tasks": [
+        "Season's totals",
+        "Groups and a line",
+        "Maybe no answer"
+      ]
+    },
+    {
+      "title": "Council",
+      "say": "No bookings on the Curlew. Clear.",
+      "note": "No null in the report."
+    }
+  ],
+  "ticket": {
+    "label": "Curlew",
+    "wrong": "printed null",
+    "why": "Nonsense",
+    "right": "no bookings"
+  },
+  "captions": [
+    "The season's end. Ossian asks for the biggest party on the Curlew, for the council.",
+    "Last year the report printed null for the Curlew, a boat that never ran at all.",
+    "You add up the season, gather it into groups and a line, and answer when there is none.",
+    "Now the Curlew reads as no bookings, and every number in the report means something.",
+    "The season in numbers, nothing hidden behind a null. Part 7 is done: rules as values."
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "season", "label": "Season's bookings", "kind": "data" },
+      { "id": "totals", "label": "Totals", "kind": "function", "mine": true },
+      { "id": "groups", "label": "Season", "kind": "function", "mine": true },
+      { "id": "lookup", "label": "Lookup", "kind": "function", "mine": true },
+      { "id": "council", "label": "Council report", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "season", "to": "totals", "label": "seats" },
+      { "from": "season", "to": "groups", "label": "a stream" },
+      { "from": "season", "to": "lookup", "label": "one boat" },
+      { "from": "totals", "to": "council", "label": "numbers" },
+      { "from": "groups", "to": "council", "label": "map, line" },
+      { "from": "lookup", "to": "council", "label": "maybe none" }
+    ],
+    "note": "The season becomes numbers, groups and a line for the council, and a missing answer is said as missing."
+  },
+  "tasks": {
+    "totals": {
+      "steps": [
+        {
+          "active": ["season", "season->totals", "totals"],
+          "note": "Each booking of the season becomes its number of seats."
+        },
+        {
+          "active": ["totals"],
+          "note": "The seats are added up, averaged with their fraction, and the largest found."
+        },
+        {
+          "active": ["totals", "totals->council", "council"],
+          "note": "A season with no bookings still gives the council numbers it can print."
+        }
+      ]
+    },
+    "groups": {
+      "steps": [
+        {
+          "active": ["season", "season->groups", "groups"],
+          "note": "The bookings are sorted into a group for each boat, and each group is counted."
+        },
+        {
+          "active": ["groups"],
+          "value": { "kind": "map", "label": "bookings per boat", "entries": [{ "key": "boat", "value": "how many" }] },
+          "note": "The council gets a map from each boat to its count, in no promised order."
+        },
+        {
+          "active": ["groups", "groups->council", "council"],
+          "note": "The passengers' names are joined into one line for the notice."
+        }
+      ]
+    },
+    "optional": {
+      "steps": [
+        {
+          "active": ["season", "season->lookup", "lookup"],
+          "note": "Only the bookings of the boat the council asks about are looked at."
+        },
+        {
+          "active": ["lookup"],
+          "note": "The biggest party comes back in a box, and the box is empty when that boat had no bookings."
+        },
+        {
+          "active": ["lookup", "lookup->council", "council"],
+          "note": "The first passenger of a boat comes back as a name, or as nobody."
+        }
+      ]
+    }
+  }
+}
