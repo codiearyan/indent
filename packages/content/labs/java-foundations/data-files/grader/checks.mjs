@@ -80,7 +80,7 @@ const GOOD = [
   ['1999-12-31,Sandpiper,0,0', ['1999-12-31', 'Sandpiper', 0, '0']]
 ]
 const BAD = [
-  ['2031-07-02,Razorbill,thirty,100.50', 37, 'a number of passengers that is not a number'],
+  ['2031-07-02,Razorbill,nine,100.50', 37, 'a number of passengers that is not a number'],
   ['2031-06-31,Guillemot,4,13.40', 52, 'a date that does not exist'],
   ['2031-07-02,Sandpiper,8', 205, 'three parts'],
   ['2031-07-02,Sandpiper,8,£26.80', 81, 'takings with a pound sign'],

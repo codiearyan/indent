@@ -39,6 +39,12 @@
           "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html#compareTo(java.math.BigDecimal)"
         }
       ],
+      "videos": [
+        {
+          "title": "Why money needs BigDecimal, not double",
+          "url": "https://www.youtube.com/watch?v=B86RtOMo6Rw"
+        }
+      ],
       "points": 10
     },
     {
@@ -86,7 +92,7 @@
       ],
       "hints": [
         "An amount written out as it is keeps the decimal places it has, and an amount written by String.format follows the language of the computer it runs on.",
-        "Set the scale before you write the amount out. A BigDecimal's own text never depends on the computer. For readAmount, part 5 took the spaces off the ends of a text, and showed how to catch one exception and throw another with it as the cause.",
+        "Fix the number of decimal places before the amount is written out. A BigDecimal's own text never depends on the computer. For readAmount, part 5 took the spaces off the ends of a text, and showed how to catch one exception and throw another with it as the cause.",
         "`return \"£\" + amount.setScale(2, RoundingMode.HALF_UP).toPlainString();`. In readAmount, `trim()`, then `substring(1)` when it starts with `\"£\"`, then `new BigDecimal(rest)` in a try, and `throw new IllegalArgumentException(\"Not an amount: \" + text, e);` in its catch."
       ],
       "docs": [

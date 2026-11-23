@@ -36,7 +36,7 @@ const CLOCK = (method) =>
   `${method} reads today's date or the time from the computer's clock. The task hands today in, so the answer is about the day Check names, and Check names days years away from today: use the dates the method is handed.`
 
 const EXPIRES = [
-  ['2031-01-31', 1, '2031-02-28'],
+  ['2027-01-31', 1, '2027-02-28'],
   ['2028-01-31', 1, '2028-02-29'],
   ['2030-11-15', 3, '2031-02-15'],
   ['2031-08-31', 6, '2032-02-29'],

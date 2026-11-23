@@ -1,7 +1,10 @@
 {
   "id": "data-files",
   "title": "A data file read into records",
-  "files": ["DayReport.java", "sailings.csv"],
+  "files": [
+    "DayReport.java",
+    "sailings.csv"
+  ],
   "terminal": {
     "description": "A shell in your workspace. Run the report here; it reads sailings.csv and writes report.txt beside it.",
     "suggestedCommand": "java DayReport.java"
@@ -31,6 +34,12 @@
         {
           "title": "Integer.parseInt",
           "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html#parseInt(java.lang.String)"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading a CSV file into objects",
+          "url": "https://www.youtube.com/watch?v=blYz2wOR8UE"
         }
       ],
       "points": 10
@@ -76,7 +85,7 @@
       ],
       "hints": [
         "Everything this needs is from the issues before: adding amounts, printing one the same on every computer, building a text a line at a time, writing a file.",
-        "A record gives back each part with a method of its name. A date prints as year-month-day by itself. An amount needs its scale set before it is written, and every line its own \"\\n\".",
+        "A record gives back each part with a method of its name. A date prints as year-month-day by itself. An amount needs its decimal places fixed before it is written, and every line its own \"\\n\".",
         "takings: `total = total.add(s.takings());` in a loop from `BigDecimal.ZERO`. In write, for each sailing `b.append(s.date()).append(' ').append(s.boat()).append(' ').append(s.passengers()).append(\" £\").append(s.takings().setScale(2, RoundingMode.HALF_UP).toPlainString()).append(\"\\n\");`, then the Total and Problem lines the same way, and `Files.writeString(file, b, StandardCharsets.UTF_8);`."
       ],
       "docs": [

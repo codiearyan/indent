@@ -1,7 +1,12 @@
 {
   "id": "files",
   "title": "Files: reading, writing and adding",
-  "files": ["HutFiles.java", "notices.txt", "till.txt", "log.txt"],
+  "files": [
+    "HutFiles.java",
+    "notices.txt",
+    "till.txt",
+    "log.txt"
+  ],
   "terminal": {
     "description": "A shell in your workspace. Run the program here; it reads and writes the files beside it.",
     "suggestedCommand": "java HutFiles.java"
@@ -63,6 +68,12 @@
         {
           "title": "StandardOpenOption",
           "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/StandardOpenOption.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Writing and reading a file with Files",
+          "url": "https://www.youtube.com/watch?v=AzJ8X9o0ezU"
         }
       ],
       "points": 10

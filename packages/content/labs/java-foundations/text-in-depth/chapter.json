@@ -35,12 +35,6 @@
           "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Formatter.html#syntax"
         }
       ],
-      "videos": [
-        {
-          "title": "Formatting text with printf and String.format",
-          "url": "https://www.youtube.com/watch?v=-ZQFJ0PZ6Qo"
-        }
-      ],
       "points": 10
     },
     {
@@ -69,6 +63,12 @@
           "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html#repeat(int)"
         }
       ],
+      "videos": [
+        {
+          "title": "String and StringBuilder",
+          "url": "https://www.youtube.com/watch?v=8Pbqf1M6PC4"
+        }
+      ],
       "points": 10
     },
     {
@@ -84,7 +84,7 @@
       ],
       "hints": [
         "Two methods take spaces off the ends of a text, and they do not agree on what a space is. split does not read its text as plain text.",
-        "split takes a pattern, in which a point stands for any character; a backslash in front makes it a plain point, and in Java text the backslash itself is written twice. equals has a cousin that takes no notice of capital letters. chars gives the characters as numbers, and Character can say which are digits.",
+        "split takes a pattern, in which a point stands for any character; a backslash in front makes it a plain point, and in Java text the backslash itself is written twice. equals has a cousin that takes no notice of capital letters. A text can hand over its characters one by one, as numbers, and Character can say which are digits.",
         "`return List.of(ref.strip().split(\"\\\\.\"));`, `return a.strip().equalsIgnoreCase(b.strip());` and `return ref.chars().filter(Character::isDigit).count();`."
       ],
       "docs": [

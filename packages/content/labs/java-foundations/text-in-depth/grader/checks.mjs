@@ -25,7 +25,7 @@ const pad = (s, n, left) => (left ? s.padEnd(n) : s.padStart(n))
 const two = (n) => String(n).padStart(2, '0')
 const rowOf = (boat, hour, minute, seats) => `${pad(boat, 10, true)} ${two(hour)}:${two(minute)} ${pad(String(seats), 3)}`
 const ROWS = [
-  ['Gannet', 14, 30, 8],
+  ['Gannet', 15, 20, 8],
   ['Greenshank', 7, 0, 120],
   ['Eider', 0, 5, 0],
   ['Guillemot', 23, 59, 45]

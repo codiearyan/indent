@@ -1,7 +1,9 @@
 {
   "id": "dates-and-times",
   "title": "Dates and times with java.time",
-  "files": ["SeasonPass.java"],
+  "files": [
+    "SeasonPass.java"
+  ],
   "terminal": {
     "description": "A shell in your workspace. Run the passes here, and try your classes from main.",
     "suggestedCommand": "java SeasonPass.java"
@@ -35,6 +37,12 @@
         {
           "title": "Date-time classes",
           "url": "https://docs.oracle.com/javase/tutorial/datetime/iso/index.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Dates and times in java.time",
+          "url": "https://www.youtube.com/watch?v=F2bZ1fkAQx0"
         }
       ],
       "points": 10
