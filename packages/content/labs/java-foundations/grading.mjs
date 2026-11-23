@@ -590,7 +590,9 @@ const METHOD_GLOSS = [
 
 function gloss(e, src, methods) {
   const table =
-    methods === 'collections'
+    methods === 'functions'
+      ? [...FUNCTION_GLOSS, ...COLLECTION_GLOSS, ...EXCEPTION_GLOSS, ...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
+      : methods === 'collections'
       ? [...COLLECTION_GLOSS, ...EXCEPTION_GLOSS, ...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
       : methods === 'exceptions'
       ? [...EXCEPTION_GLOSS, ...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
@@ -657,10 +659,12 @@ function compileProblem(spec, b, task, unit, result) {
   const earlier = (task.needs ?? []).find(
     (k) => mine.some((e) => lineIn(e, k)) && !mine.some((e) => lineIn(e, n))
   )
-  const shown = mine
-    .slice(0, 3)
-    .map((e) => javacLike(spec.file, lines, e, spec.methods || spec.objects))
-    .join('\n\n')
+  const shown = spec.functions
+    ? functionShown(spec.file, lines, mine[0])
+    : mine
+        .slice(0, 3)
+        .map((e) => javacLike(spec.file, lines, e, spec.methods || spec.objects))
+        .join('\n\n')
   if (earlier !== undefined) {
     return fail(
       `${label(n)} compiles`,
@@ -678,7 +682,7 @@ function compileProblem(spec, b, task, unit, result) {
   if (elsewhere) return fail(`${label(n)} compiles`, elsewhere, shown)
   return fail(
     `${label(n)} compiles`,
-    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.collections ? 'collections' : spec.exceptions ? 'exceptions' : spec.families ? 'families' : spec.objects ? 'objects' : spec.methods)}`,
+    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.functions ? 'functions' : spec.collections ? 'collections' : spec.exceptions ? 'exceptions' : spec.families ? 'families' : spec.objects ? 'objects' : spec.methods)}`,
     shown
   )
 }
@@ -849,7 +853,7 @@ function runProblem(spec, task, result, given = {}, call) {
     )
   }
   if (result.exception && spec.families) {
-    const known = [...(spec.collections ? COLLECTION_THROWN : []), ...FAMILY_THROWN, ...METHOD_THROWN, ...THROWN].find(([re]) => re.test(result.exception))
+    const known = [...(spec.functions ? FUNCTION_THROWN : []), ...(spec.collections ? COLLECTION_THROWN : []), ...FAMILY_THROWN, ...METHOD_THROWN, ...THROWN].find(([re]) => re.test(result.exception))
     // A method that calls itself leaves a thousand lines of trace: the first few say it all.
     const trace = result.exception.replace(/\n\tat [\w$.]*\.main\(.*/g, '').split('\n').slice(0, 6).join('\n')
     return fail(
@@ -960,6 +964,11 @@ function stopMessage(spec, b) {
         `The // Task ${b.task} comment is outside main. Every task's lines go inside main, between its braces, where the starter had them.`
       ]
     case 'imports':
+      if (spec.functions && b.lost)
+        return [
+          `${spec.file} keeps its import lines`,
+          `The line ${b.lost} at the top of ${spec.file} is not as the starter gave it. The tasks, and Check's own code, use what it brings in, so put it back as it was. An import line of java.util, java.util.function or java.util.stream you add below it can stay.`
+        ]
       return b.lost
         ? [
             `${spec.file} keeps its import line`,
@@ -1393,6 +1402,10 @@ function objectProblem(spec, b, task, unit, errors) {
   const message = (x) => x.message.replace(/\bjava\.(?:lang|util)\.(?=[A-Z])/g, '')
   const reads = Object.values(c.reads ?? {})
   const asIs = `${ranText(c) ? `Check ran:\n${indent(ranText(c))}\n` : ''}${reads.length && !c.show ? `${ranText(c) ? 'and read' : 'Check read'}:\n${indent(Object.keys(c.reads).join('\n'))}` : ''}\n\n${checkOwn(errors).map(message).join('\n\n')}`
+  if (spec.functions) {
+    const said = functionProblem(task, message(e), asIs)
+    if (said) return said
+  }
   if (spec.collections) {
     const said = collectionProblem(task, message(e), asIs)
     if (said) return said
@@ -2611,3 +2624,176 @@ export function explainCollection(x) {
   const text = `${x.type}${x.message === null ? '' : `: ${x.message}`}\n${x.frames.map((f) => `\tat ${f}`).join('\n')}`
   return COLLECTION_THROWN.find(([re]) => re.test(text))?.[1] ?? null
 }
+
+// --- Functions as values ------------------------------------------------------------------------
+// From part 7 a task writes lambdas and method references, takes and gives back functions, and
+// asks streams for answers. Check hands a method functions of its own that remember how they were
+// called, calls a function a task gives back with its own values, and, where a task asks for a
+// stream, hands over a list that refuses to be read by a loop. A failed compile shows the learner's
+// line and the first line of the error only: errors of a stream chain run long, and their detail
+// differs between Java versions. Issues set `functions: true` beside `collections`.
+
+const FUNCTION_PACKAGES = /\bjava\.util\.(?:function\.|stream\.)?(?=[A-Z])|\bjava\.lang\.(?=[A-Z])/g
+
+/** The first error as javac prints it, cut to its first line: the learner's line and a caret. */
+function functionShown(file, lines, e) {
+  const first = e.message.replace(FUNCTION_PACKAGES, '').split('\n')[0]
+  const src = lines[e.line - 1] ?? ''
+  const caret = src.slice(0, Math.max(0, e.col - 1)).replace(/[^\t]/g, ' ') + '^'
+  return [`${file}:${e.line}: error: ${first}`, src, caret].join('\n')
+}
+
+const SHAPES = 'Predicate|Function|Consumer|Supplier|BiFunction|BinaryOperator|UnaryOperator|Comparator'
+
+// Errors lambdas, method references and streams bring, read first in those issues.
+const FUNCTION_GLOSS = [
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /bad return type in lambda expression/.test(e.message) &&
+      (/missing return value/.test(e.message)
+        ? 'A lambda whose body is in braces gives back a value only through return, as a method does. Without braces, the one expression is what it gives back.'
+        : 'What the lambda gives back does not fit the one method of its interface: that method gives back another type. When you run the file, the line under the error names both.')
+  ],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /is not a functional interface/.test(e.message) &&
+      'A lambda or a method reference can stand only for a functional interface: an interface with exactly one abstract method. When you run the file, the line under the error says what Java found instead.'
+  ],
+  [
+    /^compiler\.err\.cant\.ref\.non\.effectively\.final\.var/,
+    () =>
+      'A lambda may read a local variable of the method around it, or a parameter, only when that variable never changes: not before the lambda, not after it, and not inside it. Something that has to change cannot be a local variable the lambda reads.'
+  ],
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) =>
+      /location:\s+variable \w+ of type (?:java\.lang\.)?Object\b/.test(e.message) &&
+      "Java could not work out the type of a lambda's parameter, so it took it to be Object, which has none of your methods. At the start of a chain such as comparing(...).thenComparing(...), nothing tells the first lambda what it is handed: the lesson shows how to say it."
+  ],
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) =>
+      new RegExp(`symbol:\\s+method (?:apply|test|accept|get|compare)\\(.*\\n\\s*location:\\s+variable \\w+ of type (?:java\\.util\\.(?:function\\.)?)?(?:${SHAPES})<`).test(e.message) &&
+      'Each functional interface has one method, with a name of its own, and this one is not it. The lesson has a table of the four shapes and their methods.'
+  ],
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) =>
+      /symbol:\s+method (?:sum|average|max|min)\(\)\n\s*location:\s+interface (?:java\.util\.stream\.)?Stream</.test(e.message) &&
+      'A stream of objects has no sum or average without more: those belong to a stream of plain numbers. The lesson shows how one becomes the other.'
+  ],
+  [
+    /^compiler\.err\.invalid\.mref/,
+    () =>
+      'Java found no method of that name that takes what the interface hands it. A method reference names a method that already exists: check its name and its class, capital letters included.'
+  ],
+  [
+    /^compiler\.err\.non-static\.cant\.be\.ref/,
+    (e, src) =>
+      /\bthis\b/.test(e.message) &&
+      /::/.test(src) &&
+      'this means the current object, and a static method or field has none. A static method is reached through its class.'
+  ],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /cannot infer type arguments/.test(e.message) &&
+      /conforms to (?:java\.util\.function\.)?Function</.test(e.message) &&
+      'That method takes a function that makes the value, to run only when it is needed, and it was handed the value itself.'
+  ],
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) =>
+      /inference variable \w+ has incompatible/.test(e.message) &&
+      'In a stream chain, Java works out the type step by step, and somewhere one step hands on another type than the next step, or the variable, expects. Read the chain from the start and say what each step gives back.'
+  ]
+]
+
+/** Why Check's own code did not compile against the learner's functions, or null. */
+function functionProblem(task, msg, asIs) {
+  const n = task.task
+  const first = msg.replace(FUNCTION_PACKAGES, '').split('\n')[0]
+  const notOne = /^incompatible types: (\w+) is not a functional interface/.exec(first)
+  if (notOne)
+    return fail(
+      `${notOne[1]} is a functional interface`,
+      `Check writes a lambda of its own for ${notOne[1]}, as the task says it can, and Java says ${notOne[1]} is not a functional interface: a lambda can stand only for an interface with exactly one abstract method. Compare ${notOne[1]} with the task.`,
+      asIs
+    )
+  if (/^incompatible types: bad return type in lambda expression/.test(first))
+    return fail(
+      `${label(n)} has the method the task names`,
+      `Check writes a lambda of its own for the interface of ${label(n)}, and Java says what the lambda gives back does not fit the interface's method. Compare that method's first line with the task: what it gives back, and what it takes.`,
+      asIs
+    )
+  if (/^incompatible types: incompatible parameter types in lambda expression/.test(first))
+    return fail(
+      `${label(n)} has the method the task names`,
+      `Check writes a lambda of its own for the interface of ${label(n)}, and Java says the lambda's parameters do not fit the interface's method. Compare what that method takes with the task: how many, and their types.`,
+      asIs
+    )
+  return null
+}
+
+// What an exception usually means when functions and streams are about, without the fix.
+const FUNCTION_THROWN = [
+  [
+    /IllegalStateException: stream has already been operated upon or closed/,
+    'A stream can be used once. Once an ending such as toList, count or anyMatch has run, that stream is finished, and so is a stream that a later step was already built on.'
+  ],
+  [
+    /NoSuchElementException: No value present/,
+    "get was called on an empty Optional, the same mistake as using a null: the answer was that there is none. Ask an Optional for its value only in a way that says what happens when it is empty."
+  ],
+  [
+    /ConcurrentModificationException\n\tat java\.base\/java\.util\.ArrayList\.forEach/,
+    'A list was changed inside its own forEach, and Java stopped it. forEach only walks a list; to take items off or change them in place, a list has methods of its own that take a function.'
+  ],
+  [
+    /UnsupportedOperationException\n\tat java\.base\/java\.util\.ImmutableCollections/,
+    "A list made with List.of, or given back by a stream's toList, can never be changed: add, remove, sort and replaceAll all throw this. To change one, copy it into a new ArrayList first."
+  ]
+]
+
+/** One sentence on what an exception from a function, stream or collection usually means, or null. */
+export function explainFunction(x) {
+  const text = `${x.type}${x.message === null ? '' : `: ${x.message}`}\n${x.frames.map((f) => `\tat ${f}`).join('\n')}`
+  return FUNCTION_THROWN.find(([re]) => re.test(text))?.[1] ?? explainCollection(x)
+}
+
+/** Java that is true when the object `expr` names is a lambda or a method reference. */
+export const isLambda = (expr) => `(${expr} != null && (${expr}.getClass().isSynthetic() || ${expr}.getClass().getName().contains("$$Lambda")))`
+
+// Check's own list for a task that asks for a stream: a loop, get, forEach or a copy is refused
+// with a LoopRefused, while stream() reads it as any list. It counts the items a stream draws.
+// Set `open` before reading it back.
+export const CHECK_LIST = `class LoopRefused extends RuntimeException {
+    LoopRefused(String how) { super("Check's list refuses " + how); }
+}
+class CheckList<E> extends java.util.ArrayList<E> {
+    boolean open;
+    int drawn;
+    CheckList(java.util.Collection<E> items) { super(items); }
+    private void refuse(String how) { if (!open) throw new LoopRefused(how); }
+    @Override public java.util.Iterator<E> iterator() { refuse("a loop"); return super.iterator(); }
+    @Override public java.util.ListIterator<E> listIterator() { refuse("a loop"); return super.listIterator(); }
+    @Override public java.util.ListIterator<E> listIterator(int at) { refuse("a loop"); return super.listIterator(at); }
+    @Override public E get(int at) { refuse("get"); return super.get(at); }
+    @Override public void forEach(java.util.function.Consumer<? super E> action) { refuse("forEach"); super.forEach(action); }
+    @Override public Object[] toArray() { refuse("a copy"); return super.toArray(); }
+    @Override public <T> T[] toArray(T[] into) { refuse("a copy"); return super.toArray(into); }
+    @Override public java.util.List<E> subList(int from, int to) { refuse("subList"); return super.subList(from, to); }
+    @Override public String toString() { boolean was = open; open = true; try { return super.toString(); } finally { open = was; } }
+    @Override public java.util.Spliterator<E> spliterator() {
+        java.util.Spliterator<E> inner = super.spliterator();
+        return new java.util.Spliterator<E>() {
+            public boolean tryAdvance(java.util.function.Consumer<? super E> action) { return inner.tryAdvance(x -> { drawn++; action.accept(x); }); }
+            public void forEachRemaining(java.util.function.Consumer<? super E> action) { inner.forEachRemaining(x -> { drawn++; action.accept(x); }); }
+            public java.util.Spliterator<E> trySplit() { return null; }
+            public long estimateSize() { return inner.estimateSize(); }
+            public int characteristics() { return inner.characteristics(); }
+        };
+    }
+}`
