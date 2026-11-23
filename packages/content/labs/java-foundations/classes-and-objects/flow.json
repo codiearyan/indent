@@ -1,0 +1,70 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "file", "label": "Fleet.java", "kind": "file", "mine": true },
+      { "id": "boats", "label": "Linnet and Gannet", "kind": "data" },
+      { "id": "tickets", "label": "Tickets", "kind": "data" },
+      { "id": "crossings", "label": "Crossings", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "bridie", "to": "file", "label": "asks" },
+      { "from": "file", "to": "boats", "label": "one each" },
+      { "from": "file", "to": "tickets", "label": "copies" },
+      { "from": "crossings", "to": "boats", "label": "a boat or none" }
+    ],
+    "note": "One class describes what a boat, a ticket or a crossing is, and each one is an object with values of its own."
+  },
+  "tasks": {
+    "boat": {
+      "steps": [
+        {
+          "active": ["bridie", "bridie->file", "file"],
+          "note": "Bridie wants the seats free on each boat, not one number for the whole river."
+        },
+        {
+          "active": ["file", "file->boats", "boats"],
+          "value": { "kind": "map", "label": "every boat", "entries": [{ "key": "name", "value": "text" }, { "key": "seats", "value": "whole number" }, { "key": "aboard", "value": "whole number" }] },
+          "note": "The class says what every boat has. Each boat is made with new and keeps its own values."
+        },
+        {
+          "active": ["boats"],
+          "note": "Asked for its seats free, each boat works it out from its own seats and its own people on board."
+        }
+      ]
+    },
+    "ticket": {
+      "steps": [
+        {
+          "active": ["bridie", "bridie->file"],
+          "note": "A family buys tickets, and Bridie copies the first one for the next person."
+        },
+        {
+          "active": ["file", "file->tickets", "tickets"],
+          "note": "The copy is a new ticket with the next person's name and the same fare."
+        },
+        {
+          "active": ["tickets"],
+          "value": { "kind": "array", "label": "tickets", "values": ["the first ticket, as it was", "the new ticket"] },
+          "note": "Two tickets, not two names for one ticket: the first passenger keeps theirs."
+        }
+      ]
+    },
+    "crossing": {
+      "steps": [
+        {
+          "active": ["crossings"],
+          "note": "Each crossing has an hour and, once Ossian picks one, a boat."
+        },
+        {
+          "active": ["crossings", "crossings->boats", "boats"],
+          "note": "When it has a boat, the crossing gives that boat's name, as the boat is now."
+        },
+        {
+          "active": ["crossings"],
+          "note": "An early crossing has no boat yet. It says so in words instead of falling over."
+        }
+      ]
+    }
+  }
+}
