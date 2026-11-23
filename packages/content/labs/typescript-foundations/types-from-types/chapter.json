@@ -1,0 +1,129 @@
+{
+  "id": "types-from-types",
+  "title": "Types that follow other types",
+  "files": ["src/catalogue.ts"],
+  "terminal": {
+    "description": "A shell in your workspace. `node src/catalogue.ts` runs the catalogue, and `npm run types` checks its types.",
+    "suggestedCommand": "npm run types"
+  },
+  "tasks": [
+    {
+      "id": "fields",
+      "title": "Name the properties of a tin",
+      "file": "src/catalogue.ts",
+      "description": "Under `// Task 1` in `src/catalogue.ts`, `cell` gives one property of a tin as text. Rafe typed `field` as `string`, and the compiler refuses the body. Write a type alias called `TinField`, with `export` in front, for the names of the properties of `Tin`, made from `Tin` itself. Then use it as the type of `field`. Leave the body as it is.\n\nCheck refuses `any` and `as` in your lines, and reads them for the word `type` in front of `TinField` and for `TinField` on `field`. It compiles code of its own: every property name of a tin must be a `TinField`, while a name a tin does not have, or any text at all, must be refused. Then it adds a property to `Tin` in its own copy, and expects `TinField` to take in its name. It calls `cell` with tins of its own.",
+      "nextSteps": [
+        "Run `npm run types` and read the error on the body of `cell` to the end.",
+        "Read the lesson's part on the names of the properties.",
+        "Write `TinField` above `cell`, made from `Tin`, and use it as the type of `field`.",
+        "Run both commands."
+      ],
+      "hints": [
+        "The error says a `string` cannot be used to read from a `Tin`: any text could be passed, and most text names no property. `field` should only allow the names a tin has.",
+        "Writing the names out by hand as a union works today, and stops working the day `Tin` gets a property. There is a word that gives the names of the properties of a type, and follows it.",
+        "`export type TinField = keyof Tin`, then `field: TinField` in the first line of `cell`."
+      ],
+      "docs": [
+        {
+          "title": "The keyof type operator",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/keyof-types.html"
+        },
+        {
+          "title": "Property accessors",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "size",
+      "title": "Read the type of one property",
+      "file": "src/catalogue.ts",
+      "description": "Under `// Task 2`, `tinsOfSize` gives the tins of one size. Rafe typed `size` as `number`, so a call with a size the shop does not sell compiles and finds nothing. Write a type alias called `Size`, with `export` in front, for the type of the `size` property of `Tin`, read from `Tin` itself. Then use it as the type of `size`. Leave the body as it is.\n\nCheck refuses `any` and `as` in your lines, and reads them for the word `type` in front of `Size` and for `Size` on `size`. It compiles code of its own: every size a tin can have must be a `Size`, while a size the shop does not sell, or text, must be refused. Then it gives `Tin` a new size in its own copy, and expects `Size` to take it in. It calls `tinsOfSize` with tins of its own.",
+      "nextSteps": [
+        "Look at the `size` property of `Tin`: what values does its type allow?",
+        "Read the lesson's part on reading the type of one property.",
+        "Write `Size` above `tinsOfSize`, read from `Tin`, and use it as the type of `size`.",
+        "Run both commands."
+      ],
+      "hints": [
+        "`number` allows 300, and every other number. The type of `size` in `Tin` allows only three, and that is the type this parameter should have.",
+        "Square brackets after a type, with the name of a property in quotes, give the type of that property. It changes when the property's type changes.",
+        "`export type Size = Tin['size']`, then `size: Size` in the first line of `tinsOfSize`."
+      ],
+      "docs": [
+        {
+          "title": "Indexed access types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/indexed-access-types.html"
+        },
+        {
+          "title": "Literal types",
+          "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Indexed access types and keyof",
+          "url": "https://www.youtube.com/watch?v=kTKYpkLb3u8"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "update",
+      "title": "Write a function that changes a tin",
+      "file": "src/catalogue.ts",
+      "description": "Under `// Task 3`, write a function called `updateTin`, with `export` in front, from the word `function` to its closing brace. It takes a tin and the changes to make to it: any of the properties of a tin, each with its own type, and none of them required. It gives back a new tin with the changes made, and leaves the tin it was given as it was. Make the type of the changes from `Tin`, so it follows `Tin`, and write every type. Then take away the `//` in front of the lines at the end, to see it run.\n\nCheck refuses `any` and `as` in your lines, and reads `updateTin` for its result type. It compiles code of its own: changes to one property, to a few and to none must compile, while a change of the wrong type, to a property a tin does not have, or to a size the shop does not sell must be refused. Then it adds a property and a size to `Tin` in its own copy, and expects the changes to take them in. It calls `updateTin` with tins of its own, and checks the tin it passed is left as it was.",
+      "nextSteps": [
+        "Write the first line: the name, a tin, the changes and the result type.",
+        "Read the lesson's part on a type with every property optional, and use it for the changes.",
+        "Give back a new object with the properties of the tin and then the changes.",
+        "Take away the `//` in front of the last lines, and run both commands."
+      ],
+      "hints": [
+        "`Tin` as the type of the changes asks for every property, so `{ stock: 9 }` is refused. A copy of `Tin` with a question mark on every property works until `Tin` changes.",
+        "There is a type that takes a type and makes every one of its properties optional, keeping their types. In an object, `...` copies properties, and a later one wins.",
+        "`export function updateTin(tin: Tin, changes: Partial<Tin>): Tin {` with `return { ...tin, ...changes }` inside."
+      ],
+      "docs": [
+        {
+          "title": "Partial<Type>",
+          "url": "https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype"
+        },
+        {
+          "title": "Spread syntax",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "parts",
+      "title": "Make some of a tin, or all but one",
+      "file": "src/catalogue.ts",
+      "description": "Under `// Task 4`, Rafe copied `Tin` by hand twice more. A `NewTin` is what the stock form sends: everything a tin has but its `id`, which `withId` gives it. A `ShelfLabel` has only the `blend` and the `size`, all a label needs. Write both again, made from `Tin`, so they follow it. Keep their names, with `export` in front, and leave the functions as they are.\n\nCheck refuses `any` and `as` in your lines, and reads them for the word `type` in front of both names. It compiles code of its own: a new tin without an id, a label and a whole tin passed as a label must compile, while a new tin with an id or without its stock, and a label without a blend, with a price or with a size the shop does not sell must be refused. Then it adds a property and a size to `Tin` in its own copy: a `NewTin` must take in both, and a `ShelfLabel` only the size. It calls both functions with values of its own.",
+      "nextSteps": [
+        "Read the lesson's part on keeping some properties, or all but some.",
+        "Ask, for each type: is it a few properties of a tin, or all of them but a few?",
+        "Write each again from `Tin`, naming only the properties that decide it.",
+        "Run both commands."
+      ],
+      "hints": [
+        "Both copies are right today. Check adds a property to `Tin`: a new tin from the form has it too, while a label still has only two. A copy written by hand does neither.",
+        "One type keeps only the properties you name, and another keeps all of them but the ones you name. The names go in quotes, joined by `|` when there are more than one.",
+        "`export type NewTin = Omit<Tin, 'id'>` and `export type ShelfLabel = Pick<Tin, 'blend' | 'size'>`."
+      ],
+      "docs": [
+        {
+          "title": "Pick<Type, Keys>",
+          "url": "https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys"
+        },
+        {
+          "title": "Omit<Type, Keys>",
+          "url": "https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

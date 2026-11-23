@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "types": "tsc --noEmit -p tsconfig.json"
+  }
+}
