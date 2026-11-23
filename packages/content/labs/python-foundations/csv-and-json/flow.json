@@ -1,0 +1,57 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dougie", "label": "Dougie", "kind": "story" },
+      { "id": "kitcsv", "label": "kit.csv", "kind": "file" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "saved", "label": "Saved store", "kind": "file" },
+      { "id": "positions", "label": "positions.json", "kind": "file" },
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dougie", "to": "kitcsv", "label": "saves" },
+      { "from": "kitcsv", "to": "functions", "label": "rows of text" },
+      { "from": "functions", "to": "saved", "label": "CSV or JSON" },
+      { "from": "positions", "to": "functions", "label": "JSON" },
+      { "from": "functions", "to": "ailsa", "label": "positions" }
+    ],
+    "note": "Your functions read and write the files other programs use: CSV rows from the spreadsheet, and JSON that keeps lists and dictionaries."
+  },
+  "tasks": {
+    "names": {
+      "steps": [
+        { "active": ["dougie", "dougie->kitcsv", "kitcsv"], "value": { "kind": "array", "label": "one row", "values": ["item", "count", "place"] }, "note": "Dougie's spreadsheet saves the kit list, a heading row first." },
+        { "active": ["kitcsv", "kitcsv->functions", "functions"], "note": "The csv module reads each row as a list of texts, quotes taken care of." },
+        { "active": ["functions"], "note": "The heading row is left out, and the first value of every other row is kept." }
+      ]
+    },
+    "low": {
+      "steps": [
+        { "active": ["kitcsv", "kitcsv->functions", "functions"], "value": { "kind": "map", "label": "one row", "entries": [{ "key": "item", "value": "text" }, { "key": "count", "value": "text" }, { "key": "place", "value": "text" }] }, "note": "Each row comes as a dictionary keyed by the headings, every value text." },
+        { "active": ["functions"], "note": "Each count is turned into a number before it is compared with the line." },
+        { "active": ["functions", "dougie"], "note": "The items below the line come back, in the order of the file." }
+      ]
+    },
+    "save": {
+      "steps": [
+        { "active": ["dougie", "functions"], "value": { "kind": "map", "label": "the store", "entries": [{ "key": "kind of kit", "value": "how many" }] }, "note": "The store is a dictionary of each kind and its count." },
+        { "active": ["functions", "functions->saved", "saved"], "note": "A heading row goes first, then a row for each kind, quotes added where a name needs them." },
+        { "active": ["saved"], "note": "The spreadsheet can open the file again, in the same shape." }
+      ]
+    },
+    "dump": {
+      "steps": [
+        { "active": ["dougie", "functions"], "note": "The store has to last until tomorrow." },
+        { "active": ["functions", "functions->saved", "saved"], "note": "It is written into the file as JSON, in double quotes." },
+        { "active": ["saved"], "note": "Whatever the file held before is replaced by the store." }
+      ]
+    },
+    "load": {
+      "steps": [
+        { "active": ["positions", "positions->functions", "functions"], "note": "The file holds each call sign with two numbers, east and north." },
+        { "active": ["functions"], "note": "JSON has no tuples, so each position comes back as a list and is turned into a tuple." },
+        { "active": ["functions", "functions->ailsa", "ailsa"], "note": "Ailsa gets every team's last position, east first." }
+      ]
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" },
+      { "id": "radio", "label": "Radio desk", "kind": "story" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "logfile", "label": "Log file", "kind": "file" },
+      { "id": "logs", "label": "logs folder", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "radio", "to": "functions", "label": "entries" },
+      { "from": "functions", "to": "logfile", "label": "writes" },
+      { "from": "logfile", "to": "functions", "label": "lines" },
+      { "from": "logs", "to": "functions", "label": "one night" },
+      { "from": "functions", "to": "ailsa", "label": "the log" }
+    ],
+    "note": "The log moves off the torn-out pages and into files on the laptop, which your functions read, start and add to."
+  },
+  "tasks": {
+    "read": {
+      "steps": [
+        { "active": ["ailsa", "functions"], "note": "Ailsa asks for a log file by its path." },
+        { "active": ["logfile", "logfile->functions", "functions"], "note": "The file is opened, read once from start to end, and closed." },
+        { "active": ["functions", "functions->ailsa", "ailsa"], "note": "Everything in it comes back as one text, line ends included." }
+      ]
+    },
+    "entries": {
+      "steps": [
+        { "active": ["logfile", "logfile->functions", "functions"], "value": { "kind": "array", "label": "lines as read", "values": ["entry and line end", "blank line", "entry, maybe no line end"] }, "note": "The file gives one line at a time, each with what ends it." },
+        { "active": ["functions"], "note": "Each line is tidied, and blank lines are dropped." },
+        { "active": ["functions", "functions->ailsa", "ailsa"], "note": "A list of the entries comes back, in order." }
+      ]
+    },
+    "write": {
+      "steps": [
+        { "active": ["ailsa", "functions"], "note": "A new night starts, with a title for its log." },
+        { "active": ["functions", "functions->logfile", "logfile"], "note": "The file is opened for writing, which empties it, or makes it if it is not there." },
+        { "active": ["logfile"], "note": "It now holds only the title line, ended properly." }
+      ]
+    },
+    "append": {
+      "steps": [
+        { "active": ["radio", "radio->functions", "functions"], "note": "An entry comes in from the radio desk." },
+        { "active": ["functions", "functions->logfile", "logfile"], "note": "The file is opened for adding, so what it holds stays." },
+        { "active": ["logfile"], "note": "The entry lands on a line of its own at the end, ready for the next one." }
+      ]
+    },
+    "folder": {
+      "steps": [
+        { "active": ["ailsa", "functions"], "note": "Ailsa asks for the log of one night." },
+        { "active": ["logs", "logs->functions", "functions"], "note": "The folder and the night's file name are joined into one path, and the file is looked for." },
+        { "active": ["functions", "functions->ailsa", "ailsa"], "note": "That night's entries come back, or nothing for a night with no log." }
+      ]
+    }
+  }
+}

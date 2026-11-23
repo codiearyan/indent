@@ -1,0 +1,102 @@
+{
+  "id": "formatting",
+  "title": "Formatting for people",
+  "files": ["year_report.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the hours, an incident number and the year's table with its columns lined up.",
+    "suggestedCommand": "python3 year_report.py"
+  },
+  "tasks": [
+    {
+      "id": "decimals",
+      "title": "Hours to one decimal place",
+      "file": "year_report.py",
+      "description": "Under `# Task 1` in `year_report.py`, write a function called `hours_text` that takes a number of hours, a whole number or a decimal, and gives back a text of that number with exactly one decimal place, rounded, then a space and the letter `h`. For `2.67` it gives back `2.7 h`, and for `4` it gives back `4.0 h`. Print what it gives back for `2.67` and for `4`.\n\nCheck calls `hours_text` with numbers of its own, whole numbers among them, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on decimal places.",
+        "Write an f-string with the hours in curly braces.",
+        "After the name, inside the braces, say how many decimal places to show.",
+        "Try it with a whole number: it should still show one decimal place."
+      ],
+      "hints": [
+        "Putting the number in an f-string as it is shows all its decimals, or none for a whole number. `round` keeps a whole number whole.",
+        "After the name in the braces, a colon starts the format: a full stop, the number of places and the letter `f`.",
+        "The shape is `return f\"{hours:.1f} h\"`."
+      ],
+      "docs": [
+        { "title": "Formatted string literals", "url": "https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals" },
+        { "title": "Format specification", "url": "https://docs.python.org/3/library/string.html#format-specification-mini-language" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "padding",
+      "title": "An incident number",
+      "file": "year_report.py",
+      "description": "Under `# Task 2`, write a function called `incident_id` that takes a year and the number of a callout in that year, both whole numbers, and gives back the incident number: the year, a dash, and the callout's number padded with zeros on the left to three digits. For `2026` and `7` it gives back `2026-007`; a number of three digits or more is not padded. Print what it gives back for `year` and `7`.\n\nCheck calls `incident_id` with years and numbers of its own and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on padding with zeros.",
+        "Turn the callout's number into text.",
+        "Pad that text with zeros to three characters.",
+        "Put the year, a dash and the padded number together and give it back."
+      ],
+      "hints": [
+        "A whole number has no zeros in front of it until you add them, and `+` between a number and text stops with a `TypeError`.",
+        "Text has a method that pads it with zeros on the left to a width you give. The number has to be text first.",
+        "The shape is `return f\"{year}-{str(number).zfill(3)}\"`."
+      ],
+      "docs": [
+        { "title": "str.zfill()", "url": "https://docs.python.org/3/library/stdtypes.html#str.zfill" },
+        { "title": "Formatted string literals", "url": "https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "row",
+      "title": "One row of the table",
+      "file": "year_report.py",
+      "description": "Under `# Task 3`, write a function called `report_row` that takes a hill, a number of callouts and a number of hours, and gives back one row of the table as text: the hill on the left of a column 14 characters wide, the callouts on the right of a column 6 wide, and the hours with one decimal place on the right of a column 8 wide, with nothing else in between. A row is 28 characters long, unless the hill is longer than its column. For `\"Carn Dubh\"`, `3` and `5.5` it gives back `Carn Dubh          3     5.5`. Print what it gives back for each hill in `by_hill`.\n\nCheck calls `report_row` with hills and numbers of its own and looks at what it gives back, space by space.",
+      "nextSteps": [
+        "Read the part of the lesson on widths and alignment.",
+        "Write one f-string with three pairs of curly braces.",
+        "Give each value its width and its side, and the hours their decimal place too.",
+        "Print the rows one under the other and see the columns line up."
+      ],
+      "hints": [
+        "Spaces typed between the values only line up when every value has the same length. A width in the format fills the rest of the column with spaces.",
+        "In the braces, after a colon, `<` puts a value on the left of its width and `>` on the right. A width and a number of decimal places go together, the width first.",
+        "The shape is `return f\"{hill:<14}{callouts:>6}{hours:>8.1f}\"`."
+      ],
+      "docs": [
+        { "title": "Format specification", "url": "https://docs.python.org/3/library/string.html#format-specification-mini-language" },
+        { "title": "Format examples", "url": "https://docs.python.org/3/library/string.html#format-examples" }
+      ],
+      "videos": [
+        { "title": "Formatting numbers and columns in f-strings", "url": "https://www.youtube.com/watch?v=nghuHvKLhJA" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "table",
+      "title": "The whole table",
+      "file": "year_report.py",
+      "description": "Under `# Task 4`, write a function called `report` that takes a list of `(hill, callouts, hours)` tuples and gives back a list of the lines of the table, as texts:\n\n1. a heading line: `Hill` on the left of 14 characters, `Calls` on the right of 6 and `Hours` on the right of 8;\n2. one row for each tuple, in order, made as `report_row` makes it;\n3. a total line, made as `report_row` makes it, with `Total` as the hill, the callouts added up and the hours added up.\n\nFor an empty list it gives back the heading and a total line of zeros. Print each line of what it gives back for `by_hill`.\n\nCheck calls `report` with lists of its own and looks at the lines it gives back. It gives your file its own `report_row` first, so a mistake in Task 3 does not count here.",
+      "nextSteps": [
+        "Read the part of the lesson on a table that lines up.",
+        "Start the list with the heading line, in the same widths as a row.",
+        "Go through the tuples, add a row for each, and keep two totals.",
+        "Add the total line after the loop and give back the list."
+      ],
+      "hints": [
+        "The heading is text, not numbers, so its columns take a width and a side but no decimal places.",
+        "Unpack each tuple into three names in the `for` line, call `report_row` for it, and add its callouts and hours to totals that start at 0 before the loop.",
+        "The shape is `lines = [f\"{'Hill':<14}{'Calls':>6}{'Hours':>8}\"]`, then the loop with `lines.append(report_row(hill, callouts, hours))`, and `lines.append(report_row(\"Total\", all_callouts, all_hours))` after it."
+      ],
+      "docs": [
+        { "title": "Formatted string literals", "url": "https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals" },
+        { "title": "Format specification", "url": "https://docs.python.org/3/library/string.html#format-specification-mini-language" }
+      ],
+      "points": 10
+    }
+  ]
+}

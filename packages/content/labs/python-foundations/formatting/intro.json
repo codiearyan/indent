@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Can I read it out without squinting?", "note": "At the meeting in March." },
+    { "title": "Year's figures", "text": "Right numbers, nine decimals, no columns." },
+    {
+      "title": "Your functions",
+      "file": "year_report.py",
+      "mine": true,
+      "gap": "Numbers no one can read out",
+      "tasks": ["One decimal place", "Pad with zeros", "One lined-up row", "The whole table"]
+    },
+    { "title": "Team meeting", "say": "Clear as day, every column.", "note": "The year, read straight down." }
+  ],
+  "ticket": { "label": "The year", "wrong": "hard to read", "why": "No format", "right": "lined up" },
+  "captions": [
+    "Rhona has to read the year out at the team's meeting, from one printed sheet.",
+    "Today the numbers are right but show nine decimals, and the columns wander.",
+    "You format each value: decimal places, widths, zeros in front, and a table.",
+    "Now the sheet lines up and Rhona reads the year straight down.",
+    "Hours, incident numbers and columns look the same on every page Rhona reads out."
+  ]
+}
