@@ -1,0 +1,81 @@
+{
+  "id": "a-table-of-routes",
+  "title": "A table of routes",
+  "files": ["src/router.js", "src/try.js", "src/old-server.js", "src/send.js"],
+  "terminal": {
+    "description": "A shell in your workspace where a few requests go to the old server and to your router.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "table",
+      "title": "Keep a table of routes",
+      "file": "src/router.js",
+      "description": "Implement `createRouter()`, `addRoute(router, method, path, handler)` and the first part of `handle(router, req, res)` in `src/router.js`.\n\n- `createRouter()` returns a new router with no routes; two routers never share their routes\n- `addRoute` keeps a route: a method such as `'GET'`, a path such as `'/orders/today'`, and the handler for them\n- it throws a `TypeError` when `path` is not a string that starts with `/`, or `handler` is not a function, and an `Error` when the router already has a route for that method and path\n- `handle` calls the handler of the route whose method and path are exactly `req.method` and `req.url`, with the very `req` and `res` it was given, and no other handler\n\nThe check makes its own routers and routes, sends them requests of its own and notes which handlers ran.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the error.",
+        "Decide what a router holds, and return a fresh one from `createRouter()`.",
+        "In `addRoute`, check the path and the handler, then keep the route inside that router.",
+        "In `handle`, look for the route with the request's method and path, and call its handler."
+      ],
+      "hints": [
+        "A router is only data: a list of routes, or an object of paths. What matters is that each call to `createRouter()` makes a new one.",
+        "A route is the method and the path together. Two routes may share a path when their methods differ, and that is the only time they may.",
+        "`router.routes.find((route) => route.method === req.method && route.path === req.url)` finds the route. Call `route.handler(req, res)` when there is one."
+      ],
+      "docs": [
+        { "title": "Array.prototype.find()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find" },
+        { "title": "TypeError", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError" },
+        { "title": "HTTP request methods", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "missing",
+      "title": "Say when there is no route",
+      "file": "src/router.js",
+      "description": "Make `handle` answer a request whose path has no route at all, under any method.\n\n- the answer is status `404`, sent with `sendJson`\n- its body is `{ error }`, a sentence that names the method and the path of the request, such as `There is no route for GET /invoices.`\n- no handler runs\n- a path matches a route only when it is exactly the route's path, letter for letter: `/orders/1873` is not `/orders`, and `/Orders` is not `/orders`\n\nThe check sends requests for paths its routes do not have, some close to ones they do, and reads the answer.",
+      "nextSteps": [
+        "Run `node src/try.js`: look at what your router does with `/orders/todays-list` and `/Prices`.",
+        "Find every route with the request's path, whatever its method.",
+        "When there are none, answer 404 with `sendJson` and say which request it was."
+      ],
+      "hints": [
+        "The old server matched with `startsWith`, which is why `/orders/todays-list` got today's orders. A path is the same path only when every character is the same.",
+        "Answering is what a handler would do: set the status, set the content type, end the response. `sendJson(res, status, value)` does all three.",
+        "``sendJson(res, 404, { error: `There is no route for ${req.method} ${req.url}.` })`` is the whole answer."
+      ],
+      "docs": [
+        { "title": "404 Not Found", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404" },
+        { "title": "Strict equality (===)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality" },
+        { "title": "Template literals", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals" }
+      ],
+      "videos": [
+        { "title": "HTTP status codes in five minutes", "url": "https://www.youtube.com/watch?v=qmpUfWN7hh4" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "methods",
+      "title": "Say which methods a path takes",
+      "file": "src/router.js",
+      "description": "Make `handle` answer a request whose path has routes, but none for its method.\n\n- the answer is status `405`, sent with `sendJson`\n- it has an `allow` header that lists the methods of this path's routes, in the order they were added, separated by a comma and a space: `GET, POST`\n- its body is `{ error }`, a sentence that names the method and the path of the request\n- no handler runs, the one for another method included\n\nThe check sends requests with methods its paths do not take and reads the status, the `allow` header and the body.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at `DELETE /prices`.",
+        "You already found the routes with this path. Which methods do they have?",
+        "Set the `allow` header before `sendJson` ends the response, then answer 405."
+      ],
+      "hints": [
+        "A 404 says there is nothing here. A 405 says there is something here, just not for this method, and the `allow` header says what would work.",
+        "Headers go out before the body, so set them before the response ends: `res.setHeader(name, value)` after `res.end()` throws.",
+        "`res.setHeader('allow', routesOnPath.map((route) => route.method).join(', '))`, then `sendJson(res, 405, { error: ... })`."
+      ],
+      "docs": [
+        { "title": "405 Method Not Allowed", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/405" },
+        { "title": "Allow header", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Allow" },
+        { "title": "response.setHeader()", "url": "https://nodejs.org/api/http.html#responsesetheadername-value" }
+      ],
+      "points": 10
+    }
+  ]
+}

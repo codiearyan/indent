@@ -1,0 +1,129 @@
+{
+  "id": "finding-by-content",
+  "title": "Finding words in files",
+  "files": ["today.txt"],
+  "terminal": {
+    "description": "A shell that starts in the shop's top folder. Run each search and read what it prints before you save it.",
+    "suggestedCommand": "grep Thornby sales/web-orders.csv"
+  },
+  "tasks": [
+    {
+      "id": "pellow",
+      "title": "Save the Pellow Bakery orders",
+      "file": "today.txt",
+      "description": "Save every line of `sales/web-orders.csv` that is an order from Pellow Bakery into `pellow-bakery.txt` in the top folder, each line as it is in the file. Pellow Farm Shop is a different customer, and its orders stay out.\n\nCheck compares `pellow-bakery.txt` with the Pellow Bakery lines of `sales/web-orders.csv`.",
+      "nextSteps": [
+        "Search `sales/web-orders.csv` for `Pellow` and read what comes back.",
+        "Search for the bakery's whole name, space included.",
+        "Read the output: no line from the farm shop, and no file name in front of the lines.",
+        "Save it with `>`."
+      ],
+      "hints": [
+        "One word matches both customers. The bakery's whole name has a space in it.",
+        "Put the whole name in quotes so it reaches `grep` as one piece of text. Without them, the shell splits it into two.",
+        "Run `grep \"Pellow Bakery\" sales/web-orders.csv > pellow-bakery.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "grep: print lines that match patterns",
+          "url": "https://man7.org/linux/man-pages/man1/grep.1.html"
+        },
+        {
+          "title": "Quoting in the shell",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_02"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Searching files and folders with grep",
+          "url": "https://www.youtube.com/watch?v=VGgTmxXp7xQ"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "jams",
+      "title": "Save every jam in the March log",
+      "file": "today.txt",
+      "description": "Hesper typed the press log in a hurry, and a jam is written `jam`, `Jam` or `JAM`. Save every line of `logs/press-mar.log` that contains the word jam in any letter case into `jams.txt` in the top folder.\n\nCheck compares `jams.txt` with the lines of the March log that contain jam, in any capitals.",
+      "nextSteps": [
+        "Search the March log for `jam` and count the lines.",
+        "Open the log with `less` and type `/Jam` to see how else it was written. Press `q` to leave.",
+        "Add the option that ignores letter case.",
+        "Save it with `>`."
+      ],
+      "hints": [
+        "`grep` cares about capitals unless you tell it not to.",
+        "`-i` makes `grep` match the word in any letter case.",
+        "Run `grep -i jam logs/press-mar.log > jams.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "grep: print lines that match patterns",
+          "url": "https://man7.org/linux/man-pages/man1/grep.1.html"
+        },
+        {
+          "title": "grep: the standard",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/grep.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "unpaid",
+      "title": "Count the unpaid orders",
+      "file": "today.txt",
+      "description": "The last column of `sales/web-orders.csv` says whether an order is `paid` or `unpaid`. Count how many orders are unpaid and save the number, and only the number, into `unpaid-count.txt` in the top folder.\n\nCheck reads the number in `unpaid-count.txt` and compares it with the unpaid orders in `sales/web-orders.csv`.",
+      "nextSteps": [
+        "Search for the unpaid orders and look at a few of them.",
+        "Make sure the word you search for does not also match the paid orders.",
+        "Ask `grep` for a count instead of the lines.",
+        "Save the count with `>` and look at it with `cat`."
+      ],
+      "hints": [
+        "One of the options in the lesson prints a number instead of lines.",
+        "`-c` counts the matching lines. `paid` is also inside `unpaid`, so search for the word that only unpaid orders have.",
+        "Run `grep -c unpaid sales/web-orders.csv > unpaid-count.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "grep: print lines that match patterns",
+          "url": "https://man7.org/linux/man-pages/man1/grep.1.html"
+        },
+        {
+          "title": "grep: the standard",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/grep.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "address",
+      "title": "Find every wrong address in the messages",
+      "file": "today.txt",
+      "description": "Customers wrote in about parcels sent to the wrong address. Search every file in `messages`, in all its folders, for the phrase `wrong address`, and save each line found, with its file's path and its line number in front, into `wrong-address.txt` in the top folder.\n\nCheck compares `wrong-address.txt` with every line in `messages` that contains wrong address: the path from the top folder, the line number and the line. The order does not matter.",
+      "nextSteps": [
+        "Look at how `messages` is laid out with `ls messages`.",
+        "Search the whole folder for the phrase, with the option that goes into every folder.",
+        "Add the option that numbers lines, and read the output.",
+        "Save it with `>`, searching only `messages`."
+      ],
+      "hints": [
+        "Two options from the lesson are needed together: one walks the folders, one adds line numbers.",
+        "`-r` searches a folder and every folder in it, `-n` numbers the lines. Keep the phrase in quotes, and name `messages` as the place to search.",
+        "Run `grep -rn \"wrong address\" messages > wrong-address.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "grep: print lines that match patterns",
+          "url": "https://man7.org/linux/man-pages/man1/grep.1.html"
+        },
+        {
+          "title": "grep: the standard",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/grep.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

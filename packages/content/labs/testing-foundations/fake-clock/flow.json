@@ -1,0 +1,102 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "customer", "label": "A customer", "kind": "story" },
+      { "id": "tests", "label": "schedule.test.js", "kind": "file", "mine": true },
+      { "id": "clock", "label": "Fake clock", "kind": "data" },
+      { "id": "schedule", "label": "schedule.js", "kind": "file" },
+      { "id": "van", "label": "Friday van", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "customer", "to": "schedule", "label": "an order" },
+      { "from": "tests", "to": "clock", "label": "sets, moves" },
+      { "from": "clock", "to": "schedule", "label": "the time" },
+      { "from": "schedule", "to": "tests", "label": "answers" },
+      { "from": "schedule", "to": "van", "label": "which Friday" }
+    ],
+    "note": "Your tests set the clock the code reads, so they check any day and time without waiting for it."
+  },
+  "tasks": {
+    "day": {
+      "steps": [
+        {
+          "active": ["customer", "customer->schedule", "schedule"],
+          "note": "A customer orders on a Monday."
+        },
+        {
+          "active": ["tests", "tests->clock", "clock", "clock->schedule"],
+          "note": "Your test turns on the fake clock and sets it to that Monday."
+        },
+        {
+          "active": ["schedule", "schedule->tests", "tests"],
+          "value": {
+            "kind": "map",
+            "label": "the answer",
+            "entries": [{ "key": "delivery day", "value": "a date, like 2026-07-24" }]
+          },
+          "note": "The code says which Friday the order goes out, and your test compares the whole date."
+        },
+        {
+          "active": ["schedule", "schedule->van", "van"],
+          "note": "The order goes on the right Friday's van."
+        }
+      ]
+    },
+    "cutoff": {
+      "steps": [
+        {
+          "active": ["tests", "tests->clock", "clock"],
+          "note": "Your test sets the clock to a Wednesday, just before orders close."
+        },
+        {
+          "active": ["clock", "clock->schedule", "schedule", "schedule->tests"],
+          "note": "Orders are still open."
+        },
+        {
+          "active": ["tests", "tests->clock", "clock", "clock->schedule", "schedule"],
+          "note": "Another test sets it to the cut-off itself, and orders are closed."
+        }
+      ]
+    },
+    "hold": {
+      "steps": [
+        {
+          "active": ["customer", "customer->schedule", "schedule"],
+          "note": "A customer starts an order, and the items in their basket are held."
+        },
+        {
+          "active": ["tests", "tests->clock", "clock", "clock->schedule"],
+          "note": "Your test moves the fake clock on to just before the hold runs out. No real time passes."
+        },
+        {
+          "active": ["schedule", "schedule->tests", "tests"],
+          "value": {
+            "kind": "map",
+            "label": "the hold",
+            "entries": [
+              { "key": "items", "value": "the basket" },
+              { "key": "status", "value": "held or released" }
+            ]
+          },
+          "note": "Still held. Then the clock moves to the end, and the items go back on sale."
+        }
+      ]
+    },
+    "cleanup": {
+      "steps": [
+        {
+          "active": ["tests", "tests->clock", "clock"],
+          "note": "A test turns on the fake clock and sets it to a day of its own."
+        },
+        {
+          "active": ["clock", "clock->schedule", "schedule"],
+          "note": "If the test fails, it stops there, and lines at its end never run."
+        },
+        {
+          "active": ["tests", "clock"],
+          "note": "A hook that runs after every test puts the real clock back, so the next test starts clean."
+        }
+      ]
+    }
+  }
+}

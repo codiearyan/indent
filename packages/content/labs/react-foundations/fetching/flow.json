@@ -1,0 +1,50 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "visitor", "label": "Visitor", "kind": "story" },
+      { "id": "timetable", "label": "Timetable", "kind": "function", "mine": true },
+      { "id": "files", "label": "Timetable files", "kind": "data" },
+      { "id": "state", "label": "Rides, loading, problem", "kind": "data", "mine": true },
+      { "id": "board", "label": "Ride board", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "visitor", "to": "timetable", "label": "picks a day" },
+      { "from": "timetable", "to": "files", "label": "fetch" },
+      { "from": "files", "to": "state", "label": "answer" },
+      { "from": "state", "to": "board", "label": "draw" }
+    ],
+    "note": "The board asks for the chosen day from an effect, and the answer arrives later, fails, or comes too late."
+  },
+  "tasks": {
+    "load": {
+      "steps": [
+        { "active": ["visitor", "visitor->timetable", "timetable"], "note": "A visitor picks a day." },
+        { "active": ["timetable", "timetable->files", "files"], "value": { "kind": "map", "label": "Request", "entries": [{ "key": "address", "value": "the day's file" }] }, "note": "After the board is drawn, an effect asks for that day's file, once." },
+        { "active": ["files", "files->state", "state"], "value": { "kind": "array", "label": "Rides", "values": ["ride", "ride", "ride"] }, "note": "The answer's body is read as rides and kept in state." },
+        { "active": ["state", "state->board", "board"], "note": "The board shows each ride, with its time and its tram." }
+      ]
+    },
+    "loading": {
+      "steps": [
+        { "active": ["timetable", "timetable->files", "state"], "note": "A request goes out, and the board remembers that it is waiting." },
+        { "active": ["state", "state->board", "board"], "note": "The board says the rides are loading, and shows none." },
+        { "active": ["files", "files->state", "state", "state->board", "board"], "note": "The answer arrives: the loading line goes and the rides show." }
+      ]
+    },
+    "failed": {
+      "steps": [
+        { "active": ["visitor", "visitor->timetable", "timetable", "timetable->files", "files"], "note": "A visitor picks a day whose file is not written yet." },
+        { "active": ["files", "files->state", "state"], "value": { "kind": "map", "label": "Answer", "entries": [{ "key": "ok", "value": "false" }] }, "note": "The answer has an error status, or no answer comes at all." },
+        { "active": ["state", "state->board", "board"], "note": "The board stops loading and says, in plain words, that the rides could not be loaded." }
+      ]
+    },
+    "latest": {
+      "steps": [
+        { "active": ["visitor", "visitor->timetable", "timetable", "timetable->files"], "note": "A visitor picks one day, then another, before the first has answered." },
+        { "active": ["timetable"], "note": "The first day's answer is no longer wanted, and the effect's cleanup says so." },
+        { "active": ["files", "files->state", "state"], "note": "Answers arrive in any order. Only the one for the day picked last reaches state." },
+        { "active": ["state", "state->board", "board"], "note": "The board shows the day the visitor picked last." }
+      ]
+    }
+  }
+}

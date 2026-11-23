@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilma", "label": "Wilma", "kind": "story" },
+      { "id": "server", "label": "Shop's server", "kind": "data" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "copy", "label": "Your copy", "kind": "data" },
+      { "id": "branch", "label": "Vouchers branch", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "wilma", "to": "you", "label": "requests" },
+      { "from": "server", "to": "copy", "label": "clone" },
+      { "from": "server", "to": "branch", "label": "Wilma's commit" },
+      { "from": "you", "to": "copy", "label": "commands" },
+      { "from": "copy", "to": "branch", "label": "own branch" }
+    ],
+    "note": "Your laptop gets a copy of the server's history, and work on it stays on the laptop."
+  },
+  "tasks": {
+    "clone": {
+      "steps": [
+        { "active": ["server"], "note": "The shop's history lives on the server, and your laptop has none." },
+        { "active": ["server", "server->copy", "copy"], "note": "A clone copies the whole history and every branch into shop." },
+        { "active": ["copy"], "note": "The copy remembers the server under the name origin." }
+      ]
+    },
+    "branch": {
+      "steps": [
+        { "active": ["server", "server->branch", "branch"], "note": "Wilma's branch is on the server, and your copy remembers where it is." },
+        { "active": ["you", "you->copy", "copy", "copy->branch"], "note": "You make a branch of your own that follows the server's." },
+        { "active": ["branch"], "note": "It starts at Wilma's commit, with her voucher line." }
+      ]
+    },
+    "fix": {
+      "steps": [
+        { "active": ["wilma", "wilma->you", "you"], "note": "Wilma says the vouchers do not last forever." },
+        { "active": ["you", "branch"], "note": "The fix is committed on your branch." },
+        { "active": ["branch", "server"], "note": "The server does not have it yet: your branch is ahead by one commit." }
+      ]
+    }
+  }
+}

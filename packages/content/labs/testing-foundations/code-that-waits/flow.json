@@ -1,0 +1,94 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wendell", "label": "Wendell's count", "kind": "story" },
+      { "id": "sheet", "label": "shed.json", "kind": "data" },
+      { "id": "stock", "label": "stock.js", "kind": "file" },
+      { "id": "tests", "label": "stock.test.js", "kind": "file", "mine": true },
+      { "id": "form", "label": "Order form", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "wendell", "to": "sheet", "label": "counts" },
+      { "from": "tests", "to": "stock", "label": "asks" },
+      { "from": "stock", "to": "sheet", "label": "reads" },
+      { "from": "stock", "to": "tests", "label": "answers later" },
+      { "from": "stock", "to": "form", "label": "enough or not" }
+    ],
+    "note": "The shed's counts take a moment to read, so your tests wait for each answer before they check it."
+  },
+  "tasks": {
+    "count": {
+      "steps": [
+        {
+          "active": ["wendell", "wendell->sheet", "sheet"],
+          "note": "Wendell counts the shed in the morning, and his tablet saves the counts."
+        },
+        {
+          "active": ["tests", "tests->stock", "stock", "stock->sheet"],
+          "note": "Your test asks for the count of one item. The answer is not there yet: you get a promise."
+        },
+        {
+          "active": ["stock", "stock->tests", "tests"],
+          "value": {
+            "kind": "map",
+            "label": "the answer",
+            "entries": [
+              { "key": "item", "value": "one the shed has" },
+              { "key": "count", "value": "a number" }
+            ]
+          },
+          "note": "Your test waits for the answer, and only then compares it with the count in the file."
+        }
+      ]
+    },
+    "enough": {
+      "steps": [
+        {
+          "active": ["tests", "tests->stock", "stock"],
+          "value": {
+            "kind": "array",
+            "label": "a list of items",
+            "values": ["first item", "second item", "third item"]
+          },
+          "note": "Your test asks whether the shed holds enough of every item for a number of boxes."
+        },
+        {
+          "active": ["stock", "stock->sheet", "sheet"],
+          "note": "The code reads the count of each item on the list, one after another."
+        },
+        {
+          "active": ["stock", "stock->tests", "tests"],
+          "note": "The answer comes later: yes when every item has enough, no when any one runs short."
+        },
+        {
+          "active": ["stock", "stock->form", "form"],
+          "note": "The order form only sells boxes the shed can fill."
+        }
+      ]
+    },
+    "unknown": {
+      "steps": [
+        {
+          "active": ["tests", "tests->stock", "stock"],
+          "note": "Your test asks for an item that is not in the shed's counts."
+        },
+        {
+          "active": ["stock", "stock->sheet", "sheet"],
+          "note": "The code looks for it in the file and does not find it."
+        },
+        {
+          "active": ["stock", "stock->tests", "tests"],
+          "value": {
+            "kind": "map",
+            "label": "the promise",
+            "entries": [
+              { "key": "ends", "value": "rejected" },
+              { "key": "message", "value": "text" }
+            ]
+          },
+          "note": "The promise rejects, and your test checks that the message names the item."
+        }
+      ]
+    }
+  }
+}

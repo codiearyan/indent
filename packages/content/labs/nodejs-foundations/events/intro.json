@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Imran", "say": "Ring the alarm, but only once.", "note": "A leak means a hose left on." },
+    { "title": "The logger box", "text": "One script, and it falls over at a bad line." },
+    {
+      "title": "Your meter",
+      "file": "meter.js",
+      "mine": true,
+      "gap": "Nobody hears about a leak",
+      "tasks": ["Emit each reading", "Emit a leak", "Emit an error", "Alarm once, count all"]
+    },
+    { "title": "Shed alarm", "text": "Rings at the first leak, then stays quiet." }
+  ],
+  "ticket": { "label": "Burst hose", "wrong": "nobody told", "why": "No events", "right": "alarm rings" },
+  "captions": [
+    "At Marrowfield, Imran wants the shed alarm to ring when a tap runs far too fast.",
+    "Today one script does everything with each line, and a half-written line stops it.",
+    "You write a meter that emits events, and a script that listens, in four tasks.",
+    "Now the first leak rings the alarm once, and every reading is still counted.",
+    "Same burst hose, same log. The alarm rings once, and Imran gets the counts."
+  ]
+}

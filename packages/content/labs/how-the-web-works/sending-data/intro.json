@@ -1,0 +1,31 @@
+{
+  "stations": [
+    {
+      "title": "Ffion",
+      "say": "Can the laptop add a request?",
+      "note": "Requests go on a paper pad now."
+    },
+    { "title": "Studio laptop", "text": "Sends the song as plain text, with no label." },
+    {
+      "title": "Your code",
+      "file": "send.js",
+      "mine": true,
+      "gap": "No JSON, and no label",
+      "tasks": ["Add a song request", "Read where it lives", "Added, or why not"]
+    },
+    { "title": "Cupboard server", "text": "Takes song requests as JSON, and only JSON." }
+  ],
+  "ticket": {
+    "label": "Night Bus Home",
+    "wrong": "refused",
+    "why": "Wrong label",
+    "right": "listed"
+  },
+  "captions": [
+    "Ffion wants the song requests listeners text her to go straight onto the list.",
+    "The laptop sends plain text with no label, and the cupboard server refuses it.",
+    "You send each request as JSON that says it is JSON, and read the answer, in three tasks.",
+    "Night Bus Home is on the list, with an id and an address of its own.",
+    "Data goes out in a body, and its content-type tells the server how to read it."
+  ]
+}

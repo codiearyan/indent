@@ -1,0 +1,43 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "femi", "label": "Femi and Wilma", "kind": "story" },
+      { "id": "server", "label": "Shop's server", "kind": "data" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "memory", "label": "origin/ names", "kind": "data" },
+      { "id": "main", "label": "main", "kind": "data" },
+      { "id": "vouchers", "label": "Vouchers branch", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "femi", "to": "server", "label": "new commits" },
+      { "from": "you", "to": "memory", "label": "fetch" },
+      { "from": "server", "to": "memory", "label": "what is new" },
+      { "from": "memory", "to": "main", "label": "Femi's commits" },
+      { "from": "memory", "to": "vouchers", "label": "Wilma's link" }
+    ],
+    "note": "Your copy asks the server what is new, then takes it into your own branches."
+  },
+  "tasks": {
+    "fetch": {
+      "steps": [
+        { "active": ["femi", "femi->server", "server"], "note": "Overnight Femi and Wilma sent new commits to the server." },
+        { "active": ["memory"], "note": "Your copy still remembers the server as it was, so git status says up to date." },
+        { "active": ["you", "you->memory", "server", "server->memory", "memory"], "note": "A fetch asks the server and moves the origin/ names. Your branches stay as they were." }
+      ]
+    },
+    "femi": {
+      "steps": [
+        { "active": ["memory", "main"], "note": "main is behind origin/main by Femi's two commits." },
+        { "active": ["memory"], "note": "You read the new commits before you take them." },
+        { "active": ["memory", "memory->main", "main"], "note": "main moves forward to take them in, with no merge commit." }
+      ]
+    },
+    "vouchers": {
+      "steps": [
+        { "active": ["vouchers", "memory"], "note": "Your branch has your fix, and the server's has Wilma's link: they have diverged." },
+        { "active": ["you", "you->memory", "memory", "memory->vouchers", "vouchers"], "note": "A pull fetches, then merges the server's branch into yours." },
+        { "active": ["vouchers"], "note": "A merge commit joins your fix and Wilma's link. main does not have either." }
+      ]
+    }
+  }
+}

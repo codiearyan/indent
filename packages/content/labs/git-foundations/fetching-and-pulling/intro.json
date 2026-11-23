@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Femi", "say": "I sent two commits last night.", "note": "And Wilma linked her vouchers." },
+    { "title": "Shop's server", "text": "The new commits are on the server.", "note": "Your copy has not asked." },
+    {
+      "title": "Your commands",
+      "file": "finds.html",
+      "mine": true,
+      "gap": "Says up to date, is not",
+      "tasks": ["Fetch what is new", "Take in Femi's work", "Pull Wilma's link"]
+    },
+    { "title": "Your laptop", "rows": [["Femi's new find on main"], ["The August book"], ["Your fix and her link"]] }
+  ],
+  "ticket": { "label": "New find", "wrong": "not on main", "why": "Not fetched", "right": "on your main" },
+  "captions": [
+    "Femi sent new work to the server overnight, and Wilma added to her vouchers branch.",
+    "Your copy has not asked the server since, so it does not know about any of it.",
+    "You fetch, bring Femi's commits into main and pull Wilma's link, in three tasks.",
+    "Your main has Femi's work, and your vouchers branch has your fix and Wilma's link.",
+    "Your copy asked the server first, read what came, then took it in."
+  ]
+}

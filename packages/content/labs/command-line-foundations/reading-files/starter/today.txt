@@ -1,0 +1,6 @@
+Today's jobs, from Idris
+
+1. Join the two sign-up lists in mailing into one file, mailing-list.txt: the market list first, then the shop list.
+2. The accountant wants the header and the first ten orders of sales/web-orders.csv, in first-orders.txt.
+3. Press 2 stopped on Tuesday. Hesper wants the last 8 entries of logs/press-mar.log, in last-entries.txt.
+4. How busy were the presses? Count the lines of every .log file in logs, into entry-counts.txt.

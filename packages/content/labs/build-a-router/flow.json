@@ -1,0 +1,19 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Order page", "kind": "story" },
+      { "id": "server", "label": "Order server", "kind": "story" },
+      { "id": "router", "label": "Your router", "kind": "file", "mine": true },
+      { "id": "handlers", "label": "Sefton's handlers", "kind": "story" },
+      { "id": "hesper", "label": "Hesper", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "page", "to": "server", "label": "request" },
+      { "from": "server", "to": "router", "label": "method, address" },
+      { "from": "router", "to": "handlers", "label": "the one route" },
+      { "from": "router", "to": "page", "label": "a plain no" },
+      { "from": "hesper", "to": "router", "label": "every line explained" }
+    ],
+    "note": "At Ashgrove Press, every request to the order server goes through a router you write yourself, which finds the one handler for it or says plainly why there is none."
+  }
+}

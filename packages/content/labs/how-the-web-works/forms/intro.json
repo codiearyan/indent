@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Odette",
+      "say": "Can we send the fete slips in?",
+      "note": "Requests and jingle entries."
+    },
+    {
+      "title": "Studio laptop",
+      "text": "Sends JSON, which these forms do not read."
+    },
+    {
+      "title": "Your code",
+      "file": "forms.js",
+      "mine": true,
+      "gap": "Not the way forms send",
+      "tasks": [
+        "Write a form body",
+        "Send the request form",
+        "Send a file entry"
+      ]
+    },
+    {
+      "title": "Cupboard server",
+      "text": "Takes forms only as the website sends them."
+    }
+  ],
+  "ticket": {
+    "label": "Nia's jingle",
+    "wrong": "refused",
+    "why": "Wrong kind",
+    "right": "entered"
+  },
+  "captions": [
+    "Odette has paper request slips and jingle entries from the village fete to send in.",
+    "The laptop sends JSON, but the server takes these only as the website's forms send them.",
+    "You write a form body, send it, and send a file in a body made of parts, in three tasks.",
+    "Nia's jingle script arrives as a file, and her entry is in the competition.",
+    "A form sends names and values, or parts when there is a file. The content-type says which."
+  ]
+}

@@ -132,3 +132,101 @@ export function missingAnswer(name, notes, key) {
 /** `~` and `~/...` as the shell reads them. */
 export const expandHome = (value) =>
   value === '~' ? homedir() : value.startsWith('~/') ? join(homedir(), value.slice(2)) : value
+
+/** A file's lines, each trimmed, without the empty lines at its end; null when it cannot be read. */
+export function linesOf(path) {
+  const text = read(path)
+  if (text === null) return null
+  const lines = text.split(/\r?\n/).map((line) => line.trim())
+  while (lines.length && lines[lines.length - 1] === '') lines.pop()
+  return lines
+}
+
+/** A starter file's lines, as linesOf reads them. */
+export const starterLines = (t, rel) => linesOf(t.chapterPath(`starter/${rel}`))
+
+/** True when a starter file in the workspace is no longer as it started. */
+export const changed = (t, rel) =>
+  read(join(t.workspace, ...rel.split('/'))) !== starterText(t, rel)
+
+/**
+ * The lines of a file the learner saved output into, in the top folder. When there is nothing to
+ * judge yet, `failed` is the one detail that says why.
+ */
+export function saved(t, name, file) {
+  const ws = t.workspace
+  const fail = (message, output = '') => ({ failed: check(name, false, message, output) })
+  const k = kind(ws, file)
+  if (k === 'file') {
+    const lines = linesOf(join(ws, file))
+    if (lines.length) return { lines }
+    return fail(
+      `${file} is empty: the command before > printed nothing into it. Run that command without > first and read what it prints.`
+    )
+  }
+  if (k === 'dir')
+    return fail(
+      `${file} in the top folder is a folder. Check wants a file of that name.`,
+      listing(ws)
+    )
+  const other = names(ws).find((n) => n.toLowerCase() === file.toLowerCase())
+  if (other)
+    return fail(
+      `The top folder has ${other}, but the task's name is ${file}. Capitals count.`,
+      listing(ws)
+    )
+  const elsewhere = findByName(ws, file)
+  if (elsewhere.length) {
+    return fail(
+      `${file} is at ${elsewhere[0]}, not in the top folder. A file made with > lands in the folder you are in, unless you give it a path.`,
+      elsewhere.join('\n')
+    )
+  }
+  return fail(`The top folder has no ${file} yet.`, listing(ws))
+}
+
+/** The lines `got` lacks and the lines it has too many of, compared with `want`, repeats counted. */
+export const lineDiff = (got, want) => ({ missing: notIn(want, got), extra: notIn(got, want) })
+
+/** The lines of `lines` that `other` does not have, each line of `other` used once. */
+function notIn(lines, other) {
+  const left = new Map()
+  for (const l of other) left.set(l, (left.get(l) ?? 0) + 1)
+  return lines.filter((l) => {
+    const n = left.get(l) ?? 0
+    if (n) left.set(l, n - 1)
+    return n === 0
+  })
+}
+
+/** Every file and folder under `dir`, hidden ones included, as forward-slash paths. */
+export function entriesUnder(dir, prefix = '') {
+  return names(join(dir, prefix)).flatMap((name) => {
+    const rel = prefix ? `${prefix}/${name}` : name
+    const k = kindOf(join(dir, rel))
+    return k === 'dir' ? [{ rel, kind: k }, ...entriesUnder(dir, rel)] : k ? [{ rel, kind: k }] : []
+  })
+}
+
+/** A long saved file for a check's output: its first lines and how many there are. */
+export function preview(file, lines, shown = 6) {
+  const head = lines.slice(0, shown).join('\n')
+  return lines.length > shown
+    ? `${file}, ${lines.length} lines:\n${head}\n...`
+    : `${file}:\n${head}`
+}
+
+/** A line short enough to quote in a message. */
+export const quoted = (line) => `"${line.length > 70 ? `${line.slice(0, 67)}...` : line}"`
+
+/** A sentence to add to a message when files a result is built from changed since the start. */
+export function changedNote(t, ...rels) {
+  const gone = rels.filter((rel) => changed(t, rel))
+  if (!gone.length) return ''
+  const have = gone.length > 1 ? 'have' : 'has'
+  return ` ${gone.join(' and ')} ${have} changed since the start, which may be why. Reset puts the starter files back as they were.`
+}
+
+/** The same detail with `note` added to its message. */
+export const noted = (detail, note) =>
+  note ? { ...detail, message: detail.message + note } : detail

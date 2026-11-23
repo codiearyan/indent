@@ -63,6 +63,7 @@ function shown(value) {
 
 function startServer(routes, received) {
   const used = new Map()
+  let base = ''
   const server = createServer((req, res) => {
     const chunks = []
     req.on('data', (c) => chunks.push(c))
@@ -83,7 +84,7 @@ function startServer(routes, received) {
         (r) =>
           r.path === url.pathname &&
           (!r.method || r.method === req.method) &&
-          (!r.when || req.headers[r.when.header]?.toLowerCase() === r.when.value.toLowerCase())
+          (!r.when || matches(req.headers[r.when.header], r.when))
       )
       let answer = { status: 404, body: 'Check has no page at this path.' }
       if (route) {
@@ -92,7 +93,10 @@ function startServer(routes, received) {
         answer = route.answers[Math.min(n, route.answers.length - 1)]
       }
       const body = answer.body ?? ''
-      const headers = { 'content-length': Buffer.byteLength(body), ...(answer.headers ?? {}) }
+      const headers = {
+        'content-length': Buffer.byteLength(body),
+        ...withBase(answer.headers ?? {}, base)
+      }
       if (answer.reason) res.writeHead(answer.status, answer.reason, headers)
       else res.writeHead(answer.status, headers)
       res.end(body)
@@ -104,8 +108,18 @@ function startServer(routes, received) {
   })
   return new Promise((resolve, reject) => {
     server.once('error', reject)
-    server.listen(0, '127.0.0.1', () => resolve(server))
+    server.listen(0, '127.0.0.1', () => {
+      base = `http://127.0.0.1:${server.address().port}`
+      resolve(server)
+    })
   })
+}
+
+/** A `when` of a route: the header's value equals `value`, or starts with `startsWith`. */
+function matches(header, when) {
+  const got = header?.toLowerCase()
+  if (when.startsWith !== undefined) return got?.startsWith(when.startsWith.toLowerCase()) ?? false
+  return got === when.value.toLowerCase()
 }
 
 const withBase = (value, base) =>
@@ -113,13 +127,17 @@ const withBase = (value, base) =>
     ? value.replaceAll('$base', base)
     : Array.isArray(value)
       ? value.map((v) => withBase(v, base))
-      : value
+      : value && typeof value === 'object' && value.constructor === Object
+        ? Object.fromEntries(Object.entries(value).map(([k, v]) => [k, withBase(v, base)]))
+        : value
 
 /**
  * Calls `fn` from the learner's `file` with `args` ('$base' in a string becomes the server's
- * address) while a server answers `routes`: [{ method?, path, when?: { header, value }, answers:
- * [{ status, reason?, headers?, body? }] }], one answer per request in order, the last one
- * repeating. The first route that matches answers; `when` matches a header, ignoring capitals.
+ * address, also inside arrays and plain objects) while a server answers `routes`: [{ method?,
+ * path, when?: { header, value } or { header, startsWith }, answers: [{ status, reason?,
+ * headers?, body? }] }], one answer per request in order, the last one repeating. The first route
+ * that matches answers; `when` matches a header, ignoring capitals. '$base' in an answer's header
+ * values becomes the server's address too.
  */
 export async function exchange({ file, fn, args = [], routes = [] }) {
   const received = []

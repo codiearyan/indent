@@ -1,0 +1,88 @@
+{
+  "id": "stand-ins",
+  "title": "Standing in for chance and for others",
+  "files": ["src/checkout.test.js", "src/checkout.js"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the tests here and read what they say.",
+    "suggestedCommand": "npx vitest run src/checkout.test.js"
+  },
+  "tasks": [
+    {
+      "id": "surprise",
+      "title": "Test which surprise extra comes out",
+      "file": "src/checkout.test.js",
+      "description": "`surpriseExtra()` picks one of `EXTRAS` with `Math.random()`. In the `surprise extra` block, set the random number with a stand-in, and test that the extra you worked out by hand comes out, the last one on the list included.\n\nCheck runs your tests on the working code and on versions that always pick the first extra, never pick the last, or have lost an extra from the list. A test in this block must pass on the first and fail on the others, give the same result whatever the real random number is, and pass when it runs alone.",
+      "nextSteps": [
+        "Read `surpriseExtra` and work out which extra a random number close to 1 gives.",
+        "Swap `Math.random` for a stand-in that gives that number.",
+        "Compare what comes out with the extra you worked out, written in full.",
+        "Put the real `Math.random` back after each test, and run the tests."
+      ],
+      "hints": [
+        "A test that only checks the extra is one of `EXTRAS` passes whatever the code picks.",
+        "`vi.spyOn(Math, 'random').mockReturnValue(n)` makes the code's random number `n`. `vi.restoreAllMocks()` in `afterEach` puts it back.",
+        "Write `vi.spyOn(Math, 'random').mockReturnValue(0.99)` and then `expect(surpriseExtra()).toBe('bag of apples')`."
+      ],
+      "docs": [
+        { "title": "vi.spyOn", "url": "https://vitest.dev/api/vi#vi-spyon" },
+        { "title": "mockReturnValue", "url": "https://vitest.dev/api/mock#mockreturnvalue" },
+        {
+          "title": "Math.random()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "charge",
+      "title": "Test what the card company is asked for",
+      "file": "src/checkout.test.js",
+      "description": "`checkout(order, cards, packingList)` asks `cards.charge(customer, pence)` once, for the order's total in pence. In the `charge` block, give `checkout` a fake card company, an order whose total has pennies in it and an empty list, and test what the fake was asked for and how many times.\n\nCheck runs your tests on the working code and on versions that charge in pounds, drop the pennies, or charge the card twice. A test in this block must pass on the first and fail on the others, and pass when it runs alone.",
+      "nextSteps": [
+        "Make a fake `charge` with `vi.fn()` that answers later with a receipt.",
+        "Call `checkout` with an order, an object holding your fake, and an empty list.",
+        "Check how many times the fake was called, and with what.",
+        "Run the tests."
+      ],
+      "hints": [
+        "A test that only checks `status: 'paid'` passes when the card is charged twice, or in pounds.",
+        "`toHaveBeenCalledWith` checks the arguments of a call, and `toHaveBeenCalledTimes` counts the calls. You need both.",
+        "With `const cards = { charge: vi.fn().mockResolvedValue({ id: 'r-1' }) }` and a total of 26.5, expect `cards.charge` to have been called once, with the customer and `2650`."
+      ],
+      "docs": [
+        { "title": "vi.fn", "url": "https://vitest.dev/api/vi#vi-fn" },
+        { "title": "toHaveBeenCalledWith", "url": "https://vitest.dev/api/expect#tohavebeencalledwith" },
+        {
+          "title": "toHaveBeenCalledTimes",
+          "url": "https://vitest.dev/api/expect#tohavebeencalledtimes"
+        }
+      ],
+      "videos": [
+        { "title": "Spies that record calls", "url": "https://www.youtube.com/watch?v=XMk1sG6ndwY" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "declined",
+      "title": "Test a declined card",
+      "file": "src/checkout.test.js",
+      "description": "When the card company rejects, `checkout` answers `{ status: 'unpaid', reason }` with the reason the card company gave, and the order stays off the packing list. In the `declined card` block, give `checkout` a fake card company that rejects with an error of your own, and test both.\n\nCheck runs your tests on the working code and on versions that let the error escape, put the unpaid order on the list, or give the same reason whatever happened. A test in this block must pass on the first and fail on the others, and pass when it runs alone.",
+      "nextSteps": [
+        "Make a fake `charge` that rejects with an `Error` and a reason of your own.",
+        "Call `checkout` with it and an empty packing list, and wait for the answer.",
+        "Check the answer, reason included, and then the packing list.",
+        "Run the tests."
+      ],
+      "hints": [
+        "A fake made with only `vi.fn()` answers with nothing, so the order counts as paid.",
+        "`mockRejectedValue(new Error('...'))` makes the fake reject. Then compare the whole answer with `toEqual`, and the list too.",
+        "With `charge: vi.fn().mockRejectedValue(new Error('Card declined'))`, expect the answer to equal `{ status: 'unpaid', reason: 'Card declined' }` and the list to equal `[]`."
+      ],
+      "docs": [
+        { "title": "mockRejectedValue", "url": "https://vitest.dev/api/mock#mockrejectedvalue" },
+        { "title": "Mock functions", "url": "https://vitest.dev/guide/learn/mock-functions" }
+      ],
+      "points": 10
+    }
+  ]
+}
