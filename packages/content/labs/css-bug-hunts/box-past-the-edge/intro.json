@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Bartek", "say": "The gift box sticks out on my phone.", "note": "The page slides sideways." },
+    { "title": "Gift box", "text": "Its column, plus padding and border.", "note": "Written years ago" },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "Sizes that do not add up",
+      "tasks": ["Gift box fits", "Email field fits", "Same look kept"]
+    },
+    { "title": "Bartek's phone", "text": "The gift box sits inside the page.", "note": "Nothing slides sideways." }
+  ],
+  "ticket": { "label": "Gift box", "wrong": "past the edge", "why": "Bad sum", "right": "fits the page" },
+  "captions": [
+    "Bartek opens the Wrenfield's page on his phone and the gift box hangs off the edge.",
+    "The box is as wide as its column, and its padding and border come on top of that.",
+    "You fix how the gift box and the email field are sized, and keep how they look.",
+    "On the phone the gift box sits inside the page, and the footer's field fits too.",
+    "Same boxes, same padding and borders. Their widths now add up the right way."
+  ]
+}

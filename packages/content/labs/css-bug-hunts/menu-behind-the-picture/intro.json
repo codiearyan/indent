@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Kwame", "say": "Visit opens behind the big picture.", "note": "How can 2 beat 20?" },
+    { "title": "Header", "text": "The menu has a high z-index, inside it.", "note": "The picture comes after." },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "A layer that holds it down",
+      "tasks": ["Visit menu on top", "Seat guide on top", "Nothing else moves"]
+    },
+    { "title": "Visit menu", "rows": [["Find us"], ["Access"], ["The cafe"]] }
+  ],
+  "ticket": { "label": "Visit menu", "wrong": "hidden", "why": "Wrong layer", "right": "on top" },
+  "captions": [
+    "At the Wrenfield, Kwame clicks Visit and the menu opens behind the big picture.",
+    "The menu's high z-index only counts inside the header, and the picture wins.",
+    "You find the layer that holds the menu down and fix it, and the seat guides too.",
+    "Now the Visit menu opens on top, with Find us, Access and The cafe in view.",
+    "Same header, same picture. The layers are compared the right way round."
+  ]
+}

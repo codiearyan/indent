@@ -1,0 +1,81 @@
+{
+  "id": "dark-text-on-dark",
+  "title": "Dark writing on the dark box",
+  "files": ["styles.css", "index.html"],
+  "terminal": {
+    "description": "The Wrenfield's home page runs in the Browser panel and reloads every time you save styles.css. The shell is here if you want to look around the files."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "late-show",
+      "title": "Make the late show writing light",
+      "file": "styles.css",
+      "description": "Lior's late show box has a dark background and sets `--ink` to a light colour, so its writing should be light. Only its heading is; the paragraph and the list are dark on dark.\n\nMake all the writing in the late show box light, and make it follow the box's own `--ink`, so a change to `--ink` on the box changes the writing too. No `!important`, and only `styles.css` changes.\n\nThe check reads the colour of the heading, the paragraph and the list in the box on a phone and on a wide screen, then gives the box's `--ink` another colour of its own and reads them again.",
+      "nextSteps": [
+        "Look at the late show box in the Browser panel. Read \"How it happens\" in the lesson.",
+        "Find where the box's paragraph gets its colour from: its own rules first, then the elements around it.",
+        "Work out when that colour was worked out, and from which --ink.",
+        "Give the box a colour that is worked out inside it, save and press Check."
+      ],
+      "hints": [
+        "The heading is light because a rule for headings sets `color: var(--ink)` on the heading itself. The paragraph has no colour rule of its own.",
+        "The paragraph inherits its colour from the box, the box from the page, and the page's colour comes from `body { color: var(--ink) }`, worked out with the page's dark --ink. A colour is inherited as a finished value.",
+        "Set `color: var(--ink);` in the `.late-show` rule too. Then the colour is worked out on the box, with the box's own --ink, and everything inside inherits that."
+      ],
+      "docs": [
+        { "title": "Inheritance", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Inheritance" },
+        { "title": "Using CSS custom properties", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties" },
+        { "title": "var()", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/var" }
+      ],
+      "videos": [
+        { "title": "An introduction to custom properties", "url": "https://www.youtube.com/watch?v=PHO6TBq_auI" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "footer",
+      "title": "Make the footer writing light",
+      "file": "styles.css",
+      "description": "Lior did not mention it, but the footer is dark too and does the same thing: it sets a light `--ink`, its headings are light, and its address, opening times and label are dark on dark.\n\nMake all the writing in the footer light, following the footer's own `--ink`. The same limits hold: no `!important`, and only `styles.css` changes.\n\nThe check reads the colour of the headings, the address, the paragraph and the label in the footer on a phone and on a wide screen, then gives the footer's `--ink` another colour of its own and reads them again.",
+      "nextSteps": [
+        "Scroll to the footer in the Browser panel.",
+        "Find where its address and label get their colour from.",
+        "Compare it with what you found in the late show box.",
+        "Fix the cause in the footer's rule, save and press Check."
+      ],
+      "hints": [
+        "It is the same cause as the late show box, in a different rule.",
+        "`.site-footer` sets `--ink`, but nothing works out a colour with it on the footer itself.",
+        "Set `color: var(--ink);` in the `.site-footer` rule."
+      ],
+      "docs": [
+        { "title": "Inheritance", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Inheritance" },
+        { "title": "Using CSS custom properties", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "other-colours",
+      "title": "Keep every other colour as it was",
+      "file": "styles.css",
+      "description": "Outside the two dark boxes nothing changes colour: the page's writing stays dark, the times stay grey, the notice at the top of the films stays dark orange with its bold line too, and the links and the picture caption keep their own colours.\n\nThis check runs once the late show box and the footer are right, and until then it says which task is not done yet. It reads the colour of headings, paragraphs, the times, the notice and its bold line, the late show link, the caption and the terms link.",
+      "nextSteps": [
+        "Look over the whole page in the Browser panel after your fix.",
+        "Compare the notice's bold line with the rest of the notice.",
+        "If something changed colour, find the rule that reaches it now.",
+        "Save and press Check."
+      ],
+      "hints": [
+        "A fix that changes `--ink` for the whole page, or gives every element a colour, reaches far more than the two boxes.",
+        "The bold line in the notice has no colour of its own; it inherits the notice's. A rule that gives every element `color: var(--ink)` takes that away.",
+        "Put the fix on the two dark boxes only: `.late-show` and `.site-footer` each set their own colour from their own --ink, and everything inside them inherits it."
+      ],
+      "docs": [
+        { "title": "Inheritance", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Inheritance" },
+        { "title": "Universal selector", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/Universal_selectors" }
+      ],
+      "points": 10
+    }
+  ]
+}

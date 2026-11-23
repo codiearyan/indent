@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Bartek", "say": "Films are three in a row on a phone.", "note": "He checks it between reels." },
+    { "title": "Phone layout", "text": "Written in 2021: one column on a phone.", "note": "Its condition is true." },
+    {
+      "title": "Your styles",
+      "file": "styles.css",
+      "mine": true,
+      "gap": "The phone rule always loses",
+      "tasks": ["Films in one column", "Footer stacked", "Wide layout kept"]
+    },
+    { "title": "Bartek's phone", "rows": [["Salt on the Window"], ["The Tin Orchestra"], ["A Coat for Winter"]] }
+  ],
+  "ticket": { "label": "Films", "wrong": "squeezed in a row", "why": "Rule loses", "right": "one above another" },
+  "captions": [
+    "Bartek opens the Wrenfield's page on his phone between reels.",
+    "The phone layout is in the stylesheet, yet the films are still squeezed three in a row.",
+    "You find the rule that beats the phone layout and fix it, without touching wide screens.",
+    "On the phone the films sit one above the other, and the footer is stacked.",
+    "Same stylesheet. The phone layout now arrives on phones and stays off wider screens."
+  ]
+}

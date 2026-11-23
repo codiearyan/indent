@@ -1,0 +1,77 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "root", "label": "Page ink", "kind": "data" },
+      { "id": "body", "label": "body colour", "kind": "data" },
+      { "id": "css", "label": "styles.css", "kind": "file", "mine": true },
+      { "id": "late", "label": "Late show box", "kind": "data" },
+      { "id": "footer", "label": "Footer", "kind": "data" },
+      { "id": "rest", "label": "Rest of the page", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "root", "to": "body", "label": "--ink" },
+      { "from": "body", "to": "late", "label": "a colour" },
+      { "from": "body", "to": "footer", "label": "a colour" },
+      { "from": "body", "to": "rest", "label": "a colour" },
+      { "from": "css", "to": "late", "label": "its own --ink" },
+      { "from": "css", "to": "footer", "label": "its own --ink" }
+    ],
+    "note": "The dark boxes set a light --ink, but the colour their writing inherits was already worked out on the body."
+  },
+  "tasks": {
+    "late-show": {
+      "steps": [
+        {
+          "active": ["root", "root->body", "body"],
+          "note": "The body works out its colour from --ink with the value it sees there, the page's dark ink."
+        },
+        {
+          "active": ["css", "css->late", "late"],
+          "value": { "kind": "map", "label": "the late show box", "entries": [{ "key": "--ink", "value": "a light cream" }, { "key": "background", "value": "dark" }] },
+          "note": "Lior's rule gives the box a light --ink and a dark background."
+        },
+        {
+          "active": ["body", "body->late", "late"],
+          "note": "The paragraph in the box has no colour of its own, so it inherits a finished colour from the body, and the box's --ink never reaches it."
+        },
+        {
+          "active": ["late"],
+          "note": "When a colour is worked out with the box's own --ink, everything in the box inherits the light one, and follows it when it changes."
+        }
+      ]
+    },
+    "footer": {
+      "steps": [
+        {
+          "active": ["css", "css->footer", "footer"],
+          "note": "The footer is dark too and sets the same light --ink."
+        },
+        {
+          "active": ["body", "body->footer", "footer"],
+          "note": "Its address, opening times and label inherit the body's dark colour, in the same way."
+        },
+        {
+          "active": ["footer"],
+          "note": "With a colour worked out on the footer itself, all its writing is light."
+        }
+      ]
+    },
+    "other-colours": {
+      "steps": [
+        {
+          "active": ["body", "body->rest", "rest"],
+          "value": { "kind": "array", "label": "what keeps its colour", "values": ["dark writing on the page", "grey times", "the notice and its bold line", "links and the caption"] },
+          "note": "The rest of the page keeps its dark ink, and the colours of its own."
+        },
+        {
+          "active": ["rest"],
+          "note": "A fix for the whole page, such as a colour on every element, also stops a colour reaching the elements meant to inherit it."
+        },
+        {
+          "active": ["late", "footer", "rest"],
+          "note": "With the fix on the two dark boxes only, they are light inside and nothing else changes."
+        }
+      ]
+    }
+  }
+}

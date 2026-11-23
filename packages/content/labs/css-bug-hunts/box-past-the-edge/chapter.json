@@ -1,0 +1,81 @@
+{
+  "id": "box-past-the-edge",
+  "title": "A box that sticks out on a phone",
+  "files": ["styles.css", "index.html"],
+  "terminal": {
+    "description": "The Wrenfield's home page runs in the Browser panel and reloads every time you save styles.css. Drag the panel narrower to see the page the way a phone would."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "gift-box",
+      "title": "Make the gift box fit its column",
+      "file": "styles.css",
+      "description": "On Bartek's phone the Gift a ticket box sticks out past the right edge of the page, and the whole page can be dragged sideways. It sticks out on a wide screen too, just less.\n\nMake the gift box fit its column by fixing how its width is worked out. Its padding and border stay as they are; task 3 checks them. No `overflow: hidden` on anything around it, no negative margin, and only `styles.css` changes.\n\nThe check reads the gift box's width, box-sizing, padding, border and margins on a phone and on a wide screen, and works out whether they fit columns from a small phone's width up. It knows no layout: it judges what is declared.",
+      "nextSteps": [
+        "Drag the Browser panel narrow and look at the right edge of the gift box. Read \"How it happens\" in the lesson.",
+        "Find every rule that sets the gift box's width, padding and border.",
+        "Add them up the way the browser does by default.",
+        "Change how the box is sized, not what it looks like, save and press Check."
+      ],
+      "hints": [
+        "The box has `width: 100%`, padding on both sides and a border on both sides.",
+        "By default a width covers only what is inside the box. The padding and border are added on top, so the box is 100% of its column plus 54px.",
+        "Either make the width count the padding and border with `box-sizing: border-box`, or remove `width: 100%`: a block box fills its column by itself, padding included."
+      ],
+      "docs": [
+        { "title": "box-sizing", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/box-sizing" },
+        { "title": "Introduction to the box model", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Box_model/Introduction" },
+        { "title": "width", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/width" }
+      ],
+      "videos": [
+        { "title": "content-box and border-box explained", "url": "https://www.youtube.com/watch?v=4CofRp-tjTE" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "email-field",
+      "title": "Make the email field fit the footer",
+      "file": "styles.css",
+      "description": "Bartek did not mention it, but the email field in the footer sticks out of its column too, past the Sign up button under it.\n\nMake the field fit its column while it still fills the whole width of it, padding and border included. The same limits hold: no `overflow: hidden`, no negative margin, and only `styles.css` changes.\n\nThe check reads the field's width, box-sizing, padding, border and margins on a phone and on a wide screen, and works out whether it fits and fills columns from a small phone's width up.",
+      "nextSteps": [
+        "Look at the footer's email field in a narrow Browser panel.",
+        "Find the rule that sizes it.",
+        "Ask whether removing its width would help here. A field is not a block box.",
+        "Fix how it is sized, save and press Check."
+      ],
+      "hints": [
+        "It is the same sum as the gift box: 100% plus padding and border.",
+        "A field without a width is only as wide as its own default size, so here the width has to stay.",
+        "Give the field `box-sizing: border-box`, or give every element that sizing once at the top of the file."
+      ],
+      "docs": [
+        { "title": "box-sizing", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/box-sizing" },
+        { "title": "Introduction to the box model", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Box_model/Introduction" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "same-look",
+      "title": "Keep the padding, borders and layout",
+      "file": "styles.css",
+      "description": "Fitting the boxes must not change how they look: the gift box keeps its padding and its orange border, the email field its padding and border, the film cards theirs, and the membership and gift boxes keep two columns on a wide screen and one on a phone.\n\nThis check runs once the gift box and the email field fit, and until then it says which task is not done yet. It reads the padding and borders of the gift box, the email field and a film card, and the columns of the membership and gift boxes.",
+      "nextSteps": [
+        "Look at the gift box and the footer after your fix.",
+        "Compare their padding and borders with what styles.css set for them before.",
+        "If one changed, find the rule that changed it.",
+        "Save and press Check."
+      ],
+      "hints": [
+        "Taking the padding or the border away makes a box fit by making it look different.",
+        "The width is what was worked out wrong, so the fix belongs there: what the width counts, or whether there is one.",
+        "Keep `padding` and `border` as they were, and change only `box-sizing` or `width`."
+      ],
+      "docs": [
+        { "title": "padding", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/padding" },
+        { "title": "box-sizing", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/box-sizing" }
+      ],
+      "points": 10
+    }
+  ]
+}
