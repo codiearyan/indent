@@ -123,10 +123,10 @@ export const checks = {
     const b = await box(t)
     const flagTable = await call(b, 'src/flags.js', '@FLAGS', [])
     const cases = [
-      { name: 'count --json', args: ['count', '--json', 'week.txt', 'late.txt'], command: 'count', flags: {}, code: 0 },
-      { name: 'count --by paper --json', args: ['--json', 'count', 'late.txt', '--by', 'paper'], command: 'count', files: { 'late.txt': LATE }, flags: { by: 'paper' }, code: 0 },
-      { name: 'list --json', args: ['list', 'week.txt', 'late.txt', '--paper', 'cotton', '--json'], command: 'list', flags: { paper: 'cotton' }, code: 0 },
-      { name: 'check --json', args: ['check', '--json', 'week.txt', 'late.txt'], command: 'check', flags: {}, code: 1 }
+      { name: 'count --json', args: ['count', '--json', 'week.txt', 'late.txt'], command: 'count', flags: {} },
+      { name: 'count --by paper --json', args: ['--json', 'count', 'late.txt', '--by', 'paper'], command: 'count', files: { 'late.txt': LATE }, flags: { by: 'paper' } },
+      { name: 'list --json', args: ['list', 'week.txt', 'late.txt', '--paper', 'cotton', '--json'], command: 'list', flags: { paper: 'cotton' } },
+      { name: 'check --json', args: ['check', '--json', 'week.txt', 'late.txt'], command: 'check', flags: {} }
     ]
     const runs = await Promise.all(cases.map((c) => run(b, c.args, { files: FILES })))
     const [badFlag, help] = await Promise.all([run(b, ['list', '--json', '--colour', 'week.txt'], { files: FILES }), run(b, ['list', '--help'])])
@@ -154,7 +154,8 @@ export const checks = {
       })
       let message
       if (out.length && parsed.every((p) => p.ok) && isDeepStrictEqual(parsed.map((p) => p.value), want.results.map((x) => x.value))) {
-        message = r.code === c.code ? undefined : `With --json the exit code stays what it was: ${c.code === 1 ? 'check found problems here' : 'all went well here'}.`
+        // The exit code is task 2's to judge.
+        message = undefined
       } else if (out.length === 0) {
         message = 'With --json nothing reached standard output. The JSON is the result, so it goes to standard output like any result.'
       } else if (out.length === 1 && parsed[0].ok && isDeepStrictEqual(parsed[0].value, want.results.map((x) => x.value))) {
@@ -173,9 +174,10 @@ export const checks = {
       results.push(message ? fail(c.name, message, report(r)) : pass(c.name, report(r)))
     }
     results.push(
-      badFlag.stdout === '' && badFlag.code === 2 && lines(badFlag.stderr).length === 1
+      // Where the error goes and the code it ends with are tasks 1 and 2; here only: no JSON for it.
+      !lines(badFlag.stdout).some((l) => /^\s*[{["]/.test(l)) && /unknown flag --colour/.test(`${badFlag.stdout}${badFlag.stderr}`)
         ? pass('An error with --json stays plain', report(badFlag))
-        : fail('An error with --json stays plain', 'An error is a message for a person, with or without --json: one plain line on standard error, nothing on standard output, and exit code 2.', report(badFlag))
+        : fail('An error with --json stays plain', 'An error is a message for a person, with or without --json: it stays a plain line, never JSON.', report(badFlag))
     )
     const jsonLine = lines(help.stdout).find((l) => l.includes('--json'))
     results.push(

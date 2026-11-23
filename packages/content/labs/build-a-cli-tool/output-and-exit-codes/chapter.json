@@ -1,7 +1,16 @@
 {
   "id": "output-and-exit-codes",
   "title": "Two streams and an exit code",
-  "files": ["orders.js", "src/flags.js", "src/commands.js", "src/shop.js", "src/args.js", "src/input.js", "package.json", "orders/press-2.txt"],
+  "files": [
+    "orders.js",
+    "src/flags.js",
+    "src/commands.js",
+    "src/shop.js",
+    "src/args.js",
+    "src/input.js",
+    "package.json",
+    "orders/press-2.txt"
+  ],
   "terminal": {
     "description": "A shell in your workspace. Add `2> /dev/null` (or `2> $null` in PowerShell) to see only standard output, and print the exit code with `echo $?` (or `$LASTEXITCODE` in PowerShell).",
     "suggestedCommand": "node orders.js check orders/press-1.txt orders/press-2.txt"
@@ -24,9 +33,24 @@
         "`note: (text) => console.error(text)`, and in the `catch`: `console.error(`orders: ${error.message}`)`."
       ],
       "docs": [
-        { "title": "console.error()", "url": "https://nodejs.org/api/console.html#consoleerrordata-args" },
-        { "title": "process.stderr", "url": "https://nodejs.org/api/process.html#processstderr" },
-        { "title": "process.stdout", "url": "https://nodejs.org/api/process.html#processstdout" }
+        {
+          "title": "console.error()",
+          "url": "https://nodejs.org/api/console.html#consoleerrordata-args"
+        },
+        {
+          "title": "process.stderr",
+          "url": "https://nodejs.org/api/process.html#processstderr"
+        },
+        {
+          "title": "process.stdout",
+          "url": "https://nodejs.org/api/process.html#processstdout"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Input, output and error streams",
+          "url": "https://www.youtube.com/watch?v=Oy2MjSqX8E0"
+        }
       ],
       "points": 10
     },
@@ -47,9 +71,18 @@
         "Return `ok ? 0 : 1` from `main` after running the command, and `0` after help or the version. Then `process.exitCode = await main(process.argv.slice(2))`, and `process.exitCode = 2` in the `catch`."
       ],
       "docs": [
-        { "title": "process.exitCode", "url": "https://nodejs.org/api/process.html#processexitcode_1" },
-        { "title": "process.exit()", "url": "https://nodejs.org/api/process.html#processexitcode" },
-        { "title": "A note on process I/O", "url": "https://nodejs.org/api/process.html#a-note-on-process-io" }
+        {
+          "title": "process.exitCode",
+          "url": "https://nodejs.org/api/process.html#processexitcode_1"
+        },
+        {
+          "title": "process.exit()",
+          "url": "https://nodejs.org/api/process.html#processexitcode"
+        },
+        {
+          "title": "A note on process I/O",
+          "url": "https://nodejs.org/api/process.html#a-note-on-process-io"
+        }
       ],
       "points": 10
     },
@@ -57,7 +90,7 @@
       "id": "json",
       "title": "Print JSON for a program with --json",
       "file": "orders.js",
-      "description": "Add `--json`, so another program can read the results without cutting text apart.\n\n- `json` is a switch in `FLAGS` in `src/flags.js`, with an `about` that says what it does\n- every command takes it: add it to the `flags` of each entry in `COMMANDS`, and the help shows it\n- with `--json`, each result is printed on standard output as one line: the JSON of the value `out.result` was given for it, and nothing else\n- notes and errors stay plain text on standard error, and the exit codes stay as they are\n\nFor example, `node orders.js count --by paper --json orders/press-1.txt` prints one line for each paper:\n\n```\n{\"paper\":\"cotton\",\"orders\":2}\n```\n\nThe check runs each command with `--json` on order files of its own, reads each line of standard output as JSON and compares it with the values the shop's functions give.",
+      "description": "Add `--json`, so another program can read the results without cutting text apart.\n\n- `json` is a switch in `FLAGS` in `src/flags.js`, with an `about` that says what it does\n- every command takes it: add it to the `flags` of each entry in `COMMANDS`, and the help shows it\n- with `--json`, each result is printed on standard output as one line: the JSON of the value `out.result` was given for it, and nothing else\n- notes and errors stay plain text on standard error\n\nFor example, `node orders.js count --by paper --json orders/press-1.txt` prints one line for each paper:\n\n```\n{\"paper\":\"cotton\",\"orders\":2}\n```\n\nThe check runs each command with `--json` on order files of its own, reads each line of standard output as JSON and compares it with the values the shop's functions give.",
       "nextSteps": [
         "Add the flag to `FLAGS` and to each command, and run `node orders.js list --help`.",
         "Read \"Output for programs\" in the lesson.",
@@ -70,8 +103,14 @@
         "`json: { about: 'one JSON value on each line, for programs' }` in `FLAGS`, `'json'` in each command's `flags`, and in `main`: `result: (text, value) => console.log(flags.json ? JSON.stringify(value) : text)`."
       ],
       "docs": [
-        { "title": "JSON.stringify()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" },
-        { "title": "JSON.parse()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" }
+        {
+          "title": "JSON.stringify()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify"
+        },
+        {
+          "title": "JSON.parse()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse"
+        }
       ],
       "points": 10
     }

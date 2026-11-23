@@ -1,7 +1,16 @@
 {
   "id": "reading-input",
   "title": "Input from files and pipes",
-  "files": ["src/input.js", "orders.js", "make-year.js", "src/shop.js", "src/commands.js", "src/args.js", "src/flags.js", "orders/press-2.txt"],
+  "files": [
+    "src/input.js",
+    "orders.js",
+    "make-year.js",
+    "src/shop.js",
+    "src/commands.js",
+    "src/args.js",
+    "src/flags.js",
+    "orders/press-2.txt"
+  ],
   "terminal": {
     "description": "A shell in your workspace. Pipe orders into the tool with `cat orders/press-2.txt | node orders.js check`, which works in PowerShell too.",
     "suggestedCommand": "cat orders/press-2.txt | node orders.js check"
@@ -24,9 +33,24 @@
         "`for await (const text of createInterface({ input: createReadStream(name), crlfDelay: Infinity })) yield { file: name, line: ++line, text }`, with `let line = 0` before the loop, for each name."
       ],
       "docs": [
-        { "title": "fs.createReadStream()", "url": "https://nodejs.org/api/fs.html#fscreatereadstreampath-options" },
-        { "title": "readline: for await...of", "url": "https://nodejs.org/api/readline.html#example-read-file-stream-line-by-line" },
-        { "title": "async function*", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*" }
+        {
+          "title": "fs.createReadStream()",
+          "url": "https://nodejs.org/api/fs.html#fscreatereadstreampath-options"
+        },
+        {
+          "title": "readline: for await...of",
+          "url": "https://nodejs.org/api/readline.html#example-read-file-stream-line-by-line"
+        },
+        {
+          "title": "async function*",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Streams in Node",
+          "url": "https://www.youtube.com/watch?v=EcznOgzOdxI"
+        }
       ],
       "points": 10
     },
@@ -47,8 +71,14 @@
         "`const input = name === '-' ? process.stdin : createReadStream(name)` and `const file = name === '-' ? 'stdin' : name`, then the same loop as task 1."
       ],
       "docs": [
-        { "title": "process.stdin", "url": "https://nodejs.org/api/process.html#processstdin" },
-        { "title": "readline.createInterface()", "url": "https://nodejs.org/api/readline.html#readlinecreateinterfaceoptions" }
+        {
+          "title": "process.stdin",
+          "url": "https://nodejs.org/api/process.html#processstdin"
+        },
+        {
+          "title": "readline.createInterface()",
+          "url": "https://nodejs.org/api/readline.html#readlinecreateinterfaceoptions"
+        }
       ],
       "points": 10
     },
@@ -69,9 +99,18 @@
         "At the top of `orders.js`: `process.stdout.on('error', (error) => { if (error.code === 'EPIPE') process.exit(0); throw error })`."
       ],
       "docs": [
-        { "title": "Stream: error event", "url": "https://nodejs.org/api/stream.html#event-error" },
-        { "title": "Common system errors: EPIPE", "url": "https://nodejs.org/api/errors.html#common-system-errors" },
-        { "title": "process.exit()", "url": "https://nodejs.org/api/process.html#processexitcode" }
+        {
+          "title": "Stream: error event",
+          "url": "https://nodejs.org/api/stream.html#event-error"
+        },
+        {
+          "title": "Common system errors: EPIPE",
+          "url": "https://nodejs.org/api/errors.html#common-system-errors"
+        },
+        {
+          "title": "process.exit()",
+          "url": "https://nodejs.org/api/process.html#processexitcode"
+        }
       ],
       "points": 10
     }

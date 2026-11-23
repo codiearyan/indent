@@ -1,7 +1,16 @@
 {
   "id": "commands-and-help",
   "title": "Commands and help",
-  "files": ["src/commands.js", "orders.js", "src/shop.js", "src/flags.js", "src/args.js", "src/input.js", "package.json", "orders/press-1.txt"],
+  "files": [
+    "src/commands.js",
+    "orders.js",
+    "src/shop.js",
+    "src/flags.js",
+    "src/args.js",
+    "src/input.js",
+    "package.json",
+    "orders/press-1.txt"
+  ],
   "terminal": {
     "description": "A shell in your workspace. `node orders.js` with a command runs it on the order files you name.",
     "suggestedCommand": "node orders.js count orders/press-1.txt orders/press-2.txt"
@@ -24,9 +33,18 @@
         "`count: { summary: 'Count the orders', flags: ['paper', 'by', 'help'], run: countOrders }`, and in `main`: `if (!Object.hasOwn(COMMANDS, command)) throw new Error(`unknown command ${command}`)`, then `await COMMANDS[command].run(readOrders(values), flags, out)`."
       ],
       "docs": [
-        { "title": "Object.hasOwn()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn" },
-        { "title": "Property accessors", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors" },
-        { "title": "Functions as values", "url": "https://developer.mozilla.org/en-US/docs/Glossary/First-class_Function" }
+        {
+          "title": "Object.hasOwn()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn"
+        },
+        {
+          "title": "Property accessors",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors"
+        },
+        {
+          "title": "Functions as values",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/First-class_Function"
+        }
       ],
       "points": 10
     },
@@ -47,9 +65,18 @@
         "A flag's line starts with `--${name}`, then `, -${flag.short}` when it has one, then ` <${flag.value}>` when it has one, then its `about`. In `main`: `if (flags.version)` print `JSON.parse(await readFile(new URL('package.json', import.meta.url), 'utf8')).version`, and `if (command === undefined)` print `toolHelp(COMMANDS, FLAGS)`."
       ],
       "docs": [
-        { "title": "Object.entries()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries" },
-        { "title": "import.meta", "url": "https://nodejs.org/api/esm.html#importmeta" },
-        { "title": "String.prototype.padEnd()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padEnd" }
+        {
+          "title": "Object.entries()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries"
+        },
+        {
+          "title": "import.meta",
+          "url": "https://nodejs.org/api/esm.html#importmeta"
+        },
+        {
+          "title": "String.prototype.padEnd()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padEnd"
+        }
       ],
       "points": 10
     },
@@ -70,9 +97,24 @@
         "Start a row as `[0, 1, 2, ..., b.length]`. For each letter of `a`, make the next row: `row[j] = Math.min(above[j] + 1, row[j - 1] + 1, above[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1))`. In `nearest`, start with `fewest = 3` and keep a name only when its count is smaller."
       ],
       "docs": [
-        { "title": "Math.min()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min" },
-        { "title": "Array.from()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from" },
-        { "title": "Indexed collections", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Indexed_collections" }
+        {
+          "title": "Math.min()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min"
+        },
+        {
+          "title": "Array.from()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from"
+        },
+        {
+          "title": "Indexed collections",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Indexed_collections"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Edit distance, filled in as a table",
+          "url": "https://www.youtube.com/watch?v=We3YDTzNXEk"
+        }
       ],
       "points": 10
     }

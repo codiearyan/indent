@@ -1,7 +1,17 @@
 {
   "id": "the-finished-tool",
   "title": "A tool with a name",
-  "files": ["src/settings.js", "orders.js", "package.json", "morning.txt", "src/shop.js", "src/commands.js", "src/input.js", "src/args.js", "src/flags.js"],
+  "files": [
+    "src/settings.js",
+    "orders.js",
+    "package.json",
+    "morning.txt",
+    "src/shop.js",
+    "src/commands.js",
+    "src/input.js",
+    "src/args.js",
+    "src/flags.js"
+  ],
   "terminal": {
     "description": "A shell in your workspace. Set a setting for one command with `ORDERS_LIMIT=2 node orders.js list orders/press-1.txt` (PowerShell: `$env:ORDERS_LIMIT=2` first).",
     "suggestedCommand": "node orders.js check orders/press-1.txt orders/press-2.txt"
@@ -24,8 +34,20 @@
         "`if (flags.limit !== undefined || env.ORDERS_LIMIT === undefined) return flags`, then throw `new Error(`ORDERS_LIMIT must be a whole number above 0, not \"${env.ORDERS_LIMIT}\"`)` when it does not match, and otherwise `return { ...flags, limit: env.ORDERS_LIMIT }`."
       ],
       "docs": [
-        { "title": "process.env", "url": "https://nodejs.org/api/process.html#processenv" },
-        { "title": "Spread syntax", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax" }
+        {
+          "title": "process.env",
+          "url": "https://nodejs.org/api/process.html#processenv"
+        },
+        {
+          "title": "Spread syntax",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What environment variables are",
+          "url": "https://www.youtube.com/watch?v=v5n96CX339g"
+        }
       ],
       "points": 10
     },
@@ -46,9 +68,18 @@
         "`return stream.isTTY === true && !env.NO_COLOR`. In `main`, `const red = command === 'check' && useColour(process.stdout, process.env)`, and in `out.result` print `red ? `\\x1b[31m${text}\\x1b[39m` : text` when `--json` is off."
       ],
       "docs": [
-        { "title": "writeStream.isTTY", "url": "https://nodejs.org/api/tty.html#writestreamistty" },
-        { "title": "writeStream.hasColors()", "url": "https://nodejs.org/api/tty.html#writestreamhascolorscount-env" },
-        { "title": "util.styleText()", "url": "https://nodejs.org/api/util.html#utilstyletextformat-text-options" }
+        {
+          "title": "writeStream.isTTY",
+          "url": "https://nodejs.org/api/tty.html#writestreamistty"
+        },
+        {
+          "title": "writeStream.hasColors()",
+          "url": "https://nodejs.org/api/tty.html#writestreamhascolorscount-env"
+        },
+        {
+          "title": "util.styleText()",
+          "url": "https://nodejs.org/api/util.html#utilstyletextformat-text-options"
+        }
       ],
       "points": 10
     },
@@ -69,8 +100,14 @@
         "`orders count orders/press-1.txt orders/press-2.txt`, `orders count --by paper orders/press-1.txt orders/press-2.txt` and `orders check orders/press-1.txt orders/press-2.txt`."
       ],
       "docs": [
-        { "title": "package.json: bin", "url": "https://docs.npmjs.com/cli/v11/configuring-npm/package-json#bin" },
-        { "title": "Hashbang comments", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#hashbang_comments" }
+        {
+          "title": "package.json: bin",
+          "url": "https://docs.npmjs.com/cli/v11/configuring-npm/package-json#bin"
+        },
+        {
+          "title": "Hashbang comments",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#hashbang_comments"
+        }
       ],
       "points": 10
     }

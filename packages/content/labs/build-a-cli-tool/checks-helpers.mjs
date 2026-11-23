@@ -106,7 +106,8 @@ export async function box(t, { noUtil = false } = {}) {
       '.grader/call.mjs': here('./call-case.mjs'),
       '.grader/tty.mjs': here('./preload-tty.mjs'),
       '.grader/slow-pipe.mjs': here('./preload-slow-pipe.mjs'),
-      '.grader/no-util.mjs': here('./preload-no-util.mjs')
+      '.grader/no-util.mjs': here('./preload-no-util.mjs'),
+      '.grader/closed-pipe.mjs': here('./preload-closed-pipe.mjs')
     })
   )
   // A link copied from the workspace could lead a write out of the copy, past the guard.
@@ -147,7 +148,8 @@ const quote = (arg) => (arg === '' || /[\s"'<>|&;$]/.test(arg) ? `'${arg}'` : ar
 export async function run(b, args, opts = {}) {
   const { files = {}, stdin, stdinOpen, env = {}, tty, slowPipe, memory, seconds, closeAfter, moreInput } = opts
   const folder = await caseFolder(b, files)
-  const preloads = [b.noUtil && 'no-util.mjs', tty && 'tty.mjs', slowPipe && 'slow-pipe.mjs'].filter(Boolean)
+  const closing = closeAfter !== undefined && 'closed-pipe.mjs'
+  const preloads = [b.noUtil && 'no-util.mjs', tty && 'tty.mjs', slowPipe && 'slow-pipe.mjs', closing].filter(Boolean)
   const flags = [
     ...(b.useGuard ? guardFlags(folder) : []),
     ...(memory ? [`--max-old-space-size=${memory}`] : []),

@@ -124,7 +124,7 @@ export const checks = {
       if (r.code === 13 || /unsettled top-level await/.test(r.stderr)) {
         return fail(name, 'The tool ended while an await was still waiting for input that will never come, which Node reports with exit code 13. Stop the tool itself once the reader is gone.', report(r))
       }
-      if (/EPIPE|EOF/.test(r.stderr) || hasStack(r.stderr)) {
+      if (/EPIPE|EOF|ENOTCONN/.test(r.stderr) || hasStack(r.stderr)) {
         return fail(
           name,
           'The tool stopped with an error when the reader went away. Nobody is left to read, and that is not a mistake to report to anyone: end quietly, with nothing on standard error.',
