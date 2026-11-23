@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Dorrit",
+      "say": "Take each typed line apart, right."
+    },
+    {
+      "title": "The form",
+      "text": "Stray spaces, gaps, an o in a ticket."
+    },
+    {
+      "title": "Your code",
+      "file": "fields.cpp",
+      "mine": true,
+      "gap": "Lines taken as they come",
+      "tasks": [
+        "Trim a field",
+        "Split a line",
+        "Read a number",
+        "Put a line together"
+      ]
+    },
+    {
+      "title": "The tickets",
+      "text": "Clean fields, and a word when one is wrong."
+    }
+  ],
+  "ticket": {
+    "label": "Ticket 31o7",
+    "wrong": "guessed at",
+    "why": "A guess",
+    "right": "refused"
+  },
+  "captions": [
+    "Dorrit's form saves each ticket as one typed line, and she wants every line taken apart.",
+    "Today the lines go in as typed: stray spaces, missing fields, a letter in a ticket.",
+    "You trim fields, split lines at the separator, read numbers strictly, build clean lines.",
+    "A line with a letter in its ticket number is noticed and refused, not guessed at.",
+    "Dorrit's typed lines come out as clean fields now, and a wrong one is caught at once."
+  ]
+}

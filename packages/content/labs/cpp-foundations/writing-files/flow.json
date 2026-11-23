@@ -1,0 +1,77 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ambrose", "label": "Ambrose's desk", "kind": "story" },
+      { "id": "bills", "label": "The day's bills", "kind": "data" },
+      { "id": "line", "label": "writeBillLine()", "kind": "function", "mine": true },
+      { "id": "sheet", "label": "writeSheet()", "kind": "function", "mine": true },
+      { "id": "log", "label": "addToLog()", "kind": "function", "mine": true },
+      { "id": "disk", "label": "Files on disk", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "ambrose", "to": "bills", "label": "the day" },
+      { "from": "bills", "to": "sheet", "label": "bills" },
+      { "from": "sheet", "to": "line", "label": "one bill" },
+      { "from": "line", "to": "disk", "label": "a line" },
+      { "from": "ambrose", "to": "log", "label": "today's entry" },
+      { "from": "log", "to": "disk", "label": "one more line" }
+    ],
+    "note": "The day's sheet and the logbook are written to files, the sheet in straight columns and the log one day at a time."
+  },
+  "tasks": {
+    "writeBillLine": {
+      "steps": [
+        {
+          "active": ["sheet->line", "line"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a stream", "an item", "minutes", "a price"] },
+          "note": "One bill arrives, with the stream it is to be written to."
+        },
+        {
+          "active": ["line"],
+          "value": { "kind": "array", "label": "the columns", "values": ["item, on the left", "minutes, on the right", "price with pence, on the right"] },
+          "note": "Each value takes its own column, so every line of the sheet lines up."
+        },
+        {
+          "active": ["line->disk", "disk"],
+          "note": "The line goes wherever the stream points: the terminal, or a file."
+        }
+      ]
+    },
+    "writeSheet": {
+      "steps": [
+        {
+          "active": ["ambrose->bills", "bills->sheet", "sheet"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a path", "the day's bills"] },
+          "note": "Ambrose hands over the day's bills and where the sheet goes."
+        },
+        {
+          "active": ["sheet->line", "line"],
+          "note": "Each bill becomes a line of the sheet, and the totals grow as it goes."
+        },
+        {
+          "active": ["line->disk", "disk"],
+          "value": { "kind": "array", "label": "the file", "values": ["one line per bill", "a Total line"] },
+          "note": "A fresh sheet takes the place of yesterday's, and Ambrose hears whether it could be written."
+        }
+      ]
+    },
+    "addToLog": {
+      "steps": [
+        {
+          "active": ["ambrose->log", "log"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a path", "today's entry"] },
+          "note": "Ambrose has one line to add to the logbook."
+        },
+        {
+          "active": ["log->disk", "disk"],
+          "note": "The entry goes after the days already there, which stay as they were."
+        },
+        {
+          "active": ["log"],
+          "value": { "kind": "array", "label": "comes out", "values": ["how many lines the log holds"] },
+          "note": "Once the entry is really in the file, the log's lines are counted."
+        }
+      ]
+    }
+  }
+}

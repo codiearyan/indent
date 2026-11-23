@@ -1,0 +1,40 @@
+{
+  "stations": [
+    {
+      "title": "Kasimir",
+      "say": "The list is in a file. Read it."
+    },
+    {
+      "title": "The morning",
+      "text": "The list copied in by hand, a count wrong."
+    },
+    {
+      "title": "Your code",
+      "file": "stocktake.cpp",
+      "mine": true,
+      "gap": "Nothing reads the files",
+      "tasks": [
+        "Read every line",
+        "Add up the drawer",
+        "Read the notes"
+      ]
+    },
+    {
+      "title": "The stocktake",
+      "text": "The drawer and the notes, as on disk."
+    }
+  ],
+  "ticket": {
+    "label": "Drawer list",
+    "wrong": "typed again",
+    "why": "By hand",
+    "right": "from disk"
+  },
+  "captions": [
+    "Kasimir keeps the drawer list and his notes in files, and wants the program to read them.",
+    "Today he copies both into the program by hand every morning, and a count goes wrong.",
+    "You read a file line by line, add up the drawer, and read the notes, spaces and all.",
+    "The stocktake reads the files on disk, and the counts are the ones Kasimir wrote.",
+    "Kasimir's lists are read from disk now, and nobody types them in again."
+  ]
+}

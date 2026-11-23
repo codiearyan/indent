@@ -1,0 +1,96 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dorrit", "label": "Dorrit's counter", "kind": "story" },
+      { "id": "line", "label": "A typed line", "kind": "data" },
+      { "id": "split", "label": "splitAt()", "kind": "function", "mine": true },
+      { "id": "trim", "label": "trim()", "kind": "function", "mine": true },
+      { "id": "whole", "label": "toWhole()", "kind": "function", "mine": true },
+      { "id": "join", "label": "ticketLine()", "kind": "function", "mine": true },
+      { "id": "file", "label": "The tickets file", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "dorrit", "to": "line", "label": "types" },
+      { "from": "line", "to": "split", "label": "one line" },
+      { "from": "split", "to": "trim", "label": "fields" },
+      { "from": "trim", "to": "whole", "label": "clean field" },
+      { "from": "whole", "to": "join", "label": "a number" },
+      { "from": "join", "to": "file", "label": "a clean line" }
+    ],
+    "note": "Each typed line is taken apart into clean fields, its numbers are checked, and a clean line is put back together."
+  },
+  "tasks": {
+    "trim": {
+      "steps": [
+        {
+          "active": ["split->trim", "trim"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a field, blanks and all"] },
+          "note": "A field arrives as it was typed, spaces and a stray line end around it."
+        },
+        {
+          "active": ["trim"],
+          "note": "The blanks at both ends are taken away; what is between stays as it is."
+        },
+        {
+          "active": ["trim->whole"],
+          "value": { "kind": "array", "label": "comes out", "values": ["the field without its blanks"] },
+          "note": "The clean field goes on, ready to be read."
+        }
+      ]
+    },
+    "splitAt": {
+      "steps": [
+        {
+          "active": ["dorrit->line", "line->split"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a typed line", "the separator"] },
+          "note": "Dorrit's form saves a ticket as one line, with a separator between its fields."
+        },
+        {
+          "active": ["split"],
+          "note": "The line is cut at every separator and nowhere else, empty pieces counted too."
+        },
+        {
+          "active": ["split->trim"],
+          "value": { "kind": "array", "label": "comes out", "values": ["one field per piece, in order"] },
+          "note": "The fields go on in order, so a missing one can be noticed."
+        }
+      ]
+    },
+    "toWhole": {
+      "steps": [
+        {
+          "active": ["trim->whole", "whole"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a field that should be a number"] },
+          "note": "A ticket number or the minutes arrive as text."
+        },
+        {
+          "active": ["whole"],
+          "note": "The number is read, and then whatever is left is looked at."
+        },
+        {
+          "active": ["whole->join"],
+          "value": { "kind": "array", "label": "comes out", "values": ["the number, or nothing when the field is not one"] },
+          "note": "Only a field that is a whole number and nothing else counts as one."
+        }
+      ]
+    },
+    "ticketLine": {
+      "steps": [
+        {
+          "active": ["whole->join", "join"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a ticket", "an item", "the parts"] },
+          "note": "A ticket's values arrive, checked and clean."
+        },
+        {
+          "active": ["join"],
+          "note": "They are written into one text, with commas between them and the parts to the penny."
+        },
+        {
+          "active": ["join->file", "file"],
+          "value": { "kind": "array", "label": "comes out", "values": ["one clean line"] },
+          "note": "The clean line is ready for the tickets file."
+        }
+      ]
+    }
+  }
+}

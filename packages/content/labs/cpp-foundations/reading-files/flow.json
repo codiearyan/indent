@@ -1,0 +1,78 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kasimir", "label": "Kasimir's bench", "kind": "story" },
+      { "id": "files", "label": "Files in data/", "kind": "data" },
+      { "id": "lines", "label": "readLines()", "kind": "function", "mine": true },
+      { "id": "total", "label": "totalParts()", "kind": "function", "mine": true },
+      { "id": "notes", "label": "readNotes()", "kind": "function", "mine": true },
+      { "id": "stocktake", "label": "The stocktake", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kasimir", "to": "files", "label": "writes" },
+      { "from": "files", "to": "lines", "label": "any file" },
+      { "from": "files", "to": "total", "label": "names, counts" },
+      { "from": "files", "to": "notes", "label": "notes" },
+      { "from": "lines", "to": "stocktake", "label": "every line" },
+      { "from": "total", "to": "stocktake", "label": "the total" },
+      { "from": "notes", "to": "stocktake", "label": "the notes" }
+    ],
+    "note": "Kasimir's lists are read from the files on disk, so nobody types them in again."
+  },
+  "tasks": {
+    "readLines": {
+      "steps": [
+        {
+          "active": ["files->lines", "lines"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a path", "the lines so far"] },
+          "note": "A path to one of the files arrives, with the lines read so far."
+        },
+        {
+          "active": ["lines"],
+          "note": "The file is opened, and the stocktake hears when it is not there."
+        },
+        {
+          "active": ["lines->stocktake", "stocktake"],
+          "value": { "kind": "array", "label": "comes out", "values": ["whether it opened", "each line of the file, added"] },
+          "note": "Each line of the file joins the list, in order, and nothing more."
+        }
+      ]
+    },
+    "totalParts": {
+      "steps": [
+        {
+          "active": ["files->total", "total"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a stream of names and counts"] },
+          "note": "The drawer list arrives as a stream: a part's name, then its count."
+        },
+        {
+          "active": ["total"],
+          "note": "Each name is read, then its count, until the stream ends or a count is not a number."
+        },
+        {
+          "active": ["total->stocktake", "stocktake"],
+          "value": { "kind": "array", "label": "comes out", "values": ["the counts added up, or a sign that one is wrong"] },
+          "note": "The stocktake gets the total, or hears that the list has a mistake in it."
+        }
+      ]
+    },
+    "readNotes": {
+      "steps": [
+        {
+          "active": ["kasimir->files", "files"],
+          "note": "Kasimir writes how many notes there are, then one note on each line."
+        },
+        {
+          "active": ["files->notes", "notes"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the number of notes", "a whole line per note"] },
+          "note": "The number is read first, then each note as a whole line, spaces kept."
+        },
+        {
+          "active": ["notes->stocktake", "stocktake"],
+          "value": { "kind": "array", "label": "comes out", "values": ["the notes, in order"] },
+          "note": "Only the notes the stream really holds come out, and never more than it said."
+        }
+      ]
+    }
+  }
+}

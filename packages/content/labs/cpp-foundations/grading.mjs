@@ -2285,7 +2285,7 @@ export async function buildTypes(t, spec) {
   const exe = join(dir, '.check', 'program')
   const sources = [...(single ? [] : [checkFile]), ...spec.files.filter((f) => !isHeader(f))]
   const probing = spec.probes?.length ? startProbes(cc, dir, spec, cuts, header) : null
-  const made = await output(cc, ['-std=c++17', '-Wall', ...HARDENED, ...(balanced ? [] : ['-fsyntax-only']), ...sources, '-o', exe], {
+  const made = await output(cc, ['-std=c++17', '-Wall', ...(spec.extraFlags ?? []), ...HARDENED, ...(balanced ? [] : ['-fsyntax-only']), ...sources, '-o', exe], {
     cwd: dir,
     timeoutMs: 60000,
     env: { LC_ALL: 'C' }
@@ -3503,7 +3503,7 @@ export async function judgeMemory(t, spec) {
 // can switch off, as NDEBUG would in a shop build. Given functions and classes above Task 1 can be
 // swapped for Check's own (spec.swaps), so a task that calls one can make it throw on purpose.
 
-const FAULT_HELPERS = (own) => [
+const FAULT_HELPERS = (own, named = []) => [
   '#include <exception>',
   '#include <stdexcept>',
   '#include <typeinfo>',
@@ -3523,7 +3523,7 @@ template <class T> void ft_() {
   else if constexpr (opt7_<B>::value) { std::cerr << "std::optional<"; ft_<typename opt7_<B>::elem>(); std::cerr << ">"; }
   else if constexpr (up7_<B>::value) { std::cerr << "std::unique_ptr<"; ft_<typename up7_<B>::elem>(); std::cerr << ">"; }
   else if constexpr (vec_<B>::value) { std::cerr << "std::vector<"; ft_<typename vec_<B>::elem>(); std::cerr << ">"; }
-  else if constexpr (map_<B>::value) { std::cerr << "std::map<"; ft_<typename map_<B>::key>(); std::cerr << ", "; ft_<typename map_<B>::mapped>(); std::cerr << ">"; }
+  else if constexpr (map_<B>::value) { std::cerr << "std::map<"; ft_<typename map_<B>::key>(); std::cerr << ", "; ft_<typename map_<B>::mapped>(); std::cerr << ">"; }${named.map((n) => `\n  else if constexpr (std::is_same_v<B, ${n}>) std::cerr << "${n}";`).join('')}
   else type_<B>();
   if constexpr (std::is_lvalue_reference_v<T>) std::cerr << "&";
   else if constexpr (std::is_rvalue_reference_v<T>) std::cerr << "&&";
@@ -3792,7 +3792,7 @@ export async function judgeFault(t, spec) {
     edit,
     replaced: spec.asserts ? { ...spec.replaced, [header]: ASSERT_HEADER } : spec.replaced,
     cases: cases.map((c) => ({ code: c.sig ? c.code : wrap(c) })),
-    helpers: [...(spec.counted ? MEMORY_HELPERS : []), ...FAULT_HELPERS(own), ...(spec.helpers ?? [])],
+    helpers: [...(spec.counted ? MEMORY_HELPERS : []), ...FAULT_HELPERS(own, spec.named), ...(spec.helpers ?? [])],
     classCause: (errors, ctx) =>
       spec.cause?.(errors, ctx) ??
       faultCause(errors, ctx, spec) ??
@@ -4106,4 +4106,247 @@ export async function judgeRule(t, spec) {
     link: (said, ctx) => templateLink(said, ctx, spec) ?? spec.link?.(said, ctx) ?? null,
     warning: (warnings) => part8Warning(warnings) ?? spec.warning?.(warnings) ?? null
   })
+}
+
+// ---------- Part 9: files and building ----------
+//
+// A task of part 9 reads or writes a stream. Where it can, the function takes std::istream& or
+// std::ostream&: Check hands it string streams with text of its own and reads back what it wrote,
+// with no file at all. A function handed a path is called with a file Check wrote first, under a
+// name of its own for each case (the cases run side by side), inside the sandbox copy where the
+// program runs, and Check reads the file back, byte for byte, once the function has returned.
+// Check never names a file outside the copy, the copy is deleted after the check, and a task whose
+// lines name a path outside the workspace, or any file at all, is refused before it is built. The
+// rest is judged as in part 8, with judgeRule().
+
+const PART9_HELPERS = [
+  '#include <fstream>',
+  '#include <sstream>',
+  '#include <iomanip>',
+  String.raw`namespace indent9_ {
+inline void write_(const char* name, const std::string& text) { std::ofstream f(name, std::ios::binary); f << text; }
+inline void read_(const char* key, const char* name) {
+  std::ifstream f(name, std::ios::binary);
+  if (!f) { indent_::put_(key, "\001"); return; }
+  std::ostringstream s;
+  s << f.rdbuf();
+  indent_::put_(key, s.str());
+}
+}`
+]
+
+// Named in what a function takes; declared by <iostream> already, so naming them needs no header.
+const STREAM_TYPES = ['std::istream', 'std::ostream', 'std::ifstream', 'std::ofstream', 'std::istringstream', 'std::ostringstream']
+
+/** What Check read back from a file with indent9_::read_, or null when there was no file. */
+export const fileText = (got, key) => (got[key] === undefined || got[key] === '\u0001' ? null : got[key])
+
+/** A text as a person reads it, line ends and all, quoted. */
+export const quoted = (text) => (text === null || text === undefined ? 'nothing' : JSON.stringify(text))
+
+/** A C++ string literal of `text`. */
+export const cppText = (text) => JSON.stringify(text)
+
+const PART9_HEADERS = [
+  ['fstream', /\bstd::(ifstream|ofstream|fstream)\b/],
+  ['sstream', /\bstd::(istringstream|ostringstream|stringstream)\b/],
+  ['iomanip', /\bstd::(setw|setprecision|setfill)\b/],
+  ['optional', /\bstd::(optional|nullopt)\b/],
+  ['algorithm', /\bstd::(sort|stable_sort|max_element|min_element|find_if|count_if|any_of|all_of)\s*\(/],
+  ['numeric', /\bstd::(accumulate)\s*\(/],
+  ['vector', /\bstd::(vector)\s*</]
+]
+
+const LITERAL = /"((?:\\.|[^"\\\n])*)"/g
+const OUTSIDE = /^(?:\/(?!\s|$)|~|\.\.(?:[\\/]|$)|[A-Za-z]:[\\/])|[\\/]\.\.(?:[\\/]|$)/
+const FILE_NAME = /^[\w.-]+(?:[\\/][\w.-]+)+$|^[\w-][\w.-]*\.[A-Za-z][A-Za-z0-9]{1,4}$/
+
+/** The lines of Task `task` in `whole`: from its // Task comment to the next one, or to main. */
+function sectionOf(whole, task) {
+  const lines = whole.split('\n')
+  const { starts } = marks(lines)
+  if (!starts.has(task)) return null
+  const from = starts.get(task)
+  const next = Math.min(lines.length, ...[...starts.values()].filter((i) => i > from), ...lines.map((l, i) => (i > from && /\bint\s+main\s*\(/.test(l) ? i : Infinity)))
+  return { from, text: lines.slice(from, next).join('\n') }
+}
+
+/** The includes of `file` and of the headers of its own that it includes, as header names. */
+async function includesOf(t, file, seen = new Set()) {
+  if (seen.has(file)) return new Set()
+  seen.add(file)
+  const text = await readFile(join(t.workspace, file), 'utf8').catch(() => '')
+  const found = new Set()
+  for (const m of codeOnlyIncludes(text)) {
+    if (m.angled) found.add(m.name)
+    else for (const h of await includesOf(t, join(dirname(file), m.name).replaceAll('\\', '/'), seen)) found.add(h)
+  }
+  return found
+}
+
+function codeOnlyIncludes(text) {
+  const lines = codeOnly(text.replace(/\r\n/g, '\n')).split('\n')
+  const raw = text.replace(/\r\n/g, '\n').split('\n')
+  return raw.flatMap((l, i) => {
+    if (!/^\s*#\s*include\b/.test(lines[i] ?? '')) return []
+    const m = /^\s*#\s*include\s*(?:<([^>]+)>|"([^"]+)")/.exec(l)
+    return m ? [{ angled: !!m[1], name: m[1] ?? m[2] }] : []
+  })
+}
+
+/**
+ * A failing detail when Task `task` of `file` names a path outside the workspace, names a file
+ * of its own where it is handed one, or uses a name from a header `file` does not include.
+ */
+async function fileRule(t, file, spec) {
+  const whole = (await readFile(join(t.workspace, file), 'utf8').catch(() => null))?.replace(/\r\n/g, '\n')
+  if (whole === null || whole === undefined) return null
+  const section = sectionOf(whole, spec.task)
+  if (!section) return null
+  const who = spec.fn ?? `The code of ${label(spec.task)}`
+  // A quote that codeOnly() keeps opens a string in the code; one inside a comment is blanked.
+  const blanked = codeOnly(section.text)
+  for (const m of section.text.matchAll(LITERAL)) {
+    if (blanked[m.index] !== '"') continue
+    const text = m[1].replace(/\\./g, '')
+    const line = section.from + section.text.slice(0, m.index).split('\n').length
+    if (OUTSIDE.test(text)) {
+      return fail(
+        `${label(spec.task)} stays inside the workspace`,
+        `Line ${line} of ${file} names "${text}", a place outside this workspace. Check runs your code in a copy of the workspace and does not run code that reaches outside it. ${spec.paths ? `${who} works with the path it is handed.` : `${who} works with the stream it is handed.`}`
+      )
+    }
+    if (FILE_NAME.test(text)) {
+      return fail(
+        `${who} uses what it is handed`,
+        spec.paths
+          ? `Line ${line} of ${file} names a file in the code, "${text}". ${who} opens the file at the path it is handed, so the same function works for any file: Check hands it files of its own.`
+          : `Line ${line} of ${file} names a file in the code, "${text}". ${who} works with the stream it is handed, so the same function works for a file, the terminal or a text: Check hands it streams of its own, with no file.`
+      )
+    }
+  }
+  const code = codeOnly(section.text)
+  const missing = (spec.uses ?? []).find((name) => !new RegExp(`\\b${name}\\s*\\(`).test(code))
+  if (missing) {
+    return fail(
+      `${label(spec.task)} uses std::${missing}`,
+      `${label(spec.task)} asks for std::${missing}, and Check cannot find it in the lines of ${label(spec.task)}. The point of this task is the algorithm the library already has: call std::${missing} instead of writing its loop out yourself.`
+    )
+  }
+  const ignored = (spec.uses ?? []).find((name) => [...code.matchAll(new RegExp(`\\b${name}\\s*\\(`, 'g'))].every((m) => /(?:^|[;{}])\s*(?:std\s*::\s*)?$/.test(code.slice(0, m.index))))
+  if (ignored) {
+    return fail(
+      `${label(spec.task)} uses what std::${ignored} gives back`,
+      `std::${ignored} is called on a line of its own, so what it gives back is thrown away. It changes nothing: its answer is what it gives back.`
+    )
+  }
+  const have = await includesOf(t, file)
+  for (const [header, pattern] of [...PART9_HEADERS, ...(spec.headers ?? [])]) {
+    const used = pattern.exec(code)
+    if (!used || have.has(header)) continue
+    return fail(
+      `${file} includes <${header}>`,
+      `${label(spec.task)} uses std::${used[1]}, which comes from the header <${header}>, and ${file} has no #include <${header}> at the top. One compiler may find std::${used[1]} through another header, but the next one will not: add the line with the other #include lines.`
+    )
+  }
+  return null
+}
+
+/** The causes of a build error that part 9 teaches, tried before those of parts 1 to 8. */
+function part9Cause(errors, ctx) {
+  const text = errors.length ? errors.map((e) => e.text).join('\n') : ctx.stderr ?? ''
+  if (/(?:call to (?:implicitly-)?deleted (?:copy )?constructor of|use of deleted function|is (?:implicitly )?deleted)[^\n]*basic_(?:i|o)?(?:f|string)?stream|basic_(?:i|o)?(?:f|string)?stream[^\n]*(?:deleted|is private)/.test(text)) {
+    return 'A line copies a stream: hands it to a function, or keeps it, as a copy. A stream cannot be copied, because one stream is one place being read or written, at one position. It is handed on by reference, with & after its type.'
+  }
+  if (/no matching function for call to '(?:std::)?getline\b/.test(text)) {
+    return 'std::getline cannot take what this line hands it. It reads from a stream, the first thing in its round brackets, into a std::string, the second, with a separator character third when there is one.'
+  }
+  if (/invalid operands to binary expression \('(?:std::)?(?:basic_)?istream[^']*' and|no match for 'operator<<' \(operand types are 'std::istream/.test(text)) {
+    return 'A line writes with << to a stream that only reads. A std::istream is read with >> and std::getline; writing goes to a std::ostream.'
+  }
+  if (/invalid operands to binary expression \('(?:std::)?(?:basic_)?ostream[^']*' and|no match for 'operator>>' \(operand types are 'std::ostream/.test(text) && />>/.test(ctx.source ?? '')) {
+    return 'A line reads with >> from a stream that only writes. A std::ostream is written with <<; reading comes from a std::istream.'
+  }
+  return null
+}
+
+// Warnings that clang and GCC both give under -Wall -Wextra, in the words of each, so a task fails
+// the same on a Mac as on Linux. Others, such as clang's warning for a variable that is only
+// counted up, or GCC's for an unsigned number compared with 0, are left to the learner's own build.
+const SHARED_WARNINGS = [
+  /^unused (?:variable|parameter) '/,
+  /^comparison of integers of different signs|^comparison of integer expressions of different signedness/,
+  /^missing field '\w+' initializer|^missing initializer for member/,
+  /^non-void function does not return a value|^control reaches end of non-void function|^no return statement in function returning non-void/,
+  /will be initialized after/,
+  /^expression result unused|^value computed is not used|^statement has no effect/,
+  /^using the result of an assignment as a condition without parentheses|^suggest parentheses around assignment used as truth value/
+]
+
+function part9Warning(warnings, spec) {
+  const shared = spec.allWarnings ? warnings.filter((w) => SHARED_WARNINGS.some((p) => p.test(w.text))) : []
+  if (!shared.length) return null
+  return {
+    warning: shared[0],
+    message: `The compiler warns about a line of ${label(spec.task)}. Check builds it with -Wall -Wextra, as build.sh does. A warning is the compiler pointing at a line that builds but may not do what you meant: read what it says, and change the line until it builds without one.`
+  }
+}
+
+const EOF_LOOP = /while\s*\(\s*!\s*[\w.]+\s*\.\s*eof\s*\(\s*\)\s*\)/
+
+/** Says a judged detail in part 9's words where parts 7 and 8 have more general ones. */
+function part9Words(d, spec, section) {
+  if (d.passed || !d.message) return d
+  const who = spec.fn ?? `The code of ${label(spec.task)}`
+  const stream = /as a reference to (?:an? )?(std::(?:i|o)fstream|std::(?:i|o)stringstream), and the task asks for a reference to (?:an? )?(std::(?:i|o)stream)\./.exec(d.message)
+  if (stream) {
+    return {
+      ...d,
+      message: `${who} takes ${stream[1]}&, which is one kind of stream only. The task asks for ${stream[2]}&, which takes any stream of its direction: a file, ${stream[2] === 'std::ostream' ? 'std::cout' : 'std::cin'} or a string stream. Check hands it a string stream, so a function that only takes a file cannot be called.`
+    }
+  }
+  const gone = /^The compiler warns that what the function gives back refers to (\w+), a variable of that function, which ends when it returns\. A lambda/.exec(d.message)
+  if (gone && !/\[[^\]]*&/.test(codeOnly(section ?? ''))) {
+    return {
+      ...d,
+      message: `The compiler warns that what ${spec.fn ?? spec.member ?? `the code of ${label(spec.task)}`} gives back is the address of ${gone[1]}, a variable of its own, which ends when it returns. The caller then reads through the address of something that is gone, and what it finds there has no promised value. Give back the address of something that outlives the call.`
+    }
+  }
+  if (/went on reading after the end of what Check typed/.test(d.message)) {
+    return { ...d, message: `${who} reads from std::cin, what people type in the terminal, and not from the stream it is handed. Check fills the stream with text of its own; in the terminal, std::cin would sit and wait for typing.` }
+  }
+  if (/did not finish within/.test(d.message) && EOF_LOOP.test(codeOnly(section ?? ''))) {
+    return {
+      ...d,
+      message: `${who} did not finish within ${RUN_SECONDS} seconds, so Check stopped it. Its loop asks eof() whether to go on. Once a read fails, on text that is not a number, the stream never reaches the end: every read after it fails at once, and the loop goes round for ever. The lesson shows a loop that asks the read itself.`
+    }
+  }
+  return d
+}
+
+/**
+ * Judges a task of part 9 with judgeRule(). Spec, besides what judgeRule() takes:
+ * - paths: true when the function is handed a path, so a file named in its code is refused
+ * - headers: [[header, pattern]] more names the task's lines need a header for
+ * - allWarnings: fail on any warning in the task's lines; extraFlags: more compiler flags
+ * - uses: the algorithms the task's lines must call, for a task whose code toolRule cannot find,
+ *   such as a member function written below its class
+ * Check's code writes a file with indent9_::write_(name, text) and reads one back with
+ * indent9_::read_(key, name); fileText(got, key) gives it, or null when there was none.
+ */
+export async function judgeFile(t, spec) {
+  const file = spec.toolFile ?? spec.files.at(-1)
+  const rule = await fileRule(t, file, spec)
+  if (rule) return [rule]
+  const whole = (await readFile(join(t.workspace, file), 'utf8').catch(() => ''))?.replace(/\r\n/g, '\n')
+  const section = sectionOf(whole, spec.task)?.text
+  const details = await judgeRule(t, {
+    ...spec,
+    named: [...STREAM_TYPES, ...(spec.named ?? [])],
+    helpers: [...PART9_HELPERS, ...(spec.helpers ?? [])],
+    cause: (errors, ctx) => part9Cause(errors, ctx) ?? spec.cause?.(errors, ctx) ?? null,
+    link: (said, ctx) => (spec.className ? classLink(said, ctx, spec) : null) ?? spec.link?.(said, ctx) ?? null,
+    warning: (warnings) => part9Warning(warnings, spec) ?? spec.warning?.(warnings) ?? null
+  })
+  return details.map((d) => part9Words(d, spec, section))
 }

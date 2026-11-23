@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Kasimir",
+      "say": "One thing that builds it right."
+    },
+    {
+      "title": "The bench",
+      "text": "One long command, typed again each time."
+    },
+    {
+      "title": "Your code",
+      "file": "build.sh",
+      "mine": true,
+      "gap": "No steps, no script",
+      "tasks": [
+        "Load the day",
+        "Find the longest",
+        "Write the summary",
+        "Build step by step"
+      ]
+    },
+    {
+      "title": "The day book",
+      "text": "Built in steps, and the day summed up."
+    }
+  ],
+  "ticket": {
+    "label": "Day book",
+    "wrong": "a file left off",
+    "why": "Typed again",
+    "right": "built right"
+  },
+  "captions": [
+    "Kasimir wants one thing to run that builds the five files of the day book right.",
+    "Today he types one long command after every change, and last week a file went missing.",
+    "You finish the day book's class and summary, and write its build, one file at a time.",
+    "The script builds each file apart, links them, and the day book sums up the day.",
+    "The workshop's slips are a program of its own now, built step by step at the bench."
+  ]
+}

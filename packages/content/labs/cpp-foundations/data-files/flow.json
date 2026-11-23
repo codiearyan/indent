@@ -1,0 +1,95 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "tickets", "label": "tickets.csv", "kind": "file" },
+      { "id": "read", "label": "readRepairs()", "kind": "function", "mine": true },
+      { "id": "parse", "label": "parseRepair()", "kind": "function", "mine": true },
+      { "id": "report", "label": "writeReport()", "kind": "function", "mine": true },
+      { "id": "run", "label": "runDay()", "kind": "function", "mine": true },
+      { "id": "ambrose", "label": "Ambrose's report", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "tickets", "to": "run", "label": "the file" },
+      { "from": "run", "to": "read", "label": "a stream" },
+      { "from": "read", "to": "parse", "label": "one line" },
+      { "from": "read", "to": "report", "label": "repairs, refused" },
+      { "from": "report", "to": "ambrose", "label": "the totals" }
+    ],
+    "note": "The day's tickets are read into repairs, a bad line is refused by its number, and the totals are written back to a file."
+  },
+  "tasks": {
+    "parseRepair": {
+      "steps": [
+        {
+          "active": ["read->parse", "parse"],
+          "value": { "kind": "array", "label": "goes in", "values": ["one line", "a repair to fill in"] },
+          "note": "One line of the day's tickets arrives, with a repair to fill in."
+        },
+        {
+          "active": ["parse"],
+          "value": { "kind": "array", "label": "the fields", "values": ["ticket", "item", "minutes", "parts"] },
+          "note": "The line is split and every field is looked at, before anything is filled in."
+        },
+        {
+          "active": ["parse"],
+          "value": { "kind": "array", "label": "comes out", "values": ["whether the line is a repair", "the repair, filled in only then"] },
+          "note": "A good line fills in the repair; a wrong one leaves it as it was."
+        }
+      ]
+    },
+    "readRepairs": {
+      "steps": [
+        {
+          "active": ["run->read", "read"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a stream of lines, a heading first"] },
+          "note": "The day's tickets arrive as a stream, the heading on top."
+        },
+        {
+          "active": ["read->parse", "parse"],
+          "note": "Every line after the heading that is not blank is handed over to be read."
+        },
+        {
+          "active": ["read->report"],
+          "value": { "kind": "array", "label": "comes out", "values": ["the repairs, in order", "the numbers of the refused lines"] },
+          "note": "Good lines become repairs; a bad one is written down by its line number, and the day goes on."
+        }
+      ]
+    },
+    "writeReport": {
+      "steps": [
+        {
+          "active": ["read->report", "report"],
+          "value": { "kind": "array", "label": "goes in", "values": ["a stream", "the repairs", "the refused lines"] },
+          "note": "Once the whole day is read, the repairs and the refused lines arrive together."
+        },
+        {
+          "active": ["report"],
+          "value": { "kind": "array", "label": "the report", "values": ["how many repairs", "all the minutes", "all the parts, pence and all", "the refused lines"] },
+          "note": "The totals are worked out, the parts kept with their pence."
+        },
+        {
+          "active": ["report->ambrose", "ambrose"],
+          "note": "Four lines go to whatever stream was handed over."
+        }
+      ]
+    },
+    "runDay": {
+      "steps": [
+        {
+          "active": ["tickets->run", "run"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the path of the tickets", "the path of the report"] },
+          "note": "Ambrose names the day's tickets and where the report goes."
+        },
+        {
+          "active": ["run->read", "read"],
+          "note": "The tickets are opened and read; when they are not there, nothing more happens."
+        },
+        {
+          "active": ["read->report", "report", "report->ambrose"],
+          "value": { "kind": "array", "label": "comes out", "values": ["whether the day ran", "a new report file"] },
+          "note": "Only then is the report file written, in place of yesterday's."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "id": "taking-text-apart",
+  "title": "Text taken apart and put together",
+  "files": [
+    "src/fields.cpp",
+    "data/counter.txt"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace folder. Build Dorrit's counter lines here and run them on data/counter.txt.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/fields.cpp -o fields && ./fields"
+  },
+  "tasks": [
+    {
+      "id": "trim",
+      "title": "Trim a field",
+      "file": "src/fields.cpp",
+      "description": "Under `// Task 1` in `src/fields.cpp`, write a function called `trim` that takes a text as a reference to a `const std::string` and gives back a `std::string`: the same text without the spaces, tabs and carriage returns (`'\\r'`) at its start and at its end. What is between stays as it is, and a text of only those gives back `\"\"`.\n\nCheck calls `trim` with texts of its own: blanks at one end or both, a carriage return as a Windows line end leaves it, spaces inside, only blanks, and an empty text.",
+      "nextSteps": [
+        "Write the first line: a `const std::string&` in, a `std::string` back.",
+        "Find where the first character that is not blank sits.",
+        "Give back `\"\"` when there is none.",
+        "Find the last one that is not blank, and give back the piece from the first to the last."
+      ],
+      "hints": [
+        "A text can be searched from the front or from the back for the first character that is not one of a set of characters, and `.substr` from part 1 gives back a piece of it.",
+        "A search that finds nothing gives back `std::string::npos`, a position far past any end: for a text of only blanks, that is the case to answer first. The piece's length is the distance from the first to the last, plus one.",
+        "The shape is `std::size_t first = text.find_first_not_of(\" \\t\\r\"); if (first == std::string::npos) { return \"\"; } std::size_t last = text.find_last_not_of(\" \\t\\r\"); return text.substr(first, last - first + 1);`."
+      ],
+      "docs": [
+        {
+          "title": "std::string::find_first_not_of",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/find_first_not_of"
+        },
+        {
+          "title": "std::string::find_last_not_of",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/find_last_not_of"
+        },
+        {
+          "title": "std::string::substr",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/substr"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "splitAt",
+      "title": "Split a line into fields",
+      "file": "src/fields.cpp",
+      "description": "Under `// Task 2`, write a function called `splitAt` that takes a line as a reference to a `const std::string` and a separator as a `char`, and gives back a `std::vector<std::string>`: the pieces of the line between the separators, in order, as they are, spaces kept. A line with 2 separators has 3 fields, an empty field counts as one, before, between or after the separators, and an empty line is one empty field: a field the form left empty keeps its place, so the fields after it are never taken for the wrong ones. So `\"3104,pocket watch,\"` at `','` has 3 fields, the last one empty.\n\nCheck calls `splitAt` with lines of its own: spaces around fields, empty fields at the start, in the middle and at the end, another separator, a line with none, and an empty line.",
+      "nextSteps": [
+        "Add the `#include` that `std::istringstream` comes from.",
+        "Write the first line: the line and the separator in, a `std::vector<std::string>` back.",
+        "Read the line's pieces up to each separator, and keep each one.",
+        "Look at what happens to a last field that is empty, and to an empty line."
+      ],
+      "hints": [
+        "A string stream reads a text as if it were a file, and reading a line from a stream can stop at any character you name instead of the line end.",
+        "Reading pieces stops when the text ends, so a last field that is empty is never read: a line that is empty, or that ends with the separator, needs one more empty field added by hand.",
+        "The shape is `std::istringstream in(line); std::string field; while (std::getline(in, field, separator)) { fields.push_back(field); } if (line.empty() || line.back() == separator) { fields.push_back(\"\"); }`."
+      ],
+      "docs": [
+        {
+          "title": "std::basic_istringstream",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_istringstream"
+        },
+        {
+          "title": "std::getline with a separator",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/getline"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading from a text with a string stream",
+          "url": "https://www.youtube.com/watch?v=Ycg_T6c-eYw"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "toWhole",
+      "title": "Read a whole number, and nothing else",
+      "file": "src/fields.cpp",
+      "description": "Under `// Task 3`, write a function called `toWhole` that takes a text as a reference to a `const std::string` and gives back a `std::optional<int>`: the whole number the text holds, with spaces allowed before and after it. It gives back `std::nullopt` when the text is empty, when it does not start with a whole number, or when anything but spaces is left after the number. So `\" 75 \"` gives back `75`, and `\"12abc\"` gives back nothing.\n\nCheck calls `toWhole` with texts of its own: plain numbers, spaces around one, a number below zero, letters or a point after a number, a word, an empty text and only spaces.",
+      "nextSteps": [
+        "Add the `#include` lines that `std::optional` and `std::istringstream` come from.",
+        "Write the first line: a `const std::string&` in, a `std::optional<int>` back.",
+        "Read a whole number from the text, and give back `std::nullopt` when that read fails.",
+        "Then find out whether anything other than spaces is left, and give the number back only when nothing is."
+      ],
+      "hints": [
+        "Part 7 met `std::stoi`, which reads `\"12abc\"` as 12 and throws on `\"abc\"`. A string stream made from the text reads a number the way `>>` reads typing, and the stream can be asked about what follows.",
+        "After the number, try to read one more character. `>>` skips spaces first, so the read only works when something other than spaces is left: then the text is not a whole number.",
+        "The shape is `std::istringstream in(text); int number = 0; if (!(in >> number)) { return std::nullopt; } char extra = 0; if (in >> extra) { return std::nullopt; } return number;`."
+      ],
+      "docs": [
+        {
+          "title": "std::optional",
+          "url": "https://en.cppreference.com/w/cpp/utility/optional"
+        },
+        {
+          "title": "std::basic_istringstream",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_istringstream"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ticketLine",
+      "title": "Put a ticket line together",
+      "file": "src/fields.cpp",
+      "description": "Under `// Task 4`, write a function called `ticketLine` that takes a ticket as an `int`, an item as a reference to a `const std::string` and parts as a `double`, and gives back a `std::string`: the ticket, a comma, the item, a comma, and the parts with exactly 2 decimals, with no spaces added and no line end. For `3101`, `\"mantel clock\"` and `18.5`:\n\n```\n3101,mantel clock,18.50\n```\n\nCheck calls `ticketLine` with tickets of its own, parts of 0 and over 1000 among them, and reads the text it gives back.",
+      "nextSteps": [
+        "Write the first line: the ticket, the item and the parts in, a `std::string` back.",
+        "Make a string stream that writes into a text.",
+        "Write the three fields to it with their commas, the parts with 2 decimals.",
+        "Give back the text the stream holds."
+      ],
+      "hints": [
+        "A string stream can write as well as read: everything written to it with `<<` collects in a text inside it, with all the tools `std::cout` has for numbers.",
+        "`std::to_string` of a `double` always writes six decimals. The stream writes as few as it needs, until it is told to write a set number, as part 1 did with `std::cout`.",
+        "The shape is `std::ostringstream out; out << ticket << ',' << item << ',' << std::fixed << std::setprecision(2) << parts; return out.str();`."
+      ],
+      "docs": [
+        {
+          "title": "std::basic_ostringstream",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_ostringstream"
+        },
+        {
+          "title": "std::basic_ostringstream::str",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_ostringstream/str"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
