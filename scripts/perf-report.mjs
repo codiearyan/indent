@@ -1,5 +1,6 @@
 // Prints the sizes of the renderer build, for the before and after of a performance change.
-// Run `pnpm build` first. Startup and Check timings come from INDENT_PERF=1 (apps/desktop/src/main/perf.ts).
+// Run `pnpm build` first. Startup and Check timings, and the memory in use once a minute, come
+// from INDENT_PERF=1 (apps/desktop/src/main/perf.ts).
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
