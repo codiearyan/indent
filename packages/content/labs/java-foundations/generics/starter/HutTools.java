@@ -16,7 +16,7 @@ public class HutTools {
         // Pair<Integer, String> back = sailing.swapped();
         // System.out.println(back.first() + " for the " + back.second());
 
-        List<String> skippers = List.of("Euan", "Innes", "Tormod");
+        List<String> skippers = List.of("Murdo", "Innes", "Tormod");
         // System.out.println("Next week: " + Rotas.nextWeek(skippers));
         List<Integer> boats = List.of(4, 9, 2);
         // System.out.println("Boats next week: " + Rotas.nextWeek(boats));

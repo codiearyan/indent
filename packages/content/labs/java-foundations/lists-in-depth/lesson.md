@@ -23,7 +23,7 @@ All three tasks are in `BoardingList.java`.
 static int jarsOf(List<String> stall) { ... }
 ```
 
-Now any list can come in. Hand an `ArrayList`-only method another list and the compiler says `incompatible types: List<String> cannot be converted to ArrayList<String>`. In your own variables, write `List<String> stalls = new ArrayList<>();`: the type says what you need, and only the right side says which kind.
+Now any list can come in. Hand an `ArrayList`-only method another list and the compiler says the method `cannot be applied to given types`, with the reason `argument mismatch; List<String> cannot be converted to ArrayList<String>`. In your own variables, write `List<String> stalls = new ArrayList<>();`: the type says what you need, and only the right side says which kind.
 
 ## A list that never changes
 

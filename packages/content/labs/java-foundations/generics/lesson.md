@@ -60,7 +60,7 @@ static <T> T lastOf(List<T> items) {
 
 Called with a `List<String>`, `T` is `String` and it gives back a `String`; with a `List<Integer>`, an `Integer`. Java works `T` out from what you hand it.
 
-Why not write `List<Object>` and take everything? Because a `List<String>` is not a `List<Object>`, even though a `String` is an `Object`. A method handed a `List<Object>` may add any object at all to it, a number or a boat, and that would break a list of text. So the compiler refuses: `incompatible types: List<String> cannot be converted to List<Object>`. You met the same rule in part 4 with lists of stalls. A type parameter says "whatever type you hand me, I give it back". Java also has a `?` for "a list of some type", which this repo does not need.
+Why not write `List<Object>` and take everything? Because a `List<String>` is not a `List<Object>`, even though a `String` is an `Object`. A method handed a `List<Object>` may add any object at all to it, a number or a boat, and that would break a list of text. So the compiler refuses: the method `cannot be applied to given types`, with the reason `argument mismatch; List<String> cannot be converted to List<Object>`. You met the same rule in part 4 with lists of stalls. A type parameter says "whatever type you hand me, I give it back". Java also has a `?` for "a list of some type", which this repo does not need.
 
 ## A bound
 

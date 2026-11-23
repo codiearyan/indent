@@ -13,7 +13,7 @@ public class Noticeboard {
         // List<Ticket> tickets = new ArrayList<>();
         // tickets.add(new Ticket(9000000417L, "Ishbel"));
         // tickets.add(new Ticket(10000000002L, "Torquil"));
-        // tickets.add(new Ticket(9000000417L, "Euan"));
+        // tickets.add(new Ticket(9000000417L, "Murdo"));
         // Collections.sort(tickets);
         // System.out.println(tickets);
 

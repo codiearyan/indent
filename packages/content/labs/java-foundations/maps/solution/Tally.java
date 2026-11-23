@@ -54,8 +54,9 @@ class Report {
 }
 
 // Task 3: Look up the seats left on a sailing
-// Write a record Sailing with a String boat and an int hour, in that order. Then write a class
-// Seats with a method static int left(Map<Sailing, Integer> booked, Sailing sailing,
+// Write a record Sailing with a String boat and an int hour, in that order: a record is equal to
+// any other with the same parts, as a key must be, with nothing more to write. Then write a
+// class Seats with a method static int left(Map<Sailing, Integer> booked, Sailing sailing,
 // int capacity): the capacity less the places booked on that sailing. A sailing with nothing
 // booked is not in the map at all, and has every seat left.
 record Sailing(String boat, int hour) {

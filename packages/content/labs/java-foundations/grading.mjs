@@ -366,7 +366,10 @@ async function build(t, spec) {
   const outside = [...l.sections.entries()].find(([, sec]) => !sec.inside)
   if (outside) return { stop: 'outside', task: outside[0] }
   const around = spec.methods ? methodShared : spec.objects ? objectShared : shared
-  if (bare(around(text, l)) !== bare(around(starter, s))) return { stop: 'shared' }
+  if (bare(around(text, l)) !== bare(around(starter, s))) {
+    const imports = spec.collections ? importProblem(around(text, l), around(starter, s)) : null
+    if (imports !== false) return imports ?? { stop: 'shared' }
+  }
 
   const reached = new Map()
   for (const [n, sec] of l.sections) {
@@ -956,6 +959,16 @@ function stopMessage(spec, b) {
         `${spec.file} keeps its tasks inside main`,
         `The // Task ${b.task} comment is outside main. Every task's lines go inside main, between its braces, where the starter had them.`
       ]
+    case 'imports':
+      return b.lost
+        ? [
+            `${spec.file} keeps its import line`,
+            `The line ${b.lost} at the top of ${spec.file} is not as the starter gave it. Every task, and Check's own code, uses the lists, sets and maps it brings in, so put it back as it was. An import line of java.util you add below it, such as import java.util.Iterator;, can stay.`
+          ]
+        : [
+            `${spec.file} keeps its import line`,
+            `An import line at the top of ${spec.file} brings in something from outside java.util. Check's own code uses List, Set and Map from java.util, and an import from elsewhere can give one of those names a second meaning. Remove the line you added.`
+          ]
     case 'shared':
       if (spec.objects)
         return [
@@ -2409,6 +2422,23 @@ const EXCEPTION_GLOSS = [
 /** True when two pieces of code are the same, comments and spaces aside. */
 export const sameCode = (a, b) => bare(a) === bare(b)
 
+// An import line an editor adds by itself, or a learner adds to name a class, is not a change to
+// the lines Check shares: only the starter's own import lines must stay.
+const IMPORT_LINE = /^[ \t]*import\b[^;\n]*;[ \t]*(?:\/\/[^\n]*)?$/gm
+
+/** Null when the shared lines differ from the starter's in more than their import lines; false
+ * when every starter import is there and each added one is from java.util; else what to stop with. */
+function importProblem(mine, given) {
+  if (bare(mine.replace(IMPORT_LINE, '')) !== bare(given.replace(IMPORT_LINE, ''))) return null
+  const lines = (x) => x.match(IMPORT_LINE) ?? []
+  const have = lines(mine).map(bare)
+  const lost = lines(given).find((line) => !have.includes(bare(line)))
+  if (lost) return { stop: 'imports', lost: lost.trim() }
+  const allowed = new Set(lines(given).map(bare))
+  if (have.every((line) => allowed.has(line) || /^import(?:static)?java\.util\.[\w.]*(?:\*|\w);$/.test(line))) return false
+  return { stop: 'imports' }
+}
+
 // --- Collections and generics -------------------------------------------------------------------
 // From part 6 a task takes and gives back lists, sets and maps, and writes generic types of its
 // own. Check's own code hands over collections of the types the task names (a List made with
@@ -2459,6 +2489,21 @@ function collectionProblem(task, msg, asIs) {
         asIs
       )
   }
+  // Check's own CheckOrdered<T extends Comparable<T>> and CheckCompares<C extends Comparator<X>>
+  // take only a class that names its type in angle brackets, where a raw one passes with a warning.
+  const bounds = /^type argument (\w+) is not within bounds of type-variable \w+/.exec(first)
+  if (bounds && asIs.includes(`CheckOrdered<${bounds[1]}>`))
+    return fail(
+      `${bounds[1]} implements Comparable<${bounds[1]}>`,
+      `${bounds[1]} implements Comparable with no type in angle brackets, or another type in them, so its compareTo takes any Object and Java cannot check what it is handed. The task asks for Comparable<${bounds[1]}>: with it, compareTo takes ${an(bounds[1])}, and needs no cast.`,
+      asIs
+    )
+  if (bounds && asIs.includes(`CheckCompares<${bounds[1]}>`))
+    return fail(
+      `${bounds[1]} implements a Comparator of its type`,
+      `${bounds[1]} implements Comparator with no type in angle brackets, or another type in them, so its compare takes any Object and Java cannot check what it is handed. Write the type it compares in angle brackets after Comparator, as the task does: then compare takes two of them, and needs no cast.`,
+      asIs
+    )
   const plain = /^type (\w+) does not take parameters|^cannot infer type arguments for (\w+)/.exec(first)
   if (plain) {
     const name = plain[1] ?? plain[2]

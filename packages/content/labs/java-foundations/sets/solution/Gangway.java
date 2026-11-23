@@ -14,7 +14,7 @@ public class Gangway {
         System.out.println("Scanned twice: " + Scans.scannedTwice(scans));
 
         Set<String> saturday = new HashSet<>(List.of("Ishbel", "Torquil", "Seonag", "Innes"));
-        Set<String> sunday = new HashSet<>(List.of("Seonag", "Euan", "Ishbel"));
+        Set<String> sunday = new HashSet<>(List.of("Seonag", "Murdo", "Ishbel"));
         System.out.println("Both days: " + Days.onBoth(saturday, sunday));
 
         Set<Seat> taken = new HashSet<>();
@@ -54,7 +54,8 @@ class Days {
 }
 
 // Task 3: List the free seats on a boat
-// Write a record Seat with a String boat and an int number, in that order. Then write a class
+// Write a record Seat with a String boat and an int number, in that order: a record is equal to
+// any other with the same parts, as a set needs, with nothing more to write. Then write a class
 // Plan with a method static List<Integer> freeSeats(Set<Seat> taken, String boat, int seats).
 // The boat's seats are numbered from 1 to seats, and taken holds the seats taken on every boat.
 // It gives back the numbers of the boat's seats that are not taken, smallest first.

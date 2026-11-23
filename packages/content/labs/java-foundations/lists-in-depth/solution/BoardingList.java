@@ -12,7 +12,7 @@ public class BoardingList {
         // it uses is written.
         List<String> booked = List.of("Ishbel", "Torquil", "Seonag");
         List<String> boarding = Boarding.withLate(booked, "Innes");
-        boarding.add("Euan");
+        boarding.add("Murdo");
         System.out.println("Booked: " + booked);
         System.out.println("Boarding: " + boarding);
 

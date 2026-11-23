@@ -11,7 +11,7 @@
       "id": "pair",
       "title": "Write a pair that holds two things of any types",
       "file": "HutTools.java",
-      "description": "Under `// Task 1`, write a class `Pair<A, B>` with a constructor `Pair(A first, B second)` and three methods: `A first()` and `B second()` give back what it holds, and `Pair<B, A> swapped()` gives back a new pair with the two the other way round. The pair it is called on stays as it is.\n\nCheck makes pairs of its own with different types, two at once included, and keeps what `first()`, `second()` and `swapped()` give back in variables of the types the pair was made with, which compiles only when `Pair` hands back its own types. It also compiles a line of its own that keeps a `first()` in a variable of the wrong type, which must be refused.",
+      "description": "Under `// Task 1`, write a class `Pair<A, B>` with a constructor `Pair(A first, B second)` and three methods: `A first()` and `B second()` give back what it holds, and `Pair<B, A> swapped()` gives back a new pair with the two the other way round. The pair it is called on stays as it is.\n\nCheck makes pairs of its own with different types, two at once included, and keeps what `first()`, `second()` and `swapped()` give back in variables of the types the pair was made with, which compiles only when `Pair` hands back its own types. It also compiles a line of its own that keeps a `first()` in a variable of the wrong type, which must be refused. And it reads Task 1 for a raw `Pair` or a cast, which a class with type parameters never needs.",
       "nextSteps": [
         "Read the parts of the lesson about a class with a type parameter, and about raw types.",
         "Write the class's first line with its two type parameters.",

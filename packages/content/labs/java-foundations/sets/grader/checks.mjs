@@ -6,6 +6,7 @@ const items = (r, name) => r.values[name]?.items ?? null
 const same = (a, b) => !!a && !!b && a.length === b.length && a.every((x, i) => x === String(b[i]))
 const sameSet = (a, b) => !!a && !!b && same([...a].sort(), [...b].map(String).sort())
 const halfEqual = (section) => /\bequals\s*\(/.test(codeOnly(section)) && !/\bhashCode\s*\(/.test(codeOnly(section))
+const bothWritten = (section) => /\bequals\s*\(/.test(codeOnly(section)) && /\bhashCode\s*\(/.test(codeOnly(section))
 const fromMine = (x) => !!x && x.frames.some((f) => f.includes(`(${FILE}:`))
 
 // Codes and names made while the program runs, as ones read in would be, so == cannot pass for
@@ -28,6 +29,7 @@ function twice(name, scans, expected, extra) {
     type: 'Set<String>',
     after: { [ORDER]: inOrder('got') },
     expected: { [ORDER]: expected },
+    firstOrder: [...expected].sort((a, b) => scans.indexOf(a) - scans.indexOf(b)),
     show: [...setup.map(plain), 'Set<String> got = Scans.scannedTwice(scans);'].join('\n'),
     ...extra
   })
@@ -86,6 +88,7 @@ export const checks = tasks({
       cases: [
         twice('Finds the codes scanned again, in the order of their second scan', ['T-12', 'T-74', 'T-20', 'T-31', 'T-58', 'T-58', 'T-31', 'T-74', 'T-58', 'T-12'], ['T-58', 'T-31', 'T-74', 'T-12'], { hint: 'scannedTwice should give back each code scanned more than once, once, in the order its second scan came.' }),
         twice('Two codes, the second scanned first', ['T-25', 'T-66', 'T-66', 'T-25'], ['T-66', 'T-25'], { hint: 'scannedTwice should give back the codes in the order their second scan came.' }),
+        twice('Other codes, in another order', ['T-83', 'T-05', 'T-47', 'T-29', 'T-47', 'T-83', 'T-29', 'T-05'], ['T-47', 'T-83', 'T-29', 'T-05'], { hint: 'scannedTwice should give back the codes in the order their second scan came.' }),
         twice('A code scanned three times counts once', ['T-66', 'T-66', 'T-66'], ['T-66'], { hint: 'A code scanned three times should be in the set once.' }),
         twice('Nothing scanned twice', ['T-90', 'T-17', 'T-43'], [], { hint: 'When no code is scanned twice, scannedTwice should give back an empty set.' }),
         twice('Nothing scanned at all', [], [], { hint: 'With no scans, scannedTwice should give back an empty set.' })
@@ -97,6 +100,10 @@ export const checks = tasks({
           {
             when: (r, x) => x?.name === 'UnsupportedOperationException' && fromMine(x),
             hint: 'scannedTwice changes the list of scans it was handed, a list made with List.of, which can never change. The task says scans stays as it is.'
+          },
+          {
+            when: (r, x, all) => !x && r.case.expected[ORDER].length > 1 && all.every((o) => !o.case.firstOrder || o.case.firstOrder.length < 2 || same(items(o, ORDER), o.case.firstOrder)),
+            hint: 'scannedTwice finds the right codes, in the order of their first scan. The task asks for the order of their second scan: a code goes into the set you give back at the moment it is scanned again.'
           },
           {
             when: (r, x) => !x && r.case.expected[ORDER].length > 1 && sameSet(items(r, ORDER), r.case.expected[ORDER]) && !same(items(r, ORDER), r.case.expected[ORDER]),
@@ -117,10 +124,10 @@ export const checks = tasks({
     both: {
       task: 2,
       cases: [
-        both('Finds who came on both days, in alphabetical order', ['HashSet', ['Floraidh', 'Alasdair', 'Marsaili', 'Tormod', 'Innes']], ['HashSet', ['Innes', 'Tormod', 'Floraidh', 'Euan', 'Beathag']], ['Floraidh', 'Innes', 'Tormod'], { hint: 'onBoth should give back the names in both sets, in alphabetical order.' }),
+        both('Finds who came on both days, in alphabetical order', ['HashSet', ['Floraidh', 'Alasdair', 'Marsaili', 'Tormod', 'Innes']], ['HashSet', ['Innes', 'Tormod', 'Floraidh', 'Murdo', 'Beathag']], ['Floraidh', 'Innes', 'Tormod'], { hint: 'onBoth should give back the names in both sets, in alphabetical order.' }),
         both('From a set that keeps the order names went in', ['LinkedHashSet', ['Somhairle', 'Eachann', 'Coinneach', 'Raonaid']], ['HashSet', ['Raonaid', 'Coinneach', 'Somhairle']], ['Coinneach', 'Raonaid', 'Somhairle'], { hint: 'onBoth should give back the names in both sets in alphabetical order, whatever order the sets keep.' }),
-        both('Nobody came on both days', ['HashSet', ['Euan', 'Innes']], ['HashSet', ['Tormod']], [], { hint: 'When nobody is in both sets, onBoth should give back an empty set.' }),
-        both('Nobody came on the first day', ['HashSet', []], ['HashSet', ['Euan', 'Tormod']], [], { hint: 'With nobody on the first day, onBoth should give back an empty set.' })
+        both('Nobody came on both days', ['HashSet', ['Murdo', 'Innes']], ['HashSet', ['Tormod']], [], { hint: 'When nobody is in both sets, onBoth should give back an empty set.' }),
+        both('Nobody came on the first day', ['HashSet', []], ['HashSet', ['Murdo', 'Tormod']], [], { hint: 'With nobody on the first day, onBoth should give back an empty set.' })
       ],
       judge: outcomeCases({
         file: FILE,
@@ -162,6 +169,10 @@ export const checks = tasks({
           explain: explainCollection,
           typed: 'freeSeats gives back the same list whatever Check asks it about. It should look up each seat of the boat in taken.',
           mistakes: [
+            {
+              when: (r) => r.case.record && bothWritten(ctx.section) && value(r, 'Seat is a record') === 'false',
+              hint: 'Seat is a class with an equals and a hashCode of your own, and the task asks for a record. A record of a boat and a number writes equals, hashCode and the boat() and number() methods from its parts, so the one line does all your class does, and cannot get them out of step.'
+            },
             {
               when: (r, x, all) => (r.case.lookup || r.case.record) && !halfEqual(ctx.section) && all.some((o) => o.case.record && value(o, 'Seat is a record') === 'false'),
               hint: 'Seat is not a record. Check fills taken with seats of its own and freeSeats asks about new Seat objects that hold the same boat and number. A class you write compares its objects with the equals and hashCode it gets from Object, which call two objects equal only when they are the very same one, so the set never finds them. A record writes equals and hashCode from its parts for you.'

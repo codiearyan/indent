@@ -1,10 +1,22 @@
-import { attempt, codeOnly, explainCollection, outcomeCases, refusal, tasks } from '../../grading.mjs'
+import { attempt, codeOnly, explainCollection, fail, outcomeCases, pass, refusal, tasks } from '../../grading.mjs'
 
 const FILE = 'HutTools.java'
 const value = (r, name) => r.values[name]?.value ?? null
 const items = (r, name) => r.values[name]?.items ?? null
 const same = (a, b) => !!a && !!b && a.length === b.length && a.every((x, i) => x === String(b[i]))
 const fromMine = (x) => !!x && x.frames.some((f) => f.includes(`(${FILE}:`))
+
+// A raw Pair or a cast to A, B or Pair compiles with a warning and behaves, so Check reads Task 1's
+// own lines for them: either moves the type check from the compiler to the running program.
+const NO_CAST = 'Pair keeps its types, with no raw Pair and no cast'
+function typesKept(section) {
+  const code = codeOnly(section)
+  if (/\bnew\s+Pair\s*\(|\bPair\s+\w+\s*[(=;,)]/.test(code))
+    return fail(NO_CAST, 'Task 1 names or makes a Pair with no types in angle brackets, a raw type. Java forgets the types there and lets a mix-up through with only a warning. Write the types in angle brackets wherever Pair is named or made; new Pair<> works them out for you.')
+  if (/\(\s*(?:A|B|Pair\s*(?:<[^>()]*>)?)\s*\)\s*[\w(]/.test(code))
+    return fail(NO_CAST, 'Task 1 casts to A, B or a Pair. A cast makes the compiler take your word, and moves the check to a ClassCastException on some later day. Keep the fields as A and B, and the methods give back what they hold with no cast.')
+  return pass(NO_CAST)
+}
 
 /** A case of Task 1: Check's own lines, which compile only when Pair holds the types it is given. */
 const pair = (name, code, reads, expected, hint, extra) => ({ name, code, reads, after: reads, expected, hint, ...extra })
@@ -49,7 +61,7 @@ export const checks = tasks({
       task: 1,
       cases: [
         pair('Holds a text and a number, and gives each back as its own type', ['Pair<String, Integer> p = new Pair<>("Curlew", 7);', 'String boat = p.first();', 'int hour = p.second();'], { boat: 'boat', hour: 'hour' }, { boat: 'Curlew', hour: 7 }, 'first should give back what the pair was made with first, and second what it was made with second.'),
-        pair('Holds a number and a text', ['Pair<Integer, String> q = new Pair<>(14, "Euan");', 'int number = q.first();', 'String name = q.second();'], { number: 'number', name: 'name' }, { number: 14, name: 'Euan' }, 'first and second should give back what the pair holds, whatever its types.'),
+        pair('Holds a number and a text', ['Pair<Integer, String> q = new Pair<>(14, "Murdo");', 'int number = q.first();', 'String name = q.second();'], { number: 'number', name: 'name' }, { number: 14, name: 'Murdo' }, 'first and second should give back what the pair holds, whatever its types.'),
         pair('Each pair keeps its own', ['Pair<String, Integer> a = new Pair<>("Plover", 15);', 'Pair<String, Integer> b = new Pair<>("Skua", 8);'], { 'a.first()': 'a.first()', 'a.second()': '(int) a.second()', 'b.first()': 'b.first()' }, { 'a.first()': 'Plover', 'a.second()': 15, 'b.first()': 'Skua' }, 'Each pair should give back what it was made with.', { own: true }),
         pair('swapped gives back a new pair the other way round', ['Pair<String, Integer> p = new Pair<>("Linnet", 11);', 'Pair<Integer, String> s = p.swapped();'], { 's.first()': 's == null ? -1 : (int) s.first()', 's.second()': 's == null ? null : s.second()', 'p.first()': 'p.first()', 'p.second()': '(int) p.second()' }, { 's.first()': 11, 's.second()': 'Linnet', 'p.first()': 'Linnet', 'p.second()': 11 }, 'swapped should give back a new pair holding the second first and the first second, and leave this pair as it is.', { swap: true }),
         {
@@ -76,7 +88,8 @@ export const checks = tasks({
             }
           ]
         })(runs, ctx),
-        ...runs.filter((r) => r.case.refuse).map((r) => refusal(r, r.case))
+        ...runs.filter((r) => r.case.refuse).map((r) => refusal(r, r.case)),
+        typesKept(ctx.section)
       ]
     },
 

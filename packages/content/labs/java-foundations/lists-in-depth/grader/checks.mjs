@@ -68,7 +68,7 @@ export const checks = tasks({
           hint: 'With nobody booked, withLate should give back a list holding only the late name.'
         })
       ],
-      judge: outcomeCases({
+      judge: (runs, ctx) => outcomeCases({
         file: FILE,
         explain: explainCollection,
         typed: 'withLate gives back the same list whatever Check hands it. It should build its list from the names it is handed.',
@@ -90,11 +90,15 @@ export const checks = tasks({
             hint: 'withLate gives back a list that cannot be changed: Check added a name to it, as the task says a caller can, and it threw an UnsupportedOperationException. A list made with List.of never changes. Give back a new list the caller can add to.'
           },
           {
-            when: (r, x) => !x && r.case.already && (items(r, 'got')?.length ?? 0) > r.case.expected.got.length,
+            when: (r, x) => !x && r.case.already && (items(r, 'got')?.length ?? 0) > r.case.expected.got.length && /==/.test(codeOnly(ctx.section)),
             hint: 'withLate added a name that is booked already. Check makes every name separately, as names read in would be, so == on two names asks whether they are the very same String object. contains asks each name with equals, which compares the letters.'
+          },
+          {
+            when: (r, x) => !x && r.case.already && (items(r, 'got')?.length ?? 0) > r.case.expected.got.length,
+            hint: 'withLate added a name that is booked already, so it is on the list twice. Add the late name only when it is not on the list yet.'
           }
         ]
-      })
+      })(runs, ctx)
     },
 
     seat: {
@@ -136,7 +140,7 @@ export const checks = tasks({
       task: 3,
       cases: [
         attempt({ name: 'Voids tickets next to each other', setup: ['List<Integer> sold = new ArrayList<>(List.of(1201, 1202, 1203, 1204, 1205));', 'List<Integer> voided = new ArrayList<>(List.of(1202, 1203));'], call: 'Tickets.voidAll(sold, voided)', type: 'int', after: { sold: 'sold', voided: 'voided' }, expected: { got: 2, sold: [1201, 1204, 1205], voided: [1202, 1203] }, next: true, hint: 'voidAll should take every voided ticket off sold, keep the others in order, and give back how many it took off.' }),
-        attempt({ name: 'Voids the last two tickets', setup: ['List<Integer> sold = new ArrayList<>(List.of(1310, 1311, 1312));'], call: 'Tickets.voidAll(sold, List.of(1311, 1312))', type: 'int', after: { sold: 'sold' }, expected: { got: 2, sold: [1310] }, hint: 'voidAll should take every voided ticket off sold, the last one included, and give back how many it took off.' }),
+        attempt({ name: 'Voids the last two tickets', setup: ['List<Integer> sold = new ArrayList<>(List.of(1310, 1311, 1312));'], call: 'Tickets.voidAll(sold, List.of(1311, 1312))', type: 'int', after: { sold: 'sold' }, expected: { got: 2, sold: [1310] }, lastTwo: true, hint: 'voidAll should take every voided ticket off sold, the last one included, and give back how many it took off.' }),
         attempt({ name: 'Voids the last ticket', setup: ['List<Integer> sold = new ArrayList<>(List.of(1420, 1421, 1422));'], call: 'Tickets.voidAll(sold, List.of(1422))', type: 'int', after: { sold: 'sold' }, expected: { got: 1, sold: [1420, 1421] }, hint: 'voidAll should take every voided ticket off sold, the last one included, and give back how many it took off.' }),
         attempt({ name: 'Voids every ticket, named in another order', setup: ['List<Integer> sold = new ArrayList<>(List.of(1700, 1701, 1702));'], call: 'Tickets.voidAll(sold, List.of(1702, 1700, 1701))', type: 'int', after: { sold: 'sold' }, expected: { got: 3, sold: [] }, hint: 'voidAll should take every voided ticket off sold, whatever order voided names them in.' }),
         attempt({ name: 'Voids nothing when no voided ticket was sold', setup: ['List<Integer> sold = new ArrayList<>(List.of(1500, 1501));'], call: 'Tickets.voidAll(sold, List.of(1600))', type: 'int', after: { sold: 'sold' }, expected: { got: 0, sold: [1500, 1501] }, hint: 'When no voided ticket is on sold, voidAll should change nothing and give back 0.' }),
@@ -163,6 +167,10 @@ export const checks = tasks({
             {
               when: (r, x) => !x && r.case.expected.voided && !same(items(r, 'voided'), r.case.expected.voided),
               hint: 'voidAll changed voided. The task says voided stays as it is: only sold, the caller\'s list of tickets sold, changes.'
+            },
+            {
+              when: (r, x) => !x && r.case.lastTwo && same(items(r, 'sold'), [1310, 1312]),
+              hint: 'voidAll took off the second last ticket and missed the last one. Taking an item off moves every later item one place forward: a loop that counts positions forward then steps over it, and a for-each loop may simply stop there, with no exception at all. The lesson shows a way to take items off while you walk a list.'
             },
             {
               when: (r, x) => !x && r.case.next && items(r, 'sold')?.length === 4,

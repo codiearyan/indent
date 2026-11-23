@@ -5,6 +5,7 @@ const value = (r, name) => r.values[name]?.value ?? null
 const items = (r, name) => r.values[name]?.items ?? null
 const same = (a, b) => !!a && !!b && a.length === b.length && a.every((x, i) => x === String(b[i]))
 const halfEqual = (section) => /\bequals\s*\(/.test(codeOnly(section)) && !/\bhashCode\s*\(/.test(codeOnly(section))
+const bothWritten = (section) => /\bequals\s*\(/.test(codeOnly(section)) && /\bhashCode\s*\(/.test(codeOnly(section))
 const fromMine = (x) => !!x && x.frames.some((f) => f.includes(`(${FILE}:`))
 
 // A map is judged as a map: Check builds the right one in Java and asks equals, which ignores
@@ -83,10 +84,14 @@ export const checks = tasks({
         count('Counts many tickets of one boat', ['Curlew', 'Curlew', 'Curlew', 'Curlew'], { Curlew: 4 }, { hint: 'Every ticket of a boat should add one to its count.' }),
         count('No tickets at all', [], {}, { hint: 'With no tickets, byBoat should give back an empty map.' })
       ],
-      judge: outcomeCases({
+      judge: (runs, ctx) => outcomeCases({
         file: FILE,
         explain: explainCollection,
         mistakes: [
+          {
+            when: (r, x) => /containsValue/.test(codeOnly(ctx.section)),
+            hint: 'containsValue looks among the values of the map, the counts, not among its keys. Whether a boat has been counted yet is a question about the keys.'
+          },
           {
             when: (r, x) => x?.name === 'NullPointerException' && /Map\.get/.test(x.message ?? ''),
             hint: 'byBoat asked the map for the count of a boat it had not seen yet, and get gave back null, which cannot become an int. The first ticket of each boat has no count in the map yet: ask whether the key is there, or let the map give 0 for a missing key.'
@@ -104,7 +109,7 @@ export const checks = tasks({
             hint: 'Every count is one short. The first ticket of a boat is a ticket too: a boat seen for the first time counts 1, not 0.'
           }
         ]
-      })
+      })(runs, ctx)
     },
 
     report: {
@@ -112,6 +117,7 @@ export const checks = tasks({
       cases: [
         report('Writes the lines in the order of the boats\' names, from a HashMap', 'HashMap', { Whimbrel: 2, Curlew: 5, Gannet: 1, Linnet: 7, Plover: 3 }, { hint: 'lines should give back one line per boat, as in Gannet: 3, in alphabetical order of the boats\' names.' }),
         report('From a map that keeps the order the boats went in', 'LinkedHashMap', { Skua: 4, Dunlin: 9, Pintail: 2, Fulmar: 6 }, { hint: 'lines should give back the lines in alphabetical order of the boats\' names, whatever order the map keeps them in.' }),
+        report('From a HashMap of other boats', 'HashMap', { Shoveler: 6, Fulmar: 2, Wigeon: 9, Dunlin: 4, Gadwall: 1, Scaup: 3 }, { hint: 'lines should give back the lines in alphabetical order of the boats\' names, whatever order the map keeps them in.' }),
         report('One boat', 'HashMap', { Scaup: 11 }, { hint: 'For one boat, lines should give back one line, as in Gannet: 3.' }),
         report('No boats at all', 'HashMap', {}, { hint: 'With no boats, lines should give back an empty list.' })
       ],
@@ -159,6 +165,10 @@ export const checks = tasks({
           explain: explainCollection,
           typed: 'left gives back the same number whatever Check asks it about. It should look the sailing up in the map.',
           mistakes: [
+            {
+              when: (r) => r.case.record && bothWritten(ctx.section) && value(r, 'Sailing is a record') === 'false',
+              hint: 'Sailing is a class with an equals and a hashCode of your own, and the task asks for a record. A record of a boat and an hour writes equals, hashCode and the boat() and hour() methods from its parts, so the one line does all your class does, and cannot get them out of step.'
+            },
             {
               when: (r, x, all) => (r.case.lookup || r.case.record) && !halfEqual(ctx.section) && all.some((o) => o.case.record && value(o, 'Sailing is a record') === 'false'),
               hint: 'Sailing is not a record. Check puts sailings in the map and looks them up with new Sailing objects that hold the same boat and hour, as a sailing read in would be. A class you write compares its objects with the equals and hashCode it gets from Object, which call two objects equal only when they are the very same one, so the map never finds them. A record writes equals and hashCode from its parts for you.'

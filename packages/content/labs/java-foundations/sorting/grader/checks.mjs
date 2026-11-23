@@ -37,9 +37,9 @@ const pair = (name, code, [x, y], ab, ba, kind, hint) => ({
 
 // Ticket serials whose right order differs from every near miss: reversed, the tie broken the
 // other way, and the serials compared as text ("10000000000" comes before "950" as text).
-const TICKETS = [[10000000000, 'Innes'], [950, 'Raonaid'], [9000000000, 'Euan'], [950, 'Coinneach']]
-const TICKETS_RIGHT = ['950 Coinneach', '950 Raonaid', '9000000000 Euan', '10000000000 Innes']
-const TICKETS_TEXT = ['10000000000 Innes', '9000000000 Euan', '950 Coinneach', '950 Raonaid']
+const TICKETS = [[10000000000, 'Innes'], [950, 'Raonaid'], [9000000000, 'Murdo'], [950, 'Coinneach']]
+const TICKETS_RIGHT = ['950 Coinneach', '950 Raonaid', '9000000000 Murdo', '10000000000 Innes']
+const TICKETS_TEXT = ['10000000000 Innes', '9000000000 Murdo', '950 Coinneach', '950 Raonaid']
 
 // Departures whose right order differs from fewest first, from the tie broken the other way, and
 // from seats compared as text ("9" comes after "12" as text).
@@ -79,8 +79,9 @@ export const checks = tasks({
   tasks: {
     ticket: {
       task: 1,
+      stub: 'class CheckOrdered<T extends Comparable<T>> { }',
       cases: [
-        pair('Puts the smaller serial first', [ticket('a', 4100000017, 'Innes'), ticket('b', 4100000023, 'Euan'), 'Comparable<Ticket> c = a;'], ['a.compareTo(b)', 'b.compareTo(a)'], -1, 1, 'near', 'compareTo should give back a number below 0 when this ticket\'s serial is the smaller, and above 0 when it is the larger.'),
+        pair('Puts the smaller serial first', [ticket('a', 4100000017, 'Innes'), ticket('b', 4100000023, 'Murdo'), 'Comparable<Ticket> c = a;', 'CheckOrdered<Ticket> ordered = null;'], ['a.compareTo(b)', 'b.compareTo(a)'], -1, 1, 'near', 'compareTo should give back a number below 0 when this ticket\'s serial is the smaller, and above 0 when it is the larger.'),
         pair('Orders serials far apart', [ticket('a', 1, 'Tormod'), ticket('b', 3000000000, 'Beathag')], ['a.compareTo(b)', 'b.compareTo(a)'], -1, 1, 'far', 'compareTo should put the smaller serial first however far apart the two serials are.'),
         pair('Gives back 0 for equal tickets', [ticket('a', 5000000001, 'Floraidh'), ticket('b', 5000000001, 'Floraidh')], ['a.compareTo(b)', 'b.compareTo(a)'], 0, 0, 'equal', 'Two tickets with the same serial and the same passenger are equal, and compareTo should give back 0 for them.'),
         pair('Orders the same serial by passenger', [ticket('a', 77, 'Oighrig'), ticket('b', 77, 'Alasdair')], ['a.compareTo(b)', 'b.compareTo(a)'], 1, -1, 'tie', 'Two tickets with the same serial should be in alphabetical order of their passengers.'),
@@ -128,8 +129,9 @@ export const checks = tasks({
 
     seats: {
       task: 2,
+      stub: 'class CheckCompares<C extends Comparator<Departure>> { }',
       cases: [
-        pair('Puts the departure with more seats first', ['Comparator<Departure> c = new MostSeatsFirst();', `Departure a = ${departure('Gannet', 9, 12)};`, `Departure b = ${departure('Linnet', 11, 9)};`], ['c.compare(a, b)', 'c.compare(b, a)'], -1, 1, 'near', 'compare should give back a number below 0 when the first departure has more seats free, and above 0 when it has fewer.'),
+        pair('Puts the departure with more seats first', ['Comparator<Departure> c = new MostSeatsFirst();', 'CheckCompares<MostSeatsFirst> compares = null;', `Departure a = ${departure('Gannet', 9, 12)};`, `Departure b = ${departure('Linnet', 11, 9)};`], ['c.compare(a, b)', 'c.compare(b, a)'], -1, 1, 'near', 'compare should give back a number below 0 when the first departure has more seats free, and above 0 when it has fewer.'),
         pair('Of the same seats, puts the earlier hour first', ['Comparator<Departure> c = new MostSeatsFirst();', `Departure a = ${departure('Curlew', 13, 6)};`, `Departure b = ${departure('Plover', 9, 6)};`], ['c.compare(a, b)', 'c.compare(b, a)'], 1, -1, 'tie', 'Of two departures with the same seats free, the one that leaves at the earlier hour comes first.'),
         pair('Gives back 0 for the same seats and hour', ['Comparator<Departure> c = new MostSeatsFirst();', `Departure a = ${departure('Skua', 10, 3)};`, `Departure b = ${departure('Fulmar', 10, 3)};`], ['c.compare(a, b)', 'c.compare(b, a)'], 0, 0, 'equal', 'Two departures with the same seats free and the same hour compare as 0, whatever their boats.'),
         {
