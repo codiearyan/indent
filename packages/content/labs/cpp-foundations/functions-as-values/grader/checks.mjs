@@ -87,7 +87,7 @@ export const checks = {
             const twice = what.includes('twice')
             if (num(got, 'empty') === 1) return `addTime(${n}) gave back an empty std::function, which holds no rule to run. It gives back the rule itself.`
             const wrong = twice ? num(got, 'a') !== 2 * n || num(got, 'b') !== 0 : num(got, 'a') !== n || num(got, 'b') !== n
-            if (LEFTOVER_HINT(got) || (wrong && byReference)) return `After the rule from addTime(${n}) ran ${twice ? 'twice on one repair' : 'once on each of two repairs'}, they have ${got.a} and ${got.b} minutes, which has nothing to do with ${n}. The rule's lambda captures by reference. ${DANGLING}`
+            if (LEFTOVER_HINT(got) || (wrong && byReference)) return `After the rule from addTime(${n}) ran ${twice ? 'twice on one repair' : 'once on each of two repairs'}, the repairs hold minutes that have nothing to do with ${n}. The rule's lambda captures by reference. ${DANGLING}`
             if (twice ? num(got, 'a') !== 2 * n || num(got, 'b') !== 0 : num(got, 'a') !== n || num(got, 'b') !== n) return `After the rule from addTime(${n}) ran ${twice ? 'twice on one repair' : 'once on each of two repairs'}, they have ${got.a} and ${got.b} minutes. Each call adds ${n} minutes to the repair it is called with.`
             return null
           },
@@ -96,7 +96,7 @@ export const checks = {
         {
           name: 'Two rules from addTime keep apart',
           code: `${ACTION} small = addTime(5); ${ACTION} big = addTime(60); indent8_::scrub_(); Repair a(61, "ship clock"); if (small && big) { small(a); big(a); small(a); } ${put('a', 'a.getMinutes()')}`,
-          judge: (got) => (LEFTOVER_HINT(got) || (num(got, 'a') !== 70 && byReference) ? `The repair has ${got.a} minutes, which has nothing to do with 5 and 60. The rule's lambda captures by reference. ${DANGLING}` : num(got, 'a') !== 70 ? `With a rule from addTime(5) run twice and one from addTime(60) once, the repair has ${got.a} minutes. Each rule keeps its own minutes.` : null),
+          judge: (got) => (LEFTOVER_HINT(got) || (num(got, 'a') !== 70 && byReference) ? `The repair holds minutes that have nothing to do with 5 and 60. The rule's lambda captures by reference. ${DANGLING}` : num(got, 'a') !== 70 ? `With a rule from addTime(5) run twice and one from addTime(60) once, the repair has ${got.a} minutes. Each rule keeps its own minutes.` : null),
           output: (got) => `5, then 60, then 5 more: the repair has ${got.a ?? '?'} minutes`
         }
       ]
@@ -134,7 +134,7 @@ export const checks = {
           code: `${TABLE} rules = repairRules(); indent8_::scrub_(); Repair r(3101, "mantel clock"); auto found = rules.find(${JSON.stringify(name)}); ${put('has', 'found != rules.end() && found->second ? 1 : 0')} if (found != rules.end() && found->second) { found->second(r); indent8_::scrub_(); found->second(r); } ${put('m', 'r.getMinutes()')}`,
           judge: (got) => {
             if (num(got, 'has') !== 1) return `The table has no rule called "${name}" that holds a function.`
-            if (LEFTOVER_HINT(got)) return `After "${name}" ran, the repair has ${got.m} minutes, a number that has nothing to do with the rule. ${DANGLING}`
+            if (LEFTOVER_HINT(got)) return `After "${name}" ran, the repair holds minutes that have nothing to do with the rule. ${DANGLING}`
             if (num(got, 'm') !== 2 * minutes) return `After "${name}" ran twice, the repair has ${got.m} minutes. "${name}" adds ${minutes} each time it runs.`
             return null
           },

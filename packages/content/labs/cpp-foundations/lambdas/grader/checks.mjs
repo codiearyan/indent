@@ -71,7 +71,7 @@ export const checks = {
           code: `${make(4417, 90)} auto q = quoteFor(r); indent8_::scrub_(); ${put('a', 'q(37.5)')} ${put('b', 'q(37.5)')} ${put('dbl', 'std::is_same_v<decltype(q(37.5)), double> ? 1 : 0')}`,
           judge: (got) => {
             if (num(got, 'dbl') !== 1) return 'The lambda quoteFor gives back does not give back a double. Its result type is worked out from what its return gives back.'
-            if (Math.abs(Number(got.a)) > 1e6 || Math.abs(Number(got.b)) > 1e6) return `The quote came to ${got.a} and then ${got.b}, numbers that have nothing to do with the repair. The lambda read a variable of quoteFor that had ended when quoteFor returned: a capture by reference keeps no copy of its own. A quote keeps its word by keeping what it needs in the lambda itself.`
+            if (Math.abs(Number(got.a)) > 1e6 || Math.abs(Number(got.b)) > 1e6 || !near(got, 'a', Number(got.b))) return `The quote came to numbers that have nothing to do with the repair. The lambda read a variable of quoteFor that had ended when quoteFor returned: a capture by reference keeps no copy of its own. A quote keeps its word by keeping what it needs in the lambda itself.`
             if (!near(got, 'a', 56.25)) return `A repair of 90 minutes, quoted at 37.5 an hour, came to ${got.a}. The price is the minutes in hours, times the rate.`
             if (!near(got, 'b', 56.25)) return `Asked twice for the same quote, the lambda gave back ${got.a} and then ${got.b}. A quote changes nothing when it is asked.`
             return null

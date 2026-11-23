@@ -1,27 +1,41 @@
 {
   "stations": [
-    { "title": "Ambrose", "say": "Run the cleaning step, by name." },
-    { "title": "The counter", "text": "Each step typed in again, every job." },
+    {
+      "title": "Ambrose",
+      "say": "Run that step, just by its name."
+    },
+    {
+      "title": "The counter",
+      "text": "Each step typed in again, every job."
+    },
     {
       "title": "Your rules",
       "file": "rules.cpp",
       "mine": true,
       "gap": "No table of steps",
-      "tasks": ["Log by a rule", "Make a step", "Write the table", "Run by name"]
+      "tasks": [
+        "Log by a rule",
+        "Make a step",
+        "Write the table",
+        "Run by name"
+      ]
     },
-    { "title": "The repair", "text": "The step's time is on the repair." }
+    {
+      "title": "The repair",
+      "text": "The step's time is on the repair."
+    }
   ],
   "ticket": {
-    "label": "Cleaning",
+    "label": "A step",
     "wrong": "typed again",
     "why": "No table",
     "right": "run by name"
   },
   "captions": [
-    "Ambrose wants the counter to run the cleaning step by its name.",
+    "Ambrose wants the counter to run any of the workshop's steps just by its name.",
     "Today every step is written out again at the counter, for every job.",
     "You keep the steps as values: in variables, given back, and in one table by name.",
-    "The counter asks for cleaning by name, and its time lands on the repair.",
+    "The counter asks for a step by name, and its time lands on the repair.",
     "The workshop's steps live in one table now, and the counter runs them by name."
   ]
 }
