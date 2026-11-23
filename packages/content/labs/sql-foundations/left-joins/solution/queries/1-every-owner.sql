@@ -1,0 +1,12 @@
+-- Task 1: every owner with their animals, the owners with none included.
+-- Return three columns, in this order:
+--   first_name  the owner's first name
+--   last_name   the owner's last name
+--   animal      the name of one of their animals
+-- One row for each owner and animal. An owner with no animals has one row, with NULL
+-- as the animal. Any order of rows.
+--   node run.mjs queries/1-every-owner.sql
+
+SELECT o.first_name, o.last_name, a.name AS animal
+FROM owners AS o
+LEFT JOIN animals AS a ON a.owner_id = o.id;

@@ -1,0 +1,113 @@
+{
+  "id": "redirects",
+  "title": "Being sent somewhere else",
+  "files": [
+    "src/redirects.js",
+    "run.js",
+    "server/station.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "kind",
+      "title": "Say what kind of redirect a status is",
+      "file": "src/redirects.js",
+      "description": "Under `// Task 1` in `src/redirects.js`, make `redirectKind(status)` take a status number. For the five redirects, `301`, `302`, `303`, `307` and `308`, it gives back `{ permanent, keepsPost }`:\n\n- `permanent`: `true` when the move is for good, `false` when it is for now\n- `keepsPost`: `true` when a `POST` arrives at the new address still a `POST`, with its body, and `false` when it is turned into a `GET`\n\nFor any other status it gives back `null`.\n\nCheck calls `redirectKind` with each of the five redirects and with statuses that are not redirects.",
+      "nextSteps": [
+        "Start with the statuses that are not one of the five.",
+        "Find in the lesson which redirects are for good.",
+        "Find which ones send a POST on as it was.",
+        "Run `node run.js` and read the three Task 1 lines."
+      ],
+      "hints": [
+        "Two questions per redirect, each answered with true or false. The lesson's list of five answers both.",
+        "Only 301 and 308 are for good. Only 307 and 308 promise to send the request again as it was; 301, 302 and 303 end up as a GET.",
+        "Keep an object keyed by status, like `{ 301: { permanent: true, keepsPost: false }, ... }`, and `return kinds[status] ?? null`."
+      ],
+      "docs": [
+        {
+          "title": "Redirections in HTTP",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections"
+        },
+        {
+          "title": "308 Permanent Redirect",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/308"
+        },
+        {
+          "title": "303 See Other",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/303"
+        }
+      ],
+      "videos": [
+        {
+          "title": "The 3xx statuses, with examples in Node",
+          "url": "https://www.youtube.com/watch?v=9ma5yEBQMsk"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "where",
+      "title": "See where an address leads, without going there",
+      "file": "src/redirects.js",
+      "description": "Under `// Task 2`, make `whereTo(address)` send **one** request for `address` without following a redirect. When the answer is a redirect, a status from 300 to 399 with a `location` header, it gives back the whole address that `location` points to, as text, read against `address`. Otherwise it gives back `null`.\n\nCheck starts a server of its own that answers with redirects whose `location` is a path, a whole address and a path without a slash at the start, and with answers that are not redirects. It counts the requests its server received.",
+      "nextSteps": [
+        "Tell `fetch` not to follow redirects, with the option the lesson shows.",
+        "Read the status and the `location` header of the answer.",
+        "Give back `null` unless it is a redirect.",
+        "Turn the location into a whole address, read against `address`, and run `node run.js`."
+      ],
+      "hints": [
+        "Without being told, `fetch` follows a redirect and hands you the answer from the new address. Your server then receives two requests, and the redirect is gone.",
+        "`{ redirect: 'manual' }` in the options keeps the redirect answer. `new URL(location, address)` reads a location against the address you asked for, whatever form it has.",
+        "`const response = await fetch(address, { redirect: 'manual' })`, return `null` when the status is outside 300 to 399 or `location` is `null`, and otherwise `return new URL(location, address).href`."
+      ],
+      "docs": [
+        {
+          "title": "Request: redirect property",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Request/redirect"
+        },
+        {
+          "title": "Location header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location"
+        },
+        {
+          "title": "URL() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URL/URL"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "trail",
+      "title": "Follow an address step by step",
+      "file": "src/redirects.js",
+      "description": "Under `// Task 3`, make `trail(address, most)` follow the redirects from `address` one at a time, and give back the list of every whole address it asked for, in order: `address` first, and last the one whose answer is not a redirect. When the answer is still a redirect after `most` redirects, it throws an `Error` instead, without asking any further.\n\nCheck starts a server of its own with trails of redirects of different lengths and a loop, and counts the requests its server received.",
+      "nextSteps": [
+        "Keep a list that starts with `address`.",
+        "Ask where each address leads; your function from Task 2 can do that.",
+        "Add each new address to the list until one leads nowhere.",
+        "Before you follow a redirect, check whether `most` redirects are already used up, then run `node run.js`."
+      ],
+      "hints": [
+        "A loop that follows redirects needs two ways out, as asking again did: an answer that is not a redirect, and a limit.",
+        "`whereTo` gives back the next address, or `null` at the end of the trail. The list has one more address than the redirects it followed.",
+        "`let next = await whereTo(address)`, then `while (next !== null) { if (asked.length > most) throw new Error('Too many redirects'); asked.push(next); next = await whereTo(next) }`, and `return asked`."
+      ],
+      "docs": [
+        {
+          "title": "Response: redirected property",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response/redirected"
+        },
+        {
+          "title": "while",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/while"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dougie", "label": "Dougie", "kind": "story" },
+      { "id": "count", "label": "Tonight's count", "kind": "data" },
+      { "id": "file", "label": "kit_store.py", "kind": "file", "mine": true },
+      { "id": "terminal", "label": "Terminal", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dougie", "to": "count", "label": "ropes" },
+      { "from": "count", "to": "file", "label": "numbers" },
+      { "from": "file", "to": "terminal", "label": "printed count" }
+    ],
+    "note": "Tonight's count sits at the top of kit_store.py, your variables keep and change it, and the terminal shows the result."
+  },
+  "tasks": {
+    "team": {
+      "steps": [
+        { "active": ["dougie"], "note": "Dougie wants the team's name kept under one name, so nobody types it again." },
+        { "active": ["file"], "note": "Under Task 1 a variable stores the name as text, in quotes." },
+        { "active": ["file", "file->terminal", "terminal"], "note": "Printing the variable shows the text it holds." }
+      ]
+    },
+    "count": {
+      "steps": [
+        {
+          "active": ["dougie", "dougie->count", "count"],
+          "value": { "kind": "map", "label": "tonight's count", "entries": [{ "key": "ropes_in_store", "value": "a whole number" }, { "key": "ropes_taken_out", "value": "a whole number" }] },
+          "note": "Dougie's count arrives at the top of the file as two named numbers."
+        },
+        { "active": ["count", "count->file", "file"], "note": "Under Task 2 a new variable starts with the number of ropes in the store." },
+        { "active": ["file", "file->terminal", "terminal"], "note": "The terminal shows the count after its label, with one space between them." }
+      ]
+    },
+    "taken": {
+      "steps": [
+        { "active": ["count", "count->file", "file"], "note": "Some ropes went out on tonight's callout." },
+        { "active": ["file"], "note": "Under Task 3 the same variable gets a new value: what is left in the store." },
+        { "active": ["file", "file->terminal", "terminal"], "note": "The terminal now shows two counts, before and after the callout." }
+      ]
+    },
+    "names": {
+      "steps": [
+        { "active": ["file"], "note": "Two variables called x and y hold the names of two people on the team." },
+        { "active": ["file"], "note": "Each gets a name that says what it holds, everywhere it appears." },
+        { "active": ["file", "file->terminal", "terminal"], "note": "The file prints the same two lines as before, and now Dougie can read it." }
+      ]
+    }
+  }
+}

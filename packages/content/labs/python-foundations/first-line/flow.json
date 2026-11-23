@@ -1,0 +1,52 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "rhona", "label": "Rhona", "kind": "story" },
+      { "id": "file", "label": "first_line.py", "kind": "file", "mine": true },
+      { "id": "python", "label": "Python", "kind": "story" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "rhona", "to": "file", "label": "the words" },
+      { "from": "file", "to": "python", "label": "lines" },
+      { "from": "python", "to": "terminal", "label": "printed text" }
+    ],
+    "note": "You write the lines of first_line.py, Python runs them from top to bottom, and the terminal shows what they print."
+  },
+  "tasks": {
+    "welcome": {
+      "steps": [
+        { "active": ["rhona", "rhona->file"], "note": "Rhona wants the team's name printed, exactly as the task spells it." },
+        { "active": ["file"], "note": "Under Task 1 you add one line that prints it, with the text in quotes." },
+        { "active": ["file", "file->python", "python"], "note": "Python reads the file from the top and runs each line in turn." },
+        { "active": ["python", "python->terminal", "terminal"], "note": "The team's name shows up on a line of its own in the terminal." }
+      ]
+    },
+    "radio": {
+      "steps": [
+        {
+          "active": ["rhona", "rhona->file"],
+          "value": { "kind": "array", "label": "the radio check", "values": ["first line", "second line"] },
+          "note": "The radio check has two lines, and Rhona wants them in the order the task gives."
+        },
+        { "active": ["file"], "note": "Each line of the radio check gets its own print, one under the other." },
+        { "active": ["file", "file->python", "python"], "note": "Python runs the two prints in the order they are written." },
+        { "active": ["python", "python->terminal", "terminal"], "note": "The terminal shows the two lines, one right after the other." }
+      ]
+    },
+    "old": {
+      "steps": [
+        { "active": ["file"], "note": "A line under Task 3 still sends people to the old base the team has left." },
+        { "active": ["file", "file->python", "python"], "note": "Python skips every line that is a comment." },
+        { "active": ["python", "python->terminal", "terminal"], "note": "The old meeting place no longer prints, and the line stays in the file in case Rhona wants it back." }
+      ]
+    },
+    "note": {
+      "steps": [
+        { "active": ["file"], "note": "A comment is a note for the next person who opens the file, like Rhona." },
+        { "active": ["file", "file->python", "python"], "note": "Python skips comments, so your note changes nothing that runs." },
+        { "active": ["python", "python->terminal", "terminal"], "note": "The terminal prints the same lines as before your note." }
+      ]
+    }
+  }
+}

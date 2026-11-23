@@ -1,0 +1,114 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dorrit", "label": "Dorrit", "kind": "story" },
+      { "id": "slip", "label": "Ticket slip", "kind": "data" },
+      { "id": "file", "label": "ticket.cpp", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "terminal", "label": "Terminal", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dorrit", "to": "slip", "label": "writes" },
+      { "from": "slip", "to": "file", "label": "variables" },
+      { "from": "file", "to": "compiler", "label": "types" },
+      { "from": "compiler", "to": "terminal", "label": "ticket lines" }
+    ],
+    "note": "Each box of Dorrit's slip becomes a variable with a type, and the program prints the ticket from them."
+  },
+  "tasks": {
+    "line": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->slip", "slip"],
+          "value": {
+            "kind": "map",
+            "label": "the slip",
+            "entries": [
+              { "key": "ticketNumber", "value": "int" },
+              { "key": "item", "value": "std::string" },
+              { "key": "customer", "value": "std::string" }
+            ]
+          },
+          "note": "Dorrit's slip holds the ticket number, the item and the customer."
+        },
+        {
+          "active": ["slip", "slip->file", "file"],
+          "note": "Under Task 1 one print sends the words and the three variables, piece by piece."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler", "compiler->terminal", "terminal"],
+          "note": "The ticket line prints with whatever ticket is in the variables today."
+        }
+      ]
+    },
+    "where": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->slip", "slip"],
+          "note": "The slip says which bench works on the clock and which shelf it waits on."
+        },
+        {
+          "active": ["file"],
+          "value": {
+            "kind": "map",
+            "label": "two new variables",
+            "entries": [
+              { "key": "bench", "value": "int" },
+              { "key": "shelf", "value": "char" }
+            ]
+          },
+          "note": "You make a whole number for the bench and one character for the shelf."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "The compiler checks that each value fits the type of its box."
+        },
+        {
+          "active": ["compiler->terminal", "terminal"],
+          "note": "The bench and the shelf print from the two variables."
+        }
+      ]
+    },
+    "key": {
+      "steps": [
+        {
+          "active": ["dorrit", "dorrit->slip", "slip"],
+          "note": "Edwina lost the winding key too, so the quote on her slip goes up."
+        },
+        {
+          "active": ["slip->file", "file"],
+          "value": {
+            "kind": "array",
+            "label": "quote, before and after",
+            "values": ["old quote", "old quote + key"]
+          },
+          "note": "The quote gets a new value, worked out from its old one. No new variable is made."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler", "compiler->terminal", "terminal"],
+          "note": "The new quote prints on its own line."
+        }
+      ]
+    },
+    "days": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "The days left are printed from a variable that was never given a value."
+        },
+        {
+          "active": ["file", "file->compiler", "compiler"],
+          "note": "The compiler warns about that line, and the program prints whatever was in memory."
+        },
+        {
+          "active": ["slip", "slip->file", "file"],
+          "note": "The days left take the days promised on the slip, on the line that makes them."
+        },
+        {
+          "active": ["compiler->terminal", "terminal"],
+          "note": "The ticket says the clock is ready in the days Dorrit promised."
+        }
+      ]
+    }
+  }
+}

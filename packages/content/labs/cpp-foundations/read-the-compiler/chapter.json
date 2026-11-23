@@ -1,0 +1,131 @@
+{
+  "id": "read-the-compiler",
+  "title": "Read the compiler",
+  "files": [
+    "src/workbench.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the bench sheet here and read what the compiler says about it.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/workbench.cpp -o workbench && ./workbench"
+  },
+  "tasks": [
+    {
+      "id": "springs",
+      "title": "Fix the springs on the shelf",
+      "file": "src/workbench.cpp",
+      "description": "Under `// Task 1` in `src/workbench.cpp`, the compiler refuses the lines that work out and print the springs on the shelf. Read its message, find the mistake it points at and fix it, so the program prints the springs in stock plus the springs delivered:\n\n```\nSprings on the shelf: 48\n```\n\nKeep `springsOnShelf` worked out from `springsInStock` and `springsDelivered`. Check builds your Task 1 lines with other numbers of springs, reads `springsOnShelf` and looks for the line.",
+      "nextSteps": [
+        "Build the program and find the error whose line is under Task 1.",
+        "Read the message: what did the compiler expect?",
+        "Look at the end of that line, and of the line above it.",
+        "Fix it, build again, and run the program."
+      ],
+      "hints": [
+        "The error starts with `src/workbench.cpp:` and a line number. Find that line in the editor.",
+        "The compiler expected a character that ends every statement. It reports where it noticed, which can be the end of the line or the start of the next one.",
+        "The line that makes `springsOnShelf` has no semicolon at its end."
+      ],
+      "docs": [
+        {
+          "title": "Statements",
+          "url": "https://en.cppreference.com/w/cpp/language/statements"
+        },
+        {
+          "title": "GCC: diagnostic message formatting",
+          "url": "https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Message-Formatting-Options.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hands",
+      "title": "Fix the hands to fit",
+      "file": "src/workbench.cpp",
+      "description": "Under `// Task 2`, the compiler refuses the line that prints the hands Kasimir fits today. Read its message and fix the mistake, so the line prints `handsNeeded`, the variable made on the line above it:\n\n```\nHands to fit: 10\n```\n\nKeep the name `handsNeeded`. Check builds your Task 2 lines with other numbers of hands and clocks, reads `handsNeeded` and looks for the line.",
+      "nextSteps": [
+        "Find the error whose line is under Task 2.",
+        "Read which name the compiler says it does not know.",
+        "Compare that name, letter by letter, with the variable made on the line above.",
+        "Fix the line, build again, and run."
+      ],
+      "hints": [
+        "The compiler names the word it does not know. Find that word on the line.",
+        "Names must match exactly, letter for letter. Making a new variable with the wrong name only hides the mistake.",
+        "The print uses a misspelling of `handsNeeded`."
+      ],
+      "docs": [
+        {
+          "title": "Identifiers",
+          "url": "https://en.cppreference.com/w/cpp/language/identifiers"
+        },
+        {
+          "title": "Declarations",
+          "url": "https://en.cppreference.com/w/cpp/language/declarations"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "crystal",
+      "title": "Fix the crystal size",
+      "file": "src/workbench.cpp",
+      "description": "Under `// Task 3`, the compiler refuses the line that makes `crystalSize`. Read its message and fix the mistake, so the program prints the width of the glass crystal from `crystalMm`, decimals included:\n\n```\nCrystal: 30.8 mm\n```\n\nKeep the name `crystalSize`, keep it made from `crystalMm`, and keep the decimals. Check builds your Task 3 lines with other widths, reads `crystalSize` and its type, and looks for the line.",
+      "nextSteps": [
+        "Find the error whose line is under Task 3.",
+        "Read which two types the message names.",
+        "Ask what kind of value `crystalMm` holds, and what kind of box it is put in.",
+        "Fix the type, build again, and run."
+      ],
+      "hints": [
+        "The message says something cannot be converted from one type to another. Which two?",
+        "`crystalMm` is a number with a decimal point, and the box it goes into is made for text.",
+        "Make `crystalSize` with the same type as `crystalMm`."
+      ],
+      "docs": [
+        {
+          "title": "Fundamental types",
+          "url": "https://en.cppreference.com/w/cpp/language/types"
+        },
+        {
+          "title": "Implicit conversions",
+          "url": "https://en.cppreference.com/w/cpp/language/implicit_conversion"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "oil",
+      "title": "Fix the oil line",
+      "file": "src/workbench.cpp",
+      "description": "Under `// Task 4`, the compiler refuses the line that prints the oil one service takes, with two decimals. The line itself is as Kasimir meant it. Read the message, find what is missing and add it, so the line prints:\n\n```\nOil: 0.35 ml\n```\n\nKeep the line as it is. Check builds your Task 4 lines with other amounts of oil and looks for the line with exactly two decimals.",
+      "nextSteps": [
+        "Find the error whose line is under Task 4.",
+        "Read which name the compiler says is not part of `std`.",
+        "Find out which header that name comes from, and look at the top of the file.",
+        "Add what is missing, build again, and run."
+      ],
+      "hints": [
+        "The line is fine. The compiler does not know one of the names on it, because the file never brought it in.",
+        "Names from the standard library come in through `#include` lines at the top of the file. `std::setprecision` lives in its own header; its reference page names it.",
+        "Add `#include <iomanip>` at the top of the file, with the other `#include` lines."
+      ],
+      "docs": [
+        {
+          "title": "std::setprecision",
+          "url": "https://en.cppreference.com/w/cpp/io/manip/setprecision"
+        },
+        {
+          "title": "Source file inclusion",
+          "url": "https://en.cppreference.com/w/cpp/preprocessor/include"
+        }
+      ],
+      "videos": [
+        {
+          "title": "What the compiler and the linker do",
+          "url": "https://www.youtube.com/watch?v=FfZ0LAMrv5U"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

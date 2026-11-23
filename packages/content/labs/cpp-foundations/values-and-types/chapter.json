@@ -1,0 +1,131 @@
+{
+  "id": "values-and-types",
+  "title": "Values and types",
+  "files": [
+    "src/ticket.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the ticket program here, run it, and read what it prints.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/ticket.cpp -o ticket && ./ticket"
+  },
+  "tasks": [
+    {
+      "id": "line",
+      "title": "Print the ticket line",
+      "file": "src/ticket.cpp",
+      "description": "Under `// Task 1` in `src/ticket.cpp`, print the ticket line built from the variables `ticketNumber`, `item` and `customer`. For today's slip it reads:\n\n```\nTicket 2187: carriage clock for Edwina Sallow\n```\n\nCheck builds and runs your program with other tickets in those variables, and looks for the line each one should give, on a line of its own.",
+      "nextSteps": [
+        "Read the variables at the top of `main`: their names, types and values.",
+        "Start a print with `std::cout` and send the first word as text.",
+        "Send each variable by its name, with the words between them as text.",
+        "Build, run, and compare the line with the task, spaces included."
+      ],
+      "hints": [
+        "One `std::cout` can print several pieces, each after its own `<<`.",
+        "A variable is sent by its name, without quotes. The words between the variables are text, in double quotes, with their spaces inside the quotes.",
+        "The line has the shape `std::cout << \"Ticket \" << ticketNumber << \": \" << ... << \"\\n\";`."
+      ],
+      "docs": [
+        {
+          "title": "Basic input and output with streams",
+          "url": "https://en.cppreference.com/w/cpp/io/basic_ostream/operator_ltlt"
+        },
+        {
+          "title": "std::basic_string",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "where",
+      "title": "Note where the clock waits",
+      "file": "src/ticket.cpp",
+      "description": "Under `// Task 2`, make an `int` called `bench` that holds `4`, and a `char` called `shelf` that holds the letter `B`. Then print them from those two variables:\n\n```\nBench 4, shelf B\n```\n\nCheck reads both variables and their types after your Task 2 lines, looks for the line, and reads your code to see that it prints the variables by their names.",
+      "nextSteps": [
+        "Write the type, the name, `=`, the value and a semicolon for `bench`.",
+        "Do the same for `shelf`. One character has its own kind of quotes.",
+        "Print the line, sending `bench` and `shelf` by their names.",
+        "Build and run, and read the line."
+      ],
+      "hints": [
+        "A variable is made with its type first, then its name, then `=` and its value.",
+        "A whole number has no quotes. One character goes in single quotes, and text goes in double quotes.",
+        "The two lines have the shapes `int bench = ...;` and `char shelf = '.';`."
+      ],
+      "docs": [
+        {
+          "title": "Fundamental types",
+          "url": "https://en.cppreference.com/w/cpp/language/types"
+        },
+        {
+          "title": "Character literal",
+          "url": "https://en.cppreference.com/w/cpp/language/character_literal"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Variables and data types",
+          "url": "https://www.youtube.com/watch?v=cARnMT7nmdE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "key",
+      "title": "Add the key to the quote",
+      "file": "src/ticket.cpp",
+      "description": "Edwina lost the winding key too. Under `// Task 3`, give `quote` a new value: what it holds now plus `keyPrice`. Do not make a new variable. Then print it:\n\n```\nQuote: 82.75\n```\n\nCheck runs your program with other quotes and key prices, reads `quote` after your Task 3 lines and looks for the line.",
+      "nextSteps": [
+        "Find where `quote` is made, above Task 1. It already exists.",
+        "Under Task 3, give it a new value with `=`, using its own name and `keyPrice` on the right.",
+        "Print `Quote: ` and then `quote`.",
+        "Build and run: the quote should have gone up by the price of the key."
+      ],
+      "hints": [
+        "A variable that already exists is not made again. Putting a type in front of its name makes a second one, and the compiler refuses that.",
+        "On the right of `=`, the variable still holds its old value. The new value is stored once the line is done.",
+        "The line has the shape `quote = quote + ...;`."
+      ],
+      "docs": [
+        {
+          "title": "Assignment operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_assignment"
+        },
+        {
+          "title": "Floating-point types",
+          "url": "https://en.cppreference.com/w/cpp/language/types#Floating-point_types"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "days",
+      "title": "Give daysLeft a value",
+      "file": "src/ticket.cpp",
+      "description": "Under `// Task 4`, `daysLeft` is made without a value and then printed, so the program prints whatever was left in memory. Give it the value of `promisedDays` on the line that makes it, and keep the line that prints it.\n\nCheck reads your code to see that `daysLeft` has its value before it is printed, then runs your program with other promised days and reads `daysLeft` and the line `Ready in ... days`.",
+      "nextSteps": [
+        "Build and run the program a few times and look at the number of days.",
+        "Read the warning the compiler gives about the line that prints it.",
+        "Give `daysLeft` the value of `promisedDays` where it is made.",
+        "Build and run: the warning is gone and the days are the promised ones."
+      ],
+      "hints": [
+        "The compiler warns about this line for a reason. Read what it says about `daysLeft`.",
+        "A variable made without a value holds whatever was in that memory before. It gets a value with `=` on the line that makes it.",
+        "The line has the shape `int daysLeft = ...;`, with the name of the promised days on the right."
+      ],
+      "docs": [
+        {
+          "title": "Default initialization",
+          "url": "https://en.cppreference.com/w/cpp/language/default_initialization"
+        },
+        {
+          "title": "Copy initialization",
+          "url": "https://en.cppreference.com/w/cpp/language/copy_initialization"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

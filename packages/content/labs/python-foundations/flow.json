@@ -1,0 +1,18 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "team", "label": "Rhona, Dougie and Ailsa", "kind": "story" },
+      { "id": "notebook", "label": "Notebook and spreadsheet", "kind": "data" },
+      { "id": "files", "label": "Your Python files", "kind": "file", "mine": true },
+      { "id": "python", "label": "Python", "kind": "story" },
+      { "id": "base", "label": "Base laptop", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "team", "to": "notebook", "label": "log, kit, rota" },
+      { "from": "notebook", "to": "files", "label": "numbers and names" },
+      { "from": "files", "to": "python", "label": "lines" },
+      { "from": "python", "to": "base", "label": "answers" }
+    ],
+    "note": "You move the team's log, kit counts and checks out of a notebook nobody trusts and into small Python programs that print the same answer every time."
+  }
+}

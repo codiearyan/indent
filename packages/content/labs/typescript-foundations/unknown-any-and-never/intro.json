@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Imogen",
+      "say": "Why did the cafe get 31 tins?",
+      "note": "They asked for four."
+    },
+    {
+      "title": "Cafe till",
+      "text": "Sends values the code never checks."
+    },
+    {
+      "title": "Your code",
+      "file": "cafe.ts",
+      "mine": true,
+      "gap": "Takes whatever arrives as any",
+      "tasks": ["Take out any", "Tins of any kind", "Check a whole order", "Stop on the unknown"]
+    },
+    {
+      "title": "Packing table",
+      "rows": [
+        ["Mill Street", "4 tins"],
+        ["Ember Oolong", "checked"]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Mill Street",
+    "wrong": "31 tins",
+    "why": "Unchecked",
+    "right": "4 tins"
+  },
+  "captions": [
+    "Imogen asks why the cafe on Mill Street was sent thirty-one tins.",
+    "The till sent the tins as text, and the code used them without a check.",
+    "You give each value from outside an honest type and check it before use.",
+    "Now the cafe's order comes through as the four tins they asked for.",
+    "What arrives from the till is checked, and a status nobody handled stops the code."
+  ]
+}

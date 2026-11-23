@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dougie", "say": "How many packs do I open tonight?", "note": "Torches take three each." },
+    { "title": "Envelope", "text": "Sums done by hand, one pack too many." },
+    {
+      "title": "Your code",
+      "file": "batteries.py",
+      "mine": true,
+      "gap": "No sums, only guesses",
+      "tasks": ["Count batteries", "Count full packs", "Count loose ones", "Time the walk in"]
+    },
+    { "title": "Kit store", "text": "The right packs on the bench, none spare." }
+  ],
+  "ticket": { "label": "Packs", "wrong": "one too many", "why": "A guess", "right": "just right" },
+  "captions": [
+    "Thursday at the kit store. Dougie is filling head torches before the night exercise.",
+    "Today Dougie works it out on an envelope and opens one pack too many.",
+    "You write the sums: batteries, full packs, loose batteries and the walk in.",
+    "Now the laptop says how many packs to open and how long the walk will take.",
+    "Numbers, kept as names and worked out the same way every time."
+  ]
+}

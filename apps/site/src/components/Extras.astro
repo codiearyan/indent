@@ -1,10 +1,12 @@
 ---
 import type { Repo } from '../lib/content'
-import { listPatterns, listRoadmaps } from '../lib/content'
+// Patterns is hidden for now; uncomment it here, below, in Nav and in Closing to bring it back.
+// import { listPatterns } from '../lib/content'
+import { listRoadmaps } from '../lib/content'
 import BuildStrip from './BuildStrip.astro'
 import SectionHead from './SectionHead.astro'
 import Shot from './Shot.astro'
-import pattern from '../assets/screens/pattern.png'
+// import pattern from '../assets/screens/pattern.png'
 import activity from '../assets/screens/activity.png'
 import Bell from '@lucide/astro/icons/bell'
 import CalendarPlus from '@lucide/astro/icons/calendar-plus'
@@ -20,11 +22,11 @@ interface Props {
 }
 
 const { repos } = Astro.props
-const patterns = listPatterns()
-const groups = [...new Set(patterns.map((p) => p.group))].map((group) => ({
-  group,
-  items: patterns.filter((p) => p.group === group)
-}))
+// const patterns = listPatterns()
+// const groups = [...new Set(patterns.map((p) => p.group))].map((group) => ({
+//   group,
+//   items: patterns.filter((p) => p.group === group)
+// }))
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const practiceDays = new Set(['Mon', 'Tue', 'Thu'])
 const keepUp = [
@@ -58,6 +60,7 @@ const roadmaps = listRoadmaps().map((roadmap) => {
 })
 ---
 
+{/*
 <section
   id="patterns"
   aria-labelledby="patterns-title"
@@ -116,6 +119,7 @@ const roadmaps = listRoadmaps().map((roadmap) => {
     </div>
   </div>
 </section>
+*/}
 
 <section
   id="roadmaps"
@@ -126,7 +130,7 @@ const roadmaps = listRoadmaps().map((roadmap) => {
     <SectionHead
       id="roadmaps-title"
       label="/roadmaps"
-      step={7}
+      step={6}
       muted="Not sure where to start?"
       bright="A roadmap puts the repos in order."
     >
@@ -184,7 +188,7 @@ const roadmaps = listRoadmaps().map((roadmap) => {
     <SectionHead
       id="activity-title"
       label="/activity"
-      step={8}
+      step={7}
       muted="Progress you can see."
       bright="Points, levels and a streak, kept honest by the tests."
     >

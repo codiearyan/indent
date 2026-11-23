@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Kasimir", "say": "Why won't my bench sheet build?", "note": "He wrote it from a book." },
+    { "title": "Compiler", "text": "Prints half a page of errors and no program." },
+    {
+      "title": "Your fixes",
+      "file": "workbench.cpp",
+      "mine": true,
+      "gap": "Four lines it refuses",
+      "tasks": ["Fix the springs", "Fix the hands", "Fix the crystal", "Fix the oil line"]
+    },
+    { "title": "Bench sheet", "rows": [["Springs", "on the shelf"], ["Hands", "to fit"], ["Crystal", "and oil"]] }
+  ],
+  "ticket": { "label": "Bench sheet", "wrong": "refused", "why": "Errors", "right": "built" },
+  "captions": [
+    "Kasimir wrote his own bench sheet from a book, and wants to know why it will not build.",
+    "The compiler answers with half a page of errors, and no program comes out.",
+    "You read each message, find the mistake it points at and fix only that, in four tasks.",
+    "Now the bench sheet builds, and prints the springs, the hands, the crystal and the oil.",
+    "Same lines Kasimir meant, one fix each. The messages told you where to look."
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "id": "sending-data",
+  "title": "Sending data and saying what kind it is",
+  "files": [
+    "src/send.js",
+    "run.js",
+    "server/station.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "add",
+      "title": "Add a song request",
+      "file": "src/send.js",
+      "description": "Under `// Task 1` in `src/send.js`, make `addRequest(base, song, from)` ask the server at `base` to add a song request:\n\n- a `POST` to the path `/api/requests`\n- whose body is JSON: an object with `song` and `from`, and nothing else\n- whose `content-type` says the body is JSON\n\nThe server answers with JSON about the new request. `addRequest` gives back the `id` in that answer.\n\nCheck starts a server of its own, sends songs with quotes and other characters in them, and looks at the method, the `content-type` and the body its server received, and at the id `addRequest` gave back.",
+      "nextSteps": [
+        "Hand `fetch` the method, the headers and the body in its options.",
+        "Write the body with the method that turns a value into JSON text.",
+        "Read the answer as JSON and take the id from it.",
+        "Run `node run.js` and read the request it prints: the body is under the headers."
+      ],
+      "hints": [
+        "Three things in the options: the method that adds, a `content-type` header, and the body as JSON text. Without the header, `fetch` labels a text body as plain text, and the server answers 415.",
+        "`JSON.stringify({ song, from })` writes the object as JSON, quotes and all. The JSON type is `application/json`.",
+        "`fetch(new URL('/api/requests', base), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ song, from }) })`, then `return (await response.json()).id`."
+      ],
+      "docs": [
+        {
+          "title": "Using the Fetch API: setting a body",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#setting_a_body"
+        },
+        {
+          "title": "POST request method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/POST"
+        },
+        {
+          "title": "415 Unsupported Media Type",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/415"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Sending JSON with fetch",
+          "url": "https://www.youtube.com/watch?v=ycmci-hiPfQ"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "address",
+      "title": "Read where the new request lives",
+      "file": "src/send.js",
+      "description": "Under `// Task 2`, make `requestAddress(base, song, from)` send the same request as `addRequest`, and give back the whole address of the new song request as text, built from the `location` header of the answer. The `location` may be a whole address or only a path on the server that answered.\n\nCheck starts a server of its own that answers with a path in `location` once and with whole addresses twice, and compares the address `requestAddress` gave back with where its server said the request lives.",
+      "nextSteps": [
+        "Send the same request as in Task 1.",
+        "Read the `location` header of the answer, and print it.",
+        "Turn it into a whole address, whether it is a path or already whole.",
+        "Run `node run.js`: the cupboard server answers with a path."
+      ],
+      "hints": [
+        "The server decides where a new thing lives, and says so in `location`. Do not build the address from the id yourself.",
+        "A location that is only a path means the same server. `new URL` with a second value joins a path to it, and leaves a whole address as it is.",
+        "`return new URL(response.headers.get('location'), base).href`, after the same `fetch` as Task 1."
+      ],
+      "docs": [
+        {
+          "title": "201 Created",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/201"
+        },
+        {
+          "title": "Location header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location"
+        },
+        {
+          "title": "URL() constructor",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URL/URL"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "try",
+      "title": "Say whether it was added, and why not",
+      "file": "src/send.js",
+      "description": "Under `// Task 3`, make `tryRequest(base, song, from)` send the same request as `addRequest`, and give back:\n\n- `{ added: true, id }` when the answer is `201`, with the id from the answer\n- `{ added: false, reason }` when the answer is a client error, where `reason` is the `error` the server wrote in its JSON\n\nCheck starts a server of its own that answers `201` once and refuses with client errors of its own, each with its own reason.",
+      "nextSteps": [
+        "Send the same request as in Task 1.",
+        "Read the body as JSON once, whatever the status.",
+        "Decide by the status which of the two objects to give back.",
+        "Run `node run.js`: Bram's request is already on the list, and one request has no name."
+      ],
+      "hints": [
+        "A refusal is still an answer with a JSON body. The reason is in that body, not in the status line.",
+        "Read the JSON before you decide, then give back `added` with either the `id` or the `error` from it.",
+        "`const answer = await response.json()`, then `if (response.status === 201) return { added: true, id: answer.id }` and otherwise `return { added: false, reason: answer.error }`."
+      ],
+      "docs": [
+        {
+          "title": "409 Conflict",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"
+        },
+        {
+          "title": "400 Bad Request",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

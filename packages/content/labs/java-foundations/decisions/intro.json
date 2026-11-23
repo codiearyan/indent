@@ -1,0 +1,38 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Boarding, full or cancelled?",
+      "note": "She chalks the board by hand."
+    },
+    {
+      "title": "Ossian",
+      "say": "Fog on the river. Not today.",
+      "note": "He calls it off from the boat."
+    },
+    {
+      "title": "Your program",
+      "file": "Departures.java",
+      "mine": true,
+      "gap": "Nobody decides in time",
+      "tasks": ["Is the boat full?", "Can the boat sail?", "Set the board", "Charge the fare"]
+    },
+    {
+      "title": "Departures board",
+      "text": "Shows what Ossian decided, every crossing."
+    }
+  ],
+  "ticket": {
+    "label": "Next boat",
+    "wrong": "chalked go",
+    "why": "Wrong word",
+    "right": "called off"
+  },
+  "captions": [
+    "The departures board at the hut. Bridie has to say whether the next crossing goes.",
+    "Today she chalks it by hand, and it said boarding while Ossian had called it off.",
+    "You write the true or false answers and the decisions, in four small tasks.",
+    "Now the board follows the wind, the fog and the seats, and each fare is right.",
+    "Booleans and if. The clipboard's last job is done by the program."
+  ]
+}

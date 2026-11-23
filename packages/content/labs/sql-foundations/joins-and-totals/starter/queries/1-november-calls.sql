@@ -1,0 +1,8 @@
+-- Task 1: this month's visits, with a number to ring about each one.
+-- Return four columns, in this order:
+--   visit_date
+--   animal      the name of the animal that came in
+--   last_name   its owner's last name
+--   phone       its owner's phone number
+-- One row for each visit on or after 2026-11-01. Any order of rows.
+--   node run.mjs queries/1-november-calls.sql

@@ -1,0 +1,26 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "How many trips for this queue?",
+      "note": "The queue goes along the quay."
+    },
+    { "title": "Calculator", "text": "Ossian's sums and the clipboard disagree." },
+    {
+      "title": "Your program",
+      "file": "Fares.java",
+      "mine": true,
+      "gap": "No sums anyone trusts",
+      "tasks": ["Price the return", "Count full trips", "Average crossing", "Number the ticket"]
+    },
+    { "title": "Ticket hut", "text": "Trips, fares and averages that add up." }
+  ],
+  "ticket": { "label": "The queue", "wrong": "guessed", "why": "Bad sums", "right": "trips known" },
+  "captions": [
+    "A busy morning on the quay. Bridie needs to know how many trips the queue will take.",
+    "Today the sums are done by hand, and the calculator and the clipboard disagree.",
+    "You write the sums in Java, choosing int, double or long for each answer.",
+    "Now the trips, the fares, the average and the ticket numbers come out right.",
+    "Whole numbers, decimals and big numbers, each with its trap avoided."
+  ]
+}

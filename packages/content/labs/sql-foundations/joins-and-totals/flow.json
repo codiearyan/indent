@@ -1,0 +1,122 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "treatments", "label": "treatments", "kind": "data" },
+      { "id": "visits", "label": "visits", "kind": "data" },
+      { "id": "animals", "label": "animals", "kind": "data" },
+      { "id": "owners", "label": "owners", "kind": "data" },
+      { "id": "queries", "label": "Your queries", "kind": "file", "mine": true }
+    ],
+    "edges": [
+      { "from": "treatments", "to": "visits", "label": "visit_id" },
+      { "from": "visits", "to": "animals", "label": "animal_id" },
+      { "from": "animals", "to": "owners", "label": "owner_id" },
+      { "from": "visits", "to": "queries", "label": "rows" },
+      { "from": "animals", "to": "queries", "label": "rows" },
+      { "from": "owners", "to": "queries", "label": "rows" }
+    ],
+    "note": "Your queries cross up to three tables and count or total what they find, without counting anything twice or losing anyone."
+  },
+  "tasks": {
+    "november-calls": {
+      "steps": [
+        {
+          "active": ["visits", "visits->animals", "animals"],
+          "note": "Each visit leads to the animal that came in."
+        },
+        {
+          "active": ["animals", "animals->owners", "owners"],
+          "note": "Each animal leads on to its owner, where the phone number is."
+        },
+        {
+          "active": ["visits", "animals", "owners", "owners->queries", "queries"],
+          "note": "Only this month's visits are kept, each with its animal and its owner on one row."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["visit_date", "animal", "last_name", "phone"],
+            "cells": [["a date this month", "an animal's name", "its owner's last name", "a phone number"]]
+          },
+          "note": "Winnie has a call to make for every visit."
+        }
+      ]
+    },
+    "animals-per-owner": {
+      "steps": [
+        {
+          "active": ["owners", "animals->owners", "animals"],
+          "note": "Every owner is kept, with a row for each animal, or one empty row when there is none."
+        },
+        {
+          "active": ["owners", "owners->queries", "queries"],
+          "note": "Each owner is one group, told apart by what is different for every owner, not by the name."
+        },
+        {
+          "active": ["queries"],
+          "note": "The count skips the empty rows, so an owner with no animal gets nothing counted."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["first_name", "last_name", "animals"],
+            "cells": [["a first name", "a last name", "a count"]]
+          },
+          "note": "Rosamund has every owner for the yearly review."
+        }
+      ]
+    },
+    "spent-per-animal": {
+      "steps": [
+        {
+          "active": ["animals", "visits->animals", "visits"],
+          "note": "Each animal that came in is joined to its visits."
+        },
+        {
+          "active": ["visits", "treatments->visits", "treatments"],
+          "note": "Each visit is joined to its treatments, so a visit with three treatments fills three rows, and a free visit keeps one empty row."
+        },
+        {
+          "active": ["animals", "animals->queries", "queries"],
+          "note": "Each animal is one group. Its visits are counted once each, and the prices are added up."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["animal", "visits", "spent"],
+            "cells": [["an animal's name", "a count", "a total"]]
+          },
+          "note": "Ifan sees how often each animal came in and what it came to."
+        }
+      ]
+    },
+    "dogs-per-owner": {
+      "steps": [
+        {
+          "active": ["owners", "animals->owners", "animals"],
+          "note": "Every owner is kept, and only their dogs count as partners."
+        },
+        {
+          "active": ["owners", "owners->queries", "queries"],
+          "note": "An owner with no dog still has a row, because the test for dogs only chose the partners."
+        },
+        {
+          "active": ["queries"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of what comes back",
+            "colLabels": ["first_name", "last_name", "dogs"],
+            "cells": [["a first name", "a last name", "a count"]]
+          },
+          "note": "The supplier gets a count for every owner."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "id": "text-and-strings",
+  "title": "Text with std::string",
+  "files": [
+    "src/tags.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the tag program here, run it, and read what it prints.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/tags.cpp -o tags && ./tags"
+  },
+  "tasks": [
+    {
+      "id": "tag",
+      "title": "Write the name on the tag",
+      "file": "src/tags.cpp",
+      "description": "Under `// Task 1` in `src/tags.cpp`, make a `std::string` called `tagName`: the last name, a comma and a space, then the first name. Print it:\n\n```\nName: Sallow, Edwina\n```\n\nCheck runs your program with other customers, reads `tagName` and looks for the line.",
+      "nextSteps": [
+        "Find `firstName` and `lastName` at the top of `main`.",
+        "Make `tagName`, joining the last name, the comma and space, and the first name with `+`.",
+        "Print `Name: ` and then `tagName`.",
+        "Build, run, and compare the line with the task, the comma and space included."
+      ],
+      "hints": [
+        "`+` between two texts joins them into one, in the order you write them.",
+        "`+` adds nothing in between, so the comma and the space are a piece of text of their own, in double quotes.",
+        "The line has the shape `std::string tagName = lastName + \", \" + ...;`."
+      ],
+      "docs": [
+        {
+          "title": "std::basic_string: operator+",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/operator%2B"
+        },
+        {
+          "title": "std::basic_string",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "width",
+      "title": "Measure the tag",
+      "file": "src/tags.cpp",
+      "description": "The tag needs a border of 2 characters on each side of the item. Under `// Task 2`, make an `int` called `tagWidth`: the number of characters in `item`, plus 4. Print it:\n\n```\nWidth: 18\n```\n\nCheck runs your program with other items, short and long, reads `tagWidth` and looks for the line.",
+      "nextSteps": [
+        "Count the characters of `carriage clock` by hand, the space included.",
+        "Ask `item` for its number of characters, as the lesson shows.",
+        "Add the border to it and make `tagWidth`.",
+        "Print it, build, run, and compare with your count plus 4."
+      ],
+      "hints": [
+        "A `std::string` knows how long it is. You ask it with a dot after its name.",
+        "`.size()` and `.length()` both give the number of characters, spaces included.",
+        "The line has the shape `int tagWidth = item.size() + ...;`."
+      ],
+      "docs": [
+        {
+          "title": "std::basic_string::size",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/size"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "code",
+      "title": "Make the shelf code",
+      "file": "src/tags.cpp",
+      "description": "Under `// Task 3`, make a `std::string` called `shelfCode`: the first letter of the last name, followed by the ticket number. Print it:\n\n```\nCode: S2187\n```\n\nCheck runs your program with other customers and tickets, reads `shelfCode` and looks for the line.",
+      "nextSteps": [
+        "Take the first character of `lastName`, as the lesson shows.",
+        "Turn `ticketNumber` into text.",
+        "Join the two into `shelfCode` and print it.",
+        "Build and run, and read the compiler's message if it refuses the line."
+      ],
+      "hints": [
+        "Square brackets after a text give one character of it, counted from 0.",
+        "A character plus an `int` is added up as two numbers. The number has to become text first, and `std::to_string` does that.",
+        "The line has the shape `std::string shelfCode = lastName[0] + std::to_string(...);`."
+      ],
+      "docs": [
+        {
+          "title": "std::to_string",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/to_string"
+        },
+        {
+          "title": "std::basic_string::operator[]",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/operator_at"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "short",
+      "title": "Shorten the item",
+      "file": "src/tags.cpp",
+      "description": "The small tag has room for 8 characters. Under `// Task 4`, make a `std::string` called `shortItem`: the first 8 characters of `item`, or all of it when it is shorter. Print it:\n\n```\nItem: carriage\n```\n\nCheck runs your program with other items, one shorter than 8 characters among them, reads `shortItem` and looks for the line.",
+      "nextSteps": [
+        "Read the part of the lesson on taking a piece of a text.",
+        "Decide where the piece starts and how many characters it has.",
+        "Make `shortItem` and print it.",
+        "Try it with a short item too, like `watch`, by changing `item` for a moment."
+      ],
+      "hints": [
+        "`.substr` gives a piece of a text. It takes two numbers.",
+        "The first number is where the piece starts, counted from 0, and the second is how many characters it has. Asking for more characters than are left simply stops at the end.",
+        "The line has the shape `std::string shortItem = item.substr(0, ...);`."
+      ],
+      "docs": [
+        {
+          "title": "std::basic_string::substr",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/substr"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Taking part of a string with substr",
+          "url": "https://www.youtube.com/watch?v=V3sKbgpvgwY"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

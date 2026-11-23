@@ -132,7 +132,15 @@ const repos: { labId: string; expected: string[] }[] = [
       'unions-and-literals/status',
       'narrowing/refs',
       'narrowing/count',
-      'narrowing/shelf'
+      'narrowing/shelf',
+      'unknown-any-and-never/tin',
+      'unknown-any-and-never/tins',
+      'unknown-any-and-never/order',
+      'unknown-any-and-never/status',
+      'functions-as-values/rules',
+      'generics/first',
+      'generics/result',
+      'generics/plain'
     ]
   },
   {
@@ -259,7 +267,10 @@ const repos: { labId: string; expected: string[] }[] = [
       'query-strings/build',
       'query-strings/next',
       'requests/line',
-      'status-families/family'
+      'status-families/family',
+      'json/line',
+      'forms/body',
+      'redirects/kind'
     ]
   },
   {

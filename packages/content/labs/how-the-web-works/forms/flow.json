@@ -1,0 +1,90 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "odette", "label": "Odette", "kind": "story" },
+      { "id": "slips", "label": "Slips from the fete", "kind": "data" },
+      { "id": "body", "label": "formBody()", "kind": "function", "mine": true, "fn": "formBody" },
+      { "id": "send", "label": "sendRequestForm()", "kind": "function", "mine": true },
+      { "id": "jingle", "label": "enterJingle()", "kind": "function", "mine": true },
+      { "id": "server", "label": "Cupboard server", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "odette", "to": "slips", "label": "typed up" },
+      { "from": "slips", "to": "body", "label": "fields" },
+      { "from": "send", "to": "server", "label": "form body" },
+      { "from": "jingle", "to": "server", "label": "parts" }
+    ],
+    "note": "The paper entries reach the cupboard server the way the website's forms send them: names and values, or parts with a file."
+  },
+  "tasks": {
+    "body": {
+      "trace": {
+        "file": "src/forms.js",
+        "call": "formBody",
+        "args": [{ "song": "Night Bus Home", "from": "Wyn & the night shift" }]
+      },
+      "steps": [
+        {
+          "active": ["odette", "odette->slips", "slips"],
+          "note": "Odette types up a song request slip from the fete."
+        },
+        {
+          "active": ["slips", "slips->body", "body"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "song", "value": "text" },
+              { "key": "from", "value": "text" }
+            ]
+          },
+          "note": "formBody() gets the slip's names and values, an ampersand included."
+        },
+        {
+          "active": ["body"],
+          "note": "The text that comes back is written the way a form sends it, so every value arrives as typed."
+        }
+      ]
+    },
+    "send": {
+      "steps": [
+        {
+          "active": ["slips", "send"],
+          "note": "sendRequestForm() gets one slip to send."
+        },
+        {
+          "active": ["send", "send->server", "server"],
+          "note": "It posts a form body to the request form's address, labelled as a form body."
+        },
+        {
+          "active": ["server", "send"],
+          "note": "The answer's text comes back: a thank you, or why the slip was turned down."
+        }
+      ]
+    },
+    "jingle": {
+      "steps": [
+        {
+          "active": ["jingle"],
+          "value": {
+            "kind": "map",
+            "label": "the two parts",
+            "entries": [
+              { "key": "entrant", "value": "a name" },
+              { "key": "script", "value": "a file, with its file name" }
+            ]
+          },
+          "note": "enterJingle() puts an entry together: the entrant's name, and the script as a file."
+        },
+        {
+          "active": ["jingle", "jingle->server", "server"],
+          "note": "It posts a body made of parts, with a boundary between them that the server is told about."
+        },
+        {
+          "active": ["server", "jingle"],
+          "note": "The server finds both parts, and the answer's text comes back."
+        }
+      ]
+    }
+  }
+}

@@ -35,7 +35,9 @@ yet, read `packages/content/labs/js-foundations/order-reports/`.
    itself. Three is the rule in every repo; two is fine for a small issue.
 3. **Write `chapter.json`.**
    - `id` is the folder name: lowercase letters, digits and hyphens.
-   - `files`: the files the learner opens, in tab order, the one they write first.
+   - `files`: the files the learner opens, in tab order, the one they write first. A file whose
+     name starts with a dot (`.gitignore`) shows in the app only when it is listed here; its repo
+     sets `"format": 4` in `lab.json`.
    - `terminal`: a one-sentence `description` and a `suggestedCommand` that runs the demo.
    - `preview`: only for an issue with a page, e.g. `"index.html"`.
    - `movesFiles`: `true` only for an issue whose tasks have the learner move, rename or remove

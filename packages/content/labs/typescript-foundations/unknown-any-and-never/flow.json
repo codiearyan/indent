@@ -1,0 +1,140 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "cafe", "label": "Cafe till", "kind": "story" },
+      { "id": "tin", "label": "tinLine()", "kind": "function", "mine": true, "fn": "tinLine" },
+      { "id": "tins", "label": "tinsFrom()", "kind": "function", "mine": true, "fn": "tinsFrom" },
+      {
+        "id": "order",
+        "label": "readOrder()",
+        "kind": "function",
+        "mine": true,
+        "fn": "readOrder"
+      },
+      {
+        "id": "status",
+        "label": "statusLine()",
+        "kind": "function",
+        "mine": true,
+        "fn": "statusLine"
+      },
+      { "id": "left", "label": "notHandled()", "kind": "function", "mine": true },
+      { "id": "table", "label": "Packing table", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "cafe", "to": "tins", "label": "tins" },
+      { "from": "cafe", "to": "order", "label": "an order" },
+      { "from": "cafe", "to": "status", "label": "a status" },
+      { "from": "status", "to": "left", "label": "what is left" },
+      { "from": "tin", "to": "table", "label": "tin line" },
+      { "from": "tins", "to": "table", "label": "how many" },
+      { "from": "order", "to": "table", "label": "order or null" },
+      { "from": "status", "to": "table", "label": "status line" }
+    ],
+    "note": "What the cafe's till sends is checked before the code uses it, and what nobody handled stops the code instead of slipping through."
+  },
+  "tasks": {
+    "tin": {
+      "trace": {
+        "file": "src/cafe.ts",
+        "call": "tinLine",
+        "args": [{ "blend": "Frost Sencha", "grams": 50 }]
+      },
+      "steps": [
+        {
+          "active": ["tin"],
+          "value": {
+            "kind": "map",
+            "label": "a tin",
+            "entries": [
+              { "key": "blend", "value": "text" },
+              { "key": "grams", "value": "number" }
+            ]
+          },
+          "note": "A tin of Frost Sencha comes in. With any, the compiler checks nothing about it."
+        },
+        {
+          "active": ["tin"],
+          "note": "With a real type, the compiler reads every property name in the body, and points at one a tin does not have."
+        },
+        {
+          "active": ["tin", "tin->table", "table"],
+          "note": "The packing table gets a line with the blend and the grams, and no undefined in it."
+        }
+      ]
+    },
+    "tins": {
+      "trace": { "file": "src/cafe.ts", "call": "tinsFrom", "args": ["3"] },
+      "steps": [
+        {
+          "active": ["cafe", "cafe->tins"],
+          "value": {
+            "kind": "map",
+            "label": "what the till sends",
+            "entries": [{ "key": "tins", "value": "a number, text, or anything" }]
+          },
+          "note": "The till sends the tins of an order as text this time."
+        },
+        {
+          "active": ["tins"],
+          "note": "The value is unknown, so the function asks which type it holds before using it."
+        },
+        {
+          "active": ["tins", "tins->table", "table"],
+          "note": "Bryn always gets a number of tins, so adding one more tin adds one."
+        }
+      ]
+    },
+    "order": {
+      "trace": {
+        "file": "src/cafe.ts",
+        "call": "readOrder",
+        "args": [{ "blend": "Ember Oolong", "tins": "two" }]
+      },
+      "steps": [
+        {
+          "active": ["cafe", "cafe->order"],
+          "value": {
+            "kind": "map",
+            "label": "an order",
+            "entries": [
+              { "key": "blend", "value": "should be text" },
+              { "key": "tins", "value": "should be a number" }
+            ]
+          },
+          "note": "The cafe sends an order of Ember Oolong, and the tins arrive as a word."
+        },
+        {
+          "active": ["order"],
+          "note": "The function finds out what arrived before it trusts any of it."
+        },
+        {
+          "active": ["order", "order->table", "table"],
+          "note": "Only an order that passed every check reaches the packing table. Anything else comes back as null."
+        }
+      ]
+    },
+    "status": {
+      "trace": { "file": "src/cafe.ts", "call": "statusLine", "args": ["paid"] },
+      "steps": [
+        {
+          "active": ["cafe", "cafe->status"],
+          "value": {
+            "kind": "map",
+            "label": "a status",
+            "entries": [{ "key": "status", "value": "new, paid or sent" }]
+          },
+          "note": "An order from the cafe has been paid for."
+        },
+        {
+          "active": ["status", "status->table", "table"],
+          "note": "Each status the cafe has gets its own line for the packing table."
+        },
+        {
+          "active": ["status", "status->left", "left"],
+          "note": "Whatever no case handled is passed on. If a status is added and forgotten, the compiler refuses it here, and one that slips in at run time stops the code."
+        }
+      ]
+    }
+  }
+}
